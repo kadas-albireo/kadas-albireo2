@@ -117,22 +117,22 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   QActionGroup* filterActionGroup = new QActionGroup( filterMenu );
   QAction* noFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_none.svg" ), tr( "No filter" ), filterMenu );
   filterActionGroup->addAction( noFilterAction );
-  connect( noFilterAction, SIGNAL( triggered( bool ) ), this, SLOT( clearFilter() ) );
+  connect( noFilterAction, &QAction::triggered, this, &KadasSearchBox::clearFilter );
 
   QAction* circleFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_circle.svg" ), tr( "Filter by radius" ), filterMenu );
   circleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterCircle ) ) );
   filterActionGroup->addAction( circleFilterAction );
-  connect( circleFilterAction, SIGNAL( triggered( bool ) ), this, SLOT( setFilterTool() ) );
+  connect( circleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
   QAction* rectangleFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_rect.svg" ), tr( "Filter by rectangle" ), filterMenu );
   rectangleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterRect ) ) );
   filterActionGroup->addAction( rectangleFilterAction );
-  connect( rectangleFilterAction, SIGNAL( triggered( bool ) ), this, SLOT( setFilterTool() ) );
+  connect( rectangleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
   QAction* polygonFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_poly.svg" ), tr( "Filter by polygon" ), filterMenu );
   polygonFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterPoly ) ) );
   filterActionGroup->addAction( polygonFilterAction );
-  connect( polygonFilterAction, SIGNAL( triggered( bool ) ), this, SLOT( setFilterTool() ) );
+  connect( polygonFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
   filterMenu->addActions( QList<QAction*>() << noFilterAction << circleFilterAction << rectangleFilterAction << polygonFilterAction );
 
@@ -145,7 +145,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mFilterButton->setCursor( Qt::PointingHandCursor );
   mFilterButton->setToolTip( tr( "Select Filter" ) );
   mFilterButton->setMenu( filterMenu );
-  connect( filterMenu, SIGNAL( triggered( QAction* ) ), mFilterButton, SLOT( setDefaultAction( QAction* ) ) );
+  connect( filterMenu, &QMenu::triggered, mFilterButton, &QToolButton::setDefaultAction );
 
   setLayout( new QHBoxLayout );
   layout()->addWidget( mSearchBox );
@@ -153,13 +153,13 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   layout()->setContentsMargins( 0, 5, 0, 5 );
   layout()->setSpacing( 0 );
 
-  connect( mSearchBox, SIGNAL( textEdited( QString ) ), this, SLOT( textChanged() ) );
-  connect( mSearchButton, SIGNAL( clicked() ), this, SLOT( startSearch() ) );
+  connect( mSearchBox, &LineEdit::textEdited, this, &KadasSearchBox::textChanged );
+  connect( mSearchButton, &QToolButton::clicked, this, &KadasSearchBox::startSearch  );
   connect( &mTimer, SIGNAL( timeout() ), this, SLOT( startSearch() ) );
-  connect( mTreeWidget, SIGNAL( itemSelectionChanged() ), this, SLOT( resultSelected() ) );
-  connect( mTreeWidget, SIGNAL( itemClicked( QTreeWidgetItem*, int ) ), this, SLOT( resultActivated() ) );
-  connect( mTreeWidget, SIGNAL( itemActivated( QTreeWidgetItem*, int ) ), this, SLOT( resultActivated() ) );
-  connect( QgsProject::instance(), SIGNAL( readProject( QDomDocument ) ), this, SLOT( clearSearch() ) );
+  connect( mTreeWidget, &TreeWidget::itemSelectionChanged, this, &KadasSearchBox::resultSelected );
+  connect( mTreeWidget, &TreeWidget::itemClicked, this, &KadasSearchBox::resultActivated );
+  connect( mTreeWidget, &TreeWidget::itemActivated, this, &KadasSearchBox::resultActivated );
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasSearchBox::clearSearch );
 
   int frameWidth = mSearchBox->style()->pixelMetric( QStyle::PM_DefaultFrameWidth );
   mSearchBox->setStyleSheet( QString( "QLineEdit { padding-right: %1px; } " ).arg( mSearchButton->sizeHint().width() + frameWidth + 5 ) );
@@ -174,7 +174,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mTreeWidget->installEventFilter( this );
 
   QShortcut* shortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ), this );
-  QObject::connect( shortcut, SIGNAL( activated() ), mSearchBox, SLOT( setFocus() ) );
+  QObject::connect( shortcut, &QShortcut::activated, mSearchBox, static_cast<void (LineEdit::*)()>(&LineEdit::setFocus) );
 
 }
 
@@ -186,15 +186,15 @@ KadasSearchBox::~KadasSearchBox()
 void KadasSearchBox::addSearchProvider( KadasSearchProvider* provider )
 {
   mSearchProviders.append( provider );
-  connect( provider, SIGNAL( searchFinished() ), this, SLOT( searchProviderFinished() ) );
-  connect( provider, SIGNAL( searchResultFound( KadasSearchProvider::SearchResult ) ), this, SLOT( searchResultFound( KadasSearchProvider::SearchResult ) ) );
+  connect( provider, &KadasSearchProvider::searchFinished, this, &KadasSearchBox::searchProviderFinished );
+  connect( provider, &KadasSearchProvider::searchResultFound, this, &KadasSearchBox::searchResultFound );
 }
 
 void KadasSearchBox::removeSearchProvider( KadasSearchProvider* provider )
 {
   mSearchProviders.removeAll( provider );
-  disconnect( provider, SIGNAL( searchFinished() ), this, SLOT( searchProviderFinished() ) );
-  disconnect( provider, SIGNAL( searchResultFound( KadasSearchProvider::SearchResult ) ), this, SLOT( searchResultFound( KadasSearchProvider::SearchResult ) ) );
+  disconnect( provider, &KadasSearchProvider::searchFinished, this, &KadasSearchBox::searchProviderFinished );
+  disconnect( provider, &KadasSearchProvider::searchResultFound, this, &KadasSearchBox::searchResultFound );
 }
 
 bool KadasSearchBox::eventFilter( QObject* obj, QEvent* ev )
@@ -556,7 +556,7 @@ void KadasSearchBox::setFilterTool()
     mMapCanvas->setMapTool( mFilterTool );
     action->setCheckable( true );
     action->setChecked( true );
-    connect( mFilterTool, SIGNAL( finished() ), this, SLOT( filterToolFinished() ) );
+    connect( mFilterTool, &KadasMapToolDrawShape::finished, this, &KadasSearchBox::filterToolFinished );
   }
 }
 
