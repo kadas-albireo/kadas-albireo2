@@ -1,0 +1,491 @@
+/**General styling*/
+QWidget {
+  font-size: 12px;
+}
+
+#KadasWindowBase {
+  background-color: #263B4E;
+}
+
+QDockWidget #mapWidgetTitleWidget,
+QDockWidget #globeTitleWidget {
+    background: #BEDCF6;
+}
+
+QDockWidget {
+    color: white;
+}
+
+QTreeView::indicator {
+    width: 13px;
+    height: 13px;
+    background: #FFFFFF;
+    frame: 1px #9a9a9a
+}
+
+QTreeView::indicator::checked,
+QListView::indicator::checked,
+QCheckBox::indicator:checked
+{
+  image: url(:/images/ribbon/checked.png);
+}
+
+QTreeView::indicator::unchecked,
+QListView::indicator::unchecked,
+QCheckBox::indicator:unchecked
+{
+  image: url(:/images/ribbon/unchecked.png);
+}
+
+QMenu, QComboBox QAbstractItemView  {
+    background-color: white;
+    border: 1px solid #959697;
+}
+
+QMenu::item, QAbstractItemView::item {
+    background-color: transparent;
+    color: #31363b;
+}
+
+QMenu::item::disabled,
+QMenu::item:selected::disabled,
+QAbstractItemView::item::disabled,
+QAbstractItemView::item::selected::disabled
+{
+  background-color: transparent;
+  color: #999999;
+}
+
+QMenu::item:selected, QAbstractItemView::item::selected {
+    background-color: #3daee9;
+    color: white;
+}
+
+KadasRibbonButton {
+  color: #FFFFFF;
+  background-color: #5D7081;
+}
+
+KadasRibbonButton::disabled {
+  color: #263B4E;
+}
+
+
+/** Layer tree view, catalog */
+QPushButton#mLayerTreeViewButton {
+  background-color: #263B4E;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+QPushButton#mLayerTreeViewButton:pressed
+{
+  background-color: #16232f;
+}
+
+#mLayersWidget {
+  background-color: rgba(255,255,255,220);
+  border: 1px solid #263B4E;
+}
+
+#mLayersWidget > #mLayersBox,
+#mLayersWidget > #mLayersBox > QWidget
+{
+  background-color: transparent;
+}
+
+#mGeodataToolbar QToolButton {
+  color: #FFFFFF;
+  padding: 1px 4px 1px 4px;
+  border: 1px solid #1b2a37;
+  border-radius: 2px;
+  background-color: #263B4E;
+}
+
+#mGeodataToolbar QToolButton:pressed {
+    background: #16232f;
+}
+
+/** Search **/
+#mSearchWidget {
+  background-color: #5D7081;
+}
+
+#searchBox {
+    border: 1px solid #9db2c5;
+    background-color: #E8F4FF;
+    color: black;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    padding: 5px;
+}
+
+#searchFilter {
+    border-right: 1px solid #9db2c5;
+    border-top: 1px solid #9db2c5;
+    border-bottom: 1px solid #9db2c5;
+    background-color: #5d7081;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    margin: 0;
+    padding: 5px;
+}
+
+#searchFilter:open
+{
+  background: #485764;
+}
+
+
+/** Separator between favorites and ribbon tab widget **/
+#mSeparatorFrame {
+  border: 0.5px solid #5D7081;
+}
+
+/** Ribbon widget **/
+#mRibbonBackgroundWidget {
+  background-color: #BEDCF6;
+}
+
+#mRibbonWidget QTabBar::tab:!selected {
+    background-color: #BEDCF6; /* make non-selected tabs look smaller */
+    height: 45px;
+}
+
+#mRibbonWidget QTabBar::tab:selected {
+    background-color: #263B4E;
+    color: #FFFFFF;
+}
+
+#mRibbonWidget QTabBar::tab:!enabled {
+    color: gray;
+}
+
+#mRibbonWidget > QWidget {
+  background-color: #263B4E;
+}
+
+#mRibbonWidget > QWidget > QWidget > QLabel,
+#mRibbonWidget > QWidget > QWidget > QCheckBox {
+  color: #FFFFFF;
+}
+
+#mRibbonWidget > QWidget > QWidget > QPushButton,
+#mRibbonWidget > QWidget > QWidget > QSpinBox {
+  background-color: #5D7081;
+  color: #FFFFFF;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox,
+#mRibbonWidget > QWidget > QWidget > QToolButton,
+#mRibbonWidget > QWidget > QWidget > QSpinBox
+{
+  background-color: #5D7081;
+  color: #FFFFFF;
+  padding: 1px 4px 1px 4px;
+  border: 1px solid #5D7081;
+  border-radius: 2px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox:disabled,
+#mRibbonWidget > QWidget > QWidget > QToolButton:disabled,
+#mRibbonWidget > QWidget > QWidget > QSpinBox:disabled
+{
+  color: #bbbbbb;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox
+{
+    padding: 1px 4px 1px 4px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QToolButton
+{
+    padding: 1px 19px 1px 4px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox:hover,
+#mRibbonWidget > QWidget > QWidget > QToolButton:hover,
+#mRibbonWidget > QWidget > QWidget > QSpinBox:hover
+{
+    border-color: #3daee9;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox:drop-down,
+#mRibbonWidget > QWidget > QWidget > QToolButton:menu-button
+{
+  margin: 1px 0px 1px 0px;
+  border-left: 1px solid #263B4E;
+  width: 15px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox:down-arrow,
+#mRibbonWidget > QWidget > QWidget > QToolButton:menu-arrow
+{
+  image: url(:/images/ribbon/downarrow.png);
+}
+
+#mRibbonWidget > QWidget > QWidget > QSpinBox:up-button
+{
+    image: url(:/images/ribbon/uparrow.png);
+    border-left: 1px solid #263B4E;
+    border-bottom: 1px solid #263B4E;
+    padding-bottom: 1px;
+    width: 15px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QSpinBox:down-button
+{
+    image: url(:/images/ribbon/downarrow.png);
+    border-left: 1px solid #263B4E;
+    width: 15px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QComboBox:down-arrow:disabled,
+#mRibbonWidget > QWidget > QWidget > QToolButton:menu-arrow:disabled
+{
+  image: url(:/images/ribbon/downarrow_disabled.png);
+}
+
+#mRibbonWidget > QWidget > QWidget > QSpinBox:up-button:disabled
+{
+    image: url(:/images/ribbon/uparrow_disabled.png);
+    border-left: 1px solid #263B4E;
+    border-bottom: 1px solid #263B4E;
+    padding-bottom: 1px;
+    width: 15px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QSpinBox:down-button:disabled
+{
+    image: url(:/images/ribbon/downarrow_disabled.png);
+    border-left: 1px solid #263B4E;
+    width: 15px;
+}
+
+#mRibbonWidget > QWidget > QWidget > QSpinBox:up-button:pressed,
+#mRibbonWidget > QWidget > QWidget > QSpinBox:down-button:pressed,
+#mRibbonWidget > QWidget > QWidget > QComboBox:drop-down:on,
+#mRibbonWidget > QWidget > QWidget > QComboBox:drop-down:on,
+#mRibbonWidget > QWidget > QWidget > QToolButton:menu-button:open {
+    background: #485764;
+}
+
+
+
+#mRibbonWidget > QWidget > QWidget > QComboBox QAbstractItemView
+{
+  background-color: #263B4E;
+  color: white;
+}
+
+#mRibbonWidget > QWidget > QWidget > QToolButton:checked {
+    background-color: #BEDCF6;
+    color: #263B4E;
+}
+
+#mRibbonWidget::pane {
+    /* Don't remove this, it is needed. */
+}
+
+
+/** Status bar **/
+#mStatusWidget {
+  background-color: #1E2126;
+  color: #FFFFFF;
+}
+
+#mStatusWidget #mCoordinateFrame {
+  border: 1px solid black;
+  border-radius: 2px;
+  background-color: #16171B;
+  color: white;
+}
+
+#mStatusWidget #mCoordinateLineEdit,
+#mStatusWidget #mHeightLineEdit {
+  border: 0;
+  background-color: #16171B;
+  color: white;
+}
+
+#mStatusWidget #mCoordinateLineEdit {
+  border-right: 1px solid black;
+}
+
+#mStatusWidget #mDisplayCRSButton,
+#mStatusWidget #mScaleComboBox,
+#mStatusWidget #mCRSSelectionButton,
+#mStatusWidget #mGpsToolButton
+{
+  background-color: #16171B;
+  color: #FFFFFF;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+
+#mStatusWidget #mGpsToolButton:checked
+{
+    background: black;
+}
+
+#mStatusWidget #mScaleComboBox
+{
+  padding: 1px 4px 1px 4px;
+}
+
+#mStatusWidget #mScaleComboBox:drop-down
+{
+  border-left: 1px solid black;
+}
+
+#mStatusWidget #mScaleComboBox:down-arrow
+{
+  image: url(:/images/ribbon/downarrow.png);
+}
+
+#mStatusWidget #mScaleComboBox:down-arrow:on
+{
+  left: 1px;
+  top: 1px;
+}
+
+#mStatusWidget #mCoordinateLineEdit,
+#mStatusWidget #mGpsToolButton
+{
+  padding: 1px;
+}
+
+#mStatusWidget #mDisplayCRSButton,
+#mStatusWidget #mCRSSelectionButton
+{
+  padding: 1px 10px 1px 2px;
+}
+
+#mStatusWidget #mDisplayCRSButton:menu-arrow,
+#mStatusWidget #mCRSSelectionButton:menu-arrow
+{
+  image: url(:/images/ribbon/downarrow.png);
+}
+
+#mStatusWidget QLabel {
+  color: #FFFFFF;
+}
+
+
+/** +- buttons **/
+QPushButton#mZoomInButton,
+QPushButton#mZoomOutButton {
+  background-color: #263B4E;
+  color: #FFFFFF;
+  border-radius: 0;
+  border-width: 0;
+}
+
+QPushButton#mHomeButton {
+  background-color: #263B4E;
+  color: #FFFFFF;
+  border: 1px solid #737373;
+  border-radius: 2px;
+}
+
+QPushButton#mZoomInButton:pressed,
+QPushButton#mZoomOutButton:pressed,
+QPushButton#mHomeButton:pressed {
+  background-color: #16232f;
+}
+
+
+QFrame#mZoomInOutFrame {
+    border: 1px solid #737373;
+    border-radius: 2px;
+}
+
+QFrame#mZoomBackgroundFrame {
+  border-left: 1px solid #263B4E;
+  border-right: 1px solid #263B4E;
+  background-color: #c7cacf;
+}
+
+/** Styling for dialogs **/
+QDialog {
+  background-color: #FFFFFF;
+}
+
+QDialog QDialogButtonBox {
+  dialogbuttonbox-buttons-have-icons: 0;
+}
+
+QDialogButtonBox QPushButton {
+  border-radius: 3px;
+  background-color: #e6e6e6;
+  border: 1px solid #cdcdcd;
+  padding: 6px;
+  border-style: outset;
+  min-width: 80px;
+}
+
+QDialogButtonBox QPushButton:pressed {
+    border-style: inset;
+}
+
+QDialogButtonBox QPushButton:disabled {
+    color: #C0C0C0;
+}
+
+QDialogButtonBox QPushButton[text="&OK"], QDialogButtonBox QPushButton[text="&Open"], QDialogButtonBox QPushButton[text="&Create"],
+QDialogButtonBox QPushButton[text="OK"], QDialogButtonBox QPushButton[text="Open"], QDialogButtonBox QPushButton[text="Create"] {
+  background-color: #106BBC;
+  color: #FFFFFF;
+}
+
+QDialogButtonBox QPushButton[text="&OK"]:disabled, QDialogButtonBox QPushButton[text="&Open"]:disabled, QDialogButtonBox QPushButton[text="&Create"]:disabled,
+QDialogButtonBox QPushButton[text="OK"]:disabled,  QDialogButtonBox QPushButton[text="Open"]:disabled,  QDialogButtonBox QPushButton[text="Create"]:disabled {
+  color: #C0C0C0;
+}
+
+QDialogButtonBox QPushButton[text="&Cancel"],   QDialogButtonBox QPushButton[text="&Close"],
+QDialogButtonBox QPushButton[text="Cancel"],    QDialogButtonBox QPushButton[text="Close"],
+QDialogButtonBox QPushButton[text="Abbrechen"], QDialogButtonBox QPushButton[text="Schließen"] {
+  background-color: #313B44;
+  color: #FFFFFF;
+}
+
+QDialogButtonBox QPushButton[text="&Cancel"]:disabled,   QDialogButtonBox QPushButton[text="&Close"]:disabled,
+QDialogButtonBox QPushButton[text="Cancel"]:disabled,    QDialogButtonBox QPushButton[text="Close"]:disabled,
+QDialogButtonBox QPushButton[text="Abbrechen"]:disabled, QDialogButtonBox QPushButton[text="Schließen"]:disabled {
+  color: #C0C0C0;
+}
+/*
+QDialog QComboBox, QDialog QLineEdit {
+  border: 1px solid #9a9a9a;
+  border-radius: 5px;
+}
+*/
+
+/** Case-by-case styling **/
+QgsAttributeForm QScrollArea > QWidget > QWidget
+{
+  background-color: #FFFFFF;
+}
+
+#FloatingInputWidget
+{
+  background-color: rgba(30,33,38,230);
+  border-radius: 3px;
+}
+
+#FloatingInputWidget QLabel
+{
+  color: #FFFFFF;
+}
+
+#FloatingInputWidget QLineEdit
+{
+  background-color: #16171B;
+  color: #FFFFFF;
+  border: 1px solid black;
+  border-radius: 2px;
+}
