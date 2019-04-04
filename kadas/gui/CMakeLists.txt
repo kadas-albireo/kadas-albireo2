@@ -1,7 +1,7 @@
-FILE(GLOB kadas_gui_SRC *.cpp)
+FILE(GLOB kadas_gui_SRC *.cpp search/*.cpp)
 LIST(SORT kadas_gui_SRC)
 
-FILE(GLOB kadas_gui_HDR *.h)
+FILE(GLOB kadas_gui_HDR *.h search/*.h)
 LIST(SORT kadas_gui_HDR)
 
 FILE(GLOB kadas_gui_UI ui/*.ui)

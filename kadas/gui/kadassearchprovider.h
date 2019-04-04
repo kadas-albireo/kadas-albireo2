@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
        */
       int categoryPrecedence;
       QString text;
-      QgsPoint pos;
+      QgsPointXY pos;
       QgsRectangle bbox;
       QString crs;
       double zoomScale;

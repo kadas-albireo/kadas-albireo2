@@ -31,6 +31,13 @@
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
+#include <kadas/gui/search/kadascoordinatesearchprovider.h>
+#include <kadas/gui/search/kadaslocationsearchprovider.h>
+#include <kadas/gui/search/kadaslocaldatasearchprovider.h>
+#include <kadas/gui/search/kadaspinsearchprovider.h>
+#include <kadas/gui/search/kadasremotedatasearchprovider.h>
+#include <kadas/gui/search/kadasworldlocationsearchprovider.h>
+
 #include "kadasapplication.h"
 #include "kadasgpsintegration.h"
 #include "kadaslayertreeviewmenuprovider.h"
@@ -211,13 +218,12 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
 //    }
 //  }
 
-  // TODO
-//  addSearchProvider( new QgsCoordinateSearchProvider( mMapCanvas ) );
-//  addSearchProvider( new QgsLocationSearchProvider( mMapCanvas ) );
-//  addSearchProvider( new QgsLocalDataSearchProvider( mMapCanvas ) );
-//  addSearchProvider( new QgsPinSearchProvider( mMapCanvas ) );
-//  addSearchProvider( new QgsRemoteDataSearchProvider( mMapCanvas ) );
-//  addSearchProvider( new QgsWorldLocationSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasCoordinateSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasLocalDataSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasPinSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( mMapCanvas ) );
+  mSearchWidget->addSearchProvider( new KadasWorldLocationSearchProvider( mMapCanvas ) );
 }
 
 bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
