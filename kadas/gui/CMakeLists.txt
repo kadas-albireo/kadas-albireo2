@@ -4,12 +4,20 @@ LIST(SORT kadas_gui_SRC)
 FILE(GLOB kadas_gui_HDR *.h)
 LIST(SORT kadas_gui_HDR)
 
+FILE(GLOB kadas_gui_UI ui/*.ui)
+LIST(SORT kadas_gui_UI)
+
+QT5_WRAP_UI(kadas_gui_UI_HDR ${kadas_gui_UI})
+
+SET_PROPERTY(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${GeographicLib_INCLUDE_DIR})
 
 ADD_LIBRARY(kadas_gui SHARED
     ${kadas_gui_SRC}
     ${kadas_gui_HDR}
+    ${kadas_gui_UI}
 )
 
 TARGET_LINK_LIBRARIES(kadas_gui
