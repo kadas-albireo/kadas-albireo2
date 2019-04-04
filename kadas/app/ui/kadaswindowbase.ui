@@ -580,7 +580,7 @@
   <customwidget>
    <class>KadasCatalogBrowser</class>
    <extends>QWidget</extends>
-   <header location="global">kadas/app/kadascatalogbrowser.h</header>
+   <header location="global">kadas/gui/kadascatalogbrowser.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

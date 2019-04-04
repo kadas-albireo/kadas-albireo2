@@ -20,12 +20,14 @@
 #include <QStandardItemModel>
 #include <QWidget>
 
+#include <kadas/gui/kadas_gui.h>
+
 class KadasCatalogProvider;
 class QgsFilterLineEdit;
 class QTreeView;
 
 
-class KadasCatalogBrowser : public QWidget
+class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 {
     Q_OBJECT
   public:

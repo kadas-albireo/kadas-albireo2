@@ -20,14 +20,17 @@
 #include <QObject>
 #include <QMap>
 
-class KadasCatalogBrowser;
+#include <kadas/gui/kadas_gui.h>
+
 class QDomDocument;
 class QDomElement;
 class QDomNode;
 class QMimeData;
 class QStandardItem;
+class KadasCatalogBrowser;
 
-class KadasCatalogProvider : public QObject
+
+class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
 {
     Q_OBJECT
   public:

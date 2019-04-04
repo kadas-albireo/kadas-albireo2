@@ -31,6 +31,10 @@
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
+#include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
+#include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
+#include <kadas/gui/catalog/kadasvbscatalogprovider.h>
+
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
@@ -195,28 +199,25 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree);
 
-
-// TODO
-//  QStringList catalogUris = QSettings().value( "/Qgis/geodatacatalogs" ).toString().split( ";;" );
-//  foreach ( const QString& catalogUri, catalogUris )
-//  {
-//    QUrl u = QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() );
-//    QUrlQuery q(u);
-//    QString type = q.queryItemValue( "type" );
-//    QString url = q.queryItemValue( "url" );
-//    if ( type == "geoadmin" )
-//    {
-//      addProvider( new QgsGeoAdminRestCatalogProvider( url, this ) );
-//    }
-//    else if ( type == "arcgisrest" )
-//    {
-//      addProvider( new QgsArcGisRestCatalogProvider( url, this ) );
-//    }
-//    else if ( type == "vbs" )
-//    {
-//      addProvider( new QgsVBSCatalogProvider( url, this ) );
-//    }
-//  }
+  QStringList catalogUris = QSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
+  for ( const QString& catalogUri : catalogUris )
+  {
+    QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
+    QString type = query.queryItemValue( "type" );
+    QString url = query.queryItemValue( "url" );
+    if ( type == "geoadmin" )
+    {
+      mCatalogBrowser->addProvider( new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser ) );
+    }
+    else if ( type == "arcgisrest" )
+    {
+      mCatalogBrowser->addProvider( new KadasArcGisRestCatalogProvider( url, mCatalogBrowser ) );
+    }
+    else if ( type == "vbs" )
+    {
+      mCatalogBrowser->addProvider( new KadasVBSCatalogProvider( url, mCatalogBrowser ) );
+    }
+  }
 
   mSearchWidget->addSearchProvider( new KadasCoordinateSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );
