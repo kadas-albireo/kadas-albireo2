@@ -64,10 +64,13 @@
         <file alias="icons/line">icons/line.png</file>
         <file alias="icons/azimuth">icons/azimuth.png</file>
         <file alias="icons/help">icons/help.png</file>
-
         <file alias="splash">splash.png</file>
         <file alias="logo">logo.png</file>
         <file alias="icon-60x60">icon-60x60.png</file>
+        <file alias="icons/search_filter_circle">icons/search_filter_circle.svg</file>
+        <file alias="icons/search_filter_none">icons/search_filter_none.svg</file>
+        <file alias="icons/search_filter_poly">icons/search_filter_poly.svg</file>
+        <file alias="icons/search_filter_rect">icons/search_filter_rect.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

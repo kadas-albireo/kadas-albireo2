@@ -115,21 +115,21 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 
   QMenu* filterMenu = new QMenu( mSearchBox );
   QActionGroup* filterActionGroup = new QActionGroup( filterMenu );
-  QAction* noFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_none.svg" ), tr( "No filter" ), filterMenu );
+  QAction* noFilterAction = new QAction( QIcon( ":/images/icons/search_filter_none" ), tr( "No filter" ), filterMenu );
   filterActionGroup->addAction( noFilterAction );
   connect( noFilterAction, &QAction::triggered, this, &KadasSearchBox::clearFilter );
 
-  QAction* circleFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_circle.svg" ), tr( "Filter by radius" ), filterMenu );
+  QAction* circleFilterAction = new QAction( QIcon( ":/images/icons/search_filter_circle" ), tr( "Filter by radius" ), filterMenu );
   circleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterCircle ) ) );
   filterActionGroup->addAction( circleFilterAction );
   connect( circleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
-  QAction* rectangleFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_rect.svg" ), tr( "Filter by rectangle" ), filterMenu );
+  QAction* rectangleFilterAction = new QAction( QIcon( ":/images/icons/search_filter_rect" ), tr( "Filter by rectangle" ), filterMenu );
   rectangleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterRect ) ) );
   filterActionGroup->addAction( rectangleFilterAction );
   connect( rectangleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
-  QAction* polygonFilterAction = new QAction( QIcon( ":/images/themes/default/search_filter_poly.svg" ), tr( "Filter by polygon" ), filterMenu );
+  QAction* polygonFilterAction = new QAction( QIcon( ":/images/icons/search_filter_poly" ), tr( "Filter by polygon" ), filterMenu );
   polygonFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterPoly ) ) );
   filterActionGroup->addAction( polygonFilterAction );
   connect( polygonFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );

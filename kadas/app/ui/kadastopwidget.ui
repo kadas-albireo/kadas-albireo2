@@ -292,7 +292,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="mKadasBackgroundWidget" native="true">
+    <widget class="QWidget" name="mRibbonBackgroundWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -2158,8 +2158,8 @@ Sight</string>
   </layout>
   <action name="mActionOpen">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/oeffnen.png</normaloff>:/images/kadas/oeffnen.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/open</normaloff>:/images/icons/open</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -2170,8 +2170,8 @@ Sight</string>
   </action>
   <action name="mActionSave">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/speichern.png</normaloff>:/images/kadas/speichern.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/save</normaloff>:/images/icons/save</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -2182,8 +2182,8 @@ Sight</string>
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/stecknadel.png</normaloff>:/images/kadas/stecknadel.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/pin</normaloff>:/images/icons/pin</iconset>
    </property>
    <property name="text">
     <string>Pin</string>
@@ -2191,8 +2191,8 @@ Sight</string>
   </action>
   <action name="mActionNew">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/new.png</normaloff>:/images/kadas/new.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/new</normaloff>:/images/icons/new</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -2203,8 +2203,8 @@ Sight</string>
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/distanz.png</normaloff>:/images/kadas/distanz.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/distance</normaloff>:/images/icons/distance</iconset>
    </property>
    <property name="text">
     <string>Distance</string>
@@ -2215,8 +2215,8 @@ Sight</string>
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/kadas/analyse_flaechen.png</normaloff>:/images/kadas/analyse_flaechen.png</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/images/icons/area</normaloff>:/images/icons/area</iconset>
    </property>
    <property name="text">
     <string>Area</string>

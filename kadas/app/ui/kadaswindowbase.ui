@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>KADAS Albireo</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayoutCentralWidget">
@@ -75,8 +75,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/images/kadas/layerbaum_folded.png</normaloff>:/images/kadas/layerbaum_folded.png</iconset>
+        <iconset resource="../../resources/resources.qrc">
+         <normaloff>:/images/icons/layertree_folded</normaloff>:/images/icons/layertree_folded</iconset>
        </property>
        <property name="iconSize">
         <size>

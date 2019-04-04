@@ -27,14 +27,14 @@ QTreeView::indicator::checked,
 QListView::indicator::checked,
 QCheckBox::indicator:checked
 {
-  image: url(:/images/ribbon/checked.png);
+  image: url(:/images/icons/checked);
 }
 
 QTreeView::indicator::unchecked,
 QListView::indicator::unchecked,
 QCheckBox::indicator:unchecked
 {
-  image: url(:/images/ribbon/unchecked.png);
+  image: url(:/images/icons/unchecked);
 }
 
 QMenu, QComboBox QAbstractItemView  {
@@ -72,6 +72,11 @@ KadasRibbonButton::disabled {
 
 
 /** Layer tree view, catalog */
+QgsCollapsibleGroupBox#mLayersBox,
+QgsCollapsibleGroupBox#mGeodataBox {
+    font-size: 14px;
+}
+
 QPushButton#mLayerTreeViewButton {
   background-color: #263B4E;
   border-top-right-radius: 2px;
@@ -224,12 +229,12 @@ QPushButton#mLayerTreeViewButton:pressed
 #mRibbonWidget > QWidget > QWidget > QComboBox:down-arrow,
 #mRibbonWidget > QWidget > QWidget > QToolButton:menu-arrow
 {
-  image: url(:/images/ribbon/downarrow.png);
+  image: url(:/images/icons/downarrow);
 }
 
 #mRibbonWidget > QWidget > QWidget > QSpinBox:up-button
 {
-    image: url(:/images/ribbon/uparrow.png);
+    image: url(:/images/icons/uparrow);
     border-left: 1px solid #263B4E;
     border-bottom: 1px solid #263B4E;
     padding-bottom: 1px;
@@ -238,7 +243,7 @@ QPushButton#mLayerTreeViewButton:pressed
 
 #mRibbonWidget > QWidget > QWidget > QSpinBox:down-button
 {
-    image: url(:/images/ribbon/downarrow.png);
+    image: url(:/images/icons/downarrow);
     border-left: 1px solid #263B4E;
     width: 15px;
 }
@@ -246,12 +251,12 @@ QPushButton#mLayerTreeViewButton:pressed
 #mRibbonWidget > QWidget > QWidget > QComboBox:down-arrow:disabled,
 #mRibbonWidget > QWidget > QWidget > QToolButton:menu-arrow:disabled
 {
-  image: url(:/images/ribbon/downarrow_disabled.png);
+  image: url(:/images/icons/downarrow_disabled);
 }
 
 #mRibbonWidget > QWidget > QWidget > QSpinBox:up-button:disabled
 {
-    image: url(:/images/ribbon/uparrow_disabled.png);
+    image: url(:/images/icons/uparrow_disabled);
     border-left: 1px solid #263B4E;
     border-bottom: 1px solid #263B4E;
     padding-bottom: 1px;
@@ -260,7 +265,7 @@ QPushButton#mLayerTreeViewButton:pressed
 
 #mRibbonWidget > QWidget > QWidget > QSpinBox:down-button:disabled
 {
-    image: url(:/images/ribbon/downarrow_disabled.png);
+    image: url(:/images/icons/downarrow_disabled);
     border-left: 1px solid #263B4E;
     width: 15px;
 }
@@ -343,7 +348,7 @@ QPushButton#mLayerTreeViewButton:pressed
 
 #mStatusWidget #mScaleComboBox:down-arrow
 {
-  image: url(:/images/ribbon/downarrow.png);
+  image: url(:/images/icons/downarrow);
 }
 
 #mStatusWidget #mScaleComboBox:down-arrow:on
@@ -367,7 +372,7 @@ QPushButton#mLayerTreeViewButton:pressed
 #mStatusWidget #mDisplayCRSButton:menu-arrow,
 #mStatusWidget #mCRSSelectionButton:menu-arrow
 {
-  image: url(:/images/ribbon/downarrow.png);
+  image: url(:/images/icons/downarrow);
 }
 
 #mStatusWidget QLabel {
