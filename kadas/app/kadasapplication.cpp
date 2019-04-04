@@ -67,11 +67,11 @@ KadasApplication::KadasApplication(int& argc, char** argv)
     {
       settings.setValue( "timestamp", newtimestamp );
       // Merge new settings to old settings
-      foreach ( const QString &group, newSettings.childGroups() )
+      for ( const QString &group : newSettings.childGroups() )
       {
         newSettings.beginGroup( group );
         settings.beginGroup( group );
-        foreach ( const QString &key, newSettings.childKeys() )
+        for ( const QString &key : newSettings.childKeys() )
         {
           settings.setValue( key, newSettings.value( key ) );
         }

@@ -18,12 +18,20 @@
 #define KADASMAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPointer>
+
+#include <qgis/qgsmessagebaritem.h>
 
 #include "ui_kadaswindowbase.h"
 #include "ui_kadastopwidget.h"
 #include "ui_kadasstatuswidget.h"
 
 class QSplashScreen;
+class QgsDecorationGrid;
+class QgsLayerTreeMapCanvasBridge;
+class QgsMessageBar;
+class KadasCoordinateDisplayer;
+class KadasGpsIntegration;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
@@ -31,7 +39,57 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 public:
   explicit KadasMainWindow(QSplashScreen* splash);
 
-  void openProject(const QString& fileName);
+  QgsMapCanvas* mapCanvas() const { return mMapCanvas; }
+  QgsMessageBar* messageBar() const{ return mInfoBar; }
+  int messageTimeout() const;
+
+  QWidget* addRibbonTab( const QString& name );
+  void addActionToTab( QAction* action, QWidget* tabWidget, QgsMapTool *associatedMapTool = nullptr );
+  void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu* menu, QWidget* tabWidget );
+
+private slots:
+  void checkLayerProjection( QgsMapLayer* layer );
+  void onDecimalPlacesChanged(int places);
+  void onLanguageChanged(int idx);
+  void onNumericInputCheckboxToggled( bool checked );
+  void onSnappingChanged(bool enabled);
+  void setMapScale();
+  void showFavoriteContextMenu(const QPoint& p);
+  void showProjectSelectionWidget();
+  void showScale( double scale );
+  void switchToTabForTool( QgsMapTool* tool );
+  void toggleLayerTree();
+  void checkOnTheFlyProjection();
+  void openProject();
+  void saveProject();
+  void saveProjectAs();
+
+private:
+  bool eventFilter( QObject *obj, QEvent *ev ) override;
+  void mousePressEvent( QMouseEvent* event ) override;
+  void mouseMoveEvent( QMouseEvent* event ) override;
+  void dropEvent( QDropEvent* event ) override;
+  void dragEnterEvent( QDragEnterEvent* event ) override;
+  void restoreFavoriteButton( QToolButton* button );
+  void configureButtons();
+  void setActionToButton( QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), QgsMapTool *tool = 0 );
+  void updateWidgetPositions();
+  KadasRibbonButton* addRibbonButton( QWidget* tabWidget );
+
+  QgsMessageBar* mInfoBar = nullptr;
+  QPointer<QgsMessageBarItem> mReprojMsgItem;
+
+  QgsLayerTreeMapCanvasBridge* mLayerTreeCanvasBridge = nullptr;
+  KadasCoordinateDisplayer* mCoordinateDisplayer = nullptr;
+  KadasGpsIntegration* mGpsIntegration = nullptr;
+  QgsDecorationGrid* mDecorationGrid = nullptr;
+
+  QTimer mLoadingTimer;
+  QPoint mResizePressPos;
+  QPoint mDragStartPos;
+  QMap<QString, QAction*> mAddedActions;
+
+  friend class KadasGpsIntegration;
 };
 
 #endif // KADASMAINWINDOW_H

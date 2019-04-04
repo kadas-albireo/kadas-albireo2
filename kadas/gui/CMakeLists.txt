@@ -23,6 +23,7 @@ ADD_LIBRARY(kadas_gui SHARED
 TARGET_LINK_LIBRARIES(kadas_gui
   Qt5::Widgets
   Qt5::Network
+  Qt5::Svg
   Qt5::Xml
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}

@@ -1,6 +1,6 @@
 /***************************************************************************
     kadasmainwindow.cpp
-    -----------------
+    -------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,6 +14,26 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDrag>
+#include <QMenu>
+#include <QMessageBox>
+#include <QShortcut>
+
+//#include <qgis/qgsdecorationgrid.h> // TODO
+#include <qgis/qgslayertreemapcanvasbridge.h>
+#include <qgis/qgslayertreemodel.h>
+#include <qgis/qgsmaptool.h>
+#include <qgis/qgsmessagebar.h>
+#include <qgis/qgsproject.h>
+#include <qgis/qgssnappingutils.h>
+
+#include <kadas/gui/kadasclipboard.h>
+#include <kadas/gui/kadascoordinatedisplayer.h>
+#include <kadas/gui/kadasprojecttemplateselectiondialog.h>
+
+#include "kadasapplication.h"
+#include "kadasgpsintegration.h"
+#include "kadaslayertreeviewmenuprovider.h"
 #include "kadasmainwindow.h"
 
 KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
@@ -27,6 +47,147 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   QWidget* statusWidget = new QWidget();
   KadasStatusWidget::setupUi( statusWidget );
   statusBar()->addPermanentWidget( statusWidget, 1 );
+
+  mGpsIntegration = new KadasGpsIntegration(this);
+//  mDecorationGrid = new QgsDecorationGrid(); // TODO
+  mSearchWidget->init( mMapCanvas );
+
+  mLayersWidget->setVisible( false );
+  mLayersWidget->resize( qMax( 10, qMin( 800, QSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
+  mGeodataBox->setCollapsed( false );
+  mLayersBox->setCollapsed( false );
+
+  // The MilX plugin enables the tab, if the plugin is enabled
+  mRibbonWidget->setTabEnabled( mRibbonWidget->indexOf( mMssTab ), false );
+  // The Globe plugin enables the action, if the plugin is enabled
+  mAction3D->setEnabled( false );
+
+  mLanguageCombo->addItem( tr( "System language" ), "" );
+  mLanguageCombo->addItem( "English", "en" );
+  mLanguageCombo->addItem( "Deutsch", "de" );
+  mLanguageCombo->addItem( QString( "Fran%1ais" ).arg( QChar( 0x00E7 ) ), "fr" );
+  mLanguageCombo->addItem( "Italiano", "it" );
+  QString userLocale = QSettings().value( "/locale/userLocale" ).toString();
+  if ( userLocale.isEmpty() )
+  {
+    mLanguageCombo->setCurrentIndex( 0 );
+  }
+  else
+  {
+    int idx = mLanguageCombo->findData( userLocale.left( 2 ).toLower() );
+    if ( idx >= 0 )
+    {
+      mLanguageCombo->setCurrentIndex( idx );
+    }
+  }
+  connect( mLanguageCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &KadasMainWindow::onLanguageChanged );
+
+  mSpinBoxDecimalPlaces->setValue( QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt() );
+  connect( mSpinBoxDecimalPlaces, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &KadasMainWindow::onDecimalPlacesChanged );
+
+  mSnappingCheckbox->setChecked( QSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
+  connect( mSnappingCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onSnappingChanged );
+
+  mInfoBar = new QgsMessageBar( mMapCanvas );
+  mInfoBar->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Minimum );
+
+  mLoadingLabel->adjustSize();
+  mLoadingLabel->hide();
+  mLoadingTimer.setSingleShot( true );
+  mLoadingTimer.setInterval( 500 );
+
+  QMenu* openLayerMenu = new QMenu( this );
+  openLayerMenu->addAction( tr( "Add vector layer" ), kApp, &KadasApplication::addVectorLayer );
+  openLayerMenu->addAction( tr( "Add raster layer" ), kApp, &KadasApplication::addRasterLayer );
+  openLayerMenu->addAction( tr( "Add CSV layer" ), kApp, &KadasApplication::addDelimitedTextLayer );
+  mOpenLayerButton->setMenu( openLayerMenu );
+
+  QMenu* addServiceMenu = new QMenu( this );
+  addServiceMenu->addAction( tr( "Add WMS layer" ), kApp, &KadasApplication::addWmsLayer );
+  addServiceMenu->addAction( tr( "Add WFS layer" ), kApp, &KadasApplication::addWfsLayer );
+  addServiceMenu->addAction( tr( "Add WCS layer" ), kApp, &KadasApplication::addWcsLayer );
+  mAddServiceButton->setMenu( addServiceMenu );
+
+  mMapCanvas->installEventFilter( this );
+  mLayersWidgetResizeHandle->installEventFilter( this );
+
+  mCoordinateDisplayer = new KadasCoordinateDisplayer( mDisplayCRSButton, mCoordinateLineEdit, mHeightLineEdit, mHeightUnitCombo, mMapCanvas, this );
+  mCRSSelectionButton->setMapCanvas( mMapCanvas );
+
+  connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
+
+  mNumericInputCheckbox->setChecked( QSettings().value( "/kadas/showNumericInput", false ).toBool() );
+  connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
+
+  QgsLayerTreeModel* model = new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
+  model->setFlag( QgsLayerTreeModel::AllowNodeReorder );
+  model->setFlag( QgsLayerTreeModel::AllowNodeRename );
+  model->setFlag( QgsLayerTreeModel::AllowNodeChangeVisibility );
+  model->setFlag( QgsLayerTreeModel::ShowLegendAsTree );
+  model->setAutoCollapseLegendNodes( 1 );
+
+  mLayerTreeView->setModel( model );
+  mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView, this ) );
+  mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
+
+  // Base class init
+//  init( restorePlugins ); // TODO
+
+  QgsSnappingConfig snappingConfig;
+  snappingConfig.setMode(QgsSnappingConfig::AllLayers);
+  snappingConfig.setType(QgsSnappingConfig::Vertex);
+  int snappingRadius = QSettings().value( "/Qgis/snapping/radius", 10 ).toInt();
+  snappingConfig.setTolerance(snappingRadius);
+  snappingConfig.setUnits(QgsTolerance::Pixels);
+  mMapCanvas->snappingUtils()->setConfig( snappingConfig );
+
+  // Redlining
+  // TODO
+//  QgsRedlining::RedliningUi redliningUi;
+//  redliningUi.buttonNewObject = mToolButtonRedliningNewObject;
+//  redliningUi.colorButtonFillColor = mToolButtonRedliningFillColor;
+//  redliningUi.colorButtonOutlineColor = mToolButtonRedliningBorderColor;
+//  redliningUi.comboFillStyle = mComboBoxRedliningFillStyle;
+//  redliningUi.comboOutlineStyle = mComboBoxRedliningBorderStyle;
+//  redliningUi.spinBoxSize = mSpinBoxRedliningSize;
+//  mRedlining = new QgsRedlining( this, redliningUi );
+
+  // Route editor
+  // TODO
+//  mGpsRouteEditor = new QgsGPSRouteEditor( this, mActionDrawWaypoint, mActionDrawRoute );
+
+
+  configureButtons();
+
+
+  mCatalogBrowser->reload();
+  connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
+
+  restoreFavoriteButton( mFavoriteButton1 );
+  restoreFavoriteButton( mFavoriteButton2 );
+  restoreFavoriteButton( mFavoriteButton3 );
+  restoreFavoriteButton( mFavoriteButton4 );
+  connect( mFavoriteButton1, &KadasRibbonButton::contextMenuRequested, this, &KadasMainWindow::showFavoriteContextMenu );
+  connect( mFavoriteButton2, &KadasRibbonButton::contextMenuRequested, this, &KadasMainWindow::showFavoriteContextMenu );
+  connect( mFavoriteButton3, &KadasRibbonButton::contextMenuRequested, this, &KadasMainWindow::showFavoriteContextMenu );
+  connect( mFavoriteButton4, &KadasRibbonButton::contextMenuRequested, this, &KadasMainWindow::showFavoriteContextMenu );
+
+  connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::checkOnTheFlyProjection );
+  connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::checkOnTheFlyProjection );
+  connect( mMapCanvas, &QgsMapCanvas::scaleChanged, this, &KadasMainWindow::showScale );
+  connect( mMapCanvas, &QgsMapCanvas::mapToolSet, this, &KadasMainWindow::switchToTabForTool );
+  connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, static_cast< void (QTimer::*)()>(&QTimer::start) );
+  connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
+  connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
+  connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
+  connect( mRibbonWidget, &QTabWidget::currentChanged, [this]{ mMapCanvas->setMapTool(kApp->mapToolPan()); } ); // Change to pan tool when changing active kadas tab
+  connect( mZoomInButton, &QPushButton::clicked, kApp, &KadasApplication::zoomIn );
+  connect( mZoomOutButton, &QPushButton::clicked, kApp, &KadasApplication::zoomOut );
+  connect( mHomeButton, &QPushButton::clicked, kApp, &KadasApplication::zoomFull );
+  connect( kApp->clipboard(), &KadasClipboard::dataChanged, [this]{ mActionPaste->setEnabled(!kApp->clipboard()->isEmpty()); });
+  connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
+  connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree);
+
 
 // TODO
 //  QStringList catalogUris = QSettings().value( "/Qgis/geodatacatalogs" ).toString().split( ";;" );
@@ -59,7 +220,507 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
 //  addSearchProvider( new QgsWorldLocationSearchProvider( mMapCanvas ) );
 }
 
-void KadasMainWindow::openProject(const QString& fileName)
+bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
+{
+  if ( obj == mMapCanvas && ev->type() == QEvent::Resize )
+  {
+    updateWidgetPositions();
+  }
+  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseButtonPress )
+  {
+    QMouseEvent* e = static_cast<QMouseEvent*>( ev );
+    if ( e->button() == Qt::LeftButton )
+    {
+      mResizePressPos = e->pos();
+    }
+  }
+  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseMove )
+  {
+    QMouseEvent* e = static_cast<QMouseEvent*>( ev );
+    if ( e->buttons() == Qt::LeftButton )
+    {
+      QPoint delta = e->pos() - mResizePressPos;
+      mLayersWidget->resize( qMax( 10, qMin( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
+      QSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
+      mLayerTreeViewButton->move( mLayersWidget->width(), mLayerTreeViewButton->y() );
+    }
+  }
+  return false;
+}
+
+void KadasMainWindow::updateWidgetPositions()
+{
+  // Make sure +/- buttons have constant distance to upper right corner of map canvas
+  int distanceToRightBorder = 9;
+  int distanceToTop = 20;
+  mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
+
+  mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
+
+  // Resize mLayersWidget and mLayerTreeViewButton
+  int distanceToTopBottom = 40;
+  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
+  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), distanceToTopBottom, mLayerTreeViewButton->width(), layerTreeHeight );
+  mLayersWidget->setGeometry( mLayersWidget->pos().x(), distanceToTopBottom, mLayersWidget->width(), layerTreeHeight );
+
+  // Resize info bar
+  double barwidth = 0.5 * mMapCanvas->width();
+  double x = 0.5 * mMapCanvas->width() - 0.5 * barwidth;
+  double y = mMapCanvas->y();
+  mInfoBar->move( x, y );
+  mInfoBar->setFixedWidth( barwidth );
+
+  // Move loading label
+  mLoadingLabel->move( mMapCanvas->width() - 5 - mLoadingLabel->width(), mMapCanvas->height() - 5 - mLoadingLabel->height() );
+}
+
+void KadasMainWindow::mousePressEvent( QMouseEvent* event )
+{
+  if ( event->buttons() == Qt::LeftButton )
+  {
+    KadasRibbonButton* button = dynamic_cast<KadasRibbonButton*>( childAt( event->pos() ) );
+    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) )
+    {
+      mDragStartPos = event->pos();
+    }
+  }
+  // QgisApp::mousePressEvent( event ); TODO
+}
+
+void KadasMainWindow::mouseMoveEvent( QMouseEvent* event )
+{
+  if ( event->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - event->pos() ).manhattanLength() >= QApplication::startDragDistance() )
+  {
+    KadasRibbonButton* button = dynamic_cast<KadasRibbonButton*>( childAt( event->pos() ) );
+    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) )
+    {
+      QMimeData* mimeData = new QMimeData();
+      mimeData->setData( "application/qgis-kadas-button", button->defaultAction()->objectName().toLocal8Bit() );
+      QDrag* drag = new QDrag( this );
+      drag->setMimeData( mimeData );
+      drag->setPixmap( button->icon().pixmap( 32, 32 ) );
+      drag->setHotSpot( QPoint( 16, 16 ) );
+      drag->exec( Qt::CopyAction );
+      mDragStartPos = QPoint();
+    }
+  }
+//  QgisApp::mouseMoveEvent( event ); TODO
+}
+
+void KadasMainWindow::dragEnterEvent( QDragEnterEvent* event )
+{
+  KadasRibbonButton* button = dynamic_cast<KadasRibbonButton*>( childAt( event->pos() ) );
+  if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) && button && button->objectName().startsWith( "mFavoriteButton" ) )
+  {
+    event->acceptProposedAction();
+  }
+  else
+  {
+//    QgisApp::dragEnterEvent( event ); TODO
+  }
+}
+
+void KadasMainWindow::dropEvent( QDropEvent* event )
+{
+  if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) )
+  {
+    QString actionName = QString::fromLocal8Bit( event->mimeData()->data( "application/qgis-kadas-button" ).data() );
+    QAction* action = findChild<QAction*>( actionName );
+    if ( !action )
+    {
+      action = mAddedActions.value( actionName, nullptr );
+    }
+    KadasRibbonButton* button = dynamic_cast<KadasRibbonButton*>( childAt( event->pos() ) );
+    if ( action && button && button->objectName().startsWith( "mFavoriteButton" ) )
+    {
+      button->setEnabled( true );
+      setActionToButton( action, button );
+      QSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
+    }
+  }
+  else
+  {
+//    QgisApp::dropEvent( event ); // TODO
+  }
+}
+
+void KadasMainWindow::restoreFavoriteButton( QToolButton* button )
+{
+  QString actionName = QSettings().value( "/kadas/favoriteAction/" + button->objectName() ).toString();
+  if ( actionName.isEmpty() )
+  {
+    return;
+  }
+
+  QAction* action = findChild<QAction*>( actionName );
+  if ( action )
+  {
+    setActionToButton( action, button );
+  }
+}
+
+void KadasMainWindow::configureButtons()
+{
+  // Map tab
+
+  setActionToButton( mActionNew, mNewButton, QKeySequence( Qt::CTRL + Qt::Key_N ) );
+  connect( mActionNew, &QAction::triggered, this, &KadasMainWindow::showProjectSelectionWidget );
+
+  setActionToButton( mActionOpen, mOpenButton, QKeySequence( Qt::CTRL + Qt::Key_O ) );
+  connect( mActionOpen, &QAction::triggered, this, &KadasMainWindow::openProject );
+
+  setActionToButton( mActionSave, mSaveButton, QKeySequence( Qt::CTRL + Qt::Key_S ) );
+  connect( mActionSave, &QAction::triggered, this, &KadasMainWindow::saveProject );
+
+  setActionToButton( mActionSaveAs, mSaveAsButton, QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_S ) );
+  connect( mActionSaveAs, &QAction::triggered, this, &KadasMainWindow::saveProjectAs );
+
+  setActionToButton( mActionPrint, mPrintButton, QKeySequence( Qt::CTRL + Qt::Key_P ) );
+  // signal connected by plugin
+
+  setActionToButton( mActionCopy, mCopyButton );
+  connect( mActionCopy, &QAction::triggered, kApp, &KadasApplication::saveMapToClipboard );
+
+  connect( mActionSaveMapExtent, &QAction::triggered, kApp, &KadasApplication::saveMapAsImage );
+  setActionToButton( mActionSaveMapExtent, mSaveMapExtentButton );
+
+  QMenu* kmlMenu = new QMenu();
+
+  QAction* actionExportKml = new QAction( tr( "KML Export" ) );
+  connect( actionExportKml, &QAction::triggered, kApp, &KadasApplication::exportToKml );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_E, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionExportKml, &QAction::trigger );
+  kmlMenu->addAction( actionExportKml );
+
+  QAction* actionImportKml = new QAction( tr( "KML Import" ) );
+  connect( actionImportKml, &QAction::triggered, kApp, &KadasApplication::importFromKml );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_I, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionImportKml, &QAction::trigger );
+  kmlMenu->addAction( actionImportKml );
+
+  mKMLButton->setIcon( QIcon( ":/images/icons/kml" ) );
+  mKMLButton->setMenu( kmlMenu );
+  mKMLButton->setPopupMode( QToolButton::InstantPopup );
+
+  // View tab
+  setActionToButton( mActionZoomLast, mZoomLastButton, QKeySequence( Qt::CTRL + Qt::Key_PageUp ) );
+  connect( mActionZoomLast, &QAction::triggered, kApp, &KadasApplication::zoomPrev );
+
+  setActionToButton( mActionZoomNext, mZoomNextButton, QKeySequence( Qt::CTRL + Qt::Key_PageDown ) );
+  connect( mActionZoomNext, &QAction::triggered, kApp, &KadasApplication::zoomNext );
+
+  setActionToButton( mActionNewMapWindow, mNewMapWindowButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
+//  connect( mActionNewMapWindow, &QAction::triggered, mMultiMapManager, &KadasMultiMapManager::addMapWidget ); // TODO
+
+  setActionToButton( mAction3D, m3DButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
+  // signal connected by plugin
+
+  setActionToButton( mActionGrid, mGridButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_G ) );
+//  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
+
+  // Draw tab
+  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), kApp->mapToolPinAnnotation() );
+
+  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), kApp->mapToolImageAnnotation() );
+
+  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), kApp->mapToolGuideGrid() );
+
+  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), kApp->mapToolBullsEye() );
+
+  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ) );
+  connect( mActionPaste, &QAction::triggered, kApp, &KadasApplication::paste );
+  mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() );
+
+  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), kApp->mapToolDeleteItems() );
+
+  // Analysis tab
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), kApp->mapToolMeasureDistance() );
+
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), kApp->mapToolMeasureArea() );
+
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), kApp->mapToolMeasureCircle() );
+
+  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), kApp->mapToolMeasureAzimuth() );
+
+  setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), kApp->mapToolHeightProfile() );
+
+  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), kApp->mapToolSlope() );
+
+  setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), kApp->mapToolHillshade() );
+
+  setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), kApp->mapToolViewshed() );
+
+  // GPS tab
+  setActionToButton( mActionDrawWaypoint, mDrawWaypointButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_W ) );
+  setActionToButton( mActionDrawRoute, mDrawRouteButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_R ) );
+
+  setActionToButton( mActionEnableGPS, mEnableGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_T ) );
+  connect( mActionEnableGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::enableGPS );
+
+  setActionToButton( mActionMoveWithGPS, mMoveWithGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_M ) );
+  connect( mActionMoveWithGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::moveWithGPS );
+
+  setActionToButton( mActionImportGPX, mGpxImportButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_I ) );
+  connect( mActionImportGPX, &QAction::triggered, kApp, &KadasApplication::importFromGpx );
+
+  setActionToButton( mActionExportGPX, mGpxExportButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_E ) );
+  connect( mActionExportGPX, &QAction::triggered, kApp, &KadasApplication::exportToGpx );
+
+  // MSS tab
+  setActionToButton( mActionMilx, mMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_S ) );
+  setActionToButton( mActionSaveMilx, mSaveMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_E ) );
+  setActionToButton( mActionLoadMilx, mLoadMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_I ) );
+  setActionToButton( mActionImportOVL, mOvlButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_O ) );
+
+  //help tab
+  setActionToButton( mActionHelp, mHelpButton );
+  setActionToButton( mActionAbout, mAboutButton );
+}
+
+void KadasMainWindow::setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut , QgsMapTool* tool)
+{
+  button->setDefaultAction( action );
+  button->setIconSize( QSize( 32, 32 ) );
+  if ( tool )
+  {
+    tool->setAction( action );
+    button->setCheckable( true );
+    connect( action, &QAction::triggered, [this, tool]{ mMapCanvas->setMapTool( tool ); });
+  }
+  if(!shortcut.isEmpty())
+  {
+    connect( new QShortcut( shortcut, this ), &QShortcut::activated, action, &QAction::trigger );
+  }
+}
+
+QWidget* KadasMainWindow::addRibbonTab( const QString& name )
+{
+  QWidget* widget = new QWidget( mRibbonWidget );
+  widget->setLayout( new QHBoxLayout() );
+  widget->layout()->setContentsMargins( 0, 0, 0, 0 );
+  widget->layout()->setSpacing( 6 );
+  widget->layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding ) );
+  mRibbonWidget->addTab( widget, name );
+  return widget;
+}
+
+KadasRibbonButton* KadasMainWindow::addRibbonButton( QWidget *tabWidget )
+{
+  KadasRibbonButton* button = new KadasRibbonButton();
+  button->setObjectName( QUuid::createUuid().toString() );
+  button->setMinimumSize( QSize( 0, 80 ) );
+  button->setMaximumSize( QSize( 80, 80 ) );
+  button->setIconSize( QSize( 32, 32 ) );
+
+  QSizePolicy sizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
+  sizePolicy.setHorizontalStretch( 0 );
+  sizePolicy.setVerticalStretch( 0 );
+  sizePolicy.setHeightForWidth( button->sizePolicy().hasHeightForWidth() );
+  button->setSizePolicy( sizePolicy );
+
+  QHBoxLayout* layout = dynamic_cast<QHBoxLayout*>( tabWidget->layout() );
+  layout->insertWidget( layout->count() - 1, button );
+  return button;
+}
+
+void KadasMainWindow::addActionToTab( QAction* action, QWidget* tabWidget, QgsMapTool* associatedMapTool )
+{
+  KadasRibbonButton* button = addRibbonButton( tabWidget );
+  button->setText( action->text() );
+  setActionToButton( action, button, QKeySequence(), associatedMapTool );
+
+  if ( action->objectName().isEmpty() )
+  {
+    action->setObjectName( QUuid::createUuid().toString() );
+  }
+  mAddedActions.insert( action->objectName(), action );
+}
+
+void KadasMainWindow::addMenuButtonToTab( const QString& text, const QIcon& icon, QMenu* menu, QWidget* tabWidget )
+{
+  KadasRibbonButton* button = addRibbonButton( tabWidget );
+  button->setText( text );
+  button->setIcon( icon );
+  button->setMenu( menu );
+  button->setPopupMode( QToolButton::InstantPopup );
+}
+
+void KadasMainWindow::toggleLayerTree()
+{
+  bool visible = mLayersWidget->isVisible();
+  mLayersWidget->setVisible( !visible );
+
+  if ( !visible )
+  {
+    mLayerTreeViewButton->setIcon( QIcon( ":/images/icons/layertree_unfolded" ) );
+    mLayerTreeViewButton->move( mLayersWidget->size().width(), mLayerTreeViewButton->y() );
+  }
+  else
+  {
+    mLayerTreeViewButton->setIcon( QIcon( ":/images/icons/layertree_folded" ) );
+    mLayerTreeViewButton->move( 0, mLayerTreeViewButton->y() );
+  }
+}
+
+void KadasMainWindow::checkOnTheFlyProjection()
+{
+  mInfoBar->popWidget( mReprojMsgItem.data() );
+  QString destAuthId = mMapCanvas->mapSettings().destinationCrs().authid();
+  QStringList reprojLayers;
+  // Look at legend interface instead of maplayerregistry, to only check layers
+  // the user can actually see
+  for ( QgsMapLayer* layer : mMapCanvas->layers() )
+  {
+    if ( /*layer->type() != QgsMapLayer::RedliningLayer &&*/ layer->type() != QgsMapLayer::PluginLayer && !layer->crs().authid().startsWith( "USER:" ) && layer->crs().authid() != destAuthId ) // TODO
+    {
+      reprojLayers.append( layer->name() );
+    }
+  }
+  if ( !reprojLayers.isEmpty() )
+  {
+    mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
+    mInfoBar->pushItem( mReprojMsgItem.data() );
+  }
+}
+
+void KadasMainWindow::openProject()
 {
   // TODO
 }
+
+void KadasMainWindow::saveProject()
+{
+  // TODO
+  mInfoBar->pushMessage( tr( "Project saved" ), "", Qgis::Info, messageTimeout() );
+}
+
+void KadasMainWindow::saveProjectAs()
+{
+  // TODO
+}
+
+void KadasMainWindow::setMapScale()
+{
+  mMapCanvas->zoomScale( 1.0 / mScaleComboBox->scale() );
+}
+
+void KadasMainWindow::showScale( double scale )
+{
+  mScaleComboBox->setScale( 1.0 / scale );
+}
+
+void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
+{
+  if ( tool && tool->action() )
+  {
+    for ( QWidget* widget : tool->action()->associatedWidgets() )
+    {
+      if ( dynamic_cast<KadasRibbonButton*>( widget ) )
+      {
+        for ( int i = 0, n = mRibbonWidget->count(); i < n; ++i )
+        {
+          if ( mRibbonWidget->widget( i )->findChild<QWidget*>( widget->objectName() ) )
+          {
+            mRibbonWidget->blockSignals( true );
+            mRibbonWidget->setCurrentIndex( i );
+            mRibbonWidget->blockSignals( false );
+            break;
+          }
+        }
+      }
+    }
+    // TODO
+#if 0
+    // If action is not associated to a kadas button, try with redlining and gpx route editor
+    if ( tool->action()->parent() == mRedlining )
+    {
+      mRibbonWidget->blockSignals( true );
+      mRibbonWidget->setCurrentWidget( mDrawTab );
+      mRibbonWidget->blockSignals( false );
+    }
+    else if ( tool->action()->parent() == mGpsRouteEditor )
+    {
+      mRibbonWidget->blockSignals( true );
+      mRibbonWidget->setCurrentWidget( mGpsTab );
+      mRibbonWidget->blockSignals( false );
+    }
+#endif
+  }
+  // Nothing found, do nothing
+}
+
+void KadasMainWindow::showProjectSelectionWidget()
+{
+  KadasProjectTemplateSelectionDialog dialog( this );
+  if(dialog.exec() == QDialog::Accepted && !dialog.selectedTemplate().isEmpty()) {
+    // fileNewFromTemplate(dialog.selectedTemplate()) TODO
+  }
+}
+
+void KadasMainWindow::onLanguageChanged( int idx )
+{
+  QString locale = mLanguageCombo->itemData( idx ).toString();
+  if ( locale.isEmpty() )
+  {
+    QSettings().setValue( "/locale/overrideFlag", false );
+  }
+  else
+  {
+    QSettings().setValue( "/locale/overrideFlag", true );
+    QSettings().setValue( "/locale/userLocale", locale );
+  }
+  QMessageBox::information( this, tr( "Language Changed" ), tr( "The language will be changed at the next program launch." ) );
+}
+
+void KadasMainWindow::onDecimalPlacesChanged( int places )
+{
+  QSettings().setValue( "/Qgis/measure/decimalplaces", places );
+}
+
+void KadasMainWindow::onSnappingChanged( bool enabled )
+{
+  QSettings().setValue( "/Qgis/snapping/enabled", enabled );
+}
+
+void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )
+{
+  QSettings().setValue( "/kadas/showNumericInput", checked );
+}
+
+void KadasMainWindow::showFavoriteContextMenu( const QPoint& pos )
+{
+  KadasRibbonButton* button = qobject_cast<KadasRibbonButton*>( QObject::sender() );
+  QMenu menu;
+  QAction* removeAction = menu.addAction( tr( "Remove" ) );
+  if ( menu.exec( button->mapToGlobal( pos ) ) == removeAction )
+  {
+    QSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), "" );
+    button->setText( tr( "Favorite" ) );
+    button->setIcon( QIcon( ":/images/kadas/favorit.png" ) );
+    button->setDefaultAction( 0 );
+    button->setIconSize( QSize( 16, 16 ) );
+    button->setEnabled( false );
+  }
+}
+
+void KadasMainWindow::checkLayerProjection( QgsMapLayer* layer )
+{
+  if ( layer->crs().authid().startsWith( "USER:" ) )
+  {
+    QPushButton* btn = new QPushButton( tr( "Manually set projection" ) );
+    btn->setFlat( true );
+    QgsMessageBarItem* item = new QgsMessageBarItem(
+      tr( "Unknown layer projection" ),
+      tr( "The projection of the layer %1 could not be recognized, its and features might be misplaced." ).arg( layer->name() ),
+      btn, Qgis::Warning, messageTimeout() );
+    connect( btn, &QPushButton::clicked, [=] {
+      mInfoBar->popWidget( item );
+      kApp->showLayerProperties( layer );
+    });
+    mInfoBar->pushItem( item );
+  }
+}
+
+int KadasMainWindow::messageTimeout() const
+{
+  return QSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
+}
+
