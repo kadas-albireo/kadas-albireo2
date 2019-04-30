@@ -142,7 +142,7 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   model->setAutoCollapseLegendNodes( 1 );
 
   mLayerTreeView->setModel( model );
-  mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView, this ) );
+  mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
 
   // Base class init
 //  init( restorePlugins ); // TODO

@@ -19,13 +19,11 @@
 
 #include <qgis/qgslayertreeview.h>
 
-class KadasMainWindow;
-
 class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMenuProvider
 {
     Q_OBJECT
   public:
-    KadasLayerTreeViewMenuProvider( QgsLayerTreeView* view, KadasMainWindow* mainWindow );
+    KadasLayerTreeViewMenuProvider( QgsLayerTreeView* view );
     QMenu* createContextMenu() override;
 
   private:
@@ -33,9 +31,9 @@ class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMen
     QAction* actionLayerUseAsHeightmap(QMenu *parent);
 
     QgsLayerTreeView* mView = nullptr;
-    KadasMainWindow* mMainWindow = nullptr;
 
 private slots:
+    void removeLayer();
     void setLayerTransparency(int value);
     void setLayerUseAsHeightmap(bool enabled);
     void showLayerAttributeTable();

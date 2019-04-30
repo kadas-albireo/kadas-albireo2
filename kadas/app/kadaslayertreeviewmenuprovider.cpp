@@ -29,17 +29,18 @@
 #include <qgis/qgsvectorlayer.h>
 
 //#include "qgsannotationlayer.h" TODO
+#include "kadasapplication.h"
 #include "kadaslayertreeviewmenuprovider.h"
 #include "kadasmainwindow.h"
 
-KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView* view, KadasMainWindow* mainWindow ):
-    mView( view ), mMainWindow( mainWindow )
+KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView* view ):
+    mView( view )
 {
 }
 
 QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
 {
-  if ( !mView || !mMainWindow )
+  if ( !mView )
   {
     return nullptr;
   }
@@ -66,7 +67,7 @@ QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
 //      {
 //        menu->addAction( actions->actionSymbolScale( menu ) );
 //      }
-      menu->addAction( actions->actionZoomToLayer( mMainWindow->mapCanvas(), menu ) );
+      menu->addAction( actions->actionZoomToLayer( kApp->mainWindow()->mapCanvas(), menu ) );
       menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
     }
     else if ( QgsLayerTree::isGroup( node ) )

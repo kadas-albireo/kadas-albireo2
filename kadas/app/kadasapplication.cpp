@@ -409,6 +409,11 @@ void KadasApplication::addMapLayers(const QList<QgsMapLayer*>& layers) const
   refreshMapCanvas();
 }
 
+void KadasApplication::removeLayer(QgsMapLayer* layer) const
+{
+  QgsProject::instance()->removeMapLayer(layer);
+  refreshMapCanvas();
+}
 
 void KadasApplication::exportToGpx()
 {
