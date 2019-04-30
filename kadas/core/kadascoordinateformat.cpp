@@ -124,7 +124,7 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY& p, const QgsCoor
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer* layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayer::RasterLayer )
+  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
   {
     if ( errMsg )
       *errMsg = tr( "No heightmap is defined in the project." ), tr( "Right-click a raster layer in the layer tree and select it to be used as heightmap." );

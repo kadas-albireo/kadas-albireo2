@@ -57,7 +57,7 @@ QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
     if ( QgsLayerTree::isLayer( node ) )
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
-      if ( layer->type() == QgsMapLayer::VectorLayer || layer->type() == QgsMapLayer::RasterLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ || layer->type() == QgsMapLayer::PluginLayer ) // TODO
+      if ( layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::RasterLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ || layer->type() == QgsMapLayerType::PluginLayer ) // TODO
       {
         menu->addAction( actionLayerTransparency( menu ) );
       }
@@ -79,11 +79,11 @@ QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
       // addCustomLayerActions( menu, layer ); TODO?
-      if ( layer->type() == QgsMapLayer::RasterLayer )
+      if ( layer->type() == QgsMapLayerType::RasterLayer )
       {
         menu->addAction( actionLayerUseAsHeightmap( menu ) );
       }
-      else if ( layer->type() == QgsMapLayer::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
+      else if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ), tr( "&Open Attribute Table" ),
                          this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
@@ -92,7 +92,7 @@ QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mActionInfo.png" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }
-      if ( layer->type() == QgsMapLayer::PluginLayer )
+      if ( layer->type() == QgsMapLayerType::PluginLayer )
       {
         // TODO
 //        QgsPluginLayerType* plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( static_cast<QgsPluginLayer*>( layer )->pluginLayerType() );
@@ -117,16 +117,16 @@ QAction* KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu* parent 
     return nullptr;
 
   int opacity = 0;
-  if ( layer->type() == QgsMapLayer::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
+  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
   {
     opacity = static_cast<QgsVectorLayer*>( layer )->opacity();
   }
-  else if ( layer->type() == QgsMapLayer::PluginLayer )
+  else if ( layer->type() == QgsMapLayerType::PluginLayer )
   {
     // TODO
     // opacity = static_cast<QgsPluginLayer*>( layer )->opacity();
   }
-  else if ( layer->type() == QgsMapLayer::RasterLayer )
+  else if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
     opacity = static_cast<QgsRasterLayer*>( layer )->renderer()->opacity() * 100;
   }
@@ -165,21 +165,27 @@ QAction* KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
   return heightmapAction;
 }
 
+void KadasLayerTreeViewMenuProvider::removeLayer()
+{
+  QgsMapLayer* layer = mView->currentLayer();
+  kApp->removeLayer(layer);
+}
+
 void KadasLayerTreeViewMenuProvider::setLayerTransparency(int value)
 {
   QgsMapLayer* layer = mView->currentLayer();
   if ( !layer )
     return;
 
-  if ( layer->type() == QgsMapLayer::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
+  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) // TODO
   {
     static_cast<QgsVectorLayer*>( layer )->setOpacity( 100 - value );
   }
-  else if ( layer->type() == QgsMapLayer::PluginLayer )
+  else if ( layer->type() == QgsMapLayerType::PluginLayer )
   {
 //    static_cast<QgsPluginLayer*>( layer )->setLayerTransparency( value ); TODO
   }
-  else if ( layer->type() == QgsMapLayer::RasterLayer )
+  else if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
     static_cast<QgsRasterLayer*>( layer )->renderer()->setOpacity( 1. - value / 100. );
   }
