@@ -60,8 +60,8 @@ void KadasCanvasGPSDisplay::connectGPS()
 {
   closeGPSConnection();
   QgsGpsDetector* gpsDetector = new QgsGpsDetector( mPort );
-  connect( gpsDetector, SIGNAL( detected( QgsGpsConnection* ) ), this, SLOT( gpsDetected( QgsGpsConnection* ) ) );
-  connect( gpsDetector, SIGNAL( detectionFailed() ), this, SLOT( gpsDetectionFailed() ) );
+  connect( gpsDetector, qOverload<QgsGpsConnection*>(&QgsGpsDetector::detected), this, &KadasCanvasGPSDisplay::gpsDetected );
+  connect( gpsDetector, &QgsGpsDetector::detectionFailed, this, &KadasCanvasGPSDisplay::gpsDetectionFailed );
   gpsDetector->advance();
 }
 
@@ -88,8 +88,8 @@ void KadasCanvasGPSDisplay::gpsDetected( QgsGpsConnection* conn )
 {
   mConnection = conn;
   QgsApplication::gpsConnectionRegistry()->registerConnection( mConnection );
-  connect( conn, SIGNAL( stateChanged( const QgsGPSInformation& ) ), this, SLOT( updateGPSInformation( const QgsGPSInformation& ) ) );
-  connect( conn, SIGNAL( nmeaSentenceReceived( const QString& ) ), this, SIGNAL( nmeaSentenceReceived( QString ) ) );
+  connect( conn, &QgsGpsConnection::stateChanged, this, &KadasCanvasGPSDisplay::updateGPSInformation );
+  connect( conn, &QgsGpsConnection::nmeaSentenceReceived, this, &KadasCanvasGPSDisplay::nmeaSentenceReceived );
   emit gpsConnected();
 }
 

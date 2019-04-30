@@ -91,10 +91,10 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
       mLanguageCombo->setCurrentIndex( idx );
     }
   }
-  connect( mLanguageCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &KadasMainWindow::onLanguageChanged );
+  connect( mLanguageCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, &KadasMainWindow::onLanguageChanged );
 
   mSpinBoxDecimalPlaces->setValue( QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt() );
-  connect( mSpinBoxDecimalPlaces, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &KadasMainWindow::onDecimalPlacesChanged );
+  connect( mSpinBoxDecimalPlaces, qOverload<int>(&QSpinBox::valueChanged), this, &KadasMainWindow::onDecimalPlacesChanged );
 
   mSnappingCheckbox->setChecked( QSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
   connect( mSnappingCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onSnappingChanged );
@@ -187,7 +187,7 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::checkOnTheFlyProjection );
   connect( mMapCanvas, &QgsMapCanvas::scaleChanged, this, &KadasMainWindow::showScale );
   connect( mMapCanvas, &QgsMapCanvas::mapToolSet, this, &KadasMainWindow::switchToTabForTool );
-  connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, static_cast< void (QTimer::*)()>(&QTimer::start) );
+  connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, qOverload<>(&QTimer::start) );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );

@@ -38,7 +38,7 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton* crsButton, QLin
 
   mIconLabel = new QLabel( this );
   mHeightTimer.setSingleShot( true );
-  connect( &mHeightTimer, SIGNAL( timeout() ), this, SLOT( updateHeight() ) );
+  connect( &mHeightTimer, &QTimer::timeout, this, &KadasCoordinateDisplayer::updateHeight );
 
 
   QMenu* crsSelectionMenu = new QMenu();
@@ -74,7 +74,7 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton* crsButton, QLin
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, this, &KadasCoordinateDisplayer::displayCoordinates );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasCoordinateDisplayer::syncProjectCrs );
   connect( crsSelectionMenu, &QMenu::triggered, this, &KadasCoordinateDisplayer::displayFormatChanged );
-  connect( mHeightSelectionCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &KadasCoordinateDisplayer::heightUnitChanged );
+  connect( mHeightSelectionCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, &KadasCoordinateDisplayer::heightUnitChanged );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasCoordinateDisplayer::readProjectSettings );
 
   mHeightSelectionCombo->setCurrentIndex( QSettings().value( "/Qgis/heightUnit", 0 ).toInt() );

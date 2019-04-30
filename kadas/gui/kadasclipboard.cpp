@@ -28,7 +28,7 @@
 KadasClipboard::KadasClipboard( QObject* parent )
     : QObject( parent )
 {
-  connect( QApplication::clipboard(), SIGNAL( dataChanged() ), this, SLOT( onDataChanged() ) );
+  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::onDataChanged );
 }
 
 void KadasClipboard::setMimeData( QMimeData* mimeData )

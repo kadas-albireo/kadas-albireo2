@@ -40,7 +40,7 @@ KadasCrsSelection::KadasCrsSelection( QWidget *parent )
   crsSelectionMenu->addAction( QgsCoordinateReferenceSystem( "EPSG:4326" ).description(), this, &KadasCrsSelection::setMapCrs )->setData( "EPSG:4326" );
   crsSelectionMenu->addAction( QgsCoordinateReferenceSystem( "EPSG:3857" ).description(), this, &KadasCrsSelection::setMapCrs )->setData( "EPSG:3857" );
   crsSelectionMenu->addSeparator();
-  crsSelectionMenu->addAction( tr( "More..." ), this, SLOT( selectMapCrs() ) );
+  crsSelectionMenu->addAction( tr( "More..." ), this, &KadasCrsSelection::selectMapCrs );
 
   setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
   setMenu( crsSelectionMenu );

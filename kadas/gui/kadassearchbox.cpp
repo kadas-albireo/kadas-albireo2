@@ -155,7 +155,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 
   connect( mSearchBox, &LineEdit::textEdited, this, &KadasSearchBox::textChanged );
   connect( mSearchButton, &QToolButton::clicked, this, &KadasSearchBox::startSearch  );
-  connect( &mTimer, SIGNAL( timeout() ), this, SLOT( startSearch() ) );
+  connect( &mTimer, &QTimer::timeout, this, &KadasSearchBox::startSearch );
   connect( mTreeWidget, &TreeWidget::itemSelectionChanged, this, &KadasSearchBox::resultSelected );
   connect( mTreeWidget, &TreeWidget::itemClicked, this, &KadasSearchBox::resultActivated );
   connect( mTreeWidget, &TreeWidget::itemActivated, this, &KadasSearchBox::resultActivated );
@@ -174,7 +174,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mTreeWidget->installEventFilter( this );
 
   QShortcut* shortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ), this );
-  QObject::connect( shortcut, &QShortcut::activated, mSearchBox, static_cast<void (LineEdit::*)()>(&LineEdit::setFocus) );
+  QObject::connect( shortcut, &QShortcut::activated, mSearchBox, qOverload<>(&LineEdit::setFocus) );
 
 }
 

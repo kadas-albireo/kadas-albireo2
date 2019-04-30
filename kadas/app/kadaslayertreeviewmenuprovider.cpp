@@ -74,7 +74,7 @@ QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
       menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
       menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
     }
-    menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), mMainWindow, SLOT( removeLayer() ) );
+    menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
     if ( QgsLayerTree::isLayer( node ) )
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
