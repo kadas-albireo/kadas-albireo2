@@ -101,6 +101,10 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   splash.show();
   mMainWindow = new KadasMainWindow(&splash);
 
+  mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
+
+  connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
+
   // Perform online/offline check to select default template
   QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
   QString projectTemplate;
@@ -256,6 +260,14 @@ void KadasApplication::zoomOut()
 void KadasApplication::zoomPrev()
 {
   // TODO
+}
+
+void KadasApplication::onActiveLayerChanged( QgsMapLayer *layer )
+{
+  if ( mBlockActiveLayerChanged )
+    return;
+  mMainWindow->mapCanvas()->setCurrentLayer( layer );
+  emit activeLayerChanged( layer );
 }
 
 #if 0

@@ -28,7 +28,6 @@
 
 class QSplashScreen;
 class QgsDecorationGrid;
-class QgsLayerTreeMapCanvasBridge;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
@@ -79,7 +78,6 @@ private:
   QgsMessageBar* mInfoBar = nullptr;
   QPointer<QgsMessageBarItem> mReprojMsgItem;
 
-  QgsLayerTreeMapCanvasBridge* mLayerTreeCanvasBridge = nullptr;
   KadasCoordinateDisplayer* mCoordinateDisplayer = nullptr;
   KadasGpsIntegration* mGpsIntegration = nullptr;
   QgsDecorationGrid* mDecorationGrid = nullptr;

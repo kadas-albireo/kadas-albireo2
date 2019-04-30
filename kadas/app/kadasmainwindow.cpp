@@ -139,7 +139,6 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
 
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView, this ) );
-  mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
   // Base class init
 //  init( restorePlugins ); // TODO

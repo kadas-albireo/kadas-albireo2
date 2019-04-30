@@ -19,6 +19,8 @@
 
 #include <QApplication>
 
+
+class QgsLayerTreeMapCanvasBridge;
 class QgsMapLayer;
 class QgsMapTool;
 class KadasClipboard;
@@ -89,6 +91,10 @@ public:
 private:
   KadasClipboard* mClipboard = nullptr;
   KadasMainWindow* mMainWindow = nullptr;
+  QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
+
+private slots:
+  void onActiveLayerChanged( QgsMapLayer *layer );
 };
 
 #endif // KADASAPPLICATION_H
