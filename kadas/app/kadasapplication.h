@@ -23,6 +23,8 @@
 class QgsLayerTreeMapCanvasBridge;
 class QgsMapLayer;
 class QgsMapTool;
+class QgsRasterLayer;
+class QgsVectorLayer;
 class KadasClipboard;
 class KadasMainWindow;
 
@@ -37,16 +39,16 @@ public:
   static KadasApplication *instance();
 
   KadasApplication(int &argc, char **argv);
+  ~KadasApplication();
 
   KadasClipboard* clipboard() const{ return mClipboard; }
   KadasMainWindow* mainWindow() const{ return mMainWindow; }
 
-  void addDelimitedTextLayer();
-  void addRasterLayer();
-  void addVectorLayer();
-  void addWcsLayer();
-  void addWfsLayer();
-  void addWmsLayer();
+  QgsRasterLayer *addRasterLayer(const QString &uri, const QString &baseName, const QString &providerKey) const;
+  QgsVectorLayer* addVectorLayer(const QString &uri, const QString &layerName, const QString &providerKey) const;
+  void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
+  void addMapLayers(const QList<QgsMapLayer*>& layers) const;
+  void removeLayer(QgsMapLayer* layer) const;
 
   void exportToGpx();
   void exportToKml();
@@ -88,10 +90,21 @@ public:
   void zoomOut();
   void zoomPrev();
 
+  QgsMapLayer* currentLayer() const;
+  void refreshMapCanvas() const;
+
+signals:
+  void activeLayerChanged(QgsMapLayer* layer);
+
 private:
   KadasClipboard* mClipboard = nullptr;
   KadasMainWindow* mMainWindow = nullptr;
   QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
+  bool mBlockActiveLayerChanged = false;
+
+  QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
+  QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;
+  bool showZipSublayerSelectionDialog(const QString& path) const;
 
 private slots:
   void onActiveLayerChanged( QgsMapLayer *layer );

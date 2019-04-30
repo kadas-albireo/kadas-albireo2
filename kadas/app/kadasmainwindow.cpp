@@ -20,12 +20,15 @@
 #include <QShortcut>
 
 //#include <qgis/qgsdecorationgrid.h> // TODO
+#include <qgis/qgsgui.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssnappingutils.h>
+#include <qgis/qgssourceselectproviderregistry.h>
+#include <qgis/qgssourceselectprovider.h>
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
@@ -108,15 +111,15 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   mLoadingTimer.setInterval( 500 );
 
   QMenu* openLayerMenu = new QMenu( this );
-  openLayerMenu->addAction( tr( "Add vector layer" ), kApp, &KadasApplication::addVectorLayer );
-  openLayerMenu->addAction( tr( "Add raster layer" ), kApp, &KadasApplication::addRasterLayer );
-  openLayerMenu->addAction( tr( "Add CSV layer" ), kApp, &KadasApplication::addDelimitedTextLayer );
+  openLayerMenu->addAction( tr( "Add vector layer" ), this, [this]{ showSourceSelectDialog("ogr"); });
+  openLayerMenu->addAction( tr( "Add raster layer" ), this, [this]{ showSourceSelectDialog("gdal"); } );
+  openLayerMenu->addAction( tr( "Add CSV layer" ), this, [this]{ showSourceSelectDialog("delimitedtext"); } );
   mOpenLayerButton->setMenu( openLayerMenu );
 
   QMenu* addServiceMenu = new QMenu( this );
-  addServiceMenu->addAction( tr( "Add WMS layer" ), kApp, &KadasApplication::addWmsLayer );
-  addServiceMenu->addAction( tr( "Add WFS layer" ), kApp, &KadasApplication::addWfsLayer );
-  addServiceMenu->addAction( tr( "Add WCS layer" ), kApp, &KadasApplication::addWcsLayer );
+  addServiceMenu->addAction( tr( "Add WMS layer" ), this, [this]{ showSourceSelectDialog("wms"); });
+  addServiceMenu->addAction( tr( "Add WFS layer" ), this, [this]{ showSourceSelectDialog("WFS"); } );
+  addServiceMenu->addAction( tr( "Add WCS layer" ), this, [this]{ showSourceSelectDialog("wcs"); } );
   mAddServiceButton->setMenu( addServiceMenu );
 
   mMapCanvas->installEventFilter( this );
@@ -601,6 +604,25 @@ void KadasMainWindow::saveProject()
 void KadasMainWindow::saveProjectAs()
 {
   // TODO
+}
+
+void KadasMainWindow::showSourceSelectDialog(const QString& providerName)
+{
+  QgsSourceSelectProvider* provider = QgsGui::instance()->sourceSelectProviderRegistry()->providerByName(providerName);
+  if(!provider) {
+    return;
+  }
+  QgsAbstractDataSourceWidget *dialog = provider->createDataSourceWidget();
+  dialog->setMapCanvas( mMapCanvas );
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  // TODO
+//  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
+//  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
+  connect(dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, &KadasApplication::addRasterLayer);
+  connect(dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, &KadasApplication::addVectorLayer);
+  connect(dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, &KadasApplication::addVectorLayers);
+
+  dialog->exec();
 }
 
 void KadasMainWindow::setMapScale()

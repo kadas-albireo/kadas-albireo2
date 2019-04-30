@@ -40,6 +40,7 @@ public:
 
   QgsMapCanvas* mapCanvas() const { return mMapCanvas; }
   QgsMessageBar* messageBar() const{ return mInfoBar; }
+  QgsLayerTreeView* layerTreeView() const{ return mLayerTreeView; }
   int messageTimeout() const;
 
   QWidget* addRibbonTab( const QString& name );
@@ -74,6 +75,7 @@ private:
   void setActionToButton( QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), QgsMapTool *tool = 0 );
   void updateWidgetPositions();
   KadasRibbonButton* addRibbonButton( QWidget* tabWidget );
+  void showSourceSelectDialog(const QString& provider);
 
   QgsMessageBar* mInfoBar = nullptr;
   QPointer<QgsMessageBarItem> mReprojMsgItem;
