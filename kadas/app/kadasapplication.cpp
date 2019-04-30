@@ -32,8 +32,11 @@ KadasApplication *KadasApplication::instance()
 }
 
 KadasApplication::KadasApplication(int& argc, char** argv)
-  : QApplication(argc, argv)
+  : QgsApplication(argc, argv, true)
 {
+  QgsApplication::init();
+  QgsApplication::initQgis();
+
   // Setup application style
   setWindowIcon(QIcon(":/images/icon"));
   QFile styleSheet(":/stylesheet");

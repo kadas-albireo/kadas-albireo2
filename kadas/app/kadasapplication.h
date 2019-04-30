@@ -17,8 +17,8 @@
 #ifndef KADASAPPLICATION_H
 #define KADASAPPLICATION_H
 
-#include <QApplication>
 
+#include <qgis/qgsapplication.h>
 
 class QgsLayerTreeMapCanvasBridge;
 class QgsMapLayer;
@@ -28,7 +28,7 @@ class KadasMainWindow;
 
 #define kApp KadasApplication::instance()
 
-class KadasApplication : public QApplication
+class KadasApplication : public QgsApplication
 {
   Q_OBJECT
 
