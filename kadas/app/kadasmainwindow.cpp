@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QDrag>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QShortcut>
@@ -593,6 +594,16 @@ void KadasMainWindow::checkOnTheFlyProjection()
 void KadasMainWindow::openProject()
 {
   // TODO
+//  if(!saveDirty()) {
+//    return;
+//  }
+  QgsSettings settings;
+  QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
+  QString fullPath = QFileDialog::getOpenFileName( this,
+                     tr( "Choose a KADAS Project File to Open" ),
+                     lastUsedDir,
+                     tr( "QGIS files" ) + " (*.qgs *.qgz *.QGS)" );
+  kApp->projectOpen( fullPath );
 }
 
 void KadasMainWindow::saveProject()

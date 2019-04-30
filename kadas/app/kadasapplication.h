@@ -17,6 +17,7 @@
 #ifndef KADASAPPLICATION_H
 #define KADASAPPLICATION_H
 
+#include <QDateTime>
 
 #include <qgis/qgsapplication.h>
 
@@ -73,9 +74,10 @@ public:
 
   void paste();
 
-  void projectOpen( const QString& fileName );
+  bool projectOpen( const QString& projectFile );
+  void projectClose();
   void projectSave();
-  void projectSaveAs( const QString& fileName = QString() );
+  void projectSaveAs( const QString& projectFile = QString() );
 
   void saveMapAsImage();
   void saveMapToClipboard();
@@ -94,6 +96,7 @@ public:
   void refreshMapCanvas() const;
 
 signals:
+  void projectRead();
   void activeLayerChanged(QgsMapLayer* layer);
 
 private:
@@ -101,6 +104,7 @@ private:
   KadasMainWindow* mMainWindow = nullptr;
   QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
   bool mBlockActiveLayerChanged = false;
+  QDateTime mProjectLastModified;
 
   QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
   QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;

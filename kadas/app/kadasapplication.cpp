@@ -223,6 +223,10 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   QObject::connect(this, &QApplication::lastWindowClosed, this, &QApplication::quit);
 }
 
+KadasApplication::~KadasApplication()
+{
+  projectClose();
+}
 
 QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString& layerName, const QString &providerKey ) const
 {
@@ -431,9 +435,69 @@ void KadasApplication::paste()
   // TODO
 }
 
-void KadasApplication::projectOpen( const QString& fileName )
+bool KadasApplication::projectOpen( const QString& projectFile )
+{
+  projectClose();
+
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+  mMainWindow->mapCanvas()->freeze( true );
+  bool autoSetupOnFirstLayer = mLayerTreeCanvasBridge->autoSetupOnFirstLayer();
+  mLayerTreeCanvasBridge->setAutoSetupOnFirstLayer( false );
+
+  bool success = QgsProject::instance()->read( projectFile );
+
+  if ( success )
+  {
+    mProjectLastModified = QgsProject::instance()->lastModified();
+    mMainWindow->setWindowTitle( QFileInfo(projectFile).fileName() );
+    emit projectRead();
+  }
+
+  mLayerTreeCanvasBridge->setAutoSetupOnFirstLayer( autoSetupOnFirstLayer );
+  mMainWindow->mapCanvas()->freeze( false );
+  mMainWindow->mapCanvas()->refresh();
+  QApplication::restoreOverrideCursor();
+
+  if(!success) {
+    QMessageBox::critical( mMainWindow, tr( "Unable to open project" ), QgsProject::instance()->error() );
+  }
+
+  return success;
+}
+
+void KadasApplication::projectClose()
 {
   // TODO
+//  mMainWindow->closeChildMapCanvases();
+
+  // TODO
+//  deleteLayoutDesigners();
+
+  // ensure layout widgets are fully deleted
+//  QgsApplication::sendPostedEvents( nullptr, QEvent::DeferredDelete );
+
+  // Remove annotation items
+  QGraphicsScene *scene = mMainWindow->mapCanvas()->scene();
+  for(QGraphicsItem* item : mMainWindow->mapCanvas()->items()) {
+    if(dynamic_cast<QgsMapCanvasAnnotationItem *>(item)) {
+      scene->removeItem( item );
+      delete item;
+    }
+  }
+
+  // clear out any stuff from project
+  mMainWindow->mapCanvas()->freeze( true );
+  mMainWindow->mapCanvas()->setLayers( QList<QgsMapLayer *>() );
+  mMainWindow->mapCanvas()->clearCache();
+  mMainWindow->mapCanvas()->freeze( false );
+
+  // Avoid unnecessary layer changed handling for each layer removed - instead,
+  // defer the handling until we've removed all layers
+  mBlockActiveLayerChanged = true;
+  QgsProject::instance()->clear();
+  mBlockActiveLayerChanged = false;
+
+  onActiveLayerChanged( currentLayer() );
 }
 
 void KadasApplication::projectSave()
