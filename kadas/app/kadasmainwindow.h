@@ -31,6 +31,7 @@ class QgsDecorationGrid;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
+class KadasMapWidgetManager;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
@@ -84,6 +85,7 @@ private:
 
   KadasCoordinateDisplayer* mCoordinateDisplayer = nullptr;
   KadasGpsIntegration* mGpsIntegration = nullptr;
+  KadasMapWidgetManager* mMapWidgetManager = nullptr;
   QgsDecorationGrid* mDecorationGrid = nullptr;
 
   QTimer mLoadingTimer;

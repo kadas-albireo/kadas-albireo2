@@ -32,6 +32,7 @@
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
+#include <kadas/gui/kadasmapwidgetmanager.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
 #include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
@@ -63,6 +64,7 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   statusBar()->addPermanentWidget( statusWidget, 1 );
 
   mGpsIntegration = new KadasGpsIntegration(this);
+  mMapWidgetManager = new KadasMapWidgetManager(mMapCanvas, this);
 //  mDecorationGrid = new QgsDecorationGrid(); // TODO
   mSearchWidget->init( mMapCanvas );
 
@@ -419,7 +421,7 @@ void KadasMainWindow::configureButtons()
   connect( mMapCanvas, &QgsMapCanvas::zoomNextStatusChanged, mActionZoomNext, &QAction::setEnabled);
 
   setActionToButton( mActionNewMapWindow, mNewMapWindowButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
-//  connect( mActionNewMapWindow, &QAction::triggered, mMultiMapManager, &KadasMultiMapManager::addMapWidget ); // TODO
+  connect( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, &KadasMapWidgetManager::addMapWidget );
 
   setActionToButton( mAction3D, m3DButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
   // signal connected by plugin
