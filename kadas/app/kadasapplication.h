@@ -19,7 +19,10 @@
 
 #include <QDateTime>
 
+#include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
+
+#include <kadas/gui/kadasfeaturepicker.h>
 
 class QgsLayerTreeMapCanvasBridge;
 class QgsMapLayer;
@@ -28,6 +31,7 @@ class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasClipboard;
 class KadasMainWindow;
+class KadasMapToolPan;
 
 #define kApp KadasApplication::instance()
 
@@ -95,6 +99,9 @@ public:
   QgsMapLayer* currentLayer() const;
   void refreshMapCanvas() const;
 
+public slots:
+  void displayMessage(const QString& message, Qgis::MessageLevel level = Qgis::Info);
+
 signals:
   void projectRead();
   void activeLayerChanged(QgsMapLayer* layer);
@@ -105,6 +112,7 @@ private:
   QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
   bool mBlockActiveLayerChanged = false;
   QDateTime mProjectLastModified;
+  KadasMapToolPan* mMapToolPan = nullptr;
 
   QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
   QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;
@@ -112,6 +120,9 @@ private:
 
 private slots:
   void onActiveLayerChanged( QgsMapLayer *layer );
+  void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
+  void handleItemPicked( const KadasFeaturePicker::PickResult& result );
+  void showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos);
 };
 
 #endif // KADASAPPLICATION_H

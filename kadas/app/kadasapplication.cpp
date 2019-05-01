@@ -37,6 +37,7 @@
 
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasclipboard.h>
+#include <kadas/gui/maptools/kadasmaptoolpan.h>
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -187,6 +188,10 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
+  connect(mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
+
+  mMapToolPan = new KadasMapToolPan(mMainWindow->mapCanvas());
+  mMainWindow->mapCanvas()->setMapTool(mMapToolPan);
 
   // Perform online/offline check to select default template
   QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
@@ -578,12 +583,57 @@ void KadasApplication::refreshMapCanvas() const
   mMainWindow->mapCanvas()->refreshAllLayers();
 }
 
+void KadasApplication::displayMessage(const QString& message, Qgis::MessageLevel level)
+{
+  mMainWindow->messageBar()->pushMessage(message, level, mMainWindow->messageTimeout());
+}
+
 void KadasApplication::onActiveLayerChanged( QgsMapLayer *layer )
 {
   if ( mBlockActiveLayerChanged )
     return;
   mMainWindow->mapCanvas()->setCurrentLayer( layer );
   emit activeLayerChanged( layer );
+}
+
+void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool )
+{
+  if ( oldTool )
+  {
+    disconnect( oldTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
+//    disconnect( oldTool, SIGNAL( messageDiscarded() ), this, SLOT( removeMapToolMessage() ) );
+    if ( dynamic_cast<KadasMapToolPan*>( oldTool ) )
+    {
+      disconnect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
+      disconnect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
+    }
+  }
+  // Automatically return to pan tool if no tool is active
+  if ( !newTool && oldTool != mMapToolPan )
+  {
+    mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
+    return;
+  }
+
+  if ( newTool )
+  {
+    connect( oldTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
+    if ( dynamic_cast<KadasMapToolPan*>( newTool ) )
+    {
+      connect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
+      connect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
+    }
+  }
+}
+
+void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult& result )
+{
+  // TODO
+}
+
+void KadasApplication::showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos)
+{
+  // TODO
 }
 
 QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const
