@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QFile>
+#include <QFileDialog>
 #include <QIcon>
 #include <QMessageBox>
 #include <QSplashScreen>
@@ -184,11 +185,20 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   splash.show();
   mClipboard = new KadasClipboard(this);
   mMainWindow = new KadasMainWindow(&splash);
+  mMainWindow->mapCanvas()->setCanvasColor(QColor(255, 255, 255, 0));
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect(mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
+  connect(QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle);
+  connect(QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle);
+  connect(QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle);
+
+  QgsLayerTreeModel* layerTreeModel = mMainWindow->layerTreeView()->layerTreeModel();
+  connect( layerTreeModel->rootGroup(), &QgsLayerTreeNode::addedChildren, QgsProject::instance(), &QgsProject::setDirty );
+  connect( layerTreeModel->rootGroup(), &QgsLayerTreeNode::removedChildren, QgsProject::instance(), &QgsProject::setDirty );
+  connect( layerTreeModel->rootGroup(), &QgsLayerTreeNode::visibilityChanged, QgsProject::instance(), &QgsProject::setDirty );
 
   mMapToolPan = new KadasMapToolPan(mMainWindow->mapCanvas());
   mMainWindow->mapCanvas()->setMapTool(mMapToolPan);
@@ -224,6 +234,8 @@ KadasApplication::KadasApplication(int& argc, char** argv)
 
   // TODO: QgsApplication::setMaxThreads( QSettings().value( "/Qgis/max_threads", -1 ).toInt() );
 
+  QgsProject::instance()->setDirty( false );
+  updateWindowTitle();
   mMainWindow->show();
   splash.finish(mMainWindow);
 
@@ -447,8 +459,33 @@ void KadasApplication::paste()
   // TODO
 }
 
+bool KadasApplication::projectCreateFromTemplate(const QString& templateFile )
+{
+  if(projectOpen(templateFile)) {
+    QgsProject::instance()->setFileName(QString());
+    return true;
+  }
+  return false;
+}
+
 bool KadasApplication::projectOpen( const QString& projectFile )
 {
+  if(!projectSaveDirty()) {
+    return false;
+  }
+  QString fileName = projectFile;
+  if(fileName.isEmpty()) {
+    QgsSettings settings;
+    QString lastUsedDir = settings.value( "UI/lastProjectDir", QDir::homePath() ).toString();
+    fileName = QFileDialog::getOpenFileName(
+        mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+    );
+    if(fileName.isEmpty()) {
+      return false;
+    }
+    settings.setValue( "UI/lastProjectDir", QFileInfo(fileName).absolutePath() );
+  }
+
   projectClose();
 
   QApplication::setOverrideCursor( Qt::WaitCursor );
@@ -456,12 +493,11 @@ bool KadasApplication::projectOpen( const QString& projectFile )
   bool autoSetupOnFirstLayer = mLayerTreeCanvasBridge->autoSetupOnFirstLayer();
   mLayerTreeCanvasBridge->setAutoSetupOnFirstLayer( false );
 
-  bool success = QgsProject::instance()->read( projectFile );
+  QgsProjectDirtyBlocker dirtyBlocker(QgsProject::instance());
+  bool success = QgsProject::instance()->read( fileName );
 
   if ( success )
   {
-    mProjectLastModified = QgsProject::instance()->lastModified();
-    mMainWindow->setWindowTitle( QFileInfo(projectFile).fileName() );
     emit projectRead();
   }
 
@@ -512,14 +548,64 @@ void KadasApplication::projectClose()
   onActiveLayerChanged( currentLayer() );
 }
 
-void KadasApplication::projectSave()
+bool KadasApplication::projectSaveDirty()
 {
-  // TODO
+  if(QgsProject::instance()->isDirty()) {
+    QMessageBox::StandardButton response = QMessageBox::question(
+          mMainWindow, tr("Save Project"), tr("Do you want to save the current project?"),
+          QMessageBox::Save | QMessageBox::Cancel | QMessageBox::Discard);
+    if(response == QMessageBox::Save) {
+      return projectSave();
+    } else if(response == QMessageBox::Cancel) {
+      return false;
+    }
+  }
+  return true;
 }
 
-void KadasApplication::projectSaveAs( const QString& fileName )
+bool KadasApplication::projectSave(const QString &fileName, bool promptFileName)
 {
-  // TODO
+  if ( (QgsProject::instance()->fileName().isNull() && fileName.isEmpty()) || promptFileName )
+  {
+    QgsSettings settings;
+    QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
+
+    QString path = QFileDialog::getSaveFileName(
+          mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+    );
+    if ( path.isEmpty() )
+      return false;
+
+    QFileInfo fullPath(path);
+
+    if(
+       fullPath.suffix().compare( QLatin1String( "qgz" ), Qt::CaseInsensitive ) != 0 ||
+       fullPath.suffix().compare( QLatin1String( "qgs" ), Qt::CaseInsensitive ) != 0
+    ) {
+      path += ".qgz";
+    }
+
+    QgsProject::instance()->setFileName( path );
+  }
+  else if(!fileName.isEmpty())
+  {
+    QgsProject::instance()->setFileName(fileName);
+  }
+
+  if ( QgsProject::instance()->write() )
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "Project saved" ), "", Qgis::Info, mMainWindow->messageTimeout() );
+    mMainWindow->statusBar()->showMessage( tr( "Project saved to %1" ).arg( QDir::toNativeSeparators( QgsProject::instance()->fileName() ) ), 5000 );
+  }
+  else
+  {
+    QMessageBox::critical( mMainWindow,
+                           tr( "Unable to save project %1" ).arg( QDir::toNativeSeparators( QgsProject::instance()->fileName() ) ),
+                           QgsProject::instance()->error() );
+    return false;
+  }
+
+  return true;
 }
 
 void KadasApplication::saveMapAsImage()
@@ -634,6 +720,20 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult& r
 void KadasApplication::showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos)
 {
   // TODO
+}
+
+void KadasApplication::updateWindowTitle()
+{
+  QString fileName= QFileInfo(QgsProject::instance()->fileName()).baseName();
+  if(fileName.isEmpty()) {
+    fileName = tr("<New Project>");
+  }
+  QString modified;
+  if(QgsProject::instance()->isDirty()) {
+    modified = " *";
+  }
+  QString title = QString("%1%2 - %3").arg(fileName, modified, Kadas::KADAS_FULL_RELEASE_NAME);
+  mMainWindow->setWindowTitle(title);
 }
 
 QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const

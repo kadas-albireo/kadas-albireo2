@@ -60,9 +60,6 @@ private slots:
   void switchToTabForTool( QgsMapTool* tool );
   void toggleLayerTree();
   void checkOnTheFlyProjection();
-  void openProject();
-  void saveProject();
-  void saveProjectAs();
 
 private:
   bool eventFilter( QObject *obj, QEvent *ev ) override;

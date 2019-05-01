@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include <QDrag>
-#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QShortcut>
@@ -377,13 +376,13 @@ void KadasMainWindow::configureButtons()
   connect( mActionNew, &QAction::triggered, this, &KadasMainWindow::showProjectSelectionWidget );
 
   setActionToButton( mActionOpen, mOpenButton, QKeySequence( Qt::CTRL + Qt::Key_O ) );
-  connect( mActionOpen, &QAction::triggered, this, &KadasMainWindow::openProject );
+  connect( mActionOpen, &QAction::triggered, kApp, []{ kApp->projectOpen(); } );
 
   setActionToButton( mActionSave, mSaveButton, QKeySequence( Qt::CTRL + Qt::Key_S ) );
-  connect( mActionSave, &QAction::triggered, this, &KadasMainWindow::saveProject );
+  connect( mActionSave, &QAction::triggered, kApp, []{ kApp->projectSave(); } );
 
   setActionToButton( mActionSaveAs, mSaveAsButton, QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_S ) );
-  connect( mActionSaveAs, &QAction::triggered, this, &KadasMainWindow::saveProjectAs );
+  connect( mActionSaveAs, &QAction::triggered, kApp, []{ kApp->projectSave(QString(), true); } );
 
   setActionToButton( mActionPrint, mPrintButton, QKeySequence( Qt::CTRL + Qt::Key_P ) );
   // signal connected by plugin
@@ -591,32 +590,6 @@ void KadasMainWindow::checkOnTheFlyProjection()
   }
 }
 
-void KadasMainWindow::openProject()
-{
-  // TODO
-//  if(!saveDirty()) {
-//    return;
-//  }
-  QgsSettings settings;
-  QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
-  QString fullPath = QFileDialog::getOpenFileName( this,
-                     tr( "Choose a KADAS Project File to Open" ),
-                     lastUsedDir,
-                     tr( "QGIS files" ) + " (*.qgs *.qgz *.QGS)" );
-  kApp->projectOpen( fullPath );
-}
-
-void KadasMainWindow::saveProject()
-{
-  // TODO
-  mInfoBar->pushMessage( tr( "Project saved" ), "", Qgis::Info, messageTimeout() );
-}
-
-void KadasMainWindow::saveProjectAs()
-{
-  // TODO
-}
-
 void KadasMainWindow::showSourceSelectDialog(const QString& providerName)
 {
   QgsSourceSelectProvider* provider = QgsGui::instance()->sourceSelectProviderRegistry()->providerByName(providerName);
@@ -690,7 +663,7 @@ void KadasMainWindow::showProjectSelectionWidget()
 {
   KadasProjectTemplateSelectionDialog dialog( this );
   if(dialog.exec() == QDialog::Accepted && !dialog.selectedTemplate().isEmpty()) {
-    // fileNewFromTemplate(dialog.selectedTemplate()) TODO
+    kApp->projectCreateFromTemplate(dialog.selectedTemplate());
   }
 }
 

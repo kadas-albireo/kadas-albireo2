@@ -78,10 +78,10 @@ public:
 
   void paste();
 
-  bool projectOpen( const QString& projectFile );
+  bool projectCreateFromTemplate(const QString& templateFile );
+  bool projectOpen( const QString& projectFile = QString() );
   void projectClose();
-  void projectSave();
-  void projectSaveAs( const QString& projectFile = QString() );
+  bool projectSave( const QString& fileName = QString(), bool promptFileName = false);
 
   void saveMapAsImage();
   void saveMapToClipboard();
@@ -117,12 +117,14 @@ private:
   QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
   QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;
   bool showZipSublayerSelectionDialog(const QString& path) const;
+  bool projectSaveDirty();
 
 private slots:
   void onActiveLayerChanged( QgsMapLayer *layer );
   void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
   void handleItemPicked( const KadasFeaturePicker::PickResult& result );
   void showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos);
+  void updateWindowTitle();
 };
 
 #endif // KADASAPPLICATION_H
