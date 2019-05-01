@@ -41,3 +41,5 @@ TARGET_LINK_LIBRARIES(kadas
   kadas_core
   kadas_gui
 )
+
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
