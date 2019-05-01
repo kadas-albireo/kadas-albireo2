@@ -716,11 +716,11 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
 
   if ( newTool )
   {
-    connect( oldTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
+    connect( newTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
     if ( dynamic_cast<KadasMapToolPan*>( newTool ) )
     {
-      connect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
-      connect( static_cast<KadasMapToolPan*>( oldTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
+      connect( static_cast<KadasMapToolPan*>( newTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
+      connect( static_cast<KadasMapToolPan*>( newTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
     }
   }
 }
