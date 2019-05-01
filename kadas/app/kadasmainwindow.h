@@ -60,6 +60,11 @@ private slots:
   void switchToTabForTool( QgsMapTool* tool );
   void toggleLayerTree();
   void checkOnTheFlyProjection();
+  void zoomFull();
+  void zoomIn();
+  void zoomNext();
+  void zoomOut();
+  void zoomPrev();
 
 private:
   bool eventFilter( QObject *obj, QEvent *ev ) override;

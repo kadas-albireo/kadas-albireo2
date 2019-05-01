@@ -526,6 +526,8 @@ void KadasApplication::projectClose()
   // ensure layout widgets are fully deleted
 //  QgsApplication::sendPostedEvents( nullptr, QEvent::DeferredDelete );
 
+  mMainWindow->mapCanvas()->clearExtentHistory();
+
   // Remove annotation items
   QGraphicsScene *scene = mMainWindow->mapCanvas()->scene();
   for(QGraphicsItem* item : mMainWindow->mapCanvas()->items()) {
@@ -642,31 +644,6 @@ void KadasApplication::showLayerProperties(const QgsMapLayer* layer)
 }
 
 void KadasApplication::showLayerInfo(const QgsMapLayer* layer)
-{
-  // TODO
-}
-
-void KadasApplication::zoomFull()
-{
-  // TODO
-}
-
-void KadasApplication::zoomIn()
-{
-  mMainWindow->mapCanvas()->zoomIn();
-}
-
-void KadasApplication::zoomNext()
-{
-  // TODO
-}
-
-void KadasApplication::zoomOut()
-{
-  mMainWindow->mapCanvas()->zoomOut();
-}
-
-void KadasApplication::zoomPrev()
 {
   // TODO
 }

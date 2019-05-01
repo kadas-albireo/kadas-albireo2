@@ -194,9 +194,9 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
   connect( mRibbonWidget, &QTabWidget::currentChanged, [this]{ mMapCanvas->setMapTool(kApp->mapToolPan()); } ); // Change to pan tool when changing active kadas tab
-  connect( mZoomInButton, &QPushButton::clicked, kApp, &KadasApplication::zoomIn );
-  connect( mZoomOutButton, &QPushButton::clicked, kApp, &KadasApplication::zoomOut );
-  connect( mHomeButton, &QPushButton::clicked, kApp, &KadasApplication::zoomFull );
+  connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
+  connect( mZoomOutButton, &QPushButton::clicked, this, &KadasMainWindow::zoomOut );
+  connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
   connect( kApp->clipboard(), &KadasClipboard::dataChanged, [this]{ mActionPaste->setEnabled(!kApp->clipboard()->isEmpty()); });
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree);
@@ -411,10 +411,12 @@ void KadasMainWindow::configureButtons()
 
   // View tab
   setActionToButton( mActionZoomLast, mZoomLastButton, QKeySequence( Qt::CTRL + Qt::Key_PageUp ) );
-  connect( mActionZoomLast, &QAction::triggered, kApp, &KadasApplication::zoomPrev );
+  connect( mActionZoomLast, &QAction::triggered, this, &KadasMainWindow::zoomPrev );
+  connect( mMapCanvas, &QgsMapCanvas::zoomLastStatusChanged, mActionZoomLast, &QAction::setEnabled);
 
   setActionToButton( mActionZoomNext, mZoomNextButton, QKeySequence( Qt::CTRL + Qt::Key_PageDown ) );
-  connect( mActionZoomNext, &QAction::triggered, kApp, &KadasApplication::zoomNext );
+  connect( mActionZoomNext, &QAction::triggered, this, &KadasMainWindow::zoomNext );
+  connect( mMapCanvas, &QgsMapCanvas::zoomNextStatusChanged, mActionZoomNext, &QAction::setEnabled);
 
   setActionToButton( mActionNewMapWindow, mNewMapWindowButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
 //  connect( mActionNewMapWindow, &QAction::triggered, mMultiMapManager, &KadasMultiMapManager::addMapWidget ); // TODO
@@ -588,6 +590,46 @@ void KadasMainWindow::checkOnTheFlyProjection()
     mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
     mInfoBar->pushItem( mReprojMsgItem.data() );
   }
+}
+
+void KadasMainWindow::zoomFull()
+{
+  // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
+  mScaleComboBox->blockSignals(true);
+  mMapCanvas->zoomToFullExtent();
+  mScaleComboBox->blockSignals(false);
+}
+
+void KadasMainWindow::zoomIn()
+{
+  // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
+  mScaleComboBox->blockSignals(true);
+  mMapCanvas->zoomIn();
+  mScaleComboBox->blockSignals(false);
+}
+
+void KadasMainWindow::zoomNext()
+{
+  // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
+  mScaleComboBox->blockSignals(true);
+  mMapCanvas->zoomToNextExtent();
+  mScaleComboBox->blockSignals(false);
+}
+
+void KadasMainWindow::zoomOut()
+{
+  // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
+  mScaleComboBox->blockSignals(true);
+  mMapCanvas->zoomOut();
+  mScaleComboBox->blockSignals(false);
+}
+
+void KadasMainWindow::zoomPrev()
+{
+  // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
+  mScaleComboBox->blockSignals(true);
+  mMapCanvas->zoomToPreviousExtent();
+  mScaleComboBox->blockSignals(false);
 }
 
 void KadasMainWindow::showSourceSelectDialog(const QString& providerName)

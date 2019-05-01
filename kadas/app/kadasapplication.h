@@ -90,12 +90,6 @@ public:
   void showLayerProperties(const QgsMapLayer* layer);
   void showLayerInfo(const QgsMapLayer* layer);
 
-  void zoomFull();
-  void zoomIn();
-  void zoomNext();
-  void zoomOut();
-  void zoomPrev();
-
   QgsMapLayer* currentLayer() const;
   void refreshMapCanvas() const;
 
