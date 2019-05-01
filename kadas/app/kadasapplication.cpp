@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QClipboard>
 #include <QFile>
 #include <QFileDialog>
 #include <QIcon>
@@ -23,6 +24,7 @@
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
 #include <qgis/qgsdataitem.h>
+#include <qgis/qgsguiutils.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
@@ -185,7 +187,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   splash.show();
   mClipboard = new KadasClipboard(this);
   mMainWindow = new KadasMainWindow(&splash);
-  mMainWindow->mapCanvas()->setCanvasColor(QColor(255, 255, 255, 0));
+  mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
 
@@ -610,12 +612,23 @@ bool KadasApplication::projectSave(const QString &fileName, bool promptFileName)
 
 void KadasApplication::saveMapAsImage()
 {
-  // TODO
+  QPair< QString, QString> fileAndFilter = QgsGuiUtils::getSaveAsImageName( mMainWindow, tr( "Choose an Image File" ) );
+  if ( fileAndFilter.first.isEmpty() )
+  {
+    return;
+  }
+  mMainWindow->mapCanvas()->saveAsImage( fileAndFilter.first, nullptr, fileAndFilter.second );
+  mMainWindow->messageBar()->pushMessage( tr( "Map image saved to %1" ).arg(QFileInfo(fileAndFilter.first).fileName()), QString(), Qgis::Info, mMainWindow->messageTimeout() );
 }
 
 void KadasApplication::saveMapToClipboard()
 {
-  // TODO
+  QImage image( mMainWindow->mapCanvas()->size(), QImage::Format_ARGB32 );
+  image.fill( QColor( 255, 255, 255, 1 ) );
+  QPainter painter( &image );
+  mMainWindow->mapCanvas()->render( &painter );
+  QApplication::clipboard()->setImage( image );
+  mMainWindow->messageBar()->pushMessage( tr( "Map image saved to clipboard" ), QString(), Qgis::Info, mMainWindow->messageTimeout() );
 }
 
 void KadasApplication::showLayerAttributeTable(const QgsMapLayer* layer)
