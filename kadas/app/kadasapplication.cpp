@@ -36,6 +36,7 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/gui/kadasclipboard.h>
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -180,6 +181,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   // Create main window
   QSplashScreen splash(QPixmap(":/images/splash"));
   splash.show();
+  mClipboard = new KadasClipboard(this);
   mMainWindow = new KadasMainWindow(&splash);
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
