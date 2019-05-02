@@ -470,7 +470,7 @@ void KadasGeometryRubberBand::measureGeometry( QgsAbstractGeometry *geometry, in
           if ( !points.isEmpty() )
           {
             mPartMeasurements.append( totLength );
-            QString totLengthStr = QObject::tr( "KadasGeometryRubberBand", "Tot.: %1" ).arg( formatMeasurement( totLength, false ) );
+            QString totLengthStr = tr( "Tot.: %1" ).arg( formatMeasurement( totLength, false ) );
             addMeasurements( QStringList() << totLengthStr, points.last() );
           }
         }
@@ -597,7 +597,7 @@ void KadasGeometryRubberBand::measureGeometry( QgsAbstractGeometry *geometry, in
           measurements.append( formatMeasurement( area, true ) );
           QgsPoint p1 = ring->vertexAt( QgsVertexId( 0, 0, 0 ) );
           QgsPoint p2 = ring->vertexAt( QgsVertexId( 0, 0, 1 ) );
-          measurements.append( QObject::tr( "KadasGeometryRubberBand", "Radius: %1" ).arg( formatMeasurement( mDa.measureLine( QgsPoint( p1.x(), p1.y() ), QgsPoint( p2.x(), p2.y() ) ), false ) ) );
+          measurements.append( tr( "Radius: %1" ).arg( formatMeasurement( mDa.measureLine( QgsPoint( p1.x(), p1.y() ), QgsPoint( p2.x(), p2.y() ) ), false ) ) );
         }
         break;
       case MEASURE_NONE:
