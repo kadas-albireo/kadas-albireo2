@@ -39,6 +39,7 @@
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
+#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
@@ -444,7 +445,7 @@ void KadasMainWindow::configureButtons()
   connect( mActionPaste, &QAction::triggered, kApp, &KadasApplication::paste );
   mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() );
 
-  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), nullptr );
+  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems(mMapCanvas); } );
 
   // Analysis tab
   setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure(mMapCanvas, KadasMapToolMeasure::MeasureLine); } );
