@@ -40,8 +40,8 @@
 #include <qgis/qgsrubberband.h>
 #include <qgis/qgssnappingutils.h>
 
-#include "kadasmaptooldrawshape.h"
-#include "kadasfloatinginputwidget.h"
+#include <kadas/gui/kadasfloatinginputwidget.h>
+#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
 
 KadasMapToolDrawShape::KadasMapToolDrawShape( QgsMapCanvas *canvas, bool isArea, State *initialState )
     : QgsMapTool( canvas )
@@ -651,62 +651,61 @@ QgsAbstractGeometry* KadasMapToolDrawPolyLine::createGeometry( const QgsCoordina
     if ( mGeodesic )
     {
       int nPoints = part.size();
-      if ( nPoints < 2 )
+      if ( nPoints >= 2 )
       {
-        continue;
-      }
-      QgsCoordinateTransform t1( canvas()->mapSettings().destinationCrs(), QgsCoordinateReferenceSystem( "EPSG:4326"), QgsProject::instance() );
-      QgsCoordinateTransform t2( QgsCoordinateReferenceSystem( "EPSG:4326"), targetCrs, QgsProject::instance() );
-      QList<QgsPointXY> wgsPoints;
+        QgsCoordinateTransform t1( canvas()->mapSettings().destinationCrs(), QgsCoordinateReferenceSystem( "EPSG:4326"), QgsProject::instance() );
+        QgsCoordinateTransform t2( QgsCoordinateReferenceSystem( "EPSG:4326"), targetCrs, QgsProject::instance() );
+        QList<QgsPointXY> wgsPoints;
 
-      GeographicLib::Geodesic geod( GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f() );
+        GeographicLib::Geodesic geod( GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f() );
 
-      for ( const QgsPointXY& point : part )
-      {
-        wgsPoints.append( t1.transform( point ) );
-      }
-
-      double sdist = 500000; // 500km segments
-      for ( int i = 0; i < nPoints - 1; ++i )
-      {
-        int ringSize = ring->vertexCount();
-        GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i+1].y(), wgsPoints[i+1].x() );
-        double dist = line.Distance();
-        int nIntervals = qMax( 1, int( std::ceil( dist / sdist ) ) );
-        for ( int j = 0; j < nIntervals; ++j )
+        for ( const QgsPointXY& point : part )
         {
-          double lat, lon;
-          line.Position( j * sdist, lat, lon );
-          ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
-          if ( hiddenNodes && j != 0 )
+          wgsPoints.append( t1.transform( point ) );
+        }
+
+        double sdist = 500000; // 500km segments
+        for ( int i = 0; i < nPoints - 1; ++i )
+        {
+          int ringSize = ring->vertexCount();
+          GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i+1].y(), wgsPoints[i+1].x() );
+          double dist = line.Distance();
+          int nIntervals = qMax( 1, int( std::ceil( dist / sdist ) ) );
+          for ( int j = 0; j < nIntervals; ++j )
           {
-            hiddenNodes->append( QgsVertexId( iPart, 0, ringSize + j ) );
+            double lat, lon;
+            line.Position( j * sdist, lat, lon );
+            ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
+            if ( hiddenNodes && j != 0 )
+            {
+              hiddenNodes->append( QgsVertexId( iPart, 0, ringSize + j ) );
+            }
+          }
+          if ( !mIsArea && i == nPoints - 2 )
+          {
+            double lat, lon;
+            line.Position( dist, lat, lon );
+            ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
           }
         }
-        if ( !mIsArea && i == nPoints - 2 )
+        if ( mIsArea && !part.isEmpty() )
         {
-          double lat, lon;
-          line.Position( dist, lat, lon );
-          ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
-        }
-      }
-      if ( mIsArea && !part.isEmpty() )
-      {
-        GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[nPoints -1].y(), wgsPoints[nPoints -1].x(), wgsPoints[0].y(), wgsPoints[0].x() );
-        double dist = line.Distance();
-        int nIntervals = qMax( 1, int( std::ceil( dist / sdist ) ) );
-        int ringSize = ring->vertexCount();
-        for ( int j = 0; j < nIntervals; ++j )
-        {
-          double lat, lon;
-          line.Position( j * sdist, lat, lon );
-          ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
-          if ( hiddenNodes && j != 0 )
+          GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[nPoints -1].y(), wgsPoints[nPoints -1].x(), wgsPoints[0].y(), wgsPoints[0].x() );
+          double dist = line.Distance();
+          int nIntervals = qMax( 1, int( std::ceil( dist / sdist ) ) );
+          int ringSize = ring->vertexCount();
+          for ( int j = 0; j < nIntervals; ++j )
           {
-            hiddenNodes->append( QgsVertexId( iPart, 0, ringSize + j ) );
+            double lat, lon;
+            line.Position( j * sdist, lat, lon );
+            ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
+            if ( hiddenNodes && j != 0 )
+            {
+              hiddenNodes->append( QgsVertexId( iPart, 0, ringSize + j ) );
+            }
           }
+          ring->addVertex( ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) );
         }
-        ring->addVertex( ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) );
       }
     }
     else
@@ -1314,7 +1313,7 @@ class GeodesicCircleMeasurer : public KadasGeometryRubberBand::Measurer
 
         Measurement areaMeasurement = {Measurement::Area, "", area};
         measurements.append( areaMeasurement );
-        Measurement radiusMeasurement = {Measurement::Length, QObject::tr( "GeodesicCircleMeasurer", "Radius" ), radius};
+        Measurement radiusMeasurement = {Measurement::Length, QObject::tr( "Radius" ), radius};
         measurements.append( radiusMeasurement );
       }
       return measurements;
