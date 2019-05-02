@@ -563,7 +563,7 @@ void KadasGeometryRubberBand::measureGeometry( QgsAbstractGeometry *geometry, in
       case MEASURE_POLYGON:
         if ( dynamic_cast<QgsCurvePolygon*>( geometry ) )
         {
-          double area = mDa.measureArea( QgsGeometry( static_cast<QgsCurvePolygon*>( geometry )->exteriorRing()->clone() ) );
+          double area = mDa.measureArea( QgsGeometry( geometry->clone() ) );
           mPartMeasurements.append( area );
           measurements.append( formatMeasurement( area, true ) );
         }
