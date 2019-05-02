@@ -42,6 +42,7 @@
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
+#include <kadas/gui/maptools/kadasmaptoolslope.h>
 
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
@@ -459,7 +460,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return new KadasMapToolHeightProfile(mMapCanvas); } );
 
-  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), nullptr );
+  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), [this] { return new KadasMapToolSlope(mMapCanvas); } );
 
   setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), nullptr );
 

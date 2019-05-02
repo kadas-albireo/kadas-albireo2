@@ -39,6 +39,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${QCA_LDFLAGS}
   ${QTKEYCHAIN_LIBRARIES}
   kadas_core
+  kadas_analysis
   kadas_gui
 )
 
