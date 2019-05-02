@@ -39,6 +39,8 @@
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
+#include <kadas/gui/maptools/kadasmaptoolmeasure.h>
+
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
@@ -445,13 +447,13 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), nullptr );
 
   // Analysis tab
-  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), nullptr );
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure(mMapCanvas, KadasMapToolMeasure::MeasureLine); } );
 
-  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), nullptr );
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return new KadasMapToolMeasure(mMapCanvas, KadasMapToolMeasure::MeasurePolygon); } );
 
-  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), nullptr );
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure(mMapCanvas, KadasMapToolMeasure::MeasureCircle); } );
 
-  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), nullptr );
+  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolMeasure(mMapCanvas, KadasMapToolMeasure::MeasureAzimuth); } );
 
   setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), nullptr );
 
