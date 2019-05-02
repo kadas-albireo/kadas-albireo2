@@ -625,7 +625,7 @@ QString KadasGeometryRubberBand::formatMeasurement( double value, bool isArea ) 
 QString KadasGeometryRubberBand::formatAngle( double value ) const
 {
   int decimals = QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
-  value = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, mAngleUnit);
+  value *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, mAngleUnit);
   return QgsUnitTypes::formatAngle(value, decimals, mAngleUnit);
 }
 
