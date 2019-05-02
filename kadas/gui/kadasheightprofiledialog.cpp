@@ -245,7 +245,7 @@ void KadasHeightProfileDialog::replot()
   QgsMapLayer* layer = QgsProject::instance()->mapLayer( layerid );
   if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
   {
-    emit mTool->messageEmitted( tr( "No heightmap is defined in the project." ), Qgis::Info);
+    emit mTool->messageEmitted( tr( "No heightmap is defined in the project." ), Qgis::Warning);
     return;
   }
   QString rasterFile = layer->source();
