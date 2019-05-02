@@ -126,7 +126,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   QgsApplication::initQgis();
 
   // Setup application style
-  setWindowIcon(QIcon(":/images/icon"));
+  setWindowIcon(QIcon(":/images/logo"));
   QFile styleSheet(":/stylesheet");
   if (styleSheet.open(QIODevice::ReadOnly))
   {
