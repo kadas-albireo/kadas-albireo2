@@ -19,8 +19,7 @@
 #include <QKeyEvent>
 
 #include <qgis/qgsmapcanvas.h>
-
-#include "kadasfloatinginputwidget.h"
+#include <kadas/gui/kadasfloatinginputwidget.h>
 
 KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( QValidator* validator, QWidget* parent ) : QLineEdit( parent )
 {

@@ -23,7 +23,7 @@
 #include <qgis/qgsfeaturestore.h>
 #include <qgis/qgsgeometry.h>
 
-#include "kadasclipboard.h"
+#include <kadas/gui/kadasclipboard.h>
 
 KadasClipboard::KadasClipboard( QObject* parent )
     : QObject( parent )

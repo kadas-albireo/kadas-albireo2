@@ -30,7 +30,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include "kadasgeometryrubberband.h"
+#include <kadas/gui/kadasgeometryrubberband.h>
 
 KadasGeometryRubberBand::KadasGeometryRubberBand( QgsMapCanvas* mapCanvas, QgsWkbTypes::GeometryType geomType )
     : QgsMapCanvasItem( mapCanvas )

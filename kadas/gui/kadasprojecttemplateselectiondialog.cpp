@@ -23,10 +23,7 @@
 #include <QVBoxLayout>
 
 #include <kadas/core/kadas.h>
-//#include "qgsapplication.h"
-//#include "qgisapp.h"
-
-#include "kadasprojecttemplateselectiondialog.h"
+#include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
 KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidget *parent )
     : QDialog( parent )

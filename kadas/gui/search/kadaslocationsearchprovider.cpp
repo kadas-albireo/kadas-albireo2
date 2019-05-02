@@ -25,7 +25,7 @@
 #include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 
-#include "kadaslocationsearchprovider.h"
+#include <kadas/gui/search/kadaslocationsearchprovider.h>
 
 const int KadasLocationSearchProvider::sSearchTimeout = 2000;
 const int KadasLocationSearchProvider::sResultCountLimit = 50;

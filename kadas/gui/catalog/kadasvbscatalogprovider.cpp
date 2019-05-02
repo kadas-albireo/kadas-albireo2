@@ -29,8 +29,7 @@
 #include <qgis/qgsmimedatautils.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
-
-#include "kadasvbscatalogprovider.h"
+#include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
 KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
     : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )

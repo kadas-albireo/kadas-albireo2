@@ -26,8 +26,7 @@
 #include <qgis/qgslogger.h>
 
 #include <kadas/core/kadas.h>
-
-#include "kadascrashrpt.h"
+#include <kadas/app/kadascrashrpt.h>
 
 #ifdef _MSC_VER
 // Define the callback function that will be called on crash

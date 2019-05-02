@@ -20,7 +20,7 @@
 #include <qgis/qgssymbollayer.h>
 #include <qgis/qgswkbtypes.h>
 
-#include "kadasredliningrenderer.h"
+#include <kadas/core/kadasredliningrenderer.h>
 
 // HACK to get public access to protected _getXXX methods
 class KadasSymbol : public QgsSymbol

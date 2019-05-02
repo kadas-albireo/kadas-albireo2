@@ -46,10 +46,10 @@
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
 
-#include "kadasapplication.h"
-#include "kadasgpsintegration.h"
-#include "kadaslayertreeviewmenuprovider.h"
-#include "kadasmainwindow.h"
+#include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadasgpsintegration.h>
+#include <kadas/app/kadaslayertreeviewmenuprovider.h>
+#include <kadas/app/kadasmainwindow.h>
 
 KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
 {

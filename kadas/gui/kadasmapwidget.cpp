@@ -31,8 +31,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include "maptools/kadasmaptoolpan.h"
-#include "kadasmapwidget.h"
+#include <kadas/gui/kadasmapwidget.h>
+#include <kadas/gui/maptools/kadasmaptoolpan.h>
 
 KadasMapWidget::KadasMapWidget( int number, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
     : QDockWidget( parent ), mNumber( number ), mMasterCanvas( masterCanvas ), mUnsetFixedSize( true )

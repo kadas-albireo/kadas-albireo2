@@ -19,7 +19,7 @@
 
 #include <kadas/core/kadaslatlontoutm.h>
 
-#include "kadascoordinatesearchprovider.h"
+#include <kadas/gui/search/kadascoordinatesearchprovider.h>
 
 const QString KadasCoordinateSearchProvider::sCategoryName = KadasCoordinateSearchProvider::tr( "Coordinates" );
 

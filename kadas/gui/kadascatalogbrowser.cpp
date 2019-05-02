@@ -26,8 +26,8 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgsrasterlayer.h>
 
-#include "kadascatalogbrowser.h"
-#include "kadascatalogprovider.h"
+#include <kadas/gui/kadascatalogbrowser.h>
+#include <kadas/gui/kadascatalogprovider.h>
 
 
 class KadasCatalogBrowser::CatalogItem : public QStandardItem

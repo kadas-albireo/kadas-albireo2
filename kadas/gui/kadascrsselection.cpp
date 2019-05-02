@@ -28,7 +28,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsprojectionselectiondialog.h>
 
-#include "kadascrsselection.h"
+#include <kadas/gui/kadascrsselection.h>
 
 
 KadasCrsSelection::KadasCrsSelection( QWidget *parent )

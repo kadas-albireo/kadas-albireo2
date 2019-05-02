@@ -23,8 +23,7 @@
 #include <qgis/qgsvectorlayer.h>
 
 #include <kadas/core/kadaspluginlayer.h>
-
-#include "kadasfeaturepicker.h"
+#include <kadas/gui/kadasfeaturepicker.h>
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType, filter_t filter )
 {

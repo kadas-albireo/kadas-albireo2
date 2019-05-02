@@ -25,8 +25,8 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
-#include "kadascoordinateformat.h"
-#include "kadaslatlontoutm.h"
+#include <kadas/core/kadascoordinateformat.h>
+#include <kadas/core/kadaslatlontoutm.h>
 
 static QRegExp gPatDflt = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)?$" ) );
 static QRegExp gPatDD   = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)%1?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)%1?$" ).arg( QChar( 0x00B0 ) ) );

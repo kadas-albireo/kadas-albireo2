@@ -19,8 +19,8 @@
 #include <QFile>
 #include <QStandardPaths>
 
-#include "kadas.h"
-#include "kadas_config.h"
+#include <kadas/core/kadas.h>
+#include <kadas/core/kadas_config.h>
 
 const char* Kadas::KADAS_VERSION = _KADAS_VERSION_;
 const int Kadas::KADAS_VERSION_INT = _KADAS_VERSION_INT_;

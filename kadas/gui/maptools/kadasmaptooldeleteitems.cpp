@@ -30,7 +30,7 @@
 #include <kadas/core/kadaspluginlayer.h>
 #include <kadas/core/kadasredlininglayer.h>
 
-#include "kadasmaptooldeleteitems.h"
+#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 
 
 KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas* mapCanvas )

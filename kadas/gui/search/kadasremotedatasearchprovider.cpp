@@ -31,7 +31,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 
-#include "kadasremotedatasearchprovider.h"
+#include <kadas/gui/search/kadasremotedatasearchprovider.h>
 
 
 const int KadasRemoteDataSearchProvider::sSearchTimeout = 2000;

@@ -22,8 +22,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
-
-#include "kadasgeoadminrestcatalogprovider.h"
+#include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 
 KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
     : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )

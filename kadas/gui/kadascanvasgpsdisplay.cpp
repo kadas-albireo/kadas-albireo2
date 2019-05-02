@@ -26,7 +26,7 @@
 #include <qgis/qgsproject.h>
 
 
-#include "kadascanvasgpsdisplay.h"
+#include <kadas/gui/kadascanvasgpsdisplay.h>
 
 KadasCanvasGPSDisplay::KadasCanvasGPSDisplay( QgsMapCanvas* canvas, QObject* parent )
   : QObject( parent )

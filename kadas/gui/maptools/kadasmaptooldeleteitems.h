@@ -18,7 +18,7 @@
 #define KADASMAPTOOLDELETEITEMS_H
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasmaptooldrawshape.h>
+#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
 
 class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolDrawRectangle
 {

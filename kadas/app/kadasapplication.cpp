@@ -41,9 +41,8 @@
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
-
-#include "kadasapplication.h"
-#include "kadasmainwindow.h"
+#include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadasmainwindow.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )

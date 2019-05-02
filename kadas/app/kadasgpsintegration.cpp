@@ -17,9 +17,8 @@
 #include <qgis/qgsmessagebar.h>
 
 #include <kadas/gui/kadascanvasgpsdisplay.h>
-
-#include "kadasgpsintegration.h"
-#include "kadasmainwindow.h"
+#include <kadas/app/kadasgpsintegration.h>
+#include <kadas/app/kadasmainwindow.h>
 
 KadasGpsIntegration::KadasGpsIntegration(KadasMainWindow *mainWindow)
   : QObject(mainWindow), mMainWindow(mainWindow)

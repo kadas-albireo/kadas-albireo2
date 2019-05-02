@@ -26,7 +26,6 @@
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
 
-//#include "qgsapplication.h"
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometryrubberband.h>
 #include <qgis/qgsmapcanvas.h>
@@ -34,10 +33,9 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrubberband.h>
 
-#include <kadas/gui/kadasmaptooldrawshape.h>
-//#include "qgspinannotationitem.h"
-#include "kadassearchbox.h"
-#include "kadassearchprovider.h"
+#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
+#include <kadas/gui/kadassearchbox.h>
+#include <kadas/gui/kadassearchprovider.h>
 
 
 

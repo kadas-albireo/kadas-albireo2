@@ -20,8 +20,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include "kadasredlininglayer.h"
-#include "kadasredliningrenderer.h"
+#include <kadas/core/kadasredlininglayer.h>
+#include <kadas/core/kadasredliningrenderer.h>
 
 KadasRedliningLayer::KadasRedliningLayer( const QString& name , const QString &crs ) : QgsVectorLayer(
       QString( "unknown?crs=%1&memoryid=%2" ).arg( crs ).arg( QUuid::createUuid().toString() ),

@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "kadasstatestack.h"
+#include <kadas/core/kadasstatestack.h>
 
 KadasStateStack::KadasStateStack( State *initialState, QObject* parent )
     : QObject( parent ), mState( initialState )

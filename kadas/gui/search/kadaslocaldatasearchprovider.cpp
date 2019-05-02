@@ -28,7 +28,7 @@
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsgeometry.h>
 
-#include "kadaslocaldatasearchprovider.h"
+#include <kadas/gui/search/kadaslocaldatasearchprovider.h>
 
 
 KadasLocalDataSearchProvider::KadasLocalDataSearchProvider( QgsMapCanvas* mapCanvas )

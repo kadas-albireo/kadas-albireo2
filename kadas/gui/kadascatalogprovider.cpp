@@ -19,8 +19,8 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmimedatautils.h>
 
-#include "kadascatalogbrowser.h"
-#include "kadascatalogprovider.h"
+#include <kadas/gui/kadascatalogbrowser.h>
+#include <kadas/gui/kadascatalogprovider.h>
 
 
 KadasCatalogProvider::KadasCatalogProvider( KadasCatalogBrowser* browser )

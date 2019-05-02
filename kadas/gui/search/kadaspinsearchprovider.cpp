@@ -21,7 +21,7 @@
 
 //#include <kadas/gui/kadaspinannotationitem.h> // TODO
 
-#include "kadaspinsearchprovider.h"
+#include <kadas/gui/search/kadaspinsearchprovider.h>
 
 const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr( "Pins" );
 

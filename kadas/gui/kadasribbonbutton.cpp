@@ -18,7 +18,7 @@
 #include <QDragEnterEvent>
 #include <QPainter>
 
-#include "kadasribbonbutton.h"
+#include <kadas/gui/kadasribbonbutton.h>
 
 
 void KadasRibbonButton::paintEvent( QPaintEvent* /*e*/ )

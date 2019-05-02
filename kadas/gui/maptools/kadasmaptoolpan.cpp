@@ -24,9 +24,8 @@
 #include <qgis/qgsrubberband.h>
 
 #include <kadas/gui/kadasfeaturepicker.h>
-
-#include "kadasmaptooldeleteitems.h"
-#include "kadasmaptoolpan.h"
+#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
+#include <kadas/gui/maptools/kadasmaptoolpan.h>
 
 KadasMapToolPan::KadasMapToolPan( QgsMapCanvas* canvas , bool allowItemInteraction )
     : QgsMapTool( canvas )
