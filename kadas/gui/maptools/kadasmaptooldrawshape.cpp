@@ -445,7 +445,7 @@ QgsAbstractGeometry* KadasMapToolDrawPoint::createGeometry( const QgsCoordinateR
   }
   else
   {
-    QgsAbstractGeometry* geom = multiGeom->geometryN( 0 )->clone();
+    QgsAbstractGeometry* geom = multiGeom->isEmpty() ? new QgsPoint() : multiGeom->geometryN( 0 )->clone();
     delete multiGeom;
     return geom;
   }
@@ -737,7 +737,7 @@ QgsAbstractGeometry* KadasMapToolDrawPolyLine::createGeometry( const QgsCoordina
   }
   else
   {
-    QgsAbstractGeometry* geom = multiGeom->geometryN( 0 )->clone();
+    QgsAbstractGeometry* geom = multiGeom->isEmpty() ? (mIsArea ? static_cast<QgsAbstractGeometry*>(new QgsPolygon()) : new QgsLineString()) : multiGeom->geometryN( 0 )->clone();
     delete multiGeom;
     return geom;
   }
@@ -1520,7 +1520,7 @@ QgsAbstractGeometry* KadasMapToolDrawCircle::createGeometry( const QgsCoordinate
   }
   else
   {
-    QgsAbstractGeometry* geom = multiGeom->geometryN( 0 )->clone();
+    QgsAbstractGeometry* geom = multiGeom->isEmpty() ? new QgsCurvePolygon : multiGeom->geometryN( 0 )->clone();
     delete multiGeom;
     return geom;
   }
@@ -1912,7 +1912,7 @@ QgsAbstractGeometry* KadasMapToolDrawCircularSector::createGeometry( const QgsCo
   }
   else
   {
-    QgsAbstractGeometry* geom = multiGeom->geometryN( 0 )->clone();
+    QgsAbstractGeometry* geom = multiGeom->isEmpty() ? new QgsPolygon() : multiGeom->geometryN( 0 )->clone();
     delete multiGeom;
     return geom;
   }
