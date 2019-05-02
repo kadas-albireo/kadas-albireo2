@@ -506,8 +506,8 @@ void KadasGeometryRubberBand::measureGeometry( QgsAbstractGeometry *geometry, in
             angle = angle < 0 ? angle + 2 * M_PI : angle;
             angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
             mPartMeasurements.append( angle );
-            QString segmentLength = formatAngle( angle );
-            addMeasurements( QStringList() << segmentLength, QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+            QString segmentAngle = formatAngle( angle );
+            addMeasurements( QStringList() << segmentAngle, QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
           }
         }
         break;
