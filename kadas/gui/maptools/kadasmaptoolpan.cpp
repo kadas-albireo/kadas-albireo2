@@ -72,7 +72,7 @@ void KadasMapToolPan::canvasPressEvent( QgsMapMouseEvent * e )
         int green = settings.value( "/Qgis/default_measure_color_green", 0 ).toInt();
         int blue = settings.value( "/Qgis/default_measure_color_blue", 0 ).toInt();
         mExtentRubberBand->setFillColor( QColor( red, green, blue, 63 ) );
-        mExtentRubberBand->setColor( QColor( red, green, blue, 255 ) );
+        mExtentRubberBand->setStrokeColor( QColor( red, green, blue, 255 ) );
         mExtentRubberBand->setWidth( 3 );
       }
       mExtentRect.setTopLeft( e->pos() );
