@@ -561,7 +561,7 @@ void KadasMapToolDrawPoint::edit(const KadasMapToolDrawShape::EditContext* conte
   update();
 }
 
-void KadasMapToolDrawPoint::setPart( int part, const QgsPoint& p )
+void KadasMapToolDrawPoint::setPart(int part, const QgsPointXY &p )
 {
   State* newState = cloneState();
   newState->points[part].front() = p;
@@ -1284,7 +1284,7 @@ void KadasMapToolDrawRectangle::edit(const KadasMapToolDrawShape::EditContext* c
   update();
 }
 
-void KadasMapToolDrawRectangle::setPart( int part, const QgsPoint& p1, const QgsPoint& p2 )
+void KadasMapToolDrawRectangle::setPart(int part, const QgsPointXY &p1, const QgsPointXY &p2 )
 {
   State* newState = cloneState();
   newState->p1[part] = p1;
@@ -1769,7 +1769,7 @@ void KadasMapToolDrawCircle::edit(const KadasMapToolDrawShape::EditContext* cont
   update();
 }
 
-void KadasMapToolDrawCircle::setPart( int part, const QgsPoint& center, double radius )
+void KadasMapToolDrawCircle::setPart(int part, const QgsPointXY &center, double radius )
 {
   State* newState = cloneState();
   newState->centers[part] = center;
@@ -2163,7 +2163,7 @@ void KadasMapToolDrawCircularSector::edit(const EditContext* /*context*/, const 
   /* Currently not implemented */
 }
 
-void KadasMapToolDrawCircularSector::setPart( int part, const QgsPoint& center, double radius, double startAngle, double stopAngle )
+void KadasMapToolDrawCircularSector::setPart(int part, const QgsPointXY &center, double radius, double startAngle, double stopAngle )
 {
   State* newState = cloneState();
   newState->centers[part] = center;

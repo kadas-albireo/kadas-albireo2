@@ -142,7 +142,7 @@ class KADAS_GUI_EXPORT KadasMapToolDrawPoint : public KadasMapToolDrawShape
     KadasMapToolDrawPoint( QgsMapCanvas* canvas );
     int getPartCount() const override { return state()->points.size(); }
     void getPart( int part, QgsPointXY& p ) const { p = state()->points[part].front(); }
-    void setPart( int part, const QgsPoint& p );
+    void setPart( int part, const QgsPointXY& p );
     QgsAbstractGeometry* createGeometry( const QgsCoordinateReferenceSystem& targetCrs, QList<QgsVertexId>* hiddenNodes = 0 ) const override;
 
   protected:
@@ -239,7 +239,7 @@ class KADAS_GUI_EXPORT KadasMapToolDrawRectangle : public KadasMapToolDrawShape
       p1 = state()->p1[part];
       p2 = state()->p2[part];
     }
-    void setPart( int part, const QgsPoint& p1, const QgsPoint& p2 );
+    void setPart( int part, const QgsPointXY& p1, const QgsPointXY& p2 );
     QgsAbstractGeometry* createGeometry( const QgsCoordinateReferenceSystem& targetCrs, QList<QgsVertexId>* hiddenNodes = 0 ) const override;
 
   protected:
@@ -283,7 +283,7 @@ class KADAS_GUI_EXPORT KadasMapToolDrawCircle : public KadasMapToolDrawShape
     KadasMapToolDrawCircle( QgsMapCanvas* canvas, bool geodesic = false );
     int getPartCount() const override { return state()->centers.size(); }
     void getPart(int part, QgsPointXY &center, double& radius ) const;
-    void setPart( int part, const QgsPoint& center, double radius );
+    void setPart( int part, const QgsPointXY& center, double radius );
     QgsAbstractGeometry* createGeometry( const QgsCoordinateReferenceSystem& targetCrs, QList<QgsVertexId>* hiddenNodes = 0 ) const override;
 
   protected:
@@ -340,7 +340,7 @@ class KADAS_GUI_EXPORT KadasMapToolDrawCircularSector : public KadasMapToolDrawS
       startAngle = state()->startAngles[part];
       stopAngle = state()->stopAngles[part];
     }
-    void setPart( int part, const QgsPoint& center, double radius, double startAngle, double stopAngle );
+    void setPart( int part, const QgsPointXY& center, double radius, double startAngle, double stopAngle );
     QgsAbstractGeometry* createGeometry( const QgsCoordinateReferenceSystem& targetCrs, QList<QgsVertexId>* hiddenNodes = 0 ) const override;
 
   protected:
