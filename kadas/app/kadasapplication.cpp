@@ -42,6 +42,7 @@
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
 
 
@@ -116,6 +117,11 @@ KadasApplication *KadasApplication::instance()
 KadasApplication::KadasApplication(int& argc, char** argv)
   : QgsApplication(argc, argv, true)
 {
+
+  // Install crash reporter
+  KadasCrashRpt crashReporter;
+  crashReporter.install();
+
   QgsApplication::init();
   QgsApplication::initQgis();
 

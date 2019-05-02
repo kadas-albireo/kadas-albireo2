@@ -19,11 +19,9 @@
 #include <QSettings>
 
 #include <qgis/qgslogger.h>
-#include <qgis/qgsnetworkaccessmanager.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadascrashrpt.h>
 
 int main( int argc, char *argv[] )
 {
@@ -49,10 +47,5 @@ int main( int argc, char *argv[] )
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
 
   KadasApplication app( argc, argv );
-
-  // Install crash reporter
-  KadasCrashRpt crashReporter;
-  crashReporter.install();
-
   return app.exec();
 }
