@@ -60,22 +60,6 @@ public:
   void importFromGpx();
   void importFromKml();
 
-  QgsMapTool* mapToolBullsEye() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolDeleteItems() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolGuideGrid() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolHeightProfile() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolHillshade() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolImageAnnotation() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolMeasureAzimuth() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolMeasureArea() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolMeasureCircle() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolMeasureDistance() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolSlope() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolPan() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolPinAnnotation() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolSvgAnnotation() const{ return nullptr; } // TODO
-  QgsMapTool* mapToolViewshed() const{ return nullptr; } // TODO
-
   void paste();
 
   bool projectCreateFromTemplate(const QString& templateFile );

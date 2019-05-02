@@ -45,7 +45,7 @@ public:
   int messageTimeout() const;
 
   QWidget* addRibbonTab( const QString& name );
-  void addActionToTab( QAction* action, QWidget* tabWidget, QgsMapTool *associatedMapTool = nullptr );
+  void addActionToTab(QAction* action, QWidget* tabWidget);
   void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu* menu, QWidget* tabWidget );
 
 private slots:
@@ -75,7 +75,7 @@ private:
   void dragEnterEvent( QDragEnterEvent* event ) override;
   void restoreFavoriteButton( QToolButton* button );
   void configureButtons();
-  void setActionToButton( QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), QgsMapTool *tool = 0 );
+  void setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), const std::function<QgsMapTool*()> &toolFactory = nullptr );
   void updateWidgetPositions();
   KadasRibbonButton* addRibbonButton( QWidget* tabWidget );
   void showSourceSelectDialog(const QString& provider);

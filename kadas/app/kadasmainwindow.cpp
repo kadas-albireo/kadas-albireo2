@@ -195,7 +195,7 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
-  connect( mRibbonWidget, &QTabWidget::currentChanged, [this]{ mMapCanvas->setMapTool(kApp->mapToolPan()); } ); // Change to pan tool when changing active kadas tab
+  connect( mRibbonWidget, &QTabWidget::currentChanged, [this]{ mMapCanvas->unsetMapTool(mMapCanvas->mapTool()); } ); // Clear tool when changing active kadas tab
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
   connect( mZoomOutButton, &QPushButton::clicked, this, &KadasMainWindow::zoomOut );
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
@@ -430,36 +430,36 @@ void KadasMainWindow::configureButtons()
 //  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
 
   // Draw tab
-  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), kApp->mapToolPinAnnotation() );
+  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), nullptr );
 
-  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), kApp->mapToolImageAnnotation() );
+  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), nullptr );
 
-  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), kApp->mapToolGuideGrid() );
+  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), nullptr );
 
-  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), kApp->mapToolBullsEye() );
+  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), nullptr );
 
   setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ) );
   connect( mActionPaste, &QAction::triggered, kApp, &KadasApplication::paste );
   mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() );
 
-  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), kApp->mapToolDeleteItems() );
+  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), nullptr );
 
   // Analysis tab
-  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), kApp->mapToolMeasureDistance() );
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), nullptr );
 
-  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), kApp->mapToolMeasureArea() );
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), nullptr );
 
-  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), kApp->mapToolMeasureCircle() );
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), nullptr );
 
-  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), kApp->mapToolMeasureAzimuth() );
+  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), nullptr );
 
-  setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), kApp->mapToolHeightProfile() );
+  setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), nullptr );
 
-  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), kApp->mapToolSlope() );
+  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), nullptr );
 
-  setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), kApp->mapToolHillshade() );
+  setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), nullptr );
 
-  setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), kApp->mapToolViewshed() );
+  setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), nullptr );
 
   // GPS tab
   setActionToButton( mActionDrawWaypoint, mDrawWaypointButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_W ) );
@@ -488,15 +488,19 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionAbout, mAboutButton );
 }
 
-void KadasMainWindow::setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut , QgsMapTool* tool)
+void KadasMainWindow::setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut, const std::function<QgsMapTool*()>& toolFactory)
 {
   button->setDefaultAction( action );
   button->setIconSize( QSize( 32, 32 ) );
-  if ( tool )
+  if ( toolFactory )
   {
-    tool->setAction( action );
     button->setCheckable( true );
-    connect( action, &QAction::triggered, [this, tool]{ mMapCanvas->setMapTool( tool ); });
+    connect( action, &QAction::triggered, [this, toolFactory, action]{
+      QgsMapTool* tool = toolFactory();
+      connect(tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater);
+      tool->setAction( action );
+      mMapCanvas->setMapTool( tool );
+    });
   }
   if(!shortcut.isEmpty())
   {
@@ -534,11 +538,11 @@ KadasRibbonButton* KadasMainWindow::addRibbonButton( QWidget *tabWidget )
   return button;
 }
 
-void KadasMainWindow::addActionToTab( QAction* action, QWidget* tabWidget, QgsMapTool* associatedMapTool )
+void KadasMainWindow::addActionToTab( QAction* action, QWidget* tabWidget )
 {
   KadasRibbonButton* button = addRibbonButton( tabWidget );
   button->setText( action->text() );
-  setActionToButton( action, button, QKeySequence(), associatedMapTool );
+  setActionToButton( action, button, QKeySequence() );
 
   if ( action->objectName().isEmpty() )
   {
