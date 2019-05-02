@@ -1095,7 +1095,7 @@ QgsAbstractGeometry* KadasMapToolDrawRectangle::createGeometry( const QgsCoordin
   }
   else
   {
-    QgsAbstractGeometry* geom = multiGeom->geometryN( 0 )->clone();
+    QgsAbstractGeometry* geom = multiGeom->isEmpty() ? new QgsPolygon() : multiGeom->geometryN( 0 )->clone();
     delete multiGeom;
     return geom;
   }
