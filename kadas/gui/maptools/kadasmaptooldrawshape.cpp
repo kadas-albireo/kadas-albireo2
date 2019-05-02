@@ -1902,7 +1902,7 @@ QgsAbstractGeometry* KadasMapToolDrawCircularSector::createGeometry( const QgsCo
                        << QgsPoint(t.transform( pStart )) );
       exterior->addCurve( line );
     }
-    QgsCurvePolygon* poly = new QgsCurvePolygon;
+    QgsPolygon* poly = new QgsPolygon;
     poly->setExteriorRing( exterior );
     multiGeom->addGeometry( poly );
   }
