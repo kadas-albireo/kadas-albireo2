@@ -690,7 +690,7 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
     }
   }
   // Automatically return to pan tool if no tool is active
-  if ( !newTool && oldTool != mMapToolPan )
+  if ( !newTool )
   {
     mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
     return;
