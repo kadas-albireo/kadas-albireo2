@@ -1222,8 +1222,14 @@ Sight</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>32</width>
                 <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>48</width>
+                <height>16777215</height>
                </size>
               </property>
              </widget>
@@ -1238,8 +1244,14 @@ Sight</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>32</width>
                 <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>48</width>
+                <height>16777215</height>
                </size>
               </property>
              </widget>
@@ -1254,8 +1266,14 @@ Sight</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>32</width>
                 <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>48</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="sizeAdjustPolicy">
@@ -1276,8 +1294,14 @@ Sight</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>32</width>
                 <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>48</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="sizeAdjustPolicy">
