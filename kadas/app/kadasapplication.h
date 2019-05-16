@@ -99,6 +99,7 @@ private:
 
 private slots:
   void onActiveLayerChanged( QgsMapLayer *layer );
+  void onFocusChanged(QWidget* /*old*/, QWidget* now);
   void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
   void handleItemPicked( const KadasFeaturePicker::PickResult& result );
   void showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos);

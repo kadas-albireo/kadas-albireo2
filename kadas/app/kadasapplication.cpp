@@ -201,6 +201,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   connect(QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle);
   connect(QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle);
   connect(QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle);
+  connect( this, &KadasApplication::focusChanged, this, &KadasApplication::onFocusChanged);
 
   QgsLayerTreeModel* layerTreeModel = mMainWindow->layerTreeView()->layerTreeModel();
   connect( layerTreeModel->rootGroup(), &QgsLayerTreeNode::addedChildren, QgsProject::instance(), &QgsProject::setDirty );
@@ -675,6 +676,15 @@ void KadasApplication::onActiveLayerChanged( QgsMapLayer *layer )
     return;
   mMainWindow->mapCanvas()->setCurrentLayer( layer );
   emit activeLayerChanged( layer );
+}
+
+void KadasApplication::onFocusChanged(QWidget* /*old*/, QWidget* now)
+{
+  // If nothing has focus, ensure map canvas receives it
+  if ( !now )
+  {
+    mMainWindow->mapCanvas()->setFocus();
+  }
 }
 
 void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool )
