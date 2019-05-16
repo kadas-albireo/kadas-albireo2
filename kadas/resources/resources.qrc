@@ -71,6 +71,14 @@
         <file alias="icons/search_filter_none">icons/search_filter_none.svg</file>
         <file alias="icons/search_filter_poly">icons/search_filter_poly.svg</file>
         <file alias="icons/search_filter_rect">icons/search_filter_rect.svg</file>
+        <file alias="icons/redlining_circle">icons/redlining_circle.svg</file>
+        <file alias="icons/redlining_line">icons/redlining_line.svg</file>
+        <file alias="icons/redlining_point">icons/redlining_point.svg</file>
+        <file alias="icons/redlining_polygon">icons/redlining_polygon.svg</file>
+        <file alias="icons/redlining_rectangle">icons/redlining_rectangle.svg</file>
+        <file alias="icons/redlining_square">icons/redlining_square.svg</file>
+        <file alias="icons/redlining_text">icons/redlining_text.svg</file>
+        <file alias="icons/redlining_triangle">icons/redlining_triangle.svg</file>
         <file alias="icons/clear">icons/clear.svg</file>
         <file alias="icons/search">icons/search.svg</file>
     </qresource>
