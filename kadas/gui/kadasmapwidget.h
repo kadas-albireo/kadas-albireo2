@@ -26,9 +26,9 @@ class QLineEdit;
 class QMenu;
 class QStackedWidget;
 class QToolButton;
-class QgsAnnotation;
 class QgsMapCanvas;
 class QgsRectangle;
+class KadasMapItem;
 
 
 class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
@@ -71,7 +71,8 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     void updateLayerSet();
     void updateMapProjection();
     void closeMapWidget();
-    void addAnnotation(QgsAnnotation* annotation);
+    void addMapCanvasItem(KadasMapItem* item);
+    void removeMapCanvasItem(KadasMapItem* item);
 };
 
 #endif // KADASMAPWIDGET_H

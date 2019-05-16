@@ -30,8 +30,12 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 
+#include <kadas/core/mapitems/kadasmapitem.h>
+
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
+#include <kadas/gui/kadasmapcanvasitem.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasmapwidgetmanager.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
@@ -56,6 +60,7 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
+#include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/kadasmainwindow.h>
 
 KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
@@ -152,6 +157,9 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
 
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem);
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem);
+
   // Base class init
 //  init( restorePlugins ); // TODO
 
@@ -164,15 +172,14 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
   // Redlining
-  // TODO
-//  QgsRedlining::RedliningUi redliningUi;
-//  redliningUi.buttonNewObject = mToolButtonRedliningNewObject;
-//  redliningUi.colorButtonFillColor = mToolButtonRedliningFillColor;
-//  redliningUi.colorButtonOutlineColor = mToolButtonRedliningBorderColor;
-//  redliningUi.comboFillStyle = mComboBoxRedliningFillStyle;
-//  redliningUi.comboOutlineStyle = mComboBoxRedliningBorderStyle;
-//  redliningUi.spinBoxSize = mSpinBoxRedliningSize;
-//  mRedlining = new QgsRedlining( this, redliningUi );
+  KadasRedliningIntegration::UI redliningUi;
+  redliningUi.buttonNewObject = mToolButtonRedliningNewObject;
+  redliningUi.colorButtonFillColor = mToolButtonRedliningFillColor;
+  redliningUi.colorButtonOutlineColor = mToolButtonRedliningBorderColor;
+  redliningUi.comboFillStyle = mComboBoxRedliningFillStyle;
+  redliningUi.comboOutlineStyle = mComboBoxRedliningBorderStyle;
+  redliningUi.spinBoxSize = mSpinBoxRedliningSize;
+  KadasRedliningIntegration* redlining = new KadasRedliningIntegration( redliningUi, this );
 
   // Route editor
   // TODO
@@ -765,6 +772,21 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint& pos )
     button->setDefaultAction( 0 );
     button->setIconSize( QSize( 16, 16 ) );
     button->setEnabled( false );
+  }
+}
+
+void KadasMainWindow::addMapCanvasItem( KadasMapItem* item )
+{
+  KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
+  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
+}
+
+void KadasMainWindow::removeMapCanvasItem(KadasMapItem* item)
+{
+  for(QGraphicsItem* canvasItem : mMapCanvas->items()) {
+    if(dynamic_cast<KadasMapCanvasItem*>(canvasItem) && static_cast<KadasMapCanvasItem*>(canvasItem)->mapItem() == item) {
+      delete canvasItem;
+    }
   }
 }
 

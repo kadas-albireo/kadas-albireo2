@@ -31,6 +31,7 @@ class QgsDecorationGrid;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
+class KadasMapItem;
 class KadasMapWidgetManager;
 
 
@@ -49,6 +50,8 @@ public:
   void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu* menu, QWidget* tabWidget );
 
 private slots:
+  void addMapCanvasItem( KadasMapItem* item );
+  void removeMapCanvasItem(KadasMapItem* item);
   void checkLayerProjection( QgsMapLayer* layer );
   void onDecimalPlacesChanged(int places);
   void onLanguageChanged(int idx);

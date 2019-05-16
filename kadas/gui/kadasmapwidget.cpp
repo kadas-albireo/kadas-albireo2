@@ -22,15 +22,16 @@
 #include <QStackedWidget>
 #include <QToolButton>
 
-#include <qgis/qgsannotation.h>
-#include <qgis/qgsannotationmanager.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreelayer.h>
 #include <qgis/qgsmapcanvas.h>
-#include <qgis/qgsmapcanvasannotationitem.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
+#include <kadas/core/mapitems/kadasmapitem.h>
+
+#include <kadas/gui/kadasmapcanvasitem.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasmapwidget.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 
@@ -98,13 +99,18 @@ KadasMapWidget::KadasMapWidget( int number, const QString &title, QgsMapCanvas *
   mapTool->setParent( mMapCanvas );
   mMapCanvas->setMapTool( mapTool );
 
+  for(KadasMapItem* item : KadasMapCanvasItemManager::items()) {
+    addMapCanvasItem(item);
+  }
+
   connect( mMasterCanvas, &QgsMapCanvas::extentsChanged, this, &KadasMapWidget::syncCanvasExtents );
   connect( mMasterCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMapWidget::updateMapProjection );
 //  connect( mMasterCanvas, &QgsMapCanvas::layersChanged, this, &KadasMapWidget::updateLayerSelectionMenu ); // TODO, neccessary?
   connect( QgsProject::instance(), &QgsProject::layersAdded, this, &KadasMapWidget::updateLayerSelectionMenu );
   connect( QgsProject::instance(), &QgsProject::layerRemoved, this, &KadasMapWidget::updateLayerSelectionMenu );
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, mMasterCanvas, &QgsMapCanvas::xyCoordinates );
-  connect( QgsProject::instance()->annotationManager(), &QgsAnnotationManager::annotationAdded, this, &KadasMapWidget::addAnnotation);
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMapWidget::addMapCanvasItem);
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMapWidget::removeMapCanvasItem);
 
   updateLayerSelectionMenu();
   mMapCanvas->setRenderFlag( false );
@@ -297,10 +303,19 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
   }
 }
 
-void KadasMapWidget::addAnnotation(QgsAnnotation* annotation)
+void KadasMapWidget::addMapCanvasItem(KadasMapItem* item)
 {
-  QgsMapCanvasAnnotationItem *canvasItem = new QgsMapCanvasAnnotationItem( annotation, mMapCanvas );
+  KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
   Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
+}
+
+void KadasMapWidget::removeMapCanvasItem(KadasMapItem* item)
+{
+  for(QGraphicsItem* canvasItem : mMapCanvas->items()) {
+    if(dynamic_cast<KadasMapCanvasItem*>(canvasItem) && static_cast<KadasMapCanvasItem*>(canvasItem)->mapItem() == item) {
+      delete canvasItem;
+    }
+  }
 }
 
 void KadasMapWidget::contextMenuEvent( QContextMenuEvent * e )
