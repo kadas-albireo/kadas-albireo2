@@ -96,14 +96,14 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mTimer.setInterval( 500 );
 
   mSearchButton = new QToolButton( mSearchBox );
-  mSearchButton->setIcon( QIcon( ":/images/themes/default/search.svg" ) );
+  mSearchButton->setIcon( QIcon( ":/images/icons/search" ) );
   mSearchButton->setIconSize( QSize( 16, 16 ) );
   mSearchButton->setCursor( Qt::PointingHandCursor );
   mSearchButton->setStyleSheet( "QToolButton { border: none; padding: 0px; }" );
   mSearchButton->setToolTip( tr( "Search" ) );
 
   mClearButton = new QToolButton( mSearchBox );
-  mClearButton->setIcon( QIcon( ":/images/themes/default/clear.svg" ) );
+  mClearButton->setIcon( QIcon( ":/images/icons/clear" ) );
   mClearButton->setIconSize( QSize( 16, 16 ) );
   mClearButton->setCursor( Qt::PointingHandCursor );
   mClearButton->setStyleSheet( "QToolButton { border: none; padding: 0px; }" );

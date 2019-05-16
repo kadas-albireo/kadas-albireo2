@@ -71,6 +71,8 @@
         <file alias="icons/search_filter_none">icons/search_filter_none.svg</file>
         <file alias="icons/search_filter_poly">icons/search_filter_poly.svg</file>
         <file alias="icons/search_filter_rect">icons/search_filter_rect.svg</file>
+        <file alias="icons/clear">icons/clear.svg</file>
+        <file alias="icons/search">icons/search.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
