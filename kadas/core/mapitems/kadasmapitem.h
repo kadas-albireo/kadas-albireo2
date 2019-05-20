@@ -70,10 +70,15 @@ public:
       double min;
       double max;
       int decimals;
-      std::function<double(const QgsPointXY& pos)> compute;
   };
   typedef QList<NumericAttribute> NumericAttributes;
-  virtual const NumericAttributes& attributes() const{ return mAttributes; }
+  const NumericAttributes& attributes() const{ return mAttributes; }
+  virtual QList<double> recomputeAttributes(const QgsPointXY& pos) const = 0;
+  virtual QgsPointXY positionFromAttributes(const QList<double>& values) const = 0;
+  virtual bool startPart(const QList<double>& attributeValues) = 0;
+  virtual void changeAttributeValues(const QList<double>& values) = 0;
+  virtual bool acceptAttributeValues() = 0;
+
 
 signals:
   void aboutToBeDestroyed();

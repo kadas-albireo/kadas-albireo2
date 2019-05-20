@@ -26,13 +26,18 @@
 
 #include <kadas/core/mapitems/kadascircularsectoritem.h>
 
-struct CircularSectorDrawContext {
-  QgsVertexId v;
-};
 
 KadasCircularSectorItem::KadasCircularSectorItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  mAttributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
+  mAttributes.insert(AttrA1, NumericAttribute{QString( QChar( 0x03B1 ) ) + "1", 0, dMax, 0});
+  mAttributes.insert(AttrA2, NumericAttribute{QString( QChar( 0x03B1 ) ) + "2", 0, dMax, 0});
+
   reset();
 }
 
@@ -165,4 +170,65 @@ void KadasCircularSectorItem::recomputeDerived()
     multiGeom->addGeometry( poly );
   }
   setGeometry(multiGeom);
+}
+
+QList<double> KadasCircularSectorItem::recomputeAttributes(const QgsPointXY& pos) const
+{
+  QList<double> attributes;
+  if(state()->drawStatus == State::Empty) {
+    attributes.insert(AttrX, pos.x());
+    attributes.insert(AttrY, pos.y());
+    attributes.insert(AttrR, state()->radii.last());
+    attributes.insert(AttrA1, state()->stopAngles.last());
+    attributes.insert(AttrA2, state()->stopAngles.last());
+  }
+  else if ( state()->drawStatus == State::CenterSet)
+  {
+    attributes.insert(AttrX, state()->centers.last().x());
+    attributes.insert(AttrY, state()->centers.last().y());
+    attributes.insert(AttrR, qSqrt(state()->centers.last().sqrDist(pos)));
+    attributes.insert(AttrA1, state()->stopAngles.last());
+    attributes.insert(AttrA2, state()->stopAngles.last());
+  }
+  else if ( state()->drawStatus == State::RadiusSet )
+  {
+    attributes.insert(AttrX, state()->centers.last().x());
+    attributes.insert(AttrY, state()->centers.last().y());
+    attributes.insert(AttrR, state()->radii.last());
+    double startAngle = 2.5 * M_PI - state()->startAngles.last();
+    if ( startAngle > 2 * M_PI )
+      startAngle -= 2 * M_PI;
+    else if ( startAngle < 0 )
+      startAngle += 2 * M_PI;
+    attributes.insert(AttrA1, startAngle / M_PI * 180.);
+    double stopAngle = 2.5 * M_PI - state()->stopAngles.last();
+    if ( stopAngle > 2 * M_PI )
+      stopAngle -= 2 * M_PI;
+    else if ( stopAngle < 0 )
+      stopAngle += 2 * M_PI;
+    attributes.insert(AttrA2, stopAngle / M_PI * 180.);
+  }
+  return attributes;
+}
+
+QgsPointXY KadasCircularSectorItem::positionFromAttributes(const QList<double>& values) const
+{
+  return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+bool KadasCircularSectorItem::startPart(const QList<double>& attributeValues)
+{
+  // todo
+  return false;
+}
+
+void KadasCircularSectorItem::changeAttributeValues(const QList<double>& values)
+{
+  // todo
+}
+
+bool KadasCircularSectorItem::acceptAttributeValues()
+{
+  // todo
+  return false;
 }

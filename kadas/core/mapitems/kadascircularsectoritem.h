@@ -32,6 +32,11 @@ public:
   bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   void endPart() override;
+  QList<double> recomputeAttributes(const QgsPointXY& pos) const override;
+  QgsPointXY positionFromAttributes(const QList<double>& values) const override;
+  bool startPart(const QList<double>& attributeValues) override;
+  void changeAttributeValues(const QList<double>& values) override;
+  bool acceptAttributeValues() override;
 
   const QgsMultiSurface* geometry() const;
 
@@ -45,6 +50,7 @@ private:
     QList<double> startAngles;
     QList<double> stopAngles;
   };
+  enum Attributes {AttrX, AttrY, AttrR, AttrA1, AttrA2, NAttrs};
 
   QgsUnitTypes::AreaUnit mAreaUnit;
 

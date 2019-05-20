@@ -32,6 +32,11 @@ public:
   bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   void endPart() override;
+  QList<double> recomputeAttributes(const QgsPointXY& pos) const override;
+  QgsPointXY positionFromAttributes(const QList<double>& values) const override;
+  bool startPart(const QList<double>& attributeValues) override;
+  void changeAttributeValues(const QList<double>& values) override;
+  bool acceptAttributeValues() override;
 
   const QgsMultiLineString* geometry() const;
 
@@ -49,6 +54,7 @@ private:
   struct State : KadasStateStack::State {
     QList<QList<QgsPointXY>> points;
   };
+  enum Attributes {AttrX, AttrY, NAttrs};
 
   bool mGeodesic = false;
   MeasurementMode mMeasurementMode;

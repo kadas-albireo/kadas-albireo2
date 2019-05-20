@@ -31,6 +31,11 @@
 KadasLineItem::KadasLineItem(const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+
   mGeodesic = geodesic;
   reset();
 }
@@ -197,4 +202,48 @@ void KadasLineItem::recomputeDerived()
     }
   }
   setGeometry(multiGeom);
+}
+
+QList<double> KadasLineItem::recomputeAttributes(const QgsPointXY& pos) const
+{
+  QList<double> values;
+  values.insert(AttrX, pos.x());
+  values.insert(AttrY, pos.y());
+  return values;
+}
+
+QgsPointXY KadasLineItem::positionFromAttributes(const QList<double>& values) const
+{
+  return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+bool KadasLineItem::startPart(const QList<double>& attributeValues)
+{
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  state()->points.append(QList<QgsPointXY>());
+  state()->points.last().append(point);
+  state()->points.last().append(point);
+  recomputeDerived();
+  return true;
+}
+
+void KadasLineItem::changeAttributeValues(const QList<double>& values)
+{
+  state()->points.last().last().setX(values[AttrX]);
+  state()->points.last().last().setY(values[AttrY]);
+  recomputeDerived();
+}
+
+bool KadasLineItem::acceptAttributeValues()
+{
+  // If current point is same as last one, drop last point and end geometry
+  int n = state()->points.last().size();
+  if(n > 2 && state()->points.last()[n - 1] == state()->points.last()[n - 2]) {
+    state()->points.last().removeLast();
+    recomputeDerived();
+    return false;
+  }
+  state()->points.last().append(state()->points.last().last());
+  recomputeDerived();
+  return true;
 }

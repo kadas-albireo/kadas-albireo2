@@ -20,10 +20,6 @@
 KadasMapItem::KadasMapItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
   : QObject(parent), mCrs(crs)
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  mAttributes.append(NumericAttribute{"x", dMin, dMax, 0, [](const QgsPointXY& pos) { return pos.x(); }});
-  mAttributes.append(NumericAttribute{"y", dMin, dMax, 0, [](const QgsPointXY& pos) { return pos.y(); }});
 }
 
 KadasMapItem::~KadasMapItem()

@@ -56,15 +56,18 @@ private:
 
   bool mShowInput = false;
   KadasFloatingInputWidget* mInputWidget = nullptr;
+  bool mIgnoreNextMoveEvent = false;
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
   void commitItem();
   void cleanup();
+  void reset();
+  QList<double> collectAttributeValues() const;
 
 private slots:
-  void inputChanged(int idx);
-  void acceptInput(int idx);
+  void inputChanged();
+  void acceptInput();
 
 };
 

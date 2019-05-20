@@ -43,6 +43,21 @@ void KadasMapToolCreateItem::activate()
 {
   QgsMapTool::activate();
   createItem();
+  if ( mShowInput )
+  {
+    mInputWidget = new KadasFloatingInputWidget( canvas() );
+
+    for(int i = 0, n = mItem->attributes().size(); i < n; ++i){
+      const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
+      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField();
+      connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged);
+      connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput);
+      mInputWidget->addInputField( attribute.name + ":", attrEdit );
+      if(i == 0) {
+        mInputWidget->setFocusedInputField( attrEdit );
+      }
+    }
+  }
 }
 
 void KadasMapToolCreateItem::deactivate()
@@ -52,15 +67,21 @@ void KadasMapToolCreateItem::deactivate()
     commitItem();
   }
   cleanup();
+  delete mInputWidget;
+  mInputWidget = nullptr;
 }
 
 void KadasMapToolCreateItem::cleanup()
 {
   delete mItem;
   mItem = nullptr;
-  delete mInputWidget;
-  mInputWidget = 0;
+}
 
+void KadasMapToolCreateItem::reset()
+{
+  commitItem();
+  cleanup();
+  createItem();
 }
 
 void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
@@ -83,6 +104,11 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
 
 void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
 {
+  if ( mIgnoreNextMoveEvent )
+  {
+    mIgnoreNextMoveEvent = false;
+    return;
+  }
   QgsCoordinateTransform crst(canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance());
   QgsPointXY pos = crst.transform(e->mapPoint());
 
@@ -90,10 +116,10 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
     mItem->moveCurrentPoint(pos, canvas()->mapSettings());
   }
   if(mShowInput) {
-    for(int i = 0, n = mItem->attributes().size(); i < n; ++i) {
+    QList<double> values = mItem->recomputeAttributes(pos);
+    for(int i = 0, n = values.size(); i < n; ++i) {
       const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
-      double value = attribute.compute(pos);
-      mInputWidget->inputFields()[i]->setText(QString::number(value, 'f', attribute.decimals));
+      mInputWidget->inputFields()[i]->setText(QString::number(values[i], 'f', attribute.decimals));
     }
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();
@@ -123,22 +149,8 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
 void KadasMapToolCreateItem::createItem()
 {
   mItem = mItemFactory();
-  if ( mShowInput )
-  {
-    mInputWidget = new KadasFloatingInputWidget( canvas() );
-
-    for(int i = 0, n = mItem->attributes().size(); i < n; ++i){
-      const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
-      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField();
-      connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, [this, i]{ inputChanged(i); });
-      connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, [this, i]{ acceptInput(i); });
-      mInputWidget->addInputField( attribute.name + ":", attrEdit );
-      if(i == 0) {
-        mInputWidget->setFocusedInputField( attrEdit );
-      }
-    }
-  }
   KadasMapCanvasItemManager::addItem(mItem);
+  mStatus = StatusEmpty;
 }
 
 void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
@@ -162,12 +174,11 @@ void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
       mStatus = StatusFinished;
     }
   } else if(mStatus == StatusFinished) {
-    commitItem();
-    cleanup();
-    createItem();
+    reset();
     if(mItem->startPart(pos, canvas()->mapSettings())) {
       mStatus = StatusDrawing;
     } else {
+      mItem->endPart();
       mStatus = StatusFinished;
     }
   }
@@ -181,12 +192,50 @@ void KadasMapToolCreateItem::commitItem()
   mItem = nullptr;
 }
 
-void KadasMapToolCreateItem::inputChanged(int idx)
+QList<double> KadasMapToolCreateItem::collectAttributeValues() const
 {
-
+  QList<double> attributes;
+  for(const KadasFloatingInputWidgetField* field : mInputWidget->inputFields()) {
+    attributes.append(field->text().toDouble());
+  }
+  return attributes;
 }
 
-void KadasMapToolCreateItem::acceptInput(int idx)
+void KadasMapToolCreateItem::inputChanged()
 {
+  QList<double> values = collectAttributeValues();
 
+  // Ignore the move event emitted by re-positioning the mouse cursor:
+  // The widget mouse coordinates (stored in a integer QPoint) loses precision,
+  // and mapping it back to map coordinates in the mouseMove event handler
+  // results in a position different from geoPos, and hence the user-input
+  // may get altered
+  mIgnoreNextMoveEvent = true;
+
+  QgsPointXY newPos = mItem->positionFromAttributes(values);
+  mInputWidget->adjustCursorAndExtent( newPos );
+
+  if(mStatus == StatusDrawing) {
+    mItem->changeAttributeValues(values);
+  }
+}
+
+void KadasMapToolCreateItem::acceptInput()
+{
+  if(mStatus == StatusEmpty) {
+    if(mItem->startPart(collectAttributeValues())) {
+      mStatus = StatusDrawing;
+    } else {
+      mItem->endPart();
+      mStatus = StatusFinished;
+    }
+  } else if(mStatus == StatusDrawing) {
+    if(!mItem->acceptAttributeValues()) {
+      mItem->endPart();
+      mStatus = StatusFinished;
+    }
+  } else if(mStatus == StatusFinished){
+    reset();
+    acceptInput(); // Immediately proceed to StatusEmpty case
+  }
 }

@@ -23,6 +23,11 @@
 KadasPointItem::KadasPointItem(const QgsCoordinateReferenceSystem &crs, IconType icon, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+
   setIconType(icon);
   reset();
 }
@@ -66,4 +71,36 @@ void KadasPointItem::recomputeDerived()
     multiGeom->addGeometry(new QgsPoint(point));
   }
   setGeometry(multiGeom);
+}
+
+QList<double> KadasPointItem::recomputeAttributes(const QgsPointXY& pos) const
+{
+  QList<double> values;
+  values.insert(AttrX, pos.x());
+  values.insert(AttrY, pos.y());
+  return values;
+}
+
+QgsPointXY KadasPointItem::positionFromAttributes(const QList<double>& values) const
+{
+  return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+bool KadasPointItem::startPart(const QList<double>& attributeValues)
+{
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  state()->points.append(point);
+  recomputeDerived();
+  return false;
+}
+
+void KadasPointItem::changeAttributeValues(const QList<double>& values)
+{
+  // Do nothing
+}
+
+bool KadasPointItem::acceptAttributeValues()
+{
+  // No further action allowed
+  return false;
 }

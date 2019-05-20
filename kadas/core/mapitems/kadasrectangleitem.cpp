@@ -23,9 +23,15 @@
 
 #include <kadas/core/mapitems/kadasrectangleitem.h>
 
+
 KadasRectangleItem::KadasRectangleItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+
   reset();
 }
 
@@ -110,4 +116,39 @@ void KadasRectangleItem::recomputeDerived()
     multiGeom->addGeometry( poly );
   }
   setGeometry(multiGeom);
+}
+
+QgsPointXY KadasRectangleItem::positionFromAttributes(const QList<double>& values) const
+{
+  return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+QList<double> KadasRectangleItem::recomputeAttributes(const QgsPointXY& pos) const
+{
+  QList<double> values;
+  values.insert(AttrX, pos.x());
+  values.insert(AttrY, pos.y());
+  return values;
+}
+
+bool KadasRectangleItem::startPart(const QList<double>& attributeValues)
+{
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  state()->p1.append(point);
+  state()->p2.append(point);
+  recomputeDerived();
+  return true;
+}
+
+void KadasRectangleItem::changeAttributeValues(const QList<double>& values)
+{
+  state()->p2.last().setX(values[AttrX]);
+  state()->p2.last().setY(values[AttrY]);
+  recomputeDerived();
+}
+
+bool KadasRectangleItem::acceptAttributeValues()
+{
+  // No further action allowed
+  return false;
 }
