@@ -307,6 +307,23 @@ QList<QgsPointXY> KadasGeometryItem::nodes() const
   return points;
 }
 
+void KadasGeometryItem::setMeasurementsEnabled(bool enabled, QgsUnitTypes::DistanceUnit baseUnit)
+{
+  mMeasureGeometry = enabled;
+  mBaseUnit = baseUnit;
+  emit geometryChanged(); // Trigger re-measurement
+}
+
+QgsUnitTypes::DistanceUnit KadasGeometryItem::distanceBaseUnit() const
+{
+  return mBaseUnit;
+}
+
+QgsUnitTypes::AreaUnit KadasGeometryItem::areaBaseUnit() const
+{
+  return QgsUnitTypes::distanceToAreaUnit(mBaseUnit);
+}
+
 QString KadasGeometryItem::formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const
 {
   int decimals = QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();

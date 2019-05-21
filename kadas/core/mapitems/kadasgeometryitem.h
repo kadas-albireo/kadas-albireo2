@@ -105,6 +105,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     void setIconBrushStyle( Qt::BrushStyle brushStyle );
     Qt::BrushStyle iconBrushStyle() const { return mIconBrush.style(); }
 
+    void setMeasurementsEnabled(bool enabled, QgsUnitTypes::DistanceUnit baseUnit=QgsUnitTypes::DistanceMeters);
     QString getTotalMeasurement() const{ return mTotalMeasurement; }
 
   signals:
@@ -122,6 +123,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
 
     QgsDistanceArea mDa;
     bool mMeasureGeometry = false;
+    QgsUnitTypes::DistanceUnit mBaseUnit = QgsUnitTypes::DistanceMeters;
 
     struct MeasurementLabel {
       QString string;
@@ -135,6 +137,8 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     const QgsAbstractGeometry* geometry() const { return mGeometry; }
 
     void drawVertex( QPainter* p, double x, double y ) const;
+    QgsUnitTypes::DistanceUnit distanceBaseUnit() const;
+    QgsUnitTypes::AreaUnit areaBaseUnit() const;
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;

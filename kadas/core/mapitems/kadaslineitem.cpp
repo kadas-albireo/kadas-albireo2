@@ -77,11 +77,9 @@ QgsMultiLineString* KadasLineItem::geometry()
   return static_cast<QgsMultiLineString*>(mGeometry);
 }
 
-void KadasLineItem::setMeasureGeometry(MeasurementMode measurementMode, QgsUnitTypes::DistanceUnit distanceUnit, QgsUnitTypes::AngleUnit angleUnit)
+void KadasLineItem::setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit)
 {
-  mMeasureGeometry = measurementMode != MeasureNone;
   mMeasurementMode = measurementMode;
-  mDistanceUnit = distanceUnit;
   mAngleUnit = angleUnit;
   emit geometryChanged(); // Trigger re-measurement
 }
@@ -96,7 +94,6 @@ void KadasLineItem::measureGeometry()
     }
 
     switch(mMeasurementMode) {
-    case MeasureLine:
     case MeasureLineAndSegments: {
       double totLength = 0;
       for(int i = 1, n = part.size(); i < n; ++i) {
@@ -104,13 +101,12 @@ void KadasLineItem::measureGeometry()
         const QgsPointXY& p2 = part[i];
         double length = mDa.measureLine(p1, p2);
         totLength += length;
-        if(mMeasurementMode == MeasureLineAndSegments) {
-          addMeasurements( QStringList() << formatLength( length, mDistanceUnit ), QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
-        }
+        addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
       }
-      QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, mDistanceUnit ) );
+      QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
       addMeasurements( QStringList() << totLengthStr, part.last() );
       totalLength += totLength;
+      break;
     }
     case MeasureAzimuthGeoNorth:
     case MeasureAzimuthMapNorth: {
@@ -132,11 +128,11 @@ void KadasLineItem::measureGeometry()
         QString segmentAngle = formatAngle( angle, mAngleUnit );
         addMeasurements( QStringList() << segmentAngle, QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
       }
+      break;
     }
-    case MeasureNone: {}
     }
   }
-  mTotalMeasurement = formatLength(totalLength, mDistanceUnit);
+  mTotalMeasurement = formatLength(totalLength, distanceBaseUnit());
 }
 
 void KadasLineItem::recomputeDerived()

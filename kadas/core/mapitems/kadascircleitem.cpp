@@ -74,31 +74,21 @@ QgsMultiSurface* KadasCircleItem::geometry()
   return static_cast<QgsMultiSurface*>(mGeometry);
 }
 
-void KadasCircleItem::setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit)
-{
-  mMeasureGeometry = measureGeometry;
-  mAreaUnit = areaUnit;
-  emit geometryChanged(); // Trigger re-measurement
-}
-
 void KadasCircleItem::measureGeometry()
 {
   double totalArea = 0;
   for(int i = 0, n = state()->centers.size(); i < n; ++i) {
-    const QgsPointXY& c = state()->centers[i];
-    const QgsPointXY& p = state()->ringPoints[i];
-    QgsCoordinateTransform t1( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
-    double radius = mDa.measureLine( t1.transform( c ), t1.transform( p ) );
+    double radius = mDa.measureLine( state()->centers[i], state()->ringPoints[i] );
 
     double area = radius * radius * M_PI;
 
     QStringList measurements;
-    measurements.append( formatArea( area, mAreaUnit ) );
-    measurements.append( tr( "Radius: %1" ).arg( formatLength( radius, QgsUnitTypes::areaToDistanceUnit(mAreaUnit) ) ) );
-    addMeasurements( QStringList() << measurements, c );
+    measurements.append( formatArea( area, areaBaseUnit() ) );
+    measurements.append( tr( "Radius: %1" ).arg( formatLength( radius, distanceBaseUnit() ) ) );
+    addMeasurements( QStringList() << measurements, state()->centers[i] );
     totalArea += area;
   }
-  mTotalMeasurement = formatArea(totalArea, mAreaUnit);
+  mTotalMeasurement = formatArea(totalArea, areaBaseUnit());
 }
 
 void KadasCircleItem::recomputeDerived()

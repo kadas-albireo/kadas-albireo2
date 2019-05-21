@@ -41,8 +41,6 @@ public:
 
   const QgsMultiSurface* geometry() const;
 
-  void setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit);
-
 private:
   struct State : KadasStateStack::State {
     enum DrawStatus {Empty, CenterSet, Finished} drawStatus = Empty;
@@ -52,7 +50,6 @@ private:
   enum Attributes {AttrX, AttrY, AttrR, NAttrs};
 
   bool mGeodesic = false;
-  QgsUnitTypes::AreaUnit mAreaUnit;
 
   QgsMultiSurface* geometry();
   State* state() const{ return static_cast<State*>(mState); }

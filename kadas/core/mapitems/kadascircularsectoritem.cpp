@@ -114,13 +114,6 @@ QgsMultiSurface* KadasCircularSectorItem::geometry()
   return static_cast<QgsMultiSurface*>(mGeometry);
 }
 
-void KadasCircularSectorItem::setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit)
-{
-  mMeasureGeometry = measureGeometry;
-  mAreaUnit = areaUnit;
-  emit geometryChanged(); // Trigger re-measurement
-}
-
 void KadasCircularSectorItem::measureGeometry()
 {
   // Not implemented

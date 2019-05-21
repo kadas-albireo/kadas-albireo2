@@ -41,14 +41,12 @@ public:
   const QgsMultiLineString* geometry() const;
 
   enum MeasurementMode {
-    MeasureNone,
-    MeasureLine,
     MeasureLineAndSegments,
     MeasureAzimuthMapNorth,
     MeasureAzimuthGeoNorth
   };
 
-  void setMeasureGeometry(MeasurementMode measurementMode, QgsUnitTypes::DistanceUnit distanceUnit, QgsUnitTypes::AngleUnit angleUnit);
+  void setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit=QgsUnitTypes::AngleDegrees);
 
 private:
   struct State : KadasStateStack::State {
@@ -57,9 +55,8 @@ private:
   enum Attributes {AttrX, AttrY, NAttrs};
 
   bool mGeodesic = false;
-  MeasurementMode mMeasurementMode;
-  QgsUnitTypes::DistanceUnit mDistanceUnit;
-  QgsUnitTypes::AngleUnit mAngleUnit;
+  MeasurementMode mMeasurementMode = MeasureLineAndSegments;
+  QgsUnitTypes::AngleUnit mAngleUnit = QgsUnitTypes::AngleDegrees;
 
   QgsMultiLineString* geometry();
   State* state() const{ return static_cast<State*>(mState); }

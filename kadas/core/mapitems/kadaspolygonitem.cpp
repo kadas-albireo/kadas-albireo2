@@ -77,13 +77,6 @@ QgsMultiPolygon* KadasPolygonItem::geometry()
   return static_cast<QgsMultiPolygon*>(mGeometry);
 }
 
-void KadasPolygonItem::setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit)
-{
-  mMeasureGeometry = measureGeometry;
-  mAreaUnit = areaUnit;
-  emit geometryChanged(); // Trigger re-measurement
-}
-
 void KadasPolygonItem::measureGeometry()
 {
   double totalArea = 0;
@@ -91,10 +84,10 @@ void KadasPolygonItem::measureGeometry()
     const QgsPolygon* polygon = static_cast<QgsPolygon*>(geometry()->geometryN(i));
 
     double area = mDa.measureArea( QgsGeometry( polygon->clone() ) );
-    addMeasurements( QStringList() << formatArea(area, mAreaUnit), polygon->centroid() );
+    addMeasurements( QStringList() << formatArea(area, areaBaseUnit()), polygon->centroid() );
     totalArea += area;
   }
-  mTotalMeasurement = formatArea(totalArea, mAreaUnit);
+  mTotalMeasurement = formatArea(totalArea, areaBaseUnit());
 }
 
 void KadasPolygonItem::recomputeDerived()

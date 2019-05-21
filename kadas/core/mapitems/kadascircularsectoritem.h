@@ -40,8 +40,6 @@ public:
 
   const QgsMultiSurface* geometry() const;
 
-  void setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit);
-
 private:
   struct State : KadasStateStack::State {
     enum DrawStatus {Empty, CenterSet, RadiusSet, Finished} drawStatus = Empty;
@@ -51,8 +49,6 @@ private:
     QList<double> stopAngles;
   };
   enum Attributes {AttrX, AttrY, AttrR, AttrA1, AttrA2, NAttrs};
-
-  QgsUnitTypes::AreaUnit mAreaUnit;
 
   QgsMultiSurface* geometry();
   State* state() const{ return static_cast<State*>(mState); }

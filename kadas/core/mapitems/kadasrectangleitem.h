@@ -40,16 +40,12 @@ public:
 
   const QgsMultiPolygon* geometry() const;
 
-  void setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit);
-
 private:
   struct State : KadasStateStack::State {
     QList<QgsPointXY> p1;
     QList<QgsPointXY> p2;
   };
   enum Attributes {AttrX, AttrY, NAttrs};
-
-  QgsUnitTypes::AreaUnit mAreaUnit;
 
   QgsMultiPolygon* geometry();
   State* state() const{ return static_cast<State*>(mState); }

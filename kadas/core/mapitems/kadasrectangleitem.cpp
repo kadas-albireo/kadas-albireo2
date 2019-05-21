@@ -69,33 +69,26 @@ QgsMultiPolygon* KadasRectangleItem::geometry()
   return static_cast<QgsMultiPolygon*>(mGeometry);
 }
 
-void KadasRectangleItem::setMeasureGeometry(bool measureGeometry, QgsUnitTypes::AreaUnit areaUnit)
-{
-  mMeasureGeometry = measureGeometry;
-  mAreaUnit = areaUnit;
-  emit geometryChanged(); // Trigger re-measurement
-}
-
 void KadasRectangleItem::measureGeometry()
 {
   double totalArea = 0;
   for(int i = 0, n = geometry()->numGeometries(); i < n; ++i) {
     const QgsPolygon* polygon = static_cast<QgsPolygon*>(geometry()->geometryN(i));
 
-    double area = mDa.measureArea( QgsGeometry( polygon->exteriorRing()->clone() ) );
+    double area = mDa.measureArea( QgsGeometry( polygon->clone() ) );
     QStringList measurements;
-    measurements.append( formatArea(area, mAreaUnit) );
+    measurements.append( formatArea(area, areaBaseUnit()) );
 
     const QgsPointXY& p1 = state()->p1[i];
     const QgsPointXY& p2 = state()->p2[i];
-    QString width = formatLength( mDa.measureLine( p1, QgsPoint( p2.x(), p1.y() ) ), QgsUnitTypes::areaToDistanceUnit(mAreaUnit) );
-    QString height = formatLength( mDa.measureLine( p1, QgsPoint( p1.x(), p2.y() ) ), QgsUnitTypes::areaToDistanceUnit(mAreaUnit) );
+    QString width = formatLength( mDa.measureLine( p1, QgsPoint( p2.x(), p1.y() ) ), distanceBaseUnit() );
+    QString height = formatLength( mDa.measureLine( p1, QgsPoint( p1.x(), p2.y() ) ), distanceBaseUnit() );
     measurements.append( QString( "(%1 x %2)" ).arg( width ).arg( height ) );
 
     addMeasurements( measurements, polygon->centroid() );
     totalArea += area;
   }
-  mTotalMeasurement = formatArea(totalArea, mAreaUnit);
+  mTotalMeasurement = formatArea(totalArea, areaBaseUnit());
 }
 
 void KadasRectangleItem::recomputeDerived()
