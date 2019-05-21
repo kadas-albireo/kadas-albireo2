@@ -72,7 +72,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
 
     void render( QgsRenderContext &context ) const override;
     QgsRectangle boundingBox() const override;
-    int margin() const override { return qMax(mIconSize, mPen.width()); }
+    int margin() const override;
 
     QList<QgsPointXY> nodes() const override;
 
@@ -128,6 +128,9 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     struct MeasurementLabel {
       QString string;
       QgsPointXY mapPos;
+      int width;
+      int height;
+      bool center;
     };
     QList<MeasurementLabel> mMeasurementLabels;
     QString mTotalMeasurement;
@@ -142,7 +145,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
-    void addMeasurements( const QStringList& measurements, const QgsPointXY &mapPos );
+    void addMeasurements(const QStringList& measurements, const QgsPointXY &mapPos , bool center=true);
     virtual void measureGeometry() {}
 
   private slots:

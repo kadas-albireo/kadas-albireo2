@@ -32,6 +32,13 @@
 
 #include <kadas/core/mapitems/kadasgeometryitem.h>
 
+static QFont measurementFont() {
+  QFont font;
+  font.setPixelSize(10);
+  font.setBold(true);
+  return font;
+}
+
 KadasGeometryItem::KadasGeometryItem(const QgsCoordinateReferenceSystem &crs, QObject *parent)
     : KadasMapItem(crs, parent)
     , mPen( Qt::red )
@@ -84,22 +91,20 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   }
 
   // Draw measurement labels
-  int red = QSettings().value( "/Qgis/default_measure_color_red", 222 ).toInt();
-  int green = QSettings().value( "/Qgis/default_measure_color_green", 155 ).toInt();
-  int blue = QSettings().value( "/Qgis/default_measure_color_blue", 67 ).toInt();
-  QColor rectColor = QColor(255, 255, 255, 159);
+  int red = QSettings().value( "/Qgis/default_measure_color_red", 255 ).toInt();
+  int green = QSettings().value( "/Qgis/default_measure_color_green", 0 ).toInt();
+  int blue = QSettings().value( "/Qgis/default_measure_color_blue", 0 ).toInt();
+  QColor rectColor = QColor(255, 255, 255, 192);
 
   context.painter()->setPen(QColor(red, green, blue));
-  QFont font = context.painter()->font();
-  font.setBold(true);
-  context.painter()->setFont(font);
+  context.painter()->setFont(measurementFont());
   QFontMetrics metrics = context.painter()->fontMetrics();
 
   for(const MeasurementLabel& label : mMeasurementLabels) {
     QPointF pos = context.mapToPixel().transform(label.mapPos).toQPointF();
-    int width = metrics.width(label.string) + 10;
-    int heigth = metrics.height() + 10;
-    QRectF labelRect(pos.x() - 0.5 * width, pos.y() - 0.5 * heigth, width, heigth);
+    int width = label.width + 6;
+    int heigth = label.height + 6;
+    QRectF labelRect(pos.x() - 0.5 * width, pos.y() + (label.center ? 0 : 16) - 0.5 * heigth, width, heigth);
     context.painter()->fillRect(labelRect, rectColor);
     context.painter()->drawText(labelRect, Qt::AlignCenter|Qt::AlignVCenter, label.string);
   }
@@ -158,6 +163,14 @@ void KadasGeometryItem::drawVertex( QPainter* p, double x, double y ) const
       break;
   }
   p->restore();
+}
+
+int KadasGeometryItem::margin() const {
+  int measurementMargin = 0;
+  for(const MeasurementLabel label : mMeasurementLabels) {
+    measurementMargin = qMax(measurementMargin, label.width/2 + 4);
+  }
+  return qMax(measurementMargin, qMax(mIconSize, mPen.width()));
 }
 
 void KadasGeometryItem::updateMeasurements()
@@ -346,12 +359,20 @@ QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit un
   return QgsUnitTypes::formatAngle(value, decimals, unit);
 }
 
-void KadasGeometryItem::addMeasurements(const QStringList& measurements, const QgsPointXY &mapPos )
+void KadasGeometryItem::addMeasurements(const QStringList& measurements, const QgsPointXY &mapPos, bool center )
 {
+  static QFontMetrics metrics(measurementFont());
+  int width = 0;
+  for(const QString& line : measurements) {
+    width = qMax(width, metrics.width(line));
+  }
   if(!measurements.isEmpty()) {
     mMeasurementLabels.append(MeasurementLabel{
       measurements.join("\n"),
-      mapPos
+      mapPos,
+      width,
+      metrics.height() * measurements.size(),
+      center
     });
   }
 }

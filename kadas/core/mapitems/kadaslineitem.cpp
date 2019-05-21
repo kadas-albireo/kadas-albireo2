@@ -104,7 +104,7 @@ void KadasLineItem::measureGeometry()
         addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
       }
       QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
-      addMeasurements( QStringList() << totLengthStr, part.last() );
+      addMeasurements( QStringList() << totLengthStr, part.last(), false );
       totalLength += totLength;
       break;
     }
