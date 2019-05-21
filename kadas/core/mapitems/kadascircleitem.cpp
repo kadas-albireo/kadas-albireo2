@@ -40,9 +40,9 @@ KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool g
 
 bool KadasCircleItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
 {
+  state()->drawStatus = State::Drawing;
   state()->centers.append(firstPoint);
   state()->ringPoints.append(firstPoint);
-  state()->drawStatus = State::CenterSet;
   recomputeDerived();
   return true;
 }
@@ -245,7 +245,7 @@ void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, const QgsPointX
 QList<double> KadasCircleItem::recomputeAttributes(const QgsPointXY& pos) const
 {
   QList<double> values;
-  if(state()->drawStatus == State::CenterSet) {
+  if(state()->drawStatus == State::Drawing) {
     values.insert(AttrX, state()->centers.last().x());
     values.insert(AttrY, state()->centers.last().y());
     values.insert(AttrR, qSqrt(state()->centers.last().sqrDist(pos)));
@@ -264,10 +264,10 @@ QgsPointXY KadasCircleItem::positionFromAttributes(const QList<double>& values) 
 
 bool KadasCircleItem::startPart(const QList<double>& attributeValues)
 {
+  state()->drawStatus = State::Drawing;
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   state()->centers.append(point);
   state()->ringPoints.append(point);
-  state()->drawStatus = State::CenterSet;
   recomputeDerived();
   return true;
 }

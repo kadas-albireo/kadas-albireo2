@@ -53,7 +53,6 @@ signals:
   void finishedCreatingItem(KadasMapItem* item);
 
 private:
-  enum Status {StatusEmpty, StatusDrawing, StatusFinished} mStatus = StatusEmpty;
   ItemFactory mItemFactory = nullptr;
   KadasMapItem* mItem = nullptr;
   KadasItemLayer* mLayer = nullptr;

@@ -27,8 +27,6 @@ class KADAS_CORE_EXPORT KadasCircleItem : public KadasGeometryItem
 public:
   KadasCircleItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
-  KadasStateStack::State* cloneState() const override{ return new State(*state()); }
-
   bool startPart(const QgsPointXY& firstPoint, const QgsMapSettings& mapSettings) override;
   bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
@@ -42,10 +40,10 @@ public:
   const QgsMultiSurface* geometry() const;
 
 private:
-  struct State : KadasStateStack::State {
-    enum DrawStatus {Empty, CenterSet, Finished} drawStatus = Empty;
+  struct State : KadasMapItem::State {
     QList<QgsPointXY> centers;
     QList<QgsPointXY> ringPoints;
+    State* clone() const override{ return new State(*this); }
   };
   enum Attributes {AttrX, AttrY, AttrR, NAttrs};
 

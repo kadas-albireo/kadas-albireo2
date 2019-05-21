@@ -26,8 +26,6 @@ class KADAS_CORE_EXPORT KadasLineItem : public KadasGeometryItem
 public:
   KadasLineItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
-  KadasStateStack::State* cloneState() const override{ return new State(*state()); }
-
   bool startPart(const QgsPointXY& firstPoint, const QgsMapSettings& mapSettings) override;
   bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
   bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
@@ -49,8 +47,9 @@ public:
   void setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit=QgsUnitTypes::AngleDegrees);
 
 private:
-  struct State : KadasStateStack::State {
+  struct State : KadasMapItem::State {
     QList<QList<QgsPointXY>> points;
+    State* clone() const override{ return new State(*this); }
   };
   enum Attributes {AttrX, AttrY, NAttrs};
 

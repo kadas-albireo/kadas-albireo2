@@ -43,23 +43,24 @@ KadasCircularSectorItem::KadasCircularSectorItem(const QgsCoordinateReferenceSys
 
 bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
 {
+  state()->drawStatus = State::Drawing;
+  state()->sectorStatus = State::HaveCenter;
   state()->centers.append(firstPoint);
   state()->radii.append(0);
   state()->startAngles.append(0);
   state()->stopAngles.append(0);
-  state()->drawStatus = State::CenterSet;
   recomputeDerived();
   return true;
 }
 
 bool KadasCircularSectorItem::moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
-  if ( state()->drawStatus == State::CenterSet )
+  if ( state()->sectorStatus == State::HaveCenter )
   {
     state()->radii.back() = qSqrt( p.sqrDist( state()->centers.back() ) );
     state()->startAngles.back() = state()->stopAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
   }
-  else if ( state()->drawStatus == State::RadiusSet )
+  else if ( state()->sectorStatus == State::HaveRadius )
   {
     state()->stopAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
     if ( state()->stopAngles.back() <= state()->startAngles.back() )
@@ -92,8 +93,8 @@ bool KadasCircularSectorItem::moveCurrentPoint(const QgsPointXY& p, const QgsMap
 
 bool KadasCircularSectorItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
-  if(state()->drawStatus == State::CenterSet) {
-    state()->drawStatus = State::RadiusSet;
+  if(state()->sectorStatus == State::HaveCenter) {
+    state()->sectorStatus = State::HaveRadius;
     return true;
   }
   return false;
@@ -175,7 +176,7 @@ QList<double> KadasCircularSectorItem::recomputeAttributes(const QgsPointXY& pos
     attributes.insert(AttrA1, state()->stopAngles.last());
     attributes.insert(AttrA2, state()->stopAngles.last());
   }
-  else if ( state()->drawStatus == State::CenterSet)
+  else if ( state()->sectorStatus == State::HaveCenter)
   {
     attributes.insert(AttrX, state()->centers.last().x());
     attributes.insert(AttrY, state()->centers.last().y());
@@ -183,7 +184,7 @@ QList<double> KadasCircularSectorItem::recomputeAttributes(const QgsPointXY& pos
     attributes.insert(AttrA1, state()->stopAngles.last());
     attributes.insert(AttrA2, state()->stopAngles.last());
   }
-  else if ( state()->drawStatus == State::RadiusSet )
+  else if ( state()->sectorStatus == State::HaveRadius )
   {
     attributes.insert(AttrX, state()->centers.last().x());
     attributes.insert(AttrY, state()->centers.last().y());
@@ -211,6 +212,7 @@ QgsPointXY KadasCircularSectorItem::positionFromAttributes(const QList<double>& 
 
 bool KadasCircularSectorItem::startPart(const QList<double>& attributeValues)
 {
+  state()->drawStatus = State::Drawing;
   // todo
   return false;
 }

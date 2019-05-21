@@ -55,8 +55,12 @@ public:
   QPointF translationOffset() const { return mTranslationOffset; }
 
   // State interface
-  void setState(KadasStateStack::State* state);
-  virtual KadasStateStack::State* cloneState() const = 0;
+  struct State : KadasStateStack::State {
+    enum DrawStatus { Empty, Drawing, Finished } drawStatus = Empty;
+    virtual State* clone() const = 0;
+  };
+  const State* state() const{ return mState; }
+  void setState(State* state);
 
   // Draw interface
   void reset();
@@ -85,13 +89,13 @@ signals:
   void changed();
 
 protected:
-  KadasStateStack::State* mState = nullptr;
+  State* mState = nullptr;
   QgsCoordinateReferenceSystem mCrs;
   QPointF mTranslationOffset;
   NumericAttributes mAttributes;
 
 private:
-  virtual KadasStateStack::State* createEmptyState() const = 0;
+  virtual State* createEmptyState() const = 0;
   virtual void recomputeDerived() = 0;
 };
 

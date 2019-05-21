@@ -42,6 +42,7 @@ KadasPolygonItem::KadasPolygonItem(const QgsCoordinateReferenceSystem &crs, bool
 
 bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
 {
+  state()->drawStatus = State::Drawing;
   state()->points.append(QList<QgsPointXY>());
   state()->points.last().append(firstPoint);
   state()->points.last().append(firstPoint);
@@ -65,6 +66,7 @@ bool KadasPolygonItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &m
 
 void KadasPolygonItem::endPart()
 {
+  state()->drawStatus = State::Finished;
 }
 
 const QgsMultiPolygon* KadasPolygonItem::geometry() const
@@ -173,6 +175,7 @@ QgsPointXY KadasPolygonItem::positionFromAttributes(const QList<double>& values)
 
 bool KadasPolygonItem::startPart(const QList<double>& attributeValues)
 {
+  state()->drawStatus = State::Drawing;
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   state()->points.append(QList<QgsPointXY>());
   state()->points.last().append(point);

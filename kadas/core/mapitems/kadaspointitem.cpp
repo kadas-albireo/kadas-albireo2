@@ -34,6 +34,7 @@ KadasPointItem::KadasPointItem(const QgsCoordinateReferenceSystem &crs, IconType
 
 bool KadasPointItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
 {
+  state()->drawStatus = State::Drawing;
   state()->points.append(firstPoint);
   recomputeDerived();
   return false;
@@ -51,6 +52,7 @@ bool KadasPointItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &map
 
 void KadasPointItem::endPart()
 {
+  state()->drawStatus = State::Finished;
 }
 
 const QgsMultiPoint* KadasPointItem::geometry() const
@@ -88,6 +90,7 @@ QgsPointXY KadasPointItem::positionFromAttributes(const QList<double>& values) c
 
 bool KadasPointItem::startPart(const QList<double>& attributeValues)
 {
+  state()->drawStatus = State::Drawing;
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   state()->points.append(point);
   recomputeDerived();

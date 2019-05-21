@@ -37,6 +37,7 @@ KadasRectangleItem::KadasRectangleItem(const QgsCoordinateReferenceSystem &crs, 
 
 bool KadasRectangleItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
 {
+  state()->drawStatus = State::Drawing;
   state()->p1.append(firstPoint);
   state()->p2.append(firstPoint);
   recomputeDerived();
@@ -57,6 +58,7 @@ bool KadasRectangleItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings 
 
 void KadasRectangleItem::endPart()
 {
+  state()->drawStatus = State::Finished;
 }
 
 const QgsMultiPolygon* KadasRectangleItem::geometry() const
@@ -126,6 +128,7 @@ QList<double> KadasRectangleItem::recomputeAttributes(const QgsPointXY& pos) con
 
 bool KadasRectangleItem::startPart(const QList<double>& attributeValues)
 {
+  state()->drawStatus = State::Drawing;
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   state()->p1.append(point);
   state()->p2.append(point);
