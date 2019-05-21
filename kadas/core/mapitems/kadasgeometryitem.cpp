@@ -41,6 +41,7 @@ KadasGeometryItem::KadasGeometryItem(const QgsCoordinateReferenceSystem &crs, QO
     , mIconPen( Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin )
     , mIconBrush( Qt::transparent )
 {
+  mDa.setSourceCrs(crs, QgsProject::instance()->transformContext());
   mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
   connect(this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements);
 }
