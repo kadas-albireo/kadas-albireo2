@@ -212,7 +212,7 @@ KadasGeometryItem* KadasRedliningIntegration::applyStyle(KadasGeometryItem *item
   item->setBrushStyle(brushStyle);
 
   item->setIconOutlineWidth(outlineWidth / 4);
-  item->setIconSize(2 * outlineWidth);
+  item->setIconSize(10 + 2 * outlineWidth);
   item->setIconOutlineColor(outlineColor);
   item->setIconFillColor(fillColor);
   item->setIconLineStyle(lineStyle);
