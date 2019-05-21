@@ -48,6 +48,10 @@ public:
 
   KadasMapItem* currentItem() const{ return mItem; }
 
+signals:
+  void startedCreatingItem(KadasMapItem* item);
+  void finishedCreatingItem(KadasMapItem* item);
+
 private:
   enum Status {StatusEmpty, StatusDrawing, StatusFinished} mStatus = StatusEmpty;
   ItemFactory mItemFactory = nullptr;
@@ -60,6 +64,7 @@ private:
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
+  void finishItem();
   void commitItem();
   void cleanup();
   void reset();

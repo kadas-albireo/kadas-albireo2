@@ -93,8 +93,7 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
   else if(e->button() == Qt::RightButton)
   {
     if(mStatus == StatusDrawing) {
-      mItem->endPart();
-      mStatus = StatusFinished;
+      finishItem();
     } else {
       canvas()->unsetMapTool(this);
     }
@@ -151,6 +150,7 @@ void KadasMapToolCreateItem::createItem()
   mItem = mItemFactory();
   KadasMapCanvasItemManager::addItem(mItem);
   mStatus = StatusEmpty;
+  emit startedCreatingItem(mItem);
 }
 
 void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
@@ -170,18 +170,23 @@ void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
   {
     // Add point, stop drawing if item does not accept further points
     if(!mItem->setNextPoint(pos, canvas()->mapSettings())) {
-      mItem->endPart();
-      mStatus = StatusFinished;
+      finishItem();
     }
   } else if(mStatus == StatusFinished) {
     reset();
     if(mItem->startPart(pos, canvas()->mapSettings())) {
       mStatus = StatusDrawing;
     } else {
-      mItem->endPart();
-      mStatus = StatusFinished;
+      finishItem();
     }
   }
+}
+
+void KadasMapToolCreateItem::finishItem()
+{
+  mItem->endPart();
+  mStatus = StatusFinished;
+  emit finishedCreatingItem(mItem);
 }
 
 void KadasMapToolCreateItem::commitItem()
@@ -226,13 +231,11 @@ void KadasMapToolCreateItem::acceptInput()
     if(mItem->startPart(collectAttributeValues())) {
       mStatus = StatusDrawing;
     } else {
-      mItem->endPart();
-      mStatus = StatusFinished;
+      finishItem();
     }
   } else if(mStatus == StatusDrawing) {
     if(!mItem->acceptAttributeValues()) {
-      mItem->endPart();
-      mStatus = StatusFinished;
+      finishItem();
     }
   } else if(mStatus == StatusFinished){
     reset();

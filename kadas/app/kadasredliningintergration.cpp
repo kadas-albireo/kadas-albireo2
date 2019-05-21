@@ -186,6 +186,8 @@ void KadasRedliningIntegration::toggleCreateItem(bool active, const std::functio
     tool->setShowInputWidget(QSettings().value( "/kadas/showNumericInput", false ).toBool());
     tool->setAction( action );
     connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
+    connect( tool, &KadasMapToolCreateItem::startedCreatingItem, this, [this](KadasMapItem* item) { toggleItemMeasurements(item, true); });
+    connect( tool, &KadasMapToolCreateItem::finishedCreatingItem, this, [this](KadasMapItem* item) { toggleItemMeasurements(item, false); });
     mUi.buttonNewObject->setDefaultAction( action );
     mMainWindow->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     mMainWindow->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
@@ -195,6 +197,15 @@ void KadasRedliningIntegration::toggleCreateItem(bool active, const std::functio
   {
     mCanvas->unsetMapTool( mCanvas->mapTool() );
   }
+}
+
+void KadasRedliningIntegration::toggleItemMeasurements(KadasMapItem* item, bool enabled)
+{
+  KadasGeometryItem* geometryItem = qobject_cast<KadasGeometryItem*>(item);
+  if(!geometryItem) {
+    return;
+  }
+  geometryItem->setMeasurementsEnabled(enabled);
 }
 
 KadasGeometryItem* KadasRedliningIntegration::applyStyle(KadasGeometryItem *item)

@@ -80,6 +80,7 @@ private slots:
   void saveColor();
   void saveOutlineWidth();
   void saveStyle();
+  void toggleItemMeasurements(KadasMapItem* item, bool enabled);
   void updateItemStyle();
 
 };
