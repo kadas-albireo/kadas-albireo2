@@ -26,15 +26,16 @@ class KADAS_CORE_EXPORT KadasLineItem : public KadasGeometryItem
 public:
   KadasLineItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
-  bool startPart(const QgsPointXY& firstPoint, const QgsMapSettings& mapSettings) override;
-  bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
-  bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
-  void endPart() override;
-  QList<double> recomputeAttributes(const QgsPointXY& pos) const override;
-  QgsPointXY positionFromAttributes(const QList<double>& values) const override;
+  bool startPart(const QgsPointXY& firstPoint) override;
   bool startPart(const QList<double>& attributeValues) override;
-  void changeAttributeValues(const QList<double>& values) override;
-  bool acceptAttributeValues() override;
+  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
+  void setCurrentAttributes(const QList<double>& values) override;
+  bool continuePart() override;
+  void endPart() override;
+
+  QList<NumericAttribute> attributes() const override;
+  QList<double> attributesFromPosition(const QgsPointXY& pos) const override;
+  QgsPointXY positionFromAttributes(const QList<double>& values) const override;
 
   const QgsMultiLineString* geometry() const;
 

@@ -19,12 +19,11 @@
 
 #include <qgis/qgsmaptool.h>
 
-#include <kadas/gui/kadas_gui.h>
 #include <kadas/core/kadasstatehistory.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/kadas_gui.h>
 
 class KadasFloatingInputWidget;
-class KadasFloatingInputWidgetField;
 class KadasItemLayer;
 
 class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool

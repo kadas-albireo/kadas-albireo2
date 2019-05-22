@@ -31,16 +31,11 @@
 KadasPolygonItem::KadasPolygonItem(const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-
   mGeodesic = geodesic;
-  reset();
+  clear();
 }
 
-bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
+bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
   state()->points.append(QList<QgsPointXY>());
@@ -50,16 +45,35 @@ bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint, const QgsMapSetti
   return true;
 }
 
-bool KadasPolygonItem::moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+bool KadasPolygonItem::startPart(const QList<double>& attributeValues)
+{
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  return startPart(point);
+}
+
+void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
   state()->points.last().last() = p;
   recomputeDerived();
-  return true;
 }
 
-bool KadasPolygonItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasPolygonItem::setCurrentAttributes(const QList<double>& values)
 {
-  state()->points.last().append(p);
+  state()->points.last().last().setX(values[AttrX]);
+  state()->points.last().last().setY(values[AttrY]);
+  recomputeDerived();
+}
+
+bool KadasPolygonItem::continuePart()
+{
+  // If current point is same as last one, drop last point and end geometry
+  int n = state()->points.last().size();
+  if(n > 2 && state()->points.last()[n - 1] == state()->points.last()[n - 2]) {
+    state()->points.last().removeLast();
+    recomputeDerived();
+    return false;
+  }
+  state()->points.last().append(state()->points.last().last());
   recomputeDerived();
   return true;
 }
@@ -160,7 +174,17 @@ void KadasPolygonItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<double> KadasPolygonItem::recomputeAttributes(const QgsPointXY& pos) const
+QList<KadasMapItem::NumericAttribute> KadasPolygonItem::attributes() const
+{
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  QList<KadasMapItem::NumericAttribute> attributes;
+  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  return attributes;
+}
+
+QList<double> KadasPolygonItem::attributesFromPosition(const QgsPointXY& pos) const
 {
   QList<double> values;
   values.insert(AttrX, pos.x());
@@ -171,36 +195,4 @@ QList<double> KadasPolygonItem::recomputeAttributes(const QgsPointXY& pos) const
 QgsPointXY KadasPolygonItem::positionFromAttributes(const QList<double>& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
-}
-
-bool KadasPolygonItem::startPart(const QList<double>& attributeValues)
-{
-  state()->drawStatus = State::Drawing;
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  state()->points.append(QList<QgsPointXY>());
-  state()->points.last().append(point);
-  state()->points.last().append(point);
-  recomputeDerived();
-  return true;
-}
-
-void KadasPolygonItem::changeAttributeValues(const QList<double>& values)
-{
-  state()->points.last().last().setX(values[AttrX]);
-  state()->points.last().last().setY(values[AttrY]);
-  recomputeDerived();
-}
-
-bool KadasPolygonItem::acceptAttributeValues()
-{
-  // If current point is same as last one, drop last point and end geometry
-  int n = state()->points.last().size();
-  if(n > 2 && state()->points.last()[n - 1] == state()->points.last()[n - 2]) {
-    state()->points.last().removeLast();
-    recomputeDerived();
-    return false;
-  }
-  state()->points.last().append(state()->points.last().last());
-  recomputeDerived();
-  return true;
 }

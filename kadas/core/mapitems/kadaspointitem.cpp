@@ -23,16 +23,11 @@
 KadasPointItem::KadasPointItem(const QgsCoordinateReferenceSystem &crs, IconType icon, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-
   setIconType(icon);
-  reset();
+  clear();
 }
 
-bool KadasPointItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
+bool KadasPointItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
   state()->points.append(firstPoint);
@@ -40,13 +35,25 @@ bool KadasPointItem::startPart(const QgsPointXY& firstPoint, const QgsMapSetting
   return false;
 }
 
-bool KadasPointItem::moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+bool KadasPointItem::startPart(const QList<double>& attributeValues)
 {
-  return false;
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  return startPart(point);
 }
 
-bool KadasPointItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasPointItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
+  // Do nothing
+}
+
+void KadasPointItem::setCurrentAttributes(const QList<double>& values)
+{
+  // Do nothing
+}
+
+bool KadasPointItem::continuePart()
+{
+  // No further action allowed
   return false;
 }
 
@@ -75,7 +82,17 @@ void KadasPointItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<double> KadasPointItem::recomputeAttributes(const QgsPointXY& pos) const
+QList<KadasMapItem::NumericAttribute> KadasPointItem::attributes() const
+{
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  QList<KadasMapItem::NumericAttribute> attributes;
+  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  return attributes;
+}
+
+QList<double> KadasPointItem::attributesFromPosition(const QgsPointXY& pos) const
 {
   QList<double> values;
   values.insert(AttrX, pos.x());
@@ -86,24 +103,4 @@ QList<double> KadasPointItem::recomputeAttributes(const QgsPointXY& pos) const
 QgsPointXY KadasPointItem::positionFromAttributes(const QList<double>& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
-}
-
-bool KadasPointItem::startPart(const QList<double>& attributeValues)
-{
-  state()->drawStatus = State::Drawing;
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  state()->points.append(point);
-  recomputeDerived();
-  return false;
-}
-
-void KadasPointItem::changeAttributeValues(const QList<double>& values)
-{
-  // Do nothing
-}
-
-bool KadasPointItem::acceptAttributeValues()
-{
-  // No further action allowed
-  return false;
 }

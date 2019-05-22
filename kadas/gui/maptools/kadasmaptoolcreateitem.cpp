@@ -49,9 +49,10 @@ void KadasMapToolCreateItem::activate()
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 
-    for(int i = 0, n = mItem->attributes().size(); i < n; ++i){
-      const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
-      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField();
+    QList<KadasMapItem::NumericAttribute> attributes = mItem->attributes();
+    for(int i = 0, n = attributes.size(); i < n; ++i){
+      const KadasMapItem::NumericAttribute& attribute = attributes[i];
+      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField(attribute.decimals, attribute.min, attribute.max);
       connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged);
       connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput);
       mInputWidget->addInputField( attribute.name + ":", attrEdit );
@@ -116,13 +117,12 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
   QgsPointXY pos = crst.transform(e->mapPoint());
 
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-    mItem->moveCurrentPoint(pos, canvas()->mapSettings());
+    mItem->setCurrentPoint(pos, canvas()->mapSettings());
   }
   if(mInputWidget) {
-    QList<double> values = mItem->recomputeAttributes(pos);
+    QList<double> values = mItem->attributesFromPosition(pos);
     for(int i = 0, n = values.size(); i < n; ++i) {
-      const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
-      mInputWidget->inputFields()[i]->setText(QString::number(values[i], 'f', attribute.decimals));
+      mInputWidget->inputFields()[i]->setValue(values[i]);
     }
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();
@@ -141,7 +141,7 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
 {
   if(e->key() == Qt::Key_Escape) {
     if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-      mItem->reset();
+      mItem->clear();
     } else {
       canvas()->unsetMapTool(this);
     }
@@ -164,7 +164,7 @@ void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
   else if(mItem->state()->drawStatus == KadasMapItem::State::Drawing)
   {
     // Add point, stop drawing if item does not accept further points
-    if(!mItem->setNextPoint(pos, canvas()->mapSettings())) {
+    if(!mItem->continuePart()) {
       finishItem();
     } else {
       mStateHistory->push(mItem->state()->clone());
@@ -185,7 +185,7 @@ void KadasMapToolCreateItem::createItem()
 
 void KadasMapToolCreateItem::startItem(const QgsPointXY& pos)
 {
-  if(!mItem->startPart(pos, canvas()->mapSettings())) {
+  if(!mItem->startPart(pos)) {
     finishItem();
   } else {
     mStateHistory->push(mItem->state()->clone());
@@ -240,7 +240,7 @@ void KadasMapToolCreateItem::inputChanged()
   mInputWidget->adjustCursorAndExtent( newPos );
 
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-    mItem->changeAttributeValues(values);
+    mItem->setCurrentAttributes(values);
   }
 }
 
@@ -249,7 +249,7 @@ void KadasMapToolCreateItem::acceptInput()
   if(mItem->state()->drawStatus == KadasMapItem::State::Empty) {
     startItem(collectAttributeValues());
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-    if(!mItem->acceptAttributeValues()) {
+    if(!mItem->continuePart()) {
       finishItem();
     } else {
       mStateHistory->push(mItem->state()->clone());

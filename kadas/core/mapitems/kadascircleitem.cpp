@@ -28,17 +28,11 @@
 KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-  mAttributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
-
   mGeodesic = geodesic;
-  reset();
+  clear();
 }
 
-bool KadasCircleItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
+bool KadasCircleItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
   state()->centers.append(firstPoint);
@@ -47,15 +41,30 @@ bool KadasCircleItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettin
   return true;
 }
 
-bool KadasCircleItem::moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+bool KadasCircleItem::startPart(const QList<double>& attributeValues)
+{
+  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
+  return startPart(point);
+}
+
+void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
   state()->ringPoints.last() = p;
   recomputeDerived();
-  return true;
 }
 
-bool KadasCircleItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasCircleItem::setCurrentAttributes(const QList<double>& values)
 {
+  state()->centers.last().setX(values[AttrX]);
+  state()->centers.last().setY(values[AttrY]);
+  state()->ringPoints.last().setX(values[AttrX] + values[AttrR]);
+  state()->ringPoints.last().setY(values[AttrY]);
+  recomputeDerived();
+}
+
+bool KadasCircleItem::continuePart()
+{
+  // No further action allowed
   return false;
 }
 
@@ -242,7 +251,18 @@ void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, const QgsPointX
   }
 }
 
-QList<double> KadasCircleItem::recomputeAttributes(const QgsPointXY& pos) const
+QList<KadasMapItem::NumericAttribute> KadasCircleItem::attributes() const
+{
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  QList<KadasMapItem::NumericAttribute> attributes;
+  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  attributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
+  return attributes;
+}
+
+QList<double> KadasCircleItem::attributesFromPosition(const QgsPointXY& pos) const
 {
   QList<double> values;
   if(state()->drawStatus == State::Drawing) {
@@ -260,30 +280,5 @@ QList<double> KadasCircleItem::recomputeAttributes(const QgsPointXY& pos) const
 QgsPointXY KadasCircleItem::positionFromAttributes(const QList<double>& values) const
 {
   return QgsPointXY(values[AttrX] + values[AttrR], values[AttrY]);
-}
-
-bool KadasCircleItem::startPart(const QList<double>& attributeValues)
-{
-  state()->drawStatus = State::Drawing;
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  state()->centers.append(point);
-  state()->ringPoints.append(point);
-  recomputeDerived();
-  return true;
-}
-
-void KadasCircleItem::changeAttributeValues(const QList<double>& values)
-{
-  state()->centers.last().setX(values[AttrX]);
-  state()->centers.last().setY(values[AttrY]);
-  state()->ringPoints.last().setX(values[AttrX] + values[AttrR]);
-  state()->ringPoints.last().setY(values[AttrY]);
-  recomputeDerived();
-}
-
-bool KadasCircleItem::acceptAttributeValues()
-{
-  // No further action allowed
-  return false;
 }
 

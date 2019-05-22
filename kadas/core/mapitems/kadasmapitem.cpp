@@ -39,7 +39,7 @@ void KadasMapItem::setState(const State* state)
   recomputeDerived();
 }
 
-void KadasMapItem::reset()
+void KadasMapItem::clear()
 {
   delete mState;
   mState = createEmptyState();

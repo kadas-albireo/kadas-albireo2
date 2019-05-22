@@ -30,18 +30,10 @@
 KadasCircularSectorItem::KadasCircularSectorItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  mAttributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  mAttributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-  mAttributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
-  mAttributes.insert(AttrA1, NumericAttribute{QString( QChar( 0x03B1 ) ) + "1", 0, dMax, 0});
-  mAttributes.insert(AttrA2, NumericAttribute{QString( QChar( 0x03B1 ) ) + "2", 0, dMax, 0});
-
-  reset();
+  clear();
 }
 
-bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint, const QgsMapSettings &mapSettings)
+bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
   state()->sectorStatus = State::HaveCenter;
@@ -53,7 +45,14 @@ bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint, const QgsM
   return true;
 }
 
-bool KadasCircularSectorItem::moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+bool KadasCircularSectorItem::startPart(const QList<double>& attributeValues)
+{
+  state()->drawStatus = State::Drawing;
+  // todo
+  return false;
+}
+
+void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
   if ( state()->sectorStatus == State::HaveCenter )
   {
@@ -84,14 +83,16 @@ bool KadasCircularSectorItem::moveCurrentPoint(const QgsPointXY& p, const QgsMap
     {
       state()->stopAngles.back() = state()->startAngles.back() + 2 * M_PI;
     }
-  } else {
-    return false;
   }
   recomputeDerived();
-  return true;
 }
 
-bool KadasCircularSectorItem::setNextPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasCircularSectorItem::setCurrentAttributes(const QList<double>& values)
+{
+  // todo
+}
+
+bool KadasCircularSectorItem::continuePart()
 {
   if(state()->sectorStatus == State::HaveCenter) {
     state()->sectorStatus = State::HaveRadius;
@@ -166,7 +167,20 @@ void KadasCircularSectorItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<double> KadasCircularSectorItem::recomputeAttributes(const QgsPointXY& pos) const
+QList<KadasMapItem::NumericAttribute> KadasCircularSectorItem::attributes() const
+{
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  QList<KadasMapItem::NumericAttribute> attributes;
+  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  attributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
+  attributes.insert(AttrA1, NumericAttribute{QString( QChar( 0x03B1 ) ) + "1", 0, dMax, 0});
+  attributes.insert(AttrA2, NumericAttribute{QString( QChar( 0x03B1 ) ) + "2", 0, dMax, 0});
+  return attributes;
+}
+
+QList<double> KadasCircularSectorItem::attributesFromPosition(const QgsPointXY& pos) const
 {
   QList<double> attributes;
   if(state()->drawStatus == State::Empty) {
@@ -208,22 +222,4 @@ QList<double> KadasCircularSectorItem::recomputeAttributes(const QgsPointXY& pos
 QgsPointXY KadasCircularSectorItem::positionFromAttributes(const QList<double>& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
-}
-
-bool KadasCircularSectorItem::startPart(const QList<double>& attributeValues)
-{
-  state()->drawStatus = State::Drawing;
-  // todo
-  return false;
-}
-
-void KadasCircularSectorItem::changeAttributeValues(const QList<double>& values)
-{
-  // todo
-}
-
-bool KadasCircularSectorItem::acceptAttributeValues()
-{
-  // todo
-  return false;
 }

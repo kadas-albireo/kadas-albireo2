@@ -63,26 +63,26 @@ public:
   const State* state() const{ return mState; }
   void setState(const State *state);
 
-  // Draw interface
-  void reset();
-  virtual bool startPart(const QgsPointXY& firstPoint, const QgsMapSettings& mapSettings) = 0;
-  virtual bool moveCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) = 0;
-  virtual bool setNextPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) = 0;
-  virtual void endPart() = 0;
-
   struct NumericAttribute {
       QString name;
       double min;
       double max;
       int decimals;
   };
-  typedef QList<NumericAttribute> NumericAttributes;
-  const NumericAttributes& attributes() const{ return mAttributes; }
-  virtual QList<double> recomputeAttributes(const QgsPointXY& pos) const = 0;
-  virtual QgsPointXY positionFromAttributes(const QList<double>& values) const = 0;
+
+  // Draw interface
+  void clear();
+  virtual bool startPart(const QgsPointXY& firstPoint) = 0;
   virtual bool startPart(const QList<double>& attributeValues) = 0;
-  virtual void changeAttributeValues(const QList<double>& values) = 0;
-  virtual bool acceptAttributeValues() = 0;
+  virtual void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) = 0;
+  virtual void setCurrentAttributes(const QList<double>& values) = 0;
+  virtual bool continuePart() = 0;
+  virtual void endPart() = 0;
+
+  virtual QList<NumericAttribute> attributes() const = 0;
+  virtual QList<double> attributesFromPosition(const QgsPointXY& pos) const = 0;
+  virtual QgsPointXY positionFromAttributes(const QList<double>& values) const = 0;
+
 
 
 signals:
@@ -93,7 +93,6 @@ protected:
   State* mState = nullptr;
   QgsCoordinateReferenceSystem mCrs;
   QPointF mTranslationOffset;
-  NumericAttributes mAttributes;
 
 private:
   virtual State* createEmptyState() const = 0;
