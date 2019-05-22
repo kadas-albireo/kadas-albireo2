@@ -45,7 +45,7 @@ void KadasMapToolCreateItem::activate()
   mStateHistory = new KadasStateHistory(this);
   connect(mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged);
   createItem();
-  if ( mShowInput )
+  if ( QSettings().value( "/kadas/showNumericInput", false ).toBool() )
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 
@@ -118,7 +118,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
     mItem->moveCurrentPoint(pos, canvas()->mapSettings());
   }
-  if(mShowInput) {
+  if(mInputWidget) {
     QList<double> values = mItem->recomputeAttributes(pos);
     for(int i = 0, n = values.size(); i < n; ++i) {
       const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];

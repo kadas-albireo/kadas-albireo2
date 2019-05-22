@@ -183,7 +183,6 @@ void KadasRedliningIntegration::toggleCreateItem(bool active, const std::functio
   if ( active )
   {
     KadasMapToolCreateItem* tool = new KadasMapToolCreateItem(mCanvas, itemFactory, getOrCreateLayer());
-    tool->setShowInputWidget(QSettings().value( "/kadas/showNumericInput", false ).toBool());
     tool->setAction( action );
     connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     connect( tool, &KadasMapToolCreateItem::startedCreatingItem, this, [this](KadasMapItem* item) { toggleItemMeasurements(item, true); });

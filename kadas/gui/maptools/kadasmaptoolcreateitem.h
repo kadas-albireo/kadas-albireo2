@@ -45,8 +45,6 @@ public:
   void canvasReleaseEvent( QgsMapMouseEvent* e ) override;
   void keyPressEvent( QKeyEvent *e ) override;
 
-  void setShowInputWidget( bool showInput ) { mShowInput = showInput; }
-
   KadasMapItem* currentItem() const{ return mItem; }
 
 signals:
@@ -58,7 +56,6 @@ private:
   KadasMapItem* mItem = nullptr;
   KadasItemLayer* mLayer = nullptr;
 
-  bool mShowInput = false;
   KadasStateHistory* mStateHistory = nullptr;
   KadasFloatingInputWidget* mInputWidget = nullptr;
   bool mIgnoreNextMoveEvent = false;
