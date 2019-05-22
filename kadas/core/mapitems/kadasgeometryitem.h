@@ -77,7 +77,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     QList<QgsPointXY> nodes() const override;
 
     /** Returns whether the geometry contains the specified point */
-    bool contains( const QgsPointXY& p, double tol ) const;
+    bool intersects( const QgsRectangle& rect ) const override;
 
     void setFillColor( const QColor& c );
     QColor fillColor() const;

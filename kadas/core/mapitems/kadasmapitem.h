@@ -47,6 +47,9 @@ public:
   /* Nodes for editing */
   virtual QList<QgsPointXY> nodes() const = 0;
 
+  /* Hit test, rect in item crs */
+  virtual bool intersects( const QgsRectangle& rect ) const = 0;
+
   /* Render the item */
   virtual void render( QgsRenderContext &context ) const = 0;
 
