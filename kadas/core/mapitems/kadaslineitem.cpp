@@ -28,6 +28,10 @@
 
 #include <kadas/core/mapitems/kadaslineitem.h>
 
+void KadasLineItem::State::assign(const KadasMapItem::State* other) {
+  *this = *static_cast<const State*>(other);
+}
+
 KadasLineItem::KadasLineItem(const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject* parent)
   : KadasGeometryItem(crs, parent)
 {

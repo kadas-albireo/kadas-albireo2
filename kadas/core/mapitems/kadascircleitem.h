@@ -43,6 +43,7 @@ private:
   struct State : KadasMapItem::State {
     QList<QgsPointXY> centers;
     QList<QgsPointXY> ringPoints;
+    void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override{ return new State(*this); }
   };
   enum Attributes {AttrX, AttrY, AttrR, NAttrs};

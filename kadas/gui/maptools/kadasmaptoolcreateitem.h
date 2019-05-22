@@ -20,6 +20,7 @@
 #include <qgis/qgsmaptool.h>
 
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/core/kadasstatehistory.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
 
 class KadasFloatingInputWidget;
@@ -58,11 +59,14 @@ private:
   KadasItemLayer* mLayer = nullptr;
 
   bool mShowInput = false;
+  KadasStateHistory* mStateHistory = nullptr;
   KadasFloatingInputWidget* mInputWidget = nullptr;
   bool mIgnoreNextMoveEvent = false;
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
+  void startItem(const QgsPointXY &pos);
+  void startItem(const QList<double>& attributes);
   void finishItem();
   void commitItem();
   void cleanup();
@@ -72,6 +76,7 @@ private:
 private slots:
   void inputChanged();
   void acceptInput();
+  void stateChanged(KadasStateHistory::State *state);
 
 };
 

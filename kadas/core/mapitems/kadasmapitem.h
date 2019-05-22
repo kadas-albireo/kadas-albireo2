@@ -22,7 +22,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsrectangle.h>
 
-#include <kadas/core/kadasstatestack.h>
+#include <kadas/core/kadasstatehistory.h>
 #include <kadas/core/kadas_core.h>
 
 class QgsRenderContext;
@@ -55,12 +55,13 @@ public:
   QPointF translationOffset() const { return mTranslationOffset; }
 
   // State interface
-  struct State : KadasStateStack::State {
+  struct State : KadasStateHistory::State {
     enum DrawStatus { Empty, Drawing, Finished } drawStatus = Empty;
+    virtual void assign(const State* other) = 0;
     virtual State* clone() const = 0;
   };
   const State* state() const{ return mState; }
-  void setState(State* state);
+  void setState(const State *state);
 
   // Draw interface
   void reset();

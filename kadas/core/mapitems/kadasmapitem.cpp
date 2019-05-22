@@ -33,9 +33,9 @@ void KadasMapItem::setTranslationOffset(double dx, double dy)
   emit changed();
 }
 
-void KadasMapItem::setState(State* state)
+void KadasMapItem::setState(const State* state)
 {
-  *mState = *state;
+  mState->assign(state);
   recomputeDerived();
 }
 
