@@ -83,11 +83,9 @@ void KadasPolygonItem::endPart()
 
 KadasMapItem::AttribDefs KadasPolygonItem::drawAttribs() const
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
   AttribDefs attributes;
-  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  attributes.insert(AttrX, NumericAttribute{"x"});
+  attributes.insert(AttrY, NumericAttribute{"y"});
   return attributes;
 }
 

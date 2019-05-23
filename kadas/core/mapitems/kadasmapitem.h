@@ -69,9 +69,9 @@ public:
 
   struct NumericAttribute {
       QString name;
-      double min;
-      double max;
-      int decimals;
+      double min = std::numeric_limits<double>::min();
+      double max = std::numeric_limits<double>::max();
+      int decimals = 0;
   };
   typedef QMap<int, NumericAttribute> AttribDefs;
   typedef QMap<int, double> AttribValues;

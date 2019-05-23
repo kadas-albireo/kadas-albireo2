@@ -86,12 +86,10 @@ void KadasCircleItem::endPart()
 
 KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
 {
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
   AttribDefs attributes;
-  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-  attributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
+  attributes.insert(AttrX, NumericAttribute{"x"});
+  attributes.insert(AttrY, NumericAttribute{"y"});
+  attributes.insert(AttrR, NumericAttribute{"r", 0});
   return attributes;
 }
 
