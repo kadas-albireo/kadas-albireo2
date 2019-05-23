@@ -237,7 +237,8 @@ void KadasMapToolCreateItem::inputChanged()
   mIgnoreNextMoveEvent = true;
 
   QgsPointXY newPos = mItem->positionFromDrawAttribs(values);
-  mInputWidget->adjustCursorAndExtent( newPos );
+  QgsCoordinateTransform crst(mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance());
+  mInputWidget->adjustCursorAndExtent( crst.transform(newPos) );
 
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
     mItem->setCurrentAttributes(values);
