@@ -89,6 +89,54 @@ void KadasLineItem::endPart()
   state()->drawStatus = State::Finished;
 }
 
+KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
+{
+  double dMin = std::numeric_limits<double>::min();
+  double dMax = std::numeric_limits<double>::max();
+  AttribDefs attributes;
+  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
+  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
+  return attributes;
+}
+
+KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition(const QgsPointXY& pos) const
+{
+  AttribValues values;
+  values.insert(AttrX, pos.x());
+  values.insert(AttrY, pos.y());
+  return values;
+}
+
+QgsPointXY KadasLineItem::positionFromDrawAttribs(const AttribValues& values) const
+{
+  return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+KadasMapItem::EditContext KadasLineItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
+{
+  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
+  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
+  for(int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart) {
+    const QList<QgsPointXY> part = state()->points[iPart];
+    for(int iVert = 0, nVerts = part.size(); iVert < nVerts; ++iVert) {
+      QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(part[iVert]));
+      if ( canvasPos.sqrDist(testPos) < 25 ) {
+        return EditContext(QgsVertexId(iPart, 0, iVert));
+      }
+    }
+  }
+  return EditContext();
+}
+
+void KadasLineItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+{
+  if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()
+  && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size()) {
+    state()->points[context.vidx.part][context.vidx.vertex] = newPoint;
+    recomputeDerived();
+  }
+}
+
 const QgsMultiLineString* KadasLineItem::geometry() const
 {
   return static_cast<QgsMultiLineString*>(mGeometry);
@@ -220,52 +268,4 @@ void KadasLineItem::recomputeDerived()
     }
   }
   setGeometry(multiGeom);
-}
-
-KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
-{
-  double dMin = std::numeric_limits<double>::min();
-  double dMax = std::numeric_limits<double>::max();
-  AttribDefs attributes;
-  attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
-  attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
-  return attributes;
-}
-
-KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition(const QgsPointXY& pos) const
-{
-  AttribValues values;
-  values.insert(AttrX, pos.x());
-  values.insert(AttrY, pos.y());
-  return values;
-}
-
-QgsPointXY KadasLineItem::positionFromDrawAttribs(const AttribValues& values) const
-{
-  return QgsPointXY(values[AttrX], values[AttrY]);
-}
-
-KadasMapItem::EditContext KadasLineItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
-{
-  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
-  for(int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart) {
-    const QList<QgsPointXY> part = state()->points[iPart];
-    for(int iVert = 0, nVerts = part.size(); iVert < nVerts; ++iVert) {
-      QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(part[iVert]));
-      if ( canvasPos.sqrDist(testPos) < 25 ) {
-        return EditContext(QgsVertexId(iPart, 0, iVert));
-      }
-    }
-  }
-  return EditContext();
-}
-
-void KadasLineItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
-{
-  if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()
-  && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size()) {
-    state()->points[context.vidx.part][context.vidx.vertex] = newPoint;
-    recomputeDerived();
-  }
 }

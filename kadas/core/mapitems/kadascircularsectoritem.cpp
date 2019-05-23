@@ -106,67 +106,6 @@ void KadasCircularSectorItem::endPart()
   state()->drawStatus = State::Finished;
 }
 
-const QgsMultiSurface* KadasCircularSectorItem::geometry() const
-{
-  return static_cast<QgsMultiSurface*>(mGeometry);
-}
-
-QgsMultiSurface* KadasCircularSectorItem::geometry()
-{
-  return static_cast<QgsMultiSurface*>(mGeometry);
-}
-
-void KadasCircularSectorItem::measureGeometry()
-{
-  // Not implemented
-}
-
-void KadasCircularSectorItem::recomputeDerived()
-{
-  QgsMultiSurface* multiGeom = new QgsMultiSurface();
-  for ( int i = 0, n = state()->centers.size(); i < n; ++i )
-  {
-    const QgsPointXY& center = state()->centers[i];
-    const double& radius = state()->radii[i];
-    const double& startAngle = state()->startAngles[i];
-    const double& stopAngle = state()->stopAngles[i];
-    QgsPoint pStart, pMid, pEnd;
-    if ( stopAngle == startAngle + 2 * M_PI )
-    {
-      pStart = pEnd = QgsPoint( center.x() + radius * qCos( stopAngle ),
-                                center.y() + radius * qSin( stopAngle ) );
-      pMid = QgsPoint( center );
-    }
-    else
-    {
-      double alphaMid = 0.5 * ( startAngle + stopAngle - 2 * M_PI );
-      pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
-                         center.y() + radius * qSin( startAngle ) );
-      pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
-                       center.y() + radius * qSin( alphaMid ) );
-      pEnd = QgsPoint( center.x() + radius * qCos( stopAngle - 2 * M_PI ),
-                       center.y() + radius * qSin( stopAngle - 2 * M_PI ) );
-    }
-    QgsCompoundCurve* exterior = new QgsCompoundCurve();
-    if ( startAngle != stopAngle )
-    {
-      QgsCircularString* arc = new QgsCircularString();
-      arc->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
-      exterior->addCurve( arc );
-    }
-    if ( startAngle != stopAngle + 2 * M_PI )
-    {
-      QgsLineString* line = new QgsLineString();
-      line->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
-      exterior->addCurve( line );
-    }
-    QgsPolygon* poly = new QgsPolygon;
-    poly->setExteriorRing( exterior );
-    multiGeom->addGeometry( poly );
-  }
-  setGeometry(multiGeom);
-}
-
 KadasMapItem::AttribDefs KadasCircularSectorItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
@@ -232,4 +171,65 @@ KadasMapItem::EditContext KadasCircularSectorItem::getEditContext(const QgsPoint
 void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
 {
 
+}
+
+const QgsMultiSurface* KadasCircularSectorItem::geometry() const
+{
+  return static_cast<QgsMultiSurface*>(mGeometry);
+}
+
+QgsMultiSurface* KadasCircularSectorItem::geometry()
+{
+  return static_cast<QgsMultiSurface*>(mGeometry);
+}
+
+void KadasCircularSectorItem::measureGeometry()
+{
+  // Not implemented
+}
+
+void KadasCircularSectorItem::recomputeDerived()
+{
+  QgsMultiSurface* multiGeom = new QgsMultiSurface();
+  for ( int i = 0, n = state()->centers.size(); i < n; ++i )
+  {
+    const QgsPointXY& center = state()->centers[i];
+    const double& radius = state()->radii[i];
+    const double& startAngle = state()->startAngles[i];
+    const double& stopAngle = state()->stopAngles[i];
+    QgsPoint pStart, pMid, pEnd;
+    if ( stopAngle == startAngle + 2 * M_PI )
+    {
+      pStart = pEnd = QgsPoint( center.x() + radius * qCos( stopAngle ),
+                                center.y() + radius * qSin( stopAngle ) );
+      pMid = QgsPoint( center );
+    }
+    else
+    {
+      double alphaMid = 0.5 * ( startAngle + stopAngle - 2 * M_PI );
+      pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
+                         center.y() + radius * qSin( startAngle ) );
+      pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
+                       center.y() + radius * qSin( alphaMid ) );
+      pEnd = QgsPoint( center.x() + radius * qCos( stopAngle - 2 * M_PI ),
+                       center.y() + radius * qSin( stopAngle - 2 * M_PI ) );
+    }
+    QgsCompoundCurve* exterior = new QgsCompoundCurve();
+    if ( startAngle != stopAngle )
+    {
+      QgsCircularString* arc = new QgsCircularString();
+      arc->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
+      exterior->addCurve( arc );
+    }
+    if ( startAngle != stopAngle + 2 * M_PI )
+    {
+      QgsLineString* line = new QgsLineString();
+      line->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
+      exterior->addCurve( line );
+    }
+    QgsPolygon* poly = new QgsPolygon;
+    poly->setExteriorRing( exterior );
+    multiGeom->addGeometry( poly );
+  }
+  setGeometry(multiGeom);
 }

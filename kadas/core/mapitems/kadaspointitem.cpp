@@ -63,26 +63,6 @@ void KadasPointItem::endPart()
   state()->drawStatus = State::Finished;
 }
 
-const QgsMultiPoint* KadasPointItem::geometry() const
-{
-  return static_cast<QgsMultiPoint*>(mGeometry);
-}
-
-QgsMultiPoint* KadasPointItem::geometry()
-{
-  return static_cast<QgsMultiPoint*>(mGeometry);
-}
-
-void KadasPointItem::recomputeDerived()
-{
-  QgsMultiPoint* multiGeom = new QgsMultiPoint();
-  for ( const QgsPointXY& point : state()->points )
-  {
-    multiGeom->addGeometry(new QgsPoint(point));
-  }
-  setGeometry(multiGeom);
-}
-
 KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
@@ -125,4 +105,24 @@ void KadasPointItem::edit(const EditContext& context, const QgsPointXY& newPoint
     state()->points[context.vidx.part] = newPoint;
     recomputeDerived();
   }
+}
+
+const QgsMultiPoint* KadasPointItem::geometry() const
+{
+  return static_cast<QgsMultiPoint*>(mGeometry);
+}
+
+QgsMultiPoint* KadasPointItem::geometry()
+{
+  return static_cast<QgsMultiPoint*>(mGeometry);
+}
+
+void KadasPointItem::recomputeDerived()
+{
+  QgsMultiPoint* multiGeom = new QgsMultiPoint();
+  for ( const QgsPointXY& point : state()->points )
+  {
+    multiGeom->addGeometry(new QgsPoint(point));
+  }
+  setGeometry(multiGeom);
 }
