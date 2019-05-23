@@ -100,7 +100,7 @@ QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsCoordina
 {
   for(auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it) {
     const KadasMapItem* item = it.value();
-    QgsRectangle rect = QgsCoordinateTransform(crs, item->crs(), QgsProject::instance()).transform(rect);
+    QgsRectangle rect = QgsCoordinateTransform(crs, item->crs(), QgsProject::instance()).transform(pickRect);
     if(item->intersects(rect)) {
       return it.key();
     }
