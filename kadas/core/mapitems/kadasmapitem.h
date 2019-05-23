@@ -91,13 +91,15 @@ public:
 
   // Edit interface
   struct EditContext {
-    EditContext(const QgsVertexId& _vidx = QgsVertexId(), const AttribDefs& _attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor)
+    EditContext(const QgsVertexId& _vidx = QgsVertexId(), const QgsPointXY& _pos = QgsPointXY(), const AttribDefs& _attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor)
       : vidx(_vidx)
+      , pos(_pos)
       , attributes(_attributes)
       , cursor(_cursor)
     {
     }
     QgsVertexId vidx;
+    QgsPointXY pos;
     AttribDefs attributes;
     Qt::CursorShape cursor;
     bool isValid() const{ return vidx.isValid(); }
@@ -106,6 +108,10 @@ public:
   };
   virtual EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const = 0;
   virtual void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr) = 0;
+  virtual void edit(const EditContext& context, const AttribValues& values) = 0;
+
+  virtual AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const = 0;
+  virtual QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const = 0;
 
 signals:
   void aboutToBeDestroyed();

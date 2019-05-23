@@ -101,7 +101,7 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext(const QgsPointXY& p
     for(int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert) {
       QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(points[iVert]));
       if ( canvasPos.sqrDist(testPos) < 25 ) {
-        return EditContext(QgsVertexId(iPart, 0, iVert));
+        return EditContext(QgsVertexId(iPart, 0, iVert), points[iVert], drawAttribs());
       }
     }
   }
@@ -125,6 +125,21 @@ void KadasRectangleItem::edit(const EditContext& context, const QgsPointXY& newP
     }
     recomputeDerived();
   }
+}
+
+void KadasRectangleItem::edit(const EditContext& context, const AttribValues& values)
+{
+  edit(context, QgsPointXY(values[AttrX], values[AttrY]));
+}
+
+KadasMapItem::AttribValues KadasRectangleItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
+{
+  return drawAttribsFromPosition(pos);
+}
+
+QgsPointXY KadasRectangleItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+{
+  return positionFromDrawAttribs(values);
 }
 
 const QgsMultiPolygon* KadasRectangleItem::geometry() const

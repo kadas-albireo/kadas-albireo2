@@ -85,7 +85,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent* e )
 
   if(e->buttons() == Qt::LeftButton) {
     if(mEditContext.isValid()) {
-      mItem->edit(mEditContext, pos, &canvas()->mapSettings());
+      mItem->edit(mEditContext, pos - mMoveOffset, &canvas()->mapSettings());
     }
   } else {
     KadasMapItem::EditContext oldContext = mEditContext;
@@ -93,16 +93,18 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent* e )
     if(!mEditContext.isValid()) {
       setCursor(Qt::ArrowCursor);
       clearNumericInput();
-    } else if(mEditContext != oldContext) {
-      setCursor(mEditContext.cursor);
-      setupNumericInput();
+    } else{
+      if(mEditContext != oldContext) {
+        setCursor(mEditContext.cursor);
+        setupNumericInput();
+      }
+      mMoveOffset = pos - mEditContext.pos;
     }
   }
   if(mInputWidget && mEditContext.isValid()) {
-    KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition(pos);
-    for(int i = 0, n = values.size(); i < n; ++i) {
-      const KadasMapItem::NumericAttribute& attribute = mItem->drawAttribs()[i];
-      mInputWidget->inputFields()[i]->setText(QString::number(values[i], 'f', attribute.decimals));
+    KadasMapItem::AttribValues values = mItem->editAttribsFromPosition(mEditContext, pos - mMoveOffset);
+    for(auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it) {
+      mInputWidget->inputField(it.key())->setValue(it.value());
     }
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();
@@ -138,15 +140,15 @@ void KadasMapToolEditItem::setupNumericInput()
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 
-    for(int i = 0, n = mEditContext.attributes.size(); i < n; ++i){
-      const KadasMapItem::NumericAttribute& attribute = mEditContext.attributes[i];
-      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField();
+    const KadasMapItem::AttribDefs& attributes = mEditContext.attributes;
+    for(auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it){
+      const KadasMapItem::NumericAttribute& attribute = it.value();
+      KadasFloatingInputWidgetField* attrEdit = new KadasFloatingInputWidgetField(it.key(), attribute.decimals, attribute.min, attribute.max);
       connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolEditItem::inputChanged);
-      connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolEditItem::acceptInput);
       mInputWidget->addInputField( attribute.name + ":", attrEdit );
-      if(i == 0) {
-        mInputWidget->setFocusedInputField( attrEdit );
-      }
+    }
+    if(!attributes.isEmpty()) {
+      mInputWidget->setFocusedInputField(mInputWidget->inputField(attributes.begin().key()));
     }
   }
 }
@@ -162,12 +164,32 @@ void KadasMapToolEditItem::stateChanged(KadasStateHistory::State *state)
   mItem->setState(static_cast<const KadasMapItem::State*>(state));
 }
 
-void KadasMapToolEditItem::inputChanged()
+KadasMapItem::AttribValues KadasMapToolEditItem::collectAttributeValues() const
 {
-
+  KadasMapItem::AttribValues attributes;
+  for(const KadasFloatingInputWidgetField* field : mInputWidget->inputFields()) {
+    attributes.insert(field->id(), field->text().toDouble());
+  }
+  return attributes;
 }
 
-void KadasMapToolEditItem::acceptInput()
+void KadasMapToolEditItem::inputChanged()
 {
+  if(mEditContext.isValid()) {
 
+    KadasMapItem::AttribValues values = collectAttributeValues();
+
+    // Ignore the move event emitted by re-positioning the mouse cursor:
+    // The widget mouse coordinates (stored in a integer QPoint) loses precision,
+    // and mapping it back to map coordinates in the mouseMove event handler
+    // results in a position different from geoPos, and hence the user-input
+    // may get altered
+    mIgnoreNextMoveEvent = true;
+
+    QgsPointXY newPos = mItem->positionFromEditAttribs(mEditContext, values);
+    QgsCoordinateTransform crst(mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance());
+    mInputWidget->adjustCursorAndExtent( crst.transform(newPos) );
+
+    mItem->edit(mEditContext, values);
+  }
 }

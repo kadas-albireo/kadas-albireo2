@@ -49,13 +49,14 @@ private:
 
   KadasFloatingInputWidget* mInputWidget = nullptr;
   bool mIgnoreNextMoveEvent = false;
+  QgsVector mMoveOffset;
 
+  KadasMapItem::AttribValues collectAttributeValues() const;
   void setupNumericInput();
   void clearNumericInput();
 
 public slots:
   void inputChanged();
-  void acceptInput();
   void stateChanged(KadasStateHistory::State *state);
 };
 

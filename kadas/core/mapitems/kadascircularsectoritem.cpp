@@ -170,7 +170,25 @@ KadasMapItem::EditContext KadasCircularSectorItem::getEditContext(const QgsPoint
 
 void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
+  // TODO
+}
 
+void KadasCircularSectorItem::edit(const EditContext& context, const AttribValues& values)
+{
+// TODO
+}
+
+KadasMapItem::AttribValues KadasCircularSectorItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
+{
+  AttribValues values;
+// TODO
+  return values;
+}
+
+QgsPointXY KadasCircularSectorItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+{
+// TODO
+  return QgsPointXY();
 }
 
 const QgsMultiSurface* KadasCircularSectorItem::geometry() const

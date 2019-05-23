@@ -90,7 +90,7 @@ KadasMapItem::EditContext KadasPointItem::getEditContext(const QgsPointXY& pos, 
   for(int i = 0, n = state()->points.size(); i < n; ++i) {
     QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(state()->points[i]));
     if ( canvasPos.sqrDist(testPos) < 25 ) {
-      return EditContext(QgsVertexId(i, 0, 0), drawAttribs());
+      return EditContext(QgsVertexId(i, 0, 0), state()->points[i], drawAttribs());
     }
   }
   return EditContext();
@@ -102,6 +102,21 @@ void KadasPointItem::edit(const EditContext& context, const QgsPointXY& newPoint
     state()->points[context.vidx.part] = newPoint;
     recomputeDerived();
   }
+}
+
+void KadasPointItem::edit(const EditContext& context, const AttribValues& values)
+{
+  edit(context, QgsPointXY(values[AttrX], values[AttrY]));
+}
+
+KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
+{
+  return drawAttribsFromPosition(pos);
+}
+
+QgsPointXY KadasPointItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+{
+  return positionFromDrawAttribs(values);
 }
 
 const QgsMultiPoint* KadasPointItem::geometry() const
