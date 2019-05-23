@@ -85,7 +85,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent* e )
 
   if(e->buttons() == Qt::LeftButton) {
     if(mEditContext.isValid()) {
-      mItem->edit(mEditContext, pos, canvas()->mapSettings());
+      mItem->edit(mEditContext, pos, &canvas()->mapSettings());
     }
   } else {
     KadasMapItem::EditContext oldContext = mEditContext;

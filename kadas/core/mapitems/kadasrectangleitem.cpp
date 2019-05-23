@@ -40,13 +40,12 @@ bool KadasRectangleItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasRectangleItem::startPart(const AttribValues& attributeValues)
+bool KadasRectangleItem::startPart(const AttribValues& values)
 {
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  return startPart(point);
+  return startPart(QgsPoint(values[AttrX], values[AttrY]));
 }
 
-void KadasRectangleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasRectangleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   state()->p2.last() = p;
   recomputeDerived();
@@ -54,9 +53,7 @@ void KadasRectangleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettin
 
 void KadasRectangleItem::setCurrentAttributes(const AttribValues& values)
 {
-  state()->p2.last().setX(values[AttrX]);
-  state()->p2.last().setY(values[AttrY]);
-  recomputeDerived();
+  setCurrentPoint(QgsPoint(values[AttrX], values[AttrY]));
 }
 
 bool KadasRectangleItem::continuePart()
@@ -113,7 +110,7 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext(const QgsPointXY& p
   return EditContext();
 }
 
-void KadasRectangleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasRectangleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->p1.size()
   && context.vidx.vertex >= 0 && context.vidx.vertex < 4) {

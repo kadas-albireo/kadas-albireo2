@@ -53,13 +53,12 @@ bool KadasCircleItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasCircleItem::startPart(const AttribValues& attributeValues)
+bool KadasCircleItem::startPart(const AttribValues& values)
 {
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  return startPart(point);
+  return startPart(QgsPoint(values[AttrX], values[AttrY]));
 }
 
-void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   const QgsPointXY& center = state()->centers.last();
   state()->radii.last() = qSqrt(p.sqrDist(center));
@@ -135,7 +134,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext(const QgsPointXY& pos,
   return EditContext();
 }
 
-void KadasCircleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasCircleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->centers.size()
   && context.vidx.vertex >= 0 && context.vidx.vertex < 2) {

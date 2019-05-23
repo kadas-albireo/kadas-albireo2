@@ -45,14 +45,14 @@ bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasCircularSectorItem::startPart(const AttribValues& attributeValues)
+bool KadasCircularSectorItem::startPart(const AttribValues& values)
 {
   state()->drawStatus = State::Drawing;
   // todo
   return false;
 }
 
-void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   if ( state()->sectorStatus == State::HaveCenter )
   {
@@ -68,20 +68,22 @@ void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapS
     }
 
     // Snap to full circle if within 5px
-    QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
-    const QgsPointXY& center = state()->centers.back();
-    const double& radius = state()->radii.back();
-    const double& startAngle = state()->startAngles.back();
-    const double& stopAngle = state()->stopAngles.back();
-    QgsPointXY pStart( center.x() + radius * qCos( startAngle ),
-                       center.y() + radius * qSin( startAngle ) );
-    QgsPointXY pEnd( center.x() + radius * qCos( stopAngle ),
-                     center.y() + radius * qSin( stopAngle ) );
-    pStart = mapSettings.mapToPixel().transform(crst.transform(pStart));
-    pEnd = mapSettings.mapToPixel().transform(crst.transform(pEnd));
-    if ( pStart.sqrDist(pEnd) < 25 )
-    {
-      state()->stopAngles.back() = state()->startAngles.back() + 2 * M_PI;
+    if(mapSettings) {
+      QgsCoordinateTransform crst(mCrs, mapSettings->destinationCrs(), mapSettings->transformContext());
+      const QgsPointXY& center = state()->centers.back();
+      const double& radius = state()->radii.back();
+      const double& startAngle = state()->startAngles.back();
+      const double& stopAngle = state()->stopAngles.back();
+      QgsPointXY pStart( center.x() + radius * qCos( startAngle ),
+                         center.y() + radius * qSin( startAngle ) );
+      QgsPointXY pEnd( center.x() + radius * qCos( stopAngle ),
+                       center.y() + radius * qSin( stopAngle ) );
+      pStart = mapSettings->mapToPixel().transform(crst.transform(pStart));
+      pEnd = mapSettings->mapToPixel().transform(crst.transform(pEnd));
+      if ( pStart.sqrDist(pEnd) < 25 )
+      {
+        state()->stopAngles.back() = state()->startAngles.back() + 2 * M_PI;
+      }
     }
   }
   recomputeDerived();
@@ -168,7 +170,7 @@ KadasMapItem::EditContext KadasCircularSectorItem::getEditContext(const QgsPoint
   return EditContext();
 }
 
-void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
 
 }

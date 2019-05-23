@@ -46,13 +46,12 @@ bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasPolygonItem::startPart(const AttribValues& attributeValues)
+bool KadasPolygonItem::startPart(const AttribValues& values)
 {
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  return startPart(point);
+  return startPart(QgsPoint(values[AttrX], values[AttrY]));
 }
 
-void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   state()->points.last().last() = p;
   recomputeDerived();
@@ -60,9 +59,7 @@ void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings
 
 void KadasPolygonItem::setCurrentAttributes(const AttribValues& values)
 {
-  state()->points.last().last().setX(values[AttrX]);
-  state()->points.last().last().setY(values[AttrY]);
-  recomputeDerived();
+  return setCurrentPoint(QgsPoint(values[AttrX], values[AttrY]));
 }
 
 bool KadasPolygonItem::continuePart()
@@ -123,7 +120,7 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext(const QgsPointXY& pos
   return EditContext();
 }
 
-void KadasPolygonItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasPolygonItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()
   && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size()) {

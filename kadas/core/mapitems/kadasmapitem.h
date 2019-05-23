@@ -79,8 +79,8 @@ public:
   // Draw interface
   void clear();
   virtual bool startPart(const QgsPointXY& firstPoint) = 0;
-  virtual bool startPart(const AttribValues& attributeValues) = 0;
-  virtual void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) = 0;
+  virtual bool startPart(const AttribValues& values) = 0;
+  virtual void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) = 0;
   virtual void setCurrentAttributes(const AttribValues& values) = 0;
   virtual bool continuePart() = 0;
   virtual void endPart() = 0;
@@ -105,7 +105,7 @@ public:
     bool operator!=(const EditContext& other) const{ return vidx != other.vidx; }
   };
   virtual EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const = 0;
-  virtual void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings) = 0;
+  virtual void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr) = 0;
 
 signals:
   void aboutToBeDestroyed();

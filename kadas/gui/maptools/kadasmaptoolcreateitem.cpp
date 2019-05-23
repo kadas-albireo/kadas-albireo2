@@ -117,7 +117,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
   QgsPointXY pos = crst.transform(e->mapPoint());
 
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-    mItem->setCurrentPoint(pos, canvas()->mapSettings());
+    mItem->setCurrentPoint(pos, &canvas()->mapSettings());
   }
   if(mInputWidget) {
     KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition(pos);

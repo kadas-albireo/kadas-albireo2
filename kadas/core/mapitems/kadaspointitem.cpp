@@ -36,13 +36,12 @@ bool KadasPointItem::startPart(const QgsPointXY& firstPoint)
   return false;
 }
 
-bool KadasPointItem::startPart(const AttribValues& attributeValues)
+bool KadasPointItem::startPart(const AttribValues& values)
 {
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  return startPart(point);
+  return startPart(QgsPoint(values[AttrX], values[AttrY]));
 }
 
-void KadasPointItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasPointItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   // Do nothing
 }
@@ -93,13 +92,13 @@ KadasMapItem::EditContext KadasPointItem::getEditContext(const QgsPointXY& pos, 
   for(int i = 0, n = state()->points.size(); i < n; ++i) {
     QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(state()->points[i]));
     if ( canvasPos.sqrDist(testPos) < 25 ) {
-      return EditContext(QgsVertexId(i, 0, 0));
+      return EditContext(QgsVertexId(i, 0, 0), drawAttribs());
     }
   }
   return EditContext();
 }
 
-void KadasPointItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasPointItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()) {
     state()->points[context.vidx.part] = newPoint;

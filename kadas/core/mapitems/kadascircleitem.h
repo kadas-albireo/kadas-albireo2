@@ -30,8 +30,8 @@ public:
   QList<QgsPointXY> nodes() const override;
 
   bool startPart(const QgsPointXY& firstPoint) override;
-  bool startPart(const AttribValues& attributeValues) override;
-  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
+  bool startPart(const AttribValues& values) override;
+  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) override;
   void setCurrentAttributes(const AttribValues& values) override;
   bool continuePart() override;
   void endPart() override;
@@ -41,7 +41,7 @@ public:
   QgsPointXY positionFromDrawAttribs(const AttribValues& values) const override;
 
   EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
-  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings) override;
+  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings=nullptr) override;
 
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 

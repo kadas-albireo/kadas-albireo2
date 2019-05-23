@@ -50,13 +50,12 @@ bool KadasLineItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasLineItem::startPart(const AttribValues& attributeValues)
+bool KadasLineItem::startPart(const AttribValues& values)
 {
-  QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
-  return startPart(point);
+  return startPart(QgsPoint(values[AttrX], values[AttrY]));
 }
 
-void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
+void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
 {
   state()->points.last().last() = p;
   recomputeDerived();
@@ -64,9 +63,7 @@ void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &m
 
 void KadasLineItem::setCurrentAttributes(const AttribValues& values)
 {
-  state()->points.last().last().setX(values[AttrX]);
-  state()->points.last().last().setY(values[AttrY]);
-  recomputeDerived();
+  setCurrentPoint(QgsPoint(values[AttrX], values[AttrY]));
 }
 
 bool KadasLineItem::continuePart()
@@ -128,7 +125,7 @@ KadasMapItem::EditContext KadasLineItem::getEditContext(const QgsPointXY& pos, c
   return EditContext();
 }
 
-void KadasLineItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+void KadasLineItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()
   && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size()) {
