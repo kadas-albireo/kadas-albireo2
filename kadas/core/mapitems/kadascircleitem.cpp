@@ -32,11 +32,22 @@ KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool g
   clear();
 }
 
+QList<QgsPointXY> KadasCircleItem::nodes() const
+{
+  QList<QgsPointXY> points;
+  for(int i = 0, n = state()->centers.size(); i < n; ++i) {
+    const QgsPointXY& center = state()->centers[i];
+    points.append(center);
+    points.append(QgsPointXY(center.x() + state()->radii[i], center.y()));
+  }
+  return points;
+}
+
 bool KadasCircleItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
   state()->centers.append(firstPoint);
-  state()->ringPoints.append(firstPoint);
+  state()->radii.append(0);
   recomputeDerived();
   return true;
 }
@@ -49,7 +60,8 @@ bool KadasCircleItem::startPart(const QList<double>& attributeValues)
 
 void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &mapSettings)
 {
-  state()->ringPoints.last() = p;
+  const QgsPointXY& center = state()->centers.last();
+  state()->radii.last() = qSqrt(p.sqrDist(center));
   recomputeDerived();
 }
 
@@ -57,8 +69,7 @@ void KadasCircleItem::setCurrentAttributes(const QList<double>& values)
 {
   state()->centers.last().setX(values[AttrX]);
   state()->centers.last().setY(values[AttrY]);
-  state()->ringPoints.last().setX(values[AttrX] + values[AttrR]);
-  state()->ringPoints.last().setY(values[AttrY]);
+  state()->radii.last() = values[AttrR];
   recomputeDerived();
 }
 
@@ -87,7 +98,7 @@ void KadasCircleItem::measureGeometry()
 {
   double totalArea = 0;
   for(int i = 0, n = state()->centers.size(); i < n; ++i) {
-    double radius = mDa.measureLine( state()->centers[i], state()->ringPoints[i] );
+    double radius = state()->radii[i];
 
     double area = radius * radius * M_PI;
 
@@ -106,17 +117,16 @@ void KadasCircleItem::recomputeDerived()
   for ( int i = 0, n = state()->centers.size(); i < n; ++i )
   {
     if(mGeodesic) {
-      computeGeoCircle(state()->centers[i], state()->ringPoints[i], multiGeom);
+      computeGeoCircle(state()->centers[i], state()->radii[i], multiGeom);
     } else {
-      computeCircle(state()->centers[i], state()->ringPoints[i], multiGeom);
+      computeCircle(state()->centers[i], state()->radii[i], multiGeom);
     }
   }
   setGeometry(multiGeom);
 }
 
-void KadasCircleItem::computeCircle(const QgsPointXY &center, const QgsPointXY &ringPoint, QgsMultiSurface *multiGeom)
+void KadasCircleItem::computeCircle(const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom)
 {
-  double radius = qSqrt(center.sqrDist(ringPoint));
   QgsCircularString* string = new QgsCircularString();
   string->setPoints(QgsPointSequence()
                     << QgsPoint(center.x(), center.y() + radius)
@@ -132,13 +142,13 @@ void KadasCircleItem::computeCircle(const QgsPointXY &center, const QgsPointXY &
   multiGeom->addGeometry(poly);
 }
 
-void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, const QgsPointXY& ringPoint, QgsMultiSurface* multiGeom)
+void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, double radius, QgsMultiSurface* multiGeom)
 {
   // 1 deg segmentized circle around center
   QgsCoordinateTransform t1( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326"), QgsProject::instance() );
   QgsCoordinateTransform t2( QgsCoordinateReferenceSystem( "EPSG:4326"), mCrs, QgsProject::instance() );
   QgsPointXY p1 = t1.transform( center );
-  QgsPointXY p2 = t1.transform( ringPoint );
+  QgsPointXY p2 = t1.transform( QgsPointXY(center.x() + radius, center.y()) );
   double clampLatitude = mCrs.authid() == "EPSG:3857" ? 85 : 90;
   if ( p2.y() > 90 )
   {
@@ -148,7 +158,6 @@ void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, const QgsPointX
   {
     p2.setY( -90. - ( p2.y() + 90. ) );
   }
-  double radius = mDa.measureLine( p1, p2 );
   QList<QgsPointXY> wgsPoints;
   for ( int a = 0; a < 360; ++a )
   {

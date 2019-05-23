@@ -27,6 +27,8 @@ class KADAS_CORE_EXPORT KadasCircleItem : public KadasGeometryItem
 public:
   KadasCircleItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
+  QList<QgsPointXY> nodes() const override;
+
   bool startPart(const QgsPointXY& firstPoint) override;
   bool startPart(const QList<double>& attributeValues) override;
   void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
@@ -43,7 +45,7 @@ public:
 private:
   struct State : KadasMapItem::State {
     QList<QgsPointXY> centers;
-    QList<QgsPointXY> ringPoints;
+    QList<double> radii;
     void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override{ return new State(*this); }
   };
@@ -56,8 +58,8 @@ private:
   State* createEmptyState() const override { return new State(); }
   void measureGeometry() override;
   void recomputeDerived() override;
-  void computeCircle(const QgsPointXY& center, const QgsPointXY& ringPoint, QgsMultiSurface *multiGeom);
-  void computeGeoCircle(const QgsPointXY& center, const QgsPointXY& ringPoint, QgsMultiSurface *multiGeom);
+  void computeCircle(const QgsPointXY& center, double radius, QgsMultiSurface *multiGeom);
+  void computeGeoCircle(const QgsPointXY& center, double radius, QgsMultiSurface *multiGeom);
 };
 
 #endif // KADASCIRCLEITEM_H
