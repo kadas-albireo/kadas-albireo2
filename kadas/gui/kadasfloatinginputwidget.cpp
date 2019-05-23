@@ -28,8 +28,9 @@ KadasFloatingInputWidgetField::KadasFloatingInputWidgetField(QValidator* validat
   connect( this, &KadasFloatingInputWidgetField::returnPressed, this, &KadasFloatingInputWidgetField::checkInputChanged );
 }
 
-KadasFloatingInputWidgetField::KadasFloatingInputWidgetField(int decimals, double min, double max, QWidget* parent)
+KadasFloatingInputWidgetField::KadasFloatingInputWidgetField(int id, int decimals, double min, double max, QWidget* parent)
   : QLineEdit( parent )
+  , mId(id)
   , mDecimals(decimals)
 {
   QDoubleValidator* validator = new QDoubleValidator(min, max, decimals);

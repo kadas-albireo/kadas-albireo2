@@ -62,12 +62,12 @@ private:
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
   void startItem(const QgsPointXY &pos);
-  void startItem(const QList<double>& attributes);
+  void startItem(const KadasMapItem::AttribValues& attributes);
   void finishItem();
   void commitItem();
   void cleanup();
   void reset();
-  QList<double> collectAttributeValues() const;
+  KadasMapItem::AttribValues collectAttributeValues() const;
 
 private slots:
   void inputChanged();

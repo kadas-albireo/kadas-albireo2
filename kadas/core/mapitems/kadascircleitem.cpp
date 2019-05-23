@@ -53,7 +53,7 @@ bool KadasCircleItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasCircleItem::startPart(const QList<double>& attributeValues)
+bool KadasCircleItem::startPart(const AttribValues& attributeValues)
 {
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   return startPart(point);
@@ -66,7 +66,7 @@ void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings 
   recomputeDerived();
 }
 
-void KadasCircleItem::setCurrentAttributes(const QList<double>& values)
+void KadasCircleItem::setCurrentAttributes(const AttribValues& values)
 {
   state()->centers.last().setX(values[AttrX]);
   state()->centers.last().setY(values[AttrY]);
@@ -261,20 +261,20 @@ void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, double radius, 
   }
 }
 
-QList<KadasMapItem::NumericAttribute> KadasCircleItem::attributes() const
+KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
   double dMax = std::numeric_limits<double>::max();
-  QList<KadasMapItem::NumericAttribute> attributes;
+  AttribDefs attributes;
   attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
   attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
   attributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
   return attributes;
 }
 
-QList<double> KadasCircleItem::attributesFromPosition(const QgsPointXY& pos) const
+KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition(const QgsPointXY& pos) const
 {
-  QList<double> values;
+  AttribValues values;
   if(state()->drawStatus == State::Drawing) {
     values.insert(AttrX, state()->centers.last().x());
     values.insert(AttrY, state()->centers.last().y());
@@ -287,7 +287,7 @@ QList<double> KadasCircleItem::attributesFromPosition(const QgsPointXY& pos) con
   return values;
 }
 
-QgsPointXY KadasCircleItem::positionFromAttributes(const QList<double>& values) const
+QgsPointXY KadasCircleItem::positionFromDrawAttribs(const AttribValues& values) const
 {
   return QgsPointXY(values[AttrX] + values[AttrR], values[AttrY]);
 }

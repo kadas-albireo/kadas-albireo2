@@ -31,15 +31,17 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidgetField : public QLineEdit
     Q_OBJECT
   public:
     KadasFloatingInputWidgetField( QValidator* validator = new QDoubleValidator(), QWidget* parent = 0 ); // TODO Remove
-    KadasFloatingInputWidgetField( int decimals, double min, double max, QWidget* parent = nullptr );
+    KadasFloatingInputWidgetField( int id, int decimals, double min, double max, QWidget* parent = nullptr );
     void setText( const QString& text ); // TODO Remove
     void setValue(double value);
+    int id() const{ return mId; }
 
   signals:
     void inputChanged();
     void inputConfirmed();
 
   private:
+    int mId = 0;
     int mDecimals = 0;
     QString mPrevText;
 

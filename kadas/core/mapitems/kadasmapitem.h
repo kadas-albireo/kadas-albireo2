@@ -73,30 +73,32 @@ public:
       double max;
       int decimals;
   };
+  typedef QMap<int, NumericAttribute> AttribDefs;
+  typedef QMap<int, double> AttribValues;
 
   // Draw interface
   void clear();
   virtual bool startPart(const QgsPointXY& firstPoint) = 0;
-  virtual bool startPart(const QList<double>& attributeValues) = 0;
+  virtual bool startPart(const AttribValues& attributeValues) = 0;
   virtual void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) = 0;
-  virtual void setCurrentAttributes(const QList<double>& values) = 0;
+  virtual void setCurrentAttributes(const AttribValues& values) = 0;
   virtual bool continuePart() = 0;
   virtual void endPart() = 0;
 
-  virtual QList<NumericAttribute> attributes() const = 0;
-  virtual QList<double> attributesFromPosition(const QgsPointXY& pos) const = 0;
-  virtual QgsPointXY positionFromAttributes(const QList<double>& values) const = 0;
+  virtual AttribDefs drawAttribs() const = 0;
+  virtual AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const = 0;
+  virtual QgsPointXY positionFromDrawAttribs(const AttribValues& values) const = 0;
 
   // Edit interface
   struct EditContext {
-    EditContext(const QgsVertexId& _vidx = QgsVertexId(), const QList<NumericAttribute>& _attributes = QList<NumericAttribute>(), Qt::CursorShape _cursor = Qt::CrossCursor)
+    EditContext(const QgsVertexId& _vidx = QgsVertexId(), const AttribDefs& _attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor)
       : vidx(_vidx)
       , attributes(_attributes)
       , cursor(_cursor)
     {
     }
     QgsVertexId vidx;
-    QList<NumericAttribute> attributes;
+    AttribDefs attributes;
     Qt::CursorShape cursor;
     bool isValid() const{ return vidx.isValid(); }
     bool operator==(const EditContext& other) const{ return vidx == other.vidx; }

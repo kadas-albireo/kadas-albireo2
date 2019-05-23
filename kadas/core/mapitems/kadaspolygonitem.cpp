@@ -46,7 +46,7 @@ bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasPolygonItem::startPart(const QList<double>& attributeValues)
+bool KadasPolygonItem::startPart(const AttribValues& attributeValues)
 {
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   return startPart(point);
@@ -58,7 +58,7 @@ void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings
   recomputeDerived();
 }
 
-void KadasPolygonItem::setCurrentAttributes(const QList<double>& values)
+void KadasPolygonItem::setCurrentAttributes(const AttribValues& values)
 {
   state()->points.last().last().setX(values[AttrX]);
   state()->points.last().last().setY(values[AttrY]);
@@ -175,25 +175,25 @@ void KadasPolygonItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<KadasMapItem::NumericAttribute> KadasPolygonItem::attributes() const
+KadasMapItem::AttribDefs KadasPolygonItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
   double dMax = std::numeric_limits<double>::max();
-  QList<KadasMapItem::NumericAttribute> attributes;
+  AttribDefs attributes;
   attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
   attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
   return attributes;
 }
 
-QList<double> KadasPolygonItem::attributesFromPosition(const QgsPointXY& pos) const
+KadasMapItem::AttribValues KadasPolygonItem::drawAttribsFromPosition(const QgsPointXY& pos) const
 {
-  QList<double> values;
+  AttribValues values;
   values.insert(AttrX, pos.x());
   values.insert(AttrY, pos.y());
   return values;
 }
 
-QgsPointXY KadasPolygonItem::positionFromAttributes(const QList<double>& values) const
+QgsPointXY KadasPolygonItem::positionFromDrawAttribs(const AttribValues& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
 }

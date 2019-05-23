@@ -40,7 +40,7 @@ bool KadasRectangleItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasRectangleItem::startPart(const QList<double>& attributeValues)
+bool KadasRectangleItem::startPart(const AttribValues& attributeValues)
 {
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   return startPart(point);
@@ -52,7 +52,7 @@ void KadasRectangleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettin
   recomputeDerived();
 }
 
-void KadasRectangleItem::setCurrentAttributes(const QList<double>& values)
+void KadasRectangleItem::setCurrentAttributes(const AttribValues& values)
 {
   state()->p2.last().setX(values[AttrX]);
   state()->p2.last().setY(values[AttrY]);
@@ -122,24 +122,24 @@ void KadasRectangleItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<KadasMapItem::NumericAttribute> KadasRectangleItem::attributes() const
+KadasMapItem::AttribDefs KadasRectangleItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
   double dMax = std::numeric_limits<double>::max();
-  QList<KadasMapItem::NumericAttribute> attributes;
+  KadasMapItem::AttribDefs attributes;
   attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
   attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
   return attributes;
 }
 
-QgsPointXY KadasRectangleItem::positionFromAttributes(const QList<double>& values) const
+QgsPointXY KadasRectangleItem::positionFromDrawAttribs(const AttribValues& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
 }
 
-QList<double> KadasRectangleItem::attributesFromPosition(const QgsPointXY& pos) const
+KadasMapItem::AttribValues KadasRectangleItem::drawAttribsFromPosition(const QgsPointXY& pos) const
 {
-  QList<double> values;
+  AttribValues values;
   values.insert(AttrX, pos.x());
   values.insert(AttrY, pos.y());
   return values;

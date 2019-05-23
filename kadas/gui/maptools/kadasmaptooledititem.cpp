@@ -99,9 +99,9 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent* e )
     }
   }
   if(mInputWidget && mEditContext.isValid()) {
-    QList<double> values = mItem->attributesFromPosition(pos);
+    KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition(pos);
     for(int i = 0, n = values.size(); i < n; ++i) {
-      const KadasMapItem::NumericAttribute& attribute = mItem->attributes()[i];
+      const KadasMapItem::NumericAttribute& attribute = mItem->drawAttribs()[i];
       mInputWidget->inputFields()[i]->setText(QString::number(values[i], 'f', attribute.decimals));
     }
     mInputWidget->move( e->x(), e->y() + 20 );

@@ -27,15 +27,15 @@ public:
   KadasPolygonItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
   bool startPart(const QgsPointXY& firstPoint) override;
-  bool startPart(const QList<double>& attributeValues) override;
+  bool startPart(const AttribValues& attributeValues) override;
   void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings& mapSettings) override;
-  void setCurrentAttributes(const QList<double>& values) override;
+  void setCurrentAttributes(const AttribValues& values) override;
   bool continuePart() override;
   void endPart() override;
 
-  QList<NumericAttribute> attributes() const override;
-  QList<double> attributesFromPosition(const QgsPointXY& pos) const override;
-  QgsPointXY positionFromAttributes(const QList<double>& values) const override;
+  AttribDefs drawAttribs() const override;
+  AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const override;
+  QgsPointXY positionFromDrawAttribs(const AttribValues& values) const override;
 
   EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
   void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings) override;
@@ -50,7 +50,7 @@ private:
     void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override { return new State(*this); }
   };
-  enum Attributes {AttrX, AttrY, NAttrs};
+  enum AttribIds {AttrX, AttrY, NAttrs};
 
   bool mGeodesic = false;
 

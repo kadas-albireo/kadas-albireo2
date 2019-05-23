@@ -45,7 +45,7 @@ bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasCircularSectorItem::startPart(const QList<double>& attributeValues)
+bool KadasCircularSectorItem::startPart(const AttribValues& attributeValues)
 {
   state()->drawStatus = State::Drawing;
   // todo
@@ -87,7 +87,7 @@ void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapS
   recomputeDerived();
 }
 
-void KadasCircularSectorItem::setCurrentAttributes(const QList<double>& values)
+void KadasCircularSectorItem::setCurrentAttributes(const AttribValues& values)
 {
   // todo
 }
@@ -167,11 +167,11 @@ void KadasCircularSectorItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<KadasMapItem::NumericAttribute> KadasCircularSectorItem::attributes() const
+KadasMapItem::AttribDefs KadasCircularSectorItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
   double dMax = std::numeric_limits<double>::max();
-  QList<KadasMapItem::NumericAttribute> attributes;
+  AttribDefs attributes;
   attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
   attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
   attributes.insert(AttrR, NumericAttribute{"r", 0, dMax, 0});
@@ -180,9 +180,9 @@ QList<KadasMapItem::NumericAttribute> KadasCircularSectorItem::attributes() cons
   return attributes;
 }
 
-QList<double> KadasCircularSectorItem::attributesFromPosition(const QgsPointXY& pos) const
+KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition(const QgsPointXY& pos) const
 {
-  QList<double> attributes;
+  AttribValues attributes;
   if(state()->drawStatus == State::Empty) {
     attributes.insert(AttrX, pos.x());
     attributes.insert(AttrY, pos.y());
@@ -219,7 +219,7 @@ QList<double> KadasCircularSectorItem::attributesFromPosition(const QgsPointXY& 
   return attributes;
 }
 
-QgsPointXY KadasCircularSectorItem::positionFromAttributes(const QList<double>& values) const
+QgsPointXY KadasCircularSectorItem::positionFromDrawAttribs(const AttribValues& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
 }

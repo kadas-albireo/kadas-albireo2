@@ -50,7 +50,7 @@ bool KadasLineItem::startPart(const QgsPointXY& firstPoint)
   return true;
 }
 
-bool KadasLineItem::startPart(const QList<double>& attributeValues)
+bool KadasLineItem::startPart(const AttribValues& attributeValues)
 {
   QgsPoint point(attributeValues[AttrX], attributeValues[AttrY]);
   return startPart(point);
@@ -62,7 +62,7 @@ void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings &m
   recomputeDerived();
 }
 
-void KadasLineItem::setCurrentAttributes(const QList<double>& values)
+void KadasLineItem::setCurrentAttributes(const AttribValues& values)
 {
   state()->points.last().last().setX(values[AttrX]);
   state()->points.last().last().setY(values[AttrY]);
@@ -222,25 +222,25 @@ void KadasLineItem::recomputeDerived()
   setGeometry(multiGeom);
 }
 
-QList<KadasMapItem::NumericAttribute> KadasLineItem::attributes() const
+KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
 {
   double dMin = std::numeric_limits<double>::min();
   double dMax = std::numeric_limits<double>::max();
-  QList<KadasMapItem::NumericAttribute> attributes;
+  AttribDefs attributes;
   attributes.insert(AttrX, NumericAttribute{"x", dMin, dMax, 0});
   attributes.insert(AttrY, NumericAttribute{"y", dMin, dMax, 0});
   return attributes;
 }
 
-QList<double> KadasLineItem::attributesFromPosition(const QgsPointXY& pos) const
+KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition(const QgsPointXY& pos) const
 {
-  QList<double> values;
+  AttribValues values;
   values.insert(AttrX, pos.x());
   values.insert(AttrY, pos.y());
   return values;
 }
 
-QgsPointXY KadasLineItem::positionFromAttributes(const QList<double>& values) const
+QgsPointXY KadasLineItem::positionFromDrawAttribs(const AttribValues& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
 }
