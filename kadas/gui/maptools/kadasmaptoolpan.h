@@ -60,8 +60,6 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
   signals:
     void contextMenuRequested( QPoint screenPos, QgsPointXY mapPos );
     void itemPicked( const KadasFeaturePicker::PickResult& result );
-    void featurePicked( QgsMapLayer* layer, const QgsFeature& feature, const QVariant& otherResult );
-    void labelPicked( const QgsLabelPosition& labelPos );
 
   protected:
 
