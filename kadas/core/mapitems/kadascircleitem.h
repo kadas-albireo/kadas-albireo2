@@ -40,6 +40,11 @@ public:
   QList<double> attributesFromPosition(const QgsPointXY& pos) const override;
   QgsPointXY positionFromAttributes(const QList<double>& values) const override;
 
+  EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
+  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings) override;
+
+  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
+
   const QgsMultiSurface* geometry() const;
 
 private:

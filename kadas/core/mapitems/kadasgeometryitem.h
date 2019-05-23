@@ -79,6 +79,8 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     /** Returns whether the geometry contains the specified point */
     bool intersects( const QgsRectangle& rect ) const override;
 
+    virtual QgsWkbTypes::GeometryType geometryType() const = 0;
+
     void setFillColor( const QColor& c );
     QColor fillColor() const;
     void setOutlineColor( const QColor& c );

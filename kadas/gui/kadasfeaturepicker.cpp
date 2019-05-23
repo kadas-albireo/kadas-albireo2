@@ -17,50 +17,17 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsmapcanvas.h>
-#include <qgis/qgsmapcanvasannotationitem.h>
 #include <qgis/qgspallabeling.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/core/kadaspluginlayer.h>
+#include <kadas/core/kadasitemlayer.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType, filter_t filter )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
 {
   PickResult pickResult;
 
-  // First, try annotations
-  QgsMapCanvasAnnotationItem* annotationItem = nullptr;
-  // TODO: Helper function which uses KadasAnnotationItem::hitTest
-  for(QGraphicsItem* item : canvas->items( canvasPos ))
-  {
-    annotationItem = dynamic_cast<QgsMapCanvasAnnotationItem*>(item);
-    if(annotationItem) {
-      break;
-    }
-  }
-  if ( annotationItem )
-  {
-    pickResult.annotation = annotationItem;
-    pickResult.boundingBox = annotationItem->boundingRect(); // TODO screenBoundingRect?
-    return pickResult;
-  }
-
-  // Then, try labels
-  const QgsLabelingResults* labelingResults = canvas->labelingResults();
-  QList<QgsLabelPosition> labelPositions = labelingResults ? labelingResults->labelsAtPosition( mapPos ) : QList<QgsLabelPosition>();
-  if ( !labelPositions.isEmpty() )
-  {
-    QgsMapLayer* layer = QgsProject::instance()->mapLayer( labelPositions.front().layerID );
-    if ( layer )
-    {
-      pickResult.layer = layer;
-      pickResult.labelPos = labelPositions.front();
-      return pickResult;
-    }
-  }
-
-  // Last, try layer features
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
   double radiusmm = QSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
@@ -71,76 +38,75 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* can
   filterRect.setYMinimum( mapPos.y() - radiusmu );
   filterRect.setYMaximum( mapPos.y() + radiusmu );
 
-  QgsFeatureList features;
-  for ( QgsMapLayer* layer : canvas->layers() )
-  {
-    if ( qobject_cast<KadasPluginLayer*>(layer) )
-    {
-      KadasPluginLayer* pluginLayer = static_cast<KadasPluginLayer*>( layer );
-      QVariant result;
-      QRect boundingBox;
-      if ( pluginLayer->testPick( mapPos, canvas->mapSettings(), result, boundingBox ) )
-      {
-        pickResult.layer = layer;
-        pickResult.otherResult = result;
-        pickResult.boundingBox = boundingBox;
-        return pickResult;
-      }
+  for(QgsMapLayer* layer : canvas->layers()) {
+    if(qobject_cast<KadasItemLayer*>(layer)) {
+      pickResult = pickItemLayer(static_cast<KadasItemLayer*>(layer), canvas, filterRect, geomType);
+    } else if(qobject_cast<QgsVectorLayer*>(layer)) {
+      pickResult = pickVectorLayer(static_cast<QgsVectorLayer*>(layer), canvas, renderContext, filterRect, geomType);
     }
-    if ( layer->type() != QgsMapLayerType::VectorLayer )
-    {
-      continue;
-    }
-    QgsVectorLayer* vlayer = static_cast<QgsVectorLayer*>( layer );
-    if ( geomType != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != geomType )
-    {
-      continue;
-    }
-    if ( vlayer->hasScaleBasedVisibility() &&
-         ( vlayer->minimumScale() > canvas->mapSettings().scale() ||
-           vlayer->maximumScale() <= canvas->mapSettings().scale() ) )
-    {
-      continue;
-    }
-
-    QgsFeatureRenderer* renderer = vlayer->renderer();
-    bool filteredRendering = false;
-    if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
-    {
-      // setup scale for scale dependent visibility (rule based)
-      renderer->startRender( renderContext, vlayer->fields() );
-      filteredRendering = renderer->capabilities() & QgsFeatureRenderer::Filter;
-    }
-
-    QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
-    QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
-    QgsFeature feature;
-    while ( fit.nextFeature( feature ) )
-    {
-      if ( filteredRendering && !renderer->willRenderFeature( feature, renderContext ) )
-      {
-        continue;
-      }
-      if ( filter && !filter( feature ) )
-      {
-        continue;
-      }
-      if ( geomType != QgsWkbTypes::UnknownGeometry && feature.geometry().type() != geomType )
-      {
-        continue;
-      }
-      features.append( feature );
-    }
-    if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
-    {
-      renderer->stopRender( renderContext );
-    }
-    if ( !features.empty() )
-    {
-      pickResult.layer = vlayer;
-      pickResult.feature = features.front();
-      return pickResult;
+    if(!pickResult.isEmpty()) {
+      break;
     }
   }
+  return pickResult;
+}
+
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer(KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType)
+{
+  PickResult pickResult;
+  pickResult.itemId = layer->pickItem(filterRect, canvas->mapSettings().destinationCrs());
+  if(!pickResult.itemId.isEmpty()) {
+    pickResult.layer = layer;
+  }
+  return pickResult;
+}
+
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer(QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, QgsRenderContext& renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType)
+{
+  PickResult pickResult;
+
+  QgsFeatureList features; 
+  if ( geomType != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != geomType )
+  {
+    return pickResult;
+  }
+  if ( vlayer->hasScaleBasedVisibility() &&
+       ( vlayer->minimumScale() > canvas->mapSettings().scale() ||
+         vlayer->maximumScale() <= canvas->mapSettings().scale() ) )
+  {
+    return pickResult;
+  }
+
+  QgsFeatureRenderer* renderer = vlayer->renderer();
+  bool filteredRendering = false;
+  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
+  {
+    // setup scale for scale dependent visibility (rule based)
+    renderer->startRender( renderContext, vlayer->fields() );
+    filteredRendering = renderer->capabilities() & QgsFeatureRenderer::Filter;
+  }
+
+  QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
+  QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+  QgsFeature feature;
+  while ( fit.nextFeature( feature ) )
+  {
+    if ( filteredRendering && !renderer->willRenderFeature( feature, renderContext ) )
+    {
+      continue;
+    }
+    if ( geomType != QgsWkbTypes::UnknownGeometry && feature.geometry().type() != geomType )
+    {
+      continue;
+    }
+    pickResult.layer = vlayer;
+    pickResult.feature = feature;
+    break;
+  }
+  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
+  {
+    renderer->stopRender( renderContext );
+  }
+
   return pickResult;
 }

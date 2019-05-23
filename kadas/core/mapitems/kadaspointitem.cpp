@@ -16,6 +16,7 @@
 
 #include <qgis/qgspoint.h>
 #include <qgis/qgsmultipoint.h>
+#include <qgis/qgsmapsettings.h>
 
 #include <kadas/core/mapitems/kadaspointitem.h>
 
@@ -103,4 +104,25 @@ QList<double> KadasPointItem::attributesFromPosition(const QgsPointXY& pos) cons
 QgsPointXY KadasPointItem::positionFromAttributes(const QList<double>& values) const
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
+}
+
+KadasMapItem::EditContext KadasPointItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
+{
+  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
+  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
+  for(int i = 0, n = state()->points.size(); i < n; ++i) {
+    QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(state()->points[i]));
+    if ( canvasPos.sqrDist(testPos) < 25 ) {
+      return EditContext(QgsVertexId(i, 0, 0));
+    }
+  }
+  return EditContext();
+}
+
+void KadasPointItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+{
+  if(context.vidx.part >= 0 && context.vidx.part < state()->points.size()) {
+    state()->points[context.vidx.part] = newPoint;
+    recomputeDerived();
+  }
 }

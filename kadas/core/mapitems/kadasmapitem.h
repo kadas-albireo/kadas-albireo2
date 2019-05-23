@@ -19,6 +19,7 @@
 
 #include <QObject>
 
+#include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsrectangle.h>
 
@@ -86,7 +87,23 @@ public:
   virtual QList<double> attributesFromPosition(const QgsPointXY& pos) const = 0;
   virtual QgsPointXY positionFromAttributes(const QList<double>& values) const = 0;
 
-
+  // Edit interface
+  struct EditContext {
+    EditContext(const QgsVertexId& _vidx = QgsVertexId(), const QList<NumericAttribute>& _attributes = QList<NumericAttribute>(), Qt::CursorShape _cursor = Qt::CrossCursor)
+      : vidx(_vidx)
+      , attributes(_attributes)
+      , cursor(_cursor)
+    {
+    }
+    QgsVertexId vidx;
+    QList<NumericAttribute> attributes;
+    Qt::CursorShape cursor;
+    bool isValid() const{ return vidx.isValid(); }
+    bool operator==(const EditContext& other) const{ return vidx == other.vidx; }
+    bool operator!=(const EditContext& other) const{ return vidx != other.vidx; }
+  };
+  virtual EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const = 0;
+  virtual void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings) = 0;
 
 signals:
   void aboutToBeDestroyed();

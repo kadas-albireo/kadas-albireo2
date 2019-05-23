@@ -39,8 +39,10 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/core/kadasitemlayer.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
@@ -719,6 +721,12 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
 
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult& result )
 {
+  if(qobject_cast<KadasItemLayer*>(result.layer)) {
+    KadasItemLayer* layer = static_cast<KadasItemLayer*>(result.layer);
+    QgsMapTool* tool = new KadasMapToolEditItem(mMainWindow->mapCanvas(), result.itemId, layer);
+    connect(tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater);
+    mMainWindow->mapCanvas()->setMapTool(tool);
+  }
   // TODO
 }
 

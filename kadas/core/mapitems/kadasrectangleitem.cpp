@@ -18,6 +18,7 @@
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgspolygon.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspoint.h>
 
@@ -144,3 +145,41 @@ QList<double> KadasRectangleItem::attributesFromPosition(const QgsPointXY& pos) 
   return values;
 }
 
+KadasMapItem::EditContext KadasRectangleItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
+{
+  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
+  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
+  for(int iPart = 0, nParts = state()->p1.size(); iPart < nParts; ++iPart) {
+    QList<QgsPointXY> points = QList<QgsPointXY>()
+          << state()->p1[iPart]
+          << QgsPoint( state()->p2[iPart].x(), state()->p1[iPart].y() )
+          << state()->p2[iPart]
+          << QgsPoint( state()->p1[iPart].x(), state()->p2[iPart].y() );
+    for(int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert) {
+      QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(points[iVert]));
+      if ( canvasPos.sqrDist(testPos) < 25 ) {
+        return EditContext(QgsVertexId(iPart, 0, iVert));
+      }
+    }
+  }
+  return EditContext();
+}
+
+void KadasRectangleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+{
+  if(context.vidx.part >= 0 && context.vidx.part < state()->p1.size()
+  && context.vidx.vertex >= 0 && context.vidx.vertex < 4) {
+    if(context.vidx.vertex == 0) {
+      state()->p1[context.vidx.part] = newPoint;
+    } else if(context.vidx.vertex == 1) {
+      state()->p2[context.vidx.part].setX( newPoint.x() );
+      state()->p1[context.vidx.part].setY( newPoint.y() );
+    } else if ( context.vidx.vertex == 2 ) {
+      state()->p2[context.vidx.part] = newPoint;
+    } else if ( context.vidx.vertex == 3 ) {
+      state()->p1[context.vidx.part].setX( newPoint.x() );
+      state()->p2[context.vidx.part].setY( newPoint.y() );
+    }
+    recomputeDerived();
+  }
+}

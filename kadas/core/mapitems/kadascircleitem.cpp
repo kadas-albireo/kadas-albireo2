@@ -18,6 +18,7 @@
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgscircularstring.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
@@ -291,3 +292,35 @@ QgsPointXY KadasCircleItem::positionFromAttributes(const QList<double>& values) 
   return QgsPointXY(values[AttrX] + values[AttrR], values[AttrY]);
 }
 
+
+KadasMapItem::EditContext KadasCircleItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
+{
+  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
+  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
+  for(int iPart = 0, nParts = state()->centers.size(); iPart < nParts; ++iPart) {
+    QList<QgsPointXY> points = QList<QgsPointXY>()
+          << state()->centers[iPart]
+          << QgsPointXY(state()->centers[iPart].x() + state()->radii[iPart], state()->centers[iPart].y());
+    for(int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert) {
+      QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(points[iVert]));
+      if ( canvasPos.sqrDist(testPos) < 25 ) {
+        return EditContext(QgsVertexId(iPart, 0, iVert));
+      }
+    }
+  }
+  return EditContext();
+}
+
+void KadasCircleItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+{
+  if(context.vidx.part >= 0 && context.vidx.part < state()->centers.size()
+  && context.vidx.vertex >= 0 && context.vidx.vertex < 2) {
+    const QgsPointXY& center = state()->centers[context.vidx.part];
+    if(context.vidx.vertex == 0) {
+      state()->centers[context.vidx.part] = newPoint;
+    } else if ( context.vidx.vertex == 1 ) {
+      state()->radii[context.vidx.part] = qSqrt(newPoint.sqrDist(center));
+    }
+    recomputeDerived();
+  }
+}

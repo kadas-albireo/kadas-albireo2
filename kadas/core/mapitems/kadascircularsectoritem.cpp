@@ -223,3 +223,13 @@ QgsPointXY KadasCircularSectorItem::positionFromAttributes(const QList<double>& 
 {
   return QgsPointXY(values[AttrX], values[AttrY]);
 }
+
+KadasMapItem::EditContext KadasCircularSectorItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
+{
+  return EditContext();
+}
+
+void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings& mapSettings)
+{
+
+}

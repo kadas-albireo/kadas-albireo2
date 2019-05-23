@@ -27,7 +27,7 @@
 
 class QgsMapLayer;
 class QgsMapCanvas;
-class QgsMapCanvasAnnotationItem;
+class KadasItemLayer;
 
 class KADAS_GUI_EXPORT KadasFeaturePicker
 {
@@ -35,19 +35,19 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
     class PickResult
     {
       public:
-        PickResult() : layer( 0 ), annotation( 0 ) {}
-        bool isEmpty() const { return layer == 0 && annotation == 0; }
+        bool isEmpty() const { return layer == nullptr; }
 
-        QgsMapLayer* layer;
+        QgsMapLayer* layer = nullptr;
         QgsFeature feature;
-        QVariant otherResult;
-        QgsMapCanvasAnnotationItem* annotation;
-        QgsLabelPosition labelPos;
+        QString itemId;
         QRectF boundingBox;
     };
 
-    typedef bool( *filter_t )( const QgsFeature& );
-    static PickResult pick(const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType, filter_t filter = 0 );
+    static PickResult pick(const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType);
+
+private:
+    static PickResult pickItemLayer(KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType);
+    static PickResult pickVectorLayer(QgsVectorLayer* vlayer, const QgsMapCanvas *canvas, QgsRenderContext &renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType);
 };
 
 #endif // KADASFEATUREPICKER_H
