@@ -58,7 +58,7 @@ void KadasMapToolCreateItem::activate()
       mInputWidget->addInputField( attribute.name + ":", attrEdit );
     }
     if(!attributes.isEmpty()) {
-      mInputWidget->setFocusedInputField(mInputWidget->inputFields()[0]);
+      mInputWidget->setFocusedInputField(mInputWidget->inputField(attributes.begin().key()));
     }
   }
 }
@@ -121,8 +121,8 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
   }
   if(mInputWidget) {
     KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition(pos);
-    for(int i = 0, n = values.size(); i < n; ++i) {
-      mInputWidget->inputFields()[i]->setValue(values[i]);
+    for(auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it) {
+      mInputWidget->inputField(it.key())->setValue(it.value());
     }
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();

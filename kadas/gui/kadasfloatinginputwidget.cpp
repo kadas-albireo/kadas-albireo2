@@ -96,61 +96,13 @@ int KadasFloatingInputWidget::addInputField( const QString &label, KadasFloating
   int row = gridLayout->isEmpty() ? 0 : gridLayout->rowCount();
   gridLayout->addWidget( new QLabel( label ), row, 0, 1, 1 );;
   gridLayout->addWidget( widget, row, 1, 1, 1 );
-  mInputFields.append( widget );
+  mInputFields.insert(widget->id(), widget );
   if ( initiallyfocused )
   {
     setFocusedInputField( widget );
-    mInitiallyFocusedInput = row;
+    mInitiallyFocusedInput = widget->id();
   }
   return row;
-}
-
-void KadasFloatingInputWidget::removeInputField( int idx )
-{
-  if ( mFocusedInput == mInputFields.at( idx ) )
-  {
-    int n = mInputFields.size();
-    int nextIdx = ( n + mInputFields.indexOf( mFocusedInput ) - 1 ) % n;
-    for ( int i = 0; i < n && mInputFields[nextIdx]->isHidden(); ++i )
-    {
-      nextIdx = ( nextIdx - 1 ) % n;
-    }
-    setFocusedInputField( mInputFields[nextIdx] );
-  }
-  mInputFields.removeAt( idx );
-  if ( mInitiallyFocusedInput >= idx )
-  {
-    mInitiallyFocusedInput = qMax( 0, mInitiallyFocusedInput - 1 );
-  }
-  // Because re-creating the layout is actually easier than just deleting a row...
-  QGridLayout* oldLayout = static_cast<QGridLayout*>( layout() );
-  QGridLayout* newLayout = new QGridLayout();
-  newLayout->setContentsMargins( 2, 2, 2, 2 );
-  newLayout->setSpacing( 1 );
-  newLayout->setSizeConstraint( QLayout::SetFixedSize );
-  for ( int row = 0, newrow = 0, n = oldLayout->rowCount(); row < n; ++row )
-  {
-    QLayoutItem* item0 = oldLayout->itemAtPosition( row, 0 );
-    QLayoutItem* item1 = oldLayout->itemAtPosition( row, 1 );
-    if ( row != idx )
-    {
-      if ( item0 && item1 )
-      {
-        oldLayout->removeItem( item0 );
-        oldLayout->removeItem( item1 );
-        newLayout->addWidget( item0->widget(), newrow, 0 );
-        newLayout->addWidget( item1->widget(), newrow, 1 );
-        ++newrow;
-      }
-    }
-    else
-    {
-      delete item0->widget();
-      delete item1->widget();
-    }
-  }
-  delete oldLayout;
-  setLayout( newLayout );
 }
 
 void KadasFloatingInputWidget::setInputFieldVisible( int idx, bool visible )
@@ -234,24 +186,22 @@ void KadasFloatingInputWidget::keyPressEvent( QKeyEvent *ev )
   // Override tab handling to ensure only the input fields inside the widget receive focus
   if ( ev->key() == Qt::Key_Tab || ev->key() == Qt::Key_Down )
   {
-    int n = mInputFields.size();
-    int nextIdx = ( mInputFields.indexOf( mFocusedInput ) + 1 ) % n;
-    for ( int i = 0; i < n && mInputFields[nextIdx]->isHidden(); ++i )
-    {
-      nextIdx = ( nextIdx + 1 ) % n;
+    auto nextIt = (++mInputFields.find(mFocusedInput->id()));
+    if(nextIt == mInputFields.end()) {
+      nextIt = mInputFields.begin();
     }
-    setFocusedInputField( mInputFields[nextIdx] );
+    setFocusedInputField( mInputFields[nextIt.key()] );
     ev->accept();
   }
   else if ( ev->key() == Qt::Key_Backtab || ev->key() == Qt::Key_Up )
   {
-    int n = mInputFields.size();
-    int nextIdx = ( n + mInputFields.indexOf( mFocusedInput ) - 1 ) % n;
-    for ( int i = 0; i < n && mInputFields[nextIdx]->isHidden(); ++i )
-    {
-      nextIdx = ( nextIdx - 1 ) % n;
+    auto it = mInputFields.find(mFocusedInput->id());
+    if(it == mInputFields.begin()) {
+      it = --mInputFields.end();
+    } else {
+      --it;
     }
-    setFocusedInputField( mInputFields[nextIdx] );
+    setFocusedInputField( mInputFields[it.key()] );
     ev->accept();
   }
   else
@@ -262,15 +212,9 @@ void KadasFloatingInputWidget::keyPressEvent( QKeyEvent *ev )
 
 void KadasFloatingInputWidget::showEvent( QShowEvent */*event*/ )
 {
-  int n = mInputFields.size();
-  if ( mInitiallyFocusedInput >= 0 && mInitiallyFocusedInput < n )
-  {
-    int idx = mInitiallyFocusedInput;
-    for ( int i = 0; i < n && mInputFields[idx]->isHidden(); ++i )
-    {
-      idx = ( idx + 1 ) % n;
-    }
-    setFocusedInputField( mInputFields[idx] );
+  auto it = mInputFields.find(mInitiallyFocusedInput);
+  if(it != mInputFields.end()) {
+    setFocusedInputField(it.value());
   }
 }
 

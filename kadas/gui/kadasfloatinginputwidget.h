@@ -55,10 +55,10 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
   public:
     KadasFloatingInputWidget( QgsMapCanvas* canvas );
     int addInputField( const QString& label, KadasFloatingInputWidgetField* widget, bool initiallyfocused = false );
-    void removeInputField( int idx );
     void setInputFieldVisible( int idx, bool visible );
     void setFocusedInputField( KadasFloatingInputWidgetField* widget );
-    const QList<KadasFloatingInputWidgetField*>& inputFields() const { return mInputFields; }
+    QList<KadasFloatingInputWidgetField*> inputFields() const { return mInputFields.values(); }
+    KadasFloatingInputWidgetField* inputField(int id) const{ return mInputFields.value(id); }
     KadasFloatingInputWidgetField* focusedInputField() const { return mFocusedInput; }
     bool eventFilter( QObject *obj, QEvent *ev ) override;
 
@@ -74,7 +74,7 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
     int mInitiallyFocusedInput = -1;
     QgsMapCanvas* mCanvas;
     KadasFloatingInputWidgetField* mFocusedInput;
-    QList<KadasFloatingInputWidgetField*> mInputFields;
+    QMap<int, KadasFloatingInputWidgetField*> mInputFields;
 
 };
 
