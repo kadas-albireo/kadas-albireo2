@@ -23,6 +23,7 @@
 #include <kadas/core/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadas_gui.h>
 
+class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
 
@@ -43,6 +44,7 @@ public:
 
 private:
   KadasStateHistory* mStateHistory = nullptr;
+  KadasBottomBar* mBottomBar = nullptr;
   KadasItemLayer* mLayer = nullptr;
   KadasMapItem* mItem = nullptr;
   KadasMapItem::EditContext mEditContext;

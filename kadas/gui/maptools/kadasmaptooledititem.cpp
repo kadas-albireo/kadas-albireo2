@@ -14,12 +14,15 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QPushButton>
+
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 
 #include <kadas/core/kadasitemlayer.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
@@ -45,6 +48,38 @@ void KadasMapToolEditItem::activate()
   mStateHistory = new KadasStateHistory(this);
   mStateHistory->push(mItem->state()->clone());
   connect(mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditItem::stateChanged);
+
+  mBottomBar = new KadasBottomBar(canvas());
+  mBottomBar->setLayout(new QHBoxLayout());
+  if(mItem->getEditorFactory()) {
+    KadasMapItemEditor* editor = mItem->getEditorFactory()(mItem);
+    editor->syncItemToWidget();
+    mBottomBar->layout()->addWidget(editor);
+  }
+
+  QPushButton* undoButton = new QPushButton();
+  undoButton->setIcon(QIcon(":/images/icons/undo"));
+  undoButton->setToolTip(tr("Undo"));
+  undoButton->setEnabled(false);
+  connect(undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); });
+  connect(mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled);
+  mBottomBar->layout()->addWidget(undoButton);
+
+  QPushButton* redoButton = new QPushButton();
+  redoButton->setIcon(QIcon(":/images/icons/redo"));
+  redoButton->setToolTip(tr("Redo"));
+  redoButton->setEnabled(false);
+  connect(redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); });
+  connect(mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled);
+  mBottomBar->layout()->addWidget(redoButton);
+
+  QPushButton* closeButton = new QPushButton();
+  closeButton->setIcon(QIcon(":/images/icons/close"));
+  closeButton->setToolTip(tr("Close"));
+  connect(closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool(this); });
+  mBottomBar->layout()->addWidget(closeButton);
+
+  mBottomBar->show();
 }
 
 void KadasMapToolEditItem::deactivate()
@@ -55,6 +90,8 @@ void KadasMapToolEditItem::deactivate()
     mLayer->triggerRepaint();
     KadasMapCanvasItemManager::removeItem(mItem);
   }
+  delete mBottomBar;
+  mBottomBar = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
   delete mInputWidget;

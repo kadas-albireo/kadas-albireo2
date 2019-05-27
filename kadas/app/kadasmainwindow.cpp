@@ -172,19 +172,11 @@ KadasMainWindow::KadasMainWindow(QSplashScreen *splash)
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
   // Redlining
-  KadasRedliningIntegration::UI redliningUi;
-  redliningUi.buttonNewObject = mToolButtonRedliningNewObject;
-  redliningUi.colorButtonFillColor = mToolButtonRedliningFillColor;
-  redliningUi.colorButtonOutlineColor = mToolButtonRedliningBorderColor;
-  redliningUi.comboFillStyle = mComboBoxRedliningFillStyle;
-  redliningUi.comboOutlineStyle = mComboBoxRedliningBorderStyle;
-  redliningUi.spinBoxSize = mSpinBoxRedliningSize;
-  KadasRedliningIntegration* redlining = new KadasRedliningIntegration( redliningUi, this );
+  KadasRedliningIntegration* redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
 
   // Route editor
   // TODO
 //  mGpsRouteEditor = new QgsGPSRouteEditor( this, mActionDrawWaypoint, mActionDrawRoute );
-
 
   configureButtons();
 

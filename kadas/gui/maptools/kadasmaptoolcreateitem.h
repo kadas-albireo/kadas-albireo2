@@ -23,6 +23,7 @@
 #include <kadas/core/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadas_gui.h>
 
+class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
 
@@ -46,10 +47,6 @@ public:
 
   KadasMapItem* currentItem() const{ return mItem; }
 
-signals:
-  void startedCreatingItem(KadasMapItem* item);
-  void finishedCreatingItem(KadasMapItem* item);
-
 private:
   ItemFactory mItemFactory = nullptr;
   KadasMapItem* mItem = nullptr;
@@ -58,6 +55,8 @@ private:
   KadasStateHistory* mStateHistory = nullptr;
   KadasFloatingInputWidget* mInputWidget = nullptr;
   bool mIgnoreNextMoveEvent = false;
+
+  KadasBottomBar* mBottomBar = nullptr;
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);

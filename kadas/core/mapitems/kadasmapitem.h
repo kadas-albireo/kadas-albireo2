@@ -18,6 +18,7 @@
 #define KADASMAPITEM_H
 
 #include <QObject>
+#include <QWidget>
 
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgscoordinatereferencesystem.h>
@@ -28,6 +29,20 @@
 
 class QgsRenderContext;
 struct QgsVertexId;
+class KadasMapItem;
+
+
+class KADAS_CORE_EXPORT KadasMapItemEditor : public QWidget {
+public:
+  KadasMapItemEditor(KadasMapItem* item, QWidget* parent = nullptr) : QWidget(parent), mItem(item) {}
+
+  virtual void syncItemToWidget() = 0;
+  virtual void syncWidgetToItem() = 0;
+
+protected:
+  KadasMapItem* mItem;
+};
+
 
 class KADAS_CORE_EXPORT KadasMapItem : public QObject
 {
@@ -113,6 +128,11 @@ public:
   virtual AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const = 0;
   virtual QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const = 0;
 
+  // Editor
+  typedef KadasMapItemEditor*(*EditorFactory)(KadasMapItem* item);
+  void setEditorFactory(EditorFactory factory) { mEditorFactory = factory; }
+  EditorFactory getEditorFactory() const{ return mEditorFactory; }
+
 signals:
   void aboutToBeDestroyed();
   void changed();
@@ -123,6 +143,8 @@ protected:
   QPointF mTranslationOffset;
 
 private:
+  EditorFactory mEditorFactory = nullptr;
+
   virtual State* createEmptyState() const = 0;
   virtual void recomputeDerived() = 0;
 };

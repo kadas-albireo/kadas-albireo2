@@ -22,14 +22,10 @@
 #include <QObject>
 
 class QAction;
-class QComboBox;
-class QSpinBox;
 class QToolButton;
 
-class QgsColorButton;
 class QgsMapCanvas;
 
-class KadasGeometryItem;
 class KadasItemLayer;
 class KadasMapItem;
 class KadasMainWindow;
@@ -38,25 +34,12 @@ class KadasRedliningIntegration : public QObject
 {
   Q_OBJECT
 public:
-  struct UI
-  {
-    QToolButton* buttonNewObject;
-    QSpinBox* spinBoxSize;
-    QgsColorButton* colorButtonOutlineColor;
-    QgsColorButton* colorButtonFillColor;
-    QComboBox* comboOutlineStyle;
-    QComboBox* comboFillStyle;
-  };
-
-  KadasRedliningIntegration( const UI &ui, KadasMainWindow* main );
+  KadasRedliningIntegration( QToolButton* buttonNewObject, KadasMainWindow* main );
   KadasItemLayer *getOrCreateLayer();
   KadasItemLayer *getLayer() const;
 
-signals:
-  void styleChanged();
-
 private:
-  UI mUi;
+  QToolButton* mButtonNewObject = nullptr;
   KadasMainWindow* mMainWindow = nullptr;
   QgsMapCanvas* mCanvas = nullptr;
   QString mLayerId;
@@ -70,19 +53,8 @@ private:
   QAction* mActionNewCircle = nullptr;
   QAction* mActionNewText = nullptr;
 
+  KadasMapItem *setEditorFactory(KadasMapItem* item) const;
   void toggleCreateItem(bool active, const std::function<KadasMapItem*()>& itemFactory);
-  KadasGeometryItem *applyStyle(KadasGeometryItem* item);
-
-  static QIcon createOutlineStyleIcon( Qt::PenStyle style );
-  static QIcon createFillStyleIcon( Qt::BrushStyle style );
-
-private slots:
-  void saveColor();
-  void saveOutlineWidth();
-  void saveStyle();
-  void toggleItemMeasurements(KadasMapItem* item, bool enabled);
-  void updateItemStyle();
-
 };
 
 #endif // KADASREDLININGINTEGRATION_H

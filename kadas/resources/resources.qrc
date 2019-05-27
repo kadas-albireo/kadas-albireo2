@@ -80,7 +80,11 @@
         <file alias="icons/redlining_text">icons/redlining_text.svg</file>
         <file alias="icons/redlining_triangle">icons/redlining_triangle.svg</file>
         <file alias="icons/clear">icons/clear.svg</file>
+        <file alias="icons/close">icons/close.svg</file>
         <file alias="icons/search">icons/search.svg</file>
+        <file alias="icons/shape">icons/shape.png</file>
+        <file alias="icons/undo">icons/undo.svg</file>
+        <file alias="icons/redo">icons/redo.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
