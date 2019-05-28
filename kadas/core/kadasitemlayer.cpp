@@ -37,6 +37,7 @@ public:
       if ( item ) {
         mRendererContext.painter()->save();
         mRendererContext.painter()->translate(item->translationOffset());
+        mRendererContext.setCoordinateTransform(QgsCoordinateTransform(item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext()));
         item->render( mRendererContext );
         mRendererContext.painter()->restore();
       }

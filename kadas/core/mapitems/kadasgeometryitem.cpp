@@ -78,7 +78,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   context.painter()->setPen( mPen );
 
   QgsAbstractGeometry* paintGeom = mGeometry->clone();
-  paintGeom->transform( QgsCoordinateTransform(mCrs, context.coordinateTransform().destinationCrs(), context.transformContext()) );
+  paintGeom->transform( context.coordinateTransform() );
   paintGeom->transform( context.mapToPixel().transform() );
   paintGeom->draw( *context.painter() );
 

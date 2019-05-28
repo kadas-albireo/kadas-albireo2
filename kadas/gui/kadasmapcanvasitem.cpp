@@ -28,12 +28,13 @@ KadasMapCanvasItem::KadasMapCanvasItem(KadasMapItem* item, QgsMapCanvas* canvas)
 
 void KadasMapCanvasItem::paint(QPainter *painter)
 {
-  QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
-  rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
-  rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
-  rc.setFlag( QgsRenderContext::Antialiasing, true );
-
   if ( mItem ) {
+    QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
+    rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
+    rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
+    rc.setFlag( QgsRenderContext::Antialiasing, true );
+    rc.setCoordinateTransform(QgsCoordinateTransform(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext()));
+
     rc.painter()->save();
     rc.painter()->translate( -pos() );
     mItem->render( rc );
