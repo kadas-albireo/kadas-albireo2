@@ -47,6 +47,8 @@ public:
 
   KadasMapItem* currentItem() const{ return mItem; }
 
+  void setMultipart(bool multipart) { mMultipart = multipart; }
+ 
 private:
   ItemFactory mItemFactory = nullptr;
   KadasMapItem* mItem = nullptr;
@@ -59,11 +61,13 @@ private:
   KadasBottomBar* mBottomBar = nullptr;
   KadasMapItemEditor* mEditor = nullptr;
 
+  bool mMultipart = false;
+
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
-  void startItem(const QgsPointXY &pos);
-  void startItem(const KadasMapItem::AttribValues& attributes);
-  void finishItem();
+  void startPart(const QgsPointXY &pos);
+  void startPart(const KadasMapItem::AttribValues& attributes);
+  void finishPart();
   void commitItem();
   void cleanup();
   void reset();

@@ -142,7 +142,7 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
   else if(e->button() == Qt::RightButton)
   {
     if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
-      finishItem();
+      finishPart();
     } else {
       canvas()->unsetMapTool(this);
     }
@@ -196,26 +196,37 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
   }
 }
 
-void KadasMapToolCreateItem::addPoint(const QgsPointXY &mapPos)
+QgsPointXY KadasMapToolCreateItem::transformMousePoint(QgsPointXY mapPos) const
 {
+  if(mSnapping) {
+    QgsPointLocator::Match m = mCanvas->snappingUtils()->snapToMap( mapPos );
+    if(m.isValid()) {
+      mapPos = m.point();
+    }
+  }
   QgsCoordinateTransform crst(canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance());
-  QgsPointXY pos = crst.transform(mapPos);
+  return crst.transform(mapPos);
+}
 
+void KadasMapToolCreateItem::addPoint(const QgsPointXY &pos)
+{
   if(mItem->state()->drawStatus == KadasMapItem::State::Empty)
   {
-    startItem(pos);
+    startPart(pos);
   }
   else if(mItem->state()->drawStatus == KadasMapItem::State::Drawing)
   {
     // Add point, stop drawing if item does not accept further points
     if(!mItem->continuePart()) {
-      finishItem();
+      finishPart();
     } else {
       mStateHistory->push(mItem->state()->clone());
     }
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Finished) {
-    reset();
-    startItem(pos);
+    if(!mMultipart) {
+      reset();
+    }
+    startPart(pos);
   }
 }
 
@@ -226,25 +237,25 @@ void KadasMapToolCreateItem::createItem()
   mStateHistory->clear();
 }
 
-void KadasMapToolCreateItem::startItem(const QgsPointXY& pos)
+void KadasMapToolCreateItem::startPart(const QgsPointXY& pos)
 {
   if(!mItem->startPart(pos)) {
-    finishItem();
+    finishPart();
   } else {
     mStateHistory->push(mItem->state()->clone());
   }
 }
 
-void KadasMapToolCreateItem::startItem(const KadasMapItem::AttribValues &attributes)
+void KadasMapToolCreateItem::startPart(const KadasMapItem::AttribValues &attributes)
 {
   if(!mItem->startPart(attributes)) {
-    finishItem();
+    finishPart();
   } else {
     mStateHistory->push(mItem->state()->clone());
   }
 }
 
-void KadasMapToolCreateItem::finishItem()
+void KadasMapToolCreateItem::finishPart()
 {
   mItem->endPart();
   mStateHistory->push(mItem->state()->clone());
@@ -290,16 +301,18 @@ void KadasMapToolCreateItem::inputChanged()
 void KadasMapToolCreateItem::acceptInput()
 {
   if(mItem->state()->drawStatus == KadasMapItem::State::Empty) {
-    startItem(collectAttributeValues());
+    startPart(collectAttributeValues());
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
     if(!mItem->continuePart()) {
-      finishItem();
+      finishPart();
     } else {
       mStateHistory->push(mItem->state()->clone());
     }
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Finished){
-    reset();
-    startItem(collectAttributeValues());
+    if(!mMultipart) {
+      reset();
+    }
+    startPart(collectAttributeValues());
   }
 }
 
