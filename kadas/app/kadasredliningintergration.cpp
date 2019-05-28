@@ -28,8 +28,10 @@
 #include <kadas/core/mapitems/kadaspointitem.h>
 #include <kadas/core/mapitems/kadaspolygonitem.h>
 #include <kadas/core/mapitems/kadasrectangleitem.h>
+#include <kadas/core/mapitems/kadastextitem.h>
 
 #include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
+#include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
 #include <kadas/app/kadasmainwindow.h>
@@ -61,6 +63,11 @@ KadasRedliningIntegration::KadasRedliningIntegration(QToolButton *buttonNewObjec
   };
   KadasMapToolCreateItem::ItemFactory circleFactory = [=] {
     return setEditorFactory(new KadasCircleItem(mCanvas->mapSettings().destinationCrs()));
+  };
+  KadasMapToolCreateItem::ItemFactory textFactory = [=] {
+    KadasTextItem* textItem = new KadasTextItem(mCanvas->mapSettings().destinationCrs());
+    textItem->setEditorFactory(KadasRedliningTextEditor::factory);
+    return textItem;
   };
 
 
@@ -98,11 +105,10 @@ KadasRedliningIntegration::KadasRedliningIntegration(QToolButton *buttonNewObjec
   connect( mActionNewCircle, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, circleFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), main ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
-  // TODO
-//  mActionNewText = new QAction( QIcon( ":/images/icons/redlining_text" ), tr( "Text" ), this );
-//  mActionNewText->setCheckable( true );
-//  connect( mActionNewText, &QAction::triggered, this, &KadasRedliningIntegration::setTextTool );
-//  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), main ), &QShortcut::activated, mActionNewText, &QAction::trigger );
+  mActionNewText = new QAction( QIcon( ":/images/icons/redlining_text" ), tr( "Text" ), this );
+  mActionNewText->setCheckable( true );
+  connect( mActionNewText, &QAction::triggered, this, [=](bool active) { toggleCreateItem(active, textFactory); });
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), main ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   QMenu* menuNewMarker = new QMenu();
   menuNewMarker->addAction( mActionNewPoint );

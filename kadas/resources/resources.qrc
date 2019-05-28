@@ -83,6 +83,8 @@
         <file alias="icons/close">icons/close.svg</file>
         <file alias="icons/search">icons/search.svg</file>
         <file alias="icons/shape">icons/shape.png</file>
+        <file alias="icons/textBold">icons/textBold.png</file>
+        <file alias="icons/textItalic">icons/textItalic.png</file>
         <file alias="icons/undo">icons/undo.svg</file>
         <file alias="icons/redo">icons/redo.svg</file>
     </qresource>
