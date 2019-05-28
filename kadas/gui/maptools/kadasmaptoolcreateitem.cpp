@@ -263,9 +263,14 @@ void KadasMapToolCreateItem::finishPart()
 
 void KadasMapToolCreateItem::commitItem()
 {
-  mLayer->addItem(mItem);
-  mLayer->triggerRepaint();
+  if(mLayer) {
+    mLayer->addItem(mItem);
+    mLayer->triggerRepaint();
+  }
   KadasMapCanvasItemManager::removeItem(mItem);
+  if(!mLayer) {
+    delete mItem;
+  }
   mItem = nullptr;
 }
 

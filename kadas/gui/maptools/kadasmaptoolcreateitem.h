@@ -34,7 +34,7 @@ public:
   typedef std::function<KadasMapItem*()> ItemFactory;
 
 
-  KadasMapToolCreateItem(QgsMapCanvas* canvas, ItemFactory itemFactory, KadasItemLayer* layer);
+  KadasMapToolCreateItem(QgsMapCanvas* canvas, ItemFactory itemFactory, KadasItemLayer* layer = nullptr);
   ~KadasMapToolCreateItem();
 
   void activate() override;
