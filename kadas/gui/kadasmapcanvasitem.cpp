@@ -59,5 +59,10 @@ void KadasMapCanvasItem::updateRect()
   QgsCoordinateTransform t(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
   QgsRectangle bbox = t.transform(mItem->boundingBox());
   double scale = mMapCanvas->mapUnitsPerPixel();
-  setRect(bbox.buffered(mItem->margin() * scale));
+  QSize margin = mItem->margin();
+  bbox.setXMinimum(bbox.xMinimum() - margin.width() * scale);
+  bbox.setXMaximum(bbox.xMaximum() + margin.width() * scale);
+  bbox.setYMinimum(bbox.yMinimum() - margin.height() * scale);
+  bbox.setYMaximum(bbox.yMaximum() + margin.height() * scale);
+  setRect(bbox);
 }

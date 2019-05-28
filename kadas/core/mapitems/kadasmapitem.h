@@ -51,14 +51,14 @@ public:
   KadasMapItem(const QgsCoordinateReferenceSystem& crs, QObject* parent);
   ~KadasMapItem();
 
-  /* Bounding box in geographic coordinates */
-  virtual QgsRectangle boundingBox() const = 0;
-
   /* The item crs */
   const QgsCoordinateReferenceSystem& crs() const{ return mCrs; }
 
-  /* Margin in pixels */
-  virtual int margin() const { return 0; }
+  /* Bounding box in geographic coordinates */
+  virtual QgsRectangle boundingBox() const = 0;
+
+  /* Margin (horizontal and vertical) in pixels */
+  virtual QSize margin() const { return QSize(); }
 
   /* Nodes for editing */
   virtual QList<QgsPointXY> nodes() const = 0;
