@@ -39,6 +39,8 @@ static QFont measurementFont() {
   return font;
 }
 
+static const int sLabelOffset = 16;
+
 KadasGeometryItem::KadasGeometryItem(const QgsCoordinateReferenceSystem &crs, QObject *parent)
     : KadasMapItem(crs, parent)
     , mPen( Qt::red )
@@ -104,7 +106,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     QPointF pos = context.mapToPixel().transform(label.mapPos).toQPointF();
     int width = label.width + 6;
     int height = label.height + 6;
-    QRectF labelRect(pos.x() - 0.5 * width, pos.y() + (label.center ? 0 : 16) - 0.5 * height, width, height);
+    QRectF labelRect(pos.x() - 0.5 * width, pos.y() + (label.center ? 0 : sLabelOffset) - 0.5 * height, width, height);
     context.painter()->fillRect(labelRect, rectColor);
     context.painter()->drawText(labelRect, Qt::AlignCenter|Qt::AlignVCenter, label.string);
   }
@@ -170,7 +172,7 @@ QSize KadasGeometryItem::margin() const {
   int maxMeasureLabelHeight = 0;
   for(const MeasurementLabel label : mMeasurementLabels) {
     maxMeasureLabelWidth = qMax(maxMeasureLabelWidth, label.width/2 + 1);
-    maxMeasureLabelHeight = qMax(maxMeasureLabelHeight, label.height/2 + 1);
+    maxMeasureLabelHeight = qMax(maxMeasureLabelHeight, label.height/2 + 1) + sLabelOffset;
   }
   int maxPainterMargin = qMax(mIconSize, mPen.width()) / 2 + 1;
   return QSize(qMax(maxMeasureLabelWidth, maxPainterMargin), qMax(maxMeasureLabelHeight, maxPainterMargin));
