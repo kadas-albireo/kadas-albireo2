@@ -103,7 +103,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mSearchButton->setToolTip( tr( "Search" ) );
 
   mClearButton = new QToolButton( mSearchBox );
-  mClearButton->setIcon( QIcon( ":/images/icons/clear" ) );
+  mClearButton->setIcon( QIcon( ":/images/icons/reset" ) );
   mClearButton->setIconSize( QSize( 16, 16 ) );
   mClearButton->setCursor( Qt::PointingHandCursor );
   mClearButton->setStyleSheet( "QToolButton { border: none; padding: 0px; }" );
