@@ -26,6 +26,8 @@ class KADAS_CORE_EXPORT KadasPolygonItem : public KadasGeometryItem
 public:
   KadasPolygonItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
 
+  QList<QgsPointXY> nodes() const override;
+
   bool startPart(const QgsPointXY& firstPoint) override;
   bool startPart(const AttribValues& values) override;
   void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) override;

@@ -40,6 +40,15 @@ KadasLineItem::KadasLineItem(const QgsCoordinateReferenceSystem &crs, bool geode
   clear();
 }
 
+QList<QgsPointXY> KadasLineItem::nodes() const
+{
+  QList<QgsPointXY> nodes;
+  for(const QList<QgsPointXY>& part : state()->points) {
+    nodes.append(part);
+  }
+  return nodes;
+}
+
 bool KadasLineItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;

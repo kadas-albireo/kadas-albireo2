@@ -36,6 +36,15 @@ KadasPolygonItem::KadasPolygonItem(const QgsCoordinateReferenceSystem &crs, bool
   clear();
 }
 
+QList<QgsPointXY> KadasPolygonItem::nodes() const
+{
+  QList<QgsPointXY> nodes;
+  for(const QList<QgsPointXY>& part : state()->points) {
+    nodes.append(part);
+  }
+  return nodes;
+}
+
 bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint)
 {
   state()->drawStatus = State::Drawing;
