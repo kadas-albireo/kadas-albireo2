@@ -57,6 +57,7 @@ private:
   bool mIgnoreNextMoveEvent = false;
 
   KadasBottomBar* mBottomBar = nullptr;
+  KadasMapItemEditor* mEditor = nullptr;
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);

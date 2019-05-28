@@ -67,9 +67,9 @@ void KadasMapToolCreateItem::activate()
   mBottomBar = new KadasBottomBar(canvas());
   mBottomBar->setLayout(new QHBoxLayout());
   if(mItem->getEditorFactory()) {
-    KadasMapItemEditor* editor = mItem->getEditorFactory()(mItem);
-    editor->syncWidgetToItem();
-    mBottomBar->layout()->addWidget(editor);
+    mEditor = mItem->getEditorFactory()(mItem);
+    mEditor->syncWidgetToItem();
+    mBottomBar->layout()->addWidget(mEditor);
   }
 
   QPushButton* undoButton = new QPushButton();
@@ -102,6 +102,7 @@ void KadasMapToolCreateItem::deactivate()
   QgsMapTool::deactivate();
   delete mBottomBar;
   mBottomBar = nullptr;
+  mEditor = nullptr;
   if(mItem->state()->drawStatus == KadasMapItem::State::Finished) {
     commitItem();
   }
@@ -114,6 +115,9 @@ void KadasMapToolCreateItem::deactivate()
 
 void KadasMapToolCreateItem::cleanup()
 {
+  if(mEditor) {
+    mEditor->setItem(nullptr);
+  }
   delete mItem;
   mItem = nullptr;
 }
@@ -123,6 +127,10 @@ void KadasMapToolCreateItem::reset()
   commitItem();
   cleanup();
   createItem();
+  if(mEditor) {
+    mEditor->setItem(mItem);
+    mEditor->syncWidgetToItem();
+  }
 }
 
 void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )

@@ -36,6 +36,7 @@ class KADAS_CORE_EXPORT KadasMapItemEditor : public QWidget {
 public:
   KadasMapItemEditor(KadasMapItem* item, QWidget* parent = nullptr) : QWidget(parent), mItem(item) {}
 
+  virtual void setItem(KadasMapItem* item) { mItem = item; }
   virtual void syncItemToWidget() = 0;
   virtual void syncWidgetToItem() = 0;
 
