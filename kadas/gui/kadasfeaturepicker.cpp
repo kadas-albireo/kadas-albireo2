@@ -54,7 +54,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* can
 KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer(KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType)
 {
   PickResult pickResult;
-  pickResult.itemId = layer->pickItem(filterRect, canvas->mapSettings().destinationCrs());
+  pickResult.itemId = layer->pickItem(filterRect, canvas->mapSettings());
   if(!pickResult.itemId.isEmpty()) {
     pickResult.layer = layer;
   }

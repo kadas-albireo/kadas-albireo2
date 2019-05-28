@@ -191,21 +191,22 @@ void KadasGeometryItem::setGeometry(QgsAbstractGeometry* geom )
   emit geometryChanged();
 }
 
-bool KadasGeometryItem::intersects(const QgsRectangle &rect) const
+bool KadasGeometryItem::intersects(const QgsRectangle &rect, const QgsMapSettings& settings) const
 {
   if ( !mGeometry )
   {
     return false;
   }
+  QgsRectangle r = QgsCoordinateTransform(settings.destinationCrs(), crs(), QgsProject::instance()).transform(rect);
 
   QgsPolygon filterRect;
   QgsLineString* exterior = new QgsLineString();
   exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+                       << QgsPoint( r.xMinimum(), r.yMinimum() )
+                       << QgsPoint( r.xMaximum(), r.yMinimum() )
+                       << QgsPoint( r.xMaximum(), r.yMaximum() )
+                       << QgsPoint( r.xMinimum(), r.yMaximum() )
+                       << QgsPoint( r.xMinimum(), r.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( mGeometry );

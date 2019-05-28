@@ -34,7 +34,7 @@ public:
   void addItem(KadasMapItem* item);
   KadasMapItem* takeItem(const QString& itemId);
 
-  QString pickItem(const QgsRectangle &pickRect, const QgsCoordinateReferenceSystem& crs) const;
+  QString pickItem(const QgsRectangle &pickRect, const QgsMapSettings &mapSettings) const;
 
   KadasItemLayer* clone() const override;
   QgsMapLayerRenderer* createMapRenderer( QgsRenderContext& rendererContext ) override;

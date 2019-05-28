@@ -75,9 +75,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     int margin() const override;
 
     QList<QgsPointXY> nodes() const override;
-
-    /** Returns whether the geometry contains the specified point */
-    bool intersects( const QgsRectangle& rect ) const override;
+    bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
 

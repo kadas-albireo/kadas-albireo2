@@ -17,6 +17,7 @@
 #include <QUuid>
 
 #include <qgis/qgsmaplayerrenderer.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
 
 #include <kadas/core/kadasitemlayer.h>
@@ -96,12 +97,10 @@ void KadasItemLayer::setTransformContext(const QgsCoordinateTransformContext& ct
   // TODO
 }
 
-QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsCoordinateReferenceSystem& crs) const
+QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsMapSettings& mapSettings) const
 {
   for(auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it) {
-    const KadasMapItem* item = it.value();
-    QgsRectangle rect = QgsCoordinateTransform(crs, item->crs(), QgsProject::instance()).transform(pickRect);
-    if(item->intersects(rect)) {
+    if(it.value()->intersects(pickRect, mapSettings)) {
       return it.key();
     }
   }
