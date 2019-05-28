@@ -159,6 +159,7 @@ QgsMultiLineString* KadasLineItem::geometry()
 
 void KadasLineItem::setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit)
 {
+  setMeasurementsEnabled(true);
   mMeasurementMode = measurementMode;
   mAngleUnit = angleUnit;
   emit geometryChanged(); // Trigger re-measurement
