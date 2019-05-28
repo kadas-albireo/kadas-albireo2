@@ -103,8 +103,8 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   for(const MeasurementLabel& label : mMeasurementLabels) {
     QPointF pos = context.mapToPixel().transform(label.mapPos).toQPointF();
     int width = label.width + 6;
-    int heigth = label.height + 6;
-    QRectF labelRect(pos.x() - 0.5 * width, pos.y() + (label.center ? 0 : 16) - 0.5 * heigth, width, heigth);
+    int height = label.height + 6;
+    QRectF labelRect(pos.x() - 0.5 * width, pos.y() + (label.center ? 0 : 16) - 0.5 * height, width, height);
     context.painter()->fillRect(labelRect, rectColor);
     context.painter()->drawText(labelRect, Qt::AlignCenter|Qt::AlignVCenter, label.string);
   }
