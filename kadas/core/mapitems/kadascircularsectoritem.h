@@ -58,7 +58,7 @@ private:
     void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override{ return new State(*this); }
   };
-  enum AttribIds {AttrX, AttrY, AttrR, AttrA1, AttrA2, NAttrs};
+  enum AttribIds {AttrX, AttrY, AttrR, AttrA1, AttrA2};
 
   QgsMultiSurface* geometry();
   State* state() const{ return static_cast<State*>(mState); }
