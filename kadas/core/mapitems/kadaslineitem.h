@@ -57,6 +57,8 @@ public:
   };
 
   void setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit=QgsUnitTypes::AngleDegrees);
+  MeasurementMode measurementMode() const{ return mMeasurementMode; }
+  QgsUnitTypes::AngleUnit angleUnit() const{ return mAngleUnit; }
 
 private:
   struct State : KadasMapItem::State {

@@ -50,6 +50,9 @@ public:
   void setMultipart(bool multipart) { mMultipart = multipart; }
   void setSnappingEnabled(bool snapping) { mSnapping = snapping; }
 
+public slots:
+  void reset();
+
 private:
   ItemFactory mItemFactory = nullptr;
   KadasMapItem* mItem = nullptr;
@@ -72,7 +75,6 @@ private:
   void finishPart();
   void commitItem();
   void cleanup();
-  void reset();
   QgsPointXY transformMousePoint(QgsPointXY mapPos) const;
   KadasMapItem::AttribValues collectAttributeValues() const;
 

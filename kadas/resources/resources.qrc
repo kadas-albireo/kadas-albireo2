@@ -87,6 +87,8 @@
         <file alias="icons/textItalic">icons/textItalic.png</file>
         <file alias="icons/undo">icons/undo.svg</file>
         <file alias="icons/redo">icons/redo.svg</file>
+        <file alias="icons/select">icons/select.svg</file>
+        <file alias="icons/clear">icons/clear.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

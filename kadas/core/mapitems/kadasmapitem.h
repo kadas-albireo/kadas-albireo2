@@ -130,7 +130,7 @@ public:
   virtual QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const = 0;
 
   // Editor
-  typedef KadasMapItemEditor*(*EditorFactory)(KadasMapItem* item);
+  typedef std::function<KadasMapItemEditor*(KadasMapItem*)> EditorFactory;
   void setEditorFactory(EditorFactory factory) { mEditorFactory = factory; }
   EditorFactory getEditorFactory() const{ return mEditorFactory; }
 
