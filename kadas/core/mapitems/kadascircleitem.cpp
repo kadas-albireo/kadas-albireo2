@@ -35,11 +35,18 @@ KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool g
 
 QList<QgsPointXY> KadasCircleItem::nodes() const
 {
+  QgsCoordinateTransform crst(mCrs, QgsCoordinateReferenceSystem("EPSG:4326"), QgsProject::instance());
   QList<QgsPointXY> points;
   for(int i = 0, n = state()->centers.size(); i < n; ++i) {
     const QgsPointXY& center = state()->centers[i];
     points.append(center);
-    points.append(QgsPointXY(center.x() + state()->radii[i], center.y()));
+    if(mGeodesic) {
+      QgsPointXY wgsCenter = crst.transform(center);
+      QgsPointXY wgsRPos = mDa.destination( wgsCenter, state()->radii[i], 90 );
+      points.append( crst.transform(wgsRPos, QgsCoordinateTransform::ReverseTransform) );
+    } else {
+      points.append(QgsPointXY(center.x() + state()->radii[i], center.y()));
+    }
   }
   return points;
 }
