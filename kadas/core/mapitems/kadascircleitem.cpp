@@ -263,16 +263,7 @@ void KadasCircleItem::computeGeoCircle(const QgsPointXY& center, double radius, 
   QgsCoordinateTransform t1( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326"), QgsProject::instance() );
   QgsCoordinateTransform t2( QgsCoordinateReferenceSystem( "EPSG:4326"), mCrs, QgsProject::instance() );
   QgsPointXY p1 = t1.transform( center );
-  QgsPointXY p2 = t1.transform( QgsPointXY(center.x() + radius, center.y()) );
   double clampLatitude = mCrs.authid() == "EPSG:3857" ? 85 : 90;
-  if ( p2.y() > 90 )
-  {
-    p2.setY( 90. - ( p2.y() - 90. ) );
-  }
-  if ( p2.y() < -90 )
-  {
-    p2.setY( -90. - ( p2.y() + 90. ) );
-  }
   QList<QgsPointXY> wgsPoints;
   for ( int a = 0; a < 360; ++a )
   {
