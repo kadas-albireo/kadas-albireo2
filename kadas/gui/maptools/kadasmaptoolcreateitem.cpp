@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssnappingutils.h>
 
 #include <kadas/core/kadasitemlayer.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
@@ -137,7 +138,8 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
 {
   if(e->button() == Qt::LeftButton)
   {
-    addPoint(e->mapPoint());
+    QgsPointXY pos = transformMousePoint(e->mapPoint());
+    addPoint(pos);
   }
   else if(e->button() == Qt::RightButton)
   {
@@ -157,8 +159,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  QgsCoordinateTransform crst(canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance());
-  QgsPointXY pos = crst.transform(e->mapPoint());
+  QgsPointXY pos = transformMousePoint(e->mapPoint());
 
   if(mItem->state()->drawStatus == KadasMapItem::State::Drawing) {
     mItem->setCurrentPoint(pos, &canvas()->mapSettings());

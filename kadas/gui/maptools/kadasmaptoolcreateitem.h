@@ -48,7 +48,8 @@ public:
   KadasMapItem* currentItem() const{ return mItem; }
 
   void setMultipart(bool multipart) { mMultipart = multipart; }
- 
+  void setSnappingEnabled(bool snapping) { mSnapping = snapping; }
+
 private:
   ItemFactory mItemFactory = nullptr;
   KadasMapItem* mItem = nullptr;
@@ -62,6 +63,7 @@ private:
   KadasMapItemEditor* mEditor = nullptr;
 
   bool mMultipart = false;
+  bool mSnapping = false;
 
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
@@ -71,6 +73,7 @@ private:
   void commitItem();
   void cleanup();
   void reset();
+  QgsPointXY transformMousePoint(QgsPointXY mapPos) const;
   KadasMapItem::AttribValues collectAttributeValues() const;
 
 private slots:
