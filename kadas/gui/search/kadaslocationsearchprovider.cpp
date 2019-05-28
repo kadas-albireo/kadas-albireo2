@@ -125,7 +125,7 @@ void KadasLocationSearchProvider::replyFinished()
                                         mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
     }
     // When bbox is empty, fallback to pos + zoomScale is used
-    searchResult.pos = QgsPoint( itemAttrsMap["y"].toDouble(), itemAttrsMap["x"].toDouble() );
+    searchResult.pos = QgsPointXY( itemAttrsMap["y"].toDouble(), itemAttrsMap["x"].toDouble() );
     searchResult.zoomScale = origin == "address" ? 5000 : 25000;
 
     searchResult.category = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;

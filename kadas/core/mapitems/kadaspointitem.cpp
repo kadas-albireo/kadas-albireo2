@@ -38,7 +38,7 @@ bool KadasPointItem::startPart(const QgsPointXY& firstPoint)
 
 bool KadasPointItem::startPart(const AttribValues& values)
 {
-  return startPart(QgsPoint(values[AttrX], values[AttrY]));
+  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 void KadasPointItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)

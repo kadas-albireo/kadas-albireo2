@@ -178,7 +178,7 @@ void KadasRemoteDataSearchProvider::replyFinished()
       searchResult.bbox = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
                                         mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
       // When bbox is empty, fallback to pos + zoomScale is used
-      searchResult.pos = QgsPoint( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
+      searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
       QgsCoordinateTransform ct( QgsCoordinateReferenceSystem("EPSG:4326"), QgsCoordinateReferenceSystem(searchResult.crs), QgsProject::instance() );
       searchResult.pos = ct.transform( searchResult.pos );
       if ( !bbox.isEmpty() && !bbox.contains( searchResult.pos ) )

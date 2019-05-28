@@ -55,7 +55,7 @@ bool KadasCircleItem::startPart(const QgsPointXY& firstPoint)
 
 bool KadasCircleItem::startPart(const AttribValues& values)
 {
-  return startPart(QgsPoint(values[AttrX], values[AttrY]));
+  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 void KadasCircleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)

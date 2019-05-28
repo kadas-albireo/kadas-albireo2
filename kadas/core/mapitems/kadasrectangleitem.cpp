@@ -42,7 +42,7 @@ bool KadasRectangleItem::startPart(const QgsPointXY& firstPoint)
 
 bool KadasRectangleItem::startPart(const AttribValues& values)
 {
-  return startPart(QgsPoint(values[AttrX], values[AttrY]));
+  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 void KadasRectangleItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
@@ -164,8 +164,8 @@ void KadasRectangleItem::measureGeometry()
 
     const QgsPointXY& p1 = state()->p1[i];
     const QgsPointXY& p2 = state()->p2[i];
-    QString width = formatLength( mDa.measureLine( p1, QgsPoint( p2.x(), p1.y() ) ), distanceBaseUnit() );
-    QString height = formatLength( mDa.measureLine( p1, QgsPoint( p1.x(), p2.y() ) ), distanceBaseUnit() );
+    QString width = formatLength( mDa.measureLine( p1, QgsPointXY( p2.x(), p1.y() ) ), distanceBaseUnit() );
+    QString height = formatLength( mDa.measureLine( p1, QgsPointXY( p1.x(), p2.y() ) ), distanceBaseUnit() );
     measurements.append( QString( "(%1 x %2)" ).arg( width ).arg( height ) );
 
     addMeasurements( measurements, polygon->centroid() );

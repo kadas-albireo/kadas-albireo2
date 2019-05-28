@@ -316,7 +316,7 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsRectangl
 
   for ( int i = 1; i < 4; ++i )
   {
-    pRaster = ct.transform( QgsPoint( regionPoints[i] ) );
+    pRaster = ct.transform( regionPoints[i] );
     col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
     row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
     colStart  = qMin( colStart , qFloor( col ) );

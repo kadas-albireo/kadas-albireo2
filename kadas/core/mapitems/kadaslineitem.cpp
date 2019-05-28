@@ -52,7 +52,7 @@ bool KadasLineItem::startPart(const QgsPointXY& firstPoint)
 
 bool KadasLineItem::startPart(const AttribValues& values)
 {
-  return startPart(QgsPoint(values[AttrX], values[AttrY]));
+  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
@@ -63,7 +63,7 @@ void KadasLineItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* m
 
 void KadasLineItem::setCurrentAttributes(const AttribValues& values)
 {
-  setCurrentPoint(QgsPoint(values[AttrX], values[AttrY]));
+  setCurrentPoint(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 bool KadasLineItem::continuePart()
@@ -181,7 +181,7 @@ void KadasLineItem::measureGeometry()
         const QgsPointXY& p2 = part[i];
         double length = mDa.measureLine(p1, p2);
         totLength += length;
-        addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+        addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), QgsPointXY( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
       }
       QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
       addMeasurements( QStringList() << totLengthStr, part.last(), false );
@@ -206,7 +206,7 @@ void KadasLineItem::measureGeometry()
         angle = angle < 0 ? angle + 2 * M_PI : angle;
         angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
         QString segmentAngle = formatAngle( angle, mAngleUnit );
-        addMeasurements( QStringList() << segmentAngle, QgsPoint( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+        addMeasurements( QStringList() << segmentAngle, QgsPointXY( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
       }
       break;
     }

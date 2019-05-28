@@ -157,7 +157,7 @@ QgsFeatureList KadasRedliningLayer::pasteFeatures( const QgsFeatureStore& featur
   if ( targetPos )
   {
     int n = newFeatures.size();
-    oldCenter = QgsPoint( oldCenter.x() / n, oldCenter.y() / n );
+    oldCenter = QgsPointXY( oldCenter.x() / n, oldCenter.y() / n );
     QgsVector delta = *targetPos - oldCenter;
     for ( int i = 0; i < n; ++i )
     {

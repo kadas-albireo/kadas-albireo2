@@ -48,7 +48,7 @@ bool KadasPolygonItem::startPart(const QgsPointXY& firstPoint)
 
 bool KadasPolygonItem::startPart(const AttribValues& values)
 {
-  return startPart(QgsPoint(values[AttrX], values[AttrY]));
+  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
 }
 
 void KadasPolygonItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
