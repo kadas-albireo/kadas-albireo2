@@ -260,7 +260,6 @@ void KadasLineItem::recomputeDerived()
             ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
           }
         }
-        ring->addVertex( QgsPoint(part.front()) );
       }
       multiGeom->addGeometry( ring );
     }

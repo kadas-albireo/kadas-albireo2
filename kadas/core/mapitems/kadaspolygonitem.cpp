@@ -188,9 +188,10 @@ void KadasPolygonItem::recomputeDerived()
         {
           wgsPoints.append( t1.transform( point ) );
         }
+        wgsPoints.append( t1.transform(part.front()));
 
         double sdist = 500000; // 500km segments
-        for ( int i = 0; i < nPoints - 1; ++i )
+        for ( int i = 0; i < nPoints; ++i )
         {
           int ringSize = ring->vertexCount();
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i+1].y(), wgsPoints[i+1].x() );
@@ -202,7 +203,7 @@ void KadasPolygonItem::recomputeDerived()
             line.Position( j * sdist, lat, lon );
             ring->addVertex( QgsPoint( t2.transform( QgsPointXY( lon, lat ) ) ) );
           }
-          if ( i == nPoints - 2 )
+          if ( i == nPoints - 1 )
           {
             double lat, lon;
             line.Position( dist, lat, lon );
