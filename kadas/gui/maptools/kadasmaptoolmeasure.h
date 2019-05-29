@@ -63,7 +63,6 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
   public:
     enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle, MeasureAzimuth };
     KadasMapToolMeasure( QgsMapCanvas* canvas, MeasureMode measureMode );
-    void addGeometry(const QgsGeometry& geometry, const QgsCoordinateReferenceSystem &crs );
 
     void activate() override;
     void canvasPressEvent( QgsMapMouseEvent *e ) override;

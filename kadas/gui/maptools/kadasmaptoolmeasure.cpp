@@ -183,12 +183,6 @@ KadasGeometryItem* KadasMapToolMeasure::setupItem(KadasGeometryItem *item, bool 
   return item;
 }
 
-void KadasMapToolMeasure::addGeometry( const QgsGeometry& geometry, const QgsCoordinateReferenceSystem& crs )
-{
-  // TODO
-//  mItem->addGeometry( geometry.constGet(), crs );
-}
-
 void KadasMapToolMeasure::activate()
 {
   mPickFeature = false;
@@ -232,7 +226,7 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
     KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), ( mMeasureMode == MeasureLine || mMeasureMode == MeasureAzimuth ) ? QgsWkbTypes::LineGeometry : QgsWkbTypes::PolygonGeometry );
     if ( pickResult.feature.isValid() )
     {
-      addGeometry( pickResult.feature.geometry(), pickResult.layer->crs() );
+      addPartFromGeometry( pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
     }
     mPickFeature = false;
     setCursor( Qt::ArrowCursor );

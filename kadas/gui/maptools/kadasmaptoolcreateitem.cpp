@@ -105,7 +105,7 @@ void KadasMapToolCreateItem::deactivate()
   delete mBottomBar;
   mBottomBar = nullptr;
   mEditor = nullptr;
-  if(mItem->state()->drawStatus == KadasMapItem::State::Finished) {
+  if(mItem && mItem->state()->drawStatus == KadasMapItem::State::Finished) {
     commitItem();
   }
   cleanup();
