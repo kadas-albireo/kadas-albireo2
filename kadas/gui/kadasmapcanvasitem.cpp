@@ -25,6 +25,7 @@ KadasMapCanvasItem::KadasMapCanvasItem(KadasMapItem* item, QgsMapCanvas* canvas)
   setZValue(mItem->zIndex());
   connect(item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect);
   connect(item, &QObject::destroyed, this, &QObject::deleteLater);
+  updateRect();
 }
 
 void KadasMapCanvasItem::paint(QPainter *painter)
