@@ -199,6 +199,15 @@ QgsPointXY KadasCircleItem::positionFromEditAttribs(const EditContext& context, 
   return QgsPointXY();
 }
 
+void KadasCircleItem::addPartFromGeometry(const QgsAbstractGeometry* geom)
+{
+  QgsRectangle bbox = geom->boundingBox();
+  state()->centers.append(bbox.center());
+  state()->radii.append(0.5 * bbox.width());
+  recomputeDerived();
+  endPart();
+}
+
 const QgsMultiSurface* KadasCircleItem::geometry() const
 {
   return static_cast<QgsMultiSurface*>(mGeometry);

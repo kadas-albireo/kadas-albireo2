@@ -48,6 +48,7 @@ public:
 
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
+  void addPartFromGeometry(const QgsAbstractGeometry* geom) override;
   const QgsMultiPolygon* geometry() const;
 
 private:

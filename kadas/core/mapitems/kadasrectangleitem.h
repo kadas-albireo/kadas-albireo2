@@ -44,6 +44,7 @@ public:
   AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
   QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const override;
 
+  void addPartFromGeometry(const QgsAbstractGeometry* geom) override;
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
   const QgsMultiPolygon* geometry() const;

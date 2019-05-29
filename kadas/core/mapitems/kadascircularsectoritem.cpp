@@ -191,6 +191,11 @@ QgsPointXY KadasCircularSectorItem::positionFromEditAttribs(const EditContext& c
   return QgsPointXY();
 }
 
+void KadasCircularSectorItem::addPartFromGeometry(const QgsAbstractGeometry* geom)
+{
+  // TODO
+}
+
 const QgsMultiSurface* KadasCircularSectorItem::geometry() const
 {
   return static_cast<QgsMultiSurface*>(mGeometry);

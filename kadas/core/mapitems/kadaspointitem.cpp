@@ -119,6 +119,15 @@ QgsPointXY KadasPointItem::positionFromEditAttribs(const EditContext& context, c
   return positionFromDrawAttribs(values);
 }
 
+void KadasPointItem::addPartFromGeometry(const QgsAbstractGeometry *geom)
+{
+  if(dynamic_cast<const QgsPoint*>(geom)) {
+    state()->points.append(*static_cast<const QgsPoint*>(geom));
+    recomputeDerived();
+    endPart();
+  }
+}
+
 const QgsMultiPoint* KadasPointItem::geometry() const
 {
   return static_cast<QgsMultiPoint*>(mGeometry);

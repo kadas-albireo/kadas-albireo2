@@ -156,6 +156,21 @@ QgsPointXY KadasLineItem::positionFromEditAttribs(const EditContext& context, co
   return positionFromDrawAttribs(values);
 }
 
+void KadasLineItem::addPartFromGeometry(const QgsAbstractGeometry *geom)
+{
+  if(dynamic_cast<const QgsLineString*>(geom)) {
+    QList<QgsPointXY> points;
+    QgsVertexId vidx;
+    QgsPoint p;
+    while(geom->nextVertex(vidx, p)) {
+      points.append(p);
+    }
+    state()->points.append(points);
+    recomputeDerived();
+    endPart();
+  }
+}
+
 const QgsMultiLineString* KadasLineItem::geometry() const
 {
   return static_cast<QgsMultiLineString*>(mGeometry);

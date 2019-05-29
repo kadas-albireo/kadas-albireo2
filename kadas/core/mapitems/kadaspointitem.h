@@ -43,6 +43,7 @@ public:
   QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const override;
 
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PointGeometry; }
+  void addPartFromGeometry(const QgsAbstractGeometry* geom) override;
 
   const QgsMultiPoint* geometry() const;
 

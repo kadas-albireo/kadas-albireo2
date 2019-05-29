@@ -77,6 +77,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
+    virtual void addPartFromGeometry(const QgsAbstractGeometry* geom) = 0;
 
     void setFillColor( const QColor& c );
     QColor fillColor() const;

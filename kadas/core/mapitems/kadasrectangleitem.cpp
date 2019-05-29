@@ -142,6 +142,11 @@ QgsPointXY KadasRectangleItem::positionFromEditAttribs(const EditContext& contex
   return positionFromDrawAttribs(values);
 }
 
+void KadasRectangleItem::addPartFromGeometry(const QgsAbstractGeometry* geom)
+{
+  // TODO
+}
+
 const QgsMultiPolygon* KadasRectangleItem::geometry() const
 {
   return static_cast<QgsMultiPolygon*>(mGeometry);

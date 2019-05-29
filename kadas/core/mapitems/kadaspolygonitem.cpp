@@ -151,6 +151,22 @@ QgsPointXY KadasPolygonItem::positionFromEditAttribs(const EditContext& context,
   return positionFromDrawAttribs(values);
 }
 
+void KadasPolygonItem::addPartFromGeometry(const QgsAbstractGeometry *geom)
+{
+  if(dynamic_cast<const QgsPolygon*>(geom)) {
+    QList<QgsPointXY> points;
+    QgsVertexId vidx;
+    QgsPoint p;
+    const QgsCurve* ring = static_cast<const QgsPolygon*>(geom)->exteriorRing();
+    while(ring->nextVertex(vidx, p)) {
+      points.append(p);
+    }
+    state()->points.append(points);
+    recomputeDerived();
+    endPart();
+  }
+}
+
 const QgsMultiPolygon* KadasPolygonItem::geometry() const
 {
   return static_cast<QgsMultiPolygon*>(mGeometry);
