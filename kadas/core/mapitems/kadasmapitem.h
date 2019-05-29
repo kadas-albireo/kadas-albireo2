@@ -70,6 +70,10 @@ public:
   /* Render the item */
   virtual void render( QgsRenderContext &context ) const = 0;
 
+   /* Selected state */
+  void setSelected(bool selected);
+  bool selected() const{ return mSelected; }
+
   /* The translation offset in pixels */
   void setTranslationOffset( double dx, double dy );
   QPointF translationOffset() const { return mTranslationOffset; }
@@ -145,6 +149,7 @@ signals:
 protected:
   State* mState = nullptr;
   QgsCoordinateReferenceSystem mCrs;
+  bool mSelected = false;
   QPointF mTranslationOffset;
   int mZIndex = 0;
 

@@ -75,6 +75,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor(KadasMapItem* item)
   connect( this, &KadasRedliningItemEditor::styleChanged, this, [this]{ syncWidgetToItem(); });
 
   toggleItemMeasurements(true);
+  mItem->setSelected(true);
 }
 
 void KadasRedliningItemEditor::syncItemToWidget()
@@ -135,6 +136,9 @@ void KadasRedliningItemEditor::syncWidgetToItem()
 KadasRedliningItemEditor::~KadasRedliningItemEditor()
 {
   toggleItemMeasurements(false);
+  if(mItem) {
+    mItem->setSelected(false);
+  }
 }
 
 void KadasRedliningItemEditor::toggleItemMeasurements(bool enabled)

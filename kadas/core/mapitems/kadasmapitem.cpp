@@ -27,6 +27,12 @@ KadasMapItem::~KadasMapItem()
   emit aboutToBeDestroyed();
 }
 
+void KadasMapItem::setSelected(bool selected)
+{
+  mSelected = selected;
+  emit changed();
+}
+
 void KadasMapItem::setTranslationOffset(double dx, double dy)
 {
   mTranslationOffset = QPointF(dx, dy);

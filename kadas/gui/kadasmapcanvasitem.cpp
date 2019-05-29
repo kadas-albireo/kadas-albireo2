@@ -40,7 +40,7 @@ void KadasMapCanvasItem::paint(QPainter *painter)
     rc.painter()->translate( -pos() );
     mItem->render( rc );
 
-    if(/*isSelected()*/true) {
+    if(mItem->selected()) {
       double handleSize = 8;
       rc.painter()->setPen( QPen(Qt::red, 2) );
       rc.painter()->setBrush( Qt::white );
