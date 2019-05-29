@@ -47,16 +47,18 @@ public:
 
   const QgsMultiPoint* geometry() const;
 
-private:
   struct State : KadasMapItem::State {
     QList<QgsPointXY> points;
     void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override { return new State(*this); }
   };
+  const State* state() const{ return static_cast<State*>(mState); }
+
+private:
   enum AttribIds {AttrX, AttrY};
 
   QgsMultiPoint* geometry();
-  State* state() const{ return static_cast<State*>(mState); }
+  State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
 };

@@ -61,12 +61,14 @@ public:
   MeasurementMode measurementMode() const{ return mMeasurementMode; }
   QgsUnitTypes::AngleUnit angleUnit() const{ return mAngleUnit; }
 
-private:
   struct State : KadasMapItem::State {
     QList<QList<QgsPointXY>> points;
     void assign(const KadasMapItem::State* other) override;
     State* clone() const override{ return new State(*this); }
   };
+  const State* state() const{ return static_cast<State*>(mState); }
+
+private:
   enum AttribIds {AttrX, AttrY};
 
   bool mGeodesic = false;
@@ -74,7 +76,7 @@ private:
   QgsUnitTypes::AngleUnit mAngleUnit = QgsUnitTypes::AngleDegrees;
 
   QgsMultiLineString* geometry();
-  State* state() const{ return static_cast<State*>(mState); }
+  State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void measureGeometry() override;
   void recomputeDerived() override;

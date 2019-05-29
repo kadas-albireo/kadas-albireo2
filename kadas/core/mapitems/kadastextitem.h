@@ -58,12 +58,14 @@ public:
   AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
   QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const override;
 
-private:
   struct State : KadasMapItem::State {
     QgsPointXY pos;
     void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
     State* clone() const override { return new State(*this); }
   };
+  const State* state() const{ return static_cast<State*>(mState); }
+
+private:
   enum AttribIds {AttrX, AttrY};
   QString mText;
   QColor mOutlineColor;
@@ -71,7 +73,7 @@ private:
   QFont mFont;
   double mAngle = 0.0;
 
-  State* state() const{ return static_cast<State*>(mState); }
+  State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
 };
