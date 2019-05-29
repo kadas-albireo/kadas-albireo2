@@ -177,7 +177,7 @@ KadasGeometryItem* KadasMapToolMeasure::setupItem(KadasGeometryItem *item, bool 
   item->setFillColor(QColor(255, 0, 0, 127));
   item->setEditorFactory([=](KadasMapItem* mapItem){
     KadasMeasureWidget* widget = new KadasMeasureWidget(mapItem, measureAzimut);
-    connect(widget, &KadasMeasureWidget::clearRequested, this, &KadasMapToolMeasure::reset);
+    connect(widget, &KadasMeasureWidget::clearRequested, this, &KadasMapToolMeasure::clear);
     return widget;
   });
   return item;

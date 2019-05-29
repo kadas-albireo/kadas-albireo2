@@ -51,7 +51,7 @@ public:
   void setSnappingEnabled(bool snapping) { mSnapping = snapping; }
 
 public slots:
-  void reset();
+  void clear();
 
 private:
   ItemFactory mItemFactory = nullptr;

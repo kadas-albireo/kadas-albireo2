@@ -124,7 +124,7 @@ void KadasMapToolCreateItem::cleanup()
   mItem = nullptr;
 }
 
-void KadasMapToolCreateItem::reset()
+void KadasMapToolCreateItem::clear()
 {
   commitItem();
   cleanup();
@@ -226,7 +226,7 @@ void KadasMapToolCreateItem::addPoint(const QgsPointXY &pos)
     }
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Finished) {
     if(!mMultipart) {
-      reset();
+      clear();
     }
     startPart(pos);
   }
@@ -332,7 +332,7 @@ void KadasMapToolCreateItem::acceptInput()
     }
   } else if(mItem->state()->drawStatus == KadasMapItem::State::Finished){
     if(!mMultipart) {
-      reset();
+      clear();
     }
     startPart(collectAttributeValues());
   }
