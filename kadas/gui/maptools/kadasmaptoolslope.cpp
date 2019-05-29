@@ -25,39 +25,47 @@
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
 #include <kadas/core/kadastemporaryfile.h>
+#include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/analysis/kadasslopefilter.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
 
 
 KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas* mapCanvas )
-    : KadasMapToolDrawRectangle( mapCanvas )
+    : KadasMapToolCreateItem( mapCanvas, itemFactory(mapCanvas) )
 {
   setCursor( Qt::ArrowCursor );
-  connect( this, &KadasMapToolDrawShape::finished, this, &KadasMapToolSlope::drawFinished );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolSlope::drawFinished );
 }
 
-void KadasMapToolSlope::activate()
+KadasMapToolCreateItem::ItemFactory KadasMapToolSlope::itemFactory(const QgsMapCanvas* canvas) const
 {
-  setShowInputWidget( QSettings().value( "/Qgis/showNumericInput", false ).toBool() );
-  KadasMapToolDrawShape::activate();
+  return [=]{
+    KadasRectangleItem* item = new KadasRectangleItem(canvas->mapSettings().destinationCrs());
+    return item;
+  };
 }
 
 void KadasMapToolSlope::drawFinished()
 {
-  QgsPointXY p1, p2;
-  getPart( 0, p1, p2 );
+  const KadasRectangleItem* rectItem = dynamic_cast<const KadasRectangleItem*>(currentItem());
+  if(!rectItem) {
+    return;
+  }
+  const QgsPointXY& p1 = rectItem->state()->p1.front();
+  const QgsPointXY& p2 = rectItem->state()->p2.front();
   QgsRectangle rect( p1, p2 );
   rect.normalize();
   if ( rect.isEmpty() )
   {
-    reset();
+    clear();
     return;
   }
+
   QgsCoordinateReferenceSystem rectCrs = canvas()->mapSettings().destinationCrs();
 
   compute( rect, rectCrs );
 
-  reset();
+  clear();
 }
 
 void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs )

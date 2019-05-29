@@ -18,18 +18,19 @@
 #define KADASMAPTOOLSLOPE_H
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
-class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolDrawRectangle
+class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
     KadasMapToolSlope( QgsMapCanvas* mapCanvas );
-    void activate();
     void compute( const QgsRectangle& extent, const QgsCoordinateReferenceSystem& crs );
 
   private slots:
     void drawFinished();
+
+    KadasMapToolCreateItem::ItemFactory itemFactory(const QgsMapCanvas* canvas) const;
 };
 
 #endif // KADASMAPTOOLSLOPE_H
