@@ -83,6 +83,7 @@ protected:
   void cleanup();
   QgsPointXY transformMousePoint(QgsPointXY mapPos) const;
   KadasMapItem::AttribValues collectAttributeValues() const;
+  KadasMapItem* currentItem(){ return mItem; }
 
 private slots:
   void inputChanged();
