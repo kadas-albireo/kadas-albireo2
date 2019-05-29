@@ -33,6 +33,12 @@ void KadasMapItem::setTranslationOffset(double dx, double dy)
   emit changed();
 }
 
+void KadasMapItem::setZIndex(int zIndex)
+{
+  mZIndex = zIndex;
+  emit changed();
+}
+
 void KadasMapItem::setState(const State* state)
 {
   mState->assign(state);

@@ -33,7 +33,9 @@ public:
   {}
   bool render() override
   {
-    for(const KadasMapItem* item : mLayer->mItems.values()) {
+    QList<KadasMapItem*> items = mLayer->mItems.values();
+    qStableSort(items.begin(), items.end(), [](KadasMapItem* a, KadasMapItem* b) { return a->zIndex() < b->zIndex(); });
+    for(const KadasMapItem* item : items) {
       if ( item ) {
         mRendererContext.painter()->save();
         mRendererContext.painter()->translate(item->translationOffset());

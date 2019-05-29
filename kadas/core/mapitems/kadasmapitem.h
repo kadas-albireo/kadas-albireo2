@@ -74,6 +74,10 @@ public:
   void setTranslationOffset( double dx, double dy );
   QPointF translationOffset() const { return mTranslationOffset; }
 
+  /* z-index */
+  void setZIndex(int zIndex);
+  int zIndex() const{ return mZIndex; }
+
   // State interface
   struct State : KadasStateHistory::State {
     enum DrawStatus { Empty, Drawing, Finished } drawStatus = Empty;
@@ -142,6 +146,7 @@ protected:
   State* mState = nullptr;
   QgsCoordinateReferenceSystem mCrs;
   QPointF mTranslationOffset;
+  int mZIndex = 0;
 
 private:
   EditorFactory mEditorFactory = nullptr;
