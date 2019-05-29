@@ -31,15 +31,8 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
     : KadasMapToolCreateItem( canvas, lineFactory(canvas) )
 {
   QgsSettings settings;
-  int red = settings.value( "/Qgis/default_measure_color_red", 255 ).toInt();
-  int green = settings.value( "/Qgis/default_measure_color_green", 0 ).toInt();
-  int blue = settings.value( "/Qgis/default_measure_color_blue", 0 ).toInt();
 
   mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::ICON_CIRCLE, this );
-  mPosMarker->setIconSize( 10 );
-  mPosMarker->setIconFillColor( Qt::white );
-  mPosMarker->setIconOutlineColor( QColor( red, green, blue ) );
-  mPosMarker->setIconOutlineWidth( 2 );
   mPosMarker->setZIndex(100);
   KadasMapCanvasItemManager::instance()->addItem(mPosMarker);
 
@@ -53,13 +46,7 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory(QgsMa
 {
   return [=]{
     KadasLineItem* item = new KadasLineItem(canvas->mapSettings().destinationCrs());
-    item->setOutlineWidth(4);
-    item->setOutlineColor(Qt::red);
     item->setIconType(KadasGeometryItem::ICON_CIRCLE);
-    item->setIconSize(10);
-    item->setIconOutlineColor(Qt::red);
-    item->setIconFillColor(Qt::white);
-    item->setIconOutlineWidth(2);
     return item;
   };
 }

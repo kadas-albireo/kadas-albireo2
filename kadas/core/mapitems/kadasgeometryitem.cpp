@@ -43,12 +43,12 @@ static const int sLabelOffset = 16;
 
 KadasGeometryItem::KadasGeometryItem(const QgsCoordinateReferenceSystem &crs, QObject *parent)
     : KadasMapItem(crs, parent)
-    , mPen( Qt::red )
-    , mBrush( Qt::red )
-    , mIconSize( 5 )
+    , mPen( QPen(Qt::red, 4) )
+    , mBrush( QColor(255, 0, 0, 127) )
+    , mIconSize( 10 )
     , mIconType( ICON_NONE )
-    , mIconPen( Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin )
-    , mIconBrush( Qt::transparent )
+    , mIconPen( Qt::red, 2 )
+    , mIconBrush( Qt::white )
 {
   mDa.setSourceCrs(crs, QgsProject::instance()->transformContext());
   mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
