@@ -45,13 +45,17 @@ public:
   void canvasReleaseEvent( QgsMapMouseEvent* e ) override;
   void keyPressEvent( QKeyEvent *e ) override;
 
-  KadasMapItem* currentItem() const{ return mItem; }
+  const KadasMapItem* currentItem() const{ return mItem; }
 
   void setMultipart(bool multipart) { mMultipart = multipart; }
   void setSnappingEnabled(bool snapping) { mSnapping = snapping; }
 
 public slots:
   void clear();
+
+signals:
+  void cleared();
+  void partFinished();
 
 private:
   ItemFactory mItemFactory = nullptr;

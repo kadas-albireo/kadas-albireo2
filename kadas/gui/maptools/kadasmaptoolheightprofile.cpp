@@ -17,70 +17,77 @@
 #include <qgis/qgsgeometryutils.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
-#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
-#include <qgis/qgsvectorlayer.h>
 
+#include <kadas/core/mapitems/kadaspointitem.h>
+#include <kadas/core/mapitems/kadaslineitem.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
-#include <kadas/gui/kadasgeometryrubberband.h>
 #include <kadas/gui/maptools/kadasmaptooldrawshape.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 
 KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
-    : QgsMapTool( canvas ), mPicking( false )
+    : KadasMapToolCreateItem( canvas, lineFactory(canvas) )
 {
-  setCursor( Qt::ArrowCursor );
-
-  mDrawTool = new KadasMapToolDrawPolyLine( canvas, false );
-  mDrawTool->getRubberBand()->setIconType( KadasGeometryRubberBand::ICON_CIRCLE );
-  mDrawTool->setParentTool( this );
-
   QgsSettings settings;
   int red = settings.value( "/Qgis/default_measure_color_red", 255 ).toInt();
   int green = settings.value( "/Qgis/default_measure_color_green", 0 ).toInt();
   int blue = settings.value( "/Qgis/default_measure_color_blue", 0 ).toInt();
 
-  mPosMarker = new QgsRubberBand( canvas, QgsWkbTypes::PointGeometry );
-  mPosMarker->setIcon( QgsRubberBand::ICON_CIRCLE );
+  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::ICON_CIRCLE, this );
   mPosMarker->setIconSize( 10 );
-  mPosMarker->setFillColor( Qt::white );
-  mPosMarker->setStrokeColor( QColor( red, green, blue ) );
-  mPosMarker->setWidth( 2 );
+  mPosMarker->setIconFillColor( Qt::white );
+  mPosMarker->setIconOutlineColor( QColor( red, green, blue ) );
+  mPosMarker->setIconOutlineWidth( 2 );
+  mPosMarker->setZIndex(100);
+  KadasMapCanvasItemManager::instance()->addItem(mPosMarker);
+
 
   mDialog = new KadasHeightProfileDialog( this, 0, Qt::WindowStaysOnTopHint );
-  connect( mDrawTool, &KadasMapToolDrawShape::finished, this, &KadasMapToolHeightProfile::drawFinished );
-  connect( mDrawTool, &KadasMapToolDrawShape::cleared, this, &KadasMapToolHeightProfile::drawCleared );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHeightProfile::drawFinished );
+  connect( this, &KadasMapToolCreateItem::cleared, this, &KadasMapToolHeightProfile::drawCleared );
+}
+
+KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory(QgsMapCanvas* canvas)
+{
+  return [=]{
+    KadasLineItem* item = new KadasLineItem(canvas->mapSettings().destinationCrs());
+    item->setOutlineWidth(4);
+    item->setOutlineColor(Qt::red);
+    item->setIconType(KadasGeometryItem::ICON_CIRCLE);
+    item->setIconSize(10);
+    item->setIconOutlineColor(Qt::red);
+    item->setIconFillColor(Qt::white);
+    item->setIconOutlineWidth(2);
+    return item;
+  };
 }
 
 KadasMapToolHeightProfile::~KadasMapToolHeightProfile()
 {
-  delete mDrawTool;
   delete mPosMarker;
 }
 
 void KadasMapToolHeightProfile::activate()
 {
   mPicking = false;
+  setCursor( Qt::ArrowCursor );
   mDialog->show();
-  mDrawTool->setShowInputWidget( QgsSettings().value( "/Qgis/showNumericInput", false ).toBool() );
-  mDrawTool->activate();
-  QgsMapTool::activate();
+  KadasMapToolCreateItem::activate();
 }
 
 void KadasMapToolHeightProfile::deactivate()
 {
-  mDrawTool->deactivate();
   mDialog->close();
   mDialog->setPoints( QList<QgsPointXY>(), mCanvas->mapSettings().destinationCrs() );
-  QgsMapTool::deactivate();
+  KadasMapToolCreateItem::deactivate();
 }
 
-void KadasMapToolHeightProfile::setGeometry( const QgsGeometry& geometry, QgsVectorLayer *layer )
+void KadasMapToolHeightProfile::setGeometry(const QgsAbstractGeometry* geom, const QgsCoordinateReferenceSystem &crs )
 {
-  mDrawTool->reset();
-  mDrawTool->addGeometry( geometry.constGet(), layer->crs() );
-  drawFinished();
+  clear();
+  addPartFromGeometry(geom, crs);
 }
 
 void KadasMapToolHeightProfile::pickLine()
@@ -93,7 +100,7 @@ void KadasMapToolHeightProfile::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( !mPicking )
   {
-    mDrawTool->canvasPressEvent( e );
+    KadasMapToolCreateItem::canvasPressEvent(e);
   }
 }
 
@@ -101,18 +108,19 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent * e )
 {
   if ( !mPicking )
   {
-    if ( mDrawTool->getStatus() == KadasMapToolDrawShape::StatusFinished && mDrawTool->getPartCount() > 0 )
+    const KadasLineItem* lineItem = dynamic_cast<const KadasLineItem*>(currentItem());
+    if ( lineItem && lineItem->state()->drawStatus == KadasMapItem::State::Finished && !lineItem->state()->points.isEmpty() )
     {
       QgsPointXY p = toMapCoordinates( e->pos() );
-      QList<QgsPointXY> points;
-      mDrawTool->getPart( 0, points );
+      const QList<QgsPointXY>& points = lineItem->state()->points.front();
       double minDist = std::numeric_limits<double>::max();
       int minIdx = 0;
       QgsPoint minPos;
+      QgsCoordinateTransform crst(lineItem->crs(), canvas()->mapSettings().destinationCrs(), canvas()->mapSettings().transformContext());
       for ( int i = 0, nPoints = points.size(); i < nPoints - 1; ++i )
       {
-        const QgsPointXY& p1 = points[i];
-        const QgsPointXY& p2 = points[i + 1];
+        QgsPointXY p1 = crst.transform(points[i]);
+        QgsPointXY p2 = crst.transform(points[i + 1]);
         QgsPoint pProj = QgsGeometryUtils::projectPointOnSegment( QgsPoint( p ), QgsPoint( p1 ), QgsPoint( p2 ) );
         double dist = pProj.distanceSquared( p.x(), p.y() );
         if ( dist < minDist )
@@ -124,11 +132,12 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent * e )
       }
       if ( qSqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
       {
-        mPosMarker->movePoint( 0, minPos );
+        mPosMarker->clear();
+        mPosMarker->addPartFromGeometry( &minPos );
         mDialog->setMarkerPos( minIdx, minPos );
       }
     }
-    mDrawTool->canvasMoveEvent( e );
+    KadasMapToolCreateItem::canvasMoveEvent(e);
   }
 }
 
@@ -136,14 +145,14 @@ void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
   if ( !mPicking )
   {
-    mDrawTool->canvasReleaseEvent( e );
+    KadasMapToolCreateItem::canvasReleaseEvent(e);
   }
   else
   {
     KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), QgsWkbTypes::LineGeometry );
     if ( pickResult.feature.isValid() )
     {
-      setGeometry( pickResult.feature.geometry(), static_cast<QgsVectorLayer*>( pickResult.layer ) );
+      setGeometry( pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
     }
     mPicking = false;
     setCursor( Qt::ArrowCursor );
@@ -156,31 +165,26 @@ void KadasMapToolHeightProfile::keyReleaseEvent( QKeyEvent *e )
   {
     mPicking = false;
     setCursor( Qt::ArrowCursor );
-  }
-  else if ( e->key() == Qt::Key_Escape && mDrawTool->getStatus() == KadasMapToolDrawShape::StatusReady )
-  {
-    canvas()->unsetMapTool( this );
-  }
-  else
-  {
-    mDrawTool->keyReleaseEvent( e );
+  } else {
+    KadasMapToolCreateItem::keyReleaseEvent(e);
   }
 }
 
-
 void KadasMapToolHeightProfile::drawCleared()
 {
-  mPosMarker->reset( QgsWkbTypes::PointGeometry );
+  mPosMarker->clear();
   mDialog->clear();
 }
 
 void KadasMapToolHeightProfile::drawFinished()
 {
-  QList<QgsPointXY> points;
-  mDrawTool->getPart( 0, points );
-  if ( points.size() > 0 )
-  {
-    mDialog->setPoints( points, mCanvas->mapSettings().destinationCrs() );
-    mPosMarker->addPoint( points[0] );
+  const KadasLineItem* lineItem = dynamic_cast<const KadasLineItem*>(currentItem());
+  if(lineItem) {
+    if(!lineItem->state()->points.isEmpty() && !lineItem->state()->points.front().isEmpty()) {
+      const QList<QgsPointXY>& line = lineItem->state()->points.front();
+      mDialog->setPoints( line, lineItem->crs() );
+      QgsPoint markerPos(line[0]);
+      mPosMarker->addPartFromGeometry( &markerPos );
+    }
   }
 }

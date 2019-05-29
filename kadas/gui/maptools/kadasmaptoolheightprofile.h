@@ -20,14 +20,14 @@
 #include <qgis/qgsmaptool.h>
 
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
+class QgsCoordinateReferenceSystem;
 class QgsGeometry;
-class QgsRubberBand;
-class QgsVectorLayer;
 class KadasHeightProfileDialog;
-class KadasMapToolDrawPolyLine;
+class KadasPointItem;
 
-class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public QgsMapTool
+class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
@@ -42,16 +42,17 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public QgsMapTool
     void activate() override;
     void deactivate() override;
 
-    void setGeometry(const QgsGeometry &geometry, QgsVectorLayer *layer );
+    void setGeometry(const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem& crs );
 
   public slots:
     void pickLine();
 
   private:
-    KadasMapToolDrawPolyLine* mDrawTool;
-    QgsRubberBand *mPosMarker;
-    KadasHeightProfileDialog* mDialog;
-    bool mPicking;
+    KadasPointItem *mPosMarker = nullptr;
+    KadasHeightProfileDialog* mDialog = nullptr;
+    bool mPicking = false;
+
+    static ItemFactory lineFactory(QgsMapCanvas *canvas);
 
   private slots:
     void drawCleared();

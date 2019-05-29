@@ -133,6 +133,7 @@ void KadasMapToolCreateItem::clear()
     mEditor->setItem(mItem);
     mEditor->syncWidgetToItem();
   }
+  emit cleared();
 }
 
 void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent* e )
@@ -261,6 +262,7 @@ void KadasMapToolCreateItem::finishPart()
 {
   mItem->endPart();
   mStateHistory->push(mItem->state()->clone());
+  emit partFinished();
 }
 
 void KadasMapToolCreateItem::addPartFromGeometry(const QgsAbstractGeometry* geom, const QgsCoordinateReferenceSystem& crs)

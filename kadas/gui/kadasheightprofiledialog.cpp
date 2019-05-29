@@ -36,14 +36,16 @@
 #include <gdal.h>
 
 #include <qgis/qgsdistancearea.h>
+#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvector.h>
 
 #include <kadas/core/kadascoordinateformat.h>
+#include <kadas/core/mapitems/kadaslineitem.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 
 
@@ -444,14 +446,18 @@ void KadasHeightProfileDialog::updateLineOfSight( )
     curve->attach( mPlot );
     mLinesOfSight.append( curve );
 
-    QgsRubberBand* rubberBand = new QgsRubberBand( mTool->canvas() );
+    KadasLineItem* line = new KadasLineItem( mTool->canvas()->mapSettings().destinationCrs() );
     double lambda1 = losSamples.front().x() / mNSamples;
     double lambda2 = losSamples.back().x() / mNSamples;
-    rubberBand->addPoint( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda1 );
-    rubberBand->addPoint( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda2 );
-    rubberBand->setColor( colors[iColor] );
-    rubberBand->setWidth( 5 );
-    mLinesOfSightRB.append( rubberBand );
+    QgsPoint p1(mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda1);
+    QgsPoint p2(mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda2);
+    QgsLineString geom(QgsPointSequence() << p1 << p2);
+    line->addPartFromGeometry(&geom);
+    line->setOutlineColor(colors[iColor]);
+    line->setOutlineWidth(5);
+    line->setZIndex(10);
+    KadasMapCanvasItemManager::instance()->addItem(line);
+    mLinesOfSightRB.append( line );
 
     iColor = ( iColor + 1 ) % 2;
   }
