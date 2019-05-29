@@ -29,33 +29,40 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadastemporaryfile.h>
+#include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/analysis/kadashillshadefilter.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 
 
 
 KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas* mapCanvas )
-    : KadasMapToolDrawRectangle( mapCanvas )
+    : KadasMapToolCreateItem( mapCanvas, itemFactory(mapCanvas) )
 {
   setCursor( Qt::ArrowCursor );
-  connect( this, SIGNAL( finished() ), this, SLOT( drawFinished() ) );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
 }
 
-void KadasMapToolHillshade::activate()
+KadasMapToolCreateItem::ItemFactory KadasMapToolHillshade::itemFactory(const QgsMapCanvas* canvas) const
 {
-  setShowInputWidget( QgsSettings().value( "/Qgis/showNumericInput", false ).toBool() );
-  KadasMapToolDrawShape::activate();
+  return [=]{
+    KadasRectangleItem* item = new KadasRectangleItem(canvas->mapSettings().destinationCrs());
+    return item;
+  };
 }
 
 void KadasMapToolHillshade::drawFinished()
 {
-  QgsPointXY p1, p2;
-  getPart( 0, p1, p2 );
+  const KadasRectangleItem* rectItem = dynamic_cast<const KadasRectangleItem*>(currentItem());
+  if(!rectItem) {
+    return;
+  }
+  const QgsPointXY& p1 = rectItem->state()->p1.front();
+  const QgsPointXY& p2 = rectItem->state()->p2.front();
   QgsRectangle rect( p1, p2 );
   rect.normalize();
   if ( rect.isEmpty() )
   {
-    reset();
+    clear();
     return;
   }
 
@@ -63,7 +70,7 @@ void KadasMapToolHillshade::drawFinished()
 
   compute( rect, rectCrs );
 
-  reset();
+  clear();
 }
 
 void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs )
