@@ -175,9 +175,15 @@ KadasGeometryItem* KadasMapToolMeasure::setupItem(KadasGeometryItem *item, bool 
   item->setOutlineWidth(4);
   item->setOutlineColor(Qt::red);
   item->setFillColor(QColor(255, 0, 0, 127));
+  item->setIconType(KadasGeometryItem::ICON_CIRCLE);
+  item->setIconSize(10);
+  item->setIconOutlineColor(Qt::red);
+  item->setIconFillColor(Qt::white);
+  item->setIconOutlineWidth(2);
   item->setEditorFactory([=](KadasMapItem* mapItem){
     KadasMeasureWidget* widget = new KadasMeasureWidget(mapItem, measureAzimut);
     connect(widget, &KadasMeasureWidget::clearRequested, this, &KadasMapToolMeasure::clear);
+    connect(widget, &KadasMeasureWidget::pickRequested, this, &KadasMapToolMeasure::requestPick);
     return widget;
   });
   return item;
@@ -186,10 +192,7 @@ KadasGeometryItem* KadasMapToolMeasure::setupItem(KadasGeometryItem *item, bool 
 void KadasMapToolMeasure::activate()
 {
   mPickFeature = false;
-  // TODO
-//  connect( mMeasureWidget, &KadasMeasureWidget::unitsChanged, this, &KadasMapToolMeasure::setUnits );
-//  connect( mMeasureWidget, &KadasMeasureWidget::clearRequested, mDrawTool, &KadasMapToolDrawShape::reset );
-//  connect( mMeasureWidget, &KadasMeasureWidget::pickRequested, this, &KadasMapToolMeasure::requestPick );
+  setCursor( Qt::ArrowCursor );
   KadasMapToolCreateItem::activate();
 }
 
