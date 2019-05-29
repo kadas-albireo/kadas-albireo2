@@ -68,11 +68,13 @@ private:
   bool mMultipart = false;
   bool mSnapping = false;
 
+protected:
   void createItem();
   void addPoint(const QgsPointXY& mapPos);
   void startPart(const QgsPointXY &pos);
   void startPart(const KadasMapItem::AttribValues& attributes);
   void finishPart();
+  void addPartFromGeometry(const QgsAbstractGeometry* geom, const QgsCoordinateReferenceSystem &crs);
   void commitItem();
   void cleanup();
   QgsPointXY transformMousePoint(QgsPointXY mapPos) const;

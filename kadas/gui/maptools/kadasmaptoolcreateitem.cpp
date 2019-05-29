@@ -23,6 +23,7 @@
 
 #include <kadas/core/kadasitemlayer.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/core/mapitems/kadasgeometryitem.h>
 
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
@@ -260,6 +261,21 @@ void KadasMapToolCreateItem::finishPart()
 {
   mItem->endPart();
   mStateHistory->push(mItem->state()->clone());
+}
+
+void KadasMapToolCreateItem::addPartFromGeometry(const QgsAbstractGeometry* geom, const QgsCoordinateReferenceSystem& crs)
+{
+  if(dynamic_cast<KadasGeometryItem*>(mItem)) {
+    if(crs != mItem->crs()) {
+      QgsAbstractGeometry* transformedGeom = geom->clone();
+      transformedGeom->transform(QgsCoordinateTransform(crs, mItem->crs(), QgsProject::instance()));
+      static_cast<KadasGeometryItem*>(mItem)->addPartFromGeometry(transformedGeom);
+    } else {
+      static_cast<KadasGeometryItem*>(mItem)->addPartFromGeometry(geom);
+    }
+    mStateHistory->push(mItem->state()->clone());
+    emit partFinished();
+  }
 }
 
 void KadasMapToolCreateItem::commitItem()
