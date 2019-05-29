@@ -40,7 +40,7 @@ bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint)
   state()->centers.append(firstPoint);
   state()->radii.append(0);
   state()->startAngles.append(0);
-  state()->stopAngles.append(0);
+  state()->stopAngles.append(2 * M_PI);
   recomputeDerived();
   return true;
 }
@@ -48,8 +48,16 @@ bool KadasCircularSectorItem::startPart(const QgsPointXY& firstPoint)
 bool KadasCircularSectorItem::startPart(const AttribValues& values)
 {
   state()->drawStatus = State::Drawing;
-  // todo
-  return false;
+  state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
+  state()->centers.append(QgsPointXY(values[AttrX], values[AttrY]));
+  state()->radii.append(values[AttrR]);
+  state()->startAngles.append(values[AttrA1] / 180 * M_PI);
+  state()->stopAngles.append(values[AttrA2] / 180. * M_PI);
+  if(state()->stopAngles.last() <= state()->startAngles.last()) {
+    state()->stopAngles.last() += 2 * M_PI;
+  }
+  recomputeDerived();
+  return true;
 }
 
 void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
@@ -57,15 +65,20 @@ void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapS
   if ( state()->sectorStatus == State::HaveCenter )
   {
     state()->radii.back() = qSqrt( p.sqrDist( state()->centers.back() ) );
-    state()->startAngles.back() = state()->stopAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
+    state()->startAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
+    if(state()->startAngles.back() < 0) {
+      state()->startAngles.back() += 2 * M_PI;
+    }
+    state()->stopAngles.back() = state()->startAngles.back() + 2 * M_PI;
   }
   else if ( state()->sectorStatus == State::HaveRadius )
   {
     state()->stopAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
-    if ( state()->stopAngles.back() <= state()->startAngles.back() )
+    while ( state()->stopAngles.back() <= state()->startAngles.back() )
     {
       state()->stopAngles.back() += 2 * M_PI;
     }
+    QTextStream(stdout) << state()->startAngles.back() << " " << state()->stopAngles.back() << endl;
 
     // Snap to full circle if within 5px
     if(mapSettings) {
@@ -91,7 +104,15 @@ void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapS
 
 void KadasCircularSectorItem::setCurrentAttributes(const AttribValues& values)
 {
-  // todo
+  state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
+  state()->centers.last() = QgsPointXY(values[AttrX], values[AttrY]);
+  state()->radii.last() = values[AttrR];
+  state()->startAngles.last() = values[AttrA1] / 180 * M_PI;
+  state()->stopAngles.last() = values[AttrA2] / 180. * M_PI;
+  if(state()->stopAngles.last() <= state()->startAngles.last()) {
+    state()->stopAngles.last() += 2 * M_PI;
+  }
+  recomputeDerived();
 }
 
 bool KadasCircularSectorItem::continuePart()
@@ -125,35 +146,17 @@ KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition(cons
   if(state()->drawStatus == State::Empty) {
     attributes.insert(AttrX, pos.x());
     attributes.insert(AttrY, pos.y());
-    attributes.insert(AttrR, state()->radii.last());
-    attributes.insert(AttrA1, state()->stopAngles.last());
-    attributes.insert(AttrA2, state()->stopAngles.last());
+    attributes.insert(AttrR, 0);
+    attributes.insert(AttrA1, 0);
+    attributes.insert(AttrA2, 0);
   }
-  else if ( state()->sectorStatus == State::HaveCenter)
-  {
-    attributes.insert(AttrX, state()->centers.last().x());
-    attributes.insert(AttrY, state()->centers.last().y());
-    attributes.insert(AttrR, qSqrt(state()->centers.last().sqrDist(pos)));
-    attributes.insert(AttrA1, state()->stopAngles.last());
-    attributes.insert(AttrA2, state()->stopAngles.last());
-  }
-  else if ( state()->sectorStatus == State::HaveRadius )
+  else
   {
     attributes.insert(AttrX, state()->centers.last().x());
     attributes.insert(AttrY, state()->centers.last().y());
     attributes.insert(AttrR, state()->radii.last());
-    double startAngle = 2.5 * M_PI - state()->startAngles.last();
-    if ( startAngle > 2 * M_PI )
-      startAngle -= 2 * M_PI;
-    else if ( startAngle < 0 )
-      startAngle += 2 * M_PI;
-    attributes.insert(AttrA1, startAngle / M_PI * 180.);
-    double stopAngle = 2.5 * M_PI - state()->stopAngles.last();
-    if ( stopAngle > 2 * M_PI )
-      stopAngle -= 2 * M_PI;
-    else if ( stopAngle < 0 )
-      stopAngle += 2 * M_PI;
-    attributes.insert(AttrA2, stopAngle / M_PI * 180.);
+    attributes.insert(AttrA1, state()->startAngles.last() / M_PI * 180.);
+    attributes.insert(AttrA2, state()->stopAngles.last() / M_PI * 180.);
   }
   return attributes;
 }
@@ -165,35 +168,36 @@ QgsPointXY KadasCircularSectorItem::positionFromDrawAttribs(const AttribValues& 
 
 KadasMapItem::EditContext KadasCircularSectorItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
 {
+  // Not yet implemented
   return EditContext();
 }
 
 void KadasCircularSectorItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
-  // TODO
+  // Not yet implemented
 }
 
 void KadasCircularSectorItem::edit(const EditContext& context, const AttribValues& values)
 {
-// TODO
+  // Not yet implemented
 }
 
 KadasMapItem::AttribValues KadasCircularSectorItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
 {
   AttribValues values;
-// TODO
+  // Not yet implemented
   return values;
 }
 
 QgsPointXY KadasCircularSectorItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
 {
-// TODO
+  // Not yet implemented
   return QgsPointXY();
 }
 
 void KadasCircularSectorItem::addPartFromGeometry(const QgsAbstractGeometry* geom)
 {
-  // TODO
+  // Not yet implemented
 }
 
 const QgsMultiSurface* KadasCircularSectorItem::geometry() const
@@ -208,7 +212,7 @@ QgsMultiSurface* KadasCircularSectorItem::geometry()
 
 void KadasCircularSectorItem::measureGeometry()
 {
-  // Not implemented
+  // Not yet implemented
 }
 
 void KadasCircularSectorItem::recomputeDerived()
@@ -217,38 +221,32 @@ void KadasCircularSectorItem::recomputeDerived()
   for ( int i = 0, n = state()->centers.size(); i < n; ++i )
   {
     const QgsPointXY& center = state()->centers[i];
-    const double& radius = state()->radii[i];
-    const double& startAngle = state()->startAngles[i];
-    const double& stopAngle = state()->stopAngles[i];
-    QgsPoint pStart, pMid, pEnd;
-    if ( stopAngle == startAngle + 2 * M_PI )
-    {
-      pStart = pEnd = QgsPoint( center.x() + radius * qCos( stopAngle ),
-                                center.y() + radius * qSin( stopAngle ) );
-      pMid = QgsPoint( center );
-    }
-    else
-    {
-      double alphaMid = 0.5 * ( startAngle + stopAngle - 2 * M_PI );
-      pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
-                         center.y() + radius * qSin( startAngle ) );
-      pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
-                       center.y() + radius * qSin( alphaMid ) );
-      pEnd = QgsPoint( center.x() + radius * qCos( stopAngle - 2 * M_PI ),
-                       center.y() + radius * qSin( stopAngle - 2 * M_PI ) );
-    }
+    double radius = state()->radii[i];
+    double startAngle = state()->startAngles[i];
+    double stopAngle = state()->stopAngles[i];
     QgsCompoundCurve* exterior = new QgsCompoundCurve();
-    if ( startAngle != stopAngle )
+    if ( stopAngle - startAngle < 2 * M_PI - std::numeric_limits<float>::epsilon() )
     {
+      double alphaMid = 0.5 * ( startAngle + stopAngle );
+      QgsPoint pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
+                                  center.y() + radius * qSin( startAngle ) );
+      QgsPoint pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
+                                center.y() + radius * qSin( alphaMid ) );
+      QgsPoint pEnd = QgsPoint( center.x() + radius * qCos( stopAngle ),
+                                center.y() + radius * qSin( stopAngle ) );
+      exterior->addCurve( new QgsCircularString(pStart, pMid, pEnd) );
+
+      exterior->addCurve( new QgsLineString(QgsPointSequence() << pEnd << QgsPoint(center) << pStart) );
+    } else {
       QgsCircularString* arc = new QgsCircularString();
-      arc->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
-      exterior->addCurve( arc );
-    }
-    if ( startAngle != stopAngle + 2 * M_PI )
-    {
-      QgsLineString* line = new QgsLineString();
-      line->setPoints( QgsPointSequence() << pStart << pMid << pEnd );
-      exterior->addCurve( line );
+      arc->setPoints(QgsPointSequence()
+                        << QgsPoint(center.x(), center.y() + radius)
+                        << QgsPoint(center.x() + radius, center.y())
+                        << QgsPoint(center.x(), center.y() - radius)
+                        << QgsPoint(center.x() - radius, center.y())
+                        << QgsPoint(center.x(), center.y() + radius)
+      );
+      exterior->addCurve(arc);
     }
     QgsPolygon* poly = new QgsPolygon;
     poly->setExteriorRing( exterior );
