@@ -145,5 +145,5 @@ void KadasPointItem::recomputeDerived()
   {
     multiGeom->addGeometry(new QgsPoint(point));
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }

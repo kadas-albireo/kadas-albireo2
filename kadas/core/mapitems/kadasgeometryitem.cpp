@@ -189,7 +189,7 @@ void KadasGeometryItem::updateMeasurements()
   emit changed();
 }
 
-void KadasGeometryItem::setGeometry(QgsAbstractGeometry* geom )
+void KadasGeometryItem::setInternalGeometry(QgsAbstractGeometry* geom )
 {
   delete mGeometry;
   mGeometry = geom;

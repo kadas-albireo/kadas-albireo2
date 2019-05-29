@@ -196,5 +196,5 @@ void KadasRectangleItem::recomputeDerived()
     poly->setExteriorRing( ring );
     multiGeom->addGeometry( poly );
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }

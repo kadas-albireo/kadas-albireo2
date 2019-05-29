@@ -254,5 +254,5 @@ void KadasCircularSectorItem::recomputeDerived()
     poly->setExteriorRing( exterior );
     multiGeom->addGeometry( poly );
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }

@@ -256,5 +256,5 @@ void KadasPolygonItem::recomputeDerived()
       multiGeom->addGeometry( poly );
     }
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }

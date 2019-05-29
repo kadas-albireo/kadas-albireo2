@@ -301,5 +301,5 @@ void KadasLineItem::recomputeDerived()
       multiGeom->addGeometry( ring );
     }
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }

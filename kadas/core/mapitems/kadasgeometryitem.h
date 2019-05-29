@@ -136,7 +136,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     QString mTotalMeasurement;
 
 
-    void setGeometry( QgsAbstractGeometry* geom);
+    void setInternalGeometry( QgsAbstractGeometry* geom);
     const QgsAbstractGeometry* geometry() const { return mGeometry; }
 
     void drawVertex( QPainter* p, double x, double y ) const;

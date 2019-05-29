@@ -246,7 +246,7 @@ void KadasCircleItem::recomputeDerived()
       computeCircle(state()->centers[i], state()->radii[i], multiGeom);
     }
   }
-  setGeometry(multiGeom);
+  setInternalGeometry(multiGeom);
 }
 
 void KadasCircleItem::computeCircle(const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom)
