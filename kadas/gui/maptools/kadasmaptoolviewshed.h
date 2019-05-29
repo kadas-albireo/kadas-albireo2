@@ -20,7 +20,7 @@
 #include <QDialog>
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
 class QComboBox;
 class QDoubleSpinBox;
@@ -51,16 +51,17 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     QSlider* mAccuracySlider;
 };
 
-class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolDrawCircularSector
+class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
     KadasMapToolViewshed( QgsMapCanvas* mapCanvas );
-    void activate();
 
   private slots:
     void drawFinished();
     void adjustRadius( double newRadius );
+
+    KadasMapToolCreateItem::ItemFactory itemFactory(const QgsMapCanvas* canvas) const;
 };
 
 #endif // KADASMAPTOOLVIEWSHED_H

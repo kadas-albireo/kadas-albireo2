@@ -24,6 +24,7 @@
 #include <QProgressDialog>
 
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmultisurface.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
@@ -33,6 +34,7 @@
 
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/core/kadastemporaryfile.h>
+#include <kadas/core/mapitems/kadascircularsectoritem.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
 
@@ -136,16 +138,18 @@ int KadasViewshedDialog::getAccuracyFactor() const
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasMapToolViewshed::KadasMapToolViewshed( QgsMapCanvas* mapCanvas )
-    : KadasMapToolDrawCircularSector( mapCanvas )
+    : KadasMapToolCreateItem( mapCanvas, itemFactory(mapCanvas) )
 {
   setCursor( Qt::ArrowCursor );
-  connect( this, &KadasMapToolDrawShape::finished, this, &KadasMapToolViewshed::drawFinished );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolViewshed::drawFinished );
 }
 
-void KadasMapToolViewshed::activate()
+KadasMapToolCreateItem::ItemFactory KadasMapToolViewshed::itemFactory(const QgsMapCanvas* canvas) const
 {
-  setShowInputWidget( QgsSettings().value( "/Qgis/showNumericInput", false ).toBool() );
-  KadasMapToolDrawShape::activate();
+  return [=]{
+    KadasCircularSectorItem* item = new KadasCircularSectorItem(canvas->mapSettings().destinationCrs());
+    return item;
+  };
 }
 
 void KadasMapToolViewshed::drawFinished()
@@ -155,14 +159,18 @@ void KadasMapToolViewshed::drawFinished()
   if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
   {
     emit messageEmitted( tr( "No heightmap is defined in the project." ), Qgis::Warning );
-    reset();
+    clear();
     return;
   }
 
-  double curRadius;
-  QgsPointXY center;
-  double trash;
-  getPart( 0, center, curRadius, trash, trash );
+  const KadasCircularSectorItem* item = dynamic_cast<const KadasCircularSectorItem*>(currentItem());
+  if(!item) {
+    clear();
+    return;
+  }
+
+  QgsPointXY center = item->state()->centers.last();
+  double curRadius = item->state()->radii.last();
 
   QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
   QgsUnitTypes::DistanceUnit measureUnit = canvasCrs.mapUnits();
@@ -172,7 +180,7 @@ void KadasMapToolViewshed::drawFinished()
   connect( &viewshedDialog, SIGNAL( radiusChanged( double ) ), this, SLOT( adjustRadius( double ) ) );
   if ( viewshedDialog.exec() == QDialog::Rejected )
   {
-    reset();
+    clear();
     return;
   }
 
@@ -180,12 +188,13 @@ void KadasMapToolViewshed::drawFinished()
   QString outputFile = KadasTemporaryFile::createNewFile( outputFileName );
 
   QVector<QgsPointXY> filterRegion;
-  QgsPolygonXY poly = QgsGeometry( getRubberBand()->geometry()->clone() ).asPolygon();
+  QgsPolygonXY poly = QgsGeometry( item->geometry()->geometryN(0)->clone() ).asPolygon();
   if ( !poly.isEmpty() )
   {
     filterRegion = poly.front();
   }
-  getPart( 0, center, curRadius, trash, trash );
+  center = item->state()->centers.last();
+  curRadius = item->state()->radii.last();
 
   if ( mCanvas->mapSettings().mapUnits() == QgsUnitTypes::DistanceDegrees )
   {
@@ -237,7 +246,7 @@ void KadasMapToolViewshed::drawFinished()
   {
     QMessageBox::critical( 0, tr( "Error" ), tr( "Failed to compute viewshed." ) );
   }
-  reset();
+  clear();
 }
 
 void KadasMapToolViewshed::adjustRadius( double newRadius )
@@ -245,9 +254,14 @@ void KadasMapToolViewshed::adjustRadius( double newRadius )
   QgsUnitTypes::DistanceUnit measureUnit = QgsUnitTypes::DistanceMeters;
   QgsUnitTypes::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
   newRadius *= QgsUnitTypes::fromUnitToUnitFactor(measureUnit, targetUnit);
-  double radius, startAngle, stopAngle;
-  QgsPointXY center;
-  getPart( 0, center, radius, startAngle, stopAngle );
-  setPart( 0, center, newRadius, startAngle, stopAngle );
-  update();
+
+  KadasCircularSectorItem* item = dynamic_cast<KadasCircularSectorItem*>(currentItem());
+  if(!item) {
+    return;
+  }
+
+  KadasCircularSectorItem::State* state = const_cast<const KadasCircularSectorItem*>(item)->state()->clone();
+  state->radii.last() = newRadius;
+  item->setState(state);
+  delete state;
 }
