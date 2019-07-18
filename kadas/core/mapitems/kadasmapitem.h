@@ -74,10 +74,6 @@ public:
   void setSelected(bool selected);
   bool selected() const{ return mSelected; }
 
-  /* The translation offset in pixels */
-  void setTranslationOffset( double dx, double dy );
-  QPointF translationOffset() const { return mTranslationOffset; }
-
   /* z-index */
   void setZIndex(int zIndex);
   int zIndex() const{ return mZIndex; }
@@ -150,7 +146,6 @@ protected:
   State* mState = nullptr;
   QgsCoordinateReferenceSystem mCrs;
   bool mSelected = false;
-  QPointF mTranslationOffset;
   int mZIndex = 0;
 
 private:

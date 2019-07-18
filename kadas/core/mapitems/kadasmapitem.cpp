@@ -33,12 +33,6 @@ void KadasMapItem::setSelected(bool selected)
   emit changed();
 }
 
-void KadasMapItem::setTranslationOffset(double dx, double dy)
-{
-  mTranslationOffset = QPointF(dx, dy);
-  emit changed();
-}
-
 void KadasMapItem::setZIndex(int zIndex)
 {
   mZIndex = zIndex;
