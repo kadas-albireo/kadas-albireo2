@@ -14,8 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLDRAWSHAPE_P_H
-#define QGSMAPTOOLDRAWSHAPE_P_H
+#ifndef KADASFLOATINGINPUTWIDGET_H
+#define KADASFLOATINGINPUTWIDGET_H
 
 #include <QDoubleValidator>
 #include <QGridLayout>
@@ -78,4 +78,4 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
 
 };
 
-#endif // QGSMAPTOOLDRAWSHAPE_P_H
+#endif // KADASFLOATINGINPUTWIDGET_H
