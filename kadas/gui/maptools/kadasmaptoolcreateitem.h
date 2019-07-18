@@ -46,6 +46,7 @@ public:
   void keyPressEvent( QKeyEvent *e ) override;
 
   const KadasMapItem* currentItem() const{ return mItem; }
+  KadasMapItem* takeItem();
 
   void setMultipart(bool multipart) { mMultipart = multipart; }
   void setSnappingEnabled(bool snapping) { mSnapping = snapping; }

@@ -211,6 +211,15 @@ QgsPointXY KadasMapToolCreateItem::transformMousePoint(QgsPointXY mapPos) const
   return crst.transform(mapPos);
 }
 
+KadasMapItem* KadasMapToolCreateItem::takeItem()
+{
+  KadasMapItem* item = mItem;
+  KadasMapCanvasItemManager::removeItem(mItem);
+  mItem = nullptr;
+  clear();
+  return item;
+}
+
 void KadasMapToolCreateItem::addPoint(const QgsPointXY &pos)
 {
   if(mItem->state()->drawStatus == KadasMapItem::State::Empty)
