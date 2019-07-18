@@ -14,6 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef KADASTEXTITEM_H
+#define KADASTEXTITEM_H
+
 #include <kadas/core/kadas_core.h>
 #include <kadas/core/mapitems/kadasmapitem.h>
 
@@ -77,3 +80,5 @@ private:
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
 };
+
+#endif // KADASTEXTITEM_H
