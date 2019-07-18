@@ -19,7 +19,7 @@
 #include <kadas/core/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadasmapcanvasitem.h>
 
-KadasMapCanvasItem::KadasMapCanvasItem(KadasMapItem* item, QgsMapCanvas* canvas)
+KadasMapCanvasItem::KadasMapCanvasItem(const KadasMapItem *item, QgsMapCanvas* canvas)
   : QgsMapCanvasItem(canvas), mItem(item)
 {
   setZValue(mItem->zIndex());

@@ -99,7 +99,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &title, QgsMapCanvas *
   mapTool->setParent( mMapCanvas );
   mMapCanvas->setMapTool( mapTool );
 
-  for(KadasMapItem* item : KadasMapCanvasItemManager::items()) {
+  for(const KadasMapItem* item : KadasMapCanvasItemManager::items()) {
     addMapCanvasItem(item);
   }
 
@@ -303,13 +303,13 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
   }
 }
 
-void KadasMapWidget::addMapCanvasItem(KadasMapItem* item)
+void KadasMapWidget::addMapCanvasItem(const KadasMapItem* item)
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
   Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
 }
 
-void KadasMapWidget::removeMapCanvasItem(KadasMapItem* item)
+void KadasMapWidget::removeMapCanvasItem(const KadasMapItem* item)
 {
   for(QGraphicsItem* canvasItem : mMapCanvas->items()) {
     if(dynamic_cast<KadasMapCanvasItem*>(canvasItem) && static_cast<KadasMapCanvasItem*>(canvasItem)->mapItem() == item) {

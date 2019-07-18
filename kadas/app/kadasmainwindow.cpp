@@ -767,13 +767,13 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint& pos )
   }
 }
 
-void KadasMainWindow::addMapCanvasItem( KadasMapItem* item )
+void KadasMainWindow::addMapCanvasItem( const KadasMapItem* item )
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
   Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
 }
 
-void KadasMainWindow::removeMapCanvasItem(KadasMapItem* item)
+void KadasMainWindow::removeMapCanvasItem(const KadasMapItem* item)
 {
   for(QGraphicsItem* canvasItem : mMapCanvas->items()) {
     if(dynamic_cast<KadasMapCanvasItem*>(canvasItem) && static_cast<KadasMapCanvasItem*>(canvasItem)->mapItem() == item) {

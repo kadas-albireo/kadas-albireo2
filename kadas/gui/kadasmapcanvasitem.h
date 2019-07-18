@@ -29,13 +29,13 @@ class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasI
   Q_OBJECT
 
 public:
-  KadasMapCanvasItem(KadasMapItem* item, QgsMapCanvas* canvas);
-  KadasMapItem* mapItem() const{ return mItem; }
+  KadasMapCanvasItem(const KadasMapItem* item, QgsMapCanvas* canvas);
+  const KadasMapItem* mapItem() const{ return mItem; }
 
   void paint( QPainter *painter ) override;
 
 private:
-  KadasMapItem* mItem = nullptr;
+  const KadasMapItem* mItem = nullptr;
 
 private slots:
   void updateRect();

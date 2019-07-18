@@ -23,27 +23,27 @@ KadasMapCanvasItemManager* KadasMapCanvasItemManager::instance()
   return &manager;
 }
 
-void KadasMapCanvasItemManager::addItem(KadasMapItem *item)
+void KadasMapCanvasItemManager::addItem(const KadasMapItem *item)
 {
   instance()->mMapItems.append(item);
   connect(item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed);
   emit instance()->itemAdded(item);
 }
 
-void KadasMapCanvasItemManager::removeItem(KadasMapItem *item)
+void KadasMapCanvasItemManager::removeItem(const KadasMapItem *item)
 {
   emit instance()->itemWillBeRemoved(item);
   instance()->mMapItems.removeAll(item);
 }
 
-const QList<KadasMapItem*>& KadasMapCanvasItemManager::items()
+const QList<const KadasMapItem*>& KadasMapCanvasItemManager::items()
 {
   return instance()->mMapItems;
 }
 
 void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
 {
-  KadasMapItem* item = qobject_cast<KadasMapItem*>(QObject::sender());
+  const KadasMapItem* item = qobject_cast<const KadasMapItem*>(QObject::sender());
   if(item) {
     removeItem(item);
   }

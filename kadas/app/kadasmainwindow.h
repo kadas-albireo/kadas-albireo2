@@ -50,8 +50,8 @@ public:
   void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu* menu, QWidget* tabWidget );
 
 private slots:
-  void addMapCanvasItem( KadasMapItem* item );
-  void removeMapCanvasItem(KadasMapItem* item);
+  void addMapCanvasItem(const KadasMapItem *item );
+  void removeMapCanvasItem(const KadasMapItem *item);
   void checkLayerProjection( QgsMapLayer* layer );
   void onDecimalPlacesChanged(int places);
   void onLanguageChanged(int idx);
