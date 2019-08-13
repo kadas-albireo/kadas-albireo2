@@ -89,7 +89,9 @@ void KadasMapToolEditItem::deactivate()
   if(mItem) {
     mLayer->addItem(mItem);
     mLayer->triggerRepaint();
-    KadasMapCanvasItemManager::removeItem(mItem);
+    KadasMapItem* item = mItem;
+    QObject* scope = new QObject;
+    connect(mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope]{ KadasMapCanvasItemManager::removeItem(item); scope->deleteLater(); });
     mItem->setSelected(false);
   }
   delete mBottomBar;
