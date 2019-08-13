@@ -78,7 +78,6 @@ void KadasCircularSectorItem::setCurrentPoint(const QgsPointXY& p, const QgsMapS
     {
       state()->stopAngles.back() += 2 * M_PI;
     }
-    QTextStream(stdout) << state()->startAngles.back() << " " << state()->stopAngles.back() << endl;
 
     // Snap to full circle if within 5px
     if(mapSettings) {
