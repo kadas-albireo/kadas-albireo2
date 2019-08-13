@@ -58,8 +58,8 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem* item, bool measureAzimuth 
     mUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( QgsUnitTypes::AngleDegrees ) );
     mUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
     mUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
-    mUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMil ) );
-    int defUnit = QgsSettings().value( "/Qgis/measure/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMil ) ).toInt();
+    mUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
+    int defUnit = QgsSettings().value( "/Qgis/measure/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt();
     mUnitComboBox->setCurrentIndex( defUnit );
     connect( mUnitComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &KadasMeasureWidget::setAngleUnit );
   }
