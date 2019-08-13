@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 64.000001 64.000001"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="pin_red.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="3.4181817"
+     inkscape:cy="38.443962"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4200"
+     showgrid="true"
+     units="px"
+     inkscape:object-paths="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:object-nodes="true"
+     inkscape:window-width="1600"
+     inkscape:window-height="826"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4776" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-988.36216)">
+    <g
+       id="g4200"
+       transform="matrix(0.03543036,0,0,0.03543036,6.1025327,985.18341)">
+      <title
+         id="title4202">Layer 1</title>
+      <path
+         id="svg_2-5"
+         stroke-miterlimit="10"
+         d="m 759.16438,1839.6299 c 10.84384,-106.9076 -16.66614,-195.8774 -61.84455,-278.3305 -33.51001,-61.1615 -79.07593,-117.6152 -117.91944,-176.9284 -12.96715,-19.7989 -22.36333,-40.7159 -34.10974,-61.2643 -23.48716,-41.0872 -35.81838,-88.7254 -4.66428,-150.52 30.43916,-60.3767 84.59768,-108.8087 148.52645,-148.4078 105.14487,-65.13051 255.17151,-118.53037 429.47628,-132.56375 142.5152,-11.47388 262.0108,7.91105 339.3295,37.49799 63.1771,24.17809 105.7497,56.47452 131.7716,94.53716 27.1655,39.7271 36.7007,86.6609 10.6604,147.8796 -13.3382,31.3645 -36.1997,60.4099 -60.5268,84.5025 -24.6167,24.3866 -55.3864,44.7715 -84.4685,66.5457 -56.7739,42.504 -121.2248,81.4497 -185.857,120.4151 -192.5041,116.0703 -377.60328,234.4383 -510.37392,396.6367 z"
+         inkscape:connector-curvature="0"
+         style="clip-rule:evenodd;fill:#000000;fill-opacity:0.15686275;fill-rule:evenodd;stroke:none;stroke-width:42.57017899;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.15686275" />
+      <path
+         id="svg_2"
+         stroke-miterlimit="10"
+         d="M 730.94,1839.63 C 692.17401,1649.33 623.82397,1490.96 541.03699,1344.1899 479.63001,1235.3199 408.49301,1134.83 342.673,1029.25 320.70099,994.00702 301.73901,956.77399 280.62601,920.19702 238.41,847.06 204.18201,762.26202 206.357,652.26501 208.482,544.79199 239.565,458.58099 284.38699,388.09299 358.10599,272.15799 481.58801,177.104 647.271,152.12399 782.737,131.7 909.74597,166.20599 999.81403,218.87199 1073.41,261.91 1130.41,319.39899 1173.73,387.15201 c 45.22,70.716 76.36,154.25998 78.97,263.23196 1.34,55.83002 -7.8,107.53204 -20.68,150.41803 -13.03,43.409 -33.99,79.69501 -52.64,118.45398 -36.41,75.659 -82.05,144.98402 -127.86,214.34402 -136.43699,206.61 -264.49601,417.31 -320.58,706.03 z"
+         inkscape:connector-curvature="0"
+         style="clip-rule:evenodd;fill:#ff0000;fill-rule:evenodd;stroke-width:56.44876315;stroke-miterlimit:4;stroke-dasharray:none;stroke:#ffffff;stroke-opacity:1;stroke-linecap:butt;stroke-linejoin:round;fill-opacity:1" />
+      <circle
+         id="svg_4"
+         cx="729.54602"
+         cy="651.047"
+         r="183.33299"
+         style="clip-rule:evenodd;fill:#ffffff;fill-rule:evenodd;stroke-width:56.44876315;stroke-miterlimit:4;stroke-dasharray:none;stroke:#ffffff;stroke-opacity:1;fill-opacity:1" />
+    </g>
+  </g>
+</svg>

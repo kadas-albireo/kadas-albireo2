@@ -31,6 +31,7 @@
 #include <qgis/qgssourceselectprovider.h>
 
 #include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/core/mapitems/kadasimageitem.h>
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
@@ -43,6 +44,7 @@
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
@@ -436,7 +438,7 @@ void KadasMainWindow::configureButtons()
 //  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
 
   // Draw tab
-  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), nullptr );
+  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this]{ return createPinTool(); } );
 
   setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), nullptr );
 
@@ -805,3 +807,12 @@ int KadasMainWindow::messageTimeout() const
   return QSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
 }
 
+QgsMapTool* KadasMainWindow::createPinTool()
+{
+  KadasMapToolCreateItem::ItemFactory factory = [this] {
+    KadasImageItem* item = new KadasImageItem(mapCanvas()->mapSettings().destinationCrs());
+    item->setFilePath(":/images/icons/pin_red", 0.5, 1.0);
+    return item;
+  };
+  return new KadasMapToolCreateItem(mapCanvas(), factory, kApp->getOrCreateItemLayer(tr("Pins")));
+}

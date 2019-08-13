@@ -18,6 +18,7 @@ ADD_LIBRARY(kadas_core SHARED
 TARGET_LINK_LIBRARIES(kadas_core
   Qt5::Widgets
   Qt5::Network
+  Qt5::Svg
   Qt5::Xml
   ${QGIS_CORE_LIBRARY}
   ${GDAL_LIBRARIES}

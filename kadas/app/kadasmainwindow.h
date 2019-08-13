@@ -82,6 +82,7 @@ private:
   void updateWidgetPositions();
   KadasRibbonButton* addRibbonButton( QWidget* tabWidget );
   void showSourceSelectDialog(const QString& provider);
+  QgsMapTool* createPinTool();
 
   QgsMessageBar* mInfoBar = nullptr;
   QPointer<QgsMessageBarItem> mReprojMsgItem;
