@@ -33,6 +33,7 @@
 #include <qgis/qgsproject.h>
 
 #include <kadas/core/mapitems/kadascircleitem.h>
+#include <kadas/core/mapitems/kadasimageitem.h>
 #include <kadas/core/mapitems/kadaspolygonitem.h>
 #include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
@@ -335,12 +336,7 @@ void KadasSearchBox::clearSearch()
   mSearchBox->clear();
   mSearchButton->setVisible( true );
   mClearButton->setVisible( false );
-  if ( mPin )
-  {
-//    mMapCanvas->scene()->removeItem( mPin ); // TODO
-//    delete mPin.data(); // TODO
-    mPin = 0;
-  }
+  clearPin();
   mTreeWidget->close();
   mTreeWidget->blockSignals( true );
   mTreeWidget->clear();
@@ -435,25 +431,34 @@ void KadasSearchBox::resultSelected()
   {
     QTreeWidgetItem* item = mTreeWidget->currentItem();
     if ( item->data( 0, sEntryTypeRole ) != EntryTypeResult )
+    {
+      clearPin();
       return;
+    }
 
     KadasSearchProvider::SearchResult result = item->data( 0, sResultDataRole ).value<KadasSearchProvider::SearchResult>();
     if ( result.showPin )
     {
       if ( !mPin )
       {
-        // TODO
-//        mPin = new QgsPinAnnotationItem( mMapCanvas );
-//        mPin->setFilePath( ":/images/themes/default/pin_blue.svg" );
-//        mPin->setItemFlags( QgsAnnotationItem::ItemHasNoFrame | QgsAnnotationItem::ItemHasNoMarker );
+        mPin = new KadasImageItem(mMapCanvas->mapSettings().destinationCrs(), this);
+        mPin->setFilePath(":/images/icons/pin_blue", 0.5, 1.0);
+        KadasMapCanvasItemManager::addItem(mPin);
       }
-//      mPin->setMapPosition( result.pos, QgsCRSCache::instance()->crsByAuthId( result.crs ) );
-      mSearchBox->blockSignals( true );
-      mSearchBox->setText( result.text );
-      mSearchBox->blockSignals( false );
-      mSearchButton->setVisible( true );
-      mClearButton->setVisible( false );
+      KadasImageItem::State* state = const_cast<const KadasImageItem*>(mPin)->state()->clone();
+      state->pos = QgsCoordinateTransform(QgsCoordinateReferenceSystem(result.crs), mPin->crs(), QgsProject::instance()).transform(result.pos);
+      state->drawStatus = KadasImageItem::State::Finished;
+      mPin->setState(state);
+    } else {
+      clearPin();
     }
+    mSearchBox->blockSignals( true );
+    mSearchBox->setText( result.text );
+    mSearchBox->blockSignals( false );
+    mSearchButton->setVisible( true );
+    mClearButton->setVisible( false );
+  } else {
+    clearPin();
   }
 }
 
@@ -470,17 +475,6 @@ void KadasSearchBox::resultActivated()
     if ( result.bbox.isEmpty() )
     {
       zoomExtent = mMapCanvas->mapSettings().computeExtentForScale( result.pos, result.zoomScale, QgsCoordinateReferenceSystem( result.crs ) );
-      if ( result.showPin )
-      {
-        if ( !mPin )
-        {
-          // TODO
-//          mPin = new QgsPinAnnotationItem( mMapCanvas );
-//          mPin->setFilePath( ":/images/themes/default/pin_blue.svg" );
-//          mPin->setItemFlags( QgsAnnotationItem::ItemHasNoFrame | QgsAnnotationItem::ItemHasNoMarker );
-        }
-//        mPin->setMapPosition( result.pos, QgsCRSCache::instance()->crsByAuthId( result.crs ) );
-      }
     }
     else
     {
@@ -504,14 +498,22 @@ void KadasSearchBox::cancelSearch()
   {
     provider->cancelSearch();
   }
-  // If the clear button is visible, the rubberband marks an activated search
+  // If the clear button is visible, the pin marks an activated search
   // result, which can be cleared by pressing the clear button
-  if ( mPin && !mClearButton->isVisible() )
+  if (!mClearButton->isVisible() )
   {
-    // TODO
-//    mMapCanvas->scene()->removeItem( mPin );
-//    delete mPin.data();
-    mPin = 0;
+    clearPin();
+  }
+}
+
+void KadasSearchBox::clearPin()
+{
+
+  if ( mPin )
+  {
+    KadasMapCanvasItemManager::removeItem(mPin);
+    delete mPin;
+    mPin = nullptr;
   }
 }
 

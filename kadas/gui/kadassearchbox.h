@@ -28,8 +28,8 @@
 
 class QToolButton;
 class QgsMapCanvas;
-class KadasPinAnnotation;
 class KadasMapItem;
+class KadasImageItem;
 class KadasMapToolCreateItem;
 
 class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
@@ -62,7 +62,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     static const int sResultDataRole;
 
     QgsMapCanvas* mMapCanvas;
-    KadasPinAnnotation* mPin = nullptr; // TODO
+    KadasImageItem* mPin = nullptr;
     KadasMapToolCreateItem* mFilterTool = nullptr;
     KadasMapItem* mFilterItem = nullptr;
     QList<KadasSearchProvider*> mSearchProviders;
@@ -76,6 +76,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 
     bool eventFilter( QObject* obj, QEvent* ev ) override;
     void cancelSearch();
+    void clearPin();
 
   private slots:
     void textChanged();
