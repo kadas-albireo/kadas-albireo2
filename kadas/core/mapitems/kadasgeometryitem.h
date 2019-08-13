@@ -73,7 +73,7 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     void render( QgsRenderContext &context ) const override;
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
-    QList<QgsPointXY> nodes() const override;
+    QList<QgsPointXY> nodes(const QgsMapSettings& settings) const override;
     bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;

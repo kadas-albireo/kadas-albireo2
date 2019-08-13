@@ -92,9 +92,17 @@ QRect KadasTextItem::margin() const
   return QRect(maxW, maxH, maxW, maxH);
 }
 
-QList<QgsPointXY> KadasTextItem::nodes() const
+QList<QgsPointXY> KadasTextItem::nodes(const QgsMapSettings& settings) const
 {
-  return QList<QgsPointXY>() << state()->pos;
+  QList<QgsPointXY> points = rotatedCornerPoints();
+  double mup = settings.mapUnitsPerPixel();
+  double x = state()->pos.x();
+  double y = state()->pos.y();
+  QgsPointXY p1(x + points[0].x() * mup, y + points[0].y() * mup);
+  QgsPointXY p2(x + points[1].x() * mup, y + points[1].y() * mup);
+  QgsPointXY p3(x + points[2].x() * mup, y + points[2].y() * mup);
+  QgsPointXY p4(x + points[3].x() * mup, y + points[3].y() * mup);
+  return QList<QgsPointXY>() << p1 << p2 << p3 << p4;
 }
 
 bool KadasTextItem::intersects(const QgsRectangle& rect, const QgsMapSettings &settings) const

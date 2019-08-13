@@ -318,7 +318,7 @@ QgsRectangle KadasGeometryItem::boundingBox() const
   return mGeometry ? mGeometry->boundingBox() : QgsRectangle();
 }
 
-QList<QgsPointXY> KadasGeometryItem::nodes() const
+QList<QgsPointXY> KadasGeometryItem::nodes(const QgsMapSettings &settings) const
 {
   QList<QgsPointXY> points;
   QgsVertexId vidx;

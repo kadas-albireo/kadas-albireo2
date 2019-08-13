@@ -62,7 +62,7 @@ public:
   virtual QRect margin() const { return QRect(); }
 
   /* Nodes for editing */
-  virtual QList<QgsPointXY> nodes() const = 0;
+  virtual QList<QgsPointXY> nodes(const QgsMapSettings& settings) const = 0;
 
   /* Hit test, rect map settings dest crs */
   virtual bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const = 0;

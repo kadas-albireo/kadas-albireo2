@@ -40,7 +40,7 @@ KadasLineItem::KadasLineItem(const QgsCoordinateReferenceSystem &crs, bool geode
   clear();
 }
 
-QList<QgsPointXY> KadasLineItem::nodes() const
+QList<QgsPointXY> KadasLineItem::nodes(const QgsMapSettings &settings) const
 {
   QList<QgsPointXY> nodes;
   for(const QList<QgsPointXY>& part : state()->points) {

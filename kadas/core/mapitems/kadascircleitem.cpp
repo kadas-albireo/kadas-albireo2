@@ -33,7 +33,7 @@ KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool g
   clear();
 }
 
-QList<QgsPointXY> KadasCircleItem::nodes() const
+QList<QgsPointXY> KadasCircleItem::nodes(const QgsMapSettings &settings) const
 {
   QgsCoordinateTransform crst(mCrs, QgsCoordinateReferenceSystem("EPSG:4326"), QgsProject::instance());
   QList<QgsPointXY> points;
