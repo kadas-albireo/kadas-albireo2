@@ -64,20 +64,32 @@ QgsRectangle KadasTextItem::boundingBox() const
   return QgsRectangle(state()->pos, state()->pos);
 }
 
-QSize KadasTextItem::margin() const
+QList<QgsPointXY> KadasTextItem::rotatedCornerPoints() const
 {
   QFontMetrics metrics(mFont);
   double halfW = 0.5 * metrics.width(mText);
   double halfH = 0.5 * metrics.height();
-  double cosa = qCos(mAngle / 180. * M_PI);
-  double sina = qSin(mAngle / 180. * M_PI);
-  QPointF p1(cosa * -halfW - sina * -halfH, sina * -halfW + cosa * -halfH);
-  QPointF p2(cosa * +halfW - sina * -halfH, sina * +halfW + cosa * -halfH);
-  QPointF p3(cosa * +halfW - sina * +halfH, sina * +halfW + cosa * +halfH);
-  QPointF p4(cosa * -halfW - sina * +halfH, sina * -halfW + cosa * +halfH);
-  int maxW = qMax(qMax(qAbs(p1.x()), qAbs(p2.x())), qMax(qAbs(p3.x()), qAbs(p4.x()))) + 1;
-  int maxH = qMax(qMax(qAbs(p1.y()), qAbs(p2.y())), qMax(qAbs(p3.y()), qAbs(p4.y()))) + 1;
-  return QSize(maxW, maxH);
+  double dx1 = - halfW;
+  double dx2 = + halfW;
+  double dy1 = - halfH;
+  double dy2 = + halfH;
+
+  double cosa = qCos(mAngle / 180 * M_PI);
+  double sina = qSin(mAngle / 180 * M_PI);
+  QgsPoint p1(cosa * dx1 - sina * dy1, sina * dx1 + cosa * dy1);
+  QgsPoint p2(cosa * dx2 - sina * dy1, sina * dx2 + cosa * dy1);
+  QgsPoint p3(cosa * dx2 - sina * dy2, sina * dx2 + cosa * dy2);
+  QgsPoint p4(cosa * dx1 - sina * dy2, sina * dx1 + cosa * dy2);
+
+  return QList<QgsPointXY>() << p1 << p2 << p3 << p4;
+}
+
+QRect KadasTextItem::margin() const
+{
+  QList<QgsPointXY> points = rotatedCornerPoints();
+  int maxW = qMax(qMax(qAbs(points[0].x()), qAbs(points[1].x())), qMax(qAbs(points[2].x()), qAbs(points[3].x()))) + 1;
+  int maxH = qMax(qMax(qAbs(points[0].y()), qAbs(points[1].y())), qMax(qAbs(points[2].y()), qAbs(points[3].y()))) + 1;
+  return QRect(maxW, maxH, maxW, maxH);
 }
 
 QList<QgsPointXY> KadasTextItem::nodes() const

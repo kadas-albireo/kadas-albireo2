@@ -46,7 +46,7 @@ void KadasMapCanvasItem::paint(QPainter *painter)
       rc.painter()->setBrush( Qt::white );
       QgsCoordinateTransform crst(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
 
-      for(const QgsPointXY& point : mItem->nodes()) {
+      for(const QgsPointXY& point : mItem->nodes(mMapCanvas->mapSettings())) {
         QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform(crst.transform(point));
         rc.painter()->drawRect( QRectF( screenPoint.x() - 0.5 * sHandleSize, screenPoint.y() - 0.5 * sHandleSize, sHandleSize, sHandleSize ) );
       }

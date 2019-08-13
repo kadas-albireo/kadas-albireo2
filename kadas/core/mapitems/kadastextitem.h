@@ -38,7 +38,7 @@ public:
   double rotation() const{ return mAngle; }
 
   QgsRectangle boundingBox() const override;
-  QSize margin() const override;
+  QRect margin() const override;
   QList<QgsPointXY> nodes() const override;
   bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
   void render( QgsRenderContext &context ) const override;
@@ -79,6 +79,8 @@ private:
   State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
+
+  QList<QgsPointXY> rotatedCornerPoints() const;
 };
 
 #endif // KADASTEXTITEM_H

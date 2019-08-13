@@ -167,7 +167,7 @@ void KadasGeometryItem::drawVertex( QPainter* p, double x, double y ) const
   p->restore();
 }
 
-QSize KadasGeometryItem::margin() const {
+QRect KadasGeometryItem::margin() const {
   int maxMeasureLabelWidth = 0;
   int maxMeasureLabelHeight = 0;
   for(const MeasurementLabel label : mMeasurementLabels) {
@@ -175,7 +175,9 @@ QSize KadasGeometryItem::margin() const {
     maxMeasureLabelHeight = qMax(maxMeasureLabelHeight, label.height/2 + 1) + sLabelOffset;
   }
   int maxPainterMargin = qMax(mIconSize, mPen.width()) / 2 + 1;
-  return QSize(qMax(maxMeasureLabelWidth, maxPainterMargin), qMax(maxMeasureLabelHeight, maxPainterMargin));
+  int maxW = qMax(maxMeasureLabelWidth, maxPainterMargin);
+  int maxH = qMax(maxMeasureLabelHeight, maxPainterMargin);
+  return QRect(maxW, maxH, maxW, maxH);
 }
 
 void KadasGeometryItem::updateMeasurements()

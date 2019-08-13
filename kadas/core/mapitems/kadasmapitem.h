@@ -58,8 +58,8 @@ public:
   /* Bounding box in geographic coordinates */
   virtual QgsRectangle boundingBox() const = 0;
 
-  /* Margin (horizontal and vertical) in pixels */
-  virtual QSize margin() const { return QSize(); }
+  /* Margin  */
+  virtual QRect margin() const { return QRect(); }
 
   /* Nodes for editing */
   virtual QList<QgsPointXY> nodes() const = 0;
