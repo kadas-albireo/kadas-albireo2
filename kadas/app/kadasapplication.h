@@ -54,6 +54,8 @@ public:
   void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
   void addMapLayers(const QList<QgsMapLayer*>& layers) const;
   void removeLayer(QgsMapLayer* layer) const;
+  KadasItemLayer* getItemLayer(const QString& layerName) const;
+  KadasItemLayer* getOrCreateItemLayer(const QString& layerName);
 
   void exportToGpx();
   void exportToKml();
@@ -91,6 +93,7 @@ private:
   bool mBlockActiveLayerChanged = false;
   QDateTime mProjectLastModified;
   KadasMapToolPan* mMapToolPan = nullptr;
+  QMap<QString, QString> mItemLayerMap;
 
   QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
   QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;

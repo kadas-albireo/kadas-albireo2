@@ -444,6 +444,25 @@ void KadasApplication::removeLayer(QgsMapLayer* layer) const
   refreshMapCanvas();
 }
 
+KadasItemLayer* KadasApplication::getItemLayer(const QString& layerName) const
+{
+  if(mItemLayerMap.contains(layerName)) {
+    return qobject_cast<KadasItemLayer*>(QgsProject::instance()->mapLayer(mItemLayerMap[layerName]));
+  }
+  return nullptr;
+}
+
+KadasItemLayer* KadasApplication::getOrCreateItemLayer(const QString& layerName)
+{
+  KadasItemLayer* layer = getItemLayer(layerName);
+  if(!layer) {
+    layer = new KadasItemLayer( layerName );
+    mItemLayerMap[layerName] = layer->id();
+    QgsProject::instance()->addMapLayer( layer );
+  }
+  return layer;
+}
+
 void KadasApplication::exportToGpx()
 {
   // TODO

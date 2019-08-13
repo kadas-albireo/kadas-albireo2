@@ -34,6 +34,7 @@
 #include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
+#include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasredliningintergration.h>
 
@@ -129,17 +130,12 @@ KadasRedliningIntegration::KadasRedliningIntegration(QToolButton *buttonNewObjec
 
 KadasItemLayer* KadasRedliningIntegration::getOrCreateLayer()
 {
-  if(!getLayer()) {
-    KadasItemLayer* layer = new KadasItemLayer( tr( "Redlining" ) );
-    mLayerId = layer->id();
-    QgsProject::instance()->addMapLayer( layer );
-  }
-  return getLayer();
+  return kApp->getOrCreateItemLayer(tr("Redlining"));
 }
 
 KadasItemLayer* KadasRedliningIntegration::getLayer() const
 {
-  return qobject_cast<KadasItemLayer*>(QgsProject::instance()->mapLayer(mLayerId));
+  return kApp->getItemLayer(tr("Redlining"));
 }
 
 KadasMapItem* KadasRedliningIntegration::setEditorFactory(KadasMapItem *item) const
