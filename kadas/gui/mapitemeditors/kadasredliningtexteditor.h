@@ -32,7 +32,6 @@ public:
   }
 
   KadasRedliningTextEditor(KadasMapItem* item);
-  ~KadasRedliningTextEditor();
 
   void syncItemToWidget() override;
   void syncWidgetToItem() override;

@@ -56,6 +56,7 @@ void KadasMapToolEditItem::activate()
     editor->syncItemToWidget();
     mBottomBar->layout()->addWidget(editor);
   }
+  mItem->setSelected(true);
 
   QPushButton* undoButton = new QPushButton();
   undoButton->setIcon(QIcon(":/images/icons/undo"));
@@ -89,6 +90,7 @@ void KadasMapToolEditItem::deactivate()
     mLayer->addItem(mItem);
     mLayer->triggerRepaint();
     KadasMapCanvasItemManager::removeItem(mItem);
+    mItem->setSelected(false);
   }
   delete mBottomBar;
   mBottomBar = nullptr;
