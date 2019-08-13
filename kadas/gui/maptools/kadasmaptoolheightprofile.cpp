@@ -24,7 +24,6 @@
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
-#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 
 KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
