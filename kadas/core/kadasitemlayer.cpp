@@ -55,7 +55,7 @@ private:
 KadasItemLayer::KadasItemLayer(const QString &name)
   : QgsPluginLayer(layerType(), name)
 {
-
+  mValid = true;
 }
 
 void KadasItemLayer::addItem(KadasMapItem* item)
