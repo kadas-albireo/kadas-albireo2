@@ -85,10 +85,11 @@ QgsRectangle KadasItemLayer::extent() const
   QgsRectangle rect;
   for(const KadasMapItem* item : mItems.values())
   {
+    QgsCoordinateTransform trans(item->crs(), crs(), mTransformContext);
     if(rect.isNull()) {
-      rect = item->boundingBox();
+      rect = trans.transform(item->boundingBox());
     } else {
-      rect.combineExtentWith(item->boundingBox());
+      rect.combineExtentWith(trans.transform(item->boundingBox()));
     }
   }
   return rect;
@@ -96,7 +97,7 @@ QgsRectangle KadasItemLayer::extent() const
 
 void KadasItemLayer::setTransformContext(const QgsCoordinateTransformContext& ctx)
 {
-  // TODO
+  mTransformContext = ctx;
 }
 
 QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsMapSettings& mapSettings) const

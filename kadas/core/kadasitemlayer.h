@@ -48,6 +48,7 @@ private:
   class Renderer;
 
   QMap<QString, KadasMapItem*> mItems;
+  QgsCoordinateTransformContext mTransformContext;
 };
 
 class KADAS_CORE_EXPORT KadasItemLayerType : public QgsPluginLayerType
