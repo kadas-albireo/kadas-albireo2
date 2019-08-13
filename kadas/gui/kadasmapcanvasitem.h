@@ -36,6 +36,7 @@ public:
 
 private:
   const KadasMapItem* mItem = nullptr;
+  static constexpr double sHandleSize = 8;
 
 private slots:
   void updateRect();

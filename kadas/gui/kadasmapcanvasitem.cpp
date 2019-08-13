@@ -42,14 +42,13 @@ void KadasMapCanvasItem::paint(QPainter *painter)
     mItem->render( rc );
 
     if(mItem->selected()) {
-      double handleSize = 8;
       rc.painter()->setPen( QPen(Qt::red, 2) );
       rc.painter()->setBrush( Qt::white );
       QgsCoordinateTransform crst(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
 
       for(const QgsPointXY& point : mItem->nodes()) {
         QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform(crst.transform(point));
-        rc.painter()->drawRect( QRectF( screenPoint.x() - 0.5 * handleSize, screenPoint.y() - 0.5 * handleSize, handleSize, handleSize ) );
+        rc.painter()->drawRect( QRectF( screenPoint.x() - 0.5 * sHandleSize, screenPoint.y() - 0.5 * sHandleSize, sHandleSize, sHandleSize ) );
       }
     }
     rc.painter()->restore();
@@ -61,10 +60,10 @@ void KadasMapCanvasItem::updateRect()
   QgsCoordinateTransform t(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
   QgsRectangle bbox = t.transform(mItem->boundingBox());
   double scale = mMapCanvas->mapUnitsPerPixel();
-  QSize margin = mItem->margin();
-  bbox.setXMinimum(bbox.xMinimum() - margin.width() * scale);
-  bbox.setXMaximum(bbox.xMaximum() + margin.width() * scale);
-  bbox.setYMinimum(bbox.yMinimum() - margin.height() * scale);
-  bbox.setYMaximum(bbox.yMaximum() + margin.height() * scale);
+  QRect margin = mItem->margin();
+  bbox.setXMinimum(bbox.xMinimum() - margin.left() * scale - 0.5 * sHandleSize);
+  bbox.setXMaximum(bbox.xMaximum() + margin.right() * scale + 0.5 * sHandleSize);
+  bbox.setYMinimum(bbox.yMinimum() - margin.top() * scale  - 0.5 * sHandleSize);
+  bbox.setYMaximum(bbox.yMaximum() + margin.bottom() * scale + 0.5 * sHandleSize);
   setRect(bbox);
 }
