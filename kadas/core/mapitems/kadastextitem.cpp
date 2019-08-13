@@ -112,23 +112,11 @@ bool KadasTextItem::intersects(const QgsRectangle& rect, const QgsMapSettings &s
   }
 
   QgsRectangle r = QgsCoordinateTransform(settings.destinationCrs(), crs(), QgsProject::instance()).transform(rect);
+  QList<QgsPointXY> points = nodes(settings);
+  QgsPolygon imageRect;
+  imageRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
 
-  QFontMetrics metrics(mFont);
-  double x = state()->pos.x();
-  double y = state()->pos.y();
-  double halfW = .5 * metrics.width(mText) * settings.mapUnitsPerPixel();
-  double halfH = .5 * metrics.height() * settings.mapUnitsPerPixel();
-  double cosa = qCos(mAngle / 180 * M_PI);
-  double sina = qSin(mAngle / 180 * M_PI);
-  QgsPoint p1(x + cosa * -halfW - sina * -halfH, y + sina * -halfW + cosa * -halfH);
-  QgsPoint p2(x + cosa * +halfW - sina * -halfH, y + sina * +halfW + cosa * -halfH);
-  QgsPoint p3(x + cosa * +halfW - sina * +halfH, y + sina * +halfW + cosa * +halfH);
-  QgsPoint p4(x + cosa * -halfW - sina * +halfH, y + sina * -halfW + cosa * +halfH);
-
-  QgsPolygon textRect;
-  textRect.setExteriorRing( new QgsLineString( QgsPointSequence() << p1 << p2 << p3 << p4 << p1 ) );
-
-  QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &textRect );
+  QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &imageRect );
   QgsPoint center = QgsPoint(r.center());
   bool intersects = geomEngine->contains(&center);
   delete geomEngine;
@@ -212,10 +200,7 @@ QgsPointXY KadasTextItem::positionFromDrawAttribs(const AttribValues& values) co
 
 KadasMapItem::EditContext KadasTextItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
 {
-  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
-  QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(state()->pos));
-  if ( canvasPos.sqrDist(testPos) < 25 ) {
+  if(intersects(QgsRectangle(pos, pos), mapSettings)) {
     return EditContext(QgsVertexId(0, 0, 0), state()->pos, drawAttribs());
   }
   return EditContext();
