@@ -19,7 +19,6 @@
 #include <QStandardItem>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <QTextStream>
 #include <QUrlQuery>
 
 #include <qgis/qgsfilterlineedit.h>
