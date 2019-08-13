@@ -28,9 +28,9 @@
 
 class QToolButton;
 class QgsMapCanvas;
-class QgsRubberBand;
 class KadasPinAnnotation;
-class KadasMapToolDrawShape;
+class KadasMapItem;
+class KadasMapToolCreateItem;
 
 class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 {
@@ -62,10 +62,9 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     static const int sResultDataRole;
 
     QgsMapCanvas* mMapCanvas;
-    QgsRubberBand* mRubberBand;
-    KadasPinAnnotation* mPin = nullptr;
-//    QPointer<KadasPinAnnotation> mPin; // TODO
-    KadasMapToolDrawShape* mFilterTool;
+    KadasPinAnnotation* mPin = nullptr; // TODO
+    KadasMapToolCreateItem* mFilterTool = nullptr;
+    KadasMapItem* mFilterItem = nullptr;
     QList<KadasSearchProvider*> mSearchProviders;
     QTimer mTimer;
     LineEdit* mSearchBox;
@@ -76,7 +75,6 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     int mNumRunningProviders;
 
     bool eventFilter( QObject* obj, QEvent* ev ) override;
-    void createRubberBand();
     void cancelSearch();
 
   private slots:

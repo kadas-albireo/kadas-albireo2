@@ -31,9 +31,12 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrubberband.h>
 
-#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
+#include <kadas/core/mapitems/kadascircleitem.h>
+#include <kadas/core/mapitems/kadaspolygonitem.h>
+#include <kadas/core/mapitems/kadasrectangleitem.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadassearchbox.h>
 #include <kadas/gui/kadassearchprovider.h>
 
@@ -71,9 +74,8 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 {
   mMapCanvas = canvas;
   mNumRunningProviders = 0;
-  mRubberBand = 0;
-  mPin = 0;
-  mFilterTool = 0;
+  mPin = nullptr;
+  mFilterTool = nullptr;
 
   mSearchBox = new LineEdit( this );
   mSearchBox->setObjectName( "searchBox" );
@@ -207,7 +209,6 @@ bool KadasSearchBox::eventFilter( QObject* obj, QEvent* ev )
     else
     {
       mTreeWidget->close();
-      mMapCanvas->unsetMapTool( mFilterTool );
     }
     return true;
   }
@@ -228,8 +229,8 @@ bool KadasSearchBox::eventFilter( QObject* obj, QEvent* ev )
     mMapCanvas->setMapTool( mFilterTool );
     if ( !mClearButton->isVisible() )
       resultSelected();
-    if ( mFilterTool )
-      mFilterTool->getRubberBand()->setVisible( true );
+    if ( mFilterItem )
+      KadasMapCanvasItemManager::addItem(mFilterItem);
     return true;
   }
   else if ( obj == mSearchBox && ev->type() == QEvent::MouseButtonPress )
@@ -258,8 +259,8 @@ bool KadasSearchBox::eventFilter( QObject* obj, QEvent* ev )
   {
     cancelSearch();
     mSearchBox->clearFocus();
-    if ( mFilterTool )
-      mFilterTool->getRubberBand()->setVisible( false );
+    if ( mFilterItem )
+      KadasMapCanvasItemManager::removeItem(mFilterItem);
     return true;
   }
   else if ( obj == mTreeWidget && ev->type() == QEvent::KeyPress )
@@ -268,7 +269,6 @@ bool KadasSearchBox::eventFilter( QObject* obj, QEvent* ev )
     if ( key == Qt::Key_Escape )
     {
       mTreeWidget->close();
-      mMapCanvas->unsetMapTool( mFilterTool );
       return true;
     }
     else if ( key == Qt::Key_Enter || key == Qt::Key_Return )
@@ -314,9 +314,10 @@ void KadasSearchBox::startSearch()
   if ( mFilterTool )
   {
     QgsPolygonXY poly;
-    if ( mFilterTool->getRubberBand()->geometry() )
+    const KadasMapToolCreateItem* filterTool = mFilterTool;
+    if ( filterTool->currentItem() && dynamic_cast<const KadasGeometryItem*>(filterTool->currentItem()) )
     {
-      poly = QgsGeometry( mFilterTool->getRubberBand()->geometry()->clone() ).asPolygon();
+      poly = QgsGeometry( static_cast<const KadasGeometryItem*>(filterTool->currentItem())->geometry()->clone() ).asPolygon();
     }
     if ( !poly.isEmpty() )
     {
@@ -341,7 +342,6 @@ void KadasSearchBox::clearSearch()
     mPin = 0;
   }
   mTreeWidget->close();
-  mMapCanvas->unsetMapTool( mFilterTool );
   mTreeWidget->blockSignals( true );
   mTreeWidget->clear();
   mTreeWidget->blockSignals( false );
@@ -495,15 +495,7 @@ void KadasSearchBox::resultActivated()
     mSearchButton->setVisible( false );
     mClearButton->setVisible( true );
     mTreeWidget->close();
-    mMapCanvas->unsetMapTool( mFilterTool );
   }
-}
-
-void KadasSearchBox::createRubberBand()
-{
-  mRubberBand = new QgsRubberBand( mMapCanvas, QgsWkbTypes::PointGeometry );
-  QSize imgSize = QImageReader( ":/images/themes/default/pin_blue.svg" ).size();
-  mRubberBand->setSvgIcon( ":/images/themes/default/pin_blue.svg", QPoint( -imgSize.width() / 2., -imgSize.height() ) );
 }
 
 void KadasSearchBox::cancelSearch()
@@ -525,53 +517,54 @@ void KadasSearchBox::cancelSearch()
 
 void KadasSearchBox::clearFilter()
 {
-  if ( mFilterTool != 0 )
+  if(mFilterItem)
   {
-    delete mFilterTool;
-    mFilterTool = 0;
+    delete mFilterItem;
+    mFilterItem = nullptr;
     // Trigger a new search since the filter changed
     startSearch();
+  }
+  if(mFilterTool) {
+    mMapCanvas->unsetMapTool(mFilterTool);
+    mFilterTool = nullptr;
   }
 }
 
 void KadasSearchBox::setFilterTool()
 {
+  clearFilter();
   QAction* action = qobject_cast<QAction*>( QObject::sender() );
   FilterType filterType = static_cast<FilterType>( action->data().toInt() );
-  delete mFilterTool;
+  KadasMapToolCreateItem::ItemFactory factory = nullptr;
   switch ( filterType )
   {
     case FilterRect:
-      mFilterTool = new KadasMapToolDrawRectangle( mMapCanvas ); break;
+      factory = [=]{ return new KadasRectangleItem(mMapCanvas->mapSettings().destinationCrs()); }; break;
     case FilterPoly:
-      mFilterTool = new KadasMapToolDrawPolyLine( mMapCanvas, true ); break;
+      factory = [=]{ return new KadasPolygonItem(mMapCanvas->mapSettings().destinationCrs()); }; break;
     case FilterCircle:
-      mFilterTool = new KadasMapToolDrawCircle( mMapCanvas ); break;
+      factory = [=]{ return new KadasCircleItem(mMapCanvas->mapSettings().destinationCrs()); }; break;
   }
-  if ( mFilterTool )
+  if ( factory )
   {
-    mFilterTool->setResetOnDeactivate( false );
+    mFilterTool = new KadasMapToolCreateItem(mMapCanvas, factory);
     mMapCanvas->setMapTool( mFilterTool );
     action->setCheckable( true );
     action->setChecked( true );
-    connect( mFilterTool, &KadasMapToolDrawShape::finished, this, &KadasSearchBox::filterToolFinished );
+    connect( mFilterTool, &KadasMapToolCreateItem::partFinished, this, &KadasSearchBox::filterToolFinished );
+    connect( mFilterTool, &QgsMapTool::deactivated, mFilterTool, &QObject::deleteLater);
   }
 }
 
 void KadasSearchBox::filterToolFinished()
 {
+  mFilterItem = mFilterTool->takeItem();
   mFilterButton->defaultAction()->setChecked( false );
   mFilterButton->defaultAction()->setCheckable( false );
-  if ( mFilterTool )
-  {
-    mSearchBox->setFocus();
-    mSearchBox->selectAll();
-    // Trigger a new search since the filter changed
-    startSearch();
-  }
-  else
-  {
-    mFilterButton->setDefaultAction( mFilterButton->menu()->actions().first() );
-    clearFilter();
-  }
+  mMapCanvas->unsetMapTool( mFilterTool );
+  mFilterTool = nullptr;
+  mSearchBox->setFocus();
+  mSearchBox->selectAll();
+  // Trigger a new search since the filter changed
+  startSearch();
 }

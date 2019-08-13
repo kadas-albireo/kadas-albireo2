@@ -108,6 +108,8 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
     void setMeasurementsEnabled(bool enabled, QgsUnitTypes::DistanceUnit baseUnit=QgsUnitTypes::DistanceMeters);
     QString getTotalMeasurement() const{ return mTotalMeasurement; }
 
+    const QgsAbstractGeometry* geometry() const { return mGeometry; }
+
   signals:
     void geometryChanged();
 
@@ -137,7 +139,6 @@ class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
 
 
     void setInternalGeometry( QgsAbstractGeometry* geom);
-    const QgsAbstractGeometry* geometry() const { return mGeometry; }
 
     void drawVertex( QPainter* p, double x, double y ) const;
     QgsUnitTypes::DistanceUnit distanceBaseUnit() const;
