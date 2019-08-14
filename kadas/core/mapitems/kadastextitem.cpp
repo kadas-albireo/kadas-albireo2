@@ -112,9 +112,9 @@ bool KadasTextItem::intersects(const QgsRectangle& rect, const QgsMapSettings &s
     return false;
   }
 
-  QList<QgsPointXY> points = nodes(settings);
-  QgsPolygon imageRect;
-  imageRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
+  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
+  QgsPolygon textRect;
+  textRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
 
   QgsPolygon filterRect;
   QgsLineString* exterior = new QgsLineString();
@@ -126,7 +126,7 @@ bool KadasTextItem::intersects(const QgsRectangle& rect, const QgsMapSettings &s
                        << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
-  QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &imageRect );
+  QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &textRect );
   bool intersects = geomEngine->intersects(&filterRect);
   delete geomEngine;
   return intersects;
