@@ -233,5 +233,6 @@ void KadasMapToolEditItem::inputChanged()
     mInputWidget->adjustCursorAndExtent( crst.transform(newPos) );
 
     mItem->edit(mEditContext, values);
+    mStateHistory->push(mItem->state()->clone());
   }
 }
