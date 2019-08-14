@@ -99,14 +99,14 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mTimer.setInterval( 500 );
 
   mSearchButton = new QToolButton( mSearchBox );
-  mSearchButton->setIcon( QIcon( ":/images/icons/search" ) );
+  mSearchButton->setIcon( QIcon( ":/kadas/icons/search" ) );
   mSearchButton->setIconSize( QSize( 16, 16 ) );
   mSearchButton->setCursor( Qt::PointingHandCursor );
   mSearchButton->setStyleSheet( "QToolButton { border: none; padding: 0px; }" );
   mSearchButton->setToolTip( tr( "Search" ) );
 
   mClearButton = new QToolButton( mSearchBox );
-  mClearButton->setIcon( QIcon( ":/images/icons/reset" ) );
+  mClearButton->setIcon( QIcon( ":/kadas/icons/reset" ) );
   mClearButton->setIconSize( QSize( 16, 16 ) );
   mClearButton->setCursor( Qt::PointingHandCursor );
   mClearButton->setStyleSheet( "QToolButton { border: none; padding: 0px; }" );
@@ -116,21 +116,21 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 
   QMenu* filterMenu = new QMenu( mSearchBox );
   QActionGroup* filterActionGroup = new QActionGroup( filterMenu );
-  QAction* noFilterAction = new QAction( QIcon( ":/images/icons/search_filter_none" ), tr( "No filter" ), filterMenu );
+  QAction* noFilterAction = new QAction( QIcon( ":/kadas/icons/search_filter_none" ), tr( "No filter" ), filterMenu );
   filterActionGroup->addAction( noFilterAction );
   connect( noFilterAction, &QAction::triggered, this, &KadasSearchBox::clearFilter );
 
-  QAction* circleFilterAction = new QAction( QIcon( ":/images/icons/search_filter_circle" ), tr( "Filter by radius" ), filterMenu );
+  QAction* circleFilterAction = new QAction( QIcon( ":/kadas/icons/search_filter_circle" ), tr( "Filter by radius" ), filterMenu );
   circleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterCircle ) ) );
   filterActionGroup->addAction( circleFilterAction );
   connect( circleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
-  QAction* rectangleFilterAction = new QAction( QIcon( ":/images/icons/search_filter_rect" ), tr( "Filter by rectangle" ), filterMenu );
+  QAction* rectangleFilterAction = new QAction( QIcon( ":/kadas/icons/search_filter_rect" ), tr( "Filter by rectangle" ), filterMenu );
   rectangleFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterRect ) ) );
   filterActionGroup->addAction( rectangleFilterAction );
   connect( rectangleFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
 
-  QAction* polygonFilterAction = new QAction( QIcon( ":/images/icons/search_filter_poly" ), tr( "Filter by polygon" ), filterMenu );
+  QAction* polygonFilterAction = new QAction( QIcon( ":/kadas/icons/search_filter_poly" ), tr( "Filter by polygon" ), filterMenu );
   polygonFilterAction->setData( QVariant::fromValue( static_cast<int>( FilterPoly ) ) );
   filterActionGroup->addAction( polygonFilterAction );
   connect( polygonFilterAction, &QAction::triggered, this, &KadasSearchBox::setFilterTool );
@@ -442,7 +442,7 @@ void KadasSearchBox::resultSelected()
       if ( !mPin )
       {
         mPin = new KadasImageItem(mMapCanvas->mapSettings().destinationCrs(), this);
-        mPin->setFilePath(":/images/icons/pin_blue", 0.5, 1.0);
+        mPin->setFilePath(":/kadas/icons/pin_blue", 0.5, 1.0);
         KadasMapCanvasItemManager::addItem(mPin);
       }
       KadasImageItem::State* state = const_cast<const KadasImageItem*>(mPin)->state()->clone();

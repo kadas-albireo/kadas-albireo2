@@ -68,7 +68,7 @@
     <widget class="QPushButton" name="mPushButtonBold">
      <property name="icon">
       <iconset resource="../../resources/resources.qrc">
-       <normaloff>:/images/icons/textBold</normaloff>:/images/icons/textBold</iconset>
+       <normaloff>:/kadas/icons/textBold</normaloff>:/kadas/icons/textBold</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -79,7 +79,7 @@
     <widget class="QPushButton" name="mPushButtonItalic">
      <property name="icon">
       <iconset resource="../../resources/resources.qrc">
-       <normaloff>:/images/icons/textItalic</normaloff>:/images/icons/textItalic</iconset>
+       <normaloff>:/kadas/icons/textItalic</normaloff>:/kadas/icons/textItalic</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>

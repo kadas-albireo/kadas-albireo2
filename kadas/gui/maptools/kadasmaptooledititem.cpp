@@ -59,7 +59,7 @@ void KadasMapToolEditItem::activate()
   mItem->setSelected(true);
 
   QPushButton* undoButton = new QPushButton();
-  undoButton->setIcon(QIcon(":/images/icons/undo"));
+  undoButton->setIcon(QIcon(":/kadas/icons/undo"));
   undoButton->setToolTip(tr("Undo"));
   undoButton->setEnabled(false);
   connect(undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); });
@@ -67,7 +67,7 @@ void KadasMapToolEditItem::activate()
   mBottomBar->layout()->addWidget(undoButton);
 
   QPushButton* redoButton = new QPushButton();
-  redoButton->setIcon(QIcon(":/images/icons/redo"));
+  redoButton->setIcon(QIcon(":/kadas/icons/redo"));
   redoButton->setToolTip(tr("Redo"));
   redoButton->setEnabled(false);
   connect(redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); });
@@ -75,7 +75,7 @@ void KadasMapToolEditItem::activate()
   mBottomBar->layout()->addWidget(redoButton);
 
   QPushButton* closeButton = new QPushButton();
-  closeButton->setIcon(QIcon(":/images/icons/close"));
+  closeButton->setIcon(QIcon(":/kadas/icons/close"));
   closeButton->setToolTip(tr("Close"));
   connect(closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool(this); });
   mBottomBar->layout()->addWidget(closeButton);

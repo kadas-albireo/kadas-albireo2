@@ -240,7 +240,7 @@ void KadasMapToolViewshed::drawFinished()
     QgsProject::instance()->addMapLayer( layer );
 
     KadasImageItem* pin = new KadasImageItem(canvasCrs, this);
-    pin->setFilePath(":/images/icons/pin_red", 0.5, 1.0);
+    pin->setFilePath(":/kadas/icons/pin_red", 0.5, 1.0);
     pin->associateToLayer(layer);
     KadasImageItem::State* state = const_cast<const KadasImageItem*>(pin)->state()->clone();
     state->pos = center;

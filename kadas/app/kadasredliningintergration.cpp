@@ -72,41 +72,41 @@ KadasRedliningIntegration::KadasRedliningIntegration(QToolButton *buttonNewObjec
   };
 
 
-  QAction* actionNewMarker = new QAction( QIcon( ":/images/icons/redlining_point" ), tr( "Marker" ), this );
+  QAction* actionNewMarker = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Marker" ), this );
 
-  mActionNewPoint = new QAction( QIcon( ":/images/icons/redlining_point" ), tr( "Point" ), this );
+  mActionNewPoint = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point" ), this );
   mActionNewPoint->setCheckable( true );
   connect( mActionNewPoint, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, pointFactory); });
 
-  mActionNewSquare = new QAction( QIcon( ":/images/icons/redlining_square" ), tr( "Square" ), this );
+  mActionNewSquare = new QAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square" ), this );
   mActionNewSquare->setCheckable( true );
   connect( mActionNewSquare, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, squareFactory); });
 
-  mActionNewTriangle = new QAction( QIcon( ":/images/icons/redlining_triangle" ), tr( "Triangle" ), this );
+  mActionNewTriangle = new QAction( QIcon( ":/kadas/icons/redlining_triangle" ), tr( "Triangle" ), this );
   mActionNewTriangle->setCheckable( true );
   connect( mActionNewTriangle, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, triangleFactory); });
 
-  mActionNewLine = new QAction( QIcon( ":/images/icons/redlining_line" ), tr( "Line" ), this );
+  mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
   mActionNewLine->setCheckable( true );
   connect( mActionNewLine, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, lineFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), main ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
-  mActionNewRectangle = new QAction( QIcon( ":/images/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
+  mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
   connect( mActionNewRectangle, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, rectangleFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), main ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
-  mActionNewPolygon = new QAction( QIcon( ":/images/icons/redlining_polygon" ), tr( "Polygon" ), this );
+  mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
   mActionNewPolygon->setCheckable( true );
   connect( mActionNewPolygon, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, polygonFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), main ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
-  mActionNewCircle = new QAction( QIcon( ":/images/icons/redlining_circle" ), tr( "Circle" ), this );
+  mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
   mActionNewCircle->setCheckable( true );
   connect( mActionNewCircle, &QAction::triggered, this, [=](bool active){ toggleCreateItem(active, circleFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), main ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
-  mActionNewText = new QAction( QIcon( ":/images/icons/redlining_text" ), tr( "Text" ), this );
+  mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
   connect( mActionNewText, &QAction::triggered, this, [=](bool active) { toggleCreateItem(active, textFactory); });
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), main ), &QShortcut::activated, mActionNewText, &QAction::trigger );
@@ -125,7 +125,7 @@ KadasRedliningIntegration::KadasRedliningIntegration(QToolButton *buttonNewObjec
   menuNewObject->addAction( mActionNewText );
   mButtonNewObject->setMenu( menuNewObject );
   mButtonNewObject->setPopupMode( QToolButton::InstantPopup );
-  mButtonNewObject->setIcon( QIcon( ":/images/icons/shape" ) );
+  mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
 }
 
 KadasItemLayer* KadasRedliningIntegration::getOrCreateLayer()

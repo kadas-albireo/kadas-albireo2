@@ -76,7 +76,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources/resources.qrc">
-         <normaloff>:/images/icons/layertree_folded</normaloff>:/images/icons/layertree_folded</iconset>
+         <normaloff>:/kadas/icons/layertree_folded</normaloff>:/kadas/icons/layertree_folded</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -141,7 +141,7 @@
           </property>
           <property name="icon">
            <iconset resource="../../resources/resources.qrc">
-            <normaloff>:/images/icons/zoom_in</normaloff>:/images/icons/zoom_in</iconset>
+            <normaloff>:/kadas/icons/zoom_in</normaloff>:/kadas/icons/zoom_in</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -236,7 +236,7 @@
           </property>
           <property name="icon">
            <iconset resource="../../resources/resources.qrc">
-            <normaloff>:/images/icons/zoom_out</normaloff>:/images/icons/zoom_out</iconset>
+            <normaloff>:/kadas/icons/zoom_out</normaloff>:/kadas/icons/zoom_out</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -406,7 +406,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/images/icons/open</normaloff>:/images/icons/open</iconset>
+                   <normaloff>:/kadas/icons/open</normaloff>:/kadas/icons/open</iconset>
                  </property>
                  <property name="popupMode">
                   <enum>QToolButton::InstantPopup</enum>
@@ -420,7 +420,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/images/icons/globe</normaloff>:/images/icons/globe</iconset>
+                   <normaloff>:/kadas/icons/globe</normaloff>:/kadas/icons/globe</iconset>
                  </property>
                  <property name="popupMode">
                   <enum>QToolButton::InstantPopup</enum>
@@ -434,7 +434,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/images/icons/refresh</normaloff>:/images/icons/refresh</iconset>
+                   <normaloff>:/kadas/icons/refresh</normaloff>:/kadas/icons/refresh</iconset>
                  </property>
                 </widget>
                </item>
@@ -445,7 +445,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/images/icons/login</normaloff>:/images/icons/login</iconset>
+                   <normaloff>:/kadas/icons/login</normaloff>:/kadas/icons/login</iconset>
                  </property>
                 </widget>
                </item>
@@ -541,7 +541,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources/resources.qrc">
-         <normaloff>:/images/icons/home</normaloff>:/images/icons/home</iconset>
+         <normaloff>:/kadas/icons/home</normaloff>:/kadas/icons/home</iconset>
        </property>
        <property name="iconSize">
         <size>

@@ -469,7 +469,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   }
   mLineOfSightMarker = new QwtPlotMarker();
   QwtSymbol* observerMarkerSymbol = new QwtSymbol( QwtSymbol::Pixmap );
-  observerMarkerSymbol->setPixmap( QPixmap( ":/images/themes/default/observer.svg" ) );
+  observerMarkerSymbol->setPixmap( QPixmap( ":/kadas/themes/default/observer.svg" ) );
   observerMarkerSymbol->setPinPoint( QPointF( 0, 4 ) );
   mLineOfSightMarker->setSymbol( observerMarkerSymbol );
   mLineOfSightMarker->setValue( QPointF( samples.front().x(), observerHeight ) );

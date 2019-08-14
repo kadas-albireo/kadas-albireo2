@@ -108,7 +108,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../resources/resources.qrc">
-             <normaloff>:/images/icons/favorite</normaloff>:/images/icons/favorite</iconset>
+             <normaloff>:/kadas/icons/favorite</normaloff>:/kadas/icons/favorite</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -152,7 +152,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../resources/resources.qrc">
-             <normaloff>:/images/icons/favorite</normaloff>:/images/icons/favorite</iconset>
+             <normaloff>:/kadas/icons/favorite</normaloff>:/kadas/icons/favorite</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -193,7 +193,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../resources/resources.qrc">
-             <normaloff>:/images/icons/favorite</normaloff>:/images/icons/favorite</iconset>
+             <normaloff>:/kadas/icons/favorite</normaloff>:/kadas/icons/favorite</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -234,7 +234,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../resources/resources.qrc">
-             <normaloff>:/images/icons/favorite</normaloff>:/images/icons/favorite</iconset>
+             <normaloff>:/kadas/icons/favorite</normaloff>:/kadas/icons/favorite</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -2027,7 +2027,7 @@ Sight</string>
   <action name="mActionOpen">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/open</normaloff>:/images/icons/open</iconset>
+     <normaloff>:/kadas/icons/open</normaloff>:/kadas/icons/open</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -2039,7 +2039,7 @@ Sight</string>
   <action name="mActionSave">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/save</normaloff>:/images/icons/save</iconset>
+     <normaloff>:/kadas/icons/save</normaloff>:/kadas/icons/save</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -2051,7 +2051,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/pin</normaloff>:/images/icons/pin</iconset>
+     <normaloff>:/kadas/icons/pin</normaloff>:/kadas/icons/pin</iconset>
    </property>
    <property name="text">
     <string>Pin</string>
@@ -2060,7 +2060,7 @@ Sight</string>
   <action name="mActionNew">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/new</normaloff>:/images/icons/new</iconset>
+     <normaloff>:/kadas/icons/new</normaloff>:/kadas/icons/new</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -2072,7 +2072,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/distance</normaloff>:/images/icons/distance</iconset>
+     <normaloff>:/kadas/icons/distance</normaloff>:/kadas/icons/distance</iconset>
    </property>
    <property name="text">
     <string>Distance</string>
@@ -2084,7 +2084,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/area</normaloff>:/images/icons/area</iconset>
+     <normaloff>:/kadas/icons/area</normaloff>:/kadas/icons/area</iconset>
    </property>
    <property name="text">
     <string>Area</string>
@@ -2096,7 +2096,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/heightprofile</normaloff>:/images/icons/heightprofile</iconset>
+     <normaloff>:/kadas/icons/heightprofile</normaloff>:/kadas/icons/heightprofile</iconset>
    </property>
    <property name="text">
     <string>Profile &amp; Sight</string>
@@ -2111,7 +2111,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/azimuth</normaloff>:/images/icons/azimuth</iconset>
+     <normaloff>:/kadas/icons/azimuth</normaloff>:/kadas/icons/azimuth</iconset>
    </property>
    <property name="text">
     <string>Azimuth</string>
@@ -2123,7 +2123,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/slope</normaloff>:/images/icons/slope</iconset>
+     <normaloff>:/kadas/icons/slope</normaloff>:/kadas/icons/slope</iconset>
    </property>
    <property name="text">
     <string>Slope</string>
@@ -2135,7 +2135,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/hillshade</normaloff>:/images/icons/hillshade</iconset>
+     <normaloff>:/kadas/icons/hillshade</normaloff>:/kadas/icons/hillshade</iconset>
    </property>
    <property name="text">
     <string>Hillshade</string>
@@ -2147,7 +2147,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/viewshed</normaloff>:/images/icons/viewshed</iconset>
+     <normaloff>:/kadas/icons/viewshed</normaloff>:/kadas/icons/viewshed</iconset>
    </property>
    <property name="text">
     <string>Viewshed</string>
@@ -2159,7 +2159,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/circle</normaloff>:/images/icons/circle</iconset>
+     <normaloff>:/kadas/icons/circle</normaloff>:/kadas/icons/circle</iconset>
    </property>
    <property name="text">
     <string>Circle</string>
@@ -2168,7 +2168,7 @@ Sight</string>
   <action name="mActionCopy">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/copy</normaloff>:/images/icons/copy</iconset>
+     <normaloff>:/kadas/icons/copy</normaloff>:/kadas/icons/copy</iconset>
    </property>
    <property name="text">
     <string>Copy Map</string>
@@ -2180,7 +2180,7 @@ Sight</string>
   <action name="mActionPrint">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/print</normaloff>:/images/icons/print</iconset>
+     <normaloff>:/kadas/icons/print</normaloff>:/kadas/icons/print</iconset>
    </property>
    <property name="text">
     <string>Print</string>
@@ -2189,7 +2189,7 @@ Sight</string>
   <action name="mActionSaveMapExtent">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/save_map_image</normaloff>:/images/icons/save_map_image</iconset>
+     <normaloff>:/kadas/icons/save_map_image</normaloff>:/kadas/icons/save_map_image</iconset>
    </property>
    <property name="text">
     <string>Save Map</string>
@@ -2201,7 +2201,7 @@ Sight</string>
   <action name="mActionImportOVL">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/ovl_import</normaloff>:/images/icons/ovl_import</iconset>
+     <normaloff>:/kadas/icons/ovl_import</normaloff>:/kadas/icons/ovl_import</iconset>
    </property>
    <property name="text">
     <string>Import OVL</string>
@@ -2210,7 +2210,7 @@ Sight</string>
   <action name="mActionZoomLast">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/prev_extent</normaloff>:/images/icons/prev_extent</iconset>
+     <normaloff>:/kadas/icons/prev_extent</normaloff>:/kadas/icons/prev_extent</iconset>
    </property>
    <property name="text">
     <string>Previous Extent</string>
@@ -2222,7 +2222,7 @@ Sight</string>
   <action name="mActionZoomNext">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/next_extent</normaloff>:/images/icons/next_extent</iconset>
+     <normaloff>:/kadas/icons/next_extent</normaloff>:/kadas/icons/next_extent</iconset>
    </property>
    <property name="text">
     <string>Next Extent</string>
@@ -2234,7 +2234,7 @@ Sight</string>
   <action name="mActionNewMapWindow">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/new_map_view</normaloff>:/images/icons/new_map_view</iconset>
+     <normaloff>:/kadas/icons/new_map_view</normaloff>:/kadas/icons/new_map_view</iconset>
    </property>
    <property name="text">
     <string>New map window</string>
@@ -2246,7 +2246,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/globe</normaloff>:/images/icons/globe</iconset>
+     <normaloff>:/kadas/icons/globe</normaloff>:/kadas/icons/globe</iconset>
    </property>
    <property name="text">
     <string>3D</string>
@@ -2255,7 +2255,7 @@ Sight</string>
   <action name="mActionGrid">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/grid</normaloff>:/images/icons/grid</iconset>
+     <normaloff>:/kadas/icons/grid</normaloff>:/kadas/icons/grid</iconset>
    </property>
    <property name="text">
     <string>Grid</string>
@@ -2267,7 +2267,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/routes</normaloff>:/images/icons/routes</iconset>
+     <normaloff>:/kadas/icons/routes</normaloff>:/kadas/icons/routes</iconset>
    </property>
    <property name="text">
     <string>Draw Routes</string>
@@ -2282,7 +2282,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/waypoints</normaloff>:/images/icons/waypoints</iconset>
+     <normaloff>:/kadas/icons/waypoints</normaloff>:/kadas/icons/waypoints</iconset>
    </property>
    <property name="text">
     <string>Draw Waypoints</string>
@@ -2297,7 +2297,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/gps</normaloff>:/images/icons/gps</iconset>
+     <normaloff>:/kadas/icons/gps</normaloff>:/kadas/icons/gps</iconset>
    </property>
    <property name="text">
     <string>Enable GPS</string>
@@ -2312,7 +2312,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/gps_sync</normaloff>:/images/icons/gps_sync</iconset>
+     <normaloff>:/kadas/icons/gps_sync</normaloff>:/kadas/icons/gps_sync</iconset>
    </property>
    <property name="text">
     <string>Move with GPS</string>
@@ -2324,7 +2324,7 @@ Sight</string>
   <action name="mActionImportGPX">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/gpx_import</normaloff>:/images/icons/gpx_import</iconset>
+     <normaloff>:/kadas/icons/gpx_import</normaloff>:/kadas/icons/gpx_import</iconset>
    </property>
    <property name="text">
     <string>Import GPX</string>
@@ -2336,7 +2336,7 @@ Sight</string>
   <action name="mActionExportGPX">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/gpx_export</normaloff>:/images/icons/gpx_export</iconset>
+     <normaloff>:/kadas/icons/gpx_export</normaloff>:/kadas/icons/gpx_export</iconset>
    </property>
    <property name="text">
     <string>Export GPX</string>
@@ -2348,7 +2348,7 @@ Sight</string>
   <action name="mActionAddImage">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/picture</normaloff>:/images/icons/picture</iconset>
+     <normaloff>:/kadas/icons/picture</normaloff>:/kadas/icons/picture</iconset>
    </property>
    <property name="text">
     <string>Add Image</string>
@@ -2363,7 +2363,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/milx_symbol</normaloff>:/images/icons/milx_symbol</iconset>
+     <normaloff>:/kadas/icons/milx_symbol</normaloff>:/kadas/icons/milx_symbol</iconset>
    </property>
    <property name="text">
     <string>Add MSS Symbol</string>
@@ -2375,7 +2375,7 @@ Sight</string>
   <action name="mActionSaveMilx">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/milxly_export</normaloff>:/images/icons/milxly_export</iconset>
+     <normaloff>:/kadas/icons/milxly_export</normaloff>:/kadas/icons/milxly_export</iconset>
    </property>
    <property name="text">
     <string>Export MILXLY</string>
@@ -2387,7 +2387,7 @@ Sight</string>
   <action name="mActionLoadMilx">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/milxly_import</normaloff>:/images/icons/milxly_import</iconset>
+     <normaloff>:/kadas/icons/milxly_import</normaloff>:/kadas/icons/milxly_import</iconset>
    </property>
    <property name="text">
     <string>Import MILXLY</string>
@@ -2402,7 +2402,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/delete</normaloff>:/images/icons/delete</iconset>
+     <normaloff>:/kadas/icons/delete</normaloff>:/kadas/icons/delete</iconset>
    </property>
    <property name="text">
     <string>Delete Items</string>
@@ -2414,7 +2414,7 @@ Sight</string>
   <action name="mActionHelp">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/help</normaloff>:/images/icons/help</iconset>
+     <normaloff>:/kadas/icons/help</normaloff>:/kadas/icons/help</iconset>
    </property>
    <property name="text">
     <string>Help</string>
@@ -2426,7 +2426,7 @@ Sight</string>
   <action name="mActionSaveAs">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/save</normaloff>:/images/icons/save</iconset>
+     <normaloff>:/kadas/icons/save</normaloff>:/kadas/icons/save</iconset>
    </property>
    <property name="text">
     <string>Save As</string>
@@ -2438,7 +2438,7 @@ Sight</string>
   <action name="mActionAbout">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/about</normaloff>:/images/icons/about</iconset>
+     <normaloff>:/kadas/icons/about</normaloff>:/kadas/icons/about</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -2450,7 +2450,7 @@ Sight</string>
   <action name="mActionPaste">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/paste</normaloff>:/images/icons/paste</iconset>
+     <normaloff>:/kadas/icons/paste</normaloff>:/kadas/icons/paste</iconset>
    </property>
    <property name="text">
     <string>Paste</string>
@@ -2465,7 +2465,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/guide_grid</normaloff>:/images/icons/guide_grid</iconset>
+     <normaloff>:/kadas/icons/guide_grid</normaloff>:/kadas/icons/guide_grid</iconset>
    </property>
    <property name="text">
     <string>Guide Grid</string>
@@ -2480,7 +2480,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/images/icons/bullseye</normaloff>:/images/icons/bullseye</iconset>
+     <normaloff>:/kadas/icons/bullseye</normaloff>:/kadas/icons/bullseye</iconset>
    </property>
    <property name="text">
     <string>Bullseye</string>

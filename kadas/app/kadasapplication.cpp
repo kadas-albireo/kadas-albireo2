@@ -128,7 +128,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   QgsApplication::initQgis();
 
   // Setup application style
-  setWindowIcon(QIcon(":/images/logo"));
+  setWindowIcon(QIcon(":/kadas/logo"));
   QFile styleSheet(":/stylesheet");
   if (styleSheet.open(QIODevice::ReadOnly))
   {
@@ -190,7 +190,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   installTranslator(&appTranslator);
 
   // Create main window
-  QSplashScreen splash(QPixmap(":/images/splash"));
+  QSplashScreen splash(QPixmap(":/kadas/splash"));
   splash.show();
   mClipboard = new KadasClipboard(this);
   mMainWindow = new KadasMainWindow(&splash);

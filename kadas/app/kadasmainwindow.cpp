@@ -417,7 +417,7 @@ void KadasMainWindow::configureButtons()
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_I, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionImportKml, &QAction::trigger );
   kmlMenu->addAction( actionImportKml );
 
-  mKMLButton->setIcon( QIcon( ":/images/icons/kml" ) );
+  mKMLButton->setIcon( QIcon( ":/kadas/icons/kml" ) );
   mKMLButton->setMenu( kmlMenu );
   mKMLButton->setPopupMode( QToolButton::InstantPopup );
 
@@ -577,12 +577,12 @@ void KadasMainWindow::toggleLayerTree()
 
   if ( !visible )
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/images/icons/layertree_unfolded" ) );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_unfolded" ) );
     mLayerTreeViewButton->move( mLayersWidget->size().width(), mLayerTreeViewButton->y() );
   }
   else
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/images/icons/layertree_folded" ) );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
     mLayerTreeViewButton->move( 0, mLayerTreeViewButton->y() );
   }
 }
@@ -764,7 +764,7 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint& pos )
   {
     QSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), "" );
     button->setText( tr( "Favorite" ) );
-    button->setIcon( QIcon( ":/images/kadas/favorit.png" ) );
+    button->setIcon( QIcon( ":/kadas/kadas/favorit.png" ) );
     button->setDefaultAction( 0 );
     button->setIconSize( QSize( 16, 16 ) );
     button->setEnabled( false );
@@ -813,7 +813,7 @@ QgsMapTool* KadasMainWindow::createPinTool()
 {
   KadasMapToolCreateItem::ItemFactory factory = [this] {
     KadasImageItem* item = new KadasImageItem(mapCanvas()->mapSettings().destinationCrs());
-    item->setFilePath(":/images/icons/pin_red", 0.5, 1.0);
+    item->setFilePath(":/kadas/icons/pin_red", 0.5, 1.0);
     item->setEditorFactory(KadasImageAttributesEditor::factory);
     return item;
   };

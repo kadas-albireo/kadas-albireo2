@@ -79,13 +79,13 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem* item, bool measureAzimuth 
   }
 
   QToolButton* pickButton = new QToolButton();
-  pickButton->setIcon( QIcon( ":/images/icons/select" ) );
+  pickButton->setIcon( QIcon( ":/kadas/icons/select" ) );
   pickButton->setToolTip( tr( "Pick existing geometry" ) );
   connect( pickButton, &QToolButton::clicked, this, &KadasMeasureWidget::pickRequested );
   layout()->addWidget( pickButton );
 
   QToolButton* clearButton = new QToolButton();
-  clearButton->setIcon( QIcon( ":/images/icons/clear" ) );
+  clearButton->setIcon( QIcon( ":/kadas/icons/clear" ) );
   clearButton->setToolTip( tr( "Clear" ) );
   connect( clearButton, &QToolButton::clicked, this, &KadasMeasureWidget::clearRequested );
   layout()->addWidget( clearButton );

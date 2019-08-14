@@ -94,7 +94,7 @@ bool KadasCrashRpt::install()
   GdbCrashHandler::Configuration config;
   config.applicationName = QString( "%1" ).arg( Kadas::KADAS_FULL_RELEASE_NAME );
   config.applicationVersion = QString( "%1 (%2/%3)" ).arg( Kadas::KADAS_VERSION ).arg( Kadas::KADAS_BUILD_DATE ).arg( Kadas::KADAS_DEV_VERSION );
-  config.applicationIcon = ":/images/icon-60x60";
+  config.applicationIcon = ":/kadas/icon-60x60";
   config.submitAddress = QSettings().value( "/kadas/crashrpt_url" ).toString();
   config.submitMethod = GdbCrashHandler::Configuration::SubmitService;
   GdbCrashHandler::init( config );

@@ -170,7 +170,7 @@ void KadasMapToolDrawShape::canvasPressEvent( QgsMapMouseEvent* e )
         {
           menu.addSeparator();
         }
-        QAction* deleteAction = menu.addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ) );
+        QAction* deleteAction = menu.addAction( QIcon( ":/kadas/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ) );
         QAction* clickedAction = menu.exec( canvas()->mapToGlobal( e->pos() ) );
         if ( !clickedAction )
         {
@@ -945,18 +945,18 @@ void KadasMapToolDrawPolyLine::addContextMenuActions( const KadasMapToolDrawShap
   const EditContext* ctx = static_cast<const EditContext*>( context );
   if ( ctx->node != -1 )
   {
-    QAction* deleteNodeAction = menu.addAction( QIcon( ":/images/themes/default/mActionDeleteVertex.png" ), tr( "Delete node" ) );
+    QAction* deleteNodeAction = menu.addAction( QIcon( ":/kadas/themes/default/mActionDeleteVertex.png" ), tr( "Delete node" ) );
     deleteNodeAction->setData( DeleteNode );
     deleteNodeAction->setEnabled( state()->points[ctx->part].length() >= 3 + mIsArea );
     if ( mIsArea || ( ctx->node == 0 || ctx->node == state()->points[ctx->part].length() - 1 ) )
     {
-      QAction* continueAction = menu.addAction( QIcon( ":/images/themes/default/mActionMoveVertex.png" ), tr( "Continue drawing" ) );
+      QAction* continueAction = menu.addAction( QIcon( ":/kadas/themes/default/mActionMoveVertex.png" ), tr( "Continue drawing" ) );
       continueAction->setData( ContinueGeometry );
     }
   }
   else
   {
-    QAction* addNodeAction = menu.addAction( QIcon( ":/images/themes/default/mActionAddVertex.png" ), tr( "Add node" ) );
+    QAction* addNodeAction = menu.addAction( QIcon( ":/kadas/themes/default/mActionAddVertex.png" ), tr( "Add node" ) );
     addNodeAction->setData( AddNode );
   }
 }
