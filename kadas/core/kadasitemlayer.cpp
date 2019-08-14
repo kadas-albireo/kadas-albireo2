@@ -100,11 +100,6 @@ void KadasItemLayer::setTransformContext(const QgsCoordinateTransformContext& ct
   mTransformContext = ctx;
 }
 
-QList<KadasMapItem*> KadasItemLayer::items() const
-{
-  return mItems.values();
-}
-
 QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsMapSettings& mapSettings) const
 {
   for(auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it) {
