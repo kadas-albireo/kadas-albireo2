@@ -46,7 +46,7 @@ QgsRectangle KadasImageItem::boundingBox() const
   return QgsRectangle(state()->pos, state()->pos);
 }
 
-QList<QgsPointXY> KadasImageItem::rotatedCornerPoints(double mup) const
+QList<QgsPointXY> KadasImageItem::rotatedCornerPoints(double angle, double mup) const
 {
   double dx1 = - mAnchorX * state()->size.width();
   double dx2 = + (1. - mAnchorX) * state()->size.width();
@@ -55,8 +55,8 @@ QList<QgsPointXY> KadasImageItem::rotatedCornerPoints(double mup) const
 
   double x = state()->pos.x();
   double y = state()->pos.y();
-  double cosa = qCos(state()->angle / 180 * M_PI);
-  double sina = qSin(state()->angle / 180 * M_PI);
+  double cosa = qCos(angle / 180 * M_PI);
+  double sina = qSin(angle / 180 * M_PI);
   QgsPointXY p1(x + (cosa * dx1 - sina * dy1) * mup, y + (sina * dx1 + cosa * dy1) * mup);
   QgsPointXY p2(x + (cosa * dx2 - sina * dy1) * mup, y + (sina * dx2 + cosa * dy1) * mup);
   QgsPointXY p3(x + (cosa * dx2 - sina * dy2) * mup, y + (sina * dx2 + cosa * dy2) * mup);
@@ -67,7 +67,7 @@ QList<QgsPointXY> KadasImageItem::rotatedCornerPoints(double mup) const
 
 QRect KadasImageItem::margin() const
 {
-  QList<QgsPointXY> points = rotatedCornerPoints();
+  QList<QgsPointXY> points = rotatedCornerPoints(state()->angle);
   int maxW = qMax(qMax(qAbs(points[0].x()), qAbs(points[1].x())), qMax(qAbs(points[2].x()), qAbs(points[3].x()))) + 1;
   int maxH = qMax(qMax(qAbs(points[0].y()), qAbs(points[1].y())), qMax(qAbs(points[2].y()), qAbs(points[3].y()))) + 1;
   return QRect(maxW, maxH, maxW, maxH);
@@ -75,7 +75,7 @@ QRect KadasImageItem::margin() const
 
 QList<KadasMapItem::Node> KadasImageItem::nodes(const QgsMapSettings& settings) const
 {
-  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
+  QList<QgsPointXY> points = rotatedCornerPoints(state()->angle, settings.mapUnitsPerPixel());
   QList<Node> nodes;
   nodes.append({points[0]});
   nodes.append({points[1]});
@@ -92,7 +92,7 @@ bool KadasImageItem::intersects(const QgsRectangle& rect, const QgsMapSettings &
     return false;
   }
 
-  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
+  QList<QgsPointXY> points = rotatedCornerPoints(state()->angle, settings.mapUnitsPerPixel());
   QgsPolygon imageRect;
   imageRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
 
@@ -211,6 +211,16 @@ QgsPointXY KadasImageItem::positionFromDrawAttribs(const AttribValues& values) c
 
 KadasMapItem::EditContext KadasImageItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
 {
+  QgsCoordinateTransform crst(mCrs, mapSettings.destinationCrs(), mapSettings.transformContext());
+  QgsPointXY canvasPos = mapSettings.mapToPixel().transform(crst.transform(pos));
+  QList<QgsPointXY> points = rotatedCornerPoints(state()->angle, mapSettings.mapUnitsPerPixel());
+  QgsPointXY rotateHandlePos(0.5 * (points[1].x() + points[2].x()), 0.5 * (points[1].y() + points[2].y()));
+  QgsPointXY testPos = mapSettings.mapToPixel().transform(crst.transform(rotateHandlePos));
+  if ( canvasPos.sqrDist(testPos) < 25 ) {
+    AttribDefs attributes;
+    attributes.insert(AttrA, NumericAttribute{QString( QChar( 0x03B1 ) ), 0});
+    return EditContext(QgsVertexId(0, 0, 1), rotateHandlePos, attributes);
+  }
   double tol = mapSettings.mapUnitsPerPixel();
   if(intersects(QgsRectangle(pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol), mapSettings)) {
     return EditContext(QgsVertexId(0, 0, 0), state()->pos, drawAttribs());
@@ -221,24 +231,63 @@ KadasMapItem::EditContext KadasImageItem::getEditContext(const QgsPointXY& pos, 
 void KadasImageItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
 {
   if(context.vidx.isValid()) {
-    state()->pos = newPoint;
+    if(context.vidx.vertex == 1){
+      QgsVector delta = newPoint - state()->pos;
+      // Rotate handle is in the middle of the right edge
+      QgsPointXY dir(state()->size.width() - mAnchorX * state()->size.width(), 0.5 * state()->size.height() - mAnchorY * state()->size.height());
+      double offset = qAtan2(dir.y(), dir.x());
+      double angle = (qAtan2( delta.y(), delta.x() ) + offset) / M_PI * 180.;
+      // If less than 5 deg from quarter, snap to quarter
+      if ( qAbs( angle - qRound( angle / 90. ) * 90. ) < 5 )
+      {
+        angle = qRound( angle / 90. ) * 90.;
+      }
+      state()->angle = angle;
+    } else {
+      state()->pos = newPoint;
+    }
     recomputeDerived();
   }
 }
 
 void KadasImageItem::edit(const EditContext& context, const AttribValues& values)
 {
-  edit(context, QgsPointXY(values[AttrX], values[AttrY]));
+  if(context.vidx.isValid()) {
+    if(context.vidx.vertex == 1) {
+      state()->angle = values[AttrA];
+    } else {
+      state()->pos = QgsPointXY(values[AttrX], values[AttrY]);
+    }
+    recomputeDerived();
+  }
 }
 
 KadasMapItem::AttribValues KadasImageItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
 {
-  return drawAttribsFromPosition(pos);
+  if(context.vidx.vertex == 1) {
+    QgsPointXY dir(state()->size.width() - mAnchorX * state()->size.width(), 0.5 * state()->size.height() - mAnchorY * state()->size.height());
+    double offset = qAtan2(dir.y(), dir.x());
+    QgsVector delta = pos - state()->pos;
+    double angle = (qAtan2( delta.y(), delta.x() ) + offset) / M_PI * 180.;
+    while(angle < 0) {
+      angle += 360;
+    }
+    AttribValues values;
+    values.insert(AttrA, angle);
+    return values;
+  } else {
+    return drawAttribsFromPosition(pos);
+  }
 }
 
 QgsPointXY KadasImageItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
-  return positionFromDrawAttribs(values);
+  if(context.vidx.vertex == 1) {
+    QList<QgsPointXY> points = rotatedCornerPoints(values[AttrA], mapSettings.mapUnitsPerPixel());
+    return QgsPointXY(0.5 * (points[1].x() + points[2].x()), 0.5 * (points[1].y() + points[2].y()));
+  } else {
+    return positionFromDrawAttribs(values);
+  }
 }
 
 void KadasImageItem::recomputeDerived()

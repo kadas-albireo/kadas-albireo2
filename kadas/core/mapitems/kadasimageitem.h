@@ -67,7 +67,7 @@ public:
   const State* state() const{ return static_cast<State*>(mState); }
 
 private:
-  enum AttribIds {AttrX, AttrY};
+  enum AttribIds {AttrX, AttrY, AttrA};
   QString mFilePath;
   double mAnchorX = 0.5;
   double mAnchorY = 0.5;
@@ -77,7 +77,7 @@ private:
   State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
-  QList<QgsPointXY> rotatedCornerPoints(double mup=1.) const;
+  QList<QgsPointXY> rotatedCornerPoints(double angle, double mup=1.) const;
 
   static void rotateNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize);
 };
