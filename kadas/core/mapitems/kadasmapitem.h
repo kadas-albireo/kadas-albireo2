@@ -70,6 +70,10 @@ public:
   /* Render the item */
   virtual void render( QgsRenderContext &context ) const = 0;
 
+  /* Associate to layer */
+  void associateToLayer(QgsMapLayer *layer);
+  QgsMapLayer* associatedLayer() const{ return mAssociatedLayer; }
+
    /* Selected state */
   void setSelected(bool selected);
   bool selected() const{ return mSelected; }
@@ -147,6 +151,7 @@ protected:
   QgsCoordinateReferenceSystem mCrs;
   bool mSelected = false;
   int mZIndex = 0;
+  QgsMapLayer* mAssociatedLayer = nullptr;
 
 private:
   EditorFactory mEditorFactory = nullptr;

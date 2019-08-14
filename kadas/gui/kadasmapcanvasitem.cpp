@@ -31,6 +31,9 @@ KadasMapCanvasItem::KadasMapCanvasItem(const KadasMapItem *item, QgsMapCanvas* c
 void KadasMapCanvasItem::paint(QPainter *painter)
 {
   if ( mItem ) {
+    if(mItem->associatedLayer() && !mMapCanvas->layers().contains(mItem->associatedLayer())) {
+      return;
+    }
     QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
     rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
     rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );

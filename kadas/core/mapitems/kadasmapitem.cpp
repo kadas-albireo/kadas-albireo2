@@ -14,6 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsmaplayer.h>
+#include <qgis/qgsproject.h>
+
 #include <kadas/core/mapitems/kadasmapitem.h>
 
 
@@ -25,6 +28,15 @@ KadasMapItem::KadasMapItem(const QgsCoordinateReferenceSystem &crs, QObject* par
 KadasMapItem::~KadasMapItem()
 {
   emit aboutToBeDestroyed();
+  if(mAssociatedLayer) {
+    QgsProject::instance()->removeMapLayer(mAssociatedLayer->id());
+  }
+}
+
+void KadasMapItem::associateToLayer(QgsMapLayer *layer)
+{
+  mAssociatedLayer = layer;
+  setParent(layer);
 }
 
 void KadasMapItem::setSelected(bool selected)
