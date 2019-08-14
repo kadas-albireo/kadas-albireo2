@@ -57,10 +57,10 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
     int addInputField( const QString& label, KadasFloatingInputWidgetField* widget, bool initiallyfocused = false );
     void setInputFieldVisible( int idx, bool visible );
     void setFocusedInputField( KadasFloatingInputWidgetField* widget );
+    void ensureFocus();
     QList<KadasFloatingInputWidgetField*> inputFields() const { return mInputFields.values(); }
     KadasFloatingInputWidgetField* inputField(int id) const{ return mInputFields.value(id); }
     KadasFloatingInputWidgetField* focusedInputField() const { return mFocusedInput; }
-    bool eventFilter( QObject *obj, QEvent *ev ) override;
 
     void adjustCursorAndExtent(const QgsPointXY &geoPos );
 

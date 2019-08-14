@@ -144,16 +144,11 @@ void KadasFloatingInputWidget::setFocusedInputField( KadasFloatingInputWidgetFie
   mFocusedInput->installEventFilter( this );
 }
 
-bool KadasFloatingInputWidget::eventFilter( QObject *obj, QEvent *ev )
+void KadasFloatingInputWidget::ensureFocus()
 {
-  // If currently focused widget loses focus, make it receive focus again
-  if ( obj == mFocusedInput && mFocusedInput->isVisible() && ev->type() == QEvent::FocusOut )
-  {
-    mFocusedInput->setFocus();
-    mFocusedInput->selectAll();
-    return true;
+  if(!mFocusedInput && !mInputFields.isEmpty()) {
+    setFocusedInputField(mInputFields[0]);
   }
-  return QWidget::eventFilter( obj, ev );
 }
 
 void KadasFloatingInputWidget::adjustCursorAndExtent( const QgsPointXY& geoPos )

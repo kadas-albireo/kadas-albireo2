@@ -167,6 +167,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent* e )
     mItem->setCurrentPoint(pos, &canvas()->mapSettings());
   }
   if(mInputWidget) {
+    mInputWidget->ensureFocus();
     KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition(pos);
     for(auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it) {
       mInputWidget->inputField(it.key())->setValue(it.value());

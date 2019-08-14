@@ -143,6 +143,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent* e )
     }
   }
   if(mInputWidget && mEditContext.isValid()) {
+    mInputWidget->ensureFocus();
     KadasMapItem::AttribValues values = mItem->editAttribsFromPosition(mEditContext, pos - mMoveOffset);
     for(auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it) {
       mInputWidget->inputField(it.key())->setValue(it.value());
