@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QGridLayout>
-
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
 
