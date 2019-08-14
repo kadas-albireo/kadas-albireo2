@@ -39,6 +39,8 @@ public:
 
 private:
   Ui::KadasImageAttributesEditorBase mUi;
+
+  void adjustVisiblity();
 };
 
 #endif // KADASIMAGEATTRIBUTESEDITOR_H

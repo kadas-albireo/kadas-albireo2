@@ -25,6 +25,13 @@ KadasImageAttributesEditor::KadasImageAttributesEditor(KadasMapItem* item)
   mUi.setupUi(this);
   connect(mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasImageAttributesEditor::syncWidgetToItem);
   connect(mUi.mTextEditRemarks, &QPlainTextEdit::textChanged, this, &KadasImageAttributesEditor::syncWidgetToItem);
+  connect(item, &KadasMapItem::changed, this, &KadasImageAttributesEditor::adjustVisiblity);
+  setEnabled(false);
+}
+
+void KadasImageAttributesEditor::adjustVisiblity()
+{
+  setEnabled(mItem->state()->drawStatus != KadasMapItem::State::Empty);
 }
 
 void KadasImageAttributesEditor::reset()
