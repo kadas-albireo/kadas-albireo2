@@ -90,19 +90,18 @@ bool KadasImageItem::intersects(const QgsRectangle& rect, const QgsMapSettings &
     return false;
   }
 
-  QgsRectangle r = QgsCoordinateTransform(settings.destinationCrs(), crs(), QgsProject::instance()).transform(rect);
-  QList<QgsPointXY> points = nodes(settings);
+  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
   QgsPolygon imageRect;
   imageRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
 
   QgsPolygon filterRect;
   QgsLineString* exterior = new QgsLineString();
   exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( r.xMinimum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMinimum() ) );
+                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
+                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
+                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
+                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
+                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &imageRect );

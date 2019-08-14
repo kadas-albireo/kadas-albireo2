@@ -103,7 +103,8 @@ void KadasItemLayer::setTransformContext(const QgsCoordinateTransformContext& ct
 QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsMapSettings& mapSettings) const
 {
   for(auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it) {
-    if(it.value()->intersects(pickRect, mapSettings)) {
+    QgsCoordinateTransform crst(mapSettings.destinationCrs(), it.value()->crs(), transformContext());
+    if(it.value()->intersects(crst.transform(pickRect), mapSettings)) {
       return it.key();
     }
   }
