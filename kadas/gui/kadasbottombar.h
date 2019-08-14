@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasBottomBar : public QFrame
   public:
     KadasBottomBar( QgsMapCanvas* canvas, const QString& color = "orange" );
     bool eventFilter( QObject* obj, QEvent* event ) override;
-    void showEvent( QShowEvent */*event*/ ) override { setFixedSize( size() ); updatePosition(); }
+    void showEvent( QShowEvent */*event*/ ) override;
 
   protected:
     QgsMapCanvas* mCanvas;

@@ -38,6 +38,12 @@ bool KadasBottomBar::eventFilter( QObject *obj, QEvent *event )
   return QObject::eventFilter( obj, event );
 }
 
+void KadasBottomBar::showEvent( QShowEvent */*event*/ )
+{
+  setFixedSize( size() );
+  updatePosition();
+}
+
 void KadasBottomBar::updatePosition()
 {
   int w = width();
