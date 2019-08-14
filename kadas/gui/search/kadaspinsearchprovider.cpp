@@ -19,7 +19,8 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapcanvas.h>
 
-//#include <kadas/gui/kadaspinannotationitem.h> // TODO
+#include <kadas/core/kadasitemlayer.h>
+#include <kadas/core/mapitems/kadasimageitem.h>
 
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 
@@ -27,28 +28,30 @@ const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr
 
 void KadasPinSearchProvider::startSearch( const QString &searchtext, const SearchRegion &/*searchRegion*/ )
 {
-  // TODO
-#if 0
-  for ( QGraphicsItem* item : mMapCanvas->scene()->items() )
-  {
-    if ( dynamic_cast<QgsPinAnnotationItem*>( item ) )
-    {
-      QgsPinAnnotationItem* pin = static_cast<QgsPinAnnotationItem*>( item );
-      if ( pin->getName().contains( searchtext, Qt::CaseInsensitive ) ||
-           pin->getRemarks().contains( searchtext, Qt::CaseInsensitive ) )
+  for(QgsMapLayer* layer : mMapCanvas->layers()) {
+    KadasItemLayer* itemLayer = dynamic_cast<KadasItemLayer*>(layer);
+    if(!itemLayer) {
+      return;
+    }
+    for(KadasMapItem* item : itemLayer->items()) {
+      const KadasImageItem* imageItem = dynamic_cast<KadasImageItem*>(item);
+      if(!imageItem) {
+        continue;
+      }
+      if ( imageItem->name().contains( searchtext, Qt::CaseInsensitive ) ||
+           imageItem->remarks().contains( searchtext, Qt::CaseInsensitive ) )
       {
         SearchResult searchResult;
         searchResult.zoomScale = 1000;
         searchResult.category = sCategoryName;
         searchResult.categoryPrecedence = 2;
-        searchResult.text = tr( "Pin %1" ).arg( pin->getName() );
-        searchResult.pos = pin->mapGeoPos();
-        searchResult.crs = pin->mapGeoPosCrs().authid();
+        searchResult.text = tr( "Pin %1" ).arg( imageItem->name() );
+        searchResult.pos = imageItem->state()->pos;
+        searchResult.crs = imageItem->crs().authid();
         searchResult.showPin = false;
         emit searchResultFound( searchResult );
       }
     }
   }
-#endif
   emit searchFinished();
 }
