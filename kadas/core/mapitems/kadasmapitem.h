@@ -103,7 +103,7 @@ public:
 
   struct NumericAttribute {
       QString name;
-      double min = std::numeric_limits<double>::min();
+      double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
       int decimals = 0;
   };
