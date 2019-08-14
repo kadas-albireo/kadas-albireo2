@@ -33,19 +33,19 @@ KadasCircleItem::KadasCircleItem(const QgsCoordinateReferenceSystem &crs, bool g
   clear();
 }
 
-QList<QgsPointXY> KadasCircleItem::nodes(const QgsMapSettings &settings) const
+QList<KadasMapItem::Node> KadasCircleItem::nodes(const QgsMapSettings &settings) const
 {
   QgsCoordinateTransform crst(mCrs, QgsCoordinateReferenceSystem("EPSG:4326"), QgsProject::instance());
-  QList<QgsPointXY> points;
+  QList<Node> points;
   for(int i = 0, n = state()->centers.size(); i < n; ++i) {
     const QgsPointXY& center = state()->centers[i];
-    points.append(center);
+    points.append({center});
     if(mGeodesic) {
       QgsPointXY wgsCenter = crst.transform(center);
       QgsPointXY wgsRPos = mDa.destination( wgsCenter, state()->radii[i], 90 );
-      points.append( crst.transform(wgsRPos, QgsCoordinateTransform::ReverseTransform) );
+      points.append( {crst.transform(wgsRPos, QgsCoordinateTransform::ReverseTransform)} );
     } else {
-      points.append(QgsPointXY(center.x() + state()->radii[i], center.y()));
+      points.append( {QgsPointXY(center.x() + state()->radii[i], center.y())} );
     }
   }
   return points;

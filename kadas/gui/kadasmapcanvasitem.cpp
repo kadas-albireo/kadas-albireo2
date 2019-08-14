@@ -45,13 +45,12 @@ void KadasMapCanvasItem::paint(QPainter *painter)
     mItem->render( rc );
 
     if(mItem->selected()) {
-      rc.painter()->setPen( QPen(Qt::red, 2) );
-      rc.painter()->setBrush( Qt::white );
       QgsCoordinateTransform crst(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
-
-      for(const QgsPointXY& point : mItem->nodes(mMapCanvas->mapSettings())) {
-        QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform(crst.transform(point));
-        rc.painter()->drawRect( QRectF( screenPoint.x() - 0.5 * sHandleSize, screenPoint.y() - 0.5 * sHandleSize, sHandleSize, sHandleSize ) );
+      for(const KadasMapItem::Node& node : mItem->nodes(mMapCanvas->mapSettings())) {
+        QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform(crst.transform(node.pos));
+        screenPoint.setX(qRound(screenPoint.x()));
+        screenPoint.setY(qRound(screenPoint.y()));
+        node.render(rc.painter(), screenPoint, sHandleSize);
       }
     }
     rc.painter()->restore();

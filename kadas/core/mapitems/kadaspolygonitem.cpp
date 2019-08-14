@@ -36,11 +36,13 @@ KadasPolygonItem::KadasPolygonItem(const QgsCoordinateReferenceSystem &crs, bool
   clear();
 }
 
-QList<QgsPointXY> KadasPolygonItem::nodes(const QgsMapSettings &settings) const
+QList<KadasMapItem::Node> KadasPolygonItem::nodes(const QgsMapSettings &settings) const
 {
-  QList<QgsPointXY> nodes;
+  QList<Node> nodes;
   for(const QList<QgsPointXY>& part : state()->points) {
-    nodes.append(part);
+    for(const QgsPointXY& pos : part) {
+      nodes.append({pos});
+    }
   }
   return nodes;
 }

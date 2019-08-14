@@ -318,13 +318,13 @@ QgsRectangle KadasGeometryItem::boundingBox() const
   return mGeometry ? mGeometry->boundingBox() : QgsRectangle();
 }
 
-QList<QgsPointXY> KadasGeometryItem::nodes(const QgsMapSettings &settings) const
+QList<KadasMapItem::Node> KadasGeometryItem::nodes(const QgsMapSettings &settings) const
 {
-  QList<QgsPointXY> points;
+  QList<Node> points;
   QgsVertexId vidx;
   QgsPoint p;
   while(mGeometry->nextVertex(vidx, p)) {
-    points.append(p);
+    points.append({p});
   }
   return points;
 }

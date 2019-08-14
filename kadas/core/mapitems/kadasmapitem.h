@@ -67,7 +67,12 @@ public:
   virtual QRect margin() const { return QRect(); }
 
   /* Nodes for editing */
-  virtual QList<QgsPointXY> nodes(const QgsMapSettings& settings) const = 0;
+  struct Node {
+    QgsPointXY pos;
+    std::function<void(QPainter*, QgsPointXY, int)> render = defaultNodeRenderer;
+  };
+
+  virtual QList<Node> nodes(const QgsMapSettings& settings) const = 0;
 
   /* Hit test, rect map settings dest crs */
   virtual bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const = 0;
@@ -157,6 +162,9 @@ protected:
   bool mSelected = false;
   int mZIndex = 0;
   QgsMapLayer* mAssociatedLayer = nullptr;
+
+  static void defaultNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize);
+  static void anchorNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize);
 
 private:
   EditorFactory mEditorFactory = nullptr;

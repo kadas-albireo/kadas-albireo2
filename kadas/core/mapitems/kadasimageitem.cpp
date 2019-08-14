@@ -46,19 +46,21 @@ QgsRectangle KadasImageItem::boundingBox() const
   return QgsRectangle(state()->pos, state()->pos);
 }
 
-QList<QgsPointXY> KadasImageItem::rotatedCornerPoints() const
+QList<QgsPointXY> KadasImageItem::rotatedCornerPoints(double mup) const
 {
   double dx1 = - mAnchorX * state()->size.width();
   double dx2 = + (1. - mAnchorX) * state()->size.width();
   double dy1 = - (1. - mAnchorY) * state()->size.height();
   double dy2 = + mAnchorY * state()->size.height();
 
+  double x = state()->pos.x();
+  double y = state()->pos.y();
   double cosa = qCos(state()->angle / 180 * M_PI);
   double sina = qSin(state()->angle / 180 * M_PI);
-  QgsPoint p1(cosa * dx1 - sina * dy1, sina * dx1 + cosa * dy1);
-  QgsPoint p2(cosa * dx2 - sina * dy1, sina * dx2 + cosa * dy1);
-  QgsPoint p3(cosa * dx2 - sina * dy2, sina * dx2 + cosa * dy2);
-  QgsPoint p4(cosa * dx1 - sina * dy2, sina * dx1 + cosa * dy2);
+  QgsPointXY p1(x + (cosa * dx1 - sina * dy1) * mup, y + (sina * dx1 + cosa * dy1) * mup);
+  QgsPointXY p2(x + (cosa * dx2 - sina * dy1) * mup, y + (sina * dx2 + cosa * dy1) * mup);
+  QgsPointXY p3(x + (cosa * dx2 - sina * dy2) * mup, y + (sina * dx2 + cosa * dy2) * mup);
+  QgsPointXY p4(x + (cosa * dx1 - sina * dy2) * mup, y + (sina * dx1 + cosa * dy2) * mup);
 
   return QList<QgsPointXY>() << p1 << p2 << p3 << p4;
 }
@@ -71,17 +73,17 @@ QRect KadasImageItem::margin() const
   return QRect(maxW, maxH, maxW, maxH);
 }
 
-QList<QgsPointXY> KadasImageItem::nodes(const QgsMapSettings& settings) const
+QList<KadasMapItem::Node> KadasImageItem::nodes(const QgsMapSettings& settings) const
 {
-  QList<QgsPointXY> points = rotatedCornerPoints();
-  double mup = settings.mapUnitsPerPixel();
-  double x = state()->pos.x();
-  double y = state()->pos.y();
-  QgsPointXY p1(x + points[0].x() * mup, y + points[0].y() * mup);
-  QgsPointXY p2(x + points[1].x() * mup, y + points[1].y() * mup);
-  QgsPointXY p3(x + points[2].x() * mup, y + points[2].y() * mup);
-  QgsPointXY p4(x + points[3].x() * mup, y + points[3].y() * mup);
-  return QList<QgsPointXY>() << p1 << p2 << p3 << p4;
+  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
+  QList<Node> nodes;
+  nodes.append({points[0]});
+  nodes.append({points[1]});
+  nodes.append({points[2]});
+  nodes.append({points[3]});
+  nodes.append({QgsPointXY(0.5 * (points[1].x() + points[2].x()), 0.5 * (points[1].y() + points[2].y())), rotateNodeRenderer});
+  nodes.append({state()->pos, anchorNodeRenderer});
+  return nodes;
 }
 
 bool KadasImageItem::intersects(const QgsRectangle& rect, const QgsMapSettings &settings) const
@@ -241,4 +243,11 @@ QgsPointXY KadasImageItem::positionFromEditAttribs(const EditContext& context, c
 void KadasImageItem::recomputeDerived()
 {
   emit changed();
+}
+
+void KadasImageItem::rotateNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize)
+{
+  painter->setPen( QPen(Qt::red, 2) );
+  painter->setBrush( Qt::white );
+  painter->drawEllipse(screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
 }

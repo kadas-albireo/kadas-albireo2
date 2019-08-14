@@ -63,3 +63,17 @@ void KadasMapItem::clear()
   mState = createEmptyState();
   recomputeDerived();
 }
+
+void KadasMapItem::defaultNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize)
+{
+  painter->setPen( QPen(Qt::red, 2) );
+  painter->setBrush( Qt::white );
+  painter->drawRect( QRectF( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize ) );
+}
+
+void KadasMapItem::anchorNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize)
+{
+  painter->setPen( QPen(Qt::black, 1) );
+  painter->setBrush( Qt::red );
+  painter->drawEllipse(screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
+}

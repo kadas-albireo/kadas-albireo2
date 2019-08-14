@@ -35,7 +35,7 @@ public:
 
   QgsRectangle boundingBox() const override;
   QRect margin() const override;
-  QList<QgsPointXY> nodes(const QgsMapSettings &settings) const override;
+  QList<Node> nodes(const QgsMapSettings &settings) const override;
   bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
   void render( QgsRenderContext &context ) const override;
 
@@ -77,7 +77,9 @@ private:
   State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
-  QList<QgsPointXY> rotatedCornerPoints() const;
+  QList<QgsPointXY> rotatedCornerPoints(double mup=1.) const;
+
+  static void rotateNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize);
 };
 
 #endif // KADASIMAGEITEM_H
