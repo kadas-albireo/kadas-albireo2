@@ -91,6 +91,7 @@
         <file alias="icons/clear">icons/clear.png</file>
         <file alias="icons/pin_blue">icons/pin_blue.svg</file>
         <file alias="icons/pin_red">icons/pin_red.svg</file>
+        <file alias="icons/observer">icons/observer.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
