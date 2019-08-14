@@ -195,6 +195,7 @@ KadasApplication::KadasApplication(int& argc, char** argv)
   mClipboard = new KadasClipboard(this);
   mMainWindow = new KadasMainWindow(&splash);
   mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
+  mMainWindow->mapCanvas()->setMapUpdateInterval(1000);
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
 
