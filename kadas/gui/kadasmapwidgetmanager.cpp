@@ -47,7 +47,7 @@ void KadasMapWidgetManager::addMapWidget()
   }
 
   KadasMapWidget* mapWidget = new KadasMapWidget( highestNumber, tr( "View #%1" ).arg( highestNumber ), mMasterCanvas );
-  connect( mapWidget, SIGNAL( destroyed( QObject* ) ), this, SLOT( mapWidgetDestroyed( QObject* ) ) );
+  connect( mapWidget, &QObject::destroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
 
   // Determine whether to add the new dock widget in the right or bottom area
   int nRight = 0, nBottom = 0;
@@ -180,7 +180,7 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument& doc )
       QStringList layersList;
       ds >> layersList;
       mapWidget->setInitialLayers( layersList );
-      connect( mapWidget, SIGNAL( destroyed( QObject* ) ), this, SLOT( mapWidgetDestroyed( QObject* ) ) );
+      connect( mapWidget, &QObject::destroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
       // Compiler bug?! If I pass it directly, value is always false
       bool islocked = attributes.namedItem( "islocked" ).nodeValue().toInt();
       mapWidget->setLocked( islocked );

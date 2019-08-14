@@ -328,7 +328,7 @@ void KadasMapWidget::closeMapWidget()
   close();
   if ( mMapCanvas->isDrawing() )
   {
-    connect( mMapCanvas, SIGNAL( renderComplete( QPainter* ) ), this, SLOT( deleteLater() ) );
+    connect( mMapCanvas, &QgsMapCanvas::renderComplete, this, &KadasMapWidget::deleteLater );
   }
   else
   {

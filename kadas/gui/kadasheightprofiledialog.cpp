@@ -156,7 +156,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mHeightModeCombo = new QComboBox();
   mHeightModeCombo->addItem( tr( "Ground" ), static_cast<int>( HeightRelToGround ) );
   mHeightModeCombo->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
-  connect( mHeightModeCombo, SIGNAL( currentIndexChanged( int ) ), this, SLOT( updateLineOfSight() ) );
+  connect( mHeightModeCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, &KadasHeightProfileDialog::updateLineOfSight );
   layoutLOS->addWidget( mHeightModeCombo, 0, 5 );
 
   vboxLayout->addWidget( mLineOfSightGroupBoxgroupBox );

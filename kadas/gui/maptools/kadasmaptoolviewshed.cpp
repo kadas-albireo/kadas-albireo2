@@ -179,7 +179,7 @@ void KadasMapToolViewshed::drawFinished()
   curRadius *= QgsUnitTypes::fromUnitToUnitFactor(canvasCrs.mapUnits(), QgsUnitTypes::DistanceMeters);
 
   KadasViewshedDialog viewshedDialog( curRadius );
-  connect( &viewshedDialog, SIGNAL( radiusChanged( double ) ), this, SLOT( adjustRadius( double ) ) );
+  connect( &viewshedDialog, &KadasViewshedDialog::radiusChanged, this, &KadasMapToolViewshed::adjustRadius );
   if ( viewshedDialog.exec() == QDialog::Rejected )
   {
     clear();
