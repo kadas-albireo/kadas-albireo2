@@ -52,8 +52,6 @@ public:
   QgsRasterLayer *addRasterLayer(const QString &uri, const QString &baseName, const QString &providerKey) const;
   QgsVectorLayer* addVectorLayer(const QString &uri, const QString &layerName, const QString &providerKey) const;
   void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
-  void addMapLayers(const QList<QgsMapLayer*>& layers) const;
-  void removeLayer(QgsMapLayer* layer) const;
   KadasItemLayer* getItemLayer(const QString& layerName) const;
   KadasItemLayer* getOrCreateItemLayer(const QString& layerName);
 
@@ -77,7 +75,6 @@ public:
   void showLayerInfo(const QgsMapLayer* layer);
 
   QgsMapLayer* currentLayer() const;
-  void refreshMapCanvas() const;
 
 public slots:
   void displayMessage(const QString& message, Qgis::MessageLevel level = Qgis::Info);

@@ -278,14 +278,14 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
 
   if(layer->isValid())
   {
-    addMapLayers( QList<QgsMapLayer *>() << layer );
+    QgsProject::instance()->addMapLayer( layer );
   }
   else
   {
     if ( layer->providerType() == QLatin1String( "gdal" ) && !layer->subLayers().empty() )
     {
       QList<QgsMapLayer*> subLayers = showGDALSublayerSelectionDialog( layer );
-      addMapLayers( subLayers );
+      QgsProject::instance()->addMapLayers( subLayers );
 
       // The first layer loaded is not useful in that case. The user can select it in the list if he wants to load it.
       delete layer;
@@ -353,7 +353,7 @@ QgsVectorLayer* KadasApplication::addVectorLayer(const QString &uri, const QStri
     if ( sublayers.count() > 1 && !uri.contains( QStringLiteral( "layerid=" ) ) && !uri.contains( QStringLiteral( "layername=" ) ) )
     {
       QList<QgsMapLayer*> subLayers = showOGRSublayerSelectionDialog( layer );
-      addMapLayers(subLayers);
+      QgsProject::instance()->addMapLayers( subLayers );
 
       // The first layer loaded is not useful in that case. The user can select it in the list if he wants to load it.
       delete layer;
@@ -367,7 +367,7 @@ QgsVectorLayer* KadasApplication::addVectorLayer(const QString &uri, const QStri
         setupVectorLayer( uri, sublayers, layer, providerKey, options );
       }
 
-      addMapLayers(QList<QgsMapLayer*>() << layer);
+      QgsProject::instance()->addMapLayer(layer);
     }
   }
   else
@@ -422,26 +422,6 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
     }
     addVectorLayer(uri, baseName, QStringLiteral( "ogr" ));
   }
-}
-
-void KadasApplication::addMapLayers(const QList<QgsMapLayer*>& layers) const
-{
-  if(layers.isEmpty()) {
-    return;
-  }
-  QgsProject::instance()->addMapLayers( layers );
-  bool ok;
-  for(QgsMapLayer* layer : layers) {
-    layer->loadDefaultMetadata( ok );
-    layer->loadDefaultStyle( ok );
-  }
-  refreshMapCanvas();
-}
-
-void KadasApplication::removeLayer(QgsMapLayer* layer) const
-{
-  QgsProject::instance()->removeMapLayer(layer);
-  refreshMapCanvas();
 }
 
 KadasItemLayer* KadasApplication::getItemLayer(const QString& layerName) const
@@ -678,12 +658,6 @@ void KadasApplication::showLayerInfo(const QgsMapLayer* layer)
 QgsMapLayer* KadasApplication::currentLayer() const
 {
   return mMainWindow->layerTreeView()->currentLayer();
-}
-
-void KadasApplication::refreshMapCanvas() const
-{
-  mMainWindow->mapCanvas()->stopRendering();
-  mMainWindow->mapCanvas()->refreshAllLayers();
 }
 
 void KadasApplication::displayMessage(const QString& message, Qgis::MessageLevel level)

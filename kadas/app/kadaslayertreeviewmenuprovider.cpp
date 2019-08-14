@@ -168,7 +168,7 @@ QAction* KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
 void KadasLayerTreeViewMenuProvider::removeLayer()
 {
   QgsMapLayer* layer = mView->currentLayer();
-  kApp->removeLayer(layer);
+  QgsProject::instance()->removeMapLayer(layer);
 }
 
 void KadasLayerTreeViewMenuProvider::setLayerTransparency(int value)
