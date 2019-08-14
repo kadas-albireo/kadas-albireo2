@@ -55,7 +55,7 @@ public:
   void edit(const EditContext& context, const AttribValues& values) override;
 
   AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
-  QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const override;
+  QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings) const override;
 
   struct State : KadasMapItem::State {
     QgsPointXY pos;

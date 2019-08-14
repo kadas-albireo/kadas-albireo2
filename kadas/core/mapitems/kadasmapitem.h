@@ -145,7 +145,7 @@ public:
   virtual void edit(const EditContext& context, const AttribValues& values) = 0;
 
   virtual AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const = 0;
-  virtual QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values) const = 0;
+  virtual QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings) const = 0;
 
   // Editor
   typedef std::function<KadasMapItemEditor*(KadasMapItem*)> EditorFactory;

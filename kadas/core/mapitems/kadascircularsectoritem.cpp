@@ -188,7 +188,7 @@ KadasMapItem::AttribValues KadasCircularSectorItem::editAttribsFromPosition(cons
   return values;
 }
 
-QgsPointXY KadasCircularSectorItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+QgsPointXY KadasCircularSectorItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
   // Not yet implemented
   return QgsPointXY();

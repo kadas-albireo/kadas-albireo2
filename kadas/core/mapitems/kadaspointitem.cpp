@@ -114,7 +114,7 @@ KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition(const EditCon
   return drawAttribsFromPosition(pos);
 }
 
-QgsPointXY KadasPointItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+QgsPointXY KadasPointItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
   return positionFromDrawAttribs(values);
 }

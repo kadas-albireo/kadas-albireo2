@@ -137,7 +137,7 @@ KadasMapItem::AttribValues KadasRectangleItem::editAttribsFromPosition(const Edi
   return drawAttribsFromPosition(pos);
 }
 
-QgsPointXY KadasRectangleItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+QgsPointXY KadasRectangleItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
   return positionFromDrawAttribs(values);
 }

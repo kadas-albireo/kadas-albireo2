@@ -228,7 +228,7 @@ void KadasMapToolEditItem::inputChanged()
     // may get altered
     mIgnoreNextMoveEvent = true;
 
-    QgsPointXY newPos = mItem->positionFromEditAttribs(mEditContext, values);
+    QgsPointXY newPos = mItem->positionFromEditAttribs(mEditContext, values, mCanvas->mapSettings());
     QgsCoordinateTransform crst(mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance());
     mInputWidget->adjustCursorAndExtent( crst.transform(newPos) );
 

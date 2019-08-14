@@ -186,7 +186,7 @@ KadasMapItem::AttribValues KadasCircleItem::editAttribsFromPosition(const EditCo
   return values;
 }
 
-QgsPointXY KadasCircleItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+QgsPointXY KadasCircleItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
   if(context.vidx.part >= 0 && context.vidx.part < state()->centers.size()) {
     if(context.vidx.vertex == 0) {

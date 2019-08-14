@@ -148,7 +148,7 @@ KadasMapItem::AttribValues KadasPolygonItem::editAttribsFromPosition(const EditC
   return drawAttribsFromPosition(pos);
 }
 
-QgsPointXY KadasPolygonItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values) const
+QgsPointXY KadasPolygonItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
 {
   return positionFromDrawAttribs(values);
 }
