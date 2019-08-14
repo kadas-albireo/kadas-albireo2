@@ -18,15 +18,18 @@
 #define KADASMAPTOOLDELETEITEMS_H
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptooldrawshape.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
-class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolDrawRectangle
+class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
     KadasMapToolDeleteItems( QgsMapCanvas* mapCanvas );
     void activate() override;
-    void deleteItems( const QgsRectangle& filterRect, const QgsCoordinateReferenceSystem& filterRectCrs );
+    void deleteItems( const QgsRectangle& filterRect, const QgsCoordinateReferenceSystem& crs );
+
+  private:
+    ItemFactory itemFactory(QgsMapCanvas* canvas) const;
 
   private slots:
     void drawFinished();
