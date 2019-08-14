@@ -209,7 +209,8 @@ QgsPointXY KadasTextItem::positionFromDrawAttribs(const AttribValues& values) co
 
 KadasMapItem::EditContext KadasTextItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
 {
-  if(intersects(QgsRectangle(pos, pos), mapSettings)) {
+  double tol = mapSettings.mapUnitsPerPixel();
+  if(intersects(QgsRectangle(pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol), mapSettings)) {
     return EditContext(QgsVertexId(0, 0, 0), state()->pos, drawAttribs());
   }
   return EditContext();
