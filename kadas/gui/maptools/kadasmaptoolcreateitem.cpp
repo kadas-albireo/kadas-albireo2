@@ -247,6 +247,7 @@ void KadasMapToolCreateItem::addPoint(const QgsPointXY &pos)
 void KadasMapToolCreateItem::createItem()
 {
   mItem = mItemFactory();
+  mItem->setSelected(true);
   KadasMapCanvasItemManager::addItem(mItem);
   mStateHistory->clear();
 }
@@ -293,6 +294,7 @@ void KadasMapToolCreateItem::addPartFromGeometry(const QgsAbstractGeometry* geom
 
 void KadasMapToolCreateItem::commitItem()
 {
+  mItem->setSelected(false);
   if(mLayer) {
     mLayer->addItem(mItem);
     mLayer->triggerRepaint();
