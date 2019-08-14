@@ -35,8 +35,10 @@
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/core/kadastemporaryfile.h>
 #include <kadas/core/mapitems/kadascircularsectoritem.h>
+#include <kadas/core/mapitems/kadasimageitem.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 
 
 KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
@@ -236,11 +238,15 @@ void KadasMapToolViewshed::drawFinished()
     QgsSingleBandPseudoColorRenderer* renderer = new QgsSingleBandPseudoColorRenderer( 0, 1, shader );
     layer->setRenderer( renderer );
     QgsProject::instance()->addMapLayer( layer );
-    // TODO:
-//    QgsPinAnnotationItem* pin = new QgsPinAnnotationItem( canvas() );
-//    pin->setMapPosition( center, canvasCrs );
-//    pin->setItemFlags( pin->itemFlags() | QgsAnnotationItem::ItemMapPositionLocked );
-//    QgisApp::instance()->itemCouplingManager()->addCoupling( layer, pin );
+
+    KadasImageItem* pin = new KadasImageItem(canvasCrs, this);
+    pin->setFilePath(":/images/icons/pin_red", 0.5, 1.0);
+    pin->associateToLayer(layer);
+    KadasImageItem::State* state = const_cast<const KadasImageItem*>(pin)->state()->clone();
+    state->pos = center;
+    state->drawStatus = KadasImageItem::State::Finished;
+    pin->setState(state);
+    KadasMapCanvasItemManager::addItem(pin);
   }
   else
   {
