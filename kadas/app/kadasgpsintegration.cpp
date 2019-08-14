@@ -30,6 +30,10 @@ KadasGpsIntegration::KadasGpsIntegration(KadasMainWindow *mainWindow)
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsDisconnected, this, &KadasGpsIntegration::gpsDisconnected );
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsConnectionFailed, this, &KadasGpsIntegration::gpsConnectionFailed );
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsFixStatusChanged, this, &KadasGpsIntegration::gpsFixChanged );
+}
+
+void KadasGpsIntegration::initGui()
+{
   setGPSIcon( Qt::black );
 }
 

@@ -76,6 +76,7 @@ private:
   void mouseMoveEvent( QMouseEvent* event ) override;
   void dropEvent( QDropEvent* event ) override;
   void dragEnterEvent( QDragEnterEvent* event ) override;
+  void showEvent( QShowEvent */*event*/ ) override;
   void restoreFavoriteButton( QToolButton* button );
   void configureButtons();
   void setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), const std::function<QgsMapTool*()> &toolFactory = nullptr );

@@ -28,6 +28,7 @@ class KadasGpsIntegration : public QObject {
   Q_OBJECT
 public:
   KadasGpsIntegration( KadasMainWindow* mainWindow );
+  void initGui();
 
 public slots:
   void enableGPS( bool enabled );

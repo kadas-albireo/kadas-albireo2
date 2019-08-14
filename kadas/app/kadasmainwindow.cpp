@@ -365,6 +365,11 @@ void KadasMainWindow::dropEvent( QDropEvent* event )
   }
 }
 
+void KadasMainWindow::showEvent(QShowEvent *)
+{
+  mGpsIntegration->initGui();
+}
+
 void KadasMainWindow::restoreFavoriteButton( QToolButton* button )
 {
   QString actionName = QSettings().value( "/kadas/favoriteAction/" + button->objectName() ).toString();
