@@ -33,10 +33,14 @@ class KadasMapItem;
 
 
 class KADAS_CORE_EXPORT KadasMapItemEditor : public QWidget {
+  Q_OBJECT
+
 public:
   KadasMapItemEditor(KadasMapItem* item, QWidget* parent = nullptr) : QWidget(parent), mItem(item) {}
 
   virtual void setItem(KadasMapItem* item) { mItem = item; }
+
+public slots:
   virtual void syncItemToWidget() = 0;
   virtual void syncWidgetToItem() = 0;
 

@@ -66,7 +66,7 @@ KadasRedliningTextEditor::KadasRedliningTextEditor(KadasMapItem* item)
   mUi.mToolButtonFillColor->setColor( initialFillColor );
   connect( mUi.mToolButtonFillColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveColor );
 
-  connect( this, &KadasRedliningTextEditor::styleChanged, this, [this]{ syncWidgetToItem(); });
+  connect( this, &KadasRedliningTextEditor::styleChanged, this, &KadasRedliningTextEditor::syncWidgetToItem);
 }
 
 void KadasRedliningTextEditor::syncItemToWidget()
