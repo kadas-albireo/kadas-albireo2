@@ -28,6 +28,10 @@ public:
 
   void setFilePath(const QString& path, double anchorX = 0.5, double anchorY = 0.5);
   const QString& filePath() const{ return mFilePath; }
+  void setName(const QString& name) { mName = name; }
+  const QString& name() const{ return mName; }
+  void setRemarks(const QString& remarks) { mRemarks = remarks; }
+  const QString& remarks() const{ return mRemarks; }
 
   QgsRectangle boundingBox() const override;
   QRect margin() const override;
@@ -67,6 +71,8 @@ private:
   QString mFilePath;
   double mAnchorX = 0.5;
   double mAnchorY = 0.5;
+  QString mName;
+  QString mRemarks;
 
   State* state(){ return static_cast<State*>(mState); }
   State* createEmptyState() const override { return new State(); }

@@ -44,6 +44,8 @@
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
+#include <kadas/gui/mapitemeditors/kadasimageattributeseditor.h>
+
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
@@ -812,6 +814,7 @@ QgsMapTool* KadasMainWindow::createPinTool()
   KadasMapToolCreateItem::ItemFactory factory = [this] {
     KadasImageItem* item = new KadasImageItem(mapCanvas()->mapSettings().destinationCrs());
     item->setFilePath(":/images/icons/pin_red", 0.5, 1.0);
+    item->setEditorFactory(KadasImageAttributesEditor::factory);
     return item;
   };
   return new KadasMapToolCreateItem(mapCanvas(), factory, kApp->getOrCreateItemLayer(tr("Pins")));
