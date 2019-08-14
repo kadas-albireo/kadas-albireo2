@@ -41,6 +41,7 @@ public:
   virtual void setItem(KadasMapItem* item) { mItem = item; }
 
 public slots:
+  virtual void reset() {};
   virtual void syncItemToWidget() = 0;
   virtual void syncWidgetToItem() = 0;
 

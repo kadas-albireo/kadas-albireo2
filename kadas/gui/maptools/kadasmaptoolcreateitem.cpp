@@ -131,6 +131,7 @@ void KadasMapToolCreateItem::clear()
   createItem();
   if(mEditor) {
     mEditor->setItem(mItem);
+    mEditor->reset();
     mEditor->syncWidgetToItem();
   }
   emit cleared();

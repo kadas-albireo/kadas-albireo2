@@ -33,6 +33,7 @@ public:
 
   KadasImageAttributesEditor(KadasMapItem* item);
 
+  void reset() override;
   void syncItemToWidget() override;
   void syncWidgetToItem() override;
 

@@ -27,6 +27,12 @@ KadasImageAttributesEditor::KadasImageAttributesEditor(KadasMapItem* item)
   connect(mUi.mTextEditRemarks, &QPlainTextEdit::textChanged, this, &KadasImageAttributesEditor::syncWidgetToItem);
 }
 
+void KadasImageAttributesEditor::reset()
+{
+  mUi.mLineEditName->setText("");
+  mUi.mTextEditRemarks->setPlainText("");
+}
+
 void KadasImageAttributesEditor::syncItemToWidget()
 {
   KadasImageItem* imageItem = dynamic_cast<KadasImageItem*>(mItem);
