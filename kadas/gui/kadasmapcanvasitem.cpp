@@ -42,7 +42,9 @@ void KadasMapCanvasItem::paint(QPainter *painter)
 
     rc.painter()->save();
     rc.painter()->translate( -pos() );
+    rc.painter()->save();
     mItem->render( rc );
+    rc.painter()->restore();
 
     if(mItem->selected()) {
       QgsCoordinateTransform crst(mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext());
@@ -50,7 +52,9 @@ void KadasMapCanvasItem::paint(QPainter *painter)
         QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform(crst.transform(node.pos));
         screenPoint.setX(qRound(screenPoint.x()));
         screenPoint.setY(qRound(screenPoint.y()));
+        rc.painter()->save();
         node.render(rc.painter(), screenPoint, sHandleSize);
+        rc.painter()->restore();
       }
     }
     rc.painter()->restore();

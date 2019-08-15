@@ -67,8 +67,6 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     return;
   }
 
-  context.painter()->save();
-
   if ( QgsWkbTypes::geometryType(mGeometry->wkbType()) == QgsWkbTypes::PolygonGeometry )
   {
     context.painter()->setBrush( mBrush );
@@ -111,7 +109,6 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     context.painter()->drawText(labelRect, Qt::AlignCenter|Qt::AlignVCenter, label.string);
   }
   delete paintGeom;
-  context.painter()->restore();
 }
 
 void KadasGeometryItem::drawVertex( QPainter* p, double x, double y ) const
