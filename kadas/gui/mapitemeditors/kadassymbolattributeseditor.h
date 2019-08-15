@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasimageattributeseditor.h
-    ----------------------------
+    kadassymbolattributeseditor.h
+    -----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,33 +14,33 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASIMAGEATTRIBUTESEDITOR_H
-#define KADASIMAGEATTRIBUTESEDITOR_H
+#ifndef KADASSYMBOLATTRIBUTESEDITOR_H
+#define KADASSYMBOLATTRIBUTESEDITOR_H
 
 #include <kadas/core/mapitems/kadasmapitem.h>
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/ui_kadasimageattributeseditor.h>
+#include <kadas/gui/ui_kadassymbolattributeseditor.h>
 
-class KADAS_GUI_EXPORT KadasImageAttributesEditor : public KadasMapItemEditor
+class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
 {
   Q_OBJECT
 
 public:
   static KadasMapItemEditor* factory(KadasMapItem* item) {
-    return new KadasImageAttributesEditor(item);
+    return new KadasSymbolAttributesEditor(item);
   }
 
-  KadasImageAttributesEditor(KadasMapItem* item);
+  KadasSymbolAttributesEditor(KadasMapItem* item);
 
   void reset() override;
   void syncItemToWidget() override;
   void syncWidgetToItem() override;
 
 private:
-  Ui::KadasImageAttributesEditorBase mUi;
+  Ui::KadasSymbolAttributesEditorBase mUi;
 
   void adjustVisiblity();
 };
 
-#endif // KADASIMAGEATTRIBUTESEDITOR_H
+#endif // KADASSYMBOLATTRIBUTESEDITOR_H

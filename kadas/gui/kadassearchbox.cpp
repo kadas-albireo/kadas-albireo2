@@ -33,7 +33,7 @@
 #include <qgis/qgsproject.h>
 
 #include <kadas/core/mapitems/kadascircleitem.h>
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 #include <kadas/core/mapitems/kadaspolygonitem.h>
 #include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
@@ -441,13 +441,13 @@ void KadasSearchBox::resultSelected()
     {
       if ( !mPin )
       {
-        mPin = new KadasImageItem(mMapCanvas->mapSettings().destinationCrs(), this);
+        mPin = new KadasSymbolItem(mMapCanvas->mapSettings().destinationCrs(), this);
         mPin->setFilePath(":/kadas/icons/pin_blue", 0.5, 1.0);
         KadasMapCanvasItemManager::addItem(mPin);
       }
-      KadasImageItem::State* state = const_cast<const KadasImageItem*>(mPin)->state()->clone();
+      KadasSymbolItem::State* state = const_cast<const KadasSymbolItem*>(mPin)->state()->clone();
       state->pos = QgsCoordinateTransform(QgsCoordinateReferenceSystem(result.crs), mPin->crs(), QgsProject::instance()).transform(result.pos);
-      state->drawStatus = KadasImageItem::State::Finished;
+      state->drawStatus = KadasSymbolItem::State::Finished;
       mPin->setState(state);
     } else {
       clearPin();

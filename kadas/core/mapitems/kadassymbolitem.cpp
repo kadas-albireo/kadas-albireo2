@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasimageitem.cpp
-    ------------------
+    kadassymbolitem.cpp
+    --------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -22,16 +22,16 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 
 
-KadasImageItem::KadasImageItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
+KadasSymbolItem::KadasSymbolItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
   : KadasAnchoredItem(crs, parent)
 {
   clear();
 }
 
-void KadasImageItem::setFilePath(const QString &path, double anchorX, double anchorY)
+void KadasSymbolItem::setFilePath(const QString &path, double anchorX, double anchorY)
 {
   mFilePath = path;
   setAnchor(anchorX, anchorY);
@@ -40,7 +40,7 @@ void KadasImageItem::setFilePath(const QString &path, double anchorX, double anc
   emit changed();
 }
 
-void KadasImageItem::render( QgsRenderContext &context ) const
+void KadasSymbolItem::render( QgsRenderContext &context ) const
 {
   if(state()->drawStatus == State::Empty) {
     return;

@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasimageitem.h
-    ----------------
+    kadassymbolitem.h
+    -----------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,17 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASIMAGEITEM_H
-#define KADASIMAGEITEM_H
+#ifndef KADASSYMBOLITEM_H
+#define KADASSYMBOLITEM_H
 
 #include <kadas/core/kadas_core.h>
 #include <kadas/core/mapitems/kadasanchoreditem.h>
 
 
-class KADAS_CORE_EXPORT KadasImageItem : public KadasAnchoredItem
+class KADAS_CORE_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
 public:
-  KadasImageItem(const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr);
+  KadasSymbolItem(const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr);
 
   void setFilePath(const QString& path, double anchorX = 0.5, double anchorY = 0.5);
   const QString& filePath() const{ return mFilePath; }
@@ -41,4 +41,4 @@ private:
   QString mRemarks;
 };
 
-#endif // KADASIMAGEITEM_H
+#endif // KADASSYMBOLITEM_H

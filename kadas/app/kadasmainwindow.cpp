@@ -31,7 +31,7 @@
 #include <qgis/qgssourceselectprovider.h>
 
 #include <kadas/core/mapitems/kadasmapitem.h>
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
@@ -44,7 +44,7 @@
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
-#include <kadas/gui/mapitemeditors/kadasimageattributeseditor.h>
+#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
@@ -817,9 +817,9 @@ int KadasMainWindow::messageTimeout() const
 QgsMapTool* KadasMainWindow::createPinTool()
 {
   KadasMapToolCreateItem::ItemFactory factory = [this] {
-    KadasImageItem* item = new KadasImageItem(mapCanvas()->mapSettings().destinationCrs());
+    KadasSymbolItem* item = new KadasSymbolItem(mapCanvas()->mapSettings().destinationCrs());
     item->setFilePath(":/kadas/icons/pin_red", 0.5, 1.0);
-    item->setEditorFactory(KadasImageAttributesEditor::factory);
+    item->setEditorFactory(KadasSymbolAttributesEditor::factory);
     return item;
   };
   return new KadasMapToolCreateItem(mapCanvas(), factory, kApp->getOrCreateItemLayer(tr("Pins")));

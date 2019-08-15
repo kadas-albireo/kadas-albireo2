@@ -20,7 +20,7 @@
 #include <qgis/qgsmapcanvas.h>
 
 #include <kadas/core/kadasitemlayer.h>
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 
@@ -34,20 +34,20 @@ void KadasPinSearchProvider::startSearch( const QString &searchtext, const Searc
       return;
     }
     for(KadasMapItem* item : itemLayer->items()) {
-      const KadasImageItem* imageItem = dynamic_cast<KadasImageItem*>(item);
-      if(!imageItem) {
+      const KadasSymbolItem* symbolItem = dynamic_cast<KadasSymbolItem*>(item);
+      if(!symbolItem) {
         continue;
       }
-      if ( imageItem->name().contains( searchtext, Qt::CaseInsensitive ) ||
-           imageItem->remarks().contains( searchtext, Qt::CaseInsensitive ) )
+      if ( symbolItem->name().contains( searchtext, Qt::CaseInsensitive ) ||
+           symbolItem->remarks().contains( searchtext, Qt::CaseInsensitive ) )
       {
         SearchResult searchResult;
         searchResult.zoomScale = 1000;
         searchResult.category = sCategoryName;
         searchResult.categoryPrecedence = 2;
-        searchResult.text = tr( "Pin %1" ).arg( imageItem->name() );
-        searchResult.pos = imageItem->state()->pos;
-        searchResult.crs = imageItem->crs().authid();
+        searchResult.text = tr( "Pin %1" ).arg( symbolItem->name() );
+        searchResult.pos = symbolItem->state()->pos;
+        searchResult.crs = symbolItem->crs().authid();
         searchResult.showPin = false;
         emit searchResultFound( searchResult );
       }

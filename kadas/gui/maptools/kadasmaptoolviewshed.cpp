@@ -35,7 +35,7 @@
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/core/kadastemporaryfile.h>
 #include <kadas/core/mapitems/kadascircularsectoritem.h>
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
@@ -239,12 +239,12 @@ void KadasMapToolViewshed::drawFinished()
     layer->setRenderer( renderer );
     QgsProject::instance()->addMapLayer( layer );
 
-    KadasImageItem* pin = new KadasImageItem(canvasCrs, this);
+    KadasSymbolItem* pin = new KadasSymbolItem(canvasCrs, this);
     pin->setFilePath(":/kadas/icons/pin_red", 0.5, 1.0);
     pin->associateToLayer(layer);
-    KadasImageItem::State* state = const_cast<const KadasImageItem*>(pin)->state()->clone();
+    KadasSymbolItem::State* state = const_cast<const KadasSymbolItem*>(pin)->state()->clone();
     state->pos = center;
-    state->drawStatus = KadasImageItem::State::Finished;
+    state->drawStatus = KadasSymbolItem::State::Finished;
     pin->setState(state);
     KadasMapCanvasItemManager::addItem(pin);
   }

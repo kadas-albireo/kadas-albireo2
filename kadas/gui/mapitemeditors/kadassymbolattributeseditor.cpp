@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasimageattributeseditor.cpp
-    ------------------------------
+    kadassymbolattributeseditor.cpp
+    -------------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,52 +14,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadas/core/mapitems/kadasimageitem.h>
+#include <kadas/core/mapitems/kadassymbolitem.h>
 
-#include <kadas/gui/mapitemeditors/kadasimageattributeseditor.h>
+#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 
 
-KadasImageAttributesEditor::KadasImageAttributesEditor(KadasMapItem* item)
+KadasSymbolAttributesEditor::KadasSymbolAttributesEditor(KadasMapItem* item)
   : KadasMapItemEditor(item)
 {
   mUi.setupUi(this);
-  connect(mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasImageAttributesEditor::syncWidgetToItem);
-  connect(mUi.mTextEditRemarks, &QPlainTextEdit::textChanged, this, &KadasImageAttributesEditor::syncWidgetToItem);
-  connect(item, &KadasMapItem::changed, this, &KadasImageAttributesEditor::adjustVisiblity);
+  connect(mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem);
+  connect(mUi.mTextEditRemarks, &QPlainTextEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem);
+  connect(item, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity);
   setEnabled(false);
 }
 
-void KadasImageAttributesEditor::adjustVisiblity()
+void KadasSymbolAttributesEditor::adjustVisiblity()
 {
   setEnabled(mItem->state()->drawStatus != KadasMapItem::State::Empty);
 }
 
-void KadasImageAttributesEditor::reset()
+void KadasSymbolAttributesEditor::reset()
 {
   mUi.mLineEditName->setText("");
   mUi.mTextEditRemarks->setPlainText("");
 }
 
-void KadasImageAttributesEditor::syncItemToWidget()
+void KadasSymbolAttributesEditor::syncItemToWidget()
 {
-  KadasImageItem* imageItem = dynamic_cast<KadasImageItem*>(mItem);
-  if(!imageItem) {
+  KadasSymbolItem* symbolItem = dynamic_cast<KadasSymbolItem*>(mItem);
+  if(!symbolItem) {
     return;
   }
   mUi.mLineEditName->blockSignals(true);
-  mUi.mLineEditName->setText(imageItem->name());
+  mUi.mLineEditName->setText(symbolItem->name());
   mUi.mLineEditName->blockSignals(false);
   mUi.mTextEditRemarks->blockSignals(true);
-  mUi.mTextEditRemarks->setPlainText(imageItem->remarks());
+  mUi.mTextEditRemarks->setPlainText(symbolItem->remarks());
   mUi.mTextEditRemarks->blockSignals(false);
 }
 
-void KadasImageAttributesEditor::syncWidgetToItem()
+void KadasSymbolAttributesEditor::syncWidgetToItem()
 {
-  KadasImageItem* imageItem = dynamic_cast<KadasImageItem*>(mItem);
-  if(!imageItem) {
+  KadasSymbolItem* symbolItem = dynamic_cast<KadasSymbolItem*>(mItem);
+  if(!symbolItem) {
     return;
   }
-  imageItem->setName(mUi.mLineEditName->text());
-  imageItem->setRemarks(mUi.mTextEditRemarks->toPlainText());
+  symbolItem->setName(mUi.mLineEditName->text());
+  symbolItem->setRemarks(mUi.mTextEditRemarks->toPlainText());
 }

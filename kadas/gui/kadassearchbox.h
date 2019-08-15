@@ -29,7 +29,7 @@
 class QToolButton;
 class QgsMapCanvas;
 class KadasMapItem;
-class KadasImageItem;
+class KadasSymbolItem;
 class KadasMapToolCreateItem;
 
 class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
@@ -62,7 +62,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     static const int sResultDataRole;
 
     QgsMapCanvas* mMapCanvas;
-    KadasImageItem* mPin = nullptr;
+    KadasSymbolItem* mPin = nullptr;
     KadasMapToolCreateItem* mFilterTool = nullptr;
     KadasMapItem* mFilterItem = nullptr;
     QList<KadasSearchProvider*> mSearchProviders;
