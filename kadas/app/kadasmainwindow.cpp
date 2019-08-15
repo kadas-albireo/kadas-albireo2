@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QDrag>
+#include <QFileDialog>
+#include <QImageReader>
 #include <QMenu>
 #include <QMessageBox>
 #include <QShortcut>
@@ -31,6 +33,7 @@
 #include <qgis/qgssourceselectprovider.h>
 
 #include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/core/mapitems/kadaspictureitem.h>
 #include <kadas/core/mapitems/kadassymbolitem.h>
 
 #include <kadas/gui/kadasclipboard.h>
@@ -48,6 +51,7 @@
 
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
+#include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
@@ -445,9 +449,9 @@ void KadasMainWindow::configureButtons()
 //  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
 
   // Draw tab
-  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this]{ return createPinTool(); } );
+  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this]{ return addPinTool(); } );
 
-  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), nullptr );
+  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), [this]{ return addPictureTool(); } );
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), nullptr );
 
@@ -512,9 +516,11 @@ void KadasMainWindow::setActionToButton(QAction* action, QToolButton* button, co
     button->setCheckable( true );
     connect( action, &QAction::triggered, [this, toolFactory, action]{
       QgsMapTool* tool = toolFactory();
-      connect(tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater);
-      tool->setAction( action );
-      mMapCanvas->setMapTool( tool );
+      if(tool) {
+        connect(tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater);
+        tool->setAction( action );
+        mMapCanvas->setMapTool( tool );
+      }
     });
   }
   if(!shortcut.isEmpty())
@@ -814,7 +820,7 @@ int KadasMainWindow::messageTimeout() const
   return QSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
 }
 
-QgsMapTool* KadasMainWindow::createPinTool()
+QgsMapTool* KadasMainWindow::addPinTool()
 {
   KadasMapToolCreateItem::ItemFactory factory = [this] {
     KadasSymbolItem* item = new KadasSymbolItem(mapCanvas()->mapSettings().destinationCrs());
@@ -823,4 +829,37 @@ QgsMapTool* KadasMainWindow::createPinTool()
     return item;
   };
   return new KadasMapToolCreateItem(mapCanvas(), factory, kApp->getOrCreateItemLayer(tr("Pins")));
+}
+
+QgsMapTool* KadasMainWindow::addPictureTool()
+{
+  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QSet<QString> formats;
+  for ( const QByteArray& format : QImageReader::supportedImageFormats() )
+  {
+    formats.insert( QString( "*.%1" ).arg( QString( format ).toLower() ) );
+  }
+  formats.insert( "*.svg" ); // Ensure svg is present
+
+  QString filter = QString( "Images (%1)" ).arg( QStringList( formats.toList() ).join( " " ) );
+  QString filename = QFileDialog::getOpenFileName( this, tr( "Select Image" ), lastDir, filter );
+  if ( filename.isEmpty() )
+  {
+    return nullptr;
+  }
+  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QString errMsg;
+  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
+  {
+    KadasSymbolItem* item = new KadasSymbolItem(mapCanvas()->mapSettings().destinationCrs());
+    item->setFilePath( filename );
+    item->setPosition(mapCanvas()->extent().center());
+    return new KadasMapToolEditItem(mapCanvas(), item, kApp->getOrCreateItemLayer(tr("SVG graphics")));
+  }
+  else
+  {
+    KadasPictureItem* item = new KadasPictureItem(mapCanvas()->mapSettings().destinationCrs());
+    item->setFilePath(filename, mapCanvas()->extent().center());
+    return new KadasMapToolEditItem(mapCanvas(), item, kApp->getOrCreateItemLayer(tr("Pictures")));
+  }
 }
