@@ -242,10 +242,7 @@ void KadasMapToolViewshed::drawFinished()
     KadasSymbolItem* pin = new KadasSymbolItem(canvasCrs, this);
     pin->setFilePath(":/kadas/icons/pin_red", 0.5, 1.0);
     pin->associateToLayer(layer);
-    KadasSymbolItem::State* state = const_cast<const KadasSymbolItem*>(pin)->state()->clone();
-    state->pos = center;
-    state->drawStatus = KadasSymbolItem::State::Finished;
-    pin->setState(state);
+    pin->setPosition(center);
     KadasMapCanvasItemManager::addItem(pin);
   }
   else

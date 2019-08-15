@@ -35,6 +35,13 @@ void KadasAnchoredItem::setAnchor(double anchorX, double anchorY)
   mAnchorY = anchorY;
 }
 
+void KadasAnchoredItem::setPosition(const QgsPointXY& pos)
+{
+  state()->pos = pos;
+  state()->drawStatus = State::DrawStatus::Finished;
+  emit changed();
+}
+
 QgsRectangle KadasAnchoredItem::boundingBox() const
 {
   return QgsRectangle(state()->pos, state()->pos);

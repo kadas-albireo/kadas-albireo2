@@ -29,6 +29,8 @@ public:
   // Item anchor point, as factors of its width/height
   void setAnchor(double anchorX, double anchorY);
 
+  void setPosition(const QgsPointXY& pos);
+
   QgsRectangle boundingBox() const override;
   QRect margin() const override;
   QList<Node> nodes(const QgsMapSettings &settings) const override;

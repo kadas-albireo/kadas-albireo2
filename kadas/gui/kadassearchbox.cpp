@@ -445,10 +445,7 @@ void KadasSearchBox::resultSelected()
         mPin->setFilePath(":/kadas/icons/pin_blue", 0.5, 1.0);
         KadasMapCanvasItemManager::addItem(mPin);
       }
-      KadasSymbolItem::State* state = const_cast<const KadasSymbolItem*>(mPin)->state()->clone();
-      state->pos = QgsCoordinateTransform(QgsCoordinateReferenceSystem(result.crs), mPin->crs(), QgsProject::instance()).transform(result.pos);
-      state->drawStatus = KadasSymbolItem::State::Finished;
-      mPin->setState(state);
+      mPin->setPosition(QgsCoordinateTransform(QgsCoordinateReferenceSystem(result.crs), mPin->crs(), QgsProject::instance()).transform(result.pos));
     } else {
       clearPin();
     }
