@@ -32,6 +32,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
 {
 public:
   KadasMapToolEditItem(QgsMapCanvas* canvas, const QString& itemId, KadasItemLayer* layer);
+  KadasMapToolEditItem(QgsMapCanvas* canvas, KadasMapItem* item, KadasItemLayer* layer);
   ~KadasMapToolEditItem();
 
   void activate() override;

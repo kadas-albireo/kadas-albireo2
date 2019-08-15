@@ -36,6 +36,14 @@ KadasMapToolEditItem::KadasMapToolEditItem(QgsMapCanvas* canvas, const QString& 
   KadasMapCanvasItemManager::addItem(mItem);
 }
 
+KadasMapToolEditItem::KadasMapToolEditItem(QgsMapCanvas* canvas, KadasMapItem* item, KadasItemLayer* layer)
+  : QgsMapTool(canvas)
+  , mLayer(layer)
+  , mItem(item)
+{
+  KadasMapCanvasItemManager::addItem(mItem);
+}
+
 KadasMapToolEditItem::~KadasMapToolEditItem()
 {
 
