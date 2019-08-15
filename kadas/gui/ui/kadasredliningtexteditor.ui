@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>54</height>
+    <width>392</width>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
    <item row="1" column="1">
     <widget class="QSpinBox" name="mSpinBoxSize">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -67,7 +67,7 @@
    <item row="1" column="2">
     <widget class="QPushButton" name="mPushButtonBold">
      <property name="icon">
-      <iconset resource="../../resources/resources.qrc">
+      <iconset>
        <normaloff>:/kadas/icons/textBold</normaloff>:/kadas/icons/textBold</iconset>
      </property>
      <property name="checkable">
@@ -78,7 +78,7 @@
    <item row="1" column="3">
     <widget class="QPushButton" name="mPushButtonItalic">
      <property name="icon">
-      <iconset resource="../../resources/resources.qrc">
+      <iconset>
        <normaloff>:/kadas/icons/textItalic</normaloff>:/kadas/icons/textItalic</iconset>
      </property>
      <property name="checkable">
@@ -86,23 +86,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
-    <widget class="QDoubleSpinBox" name="mSpinBoxAngle">
-     <property name="wrapping">
-      <bool>true</bool>
-     </property>
-     <property name="suffix">
-      <string>°</string>
-     </property>
-     <property name="decimals">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <double>359.899999999999977</double>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="4">
+   <item row="0" column="1" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="mLabelFillColor">
@@ -186,8 +170,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

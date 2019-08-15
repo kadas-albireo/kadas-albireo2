@@ -48,9 +48,6 @@ KadasRedliningTextEditor::KadasRedliningTextEditor(KadasMapItem* item)
   mUi.mPushButtonItalic->setChecked(font.italic());
   connect(mUi.mPushButtonItalic, &QPushButton::toggled, this, &KadasRedliningTextEditor::saveFont);
 
-  mUi.mSpinBoxAngle->setValue(QgsSettings().value("/Redlining/textRotation", 0.0).toDouble());
-  connect(mUi.mSpinBoxAngle, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &KadasRedliningTextEditor::saveRotation);
-
   mUi.mToolButtonBorderColor->setAllowOpacity( true );
   mUi.mToolButtonBorderColor->setShowNoColor( true );
   mUi.mToolButtonBorderColor->setProperty( "settings_key", "text_outline_color" );
@@ -103,10 +100,6 @@ void KadasRedliningTextEditor::syncItemToWidget()
   mUi.mPushButtonItalic->blockSignals(true);
   mUi.mPushButtonItalic->setChecked(textItem->font().italic());
   mUi.mPushButtonItalic->blockSignals(false);
-
-  mUi.mSpinBoxAngle->blockSignals(true);
-  mUi.mSpinBoxAngle->setValue(textItem->rotation());
-  mUi.mSpinBoxAngle->blockSignals(false);
 }
 
 void KadasRedliningTextEditor::syncWidgetToItem()
@@ -119,7 +112,6 @@ void KadasRedliningTextEditor::syncWidgetToItem()
   textItem->setOutlineColor(mUi.mToolButtonBorderColor->color());
   textItem->setFillColor(mUi.mToolButtonFillColor->color());
   textItem->setFont(currentFont());
-  textItem->setRotation(mUi.mSpinBoxAngle->value());
 }
 
 QFont KadasRedliningTextEditor::currentFont() const
@@ -142,12 +134,6 @@ void KadasRedliningTextEditor::saveColor()
 void KadasRedliningTextEditor::saveFont()
 {
   QgsSettings().setValue( "/Redlining/font", currentFont().toString() );
-  emit styleChanged();
-}
-
-void KadasRedliningTextEditor::saveRotation()
-{
-  QgsSettings().setValue( "/Redlining/textRotation", mUi.mSpinBoxAngle->value() );
   emit styleChanged();
 }
 

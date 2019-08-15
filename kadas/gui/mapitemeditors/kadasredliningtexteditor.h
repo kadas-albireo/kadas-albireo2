@@ -47,7 +47,6 @@ signals:
 private slots:
   void saveColor();
   void saveFont();
-  void saveRotation();
   void saveText();
 };
 

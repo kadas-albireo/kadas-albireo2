@@ -24,7 +24,7 @@
 
 
 KadasTextItem::KadasTextItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
-  : KadasMapItem(crs, parent)
+  : KadasAnchoredItem(crs, parent)
 {
   clear();
 }
@@ -32,6 +32,9 @@ KadasTextItem::KadasTextItem(const QgsCoordinateReferenceSystem &crs, QObject* p
 void KadasTextItem::setText(const QString& text)
 {
   mText = text;
+  QFontMetrics metrics(mFont);
+  state()->size.setWidth(metrics.width(mText));
+  state()->size.setHeight(metrics.height());
   emit changed();
 }
 
@@ -50,86 +53,10 @@ void KadasTextItem::setOutlineColor( const QColor& c )
 void KadasTextItem::setFont( const QFont& font )
 {
   mFont = font;
-  emit changed();
-}
-
-void KadasTextItem::setRotation(double angle)
-{
-  mAngle = angle;
-  emit changed();
-}
-
-QgsRectangle KadasTextItem::boundingBox() const
-{
-  return QgsRectangle(state()->pos, state()->pos);
-}
-
-QList<QgsPointXY> KadasTextItem::rotatedCornerPoints(double mup) const
-{
   QFontMetrics metrics(mFont);
-  double halfW = 0.5 * metrics.width(mText);
-  double halfH = 0.5 * metrics.height();
-  double dx1 = - halfW;
-  double dx2 = + halfW;
-  double dy1 = - halfH;
-  double dy2 = + halfH;
-
-  double x = state()->pos.x();
-  double y = state()->pos.y();
-  double cosa = qCos(mAngle / 180 * M_PI);
-  double sina = qSin(mAngle / 180 * M_PI);
-  QgsPointXY p1(x + (cosa * dx1 - sina * dy1) * mup, y + (sina * dx1 + cosa * dy1) * mup);
-  QgsPointXY p2(x + (cosa * dx2 - sina * dy1) * mup, y + (sina * dx2 + cosa * dy1) * mup);
-  QgsPointXY p3(x + (cosa * dx2 - sina * dy2) * mup, y + (sina * dx2 + cosa * dy2) * mup);
-  QgsPointXY p4(x + (cosa * dx1 - sina * dy2) * mup, y + (sina * dx1 + cosa * dy2) * mup);
-
-  return QList<QgsPointXY>() << p1 << p2 << p3 << p4;
-}
-
-QRect KadasTextItem::margin() const
-{
-  QList<QgsPointXY> points = rotatedCornerPoints();
-  int maxW = qMax(qMax(qAbs(points[0].x()), qAbs(points[1].x())), qMax(qAbs(points[2].x()), qAbs(points[3].x()))) + 1;
-  int maxH = qMax(qMax(qAbs(points[0].y()), qAbs(points[1].y())), qMax(qAbs(points[2].y()), qAbs(points[3].y()))) + 1;
-  return QRect(maxW, maxH, maxW, maxH);
-}
-
-QList<KadasMapItem::Node> KadasTextItem::nodes(const QgsMapSettings& settings) const
-{
-  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
-  QList<Node> nodes;
-  nodes.append({points[0]});
-  nodes.append({points[1]});
-  nodes.append({points[2]});
-  nodes.append({points[3]});
-  nodes.append({state()->pos, anchorNodeRenderer});
-  return nodes;
-}
-
-bool KadasTextItem::intersects(const QgsRectangle& rect, const QgsMapSettings &settings) const
-{
-  if(mText.isEmpty()) {
-    return false;
-  }
-
-  QList<QgsPointXY> points = rotatedCornerPoints(settings.mapUnitsPerPixel());
-  QgsPolygon textRect;
-  textRect.setExteriorRing( new QgsLineString( QgsPointSequence() << QgsPoint(points[0]) << QgsPoint(points[1]) << QgsPoint(points[2]) << QgsPoint(points[3]) << QgsPoint(points[0]) ) );
-
-  QgsPolygon filterRect;
-  QgsLineString* exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
-  filterRect.setExteriorRing( exterior );
-
-  QgsGeometryEngine* geomEngine = QgsGeometry::createGeometryEngine( &textRect );
-  bool intersects = geomEngine->intersects(&filterRect);
-  delete geomEngine;
-  return intersects;
+  state()->size.setWidth(metrics.width(mText));
+  state()->size.setHeight(metrics.height());
+  emit changed();
 }
 
 void KadasTextItem::render( QgsRenderContext &context ) const
@@ -140,106 +67,12 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   QRect bbox = metrics.boundingRect(mText);
   int baselineOffset = metrics.ascent() - 0.5 * metrics.height();
 
-  context.painter()->save();
   context.painter()->setBrush( QBrush(mFillColor) );
   context.painter()->setPen( QPen(mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin) );
   context.painter()->setFont( mFont );
   QPainterPath path;
   path.addText(-0.5 * bbox.width(), baselineOffset, mFont, mText);
   context.painter()->translate(pos);
-  context.painter()->rotate(-mAngle);
+  context.painter()->rotate(-state()->angle);
   context.painter()->drawPath(path);
-  context.painter()->restore();
-}
-
-bool KadasTextItem::startPart(const QgsPointXY& firstPoint)
-{
-  state()->drawStatus = State::Drawing;
-  state()->pos = firstPoint;
-  recomputeDerived();
-  return false;
-}
-
-bool KadasTextItem::startPart(const AttribValues& values)
-{
-  return startPart(QgsPointXY(values[AttrX], values[AttrY]));
-}
-
-void KadasTextItem::setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings)
-{
-  // Do nothing
-}
-
-void KadasTextItem::setCurrentAttributes(const AttribValues& values)
-{
-  // Do nothing
-}
-
-bool KadasTextItem::continuePart()
-{
-  // No further action allowed
-  return false;
-}
-
-void KadasTextItem::endPart()
-{
-  state()->drawStatus = State::Finished;
-}
-
-KadasMapItem::AttribDefs KadasTextItem::drawAttribs() const
-{
-  AttribDefs attributes;
-  attributes.insert(AttrX, NumericAttribute{"x"});
-  attributes.insert(AttrY, NumericAttribute{"y"});
-  return attributes;
-}
-
-KadasMapItem::AttribValues KadasTextItem::drawAttribsFromPosition(const QgsPointXY& pos) const
-{
-  AttribValues values;
-  values.insert(AttrX, pos.x());
-  values.insert(AttrY, pos.y());
-  return values;
-}
-
-QgsPointXY KadasTextItem::positionFromDrawAttribs(const AttribValues& values) const
-{
-  return QgsPointXY(values[AttrX], values[AttrY]);
-}
-
-KadasMapItem::EditContext KadasTextItem::getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const
-{
-  double tol = mapSettings.mapUnitsPerPixel();
-  if(intersects(QgsRectangle(pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol), mapSettings)) {
-    return EditContext(QgsVertexId(0, 0, 0), state()->pos, drawAttribs());
-  }
-  return EditContext();
-}
-
-void KadasTextItem::edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings)
-{
-  if(context.vidx.isValid()) {
-    state()->pos = newPoint;
-    recomputeDerived();
-  }
-}
-
-void KadasTextItem::edit(const EditContext& context, const AttribValues& values)
-{
-  edit(context, QgsPointXY(values[AttrX], values[AttrY]));
-}
-
-KadasMapItem::AttribValues KadasTextItem::editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const
-{
-  return drawAttribsFromPosition(pos);
-}
-
-QgsPointXY KadasTextItem::positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings &mapSettings) const
-{
-  return positionFromDrawAttribs(values);
-}
-
-void KadasTextItem::recomputeDerived()
-{
-  emit changed();
 }
