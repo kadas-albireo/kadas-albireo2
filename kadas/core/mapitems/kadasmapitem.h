@@ -63,7 +63,7 @@ public:
   /* Bounding box in geographic coordinates */
   virtual QgsRectangle boundingBox() const = 0;
 
-  /* Margin  */
+  /* Margin in screen units */
   virtual QRect margin() const { return QRect(); }
 
   /* Nodes for editing */
@@ -74,7 +74,7 @@ public:
 
   virtual QList<Node> nodes(const QgsMapSettings& settings) const = 0;
 
-  /* Hit test, rect map settings dest crs */
+  /* Hit test, rect in item crs */
   virtual bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const = 0;
 
   /* Render the item */
@@ -110,7 +110,7 @@ public:
   typedef QMap<int, NumericAttribute> AttribDefs;
   typedef QMap<int, double> AttribValues;
 
-  // Draw interface
+  // Draw interface (all points in item crs)
   void clear();
   virtual bool startPart(const QgsPointXY& firstPoint) = 0;
   virtual bool startPart(const AttribValues& values) = 0;
@@ -123,7 +123,7 @@ public:
   virtual AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const = 0;
   virtual QgsPointXY positionFromDrawAttribs(const AttribValues& values) const = 0;
 
-  // Edit interface
+  // Edit interface (all points in item crs)
   struct EditContext {
     EditContext(const QgsVertexId& _vidx = QgsVertexId(), const QgsPointXY& _pos = QgsPointXY(), const AttribDefs& _attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor)
       : vidx(_vidx)
