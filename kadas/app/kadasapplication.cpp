@@ -930,35 +930,3 @@ bool KadasApplication::showZipSublayerSelectionDialog ( const QString& path ) co
 
   return true;
 }
-
-#if 0
-TODO
-void KadasMainWindow::addImage()
-{
-  mMapCanvas->setMapTool ( kApp->mapToolPan() ); // Ensure pan tool is active
-
-  QString lastDir = QSettings().value ( "/UI/lastImportExportDir", "." ).toString();
-  QSet<QString> formats;
-  foreach ( const QByteArray& format, QImageReader::supportedImageFormats() ) {
-    formats.insert ( QString ( "*.%1" ).arg ( QString ( format ).toLower() ) );
-  }
-  formats.insert ( "*.svg" ); // Ensure svg is present
-
-  QString filter = QString ( "Images (%1)" ).arg ( QStringList ( formats.toList() ).join ( " " ) );
-  QString filename = QFileDialog::getOpenFileName ( this, tr ( "Select Image" ), lastDir, filter );
-  if ( filename.isEmpty() ) {
-    return;
-  }
-  QSettings().setValue ( "/UI/lastImportExportDir", QFileInfo ( filename ).absolutePath() );
-  QString errMsg;
-  if ( filename.endsWith ( ".svg", Qt::CaseInsensitive ) ) {
-    QgsSvgAnnotationItem* item = new QgsSvgAnnotationItem ( mapCanvas() );
-    item->setFilePath ( filename );
-    item->setMapPosition ( mapCanvas()->extent().center(), mapCanvas()->mapSettings().destinationCrs() );
-    QgsAnnotationLayer::getLayer ( mapCanvas(), "svgSymbols", tr ( "SVG graphics" ) )->addItem ( item );
-    mapCanvas()->setMapTool ( new QgsMapToolEditAnnotation ( mapCanvas(), item ) );
-  } else if ( !QgsGeoImageAnnotationItem::create ( mapCanvas(), filename, false, &errMsg ) ) {
-    mInfoBar->pushCritical ( tr ( "Could not add image" ), errMsg );
-  }
-}
-#endif
