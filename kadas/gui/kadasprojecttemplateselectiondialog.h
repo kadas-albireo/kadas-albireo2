@@ -29,20 +29,20 @@ class QTreeView;
 
 class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, Ui::KadasProjectTemplateSelectionDialogBase
 {
-    Q_OBJECT
-  public:
-    KadasProjectTemplateSelectionDialog( QWidget* parent = 0 );
-    const QString& selectedTemplate() const{ return mSelectedTemplate; }
+  Q_OBJECT
+public:
+  KadasProjectTemplateSelectionDialog ( QWidget* parent = 0 );
+  const QString& selectedTemplate() const { return mSelectedTemplate; }
 
-  private:
-    QFileSystemModel* mModel;
-    QAbstractButton* mCreateButton;
-    QString mSelectedTemplate;
+private:
+  QFileSystemModel* mModel;
+  QAbstractButton* mCreateButton;
+  QString mSelectedTemplate;
 
-  private slots:
-    void itemClicked( const QModelIndex& index );
-    void itemDoubleClicked( const QModelIndex& index );
-    void createProject();
+private slots:
+  void itemClicked ( const QModelIndex& index );
+  void itemDoubleClicked ( const QModelIndex& index );
+  void createProject();
 
 };
 

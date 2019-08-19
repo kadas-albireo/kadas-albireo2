@@ -23,20 +23,20 @@
 
 class KADAS_GUI_EXPORT KadasCoordinateSearchProvider : public KadasSearchProvider
 {
-    Q_OBJECT
-  public:
-    KadasCoordinateSearchProvider( QgsMapCanvas *mapCanvas );
-    void startSearch( const QString& searchtext, const SearchRegion& searchRegion ) override;
+  Q_OBJECT
+public:
+  KadasCoordinateSearchProvider ( QgsMapCanvas* mapCanvas );
+  void startSearch ( const QString& searchtext, const SearchRegion& searchRegion ) override;
 
-  private:
-    QRegExp mPatLVDD;
-    QRegExp mPatDM;
-    QRegExp mPatDMS;
-    QRegExp mPatUTM;
-    QRegExp mPatUTM2;
-    QRegExp mPatMGRS;
+private:
+  QRegExp mPatLVDD;
+  QRegExp mPatDM;
+  QRegExp mPatDMS;
+  QRegExp mPatUTM;
+  QRegExp mPatUTM2;
+  QRegExp mPatMGRS;
 
-    static const QString sCategoryName;
+  static const QString sCategoryName;
 };
 
 #endif // KADASCOORDINATESEARCHPROVIDER_H

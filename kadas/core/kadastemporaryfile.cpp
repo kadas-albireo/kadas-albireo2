@@ -27,17 +27,16 @@ KadasTemporaryFile::~KadasTemporaryFile()
 
 void KadasTemporaryFile::clear()
 {
-  for ( QTemporaryFile* file : instance()->mFiles )
-  {
-    QFile( file->fileName() + ".aux.xml" ).remove();
+  for ( QTemporaryFile* file : instance()->mFiles ) {
+    QFile ( file->fileName() + ".aux.xml" ).remove();
     delete file;
   }
   instance()->mFiles.clear();
 }
 
-QString KadasTemporaryFile::createNewFile( const QString& templateName )
+QString KadasTemporaryFile::createNewFile ( const QString& templateName )
 {
-  return instance()->_createNewFile( templateName );
+  return instance()->_createNewFile ( templateName );
 }
 
 KadasTemporaryFile* KadasTemporaryFile::instance()
@@ -46,9 +45,9 @@ KadasTemporaryFile* KadasTemporaryFile::instance()
   return &i;
 }
 
-QString KadasTemporaryFile::_createNewFile( const QString& templateName )
+QString KadasTemporaryFile::_createNewFile ( const QString& templateName )
 {
-  QTemporaryFile* tmpFile = new QTemporaryFile( QDir::temp().absoluteFilePath( "XXXXXX_" + templateName ), this );
-  mFiles.append( tmpFile );
+  QTemporaryFile* tmpFile = new QTemporaryFile ( QDir::temp().absoluteFilePath ( "XXXXXX_" + templateName ), this );
+  mFiles.append ( tmpFile );
   return tmpFile->open() ? tmpFile->fileName() : QString();
 }

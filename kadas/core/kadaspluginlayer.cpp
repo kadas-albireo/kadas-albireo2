@@ -16,8 +16,8 @@
 
 #include <kadas/core/kadaspluginlayer.h>
 
-KadasPluginLayer::KadasPluginLayer(QString layerType, QString layerName)
-  : QgsPluginLayer(layerType, layerName)
+KadasPluginLayer::KadasPluginLayer ( QString layerType, QString layerName )
+  : QgsPluginLayer ( layerType, layerName )
 {
 
 }

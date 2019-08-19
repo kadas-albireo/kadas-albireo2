@@ -29,14 +29,14 @@ class QProgressDialog;
 
 class KADAS_ANALYSIS_EXPORT KadasViewshedFilter
 {
-  public:
-    static bool computeViewshed( const QString& inputFile,
-                                 const QString& outputFile, const QString& outputFormat,
-                                 QgsPointXY observerPos, const QgsCoordinateReferenceSystem& observerPosCrs,
-                                 double observerHeight, double targetHeight, bool heightRelToTerr, double radius,
-                                 const QgsUnitTypes::DistanceUnit distanceElevUnit,
-                                 const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), bool displayVisible = true, int accuracyFactor = 1,
-                                 QProgressDialog* progress = 0 );
+public:
+  static bool computeViewshed ( const QString& inputFile,
+                                const QString& outputFile, const QString& outputFormat,
+                                QgsPointXY observerPos, const QgsCoordinateReferenceSystem& observerPosCrs,
+                                double observerHeight, double targetHeight, bool heightRelToTerr, double radius,
+                                const QgsUnitTypes::DistanceUnit distanceElevUnit,
+                                const QVector<QgsPointXY>& filterRegion = QVector<QgsPointXY>(), bool displayVisible = true, int accuracyFactor = 1,
+                                QProgressDialog* progress = 0 );
 
 };
 

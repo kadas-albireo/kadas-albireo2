@@ -22,43 +22,43 @@
 class KADAS_CORE_EXPORT KadasPointItem : public KadasGeometryItem
 {
 public:
-  KadasPointItem(const QgsCoordinateReferenceSystem& crs, IconType icon = ICON_CIRCLE, QObject* parent = nullptr);
+  KadasPointItem ( const QgsCoordinateReferenceSystem& crs, IconType icon = ICON_CIRCLE, QObject* parent = nullptr );
 
-  bool startPart(const QgsPointXY& firstPoint) override;
-  bool startPart(const AttribValues& values) override;
-  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) override;
-  void setCurrentAttributes(const AttribValues& values) override;
+  bool startPart ( const QgsPointXY& firstPoint ) override;
+  bool startPart ( const AttribValues& values ) override;
+  void setCurrentPoint ( const QgsPointXY& p, const QgsMapSettings* mapSettings = nullptr ) override;
+  void setCurrentAttributes ( const AttribValues& values ) override;
   bool continuePart() override;
   void endPart() override;
 
   AttribDefs drawAttribs() const override;
-  AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const override;
-  QgsPointXY positionFromDrawAttribs(const AttribValues& values) const override;
+  AttribValues drawAttribsFromPosition ( const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromDrawAttribs ( const AttribValues& values ) const override;
 
-  EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
-  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings=nullptr) override;
-  void edit(const EditContext& context, const AttribValues& values) override;
+  EditContext getEditContext ( const QgsPointXY& pos, const QgsMapSettings& mapSettings ) const override;
+  void edit ( const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr ) override;
+  void edit ( const EditContext& context, const AttribValues& values ) override;
 
-  AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
-  QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings) const override;
+  AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PointGeometry; }
-  void addPartFromGeometry(const QgsAbstractGeometry* geom) override;
+  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
 
   const QgsMultiPoint* geometry() const;
 
   struct State : KadasMapItem::State {
     QList<QgsPointXY> points;
-    void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
-    State* clone() const override { return new State(*this); }
+    void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
+    State* clone() const override { return new State ( *this ); }
   };
-  const State* state() const{ return static_cast<State*>(mState); }
+  const State* state() const { return static_cast<State*> ( mState ); }
 
 private:
   enum AttribIds {AttrX, AttrY};
 
   QgsMultiPoint* geometry();
-  State* state(){ return static_cast<State*>(mState); }
+  State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
 };

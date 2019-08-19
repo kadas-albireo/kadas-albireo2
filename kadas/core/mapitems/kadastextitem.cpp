@@ -23,56 +23,56 @@
 #include <kadas/core/mapitems/kadastextitem.h>
 
 
-KadasTextItem::KadasTextItem(const QgsCoordinateReferenceSystem &crs, QObject* parent)
-  : KadasAnchoredItem(crs, parent)
+KadasTextItem::KadasTextItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )
+  : KadasAnchoredItem ( crs, parent )
 {
   clear();
 }
 
-void KadasTextItem::setText(const QString& text)
+void KadasTextItem::setText ( const QString& text )
 {
   mText = text;
-  QFontMetrics metrics(mFont);
-  state()->size.setWidth(metrics.width(mText));
-  state()->size.setHeight(metrics.height());
+  QFontMetrics metrics ( mFont );
+  state()->size.setWidth ( metrics.width ( mText ) );
+  state()->size.setHeight ( metrics.height() );
   emit changed();
 }
 
-void KadasTextItem::setFillColor( const QColor& c )
+void KadasTextItem::setFillColor ( const QColor& c )
 {
   mFillColor = c;
   emit changed();
 }
 
-void KadasTextItem::setOutlineColor( const QColor& c )
+void KadasTextItem::setOutlineColor ( const QColor& c )
 {
   mOutlineColor = c;
   emit changed();
 }
 
-void KadasTextItem::setFont( const QFont& font )
+void KadasTextItem::setFont ( const QFont& font )
 {
   mFont = font;
-  QFontMetrics metrics(mFont);
-  state()->size.setWidth(metrics.width(mText));
-  state()->size.setHeight(metrics.height());
+  QFontMetrics metrics ( mFont );
+  state()->size.setWidth ( metrics.width ( mText ) );
+  state()->size.setHeight ( metrics.height() );
   emit changed();
 }
 
-void KadasTextItem::render( QgsRenderContext &context ) const
+void KadasTextItem::render ( QgsRenderContext& context ) const
 {
-  QgsPointXY mapPos = context.coordinateTransform().transform(state()->pos);
-  QPointF pos = context.mapToPixel().transform(mapPos).toQPointF();
-  QFontMetrics metrics(mFont);
-  QRect bbox = metrics.boundingRect(mText);
+  QgsPointXY mapPos = context.coordinateTransform().transform ( state()->pos );
+  QPointF pos = context.mapToPixel().transform ( mapPos ).toQPointF();
+  QFontMetrics metrics ( mFont );
+  QRect bbox = metrics.boundingRect ( mText );
   int baselineOffset = metrics.ascent() - 0.5 * metrics.height();
 
-  context.painter()->setBrush( QBrush(mFillColor) );
-  context.painter()->setPen( QPen(mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin) );
-  context.painter()->setFont( mFont );
+  context.painter()->setBrush ( QBrush ( mFillColor ) );
+  context.painter()->setPen ( QPen ( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
+  context.painter()->setFont ( mFont );
   QPainterPath path;
-  path.addText(-0.5 * bbox.width(), baselineOffset, mFont, mText);
-  context.painter()->translate(pos);
-  context.painter()->rotate(-state()->angle);
-  context.painter()->drawPath(path);
+  path.addText ( -0.5 * bbox.width(), baselineOffset, mFont, mText );
+  context.painter()->translate ( pos );
+  context.painter()->rotate ( -state()->angle );
+  context.painter()->drawPath ( path );
 }

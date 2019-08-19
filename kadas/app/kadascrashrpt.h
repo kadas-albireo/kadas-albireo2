@@ -25,7 +25,7 @@ public:
   bool install();
 
 private:
-    bool mHandlerInstalled = false;
+  bool mHandlerInstalled = false;
 };
 
 #endif // KADASCRASHRPT_H

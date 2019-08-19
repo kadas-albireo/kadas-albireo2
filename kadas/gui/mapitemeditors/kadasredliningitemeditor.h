@@ -27,11 +27,12 @@ class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor
   Q_OBJECT
 
 public:
-  static KadasMapItemEditor* factory(KadasMapItem* item) {
-    return new KadasRedliningItemEditor(item);
+  static KadasMapItemEditor* factory ( KadasMapItem* item )
+  {
+    return new KadasRedliningItemEditor ( item );
   }
 
-  KadasRedliningItemEditor(KadasMapItem* item);
+  KadasRedliningItemEditor ( KadasMapItem* item );
   ~KadasRedliningItemEditor();
 
   void syncItemToWidget() override;
@@ -40,8 +41,8 @@ public:
 private:
   Ui::KadasRedliningItemEditorBase mUi;
 
-  static QIcon createOutlineStyleIcon( Qt::PenStyle style );
-  static QIcon createFillStyleIcon( Qt::BrushStyle style );
+  static QIcon createOutlineStyleIcon ( Qt::PenStyle style );
+  static QIcon createFillStyleIcon ( Qt::BrushStyle style );
 
 signals:
   void styleChanged();
@@ -50,7 +51,7 @@ private slots:
   void saveColor();
   void saveOutlineWidth();
   void saveStyle();
-  void toggleItemMeasurements(bool enabled);
+  void toggleItemMeasurements ( bool enabled );
 };
 
 #endif // KADASREDLININGITEMEDITOR_H

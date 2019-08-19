@@ -24,31 +24,31 @@ class QgsMultiLineString;
 class KADAS_CORE_EXPORT KadasLineItem : public KadasGeometryItem
 {
 public:
-  KadasLineItem(const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr);
+  KadasLineItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
 
-  QList<Node> nodes(const QgsMapSettings& settings) const override;
+  QList<Node> nodes ( const QgsMapSettings& settings ) const override;
 
-  bool startPart(const QgsPointXY& firstPoint) override;
-  bool startPart(const AttribValues& values) override;
-  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) override;
-  void setCurrentAttributes(const AttribValues& values) override;
+  bool startPart ( const QgsPointXY& firstPoint ) override;
+  bool startPart ( const AttribValues& values ) override;
+  void setCurrentPoint ( const QgsPointXY& p, const QgsMapSettings* mapSettings = nullptr ) override;
+  void setCurrentAttributes ( const AttribValues& values ) override;
   bool continuePart() override;
   void endPart() override;
 
   AttribDefs drawAttribs() const override;
-  AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const override;
-  QgsPointXY positionFromDrawAttribs(const AttribValues& values) const override;
+  AttribValues drawAttribsFromPosition ( const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromDrawAttribs ( const AttribValues& values ) const override;
 
-  EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
-  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings=nullptr) override;
-  void edit(const EditContext& context, const AttribValues& values) override;
+  EditContext getEditContext ( const QgsPointXY& pos, const QgsMapSettings& mapSettings ) const override;
+  void edit ( const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr ) override;
+  void edit ( const EditContext& context, const AttribValues& values ) override;
 
-  AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
-  QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings) const override;
+  AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::LineGeometry; }
 
-  void addPartFromGeometry(const QgsAbstractGeometry* geom) override;
+  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
   const QgsMultiLineString* geometry() const;
 
   enum MeasurementMode {
@@ -57,16 +57,16 @@ public:
     MeasureAzimuthGeoNorth
   };
 
-  void setMeasurementMode(MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit=QgsUnitTypes::AngleDegrees);
-  MeasurementMode measurementMode() const{ return mMeasurementMode; }
-  QgsUnitTypes::AngleUnit angleUnit() const{ return mAngleUnit; }
+  void setMeasurementMode ( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees );
+  MeasurementMode measurementMode() const { return mMeasurementMode; }
+  QgsUnitTypes::AngleUnit angleUnit() const { return mAngleUnit; }
 
   struct State : KadasMapItem::State {
     QList<QList<QgsPointXY>> points;
-    void assign(const KadasMapItem::State* other) override;
-    State* clone() const override{ return new State(*this); }
+    void assign ( const KadasMapItem::State* other ) override;
+    State* clone() const override { return new State ( *this ); }
   };
-  const State* state() const{ return static_cast<State*>(mState); }
+  const State* state() const { return static_cast<State*> ( mState ); }
 
 private:
   enum AttribIds {AttrX, AttrY};
@@ -76,7 +76,7 @@ private:
   QgsUnitTypes::AngleUnit mAngleUnit = QgsUnitTypes::AngleDegrees;
 
   QgsMultiLineString* geometry();
-  State* state(){ return static_cast<State*>(mState); }
+  State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
   void measureGeometry() override;
   void recomputeDerived() override;

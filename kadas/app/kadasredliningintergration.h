@@ -34,9 +34,9 @@ class KadasRedliningIntegration : public QObject
 {
   Q_OBJECT
 public:
-  KadasRedliningIntegration( QToolButton* buttonNewObject, KadasMainWindow* main );
-  KadasItemLayer *getOrCreateLayer();
-  KadasItemLayer *getLayer() const;
+  KadasRedliningIntegration ( QToolButton* buttonNewObject, KadasMainWindow* main );
+  KadasItemLayer* getOrCreateLayer();
+  KadasItemLayer* getLayer() const;
 
 private:
   QToolButton* mButtonNewObject = nullptr;
@@ -53,8 +53,8 @@ private:
   QAction* mActionNewCircle = nullptr;
   QAction* mActionNewText = nullptr;
 
-  KadasMapItem *setEditorFactory(KadasMapItem* item) const;
-  void toggleCreateItem(bool active, const std::function<KadasMapItem*()>& itemFactory);
+  KadasMapItem* setEditorFactory ( KadasMapItem* item ) const;
+  void toggleCreateItem ( bool active, const std::function<KadasMapItem*() >& itemFactory );
 };
 
 #endif // KADASREDLININGINTEGRATION_H

@@ -31,18 +31,18 @@ const char* Kadas::KADAS_BUILD_DATE = __DATE__;
 
 static QString resolveDataPath()
 {
-  QFile file(QDir(QApplication::applicationDirPath()).absoluteFilePath("kadassourcedir.txt"));
-  if(file.open(QIODevice::ReadOnly)) {
-    return QDir(file.readAll().trimmed()).absoluteFilePath("data");
+  QFile file ( QDir ( QApplication::applicationDirPath() ).absoluteFilePath ( "kadassourcedir.txt" ) );
+  if ( file.open ( QIODevice::ReadOnly ) ) {
+    return QDir ( file.readAll().trimmed() ).absoluteFilePath ( "data" );
   } else {
-    return QDir(QString("%1/../share/%2").arg(QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME)).absolutePath();
+    return QDir ( QString ( "%1/../share/%2" ).arg ( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
   }
 }
 
 QString Kadas::configPath()
 {
-  QDir appDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-  return appDataDir.absoluteFilePath(Kadas::KADAS_RELEASE_NAME);
+  QDir appDataDir = QDir ( QStandardPaths::writableLocation ( QStandardPaths::AppDataLocation ) );
+  return appDataDir.absoluteFilePath ( Kadas::KADAS_RELEASE_NAME );
 }
 
 QString Kadas::pkgDataPath()
@@ -51,6 +51,7 @@ QString Kadas::pkgDataPath()
   return dataPath;
 }
 
-QString Kadas::projectTemplatesPath() {
-  return QDir(pkgDataPath()).absoluteFilePath("project_templates");
+QString Kadas::projectTemplatesPath()
+{
+  return QDir ( pkgDataPath() ).absoluteFilePath ( "project_templates" );
 }

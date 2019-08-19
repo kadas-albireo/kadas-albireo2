@@ -16,77 +16,73 @@
 
 #include <kadas/core/kadasstatestack.h>
 
-KadasStateStack::KadasStateStack( State *initialState, QObject* parent )
-    : QObject( parent ), mState( initialState )
+KadasStateStack::KadasStateStack ( State* initialState, QObject* parent )
+  : QObject ( parent ), mState ( initialState )
 {}
 
 KadasStateStack::~KadasStateStack()
 {
-  qDeleteAll( mUndoStack );
-  qDeleteAll( mRedoStack );
+  qDeleteAll ( mUndoStack );
+  qDeleteAll ( mRedoStack );
 }
 
-void KadasStateStack::clear( State* cleanState )
+void KadasStateStack::clear ( State* cleanState )
 {
-  qDeleteAll( mUndoStack );
+  qDeleteAll ( mUndoStack );
   mUndoStack.clear();
-  qDeleteAll( mRedoStack );
+  qDeleteAll ( mRedoStack );
   mRedoStack.clear();
-  emit canUndoChanged( false );
-  emit canRedoChanged( false );
-  mState = QSharedPointer<State>( cleanState );
+  emit canUndoChanged ( false );
+  emit canRedoChanged ( false );
+  mState = QSharedPointer<State> ( cleanState );
   emit stateChanged();
 }
 
 void KadasStateStack::undo()
 {
-  while ( !mUndoStack.isEmpty() )
-  {
+  while ( !mUndoStack.isEmpty() ) {
     StateChangeCommand* command = mUndoStack.pop();
     command->undo();
-    mRedoStack.push( command );
-    if ( !command->compress() )
-    {
+    mRedoStack.push ( command );
+    if ( !command->compress() ) {
       break;
     }
   }
-  emit canUndoChanged( !mUndoStack.isEmpty() );
-  emit canRedoChanged( !mRedoStack.isEmpty() );
+  emit canUndoChanged ( !mUndoStack.isEmpty() );
+  emit canRedoChanged ( !mRedoStack.isEmpty() );
 }
 
 void KadasStateStack::redo()
 {
-  while ( !mRedoStack.isEmpty() )
-  {
+  while ( !mRedoStack.isEmpty() ) {
     StateChangeCommand* command = mRedoStack.pop();
     command->redo();
-    mUndoStack.push( command );
-    if ( mRedoStack.isEmpty() || !mRedoStack.top()->compress() )
-    {
+    mUndoStack.push ( command );
+    if ( mRedoStack.isEmpty() || !mRedoStack.top()->compress() ) {
       break;
     }
   }
-  emit canUndoChanged( !mUndoStack.isEmpty() );
-  emit canRedoChanged( !mRedoStack.isEmpty() );
+  emit canUndoChanged ( !mUndoStack.isEmpty() );
+  emit canRedoChanged ( !mRedoStack.isEmpty() );
 }
 
-void KadasStateStack::updateState( State *newState, bool mergeable )
+void KadasStateStack::updateState ( State* newState, bool mergeable )
 {
-  push( new StateChangeCommand( this, newState, mergeable ) );
+  push ( new StateChangeCommand ( this, newState, mergeable ) );
 }
 
-void KadasStateStack::push( StateChangeCommand* command )
+void KadasStateStack::push ( StateChangeCommand* command )
 {
-  qDeleteAll( mRedoStack );
+  qDeleteAll ( mRedoStack );
   mRedoStack.clear();
-  mUndoStack.push( command );
+  mUndoStack.push ( command );
   command->redo();
-  emit canUndoChanged( true );
+  emit canUndoChanged ( true );
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasStateStack::StateChangeCommand::StateChangeCommand( KadasStateStack* stateStack, State* nextState, bool compress )
-    : mStateStack( stateStack ), mPrevState( stateStack->mState ), mNextState( nextState ), mCompress( compress )
+KadasStateStack::StateChangeCommand::StateChangeCommand ( KadasStateStack* stateStack, State* nextState, bool compress )
+  : mStateStack ( stateStack ), mPrevState ( stateStack->mState ), mNextState ( nextState ), mCompress ( compress )
 {
 }
 

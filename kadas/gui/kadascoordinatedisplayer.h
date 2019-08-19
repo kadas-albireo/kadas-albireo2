@@ -34,34 +34,34 @@ class QgsMapCanvas;
 
 class KADAS_GUI_EXPORT KadasCoordinateDisplayer : public QWidget
 {
-    Q_OBJECT
-  public:
-    KadasCoordinateDisplayer( QToolButton *crsButton, QLineEdit* coordLineEdit, QLineEdit *heightLineEdit, QComboBox *heightCombo, QgsMapCanvas* mapCanvas, QWidget* parent = 0 );
-    void getCoordinateDisplayFormat( KadasCoordinateFormat::Format &format, QString& epsg );
-    QString getDisplayString( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs );
-    double getHeightAtPos( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs, QgsUnitTypes::DistanceUnit unit );
+  Q_OBJECT
+public:
+  KadasCoordinateDisplayer ( QToolButton* crsButton, QLineEdit* coordLineEdit, QLineEdit* heightLineEdit, QComboBox* heightCombo, QgsMapCanvas* mapCanvas, QWidget* parent = 0 );
+  void getCoordinateDisplayFormat ( KadasCoordinateFormat::Format& format, QString& epsg );
+  QString getDisplayString ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs );
+  double getHeightAtPos ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs, QgsUnitTypes::DistanceUnit unit );
 
-  private:
-    enum TargetFormat { LV03, LV95, DMS, DM, DD, UTM, MGRS };
-    QgsMapCanvas* mMapCanvas;
-    QToolButton* mCRSSelectionButton;
-    QLineEdit* mCoordinateLineEdit;
-    QLineEdit* mHeightLineEdit;
-    QComboBox* mHeightSelectionCombo;
-    QLabel* mIconLabel;
-    QAction* mActionDisplayLV03;
-    QAction* mActionDisplayLV95;
-    QAction* mActionDisplayDMS;
-    QgsPointXY mLastPos;
-    QTimer mHeightTimer;
+private:
+  enum TargetFormat { LV03, LV95, DMS, DM, DD, UTM, MGRS };
+  QgsMapCanvas* mMapCanvas;
+  QToolButton* mCRSSelectionButton;
+  QLineEdit* mCoordinateLineEdit;
+  QLineEdit* mHeightLineEdit;
+  QComboBox* mHeightSelectionCombo;
+  QLabel* mIconLabel;
+  QAction* mActionDisplayLV03;
+  QAction* mActionDisplayLV95;
+  QAction* mActionDisplayDMS;
+  QgsPointXY mLastPos;
+  QTimer mHeightTimer;
 
-  private slots:
-    void displayCoordinates(const QgsPointXY &p );
-    void syncProjectCrs();
-    void displayFormatChanged( QAction* action );
-    void heightUnitChanged( int idx );
-    void readProjectSettings();
-    void updateHeight();
+private slots:
+  void displayCoordinates ( const QgsPointXY& p );
+  void syncProjectCrs();
+  void displayFormatChanged ( QAction* action );
+  void heightUnitChanged ( int idx );
+  void readProjectSettings();
+  void updateHeight();
 };
 
 #endif // KADASCOORDINATEDISPAYER_H

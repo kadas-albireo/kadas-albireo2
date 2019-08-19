@@ -33,46 +33,46 @@ class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
 {
-    Q_OBJECT
-  public:
-    KadasMapWidget( int number, const QString& title, QgsMapCanvas* masterCanvas, QWidget* parent = 0 );
-    void setInitialLayers( const QStringList& initialLayers, bool updateMenu = false );
-    int getNumber() const { return mNumber; }
-    QStringList getLayers() const;
+  Q_OBJECT
+public:
+  KadasMapWidget ( int number, const QString& title, QgsMapCanvas* masterCanvas, QWidget* parent = 0 );
+  void setInitialLayers ( const QStringList& initialLayers, bool updateMenu = false );
+  int getNumber() const { return mNumber; }
+  QStringList getLayers() const;
 
-    QgsRectangle getMapExtent() const;
-    void setMapExtent( const QgsRectangle& extent );
+  QgsRectangle getMapExtent() const;
+  void setMapExtent ( const QgsRectangle& extent );
 
-    bool getLocked() const;
-    void setLocked( bool locked );
+  bool getLocked() const;
+  void setLocked ( bool locked );
 
-  private:
-    int mNumber;
-    QgsMapCanvas* mMasterCanvas;
-    QToolButton* mLayerSelectionButton;
-    QMenu* mLayerSelectionMenu;
-    QToolButton* mLockViewButton;
-    QToolButton* mCloseButton;
-    QStackedWidget* mTitleStackedWidget;
-    QLabel* mTitleLabel;
-    QLineEdit* mTitleLineEdit;
-    QgsMapCanvas* mMapCanvas;
-    QStringList mInitialLayers;
-    bool mUnsetFixedSize;
+private:
+  int mNumber;
+  QgsMapCanvas* mMasterCanvas;
+  QToolButton* mLayerSelectionButton;
+  QMenu* mLayerSelectionMenu;
+  QToolButton* mLockViewButton;
+  QToolButton* mCloseButton;
+  QStackedWidget* mTitleStackedWidget;
+  QLabel* mTitleLabel;
+  QLineEdit* mTitleLineEdit;
+  QgsMapCanvas* mMapCanvas;
+  QStringList mInitialLayers;
+  bool mUnsetFixedSize;
 
-    void showEvent( QShowEvent * ) override;
-    bool eventFilter( QObject *obj, QEvent *ev ) override;
-    void contextMenuEvent( QContextMenuEvent * e ) override;
+  void showEvent ( QShowEvent* ) override;
+  bool eventFilter ( QObject* obj, QEvent* ev ) override;
+  void contextMenuEvent ( QContextMenuEvent* e ) override;
 
-  private slots:
-    void setCanvasLocked( bool locked );
-    void syncCanvasExtents();
-    void updateLayerSelectionMenu();
-    void updateLayerSet();
-    void updateMapProjection();
-    void closeMapWidget();
-    void addMapCanvasItem(const KadasMapItem *item);
-    void removeMapCanvasItem(const KadasMapItem *item);
+private slots:
+  void setCanvasLocked ( bool locked );
+  void syncCanvasExtents();
+  void updateLayerSelectionMenu();
+  void updateLayerSet();
+  void updateMapProjection();
+  void closeMapWidget();
+  void addMapCanvasItem ( const KadasMapItem* item );
+  void removeMapCanvasItem ( const KadasMapItem* item );
 };
 
 #endif // KADASMAPWIDGET_H

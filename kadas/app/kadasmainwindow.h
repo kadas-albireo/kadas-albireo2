@@ -38,30 +38,30 @@ class KadasMapWidgetManager;
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
 {
 public:
-  explicit KadasMainWindow(QSplashScreen* splash);
+  explicit KadasMainWindow ( QSplashScreen* splash );
 
   QgsMapCanvas* mapCanvas() const { return mMapCanvas; }
-  QgsMessageBar* messageBar() const{ return mInfoBar; }
-  QgsLayerTreeView* layerTreeView() const{ return mLayerTreeView; }
+  QgsMessageBar* messageBar() const { return mInfoBar; }
+  QgsLayerTreeView* layerTreeView() const { return mLayerTreeView; }
   int messageTimeout() const;
 
-  QWidget* addRibbonTab( const QString& name );
-  void addActionToTab(QAction* action, QWidget* tabWidget);
-  void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu* menu, QWidget* tabWidget );
+  QWidget* addRibbonTab ( const QString& name );
+  void addActionToTab ( QAction* action, QWidget* tabWidget );
+  void addMenuButtonToTab ( const QString& text, const QIcon& icon, QMenu* menu, QWidget* tabWidget );
 
 private slots:
-  void addMapCanvasItem(const KadasMapItem *item );
-  void removeMapCanvasItem(const KadasMapItem *item);
-  void checkLayerProjection( QgsMapLayer* layer );
-  void onDecimalPlacesChanged(int places);
-  void onLanguageChanged(int idx);
-  void onNumericInputCheckboxToggled( bool checked );
-  void onSnappingChanged(bool enabled);
+  void addMapCanvasItem ( const KadasMapItem* item );
+  void removeMapCanvasItem ( const KadasMapItem* item );
+  void checkLayerProjection ( QgsMapLayer* layer );
+  void onDecimalPlacesChanged ( int places );
+  void onLanguageChanged ( int idx );
+  void onNumericInputCheckboxToggled ( bool checked );
+  void onSnappingChanged ( bool enabled );
   void setMapScale();
-  void showFavoriteContextMenu(const QPoint& p);
+  void showFavoriteContextMenu ( const QPoint& p );
   void showProjectSelectionWidget();
-  void showScale( double scale );
-  void switchToTabForTool( QgsMapTool* tool );
+  void showScale ( double scale );
+  void switchToTabForTool ( QgsMapTool* tool );
   void toggleLayerTree();
   void checkOnTheFlyProjection();
   void zoomFull();
@@ -71,18 +71,18 @@ private slots:
   void zoomPrev();
 
 private:
-  bool eventFilter( QObject *obj, QEvent *ev ) override;
-  void mousePressEvent( QMouseEvent* event ) override;
-  void mouseMoveEvent( QMouseEvent* event ) override;
-  void dropEvent( QDropEvent* event ) override;
-  void dragEnterEvent( QDragEnterEvent* event ) override;
-  void showEvent( QShowEvent */*event*/ ) override;
-  void restoreFavoriteButton( QToolButton* button );
+  bool eventFilter ( QObject* obj, QEvent* ev ) override;
+  void mousePressEvent ( QMouseEvent* event ) override;
+  void mouseMoveEvent ( QMouseEvent* event ) override;
+  void dropEvent ( QDropEvent* event ) override;
+  void dragEnterEvent ( QDragEnterEvent* event ) override;
+  void showEvent ( QShowEvent* /*event*/ ) override;
+  void restoreFavoriteButton ( QToolButton* button );
   void configureButtons();
-  void setActionToButton(QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), const std::function<QgsMapTool*()> &toolFactory = nullptr );
+  void setActionToButton ( QAction* action, QToolButton* button, const QKeySequence& shortcut = QKeySequence(), const std::function<QgsMapTool*() >& toolFactory = nullptr );
   void updateWidgetPositions();
-  KadasRibbonButton* addRibbonButton( QWidget* tabWidget );
-  void showSourceSelectDialog(const QString& provider);
+  KadasRibbonButton* addRibbonButton ( QWidget* tabWidget );
+  void showSourceSelectDialog ( const QString& provider );
   QgsMapTool* addPinTool();
   QgsMapTool* addPictureTool();
 

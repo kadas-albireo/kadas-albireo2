@@ -16,48 +16,46 @@
 
 #include <kadas/core/kadasstatehistory.h>
 
-KadasStateHistory::KadasStateHistory( QObject* parent )
-    : QObject( parent )
+KadasStateHistory::KadasStateHistory ( QObject* parent )
+  : QObject ( parent )
 {}
 
 KadasStateHistory::~KadasStateHistory()
 {
-  qDeleteAll( mStates );
+  qDeleteAll ( mStates );
 }
 
 void KadasStateHistory::clear()
 {
-  qDeleteAll( mStates );
+  qDeleteAll ( mStates );
   mStates.clear();
   mCurrent = -1;
-  emit canUndoChanged( false );
-  emit canRedoChanged( false );
+  emit canUndoChanged ( false );
+  emit canRedoChanged ( false );
 }
 
 void KadasStateHistory::undo()
 {
-  if( canUndo() )
-  {
-    emit stateChanged(mStates[--mCurrent]);
+  if ( canUndo() ) {
+    emit stateChanged ( mStates[--mCurrent] );
   }
-  emit canUndoChanged( canUndo() );
-  emit canRedoChanged( canRedo() );
+  emit canUndoChanged ( canUndo() );
+  emit canRedoChanged ( canRedo() );
 }
 
 void KadasStateHistory::redo()
 {
-  if( canRedo() )
-  {
-    emit stateChanged(mStates[++mCurrent]);
+  if ( canRedo() ) {
+    emit stateChanged ( mStates[++mCurrent] );
   }
-  emit canUndoChanged( canUndo() );
-  emit canRedoChanged( canRedo() );
+  emit canUndoChanged ( canUndo() );
+  emit canRedoChanged ( canRedo() );
 }
 
-void KadasStateHistory::push( State* state )
+void KadasStateHistory::push ( State* state )
 {
-  mStates.resize(++mCurrent);
-  mStates.append(state);
-  emit canUndoChanged( canUndo() );
-  emit canRedoChanged( canRedo() );
+  mStates.resize ( ++mCurrent );
+  mStates.append ( state );
+  emit canUndoChanged ( canUndo() );
+  emit canRedoChanged ( canRedo() );
 }

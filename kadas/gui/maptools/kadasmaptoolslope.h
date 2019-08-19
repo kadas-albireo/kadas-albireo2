@@ -22,15 +22,15 @@
 
 class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem
 {
-    Q_OBJECT
-  public:
-    KadasMapToolSlope( QgsMapCanvas* mapCanvas );
-    void compute( const QgsRectangle& extent, const QgsCoordinateReferenceSystem& crs );
+  Q_OBJECT
+public:
+  KadasMapToolSlope ( QgsMapCanvas* mapCanvas );
+  void compute ( const QgsRectangle& extent, const QgsCoordinateReferenceSystem& crs );
 
-  private slots:
-    void drawFinished();
+private slots:
+  void drawFinished();
 
-    KadasMapToolCreateItem::ItemFactory itemFactory(const QgsMapCanvas* canvas) const;
+  KadasMapToolCreateItem::ItemFactory itemFactory ( const QgsMapCanvas* canvas ) const;
 };
 
 #endif // KADASMAPTOOLSLOPE_H

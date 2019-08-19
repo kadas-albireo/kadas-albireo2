@@ -25,19 +25,19 @@ class QgsMapCanvas;
 
 class KADAS_GUI_EXPORT KadasCrsSelection : public QToolButton
 {
-    Q_OBJECT
-  public:
-    KadasCrsSelection( QWidget* parent = 0 );
+  Q_OBJECT
+public:
+  KadasCrsSelection ( QWidget* parent = 0 );
 
-    void setMapCanvas( QgsMapCanvas* canvas );
+  void setMapCanvas ( QgsMapCanvas* canvas );
 
-  private:
-    QgsMapCanvas* mMapCanvas;
+private:
+  QgsMapCanvas* mMapCanvas;
 
-  private slots:
-    void syncCrsButton();
-    void setMapCrs();
-    void selectMapCrs();
+private slots:
+  void syncCrsButton();
+  void setMapCrs();
+  void selectMapCrs();
 };
 
 #endif // KADASCRSSELECTION_H

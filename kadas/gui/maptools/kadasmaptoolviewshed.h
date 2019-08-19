@@ -28,40 +28,40 @@ class QSlider;
 
 class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
 {
-    Q_OBJECT
-  public:
-    enum DisplayMode { DisplayVisibleArea, DisplayInvisibleArea };
+  Q_OBJECT
+public:
+  enum DisplayMode { DisplayVisibleArea, DisplayInvisibleArea };
 
-    KadasViewshedDialog( double radius, QWidget* parent = 0 );
-    double getObserverHeight() const;
-    double getTargetHeight() const;
-    bool getHeightRelativeToGround() const;
-    DisplayMode getDisplayMode() const;
-    int getAccuracyFactor() const;
+  KadasViewshedDialog ( double radius, QWidget* parent = 0 );
+  double getObserverHeight() const;
+  double getTargetHeight() const;
+  bool getHeightRelativeToGround() const;
+  DisplayMode getDisplayMode() const;
+  int getAccuracyFactor() const;
 
-  signals:
-    void radiusChanged( double radius );
+signals:
+  void radiusChanged ( double radius );
 
-  private:
-    enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
-    QDoubleSpinBox* mSpinBoxObserverHeight;
-    QDoubleSpinBox* mSpinBoxTargetHeight;
-    QComboBox* mComboHeightMode;
-    QComboBox* mDisplayModeCombo;
-    QSlider* mAccuracySlider;
+private:
+  enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
+  QDoubleSpinBox* mSpinBoxObserverHeight;
+  QDoubleSpinBox* mSpinBoxTargetHeight;
+  QComboBox* mComboHeightMode;
+  QComboBox* mDisplayModeCombo;
+  QSlider* mAccuracySlider;
 };
 
 class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
 {
-    Q_OBJECT
-  public:
-    KadasMapToolViewshed( QgsMapCanvas* mapCanvas );
+  Q_OBJECT
+public:
+  KadasMapToolViewshed ( QgsMapCanvas* mapCanvas );
 
-  private slots:
-    void drawFinished();
-    void adjustRadius( double newRadius );
+private slots:
+  void drawFinished();
+  void adjustRadius ( double newRadius );
 
-    KadasMapToolCreateItem::ItemFactory itemFactory(const QgsMapCanvas* canvas) const;
+  KadasMapToolCreateItem::ItemFactory itemFactory ( const QgsMapCanvas* canvas ) const;
 };
 
 #endif // KADASMAPTOOLVIEWSHED_H

@@ -35,43 +35,43 @@ class KadasMapToolHeightProfile;
 
 class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
 {
-    Q_OBJECT
-  public:
-    KadasHeightProfileDialog( KadasMapToolHeightProfile* tool, QWidget* parent = 0, Qt::WindowFlags f = 0 );
-    void setPoints(const QList<QgsPointXY> &points, const QgsCoordinateReferenceSystem& crs );
-    void setMarkerPos(int segment, const QgsPointXY &p );
-    void clear();
+  Q_OBJECT
+public:
+  KadasHeightProfileDialog ( KadasMapToolHeightProfile* tool, QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  void setPoints ( const QList<QgsPointXY>& points, const QgsCoordinateReferenceSystem& crs );
+  void setMarkerPos ( int segment, const QgsPointXY& p );
+  void clear();
 
-  private slots:
-    void finish();
-    void replot();
-    void updateLineOfSight();
-    void copyToClipboard();
-    void addToCanvas();
+private slots:
+  void finish();
+  void replot();
+  void updateLineOfSight();
+  void copyToClipboard();
+  void addToCanvas();
 
-  private:
-    class ScaleDraw;
-    enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
+private:
+  class ScaleDraw;
+  enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
 
-    KadasMapToolHeightProfile* mTool;
-    QwtPlot* mPlot;
-    QwtPlotCurve* mPlotCurve;
-    QVector<QwtPlotCurve*> mLinesOfSight;
-    QVector<KadasLineItem*> mLinesOfSightRB;
-    QwtPlotMarker* mPlotMarker;
-    QwtPlotMarker* mLineOfSightMarker;
-    QList<QwtPlotMarker*> mNodeMarkers;
-    QList<QgsPointXY> mPoints;
-    QVector<double> mSegmentLengths;
-    double mTotLength;
-    QgsCoordinateReferenceSystem mPointsCrs;
-    int mNSamples;
-    QGroupBox* mLineOfSightGroupBoxgroupBox;
-    QDoubleSpinBox* mObserverHeightSpinBox;
-    QDoubleSpinBox* mTargetHeightSpinBox;
-    QComboBox* mHeightModeCombo;
+  KadasMapToolHeightProfile* mTool;
+  QwtPlot* mPlot;
+  QwtPlotCurve* mPlotCurve;
+  QVector<QwtPlotCurve*> mLinesOfSight;
+  QVector<KadasLineItem*> mLinesOfSightRB;
+  QwtPlotMarker* mPlotMarker;
+  QwtPlotMarker* mLineOfSightMarker;
+  QList<QwtPlotMarker*> mNodeMarkers;
+  QList<QgsPointXY> mPoints;
+  QVector<double> mSegmentLengths;
+  double mTotLength;
+  QgsCoordinateReferenceSystem mPointsCrs;
+  int mNSamples;
+  QGroupBox* mLineOfSightGroupBoxgroupBox;
+  QDoubleSpinBox* mObserverHeightSpinBox;
+  QDoubleSpinBox* mTargetHeightSpinBox;
+  QComboBox* mHeightModeCombo;
 
-    void keyPressEvent( QKeyEvent *ev ) override;
+  void keyPressEvent ( QKeyEvent* ev ) override;
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

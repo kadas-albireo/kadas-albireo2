@@ -31,58 +31,54 @@ const int KadasLocationSearchProvider::sSearchTimeout = 2000;
 const int KadasLocationSearchProvider::sResultCountLimit = 50;
 
 
-KadasLocationSearchProvider::KadasLocationSearchProvider( QgsMapCanvas* mapCanvas )
-    : KadasSearchProvider( mapCanvas )
+KadasLocationSearchProvider::KadasLocationSearchProvider ( QgsMapCanvas* mapCanvas )
+  : KadasSearchProvider ( mapCanvas )
 {
   mNetReply = 0;
 
-  mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 20 ) );
-  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 21 ) );
-  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 22 ) );
-  mCategoryMap.insert( "sn25", qMakePair( tr( "Places" ), 23 ) );
-  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
-  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
-  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
+  mCategoryMap.insert ( "gg25", qMakePair ( tr ( "Municipalities" ), 20 ) );
+  mCategoryMap.insert ( "kantone", qMakePair ( tr ( "Cantons" ), 21 ) );
+  mCategoryMap.insert ( "district", qMakePair ( tr ( "Districts" ), 22 ) );
+  mCategoryMap.insert ( "sn25", qMakePair ( tr ( "Places" ), 23 ) );
+  mCategoryMap.insert ( "zipcode", qMakePair ( tr ( "Zip Codes" ), 24 ) );
+  mCategoryMap.insert ( "address", qMakePair ( tr ( "Address" ), 25 ) );
+  mCategoryMap.insert ( "gazetteer", qMakePair ( tr ( "General place name directory" ), 26 ) );
 
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
+  mPatBox = QRegExp ( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 
-  mTimeoutTimer.setSingleShot( true );
-  connect( &mTimeoutTimer, &QTimer::timeout, this, &KadasLocationSearchProvider::replyFinished );
+  mTimeoutTimer.setSingleShot ( true );
+  connect ( &mTimeoutTimer, &QTimer::timeout, this, &KadasLocationSearchProvider::replyFinished );
 }
 
-void KadasLocationSearchProvider::startSearch( const QString &searchtext , const SearchRegion &/*searchRegion*/ )
+void KadasLocationSearchProvider::startSearch ( const QString& searchtext, const SearchRegion& /*searchRegion*/ )
 {
   QString serviceUrl;
-  if ( QSettings().value( "/Qgis/isOffline" ).toBool() )
-  {
-    serviceUrl = QSettings().value( "search/locationofflinesearchurl", "http://localhost:5000/SearchServerCh" ).toString();
+  if ( QSettings().value ( "/Qgis/isOffline" ).toBool() ) {
+    serviceUrl = QSettings().value ( "search/locationofflinesearchurl", "http://localhost:5000/SearchServerCh" ).toString();
+  } else {
+    serviceUrl = QSettings().value ( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
   }
-  else
-  {
-    serviceUrl = QSettings().value( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
-  }
-  QgsDebugMsg( serviceUrl );
+  QgsDebugMsg ( serviceUrl );
 
-  QUrl url( serviceUrl );
+  QUrl url ( serviceUrl );
   QUrlQuery query;
-  query.addQueryItem( "type", "locations" );
-  query.addQueryItem( "searchText", searchtext );
-  query.addQueryItem( "limit", QString::number( sResultCountLimit ) );
-  url.setQuery( query );
+  query.addQueryItem ( "type", "locations" );
+  query.addQueryItem ( "searchText", searchtext );
+  query.addQueryItem ( "limit", QString::number ( sResultCountLimit ) );
+  url.setQuery ( query );
 
-  QNetworkRequest req( url );
-  req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  mNetReply = QgsNetworkAccessManager::instance()->get( req );
-  connect( mNetReply, &QNetworkReply::finished, this, &KadasLocationSearchProvider::replyFinished );
-  mTimeoutTimer.start( sSearchTimeout );
+  QNetworkRequest req ( url );
+  req.setRawHeader ( "Referer", QSettings().value ( "search/referer", "http://localhost" ).toByteArray() );
+  mNetReply = QgsNetworkAccessManager::instance()->get ( req );
+  connect ( mNetReply, &QNetworkReply::finished, this, &KadasLocationSearchProvider::replyFinished );
+  mTimeoutTimer.start ( sSearchTimeout );
 }
 
 void KadasLocationSearchProvider::cancelSearch()
 {
-  if ( mNetReply )
-  {
+  if ( mNetReply ) {
     mTimeoutTimer.stop();
-    disconnect( mNetReply, &QNetworkReply::finished, this, &KadasLocationSearchProvider::replyFinished );
+    disconnect ( mNetReply, &QNetworkReply::finished, this, &KadasLocationSearchProvider::replyFinished );
     mNetReply->close();
     mNetReply->deleteLater();
     mNetReply = 0;
@@ -91,11 +87,11 @@ void KadasLocationSearchProvider::cancelSearch()
 
 void KadasLocationSearchProvider::replyFinished()
 {
-  if ( !mNetReply )
+  if ( !mNetReply ) {
     return;
+  }
 
-  if ( mNetReply->error() != QNetworkReply::NoError || !mTimeoutTimer.isActive() )
-  {
+  if ( mNetReply->error() != QNetworkReply::NoError || !mTimeoutTimer.isActive() ) {
     mNetReply->deleteLater();
     mNetReply = 0;
     emit searchFinished();
@@ -104,38 +100,35 @@ void KadasLocationSearchProvider::replyFinished()
 
   QByteArray replyText = mNetReply->readAll();
   QJsonParseError err;
-  QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
-  if ( doc.isNull() )
-  {
-    QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
+  QJsonDocument doc = QJsonDocument::fromJson ( replyText, &err );
+  if ( doc.isNull() ) {
+    QgsDebugMsg ( QString ( "Parsing error:" ).arg ( err.errorString() ) );
   }
   QVariantMap resultMap = doc.object().toVariantMap();
   bool fuzzy = resultMap["fuzzy"] == "true";
-  for ( const QVariant& item : resultMap["results"].toList() )
-  {
+  for ( const QVariant& item : resultMap["results"].toList() ) {
     QVariantMap itemMap = item.toMap();
     QVariantMap itemAttrsMap = itemMap["attrs"].toMap();
 
     QString origin = itemAttrsMap["origin"].toString();
 
     SearchResult searchResult;
-    if ( mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
-    {
-      searchResult.bbox = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                        mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+    if ( mPatBox.exactMatch ( itemAttrsMap["geom_st_box2d"].toString() ) ) {
+      searchResult.bbox = QgsRectangle ( mPatBox.cap ( 1 ).toDouble(), mPatBox.cap ( 2 ).toDouble(),
+                                         mPatBox.cap ( 3 ).toDouble(), mPatBox.cap ( 4 ).toDouble() );
     }
     // When bbox is empty, fallback to pos + zoomScale is used
-    searchResult.pos = QgsPointXY( itemAttrsMap["y"].toDouble(), itemAttrsMap["x"].toDouble() );
+    searchResult.pos = QgsPointXY ( itemAttrsMap["y"].toDouble(), itemAttrsMap["x"].toDouble() );
     searchResult.zoomScale = origin == "address" ? 5000 : 25000;
 
-    searchResult.category = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
-    searchResult.categoryPrecedence = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 100;
+    searchResult.category = mCategoryMap.contains ( origin ) ? mCategoryMap[origin].first : origin;
+    searchResult.categoryPrecedence = mCategoryMap.contains ( origin ) ? mCategoryMap[origin].second : 100;
     searchResult.text = itemAttrsMap["label"].toString();
-    searchResult.text.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
+    searchResult.text.replace ( QRegExp ( "<[^>]+>" ), "" ); // Remove HTML tags
     searchResult.crs = "EPSG:21781";
     searchResult.showPin = true;
     searchResult.fuzzy = fuzzy;
-    emit searchResultFound( searchResult );
+    emit searchResultFound ( searchResult );
   }
   mNetReply->deleteLater();
   mNetReply = 0;

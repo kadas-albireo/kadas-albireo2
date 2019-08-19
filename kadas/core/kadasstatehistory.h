@@ -26,30 +26,29 @@
 
 class KADAS_CORE_EXPORT KadasStateHistory : public QObject
 {
-    Q_OBJECT
-  public:
-    struct State
-    {
-      virtual ~State() {}
-    };
+  Q_OBJECT
+public:
+  struct State {
+    virtual ~State() {}
+  };
 
-    KadasStateHistory(QObject* parent = 0 );
-    ~KadasStateHistory();
-    void clear();
-    void push(State* state);
-    void undo();
-    void redo();
-    bool canUndo() const { return mCurrent > 0; }
-    bool canRedo() const { return mCurrent < mStates.length() - 1; }
+  KadasStateHistory ( QObject* parent = 0 );
+  ~KadasStateHistory();
+  void clear();
+  void push ( State* state );
+  void undo();
+  void redo();
+  bool canUndo() const { return mCurrent > 0; }
+  bool canRedo() const { return mCurrent < mStates.length() - 1; }
 
-  signals:
-    void canUndoChanged( bool );
-    void canRedoChanged( bool );
-    void stateChanged(State* state);
+signals:
+  void canUndoChanged ( bool );
+  void canRedoChanged ( bool );
+  void stateChanged ( State* state );
 
-  private:
-    QVector<State*> mStates;
-    int mCurrent = -1;
+private:
+  QVector<State*> mStates;
+  int mCurrent = -1;
 };
 
 #endif // KADASSTATEHISTORY_H

@@ -26,16 +26,16 @@ class QTemporaryFile;
 
 class KADAS_CORE_EXPORT KadasTemporaryFile : public QObject
 {
-  public:
-    static QString createNewFile( const QString &templateName );
-    static void clear();
+public:
+  static QString createNewFile ( const QString& templateName );
+  static void clear();
 
-  private:
-    QList<QTemporaryFile*> mFiles;
-    KadasTemporaryFile() {}
-    ~KadasTemporaryFile();
-    static KadasTemporaryFile* instance();
-    QString _createNewFile( const QString &templateName );
+private:
+  QList<QTemporaryFile*> mFiles;
+  KadasTemporaryFile() {}
+  ~KadasTemporaryFile();
+  static KadasTemporaryFile* instance();
+  QString _createNewFile ( const QString& templateName );
 };
 
 #endif // KADASTEMPORARYFILE_H

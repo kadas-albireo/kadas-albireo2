@@ -29,10 +29,10 @@ class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasI
   Q_OBJECT
 
 public:
-  KadasMapCanvasItem(const KadasMapItem* item, QgsMapCanvas* canvas);
-  const KadasMapItem* mapItem() const{ return mItem; }
+  KadasMapCanvasItem ( const KadasMapItem* item, QgsMapCanvas* canvas );
+  const KadasMapItem* mapItem() const { return mItem; }
 
-  void paint( QPainter *painter ) override;
+  void paint ( QPainter* painter ) override;
 
 private:
   const KadasMapItem* mItem = nullptr;

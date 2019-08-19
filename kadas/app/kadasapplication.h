@@ -41,19 +41,19 @@ class KadasApplication : public QgsApplication
 
 public:
 
-  static KadasApplication *instance();
+  static KadasApplication* instance();
 
-  KadasApplication(int &argc, char **argv);
+  KadasApplication ( int& argc, char** argv );
   ~KadasApplication();
 
-  KadasClipboard* clipboard() const{ return mClipboard; }
-  KadasMainWindow* mainWindow() const{ return mMainWindow; }
+  KadasClipboard* clipboard() const { return mClipboard; }
+  KadasMainWindow* mainWindow() const { return mMainWindow; }
 
-  QgsRasterLayer *addRasterLayer(const QString &uri, const QString &baseName, const QString &providerKey) const;
-  QgsVectorLayer* addVectorLayer(const QString &uri, const QString &layerName, const QString &providerKey) const;
-  void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
-  KadasItemLayer* getItemLayer(const QString& layerName) const;
-  KadasItemLayer* getOrCreateItemLayer(const QString& layerName);
+  QgsRasterLayer* addRasterLayer ( const QString& uri, const QString& baseName, const QString& providerKey ) const;
+  QgsVectorLayer* addVectorLayer ( const QString& uri, const QString& layerName, const QString& providerKey ) const;
+  void addVectorLayers ( const QStringList& layerUris, const QString& enc, const QString& dataSourceType )  const;
+  KadasItemLayer* getItemLayer ( const QString& layerName ) const;
+  KadasItemLayer* getOrCreateItemLayer ( const QString& layerName );
 
   void exportToGpx();
   void exportToKml();
@@ -62,47 +62,47 @@ public:
 
   void paste();
 
-  bool projectCreateFromTemplate(const QString& templateFile );
-  bool projectOpen( const QString& projectFile = QString() );
+  bool projectCreateFromTemplate ( const QString& templateFile );
+  bool projectOpen ( const QString& projectFile = QString() );
   void projectClose();
-  bool projectSave( const QString& fileName = QString(), bool promptFileName = false);
+  bool projectSave ( const QString& fileName = QString(), bool promptFileName = false );
 
   void saveMapAsImage();
   void saveMapToClipboard();
 
-  void showLayerAttributeTable(const QgsMapLayer* layer);
-  void showLayerProperties(const QgsMapLayer* layer);
-  void showLayerInfo(const QgsMapLayer* layer);
+  void showLayerAttributeTable ( const QgsMapLayer* layer );
+  void showLayerProperties ( const QgsMapLayer* layer );
+  void showLayerInfo ( const QgsMapLayer* layer );
 
   QgsMapLayer* currentLayer() const;
 
 public slots:
-  void displayMessage(const QString& message, Qgis::MessageLevel level = Qgis::Info);
+  void displayMessage ( const QString& message, Qgis::MessageLevel level = Qgis::Info );
 
 signals:
   void projectRead();
-  void activeLayerChanged(QgsMapLayer* layer);
+  void activeLayerChanged ( QgsMapLayer* layer );
 
 private:
   KadasClipboard* mClipboard = nullptr;
   KadasMainWindow* mMainWindow = nullptr;
-  QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
+  QgsLayerTreeMapCanvasBridge* mLayerTreeCanvasBridge = nullptr;
   bool mBlockActiveLayerChanged = false;
   QDateTime mProjectLastModified;
   KadasMapToolPan* mMapToolPan = nullptr;
   QMap<QString, QString> mItemLayerMap;
 
-  QList<QgsMapLayer*> showGDALSublayerSelectionDialog(QgsRasterLayer *layer) const;
-  QList<QgsMapLayer*> showOGRSublayerSelectionDialog(QgsVectorLayer *layer) const;
-  bool showZipSublayerSelectionDialog(const QString& path) const;
+  QList<QgsMapLayer*> showGDALSublayerSelectionDialog ( QgsRasterLayer* layer ) const;
+  QList<QgsMapLayer*> showOGRSublayerSelectionDialog ( QgsVectorLayer* layer ) const;
+  bool showZipSublayerSelectionDialog ( const QString& path ) const;
   bool projectSaveDirty();
 
 private slots:
-  void onActiveLayerChanged( QgsMapLayer *layer );
-  void onFocusChanged(QWidget* /*old*/, QWidget* now);
-  void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
-  void handleItemPicked( const KadasFeaturePicker::PickResult& result );
-  void showCanvasContextMenu( const QPoint& screenPos, const QgsPointXY& mapPos);
+  void onActiveLayerChanged ( QgsMapLayer* layer );
+  void onFocusChanged ( QWidget* /*old*/, QWidget* now );
+  void onMapToolChanged ( QgsMapTool* newTool, QgsMapTool* oldTool );
+  void handleItemPicked ( const KadasFeaturePicker::PickResult& result );
+  void showCanvasContextMenu ( const QPoint& screenPos, const QgsPointXY& mapPos );
   void updateWindowTitle();
 };
 

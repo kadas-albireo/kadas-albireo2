@@ -31,17 +31,17 @@ class KadasItemLayer;
 class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
 {
 public:
-  KadasMapToolEditItem(QgsMapCanvas* canvas, const QString& itemId, KadasItemLayer* layer);
-  KadasMapToolEditItem(QgsMapCanvas* canvas, KadasMapItem* item, KadasItemLayer* layer);
+  KadasMapToolEditItem ( QgsMapCanvas* canvas, const QString& itemId, KadasItemLayer* layer );
+  KadasMapToolEditItem ( QgsMapCanvas* canvas, KadasMapItem* item, KadasItemLayer* layer );
   ~KadasMapToolEditItem();
 
   void activate() override;
   void deactivate() override;
 
-  void canvasPressEvent( QgsMapMouseEvent* e ) override;
-  void canvasMoveEvent( QgsMapMouseEvent* e ) override;
-  void canvasReleaseEvent( QgsMapMouseEvent* e ) override;
-  void keyPressEvent( QKeyEvent *e ) override;
+  void canvasPressEvent ( QgsMapMouseEvent* e ) override;
+  void canvasMoveEvent ( QgsMapMouseEvent* e ) override;
+  void canvasReleaseEvent ( QgsMapMouseEvent* e ) override;
+  void keyPressEvent ( QKeyEvent* e ) override;
 
 private:
   KadasStateHistory* mStateHistory = nullptr;
@@ -60,7 +60,7 @@ private:
 
 public slots:
   void inputChanged();
-  void stateChanged(KadasStateHistory::State *state);
+  void stateChanged ( KadasStateHistory::State* state );
 };
 
 #endif // KADASMAPTOOLEDITITEM_H

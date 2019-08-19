@@ -21,13 +21,13 @@
 
 class KADAS_GUI_EXPORT KadasPinSearchProvider : public KadasSearchProvider
 {
-    Q_OBJECT
-  public:
-    KadasPinSearchProvider( QgsMapCanvas *mapCanvas ) : KadasSearchProvider( mapCanvas ) {}
-    void startSearch( const QString& searchtext, const SearchRegion& searchRegion ) override;
+  Q_OBJECT
+public:
+  KadasPinSearchProvider ( QgsMapCanvas* mapCanvas ) : KadasSearchProvider ( mapCanvas ) {}
+  void startSearch ( const QString& searchtext, const SearchRegion& searchRegion ) override;
 
-  private:
-    static const QString sCategoryName;
+private:
+  static const QString sCategoryName;
 };
 
 #endif // KADASPINSEARCHPROVIDER_H

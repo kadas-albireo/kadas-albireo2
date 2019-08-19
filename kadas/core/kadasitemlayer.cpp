@@ -24,22 +24,23 @@
 #include <kadas/core/mapitems/kadasmapitem.h>
 
 
-class KadasItemLayer::Renderer : public QgsMapLayerRenderer {
+class KadasItemLayer::Renderer : public QgsMapLayerRenderer
+{
 public:
-  Renderer( KadasItemLayer* layer, QgsRenderContext& rendererContext )
-    : QgsMapLayerRenderer( layer->id() )
-    , mLayer(layer)
-    , mRendererContext( rendererContext )
+  Renderer ( KadasItemLayer* layer, QgsRenderContext& rendererContext )
+    : QgsMapLayerRenderer ( layer->id() )
+    , mLayer ( layer )
+    , mRendererContext ( rendererContext )
   {}
   bool render() override
   {
     QList<KadasMapItem*> items = mLayer->mItems.values();
-    qStableSort(items.begin(), items.end(), [](KadasMapItem* a, KadasMapItem* b) { return a->zIndex() < b->zIndex(); });
-    for(const KadasMapItem* item : items) {
+    qStableSort ( items.begin(), items.end(), [] ( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
+    for ( const KadasMapItem* item : items ) {
       if ( item ) {
         mRendererContext.painter()->save();
-        mRendererContext.setCoordinateTransform(QgsCoordinateTransform(item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext()));
-        item->render( mRendererContext );
+        mRendererContext.setCoordinateTransform ( QgsCoordinateTransform ( item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() ) );
+        item->render ( mRendererContext );
         mRendererContext.painter()->restore();
       }
     }
@@ -52,59 +53,59 @@ private:
 };
 
 
-KadasItemLayer::KadasItemLayer(const QString &name)
-  : QgsPluginLayer(layerType(), name)
+KadasItemLayer::KadasItemLayer ( const QString& name )
+  : QgsPluginLayer ( layerType(), name )
 {
   mValid = true;
 }
 
-void KadasItemLayer::addItem(KadasMapItem* item)
+void KadasItemLayer::addItem ( KadasMapItem* item )
 {
-  mItems.insert(QUuid::createUuid().toString(), item);
+  mItems.insert ( QUuid::createUuid().toString(), item );
 }
 
-KadasMapItem* KadasItemLayer::takeItem(const QString& itemId)
+KadasMapItem* KadasItemLayer::takeItem ( const QString& itemId )
 {
-  return mItems.take(itemId);
+  return mItems.take ( itemId );
 }
 
-KadasItemLayer* KadasItemLayer::clone() const{
-  KadasItemLayer* layer = new KadasItemLayer(name());
+KadasItemLayer* KadasItemLayer::clone() const
+{
+  KadasItemLayer* layer = new KadasItemLayer ( name() );
   // TODO
 //  layer->mItems =
   return layer;
 }
 
-QgsMapLayerRenderer* KadasItemLayer::createMapRenderer( QgsRenderContext& rendererContext )
+QgsMapLayerRenderer* KadasItemLayer::createMapRenderer ( QgsRenderContext& rendererContext )
 {
-  return new Renderer(this, rendererContext);
+  return new Renderer ( this, rendererContext );
 }
 
 QgsRectangle KadasItemLayer::extent() const
 {
   QgsRectangle rect;
-  for(const KadasMapItem* item : mItems.values())
-  {
-    QgsCoordinateTransform trans(item->crs(), crs(), mTransformContext);
-    if(rect.isNull()) {
-      rect = trans.transform(item->boundingBox());
+  for ( const KadasMapItem* item : mItems.values() ) {
+    QgsCoordinateTransform trans ( item->crs(), crs(), mTransformContext );
+    if ( rect.isNull() ) {
+      rect = trans.transform ( item->boundingBox() );
     } else {
-      rect.combineExtentWith(trans.transform(item->boundingBox()));
+      rect.combineExtentWith ( trans.transform ( item->boundingBox() ) );
     }
   }
   return rect;
 }
 
-void KadasItemLayer::setTransformContext(const QgsCoordinateTransformContext& ctx)
+void KadasItemLayer::setTransformContext ( const QgsCoordinateTransformContext& ctx )
 {
   mTransformContext = ctx;
 }
 
-QString KadasItemLayer::pickItem(const QgsRectangle& pickRect, const QgsMapSettings& mapSettings) const
+QString KadasItemLayer::pickItem ( const QgsRectangle& pickRect, const QgsMapSettings& mapSettings ) const
 {
-  for(auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it) {
-    QgsCoordinateTransform crst(mapSettings.destinationCrs(), it.value()->crs(), transformContext());
-    if(it.value()->intersects(crst.transform(pickRect), mapSettings)) {
+  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it ) {
+    QgsCoordinateTransform crst ( mapSettings.destinationCrs(), it.value()->crs(), transformContext() );
+    if ( it.value()->intersects ( crst.transform ( pickRect ), mapSettings ) ) {
       return it.key();
     }
   }

@@ -24,88 +24,81 @@
 #include <kadas/core/kadasitemlayer.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas* canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick ( const QgsMapCanvas* canvas, const QPoint& canvasPos, const QgsPointXY& mapPos, QgsWkbTypes::GeometryType geomType )
 {
   PickResult pickResult;
 
-  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
-  double radiusmm = QSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings ( canvas->mapSettings() );
+  double radiusmm = QSettings().value ( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
   QgsRectangle filterRect;
-  filterRect.setXMinimum( mapPos.x() - radiusmu );
-  filterRect.setXMaximum( mapPos.x() + radiusmu );
-  filterRect.setYMinimum( mapPos.y() - radiusmu );
-  filterRect.setYMaximum( mapPos.y() + radiusmu );
+  filterRect.setXMinimum ( mapPos.x() - radiusmu );
+  filterRect.setXMaximum ( mapPos.x() + radiusmu );
+  filterRect.setYMinimum ( mapPos.y() - radiusmu );
+  filterRect.setYMaximum ( mapPos.y() + radiusmu );
 
-  for(QgsMapLayer* layer : canvas->layers()) {
-    if(qobject_cast<KadasItemLayer*>(layer)) {
-      pickResult = pickItemLayer(static_cast<KadasItemLayer*>(layer), canvas, filterRect, geomType);
-    } else if(qobject_cast<QgsVectorLayer*>(layer)) {
-      pickResult = pickVectorLayer(static_cast<QgsVectorLayer*>(layer), canvas, renderContext, filterRect, geomType);
+  for ( QgsMapLayer* layer : canvas->layers() ) {
+    if ( qobject_cast<KadasItemLayer*> ( layer ) ) {
+      pickResult = pickItemLayer ( static_cast<KadasItemLayer*> ( layer ), canvas, filterRect, geomType );
+    } else if ( qobject_cast<QgsVectorLayer*> ( layer ) ) {
+      pickResult = pickVectorLayer ( static_cast<QgsVectorLayer*> ( layer ), canvas, renderContext, filterRect, geomType );
     }
-    if(!pickResult.isEmpty()) {
+    if ( !pickResult.isEmpty() ) {
       break;
     }
   }
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer(KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType)
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer ( KadasItemLayer* layer, const QgsMapCanvas* canvas, const QgsRectangle& filterRect, QgsWkbTypes::GeometryType geomType )
 {
   PickResult pickResult;
-  pickResult.itemId = layer->pickItem(filterRect, canvas->mapSettings());
-  if(!pickResult.itemId.isEmpty()) {
+  pickResult.itemId = layer->pickItem ( filterRect, canvas->mapSettings() );
+  if ( !pickResult.itemId.isEmpty() ) {
     pickResult.layer = layer;
   }
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer(QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, QgsRenderContext& renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType)
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer ( QgsVectorLayer* vlayer, const QgsMapCanvas* canvas, QgsRenderContext& renderContext, const QgsRectangle& filterRect, QgsWkbTypes::GeometryType geomType )
 {
   PickResult pickResult;
 
-  QgsFeatureList features; 
-  if ( geomType != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != geomType )
-  {
+  QgsFeatureList features;
+  if ( geomType != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != geomType ) {
     return pickResult;
   }
   if ( vlayer->hasScaleBasedVisibility() &&
        ( vlayer->minimumScale() > canvas->mapSettings().scale() ||
-         vlayer->maximumScale() <= canvas->mapSettings().scale() ) )
-  {
+         vlayer->maximumScale() <= canvas->mapSettings().scale() ) ) {
     return pickResult;
   }
 
   QgsFeatureRenderer* renderer = vlayer->renderer();
   bool filteredRendering = false;
-  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
-  {
+  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent ) {
     // setup scale for scale dependent visibility (rule based)
-    renderer->startRender( renderContext, vlayer->fields() );
+    renderer->startRender ( renderContext, vlayer->fields() );
     filteredRendering = renderer->capabilities() & QgsFeatureRenderer::Filter;
   }
 
-  QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
-  QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+  QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates ( vlayer, filterRect );
+  QgsFeatureIterator fit = vlayer->getFeatures ( QgsFeatureRequest ( layerFilterRect ).setFlags ( QgsFeatureRequest::ExactIntersect ) );
   QgsFeature feature;
-  while ( fit.nextFeature( feature ) )
-  {
-    if ( filteredRendering && !renderer->willRenderFeature( feature, renderContext ) )
-    {
+  while ( fit.nextFeature ( feature ) ) {
+    if ( filteredRendering && !renderer->willRenderFeature ( feature, renderContext ) ) {
       continue;
     }
-    if ( geomType != QgsWkbTypes::UnknownGeometry && feature.geometry().type() != geomType )
-    {
+    if ( geomType != QgsWkbTypes::UnknownGeometry && feature.geometry().type() != geomType ) {
       continue;
     }
     pickResult.layer = vlayer;
     pickResult.feature = feature;
     break;
   }
-  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
-  {
-    renderer->stopRender( renderContext );
+  if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent ) {
+    renderer->stopRender ( renderContext );
   }
 
   return pickResult;

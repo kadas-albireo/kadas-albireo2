@@ -27,11 +27,12 @@ class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
   Q_OBJECT
 
 public:
-  static KadasMapItemEditor* factory(KadasMapItem* item) {
-    return new KadasSymbolAttributesEditor(item);
+  static KadasMapItemEditor* factory ( KadasMapItem* item )
+  {
+    return new KadasSymbolAttributesEditor ( item );
   }
 
-  KadasSymbolAttributesEditor(KadasMapItem* item);
+  KadasSymbolAttributesEditor ( KadasMapItem* item );
 
   void reset() override;
   void syncItemToWidget() override;

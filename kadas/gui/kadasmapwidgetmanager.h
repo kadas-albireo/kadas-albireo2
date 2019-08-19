@@ -31,25 +31,25 @@ class KadasMapWidget;
 
 class KADAS_GUI_EXPORT KadasMapWidgetManager : public QObject
 {
-    Q_OBJECT
-  public:
-    KadasMapWidgetManager(QgsMapCanvas* masterCanvas, QMainWindow *parent = 0 );
-    ~KadasMapWidgetManager();
+  Q_OBJECT
+public:
+  KadasMapWidgetManager ( QgsMapCanvas* masterCanvas, QMainWindow* parent = 0 );
+  ~KadasMapWidgetManager();
 
-  public slots:
-    void addMapWidget();
-    void clearMapWidgets();
+public slots:
+  void addMapWidget();
+  void clearMapWidgets();
 
-  private:
-    QMainWindow* mMainWindow;
-    QgsMapCanvas* mMasterCanvas;
-    QList<QPointer<KadasMapWidget> > mMapWidgets;
-    QAction* mActionAddMapWidget;
+private:
+  QMainWindow* mMainWindow;
+  QgsMapCanvas* mMasterCanvas;
+  QList<QPointer<KadasMapWidget> > mMapWidgets;
+  QAction* mActionAddMapWidget;
 
-  private slots:
-    void mapWidgetDestroyed( QObject* mapWidget );
-    void writeProjectSettings( QDomDocument& doc );
-    void readProjectSettings( const QDomDocument& doc );
+private slots:
+  void mapWidgetDestroyed ( QObject* mapWidget );
+  void writeProjectSettings ( QDomDocument& doc );
+  void readProjectSettings ( const QDomDocument& doc );
 };
 
 #endif // KADASMAPWIDGETMANAGER_H

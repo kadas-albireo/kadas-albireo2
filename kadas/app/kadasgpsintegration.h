@@ -24,19 +24,20 @@
 class KadasCanvasGPSDisplay;
 class KadasMainWindow;
 
-class KadasGpsIntegration : public QObject {
+class KadasGpsIntegration : public QObject
+{
   Q_OBJECT
 public:
-  KadasGpsIntegration( KadasMainWindow* mainWindow );
+  KadasGpsIntegration ( KadasMainWindow* mainWindow );
   void initGui();
 
 public slots:
-  void enableGPS( bool enabled );
-  void moveWithGPS( bool enabled );
+  void enableGPS ( bool enabled );
+  void moveWithGPS ( bool enabled );
 
 private:
   void initGPSDisplay();
-  void setGPSIcon( const QColor& color );
+  void setGPSIcon ( const QColor& color );
 
   KadasMainWindow* mMainWindow;
   KadasCanvasGPSDisplay* mCanvasGPSDisplay = nullptr;
@@ -45,7 +46,7 @@ private slots:
   void gpsDetected();
   void gpsDisconnected();
   void gpsConnectionFailed();
-  void gpsFixChanged( QgsGpsInformation::FixStatus fixStatus );
+  void gpsFixChanged ( QgsGpsInformation::FixStatus fixStatus );
 };
 
 #endif // KADASGPSINTEGRATION_H

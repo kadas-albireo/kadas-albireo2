@@ -23,23 +23,23 @@
 
 class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    KadasRibbonButton( QWidget* parent = 0 ) : QToolButton( parent ) {}
+public:
+  KadasRibbonButton ( QWidget* parent = 0 ) : QToolButton ( parent ) {}
 
-  signals:
-    void contextMenuRequested( QPoint pos );
+signals:
+  void contextMenuRequested ( QPoint pos );
 
-  protected:
-    virtual void paintEvent( QPaintEvent* e );
-    virtual void enterEvent( QEvent* event );
-    virtual void leaveEvent( QEvent* event );
-    virtual void focusInEvent( QFocusEvent* event );
-    virtual void focusOutEvent( QFocusEvent* event );
-    virtual void mouseMoveEvent( QMouseEvent* event );
-    virtual void mousePressEvent( QMouseEvent* event );
-    virtual void contextMenuEvent( QContextMenuEvent* event );
+protected:
+  virtual void paintEvent ( QPaintEvent* e );
+  virtual void enterEvent ( QEvent* event );
+  virtual void leaveEvent ( QEvent* event );
+  virtual void focusInEvent ( QFocusEvent* event );
+  virtual void focusOutEvent ( QFocusEvent* event );
+  virtual void mouseMoveEvent ( QMouseEvent* event );
+  virtual void mousePressEvent ( QMouseEvent* event );
+  virtual void contextMenuEvent ( QContextMenuEvent* event );
 };
 
 #endif // KADASRIBBONBUTTON_H

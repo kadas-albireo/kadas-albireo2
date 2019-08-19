@@ -24,56 +24,56 @@
 class KADAS_CORE_EXPORT KadasAnchoredItem : public KadasMapItem
 {
 public:
-  KadasAnchoredItem(const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr);
+  KadasAnchoredItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
 
   // Item anchor point, as factors of its width/height
-  void setAnchor(double anchorX, double anchorY);
+  void setAnchor ( double anchorX, double anchorY );
 
-  void setPosition(const QgsPointXY& pos);
+  void setPosition ( const QgsPointXY& pos );
 
   QgsRectangle boundingBox() const override;
   QRect margin() const override;
-  QList<Node> nodes(const QgsMapSettings &settings) const override;
-  bool intersects( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
+  QList<Node> nodes ( const QgsMapSettings& settings ) const override;
+  bool intersects ( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
 
-  bool startPart(const QgsPointXY& firstPoint) override;
-  bool startPart(const AttribValues& values) override;
-  void setCurrentPoint(const QgsPointXY& p, const QgsMapSettings* mapSettings=nullptr) override;
-  void setCurrentAttributes(const AttribValues& values) override;
+  bool startPart ( const QgsPointXY& firstPoint ) override;
+  bool startPart ( const AttribValues& values ) override;
+  void setCurrentPoint ( const QgsPointXY& p, const QgsMapSettings* mapSettings = nullptr ) override;
+  void setCurrentAttributes ( const AttribValues& values ) override;
   bool continuePart() override;
   void endPart() override;
 
   AttribDefs drawAttribs() const override;
-  AttribValues drawAttribsFromPosition(const QgsPointXY& pos) const override;
-  QgsPointXY positionFromDrawAttribs(const AttribValues& values) const override;
+  AttribValues drawAttribsFromPosition ( const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromDrawAttribs ( const AttribValues& values ) const override;
 
-  EditContext getEditContext(const QgsPointXY& pos, const QgsMapSettings& mapSettings) const override;
-  void edit(const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings=nullptr) override;
-  void edit(const EditContext& context, const AttribValues& values) override;
+  EditContext getEditContext ( const QgsPointXY& pos, const QgsMapSettings& mapSettings ) const override;
+  void edit ( const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr ) override;
+  void edit ( const EditContext& context, const AttribValues& values ) override;
 
-  AttribValues editAttribsFromPosition(const EditContext& context, const QgsPointXY& pos) const override;
-  QgsPointXY positionFromEditAttribs(const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings) const override;
+  AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
+  QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
   struct State : KadasMapItem::State {
     QgsPointXY pos;
     double angle;
     QSize size;
-    void assign(const KadasMapItem::State* other) override { *this = *static_cast<const State*>(other); }
-    State* clone() const override { return new State(*this); }
+    void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
+    State* clone() const override { return new State ( *this ); }
   };
-  const State* state() const{ return static_cast<State*>(mState); }
+  const State* state() const { return static_cast<State*> ( mState ); }
 
 protected:
   enum AttribIds {AttrX, AttrY, AttrA};
   double mAnchorX = 0.5;
   double mAnchorY = 0.5;
 
-  State* state(){ return static_cast<State*>(mState); }
+  State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
-  QList<QgsPointXY> rotatedCornerPoints(double angle, double mup=1.) const;
+  QList<QgsPointXY> rotatedCornerPoints ( double angle, double mup = 1. ) const;
 
-  static void rotateNodeRenderer(QPainter* painter, const QgsPointXY& screenPoint, int nodeSize);
+  static void rotateNodeRenderer ( QPainter* painter, const QgsPointXY& screenPoint, int nodeSize );
 };
 
 #endif // KADASANCHOREDITEM_H
