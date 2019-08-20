@@ -41,6 +41,7 @@ public:
   int getNumber() const { return mNumber; }
   const QString& id() const { return mId; }
   QStringList getLayers() const;
+  QgsMapCanvas* mapCanvas() const { return mMapCanvas; }
 
   QgsRectangle getMapExtent() const;
   void setMapExtent ( const QgsRectangle& extent );
