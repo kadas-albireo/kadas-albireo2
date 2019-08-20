@@ -32,6 +32,7 @@ class KadasMapWidgetManager : public QObject
 public:
   KadasMapWidgetManager ( QgsMapCanvas* masterCanvas, QMainWindow* parent = 0 );
   ~KadasMapWidgetManager();
+  const QList<KadasMapWidget*>& mapWidgets() { return mMapWidgets; }
 
 public slots:
   KadasMapWidget* addMapWidget ( const QString& id );
