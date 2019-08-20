@@ -40,7 +40,6 @@
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/kadasmapwidgetmanager.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
 #include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
@@ -70,6 +69,7 @@
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadasmapwidgetmanager.h>
 
 KadasMainWindow::KadasMainWindow ( QSplashScreen* splash )
 {

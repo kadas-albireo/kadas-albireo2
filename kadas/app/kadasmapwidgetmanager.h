@@ -26,10 +26,7 @@ class QMainWindow;
 class QgsMapCanvas;
 class KadasMapWidget;
 
-#include <kadas/gui/kadas_gui.h>
-
-
-class KADAS_GUI_EXPORT KadasMapWidgetManager : public QObject
+class KadasMapWidgetManager : public QObject
 {
   Q_OBJECT
 public:
