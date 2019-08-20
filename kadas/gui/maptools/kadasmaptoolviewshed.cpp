@@ -170,8 +170,8 @@ void KadasMapToolViewshed::drawFinished()
     return;
   }
 
-  QgsPointXY center = item->state()->centers.last();
-  double curRadius = item->state()->radii.last();
+  QgsPointXY center = item->constState()->centers.last();
+  double curRadius = item->constState()->radii.last();
 
   QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
   QgsUnitTypes::DistanceUnit measureUnit = canvasCrs.mapUnits();
@@ -192,8 +192,8 @@ void KadasMapToolViewshed::drawFinished()
   if ( !poly.isEmpty() ) {
     filterRegion = poly.front();
   }
-  center = item->state()->centers.last();
-  curRadius = item->state()->radii.last();
+  center = item->constState()->centers.last();
+  curRadius = item->constState()->radii.last();
 
   if ( mCanvas->mapSettings().mapUnits() == QgsUnitTypes::DistanceDegrees ) {
     // Need to compute radius in meters
@@ -253,7 +253,7 @@ void KadasMapToolViewshed::adjustRadius ( double newRadius )
     return;
   }
 
-  KadasCircularSectorItem::State* state = const_cast<const KadasCircularSectorItem*> ( item )->state()->clone();
+  KadasCircularSectorItem::State* state = item->constState()->clone();
   state->radii.last() = newRadius;
   item->setState ( state );
   delete state;

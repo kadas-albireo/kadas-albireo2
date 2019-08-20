@@ -45,7 +45,7 @@ void KadasPinSearchProvider::startSearch ( const QString& searchtext, const Sear
         searchResult.category = sCategoryName;
         searchResult.categoryPrecedence = 2;
         searchResult.text = tr ( "Pin %1" ).arg ( symbolItem->name() );
-        searchResult.pos = symbolItem->state()->pos;
+        searchResult.pos = symbolItem->constState()->pos;
         searchResult.crs = symbolItem->crs().authid();
         searchResult.showPin = false;
         emit searchResultFound ( searchResult );

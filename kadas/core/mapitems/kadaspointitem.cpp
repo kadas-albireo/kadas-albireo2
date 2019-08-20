@@ -87,10 +87,10 @@ KadasMapItem::EditContext KadasPointItem::getEditContext ( const QgsPointXY& pos
 {
   QgsCoordinateTransform crst ( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
   QgsPointXY canvasPos = mapSettings.mapToPixel().transform ( crst.transform ( pos ) );
-  for ( int i = 0, n = state()->points.size(); i < n; ++i ) {
-    QgsPointXY testPos = mapSettings.mapToPixel().transform ( crst.transform ( state()->points[i] ) );
+  for ( int i = 0, n = constState()->points.size(); i < n; ++i ) {
+    QgsPointXY testPos = mapSettings.mapToPixel().transform ( crst.transform ( constState()->points[i] ) );
     if ( canvasPos.sqrDist ( testPos ) < 25 ) {
-      return EditContext ( QgsVertexId ( i, 0, 0 ), state()->points[i], drawAttribs() );
+      return EditContext ( QgsVertexId ( i, 0, 0 ), constState()->points[i], drawAttribs() );
     }
   }
   return EditContext();

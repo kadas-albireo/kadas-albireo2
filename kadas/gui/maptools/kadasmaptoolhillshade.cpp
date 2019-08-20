@@ -52,12 +52,12 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolHillshade::itemFactory ( const Q
 
 void KadasMapToolHillshade::drawFinished()
 {
-  const KadasRectangleItem* rectItem = dynamic_cast<const KadasRectangleItem*> ( currentItem() );
+  KadasRectangleItem* rectItem = dynamic_cast<KadasRectangleItem*> ( currentItem() );
   if ( !rectItem ) {
     return;
   }
-  const QgsPointXY& p1 = rectItem->state()->p1.front();
-  const QgsPointXY& p2 = rectItem->state()->p2.front();
+  const QgsPointXY& p1 = rectItem->constState()->p1.front();
+  const QgsPointXY& p2 = rectItem->constState()->p2.front();
   QgsRectangle rect ( p1, p2 );
   rect.normalize();
   if ( rect.isEmpty() ) {

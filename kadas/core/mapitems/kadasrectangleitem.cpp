@@ -92,12 +92,12 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext ( const QgsPointXY&
 {
   QgsCoordinateTransform crst ( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
   QgsPointXY canvasPos = mapSettings.mapToPixel().transform ( crst.transform ( pos ) );
-  for ( int iPart = 0, nParts = state()->p1.size(); iPart < nParts; ++iPart ) {
+  for ( int iPart = 0, nParts = constState()->p1.size(); iPart < nParts; ++iPart ) {
     QList<QgsPointXY> points = QList<QgsPointXY>()
-                               << state()->p1[iPart]
-                               << QgsPoint ( state()->p2[iPart].x(), state()->p1[iPart].y() )
-                               << state()->p2[iPart]
-                               << QgsPoint ( state()->p1[iPart].x(), state()->p2[iPart].y() );
+                               << constState()->p1[iPart]
+                               << QgsPoint ( constState()->p2[iPart].x(), constState()->p1[iPart].y() )
+                               << constState()->p2[iPart]
+                               << QgsPoint ( constState()->p1[iPart].x(), constState()->p2[iPart].y() );
     for ( int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert ) {
       QgsPointXY testPos = mapSettings.mapToPixel().transform ( crst.transform ( points[iVert] ) );
       if ( canvasPos.sqrDist ( testPos ) < 25 ) {

@@ -99,7 +99,7 @@ public:
     virtual void assign ( const State* other ) = 0;
     virtual State* clone() const = 0;
   };
-  const State* state() const { return mState; }
+  const State* constState() const { return mState; }
   void setState ( const State* state );
 
   struct NumericAttribute {

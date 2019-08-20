@@ -42,11 +42,11 @@ void KadasSymbolItem::setFilePath ( const QString& path, double anchorX, double 
 
 void KadasSymbolItem::render ( QgsRenderContext& context ) const
 {
-  if ( state()->drawStatus == State::Empty ) {
+  if ( constState()->drawStatus == State::Empty ) {
     return;
   }
 
-  QgsPoint pos = QgsPoint ( state()->pos );
+  QgsPoint pos = QgsPoint ( constState()->pos );
   pos.transform ( context.coordinateTransform() );
   pos.transform ( context.mapToPixel().transform() );
 
@@ -70,8 +70,8 @@ void KadasSymbolItem::render ( QgsRenderContext& context ) const
     }
     context.painter()->scale ( scale, scale );
     context.painter()->translate ( pos.x(), pos.y() );
-    context.painter()->rotate ( -state()->angle );
-    context.painter()->translate ( - mAnchorX * state()->size.width(), - mAnchorY * state()->size.height() );
+    context.painter()->rotate ( -constState()->angle );
+    context.painter()->translate ( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
     svgRenderer.render ( context.painter(), QRectF ( 0, 0, renderWidth, renderHeight ) );
   }
 }

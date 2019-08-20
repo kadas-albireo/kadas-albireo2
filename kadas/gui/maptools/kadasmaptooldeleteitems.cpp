@@ -47,11 +47,11 @@ KadasMapToolDeleteItems::ItemFactory KadasMapToolDeleteItems::itemFactory ( QgsM
 
 void KadasMapToolDeleteItems::drawFinished()
 {
-  const KadasRectangleItem* item = dynamic_cast<KadasRectangleItem*> ( currentItem() );
-  if ( !item || item->state()->p1.isEmpty() || item->state()->p2.isEmpty() ) {
+  KadasRectangleItem* item = dynamic_cast<KadasRectangleItem*> ( currentItem() );
+  if ( !item || item->constState()->p1.isEmpty() || item->constState()->p2.isEmpty() ) {
     return;
   }
-  QgsRectangle filterRect ( item->state()->p1.front(), item->state()->p2.front() );
+  QgsRectangle filterRect ( item->constState()->p1.front(), item->constState()->p2.front() );
   filterRect.normalize();
   if ( !filterRect.isEmpty() ) {
     deleteItems ( filterRect, item->crs() );

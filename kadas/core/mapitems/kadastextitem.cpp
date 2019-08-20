@@ -61,7 +61,7 @@ void KadasTextItem::setFont ( const QFont& font )
 
 void KadasTextItem::render ( QgsRenderContext& context ) const
 {
-  QgsPointXY mapPos = context.coordinateTransform().transform ( state()->pos );
+  QgsPointXY mapPos = context.coordinateTransform().transform ( constState()->pos );
   QPointF pos = context.mapToPixel().transform ( mapPos ).toQPointF();
   QFontMetrics metrics ( mFont );
   QRect bbox = metrics.boundingRect ( mText );
@@ -73,6 +73,6 @@ void KadasTextItem::render ( QgsRenderContext& context ) const
   QPainterPath path;
   path.addText ( -0.5 * bbox.width(), baselineOffset, mFont, mText );
   context.painter()->translate ( pos );
-  context.painter()->rotate ( -state()->angle );
+  context.painter()->rotate ( -constState()->angle );
   context.painter()->drawPath ( path );
 }

@@ -66,7 +66,7 @@ public:
     void assign ( const KadasMapItem::State* other ) override;
     State* clone() const override { return new State ( *this ); }
   };
-  const State* state() const { return static_cast<State*> ( mState ); }
+  const State* constState() const { return static_cast<State*> ( mState ); }
 
 private:
   enum AttribIds {AttrX, AttrY};

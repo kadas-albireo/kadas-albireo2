@@ -44,7 +44,7 @@ KadasLineItem::KadasLineItem ( const QgsCoordinateReferenceSystem& crs, bool geo
 QList<KadasMapItem::Node> KadasLineItem::nodes ( const QgsMapSettings& settings ) const
 {
   QList<Node> nodes;
-  for ( const QList<QgsPointXY>& part : state()->points ) {
+  for ( const QList<QgsPointXY>& part : constState()->points ) {
     for ( const QgsPointXY& pos : part ) {
       nodes.append ( {pos} );
     }
@@ -123,8 +123,8 @@ KadasMapItem::EditContext KadasLineItem::getEditContext ( const QgsPointXY& pos,
 {
   QgsCoordinateTransform crst ( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
   QgsPointXY canvasPos = mapSettings.mapToPixel().transform ( crst.transform ( pos ) );
-  for ( int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart ) {
-    const QList<QgsPointXY> part = state()->points[iPart];
+  for ( int iPart = 0, nParts = constState()->points.size(); iPart < nParts; ++iPart ) {
+    const QList<QgsPointXY> part = constState()->points[iPart];
     for ( int iVert = 0, nVerts = part.size(); iVert < nVerts; ++iVert ) {
       QgsPointXY testPos = mapSettings.mapToPixel().transform ( crst.transform ( part[iVert] ) );
       if ( canvasPos.sqrDist ( testPos ) < 25 ) {

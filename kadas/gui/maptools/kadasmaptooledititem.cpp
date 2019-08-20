@@ -54,7 +54,7 @@ void KadasMapToolEditItem::activate()
   QgsMapTool::activate();
   setCursor ( Qt::ArrowCursor );
   mStateHistory = new KadasStateHistory ( this );
-  mStateHistory->push ( mItem->state()->clone() );
+  mStateHistory->push ( mItem->constState()->clone() );
   connect ( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditItem::stateChanged );
 
   mBottomBar = new KadasBottomBar ( canvas() );
@@ -166,7 +166,7 @@ void KadasMapToolEditItem::canvasMoveEvent ( QgsMapMouseEvent* e )
 void KadasMapToolEditItem::canvasReleaseEvent ( QgsMapMouseEvent* e )
 {
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() ) {
-    mStateHistory->push ( mItem->state()->clone() );
+    mStateHistory->push ( mItem->constState()->clone() );
   }
 }
 
@@ -238,6 +238,6 @@ void KadasMapToolEditItem::inputChanged()
     mInputWidget->adjustCursorAndExtent ( crst.transform ( newPos ) );
 
     mItem->edit ( mEditContext, values );
-    mStateHistory->push ( mItem->state()->clone() );
+    mStateHistory->push ( mItem->constState()->clone() );
   }
 }

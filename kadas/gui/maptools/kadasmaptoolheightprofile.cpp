@@ -92,10 +92,10 @@ void KadasMapToolHeightProfile::canvasPressEvent ( QgsMapMouseEvent* e )
 void KadasMapToolHeightProfile::canvasMoveEvent ( QgsMapMouseEvent* e )
 {
   if ( !mPicking ) {
-    const KadasLineItem* lineItem = dynamic_cast<const KadasLineItem*> ( currentItem() );
-    if ( lineItem && lineItem->state()->drawStatus == KadasMapItem::State::Finished && !lineItem->state()->points.isEmpty() ) {
+    KadasLineItem* lineItem = dynamic_cast<KadasLineItem*> ( currentItem() );
+    if ( lineItem && lineItem->constState()->drawStatus == KadasMapItem::State::Finished && !lineItem->constState()->points.isEmpty() ) {
       QgsPointXY p = toMapCoordinates ( e->pos() );
-      const QList<QgsPointXY>& points = lineItem->state()->points.front();
+      const QList<QgsPointXY>& points = lineItem->constState()->points.front();
       double minDist = std::numeric_limits<double>::max();
       int minIdx = 0;
       QgsPoint minPos;
@@ -153,10 +153,10 @@ void KadasMapToolHeightProfile::drawCleared()
 
 void KadasMapToolHeightProfile::drawFinished()
 {
-  const KadasLineItem* lineItem = dynamic_cast<const KadasLineItem*> ( currentItem() );
+  KadasLineItem* lineItem = dynamic_cast<KadasLineItem*> ( currentItem() );
   if ( lineItem ) {
-    if ( !lineItem->state()->points.isEmpty() && !lineItem->state()->points.front().isEmpty() ) {
-      const QList<QgsPointXY>& line = lineItem->state()->points.front();
+    if ( !lineItem->constState()->points.isEmpty() && !lineItem->constState()->points.front().isEmpty() ) {
+      const QList<QgsPointXY>& line = lineItem->constState()->points.front();
       mDialog->setPoints ( line, lineItem->crs() );
       QgsPoint markerPos ( line[0] );
       mPosMarker->addPartFromGeometry ( &markerPos );

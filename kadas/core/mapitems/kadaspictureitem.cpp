@@ -67,16 +67,16 @@ void KadasPictureItem::setFilePath ( const QString& path, const QgsPointXY& fall
 
 QgsRectangle KadasPictureItem::boundingBox() const
 {
-  return QgsRectangle ( state()->pos, state()->pos );
+  return QgsRectangle ( constState()->pos, constState()->pos );
 }
 
 QRect KadasPictureItem::margin() const
 {
   return QRect (
-           qMax ( 0., 0.5 * state()->size.width() - mOffsetX + sFramePadding ),
-           qMax ( 0., 0.5 * state()->size.height() - mOffsetY + sFramePadding ),
-           qMax ( 0., 0.5 * state()->size.width() + mOffsetX + sFramePadding ),
-           qMax ( 0., 0.5 * state()->size.height() + mOffsetY + sFramePadding )
+           qMax ( 0., 0.5 * constState()->size.width() - mOffsetX + sFramePadding ),
+           qMax ( 0., 0.5 * constState()->size.height() - mOffsetY + sFramePadding ),
+           qMax ( 0., 0.5 * constState()->size.width() + mOffsetX + sFramePadding ),
+           qMax ( 0., 0.5 * constState()->size.height() + mOffsetY + sFramePadding )
          );
 }
 
@@ -84,8 +84,8 @@ QList<QgsPointXY> KadasPictureItem::cornerPoints ( const QgsPointXY& anchor, dou
 {
   double x = anchor.x();
   double y = anchor.y();
-  double halfW = 0.5 * state()->size.width();
-  double halfH = 0.5 * state()->size.height();
+  double halfW = 0.5 * constState()->size.width();
+  double halfH = 0.5 * constState()->size.height();
 
   QgsPointXY p1 ( x + ( mOffsetX - halfW ) * mup, y + ( mOffsetY - halfH ) * mup );
   QgsPointXY p2 ( x + ( mOffsetX + halfW ) * mup, y + ( mOffsetY - halfH ) * mup );
@@ -97,23 +97,23 @@ QList<QgsPointXY> KadasPictureItem::cornerPoints ( const QgsPointXY& anchor, dou
 
 QList<KadasMapItem::Node> KadasPictureItem::nodes ( const QgsMapSettings& settings ) const
 {
-  QList<QgsPointXY> points = cornerPoints ( state()->pos, settings.mapUnitsPerPixel() );
+  QList<QgsPointXY> points = cornerPoints ( constState()->pos, settings.mapUnitsPerPixel() );
   QList<Node> nodes;
   nodes.append ( {points[0]} );
   nodes.append ( {points[1]} );
   nodes.append ( {points[2]} );
   nodes.append ( {points[3]} );
-  nodes.append ( {state()->pos, anchorNodeRenderer} );
+  nodes.append ( {constState()->pos, anchorNodeRenderer} );
   return nodes;
 }
 
 bool KadasPictureItem::intersects ( const QgsRectangle& rect, const QgsMapSettings& settings ) const
 {
-  if ( state()->size.isEmpty() ) {
+  if ( constState()->size.isEmpty() ) {
     return false;
   }
 
-  QList<QgsPointXY> points = cornerPoints ( state()->pos, settings.mapUnitsPerPixel() );
+  QList<QgsPointXY> points = cornerPoints ( constState()->pos, settings.mapUnitsPerPixel() );
   QgsPolygon imageRect;
   imageRect.setExteriorRing ( new QgsLineString ( QgsPointSequence() << QgsPoint ( points[0] ) << QgsPoint ( points[1] ) << QgsPoint ( points[2] ) << QgsPoint ( points[3] ) << QgsPoint ( points[0] ) ) );
 
@@ -135,14 +135,14 @@ bool KadasPictureItem::intersects ( const QgsRectangle& rect, const QgsMapSettin
 
 void KadasPictureItem::render ( QgsRenderContext& context ) const
 {
-  QgsPoint pos ( state()->pos );
+  QgsPoint pos ( constState()->pos );
   pos.transform ( context.coordinateTransform() );
   pos.transform ( context.mapToPixel().transform() );
   context.painter()->translate ( pos.x(), pos.y() );
 
   // Draw frame
-  double w = state()->size.width();
-  double h = state()->size.height();
+  double w = constState()->size.width();
+  double h = constState()->size.height();
   double framew = w + 2 * sFramePadding;
   double frameh = h + 2 * sFramePadding;
   context.painter()->setPen ( QPen ( Qt::black, 1 ) );
@@ -240,7 +240,7 @@ KadasMapItem::EditContext KadasPictureItem::getEditContext ( const QgsPointXY& p
 {
   double mup = mapSettings.mapUnitsPerPixel();
   if ( intersects ( QgsRectangle ( pos.x() - mup, pos.y() - mup, pos.x() + mup, pos.y() + mup ), mapSettings ) ) {
-    QgsPointXY framePos ( state()->pos.x() + mOffsetX * mup, state()->pos.y() + mOffsetY * mup );
+    QgsPointXY framePos ( constState()->pos.x() + mOffsetX * mup, constState()->pos.y() + mOffsetY * mup );
     return EditContext ( QgsVertexId ( 0, 0, 0 ), framePos );
   }
   return EditContext();

@@ -137,18 +137,18 @@ KadasMapItem::AttribDefs KadasCircularSectorItem::drawAttribs() const
 KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition ( const QgsPointXY& pos ) const
 {
   AttribValues attributes;
-  if ( state()->drawStatus == State::Empty ) {
+  if ( constState()->drawStatus == State::Empty ) {
     attributes.insert ( AttrX, pos.x() );
     attributes.insert ( AttrY, pos.y() );
     attributes.insert ( AttrR, 0 );
     attributes.insert ( AttrA1, 0 );
     attributes.insert ( AttrA2, 0 );
   } else {
-    attributes.insert ( AttrX, state()->centers.last().x() );
-    attributes.insert ( AttrY, state()->centers.last().y() );
-    attributes.insert ( AttrR, state()->radii.last() );
-    attributes.insert ( AttrA1, state()->startAngles.last() / M_PI * 180. );
-    attributes.insert ( AttrA2, state()->stopAngles.last() / M_PI * 180. );
+    attributes.insert ( AttrX, constState()->centers.last().x() );
+    attributes.insert ( AttrY, constState()->centers.last().y() );
+    attributes.insert ( AttrR, constState()->radii.last() );
+    attributes.insert ( AttrA1, constState()->startAngles.last() / M_PI * 180. );
+    attributes.insert ( AttrA2, constState()->stopAngles.last() / M_PI * 180. );
   }
   return attributes;
 }
