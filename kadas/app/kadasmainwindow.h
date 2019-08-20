@@ -38,6 +38,8 @@ class KadasMapWidgetManager;
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
 {
+  Q_OBJECT
+
 public:
   explicit KadasMainWindow ( QSplashScreen* splash );
 
@@ -45,11 +47,20 @@ public:
   QgsMessageBar* messageBar() const { return mInfoBar; }
   QgsLayerTreeView* layerTreeView() const { return mLayerTreeView; }
   QgsLayerTreeMapCanvasBridge* layerTreeMapCanvasBridge() const { return mLayerTreeCanvasBridge; }
+  KadasMapWidgetManager* mapWidgetManager() const { return mMapWidgetManager; }
   int messageTimeout() const;
 
   QWidget* addRibbonTab ( const QString& name );
   void addActionToTab ( QAction* action, QWidget* tabWidget );
   void addMenuButtonToTab ( const QString& text, const QIcon& icon, QMenu* menu, QWidget* tabWidget );
+
+public slots:
+  void zoomFull();
+  void zoomIn();
+  void zoomNext();
+  void zoomOut();
+  void zoomPrev();
+  void zoomToLayerExtent();
 
 private slots:
   void addMapCanvasItem ( const KadasMapItem* item );
@@ -66,11 +77,6 @@ private slots:
   void switchToTabForTool ( QgsMapTool* tool );
   void toggleLayerTree();
   void checkOnTheFlyProjection();
-  void zoomFull();
-  void zoomIn();
-  void zoomNext();
-  void zoomOut();
-  void zoomPrev();
 
 private:
   bool eventFilter ( QObject* obj, QEvent* ev ) override;

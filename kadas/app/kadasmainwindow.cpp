@@ -25,6 +25,7 @@
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
+#include <qgis/qgslayertreeviewdefaultactions.h>
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
@@ -620,6 +621,11 @@ void KadasMainWindow::zoomPrev()
   mScaleComboBox->blockSignals ( true );
   mMapCanvas->zoomToPreviousExtent();
   mScaleComboBox->blockSignals ( false );
+}
+
+void KadasMainWindow::zoomToLayerExtent()
+{
+  mLayerTreeView->defaultActions()->zoomToLayer ( mMapCanvas );
 }
 
 void KadasMainWindow::showSourceSelectDialog ( const QString& providerName )
