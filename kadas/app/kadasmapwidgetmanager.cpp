@@ -92,6 +92,20 @@ KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
   return mapWidget;
 }
 
+void KadasMapWidgetManager::removeMapWidget ( const QString& id )
+{
+  int pos = -1;
+  for ( int i = 0, n = mMapWidgets.size(); i < n; ++i ) {
+    if ( mMapWidgets[i]->id() == id ) {
+      pos = i;
+      break;
+    }
+  }
+  if ( pos != -1 ) {
+    delete mMapWidgets.takeAt ( pos );
+  }
+}
+
 void KadasMapWidgetManager::clearMapWidgets()
 {
   qDeleteAll ( mMapWidgets );

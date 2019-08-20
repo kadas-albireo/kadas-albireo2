@@ -36,6 +36,7 @@ public:
 public slots:
   KadasMapWidget* addMapWidget ( const QString& id );
   KadasMapWidget* addMapWidget() { return addMapWidget ( QString() ); }
+  void removeMapWidget ( const QString& id );
   void clearMapWidgets();
 
 private:
