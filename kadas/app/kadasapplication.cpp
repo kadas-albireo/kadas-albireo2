@@ -28,7 +28,6 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
-#include <qgis/qgsmapcanvasannotationitem.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>

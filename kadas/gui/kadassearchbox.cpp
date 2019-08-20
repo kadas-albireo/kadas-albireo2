@@ -27,7 +27,6 @@
 #include <QVBoxLayout>
 
 #include <qgis/qgscoordinatetransform.h>
-#include <qgis/qgsgeometryrubberband.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
