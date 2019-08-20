@@ -17,25 +17,15 @@
 #ifndef KADASTEMPORARYFILE_H
 #define KADASTEMPORARYFILE_H
 
-#include <QObject>
-#include <QList>
+#include <QString>
 
 #include <kadas/core/kadas_core.h>
 
-class QTemporaryFile;
-
-class KADAS_CORE_EXPORT KadasTemporaryFile : public QObject
+class KADAS_CORE_EXPORT KadasTemporaryFile
 {
 public:
   static QString createNewFile ( const QString& templateName );
   static void clear();
-
-private:
-  QList<QTemporaryFile*> mFiles;
-  KadasTemporaryFile() {}
-  ~KadasTemporaryFile();
-  static KadasTemporaryFile* instance();
-  QString _createNewFile ( const QString& templateName );
 };
 
 #endif // KADASTEMPORARYFILE_H

@@ -15,17 +15,38 @@
  ***************************************************************************/
 
 #include <QDir>
+#include <QList>
+#include <QObject>
 #include <QTemporaryFile>
 
 #include <kadas/core/kadastemporaryfile.h>
 
+class QTemporaryFile;
 
-KadasTemporaryFile::~KadasTemporaryFile()
+class KadasTemporaryFileImpl : public QObject
+{
+public:
+  static KadasTemporaryFileImpl* instance();
+  QString createNewFile ( const QString& templateName );
+  void clear();
+
+private:
+  ~KadasTemporaryFileImpl();
+  QList<QTemporaryFile*> mFiles;
+};
+
+KadasTemporaryFileImpl::~KadasTemporaryFileImpl()
 {
   clear();
 }
 
-void KadasTemporaryFile::clear()
+KadasTemporaryFileImpl* KadasTemporaryFileImpl::instance()
+{
+  static KadasTemporaryFileImpl i;
+  return &i;
+}
+
+void KadasTemporaryFileImpl::clear()
 {
   for ( QTemporaryFile* file : instance()->mFiles ) {
     QFile ( file->fileName() + ".aux.xml" ).remove();
@@ -34,20 +55,19 @@ void KadasTemporaryFile::clear()
   instance()->mFiles.clear();
 }
 
-QString KadasTemporaryFile::createNewFile ( const QString& templateName )
-{
-  return instance()->_createNewFile ( templateName );
-}
-
-KadasTemporaryFile* KadasTemporaryFile::instance()
-{
-  static KadasTemporaryFile i;
-  return &i;
-}
-
-QString KadasTemporaryFile::_createNewFile ( const QString& templateName )
+QString KadasTemporaryFileImpl::createNewFile ( const QString& templateName )
 {
   QTemporaryFile* tmpFile = new QTemporaryFile ( QDir::temp().absoluteFilePath ( "XXXXXX_" + templateName ), this );
   mFiles.append ( tmpFile );
   return tmpFile->open() ? tmpFile->fileName() : QString();
+}
+
+void KadasTemporaryFile::clear()
+{
+  KadasTemporaryFileImpl::instance()->clear();
+}
+
+QString KadasTemporaryFile::createNewFile ( const QString& templateName )
+{
+  return KadasTemporaryFileImpl::instance()->createNewFile ( templateName );
 }
