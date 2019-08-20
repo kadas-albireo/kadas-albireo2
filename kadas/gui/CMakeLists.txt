@@ -1,3 +1,5 @@
+SET(CMAKE_AUTOMOC ON)
+
 FILE(GLOB kadas_gui_SRC
   *.cpp
   catalog/*.cpp
