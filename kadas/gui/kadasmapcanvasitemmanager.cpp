@@ -41,6 +41,12 @@ const QList<const KadasMapItem*>& KadasMapCanvasItemManager::items()
   return instance()->mMapItems;
 }
 
+void KadasMapCanvasItemManager::clear()
+{
+  qDeleteAll ( instance()->mMapItems );
+  instance()->mMapItems.clear();
+}
+
 void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
 {
   const KadasMapItem* item = qobject_cast<const KadasMapItem*> ( QObject::sender() );

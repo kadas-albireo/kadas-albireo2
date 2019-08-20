@@ -39,6 +39,7 @@
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadasitemlayer.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
@@ -494,14 +495,7 @@ void KadasApplication::projectClose()
 
   mMainWindow->mapCanvas()->clearExtentHistory();
 
-  // Remove annotation items
-  QGraphicsScene* scene = mMainWindow->mapCanvas()->scene();
-  for ( QGraphicsItem* item : mMainWindow->mapCanvas()->items() ) {
-    if ( dynamic_cast<QgsMapCanvasAnnotationItem*> ( item ) ) {
-      scene->removeItem ( item );
-      delete item;
-    }
-  }
+  KadasMapCanvasItemManager::clear();
 
   // clear out any stuff from project
   mMainWindow->mapCanvas()->freeze ( true );

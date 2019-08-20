@@ -32,6 +32,7 @@ public:
   static void addItem ( const KadasMapItem* item );
   static void removeItem ( const KadasMapItem* item );
   static const QList<const KadasMapItem*>& items();
+  static void clear();
 
 signals:
   void itemAdded ( const KadasMapItem* item );
