@@ -35,7 +35,7 @@ KadasMapWidgetManager::~KadasMapWidgetManager()
   clearMapWidgets();
 }
 
-void KadasMapWidgetManager::addMapWidget()
+KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
 {
   int highestNumber = 1;
   for ( const QPointer<KadasMapWidget>& mapWidget : mMapWidgets ) {
@@ -44,7 +44,12 @@ void KadasMapWidgetManager::addMapWidget()
     }
   }
 
-  KadasMapWidget* mapWidget = new KadasMapWidget ( highestNumber, tr ( "View #%1" ).arg ( highestNumber ), mMasterCanvas );
+  QString widgetId = id;
+  if ( widgetId.isEmpty() ) {
+    widgetId = QUuid::createUuid().toString();
+  }
+
+  KadasMapWidget* mapWidget = new KadasMapWidget ( highestNumber, widgetId, tr ( "View #%1" ).arg ( highestNumber ), mMasterCanvas );
   connect ( mapWidget, &QObject::destroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
 
   // Determine whether to add the new dock widget in the right or bottom area
@@ -84,6 +89,7 @@ void KadasMapWidgetManager::addMapWidget()
   mMainWindow->addDockWidget ( addArea, mapWidget );
   mapWidget->resize ( initialSize );
   mMapWidgets.append ( QPointer<KadasMapWidget> ( mapWidget ) );
+  return mapWidget;
 }
 
 void KadasMapWidgetManager::clearMapWidgets()
@@ -125,6 +131,7 @@ void KadasMapWidgetManager::writeProjectSettings ( QDomDocument& doc )
     mapWidgetItemElem.setAttribute ( "islocked", mapWidget->getLocked() );
     mapWidgetItemElem.setAttribute ( "area", mMainWindow->dockWidgetArea ( mapWidget ) );
     mapWidgetItemElem.setAttribute ( "title", mapWidget->windowTitle() );
+    mapWidgetItemElem.setAttribute ( "id", mapWidget->id() );
     mapWidgetItemElem.setAttribute ( "number", mapWidget->getNumber() );
     ds << mapWidget->getLayers();
     mapWidgetItemElem.setAttribute ( "layers", QString ( ba.toBase64() ) );
@@ -155,6 +162,7 @@ void KadasMapWidgetManager::readProjectSettings ( const QDomDocument& doc )
       QDataStream ds ( &ba, QIODevice::ReadOnly );
       KadasMapWidget* mapWidget = new KadasMapWidget (
         attributes.namedItem ( "number" ).nodeValue().toInt(),
+        attributes.namedItem ( "id " ).nodeValue(),
         attributes.namedItem ( "title" ).nodeValue(),
         mMasterCanvas );
       mapWidget->setAttribute ( Qt::WA_DeleteOnClose );

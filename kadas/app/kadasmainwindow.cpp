@@ -412,7 +412,7 @@ void KadasMainWindow::configureButtons()
   connect ( mMapCanvas, &QgsMapCanvas::zoomNextStatusChanged, mActionZoomNext, &QAction::setEnabled );
 
   setActionToButton ( mActionNewMapWindow, mNewMapWindowButton, QKeySequence ( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
-  connect ( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, &KadasMapWidgetManager::addMapWidget );
+  connect ( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, qOverload<> ( &KadasMapWidgetManager::addMapWidget ) );
 
   setActionToButton ( mAction3D, m3DButton, QKeySequence ( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
   // signal connected by plugin

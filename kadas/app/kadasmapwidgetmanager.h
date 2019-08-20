@@ -34,7 +34,8 @@ public:
   ~KadasMapWidgetManager();
 
 public slots:
-  void addMapWidget();
+  KadasMapWidget* addMapWidget ( const QString& id );
+  KadasMapWidget* addMapWidget() { return addMapWidget ( QString() ); }
   void clearMapWidgets();
 
 private:

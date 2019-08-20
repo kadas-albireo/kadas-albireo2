@@ -34,8 +34,8 @@
 #include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 
-KadasMapWidget::KadasMapWidget ( int number, const QString& title, QgsMapCanvas* masterCanvas, QWidget* parent )
-  : QDockWidget ( parent ), mNumber ( number ), mMasterCanvas ( masterCanvas ), mUnsetFixedSize ( true )
+KadasMapWidget::KadasMapWidget ( int number, const QString& id, const QString& title, QgsMapCanvas* masterCanvas, QWidget* parent )
+  : QDockWidget ( parent ), mId ( id ), mNumber ( number ), mMasterCanvas ( masterCanvas ), mUnsetFixedSize ( true )
 {
   QgsSettings settings;
 
