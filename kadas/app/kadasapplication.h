@@ -61,6 +61,7 @@ public:
 
   void paste();
 
+  void projectNew ( bool askToSave );
   bool projectCreateFromTemplate ( const QString& templateFile );
   bool projectOpen ( const QString& projectFile = QString() );
   void projectClose();

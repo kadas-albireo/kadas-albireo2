@@ -427,6 +427,15 @@ void KadasApplication::paste()
   // TODO
 }
 
+void KadasApplication::projectNew ( bool askToSave )
+{
+  if ( askToSave && !projectSaveDirty() ) {
+    return;
+  }
+
+  projectClose();
+}
+
 bool KadasApplication::projectCreateFromTemplate ( const QString& templateFile )
 {
   if ( projectOpen ( templateFile ) ) {
