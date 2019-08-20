@@ -42,7 +42,7 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes ( const QgsMapSettings& setting
     points.append ( {center} );
     if ( mGeodesic ) {
       QgsPointXY wgsCenter = crst.transform ( center );
-      QgsPointXY wgsRPos = mDa.destination ( wgsCenter, constState()->radii[i], 90 );
+      QgsPointXY wgsRPos = mDa.computeSpheroidProject ( wgsCenter, constState()->radii[i], 90 );
       points.append ( {crst.transform ( wgsRPos, QgsCoordinateTransform::ReverseTransform ) } );
     } else {
       points.append ( {QgsPointXY ( center.x() + constState()->radii[i], center.y() ) } );
@@ -274,13 +274,13 @@ void KadasCircleItem::computeGeoCircle ( const QgsPointXY& center, double radius
   double clampLatitude = mCrs.authid() == "EPSG:3857" ? 85 : 90;
   QList<QgsPointXY> wgsPoints;
   for ( int a = 0; a < 360; ++a ) {
-    wgsPoints.append ( mDa.destination ( p1, radius, a ) );
+    wgsPoints.append ( mDa.computeSpheroidProject ( p1, radius, a ) );
   }
   // Check if area would cross north or south pole
   // -> Check if destination point at bearing 0 / 180 with given radius would flip longitude
   // -> If crosses north/south pole, add points at lat 90 resp. -90 between points with max resp. min latitude
-  QgsPointXY pn = mDa.destination ( p1, radius, 0 );
-  QgsPointXY ps = mDa.destination ( p1, radius, 180 );
+  QgsPointXY pn = mDa.computeSpheroidProject ( p1, radius, 0 );
+  QgsPointXY ps = mDa.computeSpheroidProject ( p1, radius, 180 );
   int shift = 0;
   int nPoints = wgsPoints.size();
   if ( qFuzzyCompare ( qAbs ( pn.x() - p1.x() ), 180 ) ) { // crosses north pole
