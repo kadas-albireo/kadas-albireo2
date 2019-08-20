@@ -14,8 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadas/core/mapitems/kadassymbolitem.h>
-
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 
 

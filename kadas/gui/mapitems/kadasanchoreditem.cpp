@@ -20,7 +20,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadasanchoreditem.h>
+#include <kadas/gui/mapitems/kadasanchoreditem.h>
 
 
 KadasAnchoredItem::KadasAnchoredItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

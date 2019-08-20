@@ -29,8 +29,8 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadastemporaryfile.h>
-#include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/analysis/kadashillshadefilter.h>
+#include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 
 

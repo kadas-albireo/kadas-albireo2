@@ -31,14 +31,14 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadascircleitem.h>
-#include <kadas/core/mapitems/kadassymbolitem.h>
-#include <kadas/core/mapitems/kadaspolygonitem.h>
-#include <kadas/core/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadassearchbox.h>
 #include <kadas/gui/kadassearchprovider.h>
+#include <kadas/gui/mapitems/kadascircleitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
+#include <kadas/gui/mapitems/kadaspolygonitem.h>
+#include <kadas/gui/mapitems/kadasrectangleitem.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
 
 

@@ -22,7 +22,7 @@
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspoint.h>
 
-#include <kadas/core/mapitems/kadasrectangleitem.h>
+#include <kadas/gui/mapitems/kadasrectangleitem.h>
 
 
 KadasRectangleItem::KadasRectangleItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

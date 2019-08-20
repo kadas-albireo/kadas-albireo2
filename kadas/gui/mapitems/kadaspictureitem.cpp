@@ -24,7 +24,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadaspictureitem.h>
+#include <kadas/gui/mapitems/kadaspictureitem.h>
 
 
 KadasPictureItem::KadasPictureItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

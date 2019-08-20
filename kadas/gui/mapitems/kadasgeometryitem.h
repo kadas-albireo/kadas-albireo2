@@ -23,11 +23,11 @@
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgsdistancearea.h>
 
-#include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
 struct QgsVertexId;
 
-class KADAS_CORE_EXPORT KadasGeometryItem : public KadasMapItem
+class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem
 {
   Q_OBJECT
 public:

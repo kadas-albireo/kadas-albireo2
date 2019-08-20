@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasanchoreditem.h
-    -------------------
+    kadaspictureitem.h
+    ------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,27 +14,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASANCHOREDITEM_H
-#define KADASANCHOREDITEM_H
+#ifndef KADASPICTUREITEM_H
+#define KADASPICTUREITEM_H
 
-#include <kadas/core/kadas_core.h>
-#include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
 
-class KADAS_CORE_EXPORT KadasAnchoredItem : public KadasMapItem
+class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 {
 public:
-  KadasAnchoredItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
-
-  // Item anchor point, as factors of its width/height
-  void setAnchor ( double anchorX, double anchorY );
-
-  void setPosition ( const QgsPointXY& pos );
+  KadasPictureItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
+  void setFilePath ( const QString& path, const QgsPointXY& fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
 
   QgsRectangle boundingBox() const override;
   QRect margin() const override;
   QList<Node> nodes ( const QgsMapSettings& settings ) const override;
   bool intersects ( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
+  void render ( QgsRenderContext& context ) const override;
 
   bool startPart ( const QgsPointXY& firstPoint ) override;
   bool startPart ( const AttribValues& values ) override;
@@ -64,16 +60,21 @@ public:
   const State* constState() const { return static_cast<State*> ( mState ); }
 
 protected:
-  enum AttribIds {AttrX, AttrY, AttrA};
-  double mAnchorX = 0.5;
-  double mAnchorY = 0.5;
+  enum AttribIds {AttrX, AttrY};
+  QString mFilePath;
+  double mOffsetX = 0;
+  double mOffsetY = 0;
+  QImage mImage;
+
+  static constexpr int sFramePadding = 4;
+  static constexpr int sArrowWidth = 6;
 
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
   void recomputeDerived() override;
-  QList<QgsPointXY> rotatedCornerPoints ( double angle, double mup = 1. ) const;
 
-  static void rotateNodeRenderer ( QPainter* painter, const QgsPointXY& screenPoint, int nodeSize );
+  QList<QgsPointXY> cornerPoints ( const QgsPointXY& anchor, double mup = 1. ) const;
+  static bool readGeoPos ( const QString& filePath, QgsPointXY& wgsPos );
 };
 
-#endif // KADASANCHOREDITEM_H
+#endif // KADASPICTUREITEM_H

@@ -17,9 +17,8 @@
 #ifndef KADASSYMBOLATTRIBUTESEDITOR_H
 #define KADASSYMBOLATTRIBUTESEDITOR_H
 
-#include <kadas/core/mapitems/kadasmapitem.h>
-
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/ui_kadassymbolattributeseditor.h>
 
 class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor

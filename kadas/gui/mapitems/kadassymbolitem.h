@@ -17,11 +17,10 @@
 #ifndef KADASSYMBOLITEM_H
 #define KADASSYMBOLITEM_H
 
-#include <kadas/core/kadas_core.h>
-#include <kadas/core/mapitems/kadasanchoreditem.h>
+#include <kadas/gui/mapitems/kadasanchoreditem.h>
 
 
-class KADAS_CORE_EXPORT KadasSymbolItem : public KadasAnchoredItem
+class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
 public:
   KadasSymbolItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );

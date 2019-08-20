@@ -19,9 +19,8 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/core/kadasitemlayer.h>
-#include <kadas/core/mapitems/kadassymbolitem.h>
-
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 
 const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr ( "Pins" );

@@ -24,7 +24,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 
-#include <kadas/core/mapitems/kadascircularsectoritem.h>
+#include <kadas/gui/mapitems/kadascircularsectoritem.h>
 
 
 KadasCircularSectorItem::KadasCircularSectorItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

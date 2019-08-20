@@ -43,9 +43,9 @@
 #include <qgis/qgsvector.h>
 
 #include <kadas/core/kadascoordinateformat.h>
-#include <kadas/core/mapitems/kadaslineitem.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 
 

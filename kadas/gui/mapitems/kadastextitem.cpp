@@ -20,7 +20,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadastextitem.h>
+#include <kadas/gui/mapitems/kadastextitem.h>
 
 
 KadasTextItem::KadasTextItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

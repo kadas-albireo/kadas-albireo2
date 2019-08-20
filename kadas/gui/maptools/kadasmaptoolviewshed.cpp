@@ -34,9 +34,9 @@
 
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/core/kadastemporaryfile.h>
-#include <kadas/core/mapitems/kadascircularsectoritem.h>
-#include <kadas/core/mapitems/kadassymbolitem.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
+#include <kadas/gui/mapitems/kadascircularsectoritem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 

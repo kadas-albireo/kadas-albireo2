@@ -21,7 +21,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/core/kadasitemlayer.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick ( const QgsMapCanvas* canvas, const QPoint& canvasPos, const QgsPointXY& mapPos, QgsWkbTypes::GeometryType geomType )

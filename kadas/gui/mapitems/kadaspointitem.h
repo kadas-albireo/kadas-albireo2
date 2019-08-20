@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaslineitem.h
-    ---------------
+    kadaspointitem.h
+    ----------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,19 +14,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASLINEITEM_H
-#define KADASLINEITEM_H
+#ifndef KADASPOINTITEM_H
+#define KADASPOINTITEM_H
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
-class QgsMultiLineString;
-
-class KADAS_CORE_EXPORT KadasLineItem : public KadasGeometryItem
+class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
 {
 public:
-  KadasLineItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
-
-  QList<Node> nodes ( const QgsMapSettings& settings ) const override;
+  KadasPointItem ( const QgsCoordinateReferenceSystem& crs, IconType icon = ICON_CIRCLE, QObject* parent = nullptr );
 
   bool startPart ( const QgsPointXY& firstPoint ) override;
   bool startPart ( const AttribValues& values ) override;
@@ -46,24 +42,14 @@ public:
   AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
   QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
-  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::LineGeometry; }
-
+  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PointGeometry; }
   void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
-  const QgsMultiLineString* geometry() const;
 
-  enum MeasurementMode {
-    MeasureLineAndSegments,
-    MeasureAzimuthMapNorth,
-    MeasureAzimuthGeoNorth
-  };
-
-  void setMeasurementMode ( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees );
-  MeasurementMode measurementMode() const { return mMeasurementMode; }
-  QgsUnitTypes::AngleUnit angleUnit() const { return mAngleUnit; }
+  const QgsMultiPoint* geometry() const;
 
   struct State : KadasMapItem::State {
-    QList<QList<QgsPointXY>> points;
-    void assign ( const KadasMapItem::State* other ) override;
+    QList<QgsPointXY> points;
+    void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
     State* clone() const override { return new State ( *this ); }
   };
   const State* constState() const { return static_cast<State*> ( mState ); }
@@ -71,15 +57,10 @@ public:
 private:
   enum AttribIds {AttrX, AttrY};
 
-  bool mGeodesic = false;
-  MeasurementMode mMeasurementMode = MeasureLineAndSegments;
-  QgsUnitTypes::AngleUnit mAngleUnit = QgsUnitTypes::AngleDegrees;
-
-  QgsMultiLineString* geometry();
+  QgsMultiPoint* geometry();
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
-  void measureGeometry() override;
   void recomputeDerived() override;
 };
 
-#endif // KADASLINEITEM_H
+#endif // KADASPOINTITEM_H

@@ -1,7 +1,7 @@
-FILE(GLOB kadas_core_SRC *.cpp mapitems/*.cpp)
+FILE(GLOB kadas_core_SRC *.cpp)
 LIST(SORT kadas_core_SRC)
 
-FILE(GLOB kadas_core_HDR *.h mapitems/*.h)
+FILE(GLOB kadas_core_HDR *.h)
 LIST(SORT kadas_core_HDR)
 
 CONFIGURE_FILE(kadas_config.h.in kadas_config.h @ONLY)

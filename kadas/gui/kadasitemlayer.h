@@ -20,11 +20,11 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadas_core.h>
+#include <kadas/gui/kadas_gui.h>
 
 class KadasMapItem;
 
-class KADAS_CORE_EXPORT KadasItemLayer : public QgsPluginLayer
+class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 {
   Q_OBJECT
 public:
@@ -52,7 +52,7 @@ private:
   QgsCoordinateTransformContext mTransformContext;
 };
 
-class KADAS_CORE_EXPORT KadasItemLayerType : public QgsPluginLayerType
+class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
 {
 public:
   KadasItemLayerType()

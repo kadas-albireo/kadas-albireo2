@@ -18,7 +18,7 @@
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmapsettings.h>
 
-#include <kadas/core/mapitems/kadaspointitem.h>
+#include <kadas/gui/mapitems/kadaspointitem.h>
 
 
 KadasPointItem::KadasPointItem ( const QgsCoordinateReferenceSystem& crs, IconType icon, QObject* parent )

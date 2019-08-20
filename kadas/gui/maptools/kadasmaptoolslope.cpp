@@ -25,8 +25,8 @@
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
 #include <kadas/core/kadastemporaryfile.h>
-#include <kadas/core/mapitems/kadasrectangleitem.h>
 #include <kadas/analysis/kadasslopefilter.h>
+#include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
 
 

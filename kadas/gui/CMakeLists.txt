@@ -1,6 +1,7 @@
 FILE(GLOB kadas_gui_SRC
   *.cpp
   catalog/*.cpp
+  mapitems/*.cpp
   mapitemeditors/*.cpp
   maptools/*.cpp
   search/*.cpp
@@ -10,6 +11,7 @@ LIST(SORT kadas_gui_SRC)
 FILE(GLOB kadas_gui_HDR
   *.h
   catalog/*.h
+  mapitems/*.h
   mapitemeditors/*.h
   maptools/*.h
   search/*.h

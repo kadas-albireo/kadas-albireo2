@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaspointitem.h
-    ----------------
+    kadascircularsectoritem.h
+    -------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,15 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASPOINTITEM_H
-#define KADASPOINTITEM_H
+#ifndef KADASCIRCULARSECTORITEM_H
+#define KADASCIRCULARSECTORITEM_H
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
-class KADAS_CORE_EXPORT KadasPointItem : public KadasGeometryItem
+class QgsMultiSurface;
+
+class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 {
 public:
-  KadasPointItem ( const QgsCoordinateReferenceSystem& crs, IconType icon = ICON_CIRCLE, QObject* parent = nullptr );
+  KadasCircularSectorItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
 
   bool startPart ( const QgsPointXY& firstPoint ) override;
   bool startPart ( const AttribValues& values ) override;
@@ -42,25 +44,30 @@ public:
   AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
   QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
-  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PointGeometry; }
   void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
+  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
-  const QgsMultiPoint* geometry() const;
+  const QgsMultiSurface* geometry() const;
 
   struct State : KadasMapItem::State {
-    QList<QgsPointXY> points;
+    enum SectorStatus {HaveNothing, HaveCenter, HaveRadius} sectorStatus = HaveNothing;
+    QList<QgsPointXY> centers;
+    QList<double> radii;
+    QList<double> startAngles;
+    QList<double> stopAngles;
     void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
     State* clone() const override { return new State ( *this ); }
   };
   const State* constState() const { return static_cast<State*> ( mState ); }
 
 private:
-  enum AttribIds {AttrX, AttrY};
+  enum AttribIds {AttrX, AttrY, AttrR, AttrA1, AttrA2};
 
-  QgsMultiPoint* geometry();
+  QgsMultiSurface* geometry();
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
+  void measureGeometry() override;
   void recomputeDerived() override;
 };
 
-#endif // KADASPOINTITEM_H
+#endif // KADASCIRCULARSECTORITEM_H

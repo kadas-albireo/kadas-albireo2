@@ -30,7 +30,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
 static QFont measurementFont()
 {

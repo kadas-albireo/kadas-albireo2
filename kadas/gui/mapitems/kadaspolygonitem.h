@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadascircleitem.h
-    -----------------
+    kadaspolygonitem.h
+    ------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,18 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASCIRCLEITEM_H
-#define KADASCIRCLEITEM_H
+#ifndef KADASPOLYGONITEM_H
+#define KADASPOLYGONITEM_H
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
-class QgsCurvePolygon;
-class QgsMultiSurface;
+class QgsMultiPolygon;
 
-class KADAS_CORE_EXPORT KadasCircleItem : public KadasGeometryItem
+class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
 {
 public:
-  KadasCircleItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
+  KadasPolygonItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
 
   QList<Node> nodes ( const QgsMapSettings& settings ) const override;
 
@@ -47,31 +46,28 @@ public:
   AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
   QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
-  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
-  const QgsMultiSurface* geometry() const;
+  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
+  const QgsMultiPolygon* geometry() const;
 
   struct State : KadasMapItem::State {
-    QList<QgsPointXY> centers;
-    QList<double> radii;
+    QList<QList<QgsPointXY>> points;
     void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
     State* clone() const override { return new State ( *this ); }
   };
   const State* constState() const { return static_cast<State*> ( mState ); }
 
 private:
-  enum AttribIds {AttrX, AttrY, AttrR};
+  enum AttribIds {AttrX, AttrY};
 
   bool mGeodesic = false;
 
-  QgsMultiSurface* geometry();
+  QgsMultiPolygon* geometry();
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
   void measureGeometry() override;
   void recomputeDerived() override;
-  void computeCircle ( const QgsPointXY& center, double radius, QgsMultiSurface* multiGeom );
-  void computeGeoCircle ( const QgsPointXY& center, double radius, QgsMultiSurface* multiGeom );
 };
 
-#endif // KADASCIRCLEITEM_H
+#endif // KADASLINEITEM_H

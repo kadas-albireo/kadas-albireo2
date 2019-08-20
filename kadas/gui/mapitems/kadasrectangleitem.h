@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaspolygonitem.h
-    ------------------
+    kadasrectangleitem.h
+    --------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,19 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASPOLYGONITEM_H
-#define KADASPOLYGONITEM_H
+#ifndef KADASRECTANGLEITEM_H
+#define KADASRECTANGLEITEM_H
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
 class QgsMultiPolygon;
 
-class KADAS_CORE_EXPORT KadasPolygonItem : public KadasGeometryItem
+class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 {
 public:
-  KadasPolygonItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
-
-  QList<Node> nodes ( const QgsMapSettings& settings ) const override;
+  KadasRectangleItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
 
   bool startPart ( const QgsPointXY& firstPoint ) override;
   bool startPart ( const AttribValues& values ) override;
@@ -46,13 +44,14 @@ public:
   AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
   QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
+  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
   QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
-  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
   const QgsMultiPolygon* geometry() const;
 
   struct State : KadasMapItem::State {
-    QList<QList<QgsPointXY>> points;
+    QList<QgsPointXY> p1;
+    QList<QgsPointXY> p2;
     void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
     State* clone() const override { return new State ( *this ); }
   };
@@ -61,8 +60,6 @@ public:
 private:
   enum AttribIds {AttrX, AttrY};
 
-  bool mGeodesic = false;
-
   QgsMultiPolygon* geometry();
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
@@ -70,4 +67,4 @@ private:
   void recomputeDerived() override;
 };
 
-#endif // KADASLINEITEM_H
+#endif // KADASRECTANGLEITEM_H

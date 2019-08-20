@@ -32,10 +32,6 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 
-#include <kadas/core/mapitems/kadasmapitem.h>
-#include <kadas/core/mapitems/kadaspictureitem.h>
-#include <kadas/core/mapitems/kadassymbolitem.h>
-
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasmapcanvasitem.h>
@@ -45,6 +41,10 @@
 #include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
+
+#include <kadas/gui/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadaspictureitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 
 #include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 

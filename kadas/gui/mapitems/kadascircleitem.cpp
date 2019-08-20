@@ -24,7 +24,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadascircleitem.h>
+#include <kadas/gui/mapitems/kadascircleitem.h>
 
 KadasCircleItem::KadasCircleItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic, QObject* parent )
   : KadasGeometryItem ( crs, parent )

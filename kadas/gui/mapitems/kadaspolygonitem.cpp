@@ -26,7 +26,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadaspolygonitem.h>
+#include <kadas/gui/mapitems/kadaspolygonitem.h>
 
 
 KadasPolygonItem::KadasPolygonItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic, QObject* parent )

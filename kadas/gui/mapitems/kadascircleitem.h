@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaspictureitem.h
-    ------------------
+    kadascircleitem.h
+    -----------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,24 +14,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASPICTUREITEM_H
-#define KADASPICTUREITEM_H
+#ifndef KADASCIRCLEITEM_H
+#define KADASCIRCLEITEM_H
 
-#include <kadas/core/kadas_core.h>
-#include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
+class QgsCurvePolygon;
+class QgsMultiSurface;
 
-class KADAS_CORE_EXPORT KadasPictureItem : public KadasMapItem
+class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 {
 public:
-  KadasPictureItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
-  void setFilePath ( const QString& path, const QgsPointXY& fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+  KadasCircleItem ( const QgsCoordinateReferenceSystem& crs, bool geodesic = false, QObject* parent = nullptr );
 
-  QgsRectangle boundingBox() const override;
-  QRect margin() const override;
   QList<Node> nodes ( const QgsMapSettings& settings ) const override;
-  bool intersects ( const QgsRectangle& rect, const QgsMapSettings& settings ) const override;
-  void render ( QgsRenderContext& context ) const override;
 
   bool startPart ( const QgsPointXY& firstPoint ) override;
   bool startPart ( const AttribValues& values ) override;
@@ -51,31 +47,31 @@ public:
   AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
   QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
 
+  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
+  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
+
+  const QgsMultiSurface* geometry() const;
+
   struct State : KadasMapItem::State {
-    QgsPointXY pos;
-    double angle;
-    QSize size;
+    QList<QgsPointXY> centers;
+    QList<double> radii;
     void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
     State* clone() const override { return new State ( *this ); }
   };
   const State* constState() const { return static_cast<State*> ( mState ); }
 
-protected:
-  enum AttribIds {AttrX, AttrY};
-  QString mFilePath;
-  double mOffsetX = 0;
-  double mOffsetY = 0;
-  QImage mImage;
+private:
+  enum AttribIds {AttrX, AttrY, AttrR};
 
-  static constexpr int sFramePadding = 4;
-  static constexpr int sArrowWidth = 6;
+  bool mGeodesic = false;
 
+  QgsMultiSurface* geometry();
   State* state() { return static_cast<State*> ( mState ); }
   State* createEmptyState() const override { return new State(); }
+  void measureGeometry() override;
   void recomputeDerived() override;
-
-  QList<QgsPointXY> cornerPoints ( const QgsPointXY& anchor, double mup = 1. ) const;
-  static bool readGeoPos ( const QString& filePath, QgsPointXY& wgsPos );
+  void computeCircle ( const QgsPointXY& center, double radius, QgsMultiSurface* multiGeom );
+  void computeGeoCircle ( const QgsPointXY& center, double radius, QgsMultiSurface* multiGeom );
 };
 
-#endif // KADASPICTUREITEM_H
+#endif // KADASCIRCLEITEM_H

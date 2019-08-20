@@ -22,9 +22,8 @@
 
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/core/kadasitemlayer.h>
-#include <kadas/core/mapitems/kadasrectangleitem.h>
-
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 
 

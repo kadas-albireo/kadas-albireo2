@@ -17,7 +17,7 @@
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
 
 KadasMapItem::KadasMapItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )

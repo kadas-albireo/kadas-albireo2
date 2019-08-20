@@ -17,8 +17,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/core/mapitems/kadasgeometryitem.h>
-
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
 
 

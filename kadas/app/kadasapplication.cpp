@@ -38,7 +38,7 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/core/kadasitemlayer.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>

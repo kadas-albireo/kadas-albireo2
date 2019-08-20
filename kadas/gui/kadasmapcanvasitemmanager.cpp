@@ -14,8 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadas/core/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
 KadasMapCanvasItemManager* KadasMapCanvasItemManager::instance()
 {

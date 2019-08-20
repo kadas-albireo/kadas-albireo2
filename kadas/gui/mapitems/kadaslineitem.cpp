@@ -27,7 +27,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/mapitems/kadaslineitem.h>
+#include <kadas/gui/mapitems/kadaslineitem.h>
 
 void KadasLineItem::State::assign ( const KadasMapItem::State* other )
 {

@@ -20,8 +20,8 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/kadasitemlayer.h>
-#include <kadas/core/mapitems/kadasmapitem.h>
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>

@@ -25,7 +25,7 @@
 #include <qgis/qgsrectangle.h>
 
 #include <kadas/core/kadasstatehistory.h>
-#include <kadas/core/kadas_core.h>
+#include <kadas/gui/kadas_gui.h>
 
 class QgsRenderContext;
 struct QgsVertexId;
@@ -51,7 +51,7 @@ protected:
 };
 
 
-class KADAS_CORE_EXPORT KadasMapItem : public QObject
+class KADAS_GUI_EXPORT KadasMapItem : public QObject
 {
   Q_OBJECT
 public:

@@ -21,13 +21,13 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssnappingutils.h>
 
-#include <kadas/core/kadasitemlayer.h>
-#include <kadas/core/mapitems/kadasmapitem.h>
-#include <kadas/core/mapitems/kadasgeometryitem.h>
 
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
 
