@@ -36,6 +36,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
   Q_OBJECT
 public:
   KadasMapWidget ( int number, const QString& id, const QString& title, QgsMapCanvas* masterCanvas, QWidget* parent = 0 );
+  ~KadasMapWidget();
   void setInitialLayers ( const QStringList& initialLayers, bool updateMenu = false );
   int getNumber() const { return mNumber; }
   const QString& id() const { return mId; }
@@ -46,6 +47,9 @@ public:
 
   bool getLocked() const;
   void setLocked ( bool locked );
+
+signals:
+  void aboutToBeDestroyed();
 
 private:
   int mNumber;

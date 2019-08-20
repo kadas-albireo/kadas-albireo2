@@ -119,6 +119,11 @@ KadasMapWidget::KadasMapWidget ( int number, const QString& id, const QString& t
   mMapCanvas->setRenderFlag ( true );
 }
 
+KadasMapWidget::~KadasMapWidget()
+{
+  emit aboutToBeDestroyed();
+}
+
 void KadasMapWidget::setInitialLayers ( const QStringList& initialLayers, bool updateMenu )
 {
   mInitialLayers = initialLayers;

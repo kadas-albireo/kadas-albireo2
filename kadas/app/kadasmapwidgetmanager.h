@@ -41,11 +41,11 @@ public slots:
 private:
   QMainWindow* mMainWindow;
   QgsMapCanvas* mMasterCanvas;
-  QList<QPointer<KadasMapWidget> > mMapWidgets;
+  QList<KadasMapWidget*> mMapWidgets;
   QAction* mActionAddMapWidget;
 
 private slots:
-  void mapWidgetDestroyed ( QObject* mapWidget );
+  void mapWidgetDestroyed();
   void writeProjectSettings ( QDomDocument& doc );
   void readProjectSettings ( const QDomDocument& doc );
 };

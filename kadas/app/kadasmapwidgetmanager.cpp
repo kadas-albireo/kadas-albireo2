@@ -38,8 +38,8 @@ KadasMapWidgetManager::~KadasMapWidgetManager()
 KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
 {
   int highestNumber = 1;
-  for ( const QPointer<KadasMapWidget>& mapWidget : mMapWidgets ) {
-    if ( mapWidget && mapWidget->getNumber() >= highestNumber ) {
+  for ( KadasMapWidget* mapWidget : mMapWidgets ) {
+    if ( mapWidget->getNumber() >= highestNumber ) {
       highestNumber = mapWidget->getNumber() + 1;
     }
   }
@@ -50,13 +50,13 @@ KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
   }
 
   KadasMapWidget* mapWidget = new KadasMapWidget ( highestNumber, widgetId, tr ( "View #%1" ).arg ( highestNumber ), mMasterCanvas );
-  connect ( mapWidget, &QObject::destroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
+  connect ( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
 
   // Determine whether to add the new dock widget in the right or bottom area
   int nRight = 0, nBottom = 0;
   double rightAreaWidth = 0;
   double bottomAreaHeight = 0;
-  for ( const QPointer<KadasMapWidget>& mapWidget : mMapWidgets ) {
+  for ( KadasMapWidget*& mapWidget : mMapWidgets ) {
     Qt::DockWidgetArea area = mMainWindow->dockWidgetArea ( mapWidget );
     if ( area == Qt::RightDockWidgetArea ) {
       ++nRight;
@@ -88,26 +88,21 @@ KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
   mapWidget->setFixedSize ( initialSize );
   mMainWindow->addDockWidget ( addArea, mapWidget );
   mapWidget->resize ( initialSize );
-  mMapWidgets.append ( QPointer<KadasMapWidget> ( mapWidget ) );
+  mMapWidgets.append ( mapWidget );
   return mapWidget;
 }
 
 void KadasMapWidgetManager::clearMapWidgets()
 {
-  for ( const QPointer<KadasMapWidget>& mapWidget : mMapWidgets ) {
-    delete mapWidget.data();
-  }
+  qDeleteAll ( mMapWidgets );
   mMapWidgets.clear();
 }
 
-void KadasMapWidgetManager::mapWidgetDestroyed ( QObject* mapWidget )
+void KadasMapWidgetManager::mapWidgetDestroyed()
 {
-  QMutableListIterator<QPointer<KadasMapWidget>> i ( mMapWidgets );
-  while ( i.hasNext() ) {
-    const QPointer<KadasMapWidget>& p = i.next();
-    if ( p.data() == nullptr || static_cast<QObject*> ( p.data() ) == mapWidget ) {
-      i.remove();
-    }
+  KadasMapWidget* mapWidget = qobject_cast<KadasMapWidget*> ( QObject::sender() );
+  if ( mapWidget ) {
+    mMapWidgets.removeAll ( mapWidget );
   }
 }
 
@@ -170,7 +165,7 @@ void KadasMapWidgetManager::readProjectSettings ( const QDomDocument& doc )
       QStringList layersList;
       ds >> layersList;
       mapWidget->setInitialLayers ( layersList );
-      connect ( mapWidget, &QObject::destroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
+      connect ( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
       // Compiler bug?! If I pass it directly, value is always false
       bool islocked = attributes.namedItem ( "islocked" ).nodeValue().toInt();
       mapWidget->setLocked ( islocked );
