@@ -184,8 +184,6 @@ KadasApplication::KadasApplication ( int& argc, char** argv )
   mMainWindow->mapCanvas()->setCanvasColor ( Qt::transparent );
   mMainWindow->mapCanvas()->setMapUpdateInterval ( 1000 );
 
-  mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge ( QgsProject::instance()->layerTreeRoot(), mMainWindow->mapCanvas(), this );
-
   connect ( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect ( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
   connect ( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle );
@@ -460,8 +458,8 @@ bool KadasApplication::projectOpen ( const QString& projectFile )
 
   QApplication::setOverrideCursor ( Qt::WaitCursor );
   mMainWindow->mapCanvas()->freeze ( true );
-  bool autoSetupOnFirstLayer = mLayerTreeCanvasBridge->autoSetupOnFirstLayer();
-  mLayerTreeCanvasBridge->setAutoSetupOnFirstLayer ( false );
+  bool autoSetupOnFirstLayer = mMainWindow->layerTreeMapCanvasBridge()->autoSetupOnFirstLayer();
+  mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer ( false );
 
   QgsProjectDirtyBlocker dirtyBlocker ( QgsProject::instance() );
   bool success = QgsProject::instance()->read ( fileName );
@@ -470,7 +468,7 @@ bool KadasApplication::projectOpen ( const QString& projectFile )
     emit projectRead();
   }
 
-  mLayerTreeCanvasBridge->setAutoSetupOnFirstLayer ( autoSetupOnFirstLayer );
+  mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer ( autoSetupOnFirstLayer );
   mMainWindow->mapCanvas()->freeze ( false );
   mMainWindow->mapCanvas()->refresh();
   QApplication::restoreOverrideCursor();

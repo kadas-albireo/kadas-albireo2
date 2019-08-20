@@ -24,7 +24,6 @@
 
 #include <kadas/gui/kadasfeaturepicker.h>
 
-class QgsLayerTreeMapCanvasBridge;
 class QgsMapLayer;
 class QgsMapTool;
 class QgsRasterLayer;
@@ -86,7 +85,6 @@ signals:
 private:
   KadasClipboard* mClipboard = nullptr;
   KadasMainWindow* mMainWindow = nullptr;
-  QgsLayerTreeMapCanvasBridge* mLayerTreeCanvasBridge = nullptr;
   bool mBlockActiveLayerChanged = false;
   QDateTime mProjectLastModified;
   KadasMapToolPan* mMapToolPan = nullptr;

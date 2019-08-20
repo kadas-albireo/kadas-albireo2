@@ -83,6 +83,8 @@ KadasMainWindow::KadasMainWindow ( QSplashScreen* splash )
   KadasStatusWidget::setupUi ( statusWidget );
   statusBar()->addPermanentWidget ( statusWidget, 1 );
 
+  mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge ( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
+
   mGpsIntegration = new KadasGpsIntegration ( this );
   mMapWidgetManager = new KadasMapWidgetManager ( mMapCanvas, this );
 //  mDecorationGrid = new QgsDecorationGrid(); // TODO

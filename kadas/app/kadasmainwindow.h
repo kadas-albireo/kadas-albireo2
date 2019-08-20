@@ -28,6 +28,7 @@
 
 class QSplashScreen;
 class QgsDecorationGrid;
+class QgsLayerTreeMapCanvasBridge;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
@@ -43,6 +44,7 @@ public:
   QgsMapCanvas* mapCanvas() const { return mMapCanvas; }
   QgsMessageBar* messageBar() const { return mInfoBar; }
   QgsLayerTreeView* layerTreeView() const { return mLayerTreeView; }
+  QgsLayerTreeMapCanvasBridge* layerTreeMapCanvasBridge() const { return mLayerTreeCanvasBridge; }
   int messageTimeout() const;
 
   QWidget* addRibbonTab ( const QString& name );
@@ -89,6 +91,7 @@ private:
   QgsMessageBar* mInfoBar = nullptr;
   QPointer<QgsMessageBarItem> mReprojMsgItem;
 
+  QgsLayerTreeMapCanvasBridge* mLayerTreeCanvasBridge = nullptr;
   KadasCoordinateDisplayer* mCoordinateDisplayer = nullptr;
   KadasGpsIntegration* mGpsIntegration = nullptr;
   KadasMapWidgetManager* mMapWidgetManager = nullptr;
