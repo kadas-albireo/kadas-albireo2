@@ -21,6 +21,7 @@
 
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/kadasbottombar.h>
+#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
 class QComboBox;

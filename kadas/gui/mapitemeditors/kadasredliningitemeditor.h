@@ -19,6 +19,7 @@
 
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/ui_kadasredliningitemeditor.h>
 
 class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor

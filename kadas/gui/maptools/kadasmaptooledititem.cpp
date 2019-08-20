@@ -25,6 +25,7 @@
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 
 KadasMapToolEditItem::KadasMapToolEditItem ( QgsMapCanvas* canvas, const QString& itemId, KadasItemLayer* layer )

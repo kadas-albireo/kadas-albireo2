@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadassymbolattributeseditor.h
-    -----------------------------
+    kadasmapitemeditor.h
+    --------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,34 +14,32 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASSYMBOLATTRIBUTESEDITOR_H
-#define KADASSYMBOLATTRIBUTESEDITOR_H
+#ifndef KADASMAPITEMEDITOR_H
+#define KADASMAPITEMEDITOR_H
+
+#include <QWidget>
 
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/ui_kadassymbolattributeseditor.h>
 
-class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
+
+class KadasMapItem;
+
+class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
 {
   Q_OBJECT
 
 public:
-  static KadasMapItemEditor* factory ( KadasMapItem* item )
-  {
-    return new KadasSymbolAttributesEditor ( item );
-  }
+  KadasMapItemEditor ( KadasMapItem* item, QWidget* parent = nullptr ) : QWidget ( parent ), mItem ( item ) {}
 
-  KadasSymbolAttributesEditor ( KadasMapItem* item );
+  virtual void setItem ( KadasMapItem* item ) { mItem = item; }
 
-  void reset() override;
-  void syncItemToWidget() override;
-  void syncWidgetToItem() override;
+public slots:
+  virtual void reset() {};
+  virtual void syncItemToWidget() = 0;
+  virtual void syncWidgetToItem() = 0;
 
-private:
-  Ui::KadasSymbolAttributesEditorBase mUi;
-
-  void adjustVisiblity();
+protected:
+  KadasMapItem* mItem;
 };
 
-#endif // KADASSYMBOLATTRIBUTESEDITOR_H
+#endif // KADASMAPITEMEDITOR_H

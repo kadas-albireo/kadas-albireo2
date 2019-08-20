@@ -30,26 +30,7 @@
 class QgsRenderContext;
 struct QgsVertexId;
 class KadasMapItem;
-
-
-class KADAS_CORE_EXPORT KadasMapItemEditor : public QWidget
-{
-  Q_OBJECT
-
-public:
-  KadasMapItemEditor ( KadasMapItem* item, QWidget* parent = nullptr ) : QWidget ( parent ), mItem ( item ) {}
-
-  virtual void setItem ( KadasMapItem* item ) { mItem = item; }
-
-public slots:
-  virtual void reset() {};
-  virtual void syncItemToWidget() = 0;
-  virtual void syncWidgetToItem() = 0;
-
-protected:
-  KadasMapItem* mItem;
-};
-
+class KadasMapItemEditor;
 
 class KADAS_GUI_EXPORT KadasMapItem : public QObject
 {
