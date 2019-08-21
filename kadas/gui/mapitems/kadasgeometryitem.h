@@ -126,14 +126,6 @@ protected:
   bool mMeasureGeometry = false;
   QgsUnitTypes::DistanceUnit mBaseUnit = QgsUnitTypes::DistanceMeters;
 
-  struct MeasurementLabel {
-    QString string;
-    QgsPointXY mapPos;
-    int width;
-    int height;
-    bool center;
-  };
-  QList<MeasurementLabel> mMeasurementLabels;
   QString mTotalMeasurement;
 
 
@@ -146,10 +138,21 @@ protected:
   QString formatArea ( double value, QgsUnitTypes::AreaUnit unit ) const;
   QString formatAngle ( double value, QgsUnitTypes::AngleUnit unit ) const;
   void addMeasurements ( const QStringList& measurements, const QgsPointXY& mapPos, bool center = true );
-  virtual void measureGeometry() {}
 
 private slots:
   void updateMeasurements();
+
+private:
+  virtual void measureGeometry() {}
+
+  struct MeasurementLabel {
+    QString string;
+    QgsPointXY mapPos;
+    int width;
+    int height;
+    bool center;
+  };
+  QList<MeasurementLabel> mMeasurementLabels;
 };
 
 #endif // KADASGEOMETRYITEM_H
