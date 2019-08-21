@@ -21,13 +21,6 @@
 #include <qgis/qgsmapcanvas.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
 
-KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( QValidator *validator, QWidget *parent )
-  : QLineEdit( parent )
-{
-  setValidator( validator );
-  connect( this, &KadasFloatingInputWidgetField::returnPressed, this, &KadasFloatingInputWidgetField::checkInputChanged );
-}
-
 KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( int id, int decimals, double min, double max, QWidget *parent )
   : QLineEdit( parent )
   , mId( id )
@@ -36,12 +29,6 @@ KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( int id, int decima
   QDoubleValidator *validator = new QDoubleValidator( min, max, decimals );
   setValidator( validator );
   connect( this, &KadasFloatingInputWidgetField::returnPressed, this, &KadasFloatingInputWidgetField::checkInputChanged );
-}
-
-void KadasFloatingInputWidgetField::setText( const QString &text )
-{
-  QLineEdit::setText( text );
-  mPrevText = text;
 }
 
 void KadasFloatingInputWidgetField::setValue( double value )
