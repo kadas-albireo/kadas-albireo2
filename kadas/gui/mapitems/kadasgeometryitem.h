@@ -27,7 +27,7 @@
 
 struct QgsVertexId;
 
-class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem
+class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
   public:
@@ -73,7 +73,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem
     void render( QgsRenderContext &context ) const override;
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
-    QList<Node> nodes( const QgsMapSettings &settings ) const override;
+    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;

@@ -61,7 +61,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
     void heightDisplayUnitChanged( QgsUnitTypes::DistanceUnit heightUnit );
 
   private:
-    KadasCoordinateFormat();
+    KadasCoordinateFormat() SIP_FORCE;
 
     Format mFormat;
     QString mEpsg;

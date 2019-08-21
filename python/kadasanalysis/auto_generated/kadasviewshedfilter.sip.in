@@ -1,0 +1,50 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/analysis/kadasviewshedfilter.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+
+
+class KadasViewshedFilter
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/analysis/kadasviewshedfilter.h"
+%End
+  public:
+    static bool computeViewshed( const QString &inputFile,
+                                 const QString &outputFile, const QString &outputFormat,
+                                 QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
+                                 double observerHeight, double targetHeight, bool heightRelToTerr, double radius,
+                                 const QgsUnitTypes::DistanceUnit distanceElevUnit,
+                                 const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), bool displayVisible = true, int accuracyFactor = 1,
+                                 QProgressDialog *progress = 0 );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/analysis/kadasviewshedfilter.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

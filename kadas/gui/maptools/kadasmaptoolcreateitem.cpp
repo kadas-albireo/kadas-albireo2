@@ -38,6 +38,12 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactor
 {
 }
 
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *callable, KadasItemLayer *layer )
+  : QgsMapTool( canvas )
+  , mLayer( layer )
+{
+}
+
 KadasMapToolCreateItem::~KadasMapToolCreateItem()
 {
   delete mInputWidget;

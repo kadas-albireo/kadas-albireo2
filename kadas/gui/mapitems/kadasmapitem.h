@@ -32,7 +32,7 @@ struct QgsVertexId;
 class KadasMapItem;
 class KadasMapItemEditor;
 
-class KADAS_GUI_EXPORT KadasMapItem : public QObject
+class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
     Q_OBJECT
   public:
@@ -52,10 +52,15 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
     struct Node
     {
       QgsPointXY pos;
-      std::function<void ( QPainter *, QgsPointXY, int ) > render = defaultNodeRenderer;
+#ifndef SIP_RUN
+      typedef void ( *node_renderer_t )( QPainter *, const QgsPointXY &, int );
+      node_renderer_t render = defaultNodeRenderer;
+#else
+      // TODO
+#endif
     };
 
-    virtual QList<Node> nodes( const QgsMapSettings &settings ) const = 0;
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
     /* Hit test, rect in item crs */
     virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const = 0;
@@ -78,9 +83,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
     // State interface
     struct State : KadasStateHistory::State
     {
-      enum DrawStatus { Empty, Drawing, Finished } drawStatus = Empty;
+      enum DrawStatus { Empty, Drawing, Finished };
+      DrawStatus drawStatus = Empty;
       virtual void assign( const State *other ) = 0;
-      virtual State *clone() const = 0;
+      virtual State *clone() const = 0 SIP_FACTORY;
     };
     const State *constState() const { return mState; }
     void setState( const State *state );
@@ -92,7 +98,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
       double max = std::numeric_limits<double>::max();
       int decimals = 0;
     };
-    typedef QMap<int, NumericAttribute> AttribDefs;
+    typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
 
     // Draw interface (all points in item crs)
@@ -111,7 +117,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
     // Edit interface (all points in item crs)
     struct EditContext
     {
-      EditContext( const QgsVertexId &_vidx = QgsVertexId(), const QgsPointXY &_pos = QgsPointXY(), const AttribDefs &_attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
+      EditContext( const QgsVertexId &_vidx = QgsVertexId(), const QgsPointXY &_pos = QgsPointXY(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
         : vidx( _vidx )
         , pos( _pos )
         , attributes( _attributes )
@@ -134,9 +140,38 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
     virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
 
     // Editor
+#ifndef SIP_RUN
     typedef std::function<KadasMapItemEditor* ( KadasMapItem * ) > EditorFactory;
     void setEditorFactory( EditorFactory factory ) { mEditorFactory = factory; }
     EditorFactory getEditorFactory() const { return mEditorFactory; }
+#else
+    void setEditorFactory( SIP_PYCALLABLE factory / AllowNone / );
+    % MethodCode
+
+    Py_BEGIN_ALLOW_THREADS
+
+    sipCpp->setEditorFactory( [a0]( KadasMapItem *v )->KadasMapItemEditor*
+    {
+      KadasMapItemEditor *res;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a0, "D", v, sipType_KadasMapItem, NULL );
+      int state;
+      int sipIsError = 0;
+      res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );
+      SIP_UNBLOCK_THREADS
+      return res;
+    } );
+
+    Py_END_ALLOW_THREADS
+    % End
+
+    SIP_PYCALLABLE getEditorFactory() const;
+    % MethodCode
+    // The callable, if any,  is held in the user object.
+    sipRes = sipGetUserObject( ( sipSimpleWrapper * )sipSelf );
+    Py_XINCREF( sipRes );
+    % End
+#endif
 
   signals:
     void aboutToBeDestroyed();
@@ -152,11 +187,12 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
 
+  protected:
+    virtual void recomputeDerived() = 0;
+
   private:
     EditorFactory mEditorFactory = nullptr;
-
     virtual State *createEmptyState() const = 0;
-    virtual void recomputeDerived() = 0;
 };
 
 #endif // KADASMAPITEM_H

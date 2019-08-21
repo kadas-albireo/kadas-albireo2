@@ -54,7 +54,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
       QList<QgsPointXY> p1;
       QList<QgsPointXY> p2;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override { return new State( *this ); }
+      State *clone() const override SIP_FACTORY { return new State( *this ); }
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 

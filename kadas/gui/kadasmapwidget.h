@@ -52,6 +52,11 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
   signals:
     void aboutToBeDestroyed();
 
+  protected:
+    void showEvent( QShowEvent * ) override;
+    bool eventFilter( QObject *obj, QEvent *ev ) override;
+    void contextMenuEvent( QContextMenuEvent *e ) override;
+
   private:
     int mNumber;
     QString mId;
@@ -66,10 +71,6 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     QgsMapCanvas *mMapCanvas;
     QStringList mInitialLayers;
     bool mUnsetFixedSize;
-
-    void showEvent( QShowEvent * ) override;
-    bool eventFilter( QObject *obj, QEvent *ev ) override;
-    void contextMenuEvent( QContextMenuEvent *e ) override;
 
   private slots:
     void setCanvasLocked( bool locked );

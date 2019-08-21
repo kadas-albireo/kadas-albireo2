@@ -47,7 +47,7 @@ KadasMapToolDeleteItems::ItemFactory KadasMapToolDeleteItems::itemFactory( QgsMa
 
 void KadasMapToolDeleteItems::drawFinished()
 {
-  KadasRectangleItem *item = dynamic_cast<KadasRectangleItem *>( currentItem() );
+  const KadasRectangleItem *item = dynamic_cast<const KadasRectangleItem *>( currentItem() );
   if ( !item || item->constState()->p1.isEmpty() || item->constState()->p2.isEmpty() )
   {
     return;

@@ -51,13 +51,14 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     struct State : KadasMapItem::State
     {
-      enum SectorStatus {HaveNothing, HaveCenter, HaveRadius} sectorStatus = HaveNothing;
+      enum SectorStatus {HaveNothing, HaveCenter, HaveRadius};
+      SectorStatus sectorStatus = HaveNothing;
       QList<QgsPointXY> centers;
       QList<double> radii;
       QList<double> startAngles;
       QList<double> stopAngles;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override { return new State( *this ); }
+      State *clone() const override SIP_FACTORY { return new State( *this ); }
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 

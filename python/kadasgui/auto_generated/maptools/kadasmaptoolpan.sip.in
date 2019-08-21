@@ -1,0 +1,81 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptoolpan.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasMapToolPan : QgsMapTool
+{
+%Docstring
+A map tool for panning the map.
+@see QgsMapTool
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolpan.h"
+%End
+  public:
+    KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteraction = true );
+%Docstring
+constructor
+%End
+
+    ~KadasMapToolPan();
+
+    virtual void activate();
+
+    virtual void deactivate();
+
+
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+%Docstring
+Overridden mouse press event
+%End
+
+    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+%Docstring
+Overridden mouse move event
+%End
+
+    virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
+%Docstring
+Overridden mouse release event
+%End
+
+    virtual bool gestureEvent( QGestureEvent *event );
+
+
+  signals:
+    void contextMenuRequested( QPoint screenPos, QgsPointXY mapPos );
+    void itemPicked( const KadasFeaturePicker::PickResult &result );
+
+  protected:
+
+
+
+
+
+
+
+    void pinchTriggered( QPinchGesture *gesture );
+%Docstring
+Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptoolpan.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

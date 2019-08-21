@@ -84,14 +84,14 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     QgsRectangle mFilterRegion;
     QgsCoordinateReferenceSystem mFilterRegionCrs;
 
-    double mCellSizeX = -1.;
-    double mCellSizeY = -1.;
+    double mCellSizeX = -1.0;
+    double mCellSizeY = -1.0;
     /**The nodata value of the input layer*/
-    float mInputNodataValue = -1.;
+    float mInputNodataValue = -1.0;
     /**The nodata value of the output layer*/
-    float mOutputNodataValue = -1.;
+    float mOutputNodataValue = -1.0;
     /**Scale factor for z-value if x-/y- units are different to z-units (111120 for degree->meters and 370400 for degree->feet)*/
-    double mZFactor = -1.;
+    double mZFactor = -1.0;
 };
 
 #endif // KADASNINECELLFILTER_H

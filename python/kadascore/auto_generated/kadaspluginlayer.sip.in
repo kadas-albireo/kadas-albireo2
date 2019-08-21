@@ -1,0 +1,89 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaspluginlayer.h                                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasPluginLayer : QgsPluginLayer
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadaspluginlayer.h"
+%End
+  public:
+    KadasPluginLayer( QString layerType, QString layerName );
+
+    class IdentifyResult
+{
+%Docstring
+Get attributes at the specified map location */
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadaspluginlayer.h"
+%End
+      public:
+        IdentifyResult( const QString &featureName, const QMap<QString, QVariant> &attributes, const QgsGeometry &geom );
+        const QMap<QString, QVariant> &attributes() const;
+        const QgsGeometry &geometry() const;
+
+    };
+    virtual QList<IdentifyResult> identify( const QgsPoint & /*mapPos*/, const QgsMapSettings & /*mapSettings*/ );
+
+    virtual bool testPick( const QgsPointXY & /*mapPos*/, const QgsMapSettings & /*mapSettings*/, QVariant & /*pickResult*/, QRect & /*pickResultsExtent*/ );
+%Docstring
+Test for mouse pick. */
+%End
+    virtual void handlePick( const QVariant & /*pick*/ );
+%Docstring
+Handle a pick result. */
+%End
+
+    virtual double opacity() const;
+%Docstring
+return the current layer opacity */
+%End
+    virtual void setOpacity( double opacity );
+%Docstring
+set the layer opacity */
+%End
+
+    virtual QVariantList getItems( const QgsRectangle & /*extent*/ ) const;
+%Docstring
+Get items in extent */
+%End
+    virtual void deleteItems( const QVariantList & /*items*/ );
+%Docstring
+Delete the specified items */
+%End
+    virtual void copyItems( const QVariantList & /*items*/, bool /*cut*/ );
+%Docstring
+Copy or cut the specified items */
+%End
+
+  protected:
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaspluginlayer.h                                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

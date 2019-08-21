@@ -1,0 +1,81 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasfloatinginputwidget.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasFloatingInputWidgetField : QLineEdit
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasfloatinginputwidget.h"
+%End
+  public:
+    KadasFloatingInputWidgetField( int id, int decimals, double min, double max, QWidget *parent = 0 );
+    void setValue( double value );
+    int id() const;
+
+  signals:
+    void inputChanged();
+    void inputConfirmed();
+
+  protected:
+    virtual void focusOutEvent( QFocusEvent *ev );
+
+
+};
+
+class KadasFloatingInputWidget : QWidget
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasfloatinginputwidget.h"
+%End
+  public:
+    KadasFloatingInputWidget( QgsMapCanvas *canvas );
+    int addInputField( const QString &label, KadasFloatingInputWidgetField *widget, bool initiallyfocused = false );
+    void setInputFieldVisible( int idx, bool visible );
+    void setFocusedInputField( KadasFloatingInputWidgetField *widget );
+    void ensureFocus();
+    QList<KadasFloatingInputWidgetField *> inputFields() const;
+    KadasFloatingInputWidgetField *inputField( int id ) const;
+    KadasFloatingInputWidgetField *focusedInputField() const;
+
+    void adjustCursorAndExtent( const QgsPointXY &geoPos );
+
+  protected:
+    virtual bool focusNextPrevChild( bool next );
+
+    virtual void keyPressEvent( QKeyEvent *ev );
+
+    virtual void showEvent( QShowEvent *event );
+
+    virtual void hideEvent( QHideEvent *event );
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasfloatinginputwidget.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

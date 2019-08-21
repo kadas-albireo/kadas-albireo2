@@ -171,9 +171,6 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem );
 
-  // Base class init
-//  init( restorePlugins ); // TODO
-
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( QgsSnappingConfig::AllLayers );
   snappingConfig.setType( QgsSnappingConfig::Vertex );
@@ -181,6 +178,14 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   snappingConfig.setTolerance( snappingRadius );
   snappingConfig.setUnits( QgsTolerance::Pixels );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
+
+  mPluginsToolButton = new QToolButton( this );
+  mPluginsToolButton->setText( tr( "Plugins" ) );
+  mPluginsToolButton->setObjectName( "pluginMenuButton" );
+  mPluginsToolButton->setMenu( new QMenu() );
+  mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
+  mPluginsToolButton->setFixedHeight( 45 );
+  mPluginsToolButton->hide();
 
   // Redlining
   KadasRedliningIntegration *redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
@@ -300,6 +305,9 @@ void KadasMainWindow::updateWidgetPositions()
 
   // Move loading label
   mLoadingLabel->move( mMapCanvas->width() - 5 - mLoadingLabel->width(), mMapCanvas->height() - 5 - mLoadingLabel->height() );
+
+  // Move plugins button
+  mPluginsToolButton->move( this->width() - mPluginsToolButton->width(), 0 );
 }
 
 void KadasMainWindow::mousePressEvent( QMouseEvent *event )
@@ -584,6 +592,13 @@ void KadasMainWindow::addMenuButtonToTab( const QString &text, const QIcon &icon
   button->setIcon( icon );
   button->setMenu( menu );
   button->setPopupMode( QToolButton::InstantPopup );
+}
+
+QMenu *KadasMainWindow::pluginsMenu()
+{
+  // Only show the button if it is actually needed
+  mPluginsToolButton->show();
+  return mPluginsToolButton->menu();
 }
 
 void KadasMainWindow::toggleLayerTree()

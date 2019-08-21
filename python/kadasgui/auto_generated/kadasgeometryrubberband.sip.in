@@ -1,0 +1,144 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasgeometryrubberband.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasGeometryRubberBand: QObject, QgsMapCanvasItem
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasgeometryrubberband.h"
+%End
+  public:
+    enum IconType
+    {
+      ICON_NONE,
+      ICON_CROSS,
+      ICON_X,
+      ICON_BOX,
+      ICON_CIRCLE,
+      ICON_FULL_BOX,
+      ICON_TRIANGLE,
+      ICON_FULL_TRIANGLE
+    };
+
+    enum MeasurementMode
+    {
+      MEASURE_NONE,
+      MEASURE_LINE,
+      MEASURE_LINE_AND_SEGMENTS,
+      MEASURE_ANGLE,
+      MEASURE_AZIMUTH,
+      MEASURE_POLYGON,
+      MEASURE_RECTANGLE,
+      MEASURE_CIRCLE
+    };
+
+    enum AzimuthNorth
+    {
+      AZIMUTH_NORTH_GEOGRAPHIC,
+      AZIMUTH_NORTH_MAP
+    };
+
+    KadasGeometryRubberBand( QgsMapCanvas *mapCanvas, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::LineGeometry );
+    ~KadasGeometryRubberBand();
+
+    virtual void updatePosition();
+
+
+    void setGeometry( QgsAbstractGeometry *geom, const QList<QgsVertexId> &hiddenNodes = QList<QgsVertexId>() );
+%Docstring
+Sets geometry (takes ownership). Geometry is expected to be in map coordinates */
+%End
+    const QgsAbstractGeometry *geometry() const;
+
+    bool contains( const QgsPoint &p, double tol ) const;
+%Docstring
+Returns whether the geometry contains the specified point */
+%End
+
+    void setTranslationOffset( double dx, double dy );
+%Docstring
+Sets the translation offset (offset in map coordinates for drawing geometry) */
+%End
+    void translationOffset( double &dx, double &dy );
+
+    void moveVertex( const QgsVertexId &id, const QgsPoint &newPos );
+
+    void setFillColor( const QColor &c );
+    QColor fillColor() const;
+    void setOutlineColor( const QColor &c );
+    QColor outlineColor() const;
+    void setOutlineWidth( int width );
+    int outlineWidth() const;
+    void setLineStyle( Qt::PenStyle penStyle );
+    Qt::PenStyle lineStyle() const;
+    void setBrushStyle( Qt::BrushStyle brushStyle );
+    Qt::BrushStyle brushStyle() const;
+    void setIconType( IconType iconType );
+    IconType iconType() const;
+    void setIconSize( int iconSize );
+    int iconSize() const;
+    void setIconFillColor( const QColor &c );
+    const QColor &iconFillColor() const;
+    void setIconOutlineColor( const QColor &c );
+    QColor iconOutlineColor() const;
+    void setIconOutlineWidth( int width );
+    int iconOutlineWidth() const;
+    void setIconLineStyle( Qt::PenStyle penStyle );
+    Qt::PenStyle iconLineStyle() const;
+    void setIconBrushStyle( Qt::BrushStyle brushStyle );
+    Qt::BrushStyle iconBrushStyle() const;
+    void setMeasurementMode( MeasurementMode measurementMode, QgsUnitTypes::DistanceUnit distanceUnit, QgsUnitTypes::AreaUnit areaUnit, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees, AzimuthNorth azimuthNorth = AZIMUTH_NORTH_GEOGRAPHIC );
+
+    class Measurer
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasgeometryrubberband.h"
+%End
+      public:
+        virtual ~Measurer();
+        struct Measurement
+        {
+          enum Type {Length, Area, Angle} type;
+          QString label;
+          double value;
+        };
+        virtual QList<Measurement> measure( MeasurementMode measurementMode, int part, const QgsAbstractGeometry *geometry, QList<double> &partMeasurements ) = 0;
+    };
+    void setMeasurer( Measurer *measurer );
+
+    QString getTotalMeasurement() const;
+
+  protected:
+    virtual void paint( QPainter *painter );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasgeometryrubberband.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

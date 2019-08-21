@@ -1,0 +1,83 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaslatlontoutm.h                                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasLatLonToUTM
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadaslatlontoutm.h"
+%End
+  public:
+    struct UTMCoo
+    {
+      int easting;
+      int northing;
+      int zoneNumber;
+      QString zoneLetter;
+    };
+
+    struct MGRSCoo
+    {
+      int easting;
+      int northing;
+      int zoneNumber;
+      QString zoneLetter;
+      QString letter100kID;
+    };
+
+    struct ZoneLabel
+    {
+      QPointF pos;
+      QString label;
+      QPointF maxPos;
+    };
+
+    struct GridLabel
+    {
+      QString label;
+      int lineIdx;
+      bool horiz;
+    };
+
+    static QgsPointXY UTM2LL( const UTMCoo &utm, bool &ok );
+    static UTMCoo LL2UTM( const QgsPointXY &pLatLong );
+    static MGRSCoo UTM2MGRS( const UTMCoo &utmcoo );
+    static UTMCoo MGRS2UTM( const MGRSCoo &mgrs, bool &ok );
+
+    static int getZoneNumber( double lon, double lat );
+    static QString getHemisphereLetter( double lat );
+
+    enum GridMode { GridUTM, GridMGRS };
+    static void computeGrid( const QgsRectangle &bbox, double mapScale,
+                             QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
+                             QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels, KadasLatLonToUTM::GridMode gridMode );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaslatlontoutm.h                                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

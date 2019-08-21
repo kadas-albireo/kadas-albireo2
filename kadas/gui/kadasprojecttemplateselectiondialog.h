@@ -27,7 +27,7 @@ class QFileSystemModel;
 class QModelIndex;
 class QTreeView;
 
-class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, Ui::KadasProjectTemplateSelectionDialogBase
+class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, private Ui::KadasProjectTemplateSelectionDialogBase
 {
     Q_OBJECT
   public:

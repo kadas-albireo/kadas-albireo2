@@ -260,7 +260,7 @@ void KadasMapToolViewshed::adjustRadius( double newRadius )
   QgsUnitTypes::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
   newRadius *= QgsUnitTypes::fromUnitToUnitFactor( measureUnit, targetUnit );
 
-  KadasCircularSectorItem *item = dynamic_cast<KadasCircularSectorItem *>( currentItem() );
+  KadasCircularSectorItem *item = dynamic_cast<KadasCircularSectorItem *>( mutableItem() );
   if ( !item )
   {
     return;

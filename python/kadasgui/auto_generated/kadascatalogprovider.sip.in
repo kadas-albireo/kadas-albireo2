@@ -1,0 +1,55 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadascatalogprovider.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasCatalogProvider : QObject
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadascatalogprovider.h"
+%End
+  public:
+    KadasCatalogProvider( KadasCatalogBrowser *browser );
+    virtual void load() = 0;
+
+  signals:
+    void finished();
+
+  protected:
+
+    QList<QDomNode> childrenByTagName( const QDomElement &element, const QString &tagName ) const;
+    QMap<QString, QString> parseWMTSTileMatrixSets( const QDomDocument &doc ) const;
+    void parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, QMimeData *&mimeData ) const;
+    QStringList parseWMSFormats( const QDomDocument &doc ) const;
+    QString parseWMSNestedLayer( const QDomNode &layerItem ) const;
+    bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, QString &title, QMimeData *&mimeData ) const;
+    QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadascatalogprovider.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

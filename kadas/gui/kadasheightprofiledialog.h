@@ -42,6 +42,9 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void setMarkerPos( int segment, const QgsPointXY &p );
     void clear();
 
+  protected:
+    void keyPressEvent( QKeyEvent *ev ) override;
+
   private slots:
     void finish();
     void replot();
@@ -70,8 +73,6 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QDoubleSpinBox *mObserverHeightSpinBox;
     QDoubleSpinBox *mTargetHeightSpinBox;
     QComboBox *mHeightModeCombo;
-
-    void keyPressEvent( QKeyEvent *ev ) override;
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

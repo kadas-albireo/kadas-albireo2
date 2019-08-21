@@ -1,0 +1,15 @@
+%Module(name=kadas._kadasanalysis,
+        keyword_arguments="All")
+
+${DEFAULTDOCSTRINGSIGNATURE}
+
+%Import QtCore/QtCoremod.sip
+%Import QtGui/QtGuimod.sip
+%Import QtXml/QtXmlmod.sip
+
+%Import core/core.sip
+%Import analysis/analysis.sip
+
+%Import kadascore/kadascore.sip
+
+%Include kadasanalysis_auto.sip

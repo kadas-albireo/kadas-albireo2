@@ -154,6 +154,17 @@ QPushButton#mLayerTreeViewButton:pressed
   background-color: #BEDCF6;
 }
 
+#pluginMenuButton {
+  background-color: #BEDCF6;
+  color: black;
+  border: none;
+}
+
+#pluginMenuButton:pressed {
+  background-color: #263B4E;
+  color: white;
+}
+
 #mRibbonWidget QTabBar::tab:!selected {
     background-color: #BEDCF6; /* make non-selected tabs look smaller */
     height: 45px;

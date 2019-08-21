@@ -48,7 +48,7 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolSlope::itemFactory( const QgsMap
 
 void KadasMapToolSlope::drawFinished()
 {
-  KadasRectangleItem *rectItem = dynamic_cast<KadasRectangleItem *>( currentItem() );
+  const KadasRectangleItem *rectItem = dynamic_cast<const KadasRectangleItem *>( currentItem() );
   if ( !rectItem )
   {
     return;

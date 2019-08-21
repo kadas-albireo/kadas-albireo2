@@ -53,6 +53,17 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *addRibbonTab( const QString &name );
     void addActionToTab( QAction *action, QWidget *tabWidget );
     void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu *menu, QWidget *tabWidget );
+    QMenu *pluginsMenu();
+
+    QTabWidget *ribbonTabWidget() const { return mRibbonWidget; }
+    QWidget *mapsTab() const { return mRibbonWidget->widget( 0 ); }
+    QWidget *viewTab() const { return mRibbonWidget->widget( 1 ); }
+    QWidget *analysisTab() const { return mRibbonWidget->widget( 2 ); }
+    QWidget *drawTab() const { return mRibbonWidget->widget( 3 ); }
+    QWidget *gpsTab() const { return mRibbonWidget->widget( 4 ); }
+    QWidget *mssTab() const { return mRibbonWidget->widget( 5 ); }
+    QWidget *settingsTab() const { return mRibbonWidget->widget( 6 ); }
+    QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
   public slots:
     void zoomFull();
@@ -106,6 +117,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QTimer mLoadingTimer;
     QPoint mResizePressPos;
     QPoint mDragStartPos;
+    QToolButton *mPluginsToolButton;
     QMap<QString, QAction *> mAddedActions;
 
     friend class KadasGpsIntegration;

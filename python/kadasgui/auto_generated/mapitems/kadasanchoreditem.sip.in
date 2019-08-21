@@ -1,0 +1,105 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasanchoreditem.h                               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasAnchoredItem : KadasMapItem /Abstract/
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasanchoreditem.h"
+%End
+  public:
+    KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+
+    void setAnchor( double anchorX, double anchorY );
+
+    void setPosition( const QgsPointXY &pos );
+
+    virtual QgsRectangle boundingBox() const;
+
+    virtual QRect margin() const;
+
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
+
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const;
+
+
+    virtual bool startPart( const QgsPointXY &firstPoint );
+
+    virtual bool startPart( const AttribValues &values );
+
+    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = 0 );
+
+    virtual void setCurrentAttributes( const AttribValues &values );
+
+    virtual bool continuePart();
+
+    virtual void endPart();
+
+
+    virtual AttribDefs drawAttribs() const;
+
+    virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const;
+
+    virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const;
+
+
+    virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = 0 );
+
+    virtual void edit( const EditContext &context, const AttribValues &values );
+
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
+
+    virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    struct State : KadasMapItem::State
+    {
+      QgsPointXY pos;
+      double angle;
+      QSize size;
+      virtual void assign( const KadasMapItem::State *other );
+      virtual State *clone() const /Factory/;
+    };
+    const State *constState() const;
+
+  protected:
+    enum AttribIds {AttrX, AttrY, AttrA};
+
+    State *state();
+    virtual State *createEmptyState() const;
+    virtual void recomputeDerived();
+
+    QList<QgsPointXY> rotatedCornerPoints( double angle, double mup = 1. ) const;
+
+    static void rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasanchoreditem.h                               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

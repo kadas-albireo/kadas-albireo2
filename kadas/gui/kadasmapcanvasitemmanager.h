@@ -19,6 +19,8 @@
 
 #include <QObject>
 
+#include <qgis/qgis_sip.h>
+
 #include <kadas/gui/kadas_gui.h>
 
 class KadasMapItem;
@@ -39,7 +41,7 @@ class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
     void itemWillBeRemoved( const KadasMapItem *item );
 
   private:
-    KadasMapCanvasItemManager() {}
+    KadasMapCanvasItemManager() {} SIP_FORCE;
 
     QList<const KadasMapItem *> mMapItems;
 

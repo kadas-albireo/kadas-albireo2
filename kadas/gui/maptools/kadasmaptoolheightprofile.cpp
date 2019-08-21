@@ -95,7 +95,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( !mPicking )
   {
-    KadasLineItem *lineItem = dynamic_cast<KadasLineItem *>( currentItem() );
+    const KadasLineItem *lineItem = dynamic_cast<const KadasLineItem *>( currentItem() );
     if ( lineItem && lineItem->constState()->drawStatus == KadasMapItem::State::Finished && !lineItem->constState()->points.isEmpty() )
     {
       QgsPointXY p = toMapCoordinates( e->pos() );
@@ -167,7 +167,7 @@ void KadasMapToolHeightProfile::drawCleared()
 
 void KadasMapToolHeightProfile::drawFinished()
 {
-  KadasLineItem *lineItem = dynamic_cast<KadasLineItem *>( currentItem() );
+  const KadasLineItem *lineItem = dynamic_cast<const KadasLineItem *>( currentItem() );
   if ( lineItem )
   {
     if ( !lineItem->constState()->points.isEmpty() && !lineItem->constState()->points.front().isEmpty() )

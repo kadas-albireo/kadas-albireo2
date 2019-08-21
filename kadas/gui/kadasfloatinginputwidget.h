@@ -38,13 +38,15 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidgetField : public QLineEdit
     void inputChanged();
     void inputConfirmed();
 
+  protected:
+    void focusOutEvent( QFocusEvent *ev ) override;
+
   private:
     int mId = 0;
     int mDecimals = 0;
     QString mPrevText;
 
   private slots:
-    void focusOutEvent( QFocusEvent *ev ) override;
     void checkInputChanged();
 };
 

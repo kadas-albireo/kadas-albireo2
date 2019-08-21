@@ -1,0 +1,183 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasmapitem.h                                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasMapItem : QObject /Abstract/
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasmapitem.h"
+%End
+  public:
+    KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
+    ~KadasMapItem();
+
+    const QgsCoordinateReferenceSystem &crs() const;
+%Docstring
+The item crs */
+%End
+
+    virtual QgsRectangle boundingBox() const = 0;
+%Docstring
+Bounding box in geographic coordinates */
+%End
+
+    virtual QRect margin() const;
+%Docstring
+Margin in screen units */
+%End
+
+    struct Node
+    {
+      QgsPointXY pos;
+      // TODO
+    };
+
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
+
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const = 0;
+%Docstring
+Hit test, rect in item crs */
+%End
+
+    virtual void render( QgsRenderContext &context ) const = 0;
+%Docstring
+Render the item */
+%End
+
+    void associateToLayer( QgsMapLayer *layer );
+%Docstring
+Associate to layer */
+%End
+    QgsMapLayer *associatedLayer() const;
+
+    void setSelected( bool selected );
+%Docstring
+Selected state */
+%End
+    bool selected() const;
+
+    void setZIndex( int zIndex );
+%Docstring
+z-index */
+%End
+    int zIndex() const;
+
+    struct State : KadasStateHistory::State
+    {
+      enum DrawStatus { Empty, Drawing, Finished };
+      DrawStatus drawStatus;
+      virtual void assign( const State *other ) = 0;
+      virtual State *clone() const = 0 /Factory/;
+    };
+    const State *constState() const;
+    void setState( const State *state );
+
+    struct NumericAttribute
+    {
+      QString name;
+      double min;
+      double max;
+      int decimals;
+    };
+    typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
+    typedef QMap<int, double> AttribValues;
+
+    void clear();
+    virtual bool startPart( const QgsPointXY &firstPoint ) = 0;
+    virtual bool startPart( const AttribValues &values ) = 0;
+    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = 0 ) = 0;
+    virtual void setCurrentAttributes( const AttribValues &values ) = 0;
+    virtual bool continuePart() = 0;
+    virtual void endPart() = 0;
+
+    virtual AttribDefs drawAttribs() const = 0;
+    virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const = 0;
+    virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const = 0;
+
+    struct EditContext
+    {
+      EditContext( const QgsVertexId &_vidx = QgsVertexId(), const QgsPointXY &_pos = QgsPointXY(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+      QgsVertexId vidx;
+      QgsPointXY pos;
+      AttribDefs attributes;
+      Qt::CursorShape cursor;
+      bool isValid() const;
+      bool operator== ( const EditContext &other ) const;
+      bool operator!= ( const EditContext &other ) const;
+    };
+    virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const = 0;
+    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = 0 ) = 0;
+    virtual void edit( const EditContext &context, const AttribValues &values ) = 0;
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const = 0;
+    virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
+
+    void setEditorFactory( SIP_PYCALLABLE factory / AllowNone / );
+%MethodCode
+
+    Py_BEGIN_ALLOW_THREADS
+
+    sipCpp->setEditorFactory( [a0]( KadasMapItem *v )->KadasMapItemEditor*
+    {
+      KadasMapItemEditor *res;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a0, "D", v, sipType_KadasMapItem, NULL );
+      int state;
+      int sipIsError = 0;
+      res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );
+      SIP_UNBLOCK_THREADS
+      return res;
+    } );
+
+    Py_END_ALLOW_THREADS
+%End
+
+    SIP_PYCALLABLE getEditorFactory() const;
+%MethodCode
+    // The callable, if any,  is held in the user object.
+    sipRes = sipGetUserObject( ( sipSimpleWrapper * )sipSelf );
+    Py_XINCREF( sipRes );
+%End
+
+  signals:
+    void aboutToBeDestroyed();
+    void changed();
+
+  protected:
+
+    static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+    static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+
+  protected:
+    virtual void recomputeDerived() = 0;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasmapitem.h                                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

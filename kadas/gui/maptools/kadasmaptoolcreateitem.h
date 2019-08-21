@@ -26,15 +26,46 @@
 class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
+#ifndef SIP_RUN
+struct _object;
+typedef _object PyObject;
+#endif
 
 class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 {
     Q_OBJECT
   public:
+#ifndef SIP_RUN
     typedef std::function<KadasMapItem*() > ItemFactory;
-
-
     KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer = nullptr );
+#else
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = nullptr );
+    % MethodCode
+
+    // Make sure the callable doesn't get garbage collected, this is needed because refcount for a1 is 0
+    // and the creation function pointer is passed to the metadata and it needs to be kept in memory.
+    Py_INCREF( a1 );
+
+    Py_BEGIN_ALLOW_THREADS
+
+    sipCpp = new sipKadasMapToolCreateItem( a0, nullptr, a2 );
+    sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
+    {
+      KadasMapItem *res;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a1, NULL );
+      int state;
+      int sipIsError = 0;
+      res = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, 0, SIP_NOT_NONE, &state, &sipIsError ) );
+      SIP_UNBLOCK_THREADS
+      return res;
+
+    } );
+
+    Py_END_ALLOW_THREADS
+
+    % End
+#endif
     ~KadasMapToolCreateItem();
 
     void activate() override;
@@ -51,12 +82,35 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
 
+
+#ifndef SIP_RUN
+    void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
+#endif
+
   public slots:
     void clear();
 
   signals:
     void cleared();
     void partFinished();
+
+  protected:
+#ifndef SIP_RUN
+    // TODO: Prettier way?!
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *pyCallable, KadasItemLayer *layer = nullptr );
+#endif
+
+    void createItem();
+    void addPoint( const QgsPointXY &mapPos );
+    void startPart( const QgsPointXY &pos );
+    void startPart( const KadasMapItem::AttribValues &attributes );
+    void finishPart();
+    void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
+    void commitItem();
+    void cleanup();
+    QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
+    KadasMapItem::AttribValues collectAttributeValues() const;
+    KadasMapItem *mutableItem() { return mItem; }
 
   private:
     ItemFactory mItemFactory = nullptr;
@@ -72,19 +126,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     bool mMultipart = false;
     bool mSnapping = false;
-
-  protected:
-    void createItem();
-    void addPoint( const QgsPointXY &mapPos );
-    void startPart( const QgsPointXY &pos );
-    void startPart( const KadasMapItem::AttribValues &attributes );
-    void finishPart();
-    void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
-    void commitItem();
-    void cleanup();
-    QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
-    KadasMapItem::AttribValues collectAttributeValues() const;
-    KadasMapItem *currentItem() { return mItem; }
 
   private slots:
     void inputChanged();

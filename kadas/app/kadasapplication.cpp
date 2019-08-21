@@ -46,6 +46,8 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadaspythonintegration.h>
+#include <kadas/app/kadaspythoninterface.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -211,6 +213,10 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   mMapToolPan = new KadasMapToolPan( mMainWindow->mapCanvas() );
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
+
+  // Load python support
+  mPythonInterface = new KadasPythonInterface( this );
+  loadPythonSupport();
 
   // Perform online/offline check to select default template
   QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
@@ -1056,4 +1062,18 @@ bool KadasApplication::showZipSublayerSelectionDialog( const QString &path ) con
   }
 
   return true;
+}
+
+void KadasApplication::loadPythonSupport()
+{
+  //QgsDebugMsg("Python support library's instance() symbol resolved.");
+  mPythonIntegration = new KadasPythonIntegration( this );
+  mPythonIntegration->initPython( mPythonInterface, true );
+  if ( !mPythonIntegration->isEnabled() )
+  {
+    mMainWindow->messageBar()->pushCritical( tr( "Python unavailable" ), tr( "Failed to load python support" ) );
+//     TODO
+//    QgsPluginRegistry::instance()->setPythonUtils( mPythonUtils );
+//    QgsPythonRunner::setInstance( new QgsPythonRunnerImpl( mPythonUtils ) );
+  }
 }

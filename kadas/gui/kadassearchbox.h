@@ -48,6 +48,9 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
   public slots:
     void clearSearch();
 
+  protected:
+    bool eventFilter( QObject *obj, QEvent *ev ) override;
+
   private:
     class LineEdit;
     class TreeWidget;
@@ -74,7 +77,6 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     TreeWidget *mTreeWidget;
     int mNumRunningProviders;
 
-    bool eventFilter( QObject *obj, QEvent *ev ) override;
     void cancelSearch();
     void clearPin();
 

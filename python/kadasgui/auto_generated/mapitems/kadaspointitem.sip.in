@@ -1,0 +1,85 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadaspointitem.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+class KadasPointItem : KadasGeometryItem
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadaspointitem.h"
+%End
+  public:
+    KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon = ICON_CIRCLE, QObject *parent = 0 );
+
+    virtual bool startPart( const QgsPointXY &firstPoint );
+
+    virtual bool startPart( const AttribValues &values );
+
+    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = 0 );
+
+    virtual void setCurrentAttributes( const AttribValues &values );
+
+    virtual bool continuePart();
+
+    virtual void endPart();
+
+
+    virtual AttribDefs drawAttribs() const;
+
+    virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const;
+
+    virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const;
+
+
+    virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = 0 );
+
+    virtual void edit( const EditContext &context, const AttribValues &values );
+
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
+
+    virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    virtual QgsWkbTypes::GeometryType geometryType() const;
+    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom );
+
+
+    const QgsMultiPoint *geometry() const;
+
+    struct State : KadasMapItem::State
+    {
+      QList<QgsPointXY> points;
+      virtual void assign( const KadasMapItem::State *other );
+      virtual State *clone() const /Factory/;
+    };
+    const State *constState() const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadaspointitem.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

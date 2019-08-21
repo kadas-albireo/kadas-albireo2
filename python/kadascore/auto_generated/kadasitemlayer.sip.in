@@ -1,0 +1,71 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadasitemlayer.h                                          *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasItemLayer : QgsPluginLayer
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadasitemlayer.h"
+%End
+  public:
+    static QString layerType();
+    KadasItemLayer( const QString &name );
+
+    void addItem( KadasMapItem *item );
+    KadasMapItem *takeItem( const QString &itemId );
+
+    const QMap<QString, KadasMapItem *> &items() const;
+    QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+
+    virtual KadasItemLayer *clone() const /Factory/;
+
+    virtual QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext );
+
+    virtual QgsRectangle extent() const;
+
+    virtual void setTransformContext( const QgsCoordinateTransformContext &ctx );
+
+
+    virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;
+    virtual bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories );
+
+};
+
+class KadasItemLayerType : QgsPluginLayerType
+{
+
+%TypeHeaderCode
+#include "kadas/core/kadasitemlayer.h"
+%End
+  public:
+    KadasItemLayerType();
+    virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadasitemlayer.h                                          *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

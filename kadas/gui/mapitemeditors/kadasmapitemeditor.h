@@ -34,7 +34,7 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     virtual void setItem( KadasMapItem *item ) { mItem = item; }
 
   public slots:
-    virtual void reset() {};
+    virtual void reset() {}
     virtual void syncItemToWidget() = 0;
     virtual void syncWidgetToItem() = 0;
 

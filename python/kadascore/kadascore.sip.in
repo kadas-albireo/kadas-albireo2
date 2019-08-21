@@ -1,0 +1,12 @@
+%Module(name=kadas._kadascore,
+        keyword_arguments="All")
+
+${DEFAULTDOCSTRINGSIGNATURE}
+
+%Import QtCore/QtCoremod.sip
+%Import QtNetwork/QtNetworkmod.sip
+%Import QtXml/QtXmlmod.sip
+
+%Import core/core.sip
+
+%Include kadascore_auto.sip

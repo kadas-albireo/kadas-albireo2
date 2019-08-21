@@ -1,0 +1,72 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadascoordinateformat.h                                   *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasCoordinateFormat : QObject
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadascoordinateformat.h"
+%End
+  public:
+    enum Format
+    {
+      Default,
+      DegMinSec,
+      DegMin,
+      DecDeg,
+      UTM,
+      MGRS
+    };
+
+    static KadasCoordinateFormat *instance();
+    void getCoordinateDisplayFormat( Format &format, QString &epsg ) const;
+    QgsUnitTypes::DistanceUnit getHeightDisplayUnit() const;
+
+    QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
+    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
+
+    double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
+
+    QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
+
+  public slots:
+    void setCoordinateDisplayFormat( Format format, const QString &epsg );
+    void setHeightDisplayUnit( QgsUnitTypes::DistanceUnit heightUnit );
+
+  signals:
+    void coordinateDisplayFormatChanged( Format format, const QString &epsg );
+    void heightDisplayUnitChanged( QgsUnitTypes::DistanceUnit heightUnit );
+
+  private:
+    KadasCoordinateFormat();
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadascoordinateformat.h                                   *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

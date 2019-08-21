@@ -1,0 +1,74 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptoolmeasure.h                             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasMeasureWidget : KadasMapItemEditor
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+%End
+  public:
+    enum AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
+
+    KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth );
+
+    virtual void syncItemToWidget();
+    virtual void syncWidgetToItem();
+
+
+  signals:
+    void clearRequested();
+    void pickRequested();
+
+};
+
+class KadasMapToolMeasure : KadasMapToolCreateItem
+{
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+%End
+  public:
+    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle, MeasureAzimuth };
+    KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
+
+    virtual void activate();
+
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
+
+    virtual void keyReleaseEvent( QKeyEvent *e );
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptoolmeasure.h                             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

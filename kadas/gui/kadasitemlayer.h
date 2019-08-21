@@ -37,7 +37,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
     QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
-    KadasItemLayer *clone() const override;
+    KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
     void setTransformContext( const QgsCoordinateTransformContext &ctx ) override;
@@ -57,7 +57,8 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
   public:
     KadasItemLayerType()
       : QgsPluginLayerType( KadasItemLayer::layerType() ) {}
-    QgsPluginLayer *createLayer() override { return new KadasItemLayer( "Items" ); }
+    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
+    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
 };
 
 #endif // KADASITEMLAYER_H

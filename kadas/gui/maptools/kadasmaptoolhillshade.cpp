@@ -53,7 +53,7 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolHillshade::itemFactory( const Qg
 
 void KadasMapToolHillshade::drawFinished()
 {
-  KadasRectangleItem *rectItem = dynamic_cast<KadasRectangleItem *>( currentItem() );
+  const KadasRectangleItem *rectItem = dynamic_cast<const KadasRectangleItem *>( currentItem() );
   if ( !rectItem )
   {
     return;

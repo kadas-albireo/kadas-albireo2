@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
-    QList<Node> nodes( const QgsMapSettings &settings ) const override;
+    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
     void render( QgsRenderContext &context ) const override;
 
@@ -56,11 +56,11 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
       double angle;
       QSize size;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override { return new State( *this ); }
+      State *clone() const override SIP_FACTORY { return new State( *this ); }
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
-  protected:
+  private:
     enum AttribIds {AttrX, AttrY};
     QString mFilePath;
     double mOffsetX = 0;

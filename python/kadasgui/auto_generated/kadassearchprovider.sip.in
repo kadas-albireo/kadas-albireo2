@@ -1,0 +1,70 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassearchprovider.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+
+class KadasSearchProvider : QObject
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadassearchprovider.h"
+%End
+  public:
+    struct SearchResult
+    {
+      QString category;
+      int categoryPrecedence;
+      QString text;
+      QgsPointXY pos;
+      QgsRectangle bbox;
+      QString crs;
+      double zoomScale;
+      bool showPin;
+      bool fuzzy;
+    };
+    struct SearchRegion
+    {
+      QgsPolylineXY polygon;
+      QString crs;
+    };
+
+    KadasSearchProvider( QgsMapCanvas *mapCanvas );
+    virtual ~KadasSearchProvider();
+    virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) = 0;
+    virtual void cancelSearch();
+
+  signals:
+    void searchResultFound( KadasSearchProvider::SearchResult result );
+    void searchFinished();
+
+  protected:
+};
+
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassearchprovider.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

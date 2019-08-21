@@ -31,6 +31,8 @@ class QgsVectorLayer;
 class KadasClipboard;
 class KadasMainWindow;
 class KadasMapToolPan;
+class KadasPythonIntegration;
+class KadasPythonInterface;
 
 #define kApp KadasApplication::instance()
 
@@ -84,6 +86,8 @@ class KadasApplication : public QgsApplication
     void activeLayerChanged( QgsMapLayer *layer );
 
   private:
+    KadasPythonInterface *mPythonInterface = nullptr;
+    KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasClipboard *mClipboard = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
     bool mBlockActiveLayerChanged = false;
@@ -93,6 +97,7 @@ class KadasApplication : public QgsApplication
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
+    void loadPythonSupport();
     bool showZipSublayerSelectionDialog( const QString &path ) const;
     bool projectSaveDirty();
 
