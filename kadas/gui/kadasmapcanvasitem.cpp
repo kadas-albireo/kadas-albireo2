@@ -19,41 +19,45 @@
 #include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
-KadasMapCanvasItem::KadasMapCanvasItem ( const KadasMapItem* item, QgsMapCanvas* canvas )
-  : QgsMapCanvasItem ( canvas ), mItem ( item )
+KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas )
+  : QgsMapCanvasItem( canvas ), mItem( item )
 {
-  setZValue ( mItem->zIndex() );
-  connect ( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
-  connect ( item, &QObject::destroyed, this, &QObject::deleteLater );
+  setZValue( mItem->zIndex() );
+  connect( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
+  connect( item, &QObject::destroyed, this, &QObject::deleteLater );
   updateRect();
 }
 
-void KadasMapCanvasItem::paint ( QPainter* painter )
+void KadasMapCanvasItem::paint( QPainter *painter )
 {
-  if ( mItem ) {
-    if ( mItem->associatedLayer() && !mMapCanvas->layers().contains ( mItem->associatedLayer() ) ) {
+  if ( mItem )
+  {
+    if ( mItem->associatedLayer() && !mMapCanvas->layers().contains( mItem->associatedLayer() ) )
+    {
       return;
     }
-    QgsRenderContext rc = QgsRenderContext::fromQPainter ( painter );
-    rc.setMapToPixel ( mMapCanvas->mapSettings().mapToPixel() );
-    rc.setTransformContext ( mMapCanvas->mapSettings().transformContext() );
-    rc.setFlag ( QgsRenderContext::Antialiasing, true );
-    rc.setCoordinateTransform ( QgsCoordinateTransform ( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() ) );
+    QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
+    rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
+    rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
+    rc.setFlag( QgsRenderContext::Antialiasing, true );
+    rc.setCoordinateTransform( QgsCoordinateTransform( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() ) );
 
     rc.painter()->save();
-    rc.painter()->translate ( -pos() );
+    rc.painter()->translate( -pos() );
     rc.painter()->save();
-    mItem->render ( rc );
+    mItem->render( rc );
     rc.painter()->restore();
 
-    if ( mItem->selected() ) {
-      QgsCoordinateTransform crst ( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
-      for ( const KadasMapItem::Node& node : mItem->nodes ( mMapCanvas->mapSettings() ) ) {
-        QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform ( crst.transform ( node.pos ) );
-        screenPoint.setX ( qRound ( screenPoint.x() ) );
-        screenPoint.setY ( qRound ( screenPoint.y() ) );
+    if ( mItem->selected() )
+    {
+      QgsCoordinateTransform crst( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
+      for ( const KadasMapItem::Node &node : mItem->nodes( mMapCanvas->mapSettings() ) )
+      {
+        QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform( crst.transform( node.pos ) );
+        screenPoint.setX( qRound( screenPoint.x() ) );
+        screenPoint.setY( qRound( screenPoint.y() ) );
         rc.painter()->save();
-        node.render ( rc.painter(), screenPoint, sHandleSize );
+        node.render( rc.painter(), screenPoint, sHandleSize );
         rc.painter()->restore();
       }
     }
@@ -63,13 +67,13 @@ void KadasMapCanvasItem::paint ( QPainter* painter )
 
 void KadasMapCanvasItem::updateRect()
 {
-  QgsCoordinateTransform t ( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
-  QgsRectangle bbox = t.transform ( mItem->boundingBox() );
+  QgsCoordinateTransform t( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
+  QgsRectangle bbox = t.transform( mItem->boundingBox() );
   double scale = mMapCanvas->mapUnitsPerPixel();
   QRect margin = mItem->margin();
-  bbox.setXMinimum ( bbox.xMinimum() - margin.left() * scale - 0.5 * sHandleSize );
-  bbox.setXMaximum ( bbox.xMaximum() + margin.right() * scale + 0.5 * sHandleSize );
-  bbox.setYMinimum ( bbox.yMinimum() - margin.top() * scale  - 0.5 * sHandleSize );
-  bbox.setYMaximum ( bbox.yMaximum() + margin.bottom() * scale + 0.5 * sHandleSize );
-  setRect ( bbox );
+  bbox.setXMinimum( bbox.xMinimum() - margin.left() * scale - 0.5 * sHandleSize );
+  bbox.setXMaximum( bbox.xMaximum() + margin.right() * scale + 0.5 * sHandleSize );
+  bbox.setYMinimum( bbox.yMinimum() - margin.top() * scale  - 0.5 * sHandleSize );
+  bbox.setYMaximum( bbox.yMaximum() + margin.bottom() * scale + 0.5 * sHandleSize );
+  setRect( bbox );
 }

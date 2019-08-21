@@ -23,11 +23,11 @@
 #include <kadas/gui/kadasmapwidget.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 
-KadasMapWidgetManager::KadasMapWidgetManager ( QgsMapCanvas* masterCanvas, QMainWindow* parent )
-  : QObject ( parent ), mMainWindow ( parent ), mMasterCanvas ( masterCanvas )
+KadasMapWidgetManager::KadasMapWidgetManager( QgsMapCanvas *masterCanvas, QMainWindow *parent )
+  : QObject( parent ), mMainWindow( parent ), mMasterCanvas( masterCanvas )
 {
-  connect ( QgsProject::instance(), &QgsProject::readProject, this, &KadasMapWidgetManager::readProjectSettings );
-  connect ( QgsProject::instance(), &QgsProject::writeProject, this, &KadasMapWidgetManager::writeProjectSettings );
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMapWidgetManager::readProjectSettings );
+  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasMapWidgetManager::writeProjectSettings );
 }
 
 KadasMapWidgetManager::~KadasMapWidgetManager()
@@ -35,163 +35,184 @@ KadasMapWidgetManager::~KadasMapWidgetManager()
   clearMapWidgets();
 }
 
-KadasMapWidget* KadasMapWidgetManager::addMapWidget ( const QString& id )
+KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
 {
   int highestNumber = 1;
-  for ( KadasMapWidget* mapWidget : mMapWidgets ) {
-    if ( mapWidget->getNumber() >= highestNumber ) {
+  for ( KadasMapWidget *mapWidget : mMapWidgets )
+  {
+    if ( mapWidget->getNumber() >= highestNumber )
+    {
       highestNumber = mapWidget->getNumber() + 1;
     }
   }
 
   QString widgetId = id;
-  if ( widgetId.isEmpty() ) {
+  if ( widgetId.isEmpty() )
+  {
     widgetId = QUuid::createUuid().toString();
   }
 
-  KadasMapWidget* mapWidget = new KadasMapWidget ( highestNumber, widgetId, tr ( "View #%1" ).arg ( highestNumber ), mMasterCanvas );
-  connect ( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
+  KadasMapWidget *mapWidget = new KadasMapWidget( highestNumber, widgetId, tr( "View #%1" ).arg( highestNumber ), mMasterCanvas );
+  connect( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
 
   // Determine whether to add the new dock widget in the right or bottom area
   int nRight = 0, nBottom = 0;
   double rightAreaWidth = 0;
   double bottomAreaHeight = 0;
-  for ( KadasMapWidget*& mapWidget : mMapWidgets ) {
-    Qt::DockWidgetArea area = mMainWindow->dockWidgetArea ( mapWidget );
-    if ( area == Qt::RightDockWidgetArea ) {
+  for ( KadasMapWidget *&mapWidget : mMapWidgets )
+  {
+    Qt::DockWidgetArea area = mMainWindow->dockWidgetArea( mapWidget );
+    if ( area == Qt::RightDockWidgetArea )
+    {
       ++nRight;
       rightAreaWidth = mapWidget->width();
-    } else if ( area == Qt::BottomDockWidgetArea ) {
+    }
+    else if ( area == Qt::BottomDockWidgetArea )
+    {
       ++nBottom;
       bottomAreaHeight = mapWidget->height();
     }
   }
   QSize initialSize;
   Qt::DockWidgetArea addArea;
-  if ( nBottom >= nRight - 1 ) {
+  if ( nBottom >= nRight - 1 )
+  {
     addArea = Qt::RightDockWidgetArea;
-    initialSize.setHeight ( ( mMasterCanvas->height() + bottomAreaHeight ) / ( nRight + 1 ) );
-    initialSize.setWidth ( nRight > 0 ? rightAreaWidth : mMasterCanvas->width() / 2 );
-  } else {
+    initialSize.setHeight( ( mMasterCanvas->height() + bottomAreaHeight ) / ( nRight + 1 ) );
+    initialSize.setWidth( nRight > 0 ? rightAreaWidth : mMasterCanvas->width() / 2 );
+  }
+  else
+  {
     addArea = Qt::BottomDockWidgetArea;
-    initialSize.setHeight ( nBottom > 0 ? bottomAreaHeight : mMasterCanvas->height() / 2 );
-    initialSize.setWidth ( mMasterCanvas->width() / ( nBottom + 1 ) );
+    initialSize.setHeight( nBottom > 0 ? bottomAreaHeight : mMasterCanvas->height() / 2 );
+    initialSize.setWidth( mMasterCanvas->width() / ( nBottom + 1 ) );
   }
 
   // Set initial layers
   QStringList initialLayers;
-  for ( QgsLayerTreeLayer* layerTreeLayer : QgsProject::instance()->layerTreeRoot()->findLayers() ) {
-    if ( layerTreeLayer->layer() ) {
-      initialLayers.append ( layerTreeLayer->layer()->id() );
+  for ( QgsLayerTreeLayer *layerTreeLayer : QgsProject::instance()->layerTreeRoot()->findLayers() )
+  {
+    if ( layerTreeLayer->layer() )
+    {
+      initialLayers.append( layerTreeLayer->layer()->id() );
     }
   }
-  mapWidget->setFixedSize ( initialSize );
-  mMainWindow->addDockWidget ( addArea, mapWidget );
-  mapWidget->resize ( initialSize );
-  mMapWidgets.append ( mapWidget );
+  mapWidget->setFixedSize( initialSize );
+  mMainWindow->addDockWidget( addArea, mapWidget );
+  mapWidget->resize( initialSize );
+  mMapWidgets.append( mapWidget );
   return mapWidget;
 }
 
-void KadasMapWidgetManager::removeMapWidget ( const QString& id )
+void KadasMapWidgetManager::removeMapWidget( const QString &id )
 {
   int pos = -1;
-  for ( int i = 0, n = mMapWidgets.size(); i < n; ++i ) {
-    if ( mMapWidgets[i]->id() == id ) {
+  for ( int i = 0, n = mMapWidgets.size(); i < n; ++i )
+  {
+    if ( mMapWidgets[i]->id() == id )
+    {
       pos = i;
       break;
     }
   }
-  if ( pos != -1 ) {
-    delete mMapWidgets.takeAt ( pos );
+  if ( pos != -1 )
+  {
+    delete mMapWidgets.takeAt( pos );
   }
 }
 
 void KadasMapWidgetManager::clearMapWidgets()
 {
-  qDeleteAll ( mMapWidgets );
+  qDeleteAll( mMapWidgets );
   mMapWidgets.clear();
 }
 
 void KadasMapWidgetManager::mapWidgetDestroyed()
 {
-  KadasMapWidget* mapWidget = qobject_cast<KadasMapWidget*> ( QObject::sender() );
-  if ( mapWidget ) {
-    mMapWidgets.removeAll ( mapWidget );
+  KadasMapWidget *mapWidget = qobject_cast<KadasMapWidget *> ( QObject::sender() );
+  if ( mapWidget )
+  {
+    mMapWidgets.removeAll( mapWidget );
   }
 }
 
-void KadasMapWidgetManager::writeProjectSettings ( QDomDocument& doc )
+void KadasMapWidgetManager::writeProjectSettings( QDomDocument &doc )
 {
-  QDomNodeList nl = doc.elementsByTagName ( "qgis" );
-  if ( nl.count() < 1 || nl.at ( 0 ).toElement().isNull() ) {
+  QDomNodeList nl = doc.elementsByTagName( "qgis" );
+  if ( nl.count() < 1 || nl.at( 0 ).toElement().isNull() )
+  {
     return;
   }
-  QDomElement qgisElem = nl.at ( 0 ).toElement();
+  QDomElement qgisElem = nl.at( 0 ).toElement();
 
-  QDomElement mapViewsElem = doc.createElement ( "MapViews" );
-  for ( KadasMapWidget* mapWidget : mMapWidgets ) {
+  QDomElement mapViewsElem = doc.createElement( "MapViews" );
+  for ( KadasMapWidget *mapWidget : mMapWidgets )
+  {
     QByteArray ba;
-    QDataStream ds ( &ba, QIODevice::WriteOnly );
+    QDataStream ds( &ba, QIODevice::WriteOnly );
 
-    QDomElement mapWidgetItemElem = doc.createElement ( "MapView" );
-    mapWidgetItemElem.setAttribute ( "width", mapWidget->width() );
-    mapWidgetItemElem.setAttribute ( "height", mapWidget->height() );
-    mapWidgetItemElem.setAttribute ( "floating", mapWidget->isFloating() );
-    mapWidgetItemElem.setAttribute ( "islocked", mapWidget->getLocked() );
-    mapWidgetItemElem.setAttribute ( "area", mMainWindow->dockWidgetArea ( mapWidget ) );
-    mapWidgetItemElem.setAttribute ( "title", mapWidget->windowTitle() );
-    mapWidgetItemElem.setAttribute ( "id", mapWidget->id() );
-    mapWidgetItemElem.setAttribute ( "number", mapWidget->getNumber() );
+    QDomElement mapWidgetItemElem = doc.createElement( "MapView" );
+    mapWidgetItemElem.setAttribute( "width", mapWidget->width() );
+    mapWidgetItemElem.setAttribute( "height", mapWidget->height() );
+    mapWidgetItemElem.setAttribute( "floating", mapWidget->isFloating() );
+    mapWidgetItemElem.setAttribute( "islocked", mapWidget->getLocked() );
+    mapWidgetItemElem.setAttribute( "area", mMainWindow->dockWidgetArea( mapWidget ) );
+    mapWidgetItemElem.setAttribute( "title", mapWidget->windowTitle() );
+    mapWidgetItemElem.setAttribute( "id", mapWidget->id() );
+    mapWidgetItemElem.setAttribute( "number", mapWidget->getNumber() );
     ds << mapWidget->getLayers();
-    mapWidgetItemElem.setAttribute ( "layers", QString ( ba.toBase64() ) );
+    mapWidgetItemElem.setAttribute( "layers", QString( ba.toBase64() ) );
     ba.clear();
     ds << mapWidget->getMapExtent().toRectF();
-    mapWidgetItemElem.setAttribute ( "extent", QString ( ba.toBase64() ) );
-    mapViewsElem.appendChild ( mapWidgetItemElem );
+    mapWidgetItemElem.setAttribute( "extent", QString( ba.toBase64() ) );
+    mapViewsElem.appendChild( mapWidgetItemElem );
   }
-  qgisElem.appendChild ( mapViewsElem );
+  qgisElem.appendChild( mapViewsElem );
 }
 
-void KadasMapWidgetManager::readProjectSettings ( const QDomDocument& doc )
+void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
 {
   clearMapWidgets();
 
-  QDomNodeList nl = doc.elementsByTagName ( "MapViews" );
-  if ( nl.count() < 1 || nl.at ( 0 ).toElement().isNull() ) {
+  QDomNodeList nl = doc.elementsByTagName( "MapViews" );
+  if ( nl.count() < 1 || nl.at( 0 ).toElement().isNull() )
+  {
     return;
   }
 
-  QDomElement mapViewsElem = nl.at ( 0 ).toElement();
+  QDomElement mapViewsElem = nl.at( 0 ).toElement();
   QDomNodeList nodes = mapViewsElem.childNodes();
-  for ( int iNode = 0, nNodes = nodes.size(); iNode < nNodes; ++iNode ) {
-    QDomElement mapWidgetItemElem = nodes.at ( iNode ).toElement();
-    if ( mapWidgetItemElem.nodeName() == "MapView" ) {
+  for ( int iNode = 0, nNodes = nodes.size(); iNode < nNodes; ++iNode )
+  {
+    QDomElement mapWidgetItemElem = nodes.at( iNode ).toElement();
+    if ( mapWidgetItemElem.nodeName() == "MapView" )
+    {
       QDomNamedNodeMap attributes = mapWidgetItemElem.attributes();
       QByteArray ba;
-      QDataStream ds ( &ba, QIODevice::ReadOnly );
-      KadasMapWidget* mapWidget = new KadasMapWidget (
-        attributes.namedItem ( "number" ).nodeValue().toInt(),
-        attributes.namedItem ( "id " ).nodeValue(),
-        attributes.namedItem ( "title" ).nodeValue(),
+      QDataStream ds( &ba, QIODevice::ReadOnly );
+      KadasMapWidget *mapWidget = new KadasMapWidget(
+        attributes.namedItem( "number" ).nodeValue().toInt(),
+        attributes.namedItem( "id " ).nodeValue(),
+        attributes.namedItem( "title" ).nodeValue(),
         mMasterCanvas );
-      mapWidget->setAttribute ( Qt::WA_DeleteOnClose );
-      ba = QByteArray::fromBase64 ( attributes.namedItem ( "layers" ).nodeValue().toLocal8Bit() );
+      mapWidget->setAttribute( Qt::WA_DeleteOnClose );
+      ba = QByteArray::fromBase64( attributes.namedItem( "layers" ).nodeValue().toLocal8Bit() );
       QStringList layersList;
       ds >> layersList;
-      mapWidget->setInitialLayers ( layersList );
-      connect ( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
+      mapWidget->setInitialLayers( layersList );
+      connect( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
       // Compiler bug?! If I pass it directly, value is always false
-      bool islocked = attributes.namedItem ( "islocked" ).nodeValue().toInt();
-      mapWidget->setLocked ( islocked );
-      mapWidget->setFloating ( attributes.namedItem ( "floating" ).nodeValue().toInt() );
-      mapWidget->setFixedWidth ( attributes.namedItem ( "width" ).nodeValue().toInt() );
-      mapWidget->setFixedHeight ( attributes.namedItem ( "height" ).nodeValue().toInt() );
-      ba = QByteArray::fromBase64 ( attributes.namedItem ( "extent" ).nodeValue().toLocal8Bit() );
+      bool islocked = attributes.namedItem( "islocked" ).nodeValue().toInt();
+      mapWidget->setLocked( islocked );
+      mapWidget->setFloating( attributes.namedItem( "floating" ).nodeValue().toInt() );
+      mapWidget->setFixedWidth( attributes.namedItem( "width" ).nodeValue().toInt() );
+      mapWidget->setFixedHeight( attributes.namedItem( "height" ).nodeValue().toInt() );
+      ba = QByteArray::fromBase64( attributes.namedItem( "extent" ).nodeValue().toLocal8Bit() );
       QRectF extent;
       ds >> extent;
-      mapWidget->setMapExtent ( QgsRectangle ( extent ) );
-      mMainWindow->addDockWidget ( static_cast<Qt::DockWidgetArea> ( attributes.namedItem ( "area" ).nodeValue().toInt() ), mapWidget );
-      mMapWidgets.append ( mapWidget );
+      mapWidget->setMapExtent( QgsRectangle( extent ) );
+      mMainWindow->addDockWidget( static_cast<Qt::DockWidgetArea>( attributes.namedItem( "area" ).nodeValue().toInt() ), mapWidget );
+      mMapWidgets.append( mapWidget );
     }
   }
 }

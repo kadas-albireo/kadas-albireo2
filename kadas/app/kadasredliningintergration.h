@@ -32,29 +32,29 @@ class KadasMainWindow;
 
 class KadasRedliningIntegration : public QObject
 {
-  Q_OBJECT
-public:
-  KadasRedliningIntegration ( QToolButton* buttonNewObject, KadasMainWindow* main );
-  KadasItemLayer* getOrCreateLayer();
-  KadasItemLayer* getLayer() const;
+    Q_OBJECT
+  public:
+    KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *main );
+    KadasItemLayer *getOrCreateLayer();
+    KadasItemLayer *getLayer() const;
 
-private:
-  QToolButton* mButtonNewObject = nullptr;
-  KadasMainWindow* mMainWindow = nullptr;
-  QgsMapCanvas* mCanvas = nullptr;
-  QString mLayerId;
+  private:
+    QToolButton *mButtonNewObject = nullptr;
+    KadasMainWindow *mMainWindow = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
+    QString mLayerId;
 
-  QAction* mActionNewPoint = nullptr;
-  QAction* mActionNewSquare = nullptr;
-  QAction* mActionNewTriangle = nullptr;
-  QAction* mActionNewLine = nullptr;
-  QAction* mActionNewRectangle = nullptr;
-  QAction* mActionNewPolygon = nullptr;
-  QAction* mActionNewCircle = nullptr;
-  QAction* mActionNewText = nullptr;
+    QAction *mActionNewPoint = nullptr;
+    QAction *mActionNewSquare = nullptr;
+    QAction *mActionNewTriangle = nullptr;
+    QAction *mActionNewLine = nullptr;
+    QAction *mActionNewRectangle = nullptr;
+    QAction *mActionNewPolygon = nullptr;
+    QAction *mActionNewCircle = nullptr;
+    QAction *mActionNewText = nullptr;
 
-  KadasMapItem* setEditorFactory ( KadasMapItem* item ) const;
-  void toggleCreateItem ( bool active, const std::function<KadasMapItem*() >& itemFactory );
+    KadasMapItem *setEditorFactory( KadasMapItem *item ) const;
+    void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory );
 };
 
 #endif // KADASREDLININGINTEGRATION_H

@@ -25,84 +25,93 @@
 
 #include <kadas/gui/kadasclipboard.h>
 
-KadasClipboard::KadasClipboard ( QObject* parent )
-  : QObject ( parent )
+KadasClipboard::KadasClipboard( QObject *parent )
+  : QObject( parent )
 {
-  connect ( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::onDataChanged );
+  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::onDataChanged );
 }
 
-void KadasClipboard::setMimeData ( QMimeData* mimeData )
+void KadasClipboard::setMimeData( QMimeData *mimeData )
 {
-  QApplication::clipboard()->setMimeData ( mimeData );
+  QApplication::clipboard()->setMimeData( mimeData );
   mFeatureStore = QgsFeatureStore();
 }
 
-const QMimeData* KadasClipboard::mimeData()
+const QMimeData *KadasClipboard::mimeData()
 {
   return QApplication::clipboard()->mimeData();
 }
 
 bool KadasClipboard::isEmpty() const
 {
-  const QMimeData* mimeData = QApplication::clipboard()->mimeData();
+  const QMimeData *mimeData = QApplication::clipboard()->mimeData();
   return !mimeData || mimeData->formats().isEmpty();
 }
 
-bool KadasClipboard::hasFormat ( const QString& format ) const
+bool KadasClipboard::hasFormat( const QString &format ) const
 {
-  if ( format == KADASCLIPBOARD_FEATURESTORE_MIME ) {
+  if ( format == KADASCLIPBOARD_FEATURESTORE_MIME )
+  {
     return !mFeatureStore.features().isEmpty();
   }
-  const QMimeData* mimeData = QApplication::clipboard()->mimeData();
-  return mimeData && mimeData->hasFormat ( format );
+  const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+  return mimeData && mimeData->hasFormat( format );
 }
 
-void KadasClipboard::setStoredFeatures ( const QgsFeatureStore& featureStore )
+void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 {
   // Also store plaintext version
   QSettings settings;
-  bool copyWKT = settings.value ( "Qgis/copyGeometryAsWKT", true ).toBool();
+  bool copyWKT = settings.value( "Qgis/copyGeometryAsWKT", true ).toBool();
 
   QStringList textLines;
   QStringList textFields;
 
   // first column names
-  if ( copyWKT ) {
+  if ( copyWKT )
+  {
     textFields += "wkt_geom";
   }
-  for ( int i = 0, n = featureStore.fields().count(); i < n; ++i ) {
-    textFields.append ( featureStore.fields().at ( i ).name() );
+  for ( int i = 0, n = featureStore.fields().count(); i < n; ++i )
+  {
+    textFields.append( featureStore.fields().at( i ).name() );
   }
-  textLines.append ( textFields.join ( "\t" ) );
+  textLines.append( textFields.join( "\t" ) );
   textFields.clear();
 
   // then the field contents
-  for ( const QgsFeature& feature : featureStore.features() ) {
-    if ( copyWKT ) {
-      if ( feature.hasGeometry() ) {
-        textFields.append ( feature.geometry().asWkt() );
-      } else {
-        textFields.append ( settings.value ( "Qgis/nullValue", "NULL" ).toString() );
+  for ( const QgsFeature &feature : featureStore.features() )
+  {
+    if ( copyWKT )
+    {
+      if ( feature.hasGeometry() )
+      {
+        textFields.append( feature.geometry().asWkt() );
+      }
+      else
+      {
+        textFields.append( settings.value( "Qgis/nullValue", "NULL" ).toString() );
       }
     }
-    for ( const QVariant& attr : feature.attributes() ) {
-      textFields.append ( attr.toString() );
+    for ( const QVariant &attr : feature.attributes() )
+    {
+      textFields.append( attr.toString() );
     }
-    textLines.append ( textFields.join ( "\t" ) );
+    textLines.append( textFields.join( "\t" ) );
     textFields.clear();
   }
-  QMimeData* mimeData = new QMimeData();
-  mimeData->setData ( "text/plain", textLines.join ( "\n" ).toLocal8Bit() );
-  QApplication::clipboard()->setMimeData ( mimeData );
+  QMimeData *mimeData = new QMimeData();
+  mimeData->setData( "text/plain", textLines.join( "\n" ).toLocal8Bit() );
+  QApplication::clipboard()->setMimeData( mimeData );
 
   // Make QApplication::clipboard() emit the dataChanged signal
-  QApplication::processEvents ( QEventLoop::ExcludeUserInputEvents );
+  QApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
 
   // After plaintext version, because dataChanged clears the internal feature store
   mFeatureStore = featureStore;
 }
 
-const QgsFeatureStore& KadasClipboard::getStoredFeatures() const
+const QgsFeatureStore &KadasClipboard::getStoredFeatures() const
 {
   return mFeatureStore;
 }

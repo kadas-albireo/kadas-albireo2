@@ -25,26 +25,26 @@ class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  static KadasMapCanvasItemManager* instance();
-  static void addItem ( const KadasMapItem* item );
-  static void removeItem ( const KadasMapItem* item );
-  static const QList<const KadasMapItem*>& items();
-  static void clear();
+  public:
+    static KadasMapCanvasItemManager *instance();
+    static void addItem( const KadasMapItem *item );
+    static void removeItem( const KadasMapItem *item );
+    static const QList<const KadasMapItem *> &items();
+    static void clear();
 
-signals:
-  void itemAdded ( const KadasMapItem* item );
-  void itemWillBeRemoved ( const KadasMapItem* item );
+  signals:
+    void itemAdded( const KadasMapItem *item );
+    void itemWillBeRemoved( const KadasMapItem *item );
 
-private:
-  KadasMapCanvasItemManager() {}
+  private:
+    KadasMapCanvasItemManager() {}
 
-  QList<const KadasMapItem*> mMapItems;
+    QList<const KadasMapItem *> mMapItems;
 
-private slots:
-  void itemAboutToBeDestroyed();
+  private slots:
+    void itemAboutToBeDestroyed();
 };
 
 #endif // KADASMAPCANVASITEMMANAGER_H

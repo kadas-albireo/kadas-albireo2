@@ -28,43 +28,44 @@ class QgsCoordinateReferenceSystem;
 
 class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 {
-  Q_OBJECT
-public:
-  enum Format {
-    Default,
-    DegMinSec,
-    DegMin,
-    DecDeg,
-    UTM,
-    MGRS
-  };
+    Q_OBJECT
+  public:
+    enum Format
+    {
+      Default,
+      DegMinSec,
+      DegMin,
+      DecDeg,
+      UTM,
+      MGRS
+    };
 
-  static KadasCoordinateFormat* instance();
-  void getCoordinateDisplayFormat ( Format& format, QString& epsg ) const;
-  QgsUnitTypes::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
+    static KadasCoordinateFormat *instance();
+    void getCoordinateDisplayFormat( Format &format, QString &epsg ) const;
+    QgsUnitTypes::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
 
-  QString getDisplayString ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& sSrs ) const;
-  static QString getDisplayString ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& sSrs, Format format, const QString& epsg );
+    QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
+    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
 
-  double getHeightAtPos ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs, QString* errMsg = 0 );
-  static double getHeightAtPos ( const QgsPointXY& p, const QgsCoordinateReferenceSystem& crs, QgsUnitTypes::DistanceUnit unit, QString* errMsg = 0 );
+    double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
 
-  QgsPointXY parseCoordinate ( const QString& text, Format format, bool& valid ) const;
+    QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
 
-public slots:
-  void setCoordinateDisplayFormat ( Format format, const QString& epsg );
-  void setHeightDisplayUnit ( QgsUnitTypes::DistanceUnit heightUnit );
+  public slots:
+    void setCoordinateDisplayFormat( Format format, const QString &epsg );
+    void setHeightDisplayUnit( QgsUnitTypes::DistanceUnit heightUnit );
 
-signals:
-  void coordinateDisplayFormatChanged ( Format format, const QString& epsg );
-  void heightDisplayUnitChanged ( QgsUnitTypes::DistanceUnit heightUnit );
+  signals:
+    void coordinateDisplayFormatChanged( Format format, const QString &epsg );
+    void heightDisplayUnitChanged( QgsUnitTypes::DistanceUnit heightUnit );
 
-private:
-  KadasCoordinateFormat();
+  private:
+    KadasCoordinateFormat();
 
-  Format mFormat;
-  QString mEpsg;
-  QgsUnitTypes::DistanceUnit mHeightUnit;
+    Format mFormat;
+    QString mEpsg;
+    QgsUnitTypes::DistanceUnit mHeightUnit;
 };
 
 #endif // KADASCOORDINATEFORMAT_H

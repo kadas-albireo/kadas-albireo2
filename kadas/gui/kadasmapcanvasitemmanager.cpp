@@ -17,40 +17,41 @@
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
-KadasMapCanvasItemManager* KadasMapCanvasItemManager::instance()
+KadasMapCanvasItemManager *KadasMapCanvasItemManager::instance()
 {
   static KadasMapCanvasItemManager manager;
   return &manager;
 }
 
-void KadasMapCanvasItemManager::addItem ( const KadasMapItem* item )
+void KadasMapCanvasItemManager::addItem( const KadasMapItem *item )
 {
-  instance()->mMapItems.append ( item );
-  connect ( item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed );
-  emit instance()->itemAdded ( item );
+  instance()->mMapItems.append( item );
+  connect( item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed );
+  emit instance()->itemAdded( item );
 }
 
-void KadasMapCanvasItemManager::removeItem ( const KadasMapItem* item )
+void KadasMapCanvasItemManager::removeItem( const KadasMapItem *item )
 {
-  emit instance()->itemWillBeRemoved ( item );
-  instance()->mMapItems.removeAll ( item );
+  emit instance()->itemWillBeRemoved( item );
+  instance()->mMapItems.removeAll( item );
 }
 
-const QList<const KadasMapItem*>& KadasMapCanvasItemManager::items()
+const QList<const KadasMapItem *> &KadasMapCanvasItemManager::items()
 {
   return instance()->mMapItems;
 }
 
 void KadasMapCanvasItemManager::clear()
 {
-  qDeleteAll ( instance()->mMapItems );
+  qDeleteAll( instance()->mMapItems );
   instance()->mMapItems.clear();
 }
 
 void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
 {
-  const KadasMapItem* item = qobject_cast<const KadasMapItem*> ( QObject::sender() );
-  if ( item ) {
-    removeItem ( item );
+  const KadasMapItem *item = qobject_cast<const KadasMapItem *> ( QObject::sender() );
+  if ( item )
+  {
+    removeItem( item );
   }
 }

@@ -32,149 +32,179 @@
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 
-KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider ( QgsLayerTreeView* view ) :
-  mView ( view )
+KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
+  mView( view )
 {
 }
 
-QMenu* KadasLayerTreeViewMenuProvider::createContextMenu()
+QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 {
-  if ( !mView ) {
+  if ( !mView )
+  {
     return nullptr;
   }
-  QMenu* menu = new QMenu;
+  QMenu *menu = new QMenu;
 
-  QgsLayerTreeViewDefaultActions* actions = mView->defaultActions();
+  QgsLayerTreeViewDefaultActions *actions = mView->defaultActions();
 
   QModelIndex idx = mView->currentIndex();
-  if ( !idx.isValid() ) {
-    menu->addAction ( actions->actionAddGroup ( menu ) );
-  } else if ( QgsLayerTreeNode* node = mView->layerTreeModel()->index2node ( idx ) ) {
-    if ( QgsLayerTree::isLayer ( node ) ) {
-      QgsMapLayer* layer = QgsLayerTree::toLayer ( node )->layer();
-      if ( layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::RasterLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ || layer->type() == QgsMapLayerType::PluginLayer ) { // TODO
-        menu->addAction ( actionLayerTransparency ( menu ) );
+  if ( !idx.isValid() )
+  {
+    menu->addAction( actions->actionAddGroup( menu ) );
+  }
+  else if ( QgsLayerTreeNode *node = mView->layerTreeModel()->index2node( idx ) )
+  {
+    if ( QgsLayerTree::isLayer( node ) )
+    {
+      QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
+      if ( layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::RasterLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ || layer->type() == QgsMapLayerType::PluginLayer )   // TODO
+      {
+        menu->addAction( actionLayerTransparency( menu ) );
       }
       // TODO
 //      if ( dynamic_cast<QgsAnnotationLayer*>( layer ) )
 //      {
 //        menu->addAction( actions->actionSymbolScale( menu ) );
 //      }
-      menu->addAction ( actions->actionZoomToLayer ( kApp->mainWindow()->mapCanvas(), menu ) );
-      menu->addAction ( actions->actionRenameGroupOrLayer ( menu ) );
-    } else if ( QgsLayerTree::isGroup ( node ) ) {
-      menu->addAction ( actions->actionRenameGroupOrLayer ( menu ) );
-      menu->addAction ( actions->actionMutuallyExclusiveGroup ( menu ) );
+      menu->addAction( actions->actionZoomToLayer( kApp->mainWindow()->mapCanvas(), menu ) );
+      menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
     }
-    menu->addAction ( QgsApplication::getThemeIcon ( "/mActionRemoveLayer.svg" ), tr ( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
-    if ( QgsLayerTree::isLayer ( node ) ) {
-      QgsMapLayer* layer = QgsLayerTree::toLayer ( node )->layer();
+    else if ( QgsLayerTree::isGroup( node ) )
+    {
+      menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
+      menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
+    }
+    menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
+    if ( QgsLayerTree::isLayer( node ) )
+    {
+      QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
       // addCustomLayerActions( menu, layer ); TODO?
-      if ( layer->type() == QgsMapLayerType::RasterLayer ) {
-        menu->addAction ( actionLayerUseAsHeightmap ( menu ) );
-      } else if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) { // TODO
-        menu->addAction ( QgsApplication::getThemeIcon ( "/mActionOpenTable.png" ), tr ( "&Open Attribute Table" ),
-                          this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
+      if ( layer->type() == QgsMapLayerType::RasterLayer )
+      {
+        menu->addAction( actionLayerUseAsHeightmap( menu ) );
       }
-      if ( !layer->metadataUrl().isEmpty() ) {
-        menu->addAction ( QgsApplication::getThemeIcon ( "/mActionInfo.png" ), tr ( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
+      else if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ )     // TODO
+      {
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ), tr( "&Open Attribute Table" ),
+                         this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
       }
-      if ( layer->type() == QgsMapLayerType::PluginLayer ) {
+      if ( !layer->metadataUrl().isEmpty() )
+      {
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionInfo.png" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
+      }
+      if ( layer->type() == QgsMapLayerType::PluginLayer )
+      {
         // TODO
 //        QgsPluginLayerType* plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( static_cast<QgsPluginLayer*>( layer )->pluginLayerType() );
 //        if ( plt && plt->hasLayerProperties() != 0 )
 //        {
 //          menu->addAction( tr( "&Properties" ), mMainWindow, SLOT( layerProperties() ) );
 //        }
-      } else {
-        menu->addAction ( tr ( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
+      }
+      else
+      {
+        menu->addAction( tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
       }
     }
   }
   return menu;
 }
 
-QAction* KadasLayerTreeViewMenuProvider::actionLayerTransparency ( QMenu* parent )
+QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent )
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  if ( !layer ) {
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( !layer )
+  {
     return nullptr;
   }
 
   int opacity = 0;
-  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) { // TODO
-    opacity = static_cast<QgsVectorLayer*> ( layer )->opacity();
-  } else if ( layer->type() == QgsMapLayerType::PluginLayer ) {
+  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ )   // TODO
+  {
+    opacity = static_cast<QgsVectorLayer *>( layer )->opacity();
+  }
+  else if ( layer->type() == QgsMapLayerType::PluginLayer )
+  {
     // TODO
     // opacity = static_cast<QgsPluginLayer*>( layer )->opacity();
-  } else if ( layer->type() == QgsMapLayerType::RasterLayer ) {
-    opacity = static_cast<QgsRasterLayer*> ( layer )->renderer()->opacity() * 100;
+  }
+  else if ( layer->type() == QgsMapLayerType::RasterLayer )
+  {
+    opacity = static_cast<QgsRasterLayer *>( layer )->renderer()->opacity() * 100;
   }
 
-  QWidget* transpWidget = new QWidget();
-  QHBoxLayout* transpLayout = new QHBoxLayout ( transpWidget );
+  QWidget *transpWidget = new QWidget();
+  QHBoxLayout *transpLayout = new QHBoxLayout( transpWidget );
 
-  QLabel* transpLabel = new QLabel ( tr ( "Transparency:" ) );
-  transpLabel->setSizePolicy ( QSizePolicy::Preferred, QSizePolicy::Fixed );
-  transpLayout->addWidget ( transpLabel );
+  QLabel *transpLabel = new QLabel( tr( "Transparency:" ) );
+  transpLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+  transpLayout->addWidget( transpLabel );
 
-  QSlider* transpSlider = new QSlider ( Qt::Horizontal );
-  transpSlider->setRange ( 0, 100 );
-  transpSlider->setValue ( 100 - opacity );
-  transpSlider->setSizePolicy ( QSizePolicy::Expanding, QSizePolicy::Fixed );
-  transpSlider->setTracking ( false );
-  connect ( transpSlider, &QSlider::valueChanged, this, &KadasLayerTreeViewMenuProvider::setLayerTransparency );
-  transpLayout->addWidget ( transpSlider );
+  QSlider *transpSlider = new QSlider( Qt::Horizontal );
+  transpSlider->setRange( 0, 100 );
+  transpSlider->setValue( 100 - opacity );
+  transpSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  transpSlider->setTracking( false );
+  connect( transpSlider, &QSlider::valueChanged, this, &KadasLayerTreeViewMenuProvider::setLayerTransparency );
+  transpLayout->addWidget( transpSlider );
 
-  QWidgetAction* transpAction = new QWidgetAction ( parent );
-  transpAction->setDefaultWidget ( transpWidget );
+  QWidgetAction *transpAction = new QWidgetAction( parent );
+  transpAction->setDefaultWidget( transpWidget );
   return transpAction;
 }
 
-QAction* KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap ( QMenu* parent )
+QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *parent )
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  if ( !layer ) {
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( !layer )
+  {
     return nullptr;
   }
 
-  QAction* heightmapAction = new QAction ( tr ( "Use as heightmap" ), parent );
-  heightmapAction->setCheckable ( true );
-  QString currentHeightmap = QgsProject::instance()->readEntry ( "Heightmap", "layer" );
-  heightmapAction->setChecked ( currentHeightmap == layer->id() );
-  connect ( heightmapAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap );
+  QAction *heightmapAction = new QAction( tr( "Use as heightmap" ), parent );
+  heightmapAction->setCheckable( true );
+  QString currentHeightmap = QgsProject::instance()->readEntry( "Heightmap", "layer" );
+  heightmapAction->setChecked( currentHeightmap == layer->id() );
+  connect( heightmapAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap );
   return heightmapAction;
 }
 
 void KadasLayerTreeViewMenuProvider::removeLayer()
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  QgsProject::instance()->removeMapLayer ( layer );
+  QgsMapLayer *layer = mView->currentLayer();
+  QgsProject::instance()->removeMapLayer( layer );
 }
 
-void KadasLayerTreeViewMenuProvider::setLayerTransparency ( int value )
+void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  if ( !layer ) {
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( !layer )
+  {
     return;
   }
 
-  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ ) { // TODO
-    static_cast<QgsVectorLayer*> ( layer )->setOpacity ( 100 - value );
-  } else if ( layer->type() == QgsMapLayerType::PluginLayer ) {
-//    static_cast<QgsPluginLayer*>( layer )->setLayerTransparency( value ); TODO
-  } else if ( layer->type() == QgsMapLayerType::RasterLayer ) {
-    static_cast<QgsRasterLayer*> ( layer )->renderer()->setOpacity ( 1. - value / 100. );
+  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ )   // TODO
+  {
+    static_cast<QgsVectorLayer *>( layer )->setOpacity( 100 - value );
   }
-  mView->refreshLayerSymbology ( layer->id() );
+  else if ( layer->type() == QgsMapLayerType::PluginLayer )
+  {
+//    static_cast<QgsPluginLayer*>( layer )->setLayerTransparency( value ); TODO
+  }
+  else if ( layer->type() == QgsMapLayerType::RasterLayer )
+  {
+    static_cast<QgsRasterLayer *>( layer )->renderer()->setOpacity( 1. - value / 100. );
+  }
+  mView->refreshLayerSymbology( layer->id() );
   layer->triggerRepaint();
 }
 
-void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap ( bool enabled )
+void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  if ( layer ) {
-    QgsProject::instance()->writeEntry ( "Heightmap", "layer", enabled ? layer->id() : "" );
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( layer )
+  {
+    QgsProject::instance()->writeEntry( "Heightmap", "layer", enabled ? layer->id() : "" );
   }
 }
 
@@ -186,9 +216,10 @@ void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()
 
 void KadasLayerTreeViewMenuProvider::showLayerInfo()
 {
-  QgsMapLayer* layer = mView->currentLayer();
-  if ( layer && !layer->metadataUrl().isEmpty() ) {
-    QDesktopServices::openUrl ( layer->metadataUrl() );
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( layer && !layer->metadataUrl().isEmpty() )
+  {
+    QDesktopServices::openUrl( layer->metadataUrl() );
   }
 }
 

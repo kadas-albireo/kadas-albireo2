@@ -25,43 +25,45 @@
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
 
-KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog ( QWidget* parent )
-  : QDialog ( parent )
+KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidget *parent )
+  : QDialog( parent )
 {
-  setupUi ( this );
+  setupUi( this );
 
-  mModel = new QFileSystemModel ( this );
-  mModel->setNameFilters ( QStringList() << "*.qgs" );
-  mModel->setNameFilterDisables ( false );
-  mModel->setReadOnly ( true );
+  mModel = new QFileSystemModel( this );
+  mModel->setNameFilters( QStringList() << "*.qgs" );
+  mModel->setNameFilterDisables( false );
+  mModel->setReadOnly( true );
 
-  mTreeView->setModel ( mModel );
-  mTreeView->setRootIndex ( mModel->setRootPath ( Kadas::projectTemplatesPath() ) );
-  for ( int i = 1, n = mModel->columnCount(); i < n; ++i ) {
-    mTreeView->setColumnHidden ( i, true );
+  mTreeView->setModel( mModel );
+  mTreeView->setRootIndex( mModel->setRootPath( Kadas::projectTemplatesPath() ) );
+  for ( int i = 1, n = mModel->columnCount(); i < n; ++i )
+  {
+    mTreeView->setColumnHidden( i, true );
   }
-  connect ( mTreeView, &QTreeView::clicked, this, &KadasProjectTemplateSelectionDialog::itemClicked );
-  connect ( mTreeView, &QTreeView::doubleClicked, this, &KadasProjectTemplateSelectionDialog::itemDoubleClicked );
+  connect( mTreeView, &QTreeView::clicked, this, &KadasProjectTemplateSelectionDialog::itemClicked );
+  connect( mTreeView, &QTreeView::doubleClicked, this, &KadasProjectTemplateSelectionDialog::itemDoubleClicked );
 
-  mCreateButton = mButtonBox->addButton ( tr ( "Create" ), QDialogButtonBox::AcceptRole );
-  mCreateButton->setEnabled ( false );
-  connect ( mCreateButton, &QAbstractButton::clicked, this, &KadasProjectTemplateSelectionDialog::createProject );
+  mCreateButton = mButtonBox->addButton( tr( "Create" ), QDialogButtonBox::AcceptRole );
+  mCreateButton->setEnabled( false );
+  connect( mCreateButton, &QAbstractButton::clicked, this, &KadasProjectTemplateSelectionDialog::createProject );
 }
 
-void KadasProjectTemplateSelectionDialog::itemClicked ( const QModelIndex& index )
+void KadasProjectTemplateSelectionDialog::itemClicked( const QModelIndex &index )
 {
-  mCreateButton->setEnabled ( mModel->fileInfo ( index ).isFile() );
+  mCreateButton->setEnabled( mModel->fileInfo( index ).isFile() );
 }
 
-void KadasProjectTemplateSelectionDialog::itemDoubleClicked ( const QModelIndex& index )
+void KadasProjectTemplateSelectionDialog::itemDoubleClicked( const QModelIndex &index )
 {
-  if ( mModel->fileInfo ( index ).isFile() ) {
+  if ( mModel->fileInfo( index ).isFile() )
+  {
     createProject();
   }
 }
 
 void KadasProjectTemplateSelectionDialog::createProject()
 {
-  mSelectedTemplate = mModel->fileInfo ( mTreeView->currentIndex() ).absoluteFilePath();
+  mSelectedTemplate = mModel->fileInfo( mTreeView->currentIndex() ).absoluteFilePath();
   accept();
 }

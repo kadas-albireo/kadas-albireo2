@@ -22,17 +22,17 @@
 
 class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
 {
-  Q_OBJECT
-public:
-  KadasMapToolDeleteItems ( QgsMapCanvas* mapCanvas );
-  void activate() override;
-  void deleteItems ( const QgsRectangle& filterRect, const QgsCoordinateReferenceSystem& crs );
+    Q_OBJECT
+  public:
+    KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );
+    void activate() override;
+    void deleteItems( const QgsRectangle &filterRect, const QgsCoordinateReferenceSystem &crs );
 
-private:
-  ItemFactory itemFactory ( QgsMapCanvas* canvas ) const;
+  private:
+    ItemFactory itemFactory( QgsMapCanvas *canvas ) const;
 
-private slots:
-  void drawFinished();
+  private slots:
+    void drawFinished();
 };
 
 #endif // KADASMAPTOOLDELETEITEMS_H

@@ -28,13 +28,13 @@
 
 #include <kadas/gui/kadascanvasgpsdisplay.h>
 
-KadasCanvasGPSDisplay::KadasCanvasGPSDisplay ( QgsMapCanvas* canvas, QObject* parent )
-  : QObject ( parent )
+KadasCanvasGPSDisplay::KadasCanvasGPSDisplay( QgsMapCanvas *canvas, QObject *parent )
+  : QObject( parent )
 {
   mMarkerSize = defaultMarkerSize();
   mSpinMapExtentMultiplier = defaultSpinMapExtentMultiplier();
   mRecenterMap = defaultRecenterMode();
-  mWgs84CRS.createFromOgcWmsCrs ( "EPSG:4326" );
+  mWgs84CRS.createFromOgcWmsCrs( "EPSG:4326" );
 }
 
 KadasCanvasGPSDisplay::~KadasCanvasGPSDisplay()
@@ -42,23 +42,26 @@ KadasCanvasGPSDisplay::~KadasCanvasGPSDisplay()
   closeGPSConnection();
 
   QSettings s;
-  s.setValue ( "/gps/markerSize", mMarkerSize );
-  s.setValue ( "/gps/mapExtentMultiplier", mSpinMapExtentMultiplier );
+  s.setValue( "/gps/markerSize", mMarkerSize );
+  s.setValue( "/gps/mapExtentMultiplier", mSpinMapExtentMultiplier );
   QString panModeString = "none";
-  if ( mRecenterMap == KadasCanvasGPSDisplay::Always ) {
+  if ( mRecenterMap == KadasCanvasGPSDisplay::Always )
+  {
     panModeString = "recenterAlways";
-  } else if ( mRecenterMap == KadasCanvasGPSDisplay::WhenNeeded ) {
+  }
+  else if ( mRecenterMap == KadasCanvasGPSDisplay::WhenNeeded )
+  {
     panModeString = "recenterWhenNeeded";
   }
-  s.setValue ( "/gps/panMode", panModeString );
+  s.setValue( "/gps/panMode", panModeString );
 }
 
 void KadasCanvasGPSDisplay::connectGPS()
 {
   closeGPSConnection();
-  QgsGpsDetector* gpsDetector = new QgsGpsDetector ( mPort );
-  connect ( gpsDetector, qOverload<QgsGpsConnection*> ( &QgsGpsDetector::detected ), this, &KadasCanvasGPSDisplay::gpsDetected );
-  connect ( gpsDetector, &QgsGpsDetector::detectionFailed, this, &KadasCanvasGPSDisplay::gpsDetectionFailed );
+  QgsGpsDetector *gpsDetector = new QgsGpsDetector( mPort );
+  connect( gpsDetector, qOverload<QgsGpsConnection *> ( &QgsGpsDetector::detected ), this, &KadasCanvasGPSDisplay::gpsDetected );
+  connect( gpsDetector, &QgsGpsDetector::detectionFailed, this, &KadasCanvasGPSDisplay::gpsDetectionFailed );
   gpsDetector->advance();
 }
 
@@ -70,8 +73,9 @@ void KadasCanvasGPSDisplay::disconnectGPS()
 
 void KadasCanvasGPSDisplay::closeGPSConnection()
 {
-  if ( mConnection ) {
-    QgsApplication::gpsConnectionRegistry()->unregisterConnection ( mConnection );
+  if ( mConnection )
+  {
+    QgsApplication::gpsConnectionRegistry()->unregisterConnection( mConnection );
     mConnection->close();
     delete mConnection;
     mConnection = 0;
@@ -80,12 +84,12 @@ void KadasCanvasGPSDisplay::closeGPSConnection()
   removeMarker();
 }
 
-void KadasCanvasGPSDisplay::gpsDetected ( QgsGpsConnection* conn )
+void KadasCanvasGPSDisplay::gpsDetected( QgsGpsConnection *conn )
 {
   mConnection = conn;
-  QgsApplication::gpsConnectionRegistry()->registerConnection ( mConnection );
-  connect ( conn, &QgsGpsConnection::stateChanged, this, &KadasCanvasGPSDisplay::updateGPSInformation );
-  connect ( conn, &QgsGpsConnection::nmeaSentenceReceived, this, &KadasCanvasGPSDisplay::nmeaSentenceReceived );
+  QgsApplication::gpsConnectionRegistry()->registerConnection( mConnection );
+  connect( conn, &QgsGpsConnection::stateChanged, this, &KadasCanvasGPSDisplay::updateGPSInformation );
+  connect( conn, &QgsGpsConnection::nmeaSentenceReceived, this, &KadasCanvasGPSDisplay::nmeaSentenceReceived );
   emit gpsConnected();
 }
 
@@ -94,62 +98,68 @@ void KadasCanvasGPSDisplay::gpsDetectionFailed()
   emit gpsConnectionFailed();
 }
 
-void KadasCanvasGPSDisplay::updateGPSInformation ( const QgsGpsInformation& info )
+void KadasCanvasGPSDisplay::updateGPSInformation( const QgsGpsInformation &info )
 {
   QgsGpsInformation::FixStatus fixStatus = info.fixStatus();
 
-  if ( fixStatus != mCurFixStatus ) {
-    emit gpsFixStatusChanged ( fixStatus );
+  if ( fixStatus != mCurFixStatus )
+  {
+    emit gpsFixStatusChanged( fixStatus );
   }
   mCurFixStatus = fixStatus;
 
-  emit gpsInformationReceived ( info ); //send signal for service who want to do further actions (e.g. satellite position display, digitising, ...)
+  emit gpsInformationReceived( info );  //send signal for service who want to do further actions (e.g. satellite position display, digitising, ...)
 
-  if ( !mCanvas || !info.isValid() ) {
+  if ( !mCanvas || !info.isValid() )
+  {
     return;
   }
 
-  QgsPoint position ( info.longitude, info.latitude );
-  if ( mRecenterMap != Never && mLastGPSPosition != position ) {
+  QgsPoint position( info.longitude, info.latitude );
+  if ( mRecenterMap != Never && mLastGPSPosition != position )
+  {
     //recenter map
     QgsCoordinateReferenceSystem destCRS = mCanvas->mapSettings().destinationCrs();
-    QgsCoordinateTransform myTransform ( mWgs84CRS, destCRS, QgsProject::instance() ); // use existing WGS84 CRS
+    QgsCoordinateTransform myTransform( mWgs84CRS, destCRS, QgsProject::instance() );  // use existing WGS84 CRS
 
-    QgsPointXY centerPoint = myTransform.transform ( position );
-    QgsRectangle myRect ( centerPoint, centerPoint );
+    QgsPointXY centerPoint = myTransform.transform( position );
+    QgsRectangle myRect( centerPoint, centerPoint );
 
     // testing if position is outside some proportion of the map extent
     // this is a user setting - useful range: 5% to 100% (0.05 to 1.0)
-    QgsRectangle extentLimit ( mCanvas->extent() );
-    extentLimit.scale ( mSpinMapExtentMultiplier * 0.01 );
+    QgsRectangle extentLimit( mCanvas->extent() );
+    extentLimit.scale( mSpinMapExtentMultiplier * 0.01 );
 
-    if ( mRecenterMap == Always || !extentLimit.contains ( centerPoint ) ) {
-      mCanvas->setExtent ( myRect );
+    if ( mRecenterMap == Always || !extentLimit.contains( centerPoint ) )
+    {
+      mCanvas->setExtent( myRect );
       mCanvas->refresh();
     }
     mLastGPSPosition = position;
   }
 
-  if ( mShowMarker ) {
-    if ( ! mMarker ) {
-      mMarker = new QgsGpsMarker ( mCanvas );
+  if ( mShowMarker )
+  {
+    if ( ! mMarker )
+    {
+      mMarker = new QgsGpsMarker( mCanvas );
     }
-    mMarker->setSize ( mMarkerSize );
-    mMarker->setCenter ( position );
-    mMarker->setDirection ( info.direction );
+    mMarker->setSize( mMarkerSize );
+    mMarker->setCenter( position );
+    mMarker->setDirection( info.direction );
   }
 }
 
 int KadasCanvasGPSDisplay::defaultMarkerSize()
 {
   QSettings s;
-  return s.value ( "/gps/markerSize", "24" ).toInt();
+  return s.value( "/gps/markerSize", "24" ).toInt();
 }
 
 int KadasCanvasGPSDisplay::defaultSpinMapExtentMultiplier()
 {
   QSettings s;
-  return s.value ( "/gps/mapExtentMultiplier", "50" ).toInt();
+  return s.value( "/gps/mapExtentMultiplier", "50" ).toInt();
 }
 
 void KadasCanvasGPSDisplay::removeMarker()
@@ -160,7 +170,8 @@ void KadasCanvasGPSDisplay::removeMarker()
 
 QgsGpsInformation KadasCanvasGPSDisplay::currentGPSInformation() const
 {
-  if ( mConnection ) {
+  if ( mConnection )
+  {
     return mConnection->currentGPSInformation();
   }
 
@@ -170,12 +181,17 @@ QgsGpsInformation KadasCanvasGPSDisplay::currentGPSInformation() const
 KadasCanvasGPSDisplay::RecenterMode KadasCanvasGPSDisplay::defaultRecenterMode()
 {
   QSettings s;
-  QString panMode = s.value ( "/gps/panMode", "none" ).toString();
-  if ( panMode == "recenterAlways" ) {
+  QString panMode = s.value( "/gps/panMode", "none" ).toString();
+  if ( panMode == "recenterAlways" )
+  {
     return KadasCanvasGPSDisplay::Always;
-  } else if ( panMode == "none" ) {
+  }
+  else if ( panMode == "none" )
+  {
     return KadasCanvasGPSDisplay::Never;
-  } else { //recenterWhenNeeded
+  }
+  else     //recenterWhenNeeded
+  {
     return KadasCanvasGPSDisplay::WhenNeeded;
   }
 }

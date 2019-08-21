@@ -32,80 +32,81 @@ class QgsMapCanvas;
 /**Manages display of canvas gps marker and moving of map extent with changing GPS position*/
 class KADAS_GUI_EXPORT KadasCanvasGPSDisplay : public QObject
 {
-  Q_OBJECT
-public:
+    Q_OBJECT
+  public:
 
-  enum RecenterMode {
-    Never,
-    Always,
-    WhenNeeded
-  };
+    enum RecenterMode
+    {
+      Never,
+      Always,
+      WhenNeeded
+    };
 
-  KadasCanvasGPSDisplay ( QgsMapCanvas* canvas, QObject* parent = nullptr );
-  ~KadasCanvasGPSDisplay();
+    KadasCanvasGPSDisplay( QgsMapCanvas *canvas, QObject *parent = nullptr );
+    ~KadasCanvasGPSDisplay();
 
-  void connectGPS();
-  void disconnectGPS();
+    void connectGPS();
+    void disconnectGPS();
 
-  void setMapCanvas ( QgsMapCanvas* canvas ) { mCanvas = canvas; }
+    void setMapCanvas( QgsMapCanvas *canvas ) { mCanvas = canvas; }
 
-  RecenterMode recenterMap() const { return mRecenterMap; }
-  void setRecenterMap ( RecenterMode m ) { mRecenterMap = m; }
+    RecenterMode recenterMap() const { return mRecenterMap; }
+    void setRecenterMap( RecenterMode m ) { mRecenterMap = m; }
 
-  bool showMarker() const { return mShowMarker; }
-  void setShowMarker ( bool showMarker ) { mShowMarker = showMarker; removeMarker(); }
+    bool showMarker() const { return mShowMarker; }
+    void setShowMarker( bool showMarker ) { mShowMarker = showMarker; removeMarker(); }
 
-  int markerSize() const { return mMarkerSize; }
-  void setMarkerSize ( int size ) { mMarkerSize = size; }
+    int markerSize() const { return mMarkerSize; }
+    void setMarkerSize( int size ) { mMarkerSize = size; }
 
-  double spinMapExtentMultiplier() const { return mSpinMapExtentMultiplier; }
-  void setSpinMapExtentMultiplier ( double value ) { mSpinMapExtentMultiplier = value; }
+    double spinMapExtentMultiplier() const { return mSpinMapExtentMultiplier; }
+    void setSpinMapExtentMultiplier( double value ) { mSpinMapExtentMultiplier = value; }
 
-  QString port() const { return mPort; }
-  /**Sets the port for the GPS connection. Empty string (default) means autodetect. For gpsd connections, use '<host>:<port>:<device>'.
-  To use an integrated gps (e.g. on tablet or mobile), set 'internalGPS'*/
-  void setPort ( const QString& port ) { mPort = port; }
+    QString port() const { return mPort; }
+    /**Sets the port for the GPS connection. Empty string (default) means autodetect. For gpsd connections, use '<host>:<port>:<device>'.
+    To use an integrated gps (e.g. on tablet or mobile), set 'internalGPS'*/
+    void setPort( const QString &port ) { mPort = port; }
 
-  QgsGpsInformation currentGPSInformation() const;
-  QgsGpsInformation::FixStatus currentFixStatus() const { return mCurFixStatus; }
+    QgsGpsInformation currentGPSInformation() const;
+    QgsGpsInformation::FixStatus currentFixStatus() const { return mCurFixStatus; }
 
-private slots:
-  void gpsDetected ( QgsGpsConnection* conn );
-  void gpsDetectionFailed();
-  void updateGPSInformation ( const QgsGpsInformation& info );
+  private slots:
+    void gpsDetected( QgsGpsConnection *conn );
+    void gpsDetectionFailed();
+    void updateGPSInformation( const QgsGpsInformation &info );
 
-signals:
-  void gpsConnected();
-  void gpsDisconnected();
-  void gpsConnectionFailed();
-  void gpsFixStatusChanged ( QgsGpsInformation::FixStatus status );
+  signals:
+    void gpsConnected();
+    void gpsDisconnected();
+    void gpsConnectionFailed();
+    void gpsFixStatusChanged( QgsGpsInformation::FixStatus status );
 
-  void gpsInformationReceived ( const QgsGpsInformation& info );
-  void nmeaSentenceReceived ( const QString& substring );
+    void gpsInformationReceived( const QgsGpsInformation &info );
+    void nmeaSentenceReceived( const QString &substring );
 
-private:
-  QgsMapCanvas* mCanvas = nullptr;
-  bool mShowMarker = true;
-  QgsGpsMarker* mMarker = nullptr;
-  int mMarkerSize = 24;
-  int mSpinMapExtentMultiplier;
-  QgsPoint mLastGPSPosition;
-  QgsCoordinateReferenceSystem mWgs84CRS;
-  QgsGpsInformation::FixStatus mCurFixStatus = QgsGpsInformation::NoFix;
+  private:
+    QgsMapCanvas *mCanvas = nullptr;
+    bool mShowMarker = true;
+    QgsGpsMarker *mMarker = nullptr;
+    int mMarkerSize = 24;
+    int mSpinMapExtentMultiplier;
+    QgsPoint mLastGPSPosition;
+    QgsCoordinateReferenceSystem mWgs84CRS;
+    QgsGpsInformation::FixStatus mCurFixStatus = QgsGpsInformation::NoFix;
 
-  /**Port for the GPS connectio*/
-  QString mPort;
-  QgsGpsConnection* mConnection = nullptr;
-  RecenterMode mRecenterMap = Never;
+    /**Port for the GPS connectio*/
+    QString mPort;
+    QgsGpsConnection *mConnection = nullptr;
+    RecenterMode mRecenterMap = Never;
 
-  void closeGPSConnection();
+    void closeGPSConnection();
 
-  void removeMarker();
+    void removeMarker();
 
-  //read default settings
-  static int defaultMarkerSize();
-  static int defaultSpinMapExtentMultiplier();
-  static RecenterMode defaultRecenterMode();
+    //read default settings
+    static int defaultMarkerSize();
+    static int defaultSpinMapExtentMultiplier();
+    static RecenterMode defaultRecenterMode();
 };
 
 #endif // KADASCANVASGPSDISPLAY_H

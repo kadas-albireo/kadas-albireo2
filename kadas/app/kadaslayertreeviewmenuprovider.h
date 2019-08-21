@@ -21,24 +21,24 @@
 
 class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMenuProvider
 {
-  Q_OBJECT
-public:
-  KadasLayerTreeViewMenuProvider ( QgsLayerTreeView* view );
-  QMenu* createContextMenu() override;
+    Q_OBJECT
+  public:
+    KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view );
+    QMenu *createContextMenu() override;
 
-private:
-  QAction* actionLayerTransparency ( QMenu* parent );
-  QAction* actionLayerUseAsHeightmap ( QMenu* parent );
+  private:
+    QAction *actionLayerTransparency( QMenu *parent );
+    QAction *actionLayerUseAsHeightmap( QMenu *parent );
 
-  QgsLayerTreeView* mView = nullptr;
+    QgsLayerTreeView *mView = nullptr;
 
-private slots:
-  void removeLayer();
-  void setLayerTransparency ( int value );
-  void setLayerUseAsHeightmap ( bool enabled );
-  void showLayerAttributeTable();
-  void showLayerInfo();
-  void showLayerProperties();
+  private slots:
+    void removeLayer();
+    void setLayerTransparency( int value );
+    void setLayerUseAsHeightmap( bool enabled );
+    void showLayerAttributeTable();
+    void showLayerInfo();
+    void showLayerProperties();
 };
 
 #endif // KADASLAYERTREEVIEWMENUPROVIDER_H

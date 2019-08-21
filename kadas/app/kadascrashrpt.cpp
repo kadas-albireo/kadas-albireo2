@@ -30,7 +30,7 @@
 
 #ifdef _MSC_VER
 // Define the callback function that will be called on crash
-int CALLBACK CrashCallback ( CR_CRASH_CALLBACK_INFO* pInfo )
+int CALLBACK CrashCallback( CR_CRASH_CALLBACK_INFO *pInfo )
 {
   // TODO: Attempt to save the project
   // QgsProject::instance()->
@@ -44,7 +44,8 @@ int CALLBACK CrashCallback ( CR_CRASH_CALLBACK_INFO* pInfo )
 KadasCrashRpt::~KadasCrashRpt()
 {
 #ifdef _MSC_VER
-  if ( mHandlerInstalled ) {
+  if ( mHandlerInstalled )
+  {
     crUninstall();
   }
 #endif
@@ -53,17 +54,18 @@ KadasCrashRpt::~KadasCrashRpt()
 bool KadasCrashRpt::install()
 {
 #ifdef _MSC_VER
-  QString submitUrl = QSettings().value ( "/kadas/crashrpt_url" ).toString();
-  if ( submitUrl.isEmpty() ) {
-    QgsDebugMsg ( "Failed to install crash reporter: submit url is empty" );
+  QString submitUrl = QSettings().value( "/kadas/crashrpt_url" ).toString();
+  if ( submitUrl.isEmpty() )
+  {
+    QgsDebugMsg( "Failed to install crash reporter: submit url is empty" );
     return false;
   }
   CR_INSTALL_INFO info;
-  memset ( &info, 0, sizeof ( CR_INSTALL_INFO ) );
-  info.cb = sizeof ( CR_INSTALL_INFO );
-  info.pszAppName = _strdup ( QString ( "%1" ).arg ( Kadas::KADAS_FULL_RELEASE_NAME ).toLocal8Bit().data() );
-  info.pszAppVersion = _strdup ( QString ( "%1 (%2)" ).arg ( Kadas::KADAS_BUILD_DATE ).arg ( Kadas::KADAS_DEV_VERSION ).toLocal8Bit().data() );
-  info.pszUrl = _strdup ( submitUrl.toLocal8Bit().data() );
+  memset( &info, 0, sizeof( CR_INSTALL_INFO ) );
+  info.cb = sizeof( CR_INSTALL_INFO );
+  info.pszAppName = _strdup( QString( "%1" ).arg( Kadas::KADAS_FULL_RELEASE_NAME ).toLocal8Bit().data() );
+  info.pszAppVersion = _strdup( QString( "%1 (%2)" ).arg( Kadas::KADAS_BUILD_DATE ).arg( Kadas::KADAS_DEV_VERSION ).toLocal8Bit().data() );
+  info.pszUrl = _strdup( submitUrl.toLocal8Bit().data() );
   info.dwFlags = 0;
   info.dwFlags |= CR_INST_ALL_POSSIBLE_HANDLERS; // Install all available exception handlers.
   info.dwFlags |= CR_INST_AUTO_THREAD_HANDLERS; // Automatically install handlers to threads
@@ -74,27 +76,30 @@ bool KadasCrashRpt::install()
   info.uPriorities[CR_SMAPI] = CR_NEGATIVE_PRIORITY; // Disabled
 
   int nResult;
-  nResult = crInstall ( &info );
+  nResult = crInstall( &info );
 
-  if ( nResult != 0 ) {
+  if ( nResult != 0 )
+  {
     TCHAR buff[512];
-    crGetLastErrorMsg ( buff, sizeof ( buff ) );
-    QgsDebugMsg ( QString ( "Failed to install crash reporter: %1" ).arg ( QString::fromLocal8Bit ( buff, sizeof ( buff ) ) ) );
+    crGetLastErrorMsg( buff, sizeof( buff ) );
+    QgsDebugMsg( QString( "Failed to install crash reporter: %1" ).arg( QString::fromLocal8Bit( buff, sizeof( buff ) ) ) );
     return false;
-  } else {
-    QgsDebugMsg ( "Crash reporter installed" );
-    crSetCrashCallback ( CrashCallback, 0 );
+  }
+  else
+  {
+    QgsDebugMsg( "Crash reporter installed" );
+    crSetCrashCallback( CrashCallback, 0 );
     mHandlerInstalled = true;
     return true;
   }
 #else
   GdbCrashHandler::Configuration config;
-  config.applicationName = QString ( "%1" ).arg ( Kadas::KADAS_FULL_RELEASE_NAME );
-  config.applicationVersion = QString ( "%1 (%2/%3)" ).arg ( Kadas::KADAS_VERSION ).arg ( Kadas::KADAS_BUILD_DATE ).arg ( Kadas::KADAS_DEV_VERSION );
+  config.applicationName = QString( "%1" ).arg( Kadas::KADAS_FULL_RELEASE_NAME );
+  config.applicationVersion = QString( "%1 (%2/%3)" ).arg( Kadas::KADAS_VERSION ).arg( Kadas::KADAS_BUILD_DATE ).arg( Kadas::KADAS_DEV_VERSION );
   config.applicationIcon = ":/kadas/icon-60x60";
-  config.submitAddress = QSettings().value ( "/kadas/crashrpt_url" ).toString();
+  config.submitAddress = QSettings().value( "/kadas/crashrpt_url" ).toString();
   config.submitMethod = GdbCrashHandler::Configuration::SubmitService;
-  GdbCrashHandler::init ( config );
+  GdbCrashHandler::init( config );
   return true;
 #endif
 }

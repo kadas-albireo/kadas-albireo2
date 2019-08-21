@@ -23,9 +23,9 @@
 
 class KADAS_CORE_EXPORT KadasTemporaryFile
 {
-public:
-  static QString createNewFile ( const QString& templateName );
-  static void clear();
+  public:
+    static QString createNewFile( const QString &templateName );
+    static void clear();
 };
 
 #endif // KADASTEMPORARYFILE_H

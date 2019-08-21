@@ -25,14 +25,14 @@ class QTemporaryFile;
 
 class KadasTemporaryFileImpl : public QObject
 {
-public:
-  static KadasTemporaryFileImpl* instance();
-  QString createNewFile ( const QString& templateName );
-  void clear();
+  public:
+    static KadasTemporaryFileImpl *instance();
+    QString createNewFile( const QString &templateName );
+    void clear();
 
-private:
-  ~KadasTemporaryFileImpl();
-  QList<QTemporaryFile*> mFiles;
+  private:
+    ~KadasTemporaryFileImpl();
+    QList<QTemporaryFile *> mFiles;
 };
 
 KadasTemporaryFileImpl::~KadasTemporaryFileImpl()
@@ -40,7 +40,7 @@ KadasTemporaryFileImpl::~KadasTemporaryFileImpl()
   clear();
 }
 
-KadasTemporaryFileImpl* KadasTemporaryFileImpl::instance()
+KadasTemporaryFileImpl *KadasTemporaryFileImpl::instance()
 {
   static KadasTemporaryFileImpl i;
   return &i;
@@ -48,17 +48,18 @@ KadasTemporaryFileImpl* KadasTemporaryFileImpl::instance()
 
 void KadasTemporaryFileImpl::clear()
 {
-  for ( QTemporaryFile* file : instance()->mFiles ) {
-    QFile ( file->fileName() + ".aux.xml" ).remove();
+  for ( QTemporaryFile *file : instance()->mFiles )
+  {
+    QFile( file->fileName() + ".aux.xml" ).remove();
     delete file;
   }
   instance()->mFiles.clear();
 }
 
-QString KadasTemporaryFileImpl::createNewFile ( const QString& templateName )
+QString KadasTemporaryFileImpl::createNewFile( const QString &templateName )
 {
-  QTemporaryFile* tmpFile = new QTemporaryFile ( QDir::temp().absoluteFilePath ( "XXXXXX_" + templateName ), this );
-  mFiles.append ( tmpFile );
+  QTemporaryFile *tmpFile = new QTemporaryFile( QDir::temp().absoluteFilePath( "XXXXXX_" + templateName ), this );
+  mFiles.append( tmpFile );
   return tmpFile->open() ? tmpFile->fileName() : QString();
 }
 
@@ -67,7 +68,7 @@ void KadasTemporaryFile::clear()
   KadasTemporaryFileImpl::instance()->clear();
 }
 
-QString KadasTemporaryFile::createNewFile ( const QString& templateName )
+QString KadasTemporaryFile::createNewFile( const QString &templateName )
 {
-  return KadasTemporaryFileImpl::instance()->createNewFile ( templateName );
+  return KadasTemporaryFileImpl::instance()->createNewFile( templateName );
 }

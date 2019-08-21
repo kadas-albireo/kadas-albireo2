@@ -24,34 +24,34 @@
 
 class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  static KadasMapItemEditor* factory ( KadasMapItem* item )
-  {
-    return new KadasRedliningItemEditor ( item );
-  }
+  public:
+    static KadasMapItemEditor *factory( KadasMapItem *item )
+    {
+      return new KadasRedliningItemEditor( item );
+    }
 
-  KadasRedliningItemEditor ( KadasMapItem* item );
-  ~KadasRedliningItemEditor();
+    KadasRedliningItemEditor( KadasMapItem *item );
+    ~KadasRedliningItemEditor();
 
-  void syncItemToWidget() override;
-  void syncWidgetToItem() override;
+    void syncItemToWidget() override;
+    void syncWidgetToItem() override;
 
-private:
-  Ui::KadasRedliningItemEditorBase mUi;
+  private:
+    Ui::KadasRedliningItemEditorBase mUi;
 
-  static QIcon createOutlineStyleIcon ( Qt::PenStyle style );
-  static QIcon createFillStyleIcon ( Qt::BrushStyle style );
+    static QIcon createOutlineStyleIcon( Qt::PenStyle style );
+    static QIcon createFillStyleIcon( Qt::BrushStyle style );
 
-signals:
-  void styleChanged();
+  signals:
+    void styleChanged();
 
-private slots:
-  void saveColor();
-  void saveOutlineWidth();
-  void saveStyle();
-  void toggleItemMeasurements ( bool enabled );
+  private slots:
+    void saveColor();
+    void saveOutlineWidth();
+    void saveStyle();
+    void toggleItemMeasurements( bool enabled );
 };
 
 #endif // KADASREDLININGITEMEDITOR_H

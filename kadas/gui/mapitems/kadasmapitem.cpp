@@ -20,40 +20,41 @@
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
 
-KadasMapItem::KadasMapItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent )
-  : QObject ( parent ), mCrs ( crs )
+KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
+  : QObject( parent ), mCrs( crs )
 {
 }
 
 KadasMapItem::~KadasMapItem()
 {
   emit aboutToBeDestroyed();
-  if ( mAssociatedLayer ) {
-    QgsProject::instance()->removeMapLayer ( mAssociatedLayer->id() );
+  if ( mAssociatedLayer )
+  {
+    QgsProject::instance()->removeMapLayer( mAssociatedLayer->id() );
   }
 }
 
-void KadasMapItem::associateToLayer ( QgsMapLayer* layer )
+void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;
-  setParent ( layer );
+  setParent( layer );
 }
 
-void KadasMapItem::setSelected ( bool selected )
+void KadasMapItem::setSelected( bool selected )
 {
   mSelected = selected;
   emit changed();
 }
 
-void KadasMapItem::setZIndex ( int zIndex )
+void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
   emit changed();
 }
 
-void KadasMapItem::setState ( const State* state )
+void KadasMapItem::setState( const State *state )
 {
-  mState->assign ( state );
+  mState->assign( state );
   recomputeDerived();
 }
 
@@ -64,16 +65,16 @@ void KadasMapItem::clear()
   recomputeDerived();
 }
 
-void KadasMapItem::defaultNodeRenderer ( QPainter* painter, const QgsPointXY& screenPoint, int nodeSize )
+void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )
 {
-  painter->setPen ( QPen ( Qt::red, 2 ) );
-  painter->setBrush ( Qt::white );
-  painter->drawRect ( QRectF ( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize ) );
+  painter->setPen( QPen( Qt::red, 2 ) );
+  painter->setBrush( Qt::white );
+  painter->drawRect( QRectF( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize ) );
 }
 
-void KadasMapItem::anchorNodeRenderer ( QPainter* painter, const QgsPointXY& screenPoint, int nodeSize )
+void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )
 {
-  painter->setPen ( QPen ( Qt::black, 1 ) );
-  painter->setBrush ( Qt::red );
-  painter->drawEllipse ( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
+  painter->setPen( QPen( Qt::black, 1 ) );
+  painter->setBrush( Qt::red );
+  painter->drawEllipse( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
 }

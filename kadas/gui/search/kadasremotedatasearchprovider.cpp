@@ -38,89 +38,99 @@ const int KadasRemoteDataSearchProvider::sSearchTimeout = 2000;
 const int KadasRemoteDataSearchProvider::sResultCountLimit = 100;
 
 
-KadasRemoteDataSearchProvider::KadasRemoteDataSearchProvider ( QgsMapCanvas* mapCanvas )
-  : KadasSearchProvider ( mapCanvas )
+KadasRemoteDataSearchProvider::KadasRemoteDataSearchProvider( QgsMapCanvas *mapCanvas )
+  : KadasSearchProvider( mapCanvas )
 {
   mReplyFilter = 0;
 
-  mPatBox = QRegExp ( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
+  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 
-  mTimeoutTimer.setSingleShot ( true );
-  connect ( &mTimeoutTimer, &QTimer::timeout, this, &KadasRemoteDataSearchProvider::searchTimeout );
+  mTimeoutTimer.setSingleShot( true );
+  connect( &mTimeoutTimer, &QTimer::timeout, this, &KadasRemoteDataSearchProvider::searchTimeout );
 }
 
-void KadasRemoteDataSearchProvider::startSearch ( const QString& searchtext, const SearchRegion& searchRegion )
+void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, const SearchRegion &searchRegion )
 {
   // List queryable rasters
   typedef QPair<QString, QString> LayerIdName; // <layerid, layername>
   QList< LayerIdName > queryableLayers;
-  for ( const QgsMapLayer* layer : QgsProject::instance()->mapLayers() ) {
-    const QgsRasterLayer* rlayer = qobject_cast<const QgsRasterLayer*> ( layer );
-    if ( !rlayer ) {
+  for ( const QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
+  {
+    const QgsRasterLayer *rlayer = qobject_cast<const QgsRasterLayer *> ( layer );
+    if ( !rlayer )
+    {
       continue;
     }
 
     // Detect ArcGIS Rest MapServer layers
-    QgsDataSourceUri dataSource ( rlayer->dataProvider()->dataSourceUri() );
-    QStringList urlParts = dataSource.param ( "url" ).split ( "/", QString::SkipEmptyParts );
+    QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
+    QStringList urlParts = dataSource.param( "url" ).split( "/", QString::SkipEmptyParts );
     int nParts = urlParts.size();
-    if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" ) {
-      queryableLayers.append ( qMakePair ( urlParts[nParts - 3] + ":" + urlParts[nParts - 2], rlayer->name() ) );
+    if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
+    {
+      queryableLayers.append( qMakePair( urlParts[nParts - 3] + ":" + urlParts[nParts - 2], rlayer->name() ) );
     }
 
     // Detect geo.admin.ch layers
-    dataSource.setEncodedUri ( rlayer->dataProvider()->dataSourceUri() );
-    if ( dataSource.param ( "url" ).contains ( "geo.admin.ch" ) ) {
-      for ( const QString& id : dataSource.params ( "layers" ) ) {
-        queryableLayers.append ( qMakePair ( id, rlayer->name() ) );
+    dataSource.setEncodedUri( rlayer->dataProvider()->dataSourceUri() );
+    if ( dataSource.param( "url" ).contains( "geo.admin.ch" ) )
+    {
+      for ( const QString &id : dataSource.params( "layers" ) )
+      {
+        queryableLayers.append( qMakePair( id, rlayer->name() ) );
       }
     }
   }
-  if ( queryableLayers.isEmpty() ) {
+  if ( queryableLayers.isEmpty() )
+  {
     return;
   }
 
-  for ( const LayerIdName& ql : queryableLayers ) {
-    QUrl url ( QSettings().value ( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
+  for ( const LayerIdName &ql : queryableLayers )
+  {
+    QUrl url( QSettings().value( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
     QUrlQuery query;
-    query.addQueryItem ( "type", "featuresearch" );
-    query.addQueryItem ( "searchText", searchtext );
-    query.addQueryItem ( "features", ql.first );
-    if ( !searchRegion.polygon.isEmpty() ) {
+    query.addQueryItem( "type", "featuresearch" );
+    query.addQueryItem( "searchText", searchtext );
+    query.addQueryItem( "features", ql.first );
+    if ( !searchRegion.polygon.isEmpty() )
+    {
       QgsRectangle rect;
       rect.setMinimal();
-      QgsLineString* exterior = new QgsLineString();
-      QgsCoordinateTransform ct = QgsCoordinateTransform ( QgsCoordinateReferenceSystem ( searchRegion.crs ), QgsCoordinateReferenceSystem ( "EPSG:21781" ), QgsProject::instance() );
-      for ( const QgsPointXY& p : searchRegion.polygon ) {
-        QgsPointXY pt = ct.transform ( p );
-        rect.include ( pt );
-        exterior->addVertex ( QgsPoint ( pt ) );
+      QgsLineString *exterior = new QgsLineString();
+      QgsCoordinateTransform ct = QgsCoordinateTransform( QgsCoordinateReferenceSystem( searchRegion.crs ), QgsCoordinateReferenceSystem( "EPSG:21781" ), QgsProject::instance() );
+      for ( const QgsPointXY &p : searchRegion.polygon )
+      {
+        QgsPointXY pt = ct.transform( p );
+        rect.include( pt );
+        exterior->addVertex( QgsPoint( pt ) );
       }
-      query.addQueryItem ( "bbox", QString ( "%1,%2,%3,%4" ).arg ( rect.xMinimum() ).arg ( rect.yMinimum() ).arg ( rect.xMaximum() ).arg ( rect.yMaximum() ) );
-      QgsPolygon* poly = new QgsPolygon();
-      poly->setExteriorRing ( exterior );
-      mReplyFilter = new QgsGeometry ( poly );
+      query.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( rect.xMinimum() ).arg( rect.yMinimum() ).arg( rect.xMaximum() ).arg( rect.yMaximum() ) );
+      QgsPolygon *poly = new QgsPolygon();
+      poly->setExteriorRing( exterior );
+      mReplyFilter = new QgsGeometry( poly );
     }
 
-    url.setQuery ( query );
-    QNetworkRequest req ( url );
-    req.setRawHeader ( "Referer", QSettings().value ( "search/referer", "http://localhost" ).toByteArray() );
-    QNetworkReply* reply = QgsNetworkAccessManager::instance()->get ( req );
-    reply->setProperty ( "layerName", ql.second );
-    connect ( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );
-    mNetReplies.append ( reply );
+    url.setQuery( query );
+    QNetworkRequest req( url );
+    req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
+    reply->setProperty( "layerName", ql.second );
+    connect( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );
+    mNetReplies.append( reply );
   }
-  mTimeoutTimer.start ( sSearchTimeout );
+  mTimeoutTimer.start( sSearchTimeout );
 }
 
 void KadasRemoteDataSearchProvider::cancelSearch()
 {
   mTimeoutTimer.stop();
-  while ( !mNetReplies.isEmpty() ) {
-    QNetworkReply* reply = mNetReplies.front();
-    disconnect ( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );
+  while ( !mNetReplies.isEmpty() )
+  {
+    QNetworkReply *reply = mNetReplies.front();
+    disconnect( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );
     reply->close();
-    mNetReplies.removeAll ( reply );
+    mNetReplies.removeAll( reply );
     reply->deleteLater();
   }
   delete mReplyFilter;
@@ -129,65 +139,74 @@ void KadasRemoteDataSearchProvider::cancelSearch()
 
 void KadasRemoteDataSearchProvider::replyFinished()
 {
-  QNetworkReply* reply = qobject_cast<QNetworkReply*> ( QObject::sender() );
-  if ( !reply ) {
+  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  if ( !reply )
+  {
     return;
   }
 
-  if ( reply->error() == QNetworkReply::NoError ) {
-    QString layerName = reply->property ( "layerName" ).toString();
-    QStringList bboxStr = QUrlQuery ( reply->request().url().query() ).queryItemValue ( "bbox" ).split ( "," );
+  if ( reply->error() == QNetworkReply::NoError )
+  {
+    QString layerName = reply->property( "layerName" ).toString();
+    QStringList bboxStr = QUrlQuery( reply->request().url().query() ).queryItemValue( "bbox" ).split( "," );
     QgsRectangle bbox;
-    if ( bboxStr.size() == 4 ) {
-      bbox.setXMinimum ( bboxStr[0].toDouble() );
-      bbox.setYMinimum ( bboxStr[1].toDouble() );
-      bbox.setXMaximum ( bboxStr[2].toDouble() );
-      bbox.setYMaximum ( bboxStr[3].toDouble() );
+    if ( bboxStr.size() == 4 )
+    {
+      bbox.setXMinimum( bboxStr[0].toDouble() );
+      bbox.setYMinimum( bboxStr[1].toDouble() );
+      bbox.setXMaximum( bboxStr[2].toDouble() );
+      bbox.setYMaximum( bboxStr[3].toDouble() );
     }
 
     QByteArray replyText = reply->readAll();
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson ( replyText, &err );
-    if ( doc.isNull() ) {
-      QgsDebugMsg ( QString ( "Parsing error:" ).arg ( err.errorString() ) );
+    QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
+    if ( doc.isNull() )
+    {
+      QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
     }
     QVariantMap resultMap = doc.object().toVariantMap();
-    for ( const QVariant& item : resultMap["results"].toList() ) {
+    for ( const QVariant &item : resultMap["results"].toList() )
+    {
       QVariantMap itemMap = item.toMap();
       QVariantMap itemAttrsMap = itemMap["attrs"].toMap();
 
-      if ( !mPatBox.exactMatch ( itemAttrsMap["geom_st_box2d"].toString() ) ) {
-        QgsDebugMsg ( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString() );
+      if ( !mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
+      {
+        QgsDebugMsg( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString() );
         continue;
       }
 
       SearchResult searchResult;
       searchResult.crs = itemAttrsMap["sr"].toString();
-      searchResult.bbox = QgsRectangle ( mPatBox.cap ( 1 ).toDouble(), mPatBox.cap ( 2 ).toDouble(),
-                                         mPatBox.cap ( 3 ).toDouble(), mPatBox.cap ( 4 ).toDouble() );
+      searchResult.bbox = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
+                                        mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
       // When bbox is empty, fallback to pos + zoomScale is used
-      searchResult.pos = QgsPointXY ( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
-      QgsCoordinateTransform ct ( QgsCoordinateReferenceSystem ( "EPSG:4326" ), QgsCoordinateReferenceSystem ( searchResult.crs ), QgsProject::instance() );
-      searchResult.pos = ct.transform ( searchResult.pos );
-      if ( !bbox.isEmpty() && !bbox.contains ( searchResult.pos ) ) {
+      searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
+      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsCoordinateReferenceSystem( searchResult.crs ), QgsProject::instance() );
+      searchResult.pos = ct.transform( searchResult.pos );
+      if ( !bbox.isEmpty() && !bbox.contains( searchResult.pos ) )
+      {
         continue;
       }
-      if ( mReplyFilter && !mReplyFilter->contains ( &searchResult.pos ) ) {
+      if ( mReplyFilter && !mReplyFilter->contains( &searchResult.pos ) )
+      {
         continue;
       }
 
       searchResult.zoomScale = 1000;
-      searchResult.category = tr ( "Layer %1" ).arg ( layerName );
+      searchResult.category = tr( "Layer %1" ).arg( layerName );
       searchResult.categoryPrecedence = 11;
       searchResult.text = itemAttrsMap["label"].toString() + " (" + itemAttrsMap["detail"].toString() + ")";
-      searchResult.text.replace ( QRegExp ( "<[^>]+>" ), "" ); // Remove HTML tags
+      searchResult.text.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
       searchResult.showPin = true;
-      emit searchResultFound ( searchResult );
+      emit searchResultFound( searchResult );
     }
   }
   reply->deleteLater();
-  mNetReplies.removeAll ( reply );
-  if ( mNetReplies.isEmpty() ) {
+  mNetReplies.removeAll( reply );
+  if ( mNetReplies.isEmpty() )
+  {
     delete mReplyFilter;
     mReplyFilter = 0;
     emit searchFinished();

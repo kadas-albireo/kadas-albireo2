@@ -22,25 +22,25 @@
 
 class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
 {
-public:
-  KadasTextItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
+  public:
+    KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
-  void setText ( const QString& text );
-  const QString& text() const { return mText; }
-  void setFillColor ( const QColor& c );
-  QColor fillColor() const { return mFillColor; }
-  void setOutlineColor ( const QColor& c );
-  QColor outlineColor() const { return mOutlineColor; }
-  void setFont ( const QFont& font );
-  const QFont& font() const { return mFont; }
+    void setText( const QString &text );
+    const QString &text() const { return mText; }
+    void setFillColor( const QColor &c );
+    QColor fillColor() const { return mFillColor; }
+    void setOutlineColor( const QColor &c );
+    QColor outlineColor() const { return mOutlineColor; }
+    void setFont( const QFont &font );
+    const QFont &font() const { return mFont; }
 
-  void render ( QgsRenderContext& context ) const override;
+    void render( QgsRenderContext &context ) const override;
 
-private:
-  QString mText;
-  QColor mOutlineColor;
-  QColor mFillColor;
-  QFont mFont;
+  private:
+    QString mText;
+    QColor mOutlineColor;
+    QColor mFillColor;
+    QFont mFont;
 };
 
 #endif // KADASTEXTITEM_H

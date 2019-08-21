@@ -31,23 +31,23 @@ class KadasItemLayer;
 
 class KADAS_GUI_EXPORT KadasFeaturePicker
 {
-public:
-  class PickResult
-  {
   public:
-    bool isEmpty() const { return layer == nullptr; }
+    class PickResult
+    {
+      public:
+        bool isEmpty() const { return layer == nullptr; }
 
-    QgsMapLayer* layer = nullptr;
-    QgsFeature feature;
-    QString itemId;
-    QRectF boundingBox;
-  };
+        QgsMapLayer *layer = nullptr;
+        QgsFeature feature;
+        QString itemId;
+        QRectF boundingBox;
+    };
 
-  static PickResult pick ( const QgsMapCanvas* canvas, const QPoint& canvasPos, const QgsPointXY& mapPos, QgsWkbTypes::GeometryType geomType );
+    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
 
-private:
-  static PickResult pickItemLayer ( KadasItemLayer* layer, const QgsMapCanvas* canvas, const QgsRectangle& filterRect, QgsWkbTypes::GeometryType geomType );
-  static PickResult pickVectorLayer ( QgsVectorLayer* vlayer, const QgsMapCanvas* canvas, QgsRenderContext& renderContext, const QgsRectangle& filterRect, QgsWkbTypes::GeometryType geomType );
+  private:
+    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType );
+    static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, QgsRenderContext &renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType );
 };
 
 #endif // KADASFEATUREPICKER_H

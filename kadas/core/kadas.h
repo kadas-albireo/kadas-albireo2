@@ -18,20 +18,21 @@
 
 #include <kadas/core/kadas_core.h>
 
-struct KADAS_CORE_EXPORT Kadas {
+struct KADAS_CORE_EXPORT Kadas
+{
 
   // Version string
-  static const char* KADAS_VERSION;
+  static const char *KADAS_VERSION;
   // Version number used for comparing versions using the "Check QGIS Version" function
   static const int KADAS_VERSION_INT;
   // Release name
-  static const char* KADAS_RELEASE_NAME;
+  static const char *KADAS_RELEASE_NAME;
   // Full release name
-  static const char* KADAS_FULL_RELEASE_NAME;
+  static const char *KADAS_FULL_RELEASE_NAME;
   // The development version
-  static const char* KADAS_DEV_VERSION;
+  static const char *KADAS_DEV_VERSION;
   // The build date
-  static const char* KADAS_BUILD_DATE;
+  static const char *KADAS_BUILD_DATE;
 
   // Path where user-configuration is stored
   static QString configPath();

@@ -23,48 +23,49 @@ class QgsMultiPolygon;
 
 class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 {
-public:
-  KadasRectangleItem ( const QgsCoordinateReferenceSystem& crs, QObject* parent = nullptr );
+  public:
+    KadasRectangleItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
-  bool startPart ( const QgsPointXY& firstPoint ) override;
-  bool startPart ( const AttribValues& values ) override;
-  void setCurrentPoint ( const QgsPointXY& p, const QgsMapSettings* mapSettings = nullptr ) override;
-  void setCurrentAttributes ( const AttribValues& values ) override;
-  bool continuePart() override;
-  void endPart() override;
+    bool startPart( const QgsPointXY &firstPoint ) override;
+    bool startPart( const AttribValues &values ) override;
+    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = nullptr ) override;
+    void setCurrentAttributes( const AttribValues &values ) override;
+    bool continuePart() override;
+    void endPart() override;
 
-  AttribDefs drawAttribs() const override;
-  AttribValues drawAttribsFromPosition ( const QgsPointXY& pos ) const override;
-  QgsPointXY positionFromDrawAttribs ( const AttribValues& values ) const override;
+    AttribDefs drawAttribs() const override;
+    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override;
+    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
 
-  EditContext getEditContext ( const QgsPointXY& pos, const QgsMapSettings& mapSettings ) const override;
-  void edit ( const EditContext& context, const QgsPointXY& newPoint, const QgsMapSettings* mapSettings = nullptr ) override;
-  void edit ( const EditContext& context, const AttribValues& values ) override;
+    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = nullptr ) override;
+    void edit( const EditContext &context, const AttribValues &values ) override;
 
-  AttribValues editAttribsFromPosition ( const EditContext& context, const QgsPointXY& pos ) const override;
-  QgsPointXY positionFromEditAttribs ( const EditContext& context, const AttribValues& values, const QgsMapSettings& mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
+    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-  void addPartFromGeometry ( const QgsAbstractGeometry* geom ) override;
-  QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
+    void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;
+    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
-  const QgsMultiPolygon* geometry() const;
+    const QgsMultiPolygon *geometry() const;
 
-  struct State : KadasMapItem::State {
-    QList<QgsPointXY> p1;
-    QList<QgsPointXY> p2;
-    void assign ( const KadasMapItem::State* other ) override { *this = *static_cast<const State*> ( other ); }
-    State* clone() const override { return new State ( *this ); }
-  };
-  const State* constState() const { return static_cast<State*> ( mState ); }
+    struct State : KadasMapItem::State
+    {
+      QList<QgsPointXY> p1;
+      QList<QgsPointXY> p2;
+      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+      State *clone() const override { return new State( *this ); }
+    };
+    const State *constState() const { return static_cast<State *>( mState ); }
 
-private:
-  enum AttribIds {AttrX, AttrY};
+  private:
+    enum AttribIds {AttrX, AttrY};
 
-  QgsMultiPolygon* geometry();
-  State* state() { return static_cast<State*> ( mState ); }
-  State* createEmptyState() const override { return new State(); }
-  void measureGeometry() override;
-  void recomputeDerived() override;
+    QgsMultiPolygon *geometry();
+    State *state() { return static_cast<State *>( mState ); }
+    State *createEmptyState() const override { return new State(); }
+    void measureGeometry() override;
+    void recomputeDerived() override;
 };
 
 #endif // KADASRECTANGLEITEM_H

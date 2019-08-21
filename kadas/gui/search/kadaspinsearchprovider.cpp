@@ -23,31 +23,36 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 
-const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr ( "Pins" );
+const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr( "Pins" );
 
-void KadasPinSearchProvider::startSearch ( const QString& searchtext, const SearchRegion& /*searchRegion*/ )
+void KadasPinSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
 {
-  for ( QgsMapLayer* layer : mMapCanvas->layers() ) {
-    KadasItemLayer* itemLayer = dynamic_cast<KadasItemLayer*> ( layer );
-    if ( !itemLayer ) {
+  for ( QgsMapLayer *layer : mMapCanvas->layers() )
+  {
+    KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer );
+    if ( !itemLayer )
+    {
       return;
     }
-    for ( KadasMapItem* item : itemLayer->items() ) {
-      const KadasSymbolItem* symbolItem = dynamic_cast<KadasSymbolItem*> ( item );
-      if ( !symbolItem ) {
+    for ( KadasMapItem *item : itemLayer->items() )
+    {
+      const KadasSymbolItem *symbolItem = dynamic_cast<KadasSymbolItem *>( item );
+      if ( !symbolItem )
+      {
         continue;
       }
-      if ( symbolItem->name().contains ( searchtext, Qt::CaseInsensitive ) ||
-           symbolItem->remarks().contains ( searchtext, Qt::CaseInsensitive ) ) {
+      if ( symbolItem->name().contains( searchtext, Qt::CaseInsensitive ) ||
+           symbolItem->remarks().contains( searchtext, Qt::CaseInsensitive ) )
+      {
         SearchResult searchResult;
         searchResult.zoomScale = 1000;
         searchResult.category = sCategoryName;
         searchResult.categoryPrecedence = 2;
-        searchResult.text = tr ( "Pin %1" ).arg ( symbolItem->name() );
+        searchResult.text = tr( "Pin %1" ).arg( symbolItem->name() );
         searchResult.pos = symbolItem->constState()->pos;
         searchResult.crs = symbolItem->crs().authid();
         searchResult.showPin = false;
-        emit searchResultFound ( searchResult );
+        emit searchResultFound( searchResult );
       }
     }
   }

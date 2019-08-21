@@ -25,15 +25,15 @@ class QgsMapCanvas;
 
 class KADAS_GUI_EXPORT KadasBottomBar : public QFrame
 {
-public:
-  KadasBottomBar ( QgsMapCanvas* canvas, const QString& color = "orange" );
-  bool eventFilter ( QObject* obj, QEvent* event ) override;
-  void showEvent ( QShowEvent* /*event*/ ) override;
+  public:
+    KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );
+    bool eventFilter( QObject *obj, QEvent *event ) override;
+    void showEvent( QShowEvent * /*event*/ ) override;
 
-protected:
-  QgsMapCanvas* mCanvas;
+  protected:
+    QgsMapCanvas *mCanvas;
 
-  void updatePosition();
+    void updatePosition();
 };
 
 #endif // KADASBOTTOMBAR_H

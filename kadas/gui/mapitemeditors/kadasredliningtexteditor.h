@@ -24,31 +24,31 @@
 
 class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  static KadasMapItemEditor* factory ( KadasMapItem* item )
-  {
-    return new KadasRedliningTextEditor ( item );
-  }
+  public:
+    static KadasMapItemEditor *factory( KadasMapItem *item )
+    {
+      return new KadasRedliningTextEditor( item );
+    }
 
-  KadasRedliningTextEditor ( KadasMapItem* item );
+    KadasRedliningTextEditor( KadasMapItem *item );
 
-  void syncItemToWidget() override;
-  void syncWidgetToItem() override;
+    void syncItemToWidget() override;
+    void syncWidgetToItem() override;
 
-private:
-  Ui::KadasRedliningTextEditorBase mUi;
+  private:
+    Ui::KadasRedliningTextEditorBase mUi;
 
-  QFont currentFont() const;
+    QFont currentFont() const;
 
-signals:
-  void styleChanged();
+  signals:
+    void styleChanged();
 
-private slots:
-  void saveColor();
-  void saveFont();
-  void saveText();
+  private slots:
+    void saveColor();
+    void saveFont();
+    void saveText();
 };
 
 #endif // KADASREDLININGITEMEDITOR_H

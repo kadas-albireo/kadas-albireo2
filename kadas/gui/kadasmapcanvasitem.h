@@ -26,20 +26,20 @@ class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasItem
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  KadasMapCanvasItem ( const KadasMapItem* item, QgsMapCanvas* canvas );
-  const KadasMapItem* mapItem() const { return mItem; }
+  public:
+    KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas );
+    const KadasMapItem *mapItem() const { return mItem; }
 
-  void paint ( QPainter* painter ) override;
+    void paint( QPainter *painter ) override;
 
-private:
-  const KadasMapItem* mItem = nullptr;
-  static constexpr double sHandleSize = 8;
+  private:
+    const KadasMapItem *mItem = nullptr;
+    static constexpr double sHandleSize = 8;
 
-private slots:
-  void updateRect();
+  private slots:
+    void updateRect();
 };
 
 #endif // KADASMAPCANVASITEM_H

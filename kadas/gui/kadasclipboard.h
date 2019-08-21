@@ -28,9 +28,9 @@ class QgsPoint;
 
 class KADAS_GUI_EXPORT KadasPasteHandler
 {
-public:
-  virtual ~KadasPasteHandler() {}
-  virtual void paste ( const QString& mimeData, const QByteArray& data, const QgsPointXY* mapPos ) = 0;
+  public:
+    virtual ~KadasPasteHandler() {}
+    virtual void paste( const QString &mimeData, const QByteArray &data, const QgsPointXY *mapPos ) = 0;
 };
 
 // Constants used to describe copy-paste MIME types
@@ -39,36 +39,36 @@ public:
 
 class KADAS_GUI_EXPORT KadasClipboard : public QObject
 {
-  Q_OBJECT
-public:
-  KadasClipboard ( QObject* parent = 0 );
+    Q_OBJECT
+  public:
+    KadasClipboard( QObject *parent = 0 );
 
-  // Returns whether there is any data in the clipboard
-  bool isEmpty() const;
+    // Returns whether there is any data in the clipboard
+    bool isEmpty() const;
 
-  // Queries whether the clipboard has specified format.
-  bool hasFormat ( const QString& format ) const;
+    // Queries whether the clipboard has specified format.
+    bool hasFormat( const QString &format ) const;
 
-  // Sets the clipboard contents
-  void setMimeData ( QMimeData* mimeData );
+    // Sets the clipboard contents
+    void setMimeData( QMimeData *mimeData );
 
-  // Retreives the clipboard contents
-  const QMimeData* mimeData();
+    // Retreives the clipboard contents
+    const QMimeData *mimeData();
 
-  // Utility function for storing features in clipboard
-  void setStoredFeatures ( const QgsFeatureStore& featureStore );
+    // Utility function for storing features in clipboard
+    void setStoredFeatures( const QgsFeatureStore &featureStore );
 
-  // Utility function for getting features from clipboard
-  const QgsFeatureStore& getStoredFeatures() const;
+    // Utility function for getting features from clipboard
+    const QgsFeatureStore &getStoredFeatures() const;
 
-signals:
-  void dataChanged();
+  signals:
+    void dataChanged();
 
-private:
-  QgsFeatureStore mFeatureStore;
+  private:
+    QgsFeatureStore mFeatureStore;
 
-private slots:
-  void onDataChanged();
+  private slots:
+    void onDataChanged();
 };
 
 #endif // KADASCLIPBOARD_H

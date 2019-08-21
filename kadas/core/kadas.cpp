@@ -22,27 +22,30 @@
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadas_config.h>
 
-const char* Kadas::KADAS_VERSION = _KADAS_VERSION_;
+const char *Kadas::KADAS_VERSION = _KADAS_VERSION_;
 const int Kadas::KADAS_VERSION_INT = _KADAS_VERSION_INT_;
-const char* Kadas::KADAS_RELEASE_NAME = _KADAS_NAME_;
-const char* Kadas::KADAS_FULL_RELEASE_NAME = _KADAS_FULL_NAME_;
-const char* Kadas::KADAS_DEV_VERSION = _KADAS_DEV_VERSION_;
-const char* Kadas::KADAS_BUILD_DATE = __DATE__;
+const char *Kadas::KADAS_RELEASE_NAME = _KADAS_NAME_;
+const char *Kadas::KADAS_FULL_RELEASE_NAME = _KADAS_FULL_NAME_;
+const char *Kadas::KADAS_DEV_VERSION = _KADAS_DEV_VERSION_;
+const char *Kadas::KADAS_BUILD_DATE = __DATE__;
 
 static QString resolveDataPath()
 {
-  QFile file ( QDir ( QApplication::applicationDirPath() ).absoluteFilePath ( "kadassourcedir.txt" ) );
-  if ( file.open ( QIODevice::ReadOnly ) ) {
-    return QDir ( file.readAll().trimmed() ).absoluteFilePath ( "data" );
-  } else {
-    return QDir ( QString ( "%1/../share/%2" ).arg ( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
+  QFile file( QDir( QApplication::applicationDirPath() ).absoluteFilePath( "kadassourcedir.txt" ) );
+  if ( file.open( QIODevice::ReadOnly ) )
+  {
+    return QDir( file.readAll().trimmed() ).absoluteFilePath( "data" );
+  }
+  else
+  {
+    return QDir( QString( "%1/../share/%2" ).arg( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
   }
 }
 
 QString Kadas::configPath()
 {
-  QDir appDataDir = QDir ( QStandardPaths::writableLocation ( QStandardPaths::AppDataLocation ) );
-  return appDataDir.absoluteFilePath ( Kadas::KADAS_RELEASE_NAME );
+  QDir appDataDir = QDir( QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) );
+  return appDataDir.absoluteFilePath( Kadas::KADAS_RELEASE_NAME );
 }
 
 QString Kadas::pkgDataPath()
@@ -53,5 +56,5 @@ QString Kadas::pkgDataPath()
 
 QString Kadas::projectTemplatesPath()
 {
-  return QDir ( pkgDataPath() ).absoluteFilePath ( "project_templates" );
+  return QDir( pkgDataPath() ).absoluteFilePath( "project_templates" );
 }

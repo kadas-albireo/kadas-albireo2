@@ -29,34 +29,34 @@ class KadasPointItem;
 
 class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 {
-  Q_OBJECT
-public:
+    Q_OBJECT
+  public:
 
-  KadasMapToolHeightProfile ( QgsMapCanvas* canvas );
-  ~KadasMapToolHeightProfile();
+    KadasMapToolHeightProfile( QgsMapCanvas *canvas );
+    ~KadasMapToolHeightProfile();
 
-  void canvasPressEvent ( QgsMapMouseEvent* e ) override;
-  void canvasMoveEvent ( QgsMapMouseEvent* e ) override;
-  void canvasReleaseEvent ( QgsMapMouseEvent* e ) override;
-  void keyReleaseEvent ( QKeyEvent* e ) override;
-  void activate() override;
-  void deactivate() override;
+    void canvasPressEvent( QgsMapMouseEvent *e ) override;
+    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
+    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+    void keyReleaseEvent( QKeyEvent *e ) override;
+    void activate() override;
+    void deactivate() override;
 
-  void setGeometry ( const QgsAbstractGeometry* geom, const QgsCoordinateReferenceSystem& crs );
+    void setGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
 
-public slots:
-  void pickLine();
+  public slots:
+    void pickLine();
 
-private:
-  KadasPointItem* mPosMarker = nullptr;
-  KadasHeightProfileDialog* mDialog = nullptr;
-  bool mPicking = false;
+  private:
+    KadasPointItem *mPosMarker = nullptr;
+    KadasHeightProfileDialog *mDialog = nullptr;
+    bool mPicking = false;
 
-  static ItemFactory lineFactory ( QgsMapCanvas* canvas );
+    static ItemFactory lineFactory( QgsMapCanvas *canvas );
 
-private slots:
-  void drawCleared();
-  void drawFinished();
+  private slots:
+    void drawCleared();
+    void drawFinished();
 };
 
 #endif // KADASMAPTOOLHEIGHTPROFILE_H

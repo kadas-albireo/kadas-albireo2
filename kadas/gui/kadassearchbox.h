@@ -34,60 +34,60 @@ class KadasMapToolCreateItem;
 
 class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  KadasSearchBox ( QWidget* parent = 0 );
-  ~KadasSearchBox();
+  public:
+    KadasSearchBox( QWidget *parent = 0 );
+    ~KadasSearchBox();
 
-  void init ( QgsMapCanvas* canvas );
+    void init( QgsMapCanvas *canvas );
 
-  void addSearchProvider ( KadasSearchProvider* provider );
-  void removeSearchProvider ( KadasSearchProvider* provider );
+    void addSearchProvider( KadasSearchProvider *provider );
+    void removeSearchProvider( KadasSearchProvider *provider );
 
-public slots:
-  void clearSearch();
+  public slots:
+    void clearSearch();
 
-private:
-  class LineEdit;
-  class TreeWidget;
+  private:
+    class LineEdit;
+    class TreeWidget;
 
-  enum FilterType { FilterRect, FilterPoly, FilterCircle };
+    enum FilterType { FilterRect, FilterPoly, FilterCircle };
 
-  enum EntryType { EntryTypeCategory, EntryTypeResult };
-  static const int sEntryTypeRole;
-  static const int sCatNameRole;
-  static const int sCatPrecedenceRole;
-  static const int sCatCountRole;
-  static const int sResultDataRole;
+    enum EntryType { EntryTypeCategory, EntryTypeResult };
+    static const int sEntryTypeRole;
+    static const int sCatNameRole;
+    static const int sCatPrecedenceRole;
+    static const int sCatCountRole;
+    static const int sResultDataRole;
 
-  QgsMapCanvas* mMapCanvas;
-  KadasSymbolItem* mPin = nullptr;
-  KadasMapToolCreateItem* mFilterTool = nullptr;
-  KadasMapItem* mFilterItem = nullptr;
-  QList<KadasSearchProvider*> mSearchProviders;
-  QTimer mTimer;
-  LineEdit* mSearchBox;
-  QToolButton* mFilterButton;
-  QToolButton* mSearchButton;
-  QToolButton* mClearButton;
-  TreeWidget* mTreeWidget;
-  int mNumRunningProviders;
+    QgsMapCanvas *mMapCanvas;
+    KadasSymbolItem *mPin = nullptr;
+    KadasMapToolCreateItem *mFilterTool = nullptr;
+    KadasMapItem *mFilterItem = nullptr;
+    QList<KadasSearchProvider *> mSearchProviders;
+    QTimer mTimer;
+    LineEdit *mSearchBox;
+    QToolButton *mFilterButton;
+    QToolButton *mSearchButton;
+    QToolButton *mClearButton;
+    TreeWidget *mTreeWidget;
+    int mNumRunningProviders;
 
-  bool eventFilter ( QObject* obj, QEvent* ev ) override;
-  void cancelSearch();
-  void clearPin();
+    bool eventFilter( QObject *obj, QEvent *ev ) override;
+    void cancelSearch();
+    void clearPin();
 
-private slots:
-  void textChanged();
-  void startSearch();
-  void searchResultFound ( KadasSearchProvider::SearchResult result );
-  void searchProviderFinished();
-  void resultSelected();
-  void resultActivated();
-  void clearFilter();
-  void setFilterTool();
-  void filterToolFinished();
+  private slots:
+    void textChanged();
+    void startSearch();
+    void searchResultFound( KadasSearchProvider::SearchResult result );
+    void searchProviderFinished();
+    void resultSelected();
+    void resultActivated();
+    void clearFilter();
+    void setFilterTool();
+    void filterToolFinished();
 };
 
 #endif // KADASSEARCHBOX_H

@@ -22,15 +22,15 @@
 
 class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
 {
-  Q_OBJECT
-public:
-  KadasMapToolHillshade ( QgsMapCanvas* mapCanvas );
-  void compute ( const QgsRectangle& extent, const QgsCoordinateReferenceSystem& crs );
+    Q_OBJECT
+  public:
+    KadasMapToolHillshade( QgsMapCanvas *mapCanvas );
+    void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
-private slots:
-  void drawFinished();
+  private slots:
+    void drawFinished();
 
-  KadasMapToolCreateItem::ItemFactory itemFactory ( const QgsMapCanvas* canvas ) const;
+    KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas ) const;
 };
 
 #endif // KADASMAPTOOLHILLSHADE_H

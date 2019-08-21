@@ -23,24 +23,24 @@
 
 class KADAS_ANALYSIS_EXPORT KadasHillshadeFilter: public KadasNineCellFilter
 {
-public:
-  KadasHillshadeFilter ( const QString& inputFile, const QString& outputFile, const QString& outputFormat, double lightAzimuth = 300,
-                         double lightAngle = 40, const QgsRectangle& filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem& filterRegionCrs = QgsCoordinateReferenceSystem() );
+  public:
+    KadasHillshadeFilter( const QString &inputFile, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,
+                          double lightAngle = 40, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
 
-  /**Calculates output value from nine input values. The input values and the output value can be equal to the
-  nodata value if not present or outside of the border. Must be implemented by subclasses*/
-  float processNineCellWindow ( float* x11, float* x21, float* x31,
-                                float* x12, float* x22, float* x32,
-                                float* x13, float* x23, float* x33 ) override;
+    /**Calculates output value from nine input values. The input values and the output value can be equal to the
+    nodata value if not present or outside of the border. Must be implemented by subclasses*/
+    float processNineCellWindow( float *x11, float *x21, float *x31,
+                                 float *x12, float *x22, float *x32,
+                                 float *x13, float *x23, float *x33 ) override;
 
-  float lightAzimuth() const { return mLightAzimuth; }
-  void setLightAzimuth ( float azimuth ) { mLightAzimuth = azimuth; }
-  float lightAngle() const { return mLightAngle; }
-  void setLightAngle ( float angle ) { mLightAngle = angle; }
+    float lightAzimuth() const { return mLightAzimuth; }
+    void setLightAzimuth( float azimuth ) { mLightAzimuth = azimuth; }
+    float lightAngle() const { return mLightAngle; }
+    void setLightAngle( float angle ) { mLightAngle = angle; }
 
-private:
-  float mLightAzimuth;
-  float mLightAngle;
+  private:
+    float mLightAzimuth;
+    float mLightAngle;
 };
 
 #endif // KADASHILLSHADEFILTER_H

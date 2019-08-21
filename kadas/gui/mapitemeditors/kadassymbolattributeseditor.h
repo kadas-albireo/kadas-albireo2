@@ -24,24 +24,24 @@
 
 class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  static KadasMapItemEditor* factory ( KadasMapItem* item )
-  {
-    return new KadasSymbolAttributesEditor ( item );
-  }
+  public:
+    static KadasMapItemEditor *factory( KadasMapItem *item )
+    {
+      return new KadasSymbolAttributesEditor( item );
+    }
 
-  KadasSymbolAttributesEditor ( KadasMapItem* item );
+    KadasSymbolAttributesEditor( KadasMapItem *item );
 
-  void reset() override;
-  void syncItemToWidget() override;
-  void syncWidgetToItem() override;
+    void reset() override;
+    void syncItemToWidget() override;
+    void syncWidgetToItem() override;
 
-private:
-  Ui::KadasSymbolAttributesEditorBase mUi;
+  private:
+    Ui::KadasSymbolAttributesEditorBase mUi;
 
-  void adjustVisiblity();
+    void adjustVisiblity();
 };
 
 #endif // KADASSYMBOLATTRIBUTESEDITOR_H
