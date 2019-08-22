@@ -27,8 +27,10 @@ class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
 #ifndef SIP_RUN
+#ifndef PyObject_HEAD
 struct _object;
 typedef _object PyObject;
+#endif
 #endif
 
 class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
