@@ -32,7 +32,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasCoordinateDisplayer( QToolButton *crsButton, QLineEdit *coordLineEdit, QLineEdit *heightLineEdit, QComboBox *heightCombo, QgsMapCanvas *mapCanvas, QWidget *parent = 0 );
     void getCoordinateDisplayFormat( KadasCoordinateFormat::Format &format, QString &epsg );
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
-    double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit );
 
 };
 

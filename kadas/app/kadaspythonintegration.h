@@ -19,13 +19,15 @@
 #include <QObject>
 #include <QStringList>
 
+#include <qgis/qgspythonrunner.h>
+
 // forward declaration for PyObject
 #ifndef PyObject_HEAD
 struct _object;
 typedef _object PyObject;
 #endif
 
-class KadasPythonInterface;
+class KadasPluginInterface;
 
 
 class KadasPythonIntegration : public QObject
@@ -35,87 +37,51 @@ class KadasPythonIntegration : public QObject
     KadasPythonIntegration( QObject *parent = nullptr );
     ~KadasPythonIntegration();
 
-    /* general purpose functions */
-    void initPython( KadasPythonInterface *interface, bool installErrorHook );
+    void initPython( KadasPluginInterface *interface, bool installErrorHook );
     void exitPython();
     bool isEnabled();
+
     bool runString( const QString &command, QString msgOnError = QString(), bool single = true );
     bool runStringUnsafe( const QString &command, bool single = true );
-    bool evalString( const QString &command, QString &result );
+    bool evalString( const QString &command, QString &result ) const;
     bool getError( QString &errorClassName, QString &errorText );
-
-    /**
-     * Returns the path where QGIS Python related files are located.
-     */
-    QString pythonPath() const;
-
-    /**
-     * Returns an object's type name as a string
-     */
     QString getTypeAsString( PyObject *obj );
 
-    /* plugins related functions */
-
-    /**
-     * Returns the current path for Python plugins
-     */
-    QString pluginsPath() const;
-
-    /**
-     * Returns the current path for Python in home directory.
-     */
+    QString qgisPythonPath() const;
+    QString qgisPluginsPath() const;
+    QString kadasPythonPath() const;
+    QString kadasPluginsPath() const;
     QString homePythonPath() const;
-
-    /**
-     * Returns the current path for home directory Python plugins.
-     */
     QString homePluginsPath() const;
 
-    /**
-     * Returns a list of extra plugins paths passed with QGIS_PLUGINPATH environment variable.
-     */
-    QStringList extraPluginsPaths() const;
+    void restorePlugins();
 
-    QStringList pluginList();
-    bool isPluginLoaded( const QString &packageName );
-    QStringList listActivePlugins();
     bool loadPlugin( const QString &packageName );
-    bool startPlugin( const QString &packageName );
-    bool startProcessingPlugin( const QString &packageName );
-    QString getPluginMetadata( const QString &pluginName, const QString &function );
-    bool pluginHasProcessingProvider( const QString &pluginName );
+    QString getPluginMetadata( const QString &pluginName, const QString &function ) const;
+
     bool canUninstallPlugin( const QString &packageName );
     bool unloadPlugin( const QString &packageName );
+    void unloadAllPlugins();
+
+    QStringList pluginList();
+    QStringList listActivePlugins();
+    bool isPluginLoaded( const QString &packageName ) const;
     bool isPluginEnabled( const QString &packageName ) const;
+    bool isPythonPluginCompatible( const QString &packageName ) const;
 
   protected:
-
-    /* functions that do the initialization work */
-
-    //! initialize Python context
     void init();
-
-    //! check qgis imports and plugins
-    //\returns true if all imports worked
     bool checkSystemImports();
-
-    //\returns true if qgis.user could be imported
     bool checkQgisUser();
-
-    //! import custom user and global Python code (startup scripts)
-    void doCustomImports();
-
-    //! cleanup Python context
     void finish();
 
     void installErrorHook();
-
     void uninstallErrorHook();
 
     QString getTraceback();
 
     //! convert Python object to QString. If the object isn't unicode/str, it will be converted
-    QString PyObjectToQString( PyObject *obj );
+    QString PyObjectToQString( PyObject *obj ) const;
 
     //! reference to module __main__
     PyObject *mMainModule = nullptr;
@@ -123,12 +89,41 @@ class KadasPythonIntegration : public QObject
     //! dictionary of module __main__
     PyObject *mMainDict = nullptr;
 
-    //! flag determining that Python support is enabled
     bool mPythonEnabled = false;
 
   private:
+    bool checkQgisVersion( const QString &minVersion, const QString &maxVersion ) const;
 
     bool mErrorHookInstalled = false;
 };
+
+
+class KadasPythonRunner : public QgsPythonRunner
+{
+  public:
+    explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration ) : mPythonIntegration( pythonIntegration ) {}
+
+    bool runCommand( QString command, QString messageOnError = QString() ) override
+    {
+      if ( mPythonIntegration && mPythonIntegration->isEnabled() )
+      {
+        return mPythonIntegration->runString( command, messageOnError, false );
+      }
+      return false;
+    }
+
+    bool evalCommand( QString command, QString &result ) override
+    {
+      if ( mPythonIntegration && mPythonIntegration->isEnabled() )
+      {
+        return mPythonIntegration->evalString( command, result );
+      }
+      return false;
+    }
+
+  protected:
+    KadasPythonIntegration *mPythonIntegration = nullptr;
+};
+
 
 #endif // KADASPYTHONINTEGRATION_H

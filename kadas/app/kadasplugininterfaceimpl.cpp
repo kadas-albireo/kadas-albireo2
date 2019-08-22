@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaspythoninterface.cpp
-    ------------------------
+    kadasplugininterfaceimpl.cpp
+    ----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -29,41 +29,41 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadaspythoninterface.h>
+#include <kadas/app/kadasplugininterfaceimpl.h>
 
-KadasPythonInterface::KadasPythonInterface( KadasApplication *app )
+KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
 {
   // TODO
 }
 
-QgsPluginManagerInterface *KadasPythonInterface::pluginManagerInterface()
+QgsPluginManagerInterface *KadasPluginInterfaceImpl::pluginManagerInterface()
 {
   // TODO
   return nullptr;
 }
 
-QgsLayerTreeView *KadasPythonInterface::layerTreeView()
+QgsLayerTreeView *KadasPluginInterfaceImpl::layerTreeView()
 {
   return kApp->mainWindow()->layerTreeView();
 }
 
-void KadasPythonInterface::addCustomActionForLayerType( QAction *action, QString menu, QgsMapLayerType type, bool allLayers )
+void KadasPluginInterfaceImpl::addCustomActionForLayerType( QAction *action, QString menu, QgsMapLayerType type, bool allLayers )
 {
   // TODO
 }
 
-void KadasPythonInterface::addCustomActionForLayer( QAction *action, QgsMapLayer *layer )
+void KadasPluginInterfaceImpl::addCustomActionForLayer( QAction *action, QgsMapLayer *layer )
 {
   // TODO
 }
 
-bool KadasPythonInterface::removeCustomActionForLayerType( QAction *action )
+bool KadasPluginInterfaceImpl::removeCustomActionForLayerType( QAction *action )
 {
   // TODO
   return false;
 }
 
-QList< QgsMapCanvas * > KadasPythonInterface::mapCanvases()
+QList< QgsMapCanvas * > KadasPluginInterfaceImpl::mapCanvases()
 {
   QList<QgsMapCanvas *> canvases;
   canvases.append( kApp->mainWindow()->mapCanvas() );
@@ -74,201 +74,201 @@ QList< QgsMapCanvas * > KadasPythonInterface::mapCanvases()
   return canvases;
 }
 
-QgsMapCanvas *KadasPythonInterface::createNewMapCanvas( const QString &name )
+QgsMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas( const QString &name )
 {
   return kApp->mainWindow()->mapWidgetManager()->addMapWidget( name )->mapCanvas();
 }
 
-void KadasPythonInterface::closeMapCanvas( const QString &name )
+void KadasPluginInterfaceImpl::closeMapCanvas( const QString &name )
 {
   return kApp->mainWindow()->mapWidgetManager()->removeMapWidget( name );
 }
 
-QSize KadasPythonInterface::iconSize( bool dockedToolbar ) const
+QSize KadasPluginInterfaceImpl::iconSize( bool dockedToolbar ) const
 {
   return QSize();
 }
 
-QList<QgsMapLayer *> KadasPythonInterface::editableLayers( bool modified ) const
+QList<QgsMapLayer *> KadasPluginInterfaceImpl::editableLayers( bool modified ) const
 {
   return QList<QgsMapLayer *>();
 }
 
-QgsMapLayer *KadasPythonInterface::activeLayer()
+QgsMapLayer *KadasPluginInterfaceImpl::activeLayer()
 {
   return kApp->mainWindow()->layerTreeView()->currentLayer();
 }
 
-QgsMapCanvas *KadasPythonInterface::mapCanvas()
+QgsMapCanvas *KadasPluginInterfaceImpl::mapCanvas()
 {
   return kApp->mainWindow()->mapCanvas();
 }
 
-QgsLayerTreeMapCanvasBridge *KadasPythonInterface::layerTreeCanvasBridge()
+QgsLayerTreeMapCanvasBridge *KadasPluginInterfaceImpl::layerTreeCanvasBridge()
 {
   return kApp->mainWindow()->layerTreeMapCanvasBridge();
 }
 
-QWidget *KadasPythonInterface::mainWindow()
+QWidget *KadasPluginInterfaceImpl::mainWindow()
 {
   return kApp->mainWindow();
 }
 
-QgsMessageBar *KadasPythonInterface::messageBar()
+QgsMessageBar *KadasPluginInterfaceImpl::messageBar()
 {
   return kApp->mainWindow()->messageBar();
 }
 
-QList<QgsLayoutDesignerInterface *> KadasPythonInterface::openLayoutDesigners()
+QList<QgsLayoutDesignerInterface *> KadasPluginInterfaceImpl::openLayoutDesigners()
 {
   // TODO
   return QList<QgsLayoutDesignerInterface *>();
 
 }
 
-QgsVectorLayerTools *KadasPythonInterface::vectorLayerTools()
+QgsVectorLayerTools *KadasPluginInterfaceImpl::vectorLayerTools()
 {
   // TODO
   return nullptr;
 }
 
-void KadasPythonInterface::addPluginToMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::addPluginToMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( PLUGIN_MENU ), name )->addAction( action );
 }
 
-void KadasPythonInterface::removePluginMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::removePluginMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( PLUGIN_MENU ), name )->removeAction( action );
 }
 
-void KadasPythonInterface::insertAddLayerAction( QAction *action )
+void KadasPluginInterfaceImpl::insertAddLayerAction( QAction *action )
 {
   getClassicMenu( ADDLAYER_MENU )->addAction( action );
 }
 
-void KadasPythonInterface::removeAddLayerAction( QAction *action )
+void KadasPluginInterfaceImpl::removeAddLayerAction( QAction *action )
 {
   getClassicMenu( ADDLAYER_MENU )->removeAction( action );
 }
 
-void KadasPythonInterface::addPluginToDatabaseMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::addPluginToDatabaseMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( DATABASE_MENU ), name )->addAction( action );
 }
 
-void KadasPythonInterface::removePluginDatabaseMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::removePluginDatabaseMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( DATABASE_MENU ), name )->removeAction( action );
 }
 
-void KadasPythonInterface::addPluginToRasterMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::addPluginToRasterMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( RASTER_MENU ), name )->addAction( action );
 }
 
-void KadasPythonInterface::removePluginRasterMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::removePluginRasterMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( RASTER_MENU ), name )->removeAction( action );
 }
 
-void KadasPythonInterface::addPluginToVectorMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::addPluginToVectorMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( VECTOR_MENU ), name )->addAction( action );
 }
 
-void KadasPythonInterface::removePluginVectorMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::removePluginVectorMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( VECTOR_MENU ), name )->removeAction( action );
 }
 
-void KadasPythonInterface::addPluginToWebMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::addPluginToWebMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( WEB_MENU ), name )->addAction( action );
 }
 
-void KadasPythonInterface::removePluginWebMenu( const QString &name, QAction *action )
+void KadasPluginInterfaceImpl::removePluginWebMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( WEB_MENU ), name )->removeAction( action );
 }
 
-int KadasPythonInterface::messageTimeout()
+int KadasPluginInterfaceImpl::messageTimeout()
 {
   return kApp->mainWindow()->messageTimeout();
 }
 
-void KadasPythonInterface::zoomFull()
+void KadasPluginInterfaceImpl::zoomFull()
 {
   kApp->mainWindow()->zoomFull();
 }
 
-void KadasPythonInterface::zoomToPrevious()
+void KadasPluginInterfaceImpl::zoomToPrevious()
 {
   kApp->mainWindow()->zoomPrev();
 }
 
-void KadasPythonInterface::zoomToNext()
+void KadasPluginInterfaceImpl::zoomToNext()
 {
   kApp->mainWindow()->zoomNext();
 }
 
-void KadasPythonInterface::zoomToActiveLayer()
+void KadasPluginInterfaceImpl::zoomToActiveLayer()
 {
   kApp->mainWindow()->zoomToLayerExtent();
 }
 
-QgsVectorLayer *KadasPythonInterface::addVectorLayer( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey )
+QgsVectorLayer *KadasPluginInterfaceImpl::addVectorLayer( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey )
 {
   return kApp->addVectorLayer( vectorLayerPath, baseName, providerKey );
 }
 
-QgsRasterLayer *KadasPythonInterface::addRasterLayer( const QString &rasterLayerPath, const QString &baseName )
+QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayer( const QString &rasterLayerPath, const QString &baseName )
 {
   return kApp->addRasterLayer( rasterLayerPath, baseName, QString() );
 }
 
-QgsRasterLayer *KadasPythonInterface::addRasterLayer( const QString &url, const QString &layerName, const QString &providerKey )
+QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayer( const QString &url, const QString &layerName, const QString &providerKey )
 {
   return kApp->addRasterLayer( url, layerName, providerKey );
 }
 
-QgsMeshLayer *KadasPythonInterface::addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey )
+QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey )
 {
   return nullptr;
 }
 
-bool KadasPythonInterface::addProject( const QString &project )
+bool KadasPluginInterfaceImpl::addProject( const QString &project )
 {
   return kApp->projectOpen( project );
 }
 
-void KadasPythonInterface::newProject( bool promptToSaveFlag )
+void KadasPluginInterfaceImpl::newProject( bool promptToSaveFlag )
 {
   kApp->projectNew( promptToSaveFlag );
 }
 
-void KadasPythonInterface::reloadConnections( )
+void KadasPluginInterfaceImpl::reloadConnections( )
 {
   // TODO ?
 }
 
-bool KadasPythonInterface::setActiveLayer( QgsMapLayer *layer )
+bool KadasPluginInterfaceImpl::setActiveLayer( QgsMapLayer *layer )
 {
   kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
   return true;
 }
 
-void KadasPythonInterface::copySelectionToClipboard( QgsMapLayer * )
+void KadasPluginInterfaceImpl::copySelectionToClipboard( QgsMapLayer * )
 {
   // TODO
 }
 
-void KadasPythonInterface::pasteFromClipboard( QgsMapLayer * )
+void KadasPluginInterfaceImpl::pasteFromClipboard( QgsMapLayer * )
 {
   // TODO
 }
 
-void KadasPythonInterface::openURL( const QString &url, bool useQgisDocDirectory )
+void KadasPluginInterfaceImpl::openURL( const QString &url, bool useQgisDocDirectory )
 {
   if ( useQgisDocDirectory )
   {
@@ -280,88 +280,88 @@ void KadasPythonInterface::openURL( const QString &url, bool useQgisDocDirectory
   }
 }
 
-void KadasPythonInterface::openMessageLog()
+void KadasPluginInterfaceImpl::openMessageLog()
 {
   // TODO
 }
 
-void KadasPythonInterface::showLayoutManager()
+void KadasPluginInterfaceImpl::showLayoutManager()
 {
   // TODO
 }
 
-QgsLayoutDesignerInterface *KadasPythonInterface::openLayoutDesigner( QgsMasterLayoutInterface *layout )
+QgsLayoutDesignerInterface *KadasPluginInterfaceImpl::openLayoutDesigner( QgsMasterLayoutInterface *layout )
 {
   // TODO
   return nullptr;
 }
 
-void KadasPythonInterface::registerCustomDropHandler( QgsCustomDropHandler *handler )
+void KadasPluginInterfaceImpl::registerCustomDropHandler( QgsCustomDropHandler *handler )
 {
   // TODO
 }
 
-void KadasPythonInterface::unregisterCustomDropHandler( QgsCustomDropHandler *handler )
+void KadasPluginInterfaceImpl::unregisterCustomDropHandler( QgsCustomDropHandler *handler )
 {
   // TODO
 }
 
-void KadasPythonInterface::registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler )
+void KadasPluginInterfaceImpl::registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler )
 {
   // TODO
 }
 
-void KadasPythonInterface::unregisterCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler )
+void KadasPluginInterfaceImpl::unregisterCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler )
 {
   // TODO
 }
 
-void KadasPythonInterface::showOptionsDialog( QWidget *parent, const QString &currentPage )
+void KadasPluginInterfaceImpl::showOptionsDialog( QWidget *parent, const QString &currentPage )
 {
   // TODO ?
 }
 
-void KadasPythonInterface::showLayerProperties( QgsMapLayer *l )
+void KadasPluginInterfaceImpl::showLayerProperties( QgsMapLayer *l )
 {
   // TODO
 }
 
-QDialog *KadasPythonInterface::showAttributeTable( QgsVectorLayer *l, const QString &filterExpression )
+QDialog *KadasPluginInterfaceImpl::showAttributeTable( QgsVectorLayer *l, const QString &filterExpression )
 {
   // TODO
   return nullptr;
 }
 
-bool KadasPythonInterface::openFeatureForm( QgsVectorLayer *l, QgsFeature &f, bool updateFeatureOnly, bool showModal )
+bool KadasPluginInterfaceImpl::openFeatureForm( QgsVectorLayer *l, QgsFeature &f, bool updateFeatureOnly, bool showModal )
 {
   // TODO
   return false;
 }
 
-QgsAttributeDialog *KadasPythonInterface::getFeatureForm( QgsVectorLayer *l, QgsFeature &f )
+QgsAttributeDialog *KadasPluginInterfaceImpl::getFeatureForm( QgsVectorLayer *l, QgsFeature &f )
 {
   // TODO
   return nullptr;
 }
 
-bool KadasPythonInterface::registerMainWindowAction( QAction *action, const QString &defaultShortcut )
+bool KadasPluginInterfaceImpl::registerMainWindowAction( QAction *action, const QString &defaultShortcut )
 {
   return QgsGui::shortcutsManager()->registerAction( action, defaultShortcut );
 }
 
-bool KadasPythonInterface::unregisterMainWindowAction( QAction *action )
+bool KadasPluginInterfaceImpl::unregisterMainWindowAction( QAction *action )
 {
   return QgsGui::shortcutsManager()->unregisterAction( action );
 }
 
-QToolBar *KadasPythonInterface::dummyToolbar()
+QToolBar *KadasPluginInterfaceImpl::dummyToolbar()
 {
   static QToolBar toolbar;
   toolbar.hide();
   return &toolbar;
 }
 
-QMenu *KadasPythonInterface::getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName )
+QMenu *KadasPluginInterfaceImpl::getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName )
 {
   QString menuName;
   switch ( classicMenuLocation )
@@ -404,7 +404,7 @@ QMenu *KadasPythonInterface::getClassicMenu( ActionClassicMenuLocation classicMe
   return getSubMenu( kApp->mainWindow()->pluginsMenu(), menuName );
 }
 
-QMenu *KadasPythonInterface::getSubMenu( QMenu *menu, const QString &submenuName )
+QMenu *KadasPluginInterfaceImpl::getSubMenu( QMenu *menu, const QString &submenuName )
 {
   for ( const QAction *action : menu->actions() )
   {
@@ -419,7 +419,7 @@ QMenu *KadasPythonInterface::getSubMenu( QMenu *menu, const QString &submenuName
   return submenu;
 }
 
-QWidget *KadasPythonInterface::getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
+QWidget *KadasPluginInterfaceImpl::getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
 {
   QWidget *targetTabWidget = nullptr;
   switch ( ribbonTabLocation )
@@ -460,7 +460,7 @@ QWidget *KadasPythonInterface::getRibbonTabWidget( ActionRibbonTabLocation ribbo
   return targetTabWidget;
 }
 
-void KadasPythonInterface::addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionClassicToolbarLocation classicToolbarLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName, QgsMapTool *associatedMapTool )
+void KadasPluginInterfaceImpl::addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName, QgsMapTool *associatedMapTool )
 {
   if ( ribbonTabLocation != NO_TAB )
   {
@@ -486,7 +486,7 @@ void KadasPythonInterface::addAction( QAction *action, ActionClassicMenuLocation
   }
 }
 
-void KadasPythonInterface::addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionClassicToolbarLocation classicToolbarLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
+void KadasPluginInterfaceImpl::addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
 {
   if ( ribbonTabLocation != NO_TAB )
   {
@@ -510,12 +510,12 @@ void KadasPythonInterface::addActionMenu( const QString &text, const QIcon &icon
   }
 }
 
-QAction *KadasPythonInterface::findAction( const QString &name )
+QAction *KadasPluginInterfaceImpl::findAction( const QString &name )
 {
   return kApp->mainWindow()->findChild<QAction *>( name );
 }
 
-QObject *KadasPythonInterface::findObject( const QString &name )
+QObject *KadasPluginInterfaceImpl::findObject( const QString &name )
 {
   return kApp->mainWindow()->findChild<QObject *>( name );
 }

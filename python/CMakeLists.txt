@@ -5,7 +5,7 @@ INCLUDE(PythonMacros)
 INCLUDE(PyQtMacros)
 INCLUDE(SIPMacros)
 
-SET(KADAS_PYTHON_OUTPUT_DIRECTORY ${KADAS_OUTPUT_DIRECTORY}/python)
+SET(KADAS_PYTHON_OUTPUT_DIRECTORY ${KADAS_OUTPUT_DIRECTORY}/python/kadas)
 SET(KADAS_PYTHON_INSTALL_DIRECTORY ${Python_SITEARCH}/kadas)
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${KADAS_PYTHON_OUTPUT_DIRECTORY})
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${KADAS_PYTHON_OUTPUT_DIRECTORY})
@@ -38,21 +38,21 @@ FILE(GLOB_RECURSE sip_files_core kadascore/*.sip kadascore/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_core})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadascore.api -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadascore.pyi)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadascore kadascore/kadascore.sip "${sip_files_core}" cpp_files)
-BUILD_SIP_PYTHON_MODULE(kadas._kadascore kadascore/kadascore.sip ${cpp_files} "" kadas_core)
+BUILD_SIP_PYTHON_MODULE(kadas._kadascore kadascore/kadascore.sip ${cpp_files} "" kadas_core ${QGIS_CORE_LIBRARY})
 
 # analysis module
 FILE(GLOB_RECURSE sip_files_analysis kadasanalysis/*.sip kadasanalysis/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_analysis})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadasanalysis.api -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasanalysis.pyi)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip "${sip_files_analysis}" cpp_files)
-BUILD_SIP_PYTHON_MODULE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip ${cpp_files} "" kadas_core kadas_analysis)
+BUILD_SIP_PYTHON_MODULE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip ${cpp_files} "" kadas_core kadas_analysis ${QGIS_CORE_LIBRARY} ${QGIS_ANALYSIS_LIBRARY})
 
 # gui module
 FILE(GLOB_RECURSE sip_files_gui kadasgui/*.sip kadasgui/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_gui})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadasgui.api -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasgui.pyi)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadasgui kadasgui/kadasgui.sip "${sip_files_gui}" cpp_files)
-BUILD_SIP_PYTHON_MODULE(kadas._kadasgui kadasgui/kadasgui.sip ${cpp_files} "" kadas_core kadas_gui ${QGIS_CORE_LIBRARY})
+BUILD_SIP_PYTHON_MODULE(kadas._kadasgui kadasgui/kadasgui.sip ${cpp_files} "" kadas_core kadas_gui ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY})
 
 
 SET(PY_MODULES kadascore kadasanalysis kadasgui)

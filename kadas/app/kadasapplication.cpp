@@ -46,8 +46,8 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
-#include <kadas/app/kadaspythoninterface.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -116,6 +116,11 @@ static void setupVectorLayer( const QString &vectorLayerPath,
 KadasApplication *KadasApplication::instance()
 {
   return qobject_cast<KadasApplication *> ( QCoreApplication::instance() );
+}
+
+bool KadasApplication::isRunningFromBuildDir()
+{
+  return QFile::exists( QDir( applicationDirPath() ).absoluteFilePath( ".kadasbuilddir" ) );
 }
 
 KadasApplication::KadasApplication( int &argc, char **argv )
@@ -205,6 +210,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   connect( this, &KadasApplication::focusChanged, this, &KadasApplication::onFocusChanged );
+  connect( this, &QApplication::aboutToQuit, this, &KadasApplication::cleanup );
 
   QgsLayerTreeModel *layerTreeModel = mMainWindow->layerTreeView()->layerTreeModel();
   connect( layerTreeModel->rootGroup(), &QgsLayerTreeNode::addedChildren, QgsProject::instance(), &QgsProject::setDirty );
@@ -215,7 +221,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
 
   // Load python support
-  mPythonInterface = new KadasPythonInterface( this );
+  mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
 
   // Perform online/offline check to select default template
@@ -781,6 +787,14 @@ void KadasApplication::updateWindowTitle()
   mMainWindow->setWindowTitle( title );
 }
 
+void KadasApplication::cleanup()
+{
+  if ( mPythonIntegration )
+  {
+    mPythonIntegration->unloadAllPlugins();
+  }
+}
+
 QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const
 {
   QList<QgsMapLayer *> result;
@@ -1072,8 +1086,10 @@ void KadasApplication::loadPythonSupport()
   if ( !mPythonIntegration->isEnabled() )
   {
     mMainWindow->messageBar()->pushCritical( tr( "Python unavailable" ), tr( "Failed to load python support" ) );
-//     TODO
-//    QgsPluginRegistry::instance()->setPythonUtils( mPythonUtils );
-//    QgsPythonRunner::setInstance( new QgsPythonRunnerImpl( mPythonUtils ) );
+  }
+  else
+  {
+    QgsPythonRunner::setInstance( new KadasPythonRunner( mPythonIntegration ) );
+    mPythonIntegration->restorePlugins();
   }
 }

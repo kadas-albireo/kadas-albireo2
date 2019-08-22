@@ -39,7 +39,6 @@ class KADAS_GUI_EXPORT KadasCoordinateDisplayer : public QWidget
     KadasCoordinateDisplayer( QToolButton *crsButton, QLineEdit *coordLineEdit, QLineEdit *heightLineEdit, QComboBox *heightCombo, QgsMapCanvas *mapCanvas, QWidget *parent = 0 );
     void getCoordinateDisplayFormat( KadasCoordinateFormat::Format &format, QString &epsg );
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
-    double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit );
 
   private:
     enum TargetFormat { LV03, LV95, DMS, DM, DD, UTM, MGRS };

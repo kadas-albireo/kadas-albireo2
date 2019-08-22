@@ -20,12 +20,15 @@
 #include <QStandardPaths>
 #include <QDebug>
 
+#include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslogger.h>
+#include <qgis/qgsmessagelog.h>
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadaspythonintegration.h>
 
 PyThreadState *_mainState = nullptr;
@@ -55,35 +58,18 @@ bool KadasPythonIntegration::checkSystemImports()
 #endif
 
   // construct a list of plugin paths
-  // plugin dirs passed in QGIS_PLUGINPATH env. variable have highest priority (usually empty)
   // locally installed plugins have priority over the system plugins
-  // use os.path.expanduser to support usernames with special characters (see #2512)
   QStringList pluginpaths;
-  for ( const QString &p : extraPluginsPaths() )
-  {
-    if ( !QDir( p ).exists() )
-    {
-      QgsMessageOutput *msg = QgsMessageOutput::createMessageOutput();
-      msg->setTitle( QObject::tr( "Python error" ) );
-      msg->setMessage( QObject::tr( "The extra plugin path '%1' does not exist!" ).arg( p ), QgsMessageOutput::MessageText );
-      msg->showMessage();
-    }
-#ifdef Q_OS_WIN
-    p.replace( '\\', "\\\\" );
-#endif
-    // we store here paths in unicode strings
-    // the str constant will contain utf8 code (through runString)
-    // so we call '...'.decode('utf-8') to make a unicode string
-    pluginpaths << '"' + p + '"';
-  }
-  pluginpaths << homePluginsPath();
-  pluginpaths << '"' + pluginsPath() + '"';
+  pluginpaths << '"' + homePluginsPath() + '"';
+  pluginpaths << '"' + kadasPluginsPath() + '"';
+  pluginpaths << '"' + qgisPluginsPath() + '"';
 
   // expect that bindings are installed locally, so add the path to modules
   // also add path to plugins
   QStringList newpaths;
-  newpaths << '"' + pythonPath() + '"';
-  newpaths << homePythonPath();
+  newpaths << '"' + qgisPythonPath() + '"';
+  newpaths << '"' + kadasPythonPath() + '"';
+  newpaths << '"' + homePythonPath() + '"';
   newpaths << pluginpaths;
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
@@ -128,8 +114,8 @@ bool KadasPythonIntegration::checkSystemImports()
 
   // tell the utils script where to look for the plugins
   runString( QStringLiteral( "qgis.utils.plugin_paths = [%1]" ).arg( pluginpaths.join( ',' ) ) );
-  runString( QStringLiteral( "qgis.utils.sys_plugin_path = \"%1\"" ).arg( pluginsPath() ) );
-  runString( QStringLiteral( "qgis.utils.home_plugin_path = %1" ).arg( homePluginsPath() ) );    // note - homePluginsPath() returns a python expression, not a string literal
+  runString( QStringLiteral( "qgis.utils.sys_plugin_path = \"%1\"" ).arg( qgisPluginsPath() ) );
+  runString( QStringLiteral( "qgis.utils.home_plugin_path = \"%1\"" ).arg( homePluginsPath() ) );    // note - homePluginsPath() returns a python expression, not a string literal
 
 #ifdef Q_OS_WIN
   runString( "if oldhome: os.environ['HOME']=oldhome\n" );
@@ -173,26 +159,7 @@ bool KadasPythonIntegration::checkQgisUser()
   return true;
 }
 
-void KadasPythonIntegration::doCustomImports()
-{
-  QStringList startupPaths = QStandardPaths::locateAll( QStandardPaths::AppDataLocation, QStringLiteral( "startup.py" ) );
-  if ( startupPaths.isEmpty() )
-  {
-    return;
-  }
-
-  runString( QStringLiteral( "import importlib.util" ) );
-
-  QStringList::const_iterator iter = startupPaths.constBegin();
-  for ( ; iter != startupPaths.constEnd(); ++iter )
-  {
-    runString( QStringLiteral( "spec = importlib.util.spec_from_file_location('startup','%1')" ).arg( *iter ) );
-    runString( QStringLiteral( "module = importlib.util.module_from_spec(spec)" ) );
-    runString( QStringLiteral( "spec.loader.exec_module(module)" ) );
-  }
-}
-
-void KadasPythonIntegration::initPython( KadasPythonInterface *interface, const bool installErrorHook )
+void KadasPythonIntegration::initPython( KadasPluginInterface *interface, const bool installErrorHook )
 {
   init();
   if ( !checkSystemImports() )
@@ -212,7 +179,6 @@ void KadasPythonIntegration::initPython( KadasPythonInterface *interface, const 
     exitPython();
     return;
   }
-  doCustomImports();
   if ( installErrorHook )
   {
     KadasPythonIntegration::installErrorHook();
@@ -462,7 +428,7 @@ bool KadasPythonIntegration::getError( QString &errorClassName, QString &errorTe
 }
 
 
-QString KadasPythonIntegration::PyObjectToQString( PyObject *obj )
+QString KadasPythonIntegration::PyObjectToQString( PyObject *obj ) const
 {
   QString result;
 
@@ -494,7 +460,7 @@ QString KadasPythonIntegration::PyObjectToQString( PyObject *obj )
 }
 
 
-bool KadasPythonIntegration::evalString( const QString &command, QString &result )
+bool KadasPythonIntegration::evalString( const QString &command, QString &result ) const
 {
   // acquire global interpreter lock to ensure we are in a consistent state
   PyGILState_STATE gstate;
@@ -518,7 +484,7 @@ bool KadasPythonIntegration::evalString( const QString &command, QString &result
   return success;
 }
 
-QString KadasPythonIntegration::pythonPath() const
+QString KadasPythonIntegration::qgisPythonPath() const
 {
   if ( QgsApplication::isRunningFromBuildDir() )
   {
@@ -530,66 +496,109 @@ QString KadasPythonIntegration::pythonPath() const
   }
 }
 
-QString KadasPythonIntegration::pluginsPath() const
+QString KadasPythonIntegration::qgisPluginsPath() const
 {
-  return pythonPath() + QStringLiteral( "/plugins" );
+  return qgisPythonPath() + QStringLiteral( "/plugins" );
+}
+
+QString KadasPythonIntegration::kadasPythonPath() const
+{
+  if ( KadasApplication::isRunningFromBuildDir() )
+  {
+    return KadasApplication::applicationDirPath() + QStringLiteral( "/../python" );
+  }
+  else
+  {
+    return QgsApplication::pkgDataPath() + QStringLiteral( "/python" );
+  }
+}
+
+QString KadasPythonIntegration::kadasPluginsPath() const
+{
+  return kadasPythonPath() + QStringLiteral( "/plugins" );
 }
 
 QString KadasPythonIntegration::homePythonPath() const
 {
   QString settingsDir = QgsApplication::qgisSettingsDirPath();
-  if ( QDir::cleanPath( settingsDir ) == QDir::homePath() + QStringLiteral( "/.qgis3" ) )
-  {
-    return QStringLiteral( "\"%1/.qgis3/python\"" ).arg( QDir::homePath() );
-  }
-  else
-  {
-    return QStringLiteral( "\"" ) + settingsDir.replace( '\\', QLatin1String( "\\\\" ) ) + QStringLiteral( "python\"" );
-  }
+  return QDir( settingsDir ).absoluteFilePath( "python" );
 }
 
 QString KadasPythonIntegration::homePluginsPath() const
 {
-  return homePythonPath() + QStringLiteral( " + \"/plugins\"" );
+  return QDir( homePythonPath() ).absoluteFilePath( "plugins" );
 }
 
-QStringList KadasPythonIntegration::extraPluginsPaths() const
+void KadasPythonIntegration::restorePlugins()
 {
-  const char *cpaths = getenv( "QGIS_PLUGINPATH" );
-  if ( !cpaths )
+  QgsSettings mySettings;
+
+  for ( const QString &packageName : pluginList() )
   {
-    return QStringList();
+    // check if the plugin was active on last session
+    if ( mySettings.value( "/PythonPlugins/" + packageName ).toBool() )
+    {
+      loadPlugin( packageName );
+    }
+  }
+}
+
+bool KadasPythonIntegration::loadPlugin( const QString &packageName )
+{
+  if ( !mPythonEnabled )
+  {
+    return false;
   }
 
-  QString paths = QString::fromLocal8Bit( cpaths );
-#ifndef Q_OS_WIN
-  if ( paths.contains( ':' ) )
+  bool success = false;
+  QString output;
+
+  if ( isPluginLoaded( packageName ) )
   {
-    return paths.split( ':', QString::SkipEmptyParts );
+    return true;
   }
-#endif
-  if ( paths.contains( ';' ) )
+
+  QString pluginName  = getPluginMetadata( packageName, QStringLiteral( "name" ) );
+  QString description = getPluginMetadata( packageName, QStringLiteral( "description" ) );
+  QString version     = getPluginMetadata( packageName, QStringLiteral( "version" ) );
+  if ( pluginName == QLatin1String( "__error__" ) || description == QLatin1String( "__error__" ) || version == QLatin1String( "__error__" ) )
   {
-    return paths.split( ';', QString::SkipEmptyParts );
+    QgsMessageLog::logMessage( QObject::tr( "Error when reading metadata of plugin %1" ).arg( packageName ), QObject::tr( "Plugins" ) );
+    success = false;
   }
   else
   {
-    return QStringList( paths );
+    success = true;
   }
+
+  if ( success )
+  {
+    success = isPythonPluginCompatible( packageName );
+  }
+
+  if ( success )
+  {
+    evalString( QStringLiteral( "qgis.utils.loadPlugin('%1')" ).arg( packageName ), output );
+    success = ( output == QLatin1String( "True" ) );
+  }
+
+  if ( success )
+  {
+    evalString( QStringLiteral( "qgis.utils.startPlugin('%1')" ).arg( packageName ), output );
+    success = ( output == QLatin1String( "True" ) );
+  }
+
+  QgsSettings().setValue( "/PythonPlugins/" + packageName, success );
+  return success;
 }
 
-
-QStringList KadasPythonIntegration::pluginList()
+QString KadasPythonIntegration::getPluginMetadata( const QString &pluginName, const QString &function ) const
 {
-  runString( QStringLiteral( "qgis.utils.updateAvailablePlugins()" ) );
+  if ( !mPythonEnabled )
+  {
+    return "";
+  }
 
-  QString output;
-  evalString( QStringLiteral( "'\\n'.join(qgis.utils.available_plugins)" ), output );
-  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
-}
-
-QString KadasPythonIntegration::getPluginMetadata( const QString &pluginName, const QString &function )
-{
   QString res;
   QString str = QStringLiteral( "qgis.utils.pluginMetadata('%1', '%2')" ).arg( pluginName, function );
   evalString( str, res );
@@ -597,34 +606,13 @@ QString KadasPythonIntegration::getPluginMetadata( const QString &pluginName, co
   return res;
 }
 
-bool KadasPythonIntegration::pluginHasProcessingProvider( const QString &pluginName )
-{
-  return getPluginMetadata( pluginName, QStringLiteral( "hasProcessingProvider" ) ).compare( QLatin1String( "yes" ), Qt::CaseInsensitive ) == 0;
-}
-
-bool KadasPythonIntegration::loadPlugin( const QString &packageName )
-{
-  QString output;
-  evalString( QStringLiteral( "qgis.utils.loadPlugin('%1')" ).arg( packageName ), output );
-  return ( output == QLatin1String( "True" ) );
-}
-
-bool KadasPythonIntegration::startPlugin( const QString &packageName )
-{
-  QString output;
-  evalString( QStringLiteral( "qgis.utils.startPlugin('%1')" ).arg( packageName ), output );
-  return ( output == QLatin1String( "True" ) );
-}
-
-bool KadasPythonIntegration::startProcessingPlugin( const QString &packageName )
-{
-  QString output;
-  evalString( QStringLiteral( "qgis.utils.startProcessingPlugin('%1')" ).arg( packageName ), output );
-  return ( output == QLatin1String( "True" ) );
-}
-
 bool KadasPythonIntegration::canUninstallPlugin( const QString &packageName )
 {
+  if ( !mPythonEnabled )
+  {
+    return false;
+  }
+
   QString output;
   evalString( QStringLiteral( "qgis.utils.canUninstallPlugin('%1')" ).arg( packageName ), output );
   return ( output == QLatin1String( "True" ) );
@@ -632,9 +620,61 @@ bool KadasPythonIntegration::canUninstallPlugin( const QString &packageName )
 
 bool KadasPythonIntegration::unloadPlugin( const QString &packageName )
 {
+  if ( !mPythonEnabled )
+  {
+    return false;
+  }
+
+  bool success = false;
+
+  if ( isPluginLoaded( packageName ) )
+  {
+    QString output;
+    evalString( QStringLiteral( "qgis.utils.unloadPlugin('%1')" ).arg( packageName ), output );
+    success = ( output == QLatin1String( "True" ) );
+  }
+  QgsSettings().setValue( "/PythonPlugins/" + packageName, false );
+
+  return success;
+}
+
+void KadasPythonIntegration::unloadAllPlugins()
+{
+  if ( !mPythonEnabled )
+  {
+    return;
+  }
+
+  for ( const QString &pluginName : listActivePlugins() )
+  {
+    unloadPlugin( pluginName );
+  }
+}
+
+QStringList KadasPythonIntegration::listActivePlugins()
+{
+  if ( !mPythonEnabled )
+  {
+    return QStringList();
+  }
+
   QString output;
-  evalString( QStringLiteral( "qgis.utils.unloadPlugin('%1')" ).arg( packageName ), output );
-  return ( output == QLatin1String( "True" ) );
+  evalString( QStringLiteral( "'\\n'.join(qgis.utils.active_plugins)" ), output );
+  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
+}
+
+QStringList KadasPythonIntegration::pluginList()
+{
+  if ( !mPythonEnabled )
+  {
+    return QStringList();
+  }
+
+  runString( QStringLiteral( "qgis.utils.updateAvailablePlugins()" ) );
+
+  QString output;
+  evalString( QStringLiteral( "'\\n'.join(qgis.utils.available_plugins)" ), output );
+  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
 }
 
 bool KadasPythonIntegration::isPluginEnabled( const QString &packageName ) const
@@ -642,16 +682,104 @@ bool KadasPythonIntegration::isPluginEnabled( const QString &packageName ) const
   return QgsSettings().value( QStringLiteral( "/PythonPlugins/" ) + packageName, QVariant( false ) ).toBool();
 }
 
-bool KadasPythonIntegration::isPluginLoaded( const QString &packageName )
+bool KadasPythonIntegration::isPluginLoaded( const QString &packageName ) const
 {
+  if ( !mPythonEnabled )
+  {
+    return false;
+  }
+
   QString output;
   evalString( QStringLiteral( "qgis.utils.isPluginLoaded('%1')" ).arg( packageName ), output );
   return ( output == QLatin1String( "True" ) );
 }
 
-QStringList KadasPythonIntegration::listActivePlugins()
+bool KadasPythonIntegration::isPythonPluginCompatible( const QString &packageName ) const
 {
-  QString output;
-  evalString( QStringLiteral( "'\\n'.join(qgis.utils.active_plugins)" ), output );
-  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
+  QString minVersion = getPluginMetadata( packageName, QStringLiteral( "qgisMinimumVersion" ) );
+  // try to read qgisMaximumVersion. Note checkQgisVersion can cope with "__error__" value.
+  QString maxVersion = getPluginMetadata( packageName, QStringLiteral( "qgisMaximumVersion" ) );
+  return minVersion != QLatin1String( "__error__" ) && checkQgisVersion( minVersion, maxVersion );
+}
+
+bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const QString &maxVersion ) const
+{
+  // Parse qgisMinVersion. Must be in form x.y.z or just x.y
+  QStringList minVersionParts = minVersion.split( '.' );
+  if ( minVersionParts.count() != 2 && minVersionParts.count() != 3 )
+    return false;
+
+  int minVerMajor, minVerMinor, minVerBugfix = 0;
+  bool ok;
+  minVerMajor = minVersionParts.at( 0 ).toInt( &ok );
+  if ( !ok )
+    return false;
+  minVerMinor = minVersionParts.at( 1 ).toInt( &ok );
+  if ( !ok )
+    return false;
+  if ( minVersionParts.count() == 3 )
+  {
+    minVerBugfix = minVersionParts.at( 2 ).toInt( &ok );
+    if ( !ok )
+      return false;
+  }
+
+  // Parse qgisMaxVersion. Must be in form x.y.z or just x.y
+  int maxVerMajor, maxVerMinor, maxVerBugfix = 99;
+  if ( maxVersion.isEmpty() || maxVersion == QLatin1String( "__error__" ) )
+  {
+    maxVerMajor = minVerMajor;
+    maxVerMinor = 99;
+  }
+  else
+  {
+    QStringList maxVersionParts = maxVersion.split( '.' );
+    if ( maxVersionParts.count() != 2 && maxVersionParts.count() != 3 )
+      return false;
+
+    bool ok;
+    maxVerMajor = maxVersionParts.at( 0 ).toInt( &ok );
+    if ( !ok )
+      return false;
+    maxVerMinor = maxVersionParts.at( 1 ).toInt( &ok );
+    if ( !ok )
+      return false;
+    if ( maxVersionParts.count() == 3 )
+    {
+      maxVerBugfix = maxVersionParts.at( 2 ).toInt( &ok );
+      if ( !ok )
+        return false;
+    }
+  }
+
+  // our qgis version - cut release name after version number
+  QString qgisVersion = Qgis::QGIS_VERSION.section( '-', 0, 0 );
+
+  QStringList qgisVersionParts = qgisVersion.split( '.' );
+
+  int qgisMajor = qgisVersionParts.at( 0 ).toInt();
+  int qgisMinor = qgisVersionParts.at( 1 ).toInt();
+  int qgisBugfix = qgisVersionParts.at( 2 ).toInt();
+
+  if ( qgisMinor == 99 )
+  {
+    // we want the API version, so for x.99 bump it up to the next major release: e.g. 2.99 to 3.0.0
+    qgisMajor ++;
+    qgisMinor = 0;
+    qgisBugfix = 0;
+  };
+
+  // build XxYyZz strings with trailing zeroes if needed
+  QString minVer = QStringLiteral( "%1%2%3" ).arg( minVerMajor, 2, 10, QChar( '0' ) )
+                   .arg( minVerMinor, 2, 10, QChar( '0' ) )
+                   .arg( minVerBugfix, 2, 10, QChar( '0' ) );
+  QString maxVer = QStringLiteral( "%1%2%3" ).arg( maxVerMajor, 2, 10, QChar( '0' ) )
+                   .arg( maxVerMinor, 2, 10, QChar( '0' ) )
+                   .arg( maxVerBugfix, 2, 10, QChar( '0' ) );
+  QString curVer = QStringLiteral( "%1%2%3" ).arg( qgisMajor, 2, 10, QChar( '0' ) )
+                   .arg( qgisMinor, 2, 10, QChar( '0' ) )
+                   .arg( qgisBugfix, 2, 10, QChar( '0' ) );
+
+  // compare
+  return ( minVer <= curVer && maxVer >= curVer );
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadaspythoninterface.h
-    ----------------------
+    kadasplugininterfaceimpl.h
+    --------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,21 +14,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASPYTHONINTERFACE_H
-#define KADASPYTHONINTERFACE_H
+#ifndef KADASPLUGININTERFACEIMPL_H
+#define KADASPLUGININTERFACEIMPL_H
 
 #include <QFont>
 
-#include <qgis/qgisinterface.h>
+#include <kadas/gui/kadasplugininterface.h>
 
-class QgsMapTool;
 class KadasApplication;
 
-class KadasPythonInterface : public QgisInterface
+class KadasPluginInterfaceImpl : public KadasPluginInterface
 {
     Q_OBJECT
   public:
-    KadasPythonInterface( KadasApplication *app );
+    KadasPluginInterfaceImpl( KadasApplication *app );
 
     // Supported QGIS interface
     virtual QgsPluginManagerInterface *pluginManagerInterface() override;
@@ -271,70 +270,20 @@ class KadasPythonInterface : public QgisInterface
 
 
     // KADAS specific interface
-    enum ActionRibbonTabLocation
-    {
-      NO_TAB,
-      MAPS_TAB,
-      VIEW_TAB,
-      ANALYSIS_TAB,
-      DRAW_TAB,
-      GPS_TAB,
-      MSS_TAB,
-      SETTINGS_TAB,
-      HELP_TAB,
-      CUSTOM_TAB
-    };
-    enum ActionClassicMenuLocation
-    {
-      NO_MENU,
-      PROJECT_MENU,
-      EDIT_MENU,
-      VIEW_MENU,
-      LAYER_MENU,
-      NEWLAYER_MENU,
-      ADDLAYER_MENU,
-      SETTINGS_MENU,
-      PLUGIN_MENU,
-      RASTER_MENU,
-      DATABASE_MENU,
-      VECTOR_MENU,
-      WEB_MENU,
-      FIRST_RIGHT_STANDARD_MENU,
-      WINDOW_MENU,
-      HELP_MENU,
-      CUSTOM_MENU
-    };
-    enum ActionClassicToolbarLocation
-    {
-      NO_TOOLBAR,
-      FILE_TOOLBAR,
-      LAYER_TOOLBAR,
-      MAP_NAV_TOOL_TOOLBAR,
-      ADVANCED_DIGITIZE_TOOLBAR,
-      ATTRIBUTES_TOOLBAR,
-      PLUGIN_TOOLBAR,
-      HELP_TOOLBAR,
-      RASTER_TOOLBAR,
-      VECTOR_TOOLBAR,
-      DATABASE_TOOLBAR,
-      WEB_TOOLBAR,
-      CUSTOM_TOOLBAR
-    };
-
-    QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() );
-    QMenu *getSubMenu( QMenu *menu, const QString &submenuName );
-    QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName );
+    QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) override;
+    QMenu *getSubMenu( QMenu *menu, const QString &submenuName ) override;
+    QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName ) override;
 
     //! Generic action adder
-    void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionClassicToolbarLocation classicToolbarLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr );
-    void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionClassicToolbarLocation classicToolbarLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() );
+    void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) override;
+    void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) override;
 
     //! Generic action finder
-    QAction *findAction( const QString &name );
+    QAction *findAction( const QString &name ) override;
 
     //! Generic object finder
-    QObject *findObject( const QString &name );
+    QObject *findObject( const QString &name ) override;
 };
 
 
-#endif // KADASPYTHONINTERFACE_H
+#endif // KADASPLUGININTERFACEIMPL_H

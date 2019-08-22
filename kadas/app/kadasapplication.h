@@ -32,7 +32,7 @@ class KadasClipboard;
 class KadasMainWindow;
 class KadasMapToolPan;
 class KadasPythonIntegration;
-class KadasPythonInterface;
+class KadasPluginInterface;
 
 #define kApp KadasApplication::instance()
 
@@ -43,6 +43,7 @@ class KadasApplication : public QgsApplication
   public:
 
     static KadasApplication *instance();
+    static bool isRunningFromBuildDir();
 
     KadasApplication( int &argc, char **argv );
     ~KadasApplication();
@@ -86,7 +87,7 @@ class KadasApplication : public QgsApplication
     void activeLayerChanged( QgsMapLayer *layer );
 
   private:
-    KadasPythonInterface *mPythonInterface = nullptr;
+    KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasClipboard *mClipboard = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
@@ -108,6 +109,7 @@ class KadasApplication : public QgsApplication
     void handleItemPicked( const KadasFeaturePicker::PickResult &result );
     void showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos );
     void updateWindowTitle();
+    void cleanup();
 };
 
 #endif // KADASAPPLICATION_H
