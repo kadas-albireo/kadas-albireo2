@@ -618,6 +618,16 @@ bool KadasPythonIntegration::canUninstallPlugin( const QString &packageName )
   return ( output == QLatin1String( "True" ) );
 }
 
+bool KadasPythonIntegration::disablePlugin( const QString &packageName )
+{
+  if ( !mPythonEnabled )
+  {
+    return false;
+  }
+  QgsSettings().setValue( "/PythonPlugins/" + packageName, false );
+  return unloadPlugin( packageName );
+}
+
 bool KadasPythonIntegration::unloadPlugin( const QString &packageName )
 {
   if ( !mPythonEnabled )
@@ -633,7 +643,6 @@ bool KadasPythonIntegration::unloadPlugin( const QString &packageName )
     evalString( QStringLiteral( "qgis.utils.unloadPlugin('%1')" ).arg( packageName ), output );
     success = ( output == QLatin1String( "True" ) );
   }
-  QgsSettings().setValue( "/PythonPlugins/" + packageName, false );
 
   return success;
 }

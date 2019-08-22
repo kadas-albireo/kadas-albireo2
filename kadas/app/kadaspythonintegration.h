@@ -60,6 +60,7 @@ class KadasPythonIntegration : public QObject
     QString getPluginMetadata( const QString &pluginName, const QString &function ) const;
 
     bool canUninstallPlugin( const QString &packageName );
+    bool disablePlugin( const QString &packageName );
     bool unloadPlugin( const QString &packageName );
     void unloadAllPlugins();
 
