@@ -179,9 +179,6 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   snappingConfig.setUnits( QgsTolerance::Pixels );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
-  mPluginsToolButton = new QToolButton( this );
-  mPluginsToolButton->setText( tr( "Plugins" ) );
-  mPluginsToolButton->setObjectName( "pluginMenuButton" );
   mPluginsToolButton->setMenu( new QMenu() );
   mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
   mPluginsToolButton->setFixedHeight( 45 );

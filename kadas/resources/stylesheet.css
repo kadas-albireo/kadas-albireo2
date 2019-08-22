@@ -154,14 +154,14 @@ QPushButton#mLayerTreeViewButton:pressed
   background-color: #BEDCF6;
 }
 
-#pluginMenuButton {
-  background-color: #BEDCF6;
+#mPluginsToolButton {
+  background: #BEDCF6 url(:/kadas/icons/plugin_b) center center no-repeat;
   color: black;
   border: none;
 }
 
-#pluginMenuButton:pressed {
-  background-color: #263B4E;
+#mPluginsToolButton:pressed {
+   background: #263B4E url(:/kadas/icons/plugin_w) center center no-repeat;
   color: white;
 }
 

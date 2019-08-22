@@ -117,7 +117,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QTimer mLoadingTimer;
     QPoint mResizePressPos;
     QPoint mDragStartPos;
-    QToolButton *mPluginsToolButton;
     QMap<QString, QAction *> mAddedActions;
 
     friend class KadasGpsIntegration;
