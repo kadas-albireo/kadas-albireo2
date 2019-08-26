@@ -181,7 +181,6 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanv
 
 KadasGeometryItem *KadasMapToolMeasure::setupItem( KadasGeometryItem *item, bool measureAzimut ) const
 {
-  item->setIconType( KadasGeometryItem::ICON_CIRCLE );
   item->setEditorFactory( [ = ]( KadasMapItem * mapItem )
   {
     KadasMeasureWidget *widget = new KadasMeasureWidget( mapItem, measureAzimut );
