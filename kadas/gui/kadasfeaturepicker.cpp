@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspallabeling.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include <kadas/gui/kadasitemlayer.h>
@@ -29,7 +30,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   PickResult pickResult;
 
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
-  double radiusmm = QSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
   QgsRectangle filterRect;

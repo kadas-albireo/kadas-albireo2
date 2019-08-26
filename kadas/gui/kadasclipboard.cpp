@@ -18,10 +18,10 @@
 #include <QClipboard>
 #include <QDataStream>
 #include <QMimeData>
-#include <QSettings>
 
 #include <qgis/qgsfeaturestore.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasclipboard.h>
 
@@ -61,7 +61,7 @@ bool KadasClipboard::hasFormat( const QString &format ) const
 void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 {
   // Also store plaintext version
-  QSettings settings;
+  QgsSettings settings;
   bool copyWKT = settings.value( "Qgis/copyGeometryAsWKT", true ).toBool();
 
   QStringList textLines;

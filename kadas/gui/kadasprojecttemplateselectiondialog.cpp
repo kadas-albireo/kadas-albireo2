@@ -18,7 +18,6 @@
 #include <QFileSystemModel>
 #include <QKeyEvent>
 #include <QPushButton>
-#include <QSettings>
 #include <QTreeView>
 #include <QVBoxLayout>
 

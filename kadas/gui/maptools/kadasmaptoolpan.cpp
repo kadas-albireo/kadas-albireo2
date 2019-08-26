@@ -22,6 +22,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsrubberband.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
@@ -69,7 +70,7 @@ void KadasMapToolPan::canvasPressEvent( QgsMapMouseEvent *e )
       }
       else if ( e->modifiers() == Qt::ControlModifier )
       {
-        QSettings settings;
+        QgsSettings settings;
         int red = settings.value( "/Qgis/default_measure_color_red", 255 ).toInt();
         int green = settings.value( "/Qgis/default_measure_color_green", 0 ).toInt();
         int blue = settings.value( "/Qgis/default_measure_color_blue", 0 ).toInt();

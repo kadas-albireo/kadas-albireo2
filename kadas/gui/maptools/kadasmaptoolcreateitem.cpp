@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 #include <qgis/qgssnappingutils.h>
 
 
@@ -56,7 +57,7 @@ void KadasMapToolCreateItem::activate()
   mStateHistory = new KadasStateHistory( this );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged );
   createItem();
-  if ( QSettings().value( "/kadas/showNumericInput", false ).toBool() )
+  if ( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 

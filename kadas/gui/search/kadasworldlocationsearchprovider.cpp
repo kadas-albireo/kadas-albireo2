@@ -18,12 +18,12 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSettings>
 #include <QUrlQuery>
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
 
@@ -48,13 +48,13 @@ KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas
 void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
 {
   QString serviceUrl;
-  if ( QSettings().value( "/Qgis/isOffline" ).toBool() )
+  if ( QgsSettings().value( "/Qgis/isOffline" ).toBool() )
   {
-    serviceUrl = QSettings().value( "search/worldlocationofflinesearchurl", "http://localhost:5000/SearchServerWld" ).toString();
+    serviceUrl = QgsSettings().value( "search/worldlocationofflinesearchurl", "http://localhost:5000/SearchServerWld" ).toString();
   }
   else
   {
-    serviceUrl = QSettings().value( "search/worldlocationsearchurl", "" ).toString();
+    serviceUrl = QgsSettings().value( "search/worldlocationsearchurl", "" ).toString();
   }
 
   QUrl url( serviceUrl );
@@ -65,7 +65,7 @@ void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, c
   url.setQuery( query );
 
   QNetworkRequest req( url );
-  req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   mNetReply = QgsNetworkAccessManager::instance()->get( req );
   connect( mNetReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::replyFinished );
   mTimeoutTimer.start( sSearchTimeout );

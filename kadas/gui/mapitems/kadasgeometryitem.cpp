@@ -29,6 +29,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 
@@ -92,9 +93,9 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   }
 
   // Draw measurement labels
-  int red = QSettings().value( "/Qgis/default_measure_color_red", 255 ).toInt();
-  int green = QSettings().value( "/Qgis/default_measure_color_green", 0 ).toInt();
-  int blue = QSettings().value( "/Qgis/default_measure_color_blue", 0 ).toInt();
+  int red = QgsSettings().value( "/Qgis/default_measure_color_red", 255 ).toInt();
+  int green = QgsSettings().value( "/Qgis/default_measure_color_green", 0 ).toInt();
+  int blue = QgsSettings().value( "/Qgis/default_measure_color_blue", 0 ).toInt();
   QColor rectColor = QColor( 255, 255, 255, 192 );
 
   context.painter()->setPen( QColor( red, green, blue ) );
@@ -350,21 +351,21 @@ QgsUnitTypes::AreaUnit KadasGeometryItem::areaBaseUnit() const
 
 QString KadasGeometryItem::formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const
 {
-  int decimals = QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
   value = mDa.convertLengthMeasurement( value, unit );
   return QgsUnitTypes::formatDistance( value, decimals, unit );
 }
 
 QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit ) const
 {
-  int decimals = QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
   return QgsUnitTypes::formatArea( value, decimals, unit );
 }
 
 QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const
 {
-  int decimals = QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
   value *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, unit );
   return QgsUnitTypes::formatAngle( value, decimals, unit );
 }

@@ -18,7 +18,6 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSettings>
 #include <QUrlQuery>
 
 #include <qgis/qgsdatasourceuri.h>
@@ -30,6 +29,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 
@@ -88,7 +88,7 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
 
   for ( const LayerIdName &ql : queryableLayers )
   {
-    QUrl url( QSettings().value( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
+    QUrl url( QgsSettings().value( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
     QUrlQuery query;
     query.addQueryItem( "type", "featuresearch" );
     query.addQueryItem( "searchText", searchtext );
@@ -113,7 +113,7 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
 
     url.setQuery( query );
     QNetworkRequest req( url );
-    req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+    req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     reply->setProperty( "layerName", ql.second );
     connect( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );

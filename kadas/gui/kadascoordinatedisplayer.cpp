@@ -23,6 +23,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadascoordinatedisplayer.h>
 
@@ -77,7 +78,7 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLin
   connect( mHeightSelectionCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasCoordinateDisplayer::heightUnitChanged );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasCoordinateDisplayer::readProjectSettings );
 
-  mHeightSelectionCombo->setCurrentIndex( QSettings().value( "/Qgis/heightUnit", 0 ).toInt() );
+  mHeightSelectionCombo->setCurrentIndex( QgsSettings().value( "/Qgis/heightUnit", 0 ).toInt() );
 
   syncProjectCrs();
   int displayFormat = QgsProject::instance()->readNumEntry( "crsdisplay", "format" );
@@ -189,7 +190,7 @@ void KadasCoordinateDisplayer::displayFormatChanged( QAction *action )
 
 void KadasCoordinateDisplayer::heightUnitChanged( int idx )
 {
-  QSettings().setValue( "/Qgis/heightUnit", idx );
+  QgsSettings().setValue( "/Qgis/heightUnit", idx );
   KadasCoordinateFormat::instance()->setHeightDisplayUnit( static_cast<QgsUnitTypes::DistanceUnit>( mHeightSelectionCombo->itemData( idx ).toInt() ) );
   updateHeight();
 }

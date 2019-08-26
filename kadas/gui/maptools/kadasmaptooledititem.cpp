@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -209,7 +210,7 @@ void KadasMapToolEditItem::keyPressEvent( QKeyEvent *e )
 void KadasMapToolEditItem::setupNumericInput()
 {
   clearNumericInput();
-  if ( QSettings().value( "/kadas/showNumericInput", false ).toBool() && mEditContext.isValid() && !mEditContext.attributes.isEmpty() )
+  if ( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() && mEditContext.isValid() && !mEditContext.attributes.isEmpty() )
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 

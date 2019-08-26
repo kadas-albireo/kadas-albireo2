@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QSettings>
 #include <QSortFilterProxyModel>
 #include <QStandardItem>
 #include <QTreeView>

@@ -49,7 +49,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
     mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
     mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
-    int defUnit = QSettings().value( "/Qgis/measure/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
+    int defUnit = QgsSettings().value( "/Qgis/measure/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
     mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
     connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
   }
@@ -72,7 +72,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mNorthComboBox = new QComboBox();
     mNorthComboBox->addItem( tr( "Geographic" ), static_cast<int>( AzimuthGeoNorth ) );
     mNorthComboBox->addItem( tr( "Map" ), static_cast<int>( AzimuthMapNorth ) );
-    int defNorth = QSettings().value( "/Qgis/measure/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
+    int defNorth = QgsSettings().value( "/Qgis/measure/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
     mNorthComboBox->setCurrentIndex( defNorth );
     connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
     layout()->addWidget( mNorthComboBox );
