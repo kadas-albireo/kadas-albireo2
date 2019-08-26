@@ -182,7 +182,7 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   mPluginsToolButton->setMenu( new QMenu() );
   mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
   mPluginsToolButton->setFixedHeight( 45 );
-  mPluginsToolButton->hide();
+  mPluginsWidget->hide();
 
   // Redlining
   KadasRedliningIntegration *redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
@@ -594,7 +594,7 @@ void KadasMainWindow::addMenuButtonToTab( const QString &text, const QIcon &icon
 QMenu *KadasMainWindow::pluginsMenu()
 {
   // Only show the button if it is actually needed
-  mPluginsToolButton->show();
+  mPluginsWidget->show();
   return mPluginsToolButton->menu();
 }
 
