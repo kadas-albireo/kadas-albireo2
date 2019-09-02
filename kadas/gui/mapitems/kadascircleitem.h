@@ -29,10 +29,10 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
-    bool startPart( const QgsPointXY &firstPoint ) override;
-    bool startPart( const AttribValues &values ) override;
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = nullptr ) override;
-    void setCurrentAttributes( const AttribValues &values ) override;
+    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
+    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
+    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
+    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     bool continuePart() override;
     void endPart() override;
 
@@ -41,8 +41,8 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
     QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
 
     EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = nullptr ) override;
-    void edit( const EditContext &context, const AttribValues &values ) override;
+    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override;
+    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
 
     AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
     QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;

@@ -143,7 +143,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     if ( mEditContext.isValid() )
     {
-      mItem->edit( mEditContext, pos - mMoveOffset, &canvas()->mapSettings() );
+      mItem->edit( mEditContext, pos - mMoveOffset, canvas()->mapSettings() );
     }
   }
   else
@@ -268,7 +268,7 @@ void KadasMapToolEditItem::inputChanged()
     QgsCoordinateTransform crst( mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
     mInputWidget->adjustCursorAndExtent( crst.transform( newPos ) );
 
-    mItem->edit( mEditContext, values );
+    mItem->edit( mEditContext, values, canvas()->mapSettings() );
     mStateHistory->push( mItem->constState()->clone() );
   }
 }

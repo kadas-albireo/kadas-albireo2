@@ -182,7 +182,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
 
   if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {
-    mItem->setCurrentPoint( pos, &canvas()->mapSettings() );
+    mItem->setCurrentPoint( pos, canvas()->mapSettings() );
   }
   if ( mInputWidget )
   {
@@ -291,7 +291,7 @@ void KadasMapToolCreateItem::createItem()
 
 void KadasMapToolCreateItem::startPart( const QgsPointXY &pos )
 {
-  if ( !mItem->startPart( pos ) )
+  if ( !mItem->startPart( pos, canvas()->mapSettings() ) )
   {
     finishPart();
   }
@@ -303,7 +303,7 @@ void KadasMapToolCreateItem::startPart( const QgsPointXY &pos )
 
 void KadasMapToolCreateItem::startPart( const KadasMapItem::AttribValues &attributes )
 {
-  if ( !mItem->startPart( attributes ) )
+  if ( !mItem->startPart( attributes, canvas()->mapSettings() ) )
   {
     finishPart();
   }
@@ -385,7 +385,7 @@ void KadasMapToolCreateItem::inputChanged()
 
   if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {
-    mItem->setCurrentAttributes( values );
+    mItem->setCurrentAttributes( values, canvas()->mapSettings() );
   }
 }
 

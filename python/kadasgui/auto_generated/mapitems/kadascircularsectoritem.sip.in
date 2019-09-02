@@ -29,13 +29,13 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
 
-    virtual bool startPart( const QgsPointXY &firstPoint );
+    virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings );
 
-    virtual bool startPart( const AttribValues &values );
+    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings );
 
-    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = 0 );
+    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings );
 
-    virtual void setCurrentAttributes( const AttribValues &values );
+    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings );
 
     virtual bool continuePart();
 
@@ -51,9 +51,9 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = 0 );
+    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings );
 
-    virtual void edit( const EditContext &context, const AttribValues &values );
+    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
 
 
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;

@@ -28,7 +28,7 @@ KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconTyp
   clear();
 }
 
-bool KadasPointItem::startPart( const QgsPointXY &firstPoint )
+bool KadasPointItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->points.append( firstPoint );
@@ -36,17 +36,17 @@ bool KadasPointItem::startPart( const QgsPointXY &firstPoint )
   return false;
 }
 
-bool KadasPointItem::startPart( const AttribValues &values )
+bool KadasPointItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasPointItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasPointItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
 
-void KadasPointItem::setCurrentAttributes( const AttribValues &values )
+void KadasPointItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
@@ -98,7 +98,7 @@ KadasMapItem::EditContext KadasPointItem::getEditContext( const QgsPointXY &pos,
   return EditContext();
 }
 
-void KadasPointItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasPointItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() )
   {
@@ -107,9 +107,9 @@ void KadasPointItem::edit( const EditContext &context, const QgsPointXY &newPoin
   }
 }
 
-void KadasPointItem::edit( const EditContext &context, const AttribValues &values )
+void KadasPointItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ) );
+  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const

@@ -114,7 +114,7 @@ bool KadasAnchoredItem::intersects( const QgsRectangle &rect, const QgsMapSettin
   return intersects;
 }
 
-bool KadasAnchoredItem::startPart( const QgsPointXY &firstPoint )
+bool KadasAnchoredItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->pos = firstPoint;
@@ -122,17 +122,17 @@ bool KadasAnchoredItem::startPart( const QgsPointXY &firstPoint )
   return false;
 }
 
-bool KadasAnchoredItem::startPart( const AttribValues &values )
+bool KadasAnchoredItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasAnchoredItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasAnchoredItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
 
-void KadasAnchoredItem::setCurrentAttributes( const AttribValues &values )
+void KadasAnchoredItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
@@ -190,7 +190,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const QgsPointXY &p
   return EditContext();
 }
 
-void KadasAnchoredItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasAnchoredItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.isValid() )
   {
@@ -216,7 +216,7 @@ void KadasAnchoredItem::edit( const EditContext &context, const QgsPointXY &newP
   }
 }
 
-void KadasAnchoredItem::edit( const EditContext &context, const AttribValues &values )
+void KadasAnchoredItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.isValid() )
   {

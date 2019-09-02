@@ -55,7 +55,7 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
   return points;
 }
 
-bool KadasCircleItem::startPart( const QgsPointXY &firstPoint )
+bool KadasCircleItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->centers.append( firstPoint );
@@ -64,19 +64,19 @@ bool KadasCircleItem::startPart( const QgsPointXY &firstPoint )
   return true;
 }
 
-bool KadasCircleItem::startPart( const AttribValues &values )
+bool KadasCircleItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasCircleItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasCircleItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   const QgsPointXY &center = state()->centers.last();
   state()->radii.last() = qSqrt( p.sqrDist( center ) );
   recomputeDerived();
 }
 
-void KadasCircleItem::setCurrentAttributes( const AttribValues &values )
+void KadasCircleItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   state()->centers.last().setX( values[AttrX] );
   state()->centers.last().setY( values[AttrY] );
@@ -156,7 +156,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const QgsPointXY &pos
   return EditContext();
 }
 
-void KadasCircleItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasCircleItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->centers.size() )
   {
@@ -173,7 +173,7 @@ void KadasCircleItem::edit( const EditContext &context, const QgsPointXY &newPoi
   }
 }
 
-void KadasCircleItem::edit( const EditContext &context, const AttribValues &values )
+void KadasCircleItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->centers.size() )
   {

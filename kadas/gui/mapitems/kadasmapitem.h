@@ -103,10 +103,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     // Draw interface (all points in item crs)
     void clear();
-    virtual bool startPart( const QgsPointXY &firstPoint ) = 0;
-    virtual bool startPart( const AttribValues &values ) = 0;
-    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings = nullptr ) = 0;
-    virtual void setCurrentAttributes( const AttribValues &values ) = 0;
+    virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) = 0;
+    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
     virtual bool continuePart() = 0;
     virtual void endPart() = 0;
 
@@ -133,8 +133,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       bool operator!= ( const EditContext &other ) const { return vidx != other.vidx; }
     };
     virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const = 0;
-    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings = nullptr ) = 0;
-    virtual void edit( const EditContext &context, const AttribValues &values ) = 0;
+    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
 
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const = 0;
     virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;

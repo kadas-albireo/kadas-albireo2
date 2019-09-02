@@ -190,7 +190,7 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   context.painter()->drawImage( mOffsetX - 0.5 * w - 0.5, -mOffsetY - 0.5 * h - 0.5, mImage );
 }
 
-bool KadasPictureItem::startPart( const QgsPointXY &firstPoint )
+bool KadasPictureItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->pos = firstPoint;
@@ -198,17 +198,17 @@ bool KadasPictureItem::startPart( const QgsPointXY &firstPoint )
   return false;
 }
 
-bool KadasPictureItem::startPart( const AttribValues &values )
+bool KadasPictureItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasPictureItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasPictureItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
 
-void KadasPictureItem::setCurrentAttributes( const AttribValues &values )
+void KadasPictureItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
@@ -256,20 +256,20 @@ KadasMapItem::EditContext KadasPictureItem::getEditContext( const QgsPointXY &po
   return EditContext();
 }
 
-void KadasPictureItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasPictureItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.isValid() )
   {
-    QgsCoordinateTransform crst( crs(), mapSettings->destinationCrs(), QgsProject::instance() );
-    QgsPointXY screenPos = mapSettings->mapToPixel().transform( crst.transform( newPoint ) );
-    QgsPointXY screenAnchor = mapSettings->mapToPixel().transform( crst.transform( state()->pos ) );
+    QgsCoordinateTransform crst( crs(), mapSettings.destinationCrs(), QgsProject::instance() );
+    QgsPointXY screenPos = mapSettings.mapToPixel().transform( crst.transform( newPoint ) );
+    QgsPointXY screenAnchor = mapSettings.mapToPixel().transform( crst.transform( state()->pos ) );
     mOffsetX = screenPos.x() - screenAnchor.x();
     mOffsetY = screenAnchor.y() - screenPos.y();
     recomputeDerived();
   }
 }
 
-void KadasPictureItem::edit( const EditContext &context, const AttribValues &values )
+void KadasPictureItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   // No editable attributes
 }

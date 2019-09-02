@@ -54,7 +54,7 @@ QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings )
   return nodes;
 }
 
-bool KadasLineItem::startPart( const QgsPointXY &firstPoint )
+bool KadasLineItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->points.append( QList<QgsPointXY>() );
@@ -64,20 +64,20 @@ bool KadasLineItem::startPart( const QgsPointXY &firstPoint )
   return true;
 }
 
-bool KadasLineItem::startPart( const AttribValues &values )
+bool KadasLineItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasLineItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasLineItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   state()->points.last().last() = p;
   recomputeDerived();
 }
 
-void KadasLineItem::setCurrentAttributes( const AttribValues &values )
+void KadasLineItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  setCurrentPoint( QgsPointXY( values[AttrX], values[AttrY] ) );
+  setCurrentPoint( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 bool KadasLineItem::continuePart()
@@ -141,7 +141,7 @@ KadasMapItem::EditContext KadasLineItem::getEditContext( const QgsPointXY &pos, 
   return EditContext();
 }
 
-void KadasLineItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasLineItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
        && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
@@ -151,9 +151,9 @@ void KadasLineItem::edit( const EditContext &context, const QgsPointXY &newPoint
   }
 }
 
-void KadasLineItem::edit( const EditContext &context, const AttribValues &values )
+void KadasLineItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ) );
+  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 KadasMapItem::AttribValues KadasLineItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const

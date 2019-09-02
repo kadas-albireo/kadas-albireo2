@@ -49,7 +49,7 @@ QList<KadasMapItem::Node> KadasPolygonItem::nodes( const QgsMapSettings &setting
   return nodes;
 }
 
-bool KadasPolygonItem::startPart( const QgsPointXY &firstPoint )
+bool KadasPolygonItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
   state()->points.append( QList<QgsPointXY>() );
@@ -59,20 +59,20 @@ bool KadasPolygonItem::startPart( const QgsPointXY &firstPoint )
   return true;
 }
 
-bool KadasPolygonItem::startPart( const AttribValues &values )
+bool KadasPolygonItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ) );
+  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasPolygonItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings *mapSettings )
+void KadasPolygonItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
 {
   state()->points.last().last() = p;
   recomputeDerived();
 }
 
-void KadasPolygonItem::setCurrentAttributes( const AttribValues &values )
+void KadasPolygonItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return setCurrentPoint( QgsPoint( values[AttrX], values[AttrY] ) );
+  setCurrentPoint( QgsPoint( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 bool KadasPolygonItem::continuePart()
@@ -135,7 +135,7 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const QgsPointXY &po
   return EditContext();
 }
 
-void KadasPolygonItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings *mapSettings )
+void KadasPolygonItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
        && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
@@ -145,9 +145,9 @@ void KadasPolygonItem::edit( const EditContext &context, const QgsPointXY &newPo
   }
 }
 
-void KadasPolygonItem::edit( const EditContext &context, const AttribValues &values )
+void KadasPolygonItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ) );
+  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 KadasMapItem::AttribValues KadasPolygonItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const
