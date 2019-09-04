@@ -52,7 +52,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 
     virtual void addLayerMenuActions( QMenu *menu ) const {}
 
-  private:
+  protected:
     class Renderer;
 
     QMap<QString, KadasMapItem *> mItems;
