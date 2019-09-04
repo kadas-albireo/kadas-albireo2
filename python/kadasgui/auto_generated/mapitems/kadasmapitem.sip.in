@@ -95,7 +95,9 @@ z-index */
 
     struct NumericAttribute
     {
+      enum Type {XCooAttr, YCooAttr, DistanceAttr, OtherAttr};
       QString name;
+      Type type;
       double min;
       double max;
       int decimals;

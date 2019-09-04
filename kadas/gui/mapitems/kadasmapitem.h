@@ -93,7 +93,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     struct NumericAttribute
     {
+      enum Type {XCooAttr, YCooAttr, DistanceAttr, OtherAttr};
       QString name;
+      Type type;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
       int decimals = 0;
@@ -101,6 +103,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
 
+    // Draw interface (all coordinates in item crs, attribute distances in meters)
     virtual void clear();
     virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
@@ -113,7 +116,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const = 0;
     virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const = 0;
 
-    // Edit interface (all points in item crs)
+    // Edit interface (all coordinates in item crs, attribute distances in meters)
     struct EditContext
     {
       EditContext( const QgsVertexId &_vidx = QgsVertexId(), const QgsPointXY &_pos = QgsPointXY(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )

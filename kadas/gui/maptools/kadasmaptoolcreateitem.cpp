@@ -61,8 +61,8 @@ void KadasMapToolCreateItem::activate()
   {
     mInputWidget = new KadasFloatingInputWidget( canvas() );
 
-    KadasMapItem::AttribDefs attributes = mItem->drawAttribs();
-    for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
+    mDrawAttribs = mItem->drawAttribs();
+    for ( auto it = mDrawAttribs.begin(), itEnd = mDrawAttribs.end(); it != itEnd; ++it )
     {
       const KadasMapItem::NumericAttribute &attribute = it.value();
       KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.decimals, attribute.min, attribute.max );
@@ -70,9 +70,9 @@ void KadasMapToolCreateItem::activate()
       connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput );
       mInputWidget->addInputField( attribute.name + ":", attrEdit );
     }
-    if ( !attributes.isEmpty() )
+    if ( !mDrawAttribs.isEmpty() )
     {
-      mInputWidget->setFocusedInputField( mInputWidget->inputField( attributes.begin().key() ) );
+      mInputWidget->setFocusedInputField( mInputWidget->inputField( mDrawAttribs.begin().key() ) );
     }
   }
   mBottomBar = new KadasBottomBar( canvas() );
@@ -188,10 +188,37 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     mInputWidget->ensureFocus();
     KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition( pos );
+    QgsPointXY coo;
+    int xCooId = -1;
+    int yCooId = -1;
+    double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, canvas()->mapUnits() );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
     {
+      // This assumes that there is never more that one x-y coordinate pair in the attributes
+      if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::XCooAttr )
+      {
+        coo.setX( it.value() );
+        xCooId = it.key();
+      }
+      else if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::YCooAttr )
+      {
+        coo.setY( it.value() );
+        yCooId = it.key();
+      }
+      else if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::DistanceAttr )
+      {
+        it.value() *= distanceConv;
+      }
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     }
+    if ( xCooId >= 0 && yCooId >= 0 )
+    {
+      QgsCoordinateTransform crst( mItem->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
+      coo = crst.transform( coo );
+      mInputWidget->inputField( xCooId )->setValue( coo.x() );
+      mInputWidget->inputField( yCooId )->setValue( coo.y() );
+    }
+
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();
     if ( mInputWidget->focusedInputField() )
@@ -360,10 +387,38 @@ void KadasMapToolCreateItem::commitItem()
 
 KadasMapItem::AttribValues KadasMapToolCreateItem::collectAttributeValues() const
 {
+  QgsPointXY coo;
+  int xCooId = -1;
+  int yCooId = -1;
   KadasMapItem::AttribValues attributes;
+  double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
+
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
-    attributes.insert( field->id(), field->text().toDouble() );
+    double value = field->text().toDouble();
+    // This assumes that there is never more that one x-y coordinate pair in the attributes
+    if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::XCooAttr )
+    {
+      coo.setX( value );
+      xCooId = field->id();
+    }
+    else if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::YCooAttr )
+    {
+      coo.setY( value );
+      yCooId = field->id();
+    }
+    else if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::DistanceAttr )
+    {
+      value *= distanceConv;
+    }
+    attributes.insert( field->id(), value );
+  }
+  if ( xCooId >= 0 && yCooId >= 0 )
+  {
+    QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance()->transformContext() );
+    coo = crst.transform( coo );
+    attributes.insert( xCooId, coo.x() );
+    attributes.insert( yCooId, coo.y() );
   }
   return attributes;
 }

@@ -104,8 +104,8 @@ void KadasLineItem::endPart()
 KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
+  attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
   return attributes;
 }
 

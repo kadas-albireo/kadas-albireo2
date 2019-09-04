@@ -168,11 +168,39 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( mInputWidget && mEditContext.isValid() )
   {
     mInputWidget->ensureFocus();
+
     KadasMapItem::AttribValues values = mItem->editAttribsFromPosition( mEditContext, pos - mMoveOffset );
+    QgsPointXY coo;
+    int xCooId = -1;
+    int yCooId = -1;
+    double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, canvas()->mapUnits() );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
     {
+      // This assumes that there is never more that one x-y coordinate pair in the attributes
+      if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::XCooAttr )
+      {
+        coo.setX( it.value() );
+        xCooId = it.key();
+      }
+      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::YCooAttr )
+      {
+        coo.setY( it.value() );
+        yCooId = it.key();
+      }
+      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::DistanceAttr )
+      {
+        it.value() *= distanceConv;
+      }
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     }
+    if ( xCooId >= 0 && yCooId >= 0 )
+    {
+      QgsCoordinateTransform crst( mItem->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
+      coo = crst.transform( coo );
+      mInputWidget->inputField( xCooId )->setValue( coo.x() );
+      mInputWidget->inputField( yCooId )->setValue( coo.y() );
+    }
+
     mInputWidget->move( e->x(), e->y() + 20 );
     mInputWidget->show();
     if ( mInputWidget->focusedInputField() )
@@ -242,10 +270,38 @@ void KadasMapToolEditItem::stateChanged( KadasStateHistory::State *state )
 
 KadasMapItem::AttribValues KadasMapToolEditItem::collectAttributeValues() const
 {
+  QgsPointXY coo;
+  int xCooId = -1;
+  int yCooId = -1;
   KadasMapItem::AttribValues attributes;
+  double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
+
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
-    attributes.insert( field->id(), field->text().toDouble() );
+    double value = field->text().toDouble();
+    // This assumes that there is never more that one x-y coordinate pair in the attributes
+    if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::XCooAttr )
+    {
+      coo.setX( value );
+      xCooId = field->id();
+    }
+    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::YCooAttr )
+    {
+      coo.setY( value );
+      yCooId = field->id();
+    }
+    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::DistanceAttr )
+    {
+      value *= distanceConv;
+    }
+    attributes.insert( field->id(), value );
+  }
+  if ( xCooId >= 0 && yCooId >= 0 )
+  {
+    QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance()->transformContext() );
+    coo = crst.transform( coo );
+    attributes.insert( xCooId, coo.x() );
+    attributes.insert( yCooId, coo.y() );
   }
   return attributes;
 }

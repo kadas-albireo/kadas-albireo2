@@ -121,6 +121,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     KadasStateHistory *mStateHistory = nullptr;
     KadasFloatingInputWidget *mInputWidget = nullptr;
+    KadasMapItem::AttribDefs mDrawAttribs;
     bool mIgnoreNextMoveEvent = false;
 
     KadasBottomBar *mBottomBar = nullptr;
