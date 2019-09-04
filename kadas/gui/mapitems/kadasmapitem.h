@@ -26,11 +26,11 @@
 
 #include <kadas/core/kadasstatehistory.h>
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 
 class QgsRenderContext;
 struct QgsVertexId;
 class KadasMapItem;
-class KadasMapItemEditor;
 
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
@@ -143,7 +143,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     // Editor
 #ifndef SIP_RUN
-    typedef std::function<KadasMapItemEditor* ( KadasMapItem * ) > EditorFactory;
+    typedef std::function<KadasMapItemEditor* ( KadasMapItem *, KadasMapItemEditor::EditorType ) > EditorFactory;
     void setEditorFactory( EditorFactory factory ) { mEditorFactory = factory; }
     EditorFactory getEditorFactory() const { return mEditorFactory; }
 #else
@@ -152,11 +152,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp->setEditorFactory( [a0]( KadasMapItem *v )->KadasMapItemEditor*
+    sipCpp->setEditorFactory( [a0]( KadasMapItem *v, KadasMapItemEditor::EditorType type )->KadasMapItemEditor*
     {
       KadasMapItemEditor *res;
       SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a0, "D", v, sipType_KadasMapItem, NULL );
+      PyObject *s = sipCallMethod( NULL, a0, "Di", v, sipType_KadasMapItem, type, NULL );
       int state;
       int sipIsError = 0;
       res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );

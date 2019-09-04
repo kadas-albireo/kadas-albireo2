@@ -140,11 +140,11 @@ z-index */
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp->setEditorFactory( [a0]( KadasMapItem *v )->KadasMapItemEditor*
+    sipCpp->setEditorFactory( [a0]( KadasMapItem *v, KadasMapItemEditor::EditorType type )->KadasMapItemEditor*
     {
       KadasMapItemEditor *res;
       SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a0, "D", v, sipType_KadasMapItem, NULL );
+      PyObject *s = sipCallMethod( NULL, a0, "Di", v, sipType_KadasMapItem, type, NULL );
       int state;
       int sipIsError = 0;
       res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );

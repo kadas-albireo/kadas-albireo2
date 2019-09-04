@@ -63,7 +63,7 @@ void KadasMapToolEditItem::activate()
   mBottomBar->setLayout( new QHBoxLayout() );
   if ( mItem->getEditorFactory() )
   {
-    KadasMapItemEditor *editor = mItem->getEditorFactory()( mItem );
+    KadasMapItemEditor *editor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::EditItemEditor );
     editor->syncItemToWidget();
     mBottomBar->layout()->addWidget( editor );
   }

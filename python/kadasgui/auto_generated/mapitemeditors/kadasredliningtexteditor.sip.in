@@ -26,7 +26,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
 %End
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item );
+    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type );
 
     KadasRedliningTextEditor( KadasMapItem *item );
 
