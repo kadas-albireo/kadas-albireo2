@@ -62,6 +62,10 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       {
         menu->addAction( actionLayerTransparency( menu ) );
       }
+      if ( qobject_cast<KadasItemLayer *>( layer ) )
+      {
+        static_cast<KadasItemLayer *>( layer )->addLayerMenuActions( menu );
+      }
       // TODO
 //      if ( dynamic_cast<QgsAnnotationLayer*>( layer ) )
 //      {

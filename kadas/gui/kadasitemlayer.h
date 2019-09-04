@@ -22,6 +22,7 @@
 
 #include <kadas/gui/kadas_gui.h>
 
+class QMenu;
 class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
@@ -47,6 +48,8 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
     bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
+
+    virtual void addLayerMenuActions( QMenu *menu ) const {}
 
   private:
     class Renderer;
