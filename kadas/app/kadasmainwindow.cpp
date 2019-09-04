@@ -71,6 +71,7 @@
 #include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
+#include <kadas/app/milx/kadasmilxintegration.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
@@ -190,6 +191,18 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   // Route editor
   // TODO
 //  mGpsRouteEditor = new QgsGPSRouteEditor( this, mActionDrawWaypoint, mActionDrawRoute );
+
+  // Milx
+  KadasMilxIntegration::MilxUi milxUi;
+  milxUi.mRibbonWidget = mRibbonWidget;
+  milxUi.mMssTab = mMssTab;
+  milxUi.mActionMilx = mActionMilx;
+  milxUi.mActionSaveMilx = mActionSaveMilx;
+  milxUi.mActionLoadMilx = mActionLoadMilx;
+  milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
+  milxUi.mLineWidthSlider = mLineWidthSlider;
+  milxUi.mWorkModeCombo = mWorkModeCombo;
+  KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi );
 
   configureButtons();
 
