@@ -35,7 +35,9 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasMapItem *takeItem( const QString &itemId );
 
     const QMap<QString, KadasMapItem *> &items() const;
-    QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+
+    void setOpacity( int opacity );
+    int opacity() const;
 
     virtual KadasItemLayer *clone() const /Factory/;
 
@@ -43,6 +45,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QgsRectangle extent() const;
 
+    virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     virtual void setTransformContext( const QgsCoordinateTransformContext &ctx );
 
 

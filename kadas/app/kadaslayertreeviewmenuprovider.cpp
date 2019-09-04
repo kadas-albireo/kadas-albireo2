@@ -28,6 +28,7 @@
 #include <qgis/qgsrasterrenderer.h>
 #include <qgis/qgsvectorlayer.h>
 
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
@@ -57,7 +58,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
     if ( QgsLayerTree::isLayer( node ) )
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
-      if ( layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::RasterLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ || layer->type() == QgsMapLayerType::PluginLayer )   // TODO
+      if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) || qobject_cast<KadasItemLayer *>( layer ) )
       {
         menu->addAction( actionLayerTransparency( menu ) );
       }
@@ -119,16 +120,15 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   }
 
   int opacity = 0;
-  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ )   // TODO
+  if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
     opacity = static_cast<QgsVectorLayer *>( layer )->opacity();
   }
-  else if ( layer->type() == QgsMapLayerType::PluginLayer )
+  else if ( qobject_cast<KadasItemLayer *>( layer ) )
   {
-    // TODO
-    // opacity = static_cast<QgsPluginLayer*>( layer )->opacity();
+    opacity = static_cast<KadasItemLayer *>( layer )->opacity();
   }
-  else if ( layer->type() == QgsMapLayerType::RasterLayer )
+  else if ( qobject_cast<QgsRasterLayer *>( layer ) )
   {
     opacity = static_cast<QgsRasterLayer *>( layer )->renderer()->opacity() * 100;
   }
@@ -183,15 +183,15 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
     return;
   }
 
-  if ( layer->type() == QgsMapLayerType::VectorLayer /*|| layer->type() == QgsMapLayer::RedliningLayer*/ )   // TODO
+  if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
     static_cast<QgsVectorLayer *>( layer )->setOpacity( 100 - value );
   }
-  else if ( layer->type() == QgsMapLayerType::PluginLayer )
+  else if ( qobject_cast<KadasItemLayer *>( layer ) )
   {
-//    static_cast<QgsPluginLayer*>( layer )->setLayerTransparency( value ); TODO
+    static_cast<KadasItemLayer *>( layer )->setOpacity( 100 - value );
   }
-  else if ( layer->type() == QgsMapLayerType::RasterLayer )
+  else if ( qobject_cast<QgsRasterLayer *>( layer ) )
   {
     static_cast<QgsRasterLayer *>( layer )->renderer()->setOpacity( 1. - value / 100. );
   }

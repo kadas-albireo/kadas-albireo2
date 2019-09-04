@@ -41,6 +41,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
         if ( item )
         {
           mRendererContext.painter()->save();
+          mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
           mRendererContext.setCoordinateTransform( QgsCoordinateTransform( item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() ) );
           item->render( mRendererContext );
           mRendererContext.painter()->restore();

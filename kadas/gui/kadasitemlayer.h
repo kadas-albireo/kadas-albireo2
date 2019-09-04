@@ -35,11 +35,14 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     KadasMapItem *takeItem( const QString &itemId );
 
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
-    QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+
+    void setOpacity( int opacity ) { mOpacity = opacity; }
+    int opacity() const { return mOpacity; }
 
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
+    virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     void setTransformContext( const QgsCoordinateTransformContext &ctx ) override;
 
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
@@ -50,6 +53,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 
     QMap<QString, KadasMapItem *> mItems;
     QgsCoordinateTransformContext mTransformContext;
+    int mOpacity = 100;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
