@@ -77,6 +77,7 @@ void KadasMapToolCreateItem::activate()
   }
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
+  mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
   if ( mShowLayerSelection )
   {
     KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerSelectionFilter, mLayerCreator );

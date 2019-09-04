@@ -61,6 +61,7 @@ void KadasMapToolEditItem::activate()
 
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
+  mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
   if ( mItem->getEditorFactory() )
   {
     KadasMapItemEditor *editor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::EditItemEditor );
