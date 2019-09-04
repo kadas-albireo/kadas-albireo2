@@ -21,6 +21,7 @@
 
 #include <kadas/core/kadasstatehistory.h>
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
 class KadasBottomBar;
@@ -83,6 +84,9 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
+#ifndef SIP_RUN
+    void showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
+#endif
 
 
 #ifndef SIP_RUN
@@ -127,6 +131,10 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasBottomBar *mBottomBar = nullptr;
     KadasMapItemEditor *mEditor = nullptr;
 
+    bool mShowLayerSelection = false;
+    KadasLayerSelectionWidget::LayerFilter mLayerSelectionFilter = nullptr;
+    KadasLayerSelectionWidget::LayerCreator mLayerCreator = nullptr;
+
     bool mMultipart = false;
     bool mSnapping = false;
 
@@ -134,6 +142,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void inputChanged();
     void acceptInput();
     void stateChanged( KadasStateHistory::State *state );
+    void setTargetLayer( QgsMapLayer *layer );
 
 };
 

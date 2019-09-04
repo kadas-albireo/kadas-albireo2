@@ -77,6 +77,13 @@ void KadasMapToolCreateItem::activate()
   }
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
+  if ( mShowLayerSelection )
+  {
+    KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerSelectionFilter, mLayerCreator );
+    layerSelection->setSelectedLayer( mLayer );
+    connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
+    mBottomBar->layout()->addWidget( layerSelection );
+  }
   if ( mItem->getEditorFactory() )
   {
     mEditor = mItem->getEditorFactory()( mItem );
@@ -124,6 +131,13 @@ void KadasMapToolCreateItem::deactivate()
   mStateHistory = nullptr;
   delete mInputWidget;
   mInputWidget = nullptr;
+}
+
+void KadasMapToolCreateItem::showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
+{
+  mShowLayerSelection = enabled;
+  mLayerSelectionFilter = filter;
+  mLayerCreator = creator;
 }
 
 void KadasMapToolCreateItem::cleanup()
@@ -474,4 +488,9 @@ void KadasMapToolCreateItem::acceptInput()
 void KadasMapToolCreateItem::stateChanged( KadasStateHistory::State *state )
 {
   mItem->setState( static_cast<const KadasMapItem::State *>( state ) );
+}
+
+void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )
+{
+  mLayer = dynamic_cast<KadasItemLayer *>( layer );
 }

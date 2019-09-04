@@ -16,6 +16,7 @@
 %Include auto_generated/mapitems/kadascircleitem.sip
 %Include auto_generated/mapitems/kadassymbolitem.sip
 %Include auto_generated/mapitems/kadaspictureitem.sip
+%Include auto_generated/kadaslayerselectionwidget.sip
 %Include auto_generated/kadascrsselection.sip
 %Include auto_generated/kadasfloatinginputwidget.sip
 %Include auto_generated/mapitemeditors/kadasmapitemeditor.sip

@@ -1,0 +1,49 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadaslayerselectionwidget.h                                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasLayerSelectionWidget : QWidget
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadaslayerselectionwidget.h"
+%End
+  public:
+    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QWidget *parent = 0 );
+    QgsMapLayer *getSelectedLayer() const;
+
+  public slots:
+    void setSelectedLayer( QgsMapLayer *layer );
+
+  signals:
+    void selectedLayerChanged( QgsMapLayer *layer );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadaslayerselectionwidget.h                                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
