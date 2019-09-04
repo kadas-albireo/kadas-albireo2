@@ -81,6 +81,7 @@ class KadasApplication : public QgsApplication
 
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
+    void unsetMapTool();
 
   signals:
     void projectRead();

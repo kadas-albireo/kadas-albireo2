@@ -209,6 +209,8 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
+  // Unset any active tool before writing project to ensure that any pending edits are committed
+  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::unsetMapTool );
   connect( this, &KadasApplication::focusChanged, this, &KadasApplication::onFocusChanged );
   connect( this, &QApplication::aboutToQuit, this, &KadasApplication::cleanup );
 
@@ -751,6 +753,14 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
       connect( static_cast<KadasMapToolPan *>( newTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
       connect( static_cast<KadasMapToolPan *>( newTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
     }
+  }
+}
+
+void KadasApplication::unsetMapTool()
+{
+  if ( mMainWindow->mapCanvas()->mapTool() != mMapToolPan )
+  {
+    mMainWindow->mapCanvas()->unsetMapTool( mMainWindow->mapCanvas()->mapTool() );
   }
 }
 
