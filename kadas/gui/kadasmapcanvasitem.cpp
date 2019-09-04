@@ -74,7 +74,7 @@ void KadasMapCanvasItem::updateRect()
   QRect margin = mItem->margin();
   bbox.setXMinimum( bbox.xMinimum() - margin.left() * scale - 0.5 * sHandleSize );
   bbox.setXMaximum( bbox.xMaximum() + margin.right() * scale + 0.5 * sHandleSize );
-  bbox.setYMinimum( bbox.yMinimum() - margin.top() * scale  - 0.5 * sHandleSize );
-  bbox.setYMaximum( bbox.yMaximum() + margin.bottom() * scale + 0.5 * sHandleSize );
+  bbox.setYMinimum( bbox.yMinimum() - margin.bottom() * scale  - 0.5 * sHandleSize );
+  bbox.setYMaximum( bbox.yMaximum() + margin.top() * scale + 0.5 * sHandleSize );
   setRect( bbox );
 }
