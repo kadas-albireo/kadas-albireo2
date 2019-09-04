@@ -39,13 +39,14 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
 
   mMeasurementLabel = new QLabel();
   mMeasurementLabel->setTextInteractionFlags( Qt::TextSelectableByMouse );
-  layout()->addWidget( mMeasurementLabel );
 
   static_cast<QHBoxLayout *>( layout() )->addStretch( 1 );
 
   mUnitComboBox = new QComboBox();
   if ( !measureAzimuth )
   {
+    layout()->addWidget( mMeasurementLabel );
+
     mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
     mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
     mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
@@ -55,6 +56,15 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
   }
   else
   {
+    layout()->addWidget( new QLabel( tr( "North:" ) ) );
+    mNorthComboBox = new QComboBox();
+    mNorthComboBox->addItem( tr( "Geographic" ), static_cast<int>( AzimuthGeoNorth ) );
+    mNorthComboBox->addItem( tr( "Map" ), static_cast<int>( AzimuthMapNorth ) );
+    int defNorth = QgsSettings().value( "/Qgis/measure/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
+    mNorthComboBox->setCurrentIndex( defNorth );
+    connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
+    layout()->addWidget( mNorthComboBox );
+
     mUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( QgsUnitTypes::AngleDegrees ) );
     mUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
     mUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
@@ -65,18 +75,6 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
   }
 
   layout()->addWidget( mUnitComboBox );
-
-  if ( measureAzimuth )
-  {
-    layout()->addWidget( new QLabel( tr( "North:" ) ) );
-    mNorthComboBox = new QComboBox();
-    mNorthComboBox->addItem( tr( "Geographic" ), static_cast<int>( AzimuthGeoNorth ) );
-    mNorthComboBox->addItem( tr( "Map" ), static_cast<int>( AzimuthMapNorth ) );
-    int defNorth = QgsSettings().value( "/Qgis/measure/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
-    mNorthComboBox->setCurrentIndex( defNorth );
-    connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
-    layout()->addWidget( mNorthComboBox );
-  }
 
   QToolButton *pickButton = new QToolButton();
   pickButton->setIcon( QIcon( ":/kadas/icons/select" ) );
@@ -96,7 +94,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
   }
 
   show();
-  setFixedWidth( 400 );
+  setFixedWidth( 300 );
 }
 
 void KadasMeasureWidget::syncWidgetToItem()
