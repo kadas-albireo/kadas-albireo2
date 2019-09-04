@@ -37,6 +37,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
       return;
     }
     QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
+    rc.setMapExtent( mMapCanvas->mapSettings().extent() );
     rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
     rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
     rc.setFlag( QgsRenderContext::Antialiasing, true );
