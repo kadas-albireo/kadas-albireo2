@@ -70,7 +70,6 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 
     State *state() { return static_cast<State *>( mState ); }
     State *createEmptyState() const override { return new State(); }
-    void recomputeDerived() override;
     QList<QgsPointXY> rotatedCornerPoints( double angle, double mup = 1. ) const;
 
     static void rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );

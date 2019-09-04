@@ -55,6 +55,11 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const;
 
 
+    virtual void clear();
+
+    virtual void setState( const State *state );
+
+
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
     virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
 
@@ -107,6 +112,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
     void addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center = true );
+
+    virtual void recomputeDerived() = 0;
 
 };
 

@@ -89,8 +89,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     State *state();
     virtual State *createEmptyState() const;
-    virtual void recomputeDerived();
-
     QList<QgsPointXY> rotatedCornerPoints( double angle, double mup = 1. ) const;
 
     static void rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );

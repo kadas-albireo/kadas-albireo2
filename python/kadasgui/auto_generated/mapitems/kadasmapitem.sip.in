@@ -91,7 +91,7 @@ z-index */
       virtual State *clone() const = 0 /Factory/;
     };
     const State *constState() const;
-    void setState( const State *state );
+    virtual void setState( const State *state );
 
     struct NumericAttribute
     {
@@ -103,7 +103,7 @@ z-index */
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
 
-    void clear();
+    virtual void clear();
     virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
     virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) = 0;
@@ -170,7 +170,7 @@ z-index */
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
 
   protected:
-    virtual void recomputeDerived() = 0;
+    void update();
 
 };
 

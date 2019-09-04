@@ -224,6 +224,19 @@ bool KadasGeometryItem::intersects( const QgsRectangle &rect, const QgsMapSettin
   return intersects;
 }
 
+void KadasGeometryItem::clear()
+{
+  delete mState;
+  mState = createEmptyState();
+  recomputeDerived();
+}
+
+void KadasGeometryItem::setState( const State *state )
+{
+  mState->assign( state );
+  recomputeDerived();
+}
+
 void KadasGeometryItem::setFillColor( const QColor &c )
 {
   mBrush.setColor( c );

@@ -43,26 +43,31 @@ void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 void KadasMapItem::setSelected( bool selected )
 {
   mSelected = selected;
-  emit changed();
+  update();
 }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
-  emit changed();
+  update();
 }
 
 void KadasMapItem::setState( const State *state )
 {
   mState->assign( state );
-  recomputeDerived();
+  update();
 }
 
 void KadasMapItem::clear()
 {
   delete mState;
   mState = createEmptyState();
-  recomputeDerived();
+  update();
+}
+
+void KadasMapItem::update()
+{
+  emit changed();
 }
 
 void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )

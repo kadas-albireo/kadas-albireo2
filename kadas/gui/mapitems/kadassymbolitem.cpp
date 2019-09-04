@@ -37,7 +37,7 @@ void KadasSymbolItem::setFilePath( const QString &path, double anchorX, double a
   setAnchor( anchorX, anchorY );
   QSvgRenderer renderer( mFilePath );
   state()->size = renderer.viewBox().size();
-  emit changed();
+  update();
 }
 
 void KadasSymbolItem::render( QgsRenderContext &context ) const

@@ -39,7 +39,7 @@ void KadasAnchoredItem::setPosition( const QgsPointXY &pos )
 {
   state()->pos = pos;
   state()->drawStatus = State::DrawStatus::Finished;
-  emit changed();
+  update();
 }
 
 QgsRectangle KadasAnchoredItem::boundingBox() const
@@ -118,7 +118,7 @@ bool KadasAnchoredItem::startPart( const QgsPointXY &firstPoint, const QgsMapSet
 {
   state()->drawStatus = State::Drawing;
   state()->pos = firstPoint;
-  recomputeDerived();
+  update();
   return false;
 }
 
@@ -212,7 +212,7 @@ void KadasAnchoredItem::edit( const EditContext &context, const QgsPointXY &newP
     {
       state()->pos = newPoint;
     }
-    recomputeDerived();
+    update();
   }
 }
 
@@ -228,7 +228,7 @@ void KadasAnchoredItem::edit( const EditContext &context, const AttribValues &va
     {
       state()->pos = QgsPointXY( values[AttrX], values[AttrY] );
     }
-    recomputeDerived();
+    update();
   }
 }
 
@@ -265,11 +265,6 @@ QgsPointXY KadasAnchoredItem::positionFromEditAttribs( const EditContext &contex
   {
     return positionFromDrawAttribs( values );
   }
-}
-
-void KadasAnchoredItem::recomputeDerived()
-{
-  emit changed();
 }
 
 void KadasAnchoredItem::rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )

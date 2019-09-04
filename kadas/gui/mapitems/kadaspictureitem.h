@@ -72,7 +72,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
     State *state() { return static_cast<State *>( mState ); }
     State *createEmptyState() const override { return new State(); }
-    void recomputeDerived() override;
 
     QList<QgsPointXY> cornerPoints( const QgsPointXY &anchor, double mup = 1. ) const;
     static bool readGeoPos( const QString &filePath, QgsPointXY &wgsPos );

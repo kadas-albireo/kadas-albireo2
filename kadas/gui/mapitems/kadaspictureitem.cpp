@@ -66,7 +66,7 @@ void KadasPictureItem::setFilePath( const QString &path, const QgsPointXY &fallb
   reader.setScaledSize( size );
   mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
-  emit changed();
+  update();
 }
 
 QgsRectangle KadasPictureItem::boundingBox() const
@@ -194,7 +194,7 @@ bool KadasPictureItem::startPart( const QgsPointXY &firstPoint, const QgsMapSett
 {
   state()->drawStatus = State::Drawing;
   state()->pos = firstPoint;
-  recomputeDerived();
+  update();
   return false;
 }
 
@@ -265,7 +265,7 @@ void KadasPictureItem::edit( const EditContext &context, const QgsPointXY &newPo
     QgsPointXY screenAnchor = mapSettings.mapToPixel().transform( crst.transform( state()->pos ) );
     mOffsetX = screenPos.x() - screenAnchor.x();
     mOffsetY = screenAnchor.y() - screenPos.y();
-    recomputeDerived();
+    update();
   }
 }
 
@@ -282,11 +282,6 @@ KadasMapItem::AttribValues KadasPictureItem::editAttribsFromPosition( const Edit
 QgsPointXY KadasPictureItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
   return positionFromDrawAttribs( values );
-}
-
-void KadasPictureItem::recomputeDerived()
-{
-  emit changed();
 }
 
 bool KadasPictureItem::readGeoPos( const QString &filePath, QgsPointXY &wgsPos )

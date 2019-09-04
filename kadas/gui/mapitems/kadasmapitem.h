@@ -89,7 +89,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       virtual State *clone() const = 0 SIP_FACTORY;
     };
     const State *constState() const { return mState; }
-    void setState( const State *state );
+    virtual void setState( const State *state );
 
     struct NumericAttribute
     {
@@ -101,8 +101,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
 
-    // Draw interface (all points in item crs)
-    void clear();
+    virtual void clear();
     virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
     virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) = 0;
@@ -188,11 +187,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
 
   protected:
-    virtual void recomputeDerived() = 0;
+    void update();
 
   private:
     EditorFactory mEditorFactory = nullptr;
-    virtual State *createEmptyState() const = 0;
 };
 
 #endif // KADASMAPITEM_H

@@ -35,19 +35,19 @@ void KadasTextItem::setText( const QString &text )
   QFontMetrics metrics( mFont );
   state()->size.setWidth( metrics.width( mText ) );
   state()->size.setHeight( metrics.height() );
-  emit changed();
+  update();
 }
 
 void KadasTextItem::setFillColor( const QColor &c )
 {
   mFillColor = c;
-  emit changed();
+  update();
 }
 
 void KadasTextItem::setOutlineColor( const QColor &c )
 {
   mOutlineColor = c;
-  emit changed();
+  update();
 }
 
 void KadasTextItem::setFont( const QFont &font )
@@ -56,7 +56,7 @@ void KadasTextItem::setFont( const QFont &font )
   QFontMetrics metrics( mFont );
   state()->size.setWidth( metrics.width( mText ) );
   state()->size.setHeight( metrics.height() );
-  emit changed();
+  update();
 }
 
 void KadasTextItem::render( QgsRenderContext &context ) const

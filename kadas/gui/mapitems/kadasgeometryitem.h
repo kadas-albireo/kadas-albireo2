@@ -76,6 +76,9 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
 
+    void clear() override;
+    void setState( const State *state ) override;
+
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
     virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
 
@@ -139,6 +142,8 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
     void addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center = true );
+
+    virtual void recomputeDerived() = 0;
 
   private slots:
     void updateMeasurements();
