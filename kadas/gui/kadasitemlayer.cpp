@@ -120,3 +120,21 @@ QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
   }
   return QString();
 }
+
+QRectF KadasItemLayer::margin() const
+{
+  bool empty = true;
+  QRectF rect;
+  for ( const KadasMapItem *item : mItems )
+  {
+    if ( empty )
+    {
+      rect = item->margin();
+    }
+    else
+    {
+      rect = rect.united( item->margin() );
+    }
+  }
+  return rect;
+}

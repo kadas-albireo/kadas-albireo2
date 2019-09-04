@@ -33,11 +33,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     void addItem( KadasMapItem *item );
     KadasMapItem *takeItem( const QString &itemId );
-
     const QMap<QString, KadasMapItem *> &items() const;
 
     void setOpacity( int opacity );
     int opacity() const;
+
+    QRectF margin() const;
 
     virtual KadasItemLayer *clone() const /Factory/;
 

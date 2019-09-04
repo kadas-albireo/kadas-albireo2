@@ -34,11 +34,12 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 
     void addItem( KadasMapItem *item );
     KadasMapItem *takeItem( const QString &itemId );
-
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
 
     void setOpacity( int opacity ) { mOpacity = opacity; }
     int opacity() const { return mOpacity; }
+
+    QRectF margin() const;
 
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
