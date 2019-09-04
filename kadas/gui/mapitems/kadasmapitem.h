@@ -106,7 +106,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
     virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) = 0;
     virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    virtual bool continuePart() = 0;
+    virtual bool continuePart( const QgsMapSettings &mapSettings ) = 0;
     virtual void endPart() = 0;
 
     virtual AttribDefs drawAttribs() const = 0;

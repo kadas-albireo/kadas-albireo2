@@ -137,7 +137,7 @@ void KadasAnchoredItem::setCurrentAttributes( const AttribValues &values, const 
   // Do nothing
 }
 
-bool KadasAnchoredItem::continuePart()
+bool KadasAnchoredItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // No further action allowed
   return false;

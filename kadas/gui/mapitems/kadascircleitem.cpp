@@ -84,7 +84,7 @@ void KadasCircleItem::setCurrentAttributes( const AttribValues &values, const Qg
   recomputeDerived();
 }
 
-bool KadasCircleItem::continuePart()
+bool KadasCircleItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // No further action allowed
   return false;

@@ -80,7 +80,7 @@ void KadasLineItem::setCurrentAttributes( const AttribValues &values, const QgsM
   setCurrentPoint( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-bool KadasLineItem::continuePart()
+bool KadasLineItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // If current point is same as last one, drop last point and end geometry
   int n = state()->points.last().size();

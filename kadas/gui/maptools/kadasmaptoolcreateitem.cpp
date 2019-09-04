@@ -262,7 +262,7 @@ void KadasMapToolCreateItem::addPoint( const QgsPointXY &pos )
   else if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {
     // Add point, stop drawing if item does not accept further points
-    if ( !mItem->continuePart() )
+    if ( !mItem->continuePart( canvas()->mapSettings() ) )
     {
       finishPart();
     }
@@ -397,7 +397,7 @@ void KadasMapToolCreateItem::acceptInput()
   }
   else if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {
-    if ( !mItem->continuePart() )
+    if ( !mItem->continuePart( canvas()->mapSettings() ) )
     {
       finishPart();
     }

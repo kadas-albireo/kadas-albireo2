@@ -75,7 +75,7 @@ void KadasPolygonItem::setCurrentAttributes( const AttribValues &values, const Q
   setCurrentPoint( QgsPoint( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-bool KadasPolygonItem::continuePart()
+bool KadasPolygonItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // If current point is same as last one, drop last point and end geometry
   int n = state()->points.last().size();

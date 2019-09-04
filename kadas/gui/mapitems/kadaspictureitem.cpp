@@ -213,7 +213,7 @@ void KadasPictureItem::setCurrentAttributes( const AttribValues &values, const Q
   // Do nothing
 }
 
-bool KadasPictureItem::continuePart()
+bool KadasPictureItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // No further action allowed
   return false;

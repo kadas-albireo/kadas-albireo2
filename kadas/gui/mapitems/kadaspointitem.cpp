@@ -51,7 +51,7 @@ void KadasPointItem::setCurrentAttributes( const AttribValues &values, const Qgs
   // Do nothing
 }
 
-bool KadasPointItem::continuePart()
+bool KadasPointItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // No further action allowed
   return false;

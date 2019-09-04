@@ -115,7 +115,7 @@ void KadasCircularSectorItem::setCurrentAttributes( const AttribValues &values, 
   recomputeDerived();
 }
 
-bool KadasCircularSectorItem::continuePart()
+bool KadasCircularSectorItem::continuePart( const QgsMapSettings &mapSettings )
 {
   if ( state()->sectorStatus == State::HaveCenter )
   {

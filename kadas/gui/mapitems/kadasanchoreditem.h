@@ -39,7 +39,7 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    bool continuePart() override;
+    bool continuePart( const QgsMapSettings &mapSettings ) override;
     void endPart() override;
 
     AttribDefs drawAttribs() const override;

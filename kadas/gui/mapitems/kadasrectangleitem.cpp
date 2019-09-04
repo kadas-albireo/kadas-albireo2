@@ -56,7 +56,7 @@ void KadasRectangleItem::setCurrentAttributes( const AttribValues &values, const
   setCurrentPoint( QgsPoint( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-bool KadasRectangleItem::continuePart()
+bool KadasRectangleItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // No further action allowed
   return false;
