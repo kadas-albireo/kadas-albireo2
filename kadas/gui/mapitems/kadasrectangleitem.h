@@ -58,14 +58,16 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
+  protected:
+    State *createEmptyState() const override { return new State(); }
+    void recomputeDerived() override;
+    void measureGeometry() override;
+
   private:
     enum AttribIds {AttrX, AttrY};
 
     QgsMultiPolygon *geometry();
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); }
-    void measureGeometry() override;
-    void recomputeDerived() override;
 };
 
 #endif // KADASRECTANGLEITEM_H

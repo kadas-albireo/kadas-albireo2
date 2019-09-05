@@ -60,6 +60,9 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
+  protected:
+    State *createEmptyState() const override { return new State(); }
+
   private:
     enum AttribIds {AttrX, AttrY};
     QString mFilePath;
@@ -71,7 +74,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     static constexpr int sArrowWidth = 6;
 
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); }
 
     QList<QgsPointXY> cornerPoints( const QgsPointXY &anchor, double mup = 1. ) const;
     static bool readGeoPos( const QString &filePath, QgsPointXY &wgsPos );

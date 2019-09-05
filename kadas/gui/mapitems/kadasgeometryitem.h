@@ -144,12 +144,12 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     void addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center = true );
 
     virtual void recomputeDerived() = 0;
+    virtual void measureGeometry() {}
 
   private slots:
     void updateMeasurements();
 
   private:
-    virtual void measureGeometry() {}
 
     struct MeasurementLabel
     {

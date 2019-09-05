@@ -61,6 +61,11 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
+  protected:
+    State *createEmptyState() const override { return new State(); }
+    void recomputeDerived() override;
+    void measureGeometry() override;
+
   private:
     enum AttribIds {AttrX, AttrY, AttrR};
 
@@ -68,9 +73,6 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 
     QgsMultiSurface *geometry();
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); }
-    void measureGeometry() override;
-    void recomputeDerived() override;
     void computeCircle( const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom );
     void computeGeoCircle( const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom );
 };
