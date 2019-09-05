@@ -50,6 +50,8 @@ TARGET_LINK_LIBRARIES(kadas_gui
   ${QWT_LDFLAGS}
   ${GDAL_LDFLAGS}
   ${EXIV2_LDFLAGS}
+  kadas_core
+  kadas_analysis
 )
 
 GENERATE_EXPORT_HEADER(
