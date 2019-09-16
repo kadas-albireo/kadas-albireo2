@@ -78,9 +78,9 @@ QRect KadasPictureItem::margin() const
 {
   return QRect(
            qMax( 0., 0.5 * constState()->size.width() - mOffsetX + sFramePadding ),
-           qMax( 0., 0.5 * constState()->size.height() - mOffsetY + sFramePadding ),
+           qMax( 0., 0.5 * constState()->size.height() + mOffsetY + sFramePadding ),
            qMax( 0., 0.5 * constState()->size.width() + mOffsetX + sFramePadding ),
-           qMax( 0., 0.5 * constState()->size.height() + mOffsetY + sFramePadding )
+           qMax( 0., 0.5 * constState()->size.height() - mOffsetY + sFramePadding )
          );
 }
 
