@@ -25,6 +25,8 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Text" ); }
+
     void setText( const QString &text );
     const QString &text() const { return mText; }
     void setFillColor( const QColor &c );

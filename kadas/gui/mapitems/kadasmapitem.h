@@ -39,6 +39,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
     ~KadasMapItem();
 
+    virtual QString itemName() const = 0;
+
     /* The item crs */
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
 

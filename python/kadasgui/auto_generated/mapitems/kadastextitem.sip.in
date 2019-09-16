@@ -29,6 +29,8 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
 
+    virtual QString itemName() const;
+
     void setText( const QString &text );
     const QString &text() const;
     void setFillColor( const QColor &c );

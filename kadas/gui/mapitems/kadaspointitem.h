@@ -24,6 +24,8 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon = ICON_CIRCLE, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Point" ); }
+
     bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;

@@ -26,6 +26,8 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Rectangle" ); }
+
     bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;

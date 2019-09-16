@@ -26,6 +26,8 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
   public:
     KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Line" ); }
+
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
     bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;

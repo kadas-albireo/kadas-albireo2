@@ -27,6 +27,8 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
   public:
     KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Circle" ); }
+
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
     bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;

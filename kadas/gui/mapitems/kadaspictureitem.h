@@ -26,6 +26,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
     void setFilePath( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
 
+    QString itemName() const override { return tr( "Picture" ); }
+
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;

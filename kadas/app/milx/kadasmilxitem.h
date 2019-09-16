@@ -27,6 +27,8 @@ class KadasMilxItem : public KadasMapItem
     KadasMilxItem( QObject *parent = nullptr );
     void setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc );
 
+    QString itemName() const override { return tr( "MSS Symbol" ); }
+
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
 

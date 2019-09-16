@@ -25,6 +25,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
+    QString itemName() const override { return tr( "Symbol" ); }
+
     void setFilePath( const QString &path, double anchorX = 0.5, double anchorY = 0.5 );
     const QString &filePath() const { return mFilePath; }
     void setName( const QString &name ) { mName = name; }
