@@ -195,7 +195,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     int mZIndex = 0;
     QgsMapLayer *mAssociatedLayer = nullptr;
 
-    virtual KadasMapItem::State *createEmptyState() const = 0;
+    virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
 
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );

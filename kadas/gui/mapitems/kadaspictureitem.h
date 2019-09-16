@@ -63,7 +63,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    State *createEmptyState() const override { return new State(); }
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
 
   private:
     enum AttribIds {AttrX, AttrY};

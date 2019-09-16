@@ -65,7 +65,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    State *createEmptyState() const override { return new State(); }
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
     void recomputeDerived() override;
     void measureGeometry() override;
 

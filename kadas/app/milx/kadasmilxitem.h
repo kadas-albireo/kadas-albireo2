@@ -96,7 +96,7 @@ class KadasMilxItem : public KadasMapItem
 
     State *state() { return static_cast<State *>( mState ); }
 
-    State *createEmptyState() const override { return new State(); }
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
 
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings );
