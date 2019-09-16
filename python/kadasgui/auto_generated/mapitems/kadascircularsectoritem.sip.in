@@ -82,7 +82,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     };
     const State *constState() const;
 
-protected:
+  protected:
     virtual State *createEmptyState() const;
     virtual void recomputeDerived();
 
