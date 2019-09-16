@@ -75,6 +75,13 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   toggleItemMeasurements( true );
 }
 
+void KadasRedliningItemEditor::setItem( KadasMapItem *item )
+{
+  toggleItemMeasurements( false );
+  KadasMapItemEditor::setItem( item );
+  toggleItemMeasurements( true );
+}
+
 void KadasRedliningItemEditor::syncItemToWidget()
 {
   KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );

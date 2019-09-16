@@ -60,6 +60,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
 
+    virtual void populateContextMenu( QMenu* menu, const EditContext& context );
+
 
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
 

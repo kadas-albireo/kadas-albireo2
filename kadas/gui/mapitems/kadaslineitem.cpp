@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QMenu>
 #include <qmath.h>
 
 #include <GeographicLib/Geodesic.hpp>
@@ -154,6 +155,30 @@ void KadasLineItem::edit( const EditContext &context, const QgsPointXY &newPoint
 void KadasLineItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+}
+
+void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context )
+{
+  if ( context.vidx.vertex >= 0 )
+  {
+    menu->addAction( tr( "Delete Node" ), menu, [this, context]
+    {
+      state()->points[context.vidx.part].removeAt( context.vidx.vertex );
+      recomputeDerived();
+    } );
+  }
+  if ( context.vidx.vertex == 0 )
+  {
+    menu->addAction( tr( "Continue Line" ), menu, [this, context]
+    {
+      std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
+      recomputeDerived();
+    } )->setData( EditSwitchToDrawingTool );
+  }
+  else if ( context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
+  {
+    menu->addAction( tr( "Continue Line" ) )->setData( EditSwitchToDrawingTool );
+  }
 }
 
 KadasMapItem::AttribValues KadasLineItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const

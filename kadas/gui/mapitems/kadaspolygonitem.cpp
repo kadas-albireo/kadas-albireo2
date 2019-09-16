@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QMenu>
+
 #include <GeographicLib/Geodesic.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
 #include <GeographicLib/Constants.hpp>
@@ -148,6 +150,18 @@ void KadasPolygonItem::edit( const EditContext &context, const QgsPointXY &newPo
 void KadasPolygonItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+}
+
+void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &context )
+{
+  if ( context.vidx.vertex >= 0 )
+  {
+    menu->addAction( tr( "Delete Node" ), menu, [this, context]
+    {
+      state()->points[context.vidx.part].removeAt( context.vidx.vertex );
+      recomputeDerived();
+    } );
+  }
 }
 
 KadasMapItem::AttribValues KadasPolygonItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const

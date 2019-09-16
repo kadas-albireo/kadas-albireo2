@@ -30,6 +30,7 @@
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include <kadas/gui/maptools/kadasmaptooledititem.h>
 
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer )
@@ -43,6 +44,14 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *
   : QgsMapTool( canvas )
   , mLayer( layer )
 {
+}
+
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
+  : QgsMapTool( canvas )
+  , mItem( item )
+  , mLayer( layer )
+{
+
 }
 
 KadasMapToolCreateItem::~KadasMapToolCreateItem()
@@ -127,7 +136,11 @@ void KadasMapToolCreateItem::deactivate()
   {
     commitItem();
   }
-  cleanup();
+  else
+  {
+    delete mItem;
+    mItem = nullptr;
+  }
   delete mStateHistory;
   mStateHistory = nullptr;
   delete mInputWidget;
@@ -141,20 +154,9 @@ void KadasMapToolCreateItem::showLayerSelection( bool enabled, KadasLayerSelecti
   mLayerCreator = creator;
 }
 
-void KadasMapToolCreateItem::cleanup()
-{
-  if ( mEditor )
-  {
-    mEditor->setItem( nullptr );
-  }
-  delete mItem;
-  mItem = nullptr;
-}
-
 void KadasMapToolCreateItem::clear()
 {
   commitItem();
-  cleanup();
   createItem();
   if ( mEditor )
   {
@@ -325,7 +327,17 @@ void KadasMapToolCreateItem::addPoint( const QgsPointXY &pos )
 
 void KadasMapToolCreateItem::createItem()
 {
-  mItem = mItemFactory();
+  if ( !mItem && mItemFactory )
+  {
+    mItem = mItemFactory();
+  }
+  else
+  {
+    KadasMapItem::State *state = mItem->constState()->clone();
+    state->drawStatus = KadasMapItem::State::Drawing;
+    mItem->setState( state );
+    delete state;
+  }
   mItem->setSelected( true );
   KadasMapCanvasItemManager::addItem( mItem );
   mStateHistory->clear();
@@ -360,6 +372,14 @@ void KadasMapToolCreateItem::finishPart()
   mItem->endPart();
   mStateHistory->push( mItem->constState()->clone() );
   emit partFinished();
+  if ( !mItemFactory )
+  {
+    KadasMapItem *item = mItem;
+    KadasMapCanvasItemManager::removeItem( mItem ); // Edit tool adds item again
+    mItem = nullptr;
+    mEditor->setItem( nullptr );
+    canvas()->setMapTool( new KadasMapToolEditItem( canvas(), item, mLayer ) );
+  }
 }
 
 void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs )

@@ -28,6 +28,7 @@
 #include <kadas/gui/kadasfloatinginputwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 
 KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer )
@@ -65,9 +66,9 @@ void KadasMapToolEditItem::activate()
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
   if ( mItem->getEditorFactory() )
   {
-    KadasMapItemEditor *editor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::EditItemEditor );
-    editor->syncItemToWidget();
-    mBottomBar->layout()->addWidget( editor );
+    mEditor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::EditItemEditor );
+    mEditor->syncItemToWidget();
+    mBottomBar->layout()->addWidget( mEditor );
   }
   mItem->setSelected( true );
 
@@ -127,6 +128,16 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       menu.addAction( tr( "Delete %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::deleteItem );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
+      if ( clickedAction )
+      {
+        if ( clickedAction->data() == KadasMapItem::EditSwitchToDrawingTool )
+        {
+          KadasMapCanvasItemManager::removeItem( mItem );
+          KadasMapItem *item = mItem;
+          mItem = nullptr;
+          canvas()->setMapTool( new KadasMapToolCreateItem( canvas(), item, mLayer ) );
+        }
+      }
     }
     else
     {

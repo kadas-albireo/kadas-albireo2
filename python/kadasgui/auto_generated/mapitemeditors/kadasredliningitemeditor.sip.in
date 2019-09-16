@@ -31,6 +31,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasRedliningItemEditor( KadasMapItem *item );
     ~KadasRedliningItemEditor();
 
+    virtual void setItem(KadasMapItem* item);
+
     virtual void syncItemToWidget();
 
     virtual void syncWidgetToItem();

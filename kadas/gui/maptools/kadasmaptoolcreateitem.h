@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp = new sipKadasMapToolCreateItem( a0, nullptr, a2 );
+    sipCpp = new sipKadasMapToolCreateItem( a0, static_cast<PyObject *>( nullptr ), a2 );
     sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
     {
       KadasMapItem *res;
@@ -69,6 +69,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     % End
 #endif
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
 
     void activate() override;
@@ -113,7 +114,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void finishPart();
     void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
-    void cleanup();
     QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem() { return mItem; }

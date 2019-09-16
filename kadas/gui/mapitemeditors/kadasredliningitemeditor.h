@@ -35,6 +35,7 @@ class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor
     KadasRedliningItemEditor( KadasMapItem *item );
     ~KadasRedliningItemEditor();
 
+    void setItem( KadasMapItem *item ) override;
     void syncItemToWidget() override;
     void syncWidgetToItem() override;
 
