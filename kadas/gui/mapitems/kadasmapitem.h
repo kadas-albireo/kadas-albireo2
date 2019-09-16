@@ -28,6 +28,7 @@
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 
+class QMenu;
 class QgsRenderContext;
 struct QgsVertexId;
 class KadasMapItem;
@@ -139,6 +140,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+    virtual void populateContextMenu( QMenu *menu, const EditContext &context ) {}
 
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const = 0;
     virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;

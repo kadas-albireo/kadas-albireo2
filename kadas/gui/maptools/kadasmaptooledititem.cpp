@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QMenu>
 #include <QPushButton>
 
 #include <qgis/qgsmapcanvas.h>
@@ -121,7 +122,11 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
   {
     if ( mEditContext.isValid() )
     {
-      // Context menu
+      QMenu menu;
+      mItem->populateContextMenu( &menu, mEditContext );
+      menu.addAction( tr( "Delete %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::deleteItem );
+      QAction *clickedAction = menu.exec( e->globalPos() );
+
     }
     else
     {
@@ -234,6 +239,10 @@ void KadasMapToolEditItem::keyPressEvent( QKeyEvent *e )
   {
     mStateHistory->redo();
   }
+  else if ( e->key() == Qt::Key_Delete )
+  {
+    deleteItem();
+  }
 }
 
 void KadasMapToolEditItem::setupNumericInput()
@@ -328,4 +337,14 @@ void KadasMapToolEditItem::inputChanged()
     mItem->edit( mEditContext, values, canvas()->mapSettings() );
     mStateHistory->push( mItem->constState()->clone() );
   }
+}
+
+void KadasMapToolEditItem::deleteItem()
+{
+  delete mEditor;
+  mEditor = nullptr;
+
+  delete mItem;
+  mItem = nullptr;
+  canvas()->unsetMapTool( this );
 }
