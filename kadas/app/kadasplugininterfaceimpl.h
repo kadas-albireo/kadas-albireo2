@@ -63,6 +63,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QMenu *firstRightStandardMenu() override { return helpMenu(); }
     virtual QMenu *windowMenu() override { return getClassicMenu( WINDOW_MENU ); }
     virtual QMenu *helpMenu() override { return getClassicMenu( HELP_MENU ); }
+    virtual QMenu *pluginHelpMenu() override { return getClassicMenu( HELP_MENU ); }
 
     virtual void addPluginToMenu( const QString &name, QAction *action ) override;
     virtual void removePluginMenu( const QString &name, QAction *action ) override;
