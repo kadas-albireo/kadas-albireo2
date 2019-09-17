@@ -28,6 +28,8 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     QString itemName() const override { return tr( "Circular Sector" ); }
 
+    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
+
     bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;

@@ -33,6 +33,17 @@ KadasCircularSectorItem::KadasCircularSectorItem( const QgsCoordinateReferenceSy
   clear();
 }
 
+QList<KadasMapItem::Node> KadasCircularSectorItem::nodes( const QgsMapSettings &settings ) const
+{
+  QList<Node> points;
+  for ( int i = 0, n = constState()->centers.size(); i < n; ++i )
+  {
+    const QgsPointXY &center = constState()->centers[i];
+    points.append( {center} );
+  }
+  return points;
+}
+
 bool KadasCircularSectorItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
