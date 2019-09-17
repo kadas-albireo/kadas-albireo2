@@ -33,7 +33,7 @@ KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QOb
   clear();
 }
 
-void KadasPictureItem::setFilePath( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv, double offsetX, double offsetY )
+void KadasPictureItem::setup( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv, double offsetX, double offsetY )
 {
   mFilePath = path;
   QImageReader reader( path );
@@ -66,6 +66,24 @@ void KadasPictureItem::setFilePath( const QString &path, const QgsPointXY &fallb
   reader.setScaledSize( size );
   mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
+  update();
+}
+
+void KadasPictureItem::setFilePath( const QString &filePath )
+{
+  mFilePath = filePath;
+  update();
+}
+
+void KadasPictureItem::setOffsetX( double offsetX )
+{
+  mOffsetX = offsetX;
+  update();
+}
+
+void KadasPictureItem::setOffsetY( double offsetY )
+{
+  mOffsetY = offsetY;
   update();
 }
 

@@ -40,6 +40,30 @@ void KadasMilxItem::setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc )
   mMinNPoints = symbolDesc.minNumPoints;
 }
 
+void KadasMilxItem::setMssString( const QString &mssString )
+{
+  mMssString = mssString;
+  update();
+}
+
+void KadasMilxItem::setMilitaryName( const QString &militaryName )
+{
+  mMilitaryName = militaryName;
+  update();
+}
+
+void KadasMilxItem::setMinNPoints( int minNPoints )
+{
+  mMinNPoints = minNPoints;
+  update();
+}
+
+void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
+{
+  mHasVariablePoints = hasVariablePoints;
+  update();
+}
+
 QgsRectangle KadasMilxItem::boundingBox() const
 {
   QgsRectangle r;

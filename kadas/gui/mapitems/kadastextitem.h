@@ -22,6 +22,12 @@
 
 class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString text READ text WRITE setText )
+    Q_PROPERTY( QColor outlineColor READ outlineColor WRITE setOutlineColor )
+    Q_PROPERTY( QColor fillColor READ fillColor WRITE setFillColor )
+    Q_PROPERTY( QFont font READ font WRITE setFont )
+
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 

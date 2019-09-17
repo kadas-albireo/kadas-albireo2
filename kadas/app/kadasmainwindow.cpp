@@ -900,7 +900,7 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   else
   {
     KadasPictureItem *item = new KadasPictureItem( mapCanvas()->mapSettings().destinationCrs() );
-    item->setFilePath( filename, mapCanvas()->extent().center() );
+    item->setup( filename, mapCanvas()->extent().center() );
     return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
   }
 }

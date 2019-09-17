@@ -30,6 +30,13 @@ struct QgsVertexId;
 class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
+    Q_PROPERTY( QPen outline READ outline WRITE setOutline )
+    Q_PROPERTY( QBrush fill READ fill WRITE setFill )
+    Q_PROPERTY( int iconSize READ iconSize WRITE setIconSize )
+    Q_PROPERTY( IconType iconType READ iconType WRITE setIconType )
+    Q_PROPERTY( QPen iconOutline READ iconOutline WRITE setIconOutline )
+    Q_PROPERTY( QBrush iconFill READ iconFill WRITE setIconFill )
+
   public:
     enum IconType
     {
@@ -82,31 +89,18 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
     virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
 
-    void setFillColor( const QColor &c );
-    QColor fillColor() const;
-    void setOutlineColor( const QColor &c );
-    QColor outlineColor() const;
-    void setOutlineWidth( int width );
-    int outlineWidth() const;
-    void setLineStyle( Qt::PenStyle penStyle );
-    Qt::PenStyle lineStyle() const;
-    void setBrushStyle( Qt::BrushStyle brushStyle );
-    Qt::BrushStyle brushStyle() const;
-
-    void setIconType( IconType iconType ) { mIconType = iconType; }
-    IconType iconType() const { return mIconType; }
-    void setIconSize( int iconSize );
+    QPen outline() const { return mPen; }
+    void setOutline( const QPen &pen );
+    QBrush fill() const { return mBrush; }
+    void setFill( const QBrush &brush );
     int iconSize() const { return mIconSize; }
-    void setIconFillColor( const QColor &c );
-    const QColor &iconFillColor() const { return mIconBrush.color(); }
-    void setIconOutlineColor( const QColor &c );
-    QColor iconOutlineColor() const { return mIconPen.color(); }
-    void setIconOutlineWidth( int width );
-    int iconOutlineWidth() const { return mIconPen.width(); }
-    void setIconLineStyle( Qt::PenStyle penStyle );
-    Qt::PenStyle iconLineStyle() const { return mIconPen.style(); }
-    void setIconBrushStyle( Qt::BrushStyle brushStyle );
-    Qt::BrushStyle iconBrushStyle() const { return mIconBrush.style(); }
+    void setIconSize( int iconSize );
+    IconType iconType() const { return mIconType; }
+    void setIconType( IconType iconType );
+    QPen iconOutline() const { return mIconPen; }
+    void setIconOutline( const QPen &iconPen );
+    QBrush iconFill() const { return mIconBrush; }
+    void setIconFill( const QBrush &iconBrush );
 
     void setMeasurementsEnabled( bool enabled, QgsUnitTypes::DistanceUnit baseUnit = QgsUnitTypes::DistanceMeters );
     QString getTotalMeasurement() const { return mTotalMeasurement; }

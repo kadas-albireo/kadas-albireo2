@@ -29,10 +29,16 @@ KadasAnchoredItem::KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, Q
   clear();
 }
 
-void KadasAnchoredItem::setAnchor( double anchorX, double anchorY )
+void KadasAnchoredItem::setAnchorX( double anchorX )
 {
   mAnchorX = anchorX;
+  update();
+}
+
+void KadasAnchoredItem::setAnchorY( double anchorY )
+{
   mAnchorY = anchorY;
+  update();
 }
 
 void KadasAnchoredItem::setPosition( const QgsPointXY &pos )

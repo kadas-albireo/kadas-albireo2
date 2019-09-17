@@ -42,6 +42,12 @@ KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geod
   clear();
 }
 
+void KadasLineItem::setGeodesic( bool geodesic )
+{
+  mGeodesic = geodesic;
+  update();
+}
+
 QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings ) const
 {
   QList<Node> nodes;

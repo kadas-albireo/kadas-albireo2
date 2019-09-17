@@ -461,8 +461,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
     QgsPoint p2( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda2 );
     QgsLineString geom( QgsPointSequence() << p1 << p2 );
     line->addPartFromGeometry( &geom );
-    line->setOutlineColor( colors[iColor] );
-    line->setOutlineWidth( 5 );
+    line->setOutline( QPen( colors[iColor], 5 ) );
     line->setZIndex( 10 );
     KadasMapCanvasItemManager::instance()->addItem( line );
     mLinesOfSightRB.append( line );

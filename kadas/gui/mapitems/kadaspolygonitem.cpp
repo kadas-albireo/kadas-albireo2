@@ -38,6 +38,12 @@ KadasPolygonItem::KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, boo
   clear();
 }
 
+void KadasPolygonItem::setGeodesic( bool geodesic )
+{
+  mGeodesic = geodesic;
+  update();
+}
+
 QList<KadasMapItem::Node> KadasPolygonItem::nodes( const QgsMapSettings &settings ) const
 {
   QList<Node> nodes;

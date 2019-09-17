@@ -22,9 +22,21 @@
 
 class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+    Q_PROPERTY( double offsetX READ offsetX WRITE setOffsetX )
+    Q_PROPERTY( double offsetY READ offsetY WRITE setOffsetY )
+
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
-    void setFilePath( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+    void setup( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+
+    const QString &filePath() const { return mFilePath; }
+    void setFilePath( const QString &filePath );
+    double offsetX() const { return mOffsetX; }
+    void setOffsetX( double offsetX );
+    double offsetY() const { return mOffsetY; }
+    void setOffsetY( double offsetY );
 
     QString itemName() const override { return tr( "Picture" ); }
 

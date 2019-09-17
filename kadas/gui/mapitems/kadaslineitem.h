@@ -23,8 +23,14 @@ class QgsMultiLineString;
 
 class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
 {
+    Q_OBJECT
+    Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
+
   public:
     KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false, QObject *parent = nullptr );
+
+    bool geodesic() const { return mGeodesic; }
+    void setGeodesic( bool geodesic );
 
     QString itemName() const override { return tr( "Line" ); }
 

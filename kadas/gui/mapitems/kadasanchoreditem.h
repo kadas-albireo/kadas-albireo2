@@ -22,11 +22,18 @@
 
 class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 {
+    Q_OBJECT
+    Q_PROPERTY( double anchorX READ anchorX WRITE setAnchorX )
+    Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
+
   public:
     KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
     // Item anchor point, as factors of its width/height
-    void setAnchor( double anchorX, double anchorY );
+    double anchorX() const { return mAnchorX; }
+    void setAnchorX( double anchorX );
+    double anchorY() const { return mAnchorY; }
+    void setAnchorY( double anchorY );
 
     void setPosition( const QgsPointXY &pos );
 

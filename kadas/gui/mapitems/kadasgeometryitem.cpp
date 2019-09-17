@@ -190,7 +190,7 @@ void KadasGeometryItem::updateMeasurements()
   {
     measureGeometry();
   }
-  emit changed();
+  update();
 }
 
 void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
@@ -237,95 +237,40 @@ void KadasGeometryItem::setState( const State *state )
   recomputeDerived();
 }
 
-void KadasGeometryItem::setFillColor( const QColor &c )
+void KadasGeometryItem::setOutline( const QPen &pen )
 {
-  mBrush.setColor( c );
-  emit changed();
+  mPen = pen;
+  update();
 }
 
-QColor KadasGeometryItem::fillColor() const
+void KadasGeometryItem::setFill( const QBrush &brush )
 {
-  return mBrush.color();
-}
-
-void KadasGeometryItem::setOutlineColor( const QColor &c )
-{
-  mPen.setColor( c );
-  emit changed();
-}
-
-QColor KadasGeometryItem::outlineColor() const
-{
-  return mPen.color();
-}
-
-void KadasGeometryItem::setOutlineWidth( int width )
-{
-  mPen.setWidth( width );
-  emit changed();
-}
-
-int KadasGeometryItem::outlineWidth() const
-{
-  return mPen.width();
-}
-
-void KadasGeometryItem::setLineStyle( Qt::PenStyle penStyle )
-{
-  mPen.setStyle( penStyle );
-  emit changed();
-}
-
-Qt::PenStyle KadasGeometryItem::lineStyle() const
-{
-  return mPen.style();
-}
-
-void KadasGeometryItem::setBrushStyle( Qt::BrushStyle brushStyle )
-{
-  mBrush.setStyle( brushStyle );
-  emit changed();
-}
-
-Qt::BrushStyle KadasGeometryItem::brushStyle() const
-{
-  return mBrush.style();
+  mBrush = brush;
+  update();
 }
 
 void KadasGeometryItem::setIconSize( int iconSize )
 {
   mIconSize = iconSize;
-  emit changed();
+  update();
 }
 
-void KadasGeometryItem::setIconFillColor( const QColor &c )
+void KadasGeometryItem::setIconType( IconType iconType )
 {
-  mIconBrush.setColor( c );
-  emit changed();
+  mIconType = iconType;
+  update();
 }
 
-void KadasGeometryItem::setIconOutlineColor( const QColor &c )
+void KadasGeometryItem::setIconOutline( const QPen &iconPen )
 {
-  mIconPen.setColor( c );
-  emit changed();
+  mIconPen = iconPen;
+  update();
 }
 
-void KadasGeometryItem::setIconOutlineWidth( int width )
+void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
 {
-  mIconPen.setWidth( width );
-  emit changed();
-}
-
-void KadasGeometryItem::setIconLineStyle( Qt::PenStyle penStyle )
-{
-  mIconPen.setStyle( penStyle );
-  emit changed();
-}
-
-void KadasGeometryItem::setIconBrushStyle( Qt::BrushStyle brushStyle )
-{
-  mIconBrush.setStyle( brushStyle );
-  emit changed();
+  mIconBrush = iconBrush;
+  update();
 }
 
 QgsRectangle KadasGeometryItem::boundingBox() const

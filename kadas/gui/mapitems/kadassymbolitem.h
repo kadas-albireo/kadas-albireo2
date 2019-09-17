@@ -22,6 +22,11 @@
 
 class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+    Q_PROPERTY( QString name READ name WRITE setName )
+    Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
+
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 

@@ -38,9 +38,8 @@ KadasMapToolDeleteItems::ItemFactory KadasMapToolDeleteItems::itemFactory( QgsMa
   return [ = ]
   {
     KadasRectangleItem *item = new KadasRectangleItem( canvas->mapSettings().destinationCrs() );
-    item->setBrushStyle( Qt::NoBrush );
-    item->setOutlineColor( Qt::black );
-    item->setLineStyle( Qt::DashLine );
+    item->setFill( Qt::NoBrush );
+    item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
     return item;
   };
 }

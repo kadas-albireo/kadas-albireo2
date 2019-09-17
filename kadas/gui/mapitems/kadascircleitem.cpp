@@ -33,6 +33,12 @@ KadasCircleItem::KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool 
   clear();
 }
 
+void KadasCircleItem::setGeodesic( bool geodesic )
+{
+  mGeodesic = geodesic;
+  update();
+}
+
 QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings ) const
 {
   QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );

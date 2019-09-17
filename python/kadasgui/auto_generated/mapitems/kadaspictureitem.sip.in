@@ -28,7 +28,14 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
-    void setFilePath( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+    void setup( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+
+    const QString &filePath() const;
+    void setFilePath( const QString &filePath );
+    double offsetX() const;
+    void setOffsetX( double offsetX );
+    double offsetY() const;
+    void setOffsetY( double offsetY );
 
     virtual QString itemName() const;
 

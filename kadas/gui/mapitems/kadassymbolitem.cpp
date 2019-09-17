@@ -34,7 +34,8 @@ KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObje
 void KadasSymbolItem::setFilePath( const QString &path, double anchorX, double anchorY )
 {
   mFilePath = path;
-  setAnchor( anchorX, anchorY );
+  mAnchorX = anchorX;
+  mAnchorY = anchorY;
   QSvgRenderer renderer( mFilePath );
   state()->size = renderer.viewBox().size();
   update();

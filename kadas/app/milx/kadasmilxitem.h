@@ -23,9 +23,24 @@
 // MilX items always in EPSG:4326
 class KadasMilxItem : public KadasMapItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
+    Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
+    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
+    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
+
   public:
     KadasMilxItem( QObject *parent = nullptr );
     void setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc );
+
+    const QString &mssString() const { return mMssString; }
+    void setMssString( const QString &mssString );
+    const QString &militaryName() const { return mMilitaryName; }
+    void setMilitaryName( const QString &militaryName );
+    int minNPoints() const { return mMinNPoints; }
+    void setMinNPoints( int minNPoints );
+    bool hasVariablePoints() const { return mHasVariablePoints; }
+    void setHasVariablePoints( bool hasVariablePoints );
 
     QString itemName() const override { return tr( "MSS Symbol" ); }
 
@@ -73,8 +88,6 @@ class KadasMilxItem : public KadasMapItem
     AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
     QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    const QString &mssString() const { return mMssString; }
-    const QString &militaryName() const { return mMilitaryName; }
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     bool isMultiPoint() const;
@@ -92,6 +105,7 @@ class KadasMilxItem : public KadasMapItem
     QString mMilitaryName;
     int mMinNPoints = -1;
     bool mHasVariablePoints = false;
+
     QRect mMargin;
 
     State *state() { return static_cast<State *>( mState ); }
