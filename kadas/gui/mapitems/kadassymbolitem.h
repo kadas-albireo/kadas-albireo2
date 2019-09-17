@@ -45,6 +45,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QString mFilePath;
     QString mName;
     QString mRemarks;
+
+    KadasMapItem *_clone() const override { return new KadasSymbolItem( crs() ); } SIP_FACTORY
 };
 
 #endif // KADASSYMBOLITEM_H

@@ -39,6 +39,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
     ~KadasMapItem();
+    KadasMapItem *clone() const;
 
     virtual QString itemName() const = 0;
 
@@ -205,6 +206,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
   private:
     EditorFactory mEditorFactory = nullptr;
+
+    virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };
 
 #endif // KADASMAPITEM_H

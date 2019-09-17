@@ -86,6 +86,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     const State *constState() const;
 
   protected:
+    virtual KadasMapItem *_clone() const;
     virtual State *createEmptyState() const;
     virtual void recomputeDerived();
 

@@ -80,6 +80,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
+    KadasMapItem *_clone() const override { return new KadasLineItem( crs() ); } SIP_FACTORY
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
     void recomputeDerived() override;
     void measureGeometry() override;

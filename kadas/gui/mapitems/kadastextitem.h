@@ -49,6 +49,8 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
     QColor mOutlineColor;
     QColor mFillColor;
     QFont mFont;
+
+    KadasMapItem *_clone() const override { return new KadasTextItem( crs() ); } SIP_FACTORY
 };
 
 #endif // KADASTEXTITEM_H

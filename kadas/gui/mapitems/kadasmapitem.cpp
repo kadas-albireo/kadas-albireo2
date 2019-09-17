@@ -34,6 +34,18 @@ KadasMapItem::~KadasMapItem()
   }
 }
 
+KadasMapItem *KadasMapItem::clone() const
+{
+  KadasMapItem *item = _clone();
+  item->setState( constState()->clone() );
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    prop.write( item, prop.read( this ) );
+  }
+  return item;
+}
+
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;

@@ -68,6 +68,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
   private:
     enum AttribIds {AttrX, AttrY};
 
+    KadasMapItem *_clone() const override { return new KadasRectangleItem( crs() ); } SIP_FACTORY
     QgsMultiPolygon *geometry();
     State *state() { return static_cast<State *>( mState ); }
 };

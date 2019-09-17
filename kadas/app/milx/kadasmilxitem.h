@@ -112,6 +112,8 @@ class KadasMilxItem : public KadasMapItem
 
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
 
+    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
+
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings );
     void updateSymbolPoints( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
