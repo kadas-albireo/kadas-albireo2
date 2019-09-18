@@ -57,6 +57,9 @@ class KadasClipboard : QObject
 
     const QgsFeatureStore &getStoredFeatures() const;
 
+    void setStoredMapItems( const QList<const KadasMapItem *> &items );
+
+    const QList<const KadasMapItem *> &storedMapItems() const;
 
   signals:
     void dataChanged();

@@ -24,6 +24,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasclipboard.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
 KadasClipboard *KadasClipboard::instance()
 {
@@ -48,13 +49,14 @@ void KadasClipboard::clear()
     QApplication::clipboard()->clear();
   }
   mFeatureStore = QgsFeatureStore();
+  qDeleteAll( mItemStore );
+  mItemStore.clear();
 }
 
 void KadasClipboard::setMimeData( QMimeData *mimeData )
 {
   clear();
   QApplication::clipboard()->setMimeData( mimeData );
-  mFeatureStore = QgsFeatureStore();
 }
 
 const QMimeData *KadasClipboard::mimeData()
@@ -65,7 +67,7 @@ const QMimeData *KadasClipboard::mimeData()
 bool KadasClipboard::isEmpty() const
 {
   const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-  return mFeatureStore.features().isEmpty() && ( !mimeData || mimeData->formats().isEmpty() );
+  return mFeatureStore.features().isEmpty() && mItemStore.isEmpty() && ( !mimeData || mimeData->formats().isEmpty() );
 }
 
 bool KadasClipboard::hasFormat( const QString &format ) const
@@ -73,6 +75,10 @@ bool KadasClipboard::hasFormat( const QString &format ) const
   if ( format == KADASCLIPBOARD_FEATURESTORE_MIME )
   {
     return !mFeatureStore.features().isEmpty();
+  }
+  if ( format == KADASCLIPBOARD_ITEMSTORE_MIME )
+  {
+    return !mItemStore.isEmpty();
   }
   const QMimeData *mimeData = QApplication::clipboard()->mimeData();
   return mimeData && mimeData->hasFormat( format );
@@ -131,4 +137,14 @@ void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 
   // After plaintext version, because dataChanged clears the internal feature store
   mFeatureStore = featureStore;
+}
+
+void KadasClipboard::setStoredMapItems( const QList<const KadasMapItem *> &items )
+{
+  clear();
+  for ( const KadasMapItem *item : items )
+  {
+    mItemStore.append( item->clone() );
+  }
+  emit dataChanged();
 }
