@@ -40,7 +40,6 @@
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/app/kadasapplication.h>
@@ -199,7 +198,6 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
-  mClipboard = new KadasClipboard( this );
   mMainWindow = new KadasMainWindow( &splash );
   mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
   mMainWindow->mapCanvas()->setMapUpdateInterval( 1000 );

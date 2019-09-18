@@ -48,7 +48,6 @@ class KadasApplication : public QgsApplication
     KadasApplication( int &argc, char **argv );
     ~KadasApplication();
 
-    KadasClipboard *clipboard() const { return mClipboard; }
     KadasMainWindow *mainWindow() const { return mMainWindow; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey ) const;
@@ -90,7 +89,6 @@ class KadasApplication : public QgsApplication
   private:
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
-    KadasClipboard *mClipboard = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
     bool mBlockActiveLayerChanged = false;
     QDateTime mProjectLastModified;

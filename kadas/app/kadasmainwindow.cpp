@@ -231,7 +231,7 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
   connect( mZoomOutButton, &QPushButton::clicked, this, &KadasMainWindow::zoomOut );
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
-  connect( kApp->clipboard(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() ); } );
+  connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
 
@@ -480,7 +480,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ) );
   connect( mActionPaste, &QAction::triggered, kApp, &KadasApplication::paste );
-  mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() );
+  mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
 
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mMapCanvas ); } );
 

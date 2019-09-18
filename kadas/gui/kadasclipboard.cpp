@@ -25,14 +25,34 @@
 
 #include <kadas/gui/kadasclipboard.h>
 
-KadasClipboard::KadasClipboard( QObject *parent )
-  : QObject( parent )
+KadasClipboard *KadasClipboard::instance()
 {
-  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::onDataChanged );
+  static KadasClipboard clipboard;
+  return &clipboard;
+}
+
+KadasClipboard::KadasClipboard()
+{
+  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::dataChanged );
+}
+
+KadasClipboard::~KadasClipboard()
+{
+  clear();
+}
+
+void KadasClipboard::clear()
+{
+  if ( QApplication::instance() )
+  {
+    QApplication::clipboard()->clear();
+  }
+  mFeatureStore = QgsFeatureStore();
 }
 
 void KadasClipboard::setMimeData( QMimeData *mimeData )
 {
+  clear();
   QApplication::clipboard()->setMimeData( mimeData );
   mFeatureStore = QgsFeatureStore();
 }
@@ -45,7 +65,7 @@ const QMimeData *KadasClipboard::mimeData()
 bool KadasClipboard::isEmpty() const
 {
   const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-  return !mimeData || mimeData->formats().isEmpty();
+  return mFeatureStore.features().isEmpty() && ( !mimeData || mimeData->formats().isEmpty() );
 }
 
 bool KadasClipboard::hasFormat( const QString &format ) const
@@ -60,6 +80,8 @@ bool KadasClipboard::hasFormat( const QString &format ) const
 
 void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 {
+  clear();
+
   // Also store plaintext version
   QgsSettings settings;
   bool copyWKT = settings.value( "Qgis/copyGeometryAsWKT", true ).toBool();
@@ -109,15 +131,4 @@ void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 
   // After plaintext version, because dataChanged clears the internal feature store
   mFeatureStore = featureStore;
-}
-
-const QgsFeatureStore &KadasClipboard::getStoredFeatures() const
-{
-  return mFeatureStore;
-}
-
-void KadasClipboard::onDataChanged()
-{
-  mFeatureStore = QgsFeatureStore();
-  emit dataChanged();
 }

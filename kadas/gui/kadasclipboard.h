@@ -34,14 +34,15 @@ class KADAS_GUI_EXPORT KadasPasteHandler
 };
 
 // Constants used to describe copy-paste MIME types
-#define KADASCLIPBOARD_STYLE_MIME "application/qgis.style"
-#define KADASCLIPBOARD_FEATURESTORE_MIME "application/qgis.featurestore"
+#define KADASCLIPBOARD_FEATURESTORE_MIME "application/kadas.featurestore"
 
 class KADAS_GUI_EXPORT KadasClipboard : public QObject
 {
     Q_OBJECT
   public:
-    KadasClipboard( QObject *parent = 0 );
+    static KadasClipboard *instance();
+
+    ~KadasClipboard();
 
     // Returns whether there is any data in the clipboard
     bool isEmpty() const;
@@ -59,16 +60,18 @@ class KADAS_GUI_EXPORT KadasClipboard : public QObject
     void setStoredFeatures( const QgsFeatureStore &featureStore );
 
     // Utility function for getting features from clipboard
-    const QgsFeatureStore &getStoredFeatures() const;
+    const QgsFeatureStore &getStoredFeatures() const { return mFeatureStore; }
+
 
   signals:
     void dataChanged();
 
-  private:
+  protected:
+    KadasClipboard();
+
     QgsFeatureStore mFeatureStore;
 
-  private slots:
-    void onDataChanged();
+    void clear();
 };
 
 #endif // KADASCLIPBOARD_H

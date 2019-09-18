@@ -41,7 +41,9 @@ class KadasClipboard : QObject
 #include "kadas/gui/kadasclipboard.h"
 %End
   public:
-    KadasClipboard( QObject *parent = 0 );
+    static KadasClipboard *instance();
+
+    ~KadasClipboard();
 
     bool isEmpty() const;
 
@@ -55,9 +57,15 @@ class KadasClipboard : QObject
 
     const QgsFeatureStore &getStoredFeatures() const;
 
+
   signals:
     void dataChanged();
 
+  protected:
+    KadasClipboard();
+
+
+    void clear();
 };
 
 /************************************************************************
