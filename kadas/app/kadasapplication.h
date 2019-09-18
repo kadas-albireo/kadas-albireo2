@@ -55,13 +55,12 @@ class KadasApplication : public QgsApplication
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     KadasItemLayer *getItemLayer( const QString &layerName ) const;
     KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
+    KadasItemLayer *selectItemLayer();
 
     void exportToGpx();
     void exportToKml();
     void importFromGpx();
     void importFromKml();
-
-    void paste();
 
     void projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile );

@@ -22,11 +22,12 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadasbottombar.h>
+#include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
@@ -125,6 +126,8 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
     {
       QMenu menu;
       mItem->populateContextMenu( &menu, mEditContext );
+      menu.addAction( tr( "Cut %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( tr( "Copy %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::copyItem );
       menu.addAction( tr( "Delete %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::deleteItem );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
@@ -348,6 +351,17 @@ void KadasMapToolEditItem::inputChanged()
     mItem->edit( mEditContext, values, canvas()->mapSettings() );
     mStateHistory->push( mItem->constState()->clone() );
   }
+}
+
+void KadasMapToolEditItem::copyItem()
+{
+  KadasClipboard::instance()->setStoredMapItems( QList<const KadasMapItem *>() << mItem );
+}
+
+void KadasMapToolEditItem::cutItem()
+{
+  KadasClipboard::instance()->setStoredMapItems( QList<const KadasMapItem *>() << mItem );
+  deleteItem();
 }
 
 void KadasMapToolEditItem::deleteItem()

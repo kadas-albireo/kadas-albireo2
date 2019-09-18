@@ -39,6 +39,7 @@
 
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
@@ -468,6 +469,29 @@ KadasItemLayer *KadasApplication::getOrCreateItemLayer( const QString &layerName
   return layer;
 }
 
+KadasItemLayer *KadasApplication::selectItemLayer()
+{
+  QDialog dialog;
+  dialog.setWindowTitle( tr( "Select layer" ) );
+  dialog.setLayout( new QVBoxLayout() );
+  dialog.layout()->setMargin( 2 );
+  dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); } );
+  dialog.layout()->addWidget( layerSelectionWidget );
+  QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
+  connect( buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept );
+  connect( buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject );
+  dialog.layout()->addWidget( buttonBox );
+  if ( dialog.exec() == QDialog::Accepted )
+  {
+    return dynamic_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
 void KadasApplication::exportToGpx()
 {
   // TODO
@@ -484,11 +508,6 @@ void KadasApplication::importFromGpx()
 }
 
 void KadasApplication::importFromKml()
-{
-  // TODO
-}
-
-void KadasApplication::paste()
 {
   // TODO
 }

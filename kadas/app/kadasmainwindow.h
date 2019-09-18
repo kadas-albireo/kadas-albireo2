@@ -104,6 +104,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void showSourceSelectDialog( const QString &provider );
     QgsMapTool *addPinTool();
     QgsMapTool *addPictureTool();
+    QgsMapTool *paste();
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;

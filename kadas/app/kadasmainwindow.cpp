@@ -35,6 +35,7 @@
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
@@ -478,8 +479,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), nullptr );
 
-  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ) );
-  connect( mActionPaste, &QAction::triggered, kApp, &KadasApplication::paste );
+  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [this] { return paste(); } );
   mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
 
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mMapCanvas ); } );
@@ -903,4 +903,43 @@ QgsMapTool *KadasMainWindow::addPictureTool()
     item->setup( filename, mapCanvas()->extent().center() );
     return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
   }
+}
+
+QgsMapTool *KadasMainWindow::paste()
+{
+  QgsPointXY pastePos = mapCanvas()->center();
+  QgsCoordinateReferenceSystem mapCrs = mapCanvas()->mapSettings().destinationCrs();
+  if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
+  {
+    KadasItemLayer *layer = dynamic_cast<KadasItemLayer *>( mapCanvas()->currentLayer() );
+    if ( !layer )
+    {
+      layer = kApp->selectItemLayer();
+    }
+    QList<KadasMapItem *> items;
+    QList<QgsPointXY> itemPos;
+    QgsPointXY center;
+    for ( const KadasMapItem *item : KadasClipboard::instance()->storedMapItems() )
+    {
+      QgsCoordinateTransform crst( item->crs(), mapCrs, QgsProject::instance() );
+      QgsPointXY pos = crst.transform( item->position() );
+      itemPos.append( pos );
+      items.append( item->clone() );
+      center += QgsVector( pos.x(), pos.y() );
+    }
+    center /= itemPos.size();
+    for ( int i = 0, n = items.size(); i < n; ++i )
+    {
+      items[i]->setPosition( pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() ) );
+    }
+    if ( items.size() == 1 )
+    {
+      return new KadasMapToolEditItem( mapCanvas(), items.front(), layer );
+    }
+    else
+    {
+      // TODO
+    }
+  }
+  return nullptr;
 }
