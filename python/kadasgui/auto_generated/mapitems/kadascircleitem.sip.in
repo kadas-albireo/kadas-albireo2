@@ -69,6 +69,11 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
+    virtual QgsPointXY position() const;
+
+    virtual void setPosition( const QgsPointXY &pos );
+
+
     virtual void addPartFromGeometry( const QgsAbstractGeometry *geom );
 
     virtual QgsWkbTypes::GeometryType geometryType() const;

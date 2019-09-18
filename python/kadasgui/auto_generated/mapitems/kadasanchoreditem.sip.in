@@ -34,8 +34,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     double anchorY() const;
     void setAnchorY( double anchorY );
 
-    void setPosition( const QgsPointXY &pos );
-
     virtual QgsRectangle boundingBox() const;
 
     virtual QRect margin() const;
@@ -75,6 +73,10 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
 
     virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    virtual QgsPointXY position() const;
+    virtual void setPosition( const QgsPointXY &pos );
 
 
     struct State : KadasMapItem::State

@@ -70,6 +70,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QgsWkbTypes::GeometryType geometryType() const;
 
+    virtual QgsPointXY position() const;
+
+    virtual void setPosition( const QgsPointXY &pos );
+
+
     const QgsMultiSurface *geometry() const;
 
     struct State : KadasMapItem::State

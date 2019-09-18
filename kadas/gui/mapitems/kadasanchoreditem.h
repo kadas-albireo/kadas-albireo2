@@ -35,8 +35,6 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     double anchorY() const { return mAnchorY; }
     void setAnchorY( double anchorY );
 
-    void setPosition( const QgsPointXY &pos );
-
     QgsRectangle boundingBox() const override;
     QRect margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
@@ -59,6 +57,9 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 
     AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
     QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+
+    QgsPointXY position() const override { return constState()->pos; }
+    void setPosition( const QgsPointXY &pos ) override;
 
     struct State : KadasMapItem::State
     {

@@ -185,6 +185,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     % End
 #endif
 
+    // Position interface
+    virtual QgsPointXY position() const = 0;
+    virtual void setPosition( const QgsPointXY &pos ) = 0;
+
   signals:
     void aboutToBeDestroyed();
     void changed();

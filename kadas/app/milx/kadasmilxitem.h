@@ -88,6 +88,9 @@ class KadasMilxItem : public KadasMapItem
     AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
     QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
+    QgsPointXY position() const override;
+    void setPosition( const QgsPointXY &pos ) override;
+
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     bool isMultiPoint() const;

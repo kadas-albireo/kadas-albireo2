@@ -51,6 +51,9 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
+    QgsPointXY position() const override;
+    void setPosition( const QgsPointXY &pos ) override;
+
     const QgsMultiSurface *geometry() const;
 
     struct State : KadasMapItem::State

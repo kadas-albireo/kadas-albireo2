@@ -87,6 +87,13 @@ void KadasPictureItem::setOffsetY( double offsetY )
   update();
 }
 
+void KadasPictureItem::setPosition( const QgsPointXY &pos )
+{
+  state()->pos = pos;
+  state()->drawStatus = State::DrawStatus::Finished;
+  update();
+}
+
 QgsRectangle KadasPictureItem::boundingBox() const
 {
   return QgsRectangle( constState()->pos, constState()->pos );

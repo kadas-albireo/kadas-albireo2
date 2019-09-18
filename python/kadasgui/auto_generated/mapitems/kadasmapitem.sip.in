@@ -171,6 +171,9 @@ z-index */
     Py_XINCREF( sipRes );
 %End
 
+    virtual QgsPointXY position() const = 0;
+    virtual void setPosition( const QgsPointXY &pos ) = 0;
+
   signals:
     void aboutToBeDestroyed();
     void changed();

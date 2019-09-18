@@ -64,6 +64,37 @@ void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
   update();
 }
 
+QgsPointXY KadasMilxItem::position() const
+{
+  double x = 0., y = 0.;
+  for ( const QgsPointXY &point : constState()->points )
+  {
+    x += point.x();
+    y += point.y();
+  }
+  int n = std::max( 1, constState()->points.size() );
+  return QgsPointXY( x / n, y / n );
+}
+
+void KadasMilxItem::setPosition( const QgsPointXY &pos )
+{
+  QgsPointXY prevPos = position();
+  double dx = pos.x() - prevPos.x();
+  double dy = pos.y() - prevPos.y();
+  for ( QgsPointXY &point : state()->points )
+  {
+    point.setX( point.x() + dx );
+    point.setY( point.y() + dy );
+  }
+  for ( QPair<int, QgsPointXY> &attrp : state()->attributePoints )
+  {
+    attrp.second.setX( attrp.second.x() + dx );
+    attrp.second.setY( attrp.second.y() + dy );
+  }
+
+  update();
+}
+
 QgsRectangle KadasMilxItem::boundingBox() const
 {
   QgsRectangle r;

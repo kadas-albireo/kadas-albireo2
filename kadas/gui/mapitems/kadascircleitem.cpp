@@ -39,6 +39,35 @@ void KadasCircleItem::setGeodesic( bool geodesic )
   update();
 }
 
+QgsPointXY KadasCircleItem::position() const
+{
+  double x = 0., y = 0.;
+  for ( const QgsPointXY &center : constState()->centers )
+  {
+    x += center.x();
+    y += center.y();
+  }
+  int n = std::max( 1, constState()->centers.length() );
+  return QgsPointXY( x / n, y / n );
+}
+
+void KadasCircleItem::setPosition( const QgsPointXY &pos )
+{
+  QgsPointXY prevPos = position();
+  double dx = pos.x() - prevPos.x();
+  double dy = pos.y() - prevPos.y();
+  for ( QgsPointXY &center : state()->centers )
+  {
+    center.setX( center.x() + dx );
+    center.setY( center.y() + dy );
+  }
+  if ( mGeometry )
+  {
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+  }
+  update();
+}
+
 QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings ) const
 {
   QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );

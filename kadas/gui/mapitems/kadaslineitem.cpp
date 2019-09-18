@@ -48,6 +48,43 @@ void KadasLineItem::setGeodesic( bool geodesic )
   update();
 }
 
+QgsPointXY KadasLineItem::position() const
+{
+  double x = 0., y = 0.;
+  int n = 0;
+  for ( const QList<QgsPointXY> &part : constState()->points )
+  {
+    for ( const QgsPointXY &point : part )
+    {
+      x += point.x();
+      y += point.y();
+    }
+    n += part.size();
+  }
+  n = std::max( 1, n );
+  return QgsPointXY( x / n, y / n );
+}
+
+void KadasLineItem::setPosition( const QgsPointXY &pos )
+{
+  QgsPointXY prevPos = position();
+  double dx = pos.x() - prevPos.x();
+  double dy = pos.y() - prevPos.y();
+  for ( QList<QgsPointXY> &part : state()->points )
+  {
+    for ( QgsPointXY &point : part )
+    {
+      point.setX( point.x() + dx );
+      point.setY( point.y() + dy );
+    }
+  }
+  if ( mGeometry )
+  {
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+  }
+  update();
+}
+
 QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings ) const
 {
   QList<Node> nodes;

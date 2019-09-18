@@ -55,6 +55,9 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
     QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
+    QgsPointXY position() const override;
+    void setPosition( const QgsPointXY &pos ) override;
+
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
     void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;

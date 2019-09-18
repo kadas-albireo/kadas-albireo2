@@ -31,6 +31,45 @@ KadasRectangleItem::KadasRectangleItem( const QgsCoordinateReferenceSystem &crs,
   clear();
 }
 
+QgsPointXY KadasRectangleItem::position() const
+{
+  double x = 0., y = 0.;
+  for ( const QgsPointXY &point : constState()->p1 )
+  {
+    x += point.x();
+    y += point.y();
+  }
+  for ( const QgsPointXY &point : constState()->p2 )
+  {
+    x += point.x();
+    y += point.y();
+  }
+  int n = std::max( 1, constState()->p1.size() );
+  return QgsPointXY( x / n, y / n );
+}
+
+void KadasRectangleItem::setPosition( const QgsPointXY &pos )
+{
+  QgsPointXY prevPos = position();
+  double dx = pos.x() - prevPos.x();
+  double dy = pos.y() - prevPos.y();
+  for ( QgsPointXY &point : state()->p1 )
+  {
+    point.setX( point.x() + dx );
+    point.setY( point.y() + dy );
+  }
+  for ( QgsPointXY &point : state()->p2 )
+  {
+    point.setX( point.x() + dx );
+    point.setY( point.y() + dy );
+  }
+  if ( mGeometry )
+  {
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+  }
+  update();
+}
+
 bool KadasRectangleItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
