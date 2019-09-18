@@ -182,11 +182,11 @@ z-index */
 
     virtual KadasMapItem::State *createEmptyState() const = 0 /Factory/;
 
+    void update();
+
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
 
-  protected:
-    void update();
 
 };
 

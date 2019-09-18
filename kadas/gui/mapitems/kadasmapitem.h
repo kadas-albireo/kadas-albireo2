@@ -202,11 +202,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
 
+    void update();
+
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
 
-  protected:
-    void update();
 
   private:
     EditorFactory mEditorFactory = nullptr;
