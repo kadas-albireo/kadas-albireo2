@@ -45,6 +45,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+    QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
     void setTransformContext( const QgsCoordinateTransformContext &ctx ) override;
 
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }

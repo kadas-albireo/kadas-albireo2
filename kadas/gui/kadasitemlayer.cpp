@@ -19,6 +19,7 @@
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -119,6 +120,20 @@ QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
     }
   }
   return QString();
+}
+
+QString KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const
+{
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mapSettings );
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+  QgsRectangle filterRect;
+  filterRect.setXMinimum( mapPos.x() - radiusmu );
+  filterRect.setXMaximum( mapPos.x() + radiusmu );
+  filterRect.setYMinimum( mapPos.y() - radiusmu );
+  filterRect.setYMaximum( mapPos.y() + radiusmu );
+  return pickItem( filterRect, mapSettings );
 }
 
 QRectF KadasItemLayer::margin() const
