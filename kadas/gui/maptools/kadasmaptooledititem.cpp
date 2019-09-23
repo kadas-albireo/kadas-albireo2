@@ -355,12 +355,12 @@ void KadasMapToolEditItem::inputChanged()
 
 void KadasMapToolEditItem::copyItem()
 {
-  KadasClipboard::instance()->setStoredMapItems( QList<const KadasMapItem *>() << mItem );
+  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << mItem );
 }
 
 void KadasMapToolEditItem::cutItem()
 {
-  KadasClipboard::instance()->setStoredMapItems( QList<const KadasMapItem *>() << mItem );
+  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << mItem );
   deleteItem();
 }
 

@@ -65,10 +65,10 @@ class KADAS_GUI_EXPORT KadasClipboard : public QObject
     const QgsFeatureStore &getStoredFeatures() const { return mFeatureStore; }
 
     // Utility function fro storing map items in clipboard
-    void setStoredMapItems( const QList<const KadasMapItem *> &items );
+    void setStoredMapItems( const QList<KadasMapItem *> &items );
 
     // Utility function for getting stored map items from clipboard
-    const QList<const KadasMapItem *> &storedMapItems() const { return mItemStore; }
+    const QList<KadasMapItem *> &storedMapItems() const { return mItemStore; }
 
   signals:
     void dataChanged();
@@ -77,7 +77,7 @@ class KADAS_GUI_EXPORT KadasClipboard : public QObject
     KadasClipboard();
 
     QgsFeatureStore mFeatureStore;
-    QList<const KadasMapItem *> mItemStore;
+    QList<KadasMapItem *> mItemStore;
 
     void clear();
 };

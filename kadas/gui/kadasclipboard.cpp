@@ -139,7 +139,7 @@ void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
   mFeatureStore = featureStore;
 }
 
-void KadasClipboard::setStoredMapItems( const QList<const KadasMapItem *> &items )
+void KadasClipboard::setStoredMapItems( const QList<KadasMapItem *> &items )
 {
   clear();
   for ( const KadasMapItem *item : items )

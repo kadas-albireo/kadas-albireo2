@@ -30,9 +30,9 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     static KadasMapCanvasItemManager *instance();
-    static void addItem( const KadasMapItem *item );
-    static void removeItem( const KadasMapItem *item );
-    static const QList<const KadasMapItem *> &items();
+    static void addItem( KadasMapItem *item );
+    static void removeItem( KadasMapItem *item );
+    static const QList<KadasMapItem *> &items();
     static void clear();
 
   signals:
