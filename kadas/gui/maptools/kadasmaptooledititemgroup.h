@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasmaptooledititem.h
-    ----------------------
+    kadasmaptooledititemgroup.h
+    ---------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,26 +14,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASMAPTOOLEDITITEM_H
-#define KADASMAPTOOLEDITITEM_H
+#ifndef KADASMAPTOOLEDITITEMGROUP_H
+#define KADASMAPTOOLEDITITEMGROUP_H
 
 #include <qgis/qgsmaptool.h>
+#include <qgis/qgspoint.h>
 
-#include <kadas/core/kadasstatehistory.h>
 #include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
 
+class QLabel;
 class KadasBottomBar;
-class KadasFloatingInputWidget;
 class KadasItemLayer;
+class KadasMapItem;
 
-
-class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
+class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
 {
-    Q_OBJECT
   public:
-    KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer );
-    KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer );
+    KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer );
 
     void activate() override;
     void deactivate() override;
@@ -44,27 +41,16 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     void keyPressEvent( QKeyEvent *e ) override;
 
   private:
-    KadasStateHistory *mStateHistory = nullptr;
+    QList<KadasMapItem *> mItems;
+    KadasItemLayer *mLayer;
+    QgsPointXY mMoveRefPos;
+    QList<QgsPointXY> mItemRefPos;
     KadasBottomBar *mBottomBar = nullptr;
-    KadasItemLayer *mLayer = nullptr;
-    KadasMapItem *mItem = nullptr;
-    KadasMapItem::EditContext mEditContext;
+    QLabel *mStatusLabel = nullptr;
 
-    KadasFloatingInputWidget *mInputWidget = nullptr;
-    KadasMapItemEditor *mEditor = nullptr;
-    bool mIgnoreNextMoveEvent = false;
-    QgsVector mMoveOffset;
-
-    KadasMapItem::AttribValues collectAttributeValues() const;
-    void setupNumericInput();
-    void clearNumericInput();
-
-  private slots:
-    void inputChanged();
-    void stateChanged( KadasStateHistory::State *state );
-    void copyItem();
-    void cutItem();
-    void deleteItem();
+    void deleteItems();
+    void deselectItem( KadasMapItem *item, bool triggerRepaint = true );
+    void updateStatusLabel();
 };
 
-#endif // KADASMAPTOOLEDITITEM_H
+#endif // KADASMAPTOOLEDITITEMGROUP_H

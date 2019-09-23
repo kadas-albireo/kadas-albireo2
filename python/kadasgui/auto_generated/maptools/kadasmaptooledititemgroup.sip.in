@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/maptools/kadasmaptooledititem.h                            *
+ * kadas/gui/maptools/kadasmaptooledititemgroup.h                       *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -11,8 +11,7 @@
 
 
 
-
-class KadasMapToolEditItem : QgsMapTool
+class KadasMapToolEditItemGroup : QgsMapTool
 {
 %Docstring
 *************************************************************************
@@ -26,11 +25,10 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptooledititem.h"
+#include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 %End
   public:
-    KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer );
-    KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer );
+    KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer );
 
     virtual void activate();
 
@@ -51,7 +49,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/maptools/kadasmaptooledititem.h                            *
+ * kadas/gui/maptools/kadasmaptooledititemgroup.h                       *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

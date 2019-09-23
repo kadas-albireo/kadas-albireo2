@@ -31,6 +31,8 @@
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+
 
 KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer )
   : QgsMapTool( canvas )
@@ -47,11 +49,6 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *
   , mItem( item )
 {
   KadasMapCanvasItemManager::addItem( mItem );
-}
-
-KadasMapToolEditItem::~KadasMapToolEditItem()
-{
-
 }
 
 void KadasMapToolEditItem::activate()
@@ -120,6 +117,19 @@ void KadasMapToolEditItem::deactivate()
 
 void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
+  if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
+  {
+    QString itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
+    if ( !itemId.isEmpty() )
+    {
+      KadasMapItem *otherItem = mLayer->takeItem( itemId );
+      KadasMapCanvasItemManager::removeItem( mItem );
+      KadasMapItem *item = mItem;
+      mItem = nullptr;
+      mLayer->triggerRepaint();
+      mCanvas->setMapTool( new KadasMapToolEditItemGroup( mCanvas, QList<KadasMapItem *>() << item << otherItem, mLayer ) );
+    }
+  }
   if ( e->button() == Qt::RightButton )
   {
     if ( mEditContext.isValid() )
