@@ -44,7 +44,7 @@ QgsPointXY KadasRectangleItem::position() const
     x += point.x();
     y += point.y();
   }
-  int n = std::max( 1, constState()->p1.size() );
+  int n = std::max( 1, constState()->p1.size() + constState()->p2.size() );
   return QgsPointXY( x / n, y / n );
 }
 
