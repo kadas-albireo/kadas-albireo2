@@ -576,7 +576,6 @@ void KadasSearchBox::setFilterTool()
     action->setCheckable( true );
     action->setChecked( true );
     connect( mFilterTool, &KadasMapToolCreateItem::partFinished, this, &KadasSearchBox::filterToolFinished );
-    connect( mFilterTool, &QgsMapTool::deactivated, mFilterTool, &QObject::deleteLater );
   }
 }
 

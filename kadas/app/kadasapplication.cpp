@@ -754,6 +754,11 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
       disconnect( static_cast<KadasMapToolPan *>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
       disconnect( static_cast<KadasMapToolPan *>( oldTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
     }
+    if ( oldTool != mMapToolPan )
+    {
+      // Always delete unset tool, except for pan tool
+      oldTool->deleteLater();
+    }
   }
   // Automatically return to pan tool if no tool is active
   if ( !newTool )
@@ -787,7 +792,6 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
   {
     KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
-    connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     mMainWindow->mapCanvas()->setMapTool( tool );
   }
   // TODO

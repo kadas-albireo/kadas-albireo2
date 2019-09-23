@@ -158,7 +158,6 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( mCanvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
-    connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     mMainWindow->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     mMainWindow->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     mCanvas->setMapTool( tool );

@@ -116,7 +116,6 @@ void KadasMilxIntegration::createMilx( bool active )
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );
     tool->showLayerSelection( true, layerFilter, layerCreator );
-    connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     canvas->setMapTool( tool );

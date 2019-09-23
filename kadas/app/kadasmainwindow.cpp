@@ -540,7 +540,6 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
       QgsMapTool *tool = toolFactory();
       if ( tool )
       {
-        connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
         tool->setAction( action );
         mMapCanvas->setMapTool( tool );
       }
