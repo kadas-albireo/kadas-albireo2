@@ -86,6 +86,11 @@ z-index */
 %End
     int zIndex() const;
 
+    void update();
+%Docstring
+Trigger a redraw */
+%End
+
     struct State : KadasStateHistory::State
     {
       enum DrawStatus { Empty, Drawing, Finished };
@@ -181,8 +186,6 @@ z-index */
   protected:
 
     virtual KadasMapItem::State *createEmptyState() const = 0 /Factory/;
-
-    void update();
 
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );

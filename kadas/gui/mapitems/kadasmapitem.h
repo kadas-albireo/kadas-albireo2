@@ -84,6 +84,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setZIndex( int zIndex );
     int zIndex() const { return mZIndex; }
 
+    /* Trigger a redraw */
+    void update();
+
     // State interface
     struct State : KadasStateHistory::State
     {
@@ -201,8 +204,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QgsMapLayer *mAssociatedLayer = nullptr;
 
     virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
-
-    void update();
 
     static void defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
