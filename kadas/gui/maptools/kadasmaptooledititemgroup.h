@@ -26,6 +26,7 @@ class QLabel;
 class KadasBottomBar;
 class KadasItemLayer;
 class KadasMapItem;
+class KadasSelectionRectItem;
 
 class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
 {
@@ -47,12 +48,13 @@ class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
     QList<QgsPointXY> mItemRefPos;
     KadasBottomBar *mBottomBar = nullptr;
     QLabel *mStatusLabel = nullptr;
+    KadasSelectionRectItem *mSelectionRect = nullptr;
 
     void copyItems();
     void cutItems();
     void deleteItems();
     void deselectItem( KadasMapItem *item, bool triggerRepaint = true );
-    void updateStatusLabel();
+    void updateSelection();
 };
 
 #endif // KADASMAPTOOLEDITITEMGROUP_H

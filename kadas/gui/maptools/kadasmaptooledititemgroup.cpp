@@ -16,6 +16,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPushButton>
 
 #include <qgis/qgscoordinatetransform.h>
@@ -29,6 +30,7 @@
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadasselectionrectitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
 
@@ -45,12 +47,15 @@ void KadasMapToolEditItemGroup::activate()
     KadasMapCanvasItemManager::addItem( item );
   }
 
+  mSelectionRect = new KadasSelectionRectItem( canvas()->mapSettings().destinationCrs() );
+  KadasMapCanvasItemManager::addItem( mSelectionRect );
+
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
   mStatusLabel = new QLabel();
   mBottomBar->layout()->addWidget( mStatusLabel );
-  updateStatusLabel();
+  updateSelection();
 
   QPushButton *closeButton = new QPushButton();
   closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
@@ -70,6 +75,10 @@ void KadasMapToolEditItemGroup::deactivate()
   }
   mLayer->triggerRepaint();
 
+  KadasMapCanvasItemManager::removeItem( mSelectionRect );
+  delete mSelectionRect;
+  mSelectionRect = nullptr;
+
   delete mBottomBar;
   mBottomBar = nullptr;
   mStatusLabel = nullptr;
@@ -77,24 +86,26 @@ void KadasMapToolEditItemGroup::deactivate()
 
 void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
 {
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mCanvas->mapSettings() );
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+  QgsRectangle filterRect;
+  filterRect.setXMinimum( e->mapPoint().x() - radiusmu );
+  filterRect.setXMaximum( e->mapPoint().x() + radiusmu );
+  filterRect.setYMinimum( e->mapPoint().y() - radiusmu );
+  filterRect.setYMaximum( e->mapPoint().y() + radiusmu );
+
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
-    QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mCanvas->mapSettings() );
-    double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
-    radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
-    double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-    QgsRectangle filterRect;
-    filterRect.setXMinimum( e->mapPoint().x() - radiusmu );
-    filterRect.setXMaximum( e->mapPoint().x() + radiusmu );
-    filterRect.setYMinimum( e->mapPoint().y() - radiusmu );
-    filterRect.setYMaximum( e->mapPoint().y() + radiusmu );
-
     // First, test selected items
     for ( KadasMapItem *item : mItems )
     {
-      if ( item->intersects( filterRect, mCanvas->mapSettings() ) )
+      QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), item->crs(), QgsProject::instance() );
+      if ( item->intersects( crst.transform( filterRect ), mCanvas->mapSettings() ) )
       {
         deselectItem( item );
+        updateSelection();
 
         if ( mItems.size() == 1 )
         {
@@ -103,7 +114,6 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
           mItems.clear();
           canvas()->setMapTool( new KadasMapToolEditItem( mCanvas, item, mLayer ) );
         }
-        updateStatusLabel();
 
         return;
       }
@@ -114,11 +124,11 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
     {
       KadasMapItem *item = mLayer->takeItem( itemId );
       item->setSelected( true );
-      KadasMapCanvasItemManager::addItem( item );
       mItems.append( item );
+      updateSelection();
+      KadasMapCanvasItemManager::addItem( item );
       mLayer->triggerRepaint();
     }
-    updateStatusLabel();
   }
   else if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::NoModifier )
   {
@@ -131,7 +141,18 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
   }
   else if ( e->button() == Qt::RightButton )
   {
-    canvas()->unsetMapTool( this );
+    if ( mSelectionRect->intersects( filterRect, mCanvas->mapSettings() ) )
+    {
+      QMenu menu;
+      menu.addAction( tr( "Cut Selection" ), this, &KadasMapToolEditItemGroup::cutItems );
+      menu.addAction( tr( "Copy Selection" ), this, &KadasMapToolEditItemGroup::copyItems );
+      menu.addAction( tr( "Delete Selection" ), this, &KadasMapToolEditItemGroup::deleteItems );
+      menu.exec( e->globalPos() );
+    }
+    else
+    {
+      canvas()->unsetMapTool( this );
+    }
   }
 }
 
@@ -146,6 +167,7 @@ void KadasMapToolEditItemGroup::canvasMoveEvent( QgsMapMouseEvent *e )
       QgsPointXY newPos = crst.transform( mItemRefPos[i] + delta, QgsCoordinateTransform::ReverseTransform );
       mItems[i]->setPosition( newPos );
     }
+    mSelectionRect->update();
   }
 }
 
@@ -216,7 +238,8 @@ void KadasMapToolEditItemGroup::deselectItem( KadasMapItem *item, bool triggerRe
   connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
 }
 
-void KadasMapToolEditItemGroup::updateStatusLabel()
+void KadasMapToolEditItemGroup::updateSelection()
 {
   mStatusLabel->setText( tr( "%1 item(s) selected on layer %2" ).arg( mItems.size() ).arg( mLayer->name() ) );
+  mSelectionRect->setSelectedItems( mItems );
 }

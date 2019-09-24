@@ -1,0 +1,78 @@
+/***************************************************************************
+    kadasselectionrectitem.h
+    ------------------------
+    copyright            : (C) 2019 by Sandro Mani
+    email                : smani at sourcepole dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef KADASSELECTIONRECTITEM_H
+#define KADASSELECTIONRECTITEM_H
+
+#include <kadas/gui/mapitems/kadasmapitem.h>
+
+
+class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
+{
+    Q_OBJECT
+
+  public:
+    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+
+    void setSelectedItems( const QList<KadasMapItem *> &items );
+
+    QString itemName() const override { return tr( "Selection" ); }
+
+    QgsRectangle boundingBox() const override;
+    QRect margin() const override;
+    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override { return QList<KadasMapItem::Node>(); }
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    void render( QgsRenderContext &context ) const override;
+
+    // Item is not meant to be user-editable, all methods below are stubbed
+    struct State : KadasMapItem::State
+    {
+      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+      State *clone() const override SIP_FACTORY { return new State( *this ); }
+    };
+
+    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override { return false; }
+    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override { return false; }
+    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override { }
+    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override { }
+    bool continuePart( const QgsMapSettings &mapSettings ) override { return false; }
+    void endPart() override {}
+
+    AttribDefs drawAttribs() const override { return AttribDefs(); }
+    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override { return AttribValues(); }
+    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override { return QgsPointXY(); }
+
+    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override { return EditContext(); }
+    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override { }
+    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override { }
+
+    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override { return AttribValues(); }
+    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override { return QgsPointXY(); }
+
+    QgsPointXY position() const override {return QgsPointXY(); }
+    void setPosition( const QgsPointXY &pos ) override {}
+
+  protected:
+    KadasMapItem *_clone() const override { return new KadasSelectionRectItem( crs() ); } SIP_FACTORY
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+
+  private:
+    QList<KadasMapItem *> mItems;
+
+    QgsRectangle itemsRect( double mup ) const;
+};
+
+#endif // KADASPICTUREITEM_H

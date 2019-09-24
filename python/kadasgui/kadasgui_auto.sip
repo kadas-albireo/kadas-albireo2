@@ -7,6 +7,7 @@
 %Include auto_generated/mapitems/kadaspolygonitem.sip
 %Include auto_generated/mapitems/kadasmapitem.sip
 %Include auto_generated/mapitems/kadasgeometryitem.sip
+%Include auto_generated/mapitems/kadasselectionrectitem.sip
 %Include auto_generated/mapitems/kadastextitem.sip
 %Include auto_generated/mapitems/kadasanchoreditem.sip
 %Include auto_generated/mapitems/kadaspointitem.sip
