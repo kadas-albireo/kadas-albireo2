@@ -263,6 +263,14 @@ void KadasMapToolEditItem::keyPressEvent( QKeyEvent *e )
   {
     mStateHistory->redo();
   }
+  else if ( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
+  {
+    copyItem();
+  }
+  else if ( e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier )
+  {
+    cutItem();
+  }
   else if ( e->key() == Qt::Key_Delete )
   {
     deleteItem();
