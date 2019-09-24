@@ -48,6 +48,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
     KadasBottomBar *mBottomBar = nullptr;
     QLabel *mStatusLabel = nullptr;
 
+    void copyItems();
+    void cutItems();
     void deleteItems();
     void deselectItem( KadasMapItem *item, bool triggerRepaint = true );
     void updateStatusLabel();

@@ -25,6 +25,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasbottombar.h>
+#include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -170,10 +171,29 @@ void KadasMapToolEditItemGroup::keyPressEvent( QKeyEvent *e )
   {
 //    mStateHistory->redo();
   }
+  else if ( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
+  {
+    copyItems();
+  }
+  else if ( e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier )
+  {
+    cutItems();
+  }
   else if ( e->key() == Qt::Key_Delete )
   {
     deleteItems();
   }
+}
+
+void KadasMapToolEditItemGroup::copyItems()
+{
+  KadasClipboard::instance()->setStoredMapItems( mItems );
+}
+
+void KadasMapToolEditItemGroup::cutItems()
+{
+  KadasClipboard::instance()->setStoredMapItems( mItems );
+  deleteItems();
 }
 
 void KadasMapToolEditItemGroup::deleteItems()

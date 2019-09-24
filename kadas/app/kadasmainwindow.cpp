@@ -53,6 +53,7 @@
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
@@ -937,7 +938,7 @@ QgsMapTool *KadasMainWindow::paste()
     }
     else
     {
-      // TODO
+      return new KadasMapToolEditItemGroup( mapCanvas(), items, layer );
     }
   }
   return nullptr;
