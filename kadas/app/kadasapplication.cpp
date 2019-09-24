@@ -592,6 +592,8 @@ void KadasApplication::projectClose()
   // ensure layout widgets are fully deleted
 //  QgsApplication::sendPostedEvents( nullptr, QEvent::DeferredDelete );
 
+  unsetMapTool();
+
   mMainWindow->mapCanvas()->clearExtentHistory();
 
   KadasMapCanvasItemManager::clear();
