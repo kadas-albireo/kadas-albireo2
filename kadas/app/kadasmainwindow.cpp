@@ -104,7 +104,7 @@ void KadasMainWindow::init()
   mGeodataBox->setCollapsed( false );
   mLayersBox->setCollapsed( false );
 
-  // The MilX plugin enables the tab, if the plugin is enabled
+  // The MilX integration enables the tab, if connection to the MilX server succeeds
   mRibbonWidget->setTabEnabled( mRibbonWidget->indexOf( mMssTab ), false );
   // The Globe plugin enables the action, if the plugin is enabled
   mAction3D->setEnabled( false );
@@ -209,7 +209,7 @@ void KadasMainWindow::init()
   milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
   milxUi.mLineWidthSlider = mLineWidthSlider;
   milxUi.mWorkModeCombo = mWorkModeCombo;
-  KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi );
+  KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
 
   configureButtons();
 
