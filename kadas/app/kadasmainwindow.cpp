@@ -74,6 +74,7 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
+#include <kadas/app/globe/kadasglobeintegration.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
@@ -106,8 +107,6 @@ void KadasMainWindow::init()
 
   // The MilX integration enables the tab, if connection to the MilX server succeeds
   mRibbonWidget->setTabEnabled( mRibbonWidget->indexOf( mMssTab ), false );
-  // The Globe plugin enables the action, if the plugin is enabled
-  mAction3D->setEnabled( false );
 
   mLanguageCombo->addItem( tr( "System language" ), "" );
   mLanguageCombo->addItem( "English", "en" );
@@ -210,6 +209,9 @@ void KadasMainWindow::init()
   milxUi.mLineWidthSlider = mLineWidthSlider;
   milxUi.mWorkModeCombo = mWorkModeCombo;
   KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
+
+  // Globe
+  KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
 
   configureButtons();
 
