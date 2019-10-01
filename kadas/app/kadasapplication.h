@@ -43,7 +43,6 @@ class KadasApplication : public QgsApplication
   public:
 
     static KadasApplication *instance();
-    static bool isRunningFromBuildDir();
 
     KadasApplication( int &argc, char **argv );
     ~KadasApplication();

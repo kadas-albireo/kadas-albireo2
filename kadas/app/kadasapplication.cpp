@@ -118,11 +118,6 @@ KadasApplication *KadasApplication::instance()
   return qobject_cast<KadasApplication *> ( QCoreApplication::instance() );
 }
 
-bool KadasApplication::isRunningFromBuildDir()
-{
-  return QFile::exists( QDir( applicationDirPath() ).absoluteFilePath( ".kadasbuilddir" ) );
-}
-
 KadasApplication::KadasApplication( int &argc, char **argv )
   : QgsApplication( argc, argv, true )
 {
