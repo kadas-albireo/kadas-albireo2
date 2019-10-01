@@ -195,6 +195,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
   mMainWindow = new KadasMainWindow( &splash );
+  mMainWindow->init();
   mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
   mMainWindow->mapCanvas()->setMapUpdateInterval( 1000 );
 

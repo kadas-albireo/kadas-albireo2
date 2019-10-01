@@ -42,6 +42,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
   public:
     explicit KadasMainWindow( QSplashScreen *splash );
+    void init();
 
     QgsMapCanvas *mapCanvas() const { return mMapCanvas; }
     QgsMessageBar *messageBar() const { return mInfoBar; }

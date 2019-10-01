@@ -78,6 +78,11 @@
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
   KadasWindowBase::setupUi( this );
+}
+
+void KadasMainWindow::init()
+{
+  // Split from constructor since certain calls may require kApp->mainWindow() to return a constructed instance
 
   QWidget *topWidget = new QWidget();
   KadasTopWidget::setupUi( topWidget );
