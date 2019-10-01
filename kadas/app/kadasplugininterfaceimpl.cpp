@@ -520,3 +520,7 @@ QObject *KadasPluginInterfaceImpl::findObject( const QString &name )
   return kApp->mainWindow()->findChild<QObject *>( name );
 }
 
+QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeInsertionPoint()
+{
+  return QgsLayerTreeRegistryBridge::InsertionPoint( nullptr, 0 );
+}

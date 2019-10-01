@@ -269,6 +269,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
     virtual void unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
 
+    virtual void locatorSearch( const QString &searchText ) override { }
+    virtual QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() override;
+
 
     // KADAS specific interface
     QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) override;
