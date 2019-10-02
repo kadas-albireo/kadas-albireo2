@@ -21,42 +21,30 @@
 #include <osg/ref_ptr>
 #include <osgEarth/Version>
 
-#include <qgis/qgsrectangle.h>
-
 #include <kadas/app/globe/kadasglobedialog.h>
 
 class QAction;
-class QDockWidget;
 class QgsMapLayer;
 class QgsPointXY;
 class QgsRectangle;
 class QgsVectorLayer;
-class KadasGlobeAnnotation;
 class KadasGlobeFrustumHighlightCallback;
-class KadasGlobeFeatureIdentifyCallback;
 class KadasGlobeLayerPropertiesFactory;
 class KadasGlobeTileSource;
 class KadasGlobeVectorLayerConfig;
 class KadasGlobeWidget;
 
-namespace osg
-{
-  class Group;
-  class Vec3d;
-}
+namespace osg { class Group; }
 namespace osgViewer { class Viewer; }
 
 namespace osgEarth
 {
   class GeoPoint;
-  class GeoExtent;
   class ImageLayer;
   class MapNode;
-  namespace Annotation { class PlaceNode; }
   namespace QtGui { class ViewerWidget; }
   namespace Util
   {
-    class FeatureHighlightCallback;
     class SkyNode;
     class VerticalScale;
     namespace Controls
@@ -80,18 +68,8 @@ class KadasGlobeIntegration : public QObject
     //! Enable or disable frustum highlight
     void enableFrustumHighlight( bool statu );
 
-    //! Sets the globe coordinates of a user right-click on the globe
-    void setSelectedCoordinates( const osg::Vec3d &coords );
-    //! Gets a coordinates vector
-    osg::Vec3d getSelectedCoordinates();
     //! emits signal with current mouse coordinates
     void showCurrentCoordinates( const osgEarth::GeoPoint &geoPoint );
-    //! Gets longitude of user right click
-    double getSelectedLon() const { return mSelectedLon; }
-    //! Gets latitude of user right click
-    double getSelectedLat() const { return mSelectedLat; }
-    //! Gets elevation of user right click
-    double getSelectedElevation() { return mSelectedElevation; }
 
     //! Gets the OSG viewer
     osgViewer::Viewer *osgViewer() { return mOsgViewer; }
@@ -112,9 +90,6 @@ class KadasGlobeIntegration : public QObject
     QString mBaseLayerUrl;
     QList<KadasGlobeDialog::LayerDataSource> mImagerySources;
     QList<KadasGlobeDialog::LayerDataSource> mElevationSources;
-    double mSelectedLat = 0.;
-    double mSelectedLon = 0.;
-    double mSelectedElevation = 0.;
 
     osg::ref_ptr<osgViewer::Viewer> mOsgViewer;
     osg::ref_ptr<osgEarth::MapNode> mMapNode;
@@ -153,8 +128,6 @@ class KadasGlobeIntegration : public QObject
   signals:
     //! emits current mouse position
     void xyCoordinates( const QgsPointXY &p );
-    //! emits position of right click on globe
-    void newCoordinatesSelected( const QgsPointXY &p );
 };
 
 #endif // KADASGLOBEINTEGRATION_H

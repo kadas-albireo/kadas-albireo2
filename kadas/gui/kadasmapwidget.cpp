@@ -89,6 +89,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   mMapCanvas = new QgsMapCanvas( this );
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->setMapUpdateInterval( 1000 );
+  // TODO ?
 //  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() );
 //  QgsMapCanvas::WheelAction wheelAction = static_cast<QgsMapCanvas::WheelAction>( settings.value( "/Qgis/wheel_action", "0" ).toInt() );
 //  double zoomFactor = settings.value( "/Qgis/zoom_factor", "2.0" ).toDouble();

@@ -19,7 +19,6 @@
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmapcanvas.h>
-#include <qgis/qgspallabeling.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
@@ -34,12 +33,7 @@
 #include <QDockWidget>
 #include <QStringList>
 
-#include <osg/Light>
-#include <osgDB/ReadFile>
-#include <osgDB/Registry>
-
 #include <osgGA/StateSetManipulator>
-#include <osgGA/GUIEventHandler>
 
 #include <osgEarth/ElevationQuery>
 #include <osgEarth/Notify>
@@ -55,10 +49,8 @@
 #include <osgEarthDrivers/sky_simple/SimpleSkyOptions>
 #include <osgEarthDrivers/tms/TMSOptions>
 #include <osgEarthDrivers/wms/WMSOptions>
-#include <osgEarthFeatures/FeatureDisplayLayout>
 #include <osgEarthQt/ViewerWidget>
 #include <osgEarthUtil/AutoClipPlaneHandler>
-#include <osgEarthUtil/Controls>
 #include <osgEarthUtil/EarthManipulator>
 #include <osgEarthUtil/Sky>
 #include <osgEarthUtil/VerticalScale>
@@ -72,138 +64,11 @@
 #include <kadas/app/globe/kadasglobedialog.h>
 #include <kadas/app/globe/kadasglobefeatureidentify.h>
 #include <kadas/app/globe/kadasglobefrustumhighlight.h>
+#include <kadas/app/globe/kadasglobeinteractionhandlers.h>
 #include <kadas/app/globe/kadasglobetilesource.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
 #include <kadas/app/globe/kadasglobewidget.h>
 #include <kadas/app/globe/featuresource/kadasglobefeatureoptions.h>
-
-#define MOVE_OFFSET 0.05
-
-class NavigationControlHandler : public osgEarth::Util::Controls::ControlEventHandler
-{
-  public:
-    virtual void onMouseDown() { }
-    virtual void onClick( const osgGA::GUIEventAdapter & /*ea*/, osgGA::GUIActionAdapter & /*aa*/ ) {}
-};
-
-class ZoomControlHandler : public NavigationControlHandler
-{
-  public:
-    ZoomControlHandler( osgEarth::Util::EarthManipulator *manip, double dx, double dy )
-      : _manip( manip ), _dx( dx ), _dy( dy ) { }
-    void onMouseDown() override
-    {
-      _manip->zoom( _dx, _dy );
-    }
-  private:
-    osg::observer_ptr<osgEarth::Util::EarthManipulator> _manip;
-    double _dx;
-    double _dy;
-};
-
-class HomeControlHandler : public NavigationControlHandler
-{
-  public:
-    HomeControlHandler( osgEarth::Util::EarthManipulator *manip ) : _manip( manip ) { }
-    void onClick( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa ) override
-    {
-      _manip->home( ea, aa );
-    }
-  private:
-    osg::observer_ptr<osgEarth::Util::EarthManipulator> _manip;
-};
-
-class SyncExtentControlHandler : public NavigationControlHandler
-{
-  public:
-    SyncExtentControlHandler( KadasGlobeIntegration *globe ) : mGlobe( globe ) { }
-    void onClick( const osgGA::GUIEventAdapter & /*ea*/, osgGA::GUIActionAdapter & /*aa*/ ) override
-    {
-      mGlobe->syncExtent();
-    }
-  private:
-    KadasGlobeIntegration *mGlobe = nullptr;
-};
-
-class PanControlHandler : public NavigationControlHandler
-{
-  public:
-    PanControlHandler( osgEarth::Util::EarthManipulator *manip, double dx, double dy ) : _manip( manip ), _dx( dx ), _dy( dy ) { }
-    void onMouseDown() override
-    {
-      _manip->pan( _dx, _dy );
-    }
-  private:
-    osg::observer_ptr<osgEarth::Util::EarthManipulator> _manip;
-    double _dx;
-    double _dy;
-};
-
-class RotateControlHandler : public NavigationControlHandler
-{
-  public:
-    RotateControlHandler( osgEarth::Util::EarthManipulator *manip, double dx, double dy ) : _manip( manip ), _dx( dx ), _dy( dy ) { }
-    void onMouseDown() override
-    {
-      if ( 0 == _dx && 0 == _dy )
-        _manip->setRotation( osg::Quat() );
-      else
-        _manip->rotate( _dx, _dy );
-    }
-  private:
-    osg::observer_ptr<osgEarth::Util::EarthManipulator> _manip;
-    double _dx;
-    double _dy;
-};
-
-// An event handler that will print out the coordinates at the clicked point
-class QueryCoordinatesHandler : public osgGA::GUIEventHandler
-{
-  public:
-    QueryCoordinatesHandler( KadasGlobeIntegration *globe ) :  mGlobe( globe ) { }
-
-    bool handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa )
-    {
-      if ( ea.getEventType() == osgGA::GUIEventAdapter::MOVE )
-      {
-        osgViewer::View *view = static_cast<osgViewer::View *>( aa.asView() );
-        osgUtil::LineSegmentIntersector::Intersections hits;
-        if ( view->computeIntersections( ea.getX(), ea.getY(), hits ) )
-        {
-          osgEarth::GeoPoint isectPoint;
-          isectPoint.fromWorld( mGlobe->mapNode()->getMapSRS()->getGeodeticSRS(), hits.begin()->getWorldIntersectPoint() );
-          mGlobe->showCurrentCoordinates( isectPoint );
-        }
-      }
-      return false;
-    }
-
-  private:
-    KadasGlobeIntegration *mGlobe = nullptr;
-};
-
-class KeyboardControlHandler : public osgGA::GUIEventHandler
-{
-  public:
-    KeyboardControlHandler( osgEarth::Util::EarthManipulator *manip ) : _manip( manip ) { }
-
-    bool handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa ) override;
-
-  private:
-    osg::observer_ptr<osgEarth::Util::EarthManipulator> _manip;
-};
-
-class NavigationControl : public osgEarth::Util::Controls::ImageControl
-{
-  public:
-    NavigationControl( osg::Image *image = 0 ) : ImageControl( image ),  mMousePressed( false ) {}
-
-  protected:
-    bool handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa, osgEarth::Util::Controls::ControlContext &cx ) override;
-
-  private:
-    bool mMousePressed;
-};
 
 
 KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent )
@@ -315,8 +180,8 @@ void KadasGlobeIntegration::run()
 
   mOsgViewer->setSceneData( mRootNode );
 
-  mOsgViewer->addEventHandler( new QueryCoordinatesHandler( this ) );
-  mOsgViewer->addEventHandler( new KeyboardControlHandler( manip ) );
+  mOsgViewer->addEventHandler( new KadasGlobeQueryCoordinatesHandler( this ) );
+  mOsgViewer->addEventHandler( new KadasGlobeKeyboardControlHandler( manip ) );
   mOsgViewer->addEventHandler( new osgViewer::StatsHandler() );
   mOsgViewer->addEventHandler( new osgViewer::WindowSizeHandler() );
   mOsgViewer->addEventHandler( new osgGA::StateSetManipulator( mOsgViewer->getCamera()->getOrCreateStateSet() ) );
@@ -541,19 +406,6 @@ void KadasGlobeIntegration::showCurrentCoordinates( const osgEarth::GeoPoint &ge
   emit xyCoordinates( QgsCoordinateTransform( QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() ).transform( QgsPointXY( pos.x(), pos.y() ) ) );
 }
 
-void KadasGlobeIntegration::setSelectedCoordinates( const osg::Vec3d &coords )
-{
-  mSelectedLon = coords.x();
-  mSelectedLat = coords.y();
-  mSelectedElevation = coords.z();
-  emit newCoordinatesSelected( QgsPointXY( mSelectedLon, mSelectedLat ) );
-}
-
-osg::Vec3d KadasGlobeIntegration::getSelectedCoordinates()
-{
-  return osg::Vec3d( mSelectedLon, mSelectedLat, mSelectedElevation );
-}
-
 void KadasGlobeIntegration::syncExtent()
 {
   const QgsMapSettings &mapSettings = kApp->mainWindow()->mapCanvas()->mapSettings();
@@ -606,7 +458,7 @@ void KadasGlobeIntegration::addControl( osgEarth::Util::Controls::Control *contr
 void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler )
 {
   osg::Image *image = osgDB::readImageFile( imgPath );
-  osgEarth::Util::Controls::ImageControl *control = new NavigationControl( image );
+  osgEarth::Util::Controls::ImageControl *control = new KadasGlobeNavigationControl( image );
   control->setPosition( x, y );
   control->setWidth( image->s() );
   control->setHeight( image->t() );
@@ -624,27 +476,27 @@ void KadasGlobeIntegration::setupControls()
   int imgLeft = 16;
   int imgTop = 20;
   addImageControl( imgDir + "/YawPitchWheel.png", 16, 20 );
-  addControl( new NavigationControl, imgLeft, imgTop + 18, 20, 22, new RotateControlHandler( manip, -MOVE_OFFSET, 0 ) );
-  addControl( new NavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new RotateControlHandler( manip, MOVE_OFFSET, 0 ) );
-  addControl( new NavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new RotateControlHandler( manip, 0, 0 ) );
-  addControl( new NavigationControl, imgLeft + 20, imgTop, 24, 19, new RotateControlHandler( manip, 0, -MOVE_OFFSET ) );
-  addControl( new NavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new RotateControlHandler( manip, 0, MOVE_OFFSET ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, -1., 0 ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, 1., 0 ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeRotateControlHandler( manip, 0, 0 ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, -1. ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, 1. ) );
 
   // Move controls
   imgTop = 80;
   addImageControl( imgDir + "/MoveWheel.png", imgLeft, imgTop );
-  addControl( new NavigationControl, imgLeft, imgTop + 18, 20, 22, new PanControlHandler( manip, MOVE_OFFSET, 0 ) );
-  addControl( new NavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new PanControlHandler( manip, -MOVE_OFFSET, 0 ) );
-  addControl( new NavigationControl, imgLeft + 20, imgTop, 24, 19, new PanControlHandler( manip, 0, -MOVE_OFFSET ) );
-  addControl( new NavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new PanControlHandler( manip, 0, MOVE_OFFSET ) );
-  addControl( new NavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new HomeControlHandler( manip ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, 1., 0 ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, -1., 0 ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop, 24, 19, new KadasGlobePanControlHandler( manip, 0, -1. ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobePanControlHandler( manip, 0, 1. ) );
+  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeHomeControlHandler( manip ) );
 
   // Zoom controls
   imgLeft = 28;
   imgTop = imgTop + 62;
   addImageControl( imgDir + "/button-background.png", imgLeft, imgTop );
-  addImageControl( imgDir + "/zoom-in.png", imgLeft + 3, imgTop + 2, new ZoomControlHandler( manip, 0, -MOVE_OFFSET ) );
-  addImageControl( imgDir + "/zoom-out.png", imgLeft + 3, imgTop + 29, new ZoomControlHandler( manip, 0, MOVE_OFFSET ) );
+  addImageControl( imgDir + "/zoom-in.png", imgLeft + 3, imgTop + 2, new KadasGlobeZoomControlHandler( manip, 0, -1. ) );
+  addImageControl( imgDir + "/zoom-out.png", imgLeft + 3, imgTop + 29, new KadasGlobeZoomControlHandler( manip, 0, 1. ) );
 }
 
 void KadasGlobeIntegration::setupProxy()
@@ -1000,81 +852,4 @@ void KadasGlobeIntegration::enableFrustumHighlight( bool status )
     mMapNode->getTerrainEngine()->addUpdateCallback( mFrustumHighlightCallback );
   else
     mMapNode->getTerrainEngine()->removeUpdateCallback( mFrustumHighlightCallback );
-}
-
-bool NavigationControl::handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa, osgEarth::Util::Controls::ControlContext &cx )
-{
-  if ( ea.getEventType() == osgGA::GUIEventAdapter::PUSH )
-  {
-    mMousePressed = true;
-    // FIXME, should this work?
-    aa.requestContinuousUpdate( true );
-  }
-  else if ( ea.getEventType() == osgGA::GUIEventAdapter::FRAME && mMousePressed )
-  {
-    float canvasY = cx._vp->height() - ( ea.getY() - cx._view->getCamera()->getViewport()->y() );
-    float canvasX = ea.getX() - cx._view->getCamera()->getViewport()->x();
-
-    if ( intersects( canvasX, canvasY ) )
-    {
-      for ( osgEarth::Util::Controls::ControlEventHandlerList::const_iterator i = _eventHandlers.begin(); i != _eventHandlers.end(); ++i )
-      {
-        NavigationControlHandler *handler = dynamic_cast<NavigationControlHandler *>( i->get() );
-        if ( handler )
-        {
-          handler->onMouseDown();
-        }
-      }
-    }
-  }
-  else if ( ea.getEventType() == osgGA::GUIEventAdapter::RELEASE )
-  {
-    for ( osgEarth::Util::Controls::ControlEventHandlerList::const_iterator i = _eventHandlers.begin(); i != _eventHandlers.end(); ++i )
-    {
-      NavigationControlHandler *handler = dynamic_cast<NavigationControlHandler *>( i->get() );
-      if ( handler )
-      {
-        handler->onClick( ea, aa );
-      }
-    }
-    mMousePressed = false;
-    // FIXME, should this work?
-    aa.requestContinuousUpdate( false );
-  }
-  return Control::handle( ea, aa, cx );
-}
-
-bool KeyboardControlHandler::handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa )
-{
-  if ( ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN )
-  {
-    //move map
-    if ( ea.getKey() == '4' )
-      _manip->pan( -MOVE_OFFSET, 0 );
-    else if ( ea.getKey() == '6' )
-      _manip->pan( MOVE_OFFSET, 0 );
-    else if ( ea.getKey() == '2' )
-      _manip->pan( 0, MOVE_OFFSET );
-    else if ( ea.getKey() == '8' )
-      _manip->pan( 0, -MOVE_OFFSET );
-    //rotate
-    else if ( ea.getKey() == '/' )
-      _manip->rotate( MOVE_OFFSET, 0 );
-    else if ( ea.getKey() == '*' )
-      _manip->rotate( -MOVE_OFFSET, 0 );
-    //tilt
-    else if ( ea.getKey() == '9' )
-      _manip->rotate( 0, MOVE_OFFSET );
-    else if ( ea.getKey() == '3' )
-      _manip->rotate( 0, -MOVE_OFFSET );
-    //zoom
-    else if ( ea.getKey() == '-' )
-      _manip->zoom( 0, MOVE_OFFSET );
-    else if ( ea.getKey() == '+' )
-      _manip->zoom( 0, -MOVE_OFFSET );
-    //reset
-    else if ( ea.getKey() == '5' )
-      _manip->home( ea, aa );
-  }
-  return false;
 }

@@ -51,17 +51,17 @@ KadasGlobeDialog::KadasGlobeDialog( QWidget *parent, Qt::WindowFlags fl )
   tmsImageryMenu->addAction( "Readymap: High resolution insets from various world locations", this, &KadasGlobeDialog::addTMSImagery )->setData( "http://readymap.org/readymap/tiles/1.0.0/3/" );
   tmsImageryMenu->addAction( "Readymap: Global Land Cover Facility 15m Landsat", this, &KadasGlobeDialog::addTMSImagery )->setData( "http://readymap.org/readymap/tiles/1.0.0/6/" );
   tmsImageryMenu->addAction( "Readymap: NASA BlueMarble + Landsat + Ocean Masking Layer", this, &KadasGlobeDialog::addTMSImagery )->setData( "http://readymap.org/readymap/tiles/1.0.0/7/" );
-  tmsImageryMenu->addAction( tr( "Custom…" ), this, &KadasGlobeDialog::addCustomTMSImagery );
+  tmsImageryMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomTMSImagery );
   addImageryMenu->addAction( tr( "TMS" ) )->setMenu( tmsImageryMenu );
 
   QMenu *wmsImageryMenu = new QMenu( this );
-  wmsImageryMenu->addAction( tr( "Custom…" ), this, &KadasGlobeDialog::addCustomWMSImagery );
+  wmsImageryMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomWMSImagery );
   addImageryMenu->addAction( tr( "WMS" ) )->setMenu( wmsImageryMenu );
 
   QMenu *fileImageryMenu = new QMenu( this );
   QString worldtif = QDir::cleanPath( Kadas::pkgDataPath() + "/globe/world.tif" );
   fileImageryMenu->addAction( tr( "world.tif" ), this, &KadasGlobeDialog::addRasterImagery )->setData( worldtif );
-  fileImageryMenu->addAction( tr( "Custom…" ), this, &KadasGlobeDialog::addCustomRasterImagery );
+  fileImageryMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomRasterImagery );
   addImageryMenu->addAction( tr( "Raster" ) )->setMenu( fileImageryMenu );
 
   mAddImageryButton->setMenu( addImageryMenu );
@@ -71,11 +71,11 @@ KadasGlobeDialog::KadasGlobeDialog( QWidget *parent, Qt::WindowFlags fl )
 
   QMenu *tmsElevationMenu = new QMenu( this );
   tmsElevationMenu->addAction( "Readymap: SRTM 90m Elevation Data", this, &KadasGlobeDialog::addTMSElevation )->setData( "http://readymap.org/readymap/tiles/1.0.0/9/" );
-  tmsElevationMenu->addAction( tr( "Custom…" ), this, &KadasGlobeDialog::addCustomTMSElevation );
+  tmsElevationMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomTMSElevation );
   addElevationMenu->addAction( tr( "TMS" ) )->setMenu( tmsElevationMenu );
 
   QMenu *fileElevationMenu = new QMenu( this );
-  fileElevationMenu->addAction( tr( "Custom…" ), this, &KadasGlobeDialog::addCustomRasterElevation );
+  fileElevationMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomRasterElevation );
   addElevationMenu->addAction( tr( "Raster" ) )->setMenu( fileElevationMenu );
 
   mAddElevationButton->setMenu( addElevationMenu );
