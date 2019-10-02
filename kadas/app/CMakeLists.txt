@@ -47,6 +47,7 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Xml
   Qt5::Sql
   Qt5::OpenGL
+  Qt5::PrintSupport
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}
   ${CRASHRPT_LIBRARY}

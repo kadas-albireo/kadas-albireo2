@@ -30,6 +30,8 @@
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsprintlayout.h>
+#include <qgis/qgslayoutmanager.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsrasterlayer.h>
@@ -720,6 +722,39 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 QgsMapLayer *KadasApplication::currentLayer() const
 {
   return mMainWindow->layerTreeView()->currentLayer();
+}
+
+QgsPrintLayout *KadasApplication::createNewPrintLayout( const QString &title )
+{
+  QString t = title;
+  if ( t.isEmpty() )
+  {
+    t = QgsProject::instance()->layoutManager()->generateUniqueTitle( QgsMasterLayoutInterface::PrintLayout );
+  }
+  //create new layout object
+  QgsPrintLayout *layout = new QgsPrintLayout( QgsProject::instance() );
+  layout->setName( t );
+  layout->initializeDefaults();
+  if ( QgsProject::instance()->layoutManager()->addLayout( layout ) )
+  {
+    emit printLayoutAdded( layout );
+    return layout;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+bool KadasApplication::deletePrintLayout( QgsPrintLayout *layout )
+{
+  emit printLayoutWillBeRemoved( layout );
+  return QgsProject::instance()->layoutManager()->removeLayout( layout );
+}
+
+QList<QgsPrintLayout *> KadasApplication::printLayouts() const
+{
+  return QgsProject::instance()->layoutManager()->printLayouts();
 }
 
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )

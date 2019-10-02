@@ -287,6 +287,10 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     //! Generic object finder
     QObject *findObject( const QString &name ) override;
+
+    QgsPrintLayout *createNewPrintLayout( const QString &title ) override;
+    bool deletePrintLayout( QgsPrintLayout *layout ) override;
+    QList<QgsPrintLayout *> printLayouts() const override;
 };
 
 

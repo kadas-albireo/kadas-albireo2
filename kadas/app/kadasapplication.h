@@ -26,6 +26,7 @@
 
 class QgsMapLayer;
 class QgsMapTool;
+class QgsPrintLayout;
 class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasClipboard;
@@ -77,6 +78,10 @@ class KadasApplication : public QgsApplication
 
     QgsMapLayer *currentLayer() const;
 
+    QgsPrintLayout *createNewPrintLayout( const QString &title );
+    bool deletePrintLayout( QgsPrintLayout *layout );
+    QList<QgsPrintLayout *> printLayouts() const;
+
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
     void unsetMapTool();
@@ -84,6 +89,8 @@ class KadasApplication : public QgsApplication
   signals:
     void projectRead();
     void activeLayerChanged( QgsMapLayer *layer );
+    void printLayoutAdded( QgsPrintLayout *layout );
+    void printLayoutWillBeRemoved( QgsPrintLayout *layout );
 
   private:
     KadasPluginInterface *mPythonInterface = nullptr;
