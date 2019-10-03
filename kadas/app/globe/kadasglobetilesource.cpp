@@ -129,7 +129,7 @@ void KadasGlobeTileImage::update( osg::NodeVisitor * )
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasGlobeTileUpdateManager::KadasGlobeTileUpdateManager( QObject *parent )
-  : QObject( parent ), mCurrentTile( 0 ), mRenderer( 0 )
+  : QObject( parent )
 {
   connect( this, &KadasGlobeTileUpdateManager::startRendering, this, &KadasGlobeTileUpdateManager::start );
   connect( this, &KadasGlobeTileUpdateManager::cancelRendering, this, &KadasGlobeTileUpdateManager::cancel );
@@ -141,7 +141,7 @@ KadasGlobeTileUpdateManager::~KadasGlobeTileUpdateManager()
   KadasGlobeTileStatistics::instance()->updateQueueTileCount( 0 );
 #endif
   mTileQueue.clear();
-  mCurrentTile = 0;
+  mCurrentTile = nullptr;
   if ( mRenderer )
   {
     mRenderer->cancel();
@@ -165,7 +165,7 @@ void KadasGlobeTileUpdateManager::removeTile( KadasGlobeTileImage *tile )
 {
   if ( mCurrentTile == tile )
   {
-    mCurrentTile = 0;
+    mCurrentTile = nullptr;
     if ( mRenderer )
       emit cancelRendering();
   }
@@ -220,10 +220,10 @@ void KadasGlobeTileUpdateManager::renderingFinished()
   {
     QImage image = mRenderer->renderedImage();
     mCurrentTile->setUpdatedImage( image );
-    mCurrentTile = 0;
+    mCurrentTile = nullptr;
   }
   mRenderer->deleteLater();
-  mRenderer = 0;
+  mRenderer = nullptr;
   start();
 }
 
