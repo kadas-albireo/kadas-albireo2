@@ -90,7 +90,7 @@ class KadasGlobeTileUpdateManager : public QObject
   public:
     KadasGlobeTileUpdateManager( QObject *parent = nullptr );
     ~KadasGlobeTileUpdateManager();
-    void updateLayerSet( const QList<QgsMapLayer *> &layers ) { mLayers = layers; }
+    void updateLayerSet( const QList<QPointer<QgsMapLayer>> &layers ) { mLayers = layers; }
     void addTile( KadasGlobeTileImage *tile );
     void removeTile( KadasGlobeTileImage *tile );
     void waitForFinished() const;
@@ -100,7 +100,7 @@ class KadasGlobeTileUpdateManager : public QObject
     void cancelRendering();
 
   private:
-    QList<QgsMapLayer *> mLayers;
+    QList<QPointer<QgsMapLayer>> mLayers;
     QList<KadasGlobeTileImage *> mTileQueue;
     KadasGlobeTileImage *mCurrentTile = nullptr;
     QgsMapRendererParallelJob *mRenderer = nullptr;
@@ -123,8 +123,8 @@ class KadasGlobeTileSource : public osgEarth::TileSource
     osgEarth::CachePolicy getCachePolicyHint( const osgEarth::Profile * /*profile*/ ) const override { return osgEarth::CachePolicy::NO_CACHE; }
 
     void refresh( const QgsRectangle &dirtyExtent );
-    void setLayers( const QList<QgsMapLayer *> &layers ) { mLayers = layers; }
-    const QList<QgsMapLayer *> &layers() const { return mLayers; }
+    void setLayers( const QList<QgsMapLayer *> &layers );
+    QList<QgsMapLayer *> layers() const;
 
     void waitForFinished() const
     {
@@ -137,7 +137,7 @@ class KadasGlobeTileSource : public osgEarth::TileSource
     QMutex mTileListLock;
     QList<KadasGlobeTileImage *> mTiles;
     QgsMapCanvas *mCanvas = nullptr;
-    QList<QgsMapLayer *> mLayers;
+    QList<QPointer<QgsMapLayer>> mLayers;
     KadasGlobeTileUpdateManager mTileUpdateManager;
 
     void addTile( KadasGlobeTileImage *tile );

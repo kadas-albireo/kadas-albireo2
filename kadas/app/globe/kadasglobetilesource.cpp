@@ -74,7 +74,7 @@ KadasGlobeTileImage::KadasGlobeTileImage( KadasGlobeTileSource *tileSource, cons
 #else
   QImage qImage( mTileData, mTileSize, mTileSize, QImage::Format_ARGB32_Premultiplied );
   QPainter painter( &qImage );
-  QgsMapRendererCustomPainterJob job( createSettings( qImage.logicalDpiX(), mTileSource->mLayers ), &painter );
+  QgsMapRendererCustomPainterJob job( createSettings( qImage.logicalDpiX(), mTileSource->layers() ), &painter );
   job.renderSynchronously();
 
   setImage( mTileSize, mTileSize, 1, 4, // width, height, depth, internal_format
@@ -188,13 +188,21 @@ void KadasGlobeTileUpdateManager::waitForFinished() const
 
 void KadasGlobeTileUpdateManager::start()
 {
-  if ( mRenderer == 0 && !mTileQueue.isEmpty() )
+  if ( mRenderer == nullptr && !mTileQueue.isEmpty() )
   {
     mCurrentTile = mTileQueue.takeFirst();
 #ifdef GLOBE_SHOW_TILE_STATS
     KadasGlobeTileStatistics::instance()->updateQueueTileCount( mTileQueue.size() );
 #endif
-    mRenderer = new QgsMapRendererParallelJob( mCurrentTile->createSettings( mCurrentTile->dpi(), mLayers ) );
+    QList<QgsMapLayer *> layers;
+    for ( QPointer<QgsMapLayer> layer : mLayers )
+    {
+      if ( !layer.isNull() )
+      {
+        layers.append( layer.data() );
+      }
+    }
+    mRenderer = new QgsMapRendererParallelJob( mCurrentTile->createSettings( mCurrentTile->dpi(), layers ) );
     connect( mRenderer, &QgsMapRendererParallelJob::finished, this, &KadasGlobeTileUpdateManager::renderingFinished );
     mRenderer->start();
   }
@@ -257,7 +265,6 @@ osg::Image *KadasGlobeTileSource::createImage( const osgEarth::TileKey &key, osg
 
 void KadasGlobeTileSource::refresh( const QgsRectangle &dirtyExtent )
 {
-  mTileUpdateManager.updateLayerSet( mLayers );
   mTileListLock.lock();
   for ( KadasGlobeTileImage *tile : mTiles )
   {
@@ -268,6 +275,30 @@ void KadasGlobeTileSource::refresh( const QgsRectangle &dirtyExtent )
   }
   mTileListLock.unlock();
 }
+
+void KadasGlobeTileSource::setLayers( const QList<QgsMapLayer *> &layers )
+{
+  mLayers.clear();
+  for ( QgsMapLayer *layer : layers )
+  {
+    mLayers.append( QPointer<QgsMapLayer>( layer ) );
+  }
+  mTileUpdateManager.updateLayerSet( mLayers );
+}
+
+QList<QgsMapLayer *> KadasGlobeTileSource::layers() const
+{
+  QList<QgsMapLayer *> layers;
+  for ( QPointer<QgsMapLayer> layer : mLayers )
+  {
+    if ( !layer.isNull() )
+    {
+      layers.append( layer.data() );
+    }
+  }
+  return layers;
+}
+
 
 void KadasGlobeTileSource::addTile( KadasGlobeTileImage *tile )
 {
