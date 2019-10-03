@@ -229,6 +229,5 @@ void KadasLayerTreeViewMenuProvider::showLayerInfo()
 
 void KadasLayerTreeViewMenuProvider::showLayerProperties()
 {
-  //  mView->currentLayer();
-  // TODO
+  kApp->showLayerProperties( mView->currentLayer() );
 }

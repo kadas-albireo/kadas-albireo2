@@ -25,6 +25,7 @@
 #include <kadas/gui/kadasfeaturepicker.h>
 
 class QgsMapLayer;
+class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
 class QgsPrintLayout;
 class QgsRasterLayer;
@@ -73,10 +74,13 @@ class KadasApplication : public QgsApplication
     void saveMapToClipboard();
 
     void showLayerAttributeTable( const QgsMapLayer *layer );
-    void showLayerProperties( const QgsMapLayer *layer );
+    void showLayerProperties( QgsMapLayer *layer );
     void showLayerInfo( const QgsMapLayer *layer );
 
     QgsMapLayer *currentLayer() const;
+
+    void registerMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
+    void unregisterMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
 
     QgsPrintLayout *createNewPrintLayout( const QString &title );
     bool deletePrintLayout( QgsPrintLayout *layout );
@@ -100,6 +104,7 @@ class KadasApplication : public QgsApplication
     QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;
     QMap<QString, QString> mItemLayerMap;
+    QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
