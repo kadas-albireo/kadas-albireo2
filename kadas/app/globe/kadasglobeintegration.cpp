@@ -739,7 +739,11 @@ void KadasGlobeIntegration::layerChanged()
         mLayerExtents.remove( mapLayer->id() );
         refreshQGISMapLayer( dirtyExtent );
       }
-      mMapNode->getMap()->removeLayer( mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() ) );
+      osgEarth::Layer *layer = mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() );
+      if ( layer )
+      {
+        mMapNode->getMap()->removeLayer( layer );
+      }
       addModelLayer( static_cast<QgsVectorLayer *>( mapLayer ), layerConfig );
     }
     else
@@ -764,7 +768,11 @@ void KadasGlobeIntegration::layerChanged()
         mLayerExtents.insert( mapLayer->id(), extent );
       }
       // Remove any model layer of that layer, in case one existed
-      mMapNode->getMap()->removeLayer( mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() ) );
+      osgEarth::Layer *layer = mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() );
+      if ( layer )
+      {
+        mMapNode->getMap()->removeLayer( layer );
+      }
       QgsRectangle layerExtent = QgsCoordinateTransform( mapLayer->crs(), QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), QgsProject::instance()->transformContext() ).transform( mapLayer->extent() );
       QgsRectangle dirtyExtent = layerExtent;
       if ( mLayerExtents.contains( mapLayer->id() ) )
