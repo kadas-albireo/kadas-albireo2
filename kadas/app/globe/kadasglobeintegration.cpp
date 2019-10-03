@@ -81,7 +81,6 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
   kApp->registerMapLayerPropertiesFactory( mLayerPropertiesFactory );
 
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
-  connect( mLayerPropertiesFactory, &KadasGlobeLayerPropertiesFactory::layerSettingsChanged, this, qOverload<QgsMapLayer *>( &KadasGlobeIntegration::layerChanged ) );
   connect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
   connect( kApp, &KadasApplication::projectRead, this, &KadasGlobeIntegration::projectRead );
 }
@@ -657,9 +656,9 @@ void KadasGlobeIntegration::updateLayers()
     for ( QgsMapLayer *mapLayer : mTileSource->layers() )
     {
       if ( mapLayer )
-        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
       if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
     }
     osgEarth::ModelLayerVector modelLayers;
     mMapNode->getMap()->getLayers( modelLayers );
@@ -667,9 +666,9 @@ void KadasGlobeIntegration::updateLayers()
     {
       QgsMapLayer *mapLayer = QgsProject::instance()->mapLayer( QString::fromStdString( modelLayer->getName() ) );
       if ( mapLayer )
-        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
       if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
       if ( !selectedLayerIds.contains( QString::fromStdString( modelLayer->getName() ) ) )
         mMapNode->getMap()->removeLayer( modelLayer );
     }
@@ -677,13 +676,13 @@ void KadasGlobeIntegration::updateLayers()
     for ( const QString &layerId : selectedLayerIds )
     {
       QgsMapLayer *mapLayer = QgsProject::instance()->mapLayer( layerId );
-      connect( mapLayer, &QgsMapLayer::repaintRequested, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+      connect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
 
       KadasGlobeVectorLayerConfig *layerConfig = 0;
       if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
       {
         layerConfig = KadasGlobeVectorLayerConfig::getConfig( static_cast<QgsVectorLayer *>( mapLayer ) );
-        connect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, qOverload<>( &KadasGlobeIntegration::layerChanged ) );
+        connect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
       }
 
       if ( layerConfig && ( layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelSimple || layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced ) )
@@ -711,14 +710,10 @@ void KadasGlobeIntegration::updateLayers()
 
 void KadasGlobeIntegration::layerChanged()
 {
-  layerChanged( qobject_cast<QgsMapLayer *>( QObject::sender() ) );
-}
-
-void KadasGlobeIntegration::layerChanged( QgsMapLayer *mapLayer )
-{
+  QgsMapLayer *mapLayer = qobject_cast<QgsMapLayer *>( QObject::sender() );
   if ( !mapLayer )
   {
-    mapLayer = qobject_cast<QgsMapLayer *>( QObject::sender() );
+    return;
   }
   if ( mapLayer->isEditable() )
   {

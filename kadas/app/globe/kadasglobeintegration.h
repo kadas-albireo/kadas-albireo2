@@ -119,7 +119,6 @@ class KadasGlobeIntegration : public QObject
     void reset();
     void projectRead();
     void applySettings();
-    void layerChanged( QgsMapLayer *mapLayer );
     void layerChanged();
     void rebuildQGISLayer();
     void refreshQGISMapLayer( const QgsRectangle &dirtyRect );
