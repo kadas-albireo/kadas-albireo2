@@ -78,8 +78,7 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
   connect( mSettingsDialog, &KadasGlobeDialog::settingsApplied, this, &KadasGlobeIntegration::applySettings );
 
   mLayerPropertiesFactory = new KadasGlobeLayerPropertiesFactory( this );
-  // TODO
-//  kApp->registerMapLayerConfigWidgetFactory( mLayerPropertiesFactory );
+  kApp->registerMapLayerPropertiesFactory( mLayerPropertiesFactory );
 
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
   connect( mLayerPropertiesFactory, &KadasGlobeLayerPropertiesFactory::layerSettingsChanged, this, qOverload<QgsMapLayer *>( &KadasGlobeIntegration::layerChanged ) );

@@ -192,7 +192,7 @@ QgsMapLayerConfigWidget *KadasGlobeLayerPropertiesFactory::createWidget( QgsMapL
 
 QIcon KadasGlobeLayerPropertiesFactory::icon() const
 {
-  return QIcon( ":/globe/icon.svg" );
+  return QIcon( ":/kadas/icons/globe_color" );
 }
 
 QString KadasGlobeLayerPropertiesFactory::title() const
