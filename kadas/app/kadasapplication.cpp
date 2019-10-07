@@ -209,6 +209,8 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
+  connect( mMainWindow->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasApplication::updateWmtsZoomResolutions );
+  connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
@@ -1231,4 +1233,37 @@ void KadasApplication::loadPythonSupport()
     QgsPythonRunner::setInstance( new KadasPythonRunner( mPythonIntegration ) );
     mPythonIntegration->restorePlugins();
   }
+}
+
+void KadasApplication::updateWmtsZoomResolutions() const
+{
+  QList<double> resolutions;
+  for ( QgsMapLayer *layer : mMainWindow->mapCanvas()->layers() )
+  {
+    QgsRasterLayer *rasterLayer = dynamic_cast<QgsRasterLayer *>( layer );
+    if ( !rasterLayer )
+    {
+      continue;
+    }
+
+    QgsRasterDataProvider *currentProvider = rasterLayer->dataProvider();
+    if ( !currentProvider || currentProvider->name().compare( "wms", Qt::CaseInsensitive ) != 0 )
+    {
+      continue;
+    }
+
+    //wmts must not be reprojected
+    if ( currentProvider->crs() != mMainWindow->mapCanvas()->mapSettings().destinationCrs() )
+    {
+      continue;
+    }
+
+    //property 'resolutions' for wmts layers
+    resolutions = rasterLayer->dataProvider()->nativeResolutions();
+    if ( !resolutions.isEmpty() )
+    {
+      break;
+    }
+  }
+  mMainWindow->mapCanvas()->setZoomResolutions( resolutions );
 }
