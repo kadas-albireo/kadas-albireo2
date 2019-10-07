@@ -574,6 +574,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     emit projectRead();
   }
 
+  mMainWindow->layerTreeMapCanvasBridge()->setCanvasLayers();
   mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer( autoSetupOnFirstLayer );
   mMainWindow->mapCanvas()->freeze( false );
   mMainWindow->mapCanvas()->refresh();
