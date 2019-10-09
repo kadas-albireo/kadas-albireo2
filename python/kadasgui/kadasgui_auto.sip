@@ -24,6 +24,7 @@
 %Include auto_generated/mapitemeditors/kadasredliningitemeditor.sip
 %Include auto_generated/mapitemeditors/kadasredliningtexteditor.sip
 %Include auto_generated/mapitemeditors/kadassymbolattributeseditor.sip
+%Include auto_generated/kadascoordinateinput.sip
 %Include auto_generated/maptools/kadasmaptoolpan.sip
 %Include auto_generated/maptools/kadasmaptooledititem.sip
 %Include auto_generated/maptools/kadasmaptoolheightprofile.sip
