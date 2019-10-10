@@ -39,7 +39,7 @@ class KADAS_GUI_EXPORT KadasCoordinateInput : public QWidget
     const QgsCoordinateReferenceSystem &getCrs() const { return mCrs; }
     bool isEmpty() const { return mEmpty; }
 
-    void setCoordinate( const QgsPoint &coo, const QgsCoordinateReferenceSystem &crs );
+    void setCoordinate( const QgsPointXY &coo, const QgsCoordinateReferenceSystem &crs );
 
   private:
     static const int sFormatRole = Qt::UserRole + 1;

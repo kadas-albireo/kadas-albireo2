@@ -65,7 +65,7 @@ KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
   mCrs = QgsCoordinateReferenceSystem( mCrsCombo->currentData( sAuthidRole ).toString() );
 }
 
-void KadasCoordinateInput::setCoordinate( const QgsPoint &coo, const QgsCoordinateReferenceSystem &crs )
+void KadasCoordinateInput::setCoordinate( const QgsPointXY &coo, const QgsCoordinateReferenceSystem &crs )
 {
   mEmpty = false;
   mCoo = QgsCoordinateTransform( crs, mCrs, QgsProject::instance() ).transform( coo );

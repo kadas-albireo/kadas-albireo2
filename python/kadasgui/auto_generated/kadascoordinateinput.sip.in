@@ -32,11 +32,11 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasCoordinateInput( QWidget *parent );
 
-    const QgsPoint &getCoordinate() const;
+    const QgsPointXY &getCoordinate() const;
     const QgsCoordinateReferenceSystem &getCrs() const;
     bool isEmpty() const;
 
-    void setCoordinate( const QgsPoint &coo, const QgsCoordinateReferenceSystem &crs );
+    void setCoordinate( const QgsPointXY &coo, const QgsCoordinateReferenceSystem &crs );
 
   signals:
     void coordinateEdited();
