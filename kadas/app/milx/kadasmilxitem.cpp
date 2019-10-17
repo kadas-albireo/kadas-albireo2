@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QDesktopWidget>
+#include <QMenu>
 #include <QVector2D>
 
 #include <qgis/qgsdistancearea.h>
@@ -117,7 +118,12 @@ KadasItemRect KadasMilxItem::boundingBox() const
 
 KadasMapItem::Margin KadasMilxItem::margin() const
 {
-  return mMargin;
+  Margin m = mMargin;
+  m.left = qMax( 0, m.left - constState()->userOffset.x() );
+  m.right = qMax( 0, m.right + constState()->userOffset.x() );
+  m.top = qMax( 0, m.top - constState()->userOffset.y() );
+  m.bottom = qMax( 0, m.bottom + constState()->userOffset.y() );
+  return m;
 }
 
 QList<KadasMapItem::Node> KadasMilxItem::nodes( const QgsMapSettings &settings ) const
@@ -168,11 +174,11 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
     mCachedGraphicOffset = result.offset;
     mCachedExtent = context.mapExtent();
   }
-  QPoint renderPos = symbol.points.front() + mCachedGraphicOffset + constState()->userOffset;
+  QPoint renderPos = symbol.points.front() + mCachedGraphicOffset;
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
-    context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset );
+    context.painter()->drawLine( symbol.points.front(), symbol.points.front() - constState()->userOffset );
   }
   context.painter()->drawImage( renderPos, mCachedGraphic );
 }
@@ -288,7 +294,6 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true );
   updateSymbol( mapSettings, result );
 
-  update();
   return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
 }
 
@@ -312,8 +317,6 @@ void KadasMilxItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings 
   {
     updateSymbol( mapSettings, result );
   }
-
-  update();
 }
 
 void KadasMilxItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
@@ -343,8 +346,6 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
     {
       updateSymbol( mapSettings, result );
     }
-
-    update();
   }
   return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
 }
@@ -386,28 +387,116 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
       return EditContext( QgsVertexId( 0, 0, iPoint ), testPos, drawAttribs() );
     }
   }
+  double tol = mapSettings.mapUnitsPerPixel();
+  if ( intersects( KadasMapRect( pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->points.front(), mapSettings );
+    if ( !isMultiPoint() )
+    {
+      // Current offset symbol map position
+      refPos = KadasMapPos::fromPoint( mapSettings.mapToPixel().toMapCoordinates( mapSettings.mapToPixel().transform( refPos ).toQPointF().toPoint() + constState()->userOffset ) );
+    }
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+  }
   return EditContext();
 }
 
 void KadasMilxItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
-  int dpi = mapSettings.outputDpi();
-  KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
-
-  QPoint screenPoint = mapSettings.mapToPixel().transform( newPoint ).toQPointF().toPoint();
-  KadasMilxClient::NPointSymbolGraphic result;
-  if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, result ) )
+  if ( context.vidx.isValid() )
   {
-    updateSymbol( mapSettings, result );
-  }
+    // Move node
+    QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
+    int dpi = mapSettings.outputDpi();
+    KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
 
-  update();
+    QPoint screenPoint = mapSettings.mapToPixel().transform( newPoint ).toQPointF().toPoint();
+    KadasMilxClient::NPointSymbolGraphic result;
+    if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, result ) )
+    {
+      updateSymbol( mapSettings, result );
+    }
+  }
+  else if ( isMultiPoint() )
+  {
+    // Move multipoint symbol as a whole
+    KadasMapPos refMapPos = toMapPos( constState()->points.front(), mapSettings );
+    for ( KadasItemPos &pos : state()->points )
+    {
+      KadasMapPos mapPos = toMapPos( pos, mapSettings );
+      pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+    }
+    for ( QPair<int, KadasItemPos> &attr : state()->attributePoints )
+    {
+      KadasMapPos mapPos = toMapPos( attr.second, mapSettings );
+      attr.second = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+    }
+    // No need for full symbol update just for moving
+    update();
+  }
+  else
+  {
+    // Set one-point symbol offset
+    QPoint anchorPos = mapSettings.mapToPixel().transform( toMapPos( constState()->points.front(), mapSettings ) ).toQPointF().toPoint();
+    QPoint newPos = mapSettings.mapToPixel().transform( newPoint ).toQPointF().toPoint();
+    state()->userOffset = QPoint( newPos - anchorPos );
+    // No need for full symbol update just for moving
+    update();
+  }
 }
 
 void KadasMilxItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
   edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+}
+
+void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
+{
+  QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
+  QPoint screenPos = mapSettings.mapToPixel().transform( clickPos ).toQPointF().toPoint();
+  int dpi = mapSettings.outputDpi();
+  KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
+
+  QAction *actionEdit = menu->addAction( tr( "Symbol editor..." ), [ = ]
+  {
+    KadasMilxClient::NPointSymbolGraphic result;
+    WId winId = QApplication::topLevelWidgets().front()->winId();
+    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, result, winId ) )
+    {
+      updateSymbol( mapSettings, result );
+    }
+  } );
+  if ( isMultiPoint() )
+  {
+    if ( context.vidx.vertex >= 0 )
+    {
+      QAction *actionDeletePoint = menu->addAction( tr( "Delete node" ), [ = ]
+      {
+        KadasMilxClient::NPointSymbolGraphic result;
+        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, result ) )
+          updateSymbol( mapSettings, result );
+      } );
+      bool canDelete = false;
+      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, context.vidx.vertex, canDelete ) && canDelete );
+    }
+    else
+    {
+      menu->addAction( tr( "Add node" ), [ = ]
+      {
+        KadasMilxClient::NPointSymbolGraphic result;
+        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, result ) )
+          updateSymbol( mapSettings, result );
+      } );
+    }
+  }
+  else
+  {
+    menu->addAction( tr( "Reset offset" ), [ = ]
+    {
+      state()->userOffset = QPoint();
+      update();
+    } );
+  }
 }
 
 KadasMapItem::AttribValues KadasMilxItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
@@ -709,4 +798,6 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
 
   // Invalidate cache
   mCachedGraphic = QImage();
+
+  update();
 }

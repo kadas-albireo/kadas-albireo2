@@ -72,11 +72,11 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       for ( int i = 0, n = result.size(); i < n; ++i )
       {
         QPoint itemOrigin = symbols[i].points.front();
-        QPoint renderPos = itemOrigin + result[i].offset + renderItems[i]->constState()->userOffset;
+        QPoint renderPos = itemOrigin + result[i].offset;
         if ( !renderItems[i]->isMultiPoint() )
         {
           // Draw line from visual reference point to actual refrence point
-          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + renderItems[i]->constState()->userOffset );
+          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
       }
