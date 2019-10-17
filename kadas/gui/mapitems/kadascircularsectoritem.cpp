@@ -203,8 +203,16 @@ KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition( con
     attributes.insert( AttrX, mapCenter.x() );
     attributes.insert( AttrY, mapCenter.y() );
     attributes.insert( AttrR, qSqrt( mapCenter.sqrDist( mapRPos ) ) );
-    attributes.insert( AttrA1, constState()->startAngles.last() / M_PI * 180. );
-    attributes.insert( AttrA2, constState()->stopAngles.last() / M_PI * 180. );
+    if ( constState()->sectorStatus == State::HaveRadius )
+    {
+      attributes.insert( AttrA1, constState()->startAngles.last() / M_PI * 180. );
+      attributes.insert( AttrA2, constState()->stopAngles.last() / M_PI * 180. );
+    }
+    else
+    {
+      attributes.insert( AttrA1, 0 );
+      attributes.insert( AttrA2, 0 );
+    }
   }
   return attributes;
 }
