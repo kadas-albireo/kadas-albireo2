@@ -275,7 +275,12 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   state()->points.append( toItemPos( firstPoint, mapSettings ) );
   state()->pressedPoints = 1;
 
-  updateSymbol( mapSettings );
+  KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
+  KadasMilxClient::NPointSymbolGraphic result;
+  QRect screenExtent = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
+  int dpi = mapSettings.outputDpi();
+  KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true );
+  updateSymbol( mapSettings, result );
 
   update();
   return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
@@ -299,7 +304,7 @@ void KadasMilxItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings 
   KadasMilxClient::NPointSymbolGraphic result;
   if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, index, screenPoint, result ) )
   {
-    updateSymbolPoints( mapSettings, result );
+    updateSymbol( mapSettings, result );
   }
 
   update();
@@ -330,7 +335,7 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
     KadasMilxClient::NPointSymbolGraphic result;
     if ( KadasMilxClient::appendPoint( screenRect, dpi, symbol, screenPoint, result ) )
     {
-      updateSymbolPoints( mapSettings, result );
+      updateSymbol( mapSettings, result );
     }
 
     update();
@@ -388,7 +393,7 @@ void KadasMilxItem::edit( const EditContext &context, const KadasMapPos &newPoin
   KadasMilxClient::NPointSymbolGraphic result;
   if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, result ) )
   {
-    updateSymbolPoints( mapSettings, result );
+    updateSymbol( mapSettings, result );
   }
 
   update();
@@ -648,17 +653,7 @@ double KadasMilxItem::metersToPixels( const QgsPointXY &refPoint, const QgsMapTo
   return screenDist / ellipsoidDist;
 }
 
-void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings )
-{
-  KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
-  KadasMilxClient::NPointSymbolGraphic result;
-  QRect screenExtent = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
-  int dpi = mapSettings.outputDpi();
-  KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true );
-  updateSymbolPoints( mapSettings, result );
-}
-
-void KadasMilxItem::updateSymbolPoints( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result )
+void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result )
 {
   QgsCoordinateTransform mapCrst( crs(), mapSettings.destinationCrs(), QgsProject::instance()->transformContext() );
   state()->points.clear();

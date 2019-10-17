@@ -119,8 +119,7 @@ class KadasMilxItem : public KadasMapItem
     KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
 
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    void updateSymbol( const QgsMapSettings &mapSettings );
-    void updateSymbolPoints( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
+    void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
 
     static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
