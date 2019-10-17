@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsmapcanvas.h>
+
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
@@ -33,6 +35,20 @@ void KadasMapCanvasItemManager::removeItem( KadasMapItem *item )
 {
   emit instance()->itemWillBeRemoved( item );
   instance()->mMapItems.removeAll( item );
+}
+
+void KadasMapCanvasItemManager::removeItemAfterRefresh( KadasMapItem *item, QgsMapCanvas *canvas )
+{
+  if ( !canvas->mapSettings().hasValidSettings() )
+  {
+    // Canvas does not refresh if settings are invalid...
+    removeItem( item );
+  }
+  else
+  {
+    QObject *scope = new QObject;
+    connect( canvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { removeItem( item ); scope->deleteLater(); } );
+  }
 }
 
 const QList<KadasMapItem *> &KadasMapCanvasItemManager::items()

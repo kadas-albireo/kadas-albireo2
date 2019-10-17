@@ -233,8 +233,7 @@ void KadasMapToolEditItemGroup::deselectItem( KadasMapItem *item, bool triggerRe
   {
     mLayer->triggerRepaint();
   }
-  QObject *scope = new QObject;
-  connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+  KadasMapCanvasItemManager::removeItemAfterRefresh( item, mCanvas );
 }
 
 void KadasMapToolEditItemGroup::updateSelection()

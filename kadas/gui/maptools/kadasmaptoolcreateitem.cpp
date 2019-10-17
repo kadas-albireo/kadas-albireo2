@@ -263,8 +263,7 @@ KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) con
 KadasMapItem *KadasMapToolCreateItem::takeItem()
 {
   KadasMapItem *item = mItem;
-  QObject *scope = new QObject;
-  connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+  KadasMapCanvasItemManager::removeItemAfterRefresh( item, mCanvas );
   mItem = nullptr;
   clear();
   return item;
@@ -381,9 +380,7 @@ void KadasMapToolCreateItem::commitItem()
   {
     mLayer->addItem( mItem );
     mLayer->triggerRepaint();
-    KadasMapItem *item = mItem;
-    QObject *scope = new QObject;
-    connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+    KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
   }
   if ( !mLayer )
   {
