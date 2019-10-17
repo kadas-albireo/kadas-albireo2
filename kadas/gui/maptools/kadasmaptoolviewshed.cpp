@@ -242,7 +242,7 @@ void KadasMapToolViewshed::drawFinished()
     QgsProject::instance()->addMapLayer( layer );
 
     KadasSymbolItem *pin = new KadasSymbolItem( canvasCrs, this );
-    pin->setFilePath( ":/kadas/icons/pin_red", 0.5, 1.0 );
+    pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );
     KadasMapCanvasItemManager::addItem( pin );

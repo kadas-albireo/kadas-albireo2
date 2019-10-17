@@ -872,7 +872,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
   KadasMapToolCreateItem::ItemFactory factory = [this]
   {
     KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    item->setFilePath( ":/kadas/icons/pin_red", 0.5, 1.0 );
+    item->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
     item->setEditorFactory( KadasSymbolAttributesEditor::factory );
     return item;
   };

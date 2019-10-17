@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QSvgRenderer>
+#include <QImageReader>
 
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
@@ -31,13 +32,22 @@ KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObje
   clear();
 }
 
-void KadasSymbolItem::setFilePath( const QString &path, double anchorX, double anchorY )
+void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY )
 {
-  mFilePath = path;
   mAnchorX = anchorX;
   mAnchorY = anchorY;
-  QSvgRenderer renderer( mFilePath );
-  state()->size = renderer.viewBox().size();
+  setFilePath( path );
+}
+
+void KadasSymbolItem::setFilePath( const QString &path )
+{
+  mFilePath = path;
+  QImageReader reader( path );
+  mScalable = reader.format() == "svg";
+  state()->size = reader.size();
+  reader.setBackgroundColor( Qt::transparent );
+  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+
   update();
 }
 
@@ -52,32 +62,20 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
 
-  QSvgRenderer svgRenderer( mFilePath );
-
-  //keep width/height ratio of svg
-  QRect viewBox = svgRenderer.viewBox();
-  if ( viewBox.isValid() )
+  double scale = 1.0; // TODO
+  context.painter()->scale( scale, scale );
+  context.painter()->translate( pos.x(), pos.y() );
+  context.painter()->rotate( -constState()->angle );
+  context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
+  if ( mScalable )
   {
-    double scale = 1.0; // TODO
-    QSize frameSize = viewBox.size() * scale;
-    double widthRatio = frameSize.width() / viewBox.width();
-    double heightRatio = frameSize.height() / viewBox.height();
-    double renderWidth = 0;
-    double renderHeight = 0;
-    if ( widthRatio <= heightRatio )
-    {
-      renderWidth = frameSize.width();
-      renderHeight = viewBox.height() * frameSize.width() / viewBox.width();
-    }
-    else
-    {
-      renderHeight = frameSize.height();
-      renderWidth = viewBox.width() * frameSize.height() / viewBox.height();
-    }
-    context.painter()->scale( scale, scale );
-    context.painter()->translate( pos.x(), pos.y() );
-    context.painter()->rotate( -constState()->angle );
-    context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
-    svgRenderer.render( context.painter(), QRectF( 0, 0, renderWidth, renderHeight ) );
+    QSvgRenderer svgRenderer( mFilePath );
+    QSize renderSize = svgRenderer.viewBox().size() * scale;
+    svgRenderer.render( context.painter(), QRectF( 0, 0, renderSize.width(), renderSize.height() ) );
+
+  }
+  else
+  {
+    context.painter()->drawImage( 0, 0, mImage );
   }
 }

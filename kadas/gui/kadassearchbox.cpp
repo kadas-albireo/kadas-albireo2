@@ -457,7 +457,7 @@ void KadasSearchBox::resultSelected()
       if ( !mPin )
       {
         mPin = new KadasSymbolItem( mMapCanvas->mapSettings().destinationCrs(), this );
-        mPin->setFilePath( ":/kadas/icons/pin_blue", 0.5, 1.0 );
+        mPin->setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
         KadasMapCanvasItemManager::addItem( mPin );
       }
       QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( result.crs ), mPin->crs(), QgsProject::instance() ).transform( result.pos );

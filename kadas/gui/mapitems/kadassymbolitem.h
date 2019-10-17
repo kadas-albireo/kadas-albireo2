@@ -29,10 +29,11 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    void setup( const QString &path, double anchorX, double anchorY );
 
     QString itemName() const override { return tr( "Symbol" ); }
 
-    void setFilePath( const QString &path, double anchorX = 0.5, double anchorY = 0.5 );
+    void setFilePath( const QString &path );
     const QString &filePath() const { return mFilePath; }
     void setName( const QString &name ) { mName = name; }
     const QString &name() const { return mName; }
@@ -45,6 +46,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QString mFilePath;
     QString mName;
     QString mRemarks;
+    QImage mImage;
+    bool mScalable = false;
 
     KadasMapItem *_clone() const override { return new KadasSymbolItem( crs() ); } SIP_FACTORY
 };

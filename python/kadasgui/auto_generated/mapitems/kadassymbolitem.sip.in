@@ -28,10 +28,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    void setup( const QString &path, double anchorX, double anchorY );
 
     virtual QString itemName() const;
 
-    void setFilePath( const QString &path, double anchorX = 0.5, double anchorY = 0.5 );
+    void setFilePath( const QString &path );
     const QString &filePath() const;
     void setName( const QString &name );
     const QString &name() const;
