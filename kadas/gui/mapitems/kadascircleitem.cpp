@@ -135,9 +135,9 @@ void KadasCircleItem::endPart()
 KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
-  attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
-  attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::DistanceAttr, 0} );
+  attributes.insert( AttrX, NumericAttribute{"x"} );
+  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrR, NumericAttribute{"r", 0} );
   return attributes;
 }
 
@@ -176,7 +176,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     if ( pos.sqrDist( ringPos ) < pickTol( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::DistanceAttr, 0} );
+      attributes.insert( AttrR, NumericAttribute{"r", 0} );
       return EditContext( QgsVertexId( iPart, 0, 1 ), ringPos, attributes );
     }
 
@@ -184,8 +184,8 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     if ( pos.sqrDist( center ) < pickTol( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
-      attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
+      attributes.insert( AttrX, NumericAttribute{"x"} );
+      attributes.insert( AttrY, NumericAttribute{"y"} );
       return EditContext( QgsVertexId( iPart, 0, 0 ), center, attributes );
     }
   }

@@ -173,8 +173,8 @@ void KadasAnchoredItem::endPart()
 KadasMapItem::AttribDefs KadasAnchoredItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
-  attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
+  attributes.insert( AttrX, NumericAttribute{"x"} );
+  attributes.insert( AttrY, NumericAttribute{"y"} );
   return attributes;
 }
 
@@ -198,7 +198,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
   if ( pos.sqrDist( rotateHandlePos ) < pickTol( mapSettings ) )
   {
     AttribDefs attributes;
-    attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) ), NumericAttribute::OtherAttr} );
+    attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) )} );
     return EditContext( QgsVertexId( 0, 0, 1 ), rotateHandlePos, attributes );
   }
   double tol = mapSettings.mapUnitsPerPixel();

@@ -195,9 +195,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     struct NumericAttribute
     {
-      enum Type {XCooAttr, YCooAttr, DistanceAttr, OtherAttr};
       QString name;
-      Type type;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
       int decimals = 0;
