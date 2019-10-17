@@ -154,21 +154,27 @@ bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
   KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs() );
-  KadasMilxClient::NPointSymbolGraphic result;
-
-  int dpi = context.painter()->device()->logicalDpiX();
-  QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+  if ( mCachedGraphic.isNull() || context.mapExtent() != mCachedExtent )
   {
-    return;
+    KadasMilxClient::NPointSymbolGraphic result;
+
+    int dpi = context.painter()->device()->logicalDpiX();
+    QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
+    if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+    {
+      return;
+    }
+    mCachedGraphic = result.graphic;
+    mCachedGraphicOffset = result.offset;
+    mCachedExtent = context.mapExtent();
   }
-  QPoint renderPos = symbol.points.front() + result.offset + constState()->userOffset;
+  QPoint renderPos = symbol.points.front() + mCachedGraphicOffset + constState()->userOffset;
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
     context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset );
   }
-  context.painter()->drawImage( renderPos, result.graphic );
+  context.painter()->drawImage( renderPos, mCachedGraphic );
 }
 
 QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
@@ -700,4 +706,7 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   mMargin.top = qMax( 0, pointBounds.top() - symbolBounds.top() );
   mMargin.right = qMax( 0, symbolBounds.right() - pointBounds.right() );
   mMargin.bottom = qMax( 0, symbolBounds.bottom() - pointBounds.bottom() );
+
+  // Invalidate cache
+  mCachedGraphic = QImage();
 }

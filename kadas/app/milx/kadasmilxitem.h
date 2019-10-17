@@ -110,6 +110,11 @@ class KadasMilxItem : public KadasMapItem
     int mMinNPoints = -1;
     bool mHasVariablePoints = false;
 
+    // Symbol cache
+    mutable QImage mCachedGraphic;
+    mutable QPoint mCachedGraphicOffset;
+    mutable QgsRectangle mCachedExtent;
+
     Margin mMargin;
 
     State *state() { return static_cast<State *>( mState ); }
