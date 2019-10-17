@@ -229,7 +229,9 @@ void KadasMilxIntegration::saveMilx()
     zip = new QuaZip( filename );
     zip->open( QuaZip::mdCreate );
     dev = new QuaZipFile( zip );
-    static_cast<QuaZipFile *>( dev )->open( QIODevice::WriteOnly, QuaZipNewInfo( "Layer.milxly" ) );
+    QuaZipNewInfo info( "Layer.milxly" );
+    info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
+    static_cast<QuaZipFile *>( dev )->open( QIODevice::WriteOnly, info );
   }
   else
   {
