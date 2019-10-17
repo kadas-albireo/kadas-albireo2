@@ -384,7 +384,7 @@ void KadasPictureItem::edit( const EditContext &context, const AttribValues &val
   // No editable attributes
 }
 
-void KadasPictureItem::populateContextMenu( QMenu *menu, const EditContext &context )
+void KadasPictureItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
   QAction *frameAction = menu->addAction( tr( "Frame visible" ), [this]( bool active ) { setFrameVisible( active ); } );
   frameAction->setCheckable( true );

@@ -195,7 +195,7 @@ void KadasPolygonItem::edit( const EditContext &context, const AttribValues &val
   edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &context )
+void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.vertex >= 0 )
   {

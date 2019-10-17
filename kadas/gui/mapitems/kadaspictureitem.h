@@ -66,7 +66,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void populateContextMenu( QMenu *menu, const EditContext &context ) override;
+    void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
 
     AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;

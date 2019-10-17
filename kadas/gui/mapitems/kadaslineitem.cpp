@@ -199,7 +199,7 @@ void KadasLineItem::edit( const EditContext &context, const AttribValues &values
   edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context )
+void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.vertex >= 0 )
   {
