@@ -31,6 +31,7 @@ KadasMapItem::~KadasMapItem()
   emit aboutToBeDestroyed();
   if ( mAssociatedLayer )
   {
+    setParent( nullptr );
     QgsProject::instance()->removeMapLayer( mAssociatedLayer->id() );
   }
 }
