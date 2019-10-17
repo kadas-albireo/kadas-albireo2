@@ -114,6 +114,32 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   delete paintGeom;
 }
 
+QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+{
+  if ( !mGeometry )
+  {
+    return QString();
+  }
+
+  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>" << "\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( itemName() );
+  outStream << "<Style>";
+  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle><PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>" )
+            .arg( outline().width() ).arg( color2hex( outline().color() ) ).arg( fill().style() != Qt::NoBrush ? 1 : 0 ).arg( color2hex( fill().color() ) );
+  outStream << "</Style>\n";
+  QgsAbstractGeometry *geom = mGeometry->segmentize();
+  geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
+  outStream << geom->asKML( 6 );
+  delete geom;
+  outStream << "</Placemark>" << "\n";
+  outStream.flush();
+  return outString;
+}
+
 void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
 {
   qreal s = ( mIconSize - 1 ) / 2;

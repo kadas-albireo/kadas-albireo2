@@ -137,3 +137,18 @@ QString KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings
   return pickItem( filterRect, mapSettings );
 }
 
+QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+{
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Folder>" << "\n";
+  outStream << "<name>" << name() << "</name>" << "\n";
+  for ( const KadasMapItem *item : mItems )
+  {
+    outStream << item->asKml( context, kmzZip );
+  }
+  outStream << "</Folder>" << "\n";
+  outStream.flush();
+
+  return outString;
+}

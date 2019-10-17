@@ -162,6 +162,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* Render the item */
     virtual void render( QgsRenderContext &context ) const = 0;
 
+#ifndef SIP_RUN
+    /* Create KML representation */
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const = 0;
+#endif
+
     /* Associate to layer */
     void associateToLayer( QgsMapLayer *layer );
     QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }

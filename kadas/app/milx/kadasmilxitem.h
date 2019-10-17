@@ -52,6 +52,7 @@ class KadasMilxItem : public KadasMapItem
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
 
     void render( QgsRenderContext &context ) const override;
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 
     // State interface
     struct State : KadasMapItem::State

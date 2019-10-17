@@ -41,6 +41,9 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     const QString &remarks() const { return mRemarks; }
 
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
   private:
     QString mFilePath;

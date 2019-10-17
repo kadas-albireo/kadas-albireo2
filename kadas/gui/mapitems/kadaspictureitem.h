@@ -48,6 +48,9 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;

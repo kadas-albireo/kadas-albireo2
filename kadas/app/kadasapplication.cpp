@@ -51,6 +51,9 @@
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasvectorlayerproperties.h>
+#include <kadas/app/kml/kadaskmlexport.h>
+#include <kadas/app/kml/kadaskmlexportdialog.h>
+#include <kadas/app/kml/kadaskmlimport.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -505,7 +508,22 @@ void KadasApplication::exportToGpx()
 
 void KadasApplication::exportToKml()
 {
-  // TODO
+  KadasKMLExportDialog d( mMainWindow->mapCanvas()->layers() );
+  if ( d.exec() != QDialog::Accepted )
+  {
+    return;
+  }
+  setOverrideCursor( Qt::BusyCursor );
+  KadasKMLExport kmlExport;
+  if ( kmlExport.exportToFile( d.getFilename(), d.getSelectedLayers(), d.getExportScale() ) )
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML export completed" ), Qgis::Info, 4 );
+  }
+  else
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML export failed" ), Qgis::Critical, 4 );
+  }
+  restoreOverrideCursor();
 }
 
 void KadasApplication::importFromGpx()
@@ -515,7 +533,31 @@ void KadasApplication::importFromGpx()
 
 void KadasApplication::importFromKml()
 {
-  // TODO
+  QStringList filters;
+  filters.append( tr( "KMZ File (*.kmz)" ) );
+  filters.append( tr( "KML File (*.kml)" ) );
+
+  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString selectedFilter;
+
+  QString filename = QFileDialog::getOpenFileName( mMainWindow, tr( "Select KML/KMZ File" ), lastDir, filters.join( ";;" ), &selectedFilter );
+  if ( filename.isEmpty() )
+  {
+    return;
+  }
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+
+  QString errMsg;
+  setOverrideCursor( Qt::BusyCursor );
+  if ( KadasKMLImport().importFile( filename, errMsg ) )
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 4 );
+  }
+  else
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML import failed" ), errMsg, Qgis::Critical, 4 );
+  }
+  restoreOverrideCursor();
 }
 
 void KadasApplication::projectNew( bool askToSave )

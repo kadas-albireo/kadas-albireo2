@@ -23,6 +23,7 @@
 #include <kadas/gui/kadas_gui.h>
 
 class QMenu;
+class QuaZip;
 class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
@@ -50,6 +51,9 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
 
     virtual void addLayerMenuActions( QMenu *menu ) const {}
+#ifndef SIP_RUN
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
+#endif
 
   protected:
     class Renderer;
