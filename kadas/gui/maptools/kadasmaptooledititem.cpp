@@ -135,10 +135,17 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
     if ( mEditContext.isValid() )
     {
       QMenu menu;
+      menu.addAction( mItem->itemName() )->setEnabled( false );
+      menu.addSeparator();
+      int count = menu.actions().size();
       mItem->populateContextMenu( &menu, mEditContext, pos, mCanvas->mapSettings() );
-      menu.addAction( tr( "Cut %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::cutItem );
-      menu.addAction( tr( "Copy %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::copyItem );
-      menu.addAction( tr( "Delete %1" ).arg( mItem->itemName() ), this, &KadasMapToolEditItem::deleteItem );
+      if ( menu.actions().size() > count )
+      {
+        menu.addSeparator();
+      }
+      menu.addAction( tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
+      menu.addAction( tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
       if ( clickedAction )
