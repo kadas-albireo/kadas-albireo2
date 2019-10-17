@@ -46,10 +46,10 @@ KadasItemRect KadasSelectionRectItem::boundingBox() const
     return KadasItemRect();
   }
   QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
-  QgsRectangle rect = QgsCoordinateTransform( mItems.front()->crs(), crs(), tctx ).transform( mItems.front()->boundingBox() );
+  QgsRectangle rect = QgsCoordinateTransform( mItems.front()->crs(), crs(), tctx ).transformCover( mItems.front()->boundingBox() );
   for ( int i = 1, n = mItems.size(); i < n; ++i )
   {
-    QgsRectangle itemRect = QgsCoordinateTransform( mItems[i]->crs(), crs(), tctx ).transform( mItems[i]->boundingBox() );
+    QgsRectangle itemRect = QgsCoordinateTransform( mItems[i]->crs(), crs(), tctx ).transformCover( mItems[i]->boundingBox() );
     rect.setXMinimum( qMin( rect.xMinimum(), itemRect.xMinimum() ) );
     rect.setYMinimum( qMin( rect.yMinimum(), itemRect.yMinimum() ) );
     rect.setXMaximum( qMax( rect.xMaximum(), itemRect.xMaximum() ) );
@@ -87,7 +87,7 @@ KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
   QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
   for ( const KadasMapItem *item : mItems )
   {
-    QgsRectangle itemRect = QgsCoordinateTransform( item->crs(), mapCrs, tctx ).transform( item->boundingBox() );
+    QgsRectangle itemRect = QgsCoordinateTransform( item->crs(), mapCrs, tctx ).transformCover( item->boundingBox() );
     Margin m = item->margin();
     if ( empty )
     {
