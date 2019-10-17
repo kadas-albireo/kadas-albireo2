@@ -12,6 +12,7 @@
 
 
 
+
 class KadasMapCanvasItemManager : QObject
 {
 %Docstring
@@ -32,6 +33,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     static KadasMapCanvasItemManager *instance();
     static void addItem( KadasMapItem *item );
     static void removeItem( KadasMapItem *item );
+    static void removeItemAfterRefresh( KadasMapItem *item, QgsMapCanvas *canvas );
     static const QList<KadasMapItem *> &items();
     static void clear();
 
