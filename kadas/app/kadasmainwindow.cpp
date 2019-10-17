@@ -901,13 +901,13 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   {
     KadasSymbolItem *item = new KadasSymbolItem( mapCanvas()->mapSettings().destinationCrs() );
     item->setFilePath( filename );
-    item->setPosition( mapCanvas()->extent().center() );
+    item->setPosition( KadasItemPos::fromPoint( mapCanvas()->extent().center() ) );
     return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
   }
   else
   {
     KadasPictureItem *item = new KadasPictureItem( mapCanvas()->mapSettings().destinationCrs() );
-    item->setup( filename, mapCanvas()->extent().center() );
+    item->setup( filename, KadasItemPos::fromPoint( mapCanvas()->extent().center() ) );
     return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
   }
 }
@@ -937,7 +937,7 @@ QgsMapTool *KadasMainWindow::paste()
     center /= itemPos.size();
     for ( int i = 0, n = items.size(); i < n; ++i )
     {
-      items[i]->setPosition( pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() ) );
+      items[i]->setPosition( KadasItemPos::fromPoint( pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() ) ) );
     }
     if ( items.size() == 1 )
     {

@@ -108,13 +108,13 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 #endif
 
     void createItem();
-    void addPoint( const QgsPointXY &mapPos );
-    void startPart( const QgsPointXY &pos );
+    void addPoint( const KadasMapPos &mapPos );
+    void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();
     void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
-    QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
+    KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem() { return mItem; }
 

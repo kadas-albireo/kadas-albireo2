@@ -104,7 +104,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
 
   for ( const MeasurementLabel &label : mMeasurementLabels )
   {
-    QPointF pos = context.mapToPixel().transform( label.mapPos ).toQPointF();
+    QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( label.pos ) ).toQPointF();
     int width = label.width + 6;
     int height = label.height + 6;
     QRectF labelRect( pos.x() - 0.5 * width, pos.y() + ( label.center ? 0 : sLabelOffset ) - 0.5 * height, width, height );
@@ -167,8 +167,12 @@ void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
   p->restore();
 }
 
-QRect KadasGeometryItem::margin() const
+KadasMapItem::Margin KadasGeometryItem::margin() const
 {
+  if ( !mMeasureGeometry )
+  {
+    return Margin();
+  }
   int maxMeasureLabelWidth = 0;
   int maxMeasureLabelHeight = 0;
   for ( const MeasurementLabel label : mMeasurementLabels )
@@ -179,7 +183,7 @@ QRect KadasGeometryItem::margin() const
   int maxPainterMargin = qMax( mIconSize, mPen.width() ) / 2 + 1;
   int maxW = qMax( maxMeasureLabelWidth, maxPainterMargin );
   int maxH = qMax( maxMeasureLabelHeight, maxPainterMargin );
-  return QRect( maxW, maxH, maxW, maxH );
+  return Margin{ maxW, maxH, maxW, maxH };
 }
 
 void KadasGeometryItem::updateMeasurements()
@@ -200,7 +204,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
   emit geometryChanged();
 }
 
-bool KadasGeometryItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const
+bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
 {
   if ( !mGeometry )
   {
@@ -273,9 +277,10 @@ void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
   update();
 }
 
-QgsRectangle KadasGeometryItem::boundingBox() const
+KadasItemRect KadasGeometryItem::boundingBox() const
 {
-  return mGeometry ? mGeometry->boundingBox() : QgsRectangle();
+  QgsRectangle bbox = mGeometry ? mGeometry->boundingBox() : QgsRectangle();
+  return KadasItemRect( bbox.xMinimum(), bbox.yMinimum(), bbox.xMaximum(), bbox.yMaximum() );
 }
 
 QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settings ) const
@@ -285,7 +290,7 @@ QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settin
   QgsPoint p;
   while ( mGeometry->nextVertex( vidx, p ) )
   {
-    points.append( {p} );
+    points.append( {toMapPos( KadasItemPos( p.x(), p.y() ), settings )} );
   }
   return points;
 }
@@ -328,7 +333,7 @@ QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit un
   return QgsUnitTypes::formatAngle( value, decimals, unit );
 }
 
-void KadasGeometryItem::addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center )
+void KadasGeometryItem::addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center )
 {
   static QFontMetrics metrics( measurementFont() );
   int width = 0;

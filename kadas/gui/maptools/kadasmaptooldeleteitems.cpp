@@ -77,11 +77,11 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect, const
     {
       continue;
     }
+    KadasMapRect rect( filterRect.xMinimum(), filterRect.yMinimum(), filterRect.xMaximum(), filterRect.yMaximum() );
     for ( auto it = itemLayer->items().begin(), itEnd = itemLayer->items().end(); it != itEnd; ++it )
     {
       KadasMapItem *item = it.value();
-      QgsCoordinateTransform crst( crs, item->crs(), itemLayer->transformContext() );
-      if ( item->intersects( crst.transform( filterRect ), canvas()->mapSettings() ) )
+      if ( item->intersects( rect, canvas()->mapSettings() ) )
       {
         delItems[itemLayer].append( it.key() );
       }

@@ -34,20 +34,20 @@ the Free Software Foundation; either version 2 of the License, or     *
     double anchorY() const;
     void setAnchorY( double anchorY );
 
-    virtual QgsRectangle boundingBox() const;
+    virtual KadasItemRect boundingBox() const;
 
-    virtual QRect margin() const;
+    virtual Margin margin() const;
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
-    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
 
 
-    virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings );
+    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );
 
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings );
 
-    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings );
+    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings );
 
     virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings );
 
@@ -58,30 +58,30 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual AttribDefs drawAttribs() const;
 
-    virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const;
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const;
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
-    virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const;
+    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings );
+    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
 
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
 
 
-    virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
-    virtual QgsPointXY position() const;
-    virtual void setPosition( const QgsPointXY &pos );
+    virtual KadasItemPos position() const;
+    virtual void setPosition( const KadasItemPos &pos );
 
 
     struct State : KadasMapItem::State
     {
-      QgsPointXY pos;
+      KadasItemPos pos;
       double angle;
       QSize size;
       virtual void assign( const KadasMapItem::State *other );
@@ -94,9 +94,9 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     State *state();
     virtual State *createEmptyState() const;
-    QList<QgsPointXY> rotatedCornerPoints( double angle, double mup = 1. ) const;
+    QList<KadasMapPos> rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const;
 
-    static void rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+    static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 };
 
 /************************************************************************

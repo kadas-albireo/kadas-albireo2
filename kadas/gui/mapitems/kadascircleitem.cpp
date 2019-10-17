@@ -39,24 +39,24 @@ void KadasCircleItem::setGeodesic( bool geodesic )
   update();
 }
 
-QgsPointXY KadasCircleItem::position() const
+KadasItemPos KadasCircleItem::position() const
 {
   double x = 0., y = 0.;
-  for ( const QgsPointXY &center : constState()->centers )
+  for ( const KadasItemPos &center : constState()->centers )
   {
     x += center.x();
     y += center.y();
   }
   int n = std::max( 1, constState()->centers.length() );
-  return QgsPointXY( x / n, y / n );
+  return KadasItemPos( x / n, y / n );
 }
 
-void KadasCircleItem::setPosition( const QgsPointXY &pos )
+void KadasCircleItem::setPosition( const KadasItemPos &pos )
 {
-  QgsPointXY prevPos = position();
+  KadasItemPos prevPos = position();
   double dx = pos.x() - prevPos.x();
   double dy = pos.y() - prevPos.y();
-  for ( QgsPointXY &center : state()->centers )
+  for ( KadasItemPos &center : state()->centers )
   {
     center.setX( center.x() + dx );
     center.setY( center.y() + dy );
@@ -74,26 +74,27 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
   QList<Node> points;
   for ( int i = 0, n = constState()->centers.size(); i < n; ++i )
   {
-    const QgsPointXY &center = constState()->centers[i];
-    points.append( {center} );
+    const KadasItemPos &center = constState()->centers[i];
+    points.append( {toMapPos( center, settings )} );
     if ( mGeodesic )
     {
       QgsPointXY wgsCenter = crst.transform( center );
       QgsPointXY wgsRPos = mDa.computeSpheroidProject( wgsCenter, constState()->radii[i], 0.5 * M_PI );
-      points.append( {crst.transform( wgsRPos, QgsCoordinateTransform::ReverseTransform ) } );
+      KadasItemPos itemRPos = KadasItemPos::fromPoint( crst.transform( wgsRPos, QgsCoordinateTransform::ReverseTransform ) );
+      points.append( { toMapPos( itemRPos, settings ) } );
     }
     else
     {
-      points.append( {QgsPointXY( center.x() + constState()->radii[i], center.y() ) } );
+      points.append( { toMapPos( KadasItemPos( center.x() + constState()->radii[i], center.y() ), settings ) } );
     }
   }
   return points;
 }
 
-bool KadasCircleItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
+bool KadasCircleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
-  state()->centers.append( firstPoint );
+  state()->centers.append( toItemPos( firstPoint, mapSettings ) );
   state()->radii.append( 0 );
   recomputeDerived();
   return true;
@@ -101,21 +102,22 @@ bool KadasCircleItem::startPart( const QgsPointXY &firstPoint, const QgsMapSetti
 
 bool KadasCircleItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasCircleItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
+void KadasCircleItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
 {
-  const QgsPointXY &center = state()->centers.last();
-  state()->radii.last() = qSqrt( p.sqrDist( center ) );
+  const KadasItemPos &center = state()->centers.last();
+  state()->radii.last() = qSqrt( toItemPos( p, mapSettings ).sqrDist( center ) );
   recomputeDerived();
 }
 
 void KadasCircleItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  state()->centers.last().setX( values[AttrX] );
-  state()->centers.last().setY( values[AttrY] );
-  state()->radii.last() = values[AttrR];
+  KadasItemPos center = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+  KadasItemPos rPos = toItemPos( KadasMapPos( values[AttrX] + values[AttrR], values[AttrY] ), mapSettings );
+  state()->centers.last() = center;
+  state()->radii.last() = qSqrt( rPos.sqrDist( rPos ) );
   recomputeDerived();
 }
 
@@ -139,14 +141,15 @@ KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition( const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
   if ( constState()->drawStatus == State::Drawing )
   {
-    values.insert( AttrX, constState()->centers.last().x() );
-    values.insert( AttrY, constState()->centers.last().y() );
-    values.insert( AttrR, qSqrt( constState()->centers.last().sqrDist( pos ) ) );
+    KadasMapPos mapCenter = toMapPos( constState()->centers.last(), mapSettings );
+    values.insert( AttrX, mapCenter.x() );
+    values.insert( AttrY, mapCenter.y() );
+    values.insert( AttrR, qSqrt( mapCenter.sqrDist( pos ) ) );
   }
   else
   {
@@ -157,52 +160,50 @@ KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition( const QgsPo
   return values;
 }
 
-QgsPointXY KadasCircleItem::positionFromDrawAttribs( const AttribValues &values ) const
+KadasMapPos KadasCircleItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return QgsPointXY( values[AttrX] + values[AttrR], values[AttrY] );
+  return KadasMapPos( values[AttrX] + values[AttrR], values[AttrY] );
 }
 
-
-KadasMapItem::EditContext KadasCircleItem::getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const
+KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  QgsCoordinateTransform crst( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform( crst.transform( pos ) );
+  double mup = mapSettings.mapUnitsPerPixel();
+
   for ( int iPart = 0, nParts = constState()->centers.size(); iPart < nParts; ++iPart )
   {
 
-    QgsPointXY ringPos( constState()->centers[iPart].x() + constState()->radii[iPart], constState()->centers[iPart].y() );
-    QgsPointXY canvasRingPos = mapSettings.mapToPixel().transform( crst.transform( ringPos ) );
-    if ( canvasPos.sqrDist( canvasRingPos ) < 25 )
+    KadasMapPos ringPos = toMapPos( KadasItemPos( constState()->centers[iPart].x() + constState()->radii[iPart], constState()->centers[iPart].y() ), mapSettings );
+    if ( pos.sqrDist( ringPos ) < pickTol( mapSettings ) )
     {
       AttribDefs attributes;
       attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::DistanceAttr, 0} );
       return EditContext( QgsVertexId( iPart, 0, 1 ), ringPos, attributes );
     }
 
-    QgsPointXY canvasCenter = mapSettings.mapToPixel().transform( crst.transform( constState()->centers[iPart] ) );
-    if ( canvasPos.sqrDist( canvasCenter ) < 25 )
+    KadasMapPos center = toMapPos( constState()->centers[iPart], mapSettings );
+    if ( pos.sqrDist( center ) < pickTol( mapSettings ) )
     {
       AttribDefs attributes;
       attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
       attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
-      return EditContext( QgsVertexId( iPart, 0, 0 ), constState()->centers[iPart], attributes );
+      return EditContext( QgsVertexId( iPart, 0, 0 ), center, attributes );
     }
   }
   return EditContext();
 }
 
-void KadasCircleItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
+void KadasCircleItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->centers.size() )
   {
-    const QgsPointXY &center = state()->centers[context.vidx.part];
+    KadasItemPos itemPos = toItemPos( newPoint, mapSettings );
     if ( context.vidx.vertex == 0 )
     {
-      state()->centers[context.vidx.part] = newPoint;
+      state()->centers[context.vidx.part] = itemPos;
     }
     else if ( context.vidx.vertex == 1 )
     {
-      state()->radii[context.vidx.part] = qSqrt( newPoint.sqrDist( center ) );
+      state()->radii[context.vidx.part] = qSqrt( itemPos.sqrDist( state()->centers[context.vidx.part] ) );
     }
     recomputeDerived();
   }
@@ -212,20 +213,22 @@ void KadasCircleItem::edit( const EditContext &context, const AttribValues &valu
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->centers.size() )
   {
-    const QgsPointXY &center = state()->centers[context.vidx.part];
     if ( context.vidx.vertex == 0 )
     {
-      state()->centers[context.vidx.part] = QgsPointXY( values[AttrX], values[AttrY] );
+      state()->centers[context.vidx.part] = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
     }
     else if ( context.vidx.vertex == 1 )
     {
-      state()->radii[context.vidx.part] = values[AttrR];
+      KadasMapPos mapPos = toMapPos( state()->centers[context.vidx.part], mapSettings );
+      mapPos.setX( mapPos.x() + values[AttrR] );
+      KadasItemPos rPos = toItemPos( mapPos, mapSettings );
+      state()->radii[context.vidx.part] = qSqrt( state()->centers[context.vidx.part].sqrDist( rPos ) );
     }
     recomputeDerived();
   }
 }
 
-KadasMapItem::AttribValues KadasCircleItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasCircleItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
   if ( context.vidx.part >= 0 && context.vidx.part < constState()->centers.size() )
@@ -237,33 +240,33 @@ KadasMapItem::AttribValues KadasCircleItem::editAttribsFromPosition( const EditC
     }
     else if ( context.vidx.vertex == 1 )
     {
-      values.insert( AttrR, qSqrt( constState()->centers[context.vidx.part].sqrDist( pos ) ) );
+      values.insert( AttrR, qSqrt( toMapPos( constState()->centers[context.vidx.part], mapSettings ).sqrDist( pos ) ) );
     }
   }
   return values;
 }
 
-QgsPointXY KadasCircleItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
+KadasMapPos KadasCircleItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
   if ( context.vidx.part >= 0 && context.vidx.part < constState()->centers.size() )
   {
     if ( context.vidx.vertex == 0 )
     {
-      return QgsPointXY( values[AttrX], values[AttrY] );
+      return KadasMapPos( values[AttrX], values[AttrY] );
     }
     else if ( context.vidx.vertex == 1 )
     {
-      const QgsPointXY &center = constState()->centers[context.vidx.part];
-      return QgsPointXY( center.x() + values[AttrR], center.y() );
+      KadasMapPos mapCenter = toMapPos( constState()->centers[context.vidx.part], mapSettings );
+      return KadasMapPos( mapCenter.x() + values[AttrR], mapCenter.y() );
     }
   }
-  return QgsPointXY();
+  return KadasMapPos();
 }
 
 void KadasCircleItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
 {
   QgsRectangle bbox = geom->boundingBox();
-  state()->centers.append( bbox.center() );
+  state()->centers.append( KadasItemPos::fromPoint( bbox.center() ) );
   state()->radii.append( 0.5 * bbox.width() );
   recomputeDerived();
   endPart();
@@ -291,7 +294,7 @@ void KadasCircleItem::measureGeometry()
     QStringList measurements;
     measurements.append( formatArea( area, areaBaseUnit() ) );
     measurements.append( tr( "Radius: %1" ).arg( formatLength( radius, distanceBaseUnit() ) ) );
-    addMeasurements( QStringList() << measurements, state()->centers[i] );
+    addMeasurements( QStringList() << measurements, KadasItemPos::fromPoint( state()->centers[i] ) );
     totalArea += area;
   }
   mTotalMeasurement = formatArea( totalArea, areaBaseUnit() );
@@ -314,7 +317,7 @@ void KadasCircleItem::recomputeDerived()
   setInternalGeometry( multiGeom );
 }
 
-void KadasCircleItem::computeCircle( const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom )
+void KadasCircleItem::computeCircle( const KadasItemPos &center, double radius, QgsMultiSurface *multiGeom )
 {
   QgsCircularString *string = new QgsCircularString();
   string->setPoints( QgsPointSequence()
@@ -331,7 +334,7 @@ void KadasCircleItem::computeCircle( const QgsPointXY &center, double radius, Qg
   multiGeom->addGeometry( poly );
 }
 
-void KadasCircleItem::computeGeoCircle( const QgsPointXY &center, double radius, QgsMultiSurface *multiGeom )
+void KadasCircleItem::computeGeoCircle( const KadasItemPos &center, double radius, QgsMultiSurface *multiGeom )
 {
   // 1 deg segmentized circle around center
   QgsCoordinateTransform t1( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );

@@ -36,27 +36,27 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
-    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
+    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
+    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     bool continuePart( const QgsMapSettings &mapSettings ) override;
     void endPart() override;
 
     AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
+    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override;
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     void populateContextMenu( QMenu *menu, const EditContext &context ) override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    QgsPointXY position() const override;
-    void setPosition( const QgsPointXY &pos ) override;
+    KadasItemPos position() const override;
+    void setPosition( const KadasItemPos &pos ) override;
 
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
@@ -65,7 +65,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
 
     struct State : KadasMapItem::State
     {
-      QList<QList<QgsPointXY>> points;
+      QList<QList<KadasItemPos>> points;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
     };

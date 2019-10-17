@@ -460,7 +460,8 @@ void KadasSearchBox::resultSelected()
         mPin->setFilePath( ":/kadas/icons/pin_blue", 0.5, 1.0 );
         KadasMapCanvasItemManager::addItem( mPin );
       }
-      mPin->setPosition( QgsCoordinateTransform( QgsCoordinateReferenceSystem( result.crs ), mPin->crs(), QgsProject::instance() ).transform( result.pos ) );
+      QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( result.crs ), mPin->crs(), QgsProject::instance() ).transform( result.pos );
+      mPin->setPosition( KadasItemPos::fromPoint( itemPos ) );
     }
     else
     {

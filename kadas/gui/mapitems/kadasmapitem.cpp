@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <qgis/qgsmaplayer.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -82,14 +83,43 @@ void KadasMapItem::update()
   emit changed();
 }
 
-void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )
+KadasMapPos KadasMapItem::toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const
+{
+  QgsPointXY pos = QgsCoordinateTransform( mCrs, settings.destinationCrs(), QgsProject::instance()->transformContext() ).transform( itemPos );
+  return KadasMapPos( pos.x(), pos.y() );
+}
+
+KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const
+{
+  QgsPointXY pos = QgsCoordinateTransform( settings.destinationCrs(), mCrs, QgsProject::instance()->transformContext() ).transform( mapPos );
+  return KadasItemPos( pos.x(), pos.y() );
+}
+
+KadasMapRect KadasMapItem::toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const
+{
+  QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), QgsProject::instance()->transformContext() ).transform( itemRect );
+  return KadasMapRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+}
+
+KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
+{
+  QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, QgsProject::instance()->transformContext() ).transform( itemRect );
+  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+}
+
+double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
+{
+  return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();
+}
+
+void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
 {
   painter->setPen( QPen( Qt::red, 2 ) );
   painter->setBrush( Qt::white );
   painter->drawRect( QRectF( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize ) );
 }
 
-void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize )
+void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
 {
   painter->setPen( QPen( Qt::black, 1 ) );
   painter->setBrush( Qt::red );

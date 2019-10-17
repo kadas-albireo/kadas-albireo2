@@ -38,8 +38,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     void setOpacity( int opacity );
     int opacity() const;
 
-    QRectF margin() const;
-
     virtual KadasItemLayer *clone() const /Factory/;
 
     virtual QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext );

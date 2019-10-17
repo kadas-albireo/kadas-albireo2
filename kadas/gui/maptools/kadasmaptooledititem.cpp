@@ -132,6 +132,8 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
   }
   if ( e->button() == Qt::RightButton )
   {
+    KadasMapPos pos( e->mapPoint().x(), e->mapPoint().y() );
+    mEditContext = mItem->getEditContext( pos, canvas()->mapSettings() );
     if ( mEditContext.isValid() )
     {
       QMenu menu;
@@ -166,14 +168,13 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance() );
-  QgsPointXY pos = crst.transform( e->mapPoint() );
+  KadasMapPos pos( e->mapPoint().x(), e->mapPoint().y() );
 
   if ( e->buttons() == Qt::LeftButton )
   {
     if ( mEditContext.isValid() )
     {
-      mItem->edit( mEditContext, pos - mMoveOffset, canvas()->mapSettings() );
+      mItem->edit( mEditContext, KadasMapPos( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() ), canvas()->mapSettings() );
     }
   }
   else
@@ -192,43 +193,17 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
         setCursor( mEditContext.cursor );
         setupNumericInput();
       }
-      mMoveOffset = pos - mEditContext.pos;
+      mMoveOffset = QgsVector( pos.x() - mEditContext.pos.x(), pos.y() - mEditContext.pos.y() );
     }
   }
   if ( mInputWidget && mEditContext.isValid() )
   {
     mInputWidget->ensureFocus();
 
-    KadasMapItem::AttribValues values = mItem->editAttribsFromPosition( mEditContext, pos - mMoveOffset );
-    QgsPointXY coo;
-    int xCooId = -1;
-    int yCooId = -1;
-    double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, canvas()->mapUnits() );
+    KadasMapItem::AttribValues values = mItem->editAttribsFromPosition( mEditContext, KadasMapPos( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() ), canvas()->mapSettings() );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
     {
-      // This assumes that there is never more that one x-y coordinate pair in the attributes
-      if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::XCooAttr )
-      {
-        coo.setX( it.value() );
-        xCooId = it.key();
-      }
-      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::YCooAttr )
-      {
-        coo.setY( it.value() );
-        yCooId = it.key();
-      }
-      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-      {
-        it.value() *= distanceConv;
-      }
       mInputWidget->inputField( it.key() )->setValue( it.value() );
-    }
-    if ( xCooId >= 0 && yCooId >= 0 )
-    {
-      QgsCoordinateTransform crst( mItem->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
-      coo = crst.transform( coo );
-      mInputWidget->inputField( xCooId )->setValue( coo.x() );
-      mInputWidget->inputField( yCooId )->setValue( coo.y() );
     }
 
     mInputWidget->move( e->x(), e->y() + 20 );
@@ -312,38 +287,11 @@ void KadasMapToolEditItem::stateChanged( KadasStateHistory::State *state )
 
 KadasMapItem::AttribValues KadasMapToolEditItem::collectAttributeValues() const
 {
-  QgsPointXY coo;
-  int xCooId = -1;
-  int yCooId = -1;
   KadasMapItem::AttribValues attributes;
-  double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
 
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
-    double value = field->text().toDouble();
-    // This assumes that there is never more that one x-y coordinate pair in the attributes
-    if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::XCooAttr )
-    {
-      coo.setX( value );
-      xCooId = field->id();
-    }
-    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::YCooAttr )
-    {
-      coo.setY( value );
-      yCooId = field->id();
-    }
-    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-    {
-      value *= distanceConv;
-    }
-    attributes.insert( field->id(), value );
-  }
-  if ( xCooId >= 0 && yCooId >= 0 )
-  {
-    QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance()->transformContext() );
-    coo = crst.transform( coo );
-    attributes.insert( xCooId, coo.x() );
-    attributes.insert( yCooId, coo.y() );
+    attributes.insert( field->id(), field->text().toDouble() );
   }
   return attributes;
 }
@@ -362,9 +310,8 @@ void KadasMapToolEditItem::inputChanged()
     // may get altered
     mIgnoreNextMoveEvent = true;
 
-    QgsPointXY newPos = mItem->positionFromEditAttribs( mEditContext, values, mCanvas->mapSettings() );
-    QgsCoordinateTransform crst( mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-    mInputWidget->adjustCursorAndExtent( crst.transform( newPos ) );
+    KadasMapPos newPos = mItem->positionFromEditAttribs( mEditContext, values, mCanvas->mapSettings() );
+    mInputWidget->adjustCursorAndExtent( newPos );
 
     mItem->edit( mEditContext, values, canvas()->mapSettings() );
     mStateHistory->push( mItem->constState()->clone() );

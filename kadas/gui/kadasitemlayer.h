@@ -39,8 +39,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     void setOpacity( int opacity ) { mOpacity = opacity; }
     int opacity() const { return mOpacity; }
 
-    QRectF margin() const;
-
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;

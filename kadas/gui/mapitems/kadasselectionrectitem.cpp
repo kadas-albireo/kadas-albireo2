@@ -39,79 +39,85 @@ void KadasSelectionRectItem::setSelectedItems( const QList<KadasMapItem *> &item
   update();
 }
 
-QgsRectangle KadasSelectionRectItem::boundingBox() const
+KadasItemRect KadasSelectionRectItem::boundingBox() const
 {
   if ( mItems.isEmpty() )
   {
-    return QgsRectangle();
+    return KadasItemRect();
   }
-  QgsRectangle rect = mItems.front()->boundingBox();
+  QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
+  QgsRectangle rect = QgsCoordinateTransform( mItems.front()->crs(), crs(), tctx ).transform( mItems.front()->boundingBox() );
   for ( int i = 1, n = mItems.size(); i < n; ++i )
   {
-    QgsRectangle itemRect = mItems[i]->boundingBox();
+    QgsRectangle itemRect = QgsCoordinateTransform( mItems[i]->crs(), crs(), tctx ).transform( mItems[i]->boundingBox() );
     rect.setXMinimum( qMin( rect.xMinimum(), itemRect.xMinimum() ) );
     rect.setYMinimum( qMin( rect.yMinimum(), itemRect.yMinimum() ) );
-    rect.setXMaximum( qMin( rect.xMaximum(), itemRect.xMaximum() ) );
-    rect.setYMaximum( qMin( rect.yMaximum(), itemRect.yMaximum() ) );
+    rect.setXMaximum( qMax( rect.xMaximum(), itemRect.xMaximum() ) );
+    rect.setYMaximum( qMax( rect.yMaximum(), itemRect.yMaximum() ) );
   }
-  return rect;
+  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
 
-QRect KadasSelectionRectItem::margin() const
+KadasMapItem::Margin KadasSelectionRectItem::margin() const
 {
   if ( mItems.isEmpty() )
   {
-    return QRect();
+    return Margin();
   }
-  QRect rect = mItems.front()->margin();
+  Margin m = mItems.front()->margin();
   for ( int i = 1, n = mItems.size(); i < n; ++i )
   {
-    rect = rect.united( mItems[i]->margin() );
+    Margin im = mItems[i]->margin();
+    m.left = qMax( m.left, im.left );
+    m.right = qMax( m.right, im.right );
+    m.top = qMax( m.top, im.top );
+    m.bottom = qMax( m.bottom, im.bottom );
+  }
+  return m;
+}
+
+KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const
+{
+  if ( mItems.isEmpty() )
+  {
+    return KadasMapRect();
+  }
+  bool empty = true;
+  KadasMapRect rect;
+  QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
+  for ( const KadasMapItem *item : mItems )
+  {
+    QgsRectangle itemRect = QgsCoordinateTransform( item->crs(), mapCrs, tctx ).transform( item->boundingBox() );
+    Margin m = item->margin();
+    if ( empty )
+    {
+      rect = KadasMapRect( itemRect.xMaximum(), itemRect.yMinimum(), itemRect.xMaximum(), itemRect.yMaximum() );
+      empty = false;
+    }
+    rect.setXMinimum( qMin( rect.xMinimum(), itemRect.xMinimum() - m.left * mup ) );
+    rect.setYMinimum( qMin( rect.yMinimum(), itemRect.yMinimum() - m.bottom * mup ) );
+    rect.setXMaximum( qMax( rect.xMaximum(), itemRect.xMaximum() + m.right * mup ) );
+    rect.setYMaximum( qMax( rect.yMaximum(), itemRect.yMaximum() + m.top * mup ) );
   }
   return rect;
 }
 
-QgsRectangle KadasSelectionRectItem::itemsRect( double mup ) const
-{
-  QgsRectangle selRect;
-  for ( const KadasMapItem *item : mItems )
-  {
-    QgsRectangle itemRect = item->boundingBox();
-    QRectF itemMargin = item->margin();
-    if ( selRect.isEmpty() )
-    {
-      selRect.setXMinimum( itemRect.xMinimum() - itemMargin.left() * mup );
-      selRect.setXMaximum( itemRect.xMaximum() + itemMargin.right() * mup );
-      selRect.setYMinimum( itemRect.yMinimum() - itemMargin.bottom() * mup );
-      selRect.setYMaximum( itemRect.yMaximum() + itemMargin.top() * mup );
-    }
-    else
-    {
-      selRect.setXMinimum( qMin( itemRect.xMinimum() - itemMargin.left() * mup, selRect.xMinimum() ) );
-      selRect.setXMaximum( qMax( itemRect.xMaximum() + itemMargin.right() * mup, selRect.xMaximum() ) );
-      selRect.setYMinimum( qMin( itemRect.yMinimum() - itemMargin.bottom() * mup, selRect.yMinimum() ) );
-      selRect.setYMaximum( qMax( itemRect.yMaximum() + itemMargin.top() * mup, selRect.yMaximum() ) );
-    }
-  }
-  return selRect;
-}
-
-bool KadasSelectionRectItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const
+bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
 {
   if ( mItems.isEmpty() )
   {
     return false;
   }
-  QgsRectangle selRect = itemsRect( settings.mapUnitsPerPixel() );
+  KadasMapRect mapRect = itemsRect( settings.destinationCrs(), settings.mapUnitsPerPixel() );
 
   QgsPolygon itemRect;
   QgsLineString *points = new QgsLineString();
   points->setPoints( QgsPointSequence()
-                     << QgsPoint( selRect.xMinimum(), selRect.yMinimum() )
-                     << QgsPoint( selRect.xMaximum(), selRect.yMinimum() )
-                     << QgsPoint( selRect.xMaximum(), selRect.yMaximum() )
-                     << QgsPoint( selRect.xMinimum(), selRect.yMaximum() )
-                     << QgsPoint( selRect.xMinimum(), selRect.yMinimum() ) );
+                     << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() )
+                     << QgsPoint( mapRect.xMaximum(), mapRect.yMinimum() )
+                     << QgsPoint( mapRect.xMaximum(), mapRect.yMaximum() )
+                     << QgsPoint( mapRect.xMinimum(), mapRect.yMaximum() )
+                     << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() ) );
   itemRect.setExteriorRing( points );
 
   QgsPolygon filterRect;
@@ -137,15 +143,13 @@ void KadasSelectionRectItem::render( QgsRenderContext &context ) const
     return;
   }
 
-  double mup = context.mapToPixel().mapUnitsPerPixel();
-  QgsRectangle selRect = itemsRect( context.mapToPixel().mapUnitsPerPixel() );
-
+  KadasMapRect mapRect = itemsRect( context.coordinateTransform().destinationCrs(), context.mapToPixel().mapUnitsPerPixel() );
   QList<QgsPoint> points = QList<QgsPoint>()
-                           << QgsPoint( selRect.xMinimum(), selRect.yMinimum() )
-                           << QgsPoint( selRect.xMaximum(), selRect.yMinimum() )
-                           << QgsPoint( selRect.xMaximum(), selRect.yMaximum() )
-                           << QgsPoint( selRect.xMinimum(), selRect.yMaximum() )
-                           << QgsPoint( selRect.xMinimum(), selRect.yMinimum() );
+                           << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() )
+                           << QgsPoint( mapRect.xMaximum(), mapRect.yMinimum() )
+                           << QgsPoint( mapRect.xMaximum(), mapRect.yMaximum() )
+                           << QgsPoint( mapRect.xMinimum(), mapRect.yMaximum() )
+                           << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() );
 
   QPolygonF poly;
   for ( QgsPoint p : points )

@@ -31,34 +31,34 @@ KadasRectangleItem::KadasRectangleItem( const QgsCoordinateReferenceSystem &crs,
   clear();
 }
 
-QgsPointXY KadasRectangleItem::position() const
+KadasItemPos KadasRectangleItem::position() const
 {
   double x = 0., y = 0.;
-  for ( const QgsPointXY &point : constState()->p1 )
+  for ( const KadasItemPos &point : constState()->p1 )
   {
     x += point.x();
     y += point.y();
   }
-  for ( const QgsPointXY &point : constState()->p2 )
+  for ( const KadasItemPos &point : constState()->p2 )
   {
     x += point.x();
     y += point.y();
   }
   int n = std::max( 1, constState()->p1.size() + constState()->p2.size() );
-  return QgsPointXY( x / n, y / n );
+  return KadasItemPos( x / n, y / n );
 }
 
-void KadasRectangleItem::setPosition( const QgsPointXY &pos )
+void KadasRectangleItem::setPosition( const KadasItemPos &pos )
 {
-  QgsPointXY prevPos = position();
+  KadasItemPos prevPos = position();
   double dx = pos.x() - prevPos.x();
   double dy = pos.y() - prevPos.y();
-  for ( QgsPointXY &point : state()->p1 )
+  for ( KadasItemPos &point : state()->p1 )
   {
     point.setX( point.x() + dx );
     point.setY( point.y() + dy );
   }
-  for ( QgsPointXY &point : state()->p2 )
+  for ( KadasItemPos &point : state()->p2 )
   {
     point.setX( point.x() + dx );
     point.setY( point.y() + dy );
@@ -70,29 +70,30 @@ void KadasRectangleItem::setPosition( const QgsPointXY &pos )
   update();
 }
 
-bool KadasRectangleItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
+bool KadasRectangleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
+  KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
   state()->drawStatus = State::Drawing;
-  state()->p1.append( firstPoint );
-  state()->p2.append( firstPoint );
+  state()->p1.append( itemPos );
+  state()->p2.append( itemPos );
   recomputeDerived();
   return true;
 }
 
 bool KadasRectangleItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasRectangleItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
+void KadasRectangleItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
 {
-  state()->p2.last() = p;
+  state()->p2.last() = toItemPos( p, mapSettings );
   recomputeDerived();
 }
 
 void KadasRectangleItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  setCurrentPoint( QgsPoint( values[AttrX], values[AttrY] ), mapSettings );
+  setCurrentPoint( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 bool KadasRectangleItem::continuePart( const QgsMapSettings &mapSettings )
@@ -114,12 +115,12 @@ KadasMapItem::AttribDefs KadasRectangleItem::drawAttribs() const
   return attributes;
 }
 
-QgsPointXY KadasRectangleItem::positionFromDrawAttribs( const AttribValues &values ) const
+KadasMapPos KadasRectangleItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return QgsPointXY( values[AttrX], values[AttrY] );
+  return KadasMapPos( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::AttribValues KadasRectangleItem::drawAttribsFromPosition( const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasRectangleItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
   values.insert( AttrX, pos.x() );
@@ -127,51 +128,51 @@ KadasMapItem::AttribValues KadasRectangleItem::drawAttribsFromPosition( const Qg
   return values;
 }
 
-KadasMapItem::EditContext KadasRectangleItem::getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const
+KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  QgsCoordinateTransform crst( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform( crst.transform( pos ) );
+  double mup = mapSettings.mapUnitsPerPixel();
   for ( int iPart = 0, nParts = constState()->p1.size(); iPart < nParts; ++iPart )
   {
-    QList<QgsPointXY> points = QList<QgsPointXY>()
-                               << constState()->p1[iPart]
-                               << QgsPoint( constState()->p2[iPart].x(), constState()->p1[iPart].y() )
-                               << constState()->p2[iPart]
-                               << QgsPoint( constState()->p1[iPart].x(), constState()->p2[iPart].y() );
+    QList<KadasItemPos> points = QList<KadasItemPos>()
+                                 << constState()->p1[iPart]
+                                 << KadasItemPos( constState()->p2[iPart].x(), constState()->p1[iPart].y() )
+                                 << constState()->p2[iPart]
+                                 << KadasItemPos( constState()->p1[iPart].x(), constState()->p2[iPart].y() );
     for ( int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert )
     {
-      QgsPointXY testPos = mapSettings.mapToPixel().transform( crst.transform( points[iVert] ) );
-      if ( canvasPos.sqrDist( testPos ) < 25 )
+      KadasMapPos testPos = toMapPos( points[iVert], mapSettings );
+      if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
       {
-        return EditContext( QgsVertexId( iPart, 0, iVert ), points[iVert], drawAttribs() );
+        return EditContext( QgsVertexId( iPart, 0, iVert ), testPos, drawAttribs() );
       }
     }
   }
   return EditContext();
 }
 
-void KadasRectangleItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
+void KadasRectangleItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
+  KadasItemPos newItemPos = toItemPos( newPoint, mapSettings );
   if ( context.vidx.part >= 0 && context.vidx.part < state()->p1.size()
        && context.vidx.vertex >= 0 && context.vidx.vertex < 4 )
   {
     if ( context.vidx.vertex == 0 )
     {
-      state()->p1[context.vidx.part] = newPoint;
+      state()->p1[context.vidx.part] = newItemPos;
     }
     else if ( context.vidx.vertex == 1 )
     {
-      state()->p2[context.vidx.part].setX( newPoint.x() );
-      state()->p1[context.vidx.part].setY( newPoint.y() );
+      state()->p2[context.vidx.part].setX( newItemPos.x() );
+      state()->p1[context.vidx.part].setY( newItemPos.y() );
     }
     else if ( context.vidx.vertex == 2 )
     {
-      state()->p2[context.vidx.part] = newPoint;
+      state()->p2[context.vidx.part] = newItemPos;
     }
     else if ( context.vidx.vertex == 3 )
     {
-      state()->p1[context.vidx.part].setX( newPoint.x() );
-      state()->p2[context.vidx.part].setY( newPoint.y() );
+      state()->p1[context.vidx.part].setX( newItemPos.x() );
+      state()->p2[context.vidx.part].setY( newItemPos.y() );
     }
     recomputeDerived();
   }
@@ -179,17 +180,17 @@ void KadasRectangleItem::edit( const EditContext &context, const QgsPointXY &new
 
 void KadasRectangleItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-KadasMapItem::AttribValues KadasRectangleItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasRectangleItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  return drawAttribsFromPosition( pos );
+  return drawAttribsFromPosition( pos, mapSettings );
 }
 
-QgsPointXY KadasRectangleItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
+KadasMapPos KadasRectangleItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return positionFromDrawAttribs( values );
+  return positionFromDrawAttribs( values, mapSettings );
 }
 
 void KadasRectangleItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
@@ -218,13 +219,13 @@ void KadasRectangleItem::measureGeometry()
     QStringList measurements;
     measurements.append( formatArea( area, areaBaseUnit() ) );
 
-    const QgsPointXY &p1 = state()->p1[i];
-    const QgsPointXY &p2 = state()->p2[i];
-    QString width = formatLength( mDa.measureLine( p1, QgsPointXY( p2.x(), p1.y() ) ), distanceBaseUnit() );
-    QString height = formatLength( mDa.measureLine( p1, QgsPointXY( p1.x(), p2.y() ) ), distanceBaseUnit() );
+    const KadasItemPos &p1 = state()->p1[i];
+    const KadasItemPos &p2 = state()->p2[i];
+    QString width = formatLength( mDa.measureLine( p1, KadasItemPos( p2.x(), p1.y() ) ), distanceBaseUnit() );
+    QString height = formatLength( mDa.measureLine( p1, KadasItemPos( p1.x(), p2.y() ) ), distanceBaseUnit() );
     measurements.append( QString( "(%1 x %2)" ).arg( width ).arg( height ) );
 
-    addMeasurements( measurements, polygon->centroid() );
+    addMeasurements( measurements, KadasItemPos::fromPoint( polygon->centroid() ) );
     totalArea += area;
   }
   mTotalMeasurement = formatArea( totalArea, areaBaseUnit() );
@@ -235,8 +236,8 @@ void KadasRectangleItem::recomputeDerived()
   QgsGeometryCollection *multiGeom = new QgsMultiPolygon();
   for ( int i = 0, n = state()->p1.size(); i < n; ++i )
   {
-    const QgsPointXY &p1 = state()->p1[i];
-    const QgsPointXY &p2 = state()->p2[i];
+    const KadasItemPos &p1 = state()->p1[i];
+    const KadasItemPos &p2 = state()->p2[i];
     QgsLineString *ring = new QgsLineString();
     ring->addVertex( QgsPoint( p1 ) );
     ring->addVertex( QgsPoint( p2.x(), p1.y() ) );

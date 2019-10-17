@@ -99,7 +99,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
     if ( lineItem && lineItem->constState()->drawStatus == KadasMapItem::State::Finished && !lineItem->constState()->points.isEmpty() )
     {
       QgsPointXY p = toMapCoordinates( e->pos() );
-      const QList<QgsPointXY> &points = lineItem->constState()->points.front();
+      const QList<KadasItemPos> &points = lineItem->constState()->points.front();
       double minDist = std::numeric_limits<double>::max();
       int minIdx = 0;
       QgsPoint minPos;
@@ -172,9 +172,13 @@ void KadasMapToolHeightProfile::drawFinished()
   {
     if ( !lineItem->constState()->points.isEmpty() && !lineItem->constState()->points.front().isEmpty() )
     {
-      const QList<QgsPointXY> &line = lineItem->constState()->points.front();
-      mDialog->setPoints( line, lineItem->crs() );
-      QgsPoint markerPos( line[0] );
+      QList<QgsPointXY> points;
+      for ( const KadasItemPos &pos : lineItem->constState()->points.front() )
+      {
+        points.append( pos );
+      }
+      mDialog->setPoints( points, lineItem->crs() );
+      QgsPoint markerPos( points[0] );
       mPosMarker->addPartFromGeometry( &markerPos );
     }
   }

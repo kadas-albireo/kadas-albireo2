@@ -29,7 +29,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
-    void setup( const QString &path, const QgsPointXY &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+    void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
 
     const QString &filePath() const { return mFilePath; }
     void setFilePath( const QString &filePath );
@@ -40,36 +40,37 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
     QString itemName() const override { return tr( "Picture" ); }
 
-    QgsRectangle boundingBox() const override;
-    QRect margin() const override;
+    KadasItemRect boundingBox() const override;
+    Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
     void render( QgsRenderContext &context ) const override;
 
-    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
+    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
+    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     bool continuePart( const QgsMapSettings &mapSettings ) override;
     void endPart() override;
 
     AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
+    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override;
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
+    void populateContextMenu( QMenu *menu, const EditContext &context ) override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    QgsPointXY position() const override { return constState()->pos; }
-    void setPosition( const QgsPointXY &pos ) override;
+    KadasItemPos position() const override { return constState()->pos; }
+    void setPosition( const KadasItemPos &pos ) override;
 
     struct State : KadasMapItem::State
     {
-      QgsPointXY pos;
+      KadasItemPos pos;
       double angle;
       QSize size;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
@@ -87,13 +88,14 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     double mOffsetX = 0;
     double mOffsetY = 0;
     QImage mImage;
+    bool mFrame = true;
 
     static constexpr int sFramePadding = 4;
     static constexpr int sArrowWidth = 6;
 
     State *state() { return static_cast<State *>( mState ); }
 
-    QList<QgsPointXY> cornerPoints( const QgsPointXY &anchor, double mup = 1. ) const;
+    QList<KadasMapPos> cornerPoints( const QgsMapSettings &settings ) const;
     static bool readGeoPos( const QString &filePath, QgsPointXY &wgsPos );
 };
 

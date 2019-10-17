@@ -90,7 +90,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  QgsRectangle filterRect;
+  KadasMapRect filterRect;
   filterRect.setXMinimum( e->mapPoint().x() - radiusmu );
   filterRect.setXMaximum( e->mapPoint().x() + radiusmu );
   filterRect.setYMinimum( e->mapPoint().y() - radiusmu );
@@ -101,8 +101,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
     // First, test selected items
     for ( KadasMapItem *item : mItems )
     {
-      QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), item->crs(), QgsProject::instance() );
-      if ( item->intersects( crst.transform( filterRect ), mCanvas->mapSettings() ) )
+      if ( item->intersects( filterRect, mCanvas->mapSettings() ) )
       {
         deselectItem( item );
         updateSelection();
@@ -165,7 +164,7 @@ void KadasMapToolEditItemGroup::canvasMoveEvent( QgsMapMouseEvent *e )
     {
       QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), mItems[i]->crs(), QgsProject::instance() );
       QgsPointXY newPos = crst.transform( mItemRefPos[i] + delta, QgsCoordinateTransform::ReverseTransform );
-      mItems[i]->setPosition( newPos );
+      mItems[i]->setPosition( KadasItemPos::fromPoint( newPos ) );
     }
     mSelectionRect->update();
   }

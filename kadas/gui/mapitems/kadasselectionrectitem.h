@@ -31,11 +31,14 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
 
     QString itemName() const override { return tr( "Selection" ); }
 
-    QgsRectangle boundingBox() const override;
-    QRect margin() const override;
+    KadasItemRect boundingBox() const override;
+    Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override { return QList<KadasMapItem::Node>(); }
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override { return QString(); }
+#endif
 
     // Item is not meant to be user-editable, all methods below are stubbed
     struct State : KadasMapItem::State
@@ -44,26 +47,26 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
       State *clone() const override SIP_FACTORY { return new State( *this ); }
     };
 
-    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override { return false; }
+    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override { return false; }
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override { return false; }
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override { }
+    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override { }
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override { }
     bool continuePart( const QgsMapSettings &mapSettings ) override { return false; }
     void endPart() override {}
 
     AttribDefs drawAttribs() const override { return AttribDefs(); }
-    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override { return AttribValues(); }
-    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override { return QgsPointXY(); }
+    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override { return AttribValues(); }
+    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override { return KadasMapPos(); }
 
-    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override { return EditContext(); }
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override { }
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override { return EditContext(); }
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override { }
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override { }
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override { return AttribValues(); }
-    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override { return QgsPointXY(); }
+    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override { return AttribValues(); }
+    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override { return KadasMapPos(); }
 
-    QgsPointXY position() const override {return QgsPointXY(); }
-    void setPosition( const QgsPointXY &pos ) override {}
+    KadasItemPos position() const override {return KadasItemPos(); }
+    void setPosition( const KadasItemPos &pos ) override {}
 
   protected:
     KadasMapItem *_clone() const override { return new KadasSelectionRectItem( crs() ); } SIP_FACTORY
@@ -72,7 +75,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
   private:
     QList<KadasMapItem *> mItems;
 
-    QgsRectangle itemsRect( double mup ) const;
+    KadasMapRect itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const;
 };
 
 #endif // KADASPICTUREITEM_H

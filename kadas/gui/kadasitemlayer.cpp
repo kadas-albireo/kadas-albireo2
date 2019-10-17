@@ -111,10 +111,10 @@ void KadasItemLayer::setTransformContext( const QgsCoordinateTransformContext &c
 
 QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
+  KadasMapRect rect( pickRect.xMinimum(), pickRect.yMinimum(), pickRect.xMaximum(), pickRect.yMaximum() );
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
   {
-    QgsCoordinateTransform crst( mapSettings.destinationCrs(), it.value()->crs(), transformContext() );
-    if ( it.value()->intersects( crst.transform( pickRect ), mapSettings ) )
+    if ( it.value()->intersects( rect, mapSettings ) )
     {
       return it.key();
     }
@@ -136,20 +136,3 @@ QString KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings
   return pickItem( filterRect, mapSettings );
 }
 
-QRectF KadasItemLayer::margin() const
-{
-  bool empty = true;
-  QRectF rect;
-  for ( const KadasMapItem *item : mItems )
-  {
-    if ( empty )
-    {
-      rect = item->margin();
-    }
-    else
-    {
-      rect = rect.united( item->margin() );
-    }
-  }
-  return rect;
-}

@@ -77,16 +77,17 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
     ~KadasGeometryItem();
 
-    void render( QgsRenderContext &context ) const override;
-    QgsRectangle boundingBox() const override;
-    QRect margin() const override;
+    KadasItemRect boundingBox() const override;
+    Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
+    void render( QgsRenderContext &context ) const override;
 
     void clear() override;
     void setState( const State *state ) override;
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
+    // Geometry in item CRS
     virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
 
     QPen outline() const { return mPen; }
@@ -105,6 +106,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     void setMeasurementsEnabled( bool enabled, QgsUnitTypes::DistanceUnit baseUnit = QgsUnitTypes::DistanceMeters );
     QString getTotalMeasurement() const { return mTotalMeasurement; }
 
+    // Geometry in item CRS
     const QgsAbstractGeometry *geometry() const { return mGeometry; }
 
   signals:
@@ -135,7 +137,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
-    void addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center = true );
+    void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
 
     virtual void recomputeDerived() = 0;
     virtual void measureGeometry() {}
@@ -148,7 +150,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     struct MeasurementLabel
     {
       QString string;
-      QgsPointXY mapPos;
+      KadasItemPos pos;
       int width;
       int height;
       bool center;

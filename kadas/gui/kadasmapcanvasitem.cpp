@@ -37,7 +37,8 @@ void KadasMapCanvasItem::paint( QPainter *painter )
       return;
     }
     QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
-    rc.setMapExtent( mMapCanvas->mapSettings().extent() );
+    rc.setMapExtent( mMapCanvas->mapSettings().visibleExtent() );
+    rc.setExtent( mMapCanvas->mapSettings().extent() );
     rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
     rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
     rc.setFlag( QgsRenderContext::Antialiasing, true );
@@ -51,10 +52,9 @@ void KadasMapCanvasItem::paint( QPainter *painter )
 
     if ( mItem->selected() )
     {
-      QgsCoordinateTransform crst( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
       for ( const KadasMapItem::Node &node : mItem->nodes( mMapCanvas->mapSettings() ) )
       {
-        QgsPointXY screenPoint = mMapCanvas->mapSettings().mapToPixel().transform( crst.transform( node.pos ) );
+        QPointF screenPoint = mMapCanvas->mapSettings().mapToPixel().transform( node.pos ).toQPointF();
         screenPoint.setX( qRound( screenPoint.x() ) );
         screenPoint.setY( qRound( screenPoint.y() ) );
         rc.painter()->save();
@@ -69,12 +69,13 @@ void KadasMapCanvasItem::paint( QPainter *painter )
 void KadasMapCanvasItem::updateRect()
 {
   QgsCoordinateTransform t( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
+  // FIXME This creates a bounding box which is not guaranteed to cover other one?!
   QgsRectangle bbox = t.transform( mItem->boundingBox() );
-  double scale = mMapCanvas->mapUnitsPerPixel();
-  QRect margin = mItem->margin();
-  bbox.setXMinimum( bbox.xMinimum() - margin.left() * scale - 0.5 * sHandleSize );
-  bbox.setXMaximum( bbox.xMaximum() + margin.right() * scale + 0.5 * sHandleSize );
-  bbox.setYMinimum( bbox.yMinimum() - margin.bottom() * scale  - 0.5 * sHandleSize );
-  bbox.setYMaximum( bbox.yMaximum() + margin.top() * scale + 0.5 * sHandleSize );
+  double mup = mMapCanvas->mapUnitsPerPixel();
+  KadasMapItem::Margin margin = mItem->margin();
+  bbox.setXMinimum( bbox.xMinimum() - ( margin.left + sHandleSize ) * mup );
+  bbox.setXMaximum( bbox.xMaximum() + ( margin.right + sHandleSize ) * mup );
+  bbox.setYMinimum( bbox.yMinimum() - ( margin.bottom + sHandleSize ) * mup );
+  bbox.setYMaximum( bbox.yMaximum() + ( margin.top + sHandleSize ) * mup );
   setRect( bbox );
 }
