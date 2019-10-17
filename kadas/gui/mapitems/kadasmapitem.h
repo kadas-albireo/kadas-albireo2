@@ -221,20 +221,23 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // Edit interface (coordinates in map crs, attribute distances in map units)
     struct EditContext
     {
-      EditContext( const QgsVertexId &_vidx = QgsVertexId(), const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
-        : vidx( _vidx )
+      EditContext() : mValid( false ) {}
+      EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
+        : mValid( true )
+        , vidx( _vidx )
         , pos( _pos )
         , attributes( _attributes )
         , cursor( _cursor )
       {
       }
+      bool mValid = false;
       QgsVertexId vidx;
       KadasMapPos pos;
       AttribDefs attributes;
       Qt::CursorShape cursor;
-      bool isValid() const { return vidx.isValid(); }
-      bool operator== ( const EditContext &other ) const { return vidx == other.vidx; }
-      bool operator!= ( const EditContext &other ) const { return vidx != other.vidx; }
+      bool isValid() const { return mValid; }
+      bool operator== ( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
+      bool operator!= ( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
