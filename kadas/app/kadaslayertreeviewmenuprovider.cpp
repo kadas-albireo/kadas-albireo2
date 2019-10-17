@@ -80,7 +80,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
     }
     menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
-    if ( QgsLayerTree::isLayer( node ) )
+    if ( QgsLayerTree::isLayer( node ) && QgsLayerTree::toLayer( node )->layer() )
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
       // addCustomLayerActions( menu, layer ); TODO?
