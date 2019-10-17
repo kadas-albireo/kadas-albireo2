@@ -26,6 +26,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
     Q_PROPERTY( double offsetX READ offsetX WRITE setOffsetX )
     Q_PROPERTY( double offsetY READ offsetY WRITE setOffsetY )
+    Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
 
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
@@ -37,6 +38,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     void setOffsetX( double offsetX );
     double offsetY() const { return mOffsetY; }
     void setOffsetY( double offsetY );
+    bool frameVisible() const { return mFrame; }
+    void setFrameVisible( bool frame );
 
     QString itemName() const override { return tr( "Picture" ); }
 

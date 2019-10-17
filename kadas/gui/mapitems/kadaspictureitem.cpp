@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QImageReader>
+#include <QMenu>
 
 #include <exiv2/exiv2.hpp>
 
@@ -86,6 +87,17 @@ void KadasPictureItem::setOffsetX( double offsetX )
 void KadasPictureItem::setOffsetY( double offsetY )
 {
   mOffsetY = offsetY;
+  update();
+}
+
+void KadasPictureItem::setFrameVisible( bool frame )
+{
+  mFrame = frame;
+  if ( !frame )
+  {
+    mOffsetX = 0;
+    mOffsetY = 0;
+  }
   update();
 }
 
@@ -175,47 +187,51 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   pos.transform( context.mapToPixel().transform() );
   context.painter()->translate( pos.x(), pos.y() );
 
-  // Draw frame
   double w = constState()->size.width();
   double h = constState()->size.height();
-  double framew = w + 2 * sFramePadding;
-  double frameh = h + 2 * sFramePadding;
-  context.painter()->setPen( QPen( Qt::black, 1 ) );
-  context.painter()->setBrush( Qt::white );
-  QPolygonF poly;
-  poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
-  poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
-  poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
-  poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
-  poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
-  // Draw frame triangle
-  if ( qAbs( mOffsetX ) > qAbs( 0.5 * framew ) || qAbs( mOffsetY ) > qAbs( 0.5 * frameh ) )
+
+  // Draw frame
+  if ( mFrame )
   {
-    QgsPointXY framePos;
-    QgsVector baseDir;
-    // Determine triangle quadrant
-    int quadrant = qRound( qAtan2( -mOffsetY, mOffsetX ) / M_PI * 180 / 90 );
-    if ( quadrant < 0 ) { quadrant += 4; }
-    if ( quadrant == 0 || quadrant == 2 )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
+    double framew = w + 2 * sFramePadding;
+    double frameh = h + 2 * sFramePadding;
+    context.painter()->setPen( QPen( Qt::black, 1 ) );
+    context.painter()->setBrush( Qt::white );
+    QPolygonF poly;
+    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
+    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
+    poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
+    poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
+    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
+    // Draw frame triangle
+    if ( qAbs( mOffsetX ) > qAbs( 0.5 * framew ) || qAbs( mOffsetY ) > qAbs( 0.5 * frameh ) )
     {
-      baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
-      framePos.setX( quadrant == 0 ? mOffsetX - 0.5 * framew : mOffsetX + 0.5 * framew );
-      framePos.setY( qMin( qMax( -mOffsetY - 0.5 * frameh + sArrowWidth, 0. ), -mOffsetY + 0.5 * frameh - sArrowWidth ) );
+      QgsPointXY framePos;
+      QgsVector baseDir;
+      // Determine triangle quadrant
+      int quadrant = qRound( qAtan2( -mOffsetY, mOffsetX ) / M_PI * 180 / 90 );
+      if ( quadrant < 0 ) { quadrant += 4; }
+      if ( quadrant == 0 || quadrant == 2 )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
+      {
+        baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
+        framePos.setX( quadrant == 0 ? mOffsetX - 0.5 * framew : mOffsetX + 0.5 * framew );
+        framePos.setY( qMin( qMax( -mOffsetY - 0.5 * frameh + sArrowWidth, 0. ), -mOffsetY + 0.5 * frameh - sArrowWidth ) );
+      }
+      else     // Triangle above (quadrant = 1) or below (quadrant = 3)
+      {
+        framePos.setX( qMin( qMax( mOffsetX - 0.5 * framew + sArrowWidth, 0. ), mOffsetX + 0.5 * framew - sArrowWidth ) );
+        framePos.setY( quadrant == 1 ? -mOffsetY - 0.5 * frameh : -mOffsetY + 0.5 * frameh );
+        baseDir = QgsVector( quadrant == 1 ? 1 : -1, 0 );
+      }
+      int inspos = quadrant + 1;
+      poly.insert( inspos++, QPointF( framePos.x() - sArrowWidth * baseDir.x(), framePos.y() - sArrowWidth * baseDir.y() ) );
+      poly.insert( inspos++, QPointF( 0, 0 ) );
+      poly.insert( inspos++, QPointF( framePos.x() + sArrowWidth * baseDir.x(), framePos.y() + sArrowWidth * baseDir.y() ) );
     }
-    else     // Triangle above (quadrant = 1) or below (quadrant = 3)
-    {
-      framePos.setX( qMin( qMax( mOffsetX - 0.5 * framew + sArrowWidth, 0. ), mOffsetX + 0.5 * framew - sArrowWidth ) );
-      framePos.setY( quadrant == 1 ? -mOffsetY - 0.5 * frameh : -mOffsetY + 0.5 * frameh );
-      baseDir = QgsVector( quadrant == 1 ? 1 : -1, 0 );
-    }
-    int inspos = quadrant + 1;
-    poly.insert( inspos++, QPointF( framePos.x() - sArrowWidth * baseDir.x(), framePos.y() - sArrowWidth * baseDir.y() ) );
-    poly.insert( inspos++, QPointF( 0, 0 ) );
-    poly.insert( inspos++, QPointF( framePos.x() + sArrowWidth * baseDir.x(), framePos.y() + sArrowWidth * baseDir.y() ) );
+    QPainterPath path;
+    path.addPolygon( poly );
+    context.painter()->drawPath( path );
   }
-  QPainterPath path;
-  path.addPolygon( poly );
-  context.painter()->drawPath( path );
 
   context.painter()->drawImage( mOffsetX - 0.5 * w - 0.5, -mOffsetY - 0.5 * h - 0.5, mImage );
 }

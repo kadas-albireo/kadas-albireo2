@@ -36,6 +36,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     void setOffsetX( double offsetX );
     double offsetY() const;
     void setOffsetY( double offsetY );
+    bool frameVisible() const;
+    void setFrameVisible( bool frame );
 
     virtual QString itemName() const;
 
