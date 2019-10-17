@@ -468,7 +468,7 @@ KadasItemLayer *KadasApplication::getOrCreateItemLayer( const QString &layerName
   KadasItemLayer *layer = getItemLayer( layerName );
   if ( !layer )
   {
-    layer = new KadasItemLayer( layerName );
+    layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
     mItemLayerMap[layerName] = layer->id();
     QgsProject::instance()->addMapLayer( layer );
   }

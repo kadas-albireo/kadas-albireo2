@@ -57,9 +57,10 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
 };
 
 
-KadasItemLayer::KadasItemLayer( const QString &name )
+KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs )
   : QgsPluginLayer( layerType(), name )
 {
+  setCrs( crs );
   mValid = true;
 }
 
@@ -75,7 +76,7 @@ KadasMapItem *KadasItemLayer::takeItem( const QString &itemId )
 
 KadasItemLayer *KadasItemLayer::clone() const
 {
-  KadasItemLayer *layer = new KadasItemLayer( name() );
+  KadasItemLayer *layer = new KadasItemLayer( name(), crs() );
   // TODO
 //  layer->mItems =
   return layer;

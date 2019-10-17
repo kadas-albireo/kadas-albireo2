@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     static QString layerType();
-    KadasItemLayer( const QString &name );
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
 
     void addItem( KadasMapItem *item );
     KadasMapItem *takeItem( const QString &itemId );

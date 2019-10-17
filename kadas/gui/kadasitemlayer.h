@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     Q_OBJECT
   public:
     static QString layerType() { return "KadasItemLayer"; }
-    KadasItemLayer( const QString &name );
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
 
     void addItem( KadasMapItem *item );
     KadasMapItem *takeItem( const QString &itemId );
@@ -64,8 +64,8 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
   public:
     KadasItemLayerType()
       : QgsPluginLayerType( KadasItemLayer::layerType() ) {}
-    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
-    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
+    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
+    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
 };
 
 #endif // KADASITEMLAYER_H

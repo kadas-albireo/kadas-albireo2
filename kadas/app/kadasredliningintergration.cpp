@@ -43,37 +43,39 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   mMainWindow = main;
   mCanvas = main->mapCanvas();
 
+  QgsCoordinateReferenceSystem crsMercator( "EPSG:3857" );
+
   KadasMapToolCreateItem::ItemFactory pointFactory = [ = ]
   {
-    return setEditorFactory( new KadasPointItem( mCanvas->mapSettings().destinationCrs(), KadasPointItem::ICON_CIRCLE ) );
+    return setEditorFactory( new KadasPointItem( crsMercator, KadasPointItem::ICON_CIRCLE ) );
   };
   KadasMapToolCreateItem::ItemFactory squareFactory = [ = ]
   {
-    return setEditorFactory( new KadasPointItem( mCanvas->mapSettings().destinationCrs(), KadasPointItem::ICON_FULL_BOX ) );
+    return setEditorFactory( new KadasPointItem( crsMercator, KadasPointItem::ICON_FULL_BOX ) );
   };
   KadasMapToolCreateItem::ItemFactory triangleFactory = [ = ]
   {
-    return setEditorFactory( new KadasPointItem( mCanvas->mapSettings().destinationCrs(), KadasPointItem::ICON_FULL_TRIANGLE ) );
+    return setEditorFactory( new KadasPointItem( crsMercator, KadasPointItem::ICON_FULL_TRIANGLE ) );
   };
   KadasMapToolCreateItem::ItemFactory lineFactory = [ = ]
   {
-    return setEditorFactory( new KadasLineItem( mCanvas->mapSettings().destinationCrs() ) );
+    return setEditorFactory( new KadasLineItem( crsMercator ) );
   };
   KadasMapToolCreateItem::ItemFactory rectangleFactory = [ = ]
   {
-    return setEditorFactory( new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() ) );
+    return setEditorFactory( new KadasRectangleItem( crsMercator ) );
   };
   KadasMapToolCreateItem::ItemFactory polygonFactory = [ = ]
   {
-    return setEditorFactory( new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() ) );
+    return setEditorFactory( new KadasPolygonItem( crsMercator ) );
   };
   KadasMapToolCreateItem::ItemFactory circleFactory = [ = ]
   {
-    return setEditorFactory( new KadasCircleItem( mCanvas->mapSettings().destinationCrs() ) );
+    return setEditorFactory( new KadasCircleItem( crsMercator ) );
   };
   KadasMapToolCreateItem::ItemFactory textFactory = [ = ]
   {
-    KadasTextItem *textItem = new KadasTextItem( mCanvas->mapSettings().destinationCrs() );
+    KadasTextItem *textItem = new KadasTextItem( crsMercator );
     textItem->setEditorFactory( KadasRedliningTextEditor::factory );
     return textItem;
   };
