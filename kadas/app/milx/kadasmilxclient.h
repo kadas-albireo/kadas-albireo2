@@ -85,26 +85,27 @@ class KadasMilxClient : public QThread
       bool colored;
     };
 
-    struct NPointSymbolGraphic
+    enum AttributeType
     {
-      QImage graphic;
-      QPoint offset;
-      QList<QPoint> adjustedPoints;
-      QList<int> controlPoints;
-      QList< QPair<int, double> > attributes;
-      QList< QPair<int, QPoint> > attributePoints;
-    };
-
-    enum AttributeTypes
-    {
+      AttributeUnknown = 0,
       AttributeWidth = 1,
       AttributeLength = 2,
       AttributeRadius = 4,
       AttributeAttitude = 8
     };
 
-    static QString attributeName( int idx );
-    static int attributeIdx( const QString &name );
+    struct NPointSymbolGraphic
+    {
+      QImage graphic;
+      QPoint offset;
+      QList<QPoint> adjustedPoints;
+      QList<int> controlPoints;
+      QMap<AttributeType, double> attributes;
+      QMap<AttributeType, QPoint> attributePoints;
+    };
+
+    static QString attributeName( AttributeType idx );
+    static AttributeType attributeIdx( const QString &name );
 
     static void setSymbolSize( int value ) { instance()->mSymbolSize = value; instance()->setSymbolOptions( instance()->mSymbolSize, instance()->mLineWidth, instance()->mWorkMode ); }
     static void setLineWidth( int value ) { instance()->mLineWidth = value; instance()->setSymbolOptions( instance()->mSymbolSize, instance()->mLineWidth, instance()->mWorkMode ); }
@@ -154,6 +155,7 @@ class KadasMilxClient : public QThread
     ~KadasMilxClient();
     static KadasMilxClient *instance();
     static QImage renderSvg( const QByteArray &xml );
+    static void deserializeSymbol( QDataStream &ostream, NPointSymbolGraphic &result, bool deserializePoints = true );
 
     bool processRequest( const QByteArray &request, QByteArray &response, quint8 expectedReply, bool async = false );
     bool setSymbolOptions( int symbolSize, int lineWidth, int workMode );

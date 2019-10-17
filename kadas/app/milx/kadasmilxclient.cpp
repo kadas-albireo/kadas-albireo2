@@ -334,7 +334,7 @@ bool KadasMilxClient::processRequest( const QByteArray &request, QByteArray &res
   }
 }
 
-QString KadasMilxClient::attributeName( int idx )
+QString KadasMilxClient::attributeName( AttributeType idx )
 {
   if ( idx == AttributeWidth )
     return "Width";
@@ -347,7 +347,7 @@ QString KadasMilxClient::attributeName( int idx )
   return "";
 }
 
-int KadasMilxClient::attributeIdx( const QString &name )
+KadasMilxClient::AttributeType KadasMilxClient::attributeIdx( const QString &name )
 {
   if ( name == "Width" )
     return AttributeWidth;
@@ -357,7 +357,7 @@ int KadasMilxClient::attributeIdx( const QString &name )
     return AttributeRadius;
   else if ( name == "Attitude" )
     return AttributeAttitude;
-  return 0;
+  return AttributeUnknown;
 }
 
 bool KadasMilxClient::init()
@@ -434,13 +434,7 @@ bool KadasMilxClient::appendPoint( const QRect &visibleExtent, int dpi, const NP
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -458,13 +452,7 @@ bool KadasMilxClient::insertPoint( const QRect &visibleExtent, int dpi, const NP
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -482,13 +470,7 @@ bool KadasMilxClient::movePoint( const QRect &visibleExtent, int dpi, const NPoi
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -506,13 +488,7 @@ bool KadasMilxClient::moveAttributePoint( const QRect &visibleExtent, int dpi, c
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -548,13 +524,7 @@ bool KadasMilxClient::deletePoint( const QRect &visibleExtent, int dpi, const NP
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -581,13 +551,7 @@ bool KadasMilxClient::editSymbol( const QRect &visibleExtent, int dpi, const NPo
   MilXServerReply replycmd = 0; ostream >> replycmd;
   ostream >> newSymbolXml;
   ostream >> newSymbolMilitaryName;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  ostream >> result.adjustedPoints;
-  ostream >> result.controlPoints;
-  ostream >> result.attributes;
-  ostream >> result.attributePoints;
+  KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
 
@@ -634,16 +598,7 @@ bool KadasMilxClient::updateSymbol( const QRect &visibleExtent, int dpi, const N
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
-  QByteArray svgxml; ostream >> svgxml;
-  result.graphic = renderSvg( svgxml );
-  ostream >> result.offset;
-  if ( returnPoints )
-  {
-    ostream >> result.adjustedPoints;
-    ostream >> result.controlPoints;
-    ostream >> result.attributes;
-    ostream >> result.attributePoints;
-  }
+  KadasMilxClient::deserializeSymbol( ostream, result, returnPoints );
   return true;
 }
 
@@ -657,7 +612,7 @@ bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, double
   istream << dpi;
   istream << scaleFactor;
   istream << nSymbols;
-  foreach ( const NPointSymbol &symbol, symbols )
+  for ( const NPointSymbol &symbol : symbols )
   {
     istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored;
   }
@@ -905,4 +860,33 @@ QImage KadasMilxClient::renderSvg( const QByteArray &xml )
   g_object_unref( handle );
   g_object_unref( stream );
   return image;
+}
+
+void KadasMilxClient::deserializeSymbol( QDataStream &ostream, NPointSymbolGraphic &result, bool deserializePoints )
+{
+  QList<QPair<int, double>> attributes;
+  QList<QPair<int, QPoint>> attributePoints;
+  QByteArray svgxml;
+
+  ostream >> svgxml;
+  ostream >> result.offset;
+  if ( deserializePoints )
+  {
+    ostream >> result.adjustedPoints;
+    ostream >> result.controlPoints;
+    ostream >> attributes;
+    ostream >> attributePoints;
+  }
+
+  result.graphic = renderSvg( svgxml );
+  for ( const auto &pair : attributes )
+  {
+    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( pair.first );
+    result.attributes.insert( attr, pair.second );
+  }
+  for ( const auto &pair : attributePoints )
+  {
+    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( pair.first );
+    result.attributePoints.insert( attr, pair.second );
+  }
 }

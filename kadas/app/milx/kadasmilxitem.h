@@ -58,8 +58,8 @@ class KadasMilxItem : public KadasMapItem
     struct State : KadasMapItem::State
     {
       QList<KadasItemPos> points;
-      QList< QPair<int, double> > attributes;
-      QList< QPair<int, KadasItemPos> > attributePoints;
+      QMap<KadasMilxClient::AttributeType, double> attributes;
+      QMap<KadasMilxClient::AttributeType, KadasItemPos> attributePoints;
       QList<int> controlPoints;
       QPoint userOffset;
       int pressedPoints = 0;
@@ -104,7 +104,15 @@ class KadasMilxItem : public KadasMapItem
     static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
 
   private:
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX = -2,
+      AttrY = -1,
+      AttrW = KadasMilxClient::AttributeWidth,
+      AttrL = KadasMilxClient::AttributeLength,
+      AttrR = KadasMilxClient::AttributeRadius,
+      AttrA = KadasMilxClient::AttributeAttitude
+    };
 
     QString mMssString;
     QString mMilitaryName;
