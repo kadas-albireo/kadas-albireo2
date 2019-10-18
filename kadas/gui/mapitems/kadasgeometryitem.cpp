@@ -379,3 +379,35 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
     } );
   }
 }
+
+static KadasItemPos projectPointOnSegment( const KadasItemPos &p, const KadasItemPos &s1, const KadasItemPos &s2 )
+{
+  double nx = s2.y() - s1.y();
+  double ny = -( s2.x() - s1.x() );
+  double t = ( p.x() * ny - p.y() * nx - s1.x() * ny + s1.y() * nx ) / ( ( s2.x() - s1.x() ) * ny - ( s2.y() - s1.y() ) * nx );
+  return t < 0. ? s1 : t > 1. ? s2 : KadasItemPos( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+}
+
+QgsVertexId KadasGeometryItem::insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const
+{
+  double minDist = std::numeric_limits<double>::max();
+  QgsVertexId minVtx;
+  for ( int j = 0, m = points.size(); j < m; ++j )
+  {
+    const QList<KadasItemPos> &part = points[j];
+    int n = part.size();
+    for ( int i = 0; i < n - 1; ++i )
+    {
+      const KadasItemPos &p1 = part[i];
+      const KadasItemPos &p2 = part[i + 1];
+      KadasItemPos inter = projectPointOnSegment( testPos, p1, p2 );
+      double dist = inter.sqrDist( testPos );
+      if ( dist < minDist )
+      {
+        minDist = dist;
+        minVtx = QgsVertexId( j, 0, i + 1 );
+      }
+    }
+  }
+  return minVtx;
+}

@@ -142,6 +142,8 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
     void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
 
+    QgsVertexId insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const;
+
     virtual void recomputeDerived() = 0;
     virtual void measureGeometry() {}
 

@@ -177,6 +177,11 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const KadasMapPos &p
       }
     }
   }
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->points.front().front(), mapSettings );
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+  }
   return EditContext();
 }
 
@@ -186,6 +191,20 @@ void KadasPolygonItem::edit( const EditContext &context, const KadasMapPos &newP
        && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
   {
     state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
+    recomputeDerived();
+  }
+  else
+  {
+    // Move geometry a whole
+    KadasMapPos refMapPos = toMapPos( constState()->points.front().front(), mapSettings );
+    for ( QList<KadasItemPos> &part : state()->points )
+    {
+      for ( KadasItemPos &pos : part )
+      {
+        KadasMapPos mapPos = toMapPos( pos, mapSettings );
+        pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+      }
+    }
     recomputeDerived();
   }
 }
@@ -199,9 +218,20 @@ void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &cont
 {
   if ( context.vidx.vertex >= 0 )
   {
-    menu->addAction( tr( "Delete Node" ), menu, [this, context]
+    QAction *deleteNodeAction = menu->addAction( tr( "Delete node" ), menu, [this, context]
     {
       state()->points[context.vidx.part].removeAt( context.vidx.vertex );
+      recomputeDerived();
+    } );
+    deleteNodeAction->setEnabled( constState()->points[context.vidx.part].size() > 3 );
+  }
+  else
+  {
+    menu->addAction( tr( "Add node" ), menu, [ = ]
+    {
+      KadasItemPos newPos = toItemPos( clickPos, mapSettings );
+      QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
+      state()->points[insPoint.part].insert( insPoint.vertex, newPos );
       recomputeDerived();
     } );
   }

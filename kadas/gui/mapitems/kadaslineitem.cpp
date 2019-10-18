@@ -181,6 +181,11 @@ KadasMapItem::EditContext KadasLineItem::getEditContext( const KadasMapPos &pos,
       }
     }
   }
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->points.front().front(), mapSettings );
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+  }
   return EditContext();
 }
 
@@ -192,6 +197,20 @@ void KadasLineItem::edit( const EditContext &context, const KadasMapPos &newPoin
     state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
     recomputeDerived();
   }
+  else
+  {
+    // Move geometry a whole
+    KadasMapPos refMapPos = toMapPos( constState()->points.front().front(), mapSettings );
+    for ( QList<KadasItemPos> &part : state()->points )
+    {
+      for ( KadasItemPos &pos : part )
+      {
+        KadasMapPos mapPos = toMapPos( pos, mapSettings );
+        pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+      }
+    }
+    recomputeDerived();
+  }
 }
 
 void KadasLineItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
@@ -201,25 +220,36 @@ void KadasLineItem::edit( const EditContext &context, const AttribValues &values
 
 void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.vertex >= 0 )
-  {
-    menu->addAction( tr( "Delete Node" ), menu, [this, context]
-    {
-      state()->points[context.vidx.part].removeAt( context.vidx.vertex );
-      recomputeDerived();
-    } );
-  }
   if ( context.vidx.vertex == 0 )
   {
-    menu->addAction( tr( "Continue Line" ), menu, [this, context]
+    menu->addAction( tr( "Continue line" ), menu, [this, context]
     {
       std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
       recomputeDerived();
     } )->setData( EditSwitchToDrawingTool );
   }
-  else if ( context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
+  else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
   {
-    menu->addAction( tr( "Continue Line" ) )->setData( EditSwitchToDrawingTool );
+    menu->addAction( tr( "Continue line" ) )->setData( EditSwitchToDrawingTool );
+  }
+  if ( context.vidx.vertex >= 0 )
+  {
+    QAction *deleteNodeAction = menu->addAction( tr( "Delete node" ), menu, [this, context]
+    {
+      state()->points[context.vidx.part].removeAt( context.vidx.vertex );
+      recomputeDerived();
+    } );
+    deleteNodeAction->setEnabled( constState()->points[context.vidx.part].size() > 2 );
+  }
+  else
+  {
+    menu->addAction( tr( "Add node" ), menu, [ = ]
+    {
+      KadasItemPos newPos = toItemPos( clickPos, mapSettings );
+      QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
+      state()->points[insPoint.part].insert( insPoint.vertex, newPos );
+      recomputeDerived();
+    } );
   }
 }
 

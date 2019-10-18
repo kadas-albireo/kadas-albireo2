@@ -100,6 +100,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
     void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
 
+    QgsVertexId insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const;
+
     virtual void recomputeDerived() = 0;
     virtual void measureGeometry();
 
