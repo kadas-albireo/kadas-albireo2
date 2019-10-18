@@ -27,6 +27,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     Q_PROPERTY( double offsetX READ offsetX WRITE setOffsetX )
     Q_PROPERTY( double offsetY READ offsetY WRITE setOffsetY )
     Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
+    Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
@@ -40,6 +41,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     void setOffsetY( double offsetY );
     bool frameVisible() const { return mFrame; }
     void setFrameVisible( bool frame );
+    bool positionLocked() const { return mPosLocked; }
+    void setPositionLocked( bool locked );
 
     QString itemName() const override { return tr( "Picture" ); }
 
@@ -95,6 +98,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     double mOffsetY = 0;
     QImage mImage;
     bool mFrame = true;
+    bool mPosLocked = false;
 
     static constexpr int sFramePadding = 4;
     static constexpr int sArrowWidth = 6;

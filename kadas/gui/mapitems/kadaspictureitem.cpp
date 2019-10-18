@@ -62,6 +62,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   {
     QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( "EPSG:4326" ), mCrs, QgsProject::instance()->transformContext() ).transform( wgsPos );
     state()->pos = KadasItemPos( itemPos.x(), itemPos.y() );
+    mPosLocked = true;
   }
 
   mOffsetX = offsetX;
@@ -100,6 +101,12 @@ void KadasPictureItem::setFrameVisible( bool frame )
     mOffsetX = 0;
     mOffsetY = 0;
   }
+  update();
+}
+
+void KadasPictureItem::setPositionLocked( bool locked )
+{
+  mPosLocked = locked;
   update();
 }
 
@@ -357,18 +364,28 @@ KadasMapPos KadasPictureItem::positionFromDrawAttribs( const AttribValues &value
 KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   double mup = mapSettings.mapUnitsPerPixel();
+  KadasMapPos testPos = toMapPos( constState()->pos, mapSettings );
+  if ( !mPosLocked && pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
+  {
+    return EditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
+  }
   if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
   {
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
     KadasMapPos framePos( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
-    return EditContext( QgsVertexId( 0, 0, 0 ), framePos );
+    return EditContext( QgsVertexId(), framePos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
   }
   return EditContext();
 }
 
 void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.isValid() )
+  if ( context.vidx.vertex == 0 )
+  {
+    state()->pos = toItemPos( newPoint, mapSettings );
+    update();
+  }
+  else
   {
     QgsCoordinateTransform crst( crs(), mapSettings.destinationCrs(), QgsProject::instance() );
     QgsPointXY screenPos = mapSettings.mapToPixel().transform( newPoint );
@@ -381,7 +398,7 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
 
 void KadasPictureItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  // No editable attributes
+  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 void KadasPictureItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
@@ -389,6 +406,10 @@ void KadasPictureItem::populateContextMenu( QMenu *menu, const EditContext &cont
   QAction *frameAction = menu->addAction( tr( "Frame visible" ), [this]( bool active ) { setFrameVisible( active ); } );
   frameAction->setCheckable( true );
   frameAction->setChecked( mFrame );
+
+  QAction *lockedAction = menu->addAction( tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
+  lockedAction->setCheckable( true );
+  lockedAction->setChecked( mPosLocked );
 }
 
 KadasMapItem::AttribValues KadasPictureItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
