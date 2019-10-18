@@ -147,6 +147,11 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos 
       }
     }
   }
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->p1.front(), mapSettings );
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+  }
   return EditContext();
 }
 
@@ -173,6 +178,22 @@ void KadasRectangleItem::edit( const EditContext &context, const KadasMapPos &ne
     {
       state()->p1[context.vidx.part].setX( newItemPos.x() );
       state()->p2[context.vidx.part].setY( newItemPos.y() );
+    }
+    recomputeDerived();
+  }
+  else
+  {
+    // Move geometry a whole
+    KadasMapPos refMapPos = toMapPos( constState()->p1.front(), mapSettings );
+    for ( KadasItemPos &pos : state()->p1 )
+    {
+      KadasMapPos mapPos = toMapPos( pos, mapSettings );
+      pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+    }
+    for ( KadasItemPos &pos : state()->p2 )
+    {
+      KadasMapPos mapPos = toMapPos( pos, mapSettings );
+      pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
     }
     recomputeDerived();
   }

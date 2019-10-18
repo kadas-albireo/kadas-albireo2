@@ -189,6 +189,11 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
       return EditContext( QgsVertexId( iPart, 0, 0 ), center, attributes );
     }
   }
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->centers.front(), mapSettings );
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+  }
   return EditContext();
 }
 
@@ -204,6 +209,17 @@ void KadasCircleItem::edit( const EditContext &context, const KadasMapPos &newPo
     else if ( context.vidx.vertex == 1 )
     {
       state()->radii[context.vidx.part] = qSqrt( itemPos.sqrDist( state()->centers[context.vidx.part] ) );
+    }
+    recomputeDerived();
+  }
+  else
+  {
+    // Move geometry a whole
+    KadasMapPos refMapPos = toMapPos( constState()->centers.front(), mapSettings );
+    for ( KadasItemPos &pos : state()->centers )
+    {
+      KadasMapPos mapPos = toMapPos( pos, mapSettings );
+      pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
     }
     recomputeDerived();
   }
