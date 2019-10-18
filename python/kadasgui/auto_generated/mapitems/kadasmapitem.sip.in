@@ -49,6 +49,7 @@ class KadasMapRect
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
     KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 );
+    KadasMapRect( const KadasMapPos &center, double span );
     double xMinimum() const;
     void setXMinimum( double xMin );
     double yMinimum() const;
@@ -278,6 +279,7 @@ Trigger a redraw */
     KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
+    double pickTol( const QgsMapSettings &settings ) const;
 
 
 };

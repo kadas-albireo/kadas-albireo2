@@ -58,6 +58,7 @@ class KADAS_GUI_EXPORT KadasMapRect
     KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
       : mXmin( std::min( p1.x(), p2.x() ) ), mYmin( std::min( p1.y(), p2.y() ) ),
         mXmax( std::max( p1.x(), p2.x() ) ), mYmax( std::max( p1.y(), p2.y() ) ) {}
+    KadasMapRect( const KadasMapPos &center, double span ) : mXmin( center.x() - span ), mYmin( center.y() - span ), mXmax( center.x() + span ), mYmax( center.y() + span ) {}
     double xMinimum() const { return mXmin; }
     void setXMinimum( double xMin ) { mXmin = xMin; }
     double yMinimum() const { return mYmin; }
@@ -309,6 +310,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
+    double pickTol( const QgsMapSettings &settings ) const;
 
 
   private:

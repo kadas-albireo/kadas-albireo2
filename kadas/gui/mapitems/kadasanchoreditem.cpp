@@ -201,8 +201,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
     attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) )} );
     return EditContext( QgsVertexId( 0, 0, 1 ), rotateHandlePos, attributes );
   }
-  double tol = mapSettings.mapUnitsPerPixel();
-  if ( intersects( KadasMapRect( pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol ), mapSettings ) )
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
   {
     return EditContext( QgsVertexId( 0, 0, 0 ), toMapPos( constState()->pos, mapSettings ), drawAttribs() );
   }

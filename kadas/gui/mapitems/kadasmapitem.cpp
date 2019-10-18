@@ -113,6 +113,11 @@ double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
   return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();
 }
 
+double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
+{
+  return 5 * settings.mapUnitsPerPixel();
+}
+
 void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
 {
   painter->setPen( QPen( Qt::red, 2 ) );

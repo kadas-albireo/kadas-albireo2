@@ -399,8 +399,7 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
       return EditContext( QgsVertexId( 0, 1, it.key() ), testPos, attributes );
     }
   }
-  double tol = mapSettings.mapUnitsPerPixel();
-  if ( intersects( KadasMapRect( pos.x() - tol, pos.y() - tol, pos.x() + tol, pos.y() + tol ), mapSettings ) )
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
   {
     KadasMapPos refPos = toMapPos( constState()->points.front(), mapSettings );
     if ( !isMultiPoint() )

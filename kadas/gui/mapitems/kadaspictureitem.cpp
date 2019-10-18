@@ -357,7 +357,7 @@ KadasMapPos KadasPictureItem::positionFromDrawAttribs( const AttribValues &value
 KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   double mup = mapSettings.mapUnitsPerPixel();
-  if ( intersects( KadasMapRect( pos.x() - mup, pos.y() - mup, pos.x() + mup, pos.y() + mup ), mapSettings ) )
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
   {
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
     KadasMapPos framePos( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
