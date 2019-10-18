@@ -173,7 +173,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
   {
 
     KadasMapPos ringPos = toMapPos( KadasItemPos( constState()->centers[iPart].x() + constState()->radii[iPart], constState()->centers[iPart].y() ), mapSettings );
-    if ( pos.sqrDist( ringPos ) < pickTol( mapSettings ) )
+    if ( pos.sqrDist( ringPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
       attributes.insert( AttrR, NumericAttribute{"r", 0} );
@@ -181,7 +181,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     }
 
     KadasMapPos center = toMapPos( constState()->centers[iPart], mapSettings );
-    if ( pos.sqrDist( center ) < pickTol( mapSettings ) )
+    if ( pos.sqrDist( center ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
       attributes.insert( AttrX, NumericAttribute{"x"} );

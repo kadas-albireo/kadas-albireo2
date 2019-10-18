@@ -171,7 +171,7 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const KadasMapPos &p
     for ( int iVert = 0, nVerts = part.size(); iVert < nVerts; ++iVert )
     {
       KadasMapPos testPos = toMapPos( part[iVert], mapSettings );
-      if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
+      if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
       {
         return EditContext( QgsVertexId( iPart, 0, iVert ), testPos, drawAttribs() );
       }

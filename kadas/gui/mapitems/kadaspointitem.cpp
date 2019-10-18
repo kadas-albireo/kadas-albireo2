@@ -117,7 +117,7 @@ KadasMapItem::EditContext KadasPointItem::getEditContext( const KadasMapPos &pos
   for ( int i = 0, n = constState()->points.size(); i < n; ++i )
   {
     KadasMapPos testPos = toMapPos( constState()->points[i], mapSettings );
-    if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
+    if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
     {
       return EditContext( QgsVertexId( i, 0, 0 ), testPos, drawAttribs() );
     }

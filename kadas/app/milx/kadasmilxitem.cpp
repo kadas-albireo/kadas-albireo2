@@ -381,7 +381,7 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
   for ( int iPoint = 0, nPoints = constState()->points.size(); iPoint < nPoints; ++iPoint )
   {
     KadasMapPos testPos = toMapPos( constState()->points[iPoint], mapSettings );
-    if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
+    if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
     {
       return EditContext( QgsVertexId( 0, 0, iPoint ), testPos, drawAttribs() );
     }
@@ -389,7 +389,7 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
   for ( auto it = constState()->attributePoints.begin(), itEnd = constState()->attributePoints.end(); it != itEnd; ++it )
   {
     KadasMapPos testPos = toMapPos( it.value(), mapSettings );
-    if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
+    if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
       double min = it.key() == KadasMilxClient::AttributeAttitude ? std::numeric_limits<double>::lowest() : 0;

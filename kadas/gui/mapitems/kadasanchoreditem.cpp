@@ -195,7 +195,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
 {
   QList<KadasMapPos> points = rotatedCornerPoints( constState()->angle, mapSettings );
   KadasMapPos rotateHandlePos( 0.5 * ( points[1].x() + points[2].x() ), 0.5 * ( points[1].y() + points[2].y() ) );
-  if ( pos.sqrDist( rotateHandlePos ) < pickTol( mapSettings ) )
+  if ( pos.sqrDist( rotateHandlePos ) < pickTolSqr( mapSettings ) )
   {
     AttribDefs attributes;
     attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) )} );

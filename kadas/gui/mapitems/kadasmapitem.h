@@ -308,7 +308,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
     KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
-    double pickTol( const QgsMapSettings &settings ) const;
+    double pickTolSqr( const QgsMapSettings &settings ) const;
 
 
   private:

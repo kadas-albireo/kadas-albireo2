@@ -141,7 +141,7 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos 
     for ( int iVert = 0, nVerts = points.size(); iVert < nVerts; ++iVert )
     {
       KadasMapPos testPos = toMapPos( points[iVert], mapSettings );
-      if ( pos.sqrDist( testPos ) < pickTol( mapSettings ) )
+      if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
       {
         return EditContext( QgsVertexId( iPart, 0, iVert ), testPos, drawAttribs() );
       }

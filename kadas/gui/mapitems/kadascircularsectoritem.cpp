@@ -134,7 +134,7 @@ void KadasCircularSectorItem::setCurrentPoint( const KadasMapPos &p, const QgsMa
                        center.y() + radius * qSin( stopAngle ) );
     KadasMapPos mapPStart = toMapPos( pStart, mapSettings );
     KadasMapPos mapPEnd = toMapPos( pEnd, mapSettings );
-    if ( mapPStart.sqrDist( mapPEnd ) < pickTol( mapSettings ) )
+    if ( mapPStart.sqrDist( mapPEnd ) < pickTolSqr( mapSettings ) )
     {
       state()->stopAngles.back() = state()->startAngles.back() + 2 * M_PI;
     }

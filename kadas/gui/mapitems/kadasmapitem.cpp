@@ -108,7 +108,7 @@ KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsM
   return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
 
-double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
+double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
 {
   return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();
 }
