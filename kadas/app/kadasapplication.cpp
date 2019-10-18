@@ -234,33 +234,42 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
 
-  // Perform online/offline check to select default template
-  QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
-  QString projectTemplate;
-  if ( !onlineTestUrl.isEmpty() )
+  // Open startup project
+  QgsProject::instance()->setDirty( false );
+  if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
   {
-    QEventLoop eventLoop;
-    QNetworkReply *reply = QgsNetworkAccessManager::instance()->head( QNetworkRequest( onlineTestUrl ) );
-    QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
-    eventLoop.exec();
-
-    if ( reply->error() == QNetworkReply::NoError )
-    {
-      projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
-      settings.setValue( "/kadas/isOffline", false );
-    }
-    else
-    {
-      projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
-      settings.setValue( "/kadas/isOffline", true );
-    }
-    delete reply;
+    projectOpen( arguments()[1] );
   }
-
-  if ( !projectTemplate.isEmpty() )
+  else
   {
-    projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
-    projectOpen( projectTemplate );
+    // Perform online/offline check to select default template
+    QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
+    QString projectTemplate;
+    if ( !onlineTestUrl.isEmpty() )
+    {
+      QEventLoop eventLoop;
+      QNetworkReply *reply = QgsNetworkAccessManager::instance()->head( QNetworkRequest( onlineTestUrl ) );
+      QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
+      eventLoop.exec();
+
+      if ( reply->error() == QNetworkReply::NoError )
+      {
+        projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
+        settings.setValue( "/kadas/isOffline", false );
+      }
+      else
+      {
+        projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
+        settings.setValue( "/kadas/isOffline", true );
+      }
+      delete reply;
+    }
+
+    if ( !projectTemplate.isEmpty() )
+    {
+      projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
+      projectCreateFromTemplate( projectTemplate );
+    }
   }
 
   // TODO: QgsApplication::setMaxThreads( QSettings().value( "/Qgis/max_threads", -1 ).toInt() );
