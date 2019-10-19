@@ -34,15 +34,11 @@ class KadasRedliningIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *main );
+    KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *parent );
     KadasItemLayer *getOrCreateLayer();
-    KadasItemLayer *getLayer() const;
 
   private:
     QToolButton *mButtonNewObject = nullptr;
-    KadasMainWindow *mMainWindow = nullptr;
-    QgsMapCanvas *mCanvas = nullptr;
-    QString mLayerId;
 
     QAction *mActionNewPoint = nullptr;
     QAction *mActionNewSquare = nullptr;

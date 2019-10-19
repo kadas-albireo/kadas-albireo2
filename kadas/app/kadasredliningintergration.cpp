@@ -37,11 +37,9 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasredliningintergration.h>
 
-KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *main )
-  : mButtonNewObject( buttonNewObject )
+KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *parent )
+  : QObject( parent ), mButtonNewObject( buttonNewObject )
 {
-  mMainWindow = main;
-  mCanvas = main->mapCanvas();
 
   QgsCoordinateReferenceSystem crsMercator( "EPSG:3857" );
 
@@ -98,27 +96,27 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
   mActionNewLine->setCheckable( true );
   connect( mActionNewLine, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, lineFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), main ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), parent ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
   mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
   connect( mActionNewRectangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, rectangleFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), main ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), parent ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
   mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
   mActionNewPolygon->setCheckable( true );
   connect( mActionNewPolygon, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, polygonFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), main ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), parent ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
   mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
   mActionNewCircle->setCheckable( true );
   connect( mActionNewCircle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, circleFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), main ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), parent ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
   mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
   connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, textFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), main ), &QShortcut::activated, mActionNewText, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), parent ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   QMenu *menuNewMarker = new QMenu();
   menuNewMarker->addAction( mActionNewPoint );
@@ -142,11 +140,6 @@ KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
   return kApp->getOrCreateItemLayer( tr( "Redlining" ) );
 }
 
-KadasItemLayer *KadasRedliningIntegration::getLayer() const
-{
-  return kApp->getItemLayer( tr( "Redlining" ) );
-}
-
 KadasMapItem *KadasRedliningIntegration::setEditorFactory( KadasMapItem *item ) const
 {
   item->setEditorFactory( KadasRedliningItemEditor::factory );
@@ -155,17 +148,18 @@ KadasMapItem *KadasRedliningIntegration::setEditorFactory( KadasMapItem *item ) 
 
 void KadasRedliningIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
 {
+  QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *> ( QObject::sender() );
   if ( active )
   {
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( mCanvas, itemFactory, getOrCreateLayer() );
+    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
-    mMainWindow->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
-    mMainWindow->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
-    mCanvas->setMapTool( tool );
+    kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
+    kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
+    canvas->setMapTool( tool );
   }
-  else if ( !active && mCanvas->mapTool() && mCanvas->mapTool()->action() == action )
+  else if ( !active && canvas->mapTool() && canvas->mapTool()->action() == action )
   {
-    mCanvas->unsetMapTool( mCanvas->mapTool() );
+    canvas->unsetMapTool( canvas->mapTool() );
   }
 }
