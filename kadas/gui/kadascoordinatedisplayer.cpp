@@ -86,7 +86,7 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLin
   {
     displayFormat = 0;
   }
-  displayFormatChanged( crsSelectionMenu->actions().front() );
+  displayFormatChanged( crsSelectionMenu->actions().at( displayFormat ) );
 }
 
 void KadasCoordinateDisplayer::getCoordinateDisplayFormat( KadasCoordinateFormat::Format &format, QString &epsg )
@@ -179,7 +179,7 @@ void KadasCoordinateDisplayer::syncProjectCrs()
 
 void KadasCoordinateDisplayer::displayFormatChanged( QAction *action )
 {
-  QgsProject::instance()->writeEntry( "coodisplay", "crs", mCRSSelectionButton->menu()->actions().indexOf( action ) );
+  QgsProject::instance()->writeEntry( "crsdisplay", "format", mCRSSelectionButton->menu()->actions().indexOf( action ) );
   mCRSSelectionButton->setDefaultAction( action );
   mCoordinateLineEdit->clear();
   KadasCoordinateFormat::Format format;
