@@ -84,8 +84,12 @@ KadasMapItem *KadasItemLayer::takeItem( const QString &itemId )
 KadasItemLayer *KadasItemLayer::clone() const
 {
   KadasItemLayer *layer = new KadasItemLayer( name(), crs() );
-  // TODO
-//  layer->mItems =
+  layer->mTransformContext = mTransformContext;
+  layer->mOpacity = mOpacity;
+  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
+  {
+    layer->mItems.insert( it.key(), it.value()->clone() );
+  }
   return layer;
 }
 
