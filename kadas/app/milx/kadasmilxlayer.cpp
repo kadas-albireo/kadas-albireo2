@@ -101,6 +101,11 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
 
 QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
+  if ( mIsApproved )
+  {
+    // No items can be picked from approved layer
+    return QString();
+  }
   QPoint screenPos = mapSettings.mapToPixel().transform( pickRect.center() ).toQPointF().toPoint();
   QList<KadasMilxClient::NPointSymbol> symbols;
   QMap<int, QString> itemIdMap;
