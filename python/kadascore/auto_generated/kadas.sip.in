@@ -9,6 +9,7 @@
 
 
 
+
 class Kadas
 {
 %Docstring
@@ -39,6 +40,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     static QString projectTemplatesPath();
 };
+
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
