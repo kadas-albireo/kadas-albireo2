@@ -22,8 +22,8 @@
 
 #include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
 
-KadasGpxWaypointItem::KadasGpxWaypointItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasPointItem( crs, ICON_CIRCLE, parent )
+KadasGpxWaypointItem::KadasGpxWaypointItem( QObject *parent )
+  : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), ICON_CIRCLE, parent )
 {
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );

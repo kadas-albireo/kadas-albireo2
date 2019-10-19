@@ -22,8 +22,8 @@
 
 #include <kadas/gui/mapitems/kadasgpxrouteitem.h>
 
-KadasGpxRouteItem::KadasGpxRouteItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasLineItem( crs, parent )
+KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
+  : KadasLineItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
 {
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );

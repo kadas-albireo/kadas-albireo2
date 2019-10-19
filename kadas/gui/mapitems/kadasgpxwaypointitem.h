@@ -25,7 +25,7 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
     Q_PROPERTY( QString name READ name WRITE setName )
 
   public:
-    KadasGpxWaypointItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasGpxWaypointItem( QObject *parent = nullptr );
 
     const QString &name() const { return mName; }
     void setName( const QString &name );

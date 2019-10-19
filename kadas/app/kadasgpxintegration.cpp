@@ -35,17 +35,15 @@ KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *acti
   : QObject( parent ), mActionWaypoint( actionWaypoint ), mActionRoute( actionRoute )
 {
 
-  QgsCoordinateReferenceSystem crsMercator( "EPSG:3857" );
-
   KadasMapToolCreateItem::ItemFactory waypointFactory = [ = ]
   {
-    KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem( crsMercator );
+    KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
     waypoint->setEditorFactory( KadasGpxWaypointEditor::factory );
     return waypoint;
   };
   KadasMapToolCreateItem::ItemFactory routeFactory = [ = ]
   {
-    KadasGpxRouteItem *route = new KadasGpxRouteItem( crsMercator );
+    KadasGpxRouteItem *route = new KadasGpxRouteItem();
     route->setEditorFactory( KadasGpxRouteEditor::factory );
     return route;
   };

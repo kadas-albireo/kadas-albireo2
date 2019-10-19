@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     Q_PROPERTY( QString number READ number WRITE setNumber )
 
   public:
-    KadasGpxRouteItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasGpxRouteItem( QObject *parent = nullptr );
 
     const QString &name() const { return mName; }
     void setName( const QString &name );
