@@ -27,6 +27,17 @@ KadasGpxWaypointItem::KadasGpxWaypointItem( QObject *parent )
 {
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
+
+  // Default style
+  int size = 2;
+  QColor color = Qt::yellow;
+
+  setOutline( QPen( color, size ) );
+  setFill( QBrush( color ) );
+
+  setIconSize( 10 + 2 * size );
+  setIconOutline( QPen( Qt::black, size / 2 ) );
+  setIconFill( QBrush( color ) );
 }
 
 void KadasGpxWaypointItem::setName( const QString &name )

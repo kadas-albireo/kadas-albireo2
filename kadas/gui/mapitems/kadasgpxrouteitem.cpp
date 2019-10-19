@@ -27,6 +27,13 @@ KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
 {
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
+
+  // Default style
+  int outlineWidth = 2;
+  QColor color = Qt::yellow;
+
+  setOutline( QPen( color, outlineWidth ) );
+  setFill( QBrush( color ) );
 }
 
 void KadasGpxRouteItem::setName( const QString &name )
