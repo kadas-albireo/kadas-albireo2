@@ -66,6 +66,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *settingsTab() const { return mRibbonWidget->widget( 6 ); }
     QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
+    QAction *actionBullseye() const { return mActionBullseye; }
+
   public slots:
     void zoomFull();
     void zoomIn();

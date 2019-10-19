@@ -74,8 +74,9 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasredliningintergration.h>
-#include <kadas/app/milx/kadasmilxintegration.h>
+#include <kadas/app/bullseye/kadasmaptoolbullseye.h>
 #include <kadas/app/globe/kadasglobeintegration.h>
+#include <kadas/app/milx/kadasmilxintegration.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
@@ -485,7 +486,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), nullptr );
 
-  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), nullptr );
+  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
   setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [this] { return paste(); } );
   mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );

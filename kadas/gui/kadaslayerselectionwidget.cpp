@@ -57,6 +57,16 @@ KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, Laye
   repopulateLayers();
 }
 
+void KadasLayerSelectionWidget::createLayerIfEmpty( const QString &layerName )
+{
+  if ( mLayersCombo->count() == 0 && mCreator )
+  {
+    QgsMapLayer *layer = mCreator( layerName );
+    QgsProject::instance()->addMapLayer( layer );
+    setSelectedLayer( layer );
+  }
+}
+
 void KadasLayerSelectionWidget::setLabel( const QString &label )
 {
   mLabel->setText( label );

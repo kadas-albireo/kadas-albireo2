@@ -95,6 +95,7 @@
         <file alias="icons/plugin_b">icons/plugin_b.png</file>
         <file alias="icons/plugin_w">icons/plugin_w.png</file>
         <file alias="icons/globe_color">icons/globe_color.svg</file>
+        <file alias="icons/pick">icons/pick.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

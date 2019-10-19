@@ -4,13 +4,13 @@ FIND_PACKAGE(PythonLibs 3.0 REQUIRED)
 FIND_PACKAGE(OSG REQUIRED)
 FIND_PACKAGE(OSGEARTH REQUIRED)
 
-FILE(GLOB kadas_SRC *.cpp milx/*.cpp globe/*.cpp kml/*.cpp)
+FILE(GLOB kadas_SRC *.cpp milx/*.cpp globe/*.cpp kml/*.cpp bullseye/*.cpp)
 LIST(SORT kadas_SRC)
 
-FILE(GLOB kadas_HDR *.h milx/*.h globe/*.h kml/*.h)
+FILE(GLOB kadas_HDR *.h milx/*.h globe/*.h kml/*.h bullseye/*.h)
 LIST(SORT kadas_HDR)
 
-FILE(GLOB kadas_UI ui/*.ui globe/*.ui kml/*.ui)
+FILE(GLOB kadas_UI ui/*.ui globe/*.ui kml/*.ui bullseye/*.ui)
 LIST(SORT kadas_UI)
 
 SET(kadas_RCC_SRC ../resources/resources.qrc)

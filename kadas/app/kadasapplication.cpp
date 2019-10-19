@@ -52,6 +52,7 @@
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasvectorlayerproperties.h>
+#include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/kml/kadaskmlexport.h>
 #include <kadas/app/kml/kadaskmlexportdialog.h>
 #include <kadas/app/kml/kadaskmlimport.h>
@@ -235,6 +236,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   // Register plugin layers
   pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
   pluginLayerRegistry()->addPluginLayerType( new KadasMilxLayerType() );
+  pluginLayerRegistry()->addPluginLayerType( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
 
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );
