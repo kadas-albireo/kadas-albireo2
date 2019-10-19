@@ -32,6 +32,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgslayoutmanager.h>
+#include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsrasterlayer.h>
@@ -54,6 +55,7 @@
 #include <kadas/app/kml/kadaskmlexport.h>
 #include <kadas/app/kml/kadaskmlexportdialog.h>
 #include <kadas/app/kml/kadaskmlimport.h>
+#include <kadas/app/milx/kadasmilxlayer.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -229,6 +231,10 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   mMapToolPan = new KadasMapToolPan( mMainWindow->mapCanvas() );
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
+
+  // Register plugin layers
+  pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
+  pluginLayerRegistry()->addPluginLayerType( new KadasMilxLayerType() );
 
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );
