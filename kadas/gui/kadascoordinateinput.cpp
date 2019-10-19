@@ -33,8 +33,8 @@ KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
 
   mLineEdit = new QLineEdit( this );
   layout()->addWidget( mLineEdit );
-  connect( mLineEdit, SIGNAL( textEdited( QString ) ), this, SLOT( entryChanged() ) );
-  connect( mLineEdit, SIGNAL( editingFinished() ), this, SLOT( entryEdited() ) );
+  connect( mLineEdit, &QLineEdit::textEdited, this, &KadasCoordinateInput::entryChanged );
+  connect( mLineEdit, &QLineEdit::editingFinished, this, &KadasCoordinateInput::entryEdited );
 
   mCrsCombo = new QComboBox( this );
   mCrsCombo->addItem( "LV03" );
@@ -60,7 +60,7 @@ KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
   mCrsCombo->setItemData( mCrsCombo->count() - 1, "EPSG:4326", sAuthidRole );
   mCrsCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "crsdisplay", "format" ) );
   layout()->addWidget( mCrsCombo );
-  connect( mCrsCombo, SIGNAL( currentIndexChanged( int ) ), this, SLOT( crsChanged() ) );
+  connect( mCrsCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasCoordinateInput::crsChanged );
 
   mCrs = QgsCoordinateReferenceSystem( mCrsCombo->currentData( sAuthidRole ).toString() );
 }
