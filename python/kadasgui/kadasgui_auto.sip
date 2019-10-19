@@ -15,13 +15,17 @@
 %Include auto_generated/mapitems/kadascircularsectoritem.sip
 %Include auto_generated/mapitems/kadaslineitem.sip
 %Include auto_generated/mapitems/kadascircleitem.sip
+%Include auto_generated/mapitems/kadasgpxwaypointitem.sip
 %Include auto_generated/mapitems/kadassymbolitem.sip
 %Include auto_generated/mapitems/kadaspictureitem.sip
+%Include auto_generated/mapitems/kadasgpxrouteitem.sip
 %Include auto_generated/kadaslayerselectionwidget.sip
 %Include auto_generated/kadascrsselection.sip
 %Include auto_generated/kadasfloatinginputwidget.sip
 %Include auto_generated/mapitemeditors/kadasmapitemeditor.sip
+%Include auto_generated/mapitemeditors/kadasgpxrouteeditor.sip
 %Include auto_generated/mapitemeditors/kadasredliningitemeditor.sip
+%Include auto_generated/mapitemeditors/kadasgpxwaypointeditor.sip
 %Include auto_generated/mapitemeditors/kadasredliningtexteditor.sip
 %Include auto_generated/mapitemeditors/kadassymbolattributeseditor.sip
 %Include auto_generated/kadascoordinateinput.sip

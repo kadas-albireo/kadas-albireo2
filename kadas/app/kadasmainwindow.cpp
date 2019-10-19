@@ -69,10 +69,11 @@
 
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasgpsintegration.h>
+#include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
-#include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
+#include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 #include <kadas/app/globe/kadasglobeintegration.h>
 
@@ -194,9 +195,8 @@ void KadasMainWindow::init()
   // Redlining
   KadasRedliningIntegration *redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
 
-  // Route editor
-  // TODO
-//  mGpsRouteEditor = new QgsGPSRouteEditor( this, mActionDrawWaypoint, mActionDrawRoute );
+  // GPX routes
+  KadasGpxIntegration *gpx = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, this );
 
   // Milx
   KadasMilxIntegration::MilxUi milxUi;
