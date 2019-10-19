@@ -59,9 +59,7 @@ class KadasApplication : public QgsApplication
     KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
     KadasItemLayer *selectItemLayer();
 
-    void exportToGpx();
     void exportToKml();
-    void importFromGpx();
     void importFromKml();
 
     void projectNew( bool askToSave );

@@ -510,11 +510,6 @@ KadasItemLayer *KadasApplication::selectItemLayer()
   }
 }
 
-void KadasApplication::exportToGpx()
-{
-  // TODO
-}
-
 void KadasApplication::exportToKml()
 {
   KadasKMLExportDialog d( mMainWindow->mapCanvas()->layers() );
@@ -533,11 +528,6 @@ void KadasApplication::exportToKml()
     mMainWindow->messageBar()->pushMessage( tr( "KML export failed" ), Qgis::Critical, 4 );
   }
   restoreOverrideCursor();
-}
-
-void KadasApplication::importFromGpx()
-{
-  // TODO
 }
 
 void KadasApplication::importFromKml()
