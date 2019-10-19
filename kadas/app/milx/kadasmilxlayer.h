@@ -17,8 +17,8 @@
 #ifndef KADASMILXLAYER_H
 #define KADASMILXLAYER_H
 
+#include <kadas/core/kadaspluginlayertype.h>
 #include <kadas/gui/kadasitemlayer.h>
-
 
 class KadasMilxLayer : public KadasItemLayer
 {
@@ -31,8 +31,6 @@ class KadasMilxLayer : public KadasItemLayer
 
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const override;
-
-    void addLayerMenuActions( QMenu *menu ) const override;
 
     void setApproved( bool approved );
     bool isApproved() const { return mIsApproved; }
@@ -50,13 +48,14 @@ class KadasMilxLayer : public KadasItemLayer
 };
 
 
-class KadasMilxLayerType : public QgsPluginLayerType
+class KadasMilxLayerType : public KadasPluginLayerType
 {
   public:
     KadasMilxLayerType()
-      : QgsPluginLayerType( KadasMilxLayer::layerType() ) {}
+      : KadasPluginLayerType( KadasMilxLayer::layerType() ) {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasMilxLayer(); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasMilxLayer(); }
+    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
 #endif // KADASMILXLAYER_H

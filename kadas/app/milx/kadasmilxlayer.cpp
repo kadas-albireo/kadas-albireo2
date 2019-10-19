@@ -127,12 +127,6 @@ QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
   return QString();
 }
 
-void KadasMilxLayer::addLayerMenuActions( QMenu *menu ) const
-{
-  QAction *action = menu->addAction( tr( "Approved layer" ), this, &KadasMilxLayer::setApproved );
-  action->setChecked( mIsApproved );
-}
-
 void KadasMilxLayer::setApproved( bool approved )
 {
   mIsApproved = approved;
@@ -218,4 +212,17 @@ bool KadasMilxLayer::importFromMilxly( QDomElement &milxLayerEl, int dpi, QStrin
     addItem( KadasMilxItem::fromMilx( graphicEl, crst, symbolSize ) );
   }
   return true;
+}
+
+
+void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
+{
+  if ( dynamic_cast<KadasMilxLayer *>( layer ) )
+  {
+    KadasMilxLayer *milxLayer = static_cast<KadasMilxLayer *>( layer );
+    menu->addAction( tr( "Approved layer" ), [milxLayer]
+    {
+      milxLayer->setApproved( !milxLayer->isApproved() );
+    } )->setChecked( milxLayer->isApproved() );
+  }
 }

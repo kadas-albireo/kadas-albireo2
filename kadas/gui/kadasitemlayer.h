@@ -20,6 +20,7 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
+#include <kadas/core/kadaspluginlayertype.h>
 #include <kadas/gui/kadas_gui.h>
 
 class QMenu;
@@ -50,7 +51,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
     bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
 
-    virtual void addLayerMenuActions( QMenu *menu ) const {}
 #ifndef SIP_RUN
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
 #endif
@@ -64,11 +64,11 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     int mOpacity = 100;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
+class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
 {
   public:
     KadasItemLayerType()
-      : QgsPluginLayerType( KadasItemLayer::layerType() ) {}
+      : KadasPluginLayerType( KadasItemLayer::layerType() ) {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
 };

@@ -52,14 +52,13 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;
     virtual bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories );
 
-    virtual void addLayerMenuActions( QMenu *menu ) const;
 
   protected:
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
 
 };
 
-class KadasItemLayerType : QgsPluginLayerType
+class KadasItemLayerType : KadasPluginLayerType
 {
 
 %TypeHeaderCode
