@@ -195,16 +195,15 @@ void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
 
 KadasMapItem::Margin KadasGeometryItem::margin() const
 {
-  if ( !mMeasureGeometry )
-  {
-    return Margin();
-  }
   int maxMeasureLabelWidth = 0;
   int maxMeasureLabelHeight = 0;
-  for ( const MeasurementLabel label : mMeasurementLabels )
+  if ( mMeasureGeometry )
   {
-    maxMeasureLabelWidth = qMax( maxMeasureLabelWidth, label.width / 2 + 1 );
-    maxMeasureLabelHeight = qMax( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
+    for ( const MeasurementLabel label : mMeasurementLabels )
+    {
+      maxMeasureLabelWidth = qMax( maxMeasureLabelWidth, label.width / 2 + 1 );
+      maxMeasureLabelHeight = qMax( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
+    }
   }
   int maxPainterMargin = qMax( mIconSize, mPen.width() ) / 2 + 1;
   int maxW = qMax( maxMeasureLabelWidth, maxPainterMargin );
