@@ -539,13 +539,20 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
   if ( toolFactory )
   {
     button->setCheckable( true );
-    connect( action, &QAction::triggered, [this, toolFactory, action]
+    connect( action, &QAction::toggled, [this, toolFactory, action]( bool active )
     {
-      QgsMapTool *tool = toolFactory();
-      if ( tool )
+      if ( active )
       {
-        tool->setAction( action );
-        mMapCanvas->setMapTool( tool );
+        QgsMapTool *tool = toolFactory();
+        if ( tool )
+        {
+          tool->setAction( action );
+          mMapCanvas->setMapTool( tool );
+        }
+      }
+      else if ( mMapCanvas->mapTool()->action() == action )
+      {
+        mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
       }
     } );
   }
