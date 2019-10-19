@@ -247,14 +247,14 @@ KadasMapPos KadasPolygonItem::positionFromEditAttribs( const EditContext &contex
   return positionFromDrawAttribs( values, mapSettings );
 }
 
-void KadasPolygonItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasPolygonItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsPolygon *>( geom ) )
+  if ( dynamic_cast<const QgsPolygon *>( &geom ) )
   {
     QList<KadasItemPos> points;
     QgsVertexId vidx;
     QgsPoint p;
-    const QgsCurve *ring = static_cast<const QgsPolygon *>( geom )->exteriorRing();
+    const QgsCurve *ring = static_cast<const QgsPolygon & >( geom ).exteriorRing();
     while ( ring->nextVertex( vidx, p ) )
     {
       points.append( KadasItemPos( p.x(), p.y() ) );

@@ -354,15 +354,16 @@ void KadasMapToolCreateItem::finishPart()
   }
 }
 
-void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs )
+void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs )
 {
   if ( dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
     if ( crs != mItem->crs() )
     {
-      QgsAbstractGeometry *transformedGeom = geom->clone();
+      QgsAbstractGeometry *transformedGeom = geom.clone();
       transformedGeom->transform( QgsCoordinateTransform( crs, mItem->crs(), QgsProject::instance() ) );
-      static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( transformedGeom );
+      static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( *transformedGeom );
+      delete transformedGeom;
     }
     else
     {

@@ -66,7 +66,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QgsWkbTypes::GeometryType geometryType() const;
 
-    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom );
+    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom );
 
     const QgsMultiLineString *geometry() const;
 

@@ -251,7 +251,7 @@ KadasMapPos KadasCircularSectorItem::positionFromEditAttribs( const EditContext 
   return KadasMapPos();
 }
 
-void KadasCircularSectorItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasCircularSectorItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
   // Not yet implemented
 }

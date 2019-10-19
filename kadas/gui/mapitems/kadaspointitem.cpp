@@ -149,11 +149,11 @@ KadasMapPos KadasPointItem::positionFromEditAttribs( const EditContext &context,
   return positionFromDrawAttribs( values, mapSettings );
 }
 
-void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsPoint *>( geom ) )
+  if ( dynamic_cast<const QgsPoint *>( &geom ) )
   {
-    const QgsPoint &pos = *static_cast<const QgsPoint *>( geom );
+    const QgsPoint &pos = static_cast<const QgsPoint &>( geom );
     state()->points.append( KadasItemPos( pos.x(), pos.y() ) );
     recomputeDerived();
     endPart();

@@ -60,7 +60,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
 
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::LineGeometry; }
 
-    void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;
+    void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;
 
     enum MeasurementMode

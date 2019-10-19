@@ -229,7 +229,7 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
     KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), ( mMeasureMode == MeasureLine || mMeasureMode == MeasureAzimuth ) ? QgsWkbTypes::LineGeometry : QgsWkbTypes::PolygonGeometry );
     if ( pickResult.feature.isValid() )
     {
-      addPartFromGeometry( pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
+      addPartFromGeometry( *pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
     }
     mPickFeature = false;
     setCursor( Qt::ArrowCursor );

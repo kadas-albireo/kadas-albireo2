@@ -214,7 +214,7 @@ KadasMapPos KadasRectangleItem::positionFromEditAttribs( const EditContext &cont
   return positionFromDrawAttribs( values, mapSettings );
 }
 
-void KadasRectangleItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasRectangleItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
   // TODO
 }

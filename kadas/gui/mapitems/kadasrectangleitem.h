@@ -49,7 +49,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;
+    void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
     const QgsMultiPolygon *geometry() const;

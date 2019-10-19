@@ -61,7 +61,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
-    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
+    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom ) = 0;
 
     QPen outline() const;
     void setOutline( const QPen &pen );

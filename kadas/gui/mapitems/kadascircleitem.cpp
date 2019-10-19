@@ -279,9 +279,9 @@ KadasMapPos KadasCircleItem::positionFromEditAttribs( const EditContext &context
   return KadasMapPos();
 }
 
-void KadasCircleItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasCircleItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  QgsRectangle bbox = geom->boundingBox();
+  QgsRectangle bbox = geom.boundingBox();
   state()->centers.append( KadasItemPos::fromPoint( bbox.center() ) );
   state()->radii.append( 0.5 * bbox.width() );
   recomputeDerived();

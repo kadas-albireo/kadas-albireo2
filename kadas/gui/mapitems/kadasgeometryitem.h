@@ -91,7 +91,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
     // Geometry in item CRS
-    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
+    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom ) = 0;
 
     QPen outline() const { return mPen; }
     void setOutline( const QPen &pen );

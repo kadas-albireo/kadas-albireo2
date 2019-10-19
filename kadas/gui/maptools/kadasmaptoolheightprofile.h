@@ -42,7 +42,7 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     void activate() override;
     void deactivate() override;
 
-    void setGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
+    void setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
     void pickLine();

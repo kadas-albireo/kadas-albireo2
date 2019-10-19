@@ -206,7 +206,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         {
           KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
           item->setEditorFactory( KadasRedliningItemEditor::factory );
-          item->addPartFromGeometry( geom );
+          item->addPartFromGeometry( *geom );
           item->setIconSize( 10 + 2 * style.outlineSize );
           item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
           item->setIconFill( QBrush( style.fillColor ) );
@@ -216,7 +216,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         {
           KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
           item->setEditorFactory( KadasRedliningItemEditor::factory );
-          item->addPartFromGeometry( geom );
+          item->addPartFromGeometry( *geom );
           item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
           itemLayer->addItem( item );
         }
@@ -224,7 +224,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         {
           KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
           item->setEditorFactory( KadasRedliningItemEditor::factory );
-          item->addPartFromGeometry( geom );
+          item->addPartFromGeometry( *geom );
           item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
           item->setFill( QBrush( style.fillColor ) );
           kApp->getOrCreateItemLayer( filename )->addItem( item );

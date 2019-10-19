@@ -60,7 +60,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
 
     QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
 
-    void addPartFromGeometry( const QgsAbstractGeometry *geom ) override;
+    void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiPolygon *geometry() const;
 
     struct State : KadasMapItem::State

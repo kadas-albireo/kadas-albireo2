@@ -263,14 +263,14 @@ KadasMapPos KadasLineItem::positionFromEditAttribs( const EditContext &context, 
   return positionFromDrawAttribs( values, mapSettings );
 }
 
-void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsLineString *>( geom ) )
+  if ( dynamic_cast<const QgsLineString *>( &geom ) )
   {
     QList<KadasItemPos> points;
     QgsVertexId vidx;
     QgsPoint p;
-    while ( geom->nextVertex( vidx, p ) )
+    while ( geom.nextVertex( vidx, p ) )
     {
       points.append( KadasItemPos( p.x(), p.y() ) );
     }
