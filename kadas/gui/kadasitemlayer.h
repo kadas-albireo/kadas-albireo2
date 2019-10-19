@@ -56,6 +56,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
 #endif
 
   protected:
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
     QMap<QString, KadasMapItem *> mItems;

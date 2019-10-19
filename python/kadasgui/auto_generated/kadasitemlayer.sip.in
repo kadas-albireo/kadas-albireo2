@@ -55,6 +55,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void addLayerMenuActions( QMenu *menu ) const;
 
   protected:
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
 
 };
 

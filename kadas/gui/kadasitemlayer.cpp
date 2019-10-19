@@ -64,6 +64,13 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
   mValid = true;
 }
 
+KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType )
+  : QgsPluginLayer( layerType, name )
+{
+  setCrs( crs );
+  mValid = true;
+}
+
 void KadasItemLayer::addItem( KadasMapItem *item )
 {
   mItems.insert( QUuid::createUuid().toString(), item );

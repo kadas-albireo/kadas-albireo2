@@ -90,7 +90,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasMilxLayer::KadasMilxLayer( const QString &name )
-  : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ) )
+  : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
 {
 }
 
