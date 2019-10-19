@@ -196,7 +196,7 @@ void KadasMainWindow::init()
   KadasRedliningIntegration *redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
 
   // GPX routes
-  KadasGpxIntegration *gpx = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, this );
+  KadasGpxIntegration *gpx = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, mActionExportGPX, mActionImportGPX, this );
 
   // Milx
   KadasMilxIntegration::MilxUi milxUi;
@@ -510,20 +510,16 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), [this] { return new KadasMapToolViewshed( mMapCanvas ); } );
 
   // GPS tab
-  setActionToButton( mActionDrawWaypoint, mDrawWaypointButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_W ) );
-  setActionToButton( mActionDrawRoute, mDrawRouteButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_R ) );
-
   setActionToButton( mActionEnableGPS, mEnableGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_T ) );
   connect( mActionEnableGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::enableGPS );
 
   setActionToButton( mActionMoveWithGPS, mMoveWithGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_M ) );
   connect( mActionMoveWithGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::moveWithGPS );
 
+  setActionToButton( mActionDrawWaypoint, mDrawWaypointButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_W ) );
+  setActionToButton( mActionDrawRoute, mDrawRouteButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_R ) );
   setActionToButton( mActionImportGPX, mGpxImportButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_I ) );
-  connect( mActionImportGPX, &QAction::triggered, kApp, &KadasApplication::importFromGpx );
-
   setActionToButton( mActionExportGPX, mGpxExportButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_E ) );
-  connect( mActionExportGPX, &QAction::triggered, kApp, &KadasApplication::exportToGpx );
 
   // MSS tab
   setActionToButton( mActionMilx, mMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_S ) );

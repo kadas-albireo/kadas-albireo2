@@ -31,14 +31,15 @@ class KadasGpxIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, KadasMainWindow *parent );
+    KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, KadasMainWindow *parent );
     KadasItemLayer *getOrCreateLayer();
 
   private:
-    QAction *mActionWaypoint = nullptr;
-    QAction *mActionRoute = nullptr;
-
     void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory );
+
+  private slots:
+    void importGpx();
+    void exportGpx();
 };
 
 #endif // KADASGPXINTEGRATION_H
