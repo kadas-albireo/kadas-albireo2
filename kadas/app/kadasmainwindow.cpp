@@ -446,12 +446,12 @@ void KadasMainWindow::configureButtons()
 
   QMenu *kmlMenu = new QMenu();
 
-  QAction *actionExportKml = new QAction( tr( "KML Export" ) );
+  QAction *actionExportKml = new QAction( tr( "KML Export" ), kmlMenu );
   connect( actionExportKml, &QAction::triggered, kApp, &KadasApplication::exportToKml );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_E, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionExportKml, &QAction::trigger );
   kmlMenu->addAction( actionExportKml );
 
-  QAction *actionImportKml = new QAction( tr( "KML Import" ) );
+  QAction *actionImportKml = new QAction( tr( "KML Import" ), kmlMenu );
   connect( actionImportKml, &QAction::triggered, kApp, &KadasApplication::importFromKml );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_I, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionImportKml, &QAction::trigger );
   kmlMenu->addAction( actionImportKml );
