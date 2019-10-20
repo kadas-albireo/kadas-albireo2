@@ -143,9 +143,9 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       {
         menu.addSeparator();
       }
-      menu.addAction( tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
-      menu.addAction( tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
-      menu.addAction( tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
+      menu.addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
+      menu.addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
       if ( clickedAction )

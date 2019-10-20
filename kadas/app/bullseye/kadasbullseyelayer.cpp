@@ -235,7 +235,7 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
 
 void KadasBullseyeLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( tr( "Edit" ), this, [this, layer]
+  menu->addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
   {
     mActionBullseyeTool->setChecked( true );
   } );
