@@ -48,18 +48,6 @@
 #include <kadas/gui/mapitems/kadaspictureitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 
-#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
-
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
-#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
-#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
-#include <kadas/gui/maptools/kadasmaptoolmeasure.h>
-#include <kadas/gui/maptools/kadasmaptoolslope.h>
-#include <kadas/gui/maptools/kadasmaptoolviewshed.h>
-
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
@@ -472,35 +460,35 @@ void KadasMainWindow::configureButtons()
 //  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
 
   // Draw tab
-  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this] { return addPinTool(); } );
+  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this] { return kApp->addPinTool(); } );
 
-  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), [this] { return addPictureTool(); } );
+  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), [this] { return kApp->addPictureTool(); } );
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), nullptr );
 
   setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
-  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [this] { return paste(); } );
+  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [this] { return kApp->paste(); } );
   mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
 
-  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mMapCanvas ); } );
+  setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return kApp->deleteItemsTool(); } );
 
   // Analysis tab
-  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure( mMapCanvas, KadasMapToolMeasure::MeasureLine ); } );
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return kApp->measureTool( KadasMapToolMeasure::MeasureLine ); } );
 
-  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return new KadasMapToolMeasure( mMapCanvas, KadasMapToolMeasure::MeasurePolygon ); } );
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return kApp->measureTool( KadasMapToolMeasure::MeasurePolygon ); } );
 
-  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure( mMapCanvas, KadasMapToolMeasure::MeasureCircle ); } );
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return kApp->measureTool( KadasMapToolMeasure::MeasureCircle ); } );
 
-  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolMeasure( mMapCanvas, KadasMapToolMeasure::MeasureAzimuth ); } );
+  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), [this] { return kApp->measureTool( KadasMapToolMeasure::MeasureAzimuth ); } );
 
-  setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return new KadasMapToolHeightProfile( mMapCanvas ); } );
+  setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return kApp->measureHeightProfileTool(); } );
 
-  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), [this] { return new KadasMapToolSlope( mMapCanvas ); } );
+  setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), [this] { return kApp->terrainSlopeTool(); } );
 
-  setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), [this] { return new KadasMapToolHillshade( mMapCanvas ); } );
+  setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), [this] { return kApp->terrainHillshadeTool(); } );
 
-  setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), [this] { return new KadasMapToolViewshed( mMapCanvas ); } );
+  setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), [this] { return kApp->terrainViewshedTool(); } );
 
   // GPS tab
   setActionToButton( mActionEnableGPS, mEnableGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_T ) );
@@ -861,87 +849,4 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
 int KadasMainWindow::messageTimeout() const
 {
   return QSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
-}
-
-QgsMapTool *KadasMainWindow::addPinTool()
-{
-  KadasMapToolCreateItem::ItemFactory factory = [this]
-  {
-    KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    item->setEditorFactory( KadasSymbolAttributesEditor::factory );
-    return item;
-  };
-  return new KadasMapToolCreateItem( mapCanvas(), factory, kApp->getOrCreateItemLayer( tr( "Pins" ) ) );
-}
-
-QgsMapTool *KadasMainWindow::addPictureTool()
-{
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
-  QSet<QString> formats;
-  for ( const QByteArray &format : QImageReader::supportedImageFormats() )
-  {
-    formats.insert( QString( "*.%1" ).arg( QString( format ).toLower() ) );
-  }
-  formats.insert( "*.svg" );  // Ensure svg is present
-
-  QString filter = QString( "Images (%1)" ).arg( QStringList( formats.toList() ).join( " " ) );
-  QString filename = QFileDialog::getOpenFileName( this, tr( "Select Image" ), lastDir, filter );
-  if ( filename.isEmpty() )
-  {
-    return nullptr;
-  }
-  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-  QString errMsg;
-  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
-  {
-    KadasSymbolItem *item = new KadasSymbolItem( mapCanvas()->mapSettings().destinationCrs() );
-    item->setFilePath( filename );
-    item->setPosition( KadasItemPos::fromPoint( mapCanvas()->extent().center() ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
-  }
-  else
-  {
-    KadasPictureItem *item = new KadasPictureItem( mapCanvas()->mapSettings().destinationCrs() );
-    item->setup( filename, KadasItemPos::fromPoint( mapCanvas()->extent().center() ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
-  }
-}
-
-QgsMapTool *KadasMainWindow::paste()
-{
-  QgsPointXY pastePos = mapCanvas()->center();
-  QgsCoordinateReferenceSystem mapCrs = mapCanvas()->mapSettings().destinationCrs();
-  if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
-  {
-    KadasItemLayer *layer = dynamic_cast<KadasItemLayer *>( mapCanvas()->currentLayer() );
-    if ( !layer )
-    {
-      layer = kApp->selectItemLayer();
-    }
-    QList<KadasMapItem *> items;
-    QList<QgsPointXY> itemPos;
-    QgsPointXY center;
-    for ( const KadasMapItem *item : KadasClipboard::instance()->storedMapItems() )
-    {
-      QgsCoordinateTransform crst( item->crs(), mapCrs, QgsProject::instance() );
-      QgsPointXY pos = crst.transform( item->position() );
-      itemPos.append( pos );
-      items.append( item->clone() );
-      center += QgsVector( pos.x(), pos.y() );
-    }
-    center /= itemPos.size();
-    for ( int i = 0, n = items.size(); i < n; ++i )
-    {
-      items[i]->setPosition( KadasItemPos::fromPoint( pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() ) ) );
-    }
-    if ( items.size() == 1 )
-    {
-      return new KadasMapToolEditItem( mapCanvas(), items.front(), layer );
-    }
-    else
-    {
-      return new KadasMapToolEditItemGroup( mapCanvas(), items, layer );
-    }
-  }
-  return nullptr;
 }

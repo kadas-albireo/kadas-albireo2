@@ -110,9 +110,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void updateWidgetPositions();
     KadasRibbonButton *addRibbonButton( QWidget *tabWidget );
     void showSourceSelectDialog( const QString &provider );
-    QgsMapTool *addPinTool();
-    QgsMapTool *addPictureTool();
-    QgsMapTool *paste();
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;

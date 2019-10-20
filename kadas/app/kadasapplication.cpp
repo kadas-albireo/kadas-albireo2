@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QIcon>
+#include <QImageReader>
 #include <QMessageBox>
 #include <QSplashScreen>
 
@@ -41,12 +42,28 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/core/kadastemporaryfile.h>
+#include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include <kadas/gui/mapitems/kadaspointitem.h>
+#include <kadas/gui/mapitems/kadaslineitem.h>
+#include <kadas/gui/mapitems/kadaspictureitem.h>
+#include <kadas/gui/mapitems/kadaspolygonitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
+#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
+#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
+#include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include <kadas/gui/maptools/kadasmaptoolslope.h>
+#include <kadas/gui/maptools/kadasmaptoolviewshed.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadasmainwindow.h>
@@ -945,6 +962,229 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
     }
   }
 }
+
+QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
+{
+  QgsMapCanvas *canvas = mMainWindow->mapCanvas();
+  QgsPointXY pastePos = mapPos ? *mapPos : mMainWindow->mapCanvas()->center();
+  QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
+  if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
+  {
+    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    QList<KadasMapItem *> items;
+    QList<QgsPointXY> itemPos;
+    QgsPointXY center;
+    for ( const KadasMapItem *item : KadasClipboard::instance()->storedMapItems() )
+    {
+      QgsCoordinateTransform crst( item->crs(), mapCrs, QgsProject::instance() );
+      QgsPointXY pos = crst.transform( item->position() );
+      itemPos.append( pos );
+      items.append( item->clone() );
+      center += QgsVector( pos.x(), pos.y() );
+    }
+    center /= itemPos.size();
+    for ( int i = 0, n = items.size(); i < n; ++i )
+    {
+      QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
+      QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
+      items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+    }
+    if ( items.size() == 1 )
+    {
+      return new KadasMapToolEditItem( canvas, items.front(), layer );
+    }
+    else
+    {
+      return new KadasMapToolEditItemGroup( canvas, items, layer );
+    }
+  }
+  else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
+  {
+    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    QList<KadasMapItem *> items;
+    const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
+    for ( const QgsFeature &feature : featureStore.features() )
+    {
+      if ( feature.geometry().type() == QgsWkbTypes::PointGeometry )
+      {
+        KadasPointItem *item = new KadasPointItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+      else if ( feature.geometry().type() == QgsWkbTypes::LineGeometry )
+      {
+        KadasLineItem *item = new KadasLineItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+      else if ( feature.geometry().type() == QgsWkbTypes::PolygonGeometry )
+      {
+        KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+    }
+    if ( items.size() == 1 )
+    {
+      return new KadasMapToolEditItem( canvas, items.front(), layer );
+    }
+    else
+    {
+      return new KadasMapToolEditItemGroup( canvas, items, layer );
+    }
+  }
+  else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
+  {
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+    QString filename = KadasTemporaryFile::createNewFile( "pasted_image.svg" );
+    QFile file( filename );
+    if ( file.open( QIODevice::WriteOnly ) )
+    {
+      file.write( mimeData->data( "image/svg+xml" ) );
+      file.close();
+      KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
+      item->setup( filename, 0.5, 0.5 );
+      item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
+      return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
+    }
+  }
+  else
+  {
+    QList<QByteArray> mimeTypes = QImageReader::supportedMimeTypes();
+    mimeTypes.prepend( "image/png" ); // Try png first
+    for ( const QByteArray &mimeType : mimeTypes )
+    {
+      if ( KadasClipboard::instance()->hasFormat( mimeType ) )
+      {
+        const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+        QByteArray imageData = mimeData->data( mimeType );
+        QBuffer buf( &imageData );
+        QString ext = QImageReader( &buf ).format();
+        QString filename = KadasTemporaryFile::createNewFile( QString( "pasted_image.%1" ).arg( ext ) );
+        QFile file( filename );
+        if ( file.open( QIODevice::WriteOnly ) )
+        {
+          file.write( imageData );
+          file.close();
+          KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+          QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
+          item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
+          return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
+        }
+        break;
+      }
+    }
+  }
+  return nullptr;
+}
+
+QgsMapTool *KadasApplication::addPinTool() const
+{
+  KadasMapToolCreateItem::ItemFactory factory = [this]
+  {
+    KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+    item->setEditorFactory( KadasSymbolAttributesEditor::factory );
+    return item;
+  };
+  return new KadasMapToolCreateItem( mMainWindow->mapCanvas(), factory, kApp->getOrCreateItemLayer( tr( "Pins" ) ) );
+}
+
+QgsMapTool *KadasApplication::deleteItemsTool() const
+{
+  return new KadasMapToolDeleteItems( mMainWindow->mapCanvas() );
+}
+
+QgsMapTool *KadasApplication::measureTool( KadasMapToolMeasure::MeasureMode mode, const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &geomCrs ) const
+{
+  KadasMapToolMeasure *measureTool = new KadasMapToolMeasure( mMainWindow->mapCanvas(), mode );
+  if ( geom )
+  {
+    connect( measureTool, &KadasMapToolMeasure::activated, this, [ = ]
+    {
+      measureTool->addPartFromGeometry( *geom, geomCrs );
+    } );
+  }
+  return measureTool;
+}
+
+QgsMapTool *KadasApplication::measureHeightProfileTool( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &geomCrs ) const
+{
+  KadasMapToolHeightProfile *measureTool = new KadasMapToolHeightProfile( mMainWindow->mapCanvas() );
+  if ( geom )
+  {
+    connect( measureTool, &KadasMapToolMeasure::activated, this, [ = ]
+    {
+      measureTool->addPartFromGeometry( *geom, geomCrs );
+    } );
+  }
+  return measureTool;
+}
+
+QgsMapTool *KadasApplication::terrainHillshadeTool( const QgsRectangle &rect, const QgsCoordinateReferenceSystem &rectCrs ) const
+{
+  KadasMapToolHillshade *hillshadeTool = new KadasMapToolHillshade( mMainWindow->mapCanvas() );
+  if ( !rect.isEmpty() )
+  {
+    hillshadeTool->compute( rect, rectCrs );
+    delete hillshadeTool;
+    return nullptr;
+  }
+  return hillshadeTool;
+}
+
+QgsMapTool *KadasApplication::terrainSlopeTool( const QgsRectangle &rect, const QgsCoordinateReferenceSystem &rectCrs ) const
+{
+  KadasMapToolSlope *slopeTool = new KadasMapToolSlope( mMainWindow->mapCanvas() );
+  if ( !rect.isEmpty() )
+  {
+    slopeTool->compute( rect, rectCrs );
+    delete slopeTool;
+    return nullptr;
+  }
+  return slopeTool;
+}
+
+QgsMapTool *KadasApplication::terrainViewshedTool() const
+{
+  return new KadasMapToolViewshed( mMainWindow->mapCanvas() );
+}
+
+QgsMapTool *KadasApplication::addPictureTool() const
+{
+  QgsMapCanvas *canvas = mMainWindow->mapCanvas();
+
+  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QSet<QString> formats;
+  for ( const QByteArray &format : QImageReader::supportedImageFormats() )
+  {
+    formats.insert( QString( "*.%1" ).arg( QString( format ).toLower() ) );
+  }
+  formats.insert( "*.svg" );  // Ensure svg is present
+
+  QString filter = QString( "Images (%1)" ).arg( QStringList( formats.toList() ).join( " " ) );
+  QString filename = QFileDialog::getOpenFileName( mMainWindow, tr( "Select Image" ), lastDir, filter );
+  if ( filename.isEmpty() )
+  {
+    return nullptr;
+  }
+  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QString errMsg;
+  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
+  {
+    KadasSymbolItem *item = new KadasSymbolItem( canvas->mapSettings().destinationCrs() );
+    item->setFilePath( filename );
+    item->setPosition( KadasItemPos::fromPoint( canvas->extent().center() ) );
+    return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
+  }
+  else
+  {
+    KadasPictureItem *item = new KadasPictureItem( canvas->mapSettings().destinationCrs() );
+    item->setup( filename, KadasItemPos::fromPoint( canvas->extent().center() ) );
+    return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
+  }
+}
+
 
 void KadasApplication::unsetMapTool()
 {

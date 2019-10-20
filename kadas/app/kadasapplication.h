@@ -23,6 +23,7 @@
 #include <qgis/qgsapplication.h>
 
 #include <kadas/gui/kadasfeaturepicker.h>
+#include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
@@ -85,6 +86,16 @@ class KadasApplication : public QgsApplication
     QgsPrintLayout *createNewPrintLayout( const QString &title );
     bool deletePrintLayout( QgsPrintLayout *layout );
     QList<QgsPrintLayout *> printLayouts() const;
+
+    QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
+    QgsMapTool *addPictureTool() const;
+    QgsMapTool *addPinTool() const;
+    QgsMapTool *deleteItemsTool() const;
+    QgsMapTool *measureTool( KadasMapToolMeasure::MeasureMode mode, const QgsAbstractGeometry *geom = nullptr, const QgsCoordinateReferenceSystem &geomCrs = QgsCoordinateReferenceSystem() ) const;
+    QgsMapTool *measureHeightProfileTool( const QgsAbstractGeometry *geom = nullptr, const QgsCoordinateReferenceSystem &geomCrs = QgsCoordinateReferenceSystem() ) const;
+    QgsMapTool *terrainHillshadeTool( const QgsRectangle &rect = QgsRectangle(), const QgsCoordinateReferenceSystem &rectCrs = QgsCoordinateReferenceSystem() ) const;
+    QgsMapTool *terrainSlopeTool( const QgsRectangle &rect = QgsRectangle(), const QgsCoordinateReferenceSystem &rectCrs = QgsCoordinateReferenceSystem() ) const;
+    QgsMapTool *terrainViewshedTool() const;
 
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
