@@ -24,6 +24,7 @@
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasfeaturepicker.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
 {
@@ -43,7 +44,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   {
     if ( qobject_cast<KadasItemLayer *> ( layer ) )
     {
-      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, filterRect, geomType );
+      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, filterRect );
     }
     else if ( qobject_cast<QgsVectorLayer *> ( layer ) )
     {
@@ -57,13 +58,18 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect )
 {
   PickResult pickResult;
   pickResult.itemId = layer->pickItem( filterRect, canvas->mapSettings() );
   if ( !pickResult.itemId.isEmpty() )
   {
     pickResult.layer = layer;
+    pickResult.crs = layer->items()[pickResult.itemId]->crs();
+    if ( dynamic_cast<KadasGeometryItem *>( layer->items()[pickResult.itemId] ) )
+    {
+      pickResult.geom = static_cast<KadasGeometryItem *>( layer->items()[pickResult.itemId] )->geometry();
+    }
   }
   return pickResult;
 }
@@ -108,6 +114,8 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
     }
     pickResult.layer = vlayer;
     pickResult.feature = feature;
+    pickResult.geom = feature.geometry().constGet();
+    pickResult.crs = vlayer->crs();
     break;
   }
   if ( renderer && renderer->capabilities() & QgsFeatureRenderer::ScaleDependent )
