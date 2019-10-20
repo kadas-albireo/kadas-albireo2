@@ -1202,12 +1202,11 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
     mMainWindow->mapCanvas()->setMapTool( tool );
   }
-  // TODO
 }
 
 void KadasApplication::showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos )
 {
-  // TODO
+  KadasCanvasContextMenu( mMainWindow->mapCanvas(), screenPos, mapPos ).exec( mMainWindow->mapCanvas()->mapToGlobal( screenPos ) );
 }
 
 void KadasApplication::updateWindowTitle()

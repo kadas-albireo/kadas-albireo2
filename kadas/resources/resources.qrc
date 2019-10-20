@@ -96,6 +96,17 @@
         <file alias="icons/plugin_w">icons/plugin_w.png</file>
         <file alias="icons/globe_color">icons/globe_color.svg</file>
         <file alias="icons/pick">icons/pick.svg</file>
+        <file alias="icons/measure_angle">icons/measure_angle.svg</file>
+        <file alias="icons/measure_area">icons/measure_area.svg</file>
+        <file alias="icons/measure_circle">icons/measure_circle.svg</file>
+        <file alias="icons/measure_height_profile">icons/measure_height_profile.svg</file>
+        <file alias="icons/measure_line">icons/measure_line.svg</file>
+        <file alias="icons/hillshade_color">icons/hillshade.svg</file>
+        <file alias="icons/slope_color">icons/slope.svg</file>
+        <file alias="icons/viewshed_color">icons/viewshed.svg</file>
+        <file alias="icons/copy_coordinates">icons/copy_coordinates.svg</file>
+        <file alias="icons/copy_map">icons/copy_map.svg</file>
+        <file alias="icons/waypoint">icons/waypoint.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
