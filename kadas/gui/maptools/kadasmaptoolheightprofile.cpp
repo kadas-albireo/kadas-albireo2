@@ -137,9 +137,9 @@ void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
   else
   {
     KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), QgsWkbTypes::LineGeometry );
-    if ( pickResult.feature.isValid() )
+    if ( pickResult.geom )
     {
-      setGeometry( *pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
+      setGeometry( *pickResult.geom, pickResult.crs );
     }
     mPicking = false;
     setCursor( Qt::ArrowCursor );
