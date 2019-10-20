@@ -155,7 +155,7 @@ void KadasMeasureWidget::updateTotal()
 
 
 KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode )
-  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) )
+  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) ), mMeasureMode( measureMode )
 {
   setMultipart( measureMode != MeasureAzimuth );
   setSnappingEnabled( true );
