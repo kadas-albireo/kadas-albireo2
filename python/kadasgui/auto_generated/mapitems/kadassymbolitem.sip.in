@@ -44,6 +44,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 };
 
+
+class KadasPinItem : KadasSymbolItem
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+%End
+  public:
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+};
+
+
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *

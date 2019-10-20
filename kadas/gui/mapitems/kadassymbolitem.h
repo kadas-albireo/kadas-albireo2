@@ -55,4 +55,12 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     KadasMapItem *_clone() const override { return new KadasSymbolItem( crs() ); } SIP_FACTORY
 };
 
+
+class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
+{
+  public:
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+};
+
+
 #endif // KADASSYMBOLITEM_H

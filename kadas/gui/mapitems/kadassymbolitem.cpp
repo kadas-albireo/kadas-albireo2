@@ -142,3 +142,9 @@ QString KadasSymbolItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip 
 
   return outString;
 }
+
+KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
+  : KadasSymbolItem( crs, parent )
+{
+  setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
+}
