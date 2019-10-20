@@ -62,7 +62,6 @@ KadasMapToolCreateItem::~KadasMapToolCreateItem()
 
 void KadasMapToolCreateItem::activate()
 {
-  QgsMapTool::activate();
   mStateHistory = new KadasStateHistory( this );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged );
   createItem();
@@ -124,6 +123,7 @@ void KadasMapToolCreateItem::activate()
   mBottomBar->layout()->addWidget( closeButton );
 
   mBottomBar->show();
+  QgsMapTool::activate();
 }
 
 void KadasMapToolCreateItem::deactivate()
