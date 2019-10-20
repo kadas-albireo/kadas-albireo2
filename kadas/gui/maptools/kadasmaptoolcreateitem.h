@@ -87,12 +87,9 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
-#endif
-
-
-#ifndef SIP_RUN
     void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
 #endif
+    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
     void clear();
@@ -112,7 +109,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();
-    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
     KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;

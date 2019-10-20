@@ -66,8 +66,7 @@ class KadasMapToolCreateItem : QgsMapTool
 
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );
-
-
+    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
     void clear();
@@ -83,7 +82,6 @@ class KadasMapToolCreateItem : QgsMapTool
     void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();
-    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
     KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;
