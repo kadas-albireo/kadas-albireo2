@@ -151,13 +151,28 @@ KadasMapPos KadasPointItem::positionFromEditAttribs( const EditContext &context,
 
 void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsPoint *>( &geom ) )
+  QList<const QgsPoint *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
   {
-    const QgsPoint &pos = static_cast<const QgsPoint &>( geom );
-    state()->points.append( KadasItemPos( pos.x(), pos.y() ) );
-    recomputeDerived();
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsPoint *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsPoint *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsPoint *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsPoint *>( &geom ) );
+  }
+  for ( const QgsPoint *point : geoms )
+  {
+    state()->points.append( KadasItemPos( point->x(), point->y() ) );
     endPart();
   }
+  recomputeDerived();
 }
 
 const QgsMultiPoint *KadasPointItem::geometry() const

@@ -249,20 +249,36 @@ KadasMapPos KadasPolygonItem::positionFromEditAttribs( const EditContext &contex
 
 void KadasPolygonItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsPolygon *>( &geom ) )
+  QList<const QgsPolygon *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
+  {
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsPolygon *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsPolygon *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsPolygon *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsPolygon *>( &geom ) );
+  }
+  for ( const QgsPolygon *poly : geoms )
   {
     QList<KadasItemPos> points;
     QgsVertexId vidx;
     QgsPoint p;
-    const QgsCurve *ring = static_cast<const QgsPolygon & >( geom ).exteriorRing();
+    const QgsCurve *ring = poly->exteriorRing();
     while ( ring->nextVertex( vidx, p ) )
     {
       points.append( KadasItemPos( p.x(), p.y() ) );
     }
     state()->points.append( points );
-    recomputeDerived();
     endPart();
   }
+  recomputeDerived();
 }
 
 const QgsMultiPolygon *KadasPolygonItem::geometry() const

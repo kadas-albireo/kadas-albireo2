@@ -265,19 +265,35 @@ KadasMapPos KadasLineItem::positionFromEditAttribs( const EditContext &context, 
 
 void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsLineString *>( &geom ) )
+  QList<const QgsLineString *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
+  {
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsLineString *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsLineString *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsLineString *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsLineString *>( &geom ) );
+  }
+  for ( const QgsLineString *line : geoms )
   {
     QList<KadasItemPos> points;
     QgsVertexId vidx;
     QgsPoint p;
-    while ( geom.nextVertex( vidx, p ) )
+    while ( line->nextVertex( vidx, p ) )
     {
       points.append( KadasItemPos( p.x(), p.y() ) );
     }
     state()->points.append( points );
-    recomputeDerived();
     endPart();
   }
+  recomputeDerived();
 }
 
 const QgsMultiLineString *KadasLineItem::geometry() const
