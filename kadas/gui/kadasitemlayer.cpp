@@ -106,11 +106,11 @@ QgsRectangle KadasItemLayer::extent() const
     QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
     if ( rect.isNull() )
     {
-      rect = trans.transformCover( item->boundingBox() );
+      rect = trans.transformBoundingBox( item->boundingBox() );
     }
     else
     {
-      rect.combineExtentWith( trans.transformCover( item->boundingBox() ) );
+      rect.combineExtentWith( trans.transformBoundingBox( item->boundingBox() ) );
     }
   }
   return rect;

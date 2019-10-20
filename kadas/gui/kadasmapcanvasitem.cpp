@@ -69,8 +69,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
 void KadasMapCanvasItem::updateRect()
 {
   QgsCoordinateTransform t( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
-  // FIXME This creates a bounding box which is not guaranteed to cover other one?!
-  QgsRectangle bbox = t.transformCover( mItem->boundingBox() );
+  QgsRectangle bbox = t.transformBoundingBox( mItem->boundingBox() );
   double mup = mMapCanvas->mapUnitsPerPixel();
   KadasMapItem::Margin margin = mItem->margin();
   bbox.setXMinimum( bbox.xMinimum() - ( margin.left + sHandleSize ) * mup );
