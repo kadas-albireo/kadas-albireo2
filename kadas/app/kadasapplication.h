@@ -31,10 +31,12 @@ class QgsPrintLayout;
 class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasClipboard;
+class KadasGpxIntegration;
 class KadasMainWindow;
 class KadasMapToolPan;
 class KadasPythonIntegration;
 class KadasPluginInterface;
+class KadasRedliningIntegration;
 
 #define kApp KadasApplication::instance()
 
@@ -84,6 +86,9 @@ class KadasApplication : public QgsApplication
     bool deletePrintLayout( QgsPrintLayout *layout );
     QList<QgsPrintLayout *> printLayouts() const;
 
+    KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
+    KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
+
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
     void unsetMapTool();
@@ -98,6 +103,8 @@ class KadasApplication : public QgsApplication
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
+    KadasRedliningIntegration *mRedliningIntegration = nullptr;
+    KadasGpxIntegration *mGpxIntegration = nullptr;
     bool mBlockActiveLayerChanged = false;
     QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;

@@ -69,11 +69,9 @@
 
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasgpsintegration.h>
-#include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadasredliningintergration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
 #include <kadas/app/globe/kadasglobeintegration.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
@@ -192,12 +190,6 @@ void KadasMainWindow::init()
   mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
   mPluginsToolButton->setFixedHeight( 45 );
   mPluginsWidget->hide();
-
-  // Redlining
-  KadasRedliningIntegration *redlining = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
-
-  // GPX routes
-  KadasGpxIntegration *gpx = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, mActionExportGPX, mActionImportGPX, this );
 
   // Milx
   KadasMilxIntegration::MilxUi milxUi;

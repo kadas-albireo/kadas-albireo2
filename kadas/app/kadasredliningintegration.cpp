@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasredliningintergration.cpp
-    ------------------------------
+    kadasredliningintegration.cpp
+    -----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -35,9 +35,9 @@
 
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasredliningintergration.h>
+#include <kadas/app/kadasredliningintegration.h>
 
-KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *parent )
+KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
   : QObject( parent ), mButtonNewObject( buttonNewObject )
 {
 
@@ -96,27 +96,27 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
   mActionNewLine->setCheckable( true );
   connect( mActionNewLine, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, lineFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), parent ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), kApp->mainWindow() ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
   mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
   connect( mActionNewRectangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, rectangleFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), parent ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
   mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
   mActionNewPolygon->setCheckable( true );
   connect( mActionNewPolygon, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, polygonFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), parent ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), kApp->mainWindow() ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
   mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
   mActionNewCircle->setCheckable( true );
   connect( mActionNewCircle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, circleFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), parent ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
   mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
   connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, textFactory ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), parent ), &QShortcut::activated, mActionNewText, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   QMenu *menuNewMarker = new QMenu();
   menuNewMarker->addAction( mActionNewPoint );

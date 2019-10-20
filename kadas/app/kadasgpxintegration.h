@@ -31,7 +31,7 @@ class KadasGpxIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, KadasMainWindow *parent );
+    KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent );
     KadasItemLayer *getOrCreateLayer();
 
   private:

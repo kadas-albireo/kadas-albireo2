@@ -67,6 +67,11 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
     QAction *actionBullseye() const { return mActionBullseye; }
+    QToolButton *buttonNewRedliningObject() const { return mToolButtonRedliningNewObject; }
+    QAction *actionDrawWaypoint() const { return mActionDrawWaypoint; }
+    QAction *actionDrawRoute() const { return mActionDrawRoute; }
+    QAction *actionExportGPX() const { return mActionExportGPX; }
+    QAction *actionImportGPX() const { return mActionImportGPX; }
 
   public slots:
     void zoomFull();

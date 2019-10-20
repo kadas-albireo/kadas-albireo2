@@ -40,7 +40,7 @@
 #include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadasmainwindow.h>
 
-KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, KadasMainWindow *parent )
+KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
 

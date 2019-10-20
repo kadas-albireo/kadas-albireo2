@@ -48,9 +48,11 @@
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascrashrpt.h>
+#include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
+#include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/kadasvectorlayerproperties.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/kml/kadaskmlexport.h>
@@ -232,6 +234,12 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   mMapToolPan = new KadasMapToolPan( mMainWindow->mapCanvas() );
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
+
+  // Redlining
+  mRedliningIntegration = new KadasRedliningIntegration( mMainWindow->buttonNewRedliningObject(), this );
+
+  // GPX routes
+  mGpxIntegration = new KadasGpxIntegration( mMainWindow->actionDrawWaypoint(), mMainWindow->actionDrawRoute(), mMainWindow->actionExportGPX(), mMainWindow->actionImportGPX(), this );
 
   // Register plugin layers
   pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
