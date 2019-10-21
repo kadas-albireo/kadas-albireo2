@@ -133,6 +133,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   mButtonNewObject->setMenu( menuNewObject );
   mButtonNewObject->setPopupMode( QToolButton::InstantPopup );
   mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
+  mButtonNewObject->setCheckable( true );
 }
 
 KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
@@ -154,6 +155,8 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
+    connect( tool, &QgsMapTool::activated, this, &KadasRedliningIntegration::activateNewButtonObject );
+    connect( tool, &QgsMapTool::deactivated, this, &KadasRedliningIntegration::deactivateNewButtonObject );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     canvas->setMapTool( tool );
@@ -162,4 +165,19 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
   {
     canvas->unsetMapTool( canvas->mapTool() );
   }
+}
+
+void KadasRedliningIntegration::activateNewButtonObject()
+{
+  QAction *action = kApp->mainWindow()->mapCanvas()->mapTool()->action();
+  mButtonNewObject->setText( action->text() );
+  mButtonNewObject->setIcon( action->icon() );
+  mButtonNewObject->setChecked( true );
+}
+
+void KadasRedliningIntegration::deactivateNewButtonObject()
+{
+  mButtonNewObject->setText( tr( "Drawing" ) );
+  mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
+  mButtonNewObject->setChecked( false );
 }

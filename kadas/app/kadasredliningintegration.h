@@ -60,6 +60,10 @@ class KadasRedliningIntegration : public QObject
 
     KadasMapItem *setEditorFactory( KadasMapItem *item ) const;
     void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory );
+
+  private slots:
+    void activateNewButtonObject();
+    void deactivateNewButtonObject();
 };
 
 #endif // KADASREDLININGINTEGRATION_H
