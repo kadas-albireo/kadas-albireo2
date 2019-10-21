@@ -35,8 +35,8 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
 
-    void addItem( KadasMapItem *item );
-    KadasMapItem *takeItem( const QString &itemId );
+    void addItem( KadasMapItem *item SIP_TRANSFER );
+    KadasMapItem *takeItem( const QString &itemId ) SIP_TRANSFER;
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
 
     void setOpacity( int opacity ) { mOpacity = opacity; }
