@@ -31,10 +31,13 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
 #include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
+#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
+#include <kadas/gui/maptools/kadasmaptoolslope.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascanvascontextmenu.h>
+#include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasredliningintegration.h>
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos )
@@ -251,7 +254,7 @@ void KadasCanvasContextMenu::deleteItem()
 
 void KadasCanvasContextMenu::deleteItems()
 {
-  mCanvas->setMapTool( kApp->deleteItemsTool() );
+  kApp->mainWindow()->actionDeleteItems()->trigger();
 }
 
 void KadasCanvasContextMenu::editItem()
@@ -266,7 +269,7 @@ void KadasCanvasContextMenu::paste()
 
 void KadasCanvasContextMenu::drawPin()
 {
-  mCanvas->setMapTool( kApp->addPinTool() );
+  kApp->mainWindow()->actionPin()->trigger();
 }
 
 void KadasCanvasContextMenu::drawPointMarker()
@@ -311,38 +314,63 @@ void KadasCanvasContextMenu::drawText()
 
 void KadasCanvasContextMenu::measureLine()
 {
-  mCanvas->setMapTool( kApp->measureTool( KadasMapToolMeasure::MeasureLine, mPickResult.geom, mPickResult.crs ) );
+  kApp->mainWindow()->actionMeasureLine()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
 }
 
 void KadasCanvasContextMenu::measurePolygon()
 {
-  mCanvas->setMapTool( kApp->measureTool( KadasMapToolMeasure::MeasurePolygon, mPickResult.geom, mPickResult.crs ) );
+  kApp->mainWindow()->actionMeasureArea()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
 }
 
 void KadasCanvasContextMenu::measureCircle()
 {
-  mCanvas->setMapTool( kApp->measureTool( KadasMapToolMeasure::MeasureCircle, mPickResult.geom, mPickResult.crs ) );
+  kApp->mainWindow()->actionMeasureCircle()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
 }
 
 void KadasCanvasContextMenu::measureAzimuth()
 {
-  mCanvas->setMapTool( kApp->measureTool( KadasMapToolMeasure::MeasureAzimuth, mPickResult.geom, mPickResult.crs ) );
+  kApp->mainWindow()->actionMeasureAzimuth()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
 }
 
 void KadasCanvasContextMenu::measureHeightProfile()
 {
-  mCanvas->setMapTool( kApp->measureHeightProfileTool( mPickResult.geom, mPickResult.crs ) );
+  kApp->mainWindow()->actionMeasureHeightProfile()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
 }
 
 void KadasCanvasContextMenu::terrainSlope()
 {
   if ( mPickResult.geom )
   {
-    kApp->terrainSlopeTool( mPickResult.geom->boundingBox(), mPickResult.crs );
+    KadasMapToolSlope( kApp->mainWindow()->mapCanvas() ).compute( mPickResult.geom->boundingBox(), mPickResult.crs );
   }
   else
   {
-    mCanvas->setMapTool( kApp->terrainSlopeTool() );
+    kApp->mainWindow()->actionTerrainSlope()->trigger();
   }
 }
 
@@ -350,17 +378,17 @@ void KadasCanvasContextMenu::terrainHillshade()
 {
   if ( mPickResult.geom )
   {
-    kApp->terrainHillshadeTool( mPickResult.geom->boundingBox(), mPickResult.crs );
+    KadasMapToolHillshade( kApp->mainWindow()->mapCanvas() ).compute( mPickResult.geom->boundingBox(), mPickResult.crs );
   }
   else
   {
-    mCanvas->setMapTool( kApp->terrainHillshadeTool() );
+    kApp->mainWindow()->actionTerrainHillshade()->trigger();
   }
 }
 
 void KadasCanvasContextMenu::terrainViewshed()
 {
-  mCanvas->setMapTool( kApp->terrainViewshedTool() );
+  kApp->mainWindow()->actionTerrainViewshed()->trigger();
 }
 
 void KadasCanvasContextMenu::print()

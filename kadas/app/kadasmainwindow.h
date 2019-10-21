@@ -66,12 +66,22 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *settingsTab() const { return mRibbonWidget->widget( 6 ); }
     QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
-    QAction *actionBullseye() const { return mActionBullseye; }
     QToolButton *buttonNewRedliningObject() const { return mToolButtonRedliningNewObject; }
+    QAction *actionBullseye() const { return mActionBullseye; }
     QAction *actionDrawWaypoint() const { return mActionDrawWaypoint; }
     QAction *actionDrawRoute() const { return mActionDrawRoute; }
+    QAction *actionDeleteItems() const { return mActionDeleteItems; }
     QAction *actionExportGPX() const { return mActionExportGPX; }
     QAction *actionImportGPX() const { return mActionImportGPX; }
+    QAction *actionPin() const { return mActionPin; }
+    QAction *actionMeasureLine() const { return mActionDistance; }
+    QAction *actionMeasureArea() const { return mActionArea; }
+    QAction *actionMeasureCircle() const { return mActionCircle; }
+    QAction *actionMeasureAzimuth() const { return mActionAzimuth; }
+    QAction *actionMeasureHeightProfile() const { return mActionProfile; }
+    QAction *actionTerrainSlope() const { return mActionSlope; }
+    QAction *actionTerrainHillshade() const { return mActionHillshade; }
+    QAction *actionTerrainViewshed() const { return mActionViewshed; }
 
   public slots:
     void zoomFull();
@@ -104,12 +114,15 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void dropEvent( QDropEvent *event ) override;
     void dragEnterEvent( QDragEnterEvent *event ) override;
     void showEvent( QShowEvent * /*event*/ ) override;
-    void restoreFavoriteButton( QToolButton *button );
-    void configureButtons();
-    void setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut = QKeySequence(), const std::function<QgsMapTool*() > &toolFactory = nullptr );
-    void updateWidgetPositions();
+
+    QgsMapTool *addPictureTool();
+    QgsMapTool *addPinTool();
     KadasRibbonButton *addRibbonButton( QWidget *tabWidget );
+    void configureButtons();
+    void restoreFavoriteButton( QToolButton *button );
+    void setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut = QKeySequence(), const std::function<QgsMapTool*() > &toolFactory = nullptr );
     void showSourceSelectDialog( const QString &provider );
+    void updateWidgetPositions();
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;
