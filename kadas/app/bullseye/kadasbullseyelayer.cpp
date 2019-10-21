@@ -40,7 +40,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       , mGeod( GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f() )
     {
       mDa.setEllipsoid( "WGS84" );
-      mDa.setSourceCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ), mLayer->mTransformContext );
+      mDa.setSourceCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.transformContext() );
     }
 
     bool render() override
@@ -64,8 +64,8 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       QFontMetrics metrics( mRendererContext.painter()->font() );
 
       QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-      QgsCoordinateTransform ct( mLayer->crs(), crsWgs84, mLayer->transformContext() );
-      QgsCoordinateTransform rct( crsWgs84, mRendererContext.coordinateTransform().destinationCrs(), mLayer->transformContext() );
+      QgsCoordinateTransform ct( mLayer->crs(), crsWgs84, mRendererContext.transformContext() );
+      QgsCoordinateTransform rct( crsWgs84, mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
 
       // Draw rings
       QgsPointXY wgsCenter = ct.transform( mLayer->mCenter );

@@ -86,25 +86,25 @@ void KadasMapItem::update()
 
 KadasMapPos KadasMapItem::toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const
 {
-  QgsPointXY pos = QgsCoordinateTransform( mCrs, settings.destinationCrs(), QgsProject::instance()->transformContext() ).transform( itemPos );
+  QgsPointXY pos = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemPos );
   return KadasMapPos( pos.x(), pos.y() );
 }
 
 KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const
 {
-  QgsPointXY pos = QgsCoordinateTransform( settings.destinationCrs(), mCrs, QgsProject::instance()->transformContext() ).transform( mapPos );
+  QgsPointXY pos = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( mapPos );
   return KadasItemPos( pos.x(), pos.y() );
 }
 
 KadasMapRect KadasMapItem::toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const
 {
-  QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), QgsProject::instance()->transformContext() ).transform( itemRect );
+  QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
   return KadasMapRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
 
 KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
 {
-  QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, QgsProject::instance()->transformContext() ).transform( itemRect );
+  QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( itemRect );
   return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
 
