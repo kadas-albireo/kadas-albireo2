@@ -71,6 +71,11 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
   mValid = true;
 }
 
+KadasItemLayer::~KadasItemLayer()
+{
+  qDeleteAll( mItems );
+}
+
 void KadasItemLayer::addItem( KadasMapItem *item )
 {
   mItems.insert( QUuid::createUuid().toString(), item );

@@ -33,6 +33,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
   public:
     static QString layerType() { return "KadasItemLayer"; }
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
+    ~KadasItemLayer();
 
     void addItem( KadasMapItem *item );
     KadasMapItem *takeItem( const QString &itemId );
