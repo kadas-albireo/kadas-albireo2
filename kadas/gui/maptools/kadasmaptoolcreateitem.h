@@ -85,6 +85,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
+    void setSelectItems( bool select ) { mSelectItems = select; }
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
     void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
@@ -133,6 +134,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     bool mMultipart = false;
     bool mSnapping = false;
+    bool mSelectItems = true;
 
   private slots:
     void inputChanged();

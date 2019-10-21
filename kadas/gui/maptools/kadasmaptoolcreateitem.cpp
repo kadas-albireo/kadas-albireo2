@@ -310,7 +310,7 @@ void KadasMapToolCreateItem::createItem()
     mItem->setState( state );
     delete state;
   }
-  mItem->setSelected( true );
+  mItem->setSelected( mSelectItems );
   KadasMapCanvasItemManager::addItem( mItem );
   mStateHistory->clear();
 }

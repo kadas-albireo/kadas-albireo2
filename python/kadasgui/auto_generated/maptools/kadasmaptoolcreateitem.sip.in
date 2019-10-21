@@ -66,6 +66,7 @@ class KadasMapToolCreateItem : QgsMapTool
 
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );
+    void setSelectItems( bool select );
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
