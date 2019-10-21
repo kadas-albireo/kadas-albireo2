@@ -267,6 +267,10 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
 
+  mMainWindow->show();
+  splash.finish( mMainWindow );
+  processEvents();
+
   // Open startup project
   QgsProject::instance()->setDirty( false );
   if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
@@ -309,8 +313,6 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   QgsProject::instance()->setDirty( false );
   updateWindowTitle();
-  mMainWindow->show();
-  splash.finish( mMainWindow );
 
   QObject::connect( this, &QApplication::lastWindowClosed, this, &QApplication::quit );
 }
