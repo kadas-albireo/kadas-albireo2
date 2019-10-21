@@ -42,19 +42,28 @@ KadasItemPos KadasPointItem::position() const
 
 void KadasPointItem::setPosition( const KadasItemPos &pos )
 {
-  KadasItemPos prevPos = position();
-  double dx = pos.x() - prevPos.x();
-  double dy = pos.y() - prevPos.y();
-  for ( KadasItemPos &point : state()->points )
+  if ( state()->points.isEmpty() )
   {
-    point.setX( point.x() + dx );
-    point.setY( point.y() + dy );
+    state()->points.append( pos );
+    endPart();
+    recomputeDerived();
   }
-  if ( mGeometry )
+  else
   {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    KadasItemPos prevPos = position();
+    double dx = pos.x() - prevPos.x();
+    double dy = pos.y() - prevPos.y();
+    for ( KadasItemPos &point : state()->points )
+    {
+      point.setX( point.x() + dx );
+      point.setY( point.y() + dy );
+    }
+    if ( mGeometry )
+    {
+      mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    }
+    update();
   }
-  update();
 }
 
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
