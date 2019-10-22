@@ -69,6 +69,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
     QAction *actionBullseye() const { return mActionBullseye; }
+    QAction *actionGuideGrid() const { return mActionGuideGrid; }
     QAction *actionDrawWaypoint() const { return mActionDrawWaypoint; }
     QAction *actionDrawRoute() const { return mActionDrawRoute; }
     QAction *actionDeleteItems() const { return mActionDeleteItems; }

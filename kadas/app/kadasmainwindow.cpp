@@ -72,6 +72,7 @@
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
 #include <kadas/app/globe/kadasglobeintegration.h>
+#include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
@@ -480,7 +481,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), [this] { return addPictureTool(); } );
 
-  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), nullptr );
+  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), [this] { return new KadasMapToolGuideGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
   setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
