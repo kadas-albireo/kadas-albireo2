@@ -274,42 +274,42 @@ void KadasCanvasContextMenu::drawPin()
 
 void KadasCanvasContextMenu::drawPointMarker()
 {
-  kApp->redliningIntegration()->actionNewPoint()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewPoint()->trigger();
 }
 
 void KadasCanvasContextMenu::drawSquareMarker()
 {
-  kApp->redliningIntegration()->actionNewSquare()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewSquare()->trigger();
 }
 
 void KadasCanvasContextMenu::drawTriangleMarker()
 {
-  kApp->redliningIntegration()->actionNewTriangle()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewTriangle()->trigger();
 }
 
 void KadasCanvasContextMenu::drawLine()
 {
-  kApp->redliningIntegration()->actionNewLine()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewLine()->trigger();
 }
 
 void KadasCanvasContextMenu::drawRectangle()
 {
-  kApp->redliningIntegration()->actionNewRectangle()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewRectangle()->trigger();
 }
 
 void KadasCanvasContextMenu::drawPolygon()
 {
-  kApp->redliningIntegration()->actionNewPolygon()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewPolygon()->trigger();
 }
 
 void KadasCanvasContextMenu::drawCircle()
 {
-  kApp->redliningIntegration()->actionNewCircle()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewCircle()->trigger();
 }
 
 void KadasCanvasContextMenu::drawText()
 {
-  kApp->redliningIntegration()->actionNewText()->trigger();
+  kApp->mainWindow()->redliningIntegration()->actionNewText()->trigger();
 }
 
 void KadasCanvasContextMenu::measureLine()

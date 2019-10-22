@@ -88,9 +88,6 @@ class KadasApplication : public QgsApplication
 
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
 
-    KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
-    KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
-
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
     void unsetMapTool();
@@ -105,8 +102,6 @@ class KadasApplication : public QgsApplication
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
-    KadasRedliningIntegration *mRedliningIntegration = nullptr;
-    KadasGpxIntegration *mGpxIntegration = nullptr;
     bool mBlockActiveLayerChanged = false;
     QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;

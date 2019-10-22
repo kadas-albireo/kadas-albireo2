@@ -189,6 +189,12 @@ void KadasMainWindow::init()
   mPluginsToolButton->setFixedHeight( 45 );
   mPluginsWidget->hide();
 
+  // Redlining
+  mRedliningIntegration = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
+
+  // GPX routes
+  mGpxIntegration = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, mActionExportGPX, mActionImportGPX, this );
+
   // Milx
   KadasMilxIntegration::MilxUi milxUi;
   milxUi.mRibbonWidget = mRibbonWidget;
@@ -750,13 +756,13 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
     }
     // TODO
     // If action is not associated to a kadas button, try with redlining and gpx route editor
-    if ( tool->action()->parent() == kApp->redliningIntegration() )
+    if ( tool->action()->parent() == mRedliningIntegration )
     {
       mRibbonWidget->blockSignals( true );
       mRibbonWidget->setCurrentWidget( mDrawTab );
       mRibbonWidget->blockSignals( false );
     }
-    else if ( tool->action()->parent() == kApp->gpxIntegration() )
+    else if ( tool->action()->parent() == mGpxIntegration )
     {
       mRibbonWidget->blockSignals( true );
       mRibbonWidget->setCurrentWidget( mGpsTab );

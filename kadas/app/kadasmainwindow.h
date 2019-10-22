@@ -32,8 +32,10 @@ class QgsLayerTreeMapCanvasBridge;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
+class KadasGpxIntegration;
 class KadasMapItem;
 class KadasMapWidgetManager;
+class KadasRedliningIntegration;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
@@ -66,7 +68,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *settingsTab() const { return mRibbonWidget->widget( 6 ); }
     QWidget *helpTab() const { return mRibbonWidget->widget( 7 ); }
 
-    QToolButton *buttonNewRedliningObject() const { return mToolButtonRedliningNewObject; }
     QAction *actionBullseye() const { return mActionBullseye; }
     QAction *actionDrawWaypoint() const { return mActionDrawWaypoint; }
     QAction *actionDrawRoute() const { return mActionDrawRoute; }
@@ -82,6 +83,9 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QAction *actionTerrainSlope() const { return mActionSlope; }
     QAction *actionTerrainHillshade() const { return mActionHillshade; }
     QAction *actionTerrainViewshed() const { return mActionViewshed; }
+
+    KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
+    KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
 
   public slots:
     void zoomFull();
@@ -131,6 +135,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasCoordinateDisplayer *mCoordinateDisplayer = nullptr;
     KadasGpsIntegration *mGpsIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
+    KadasRedliningIntegration *mRedliningIntegration = nullptr;
+    KadasGpxIntegration *mGpxIntegration = nullptr;
     QgsDecorationGrid *mDecorationGrid = nullptr;
 
     QTimer mLoadingTimer;
