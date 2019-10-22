@@ -59,6 +59,7 @@ KadasMapToolBullseye::~KadasMapToolBullseye()
 void KadasMapToolBullseye::activate()
 {
   QgsMapTool::activate();
+  setCursor( Qt::ArrowCursor );
   mWidget->setVisible( true );
 }
 
