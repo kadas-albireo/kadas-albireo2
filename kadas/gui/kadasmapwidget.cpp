@@ -50,7 +50,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   mLockViewButton->setAutoRaise( true );
   mLockViewButton->setToolTip( tr( "Lock with main view" ) );
   mLockViewButton->setCheckable( true );
-  mLockViewButton->setIcon( QIcon( ":/images/themes/default/unlocked.svg" ) );
+  mLockViewButton->setIcon( QIcon( ":/kadas/icons/unlocked" ) );
   mLockViewButton->setIconSize( QSize( 12, 12 ) );
   connect( mLockViewButton, &QToolButton::toggled, this, &KadasMapWidget::setCanvasLocked );
 
@@ -173,11 +173,11 @@ void KadasMapWidget::setCanvasLocked( bool locked )
 {
   if ( locked )
   {
-    mLockViewButton->setIcon( QIcon( ":/images/themes/default/locked.svg" ) );
+    mLockViewButton->setIcon( QIcon( ":/kadas/icons/locked" ) );
   }
   else
   {
-    mLockViewButton->setIcon( QIcon( ":/images/themes/default/unlocked.svg" ) );
+    mLockViewButton->setIcon( QIcon( ":/kadas/icons/unlocked" ) );
   }
   if ( locked )
   {

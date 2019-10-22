@@ -107,6 +107,8 @@
         <file alias="icons/copy_coordinates">icons/copy_coordinates.svg</file>
         <file alias="icons/copy_map">icons/copy_map.svg</file>
         <file alias="icons/waypoint">icons/waypoint.svg</file>
+        <file alias="icons/locked">icons/locked.svg</file>
+        <file alias="icons/unlocked">icons/unlocked.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
