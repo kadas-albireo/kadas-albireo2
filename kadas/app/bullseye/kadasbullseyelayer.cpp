@@ -237,6 +237,6 @@ void KadasBullseyeLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLaye
 {
   menu->addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
   {
-    mActionBullseyeTool->setChecked( true );
+    mActionBullseyeTool->trigger();
   } );
 }
