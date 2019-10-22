@@ -11,7 +11,7 @@
 
 
 
-class KadasItemLayer : QgsPluginLayer
+class KadasItemLayer : KadasPluginLayer
 {
 %Docstring
 *************************************************************************
@@ -36,9 +36,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasMapItem *takeItem( const QString &itemId ) /Transfer/;
     const QMap<QString, KadasMapItem *> &items() const;
 
-    void setOpacity( int opacity );
-    int opacity() const;
-
     virtual KadasItemLayer *clone() const /Factory/;
 
     virtual QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext );
@@ -47,11 +44,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
-    virtual void setTransformContext( const QgsCoordinateTransformContext &ctx );
-
-
-    virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;
-    virtual bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories );
 
 
   protected:

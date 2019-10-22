@@ -58,14 +58,14 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
 
 
 KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs )
-  : QgsPluginLayer( layerType(), name )
+  : KadasPluginLayer( layerType(), name )
 {
   setCrs( crs );
   mValid = true;
 }
 
 KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType )
-  : QgsPluginLayer( layerType, name )
+  : KadasPluginLayer( layerType, name )
 {
   setCrs( crs );
   mValid = true;
@@ -119,11 +119,6 @@ QgsRectangle KadasItemLayer::extent() const
     }
   }
   return rect;
-}
-
-void KadasItemLayer::setTransformContext( const QgsCoordinateTransformContext &ctx )
-{
-  mTransformContext = ctx;
 }
 
 QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const

@@ -20,14 +20,14 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadaspluginlayertype.h>
+#include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/kadas_gui.h>
 
 class QMenu;
 class QuaZip;
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
+class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
@@ -39,18 +39,11 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     KadasMapItem *takeItem( const QString &itemId ) SIP_TRANSFER;
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
 
-    void setOpacity( int opacity ) { mOpacity = opacity; }
-    int opacity() const { return mOpacity; }
-
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
-    void setTransformContext( const QgsCoordinateTransformContext &ctx ) override;
-
-    bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
-    bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
 
 #ifndef SIP_RUN
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
@@ -61,8 +54,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
     class Renderer;
 
     QMap<QString, KadasMapItem *> mItems;
-    QgsCoordinateTransformContext mTransformContext;
-    int mOpacity = 100;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType

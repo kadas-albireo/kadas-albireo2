@@ -2,5 +2,5 @@
 %Include auto_generated/kadascoordinateformat.sip
 %Include auto_generated/kadastemporaryfile.sip
 %Include auto_generated/kadas.sip
-%Include auto_generated/kadaspluginlayertype.sip
+%Include auto_generated/kadaspluginlayer.sip
 %Include auto_generated/kadasstatehistory.sip

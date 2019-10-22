@@ -20,12 +20,12 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadaspluginlayertype.h>
+#include <kadas/core/kadaspluginlayer.h>
 
 class QgsMapCanvas;
 class QgsLayerTreeView;
 
-class KadasBullseyeLayer : public QgsPluginLayer
+class KadasBullseyeLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
@@ -36,9 +36,6 @@ class KadasBullseyeLayer : public QgsPluginLayer
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, double axesInterval );
 
     KadasBullseyeLayer *clone() const override;
-    bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
-    bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
-    void setTransformContext( const QgsCoordinateTransformContext &ctx ) override { mTransformContext = ctx; }
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
 
@@ -51,14 +48,12 @@ class KadasBullseyeLayer : public QgsPluginLayer
     int fontSize() const { return mFontSize; }
     LabellingMode labellingMode() const { return mLabellingMode; }
     int lineWidth() const { return mLineWidth; }
-    int opacity() const { return mOpacity; }
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
     void setLabellingMode( LabellingMode labellingMode ) { mLabellingMode = labellingMode; }
     void setLineWidth( int lineWidth ) { mLineWidth = lineWidth; }
-    void setOpacity( int opacity ) { mOpacity = opacity; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -67,7 +62,6 @@ class KadasBullseyeLayer : public QgsPluginLayer
   private:
     class Renderer;
 
-    QgsCoordinateTransformContext mTransformContext;
     QgsPointXY mCenter;
     int mRings;
     double mInterval;
@@ -76,7 +70,6 @@ class KadasBullseyeLayer : public QgsPluginLayer
     int mFontSize = 10;
     LabellingMode mLabellingMode = NO_LABELS;
     int mLineWidth = 1;
-    int mOpacity = 100;
 };
 
 class KadasBullseyeLayerType : public KadasPluginLayerType

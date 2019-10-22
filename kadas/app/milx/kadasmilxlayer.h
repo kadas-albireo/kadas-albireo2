@@ -17,7 +17,7 @@
 #ifndef KADASMILXLAYER_H
 #define KADASMILXLAYER_H
 
-#include <kadas/core/kadaspluginlayertype.h>
+#include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/kadasitemlayer.h>
 
 class KadasMilxLayer : public KadasItemLayer

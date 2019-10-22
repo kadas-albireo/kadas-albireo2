@@ -10,6 +10,9 @@
 
 
 
+
+
+
 class KadasPluginLayer : QgsPluginLayer
 {
 %Docstring
@@ -27,13 +30,17 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/core/kadaspluginlayer.h"
 %End
   public:
-    KadasPluginLayer( QString layerType, QString layerName );
+    KadasPluginLayer( const QString &layerType, const QString &layerName = QString() );
+
+    virtual void setTransformContext( const QgsCoordinateTransformContext &ctx );
+    virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;
+    virtual bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories );
+
+    void setOpacity( int opacity );
+    int opacity() const;
 
     class IdentifyResult
 {
-%Docstring
-Get attributes at the specified map location */
-%End
 
 %TypeHeaderCode
 #include "kadas/core/kadaspluginlayer.h"
@@ -44,40 +51,21 @@ Get attributes at the specified map location */
         const QgsGeometry &geometry() const;
 
     };
-    virtual QList<IdentifyResult> identify( const QgsPoint & /*mapPos*/, const QgsMapSettings & /*mapSettings*/ );
-
-    virtual bool testPick( const QgsPointXY & /*mapPos*/, const QgsMapSettings & /*mapSettings*/, QVariant & /*pickResult*/, QRect & /*pickResultsExtent*/ );
-%Docstring
-Test for mouse pick. */
-%End
-    virtual void handlePick( const QVariant & /*pick*/ );
-%Docstring
-Handle a pick result. */
-%End
-
-    virtual double opacity() const;
-%Docstring
-return the current layer opacity */
-%End
-    virtual void setOpacity( double opacity );
-%Docstring
-set the layer opacity */
-%End
-
-    virtual QVariantList getItems( const QgsRectangle & /*extent*/ ) const;
-%Docstring
-Get items in extent */
-%End
-    virtual void deleteItems( const QVariantList & /*items*/ );
-%Docstring
-Delete the specified items */
-%End
-    virtual void copyItems( const QVariantList & /*items*/, bool /*cut*/ );
-%Docstring
-Copy or cut the specified items */
-%End
+    virtual QList<KadasPluginLayer::IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings );
 
   protected:
+};
+
+
+class KadasPluginLayerType : QObject, QgsPluginLayerType
+{
+
+%TypeHeaderCode
+#include "kadas/core/kadaspluginlayer.h"
+%End
+  public:
+    KadasPluginLayerType( const QString &name );
+    virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 };
 
 /************************************************************************

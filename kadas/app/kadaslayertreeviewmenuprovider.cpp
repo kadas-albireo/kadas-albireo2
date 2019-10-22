@@ -28,8 +28,7 @@
 #include <qgis/qgsrasterrenderer.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/core/kadaspluginlayertype.h>
-#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/core/kadaspluginlayer.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
@@ -65,6 +64,12 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
 
+
+      if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) || qobject_cast<KadasPluginLayer *>( layer ) )
+      {
+        menu->addAction( actionLayerTransparency( menu ) );
+      }
+
       if ( layer->type() == QgsMapLayerType::PluginLayer )
       {
         QgsPluginLayer *pluginLayer = static_cast<QgsPluginLayer *>( layer );
@@ -73,11 +78,6 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         {
           plt->addLayerTreeMenuActions( menu, pluginLayer );
         }
-      }
-
-      if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) || qobject_cast<KadasItemLayer *>( layer ) )
-      {
-        menu->addAction( actionLayerTransparency( menu ) );
       }
       menu->addAction( actions->actionZoomToLayer( kApp->mainWindow()->mapCanvas(), menu ) );
       menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
@@ -128,9 +128,9 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   {
     opacity = static_cast<QgsVectorLayer *>( layer )->opacity();
   }
-  else if ( qobject_cast<KadasItemLayer *>( layer ) )
+  else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    opacity = static_cast<KadasItemLayer *>( layer )->opacity();
+    opacity = static_cast<KadasPluginLayer *>( layer )->opacity();
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) )
   {
@@ -191,9 +191,9 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
   {
     static_cast<QgsVectorLayer *>( layer )->setOpacity( 100 - value );
   }
-  else if ( qobject_cast<KadasItemLayer *>( layer ) )
+  else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    static_cast<KadasItemLayer *>( layer )->setOpacity( 100 - value );
+    static_cast<KadasPluginLayer *>( layer )->setOpacity( 100 - value );
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) )
   {

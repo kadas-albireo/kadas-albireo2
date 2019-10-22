@@ -151,7 +151,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
-  : QgsPluginLayer( layerTypeKey(), name )
+  : KadasPluginLayer( layerTypeKey(), name )
 {
   mValid = true;
 }
@@ -169,6 +169,7 @@ KadasBullseyeLayer *KadasBullseyeLayer::clone() const
 {
   KadasBullseyeLayer *layer = new KadasBullseyeLayer( name() );
   layer->mTransformContext = mTransformContext;
+  layer->mOpacity = mOpacity;
   layer->mCenter = mCenter;
   layer->mRings = mRings;
   layer->mInterval = mInterval;
@@ -177,7 +178,6 @@ KadasBullseyeLayer *KadasBullseyeLayer::clone() const
   layer->mFontSize = mFontSize;
   layer->mLabellingMode = mLabellingMode;
   layer->mLineWidth = mLineWidth;
-  layer->mOpacity = mOpacity;
   return layer;
 }
 
