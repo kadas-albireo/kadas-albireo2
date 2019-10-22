@@ -112,6 +112,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setScaleFactor( 96.0 / 25.4 );
   rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
                                    fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
+  rc.setCustomRenderFlags( QStringList() << "kml" );
 
   // Render layers
   int drawingOrder = 0;
@@ -379,6 +380,7 @@ bool KadasKMLExport::renderTile( QImage &img, const QgsRectangle &extent, QgsMap
   QgsMapToPixel mtp( extent.width() / img.width(), centerPoint.x(), centerPoint.y(), img.width(), img.height(), 0.0 );
   context.setMapToPixel( mtp );
   context.setExtent( crst.transformBoundingBox( extent, QgsCoordinateTransform::ReverseTransform ) );
+  context.setCustomRenderFlags( QStringList() << "kml" );
   QgsMapLayerRenderer *layerRenderer = mapLayer->createMapRenderer( context );
   bool rendered = false;
   if ( layerRenderer )
