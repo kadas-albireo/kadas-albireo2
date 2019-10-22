@@ -205,7 +205,7 @@ KadasMapItem::Margin KadasGeometryItem::margin() const
       maxMeasureLabelHeight = qMax( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
     }
   }
-  int maxPainterMargin = qMax( mIconSize, mPen.width() ) / 2 + 1;
+  int maxPainterMargin = qMax( mIconType != ICON_NONE ? mIconSize : 0, mPen.width() ) / 2 + 1;
   int maxW = qMax( maxMeasureLabelWidth, maxPainterMargin );
   int maxH = qMax( maxMeasureLabelHeight, maxPainterMargin );
   return Margin{ maxW, maxH, maxW, maxH };
