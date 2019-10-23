@@ -43,6 +43,16 @@ static QFont measurementFont()
 
 static const int sLabelOffset = 16;
 
+void KadasGeometryItem::registerMetaTypes()
+{
+  static bool registered = false;
+  if ( !registered )
+  {
+    qRegisterMetaType<IconType>( "IconType" );
+    registered = true;
+  }
+}
+
 KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasMapItem( crs, parent )
   , mPen( QPen( Qt::red, 4 ) )
@@ -52,6 +62,8 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, Q
   , mIconPen( Qt::red, 2 )
   , mIconBrush( Qt::white )
 {
+  registerMetaTypes();
+
   mDa.setSourceCrs( crs, QgsProject::instance()->transformContext() );
   mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
   connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );

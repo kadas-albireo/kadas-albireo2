@@ -161,6 +161,8 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
       bool center;
     };
     QList<MeasurementLabel> mMeasurementLabels;
+
+    static void registerMetaTypes();
 };
 
 Q_DECLARE_METATYPE( KadasGeometryItem::IconType )
