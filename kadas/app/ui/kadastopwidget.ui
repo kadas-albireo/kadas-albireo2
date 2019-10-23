@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1387</width>
+    <width>1403</width>
     <height>133</height>
    </rect>
   </property>
@@ -2394,6 +2394,9 @@ Sight</string>
    </property>
   </action>
   <action name="mActionAddImage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
      <normaloff>:/kadas/icons/picture</normaloff>:/kadas/icons/picture</iconset>
