@@ -28,12 +28,13 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
     KadasGuideGridLayer( const QString &name );
     void setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked );
-    bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
-    bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
 
     QString layerTypeKey() const override { return layerType(); };
+    KadasGuideGridLayer *clone() const override;
+    QList<IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override  { return mGridRect; }
+
     int cols() const { return mCols; }
     int rows() const { return mRows; }
     bool colSizeLocked() const { return mColSizeLocked; }
@@ -42,9 +43,6 @@ class KadasGuideGridLayer : public KadasPluginLayer
     const QColor &color() const { return mColor; }
     int fontSize() const { return mFontSize; }
     LabellingMode labelingMode() const { return mLabellingMode; }
-
-    KadasGuideGridLayer *clone() const override;
-    QList<IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings ) override;
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
