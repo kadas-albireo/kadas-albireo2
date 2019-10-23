@@ -613,7 +613,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     QgsSettings settings;
     QString lastUsedDir = settings.value( "UI/lastProjectDir", QDir::homePath() ).toString();
     fileName = QFileDialog::getOpenFileName(
-                 mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+                 mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)"
                );
     if ( fileName.isEmpty() )
     {
@@ -710,19 +710,13 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
 
     QString path = QFileDialog::getSaveFileName(
-                     mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+                     mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)"
                    );
     if ( path.isEmpty() )
     {
       return false;
     }
-
-    QFileInfo fullPath( path );
-
-    if (
-      fullPath.suffix().compare( QLatin1String( "qgz" ), Qt::CaseInsensitive ) != 0 ||
-      fullPath.suffix().compare( QLatin1String( "qgs" ), Qt::CaseInsensitive ) != 0
-    )
+    if ( !path.endsWith( ".qgz", Qt::CaseInsensitive ) )
     {
       path += ".qgz";
     }
