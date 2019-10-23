@@ -104,6 +104,7 @@ void KadasMapToolEditItem::deactivate()
     mLayer->triggerRepaint();
     KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
     mItem->setSelected( false );
+    mItem = nullptr;
   }
   delete mBottomBar;
   mBottomBar = nullptr;
