@@ -56,7 +56,7 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
         QMap<QString, QVariant> mAttributes;
         QgsGeometry mGeom;
     };
-    virtual QList<KadasPluginLayer::IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings ) { return QList<IdentifyResult>(); }
+    virtual QList<KadasPluginLayer::IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) { return QList<IdentifyResult>(); }
 
   protected:
     int mOpacity = 100;

@@ -52,7 +52,7 @@ the Free Software Foundation; either version 2 of the License, or     *
         const QgsGeometry &geometry() const;
 
     };
-    virtual QList<KadasPluginLayer::IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings );
+    virtual QList<KadasPluginLayer::IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings );
 
   protected:
 };

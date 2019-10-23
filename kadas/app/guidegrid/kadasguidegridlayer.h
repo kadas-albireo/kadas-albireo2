@@ -31,7 +31,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
     QString layerTypeKey() const override { return layerType(); };
     KadasGuideGridLayer *clone() const override;
-    QList<IdentifyResult> identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings ) override;
+    QList<IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override  { return mGridRect; }
 

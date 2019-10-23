@@ -237,7 +237,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   return true;
 }
 
-QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const QgsPoint &mapPos, const QgsMapSettings &mapSettings )
+QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings )
 {
   QgsCoordinateTransform crst( mapSettings.destinationCrs(), crs(), mTransformContext );
   QgsPointXY pos = crst.transform( mapPos );
