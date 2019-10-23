@@ -23,6 +23,8 @@ class QgsMultiSurface;
 
 class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 {
+    Q_OBJECT
+
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 

@@ -23,6 +23,8 @@ class QgsMultiPolygon;
 
 class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 {
+    Q_OBJECT
+
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 

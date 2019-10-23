@@ -58,6 +58,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
 class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
 {
+    Q_OBJECT
+
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 };

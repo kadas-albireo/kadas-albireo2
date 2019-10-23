@@ -21,6 +21,8 @@
 
 class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
 {
+    Q_OBJECT
+
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon = ICON_CIRCLE, QObject *parent = nullptr );
 
