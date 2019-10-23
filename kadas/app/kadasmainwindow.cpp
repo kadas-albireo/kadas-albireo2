@@ -541,14 +541,19 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
     {
       if ( active )
       {
+        mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
         QgsMapTool *tool = toolFactory();
         if ( tool )
         {
           tool->setAction( action );
           mMapCanvas->setMapTool( tool );
         }
+        else
+        {
+          action->setChecked( false );
+        }
       }
-      else if ( mMapCanvas->mapTool()->action() == action )
+      else if ( mMapCanvas->mapTool() && mMapCanvas->mapTool()->action() == action )
       {
         mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
       }
