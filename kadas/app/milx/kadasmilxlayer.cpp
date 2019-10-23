@@ -134,6 +134,22 @@ void KadasMilxLayer::setApproved( bool approved )
   triggerRepaint();
 }
 
+bool KadasMilxLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
+{
+  bool success = KadasItemLayer::readXml( layer_node, context );
+  QDomElement layerEl = layer_node.toElement();
+  mIsApproved = layerEl.attribute( "approved" ).toInt() == 1;
+  return success;
+}
+
+bool KadasMilxLayer::writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  bool success = KadasItemLayer::writeXml( layer_node, document, context );
+  QDomElement layerEl = layer_node.toElement();
+  layerEl.setAttribute( "approved", mIsApproved ? "1" : "0" );
+  return success;
+}
+
 void KadasMilxLayer::exportToMilxly( QDomElement &milxLayerEl, int dpi )
 {
   QDomDocument doc = milxLayerEl.ownerDocument();

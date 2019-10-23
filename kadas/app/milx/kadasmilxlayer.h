@@ -30,6 +30,9 @@ class KadasMilxLayer : public KadasItemLayer
     KadasMilxLayer( const QString &name = "MilX" );
     QString layerTypeKey() const override { return layerType(); };
 
+    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
+    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
+
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const override;
 
