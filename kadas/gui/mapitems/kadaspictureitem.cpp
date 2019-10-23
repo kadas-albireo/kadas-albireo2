@@ -77,7 +77,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
 
 void KadasPictureItem::setFilePath( const QString &filePath )
 {
-  mFilePath = filePath;
+  setup( filePath, constState()->pos, true, mOffsetX, mOffsetY );
   update();
 }
 
