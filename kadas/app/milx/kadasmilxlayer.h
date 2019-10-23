@@ -28,6 +28,7 @@ class KadasMilxLayer : public KadasItemLayer
     static QString layerType() { return "KadasMilxLayer"; }
 
     KadasMilxLayer( const QString &name = "MilX" );
+    QString layerTypeKey() const override { return layerType(); };
 
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const override;

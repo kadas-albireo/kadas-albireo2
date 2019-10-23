@@ -23,13 +23,15 @@ class KadasGuideGridLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
-    static QString layerTypeKey() { return "guide_grid"; }
+    static QString layerType() { return "guide_grid"; }
     enum LabellingMode { LABEL_A_1, LABEL_1_A };
 
     KadasGuideGridLayer( const QString &name );
     void setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked );
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
     bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
+
+    QString layerTypeKey() const override { return layerType(); };
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override  { return mGridRect; }
     int cols() const { return mCols; }
@@ -71,7 +73,7 @@ class KadasGuideGridLayerType : public KadasPluginLayerType
 {
   public:
     KadasGuideGridLayerType( QAction *actionGuideGridTool )
-      : KadasPluginLayerType( KadasGuideGridLayer::layerTypeKey() ), mActionGuideGridTool( actionGuideGridTool ) {}
+      : KadasPluginLayerType( KadasGuideGridLayer::layerType() ), mActionGuideGridTool( actionGuideGridTool ) {}
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
     QgsPluginLayer *createLayer() override { return new KadasGuideGridLayer( "" ); }
 

@@ -29,12 +29,13 @@ class KadasBullseyeLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
-    static QString layerTypeKey() { return "bullseye"; }
+    static QString layerType() { return "bullseye"; }
     enum LabellingMode { NO_LABELS, LABEL_AXES, LABEL_RINGS, LABEL_AXES_RINGS };
 
     KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, double axesInterval );
 
+    QString layerTypeKey() const override { return layerType(); };
     KadasBullseyeLayer *clone() const override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
@@ -76,7 +77,7 @@ class KadasBullseyeLayerType : public KadasPluginLayerType
 {
   public:
     KadasBullseyeLayerType( QAction *actionBullseyeTool )
-      : KadasPluginLayerType( KadasBullseyeLayer::layerTypeKey() ), mActionBullseyeTool( actionBullseyeTool ) {}
+      : KadasPluginLayerType( KadasBullseyeLayer::layerType() ), mActionBullseyeTool( actionBullseyeTool ) {}
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
     QgsPluginLayer *createLayer() override { return new KadasBullseyeLayer( "" ); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasBullseyeLayer( "" ); }

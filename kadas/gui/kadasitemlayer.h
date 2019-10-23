@@ -34,6 +34,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     static QString layerType() { return "KadasItemLayer"; }
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
+    QString layerTypeKey() const override { return layerType(); };
 
     void addItem( KadasMapItem *item SIP_TRANSFER );
     KadasMapItem *takeItem( const QString &itemId ) SIP_TRANSFER;

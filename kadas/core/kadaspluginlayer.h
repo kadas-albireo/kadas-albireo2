@@ -33,6 +33,7 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
 
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() ) : QgsPluginLayer( layerType, layerName ) {}
+    virtual QString layerTypeKey() const = 0;
 
     void setTransformContext( const QgsCoordinateTransformContext &ctx ) override { mTransformContext = ctx; }
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
