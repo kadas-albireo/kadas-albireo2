@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsproject.h>
+
 #include <kadas/core/kadasstatehistory.h>
 
 KadasStateHistory::KadasStateHistory( QObject *parent )
@@ -60,4 +62,6 @@ void KadasStateHistory::push( State *state )
   mStates.append( state );
   emit canUndoChanged( canUndo() );
   emit canRedoChanged( canRedo() );
+
+  QgsProject::instance()->setDirty( true );
 }
