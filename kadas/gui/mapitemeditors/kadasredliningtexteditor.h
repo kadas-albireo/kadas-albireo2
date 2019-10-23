@@ -27,11 +27,6 @@ class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
     Q_OBJECT
 
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type )
-    {
-      return new KadasRedliningTextEditor( item );
-    }
-
     KadasRedliningTextEditor( KadasMapItem *item );
 
     void syncItemToWidget() override;

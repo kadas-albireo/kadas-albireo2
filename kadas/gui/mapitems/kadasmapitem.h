@@ -252,38 +252,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
 
     // Editor
-#ifndef SIP_RUN
-    typedef std::function<KadasMapItemEditor* ( KadasMapItem *, KadasMapItemEditor::EditorType ) > EditorFactory;
-    void setEditorFactory( EditorFactory factory ) { mEditorFactory = factory; }
-    EditorFactory getEditorFactory() const { return mEditorFactory; }
-#else
-    void setEditorFactory( SIP_PYCALLABLE factory / AllowNone / );
-    % MethodCode
-
-    Py_BEGIN_ALLOW_THREADS
-
-    sipCpp->setEditorFactory( [a0]( KadasMapItem *v, KadasMapItemEditor::EditorType type )->KadasMapItemEditor*
-    {
-      KadasMapItemEditor *res;
-      SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a0, "Di", v, sipType_KadasMapItem, type, NULL );
-      int state;
-      int sipIsError = 0;
-      res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );
-      SIP_UNBLOCK_THREADS
-      return res;
-    } );
-
-    Py_END_ALLOW_THREADS
-    % End
-
-    SIP_PYCALLABLE getEditorFactory() const;
-    % MethodCode
-    // The callable, if any,  is held in the user object.
-    sipRes = sipGetUserObject( ( sipSimpleWrapper * )sipSelf );
-    Py_XINCREF( sipRes );
-    % End
-#endif
+    void setEditor( const QString &editor ) { mEditor = editor; }
+    const QString &editor() const { return mEditor; }
 
     // Position interface
     virtual KadasItemPos position() const = 0;
@@ -312,9 +282,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
 
-
   private:
-    EditorFactory mEditorFactory = nullptr;
+    QString mEditor;
 
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };

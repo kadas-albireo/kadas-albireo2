@@ -879,7 +879,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
   KadasMapToolCreateItem::ItemFactory factory = [this]
   {
     KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    item->setEditorFactory( KadasSymbolAttributesEditor::factory );
+    item->setEditor( "KadasSymbolAttributesEditor" );
     return item;
   };
   return new KadasMapToolCreateItem( mapCanvas(), factory, kApp->getOrCreateItemLayer( tr( "Pins" ) ) );

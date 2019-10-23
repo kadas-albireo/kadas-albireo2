@@ -193,7 +193,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         {
           QgsPointXY pos = *static_cast<QgsPoint *>( geom );
           KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
-          item->setEditorFactory( KadasRedliningTextEditor::factory );
+          item->setEditor( "KadasRedliningTextEditor" );
           item->setText( name );
           item->setFillColor( style.labelColor );
           QFont font = item->font();
@@ -205,7 +205,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         else if ( dynamic_cast<QgsPoint *>( geom ) )
         {
           KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
-          item->setEditorFactory( KadasRedliningItemEditor::factory );
+          item->setEditor( "KadasRedliningItemEditor" );
           item->addPartFromGeometry( *geom );
           item->setIconSize( 10 + 2 * style.outlineSize );
           item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
@@ -215,7 +215,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         else if ( dynamic_cast<QgsLineString *>( geom ) )
         {
           KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
-          item->setEditorFactory( KadasRedliningItemEditor::factory );
+          item->setEditor( "KadasRedliningItemEditor" );
           item->addPartFromGeometry( *geom );
           item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
           itemLayer->addItem( item );
@@ -223,7 +223,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         else if ( dynamic_cast<QgsPolygon *>( geom ) )
         {
           KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
-          item->setEditorFactory( KadasRedliningItemEditor::factory );
+          item->setEditor( "KadasRedliningItemEditor" );
           item->addPartFromGeometry( *geom );
           item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
           item->setFill( QBrush( style.fillColor ) );

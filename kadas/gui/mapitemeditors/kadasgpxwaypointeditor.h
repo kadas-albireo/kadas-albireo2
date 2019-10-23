@@ -27,11 +27,6 @@ class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
     Q_OBJECT
 
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type )
-    {
-      return new KadasGpxWaypointEditor( item );
-    }
-
     KadasGpxWaypointEditor( KadasMapItem *item );
 
     void syncItemToWidget() override;

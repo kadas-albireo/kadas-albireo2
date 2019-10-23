@@ -27,11 +27,6 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
     Q_OBJECT
 
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type )
-    {
-      return new KadasGpxRouteEditor( item );
-    }
-
     KadasGpxRouteEditor( KadasMapItem *item );
     ~KadasGpxRouteEditor();
 

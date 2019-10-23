@@ -26,8 +26,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 %End
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type );
-
     KadasGpxWaypointEditor( KadasMapItem *item );
 
     virtual void syncItemToWidget();

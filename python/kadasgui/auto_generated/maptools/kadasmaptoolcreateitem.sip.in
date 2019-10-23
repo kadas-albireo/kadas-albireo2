@@ -63,6 +63,7 @@ class KadasMapToolCreateItem : QgsMapTool
 
     const KadasMapItem *currentItem() const;
     KadasMapItem *takeItem();
+    const KadasMapItemEditor *currentEditor() const;
 
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );

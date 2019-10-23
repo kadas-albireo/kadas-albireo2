@@ -74,7 +74,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   KadasMapToolCreateItem::ItemFactory textFactory = [ = ]
   {
     KadasTextItem *textItem = new KadasTextItem( crsMercator );
-    textItem->setEditorFactory( KadasRedliningTextEditor::factory );
+    textItem->setEditor( "KadasRedliningTextEditor" );
     return textItem;
   };
 
@@ -143,7 +143,7 @@ KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
 
 KadasMapItem *KadasRedliningIntegration::setEditorFactory( KadasMapItem *item ) const
 {
-  item->setEditorFactory( KadasRedliningItemEditor::factory );
+  item->setEditor( "KadasRedliningItemEditor" );
   return item;
 }
 

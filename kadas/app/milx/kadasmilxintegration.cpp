@@ -66,6 +66,11 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow() );
+
+  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
+  {
+    return new KadasMilxEditor( item, type, mMilxLibrary );
+  } );
 }
 
 KadasMilxIntegration::~KadasMilxIntegration()
@@ -101,13 +106,11 @@ void KadasMilxIntegration::createMilx( bool active )
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   if ( active )
   {
+
     KadasMapToolCreateItem::ItemFactory itemFactory = [ = ]
     {
       KadasMilxItem *item = new KadasMilxItem();
-      item->setEditorFactory( [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
-      {
-        return new KadasMilxEditor( item, type, mMilxLibrary );
-      } );
+      item->setEditor( "KadasMilxEditor" );
       return item;
     };
     KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };

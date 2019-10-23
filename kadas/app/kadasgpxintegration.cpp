@@ -47,13 +47,13 @@ KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *acti
   KadasMapToolCreateItem::ItemFactory waypointFactory = [ = ]
   {
     KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-    waypoint->setEditorFactory( KadasGpxWaypointEditor::factory );
+    waypoint->setEditor( "KadasGpxWaypointEditor" );
     return waypoint;
   };
   KadasMapToolCreateItem::ItemFactory routeFactory = [ = ]
   {
     KadasGpxRouteItem *route = new KadasGpxRouteItem();
-    route->setEditorFactory( KadasGpxRouteEditor::factory );
+    route->setEditor( "KadasGpxRouteEditor" );
     return route;
   };
 

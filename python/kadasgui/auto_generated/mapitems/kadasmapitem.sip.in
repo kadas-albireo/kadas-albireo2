@@ -233,35 +233,12 @@ Trigger a redraw */
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
 
-    void setEditorFactory( SIP_PYCALLABLE factory / AllowNone / );
-%MethodCode
-
-    Py_BEGIN_ALLOW_THREADS
-
-    sipCpp->setEditorFactory( [a0]( KadasMapItem *v, KadasMapItemEditor::EditorType type )->KadasMapItemEditor*
-    {
-      KadasMapItemEditor *res;
-      SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a0, "Di", v, sipType_KadasMapItem, type, NULL );
-      int state;
-      int sipIsError = 0;
-      res = reinterpret_cast<KadasMapItemEditor *>( sipConvertToType( s, sipType_KadasMapItemEditor, 0, SIP_NOT_NONE, &state, &sipIsError ) );
-      SIP_UNBLOCK_THREADS
-      return res;
-    } );
-
-    Py_END_ALLOW_THREADS
-%End
-
-    SIP_PYCALLABLE getEditorFactory() const;
-%MethodCode
-    // The callable, if any,  is held in the user object.
-    sipRes = sipGetUserObject( ( sipSimpleWrapper * )sipSelf );
-    Py_XINCREF( sipRes );
-%End
+    void setEditor( const QString &editor );
+    const QString &editor() const;
 
     virtual KadasItemPos position() const = 0;
     virtual void setPosition( const KadasItemPos &pos ) = 0;
+
 
   signals:
     void aboutToBeDestroyed();
@@ -281,8 +258,8 @@ Trigger a redraw */
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
 
-
 };
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

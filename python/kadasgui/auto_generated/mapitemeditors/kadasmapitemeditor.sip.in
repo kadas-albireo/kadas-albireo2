@@ -12,6 +12,7 @@
 
 
 
+
 class KadasMapItemEditor : QWidget
 {
 %Docstring
@@ -35,6 +36,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual void setItem( KadasMapItem *item );
 
+
   public slots:
     virtual void reset();
     virtual void syncItemToWidget() = 0;
@@ -42,6 +44,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
   protected:
 };
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

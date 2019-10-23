@@ -21,6 +21,8 @@
 #include <kadas/gui/mapitemeditors/kadasgpxrouteeditor.h>
 
 
+KADAS_REGISTER_MAP_ITEM_EDITOR( KadasGpxRouteEditor, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasGpxRouteEditor( item ); } )
+
 KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {

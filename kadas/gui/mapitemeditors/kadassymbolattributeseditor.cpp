@@ -18,6 +18,8 @@
 #include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 
 
+KADAS_REGISTER_MAP_ITEM_EDITOR( KadasSymbolAttributesEditor, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasSymbolAttributesEditor( item ); } )
+
 KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {

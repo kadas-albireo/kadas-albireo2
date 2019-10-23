@@ -172,7 +172,7 @@ void KadasCanvasContextMenu::convertWaypointToPin()
   KadasGpxWaypointItem *waypoint = dynamic_cast<KadasGpxWaypointItem *>( pickedItem );
 
   KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-  pin->setEditorFactory( KadasSymbolAttributesEditor::factory );
+  pin->setEditor( "KadasSymbolAttributesEditor" );
   pin->setName( waypoint->name() );
   QgsCoordinateTransform crst( waypoint->crs(), pin->crs(), QgsProject::instance()->transformContext() );
   pin->setPosition( KadasItemPos::fromPoint( crst.transform( waypoint->position() ) ) );
@@ -189,7 +189,7 @@ void KadasCanvasContextMenu::convertPinToWaypoint()
   KadasPinItem *pin = dynamic_cast<KadasPinItem *>( pickedItem );
 
   KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-  waypoint->setEditorFactory( KadasGpxWaypointEditor::factory );
+  waypoint->setEditor( "KadasGpxWaypointEditor" );
   waypoint->setName( pin->name() );
   QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
   waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );

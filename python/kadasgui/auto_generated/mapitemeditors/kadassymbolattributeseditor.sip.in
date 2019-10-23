@@ -26,8 +26,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 %End
   public:
-    static KadasMapItemEditor *factory( KadasMapItem *item, EditorType type );
-
     KadasSymbolAttributesEditor( KadasMapItem *item );
 
     virtual void reset();
