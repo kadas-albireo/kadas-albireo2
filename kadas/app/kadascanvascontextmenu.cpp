@@ -38,6 +38,7 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadasmapidentifydialog.h>
 #include <kadas/app/kadasredliningintegration.h>
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos )
@@ -161,9 +162,7 @@ KadasCanvasContextMenu::~KadasCanvasContextMenu()
 
 void KadasCanvasContextMenu::identify()
 {
-  // TODO
-//  QgsMapIdentifyDialog* dialog = new QgsMapIdentifyDialog( mCanvas, mMapPos );
-//  dialog->show();
+  KadasMapIdentifyDialog::popup( mCanvas, mMapPos );
 }
 
 void KadasCanvasContextMenu::convertWaypointToPin()
