@@ -121,6 +121,60 @@ QgsRectangle KadasItemLayer::extent() const
   return rect;
 }
 
+
+bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
+{
+  QDomElement layerEl = layer_node.toElement();
+  mLayerName = layerEl.attribute( "title" );
+  QDomNodeList itemEls = layerEl.elementsByTagName( "MapItem" );
+  for ( int i = 0, n = itemEls.size(); i < n; ++i )
+  {
+    QDomElement itemEl = itemEls.at( i ).toElement();
+    QString name = itemEl.attribute( "name" );
+    QString id = itemEl.attribute( "id" );
+    QString crs = itemEl.attribute( "crs" );
+    QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+    KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
+    if ( factory )
+    {
+      KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
+      if ( item->deserialize( data.object() ) )
+      {
+        mItems.insert( id, item );
+      }
+      else
+      {
+        QgsDebugMsg( "Item deserialization failed: " + id );
+      }
+    }
+    else
+    {
+      QgsDebugMsg( "Unknown item: " + id );
+    }
+  }
+  return true;
+}
+
+bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  QDomElement layerEl = layer_node.toElement();
+  layerEl.setAttribute( "type", "plugin" );
+  layerEl.setAttribute( "name", layerTypeKey() );
+  layerEl.setAttribute( "title", name() );
+  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
+  {
+    QDomElement itemEl = document.createElement( "MapItem" );
+    itemEl.setAttribute( "name", it.value()->metaObject()->className() );
+    itemEl.setAttribute( "id", it.key() );
+    itemEl.setAttribute( "crs", it.value()->crs().authid() );
+    QJsonDocument doc;
+    doc.setObject( it.value()->serialize() );
+    itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+    layerEl.appendChild( itemEl );
+  }
+  return true;
+}
+
 QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
   KadasMapRect rect( pickRect.xMinimum(), pickRect.yMinimum(), pickRect.xMaximum(), pickRect.yMaximum() );

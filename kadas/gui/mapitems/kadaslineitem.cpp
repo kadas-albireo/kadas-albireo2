@@ -30,9 +30,47 @@
 
 #include <kadas/gui/mapitems/kadaslineitem.h>
 
-void KadasLineItem::State::assign( const KadasMapItem::State *other )
+
+KADAS_REGISTER_MAP_ITEM( KadasLineItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasLineItem( crs ); } );
+
+QJsonObject KadasLineItem::State::serialize() const
 {
-  *this = *static_cast<const State *>( other );
+  QJsonArray pts;
+  for ( const QList<KadasItemPos> &part : points )
+  {
+    QJsonArray prt;
+    for ( const KadasItemPos &pos : part )
+    {
+      QJsonArray p;
+      p.append( pos.x() );
+      p.append( pos.y() );
+      prt.append( p );
+    }
+    pts.append( prt );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["points"] = pts;
+  return json;
+}
+
+bool KadasLineItem::State::deserialize( const QJsonObject &json )
+{
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  points.clear();
+  QJsonArray pts = json["points"].toArray();
+  for ( QJsonValue prtValue : pts )
+  {
+    QJsonArray prt = prtValue.toArray();
+    QList<KadasItemPos> part;
+    for ( QJsonValue pValue : prt )
+    {
+      QJsonArray p = pValue.toArray();
+      part.append( KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
+    }
+    points.append( part );
+  }
+  return true;
 }
 
 KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject *parent )

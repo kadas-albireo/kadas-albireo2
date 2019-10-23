@@ -29,6 +29,93 @@
 #include <kadas/app/milx/kadasmilxitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasMilxItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasMilxItem(); } );
+
+QJsonObject KadasMilxItem::State::serialize() const
+{
+  QJsonArray pts;
+  for ( const KadasItemPos &pos : points )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    pts.append( p );
+  }
+  QJsonArray attrs;
+  for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
+  {
+    QJsonArray attr;
+    attr.append( it.key() );
+    attr.append( it.value() );
+    attrs.append( attr );
+  }
+  QJsonArray attrPts;
+  for ( auto it = attributePoints.begin(), itEnd = attributePoints.end(); it != itEnd; ++it )
+  {
+    QJsonArray attrPt;
+    attrPt.append( it.key() );
+    QJsonArray pt;
+    pt.append( it.value().x() );
+    pt.append( it.value().y() );
+    attrPt.append( pt );
+    attrPts.append( attrPt );
+  }
+  QJsonArray ctrlPts;
+  for ( int ctrlPt : controlPoints )
+  {
+    ctrlPts.append( ctrlPt );
+  }
+  QJsonArray offset;
+  offset.append( userOffset.x() );
+  offset.append( userOffset.y() );
+
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["points"] = pts;
+  json["attributes"] = attrs;
+  json["attributePoints"] = attrPts;
+  json["controlPoints"] = ctrlPts;
+  json["userOffset"] = offset;
+  json["pressedPoints"] = pressedPoints;
+  return json;;
+}
+
+bool KadasMilxItem::State::deserialize( const QJsonObject &json )
+{
+  points.clear();
+  attributes.clear();
+  attributePoints.clear();
+  controlPoints.clear();
+
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  for ( QJsonValue val : json["points"].toArray() )
+  {
+    QJsonArray pos = val.toArray();
+    points.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
+  }
+  for ( QJsonValue attrVal : json["attributes"].toArray() )
+  {
+    QJsonArray attr = attrVal.toArray();
+    attributes.insert( static_cast<KadasMilxClient::AttributeType>( attr.at( 0 ).toInt() ), attr.at( 1 ).toDouble() );
+  }
+  for ( QJsonValue attrPtVal : json["attributePoints"].toArray() )
+  {
+    QJsonArray attrPt = attrPtVal.toArray();
+    QJsonArray pt = attrPt.at( 1 ).toArray();
+    attributePoints.insert( static_cast<KadasMilxClient::AttributeType>( attrPt.at( 0 ).toInt() ), KadasItemPos( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
+  }
+  for ( QJsonValue val : json["controlPoints"].toArray() )
+  {
+    controlPoints.append( val.toInt() );
+  }
+  QJsonArray offset = json["userOffset"].toArray();
+  userOffset.setX( offset.at( 0 ).toDouble() );
+  userOffset.setY( offset.at( 1 ).toDouble() );
+  pressedPoints = json["pressedPoints"].toInt();
+  return attributes.size() == attributePoints.size();
+}
+
+
 KadasMilxItem::KadasMilxItem( QObject *parent )
   : KadasMapItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
 {

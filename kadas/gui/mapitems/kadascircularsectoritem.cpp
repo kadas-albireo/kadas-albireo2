@@ -27,6 +27,73 @@
 #include <kadas/gui/mapitems/kadascircularsectoritem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasCircularSectorItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCircularSectorItem( crs ); } );
+
+QJsonObject KadasCircularSectorItem::State::serialize() const
+{
+  QJsonArray c;
+  for ( const KadasItemPos &pos : centers )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    c.append( p );
+  }
+  QJsonArray r;
+  for ( double radius : radii )
+  {
+    r.append( radius );
+  }
+  QJsonArray a1;
+  for ( double startAngle : startAngles )
+  {
+    a1.append( startAngle );
+  }
+  QJsonArray a2;
+  for ( double stopAngle : stopAngles )
+  {
+    a2.append( stopAngle );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["centers"] = c;
+  json["radii"] = r;
+  json["startAngles"] = a1;
+  json["stopAngles"] = a2;
+  json["sectorStatus"] = sectorStatus;
+  return json;
+}
+
+bool KadasCircularSectorItem::State::deserialize( const QJsonObject &json )
+{
+  centers.clear();
+  radii.clear();
+  startAngles.clear();
+  stopAngles.clear();
+
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  for ( QJsonValue val : json["centers"].toArray() )
+  {
+    QJsonArray pos = val.toArray();
+    centers.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
+  }
+  for ( QJsonValue val : json["radii"].toArray() )
+  {
+    radii.append( val.toDouble() );
+  }
+  for ( QJsonValue val : json["startAngles"].toArray() )
+  {
+    startAngles.append( val.toDouble() );
+  }
+  for ( QJsonValue val : json["stopAngles"].toArray() )
+  {
+    stopAngles.append( val.toDouble() );
+  }
+  sectorStatus = static_cast<SectorStatus>( json["sectorStatus"].toInt() );
+
+  return centers.size() == radii.size() && centers.size() == startAngles.size() && centers.size() == stopAngles.size();
+}
+
 KadasCircularSectorItem::KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasGeometryItem( crs, parent )
 {

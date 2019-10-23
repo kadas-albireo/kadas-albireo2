@@ -26,6 +26,49 @@
 
 #include <kadas/gui/mapitems/kadascircleitem.h>
 
+
+KADAS_REGISTER_MAP_ITEM( KadasCircleItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCircleItem( crs ); } );
+
+QJsonObject KadasCircleItem::State::serialize() const
+{
+  QJsonArray c;
+  for ( const KadasItemPos &pos : centers )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    c.append( p );
+  }
+  QJsonArray r;
+  for ( double radius : radii )
+  {
+    r.append( radius );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["centers"] = c;
+  json["radii"] = r;
+  return json;
+}
+
+bool KadasCircleItem::State::deserialize( const QJsonObject &json )
+{
+  centers.clear();
+  radii.clear();
+
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  for ( QJsonValue val : json["centers"].toArray() )
+  {
+    QJsonArray pos = val.toArray();
+    centers.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
+  }
+  for ( QJsonValue val : json["radii"].toArray() )
+  {
+    radii.append( val.toDouble() );
+  }
+  return centers.size() == radii.size();
+}
+
 KadasCircleItem::KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject *parent )
   : KadasGeometryItem( crs, parent )
 {

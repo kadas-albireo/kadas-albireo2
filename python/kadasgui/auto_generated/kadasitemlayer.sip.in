@@ -42,6 +42,10 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QgsRectangle extent() const;
 
+    virtual bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context );
+
+    virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
 

@@ -21,6 +21,37 @@
 #include <kadas/gui/mapitems/kadaspointitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasPointItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPointItem( crs ); } );
+
+QJsonObject KadasPointItem::State::serialize() const
+{
+  QJsonArray pts;
+  for ( const KadasItemPos &pos : points )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    pts.append( p );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["points"] = pts;
+  return json;
+}
+
+bool KadasPointItem::State::deserialize( const QJsonObject &json )
+{
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  points.clear();
+  QJsonArray pts = json["points"].toArray();
+  for ( QJsonValue pValue : pts )
+  {
+    QJsonArray p = pValue.toArray();
+    points.append( KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
+  }
+  return true;
+}
+
 KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon, QObject *parent )
   : KadasGeometryItem( crs, parent )
 {

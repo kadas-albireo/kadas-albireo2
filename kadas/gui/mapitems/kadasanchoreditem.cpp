@@ -23,6 +23,35 @@
 #include <kadas/gui/mapitems/kadasanchoreditem.h>
 
 
+QJsonObject KadasAnchoredItem::State::serialize() const
+{
+  QJsonArray p;
+  p.append( pos.x() );
+  p.append( pos.y() );
+  QJsonArray s;
+  s.append( size.width() );
+  s.append( size.height() );
+
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["pos"] = p;
+  json["angle"] = angle;
+  json["size"] = s;
+  return json;
+}
+
+bool KadasAnchoredItem::State::deserialize( const QJsonObject &json )
+{
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  QJsonArray p = json["pos"].toArray();
+  pos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
+  angle = json["angle"].toDouble();
+  QJsonArray s = json["size"].toArray();
+  size = QSize( s.at( 0 ).toDouble(), s.at( 1 ).toDouble() );
+  return true;
+}
+
+
 KadasAnchoredItem::KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasMapItem( crs, parent )
 {

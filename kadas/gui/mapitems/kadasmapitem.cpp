@@ -48,6 +48,84 @@ KadasMapItem *KadasMapItem::clone() const
   return item;
 }
 
+QJsonObject KadasMapItem::serialize() const
+{
+  QJsonObject props;
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    QVariant variant = prop.read( this );
+    QJsonValue value = variant.toJsonValue();
+    if ( value.isUndefined() )
+    {
+      // Manually handle conversion, i.e. variant.toJsonValue does not convert enums to int...
+      if ( variant.canConvert( QVariant::Int ) )
+      {
+        value = QJsonValue( variant.toInt() );
+      }
+      else if ( variant.canConvert( QVariant::Double ) )
+      {
+        value = QJsonValue( variant.toDouble() );
+      }
+      else if ( variant.canConvert( QVariant::String ) )
+      {
+        value = QJsonValue( variant.toString() );
+      }
+      else
+      {
+        // Serialize non-convertible types as base64 encoded binary strings
+        QByteArray data;
+        QDataStream ds( &data, QIODevice::WriteOnly );
+        ds << variant;
+        value = QJsonValue( QString( data.toBase64() ) );
+      }
+    }
+    props[prop.name()] = value;
+  }
+  QJsonObject json;
+  json["state"] = constState()->serialize();
+  json["props"] = props;
+  return json;
+}
+
+bool KadasMapItem::deserialize( const QJsonObject &json )
+{
+  QJsonObject props = json["props"].toObject();
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    QJsonValue value = props[prop.name()];
+    QVariant variant( prop.type() );
+    if ( variant.toJsonValue().isUndefined() && value.type() == QJsonValue::String )
+    {
+      // Deserialize non-convertible types from base64 encoded binary strings
+      QByteArray ba = QByteArray::fromBase64( value.toString().toLocal8Bit() );
+      if ( !ba.isNull() )
+      {
+        QDataStream ds( &ba, QIODevice::ReadOnly );
+        ds >> variant;
+        prop.write( this, variant );
+      }
+      else
+      {
+        prop.write( this, value.toVariant() );
+      }
+    }
+    else
+    {
+      prop.write( this, value.toVariant() );
+    }
+  }
+  State *state = createEmptyState();
+  bool success = state->deserialize( json["state"].toObject() );
+  if ( success )
+  {
+    setState( state );
+  }
+  delete state;
+  return success;
+}
+
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;

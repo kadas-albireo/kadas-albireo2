@@ -68,6 +68,8 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
       QList<QList<KadasItemPos>> points;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
+      QJsonObject serialize() const override;
+      bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 

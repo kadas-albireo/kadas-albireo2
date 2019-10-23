@@ -25,6 +25,53 @@
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasRectangleItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasRectangleItem( crs ); } );
+
+QJsonObject KadasRectangleItem::State::serialize() const
+{
+  QJsonArray pt1;
+  for ( const KadasItemPos &pos : p1 )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    pt1.append( p );
+  }
+  QJsonArray pt2;
+  for ( const KadasItemPos &pos : p2 )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    pt2.append( p );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["p1"] = pt1;
+  json["p2"] = pt2;
+  return json;
+}
+
+bool KadasRectangleItem::State::deserialize( const QJsonObject &json )
+{
+  p1.clear();
+  p2.clear();
+
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  for ( QJsonValue val : json["p1"].toArray() )
+  {
+    QJsonArray pos = val.toArray();
+    p1.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
+  }
+  for ( QJsonValue val : json["p2"].toArray() )
+  {
+    QJsonArray pos = val.toArray();
+    p2.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
+  }
+  return p1.size() == p2.size();
+}
+
+
 KadasRectangleItem::KadasRectangleItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasGeometryItem( crs, parent )
 {

@@ -28,6 +28,8 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasSymbolItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasSymbolItem( crs ); } );
+
 KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasAnchoredItem( crs, parent )
 {

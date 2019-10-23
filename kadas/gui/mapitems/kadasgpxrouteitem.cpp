@@ -22,6 +22,9 @@
 
 #include <kadas/gui/mapitems/kadasgpxrouteitem.h>
 
+
+KADAS_REGISTER_MAP_ITEM( KadasGpxRouteItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasGpxRouteItem(); } );
+
 KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
   : KadasLineItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
 {

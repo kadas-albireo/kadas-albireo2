@@ -120,10 +120,15 @@ class KADAS_GUI_EXPORT KadasItemRect
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
     Q_OBJECT
+    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+    Q_PROPERTY( QString editor READ editor WRITE setEditor )
+
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
     ~KadasMapItem();
     KadasMapItem *clone() const;
+    QJsonObject serialize() const;
+    bool deserialize( const QJsonObject &json );
 
     virtual QString itemName() const = 0;
 
@@ -190,6 +195,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       DrawStatus drawStatus = Empty;
       virtual void assign( const State *other ) = 0;
       virtual State *clone() const = 0 SIP_FACTORY;
+      virtual QJsonObject serialize() const = 0;
+      virtual bool deserialize( const QJsonObject &json ) = 0;
     };
     const State *constState() const { return mState; }
     virtual void setState( const State *state );
@@ -259,6 +266,17 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual KadasItemPos position() const = 0;
     virtual void setPosition( const KadasItemPos &pos ) = 0;
 
+    // TODO: SIP
+#ifndef SIP_RUN
+    typedef std::function<KadasMapItem*( const QgsCoordinateReferenceSystem & ) > RegistryItemFactory;
+    typedef QMap<QString, RegistryItemFactory> Registry;
+    static Registry *registry()
+    {
+      static Registry instance;
+      return &instance;
+    };
+#endif
+
   signals:
     void aboutToBeDestroyed();
     void changed();
@@ -287,5 +305,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };
+
+#ifndef SIP_RUN
+#define KADAS_REGISTER_MAP_ITEM(classname, factory) \
+  static int register##classname(){ KadasMapItem::registry()->insert(#classname, factory); return 0; } \
+  static int __reg##classname = register##classname();
+#endif
 
 #endif // KADASMAPITEM_H

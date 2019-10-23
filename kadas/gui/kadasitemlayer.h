@@ -43,6 +43,8 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
+    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
+    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
     QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
 
