@@ -732,12 +732,12 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
 
 void KadasMainWindow::setMapScale()
 {
-  mMapCanvas->zoomScale( 1.0 / mScaleComboBox->scale() );
+  mMapCanvas->zoomScale( mScaleComboBox->scale() );
 }
 
 void KadasMainWindow::showScale( double scale )
 {
-  mScaleComboBox->setScale( 1.0 / scale );
+  mScaleComboBox->setScale( scale );
 }
 
 void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
