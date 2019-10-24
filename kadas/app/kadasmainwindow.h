@@ -34,6 +34,7 @@ class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
 class KadasMapItem;
 class KadasMapWidgetManager;
+class KadasPluginManager;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
@@ -88,6 +89,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void switchToTabForTool( QgsMapTool *tool );
     void toggleLayerTree();
     void checkOnTheFlyProjection();
+    void showPluginManager( bool show );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
@@ -118,6 +120,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QPoint mResizePressPos;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
+
+    KadasPluginManager* mPluginManager = 0;
 
     friend class KadasGpsIntegration;
 };

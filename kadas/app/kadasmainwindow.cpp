@@ -72,6 +72,7 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
+#include <kadas/app/kadaspluginmanager.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
@@ -234,6 +235,7 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   connect( kApp->clipboard(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
+  connect( mPluginManagerButton, SIGNAL( toggled( bool ) ), this, SLOT( showPluginManager( bool) ) );
 
   QStringList catalogUris = QSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
   for ( const QString &catalogUri : catalogUris )
@@ -903,4 +905,25 @@ QgsMapTool *KadasMainWindow::addPictureTool()
     item->setFilePath( filename, mapCanvas()->extent().center() );
     return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
   }
+}
+
+void KadasMainWindow::showPluginManager( bool show)
+{
+    if( !mPluginManager && !show )
+    {
+        return;
+    }
+
+    if( show )
+    {
+        if( !mPluginManager )
+        {
+            mPluginManager = new KadasPluginManager( mapCanvas() );
+        }
+        mPluginManager->show();
+    }
+    else
+    {
+        mPluginManager->hide();
+    }
 }

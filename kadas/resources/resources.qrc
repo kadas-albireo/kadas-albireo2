@@ -94,6 +94,9 @@
         <file alias="icons/observer">icons/observer.svg</file>
         <file alias="icons/plugin_b">icons/plugin_b.png</file>
         <file alias="icons/plugin_w">icons/plugin_w.png</file>
+        <file alias="icons/add">icons/add.svg</file>
+        <file alias="icons/remove">icons/remove.svg</file>
+        <file alias="icons/download">icons/download.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
