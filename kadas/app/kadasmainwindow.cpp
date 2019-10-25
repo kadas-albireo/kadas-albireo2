@@ -606,6 +606,25 @@ void KadasMainWindow::addMenuButtonToTab( const QString &text, const QIcon &icon
   button->setPopupMode( QToolButton::InstantPopup );
 }
 
+void KadasMainWindow::removeActionFromTab( QAction *action, QWidget *tabWidget )
+{
+    const QObjectList& c = tabWidget->children();
+    QObjectList::const_iterator cIt = c.constBegin();
+    for(; cIt != c.constEnd(); ++cIt )
+    {
+        KadasRibbonButton* b = dynamic_cast<KadasRibbonButton*>( *cIt );
+        if( b )
+        {
+            if( b->defaultAction() == action )
+            {
+                delete b;
+                delete action;
+                return;
+            }
+        }
+    }
+}
+
 QMenu *KadasMainWindow::pluginsMenu()
 {
   // Only show the button if it is actually needed

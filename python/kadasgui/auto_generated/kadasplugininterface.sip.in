@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasplugininterface.h                                     *
+ * ./kadas/gui/kadasplugininterface.h                                   *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadasplugininterface.h"
+#include "./kadas/gui/kadasplugininterface.h"
 %End
   public:
     static KadasPluginInterface *cast( QgisInterface *iface );
@@ -73,6 +73,11 @@ Generic action adder
 %End
     virtual void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
 
+    virtual void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = 0 ) = 0;
+%Docstring
+Generic action remover
+%End
+
     virtual QAction *findAction( const QString &name ) = 0;
 %Docstring
 Generic action finder
@@ -88,7 +93,7 @@ Generic object finder
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasplugininterface.h                                     *
+ * ./kadas/gui/kadasplugininterface.h                                   *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
