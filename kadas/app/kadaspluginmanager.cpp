@@ -34,11 +34,11 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas* canvas ): KadasBottomBar( 
         installedItem->setData( 0, Qt::UserRole, *installedIt );
         if( p->isPluginEnabled( *installedIt ) )
         {
-            installedItem->setIcon( 1, QIcon( ":/kadas/icons/remove" ) );
+            setItemDeactivatable( installedItem );
         }
         else
         {
-            installedItem->setIcon( 1, QIcon( ":/kadas/icons/add" ) );
+            setItemActivatable( installedItem );
         }
         mInstalledTreeWidget->addTopLevelItem( installedItem );
     }
@@ -50,11 +50,11 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas* canvas ): KadasBottomBar( 
         availableItem->setText( 0, pluginIt.key() );
         if( installedPluginNames.contains( pluginIt.key() ) )
         {
-            availableItem->setIcon( 1, QIcon( ":/kadas/icons/remove" ) );
+            setItemRemoveable( availableItem );
         }
         else
         {
-            availableItem->setIcon( 1, QIcon( ":/kadas/icons/download" ) );
+            setItemInstallable( availableItem );
         }
         mAvailableTreeWidget->addTopLevelItem( availableItem );
     }
@@ -115,14 +115,14 @@ void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *i
     {
         if( p->unloadPlugin( pluginModule ) )
         {
-            item->setIcon( 1, QIcon( ":/kadas/icons/add" ) );
+            setItemActivatable( item );
         }
     }
     else
     {
         if( p->loadPlugin( pluginModule ) )
         {
-            item->setIcon( 1, QIcon( ":/kadas/icons/remove" ) );
+            setItemDeactivatable( item );
         }
     }
 }
@@ -154,7 +154,7 @@ void KadasPluginManager::on_mAvailableTreeWidget_itemClicked( QTreeWidgetItem *i
     }
 }
 
-void KadasPluginManager::installPlugin( const QString& pluginName, const  QString& downloadUrl ) const
+void KadasPluginManager::installPlugin( const QString& pluginName, const  QString& downloadUrl )
 {
     KadasPythonIntegration* p = KadasApplication::instance()->pythonIntegration();
     if( !p )
@@ -225,11 +225,11 @@ void KadasPluginManager::installPlugin( const QString& pluginName, const  QStrin
     p->pluginList();
     if( p->loadPlugin( moduleName ) )
     {
-       installedItem->setIcon( 1, QIcon( ":/kadas/icons/remove" ) );
+        setItemDeactivatable( installedItem );
     }
     else
     {
-        installedItem->setIcon( 1, QIcon( ":/kadas/icons/add" ) );
+        setItemActivatable( installedItem );
     }
     mInstalledTreeWidget->addTopLevelItem( installedItem );
 
@@ -237,7 +237,7 @@ void KadasPluginManager::installPlugin( const QString& pluginName, const  QStrin
     QList<QTreeWidgetItem*> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
     if( availableItem.size() > 0 )
     {
-        availableItem.at( 0 )->setIcon( 1, QIcon( ":/kadas/icons/remove" ) );
+        setItemRemoveable( availableItem.at( 0 ) );
     }
 }
 
@@ -270,6 +270,38 @@ void KadasPluginManager::uninstallPlugin( const QString& pluginName, const QStri
     QList<QTreeWidgetItem*> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
     if( availableItem.size() > 0 )
     {
-        availableItem.at( 0 )->setIcon( 1, QIcon( ":/kadas/icons/download" ) );
+        setItemInstallable( availableItem.at( 0 ) );
+    }
+}
+
+void KadasPluginManager::setItemInstallable( QTreeWidgetItem* item )
+{
+    if( item )
+    {
+        item->setText( 1, tr( "Install" ) );
+    }
+}
+
+void KadasPluginManager::setItemRemoveable( QTreeWidgetItem* item )
+{
+    if( item )
+    {
+        item->setText( 1, tr( "Remove" ) );
+    }
+}
+
+void KadasPluginManager::setItemActivatable( QTreeWidgetItem* item )
+{
+    if( item )
+    {
+        item->setText( 1, tr( "Activate" ) );
+    }
+}
+
+void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem* item )
+{
+    if( item )
+    {
+        item->setText( 1, tr( "Dectivate" ) );
     }
 }

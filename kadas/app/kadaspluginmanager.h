@@ -18,6 +18,12 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
         QMap< QString, QString > mAvailablePlugins;
 
         QMap< QString, QString > availablePlugins();
-        void installPlugin( const QString& pluginName, const  QString& downloadUrl ) const;
+        void installPlugin( const QString& pluginName, const  QString& downloadUrl );
         void uninstallPlugin( const QString& pluginName, const QString& moduleName );
+
+        //tree widget state
+        void setItemInstallable( QTreeWidgetItem* item );
+        void setItemRemoveable( QTreeWidgetItem* item );
+        void setItemActivatable( QTreeWidgetItem* item );
+        void setItemDeactivatable( QTreeWidgetItem* item );
 };
