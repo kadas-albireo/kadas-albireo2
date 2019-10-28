@@ -235,7 +235,7 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   connect( kApp->clipboard(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !kApp->clipboard()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
-  connect( mPluginManagerButton, SIGNAL( toggled( bool ) ), this, SLOT( showPluginManager( bool) ) );
+  connect( mPluginManagerButton, &QPushButton::toggled, this, &KadasMainWindow::showPluginManager );
 
   QStringList catalogUris = QSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
   for ( const QString &catalogUri : catalogUris )
@@ -608,21 +608,20 @@ void KadasMainWindow::addMenuButtonToTab( const QString &text, const QIcon &icon
 
 void KadasMainWindow::removeActionFromTab( QAction *action, QWidget *tabWidget )
 {
-    const QObjectList& c = tabWidget->children();
-    QObjectList::const_iterator cIt = c.constBegin();
-    for(; cIt != c.constEnd(); ++cIt )
+  const QObjectList &c = tabWidget->children();
+  QObjectList::const_iterator cIt = c.constBegin();
+  for ( ; cIt != c.constEnd(); ++cIt )
+  {
+    KadasRibbonButton *b = dynamic_cast<KadasRibbonButton *>( *cIt );
+    if ( b )
     {
-        KadasRibbonButton* b = dynamic_cast<KadasRibbonButton*>( *cIt );
-        if( b )
-        {
-            if( b->defaultAction() == action )
-            {
-                delete b;
-                delete action;
-                return;
-            }
-        }
+      if ( b->defaultAction() == action )
+      {
+        delete b;
+        return;
+      }
     }
+  }
 }
 
 QMenu *KadasMainWindow::pluginsMenu()
@@ -926,23 +925,23 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   }
 }
 
-void KadasMainWindow::showPluginManager( bool show)
+void KadasMainWindow::showPluginManager( bool show )
 {
-    if( !mPluginManager && !show )
-    {
-        return;
-    }
+  if ( !mPluginManager && !show )
+  {
+    return;
+  }
 
-    if( show )
+  if ( show )
+  {
+    if ( !mPluginManager )
     {
-        if( !mPluginManager )
-        {
-            mPluginManager = new KadasPluginManager( mapCanvas() );
-        }
-        mPluginManager->show();
+      mPluginManager = new KadasPluginManager( mapCanvas() );
     }
-    else
-    {
-        mPluginManager->hide();
-    }
+    mPluginManager->show();
+  }
+  else
+  {
+    mPluginManager->hide();
+  }
 }
