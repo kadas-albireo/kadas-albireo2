@@ -73,6 +73,11 @@ Generic action adder
 %End
     virtual void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
 
+    virtual void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = 0 ) = 0;
+%Docstring
+Generic action remover
+%End
+
     virtual QAction *findAction( const QString &name ) = 0;
 %Docstring
 Generic action finder

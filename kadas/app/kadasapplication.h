@@ -53,6 +53,7 @@ class KadasApplication : public QgsApplication
     ~KadasApplication();
 
     KadasMainWindow *mainWindow() const { return mMainWindow; }
+    KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey ) const;

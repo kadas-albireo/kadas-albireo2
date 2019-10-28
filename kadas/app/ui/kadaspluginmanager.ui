@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KadasPluginManagerBase</class>
+ <widget class="QFrame" name="KadasPluginManagerBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>826</width>
+    <height>227</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Frame</string>
+  </property>
+  <property name="frameShape">
+   <enum>QFrame::StyledPanel</enum>
+  </property>
+  <property name="frameShadow">
+   <enum>QFrame::Raised</enum>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="mInstalledLabel">
+       <property name="text">
+        <string>Installed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="MAvailableLabel">
+       <property name="text">
+        <string>Available</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTreeWidget" name="mAvailableTreeWidget">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string>plugin</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>icon</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QTreeWidget" name="mInstalledTreeWidget">
+       <property name="rootIsDecorated">
+        <bool>true</bool>
+       </property>
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

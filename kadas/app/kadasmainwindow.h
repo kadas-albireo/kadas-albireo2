@@ -35,6 +35,7 @@ class KadasGpsIntegration;
 class KadasGpxIntegration;
 class KadasMapItem;
 class KadasMapWidgetManager;
+class KadasPluginManager;
 class KadasRedliningIntegration;
 
 
@@ -56,6 +57,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QWidget *addRibbonTab( const QString &name );
     void addActionToTab( QAction *action, QWidget *tabWidget );
     void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu *menu, QWidget *tabWidget );
+    void removeActionFromTab( QAction *action, QWidget *tabWidget );
     QMenu *pluginsMenu();
 
     QTabWidget *ribbonTabWidget() const { return mRibbonWidget; }
@@ -111,6 +113,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void switchToTabForTool( QgsMapTool *tool );
     void toggleLayerTree();
     void checkOnTheFlyProjection();
+    void showPluginManager( bool show );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
@@ -144,6 +147,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QPoint mResizePressPos;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
+
+    KadasPluginManager *mPluginManager = nullptr;
 
     friend class KadasGpsIntegration;
 };
