@@ -69,8 +69,10 @@ KadasPluginManager::KadasPluginManager(): KadasBottomBar( 0 )
 
 QMap< QString, QString > KadasPluginManager::availablePlugins()
 {
+    QSettings s;
+    QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
     QgsNetworkContentFetcher nf;
-    QUrl repositoryUrl( "http://localhost/kadas_plugin_repository/qgis-repo.xml" );
+    QUrl repositoryUrl( repoUrl );
     QEventLoop e;
     nf.fetchContent( repositoryUrl );
     QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
