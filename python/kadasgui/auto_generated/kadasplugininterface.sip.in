@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasplugininterface.h                                   *
+ * kadas/gui/kadasplugininterface.h                                     *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -101,7 +101,7 @@ Generic object finder
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasplugininterface.h                                   *
+ * kadas/gui/kadasplugininterface.h                                     *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
