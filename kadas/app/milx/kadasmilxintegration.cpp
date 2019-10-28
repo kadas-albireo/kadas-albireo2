@@ -20,7 +20,7 @@
 #include <QPlainTextEdit>
 #include <QSlider>
 #include <QTabWidget>
-#include <quazipfile.h>
+#include <quazip5/quazipfile.h>
 
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmessagebar.h>

@@ -1,4 +1,11 @@
-FIND_PACKAGE(Python 3 REQUIRED COMPONENTS Interpreter Development)
+FIND_PACKAGE(Python 3 COMPONENTS Interpreter Development)
+
+# Compatibility with cmake < 3.12
+IF(NOT Python_EXECUTABLE)
+    FIND_PACKAGE(PythonInterp 3 REQUIRED)
+    FIND_PACKAGE(PythonLibrary REQUIRED)
+ENDIF(NOT Python_EXECUTABLE)
+
 FIND_PACKAGE(SIP REQUIRED)
 FIND_PACKAGE(PyQt5 REQUIRED)
 INCLUDE(PythonMacros)
