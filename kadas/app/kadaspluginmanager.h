@@ -20,6 +20,4 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
         QMap< QString, QString > availablePlugins();
         void installPlugin( const QString& pluginName, const  QString& downloadUrl ) const;
         void uninstallPlugin( const QString& pluginName, const QString& moduleName );
-        void activatePlugin( const QString& pluginName ) const;
-        void deactivatePlugin( const QString& pluginName ) const;
 };

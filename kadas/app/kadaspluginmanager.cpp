@@ -85,7 +85,6 @@ QMap< QString, QString > KadasPluginManager::availablePlugins()
     QDomDocument xml;
     if( !xml.setContent( pluginContent ) )
     {
-        qWarning( "************************xml not valid******************" );
         return pluginMap;
     }
 
@@ -163,11 +162,7 @@ void KadasPluginManager::installPlugin( const QString& pluginName, const  QStrin
         return;
     }
 
-    QString debug = "Installing plugin " + pluginName + "  " + downloadUrl;
-    qWarning( debug.toLocal8Bit().data() );
-
     QString pp = p->homePluginsPath();
-    qWarning( pp.toLocal8Bit().data() );
 
     //download and unzip in kadasPluginsPath
     QgsNetworkContentFetcher nf;
@@ -277,14 +272,4 @@ void KadasPluginManager::uninstallPlugin( const QString& pluginName, const QStri
     {
         availableItem.at( 0 )->setIcon( 1, QIcon( ":/kadas/icons/download" ) );
     }
-}
-
-void KadasPluginManager::activatePlugin( const QString& pluginName ) const
-{
-    //KadasPythonIntegration::loadPlugin()
-    //todo...
-}
-void KadasPluginManager::deactivatePlugin( const QString& pluginName ) const
-{
-    //todo...
 }
