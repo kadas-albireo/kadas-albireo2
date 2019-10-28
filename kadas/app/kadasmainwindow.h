@@ -148,7 +148,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
 
-    KadasPluginManager *mPluginManager = 0;
+    KadasPluginManager *mPluginManager = nullptr;
 
     friend class KadasGpsIntegration;
 };
