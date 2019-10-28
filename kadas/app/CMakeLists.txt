@@ -58,9 +58,6 @@ ADD_EXECUTABLE(kadas
 )
 
 TARGET_LINK_LIBRARIES(kadas
-  kadas_core
-  kadas_analysis
-  kadas_gui
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
