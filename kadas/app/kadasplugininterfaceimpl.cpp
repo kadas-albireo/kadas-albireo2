@@ -22,6 +22,7 @@
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmaptool.h>
+#include <qgis/qgsprintlayout.h>
 #include <qgis/qgsshortcutsmanager.h>
 
 #include <kadas/gui/kadasmapwidget.h>
@@ -33,6 +34,8 @@
 
 KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
 {
+  connect( kApp, &KadasApplication::printLayoutAdded, this, &KadasPluginInterface::printLayoutAdded );
+  connect( kApp, &KadasApplication::printLayoutWillBeRemoved, this, &KadasPluginInterface::printLayoutWillBeRemoved );
   // TODO
 }
 
@@ -321,6 +324,13 @@ void KadasPluginInterfaceImpl::showOptionsDialog( QWidget *parent, const QString
   // TODO ?
 }
 
+
+QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeInsertionPoint()
+{
+  // TODO ?
+  return QgsLayerTreeRegistryBridge::InsertionPoint( nullptr, 0 );
+}
+
 void KadasPluginInterfaceImpl::showLayerProperties( QgsMapLayer *l )
 {
   // TODO
@@ -542,3 +552,17 @@ QObject *KadasPluginInterfaceImpl::findObject( const QString &name )
   return kApp->mainWindow()->findChild<QObject *>( name );
 }
 
+QgsPrintLayout *KadasPluginInterfaceImpl::createNewPrintLayout( const QString &title )
+{
+  return kApp->createNewPrintLayout( title );
+}
+
+bool KadasPluginInterfaceImpl::deletePrintLayout( QgsPrintLayout *layout )
+{
+  return kApp->deletePrintLayout( layout );
+}
+
+QList<QgsPrintLayout *> KadasPluginInterfaceImpl::printLayouts() const
+{
+  return kApp->printLayouts();
+}

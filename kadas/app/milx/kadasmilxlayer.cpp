@@ -62,7 +62,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasMilxClient::NPointSymbolGraphic> result;
       int dpi = mRendererContext.painter()->device()->logicalDpiX();
       double scaleFactor = double( mRendererContext.painter()->device()->logicalDpiX() ) / double( QApplication::desktop()->logicalDpiX() );
-      QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.extent(), mRendererContext.mapToPixel() );
+      QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.coordinateTransform().transform( mRendererContext.extent() ), mRendererContext.mapToPixel() );
       if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, scaleFactor, symbols, result ) )
       {
         return false;
@@ -72,11 +72,11 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       for ( int i = 0, n = result.size(); i < n; ++i )
       {
         QPoint itemOrigin = symbols[i].points.front();
-        QPoint renderPos = itemOrigin + result[i].offset + renderItems[i]->constState()->userOffset;
+        QPoint renderPos = itemOrigin + result[i].offset;
         if ( !renderItems[i]->isMultiPoint() )
         {
           // Draw line from visual reference point to actual refrence point
-          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + renderItems[i]->constState()->userOffset );
+          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
       }
@@ -90,7 +90,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasMilxLayer::KadasMilxLayer( const QString &name )
-  : KadasItemLayer( name )
+  : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
 {
 }
 
@@ -101,6 +101,11 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
 
 QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
+  if ( mIsApproved )
+  {
+    // No items can be picked from approved layer
+    return QString();
+  }
   QPoint screenPos = mapSettings.mapToPixel().transform( pickRect.center() ).toQPointF().toPoint();
   QList<KadasMilxClient::NPointSymbol> symbols;
   QMap<int, QString> itemIdMap;
@@ -122,17 +127,27 @@ QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
   return QString();
 }
 
-void KadasMilxLayer::addLayerMenuActions( QMenu *menu ) const
-{
-  QAction *action = menu->addAction( tr( "Approved layer" ), this, &KadasMilxLayer::setApproved );
-  action->setChecked( mIsApproved );
-}
-
 void KadasMilxLayer::setApproved( bool approved )
 {
   mIsApproved = approved;
   emit approvedChanged( approved );
   triggerRepaint();
+}
+
+bool KadasMilxLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
+{
+  bool success = KadasItemLayer::readXml( layer_node, context );
+  QDomElement layerEl = layer_node.toElement();
+  mIsApproved = layerEl.attribute( "approved" ).toInt() == 1;
+  return success;
+}
+
+bool KadasMilxLayer::writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  bool success = KadasItemLayer::writeXml( layer_node, document, context );
+  QDomElement layerEl = layer_node.toElement();
+  layerEl.setAttribute( "approved", mIsApproved ? "1" : "0" );
+  return success;
 }
 
 void KadasMilxLayer::exportToMilxly( QDomElement &milxLayerEl, int dpi )
@@ -213,4 +228,19 @@ bool KadasMilxLayer::importFromMilxly( QDomElement &milxLayerEl, int dpi, QStrin
     addItem( KadasMilxItem::fromMilx( graphicEl, crst, symbolSize ) );
   }
   return true;
+}
+
+
+void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
+{
+  if ( dynamic_cast<KadasMilxLayer *>( layer ) )
+  {
+    KadasMilxLayer *milxLayer = static_cast<KadasMilxLayer *>( layer );
+    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer]
+    {
+      milxLayer->setApproved( !milxLayer->isApproved() );
+    } );
+    action->setCheckable( true );
+    action->setChecked( milxLayer->isApproved() );
+  }
 }

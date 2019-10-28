@@ -63,6 +63,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QMenu *firstRightStandardMenu() override { return helpMenu(); }
     virtual QMenu *windowMenu() override { return getClassicMenu( WINDOW_MENU ); }
     virtual QMenu *helpMenu() override { return getClassicMenu( HELP_MENU ); }
+    virtual QMenu *pluginHelpMenu() override { return getClassicMenu( HELP_MENU ); }
 
     virtual void addPluginToMenu( const QString &name, QAction *action ) override;
     virtual void removePluginMenu( const QString &name, QAction *action ) override;
@@ -268,6 +269,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
     virtual void unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
 
+    virtual void locatorSearch( const QString &searchText ) override { }
+    virtual QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() override;
+
 
     // KADAS specific interface
     QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) override;
@@ -286,6 +290,10 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     //! Generic object finder
     QObject *findObject( const QString &name ) override;
+
+    QgsPrintLayout *createNewPrintLayout( const QString &title ) override;
+    bool deletePrintLayout( QgsPrintLayout *layout ) override;
+    QList<QgsPrintLayout *> printLayouts() const override;
 };
 
 

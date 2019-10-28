@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp = new sipKadasMapToolCreateItem( a0, nullptr, a2 );
+    sipCpp = new sipKadasMapToolCreateItem( a0, static_cast<PyObject *>( nullptr ), a2 );
     sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
     {
       KadasMapItem *res;
@@ -69,6 +69,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     % End
 #endif
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
 
     void activate() override;
@@ -81,17 +82,16 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     const KadasMapItem *currentItem() const { return mItem; }
     KadasMapItem *takeItem();
+    const KadasMapItemEditor *currentEditor() const { return mEditor; }
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
+    void setSelectItems( bool select ) { mSelectItems = select; }
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
-#endif
-
-
-#ifndef SIP_RUN
     void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
 #endif
+    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
     void clear();
@@ -107,14 +107,12 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 #endif
 
     void createItem();
-    void addPoint( const QgsPointXY &mapPos );
-    void startPart( const QgsPointXY &pos );
+    void addPoint( const KadasMapPos &mapPos );
+    void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();
-    void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
-    void cleanup();
-    QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
+    KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem() { return mItem; }
 
@@ -137,6 +135,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     bool mMultipart = false;
     bool mSnapping = false;
+    bool mSelectItems = true;
 
   private slots:
     void inputChanged();

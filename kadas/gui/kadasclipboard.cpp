@@ -24,17 +24,39 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasclipboard.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 
-KadasClipboard::KadasClipboard( QObject *parent )
-  : QObject( parent )
+KadasClipboard *KadasClipboard::instance()
 {
-  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::onDataChanged );
+  static KadasClipboard clipboard;
+  return &clipboard;
+}
+
+KadasClipboard::KadasClipboard()
+{
+  connect( QApplication::clipboard(), &QClipboard::dataChanged, this, &KadasClipboard::dataChanged );
+}
+
+KadasClipboard::~KadasClipboard()
+{
+  clear();
+}
+
+void KadasClipboard::clear()
+{
+  if ( QApplication::instance() )
+  {
+    QApplication::clipboard()->clear();
+  }
+  mFeatureStore = QgsFeatureStore();
+  qDeleteAll( mItemStore );
+  mItemStore.clear();
 }
 
 void KadasClipboard::setMimeData( QMimeData *mimeData )
 {
+  clear();
   QApplication::clipboard()->setMimeData( mimeData );
-  mFeatureStore = QgsFeatureStore();
 }
 
 const QMimeData *KadasClipboard::mimeData()
@@ -45,7 +67,7 @@ const QMimeData *KadasClipboard::mimeData()
 bool KadasClipboard::isEmpty() const
 {
   const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-  return !mimeData || mimeData->formats().isEmpty();
+  return mFeatureStore.features().isEmpty() && mItemStore.isEmpty() && ( !mimeData || mimeData->formats().isEmpty() );
 }
 
 bool KadasClipboard::hasFormat( const QString &format ) const
@@ -54,12 +76,18 @@ bool KadasClipboard::hasFormat( const QString &format ) const
   {
     return !mFeatureStore.features().isEmpty();
   }
+  if ( format == KADASCLIPBOARD_ITEMSTORE_MIME )
+  {
+    return !mItemStore.isEmpty();
+  }
   const QMimeData *mimeData = QApplication::clipboard()->mimeData();
   return mimeData && mimeData->hasFormat( format );
 }
 
 void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
 {
+  clear();
+
   // Also store plaintext version
   QgsSettings settings;
   bool copyWKT = settings.value( "Qgis/copyGeometryAsWKT", true ).toBool();
@@ -111,13 +139,12 @@ void KadasClipboard::setStoredFeatures( const QgsFeatureStore &featureStore )
   mFeatureStore = featureStore;
 }
 
-const QgsFeatureStore &KadasClipboard::getStoredFeatures() const
+void KadasClipboard::setStoredMapItems( const QList<KadasMapItem *> &items )
 {
-  return mFeatureStore;
-}
-
-void KadasClipboard::onDataChanged()
-{
-  mFeatureStore = QgsFeatureStore();
+  clear();
+  for ( const KadasMapItem *item : items )
+  {
+    mItemStore.append( item->clone() );
+  }
   emit dataChanged();
 }

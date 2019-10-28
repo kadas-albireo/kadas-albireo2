@@ -21,6 +21,37 @@
 #include <kadas/gui/mapitems/kadaspointitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasPointItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPointItem( crs ); } );
+
+QJsonObject KadasPointItem::State::serialize() const
+{
+  QJsonArray pts;
+  for ( const KadasItemPos &pos : points )
+  {
+    QJsonArray p;
+    p.append( pos.x() );
+    p.append( pos.y() );
+    pts.append( p );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["points"] = pts;
+  return json;
+}
+
+bool KadasPointItem::State::deserialize( const QJsonObject &json )
+{
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  points.clear();
+  QJsonArray pts = json["points"].toArray();
+  for ( QJsonValue pValue : pts )
+  {
+    QJsonArray p = pValue.toArray();
+    points.append( KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
+  }
+  return true;
+}
+
 KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon, QObject *parent )
   : KadasGeometryItem( crs, parent )
 {
@@ -28,20 +59,58 @@ KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconTyp
   clear();
 }
 
-bool KadasPointItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
+KadasItemPos KadasPointItem::position() const
+{
+  double x = 0., y = 0.;
+  for ( const KadasItemPos &point : constState()->points )
+  {
+    x += point.x();
+    y += point.y();
+  }
+  int n = std::max( 1, constState()->points.size() );
+  return KadasItemPos( x / n, y / n );
+}
+
+void KadasPointItem::setPosition( const KadasItemPos &pos )
+{
+  if ( state()->points.isEmpty() )
+  {
+    state()->points.append( pos );
+    endPart();
+    recomputeDerived();
+  }
+  else
+  {
+    KadasItemPos prevPos = position();
+    double dx = pos.x() - prevPos.x();
+    double dy = pos.y() - prevPos.y();
+    for ( KadasItemPos &point : state()->points )
+    {
+      point.setX( point.x() + dx );
+      point.setY( point.y() + dy );
+    }
+    if ( mGeometry )
+    {
+      mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    }
+    update();
+  }
+}
+
+bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::Drawing;
-  state()->points.append( firstPoint );
+  state()->points.append( toItemPos( firstPoint, mapSettings ) );
   recomputeDerived();
   return false;
 }
 
 bool KadasPointItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasPointItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
+void KadasPointItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
 {
   // Do nothing
 }
@@ -65,12 +134,12 @@ void KadasPointItem::endPart()
 KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
-  attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
+  attributes.insert( AttrX, NumericAttribute{"x"} );
+  attributes.insert( AttrY, NumericAttribute{"y"} );
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasPointItem::drawAttribsFromPosition( const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasPointItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
   values.insert( AttrX, pos.x() );
@@ -78,58 +147,72 @@ KadasMapItem::AttribValues KadasPointItem::drawAttribsFromPosition( const QgsPoi
   return values;
 }
 
-QgsPointXY KadasPointItem::positionFromDrawAttribs( const AttribValues &values ) const
+KadasMapPos KadasPointItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return QgsPointXY( values[AttrX], values[AttrY] );
+  return KadasMapPos( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasPointItem::getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const
+KadasMapItem::EditContext KadasPointItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  QgsCoordinateTransform crst( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform( crst.transform( pos ) );
   for ( int i = 0, n = constState()->points.size(); i < n; ++i )
   {
-    QgsPointXY testPos = mapSettings.mapToPixel().transform( crst.transform( constState()->points[i] ) );
-    if ( canvasPos.sqrDist( testPos ) < 25 )
+    KadasMapPos testPos = toMapPos( constState()->points[i], mapSettings );
+    if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
     {
-      return EditContext( QgsVertexId( i, 0, 0 ), constState()->points[i], drawAttribs() );
+      return EditContext( QgsVertexId( i, 0, 0 ), testPos, drawAttribs() );
     }
   }
   return EditContext();
 }
 
-void KadasPointItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
+void KadasPointItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() )
   {
-    state()->points[context.vidx.part] = newPoint;
+    state()->points[context.vidx.part] = toItemPos( newPoint, mapSettings );
     recomputeDerived();
   }
 }
 
 void KadasPointItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  return drawAttribsFromPosition( pos );
+  return drawAttribsFromPosition( pos, mapSettings );
 }
 
-QgsPointXY KadasPointItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
+KadasMapPos KadasPointItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return positionFromDrawAttribs( values );
+  return positionFromDrawAttribs( values, mapSettings );
 }
 
-void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
+void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  if ( dynamic_cast<const QgsPoint *>( geom ) )
+  QList<const QgsPoint *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
   {
-    state()->points.append( *static_cast<const QgsPoint *>( geom ) );
-    recomputeDerived();
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsPoint *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsPoint *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsPoint *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsPoint *>( &geom ) );
+  }
+  for ( const QgsPoint *point : geoms )
+  {
+    state()->points.append( KadasItemPos( point->x(), point->y() ) );
     endPart();
   }
+  recomputeDerived();
 }
 
 const QgsMultiPoint *KadasPointItem::geometry() const
@@ -145,7 +228,7 @@ QgsMultiPoint *KadasPointItem::geometry()
 void KadasPointItem::recomputeDerived()
 {
   QgsMultiPoint *multiGeom = new QgsMultiPoint();
-  for ( const QgsPointXY &point : state()->points )
+  for ( const KadasItemPos &point : state()->points )
   {
     multiGeom->addGeometry( new QgsPoint( point ) );
   }

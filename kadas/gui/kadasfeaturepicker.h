@@ -38,15 +38,16 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         bool isEmpty() const { return layer == nullptr; }
 
         QgsMapLayer *layer = nullptr;
+        const QgsAbstractGeometry *geom = nullptr;
+        QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
         QString itemId;
-        QRectF boundingBox;
     };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
+    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
 
   private:
-    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType );
+    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect );
     static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, QgsRenderContext &renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType );
 };
 

@@ -22,6 +22,7 @@
 #include <kadas/gui/kadas_gui.h>
 
 class QgsMapTool;
+class QgsPrintLayout;
 
 class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
 {
@@ -79,6 +80,14 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
 
     //! Generic object finder
     virtual QObject *findObject( const QString &name ) = 0;
+
+    virtual QgsPrintLayout *createNewPrintLayout( const QString &title ) = 0;
+    virtual bool deletePrintLayout( QgsPrintLayout *layout ) = 0;
+    virtual QList<QgsPrintLayout *> printLayouts() const = 0;
+
+  signals:
+    void printLayoutAdded( QgsPrintLayout *layout );
+    void printLayoutWillBeRemoved( QgsPrintLayout *layout );
 };
 
 

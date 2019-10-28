@@ -22,44 +22,54 @@
 
 class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 {
+    Q_OBJECT
+    Q_PROPERTY( double anchorX READ anchorX WRITE setAnchorX )
+    Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
+
   public:
     KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
 
     // Item anchor point, as factors of its width/height
-    void setAnchor( double anchorX, double anchorY );
+    double anchorX() const { return mAnchorX; }
+    void setAnchorX( double anchorX );
+    double anchorY() const { return mAnchorY; }
+    void setAnchorY( double anchorY );
 
-    void setPosition( const QgsPointXY &pos );
-
-    QgsRectangle boundingBox() const override;
-    QRect margin() const override;
+    KadasItemRect boundingBox() const override;
+    Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
 
-    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
+    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
+    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     bool continuePart( const QgsMapSettings &mapSettings ) override;
     void endPart() override;
 
     AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
+    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override;
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+
+    KadasItemPos position() const override { return constState()->pos; }
+    void setPosition( const KadasItemPos &pos ) override;
 
     struct State : KadasMapItem::State
     {
-      QgsPointXY pos;
+      KadasItemPos pos;
       double angle;
       QSize size;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
+      QJsonObject serialize() const override;
+      bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
@@ -69,10 +79,10 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     double mAnchorY = 0.5;
 
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); }
-    QList<QgsPointXY> rotatedCornerPoints( double angle, double mup = 1. ) const;
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    QList<KadasMapPos> rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const;
 
-    static void rotateNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+    static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 };
 
 #endif // KADASANCHOREDITEM_H

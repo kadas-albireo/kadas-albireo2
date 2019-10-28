@@ -1,0 +1,89 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasselectionrectitem.h                          *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasSelectionRectItem : KadasMapItem
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasselectionrectitem.h"
+%End
+  public:
+    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+
+    void setSelectedItems( const QList<KadasMapItem *> &items );
+
+    virtual QString itemName() const;
+
+    virtual KadasItemRect boundingBox() const;
+
+    virtual Margin margin() const;
+
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
+
+    virtual void render( QgsRenderContext &context ) const;
+
+
+    struct State : KadasMapItem::State
+    {
+      virtual void assign( const KadasMapItem::State *other );
+      virtual State *clone() const /Factory/;
+      virtual QJsonObject serialize() const;
+
+      virtual bool deserialize( const QJsonObject &json );
+
+    };
+
+    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );
+    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings );
+    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings );
+    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings );
+    virtual bool continuePart( const QgsMapSettings &mapSettings );
+    virtual void endPart();
+
+    virtual AttribDefs drawAttribs() const;
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
+    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+    virtual KadasItemPos position() const;
+    virtual void setPosition( const KadasItemPos &pos );
+
+  protected:
+    virtual KadasMapItem *_clone() const;
+    virtual State *createEmptyState() const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/mapitems/kadasselectionrectitem.h                          *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

@@ -87,6 +87,14 @@ Generic action finder
 %Docstring
 Generic object finder
 %End
+
+    virtual QgsPrintLayout *createNewPrintLayout( const QString &title ) = 0;
+    virtual bool deletePrintLayout( QgsPrintLayout *layout ) = 0;
+    virtual QList<QgsPrintLayout *> printLayouts() const = 0;
+
+  signals:
+    void printLayoutAdded( QgsPrintLayout *layout );
+    void printLayoutWillBeRemoved( QgsPrintLayout *layout );
 };
 
 

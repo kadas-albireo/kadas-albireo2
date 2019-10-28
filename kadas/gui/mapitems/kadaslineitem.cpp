@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QMenu>
 #include <qmath.h>
 
 #include <GeographicLib/Geodesic.hpp>
@@ -29,9 +30,47 @@
 
 #include <kadas/gui/mapitems/kadaslineitem.h>
 
-void KadasLineItem::State::assign( const KadasMapItem::State *other )
+
+KADAS_REGISTER_MAP_ITEM( KadasLineItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasLineItem( crs ); } );
+
+QJsonObject KadasLineItem::State::serialize() const
 {
-  *this = *static_cast<const State *>( other );
+  QJsonArray pts;
+  for ( const QList<KadasItemPos> &part : points )
+  {
+    QJsonArray prt;
+    for ( const KadasItemPos &pos : part )
+    {
+      QJsonArray p;
+      p.append( pos.x() );
+      p.append( pos.y() );
+      prt.append( p );
+    }
+    pts.append( prt );
+  }
+  QJsonObject json;
+  json["status"] = drawStatus;
+  json["points"] = pts;
+  return json;
+}
+
+bool KadasLineItem::State::deserialize( const QJsonObject &json )
+{
+  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  points.clear();
+  QJsonArray pts = json["points"].toArray();
+  for ( QJsonValue prtValue : pts )
+  {
+    QJsonArray prt = prtValue.toArray();
+    QList<KadasItemPos> part;
+    for ( QJsonValue pValue : prt )
+    {
+      QJsonArray p = pValue.toArray();
+      part.append( KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
+    }
+    points.append( part );
+  }
+  return true;
 }
 
 KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject *parent )
@@ -41,43 +80,87 @@ KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geod
   clear();
 }
 
+void KadasLineItem::setGeodesic( bool geodesic )
+{
+  mGeodesic = geodesic;
+  update();
+}
+
+KadasItemPos KadasLineItem::position() const
+{
+  double x = 0., y = 0.;
+  int n = 0;
+  for ( const QList<KadasItemPos> &part : constState()->points )
+  {
+    for ( const KadasItemPos &point : part )
+    {
+      x += point.x();
+      y += point.y();
+    }
+    n += part.size();
+  }
+  n = std::max( 1, n );
+  return KadasItemPos( x / n, y / n );
+}
+
+void KadasLineItem::setPosition( const KadasItemPos &pos )
+{
+  KadasItemPos prevPos = position();
+  double dx = pos.x() - prevPos.x();
+  double dy = pos.y() - prevPos.y();
+  for ( QList<KadasItemPos> &part : state()->points )
+  {
+    for ( KadasItemPos &point : part )
+    {
+      point.setX( point.x() + dx );
+      point.setY( point.y() + dy );
+    }
+  }
+  if ( mGeometry )
+  {
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+  }
+  update();
+}
+
 QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings ) const
 {
   QList<Node> nodes;
-  for ( const QList<QgsPointXY> &part : constState()->points )
+  for ( const QList<KadasItemPos> &part : constState()->points )
   {
-    for ( const QgsPointXY &pos : part )
+    for ( const KadasItemPos &pos : part )
     {
-      nodes.append( {pos} );
+      nodes.append( {toMapPos( pos, settings )} );
     }
   }
   return nodes;
 }
 
-bool KadasLineItem::startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings )
+bool KadasLineItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
+  KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
   state()->drawStatus = State::Drawing;
-  state()->points.append( QList<QgsPointXY>() );
-  state()->points.last().append( firstPoint );
-  state()->points.last().append( firstPoint );
+  state()->points.append( QList<KadasItemPos>() );
+  state()->points.last().append( itemPos );
+  state()->points.last().append( itemPos );
   recomputeDerived();
   return true;
 }
 
 bool KadasLineItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  return startPart( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-void KadasLineItem::setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings )
+void KadasLineItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
 {
-  state()->points.last().last() = p;
+  state()->points.last().last() = toItemPos( p, mapSettings );
   recomputeDerived();
 }
 
 void KadasLineItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  setCurrentPoint( QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  setCurrentPoint( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
 bool KadasLineItem::continuePart( const QgsMapSettings &mapSettings )
@@ -104,12 +187,12 @@ void KadasLineItem::endPart()
 KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x", NumericAttribute::XCooAttr} );
-  attributes.insert( AttrY, NumericAttribute{"y", NumericAttribute::YCooAttr} );
+  attributes.insert( AttrX, NumericAttribute{"x"} );
+  attributes.insert( AttrY, NumericAttribute{"y"} );
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition( const QgsPointXY &pos ) const
+KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
   values.insert( AttrX, pos.x() );
@@ -117,70 +200,138 @@ KadasMapItem::AttribValues KadasLineItem::drawAttribsFromPosition( const QgsPoin
   return values;
 }
 
-QgsPointXY KadasLineItem::positionFromDrawAttribs( const AttribValues &values ) const
+KadasMapPos KadasLineItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
 {
-  return QgsPointXY( values[AttrX], values[AttrY] );
+  return KadasMapPos( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasLineItem::getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const
+KadasMapItem::EditContext KadasLineItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  QgsCoordinateTransform crst( mCrs, mapSettings.destinationCrs(), mapSettings.transformContext() );
-  QgsPointXY canvasPos = mapSettings.mapToPixel().transform( crst.transform( pos ) );
   for ( int iPart = 0, nParts = constState()->points.size(); iPart < nParts; ++iPart )
   {
-    const QList<QgsPointXY> part = constState()->points[iPart];
+    const QList<KadasItemPos> &part = constState()->points[iPart];
     for ( int iVert = 0, nVerts = part.size(); iVert < nVerts; ++iVert )
     {
-      QgsPointXY testPos = mapSettings.mapToPixel().transform( crst.transform( part[iVert] ) );
-      if ( canvasPos.sqrDist( testPos ) < 25 )
+      KadasMapPos testPos = toMapPos( part[iVert], mapSettings );
+      if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
       {
-        return EditContext( QgsVertexId( iPart, 0, iVert ), part[iVert], drawAttribs() );
+        return EditContext( QgsVertexId( iPart, 0, iVert ), testPos, drawAttribs() );
       }
     }
+  }
+  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  {
+    KadasMapPos refPos = toMapPos( constState()->points.front().front(), mapSettings );
+    return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
   }
   return EditContext();
 }
 
-void KadasLineItem::edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings )
+void KadasLineItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
   if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
        && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
   {
-    state()->points[context.vidx.part][context.vidx.vertex] = newPoint;
+    state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
+    recomputeDerived();
+  }
+  else
+  {
+    // Move geometry a whole
+    KadasMapPos refMapPos = toMapPos( constState()->points.front().front(), mapSettings );
+    for ( QList<KadasItemPos> &part : state()->points )
+    {
+      for ( KadasItemPos &pos : part )
+      {
+        KadasMapPos mapPos = toMapPos( pos, mapSettings );
+        pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+      }
+    }
     recomputeDerived();
   }
 }
 
 void KadasLineItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
 {
-  edit( context, QgsPointXY( values[AttrX], values[AttrY] ), mapSettings );
+  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
 }
 
-KadasMapItem::AttribValues KadasLineItem::editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const
+void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
-  return drawAttribsFromPosition( pos );
-}
-
-QgsPointXY KadasLineItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
-{
-  return positionFromDrawAttribs( values );
-}
-
-void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry *geom )
-{
-  if ( dynamic_cast<const QgsLineString *>( geom ) )
+  if ( context.vidx.vertex == 0 )
   {
-    QList<QgsPointXY> points;
+    menu->addAction( tr( "Continue line" ), menu, [this, context]
+    {
+      std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
+      recomputeDerived();
+    } )->setData( EditSwitchToDrawingTool );
+  }
+  else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
+  {
+    menu->addAction( tr( "Continue line" ) )->setData( EditSwitchToDrawingTool );
+  }
+  if ( context.vidx.vertex >= 0 )
+  {
+    QAction *deleteNodeAction = menu->addAction( tr( "Delete node" ), menu, [this, context]
+    {
+      state()->points[context.vidx.part].removeAt( context.vidx.vertex );
+      recomputeDerived();
+    } );
+    deleteNodeAction->setEnabled( constState()->points[context.vidx.part].size() > 2 );
+  }
+  else
+  {
+    menu->addAction( tr( "Add node" ), menu, [ = ]
+    {
+      KadasItemPos newPos = toItemPos( clickPos, mapSettings );
+      QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
+      state()->points[insPoint.part].insert( insPoint.vertex, newPos );
+      recomputeDerived();
+    } );
+  }
+}
+
+KadasMapItem::AttribValues KadasLineItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
+{
+  return drawAttribsFromPosition( pos, mapSettings );
+}
+
+KadasMapPos KadasLineItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
+{
+  return positionFromDrawAttribs( values, mapSettings );
+}
+
+void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
+{
+  QList<const QgsLineString *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
+  {
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsLineString *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsLineString *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsLineString *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsLineString *>( &geom ) );
+  }
+  for ( const QgsLineString *line : geoms )
+  {
+    QList<KadasItemPos> points;
     QgsVertexId vidx;
     QgsPoint p;
-    while ( geom->nextVertex( vidx, p ) )
+    while ( line->nextVertex( vidx, p ) )
     {
-      points.append( p );
+      points.append( KadasItemPos( p.x(), p.y() ) );
     }
     state()->points.append( points );
-    recomputeDerived();
     endPart();
   }
+  recomputeDerived();
 }
 
 const QgsMultiLineString *KadasLineItem::geometry() const
@@ -206,7 +357,7 @@ void KadasLineItem::measureGeometry()
   double totalLength = 0;
   for ( int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart )
   {
-    const QList<QgsPointXY> &part = state()->points[iPart];
+    const QList<KadasItemPos> &part = state()->points[iPart];
     if ( part.size() < 2 )
     {
       continue;
@@ -219,14 +370,14 @@ void KadasLineItem::measureGeometry()
         double totLength = 0;
         for ( int i = 1, n = part.size(); i < n; ++i )
         {
-          const QgsPointXY &p1 = part[i - 1];
-          const QgsPointXY &p2 = part[i];
+          const KadasItemPos &p1 = part[i - 1];
+          const KadasItemPos &p2 = part[i];
           double length = mDa.measureLine( p1, p2 );
           totLength += length;
-          addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), QgsPointXY( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+          addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
         QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
-        addMeasurements( QStringList() << totLengthStr, part.last(), false );
+        addMeasurements( QStringList() << totLengthStr, KadasItemPos::fromPoint( part.last() ), false );
         totalLength += totLength;
         break;
       }
@@ -235,8 +386,8 @@ void KadasLineItem::measureGeometry()
       {
         for ( int i = 1, n = part.size(); i < n; ++i )
         {
-          const QgsPointXY &p1 = part[i - 1];
-          const QgsPointXY &p2 = part[i];
+          const KadasItemPos &p1 = part[i - 1];
+          const KadasItemPos &p2 = part[i];
           double angle = 0;
           if ( mMeasurementMode == MeasureAzimuthGeoNorth )
           {
@@ -250,7 +401,7 @@ void KadasLineItem::measureGeometry()
           angle = angle < 0 ? angle + 2 * M_PI : angle;
           angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
           QString segmentAngle = formatAngle( angle, mAngleUnit );
-          addMeasurements( QStringList() << segmentAngle, QgsPointXY( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+          addMeasurements( QStringList() << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
         break;
       }
@@ -271,14 +422,14 @@ void KadasLineItem::recomputeDerived()
 
     for ( int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart )
     {
-      const QList<QgsPointXY> &part = state()->points[iPart];
+      const QList<KadasItemPos> &part = state()->points[iPart];
       QgsLineString *ring = new QgsLineString();
 
       int nPoints = part.size();
       if ( nPoints >= 2 )
       {
         QList<QgsPointXY> wgsPoints;
-        for ( const QgsPointXY &point : part )
+        for ( const KadasItemPos &point : part )
         {
           wgsPoints.append( t1.transform( point ) );
         }
@@ -311,9 +462,9 @@ void KadasLineItem::recomputeDerived()
   {
     for ( int iPart = 0, nParts = state()->points.size(); iPart < nParts; ++iPart )
     {
-      const QList<QgsPointXY> &part = state()->points[iPart];
+      const QList<KadasItemPos> &part = state()->points[iPart];
       QgsLineString *ring = new QgsLineString();
-      for ( const QgsPointXY &point : part )
+      for ( const KadasItemPos &point : part )
       {
         ring->addVertex( QgsPoint( point ) );
       }

@@ -22,10 +22,18 @@
 
 class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+    Q_PROPERTY( QString name READ name WRITE setName )
+    Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
+
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    void setup( const QString &path, double anchorX, double anchorY );
 
-    void setFilePath( const QString &path, double anchorX = 0.5, double anchorY = 0.5 );
+    QString itemName() const override { return tr( "Symbol" ); }
+
+    void setFilePath( const QString &path );
     const QString &filePath() const { return mFilePath; }
     void setName( const QString &name ) { mName = name; }
     const QString &name() const { return mName; }
@@ -33,11 +41,28 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     const QString &remarks() const { return mRemarks; }
 
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
   private:
     QString mFilePath;
     QString mName;
     QString mRemarks;
+    QImage mImage;
+    bool mScalable = false;
+
+    KadasMapItem *_clone() const override { return new KadasSymbolItem( crs() ); } SIP_FACTORY
 };
+
+
+class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
+{
+    Q_OBJECT
+
+  public:
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+};
+
 
 #endif // KADASSYMBOLITEM_H

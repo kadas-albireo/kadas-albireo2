@@ -28,8 +28,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    void setup( const QString &path, double anchorX, double anchorY );
 
-    void setFilePath( const QString &path, double anchorX = 0.5, double anchorY = 0.5 );
+    virtual QString itemName() const;
+
+    void setFilePath( const QString &path );
     const QString &filePath() const;
     void setName( const QString &name );
     const QString &name() const;
@@ -40,6 +43,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 
 };
+
+
+class KadasPinItem : KadasSymbolItem
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+%End
+  public:
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+};
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

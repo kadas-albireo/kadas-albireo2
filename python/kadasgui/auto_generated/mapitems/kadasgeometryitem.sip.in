@@ -44,15 +44,15 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
     ~KadasGeometryItem();
 
-    virtual void render( QgsRenderContext &context ) const;
+    virtual KadasItemRect boundingBox() const;
 
-    virtual QgsRectangle boundingBox() const;
-
-    virtual QRect margin() const;
+    virtual Margin margin() const;
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
-    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
+
+    virtual void render( QgsRenderContext &context ) const;
 
 
     virtual void clear();
@@ -61,33 +61,20 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 
     virtual QgsWkbTypes::GeometryType geometryType() const = 0;
-    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom ) = 0;
+    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom ) = 0;
 
-    void setFillColor( const QColor &c );
-    QColor fillColor() const;
-    void setOutlineColor( const QColor &c );
-    QColor outlineColor() const;
-    void setOutlineWidth( int width );
-    int outlineWidth() const;
-    void setLineStyle( Qt::PenStyle penStyle );
-    Qt::PenStyle lineStyle() const;
-    void setBrushStyle( Qt::BrushStyle brushStyle );
-    Qt::BrushStyle brushStyle() const;
-
-    void setIconType( IconType iconType );
-    IconType iconType() const;
-    void setIconSize( int iconSize );
+    QPen outline() const;
+    void setOutline( const QPen &pen );
+    QBrush fill() const;
+    void setFill( const QBrush &brush );
     int iconSize() const;
-    void setIconFillColor( const QColor &c );
-    const QColor &iconFillColor() const;
-    void setIconOutlineColor( const QColor &c );
-    QColor iconOutlineColor() const;
-    void setIconOutlineWidth( int width );
-    int iconOutlineWidth() const;
-    void setIconLineStyle( Qt::PenStyle penStyle );
-    Qt::PenStyle iconLineStyle() const;
-    void setIconBrushStyle( Qt::BrushStyle brushStyle );
-    Qt::BrushStyle iconBrushStyle() const;
+    void setIconSize( int iconSize );
+    IconType iconType() const;
+    void setIconType( IconType iconType );
+    QPen iconOutline() const;
+    void setIconOutline( const QPen &iconPen );
+    QBrush iconFill() const;
+    void setIconFill( const QBrush &iconBrush );
 
     void setMeasurementsEnabled( bool enabled, QgsUnitTypes::DistanceUnit baseUnit = QgsUnitTypes::DistanceMeters );
     QString getTotalMeasurement() const;
@@ -111,12 +98,15 @@ the Free Software Foundation; either version 2 of the License, or     *
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;
     QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
     QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
-    void addMeasurements( const QStringList &measurements, const QgsPointXY &mapPos, bool center = true );
+    void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
+
+    QgsVertexId insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const;
 
     virtual void recomputeDerived() = 0;
     virtual void measureGeometry();
 
 };
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

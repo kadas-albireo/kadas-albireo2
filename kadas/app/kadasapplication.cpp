@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QIcon>
+#include <QImageReader>
 #include <QMessageBox>
 #include <QSplashScreen>
 
@@ -30,6 +31,9 @@
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsprintlayout.h>
+#include <qgis/qgslayoutmanager.h>
+#include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsrasterlayer.h>
@@ -38,16 +42,32 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/core/kadastemporaryfile.h>
 #include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/kadaslayerselectionwidget.h>
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadaspointitem.h>
+#include <kadas/gui/mapitems/kadaslineitem.h>
+#include <kadas/gui/mapitems/kadaspictureitem.h>
+#include <kadas/gui/mapitems/kadaspolygonitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+#include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
+#include <kadas/app/kadasvectorlayerproperties.h>
+#include <kadas/app/bullseye/kadasbullseyelayer.h>
+#include <kadas/app/guidegrid/kadasguidegridlayer.h>
+#include <kadas/app/kml/kadaskmlexport.h>
+#include <kadas/app/kml/kadaskmlexportdialog.h>
+#include <kadas/app/kml/kadaskmlimport.h>
+#include <kadas/app/milx/kadasmilxlayer.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -199,13 +219,15 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
-  mClipboard = new KadasClipboard( this );
   mMainWindow = new KadasMainWindow( &splash );
+  mMainWindow->init();
   mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
   mMainWindow->mapCanvas()->setMapUpdateInterval( 1000 );
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
+  connect( mMainWindow->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasApplication::updateWmtsZoomResolutions );
+  connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
@@ -222,45 +244,62 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   mMapToolPan = new KadasMapToolPan( mMainWindow->mapCanvas() );
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
 
+  // Register plugin layers
+  pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
+  pluginLayerRegistry()->addPluginLayerType( new KadasMilxLayerType() );
+  pluginLayerRegistry()->addPluginLayerType( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
+  pluginLayerRegistry()->addPluginLayerType( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
+
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
 
-  // Perform online/offline check to select default template
-  QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
-  QString projectTemplate;
-  if ( !onlineTestUrl.isEmpty() )
-  {
-    QEventLoop eventLoop;
-    QNetworkReply *reply = QgsNetworkAccessManager::instance()->head( QNetworkRequest( onlineTestUrl ) );
-    QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
-    eventLoop.exec();
+  mMainWindow->show();
+  splash.finish( mMainWindow );
+  processEvents();
 
-    if ( reply->error() == QNetworkReply::NoError )
-    {
-      projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
-      settings.setValue( "/kadas/isOffline", false );
-    }
-    else
-    {
-      projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
-      settings.setValue( "/kadas/isOffline", true );
-    }
-    delete reply;
+  // Open startup project
+  QgsProject::instance()->setDirty( false );
+  if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
+  {
+    projectOpen( arguments()[1] );
   }
-
-  if ( !projectTemplate.isEmpty() )
+  else
   {
-    projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
-    projectOpen( projectTemplate );
+    // Perform online/offline check to select default template
+    QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
+    QString projectTemplate;
+    if ( !onlineTestUrl.isEmpty() )
+    {
+      QEventLoop eventLoop;
+      QNetworkReply *reply = QgsNetworkAccessManager::instance()->head( QNetworkRequest( onlineTestUrl ) );
+      QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
+      eventLoop.exec();
+
+      if ( reply->error() == QNetworkReply::NoError )
+      {
+        projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
+        settings.setValue( "/kadas/isOffline", false );
+      }
+      else
+      {
+        projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
+        settings.setValue( "/kadas/isOffline", true );
+      }
+      delete reply;
+    }
+
+    if ( !projectTemplate.isEmpty() )
+    {
+      projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
+      projectCreateFromTemplate( projectTemplate );
+    }
   }
 
   // TODO: QgsApplication::setMaxThreads( QSettings().value( "/Qgis/max_threads", -1 ).toInt() );
 
   QgsProject::instance()->setDirty( false );
   updateWindowTitle();
-  mMainWindow->show();
-  splash.finish( mMainWindow );
 
   QObject::connect( this, &QApplication::lastWindowClosed, this, &QApplication::quit );
 }
@@ -463,36 +502,83 @@ KadasItemLayer *KadasApplication::getOrCreateItemLayer( const QString &layerName
   KadasItemLayer *layer = getItemLayer( layerName );
   if ( !layer )
   {
-    layer = new KadasItemLayer( layerName );
+    layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
     mItemLayerMap[layerName] = layer->id();
     QgsProject::instance()->addMapLayer( layer );
   }
   return layer;
 }
 
-void KadasApplication::exportToGpx()
+KadasItemLayer *KadasApplication::selectItemLayer()
 {
-  // TODO
+  QDialog dialog;
+  dialog.setWindowTitle( tr( "Select layer" ) );
+  dialog.setLayout( new QVBoxLayout() );
+  dialog.layout()->setMargin( 2 );
+  dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); } );
+  dialog.layout()->addWidget( layerSelectionWidget );
+  QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
+  connect( buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept );
+  connect( buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject );
+  dialog.layout()->addWidget( buttonBox );
+  if ( dialog.exec() == QDialog::Accepted )
+  {
+    return dynamic_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 void KadasApplication::exportToKml()
 {
-  // TODO
-}
-
-void KadasApplication::importFromGpx()
-{
-  // TODO
+  KadasKMLExportDialog d( mMainWindow->mapCanvas()->layers() );
+  if ( d.exec() != QDialog::Accepted )
+  {
+    return;
+  }
+  setOverrideCursor( Qt::BusyCursor );
+  KadasKMLExport kmlExport;
+  if ( kmlExport.exportToFile( d.getFilename(), d.getSelectedLayers(), d.getExportScale() ) )
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML export completed" ), Qgis::Info, 4 );
+  }
+  else
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML export failed" ), Qgis::Critical, 4 );
+  }
+  restoreOverrideCursor();
 }
 
 void KadasApplication::importFromKml()
 {
-  // TODO
-}
+  QStringList filters;
+  filters.append( tr( "KMZ File (*.kmz)" ) );
+  filters.append( tr( "KML File (*.kml)" ) );
 
-void KadasApplication::paste()
-{
-  // TODO
+  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString selectedFilter;
+
+  QString filename = QFileDialog::getOpenFileName( mMainWindow, tr( "Select KML/KMZ File" ), lastDir, filters.join( ";;" ), &selectedFilter );
+  if ( filename.isEmpty() )
+  {
+    return;
+  }
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+
+  QString errMsg;
+  setOverrideCursor( Qt::BusyCursor );
+  if ( KadasKMLImport().importFile( filename, errMsg ) )
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 4 );
+  }
+  else
+  {
+    mMainWindow->messageBar()->pushMessage( tr( "KML import failed" ), errMsg, Qgis::Critical, 4 );
+  }
+  restoreOverrideCursor();
 }
 
 void KadasApplication::projectNew( bool askToSave )
@@ -527,7 +613,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     QgsSettings settings;
     QString lastUsedDir = settings.value( "UI/lastProjectDir", QDir::homePath() ).toString();
     fileName = QFileDialog::getOpenFileName(
-                 mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+                 mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)"
                );
     if ( fileName.isEmpty() )
     {
@@ -551,6 +637,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     emit projectRead();
   }
 
+  mMainWindow->layerTreeMapCanvasBridge()->setCanvasLayers();
   mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer( autoSetupOnFirstLayer );
   mMainWindow->mapCanvas()->freeze( false );
   mMainWindow->mapCanvas()->refresh();
@@ -574,6 +661,8 @@ void KadasApplication::projectClose()
 
   // ensure layout widgets are fully deleted
 //  QgsApplication::sendPostedEvents( nullptr, QEvent::DeferredDelete );
+
+  unsetMapTool();
 
   mMainWindow->mapCanvas()->clearExtentHistory();
 
@@ -621,19 +710,13 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
 
     QString path = QFileDialog::getSaveFileName(
-                     mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "QGIS files" ) + " (*.qgs *.qgz)"
+                     mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)"
                    );
     if ( path.isEmpty() )
     {
       return false;
     }
-
-    QFileInfo fullPath( path );
-
-    if (
-      fullPath.suffix().compare( QLatin1String( "qgz" ), Qt::CaseInsensitive ) != 0 ||
-      fullPath.suffix().compare( QLatin1String( "qgs" ), Qt::CaseInsensitive ) != 0
-    )
+    if ( !path.endsWith( ".qgz", Qt::CaseInsensitive ) )
     {
       path += ".qgz";
     }
@@ -687,9 +770,68 @@ void KadasApplication::showLayerAttributeTable( const QgsMapLayer *layer )
   // TODO
 }
 
-void KadasApplication::showLayerProperties( const QgsMapLayer *layer )
+void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 {
-  // TODO
+  if ( !layer )
+    return;
+
+  switch ( layer->type() )
+  {
+#if 0
+    case QgsMapLayerType::RasterLayer:
+    {
+      QgsRasterLayerProperties *rasterLayerPropertiesDialog = new QgsRasterLayerProperties( mapLayer, mMapCanvas, this );
+      // Cannot use exec here due to raster transparency map tool:
+      // in order to pass focus to the canvas, the dialog needs to
+      // be hidden and shown in non-modal mode.
+      rasterLayerPropertiesDialog->setModal( true );
+      rasterLayerPropertiesDialog->show();
+      // Delete (later, for safety) since dialog cannot be reused without
+      // updating code
+      connect( rasterLayerPropertiesDialog, &QgsRasterLayerProperties::accepted, [ rasterLayerPropertiesDialog ]
+      {
+        rasterLayerPropertiesDialog->deleteLater();
+      } );
+      connect( rasterLayerPropertiesDialog, &QgsRasterLayerProperties::rejected, [ rasterLayerPropertiesDialog ]
+      {
+        rasterLayerPropertiesDialog->deleteLater();
+      } );
+      break;
+    }
+#endif
+
+    case QgsMapLayerType::VectorLayer:
+    {
+      QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+
+      KadasVectorLayerProperties vectorLayerPropertiesDialog( vlayer, mainWindow() );
+      for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+      {
+        vectorLayerPropertiesDialog.addPropertiesPageFactory( factory );
+      }
+      vectorLayerPropertiesDialog.exec();
+      break;
+    }
+
+    case QgsMapLayerType::PluginLayer:
+    {
+      QgsPluginLayer *pl = qobject_cast<QgsPluginLayer *>( layer );
+      if ( !pl )
+        return;
+
+      QgsPluginLayerType *plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( pl->pluginLayerType() );
+      if ( !plt )
+        return;
+
+      if ( !plt->showLayerProperties( pl ) )
+      {
+        mainWindow()->messageBar()->pushMessage( tr( "Warning" ),
+            tr( "This layer doesn't have a properties dialog." ),
+            Qgis::Info, mainWindow()->messageTimeout() );
+      }
+      break;
+    }
+  }
 }
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
@@ -700,6 +842,49 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 QgsMapLayer *KadasApplication::currentLayer() const
 {
   return mMainWindow->layerTreeView()->currentLayer();
+}
+
+void KadasApplication::registerMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory )
+{
+  mMapLayerPanelFactories << factory;
+}
+
+void KadasApplication::unregisterMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory )
+{
+  mMapLayerPanelFactories.removeAll( factory );
+}
+
+QgsPrintLayout *KadasApplication::createNewPrintLayout( const QString &title )
+{
+  QString t = title;
+  if ( t.isEmpty() )
+  {
+    t = QgsProject::instance()->layoutManager()->generateUniqueTitle( QgsMasterLayoutInterface::PrintLayout );
+  }
+  //create new layout object
+  QgsPrintLayout *layout = new QgsPrintLayout( QgsProject::instance() );
+  layout->setName( t );
+  layout->initializeDefaults();
+  if ( QgsProject::instance()->layoutManager()->addLayout( layout ) )
+  {
+    emit printLayoutAdded( layout );
+    return layout;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+bool KadasApplication::deletePrintLayout( QgsPrintLayout *layout )
+{
+  emit printLayoutWillBeRemoved( layout );
+  return QgsProject::instance()->layoutManager()->removeLayout( layout );
+}
+
+QList<QgsPrintLayout *> KadasApplication::printLayouts() const
+{
+  return QgsProject::instance()->layoutManager()->printLayouts();
 }
 
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )
@@ -737,6 +922,11 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
       disconnect( static_cast<KadasMapToolPan *>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
       disconnect( static_cast<KadasMapToolPan *>( oldTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
     }
+    if ( oldTool != mMapToolPan )
+    {
+      // Always delete unset tool, except for pan tool
+      oldTool->deleteLater();
+    }
   }
   // Automatically return to pan tool if no tool is active
   if ( !newTool )
@@ -756,6 +946,122 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
   }
 }
 
+QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
+{
+  QgsMapCanvas *canvas = mMainWindow->mapCanvas();
+  QgsPointXY pastePos = mapPos ? *mapPos : mMainWindow->mapCanvas()->center();
+  QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
+  if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
+  {
+    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    QList<KadasMapItem *> items;
+    QList<QgsPointXY> itemPos;
+    QgsPointXY center;
+    for ( const KadasMapItem *item : KadasClipboard::instance()->storedMapItems() )
+    {
+      QgsCoordinateTransform crst( item->crs(), mapCrs, QgsProject::instance() );
+      QgsPointXY pos = crst.transform( item->position() );
+      itemPos.append( pos );
+      items.append( item->clone() );
+      center += QgsVector( pos.x(), pos.y() );
+    }
+    center /= itemPos.size();
+    for ( int i = 0, n = items.size(); i < n; ++i )
+    {
+      QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
+      QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
+      items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+    }
+    if ( items.size() == 1 )
+    {
+      return new KadasMapToolEditItem( canvas, items.front(), layer );
+    }
+    else
+    {
+      return new KadasMapToolEditItemGroup( canvas, items, layer );
+    }
+  }
+  else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
+  {
+    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    QList<KadasMapItem *> items;
+    const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
+    for ( const QgsFeature &feature : featureStore.features() )
+    {
+      if ( feature.geometry().type() == QgsWkbTypes::PointGeometry )
+      {
+        KadasPointItem *item = new KadasPointItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+      else if ( feature.geometry().type() == QgsWkbTypes::LineGeometry )
+      {
+        KadasLineItem *item = new KadasLineItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+      else if ( feature.geometry().type() == QgsWkbTypes::PolygonGeometry )
+      {
+        KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
+        item->addPartFromGeometry( *feature.geometry().constGet() );
+        items.append( item );
+      }
+    }
+    if ( items.size() == 1 )
+    {
+      return new KadasMapToolEditItem( canvas, items.front(), layer );
+    }
+    else
+    {
+      return new KadasMapToolEditItemGroup( canvas, items, layer );
+    }
+  }
+  else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
+  {
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+    QString filename = KadasTemporaryFile::createNewFile( "pasted_image.svg" );
+    QFile file( filename );
+    if ( file.open( QIODevice::WriteOnly ) )
+    {
+      file.write( mimeData->data( "image/svg+xml" ) );
+      file.close();
+      KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
+      item->setup( filename, 0.5, 0.5 );
+      item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
+      return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
+    }
+  }
+  else
+  {
+    QList<QByteArray> mimeTypes = QImageReader::supportedMimeTypes();
+    mimeTypes.prepend( "image/png" ); // Try png first
+    for ( const QByteArray &mimeType : mimeTypes )
+    {
+      if ( KadasClipboard::instance()->hasFormat( mimeType ) )
+      {
+        const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+        QByteArray imageData = mimeData->data( mimeType );
+        QBuffer buf( &imageData );
+        QString ext = QImageReader( &buf ).format();
+        QString filename = KadasTemporaryFile::createNewFile( QString( "pasted_image.%1" ).arg( ext ) );
+        QFile file( filename );
+        if ( file.open( QIODevice::WriteOnly ) )
+        {
+          file.write( imageData );
+          file.close();
+          KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+          QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
+          item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
+          return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
+        }
+        break;
+      }
+    }
+  }
+  return nullptr;
+}
+
 void KadasApplication::unsetMapTool()
 {
   if ( mMainWindow->mapCanvas()->mapTool() != mMapToolPan )
@@ -770,15 +1076,13 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
   {
     KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
-    connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     mMainWindow->mapCanvas()->setMapTool( tool );
   }
-  // TODO
 }
 
 void KadasApplication::showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos )
 {
-  // TODO
+  KadasCanvasContextMenu( mMainWindow->mapCanvas(), screenPos, mapPos ).exec( mMainWindow->mapCanvas()->mapToGlobal( screenPos ) );
 }
 
 void KadasApplication::updateWindowTitle()
@@ -1102,4 +1406,37 @@ void KadasApplication::loadPythonSupport()
     QgsPythonRunner::setInstance( new KadasPythonRunner( mPythonIntegration ) );
     mPythonIntegration->restorePlugins();
   }
+}
+
+void KadasApplication::updateWmtsZoomResolutions() const
+{
+  QList<double> resolutions;
+  for ( QgsMapLayer *layer : mMainWindow->mapCanvas()->layers() )
+  {
+    QgsRasterLayer *rasterLayer = dynamic_cast<QgsRasterLayer *>( layer );
+    if ( !rasterLayer )
+    {
+      continue;
+    }
+
+    QgsRasterDataProvider *currentProvider = rasterLayer->dataProvider();
+    if ( !currentProvider || currentProvider->name().compare( "wms", Qt::CaseInsensitive ) != 0 )
+    {
+      continue;
+    }
+
+    //wmts must not be reprojected
+    if ( currentProvider->crs() != mMainWindow->mapCanvas()->mapSettings().destinationCrs() )
+    {
+      continue;
+    }
+
+    //property 'resolutions' for wmts layers
+    resolutions = rasterLayer->dataProvider()->nativeResolutions();
+    if ( !resolutions.isEmpty() )
+    {
+      break;
+    }
+  }
+  mMainWindow->mapCanvas()->setZoomResolutions( resolutions );
 }

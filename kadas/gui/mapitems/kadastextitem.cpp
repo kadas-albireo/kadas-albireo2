@@ -23,6 +23,8 @@
 #include <kadas/gui/mapitems/kadastextitem.h>
 
 
+KADAS_REGISTER_MAP_ITEM( KadasTextItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasTextItem( crs ); } );
+
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasAnchoredItem( crs, parent )
 {
@@ -75,4 +77,21 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   context.painter()->translate( pos );
   context.painter()->rotate( -constState()->angle );
   context.painter()->drawPath( path );
+}
+
+QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+{
+  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  QgsPointXY pos = QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ).transform( position() );
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>" << "\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( mText );
+  outStream << "<Style>";
+  outStream << QString( "<IconStyle><scale>0</scale></IconStyle><LabelStyle><color>%1</color><scale>%2</scale></LabelStyle></Style>" ).arg( color2hex( mFillColor ) ).arg( mFont.pointSizeF() / QFont().pointSizeF() );
+  outStream << QString( "<Point><coordinates>%1,%2</coordinates></Point>" ).arg( QString::number( pos.x(), 'f', 10 ) ).arg( QString::number( pos.y(), 'f', 10 ) );
+  outStream << "</Placemark>" << "\n";
+  outStream.flush();
+  return outString;
 }

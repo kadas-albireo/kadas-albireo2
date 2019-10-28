@@ -27,7 +27,7 @@ class KadasMapToolCreateItem : QgsMapTool
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp = new sipKadasMapToolCreateItem( a0, nullptr, a2 );
+    sipCpp = new sipKadasMapToolCreateItem( a0, static_cast<PyObject *>( nullptr ), a2 );
     sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
     {
       KadasMapItem *res;
@@ -44,6 +44,7 @@ class KadasMapToolCreateItem : QgsMapTool
     Py_END_ALLOW_THREADS
 
 %End
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = 0 );
     ~KadasMapToolCreateItem();
 
     virtual void activate();
@@ -62,11 +63,12 @@ class KadasMapToolCreateItem : QgsMapTool
 
     const KadasMapItem *currentItem() const;
     KadasMapItem *takeItem();
+    const KadasMapItemEditor *currentEditor() const;
 
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );
-
-
+    void setSelectItems( bool select );
+    void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
     void clear();
@@ -78,14 +80,12 @@ class KadasMapToolCreateItem : QgsMapTool
   protected:
 
     void createItem();
-    void addPoint( const QgsPointXY &mapPos );
-    void startPart( const QgsPointXY &pos );
+    void addPoint( const KadasMapPos &mapPos );
+    void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();
-    void addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs );
     void commitItem();
-    void cleanup();
-    QgsPointXY transformMousePoint( QgsPointXY mapPos ) const;
+    KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem();
 

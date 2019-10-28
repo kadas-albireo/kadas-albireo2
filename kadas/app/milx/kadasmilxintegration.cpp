@@ -66,6 +66,11 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow() );
+
+  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
+  {
+    return new KadasMilxEditor( item, type, mMilxLibrary );
+  } );
 }
 
 KadasMilxIntegration::~KadasMilxIntegration()
@@ -101,13 +106,11 @@ void KadasMilxIntegration::createMilx( bool active )
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   if ( active )
   {
+
     KadasMapToolCreateItem::ItemFactory itemFactory = [ = ]
     {
       KadasMilxItem *item = new KadasMilxItem();
-      item->setEditorFactory( [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
-      {
-        return new KadasMilxEditor( item, type, mMilxLibrary );
-      } );
+      item->setEditor( "KadasMilxEditor" );
       return item;
     };
     KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
@@ -116,7 +119,6 @@ void KadasMilxIntegration::createMilx( bool active )
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );
     tool->showLayerSelection( true, layerFilter, layerCreator );
-    connect( tool, &QgsMapTool::deactivated, tool, &QObject::deleteLater );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     canvas->setMapTool( tool );
@@ -230,7 +232,9 @@ void KadasMilxIntegration::saveMilx()
     zip = new QuaZip( filename );
     zip->open( QuaZip::mdCreate );
     dev = new QuaZipFile( zip );
-    static_cast<QuaZipFile *>( dev )->open( QIODevice::WriteOnly, QuaZipNewInfo( "Layer.milxly" ) );
+    QuaZipNewInfo info( "Layer.milxly" );
+    info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
+    static_cast<QuaZipFile *>( dev )->open( QIODevice::WriteOnly, info );
   }
   else
   {

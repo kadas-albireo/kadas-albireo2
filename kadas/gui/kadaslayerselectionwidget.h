@@ -19,6 +19,7 @@
 
 #include <functional>
 
+#include <QLabel>
 #include <QWidget>
 
 #include <kadas/gui/kadas_gui.h>
@@ -38,6 +39,8 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, LayerFilter filter = nullptr, LayerCreator creator = nullptr, QWidget *parent = nullptr );
 #endif
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QWidget *parent = nullptr ) : KadasLayerSelectionWidget( canvas, nullptr, nullptr, parent ) {}
+    void createLayerIfEmpty( const QString &name );
+    void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
 
   public slots:
@@ -51,6 +54,7 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     LayerCreator mCreator = nullptr;
 
     QgsMapCanvas *mCanvas;
+    QLabel *mLabel;
     QComboBox *mLayersCombo;
 
   private slots:

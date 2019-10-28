@@ -30,10 +30,10 @@ class KadasItemLayer;
 
 class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
 {
+    Q_OBJECT
   public:
     KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer );
     KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer );
-    ~KadasMapToolEditItem();
 
     void activate() override;
     void deactivate() override;
@@ -51,6 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasMapItem::EditContext mEditContext;
 
     KadasFloatingInputWidget *mInputWidget = nullptr;
+    KadasMapItemEditor *mEditor = nullptr;
     bool mIgnoreNextMoveEvent = false;
     QgsVector mMoveOffset;
 
@@ -58,9 +59,12 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     void setupNumericInput();
     void clearNumericInput();
 
-  public slots:
+  private slots:
     void inputChanged();
     void stateChanged( KadasStateHistory::State *state );
+    void copyItem();
+    void cutItem();
+    void deleteItem();
 };
 
 #endif // KADASMAPTOOLEDITITEM_H

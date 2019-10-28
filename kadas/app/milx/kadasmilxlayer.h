@@ -17,8 +17,8 @@
 #ifndef KADASMILXLAYER_H
 #define KADASMILXLAYER_H
 
+#include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/kadasitemlayer.h>
-
 
 class KadasMilxLayer : public KadasItemLayer
 {
@@ -28,11 +28,13 @@ class KadasMilxLayer : public KadasItemLayer
     static QString layerType() { return "KadasMilxLayer"; }
 
     KadasMilxLayer( const QString &name = "MilX" );
+    QString layerTypeKey() const override { return layerType(); };
+
+    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
+    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const override;
-
-    void addLayerMenuActions( QMenu *menu ) const override;
 
     void setApproved( bool approved );
     bool isApproved() const { return mIsApproved; }
@@ -50,13 +52,14 @@ class KadasMilxLayer : public KadasItemLayer
 };
 
 
-class KadasMilxLayerType : public QgsPluginLayerType
+class KadasMilxLayerType : public KadasPluginLayerType
 {
   public:
     KadasMilxLayerType()
-      : QgsPluginLayerType( KadasMilxLayer::layerType() ) {}
+      : KadasPluginLayerType( KadasMilxLayer::layerType() ) {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasMilxLayer(); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasMilxLayer(); }
+    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
 #endif // KADASMILXLAYER_H

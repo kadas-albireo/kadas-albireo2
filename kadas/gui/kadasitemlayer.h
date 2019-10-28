@@ -20,53 +20,52 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
+#include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/kadas_gui.h>
 
 class QMenu;
+class QuaZip;
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasItemLayer : public QgsPluginLayer
+class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
     static QString layerType() { return "KadasItemLayer"; }
-    KadasItemLayer( const QString &name );
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
+    ~KadasItemLayer();
+    QString layerTypeKey() const override { return layerType(); };
 
-    void addItem( KadasMapItem *item );
-    KadasMapItem *takeItem( const QString &itemId );
+    void addItem( KadasMapItem *item SIP_TRANSFER );
+    KadasMapItem *takeItem( const QString &itemId ) SIP_TRANSFER;
     const QMap<QString, KadasMapItem *> &items() const { return mItems; }
-
-    void setOpacity( int opacity ) { mOpacity = opacity; }
-    int opacity() const { return mOpacity; }
-
-    QRectF margin() const;
 
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
+    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
+    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     virtual QString pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
-    void setTransformContext( const QgsCoordinateTransformContext &ctx ) override;
+    QString pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
 
-    bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
-    bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
-
-    virtual void addLayerMenuActions( QMenu *menu ) const {}
+#ifndef SIP_RUN
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
+#endif
 
   protected:
+    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
     QMap<QString, KadasMapItem *> mItems;
-    QgsCoordinateTransformContext mTransformContext;
-    int mOpacity = 100;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerType : public QgsPluginLayerType
+class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
 {
   public:
     KadasItemLayerType()
-      : QgsPluginLayerType( KadasItemLayer::layerType() ) {}
-    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
-    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items" ); }
+      : KadasPluginLayerType( KadasItemLayer::layerType() ) {}
+    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
+    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
 };
 
 #endif // KADASITEMLAYER_H

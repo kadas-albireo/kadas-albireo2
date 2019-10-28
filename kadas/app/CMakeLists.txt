@@ -1,14 +1,33 @@
 SET(CMAKE_AUTOMOC ON)
 
 FIND_PACKAGE(PythonLibs 3.0 REQUIRED)
+FIND_PACKAGE(OSG REQUIRED)
+FIND_PACKAGE(OSGEARTH REQUIRED)
 
-FILE(GLOB kadas_SRC *.cpp milx/*.cpp)
+FILE(GLOB kadas_SRC
+  *.cpp
+  milx/*.cpp
+  globe/*.cpp
+  kml/*.cpp
+  bullseye/*.cpp
+  guidegrid/*.cpp)
 LIST(SORT kadas_SRC)
 
-FILE(GLOB kadas_HDR *.h milx/*.h)
+FILE(GLOB kadas_HDR
+  *.h
+  milx/*.h
+  globe/*.h
+  kml/*.h
+  bullseye/*.h
+  guidegrid/*.h)
 LIST(SORT kadas_HDR)
 
-FILE(GLOB kadas_UI ui/*.ui)
+FILE(GLOB kadas_UI
+  ui/*.ui
+  globe/*.ui
+  kml/*.ui
+  bullseye/*.ui
+  guidegrid/*.ui)
 LIST(SORT kadas_UI)
 
 SET(kadas_RCC_SRC ../resources/resources.qrc)
@@ -25,6 +44,9 @@ INCLUDE_DIRECTORIES(${QTKEYCHAIN_INCLUDE_DIRS}/qt5keychain)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${CAIRO_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBRSVG_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${OSGEARTH_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${GEOS_INCLUDE_DIR})
 
 ADD_EXECUTABLE(kadas
     ${kadas_SRC}
@@ -43,6 +65,8 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Network
   Qt5::Xml
   Qt5::Sql
+  Qt5::OpenGL
+  Qt5::PrintSupport
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}
   ${CRASHRPT_LIBRARY}
@@ -52,6 +76,26 @@ TARGET_LINK_LIBRARIES(kadas
   ${PYTHON_LIBRARIES}
   ${CAIRO_LIBRARIES}
   ${LIBRSVG_LIBRARIES}
+
+  ${OSGDB_LIBRARY}
+  ${OSGGA_LIBRARY}
+  ${OSGUTIL_LIBRARY}
+  ${OSG_LIBRARY}
+  ${OSGQT_LIBRARY}
+  ${OSGVIEWER_LIBRARY}
+  ${OSGEARTH_LIBRARY}
+  ${OSGEARTHANNOTATION_LIBRARY}
+  ${OSGEARTHFEATURES_LIBRARY}
+  ${OSGEARTHUTIL_LIBRARY}
+  ${OSGEARTHSYMBOLOGY_LIBRARY}
+  ${OSGEARTHQT_LIBRARY}
+  ${OPENTHREADS_LIBRARY}
+
+  kadas_core
+  kadas_analysis
+  kadas_gui
 )
 
-FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
+FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
+
+ADD_SUBDIRECTORY(globe/featuresource)

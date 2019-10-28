@@ -30,6 +30,10 @@
 #include <kadas/gui/mapitems/kadascircleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 
+
+KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item, false ); } )
+KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureAzimuthWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item, true ); } )
+
 KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth )
   : KadasMapItemEditor( item ), mMeasureAzimuth( measureAzimuth )
 {
@@ -155,7 +159,7 @@ void KadasMeasureWidget::updateTotal()
 
 
 KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode )
-  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) )
+  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) ), mMeasureMode( measureMode )
 {
   setMultipart( measureMode != MeasureAzimuth );
   setSnappingEnabled( true );
@@ -179,13 +183,7 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanv
 
 KadasGeometryItem *KadasMapToolMeasure::setupItem( KadasGeometryItem *item, bool measureAzimut ) const
 {
-  item->setEditorFactory( [ = ]( KadasMapItem * mapItem, KadasMapItemEditor::EditorType type )
-  {
-    KadasMeasureWidget *widget = new KadasMeasureWidget( mapItem, measureAzimut );
-    connect( widget, &KadasMeasureWidget::clearRequested, this, &KadasMapToolMeasure::clear );
-    connect( widget, &KadasMeasureWidget::pickRequested, this, &KadasMapToolMeasure::requestPick );
-    return widget;
-  } );
+  item->setEditor( measureAzimut ? "KadasMeasureAzimuthWidget" : "KadasMeasureWidget" );
   return item;
 }
 
@@ -194,6 +192,13 @@ void KadasMapToolMeasure::activate()
   mPickFeature = false;
   setCursor( Qt::ArrowCursor );
   KadasMapToolCreateItem::activate();
+
+  const KadasMeasureWidget *widget = dynamic_cast<const KadasMeasureWidget *>( currentEditor() );
+  if ( widget )
+  {
+    connect( widget, &KadasMeasureWidget::clearRequested, this, &KadasMapToolMeasure::clear );
+    connect( widget, &KadasMeasureWidget::pickRequested, this, &KadasMapToolMeasure::requestPick );
+  }
 }
 
 void KadasMapToolMeasure::requestPick()
@@ -227,9 +232,9 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
   else
   {
     KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), ( mMeasureMode == MeasureLine || mMeasureMode == MeasureAzimuth ) ? QgsWkbTypes::LineGeometry : QgsWkbTypes::PolygonGeometry );
-    if ( pickResult.feature.isValid() )
+    if ( pickResult.geom )
     {
-      addPartFromGeometry( pickResult.feature.geometry().constGet(), pickResult.layer->crs() );
+      addPartFromGeometry( *pickResult.geom, pickResult.crs );
     }
     mPickFeature = false;
     setCursor( Qt::ArrowCursor );

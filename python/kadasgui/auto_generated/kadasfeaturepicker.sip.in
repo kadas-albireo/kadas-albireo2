@@ -39,12 +39,13 @@ the Free Software Foundation; either version 2 of the License, or     *
         bool isEmpty() const;
 
         QgsMapLayer *layer;
+        const QgsAbstractGeometry *geom;
+        QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
         QString itemId;
-        QRectF boundingBox;
     };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
+    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
 
 };
 

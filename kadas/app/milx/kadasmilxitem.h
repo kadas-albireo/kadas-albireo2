@@ -23,56 +23,78 @@
 // MilX items always in EPSG:4326
 class KadasMilxItem : public KadasMapItem
 {
+    Q_OBJECT
+    Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
+    Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
+    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
+    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
+
   public:
     KadasMilxItem( QObject *parent = nullptr );
     void setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc );
 
-    QgsRectangle boundingBox() const override;
-    QRect margin() const override;
+    const QString &mssString() const { return mMssString; }
+    void setMssString( const QString &mssString );
+    const QString &militaryName() const { return mMilitaryName; }
+    void setMilitaryName( const QString &militaryName );
+    int minNPoints() const { return mMinNPoints; }
+    void setMinNPoints( int minNPoints );
+    bool hasVariablePoints() const { return mHasVariablePoints; }
+    void setHasVariablePoints( bool hasVariablePoints );
+
+    QString itemName() const override { return mMilitaryName; }
+
+    KadasItemRect boundingBox() const override;
+    Margin margin() const override;
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
 
     void render( QgsRenderContext &context ) const override;
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 
     // State interface
     struct State : KadasMapItem::State
     {
-      QList<QgsPointXY> points;
-      QList< QPair<int, double> > attributes;
-      QList< QPair<int, QgsPointXY> > attributePoints;
+      QList<KadasItemPos> points;
+      QMap<KadasMilxClient::AttributeType, double> attributes;
+      QMap<KadasMilxClient::AttributeType, KadasItemPos> attributePoints;
       QList<int> controlPoints;
       QPoint userOffset;
       int pressedPoints = 0;
 
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
+      QJsonObject serialize() const override;
+      bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
     // Draw interface (all points in item crs)
-    bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings ) override;
+    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings ) override;
+    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
     void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
     bool continuePart( const QgsMapSettings &mapSettings ) override;
     void endPart() override;
 
     AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const override;
+    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
     // Edit interface (all points in item crs)
-    EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings ) override;
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
+    void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const override;
-    QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    const QString &mssString() const { return mMssString; }
-    const QString &militaryName() const { return mMilitaryName; }
+    KadasItemPos position() const override;
+    void setPosition( const KadasItemPos &pos ) override;
+
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     bool isMultiPoint() const;
@@ -84,24 +106,39 @@ class KadasMilxItem : public KadasMapItem
     static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
 
   private:
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX = -2,
+      AttrY = -1,
+      AttrW = KadasMilxClient::AttributeWidth,
+      AttrL = KadasMilxClient::AttributeLength,
+      AttrR = KadasMilxClient::AttributeRadius,
+      AttrA = KadasMilxClient::AttributeAttitude
+    };
 
     QString mMssString;
     QString mMilitaryName;
     int mMinNPoints = -1;
     bool mHasVariablePoints = false;
-    QRect mMargin;
+
+    // Symbol cache
+    mutable QImage mCachedGraphic;
+    mutable QPoint mCachedGraphicOffset;
+    mutable QgsRectangle mCachedExtent;
+
+    Margin mMargin;
 
     State *state() { return static_cast<State *>( mState ); }
 
-    State *createEmptyState() const override { return new State(); }
+    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+
+    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
 
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    void updateSymbol( const QgsMapSettings &mapSettings );
-    void updateSymbolPoints( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
+    void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
 
-    static void posPointNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
-    static void ctrlPointNodeRenderer( QPainter *painter, const QgsPointXY &screenPoint, int nodeSize );
+    static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
+    static void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 
 };
 

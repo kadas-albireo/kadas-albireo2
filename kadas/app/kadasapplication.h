@@ -25,14 +25,18 @@
 #include <kadas/gui/kadasfeaturepicker.h>
 
 class QgsMapLayer;
+class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
+class QgsPrintLayout;
 class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasClipboard;
+class KadasGpxIntegration;
 class KadasMainWindow;
 class KadasMapToolPan;
 class KadasPythonIntegration;
 class KadasPluginInterface;
+class KadasRedliningIntegration;
 
 #define kApp KadasApplication::instance()
 
@@ -48,7 +52,6 @@ class KadasApplication : public QgsApplication
     KadasApplication( int &argc, char **argv );
     ~KadasApplication();
 
-    KadasClipboard *clipboard() const { return mClipboard; }
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
 
@@ -57,13 +60,10 @@ class KadasApplication : public QgsApplication
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     KadasItemLayer *getItemLayer( const QString &layerName ) const;
     KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
+    KadasItemLayer *selectItemLayer();
 
-    void exportToGpx();
     void exportToKml();
-    void importFromGpx();
     void importFromKml();
-
-    void paste();
 
     void projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile );
@@ -75,10 +75,19 @@ class KadasApplication : public QgsApplication
     void saveMapToClipboard();
 
     void showLayerAttributeTable( const QgsMapLayer *layer );
-    void showLayerProperties( const QgsMapLayer *layer );
+    void showLayerProperties( QgsMapLayer *layer );
     void showLayerInfo( const QgsMapLayer *layer );
 
     QgsMapLayer *currentLayer() const;
+
+    void registerMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
+    void unregisterMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
+
+    QgsPrintLayout *createNewPrintLayout( const QString &title );
+    bool deletePrintLayout( QgsPrintLayout *layout );
+    QList<QgsPrintLayout *> printLayouts() const;
+
+    QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
 
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
@@ -87,16 +96,18 @@ class KadasApplication : public QgsApplication
   signals:
     void projectRead();
     void activeLayerChanged( QgsMapLayer *layer );
+    void printLayoutAdded( QgsPrintLayout *layout );
+    void printLayoutWillBeRemoved( QgsPrintLayout *layout );
 
   private:
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
-    KadasClipboard *mClipboard = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
     bool mBlockActiveLayerChanged = false;
     QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;
     QMap<QString, QString> mItemLayerMap;
+    QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
@@ -112,6 +123,7 @@ class KadasApplication : public QgsApplication
     void showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos );
     void updateWindowTitle();
     void cleanup();
+    void updateWmtsZoomResolutions() const;
 };
 
 #endif // KADASAPPLICATION_H

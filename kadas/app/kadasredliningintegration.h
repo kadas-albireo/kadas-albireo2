@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasredliningintergration.h
-    ----------------------------
+    kadasredliningintegration.h
+    ---------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -34,15 +34,20 @@ class KadasRedliningIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasRedliningIntegration( QToolButton *buttonNewObject, KadasMainWindow *main );
+    KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent );
     KadasItemLayer *getOrCreateLayer();
-    KadasItemLayer *getLayer() const;
+
+    QAction *actionNewPoint() const { return mActionNewPoint; }
+    QAction *actionNewSquare() const { return mActionNewSquare; }
+    QAction *actionNewTriangle() const { return mActionNewTriangle; }
+    QAction *actionNewLine() const { return mActionNewLine; }
+    QAction *actionNewRectangle() const { return mActionNewRectangle; }
+    QAction *actionNewPolygon() const { return mActionNewPolygon; }
+    QAction *actionNewCircle() const { return mActionNewCircle; }
+    QAction *actionNewText() const { return mActionNewText; }
 
   private:
     QToolButton *mButtonNewObject = nullptr;
-    KadasMainWindow *mMainWindow = nullptr;
-    QgsMapCanvas *mCanvas = nullptr;
-    QString mLayerId;
 
     QAction *mActionNewPoint = nullptr;
     QAction *mActionNewSquare = nullptr;
@@ -55,6 +60,10 @@ class KadasRedliningIntegration : public QObject
 
     KadasMapItem *setEditorFactory( KadasMapItem *item ) const;
     void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory );
+
+  private slots:
+    void activateNewButtonObject();
+    void deactivateNewButtonObject();
 };
 
 #endif // KADASREDLININGINTEGRATION_H

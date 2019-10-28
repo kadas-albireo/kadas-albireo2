@@ -457,10 +457,11 @@ void KadasSearchBox::resultSelected()
       if ( !mPin )
       {
         mPin = new KadasSymbolItem( mMapCanvas->mapSettings().destinationCrs(), this );
-        mPin->setFilePath( ":/kadas/icons/pin_blue", 0.5, 1.0 );
+        mPin->setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
         KadasMapCanvasItemManager::addItem( mPin );
       }
-      mPin->setPosition( QgsCoordinateTransform( QgsCoordinateReferenceSystem( result.crs ), mPin->crs(), QgsProject::instance() ).transform( result.pos ) );
+      QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( result.crs ), mPin->crs(), QgsProject::instance() ).transform( result.pos );
+      mPin->setPosition( KadasItemPos::fromPoint( itemPos ) );
     }
     else
     {
@@ -576,7 +577,6 @@ void KadasSearchBox::setFilterTool()
     action->setCheckable( true );
     action->setChecked( true );
     connect( mFilterTool, &KadasMapToolCreateItem::partFinished, this, &KadasSearchBox::filterToolFinished );
-    connect( mFilterTool, &QgsMapTool::deactivated, mFilterTool, &QObject::deleteLater );
   }
 }
 

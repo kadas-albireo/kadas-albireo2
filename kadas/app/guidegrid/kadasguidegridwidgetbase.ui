@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KadasGuideGridWidgetBase</class>
+ <widget class="QWidget" name="KadasGuideGridWidgetBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>546</width>
+    <height>126</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
+   <item row="2" column="0" colspan="2">
+    <widget class="QWidget" name="widgetLayerSetup" native="true">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="1">
+       <widget class="QWidget" name="widgetTopLeft" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="lineEditTopLeft">
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButtonPickTopLeft">
+           <property name="icon">
+            <iconset resource="../../resources/resources.qrc">
+             <normaloff>:/kadas/icons/pick</normaloff>:/kadas/icons/pick</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelTopLeft">
+        <property name="text">
+         <string>Top left:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labelGrid">
+        <property name="text">
+         <string>Grid:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelBottomRight">
+        <property name="text">
+         <string>Bottom right:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QWidget" name="widgetBottomRight" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="lineEditBottomRight">
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButtonPickBottomRight">
+           <property name="icon">
+            <iconset resource="../../resources/resources.qrc">
+             <normaloff>:/kadas/icons/pick</normaloff>:/kadas/icons/pick</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="labelCell">
+        <property name="text">
+         <string>Cell:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QWidget" name="widgetWidth" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinBoxWidth">
+           <property name="toolTip">
+            <string>Width</string>
+           </property>
+           <property name="minimum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>999999.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButtonLockWidth">
+           <property name="icon">
+            <iconset resource="../../resources/resources.qrc">
+             <normaloff>:/kadas/icons/unlocked</normaloff>:/kadas/icons/unlocked</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="labelCellX">
+        <property name="text">
+         <string notr="true">x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QSpinBox" name="spinBoxCols">
+        <property name="toolTip">
+         <string>Columns</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="labelGridX">
+        <property name="text">
+         <string notr="true">x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QWidget" name="widgetHeight" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinBoxHeight">
+           <property name="toolTip">
+            <string>Height</string>
+           </property>
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="minimum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>999999.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButtonLockHeight">
+           <property name="icon">
+            <iconset resource="../../resources/resources.qrc">
+             <normaloff>:/kadas/icons/unlocked</normaloff>:/kadas/icons/unlocked</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QSpinBox" name="spinBoxRows">
+        <property name="toolTip">
+         <string>Rows</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="6">
+       <widget class="QWidget" name="widget_3" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labelColor">
+           <property name="text">
+            <string>Color:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QgsColorButton" name="toolButtonColor">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelFontSize">
+           <property name="text">
+            <string>Font size:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxFontSize">
+           <property name="suffix">
+            <string notr="true"> px</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelLabeling">
+           <property name="text">
+            <string>Labeling:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxLabeling">
+           <item>
+            <property name="text">
+             <string notr="true">A- x 1-</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string notr="true">1- x A-</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="layerSelectionWidgetHolder">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsColorButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">qgis/qgscolorbutton.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

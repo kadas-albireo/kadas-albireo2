@@ -30,6 +30,7 @@
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include <kadas/gui/maptools/kadasmaptooledititem.h>
 
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer )
@@ -45,6 +46,14 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *
 {
 }
 
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
+  : QgsMapTool( canvas )
+  , mItem( item )
+  , mLayer( layer )
+{
+
+}
+
 KadasMapToolCreateItem::~KadasMapToolCreateItem()
 {
   delete mInputWidget;
@@ -53,7 +62,6 @@ KadasMapToolCreateItem::~KadasMapToolCreateItem()
 
 void KadasMapToolCreateItem::activate()
 {
-  QgsMapTool::activate();
   mStateHistory = new KadasStateHistory( this );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged );
   createItem();
@@ -85,9 +93,10 @@ void KadasMapToolCreateItem::activate()
     connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
     mBottomBar->layout()->addWidget( layerSelection );
   }
-  if ( mItem->getEditorFactory() )
+  KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
+  if ( factory )
   {
-    mEditor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::CreateItemEditor );
+    mEditor = factory( mItem, KadasMapItemEditor::CreateItemEditor );
     mEditor->syncWidgetToItem();
     mBottomBar->layout()->addWidget( mEditor );
   }
@@ -115,6 +124,7 @@ void KadasMapToolCreateItem::activate()
   mBottomBar->layout()->addWidget( closeButton );
 
   mBottomBar->show();
+  QgsMapTool::activate();
 }
 
 void KadasMapToolCreateItem::deactivate()
@@ -127,7 +137,11 @@ void KadasMapToolCreateItem::deactivate()
   {
     commitItem();
   }
-  cleanup();
+  else
+  {
+    delete mItem;
+    mItem = nullptr;
+  }
   delete mStateHistory;
   mStateHistory = nullptr;
   delete mInputWidget;
@@ -141,20 +155,9 @@ void KadasMapToolCreateItem::showLayerSelection( bool enabled, KadasLayerSelecti
   mLayerCreator = creator;
 }
 
-void KadasMapToolCreateItem::cleanup()
-{
-  if ( mEditor )
-  {
-    mEditor->setItem( nullptr );
-  }
-  delete mItem;
-  mItem = nullptr;
-}
-
 void KadasMapToolCreateItem::clear()
 {
   commitItem();
-  cleanup();
   createItem();
   if ( mEditor )
   {
@@ -169,7 +172,7 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( e->button() == Qt::LeftButton )
   {
-    QgsPointXY pos = transformMousePoint( e->mapPoint() );
+    KadasMapPos pos = transformMousePoint( e->mapPoint() );
     addPoint( pos );
   }
   else if ( e->button() == Qt::RightButton )
@@ -193,7 +196,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  QgsPointXY pos = transformMousePoint( e->mapPoint() );
+  KadasMapPos pos = transformMousePoint( e->mapPoint() );
 
   if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {
@@ -202,36 +205,10 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( mInputWidget )
   {
     mInputWidget->ensureFocus();
-    KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition( pos );
-    QgsPointXY coo;
-    int xCooId = -1;
-    int yCooId = -1;
-    double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, canvas()->mapUnits() );
+    KadasMapItem::AttribValues values = mItem->drawAttribsFromPosition( pos, canvas()->mapSettings() );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
     {
-      // This assumes that there is never more that one x-y coordinate pair in the attributes
-      if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::XCooAttr )
-      {
-        coo.setX( it.value() );
-        xCooId = it.key();
-      }
-      else if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::YCooAttr )
-      {
-        coo.setY( it.value() );
-        yCooId = it.key();
-      }
-      else if ( mDrawAttribs[it.key()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-      {
-        it.value() *= distanceConv;
-      }
       mInputWidget->inputField( it.key() )->setValue( it.value() );
-    }
-    if ( xCooId >= 0 && yCooId >= 0 )
-    {
-      QgsCoordinateTransform crst( mItem->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
-      coo = crst.transform( coo );
-      mInputWidget->inputField( xCooId )->setValue( coo.x() );
-      mInputWidget->inputField( yCooId )->setValue( coo.y() );
     }
 
     mInputWidget->move( e->x(), e->y() + 20 );
@@ -271,7 +248,7 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
   }
 }
 
-QgsPointXY KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) const
+KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) const
 {
   if ( mSnapping )
   {
@@ -281,21 +258,19 @@ QgsPointXY KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) cons
       mapPos = m.point();
     }
   }
-  QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance() );
-  return crst.transform( mapPos );
+  return KadasMapPos( mapPos.x(), mapPos.y() );
 }
 
 KadasMapItem *KadasMapToolCreateItem::takeItem()
 {
   KadasMapItem *item = mItem;
-  QObject *scope = new QObject;
-  connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+  KadasMapCanvasItemManager::removeItemAfterRefresh( item, mCanvas );
   mItem = nullptr;
   clear();
   return item;
 }
 
-void KadasMapToolCreateItem::addPoint( const QgsPointXY &pos )
+void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 {
   if ( mItem->constState()->drawStatus == KadasMapItem::State::Empty )
   {
@@ -325,13 +300,23 @@ void KadasMapToolCreateItem::addPoint( const QgsPointXY &pos )
 
 void KadasMapToolCreateItem::createItem()
 {
-  mItem = mItemFactory();
-  mItem->setSelected( true );
+  if ( !mItem && mItemFactory )
+  {
+    mItem = mItemFactory();
+  }
+  else
+  {
+    KadasMapItem::State *state = mItem->constState()->clone();
+    state->drawStatus = KadasMapItem::State::Drawing;
+    mItem->setState( state );
+    delete state;
+  }
+  mItem->setSelected( mSelectItems );
   KadasMapCanvasItemManager::addItem( mItem );
   mStateHistory->clear();
 }
 
-void KadasMapToolCreateItem::startPart( const QgsPointXY &pos )
+void KadasMapToolCreateItem::startPart( const KadasMapPos &pos )
 {
   if ( !mItem->startPart( pos, canvas()->mapSettings() ) )
   {
@@ -360,17 +345,26 @@ void KadasMapToolCreateItem::finishPart()
   mItem->endPart();
   mStateHistory->push( mItem->constState()->clone() );
   emit partFinished();
+  if ( !mItemFactory )
+  {
+    KadasMapItem *item = mItem;
+    KadasMapCanvasItemManager::removeItem( mItem ); // Edit tool adds item again
+    mItem = nullptr;
+    mEditor->setItem( nullptr );
+    canvas()->setMapTool( new KadasMapToolEditItem( canvas(), item, mLayer ) );
+  }
 }
 
-void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry *geom, const QgsCoordinateReferenceSystem &crs )
+void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs )
 {
   if ( dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
     if ( crs != mItem->crs() )
     {
-      QgsAbstractGeometry *transformedGeom = geom->clone();
+      QgsAbstractGeometry *transformedGeom = geom.clone();
       transformedGeom->transform( QgsCoordinateTransform( crs, mItem->crs(), QgsProject::instance() ) );
-      static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( transformedGeom );
+      static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( *transformedGeom );
+      delete transformedGeom;
     }
     else
     {
@@ -388,9 +382,7 @@ void KadasMapToolCreateItem::commitItem()
   {
     mLayer->addItem( mItem );
     mLayer->triggerRepaint();
-    KadasMapItem *item = mItem;
-    QObject *scope = new QObject;
-    connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+    KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
   }
   if ( !mLayer )
   {
@@ -402,38 +394,12 @@ void KadasMapToolCreateItem::commitItem()
 
 KadasMapItem::AttribValues KadasMapToolCreateItem::collectAttributeValues() const
 {
-  QgsPointXY coo;
-  int xCooId = -1;
-  int yCooId = -1;
   KadasMapItem::AttribValues attributes;
   double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
 
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
-    double value = field->text().toDouble();
-    // This assumes that there is never more that one x-y coordinate pair in the attributes
-    if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::XCooAttr )
-    {
-      coo.setX( value );
-      xCooId = field->id();
-    }
-    else if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::YCooAttr )
-    {
-      coo.setY( value );
-      yCooId = field->id();
-    }
-    else if ( mDrawAttribs[field->id()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-    {
-      value *= distanceConv;
-    }
-    attributes.insert( field->id(), value );
-  }
-  if ( xCooId >= 0 && yCooId >= 0 )
-  {
-    QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance()->transformContext() );
-    coo = crst.transform( coo );
-    attributes.insert( xCooId, coo.x() );
-    attributes.insert( yCooId, coo.y() );
+    attributes.insert( field->id(), field->text().toDouble() );
   }
   return attributes;
 }
@@ -449,9 +415,8 @@ void KadasMapToolCreateItem::inputChanged()
   // may get altered
   mIgnoreNextMoveEvent = true;
 
-  QgsPointXY newPos = mItem->positionFromDrawAttribs( values );
-  QgsCoordinateTransform crst( mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-  mInputWidget->adjustCursorAndExtent( crst.transform( newPos ) );
+  KadasMapPos newPos = mItem->positionFromDrawAttribs( values, mCanvas->mapSettings() );
+  mInputWidget->adjustCursorAndExtent( newPos );
 
   if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
   {

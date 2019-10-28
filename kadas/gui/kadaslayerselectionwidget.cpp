@@ -34,7 +34,8 @@ KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, Laye
   layout()->setSpacing( 2 );
   layout()->setContentsMargins( 0, 0, 0, 0 );
 
-  layout()->addWidget( new QLabel( tr( "Layer:" ) ) );
+  mLabel = new QLabel( tr( "Layer:" ) );
+  layout()->addWidget( mLabel );
 
   mLayersCombo = new QComboBox( this );
   mLayersCombo->setFixedWidth( 100 );
@@ -54,6 +55,21 @@ KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, Laye
   connect( mCanvas, &QgsMapCanvas::currentLayerChanged, this, qOverload<QgsMapLayer *>( &KadasLayerSelectionWidget::setSelectedLayer ) );
 
   repopulateLayers();
+}
+
+void KadasLayerSelectionWidget::createLayerIfEmpty( const QString &layerName )
+{
+  if ( mLayersCombo->count() == 0 && mCreator )
+  {
+    QgsMapLayer *layer = mCreator( layerName );
+    QgsProject::instance()->addMapLayer( layer );
+    setSelectedLayer( layer );
+  }
+}
+
+void KadasLayerSelectionWidget::setLabel( const QString &label )
+{
+  mLabel->setText( label );
 }
 
 QgsMapLayer *KadasLayerSelectionWidget::getSelectedLayer() const

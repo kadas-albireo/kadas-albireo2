@@ -28,11 +28,13 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon = ICON_CIRCLE, QObject *parent = 0 );
 
-    virtual bool startPart( const QgsPointXY &firstPoint, const QgsMapSettings &mapSettings );
+    virtual QString itemName() const;
+
+    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );
 
     virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings );
 
-    virtual void setCurrentPoint( const QgsPointXY &p, const QgsMapSettings &mapSettings );
+    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings );
 
     virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings );
 
@@ -43,38 +45,48 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual AttribDefs drawAttribs() const;
 
-    virtual AttribValues drawAttribsFromPosition( const QgsPointXY &pos ) const;
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual QgsPointXY positionFromDrawAttribs( const AttribValues &values ) const;
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
-    virtual EditContext getEditContext( const QgsPointXY &pos, const QgsMapSettings &mapSettings ) const;
+    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual void edit( const EditContext &context, const QgsPointXY &newPoint, const QgsMapSettings &mapSettings );
+    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
 
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
 
 
-    virtual AttribValues editAttribsFromPosition( const EditContext &context, const QgsPointXY &pos ) const;
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
-    virtual QgsPointXY positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    virtual KadasItemPos position() const;
+
+    virtual void setPosition( const KadasItemPos &pos );
 
 
     virtual QgsWkbTypes::GeometryType geometryType() const;
-    virtual void addPartFromGeometry( const QgsAbstractGeometry *geom );
+    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom );
 
 
     const QgsMultiPoint *geometry() const;
 
     struct State : KadasMapItem::State
     {
-      QList<QgsPointXY> points;
+      QList<KadasItemPos> points;
       virtual void assign( const KadasMapItem::State *other );
       virtual State *clone() const /Factory/;
+      virtual QJsonObject serialize() const;
+
+      virtual bool deserialize( const QJsonObject &json );
+
     };
     const State *constState() const;
 
   protected:
+    virtual KadasMapItem *_clone() const;
     virtual State *createEmptyState() const;
     virtual void recomputeDerived();
 

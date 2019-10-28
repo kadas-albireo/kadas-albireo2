@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QMenu>
 #include <QPushButton>
 
 #include <qgis/qgsmapcanvas.h>
@@ -21,13 +22,17 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/kadasbottombar.h>
+#include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
+#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+
 
 KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer )
   : QgsMapTool( canvas )
@@ -46,11 +51,6 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *
   KadasMapCanvasItemManager::addItem( mItem );
 }
 
-KadasMapToolEditItem::~KadasMapToolEditItem()
-{
-
-}
-
 void KadasMapToolEditItem::activate()
 {
   QgsMapTool::activate();
@@ -62,11 +62,12 @@ void KadasMapToolEditItem::activate()
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
-  if ( mItem->getEditorFactory() )
+  KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
+  if ( factory )
   {
-    KadasMapItemEditor *editor = mItem->getEditorFactory()( mItem, KadasMapItemEditor::EditItemEditor );
-    editor->syncItemToWidget();
-    mBottomBar->layout()->addWidget( editor );
+    mEditor = factory( mItem, KadasMapItemEditor::CreateItemEditor );
+    mEditor->syncItemToWidget();
+    mBottomBar->layout()->addWidget( mEditor );
   }
   mItem->setSelected( true );
 
@@ -102,10 +103,9 @@ void KadasMapToolEditItem::deactivate()
   {
     mLayer->addItem( mItem );
     mLayer->triggerRepaint();
-    KadasMapItem *item = mItem;
-    QObject *scope = new QObject;
-    connect( mCanvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { KadasMapCanvasItemManager::removeItem( item ); scope->deleteLater(); } );
+    KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
     mItem->setSelected( false );
+    mItem = nullptr;
   }
   delete mBottomBar;
   mBottomBar = nullptr;
@@ -117,11 +117,49 @@ void KadasMapToolEditItem::deactivate()
 
 void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
+  if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
+  {
+    QString itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
+    if ( !itemId.isEmpty() )
+    {
+      KadasMapItem *otherItem = mLayer->takeItem( itemId );
+      KadasMapCanvasItemManager::removeItem( mItem );
+      KadasMapItem *item = mItem;
+      mItem = nullptr;
+      mLayer->triggerRepaint();
+      mCanvas->setMapTool( new KadasMapToolEditItemGroup( mCanvas, QList<KadasMapItem *>() << item << otherItem, mLayer ) );
+    }
+  }
   if ( e->button() == Qt::RightButton )
   {
+    KadasMapPos pos( e->mapPoint().x(), e->mapPoint().y() );
+    mEditContext = mItem->getEditContext( pos, canvas()->mapSettings() );
     if ( mEditContext.isValid() )
     {
-      // Context menu
+      QMenu menu;
+      menu.addAction( mItem->itemName() )->setEnabled( false );
+      menu.addSeparator();
+      int count = menu.actions().size();
+      mItem->populateContextMenu( &menu, mEditContext, pos, mCanvas->mapSettings() );
+      if ( menu.actions().size() > count )
+      {
+        menu.addSeparator();
+      }
+      menu.addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
+      menu.addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
+      QAction *clickedAction = menu.exec( e->globalPos() );
+
+      if ( clickedAction )
+      {
+        if ( clickedAction->data() == KadasMapItem::EditSwitchToDrawingTool )
+        {
+          KadasMapCanvasItemManager::removeItem( mItem );
+          KadasMapItem *item = mItem;
+          mItem = nullptr;
+          canvas()->setMapTool( new KadasMapToolCreateItem( canvas(), item, mLayer ) );
+        }
+      }
     }
     else
     {
@@ -137,14 +175,13 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance() );
-  QgsPointXY pos = crst.transform( e->mapPoint() );
+  KadasMapPos pos( e->mapPoint().x(), e->mapPoint().y() );
 
   if ( e->buttons() == Qt::LeftButton )
   {
     if ( mEditContext.isValid() )
     {
-      mItem->edit( mEditContext, pos - mMoveOffset, canvas()->mapSettings() );
+      mItem->edit( mEditContext, KadasMapPos( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() ), canvas()->mapSettings() );
     }
   }
   else
@@ -163,43 +200,17 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
         setCursor( mEditContext.cursor );
         setupNumericInput();
       }
-      mMoveOffset = pos - mEditContext.pos;
+      mMoveOffset = QgsVector( pos.x() - mEditContext.pos.x(), pos.y() - mEditContext.pos.y() );
     }
   }
   if ( mInputWidget && mEditContext.isValid() )
   {
     mInputWidget->ensureFocus();
 
-    KadasMapItem::AttribValues values = mItem->editAttribsFromPosition( mEditContext, pos - mMoveOffset );
-    QgsPointXY coo;
-    int xCooId = -1;
-    int yCooId = -1;
-    double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, canvas()->mapUnits() );
+    KadasMapItem::AttribValues values = mItem->editAttribsFromPosition( mEditContext, KadasMapPos( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() ), canvas()->mapSettings() );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
     {
-      // This assumes that there is never more that one x-y coordinate pair in the attributes
-      if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::XCooAttr )
-      {
-        coo.setX( it.value() );
-        xCooId = it.key();
-      }
-      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::YCooAttr )
-      {
-        coo.setY( it.value() );
-        yCooId = it.key();
-      }
-      else if ( mEditContext.attributes[it.key()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-      {
-        it.value() *= distanceConv;
-      }
       mInputWidget->inputField( it.key() )->setValue( it.value() );
-    }
-    if ( xCooId >= 0 && yCooId >= 0 )
-    {
-      QgsCoordinateTransform crst( mItem->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
-      coo = crst.transform( coo );
-      mInputWidget->inputField( xCooId )->setValue( coo.x() );
-      mInputWidget->inputField( yCooId )->setValue( coo.y() );
     }
 
     mInputWidget->move( e->x(), e->y() + 20 );
@@ -233,6 +244,18 @@ void KadasMapToolEditItem::keyPressEvent( QKeyEvent *e )
   else if ( e->key() == Qt::Key_Y && e->modifiers() == Qt::ControlModifier )
   {
     mStateHistory->redo();
+  }
+  else if ( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
+  {
+    copyItem();
+  }
+  else if ( e->key() == Qt::Key_X && e->modifiers() == Qt::ControlModifier )
+  {
+    cutItem();
+  }
+  else if ( e->key() == Qt::Key_Delete )
+  {
+    deleteItem();
   }
 }
 
@@ -271,38 +294,11 @@ void KadasMapToolEditItem::stateChanged( KadasStateHistory::State *state )
 
 KadasMapItem::AttribValues KadasMapToolEditItem::collectAttributeValues() const
 {
-  QgsPointXY coo;
-  int xCooId = -1;
-  int yCooId = -1;
   KadasMapItem::AttribValues attributes;
-  double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
 
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
-    double value = field->text().toDouble();
-    // This assumes that there is never more that one x-y coordinate pair in the attributes
-    if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::XCooAttr )
-    {
-      coo.setX( value );
-      xCooId = field->id();
-    }
-    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::YCooAttr )
-    {
-      coo.setY( value );
-      yCooId = field->id();
-    }
-    else if ( mEditContext.attributes[field->id()].type == KadasMapItem::NumericAttribute::DistanceAttr )
-    {
-      value *= distanceConv;
-    }
-    attributes.insert( field->id(), value );
-  }
-  if ( xCooId >= 0 && yCooId >= 0 )
-  {
-    QgsCoordinateTransform crst( canvas()->mapSettings().destinationCrs(), mItem->crs(), QgsProject::instance()->transformContext() );
-    coo = crst.transform( coo );
-    attributes.insert( xCooId, coo.x() );
-    attributes.insert( yCooId, coo.y() );
+    attributes.insert( field->id(), field->text().toDouble() );
   }
   return attributes;
 }
@@ -321,11 +317,31 @@ void KadasMapToolEditItem::inputChanged()
     // may get altered
     mIgnoreNextMoveEvent = true;
 
-    QgsPointXY newPos = mItem->positionFromEditAttribs( mEditContext, values, mCanvas->mapSettings() );
-    QgsCoordinateTransform crst( mItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-    mInputWidget->adjustCursorAndExtent( crst.transform( newPos ) );
+    KadasMapPos newPos = mItem->positionFromEditAttribs( mEditContext, values, mCanvas->mapSettings() );
+    mInputWidget->adjustCursorAndExtent( newPos );
 
     mItem->edit( mEditContext, values, canvas()->mapSettings() );
     mStateHistory->push( mItem->constState()->clone() );
   }
+}
+
+void KadasMapToolEditItem::copyItem()
+{
+  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << mItem );
+}
+
+void KadasMapToolEditItem::cutItem()
+{
+  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << mItem );
+  deleteItem();
+}
+
+void KadasMapToolEditItem::deleteItem()
+{
+  delete mEditor;
+  mEditor = nullptr;
+
+  delete mItem;
+  mItem = nullptr;
+  canvas()->unsetMapTool( this );
 }
