@@ -48,7 +48,7 @@ class KadasMilxLayer : public KadasItemLayer
   private:
     class Renderer;
 
-    bool mIsApproved;
+    bool mIsApproved = false;
 };
 
 
