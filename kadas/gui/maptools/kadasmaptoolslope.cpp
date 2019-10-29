@@ -24,7 +24,6 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
-#include <kadas/core/kadastemporaryfile.h>
 #include <kadas/analysis/kadasslopefilter.h>
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
@@ -81,7 +80,7 @@ void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinate
   }
 
   QString outputFileName = QString( "slope_%1-%2_%3-%4.tif" ).arg( extent.xMinimum() ).arg( extent.xMaximum() ).arg( extent.yMinimum() ).arg( extent.yMaximum() );
-  QString outputFile = KadasTemporaryFile::createNewFile( outputFileName );
+  QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
   KadasSlopeFilter slope( layer->source(), outputFile, "GTiff", extent, crs );
   QProgressDialog p( tr( "Calculating slope..." ), tr( "Abort" ), 0, 0 );

@@ -56,7 +56,12 @@ QJsonObject KadasMapItem::serialize() const
     QMetaProperty prop = metaObject()->property( i );
     QVariant variant = prop.read( this );
     QJsonValue value = variant.toJsonValue();
-    if ( value.isUndefined() )
+    // TODO: use custom type
+    if ( prop.name() == QString( "filePath" ) )
+    {
+      value = QJsonValue( QgsProject::instance()->writePath( variant.toString() ) );
+    }
+    else if ( value.isUndefined() )
     {
       // Manually handle conversion, i.e. variant.toJsonValue does not convert enums to int...
       if ( variant.canConvert( QVariant::Int ) )
@@ -96,7 +101,12 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
     QMetaProperty prop = metaObject()->property( i );
     QJsonValue value = props[prop.name()];
     QVariant variant( prop.type() );
-    if ( variant.toJsonValue().isUndefined() && value.type() == QJsonValue::String )
+    // TODO: use custom type
+    if ( prop.name() == QString( "filePath" ) )
+    {
+      prop.write( this, QVariant::fromValue( QgsProject::instance()->readPath( value.toString() ) ) );
+    }
+    else if ( variant.toJsonValue().isUndefined() && value.type() == QJsonValue::String )
     {
       // Deserialize non-convertible types from base64 encoded binary strings
       QByteArray ba = QByteArray::fromBase64( value.toString().toLocal8Bit() );

@@ -28,7 +28,6 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/core/kadastemporaryfile.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
@@ -286,7 +285,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   // Prepare vsi output
   QString safename = name;
   safename.replace( QRegExp( "[<>:\"/\\\\|?*]" ), "_" ); // Replace invalid path chars
-  QString vsifilename = KadasTemporaryFile::createNewFile( QString( "%1.zip" ).arg( safename ) );
+  QString vsifilename = QgsProject::instance()->createAttachedFile( QString( "%1.zip" ).arg( safename ) );
   QuaZip vsiZip( vsifilename );
   if ( !vsiZip.open( QuaZip::mdCreate ) )
   {
@@ -433,7 +432,7 @@ KadasKMLImport::StyleData KadasKMLImport::parseStyle( const QDomElement &styleEl
       if ( file.open( QIODevice::ReadOnly ) )
       {
         QImage icon = QImage::fromData( file.readAll() );
-        style.icon = KadasTemporaryFile::createNewFile( "kml_import.png" );
+        style.icon = QgsProject::instance()->createAttachedFile( "kml_import.png" );
         icon.save( style.icon );
 
         QDomElement hotSpotEl = styleEl.firstChildElement( "IconStyle" ).firstChildElement( "hotSpot" );

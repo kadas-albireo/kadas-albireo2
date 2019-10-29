@@ -42,7 +42,6 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/core/kadastemporaryfile.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
@@ -1019,7 +1018,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-    QString filename = KadasTemporaryFile::createNewFile( "pasted_image.svg" );
+    QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.svg" );
     QFile file( filename );
     if ( file.open( QIODevice::WriteOnly ) )
     {
@@ -1034,29 +1033,16 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   }
   else
   {
-    QList<QByteArray> mimeTypes = QImageReader::supportedMimeTypes();
-    mimeTypes.prepend( "image/png" ); // Try png first
-    for ( const QByteArray &mimeType : mimeTypes )
+    const QMimeData *mimeData = KadasClipboard::instance()->mimeData();
+    if ( mimeData && mimeData->hasImage() )
     {
-      if ( KadasClipboard::instance()->hasFormat( mimeType ) )
-      {
-        const QMimeData *mimeData = QApplication::clipboard()->mimeData();
-        QByteArray imageData = mimeData->data( mimeType );
-        QBuffer buf( &imageData );
-        QString ext = QImageReader( &buf ).format();
-        QString filename = KadasTemporaryFile::createNewFile( QString( "pasted_image.%1" ).arg( ext ) );
-        QFile file( filename );
-        if ( file.open( QIODevice::WriteOnly ) )
-        {
-          file.write( imageData );
-          file.close();
-          KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-          QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
-          item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-          return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
-        }
-        break;
-      }
+      QImage image = qvariant_cast<QImage>( mimeData->imageData() );
+      QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
+      image.save( filename );
+      KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
+      item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
+      return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
     }
   }
   return nullptr;

@@ -33,7 +33,6 @@
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
 #include <kadas/core/kadascoordinateformat.h>
-#include <kadas/core/kadastemporaryfile.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 #include <kadas/gui/mapitems/kadascircularsectoritem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
@@ -189,7 +188,7 @@ void KadasMapToolViewshed::drawFinished()
   }
 
   QString outputFileName = QString( "viewshed_%1,%2.tif" ).arg( center.x() ).arg( center.y() );
-  QString outputFile = KadasTemporaryFile::createNewFile( outputFileName );
+  QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
   QVector<QgsPointXY> filterRegion;
   QgsPolygonXY poly = QgsGeometry( item->geometry()->geometryN( 0 )->clone() ).asPolygon();
