@@ -541,28 +541,38 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
   button->setIconSize( QSize( 32, 32 ) );
   if ( toolFactory )
   {
-    button->setCheckable( true );
-    connect( action, &QAction::toggled, [this, toolFactory, action]( bool active )
+    button->setCheckable( action->isCheckable() );
+    if ( button->isCheckable() )
     {
-      if ( active )
+      connect( action, &QAction::toggled, this, [this, toolFactory, action]( bool active )
       {
-        mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
-        QgsMapTool *tool = toolFactory();
-        if ( tool )
+        if ( active )
         {
-          tool->setAction( action );
-          mMapCanvas->setMapTool( tool );
+          mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
+          QgsMapTool *tool = toolFactory();
+          if ( tool )
+          {
+            tool->setAction( action );
+            mMapCanvas->setMapTool( tool );
+          }
+          else
+          {
+            action->setChecked( false );
+          }
         }
-        else
+        else if ( mMapCanvas->mapTool() && mMapCanvas->mapTool()->action() == action )
         {
-          action->setChecked( false );
+          mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
         }
-      }
-      else if ( mMapCanvas->mapTool() && mMapCanvas->mapTool()->action() == action )
+      } );
+    }
+    else
+    {
+      connect( action, &QAction::triggered, this, [this, toolFactory, action]
       {
-        mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
-      }
-    } );
+        mMapCanvas->setMapTool( toolFactory() );
+      } );
+    }
   }
   if ( !shortcut.isEmpty() )
   {
