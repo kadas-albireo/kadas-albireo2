@@ -1946,7 +1946,7 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>V Repo</string>
+             <string>Plugin Manager</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -2560,6 +2560,18 @@ Sight</string>
    </property>
    <property name="toolTip">
     <string>Bullseye</string>
+   </property>
+  </action>
+  <action name="mActionPluginManager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/pluginmanager</normaloff>:/kadas/icons/pluginmanager</iconset>
+   </property>
+   <property name="text">
+    <string>Plugin Manager</string>
    </property>
   </action>
  </widget>

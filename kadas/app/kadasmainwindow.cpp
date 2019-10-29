@@ -242,7 +242,6 @@ void KadasMainWindow::init()
   connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
-  connect( mPluginManagerButton, &QPushButton::toggled, this, &KadasMainWindow::showPluginManager );
 
   QStringList catalogUris = QSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
   for ( const QString &catalogUri : catalogUris )
@@ -526,6 +525,10 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionSaveMilx, mSaveMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_E ) );
   setActionToButton( mActionLoadMilx, mLoadMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_I ) );
   setActionToButton( mActionImportOVL, mOvlButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_O ) );
+
+  // Settings tab
+  setActionToButton( mActionPluginManager, mPluginManagerButton, QKeySequence( Qt::CTRL + Qt::Key_S, Qt::CTRL + Qt::Key_P ) );
+  connect( mActionPluginManager, &QAction::toggled, this, &KadasMainWindow::showPluginManager );
 
   //help tab
   setActionToButton( mActionHelp, mHelpButton );

@@ -64,6 +64,7 @@
         <file alias="icons/line">icons/line.png</file>
         <file alias="icons/azimuth">icons/azimuth.png</file>
         <file alias="icons/help">icons/help.png</file>
+        <file alias="icons/pluginmanager">icons/pluginmanager.png</file>
         <file alias="splash">splash.png</file>
         <file alias="logo">logo.png</file>
         <file alias="icon-60x60">icon-60x60.png</file>
