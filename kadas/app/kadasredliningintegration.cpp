@@ -154,6 +154,9 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
   if ( active )
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
+    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return kApp->getOrCreateItemLayer( name ); };
+    tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
     tool->setAction( action );
     connect( tool, &QgsMapTool::activated, this, &KadasRedliningIntegration::activateNewButtonObject );
     connect( tool, &QgsMapTool::deactivated, this, &KadasRedliningIntegration::deactivateNewButtonObject );

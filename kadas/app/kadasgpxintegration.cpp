@@ -76,6 +76,9 @@ void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<Kad
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
+    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return kApp->getOrCreateItemLayer( name ); };
+    tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     canvas->setMapTool( tool );
