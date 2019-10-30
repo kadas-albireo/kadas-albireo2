@@ -42,25 +42,20 @@ KadasMapToolBullseye::KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeVi
   }
 
   mWidget = new KadasBullseyeWidget( canvas, layerTreeView );
-  mWidget->setVisible( false );
   if ( layer )
   {
     mWidget->setLayer( layer );
   }
+  setCursor( Qt::ArrowCursor );
   connect( mWidget, &KadasBullseyeWidget::requestPickCenter, this, &KadasMapToolBullseye::setPicking );
   connect( mWidget, &KadasBullseyeWidget::close, this, &KadasMapToolBullseye::close );
+
+  mWidget->show();
 }
 
 KadasMapToolBullseye::~KadasMapToolBullseye()
 {
   delete mWidget;
-}
-
-void KadasMapToolBullseye::activate()
-{
-  QgsMapTool::activate();
-  setCursor( Qt::ArrowCursor );
-  mWidget->setVisible( true );
 }
 
 void KadasMapToolBullseye::setPicking( bool picking )

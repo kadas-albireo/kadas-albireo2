@@ -42,25 +42,20 @@ KadasMapToolGuideGrid::KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTree
   }
 
   mWidget = new KadasGuideGridWidget( canvas, layerTreeView );
-  mWidget->setVisible( false );
   if ( layer )
   {
     mWidget->setLayer( layer );
   }
+  setCursor( Qt::ArrowCursor );
   connect( mWidget, &KadasGuideGridWidget::requestPick, this, &KadasMapToolGuideGrid::setPickMode );
   connect( mWidget, &KadasGuideGridWidget::close, this, &KadasMapToolGuideGrid::close );
+
+  mWidget->show();
 }
 
 KadasMapToolGuideGrid::~KadasMapToolGuideGrid()
 {
   delete mWidget;
-}
-
-void KadasMapToolGuideGrid::activate()
-{
-  QgsMapTool::activate();
-  setCursor( Qt::ArrowCursor );
-  mWidget->setVisible( true );
 }
 
 void KadasMapToolGuideGrid::setPickMode( PickMode pickMode )

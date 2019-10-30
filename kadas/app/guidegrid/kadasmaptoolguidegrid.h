@@ -38,7 +38,6 @@ class KadasMapToolGuideGrid : public QgsMapTool
     KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
     ~KadasMapToolGuideGrid();
 
-    void activate() override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
 

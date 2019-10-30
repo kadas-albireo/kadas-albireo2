@@ -34,7 +34,6 @@ class KadasMapToolBullseye : public QgsMapTool
     KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer = nullptr );
     ~KadasMapToolBullseye();
 
-    void activate() override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
 
