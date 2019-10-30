@@ -77,7 +77,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     KadasItemPos position() const override { return constState()->pos; }
     void setPosition( const KadasItemPos &pos ) override;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       KadasItemPos pos;
       double angle;

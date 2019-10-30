@@ -54,7 +54,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
 
     const QgsMultiPoint *geometry() const;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<KadasItemPos> points;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }

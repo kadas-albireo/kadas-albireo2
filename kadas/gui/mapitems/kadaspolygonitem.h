@@ -63,7 +63,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiPolygon *geometry() const;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<QList<KadasItemPos>> points;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }

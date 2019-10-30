@@ -41,7 +41,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
 #endif
 
     // Item is not meant to be user-editable, all methods below are stubbed
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }

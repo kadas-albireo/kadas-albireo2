@@ -63,7 +63,7 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 
     const QgsMultiSurface *geometry() const;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<KadasItemPos> centers;
       QList<double> radii;

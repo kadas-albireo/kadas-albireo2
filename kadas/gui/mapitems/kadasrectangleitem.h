@@ -56,7 +56,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 
     const QgsMultiPolygon *geometry() const;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<KadasItemPos> p1;
       QList<KadasItemPos> p2;

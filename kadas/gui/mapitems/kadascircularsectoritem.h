@@ -58,7 +58,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     const QgsMultiSurface *geometry() const;
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       enum SectorStatus {HaveNothing, HaveCenter, HaveRadius};
       SectorStatus sectorStatus = HaveNothing;

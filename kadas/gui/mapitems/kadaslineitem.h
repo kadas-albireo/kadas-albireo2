@@ -74,7 +74,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     MeasurementMode measurementMode() const { return mMeasurementMode; }
     QgsUnitTypes::AngleUnit angleUnit() const { return mAngleUnit; }
 
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<QList<KadasItemPos>> points;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
