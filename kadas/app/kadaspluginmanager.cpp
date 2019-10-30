@@ -321,7 +321,7 @@ void KadasPluginManager::setItemActivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setText( 1, tr( "Activate" ) );
+    item->setCheckState( 1, Qt::Unchecked );
   }
 }
 
@@ -329,6 +329,6 @@ void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setText( 1, tr( "Dectivate" ) );
+    item->setCheckState( 1, Qt::Checked );
   }
 }
