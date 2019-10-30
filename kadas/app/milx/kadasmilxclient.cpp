@@ -82,7 +82,7 @@ bool KadasMilxClientWorker::initialize()
   else
   {
     mProcess = new QProcess( this );
-    connect( mProcess, &QProcess::finished, this, &KadasMilxClientWorker::cleanup );
+    connect( mProcess, qOverload<int>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
     {
 #ifdef __MINGW32__
       QString serverDir = QDir( QString( "%1/../opt/mss/" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
