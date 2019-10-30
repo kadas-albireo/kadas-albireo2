@@ -50,6 +50,7 @@ TARGET_LINK_LIBRARIES(kadas_gui
   ${QWT_LDFLAGS}
   ${GDAL_LDFLAGS}
   ${EXIV2_LDFLAGS}
+  ${QUAZIP_LIBRARIES}
   kadas_core
   kadas_analysis
 )
