@@ -30,10 +30,10 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
   private:
     KadasPluginManager();
 
-    /**plugin name, download link*/
-    QMap< QString, QString > mAvailablePlugins;
+    /**plugin name, pair<description, download link>*/
+    QMap< QString, QPair< QString, QString> > mAvailablePlugins;
 
-    QMap< QString, QString > availablePlugins();
+    QMap< QString, QPair< QString, QString > > availablePlugins();
     void installPlugin( const QString &pluginName, const  QString &downloadUrl );
     void uninstallPlugin( const QString &pluginName, const QString &moduleName );
 

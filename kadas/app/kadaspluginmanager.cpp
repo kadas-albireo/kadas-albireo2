@@ -48,9 +48,11 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas ): KadasBottomBar( 
   for ( ; installedIt != installedPlugins.constEnd(); ++installedIt )
   {
     QString pluginName = p->getPluginMetadata( *installedIt, "name" );
+    QString pluginDescription = p->getPluginMetadata( *installedIt, "description" );
     installedPluginNames.insert( pluginName );
     QTreeWidgetItem *installedItem = new QTreeWidgetItem();
     installedItem->setText( 0, pluginName );
+    installedItem->setToolTip( 0, pluginDescription );
     installedItem->setData( 0, Qt::UserRole, *installedIt );
     if ( p->isPluginEnabled( *installedIt ) )
     {
@@ -63,11 +65,12 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas ): KadasBottomBar( 
     mInstalledTreeWidget->addTopLevelItem( installedItem );
   }
 
-  QMap<QString, QString>::const_iterator pluginIt = mAvailablePlugins.constBegin();
+  QMap<QString, QPair< QString, QString > >::const_iterator pluginIt = mAvailablePlugins.constBegin();
   for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
   {
     QTreeWidgetItem *availableItem = new QTreeWidgetItem();
     availableItem->setText( 0, pluginIt.key() );
+    availableItem->setToolTip( 0, pluginIt->first );
     mAvailableTreeWidget->addTopLevelItem( availableItem );
     if ( installedPluginNames.contains( pluginIt.key() ) )
     {
@@ -87,7 +90,7 @@ KadasPluginManager::KadasPluginManager(): KadasBottomBar( 0 )
 {
 }
 
-QMap< QString, QString > KadasPluginManager::availablePlugins()
+QMap< QString, QPair< QString, QString > > KadasPluginManager::availablePlugins()
 {
   QgsSettings s;
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
@@ -99,7 +102,7 @@ QMap< QString, QString > KadasPluginManager::availablePlugins()
   e.exec();
 
   QString pluginContent = nf.contentAsString();
-  QMap< QString, QString > pluginMap;
+  QMap< QString, QPair< QString, QString > > pluginMap;
 
   //Dom document
   QDomDocument xml;
@@ -112,7 +115,10 @@ QMap< QString, QString > KadasPluginManager::availablePlugins()
   for ( int i = 0; i < pluginNodeList.size(); ++i )
   {
     QDomElement pluginElem  = pluginNodeList.at( i ).toElement();
-    pluginMap.insert( pluginElem.attribute( "name" ), pluginElem.firstChildElement( "download_url" ).text() );
+    QString pluginName = pluginElem.attribute( "name" );
+    QString pluginDescription = pluginElem.firstChildElement( "description" ).text();
+    QString downloadUrl = pluginElem.firstChildElement( "download_url" ).text();
+    pluginMap.insert( pluginName, qMakePair( pluginDescription, downloadUrl ) );
   }
   return pluginMap;
 }
@@ -159,7 +165,7 @@ void KadasPluginManager::installButtonClicked()
 
   if ( installed.size() < 1 ) //not yet installed
   {
-    QString downloadPath = mAvailablePlugins.value( pluginName );
+    QString downloadPath = mAvailablePlugins.value( pluginName ).second;
     if ( downloadPath.isEmpty() )
     {
       return;
