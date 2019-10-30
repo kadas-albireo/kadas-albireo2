@@ -16,6 +16,7 @@
 
 #include <QDomDocument>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QSet>
 #include <QTreeWidgetItem>
 #include <quazip5/quazipfile.h>
@@ -67,6 +68,7 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas ): KadasBottomBar( 
   {
     QTreeWidgetItem *availableItem = new QTreeWidgetItem();
     availableItem->setText( 0, pluginIt.key() );
+    mAvailableTreeWidget->addTopLevelItem( availableItem );
     if ( installedPluginNames.contains( pluginIt.key() ) )
     {
       setItemRemoveable( availableItem );
@@ -75,7 +77,6 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas ): KadasBottomBar( 
     {
       setItemInstallable( availableItem );
     }
-    mAvailableTreeWidget->addTopLevelItem( availableItem );
   }
 
   mInstalledTreeWidget->resizeColumnToContents( 0 );
@@ -146,29 +147,31 @@ void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *i
   }
 }
 
-void KadasPluginManager::on_mAvailableTreeWidget_itemClicked( QTreeWidgetItem *item, int column )
+void KadasPluginManager::installButtonClicked()
 {
-  if ( column == 1 )
+  QString pluginName = sender()->property( "PluginName" ).toString();
+  if ( pluginName.isEmpty() )
   {
-    QString pluginName = item->text( 0 );
-    QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+    return;
+  }
 
-    if ( installed.size() < 1 ) //not yet installed
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+
+  if ( installed.size() < 1 ) //not yet installed
+  {
+    QString downloadPath = mAvailablePlugins.value( pluginName );
+    if ( downloadPath.isEmpty() )
     {
-      QString downloadPath = mAvailablePlugins.value( pluginName );
-      if ( downloadPath.isEmpty() )
-      {
-        return;
-      }
-      installPlugin( pluginName, downloadPath );
+      return;
     }
-    else //plugin installed, remove it
+    installPlugin( pluginName, downloadPath );
+  }
+  else //plugin installed, remove it
+  {
+    if ( QMessageBox::question( this, tr( "Remove plugin" ), tr( "Are you sure you want to remove the plugin '%1'?" ).arg( pluginName ) ) == QMessageBox::Yes )
     {
-      if ( QMessageBox::question( this, tr( "Remove plugin" ), tr( "Are you sure you want to remove the plugin '%1'?" ).arg( pluginName ) ) == QMessageBox::Yes )
-      {
-        QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
-        uninstallPlugin( pluginName, moduleName );
-      }
+      QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
+      uninstallPlugin( pluginName, moduleName );
     }
   }
 }
@@ -295,17 +298,22 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
 
 void KadasPluginManager::setItemInstallable( QTreeWidgetItem *item )
 {
-  if ( item )
-  {
-    item->setText( 1, tr( "Install" ) );
-  }
+  changeItemInstallationState( item, tr( "Install" ) );
 }
 
 void KadasPluginManager::setItemRemoveable( QTreeWidgetItem *item )
 {
+  changeItemInstallationState( item, tr( "Uninstall" ) );
+}
+
+void KadasPluginManager::changeItemInstallationState( QTreeWidgetItem *item, const QString &buttonText )
+{
   if ( item )
   {
-    item->setText( 1, tr( "Remove" ) );
+    QPushButton *b = new QPushButton( buttonText );
+    b->setProperty( "PluginName", item->text( 0 ) );
+    QObject::connect( b, &QPushButton::clicked, this, &KadasPluginManager::installButtonClicked );
+    mAvailableTreeWidget->setItemWidget( item, 1, b );
   }
 }
 

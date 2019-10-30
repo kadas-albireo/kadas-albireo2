@@ -24,7 +24,7 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     KadasPluginManager( QgsMapCanvas *canvas );
 
   private slots:
-    void on_mAvailableTreeWidget_itemClicked( QTreeWidgetItem *item, int column );
+    void installButtonClicked();
     void on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *item, int column );
 
   private:
@@ -40,6 +40,7 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     //tree widget state
     void setItemInstallable( QTreeWidgetItem *item );
     void setItemRemoveable( QTreeWidgetItem *item );
+    void changeItemInstallationState( QTreeWidgetItem *item, const QString &buttonText );
     void setItemActivatable( QTreeWidgetItem *item );
     void setItemDeactivatable( QTreeWidgetItem *item );
 };
