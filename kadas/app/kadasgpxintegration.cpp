@@ -192,7 +192,7 @@ void KadasGpxIntegration::exportGpx()
   QDialog dialog;
   dialog.setWindowTitle( tr( "Export to GPX" ) );
   dialog.setLayout( new QVBoxLayout );
-  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), []( QgsMapLayer * layer )
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), kApp->mainWindow()->layerTreeView(), []( QgsMapLayer * layer )
   {
     if ( !dynamic_cast<KadasItemLayer *>( layer ) )
     {

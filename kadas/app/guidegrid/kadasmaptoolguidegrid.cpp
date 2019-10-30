@@ -103,7 +103,7 @@ void KadasMapToolGuideGrid::keyReleaseEvent( QKeyEvent *e )
 static QRegExp g_cooRegExp( "^\\s*(\\d+\\.?\\d*)[,\\s]?\\s*(\\d+\\.?\\d*)\\s*$" );
 
 KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView )
-  : KadasBottomBar( canvas ), mLayerTreeView( layerTreeView )
+  : KadasBottomBar( canvas )
 {
   setLayout( new QHBoxLayout );
   layout()->setSpacing( 10 );
@@ -122,7 +122,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
 
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
-  mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerFilter, layerCreator );
+  mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
   mLayerSelectionWidget->createLayerIfEmpty( tr( "Guidegrid" ) );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
@@ -178,8 +178,6 @@ void KadasGuideGridWidget::setLayer( QgsMapLayer *layer )
   mLayerSelectionWidget->blockSignals( true );
   mLayerSelectionWidget->setSelectedLayer( layer );
   mLayerSelectionWidget->blockSignals( false );
-  mLayerTreeView->setLayerVisible( mCurrentLayer, true );
-  mCanvas->setCurrentLayer( mCurrentLayer );
 
   mCrs = mCurrentLayer->crs();
   int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;

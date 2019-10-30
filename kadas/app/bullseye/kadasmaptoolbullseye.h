@@ -60,7 +60,6 @@ class KadasBullseyeWidget : public KadasBottomBar
     void setLayer( QgsMapLayer *layer );
 
   private:
-    QgsLayerTreeView *mLayerTreeView;
     Ui::KadasBullseyeWidgetBase ui;
     KadasLayerSelectionWidget *mLayerSelectionWidget;
     KadasBullseyeLayer *mCurrentLayer = nullptr;

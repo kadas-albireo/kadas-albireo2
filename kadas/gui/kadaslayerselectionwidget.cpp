@@ -27,8 +27,8 @@
 #include <kadas/gui/kadaslayerselectionwidget.h>
 
 
-KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, LayerFilter filter, LayerCreator creator, QWidget *parent )
-  : QWidget( parent ), mFilter( filter ), mCreator( creator ), mCanvas( canvas )
+KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, LayerFilter filter, LayerCreator creator, QWidget *parent )
+  : QWidget( parent ),  mCanvas( canvas ), mLayerTreeView( layerTreeView ), mFilter( filter ), mCreator( creator )
 {
   setLayout( new QHBoxLayout() );
   layout()->setSpacing( 2 );
@@ -113,6 +113,8 @@ void KadasLayerSelectionWidget::setSelectedLayer( int idx )
     QgsMapLayer *layer = QgsProject::instance()->mapLayer( mLayersCombo->itemData( idx ).toString() );
     if ( layer && mCanvas->currentLayer() != layer )
     {
+      mLayerTreeView->setLayerVisible( layer, true );
+      mLayerTreeView->setCurrentLayer( layer );
       mCanvas->setCurrentLayer( layer );
     }
     emit selectedLayerChanged( layer );

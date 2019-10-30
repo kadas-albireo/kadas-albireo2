@@ -99,7 +99,7 @@ void KadasMapToolBullseye::keyReleaseEvent( QKeyEvent *e )
 
 
 KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView )
-  : KadasBottomBar( canvas ), mLayerTreeView( layerTreeView )
+  : KadasBottomBar( canvas )
 {
   setLayout( new QHBoxLayout );
   layout()->setSpacing( 10 );
@@ -118,7 +118,7 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
 
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
-  mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerFilter, layerCreator );
+  mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   mLayerSelectionWidget->createLayerIfEmpty( tr( "Bullseye" ) );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
@@ -172,9 +172,6 @@ void KadasBullseyeWidget::setLayer( QgsMapLayer *layer )
   mLayerSelectionWidget->blockSignals( true );
   mLayerSelectionWidget->setSelectedLayer( mCurrentLayer );
   mLayerSelectionWidget->blockSignals( false );
-  mLayerTreeView->setLayerVisible( mCurrentLayer, true );
-  mLayerTreeView->setCurrentLayer( mCurrentLayer );
-  mCanvas->setCurrentLayer( mCurrentLayer );
 
   ui.inputCenter->blockSignals( true );
   ui.inputCenter->setCoordinate( mCurrentLayer->center(), mCurrentLayer->crs() );

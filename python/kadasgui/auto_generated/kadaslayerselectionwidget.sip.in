@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/kadaslayerselectionwidget.h"
 %End
   public:
-    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QWidget *parent = 0 );
+    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator, QWidget *parent = 0 );
     void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;

@@ -63,7 +63,6 @@ class KadasGuideGridWidget : public KadasBottomBar
     void setLayer( QgsMapLayer *layer );
 
   private:
-    QgsLayerTreeView *mLayerTreeView;
     QgsCoordinateReferenceSystem mCrs;
     QgsRectangle mCurRect;
     Ui::KadasGuideGridWidgetBase ui;

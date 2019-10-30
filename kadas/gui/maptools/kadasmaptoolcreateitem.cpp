@@ -88,7 +88,7 @@ void KadasMapToolCreateItem::activate()
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
   if ( mShowLayerSelection )
   {
-    KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerSelectionFilter, mLayerCreator );
+    KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerTreeView, mLayerSelectionFilter, mLayerCreator );
     layerSelection->setSelectedLayer( mLayer );
     connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
     mBottomBar->layout()->addWidget( layerSelection );
@@ -148,8 +148,9 @@ void KadasMapToolCreateItem::deactivate()
   mInputWidget = nullptr;
 }
 
-void KadasMapToolCreateItem::showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
+void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
 {
+  mLayerTreeView = layerTreeView;
   mShowLayerSelection = enabled;
   mLayerSelectionFilter = filter;
   mLayerCreator = creator;

@@ -25,6 +25,7 @@
 #include <kadas/gui/kadas_gui.h>
 
 class QComboBox;
+class QgsLayerTreeView;
 class QgsMapCanvas;
 class QgsMapLayer;
 
@@ -36,9 +37,9 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     typedef std::function<bool( QgsMapLayer * )> LayerFilter;
     typedef std::function<QgsMapLayer*( const QString & )> LayerCreator;
 
-    KadasLayerSelectionWidget( QgsMapCanvas *canvas, LayerFilter filter = nullptr, LayerCreator creator = nullptr, QWidget *parent = nullptr );
+    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, LayerFilter filter = nullptr, LayerCreator creator = nullptr, QWidget *parent = nullptr );
 #endif
-    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QWidget *parent = nullptr ) : KadasLayerSelectionWidget( canvas, nullptr, nullptr, parent ) {}
+    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = nullptr ) : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent ) {}
     void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
@@ -54,6 +55,7 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     LayerCreator mCreator = nullptr;
 
     QgsMapCanvas *mCanvas;
+    QgsLayerTreeView *mLayerTreeView;
     QLabel *mLabel;
     QComboBox *mLayersCombo;
 

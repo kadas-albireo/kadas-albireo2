@@ -88,7 +88,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
     void setSelectItems( bool select ) { mSelectItems = select; }
 #ifndef SIP_RUN
-    void showLayerSelection( bool enabled, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
+    void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
     void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
 #endif
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
@@ -117,6 +117,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasMapItem *mutableItem() { return mItem; }
 
   private:
+    QgsLayerTreeView *mLayerTreeView = nullptr;
     ItemFactory mItemFactory = nullptr;
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
