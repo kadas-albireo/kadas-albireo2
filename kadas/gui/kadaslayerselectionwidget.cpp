@@ -88,6 +88,7 @@ void KadasLayerSelectionWidget::repopulateLayers()
   mLayersCombo->blockSignals( true );
   mLayersCombo->clear();
   int idx = 0, current = 0;
+  QgsMapLayer *currentLayer = nullptr;
   for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
   {
     if ( !mFilter || mFilter( layer ) )
@@ -97,13 +98,15 @@ void KadasLayerSelectionWidget::repopulateLayers()
       if ( mCanvas->currentLayer() == layer )
       {
         current = idx;
+        currentLayer = layer;
       }
       ++idx;
     }
   }
   mLayersCombo->setCurrentIndex( -1 );
-  mLayersCombo->blockSignals( false );
   mLayersCombo->setCurrentIndex( current );
+  emit selectedLayerChanged( currentLayer );
+  mLayersCombo->blockSignals( false );
 }
 
 void KadasLayerSelectionWidget::setSelectedLayer( int idx )
