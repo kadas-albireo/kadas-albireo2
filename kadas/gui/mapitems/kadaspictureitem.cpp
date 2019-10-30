@@ -182,7 +182,6 @@ QList<KadasMapPos> KadasPictureItem::cornerPoints( const QgsMapSettings &setting
 
 QList<KadasMapItem::Node> KadasPictureItem::nodes( const QgsMapSettings &settings ) const
 {
-  double mup = settings.mapUnitsPerPixel() * QgsUnitTypes::fromUnitToUnitFactor( settings.destinationCrs().mapUnits(), mCrs.mapUnits() );
   QList<KadasMapPos> points = cornerPoints( settings );
   QList<Node> nodes;
   nodes.append( {points[0]} );

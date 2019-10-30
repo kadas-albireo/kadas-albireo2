@@ -405,7 +405,6 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
   {
     return;
   }
-  QgsExpression *expr = 0;
 
   outStream << "<Style>";
   if ( s->type() == QgsSymbol::Line )

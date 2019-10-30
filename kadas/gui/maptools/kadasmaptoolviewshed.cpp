@@ -176,7 +176,6 @@ void KadasMapToolViewshed::drawFinished()
   double curRadius = item->constState()->radii.last();
 
   QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
-  QgsUnitTypes::DistanceUnit measureUnit = canvasCrs.mapUnits();
   curRadius *= QgsUnitTypes::fromUnitToUnitFactor( canvasCrs.mapUnits(), QgsUnitTypes::DistanceMeters );
 
   KadasViewshedDialog viewshedDialog( curRadius );

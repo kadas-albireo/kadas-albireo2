@@ -51,13 +51,14 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     void selectedLayerChanged( QgsMapLayer *layer );
 
   private:
+
+    QgsMapCanvas *mCanvas = nullptr;
+    QgsLayerTreeView *mLayerTreeView = nullptr;
+    QLabel *mLabel = nullptr;
+    QComboBox *mLayersCombo = nullptr;
+
     LayerFilter mFilter = nullptr;
     LayerCreator mCreator = nullptr;
-
-    QgsMapCanvas *mCanvas;
-    QgsLayerTreeView *mLayerTreeView;
-    QLabel *mLabel;
-    QComboBox *mLayersCombo;
 
   private slots:
     void createLayer();

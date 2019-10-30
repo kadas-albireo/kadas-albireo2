@@ -208,9 +208,11 @@ void KadasMainWindow::init()
   milxUi.mLineWidthSlider = mLineWidthSlider;
   milxUi.mWorkModeCombo = mWorkModeCombo;
   KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
+  Q_UNUSED( milx );
 
   // Globe
   KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
+  Q_UNUSED( globe );
 
   configureButtons();
 

@@ -210,8 +210,6 @@ KadasMapPos KadasCircleItem::positionFromDrawAttribs( const AttribValues &values
 
 KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  double mup = mapSettings.mapUnitsPerPixel();
-
   for ( int iPart = 0, nParts = constState()->centers.size(); iPart < nParts; ++iPart )
   {
 

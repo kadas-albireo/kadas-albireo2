@@ -177,7 +177,6 @@ KadasMapItem::AttribValues KadasRectangleItem::drawAttribsFromPosition( const Ka
 
 KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  double mup = mapSettings.mapUnitsPerPixel();
   for ( int iPart = 0, nParts = constState()->p1.size(); iPart < nParts; ++iPart )
   {
     QList<KadasItemPos> points = QList<KadasItemPos>()

@@ -187,7 +187,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       {
         geom->transform( itemCrst );
 
-        QgsWkbTypes::Type type = QgsWkbTypes::singleType( QgsWkbTypes::flatType( geom->wkbType() ) );
         if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
         {
           QgsPointXY pos = *static_cast<QgsPoint *>( geom );

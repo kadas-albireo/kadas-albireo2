@@ -126,7 +126,6 @@ KadasMapItem::Margin KadasAnchoredItem::margin() const
 
 QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settings ) const
 {
-  double mup = settings.mapUnitsPerPixel() * QgsUnitTypes::fromUnitToUnitFactor( settings.destinationCrs().mapUnits(), mCrs.mapUnits() );
   QList<KadasMapPos> points = rotatedCornerPoints( constState()->angle, settings );
   QList<Node> nodes;
   nodes.append( {points[0]} );

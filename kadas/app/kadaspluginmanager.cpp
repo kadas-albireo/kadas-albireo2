@@ -201,7 +201,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     zFile.setZip( &zip );
     if ( !zFile.open( QIODevice::ReadOnly ) )
     {
-      int errorCode = zFile.getZipError();
+//      int errorCode = zFile.getZipError();
       continue;
     }
 

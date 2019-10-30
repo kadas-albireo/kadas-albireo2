@@ -952,7 +952,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
   if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
   {
-    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    KadasItemLayer *layer = kApp->selectItemLayer();
     QList<KadasMapItem *> items;
     QList<QgsPointXY> itemPos;
     QgsPointXY center;
@@ -982,7 +982,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   }
   else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
   {
-    KadasItemLayer *layer = layer = kApp->selectItemLayer();
+    KadasItemLayer *layer = kApp->selectItemLayer();
     QList<KadasMapItem *> items;
     const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
     for ( const QgsFeature &feature : featureStore.features() )

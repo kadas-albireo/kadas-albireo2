@@ -581,7 +581,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
 
-  QAction *actionEdit = menu->addAction( tr( "Symbol editor..." ), [ = ]
+  menu->addAction( tr( "Symbol editor..." ), [ = ]
   {
     KadasMilxClient::NPointSymbolGraphic result;
     WId winId = QApplication::topLevelWidgets().front()->winId();

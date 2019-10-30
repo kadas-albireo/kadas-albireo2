@@ -437,7 +437,6 @@ void KadasLineItem::recomputeDerived()
         double sdist = 500000; // 500km segments
         for ( int i = 0; i < nPoints - 1; ++i )
         {
-          int ringSize = ring->vertexCount();
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
           double dist = line.Distance();
           int nIntervals = qMax( 1, int ( std::ceil( dist / sdist ) ) );

@@ -396,8 +396,6 @@ void KadasMapToolCreateItem::commitItem()
 KadasMapItem::AttribValues KadasMapToolCreateItem::collectAttributeValues() const
 {
   KadasMapItem::AttribValues attributes;
-  double distanceConv = QgsUnitTypes::fromUnitToUnitFactor( canvas()->mapUnits(), QgsUnitTypes::DistanceMeters );
-
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
   {
     attributes.insert( field->id(), field->text().toDouble() );
