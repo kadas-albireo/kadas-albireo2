@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>826</width>
-    <height>227</height>
+    <width>782</width>
+    <height>217</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,61 +19,81 @@
   <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="mInstalledLabel">
-       <property name="text">
-        <string>Installed</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="MAvailableLabel">
-       <property name="text">
-        <string>Available</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QTreeWidget" name="mAvailableTreeWidget">
-       <property name="headerHidden">
-        <bool>true</bool>
-       </property>
-       <column>
-        <property name="text">
-         <string>plugin</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>icon</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QTreeWidget" name="mInstalledTreeWidget">
-       <property name="rootIsDecorated">
-        <bool>true</bool>
-       </property>
-       <property name="headerHidden">
-        <bool>true</bool>
-       </property>
-       <column>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QLabel" name="mInstalledLabel">
+     <property name="text">
+      <string>Installed</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="MAvailableLabel">
+     <property name="text">
+      <string>Available</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QTreeWidget" name="mInstalledTreeWidget">
+     <property name="rootIsDecorated">
+      <bool>true</bool>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text">
+       <string>1</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>2</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="1" column="1" rowspan="2">
+    <widget class="QTreeWidget" name="mAvailableTreeWidget">
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text">
+       <string>plugin</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>icon</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>158</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="mCloseButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="close">
+       <normaloff>.</normaloff>.</iconset>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
