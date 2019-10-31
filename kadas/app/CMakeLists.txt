@@ -35,6 +35,14 @@ SET(kadas_RCC_SRC ../resources/resources.qrc)
 QT5_ADD_RESOURCES(kadas_RCC ${kadas_RCC_SRC})
 QT5_WRAP_UI(kadas_UI_HDR ${kadas_UI})
 
+IF(MINGW)
+  ENABLE_LANGUAGE(RC)
+  SET(CMAKE_RC_COMPILER_INIT ${CMAKE_GENERATOR_RC})
+  SET(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -i <SOURCE> -o <OBJECT>")
+  SET(kadas_SRC ${kadas_SRC} ../resources/kadas-icon.rc)
+  SET(kadas_RC_LIBS -mwindows)
+ENDIF(MINGW)
+
 SET_PROPERTY(SOURCE ${kadas_UI_HDR} PROPERTY SKIP_AUTOMOC ON)
 SET_PROPERTY(SOURCE ${kadas_RCC} PROPERTY SKIP_AUTOMOC ON)
 
@@ -87,6 +95,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${OSGEARTHSYMBOLOGY_LIBRARY}
   ${OSGEARTHQT_LIBRARY}
   ${OPENTHREADS_LIBRARY}
+  ${kadas_RC_LIBS}
 
   kadas_core
   kadas_analysis
