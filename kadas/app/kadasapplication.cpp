@@ -1114,7 +1114,8 @@ void KadasApplication::updateWindowTitle()
   {
     modified = " *";
   }
-  QString title = QString( "%1%2 - %3" ).arg( fileName, modified, Kadas::KADAS_FULL_RELEASE_NAME );
+  QString online = QgsSettings().value( "isOffline" ).toBool() ? tr( "Offline" ) : tr( "Online" );
+  QString title = QString( "%1%2 - %3 [%4]" ).arg( fileName, modified, Kadas::KADAS_FULL_RELEASE_NAME, online );
   mMainWindow->setWindowTitle( title );
 }
 
