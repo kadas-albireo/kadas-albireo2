@@ -56,11 +56,10 @@ class KadasGuideGridWidget : public KadasBottomBar
     Q_OBJECT
 
   public:
-    KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView );
+    KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
     void pointPicked( KadasMapToolGuideGrid::PickMode pickMode, const QgsPointXY &pos );
 
     QgsMapLayer *createLayer( QString layerName = QString() );
-    void setLayer( QgsMapLayer *layer );
 
   private:
     QgsCoordinateReferenceSystem mCrs;
@@ -76,6 +75,7 @@ class KadasGuideGridWidget : public KadasBottomBar
     void close();
 
   private slots:
+    void setCurrentLayer( QgsMapLayer *layer );
     void topLeftEdited();
     void bottomRightEdited();
     void updateIntervals();
@@ -86,7 +86,6 @@ class KadasGuideGridWidget : public KadasBottomBar
     void updateLabeling( int labelingMode );
     void pickTopLeftPos() { emit requestPick( KadasMapToolGuideGrid::PICK_TOP_LEFT ); }
     void pickBottomRight() { emit requestPick( KadasMapToolGuideGrid::PICK_BOTTOM_RIGHT ); }
-    void currentLayerChanged( QgsMapLayer *layer );
 };
 
 #endif // KADASMAPTOOLGUIDEGRID_H

@@ -41,11 +41,7 @@ KadasMapToolBullseye::KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeVi
     }
   }
 
-  mWidget = new KadasBullseyeWidget( canvas, layerTreeView );
-  if ( layer )
-  {
-    mWidget->setLayer( layer );
-  }
+  mWidget = new KadasBullseyeWidget( canvas, layerTreeView, layer );
   setCursor( Qt::ArrowCursor );
   connect( mWidget, &KadasBullseyeWidget::requestPickCenter, this, &KadasMapToolBullseye::setPicking );
   connect( mWidget, &KadasBullseyeWidget::close, this, &KadasMapToolBullseye::close );
@@ -98,7 +94,7 @@ void KadasMapToolBullseye::keyReleaseEvent( QKeyEvent *e )
 }
 
 
-KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView )
+KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : KadasBottomBar( canvas )
 {
   setLayout( new QHBoxLayout );
@@ -119,7 +115,6 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
-  mLayerSelectionWidget->createLayerIfEmpty( tr( "Bullseye" ) );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
   ui.comboBoxLabels->addItem( tr( "Disabled" ), static_cast<int>( KadasBullseyeLayer::NO_LABELS ) );
@@ -138,7 +133,10 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateFontSize );
   connect( ui.comboBoxLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasBullseyeWidget::updateLabeling );
   connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateLineWidth );
-  connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasBullseyeWidget::currentLayerChanged );
+  connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasBullseyeWidget::setCurrentLayer );
+
+  mLayerSelectionWidget->setSelectedLayer( layer );
+  mLayerSelectionWidget->createLayerIfEmpty( tr( "Bullseye" ) );
 }
 
 KadasBullseyeLayer *KadasBullseyeWidget::createLayer( QString layerName )
@@ -151,11 +149,10 @@ KadasBullseyeLayer *KadasBullseyeWidget::createLayer( QString layerName )
   double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceNauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
   KadasBullseyeLayer *bullseyeLayer = new KadasBullseyeLayer( layerName );
   bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval, 45 );
-  setLayer( bullseyeLayer );
   return bullseyeLayer;
 }
 
-void KadasBullseyeWidget::setLayer( QgsMapLayer *layer )
+void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
 {
   if ( layer == mCurrentLayer )
   {
@@ -168,10 +165,6 @@ void KadasBullseyeWidget::setLayer( QgsMapLayer *layer )
     ui.widgetLayerSetup->setEnabled( false );
     return;
   }
-
-  mLayerSelectionWidget->blockSignals( true );
-  mLayerSelectionWidget->setSelectedLayer( mCurrentLayer );
-  mLayerSelectionWidget->blockSignals( false );
 
   ui.inputCenter->blockSignals( true );
   ui.inputCenter->setCoordinate( mCurrentLayer->center(), mCurrentLayer->crs() );
@@ -244,18 +237,5 @@ void KadasBullseyeWidget::updateLineWidth( int width )
   {
     mCurrentLayer->setLineWidth( width );
     mCurrentLayer->triggerRepaint();
-  }
-}
-
-void KadasBullseyeWidget::currentLayerChanged( QgsMapLayer *layer )
-{
-  KadasBullseyeLayer *bullseyeLayer = dynamic_cast<KadasBullseyeLayer *>( layer );
-  if ( bullseyeLayer )
-  {
-    setLayer( bullseyeLayer );
-  }
-  else
-  {
-    ui.widgetLayerSetup->setEnabled( false );
   }
 }

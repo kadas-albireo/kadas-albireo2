@@ -39,7 +39,7 @@ KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsL
 
   mLayersCombo = new QComboBox( this );
   mLayersCombo->setFixedWidth( 100 );
-  connect( mLayersCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, qOverload<int>( &KadasLayerSelectionWidget::setSelectedLayer ) );
+  connect( mLayersCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, qOverload<int>( &KadasLayerSelectionWidget::layerSelectionChanged ) );
   layout()->addWidget( mLayersCombo );
 
   if ( creator )
@@ -87,7 +87,7 @@ void KadasLayerSelectionWidget::repopulateLayers()
   }
   mLayersCombo->blockSignals( true );
   mLayersCombo->clear();
-  int idx = 0, current = 0;
+  int idx = 0, current = -1;
   QgsMapLayer *currentLayer = nullptr;
   for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
   {
@@ -109,7 +109,7 @@ void KadasLayerSelectionWidget::repopulateLayers()
   mLayersCombo->blockSignals( false );
 }
 
-void KadasLayerSelectionWidget::setSelectedLayer( int idx )
+void KadasLayerSelectionWidget::layerSelectionChanged( int idx )
 {
   if ( idx >= 0 )
   {
@@ -131,10 +131,10 @@ void KadasLayerSelectionWidget::setSelectedLayer( int idx )
 void KadasLayerSelectionWidget::setSelectedLayer( QgsMapLayer *layer )
 {
   int idx = layer ? mLayersCombo->findData( layer->id() ) : -1;
-  if ( idx >= 0 )
-  {
-    mLayersCombo->setCurrentIndex( idx );
-  }
+  mLayersCombo->blockSignals( true );
+  mLayersCombo->setCurrentIndex( -1 );
+  mLayersCombo->blockSignals( false );
+  mLayersCombo->setCurrentIndex( idx );
 }
 
 void KadasLayerSelectionWidget::createLayer()

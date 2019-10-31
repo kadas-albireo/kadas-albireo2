@@ -41,11 +41,7 @@ KadasMapToolGuideGrid::KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTree
     }
   }
 
-  mWidget = new KadasGuideGridWidget( canvas, layerTreeView );
-  if ( layer )
-  {
-    mWidget->setLayer( layer );
-  }
+  mWidget = new KadasGuideGridWidget( canvas, layerTreeView, layer );
   setCursor( Qt::ArrowCursor );
   connect( mWidget, &KadasGuideGridWidget::requestPick, this, &KadasMapToolGuideGrid::setPickMode );
   connect( mWidget, &KadasGuideGridWidget::close, this, &KadasMapToolGuideGrid::close );
@@ -102,7 +98,7 @@ void KadasMapToolGuideGrid::keyReleaseEvent( QKeyEvent *e )
 
 static QRegExp g_cooRegExp( "^\\s*(\\d+\\.?\\d*)[,\\s]?\\s*(\\d+\\.?\\d*)\\s*$" );
 
-KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView )
+KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : KadasBottomBar( canvas )
 {
   setLayout( new QHBoxLayout );
@@ -123,7 +119,6 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
-  mLayerSelectionWidget->createLayerIfEmpty( tr( "Guidegrid" ) );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
   connect( ui.lineEditTopLeft, &QLineEdit::editingFinished, this, &KadasGuideGridWidget::topLeftEdited );
@@ -151,18 +146,20 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
   connect( ui.comboBoxLabeling, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
 
-  connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::currentLayerChanged );
+  connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::setCurrentLayer );
+
+  mLayerSelectionWidget->setSelectedLayer( layer );
+  mLayerSelectionWidget->createLayerIfEmpty( tr( "Guidegrid" ) );
 }
 
 QgsMapLayer *KadasGuideGridWidget::createLayer( QString layerName )
 {
   KadasGuideGridLayer *guideGridLayer = new KadasGuideGridLayer( layerName );
   guideGridLayer->setup( mCanvas->extent(), 10, 10, mCanvas->mapSettings().destinationCrs(), false, false );
-  setLayer( guideGridLayer );
   return guideGridLayer;
 }
 
-void KadasGuideGridWidget::setLayer( QgsMapLayer *layer )
+void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
 {
   if ( layer == mCurrentLayer )
   {
@@ -175,9 +172,6 @@ void KadasGuideGridWidget::setLayer( QgsMapLayer *layer )
     ui.widgetLayerSetup->setEnabled( false );
     return;
   }
-  mLayerSelectionWidget->blockSignals( true );
-  mLayerSelectionWidget->setSelectedLayer( layer );
-  mLayerSelectionWidget->blockSignals( false );
 
   mCrs = mCurrentLayer->crs();
   int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
@@ -385,17 +379,4 @@ void KadasGuideGridWidget::updateLabeling( int labelingMode )
   }
   mCurrentLayer->setLabelingMode( static_cast<KadasGuideGridLayer::LabellingMode>( labelingMode ) );
   mCurrentLayer->triggerRepaint();
-}
-
-void KadasGuideGridWidget::currentLayerChanged( QgsMapLayer *layer )
-{
-  KadasGuideGridLayer *guidegridLayer = dynamic_cast<KadasGuideGridLayer *>( layer );
-  if ( guidegridLayer )
-  {
-    setLayer( guidegridLayer );
-  }
-  else
-  {
-    ui.widgetLayerSetup->setEnabled( false );
-  }
 }

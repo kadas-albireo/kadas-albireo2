@@ -116,7 +116,7 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
 
   private slots:
     void createLayer();
-    void setSelectedLayer( int idx );
+    void layerSelectionChanged( int idx );
     void repopulateLayers();
 };
 

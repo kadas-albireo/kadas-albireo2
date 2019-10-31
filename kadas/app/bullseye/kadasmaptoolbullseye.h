@@ -52,12 +52,11 @@ class KadasBullseyeWidget : public KadasBottomBar
     Q_OBJECT
 
   public:
-    KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView );
+    KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
     void centerPicked( const QgsPointXY &pos );
 
   public slots:
     KadasBullseyeLayer *createLayer( QString layerName );
-    void setLayer( QgsMapLayer *layer );
 
   private:
     Ui::KadasBullseyeWidgetBase ui;
@@ -71,12 +70,12 @@ class KadasBullseyeWidget : public KadasBottomBar
     void close();
 
   private slots:
+    void setCurrentLayer( QgsMapLayer *layer );
     void updateLayer();
     void updateColor( const QColor &color );
     void updateFontSize( int fontSize );
     void updateLabeling( int index );
     void updateLineWidth( int width );
-    void currentLayerChanged( QgsMapLayer *layer );
 };
 
 #endif // KADASMAPTOOLBULLSEYE_H
