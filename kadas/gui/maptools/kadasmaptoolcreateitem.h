@@ -27,12 +27,6 @@
 class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
-#ifndef SIP_RUN
-#ifndef PyObject_HEAD
-struct _object;
-typedef _object PyObject;
-#endif
-#endif
 
 class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 {
@@ -42,7 +36,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     typedef std::function<KadasMapItem*() > ItemFactory;
     KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer = nullptr );
 #else
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = nullptr );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = nullptr )[( QgsMapCanvas *, ItemFactory, KadasItemLayer * )];
     % MethodCode
 
     // Make sure the callable doesn't get garbage collected, this is needed because refcount for a1 is 0
@@ -51,19 +45,23 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp = new sipKadasMapToolCreateItem( a0, static_cast<PyObject *>( nullptr ), a2 );
-    sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
+    auto factory = [a1]() -> KadasMapItem *
     {
-      KadasMapItem *res;
+      KadasMapItem *result = nullptr;
       SIP_BLOCK_THREADS
       PyObject *s = sipCallMethod( NULL, a1, NULL );
-      int state;
-      int sipIsError = 0;
-      res = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, 0, SIP_NOT_NONE, &state, &sipIsError ) );
+      if ( s )
+      {
+        int state;
+        int sipIsError = 0;
+        result = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
+        sipReleaseType( result, sipType_KadasMapItem, state );
+      }
       SIP_UNBLOCK_THREADS
-      return res;
+      return result;
+    };
 
-    } );
+    sipCpp = new sipKadasMapToolCreateItem( a0, factory, a2 );
 
     Py_END_ALLOW_THREADS
 
@@ -89,7 +87,51 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setSelectItems( bool select ) { mSelectItems = select; }
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
-    void setItemFactory( ItemFactory itemFactory ) { mItemFactory = itemFactory; }
+#else
+    // TODO: creator should be optional
+    void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
+    % MethodCode
+
+    // Make sure the callables doesn't get garbage collected, this is needed because refcount for a1/a2 is 0
+    // and the creation function pointer is passed to the metadata and it needs to be kept in memory.
+    Py_INCREF( a2 );
+    Py_INCREF( a3 );
+
+    Py_BEGIN_ALLOW_THREADS
+
+    auto layerFilter = [a2]( QgsMapLayer *layer ) -> bool
+    {
+      bool result = false;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a2, "D", layer, sipType_QgsMapLayer, NULL );
+      if ( s )
+      {
+        result = sipConvertToBool( s );
+      }
+      SIP_UNBLOCK_THREADS
+      return result;
+    };
+
+    auto layerCreator = [a3]( const QString &name ) -> QgsMapLayer *
+    {
+      QgsMapLayer *result = nullptr;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a3, "D", &name, sipType_QString, NULL );
+      if ( s )
+      {
+        int state;
+        int sipIsError = 0;
+        result = reinterpret_cast<QgsMapLayer *>( sipConvertToType( s, sipType_QgsMapLayer, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
+        sipReleaseType( result, sipType_QgsMapLayer, state );
+      }
+      SIP_UNBLOCK_THREADS
+      return result;
+    };
+
+    sipCpp->showLayerSelection( a0, a1, layerFilter, layerCreator );
+    Py_END_ALLOW_THREADS
+
+    % End
 #endif
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
@@ -101,11 +143,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void partFinished();
 
   protected:
-#ifndef SIP_RUN
-    // TODO: Prettier way?!
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *pyCallable, KadasItemLayer *layer = nullptr );
-#endif
-
     void createItem();
     void addPoint( const KadasMapPos &mapPos );
     void startPart( const KadasMapPos &pos );

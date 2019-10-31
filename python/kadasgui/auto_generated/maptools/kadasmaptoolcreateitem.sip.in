@@ -13,12 +13,22 @@
 
 class KadasMapToolCreateItem : QgsMapTool
 {
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
 
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 %End
   public:
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = 0 );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = 0 )[( QgsMapCanvas *, ItemFactory, KadasItemLayer * )];
 %MethodCode
 
     // Make sure the callable doesn't get garbage collected, this is needed because refcount for a1 is 0
@@ -27,19 +37,23 @@ class KadasMapToolCreateItem : QgsMapTool
 
     Py_BEGIN_ALLOW_THREADS
 
-    sipCpp = new sipKadasMapToolCreateItem( a0, static_cast<PyObject *>( nullptr ), a2 );
-    sipCpp->setItemFactory( [a1]( ) -> KadasMapItem*
+    auto factory = [a1]() -> KadasMapItem *
     {
-      KadasMapItem *res;
+      KadasMapItem *result = nullptr;
       SIP_BLOCK_THREADS
       PyObject *s = sipCallMethod( NULL, a1, NULL );
-      int state;
-      int sipIsError = 0;
-      res = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, 0, SIP_NOT_NONE, &state, &sipIsError ) );
+      if ( s )
+      {
+        int state;
+        int sipIsError = 0;
+        result = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
+        sipReleaseType( result, sipType_KadasMapItem, state );
+      }
       SIP_UNBLOCK_THREADS
-      return res;
+      return result;
+    };
 
-    } );
+    sipCpp = new sipKadasMapToolCreateItem( a0, factory, a2 );
 
     Py_END_ALLOW_THREADS
 
@@ -68,6 +82,50 @@ class KadasMapToolCreateItem : QgsMapTool
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );
     void setSelectItems( bool select );
+    // TODO: creator should be optional
+    void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
+%MethodCode
+
+    // Make sure the callables doesn't get garbage collected, this is needed because refcount for a1/a2 is 0
+    // and the creation function pointer is passed to the metadata and it needs to be kept in memory.
+    Py_INCREF( a2 );
+    Py_INCREF( a3 );
+
+    Py_BEGIN_ALLOW_THREADS
+
+    auto layerFilter = [a2]( QgsMapLayer *layer ) -> bool
+    {
+      bool result = false;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a2, "D", layer, sipType_QgsMapLayer, NULL );
+      if ( s )
+      {
+        result = sipConvertToBool( s );
+      }
+      SIP_UNBLOCK_THREADS
+      return result;
+    };
+
+    auto layerCreator = [a3]( const QString &name ) -> QgsMapLayer *
+    {
+      QgsMapLayer *result = nullptr;
+      SIP_BLOCK_THREADS
+      PyObject *s = sipCallMethod( NULL, a3, "D", &name, sipType_QString, NULL );
+      if ( s )
+      {
+        int state;
+        int sipIsError = 0;
+        result = reinterpret_cast<QgsMapLayer *>( sipConvertToType( s, sipType_QgsMapLayer, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
+        sipReleaseType( result, sipType_QgsMapLayer, state );
+      }
+      SIP_UNBLOCK_THREADS
+      return result;
+    };
+
+    sipCpp->showLayerSelection( a0, a1, layerFilter, layerCreator );
+    Py_END_ALLOW_THREADS
+
+%End
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
 
   public slots:
@@ -78,7 +136,6 @@ class KadasMapToolCreateItem : QgsMapTool
     void partFinished();
 
   protected:
-
     void createItem();
     void addPoint( const KadasMapPos &mapPos );
     void startPart( const KadasMapPos &pos );

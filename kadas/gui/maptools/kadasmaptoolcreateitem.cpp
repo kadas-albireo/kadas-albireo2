@@ -40,12 +40,6 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactor
 {
 }
 
-KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, PyObject *callable, KadasItemLayer *layer )
-  : QgsMapTool( canvas )
-  , mLayer( layer )
-{
-}
-
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
   : QgsMapTool( canvas )
   , mItem( item )
