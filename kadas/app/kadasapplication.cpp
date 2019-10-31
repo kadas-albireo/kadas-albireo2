@@ -201,6 +201,25 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   }
   settings.sync();
 
+  // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
+  QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
+  QgsDebugMsg( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ) );
+  for ( const QString &certFilename : certDir.entryList( QStringList() << "*.pem", QDir::Files ) )
+  {
+    QFile certFile( certDir.absoluteFilePath( certFilename ) );
+    if ( certFile.open( QIODevice::ReadOnly ) )
+    {
+      QgsDebugMsg( QString( "Reading certificate file %1" ).arg( certFile.fileName() ) );
+      QByteArray pem = certFile.readAll();
+      QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
+      QgsDebugMsg( QString( "Adding %1 certificates" ).arg( certs.size() ) );
+      for ( const QSslCertificate &cert : certs )
+      {
+        QSslSocket::addDefaultCaCertificate( cert );
+      }
+    }
+  }
+
   // Setup localization
   QString userLocale = settings.value( "locale/userLocale", QLocale::system().name() ).toString();
 
