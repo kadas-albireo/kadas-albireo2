@@ -31,3 +31,10 @@ GENERATE_EXPORT_HEADER(
   EXPORT_FILE_NAME kadas_analysis.h
 )
 SET(kadas_analysis_HDR ${kadas_analysis_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_analysis.h)
+
+INSTALL(TARGETS kadas_analysis
+  RUNTIME DESTINATION bin COMPONENT libraries
+  ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
+  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries)
+
+INSTALL(FILES ${kadas_analysis_HDR} DESTINATION include/kadas/analysis)
