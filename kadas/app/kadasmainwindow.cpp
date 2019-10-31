@@ -113,7 +113,7 @@ void KadasMainWindow::init()
   mLanguageCombo->addItem( "Deutsch", "de" );
   mLanguageCombo->addItem( QString( "Fran%1ais" ).arg( QChar( 0x00E7 ) ), "fr" );
   mLanguageCombo->addItem( "Italiano", "it" );
-  QString userLocale = QSettings().value( "/locale/userLocale" ).toString();
+  QString userLocale = QSettings().value( "/locale/userLocale", "en" ).toString();
   if ( userLocale.isEmpty() )
   {
     mLanguageCombo->setCurrentIndex( 0 );
