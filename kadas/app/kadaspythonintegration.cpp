@@ -63,6 +63,7 @@ bool KadasPythonIntegration::checkSystemImports()
   pluginpaths << '"' + homePluginsPath() + '"';
   pluginpaths << '"' + kadasPluginsPath() + '"';
   pluginpaths << '"' + qgisPluginsPath() + '"';
+  QgsDebugMsg( "Plugin paths: " + pluginpaths.join( "; " ) );
 
   // expect that bindings are installed locally, so add the path to modules
   // also add path to plugins
@@ -70,6 +71,7 @@ bool KadasPythonIntegration::checkSystemImports()
   newpaths << '"' + qgisPythonPath() + '"';
   newpaths << '"' + kadasPythonPath() + '"';
   newpaths << '"' + homePythonPath() + '"';
+  QgsDebugMsg( "Python paths: " + pluginpaths.join( "; " ) );
   newpaths << pluginpaths;
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
