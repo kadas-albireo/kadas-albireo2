@@ -271,6 +271,9 @@ void KadasMainWindow::init()
   mSearchWidget->addSearchProvider( new KadasPinSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasWorldLocationSearchProvider( mMapCanvas ) );
+
+  // Restore geometry
+  restoreGeometry( QgsSettings().value( "/kadas/windowgeometry" ).toByteArray() );
 }
 
 bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
@@ -403,6 +406,11 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
 void KadasMainWindow::showEvent( QShowEvent * )
 {
   mGpsIntegration->initGui();
+}
+
+void KadasMainWindow::closeEvent( QCloseEvent * )
+{
+  QgsSettings().setValue( "/kadas/windowgeometry", saveGeometry() );
 }
 
 void KadasMainWindow::restoreFavoriteButton( QToolButton *button )

@@ -122,6 +122,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void dropEvent( QDropEvent *event ) override;
     void dragEnterEvent( QDragEnterEvent *event ) override;
     void showEvent( QShowEvent * /*event*/ ) override;
+    void closeEvent( QCloseEvent * /*event*/ ) override;
 
     QgsMapTool *addPictureTool();
     QgsMapTool *addPinTool();
