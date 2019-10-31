@@ -251,7 +251,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
   // Raster layer query
   if ( !rlayerIds.isEmpty() )
   {
-    QUrl identifyUrl( QSettings().value( "vbs/identifyurl", "" ).toString() );
+    QUrl identifyUrl( QSettings().value( "kadas/identifyurl", "" ).toString() );
     QUrlQuery query;
     query.addQueryItem( "geometryType", "esriGeometryPoint" );
     query.addQueryItem( "geometry", QString( "%1,%2" ).arg( worldPos.x(), 0, 'f', 10 ).arg( worldPos.y(), 0, 'f', 10 ) );

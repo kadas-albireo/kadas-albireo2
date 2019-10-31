@@ -106,33 +106,33 @@ void KadasGlobeDialog::restoreSavedSettings()
   QgsSettings settings;
 
   // Video settings
-  comboBoxStereoMode->setCurrentIndex( comboBoxStereoMode->findText( settings.value( "/Plugin-Globe/stereoMode", "OFF" ).toString() ) );
-  spinBoxStereoScreenDistance->setValue( settings.value( "/Plugin-Globe/spinBoxStereoScreenDistance",
+  comboBoxStereoMode->setCurrentIndex( comboBoxStereoMode->findText( settings.value( "/Globe/stereoMode", "OFF" ).toString() ) );
+  spinBoxStereoScreenDistance->setValue( settings.value( "/Globe/spinBoxStereoScreenDistance",
                                          osg::DisplaySettings::instance()->getScreenDistance() ).toDouble() );
-  spinBoxStereoScreenWidth->setValue( settings.value( "/Plugin-Globe/spinBoxStereoScreenWidth",
+  spinBoxStereoScreenWidth->setValue( settings.value( "/Globe/spinBoxStereoScreenWidth",
                                       osg::DisplaySettings::instance()->getScreenWidth() ).toDouble() );
-  spinBoxStereoScreenHeight->setValue( settings.value( "/Plugin-Globe/spinBoxStereoScreenHeight",
+  spinBoxStereoScreenHeight->setValue( settings.value( "/Globe/spinBoxStereoScreenHeight",
                                        osg::DisplaySettings::instance()->getScreenHeight() ).toDouble() );
-  spinBoxStereoEyeSeparation->setValue( settings.value( "/Plugin-Globe/spinBoxStereoEyeSeparation",
+  spinBoxStereoEyeSeparation->setValue( settings.value( "/Globe/spinBoxStereoEyeSeparation",
                                         osg::DisplaySettings::instance()->getEyeSeparation() ).toDouble() );
-  spinBoxSplitStereoHorizontalSeparation->setValue( settings.value( "/Plugin-Globe/spinBoxSplitStereoHorizontalSeparation",
+  spinBoxSplitStereoHorizontalSeparation->setValue( settings.value( "/Globe/spinBoxSplitStereoHorizontalSeparation",
       osg::DisplaySettings::instance()->getSplitStereoHorizontalSeparation() ).toInt() );
-  spinBoxSplitStereoVerticalSeparation->setValue( settings.value( "/Plugin-Globe/spinBoxSplitStereoVerticalSeparation",
+  spinBoxSplitStereoVerticalSeparation->setValue( settings.value( "/Globe/spinBoxSplitStereoVerticalSeparation",
       osg::DisplaySettings::instance()->getSplitStereoVerticalSeparation() ).toInt() );
-  comboBoxSplitStereoHorizontalEyeMapping->setCurrentIndex( settings.value( "/Plugin-Globe/comboBoxSplitStereoHorizontalEyeMapping",
+  comboBoxSplitStereoHorizontalEyeMapping->setCurrentIndex( settings.value( "/Globe/comboBoxSplitStereoHorizontalEyeMapping",
       osg::DisplaySettings::instance()->getSplitStereoHorizontalEyeMapping() ).toInt() );
-  comboBoxSplitStereoVerticalEyeMapping->setCurrentIndex( settings.value( "/Plugin-Globe/comboBoxSplitStereoVerticalEyeMapping",
+  comboBoxSplitStereoVerticalEyeMapping->setCurrentIndex( settings.value( "/Globe/comboBoxSplitStereoVerticalEyeMapping",
       osg::DisplaySettings::instance()->getSplitStereoVerticalEyeMapping() ).toInt() );
-  groupBoxAntiAliasing->setChecked( settings.value( "/Plugin-Globe/anti-aliasing", false ).toBool() );
-  lineEditAASamples->setText( settings.value( "/Plugin-Globe/anti-aliasing-level", "" ).toString() );
+  groupBoxAntiAliasing->setChecked( settings.value( "/Globe/anti-aliasing", false ).toBool() );
+  lineEditAASamples->setText( settings.value( "/Globe/anti-aliasing-level", "" ).toString() );
 
   horizontalSliderMinAmbient->setEnabled( checkBoxSkyAutoAmbient->isChecked() );
   dateTimeEditSky->setEnabled( checkBoxDateTime->isChecked() );
 
   // Advanced
-  sliderScrollSensitivity->setValue( settings.value( "/Plugin-Globe/scrollSensitivity", 20 ).toInt() );
-  checkBoxInvertScroll->setChecked( settings.value( "/Plugin-Globe/invertScrollWheel", 0 ).toInt() );
-  checkBoxFrustumHighlighting->setChecked( settings.value( "/Plugin-Globe/frustum-highlighting", false ).toBool() );
+  sliderScrollSensitivity->setValue( settings.value( "/Globe/scrollSensitivity", 20 ).toInt() );
+  checkBoxInvertScroll->setChecked( settings.value( "/Globe/invertScrollWheel", 0 ).toInt() );
+  checkBoxFrustumHighlighting->setChecked( settings.value( "/Globe/frustum-highlighting", false ).toBool() );
 }
 
 void KadasGlobeDialog::on_buttonBox_accepted()
@@ -153,22 +153,22 @@ void KadasGlobeDialog::apply()
   QgsSettings settings;
 
   // Video settings
-  settings.setValue( "/Plugin-Globe/stereoMode", comboBoxStereoMode->currentText() );
-  settings.setValue( "/Plugin-Globe/stereoScreenDistance", spinBoxStereoScreenDistance->value() );
-  settings.setValue( "/Plugin-Globe/stereoScreenWidth", spinBoxStereoScreenWidth->value() );
-  settings.setValue( "/Plugin-Globe/stereoScreenHeight", spinBoxStereoScreenHeight->value() );
-  settings.setValue( "/Plugin-Globe/stereoEyeSeparation", spinBoxStereoEyeSeparation->value() );
-  settings.setValue( "/Plugin-Globe/SplitStereoHorizontalSeparation", spinBoxSplitStereoHorizontalSeparation->value() );
-  settings.setValue( "/Plugin-Globe/SplitStereoVerticalSeparation", spinBoxSplitStereoVerticalSeparation->value() );
-  settings.setValue( "/Plugin-Globe/SplitStereoHorizontalEyeMapping", comboBoxSplitStereoHorizontalEyeMapping->currentIndex() );
-  settings.setValue( "/Plugin-Globe/SplitStereoVerticalEyeMapping", comboBoxSplitStereoVerticalEyeMapping->currentIndex() );
-  settings.setValue( "/Plugin-Globe/anti-aliasing", groupBoxAntiAliasing->isChecked() );
-  settings.setValue( "/Plugin-Globe/anti-aliasing-level", lineEditAASamples->text() );
+  settings.setValue( "/Globe/stereoMode", comboBoxStereoMode->currentText() );
+  settings.setValue( "/Globe/stereoScreenDistance", spinBoxStereoScreenDistance->value() );
+  settings.setValue( "/Globe/stereoScreenWidth", spinBoxStereoScreenWidth->value() );
+  settings.setValue( "/Globe/stereoScreenHeight", spinBoxStereoScreenHeight->value() );
+  settings.setValue( "/Globe/stereoEyeSeparation", spinBoxStereoEyeSeparation->value() );
+  settings.setValue( "/Globe/SplitStereoHorizontalSeparation", spinBoxSplitStereoHorizontalSeparation->value() );
+  settings.setValue( "/Globe/SplitStereoVerticalSeparation", spinBoxSplitStereoVerticalSeparation->value() );
+  settings.setValue( "/Globe/SplitStereoHorizontalEyeMapping", comboBoxSplitStereoHorizontalEyeMapping->currentIndex() );
+  settings.setValue( "/Globe/SplitStereoVerticalEyeMapping", comboBoxSplitStereoVerticalEyeMapping->currentIndex() );
+  settings.setValue( "/Globe/anti-aliasing", groupBoxAntiAliasing->isChecked() );
+  settings.setValue( "/Globe/anti-aliasing-level", lineEditAASamples->text() );
 
   // Advanced settings
-  settings.setValue( "/Plugin-Globe/scrollSensitivity", sliderScrollSensitivity->value() );
-  settings.setValue( "/Plugin-Globe/invertScrollWheel", checkBoxInvertScroll->checkState() );
-  settings.setValue( "/Plugin-Globe/frustum-highlighting", checkBoxFrustumHighlighting->isChecked() );
+  settings.setValue( "/Globe/scrollSensitivity", sliderScrollSensitivity->value() );
+  settings.setValue( "/Globe/invertScrollWheel", checkBoxInvertScroll->checkState() );
+  settings.setValue( "/Globe/frustum-highlighting", checkBoxFrustumHighlighting->isChecked() );
 
   writeProjectSettings();
 

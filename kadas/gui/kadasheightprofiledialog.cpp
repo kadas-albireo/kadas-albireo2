@@ -135,7 +135,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mObserverHeightSpinBox->setRange( 0, 8000 );
   mObserverHeightSpinBox->setDecimals( 1 );
   mObserverHeightSpinBox->setSuffix( heightDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
-  mObserverHeightSpinBox->setValue( QgsSettings().value( "/Qgis/measure/heightprofile/observerheight", 2.0 ).toDouble() );
+  mObserverHeightSpinBox->setValue( QgsSettings().value( "/kadas/heightprofile_observerheight", 2.0 ).toDouble() );
   mObserverHeightSpinBox->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
   connect( mObserverHeightSpinBox, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasHeightProfileDialog::updateLineOfSight );
 
@@ -146,7 +146,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mTargetHeightSpinBox->setRange( 0, 8000 );
   mTargetHeightSpinBox->setDecimals( 1 );
   mTargetHeightSpinBox->setSuffix( heightDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
-  mTargetHeightSpinBox->setValue( QgsSettings().value( "/Qgis/measure/heightprofile/targetheight", 2.0 ).toDouble() );
+  mTargetHeightSpinBox->setValue( QgsSettings().value( "/kadas/heightprofile_targetheight", 2.0 ).toDouble() );
   mTargetHeightSpinBox->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
   connect( mTargetHeightSpinBox, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasHeightProfileDialog::updateLineOfSight );
 
@@ -364,6 +364,9 @@ void KadasHeightProfileDialog::replot()
 
 void KadasHeightProfileDialog::updateLineOfSight( )
 {
+  QgsSettings().setValue( "/kadas/heightprofile_observerheight", mObserverHeightSpinBox->value() );
+  QgsSettings().setValue( "/kadas/heightprofile_targetheight", mTargetHeightSpinBox->value() );
+
   qDeleteAll( mLinesOfSight );
   mLinesOfSight.clear();
   qDeleteAll( mLinesOfSightRB );

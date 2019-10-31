@@ -128,7 +128,7 @@ void KadasMainWindow::init()
   }
   connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
-  mSpinBoxDecimalPlaces->setValue( QSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt() );
+  mSpinBoxDecimalPlaces->setValue( QSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
   connect( mSpinBoxDecimalPlaces, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
 
   mSnappingCheckbox->setChecked( QSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
@@ -839,7 +839,7 @@ void KadasMainWindow::onLanguageChanged( int idx )
 
 void KadasMainWindow::onDecimalPlacesChanged( int places )
 {
-  QSettings().setValue( "/Qgis/measure/decimalplaces", places );
+  QSettings().setValue( "/kadas/measure_decimals", places );
 }
 
 void KadasMainWindow::onSnappingChanged( bool enabled )

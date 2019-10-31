@@ -54,7 +54,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
     mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
     mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
-    int defUnit = QgsSettings().value( "/Qgis/measure/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
+    int defUnit = QgsSettings().value( "/kadas/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
     mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
     connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
   }
@@ -64,7 +64,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mNorthComboBox = new QComboBox();
     mNorthComboBox->addItem( tr( "Geographic" ), static_cast<int>( AzimuthGeoNorth ) );
     mNorthComboBox->addItem( tr( "Map" ), static_cast<int>( AzimuthMapNorth ) );
-    int defNorth = QgsSettings().value( "/Qgis/measure/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
+    int defNorth = QgsSettings().value( "/kadas/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt();
     mNorthComboBox->setCurrentIndex( defNorth );
     connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
     layout()->addWidget( mNorthComboBox );
@@ -73,7 +73,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
     mUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
     mUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
-    int defUnit = QgsSettings().value( "/Qgis/measure/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt();
+    int defUnit = QgsSettings().value( "/kadas/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt();
     mUnitComboBox->setCurrentIndex( defUnit );
     connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
   }
@@ -117,7 +117,7 @@ void KadasMeasureWidget::syncWidgetToItem()
 void KadasMeasureWidget::setDistanceUnit( int index )
 {
   QgsUnitTypes::DistanceUnit unit = static_cast<QgsUnitTypes::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
-  QgsSettings().setValue( "/Qgis/measure/last_measure_unit", unit );
+  QgsSettings().setValue( "/kadas/last_measure_unit", unit );
   if ( dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
     static_cast<KadasGeometryItem *>( mItem )->setMeasurementsEnabled( true, unit );
@@ -127,7 +127,7 @@ void KadasMeasureWidget::setDistanceUnit( int index )
 void KadasMeasureWidget::setAngleUnit( int index )
 {
   QgsUnitTypes::AngleUnit unit = static_cast<QgsUnitTypes::AngleUnit>( mUnitComboBox->itemData( index ).toInt() );
-  QgsSettings().setValue( "/Qgis/measure/last_angle_unit", unit );
+  QgsSettings().setValue( "/kadas/last_angle_unit", unit );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
@@ -138,7 +138,7 @@ void KadasMeasureWidget::setAngleUnit( int index )
 void KadasMeasureWidget::setAzimuthNorth( int index )
 {
   AzimuthNorth north = static_cast<AzimuthNorth>( mNorthComboBox->itemData( index ).toInt() );
-  QgsSettings().setValue( "/Qgis/measure/last_azimuth_north", north );
+  QgsSettings().setValue( "/kadas/last_azimuth_north", north );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );

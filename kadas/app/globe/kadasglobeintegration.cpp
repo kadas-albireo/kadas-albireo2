@@ -193,11 +193,11 @@ void KadasGlobeIntegration::run()
   QGLFormat glf = QGLFormat::defaultFormat();
   glf.setVersion( 3, 3 );
   glf.setProfile( QGLFormat::CoreProfile );
-  if ( settings.value( "/Plugin-Globe/anti-aliasing", true ).toBool() &&
-       settings.value( "/Plugin-Globe/anti-aliasing-level", "" ).toInt() > 0 )
+  if ( settings.value( "/Globe/anti-aliasing", true ).toBool() &&
+       settings.value( "/Globe/anti-aliasing-level", "" ).toInt() > 0 )
   {
     glf.setSampleBuffers( true );
-    glf.setSamples( settings.value( "/Plugin-Globe/anti-aliasing-level", "" ).toInt() );
+    glf.setSamples( settings.value( "/Globe/anti-aliasing-level", "" ).toInt() );
   }
   mViewerWidget->setFormat( glf );
 

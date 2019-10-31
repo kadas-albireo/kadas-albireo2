@@ -351,21 +351,21 @@ QgsUnitTypes::AreaUnit KadasGeometryItem::areaBaseUnit() const
 
 QString KadasGeometryItem::formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const
 {
-  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertLengthMeasurement( value, unit );
   return QgsUnitTypes::formatDistance( value, decimals, unit );
 }
 
 QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit ) const
 {
-  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
   return QgsUnitTypes::formatArea( value, decimals, unit );
 }
 
 QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const
 {
-  int decimals = QgsSettings().value( "/Qgis/measure/decimalplaces", "2" ).toInt();
+  int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, unit );
   return QgsUnitTypes::formatAngle( value, decimals, unit );
 }
