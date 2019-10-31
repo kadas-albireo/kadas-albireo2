@@ -27,6 +27,8 @@
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
+class KadasMessageLogViewer;
+class QgsMessageOutput;
 class QgsPrintLayout;
 class QgsRasterLayer;
 class QgsVectorLayer;
@@ -77,6 +79,7 @@ class KadasApplication : public QgsApplication
     void showLayerAttributeTable( const QgsMapLayer *layer );
     void showLayerProperties( QgsMapLayer *layer );
     void showLayerInfo( const QgsMapLayer *layer );
+    void showMessageLog();
 
     QgsMapLayer *currentLayer() const;
 
@@ -103,6 +106,7 @@ class KadasApplication : public QgsApplication
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
+    KadasMessageLogViewer *mMessageLogViewer = nullptr;
     bool mBlockActiveLayerChanged = false;
     QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;
@@ -114,6 +118,8 @@ class KadasApplication : public QgsApplication
     void loadPythonSupport();
     bool showZipSublayerSelectionDialog( const QString &path ) const;
     bool projectSaveDirty();
+
+    static QgsMessageOutput *messageOutputViewer();
 
   private slots:
     void onActiveLayerChanged( QgsMapLayer *layer );

@@ -30,6 +30,8 @@
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgsmessagebar.h>
+#include <qgis/qgsmessageoutput.h>
+#include <qgis/qgsmessageviewer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgslayoutmanager.h>
@@ -58,6 +60,7 @@
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasvectorlayerproperties.h>
@@ -261,6 +264,9 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
   mMapToolPan = new KadasMapToolPan( mMainWindow->mapCanvas() );
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
+
+  QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
+  mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
 
   // Register plugin layers
   pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
@@ -857,6 +863,12 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   // TODO
 }
 
+void KadasApplication::showMessageLog()
+{
+  mMessageLogViewer->exec();
+  mMessageLogViewer->hide();
+}
+
 QgsMapLayer *KadasApplication::currentLayer() const
 {
   return mMainWindow->layerTreeView()->currentLayer();
@@ -1444,4 +1456,16 @@ void KadasApplication::updateWmtsZoomResolutions() const
     }
   }
   mMainWindow->mapCanvas()->setZoomResolutions( resolutions );
+}
+
+QgsMessageOutput *KadasApplication::messageOutputViewer()
+{
+  if ( QThread::currentThread() == kApp->thread() )
+  {
+    return new QgsMessageViewer( kApp->mainWindow() );
+  }
+  else
+  {
+    return new QgsMessageOutputConsole();
+  }
 }
