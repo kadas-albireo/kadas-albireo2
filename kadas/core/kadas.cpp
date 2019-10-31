@@ -19,6 +19,8 @@
 #include <QFile>
 #include <QStandardPaths>
 
+#include <qgis/qgssettings.h>
+
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadas_config.h>
 
@@ -31,6 +33,11 @@ const char *Kadas::KADAS_BUILD_DATE = __DATE__;
 
 static QString resolveDataPath()
 {
+  QString dataPath = qgetenv( "KADAS_DATA_PATH" );
+  if ( !dataPath.isEmpty() )
+  {
+    return dataPath;
+  }
   QFile file( QDir( QApplication::applicationDirPath() ).absoluteFilePath( "kadassourcedir.txt" ) );
   if ( file.open( QIODevice::ReadOnly ) )
   {
