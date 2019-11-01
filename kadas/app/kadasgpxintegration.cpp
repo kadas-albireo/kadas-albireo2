@@ -91,13 +91,13 @@ void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<Kad
 
 void KadasGpxIntegration::importGpx()
 {
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QStringList filenames = QFileDialog::getOpenFileNames( kApp->mainWindow(), tr( "Import GPX" ), lastDir, tr( "GPX Files (*.gpx)" ) );
   if ( filenames.isEmpty() )
   {
     return;
   }
-  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filenames[0] ).absolutePath() );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filenames[0] ).absolutePath() );
 
   int nWpts = 0;
   int nRtes = 0;
@@ -223,13 +223,13 @@ void KadasGpxIntegration::exportGpx()
   }
   KadasItemLayer *layer = static_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
 
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), lastDir, tr( "GPX Files (*.gpx)" ) );
   if ( filename.isEmpty() )
   {
     return;
   }
-  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
   if ( !filename.endsWith( ".gpx", Qt::CaseInsensitive ) )
   {
     filename += ".gpx";

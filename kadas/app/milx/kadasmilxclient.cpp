@@ -27,7 +27,6 @@
 #include <QNetworkSession>
 #include <QImage>
 #include <QProcess>
-#include <QSettings>
 #include <QTcpSocket>
 #include <QThread>
 #include <QTimer>

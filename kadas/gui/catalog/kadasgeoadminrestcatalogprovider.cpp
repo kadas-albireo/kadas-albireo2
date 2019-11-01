@@ -17,9 +17,9 @@
 #include <QDomElement>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSettings>
 
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
@@ -32,7 +32,7 @@ KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QStrin
 void KadasGeoAdminRestCatalogProvider::load()
 {
   QNetworkRequest req( mBaseUrl );
-  req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyFinished );
 }
@@ -71,7 +71,7 @@ void KadasGeoAdminRestCatalogProvider::replyFinished()
     return;
   }
 
-  QString referer = QSettings().value( "search/referer", "http://localhost" ).toString();
+  QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
   // Categories
   QMap<QString, QStandardItem *> layerParentMap;

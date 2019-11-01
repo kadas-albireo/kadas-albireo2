@@ -101,7 +101,7 @@ void KadasMainWindow::init()
   mSearchWidget->init( mMapCanvas );
 
   mLayersWidget->setVisible( false );
-  mLayersWidget->resize( qMax( 10, qMin( 800, QSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
+  mLayersWidget->resize( qMax( 10, qMin( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
   mGeodataBox->setCollapsed( false );
   mLayersBox->setCollapsed( false );
 
@@ -113,7 +113,7 @@ void KadasMainWindow::init()
   mLanguageCombo->addItem( "Deutsch", "de" );
   mLanguageCombo->addItem( QString( "Fran%1ais" ).arg( QChar( 0x00E7 ) ), "fr" );
   mLanguageCombo->addItem( "Italiano", "it" );
-  QString userLocale = QSettings().value( "/locale/userLocale", "en" ).toString();
+  QString userLocale = QgsSettings().value( "/locale/userLocale", "en" ).toString();
   if ( userLocale.isEmpty() )
   {
     mLanguageCombo->setCurrentIndex( 0 );
@@ -128,10 +128,10 @@ void KadasMainWindow::init()
   }
   connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
-  mSpinBoxDecimalPlaces->setValue( QSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
+  mSpinBoxDecimalPlaces->setValue( QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
   connect( mSpinBoxDecimalPlaces, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
 
-  mSnappingCheckbox->setChecked( QSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
+  mSnappingCheckbox->setChecked( QgsSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
   connect( mSnappingCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onSnappingChanged );
 
   mInfoBar = new QgsMessageBar( mMapCanvas );
@@ -162,7 +162,7 @@ void KadasMainWindow::init()
 
   connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
 
-  mNumericInputCheckbox->setChecked( QSettings().value( "/kadas/showNumericInput", false ).toBool() );
+  mNumericInputCheckbox->setChecked( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() );
   connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
 
   QgsLayerTreeModel *model = new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
@@ -181,7 +181,7 @@ void KadasMainWindow::init()
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( QgsSnappingConfig::AllLayers );
   snappingConfig.setType( QgsSnappingConfig::Vertex );
-  int snappingRadius = QSettings().value( "/Qgis/snapping/radius", 10 ).toInt();
+  int snappingRadius = QgsSettings().value( "/Qgis/snapping/radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
   snappingConfig.setUnits( QgsTolerance::Pixels );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
@@ -245,7 +245,7 @@ void KadasMainWindow::init()
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
 
-  QStringList catalogUris = QSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
+  QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
   for ( const QString &catalogUri : catalogUris )
   {
     QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
@@ -297,7 +297,7 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     {
       QPoint delta = e->pos() - mResizePressPos;
       mLayersWidget->resize( qMax( 10, qMin( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
-      QSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
+      QgsSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
       mLayerTreeViewButton->move( mLayersWidget->width(), mLayerTreeViewButton->y() );
     }
   }
@@ -394,7 +394,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
     {
       button->setEnabled( true );
       setActionToButton( action, button );
-      QSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
+      QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
     }
   }
   else
@@ -415,7 +415,7 @@ void KadasMainWindow::closeEvent( QCloseEvent * )
 
 void KadasMainWindow::restoreFavoriteButton( QToolButton *button )
 {
-  QString actionName = QSettings().value( "/kadas/favoriteAction/" + button->objectName() ).toString();
+  QString actionName = QgsSettings().value( "/kadas/favoriteAction/" + button->objectName() ).toString();
   if ( actionName.isEmpty() )
   {
     return;
@@ -835,29 +835,29 @@ void KadasMainWindow::onLanguageChanged( int idx )
   QString locale = mLanguageCombo->itemData( idx ).toString();
   if ( locale.isEmpty() )
   {
-    QSettings().setValue( "/locale/overrideFlag", false );
+    QgsSettings().setValue( "/locale/overrideFlag", false );
   }
   else
   {
-    QSettings().setValue( "/locale/overrideFlag", true );
-    QSettings().setValue( "/locale/userLocale", locale );
+    QgsSettings().setValue( "/locale/overrideFlag", true );
+    QgsSettings().setValue( "/locale/userLocale", locale );
   }
   QMessageBox::information( this, tr( "Language Changed" ), tr( "The language will be changed at the next program launch." ) );
 }
 
 void KadasMainWindow::onDecimalPlacesChanged( int places )
 {
-  QSettings().setValue( "/kadas/measure_decimals", places );
+  QgsSettings().setValue( "/kadas/measure_decimals", places );
 }
 
 void KadasMainWindow::onSnappingChanged( bool enabled )
 {
-  QSettings().setValue( "/Qgis/snapping/enabled", enabled );
+  QgsSettings().setValue( "/Qgis/snapping/enabled", enabled );
 }
 
 void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )
 {
-  QSettings().setValue( "/kadas/showNumericInput", checked );
+  QgsSettings().setValue( "/kadas/showNumericInput", checked );
 }
 
 void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
@@ -867,7 +867,7 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   QAction *removeAction = menu.addAction( tr( "Remove" ) );
   if ( menu.exec( button->mapToGlobal( pos ) ) == removeAction )
   {
-    QSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), "" );
+    QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), "" );
     button->setText( tr( "Favorite" ) );
     button->setIcon( QIcon( ":/kadas/kadas/favorit.png" ) );
     button->setDefaultAction( 0 );
@@ -914,7 +914,7 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
 
 int KadasMainWindow::messageTimeout() const
 {
-  return QSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
+  return QgsSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
 }
 
 QgsMapTool *KadasMainWindow::addPinTool()
@@ -930,7 +930,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
 
 QgsMapTool *KadasMainWindow::addPictureTool()
 {
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QSet<QString> formats;
   for ( const QByteArray &format : QImageReader::supportedImageFormats() )
   {
@@ -944,7 +944,7 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   {
     return nullptr;
   }
-  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
   QString errMsg;
   QgsCoordinateReferenceSystem crs( "EPSG:3857" );
   QgsCoordinateTransform crst( mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );

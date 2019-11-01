@@ -21,12 +21,12 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSettings>
 #include <QUrlQuery>
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsmimedatautils.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
@@ -41,12 +41,12 @@ void KadasVBSCatalogProvider::load()
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
 //  QgsArcGisRestUtils::addToken( url ); // TODO
-  QString lang = QSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
   QUrlQuery query;
   query.addQueryItem( "lang", lang );
   url.setQuery( query );
   QNetworkRequest req( url );
-  req.setRawHeader( "Referer", QSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasVBSCatalogProvider::replyFinished );
 }
@@ -117,7 +117,7 @@ void KadasVBSCatalogProvider::readWMTSCapabilitiesDo()
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
-  QString referer = QSettings().value( "search/referer", "http://localhost" ).toString();
+  QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
   if ( reply->error() == QNetworkReply::NoError )
   {

@@ -1,13 +1,16 @@
-#include "kadaspluginmanager.h"
-#include "kadasapplication.h"
-#include "kadaspythonintegration.h"
-#include <qgis/qgsnetworkaccessmanager.h>
-#include <qgis/qgsnetworkcontentfetcher.h>
 #include <QDomDocument>
 #include <QMessageBox>
 #include <QSet>
 #include <QTreeWidgetItem>
 #include <quazip5/quazipfile.h>
+
+#include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsnetworkcontentfetcher.h>
+#include <qgis/qgssettings.h>
+
+#include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadaspluginmanager.h>
+#include <kadas/app/kadaspythonintegration.h>
 
 KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas ): KadasBottomBar( canvas )
 {
@@ -69,7 +72,7 @@ KadasPluginManager::KadasPluginManager(): KadasBottomBar( 0 )
 
 QMap< QString, QString > KadasPluginManager::availablePlugins()
 {
-  QSettings s;
+  QgsSettings s;
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
   QgsNetworkContentFetcher nf;
   QUrl repositoryUrl( repoUrl );

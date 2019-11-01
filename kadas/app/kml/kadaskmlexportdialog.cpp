@@ -15,11 +15,11 @@
  ***************************************************************************/
 
 #include <qgis/qgslayertree.h>
+#include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include <QPushButton>
 #include <QFileDialog>
-#include <QSettings>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/kml/kadaskmlexportdialog.h>
@@ -56,7 +56,7 @@ void KadasKMLExportDialog::selectFile()
   filters.append( tr( "KMZ File (*.kmz)" ) );
   filters.append( tr( "KML File (*.kml)" ) );
 
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString selectedFilter;
 
   QString filename = QFileDialog::getSaveFileName( 0, tr( "Select Output" ), lastDir, filters.join( ";;" ), &selectedFilter );
@@ -64,7 +64,7 @@ void KadasKMLExportDialog::selectFile()
   {
     return;
   }
-  QSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
   if ( selectedFilter == filters[0] && !filename.endsWith( ".kmz", Qt::CaseInsensitive ) )
   {
     filename += ".kmz";

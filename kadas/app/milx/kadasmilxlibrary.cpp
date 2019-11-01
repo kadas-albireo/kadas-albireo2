@@ -270,9 +270,9 @@ void KadasMilxLibraryLoader::run()
 #endif
   if ( !QDir( galleryPath ).exists() )
   {
-    galleryPath = QSettings().value( "/milx/milx_gallery_path", "" ).toString();
+    galleryPath = QgsSettings().value( "/milx/milx_gallery_path", "" ).toString();
   }
-  QString lang = QSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
 
   QDir galleryDir( galleryPath );
   if ( galleryDir.exists() )

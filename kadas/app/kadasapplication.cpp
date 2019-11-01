@@ -165,7 +165,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   }
 
   // Create / migrate settings
-  QSettings settings;
+  QgsSettings settings;
 
   QFile srcSettings;
   bool settingsEmpty = false;
@@ -182,7 +182,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   }
   if ( srcSettings.exists() )
   {
-    QSettings newSettings( srcSettings.fileName(), QSettings::IniFormat );
+    QgsSettings newSettings( srcSettings.fileName(), QSettings::IniFormat );
     QString timestamp = settings.value( "timestamp", "0" ).toString();
     QString newtimestamp = newSettings.value( "timestamp" ).toString();
     if ( settingsEmpty || newtimestamp > timestamp )
@@ -320,7 +320,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
     }
   }
 
-  // TODO: QgsApplication::setMaxThreads( QSettings().value( "/Qgis/max_threads", -1 ).toInt() );
+  // TODO: QgsApplication::setMaxThreads( QgsSettings().value( "/Qgis/max_threads", -1 ).toInt() );
 
   QgsProject::instance()->setDirty( false );
   updateWindowTitle();
@@ -582,7 +582,7 @@ void KadasApplication::importFromKml()
   filters.append( tr( "KMZ File (*.kmz)" ) );
   filters.append( tr( "KML File (*.kml)" ) );
 
-  QString lastDir = QSettings().value( "/UI/lastImportExportDir", "." ).toString();
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString selectedFilter;
 
   QString filename = QFileDialog::getOpenFileName( mMainWindow, tr( "Select KML/KMZ File" ), lastDir, filters.join( ";;" ), &selectedFilter );

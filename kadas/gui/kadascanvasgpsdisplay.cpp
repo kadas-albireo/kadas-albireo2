@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QSettings>
-
 #include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgpsconnection.h>
@@ -24,6 +22,7 @@
 #include <qgis/qgsgpsmarker.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 
 #include <kadas/gui/kadascanvasgpsdisplay.h>
@@ -41,7 +40,7 @@ KadasCanvasGPSDisplay::~KadasCanvasGPSDisplay()
 {
   closeGPSConnection();
 
-  QSettings s;
+  QgsSettings s;
   s.setValue( "/gps/markerSize", mMarkerSize );
   s.setValue( "/gps/mapExtentMultiplier", mSpinMapExtentMultiplier );
   QString panModeString = "none";
@@ -152,14 +151,12 @@ void KadasCanvasGPSDisplay::updateGPSInformation( const QgsGpsInformation &info 
 
 int KadasCanvasGPSDisplay::defaultMarkerSize()
 {
-  QSettings s;
-  return s.value( "/gps/markerSize", "24" ).toInt();
+  return QgsSettings().value( "/gps/markerSize", "24" ).toInt();
 }
 
 int KadasCanvasGPSDisplay::defaultSpinMapExtentMultiplier()
 {
-  QSettings s;
-  return s.value( "/gps/mapExtentMultiplier", "50" ).toInt();
+  return QgsSettings().value( "/gps/mapExtentMultiplier", "50" ).toInt();
 }
 
 void KadasCanvasGPSDisplay::removeMarker()
@@ -180,8 +177,7 @@ QgsGpsInformation KadasCanvasGPSDisplay::currentGPSInformation() const
 
 KadasCanvasGPSDisplay::RecenterMode KadasCanvasGPSDisplay::defaultRecenterMode()
 {
-  QSettings s;
-  QString panMode = s.value( "/gps/panMode", "none" ).toString();
+  QString panMode = QgsSettings().value( "/gps/panMode", "none" ).toString();
   if ( panMode == "recenterAlways" )
   {
     return KadasCanvasGPSDisplay::Always;

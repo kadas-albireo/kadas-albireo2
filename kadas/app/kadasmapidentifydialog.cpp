@@ -29,6 +29,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
@@ -165,7 +166,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
 
   // Prepare for vector layers
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mCanvas->mapSettings() );
-  double radiusmm = QSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
   QgsRectangle filterRect;
@@ -251,7 +252,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
   // Raster layer query
   if ( !rlayerIds.isEmpty() )
   {
-    QUrl identifyUrl( QSettings().value( "kadas/identifyurl", "" ).toString() );
+    QUrl identifyUrl( QgsSettings().value( "kadas/identifyurl", "" ).toString() );
     QUrlQuery query;
     query.addQueryItem( "geometryType", "esriGeometryPoint" );
     query.addQueryItem( "geometry", QString( "%1,%2" ).arg( worldPos.x(), 0, 'f', 10 ).arg( worldPos.y(), 0, 'f', 10 ) );
