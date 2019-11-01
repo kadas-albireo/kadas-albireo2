@@ -71,7 +71,9 @@
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
+#ifdef WITH_GLOBE
 #include <kadas/app/globe/kadasglobeintegration.h>
+#endif
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 #include <kadas/app/kadaspluginmanager.h>
@@ -211,9 +213,11 @@ void KadasMainWindow::init()
   KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
   Q_UNUSED( milx );
 
+#ifdef WITH_GLOBE
   // Globe
   KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
   Q_UNUSED( globe );
+#endif
 
   configureButtons();
 
