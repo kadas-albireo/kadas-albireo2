@@ -37,7 +37,7 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     QMap< QString, QPair< QString, QString> > mAvailablePlugins;
 
     QMap< QString, QPair< QString, QString > > availablePlugins();
-    void installPlugin( const QString &pluginName, const  QString &downloadUrl );
+    void installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip );
     void uninstallPlugin( const QString &pluginName, const QString &moduleName );
 
     //tree widget state

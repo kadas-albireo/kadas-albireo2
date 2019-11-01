@@ -172,11 +172,12 @@ void KadasPluginManager::installButtonClicked()
   if ( installed.size() < 1 ) //not yet installed
   {
     QString downloadPath = mAvailablePlugins.value( pluginName ).second;
+    QString pluginTooltip = mAvailablePlugins.value( pluginName ).first;
     if ( downloadPath.isEmpty() )
     {
       return;
     }
-    installPlugin( pluginName, downloadPath );
+    installPlugin( pluginName, downloadPath, pluginTooltip );
   }
   else //plugin installed, remove it
   {
@@ -188,7 +189,7 @@ void KadasPluginManager::installButtonClicked()
   }
 }
 
-void KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl )
+void KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip )
 {
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
@@ -254,6 +255,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   //insert into mInstalledTreeWidget
   QTreeWidgetItem *installedItem = new QTreeWidgetItem();
   installedItem->setText( 0, pluginName );
+  installedItem->setToolTip( 0, pluginTooltip );
   installedItem->setData( 0, Qt::UserRole, moduleName );
 
   p->pluginList();
