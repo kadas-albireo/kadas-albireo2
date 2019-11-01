@@ -979,7 +979,7 @@ void KadasMainWindow::showPluginManager( bool show )
   {
     if ( !mPluginManager )
     {
-      mPluginManager = new KadasPluginManager( mapCanvas(), mPluginManagerButton );
+      mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
     }
     mPluginManager->show();
   }

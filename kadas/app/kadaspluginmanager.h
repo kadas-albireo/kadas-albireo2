@@ -23,7 +23,7 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
 {
     Q_OBJECT
   public:
-    KadasPluginManager( QgsMapCanvas *canvas, KadasRibbonButton* mainWindowButton );
+    KadasPluginManager( QgsMapCanvas *canvas, QAction* action );
 
   private slots:
     void installButtonClicked();
@@ -48,5 +48,5 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     void setItemDeactivatable( QTreeWidgetItem *item );
 
     //main window button to show/hide the plugin manager
-    KadasRibbonButton* mMainWindowButton;
+    QAction* mAction;
 };

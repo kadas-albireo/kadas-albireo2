@@ -29,7 +29,7 @@
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 
-KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, KadasRibbonButton* mainWindowButton ): KadasBottomBar( canvas ), mMainWindowButton( mainWindowButton )
+KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction* action ): KadasBottomBar( canvas ), mAction( action )
 {
   setupUi( this );
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
@@ -156,7 +156,10 @@ void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *i
 
 void KadasPluginManager::on_mCloseButton_clicked()
 {
-    mMainWindowButton->setChecked( false );
+    if( mAction )
+    {
+        mAction->toggle();
+    }
 }
 
 void KadasPluginManager::installButtonClicked()
