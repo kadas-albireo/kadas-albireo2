@@ -77,7 +77,15 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
 QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg )
 {
   QgsCoordinateReferenceSystem destCrs( epsg );
-  QgsPointXY pTrans = QgsCoordinateTransform( sSrs, destCrs, QgsProject::instance() ).transform( p );
+  QgsPointXY pTrans;
+  try
+  {
+    pTrans = QgsCoordinateTransform( sSrs, destCrs, QgsProject::instance() ).transform( p );
+  }
+  catch ( ... )
+  {
+    return "";
+  }
   switch ( format )
   {
     case Default:
