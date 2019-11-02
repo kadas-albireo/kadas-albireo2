@@ -270,6 +270,12 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
   context.painter()->drawImage( renderPos, mCachedGraphic );
 }
 
+void KadasMilxItem::setState( const KadasMapItem::State *state )
+{
+  mCachedGraphic = QImage();
+  KadasMapItem::setState( state );
+}
+
 QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
   if ( !kmzZip )

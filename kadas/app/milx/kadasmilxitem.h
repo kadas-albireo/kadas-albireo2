@@ -69,6 +69,7 @@ class KadasMilxItem : public KadasMapItem
       QJsonObject serialize() const override;
       bool deserialize( const QJsonObject &json ) override;
     };
+    void setState( const KadasMapItem::State *state ) override;
     const State *constState() const { return static_cast<State *>( mState ); }
 
     // Draw interface (all points in item crs)
