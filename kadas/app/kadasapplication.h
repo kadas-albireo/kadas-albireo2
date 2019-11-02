@@ -99,6 +99,7 @@ class KadasApplication : public QgsApplication
     void unsetMapTool();
 
   signals:
+    void projectWillBeClosed();
     void projectRead();
     void activeLayerChanged( QgsMapLayer *layer );
     void printLayoutAdded( QgsPrintLayout *layout );

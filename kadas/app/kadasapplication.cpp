@@ -680,8 +680,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
 void KadasApplication::projectClose()
 {
-  // TODO
-//  mMainWindow->closeChildMapCanvases();
+  emit projectWillBeClosed();
 
   // TODO
 //  deleteLayoutDesigners();
