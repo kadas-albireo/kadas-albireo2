@@ -42,11 +42,7 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
 #ifndef SIP_RUN
     typedef std::function<KadasMapItemEditor*( KadasMapItem *, EditorType ) > Factory;
     typedef QMap<QString, Factory> Registry;
-    static Registry *registry()
-    {
-      static Registry instance;
-      return &instance;
-    };
+    static Registry *registry();
 #endif
 
   public slots:

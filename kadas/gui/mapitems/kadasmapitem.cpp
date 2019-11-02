@@ -219,3 +219,9 @@ void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QPointF &screenP
   painter->setBrush( Qt::red );
   painter->drawEllipse( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
 }
+
+KadasMapItem::Registry *KadasMapItem::registry()
+{
+  static Registry instance;
+  return &instance;
+};

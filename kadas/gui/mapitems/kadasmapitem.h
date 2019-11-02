@@ -270,11 +270,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 #ifndef SIP_RUN
     typedef std::function<KadasMapItem*( const QgsCoordinateReferenceSystem & ) > RegistryItemFactory;
     typedef QMap<QString, RegistryItemFactory> Registry;
-    static Registry *registry()
-    {
-      static Registry instance;
-      return &instance;
-    };
+    static Registry *registry();
 #endif
 
   signals:
