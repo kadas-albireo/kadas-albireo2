@@ -147,8 +147,10 @@ bool KadasApplication::isRunningFromBuildDir()
 
 KadasApplication::KadasApplication( int &argc, char **argv )
   : QgsApplication( argc, argv, true )
-{
+{}
 
+void KadasApplication::init()
+{
   // Install crash reporter
   KadasCrashRpt crashReporter;
   crashReporter.install();

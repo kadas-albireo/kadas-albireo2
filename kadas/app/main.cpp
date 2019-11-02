@@ -25,17 +25,6 @@
 
 int main( int argc, char *argv[] )
 {
-  // Setup environment
-#ifdef __MINGW32__
-  QString gdalDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
-  qputenv( "GDAL_DATA", gdalDir.toLocal8Bit() );
-#endif
-
-  QgsDebugMsg( QString( "Starting qgis main" ) );
-
-  // Set up the custom qWarning/qDebug custom handler
-  // TODO: qInstallMsgHandler( myMessageOutput );
-
   // Setup application
   QApplication::setOrganizationName( Kadas::KADAS_RELEASE_NAME );
   QApplication::setOrganizationDomain( Kadas::KADAS_RELEASE_NAME );
@@ -47,5 +36,12 @@ int main( int argc, char *argv[] )
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
 
   KadasApplication app( argc, argv );
+
+#ifdef __MINGW32__
+  QString gdalDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
+  qputenv( "GDAL_DATA", gdalDir.toLocal8Bit() );
+#endif
+
+  app.init();
   return app.exec();
 }

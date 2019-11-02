@@ -54,6 +54,8 @@ class KadasApplication : public QgsApplication
     KadasApplication( int &argc, char **argv );
     ~KadasApplication();
 
+    void init();
+
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
 
