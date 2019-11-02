@@ -244,8 +244,6 @@ void KadasApplication::init()
   splash.show();
   mMainWindow = new KadasMainWindow( &splash );
   mMainWindow->init();
-  mMainWindow->mapCanvas()->setCanvasColor( Qt::transparent );
-  mMainWindow->mapCanvas()->setMapUpdateInterval( 1000 );
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );

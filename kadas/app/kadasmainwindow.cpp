@@ -95,6 +95,9 @@ void KadasMainWindow::init()
   KadasStatusWidget::setupUi( statusWidget );
   statusBar()->addPermanentWidget( statusWidget, 1 );
 
+  mMapCanvas->setCanvasColor( Qt::transparent );
+  mMapCanvas->setMapUpdateInterval( 1000 );
+
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
   mGpsIntegration = new KadasGpsIntegration( this );
