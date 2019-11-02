@@ -40,8 +40,8 @@ osgEarth::Status KadasGlobeFeatureSource::initialize( const osgDB::Options *dbOp
   Q_UNUSED( dbOptions )
   mLayer = mOptions.layer();
 
-  connect( mLayer, SIGNAL( attributeValueChanged( QgsFeatureId, int, QVariant ) ), this, SLOT( attributeValueChanged( QgsFeatureId, int, QVariant ) ) );
-  connect( mLayer, SIGNAL( geometryChanged( QgsFeatureId, QgsGeometry ) ), this, SLOT( geometryChanged( QgsFeatureId, QgsGeometry ) ) );
+  connect( mLayer, &QgsVectorLayer::attributeValueChanged, this, &KadasGlobeFeatureSource::attributeValueChanged );
+  connect( mLayer, &QgsVectorLayer::geometryChanged, this, &KadasGlobeFeatureSource::geometryChanged );
 
   // create the profile
   osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( mLayer->crs().toWkt().toStdString() );

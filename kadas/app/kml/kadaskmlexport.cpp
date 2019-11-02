@@ -169,7 +169,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
       if ( rl && rl->providerType() == "wms" )
       {
         QMap<QString, QString> parameterMap;
-        foreach ( const QString &param, rl->source().split( "&" ) )
+        for ( const QString &param : rl->source().split( "&" ) )
         {
           QStringList pair = param.split( "=" );
           if ( pair.size() >= 2 )

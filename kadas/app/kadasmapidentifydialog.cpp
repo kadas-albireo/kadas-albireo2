@@ -206,7 +206,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       {
         QStringList sublayerIds = dataSource.params( "layers" );
         rlayerIds.append( sublayerIds );
-        foreach ( const QString &id, sublayerIds )
+        for ( const QString &id : sublayerIds )
         {
           rlayerMap.insert( id, rlayer->id() );
         }

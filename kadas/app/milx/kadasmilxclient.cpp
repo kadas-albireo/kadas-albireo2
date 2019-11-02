@@ -724,7 +724,7 @@ bool KadasMilxClient::pickSymbol( const QList<NPointSymbol> &symbols, const QPoi
   QDataStream istream( &request, QIODevice::WriteOnly );
   istream << MILX_REQUEST_PICK_SYMBOL << clickPos;
   istream << nSymbols;
-  foreach ( const NPointSymbol &symbol, symbols )
+  for ( const NPointSymbol &symbol : symbols )
   {
     istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored;
   }
