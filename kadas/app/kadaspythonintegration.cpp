@@ -511,7 +511,7 @@ QString KadasPythonIntegration::kadasPythonPath() const
   }
   else
   {
-    return QgsApplication::pkgDataPath() + QStringLiteral( "/python" );
+    return Kadas::pkgDataPath() + QStringLiteral( "/python" );
   }
 }
 
