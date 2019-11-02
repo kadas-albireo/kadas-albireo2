@@ -59,6 +59,7 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
+#include <kadas/app/kadashandlebadlayers.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
@@ -267,6 +268,8 @@ void KadasApplication::init()
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
   mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
+
+  QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
 
   // Register plugin layers
   pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
