@@ -97,6 +97,7 @@ void KadasMainWindow::init()
 
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->setMapUpdateInterval( 1000 );
+  mMapCanvas->setPreviewJobsEnabled( true );
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
