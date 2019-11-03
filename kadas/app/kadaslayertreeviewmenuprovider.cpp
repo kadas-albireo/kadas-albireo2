@@ -57,7 +57,9 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
   {
     if ( QgsLayerTree::isGroup( node ) )
     {
-      menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
+      QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
+      renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
+      menu->addAction( renameAction );
       menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
     }
     else if ( QgsLayerTree::isLayer( node ) && QgsLayerTree::toLayer( node )->layer() )
@@ -80,22 +82,24 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         }
       }
       menu->addAction( actions->actionZoomToLayer( kApp->mainWindow()->mapCanvas(), menu ) );
-      menu->addAction( actions->actionRenameGroupOrLayer( menu ) );
+      QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
+      renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
+      menu->addAction( renameAction );
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
 
 
-      if ( layer->type() == QgsMapLayerType::RasterLayer )
+      if ( layer->type() == QgsMapLayerType::RasterLayer && layer->providerType() == "gdal" )
       {
         menu->addAction( actionLayerUseAsHeightmap( menu ) );
       }
       else if ( layer->type() == QgsMapLayerType::VectorLayer )
       {
-        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.png" ), tr( "&Open Attribute Table" ),
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ),
                          this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
       }
       if ( !layer->metadataUrl().isEmpty() )
       {
-        menu->addAction( QgsApplication::getThemeIcon( "/mActionInfo.png" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
+        menu->addAction( QIcon( ":/kadas/icons/info" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }
       if ( layer->type() == QgsMapLayerType::PluginLayer )
       {
@@ -103,12 +107,12 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         QgsPluginLayerType *plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( pluginLayer->pluginLayerType() );
         if ( plt && plt->showLayerProperties( pluginLayer ) )
         {
-          menu->addAction( tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
+          menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
         }
       }
       else
       {
-        menu->addAction( tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
+        menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
       }
     }
   }
