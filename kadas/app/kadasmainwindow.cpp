@@ -21,7 +21,6 @@
 #include <QMessageBox>
 #include <QShortcut>
 
-//#include <qgis/qgsdecorationgrid.h> // TODO
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
@@ -103,7 +102,6 @@ void KadasMainWindow::init()
 
   mGpsIntegration = new KadasGpsIntegration( this );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
-//  mDecorationGrid = new QgsDecorationGrid(); // TODO
   mSearchWidget->init( mMapCanvas );
 
   mLayersWidget->setVisible( false );
@@ -352,7 +350,6 @@ void KadasMainWindow::mousePressEvent( QMouseEvent *event )
       mDragStartPos = event->pos();
     }
   }
-  // QgisApp::mousePressEvent( event ); TODO
 }
 
 void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
@@ -372,7 +369,6 @@ void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
       mDragStartPos = QPoint();
     }
   }
-//  QgisApp::mouseMoveEvent( event ); TODO
 }
 
 void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
@@ -381,10 +377,6 @@ void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
   if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) && button && button->objectName().startsWith( "mFavoriteButton" ) )
   {
     event->acceptProposedAction();
-  }
-  else
-  {
-//    QgisApp::dragEnterEvent( event ); TODO
   }
 }
 
@@ -405,10 +397,6 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       setActionToButton( action, button );
       QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
     }
-  }
-  else
-  {
-//    QgisApp::dropEvent( event ); // TODO
   }
 }
 

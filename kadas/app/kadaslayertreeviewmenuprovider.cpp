@@ -214,8 +214,7 @@ void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
 
 void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()
 {
-//  mView->currentLayer();
-  // TODO
+  kApp->showLayerAttributeTable( mView->currentLayer() );
 }
 
 void KadasLayerTreeViewMenuProvider::showLayerInfo()

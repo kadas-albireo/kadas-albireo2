@@ -49,7 +49,6 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
 
 void KadasMilxEditor::syncItemToWidget()
 {
-  // TODO
 }
 
 void KadasMilxEditor::syncWidgetToItem()

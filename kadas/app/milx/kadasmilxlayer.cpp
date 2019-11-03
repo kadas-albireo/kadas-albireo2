@@ -191,7 +191,6 @@ void KadasMilxLayer::exportToMilxly( QDomElement &milxLayerEl, int dpi )
 bool KadasMilxLayer::importFromMilxly( QDomElement &milxLayerEl, int dpi, QString &errorMsg )
 {
   setName( milxLayerEl.firstChildElement( "Name" ).text() );
-  //    QString layerType = milxLayerEl.firstChildElement( "LayerType" ).text(); // TODO
   float symbolSize = milxLayerEl.firstChildElement( "SymbolSize" ).text().toFloat(); // This is in mm
   symbolSize = ( symbolSize * dpi ) / 25.4; // mm to px
   QString crs = milxLayerEl.firstChildElement( "CoordSystemType" ).text();
