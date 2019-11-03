@@ -56,6 +56,7 @@
 %Include auto_generated/kadascanvasgpsdisplay.sip
 %Include auto_generated/kadassearchprovider.sip
 %Include auto_generated/kadasitemlayer.sip
+%Include auto_generated/kadasattributetabledialog.sip
 %Include auto_generated/kadasribbonbutton.sip
 %Include auto_generated/kadasclipboard.sip
 %Include auto_generated/kadasprojecttemplateselectiondialog.sip

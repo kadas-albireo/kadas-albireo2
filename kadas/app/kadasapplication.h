@@ -78,7 +78,7 @@ class KadasApplication : public QgsApplication
     void saveMapAsImage();
     void saveMapToClipboard();
 
-    void showLayerAttributeTable( const QgsMapLayer *layer );
+    void showLayerAttributeTable( QgsMapLayer *layer );
     void showLayerProperties( QgsMapLayer *layer );
     void showLayerInfo( const QgsMapLayer *layer );
     void showMessageLog();

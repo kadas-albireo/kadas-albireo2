@@ -44,6 +44,7 @@
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/gui/kadasattributetabledialog.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
@@ -791,9 +792,14 @@ void KadasApplication::saveMapToClipboard()
   mMainWindow->messageBar()->pushMessage( tr( "Map image saved to clipboard" ), QString(), Qgis::Info, mMainWindow->messageTimeout() );
 }
 
-void KadasApplication::showLayerAttributeTable( const QgsMapLayer *layer )
+void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
 {
-  // TODO
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+  if ( vlayer )
+  {
+    ( new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow ) )->show();
+    // Deletes on close
+  }
 }
 
 void KadasApplication::showLayerProperties( QgsMapLayer *layer )
