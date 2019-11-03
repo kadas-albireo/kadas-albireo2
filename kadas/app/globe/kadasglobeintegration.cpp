@@ -83,7 +83,7 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
   connect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
   connect( kApp, &KadasApplication::projectRead, this, &KadasGlobeIntegration::projectRead );
-  connect( kApp, &KadasApplication::projectWillBeClosed, this, [this] { setGlobeEnabled( false ); } );
+  connect( kApp, &KadasApplication::projectWillBeClosed, this, [action3D] { action3D->setChecked( false ); } );
 }
 
 KadasGlobeIntegration::~KadasGlobeIntegration()
