@@ -223,10 +223,6 @@ void KadasMainWindow::init()
 
   configureButtons();
 
-
-  mCatalogBrowser->reload();
-  connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
-
   restoreFavoriteButton( mFavoriteButton1 );
   restoreFavoriteButton( mFavoriteButton2 );
   restoreFavoriteButton( mFavoriteButton3 );
@@ -271,6 +267,10 @@ void KadasMainWindow::init()
       mCatalogBrowser->addProvider( new KadasVBSCatalogProvider( url, mCatalogBrowser ) );
     }
   }
+  connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
+  mCatalogBrowser->reload();
+
 
   mSearchWidget->addSearchProvider( new KadasCoordinateSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );
@@ -871,6 +871,40 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
     button->setIconSize( QSize( 16, 16 ) );
     button->setEnabled( false );
   }
+}
+
+void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri )
+{
+  QString adjustedUri = uri.uri;
+
+  // Adjust layer CRS to project CRS
+  QgsCoordinateReferenceSystem testCrs;
+  for ( QString c : uri.supportedCrs )
+  {
+    testCrs.createFromOgcWmsCrs( c );
+    if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
+    {
+      adjustedUri.replace( QRegExp( "crs=[^&]+" ), "crs=" + c );
+      QgsDebugMsg( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ) );
+      break;
+    }
+  }
+
+  // Use the last used image format
+  QString lastImageEncoding = QSettings().value( "/Qgis/lastWmsImageEncoding", "image/png" ).toString();
+  for ( QString fmt : uri.supportedFormats )
+  {
+    if ( fmt == lastImageEncoding )
+    {
+      adjustedUri.replace( QRegExp( "format=[^&]+" ), "format=" + fmt );
+      QgsDebugMsg( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ) );
+      break;
+    }
+  }
+
+  kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
+  // TODO
+  // layer->setInfoUrl( uriList[0].layerInfoUrl );
 }
 
 void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )

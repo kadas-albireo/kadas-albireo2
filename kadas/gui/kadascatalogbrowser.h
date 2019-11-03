@@ -20,6 +20,8 @@
 #include <QStandardItemModel>
 #include <QWidget>
 
+#include <qgis/qgsmimedatautils.h>
+
 #include <kadas/gui/kadas_gui.h>
 
 class KadasCatalogProvider;
@@ -37,6 +39,9 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 
   public slots:
     void reload();
+
+  signals:
+    void layerSelected( const QgsMimeDataUtils::Uri &uri );
 
   private:
     class CatalogModel;

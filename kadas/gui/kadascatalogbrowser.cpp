@@ -21,7 +21,6 @@
 #include <QUrlQuery>
 
 #include <qgis/qgsfilterlineedit.h>
-#include <qgis/qgsmimedatautils.h>
 #include <qgis/qgsrasterlayer.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
@@ -263,11 +262,7 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
     QgsMimeDataUtils::UriList uriList = QgsMimeDataUtils::decodeUriList( data );
     if ( !uriList.isEmpty() && !uriList[0].uri.isEmpty() )
     {
-      // TODO
-//      QString uri = QgisApp::instance()->crsAndFormatAdjustedLayerUri( uriList[0].uri, uriList[0].supportedCrs, uriList[0].supportedFormats );
-//      QgsRasterLayer* layer = QgisApp::instance()->addRasterLayer( uri, uriList[0].name, uriList[0].providerKey );
-//      if ( layer )
-//        layer->setInfoUrl( uriList[0].layerInfoUrl );
+      emit layerSelected( uriList[0] );
     }
     delete data;
   }
