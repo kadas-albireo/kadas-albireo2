@@ -43,6 +43,9 @@ class KADAS_CORE_EXPORT Kadas
     // Path where application data is stored
     static QString pkgDataPath();
 
+    // Path where application resources are stored
+    static QString pkgResourcePath();
+
     // Path where project templates are stored
     static QString projectTemplatesPath();
 };

@@ -2,3 +2,5 @@ ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(analysis)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(app)
+
+INSTALL (DIRECTORY resources/globe DESTINATION share/kadas/resources)

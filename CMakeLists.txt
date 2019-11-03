@@ -57,5 +57,3 @@ FILE(WRITE "${CMAKE_BINARY_DIR}/output/bin/.kadasbuilddir")
 ADD_SUBDIRECTORY(kadas)
 ADD_SUBDIRECTORY(python)
 
-INSTALL (DIRECTORY data DESTINATION share/kadas)
-

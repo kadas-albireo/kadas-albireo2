@@ -59,7 +59,7 @@ KadasGlobeDialog::KadasGlobeDialog( QWidget *parent, Qt::WindowFlags fl )
   addImageryMenu->addAction( tr( "WMS" ) )->setMenu( wmsImageryMenu );
 
   QMenu *fileImageryMenu = new QMenu( this );
-  QString worldtif = QDir::cleanPath( Kadas::pkgDataPath() + "/globe/world.tif" );
+  QString worldtif = QDir::cleanPath( Kadas::pkgResourcePath() + "/globe/world.tif" );
   fileImageryMenu->addAction( tr( "world.tif" ), this, &KadasGlobeDialog::addRasterImagery )->setData( worldtif );
   fileImageryMenu->addAction( tr( "Custom..." ), this, &KadasGlobeDialog::addCustomRasterImagery );
   addImageryMenu->addAction( tr( "Raster" ) )->setMenu( fileImageryMenu );

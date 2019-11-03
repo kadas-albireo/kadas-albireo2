@@ -357,7 +357,7 @@ void KadasGlobeIntegration::applyProjectSettings()
       if ( !mSkyNode.get() )
       {
         osgEarth::SimpleSky::SimpleSkyOptions skyOpts;
-        skyOpts.moonImageURI() = QString( "%1/globe/moon.jpg" ).arg( Kadas::pkgDataPath() ).toStdString();
+        skyOpts.moonImageURI() = QString( "%1/globe/moon.jpg" ).arg( Kadas::pkgResourcePath() ).toStdString();
         mSkyNode = osgEarth::Util::SkyNode::create( skyOpts, mMapNode );
         mSkyNode->attach( mOsgViewer );
         mRootNode->addChild( mSkyNode );
@@ -468,7 +468,7 @@ void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, 
 
 void KadasGlobeIntegration::setupControls()
 {
-  std::string imgDir = QDir::cleanPath( Kadas::pkgDataPath() + "/globe" ).toStdString();
+  std::string imgDir = QDir::cleanPath( Kadas::pkgResourcePath() + "/globe" ).toStdString();
   osgEarth::Util::EarthManipulator *manip = dynamic_cast<osgEarth::Util::EarthManipulator *>( mOsgViewer->getCameraManipulator() );
 
   // Rotate and tiltcontrols

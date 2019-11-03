@@ -38,6 +38,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     static QString pkgDataPath();
 
+    static QString pkgResourcePath();
+
     static QString projectTemplatesPath();
 };
 

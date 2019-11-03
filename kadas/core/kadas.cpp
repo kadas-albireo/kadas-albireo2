@@ -49,6 +49,19 @@ static QString resolveDataPath()
   }
 }
 
+static QString resolveResourcePath()
+{
+  QFile file( QDir( QApplication::applicationDirPath() ).absoluteFilePath( "kadassourcedir.txt" ) );
+  if ( file.open( QIODevice::ReadOnly ) )
+  {
+    return QDir( file.readAll().trimmed() ).absoluteFilePath( "kadas/resources" );
+  }
+  else
+  {
+    return QDir( QString( "%1/../share/%2/resources" ).arg( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
+  }
+}
+
 QString Kadas::configPath()
 {
   QDir appDataDir = QDir( QStandardPaths::writableLocation( QStandardPaths::AppDataLocation ) );
@@ -59,6 +72,12 @@ QString Kadas::pkgDataPath()
 {
   static QString dataPath = resolveDataPath();
   return dataPath;
+}
+
+QString Kadas::pkgResourcePath()
+{
+  static QString resourcePath = resolveResourcePath();
+  return resourcePath;
 }
 
 QString Kadas::projectTemplatesPath()
