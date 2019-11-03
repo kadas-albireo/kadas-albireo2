@@ -57,6 +57,7 @@ KadasHandleBadLayers::KadasHandleBadLayers( const QList<QDomNode> &layers )
   mLayerList->setSelectionBehavior( QAbstractItemView::SelectRows );
   mLayerList->setColumnCount( 4 );
   mLayerList->setColumnWidth( 3, 24 );
+  mLayerList->setWordWrap( false );
 
   mLayerList->setHorizontalHeaderLabels( QStringList() << tr( "Layer name" ) << tr( "Type" ) << tr( "Datasource" ) << "" );
   mLayerList->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::Stretch );
