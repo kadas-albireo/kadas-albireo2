@@ -258,8 +258,8 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       mimeDataUri.name = entry.title;
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.toList().front();
       mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
-//      mimeDataUri.layerInfoUrl = entry.metadataUrl; // TODO
       QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
+      mimeData->setProperty( "metadataUrl", entry.metadataUrl );
       QStringList sortIndices = entry.sortIndices.split( "/" );
       mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), mimeDataUri.name, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }

@@ -28,6 +28,7 @@
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssnappingutils.h>
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
@@ -873,7 +874,7 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   }
 }
 
-void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri )
+void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl )
 {
   QString adjustedUri = uri.uri;
 
@@ -902,9 +903,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri )
     }
   }
 
-  kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
-  // TODO
-  // layer->setInfoUrl( uriList[0].layerInfoUrl );
+  QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
+  if ( layer )
+  {
+    layer->setMetadataUrl( metadataUrl );
+  }
 }
 
 void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )

@@ -81,8 +81,8 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
                       "&styles=%5&url=%6%7"
                     ).arg( layerid ).arg( supportedCrs ).arg( imgFormat ).arg( tileMatrixSet ).arg( styleId ).arg( url ).arg( extraParams );
   mimeDataUri.uri += "&tileDimensions=" + dimensionParams; // Add this last because it contains % (from %3D) which confuses .arg
-//  mimeDataUri.layerInfoUrl = layerInfoUrl; // TODO
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
+  mimeData->setProperty( "metadataUrl", layerInfoUrl );
 }
 
 QStringList KadasCatalogProvider::parseWMSFormats( const QDomDocument &doc ) const
@@ -161,8 +161,8 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7"
                       "&crs=%1&format=%2"
                       "%3&url=%4" ).arg( supportedCrs[0] ).arg( imgFormat ).arg( subLayerParams ).arg( url );
-  // mimeDataUri.layerInfoUrl = layerInfoUrl; // TODO
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
+  mimeData->setProperty( "metadataUrl", layerInfoUrl );
   return true;
 }
 
