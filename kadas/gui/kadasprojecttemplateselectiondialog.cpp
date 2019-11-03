@@ -30,7 +30,7 @@ KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidge
   setupUi( this );
 
   mModel = new QFileSystemModel( this );
-  mModel->setNameFilters( QStringList() << "*.qgs" );
+  mModel->setNameFilters( QStringList() << "*.qgz" );
   mModel->setNameFilterDisables( false );
   mModel->setReadOnly( true );
 
