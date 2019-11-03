@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
 #include <QDomDocument>
 #include <QMessageBox>
 #include <QPushButton>
