@@ -47,7 +47,7 @@ FILE(GLOB kadas_HDR
   guidegrid/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h)
-    SET(kadas_SRC ${kadas_HDR} ${globe_HDR})
+    SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
 ENDIF(WITH_GLOBE)
 LIST(SORT kadas_HDR)
 
