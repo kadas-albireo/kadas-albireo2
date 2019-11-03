@@ -67,7 +67,7 @@ KadasMapIdentifyDialog::KadasMapIdentifyDialog( QgsMapCanvas *canvas, const QgsP
   mTreeWidget->setColumnCount( 2 );
   mTreeWidget->header()->setStretchLastSection( true );
   mTreeWidget->header()->resizeSection( 0, 200 );
-  mTreeWidget->setHeaderLabels( QStringList() << "" << "" );
+  mTreeWidget->setHeaderHidden( true );
   mTreeWidget->setDropIndicatorShown( false );
   mTreeWidget->setVerticalScrollMode( QTreeWidget::ScrollPerPixel );
   layout()->addWidget( mTreeWidget );
