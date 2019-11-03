@@ -75,6 +75,8 @@ class KadasApplication : public QgsApplication
     void projectClose();
     bool projectSave( const QString &fileName = QString(), bool promptFileName = false );
 
+    void addDefaultPrintTemplates();
+
     void saveMapAsImage();
     void saveMapToClipboard();
 

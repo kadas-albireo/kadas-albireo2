@@ -624,6 +624,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile )
   if ( projectOpen( templateFile ) )
   {
     QgsProject::instance()->setFileName( QString() );
+    addDefaultPrintTemplates();
     return true;
   }
   return false;
@@ -769,6 +770,42 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
   }
 
   return true;
+}
+
+void KadasApplication::addDefaultPrintTemplates()
+{
+  QDir printTemplatesDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "print_templates" ) );
+  for ( const QString &entry : printTemplatesDir.entryList( QStringList( "*.qpt" ), QDir::Files | QDir::NoDotAndDotDot ) )
+  {
+    QFile printTemplate( printTemplatesDir.absoluteFilePath( entry ) );
+    if ( !printTemplate.open( QIODevice::ReadOnly ) )
+    {
+      QgsDebugMsg( QString( "Failed to open print template: %1" ).arg( printTemplate.fileName() ) );
+      continue;
+    }
+
+    QDomDocument doc;
+    doc.setContent( &printTemplate );
+    QDomNodeList layoutEls = doc.elementsByTagName( "Layout" );
+    if ( layoutEls.isEmpty() )
+    {
+      QgsDebugMsg( QString( "Empty print template: %1" ).arg( printTemplate.fileName() ) );
+      continue;
+    }
+
+    QDomElement layoutEl = layoutEls.at( 0 ).toElement();
+    QgsPrintLayout *layout = new QgsPrintLayout( QgsProject::instance() );
+    layout->setName( layoutEl.attribute( "name" ) );
+
+    if ( layout->loadFromTemplate( doc, QgsReadWriteContext() ).isEmpty() )
+    {
+      delete layout;
+      QgsDebugMsg( QString( "Failed to load print template: %1" ).arg( printTemplate.fileName() ) );
+      continue;
+    }
+
+    QgsProject::instance()->layoutManager()->addLayout( layout );
+  }
 }
 
 void KadasApplication::saveMapAsImage()
