@@ -392,10 +392,9 @@ void KadasCanvasContextMenu::terrainViewshed()
 
 void KadasCanvasContextMenu::print()
 {
-  // TODO
-//  QAction* printAction = QgisApp::instance()->findAction( "mActionPrint" );
-//  if ( printAction && !printAction->isChecked() )
-//  {
-//    printAction->trigger();
-//  }
+  QAction *printAction = kApp->mainWindow()->findChild<QAction *>( "mActionPrint" );
+  if ( printAction && !printAction->isChecked() )
+  {
+    printAction->trigger();
+  }
 }
