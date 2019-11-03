@@ -192,6 +192,10 @@ linkDep lib/qt5/plugins/crypto/libqca-softstore.dll bin/crypto
 linkDep lib/qt5/plugins/crypto/libqca-gnupg.dll bin/crypto
 linkDep lib/qt5/plugins/crypto/libqca-ossl.dll bin/crypto
 
+# Osg plugins
+osgPlugins=$(basename $MINGWROOT/bin/osgPlugins-*)
+lnk $MINGWROOT/bin/$osgPlugins $installprefix/bin/$osgPlugins
+
 mkdir -p $installprefix/share/qt5/translations/
 cp -a $MINGWROOT/share/qt5/translations/qt_*.qm  $installprefix/share/qt5/translations
 cp -a $MINGWROOT/share/qt5/translations/qtbase_*.qm  $installprefix/share/qt5/translations
