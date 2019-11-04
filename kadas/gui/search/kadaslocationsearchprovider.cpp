@@ -64,7 +64,7 @@ void KadasLocationSearchProvider::startSearch( const QString &searchtext, const 
   QgsDebugMsg( serviceUrl );
 
   QUrl url( serviceUrl );
-  QUrlQuery query;
+  QUrlQuery query( serviceUrl );
   query.addQueryItem( "type", "locations" );
   query.addQueryItem( "searchText", searchtext );
   query.addQueryItem( "limit", QString::number( sResultCountLimit ) );

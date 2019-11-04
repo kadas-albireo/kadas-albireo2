@@ -18,7 +18,6 @@
 #include <QStandardItem>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <QUrlQuery>
 
 #include <qgis/qgsfilterlineedit.h>
 #include <qgis/qgsrasterlayer.h>

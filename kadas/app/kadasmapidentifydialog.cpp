@@ -253,7 +253,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
   if ( !rlayerIds.isEmpty() )
   {
     QUrl identifyUrl( QgsSettings().value( "kadas/identifyurl", "" ).toString() );
-    QUrlQuery query;
+    QUrlQuery query( identifyUrl );
     query.addQueryItem( "geometryType", "esriGeometryPoint" );
     query.addQueryItem( "geometry", QString( "%1,%2" ).arg( worldPos.x(), 0, 'f', 10 ).arg( worldPos.y(), 0, 'f', 10 ) );
     query.addQueryItem( "imageDisplay", QString( "%1,%2,%3" ).arg( mCanvas->width() ).arg( mCanvas->height() ).arg( mCanvas->mapSettings().outputDpi() ) );

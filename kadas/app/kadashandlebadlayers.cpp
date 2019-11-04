@@ -18,7 +18,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTableWidget>
-#include <QUrlQuery>
 
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsproject.h>

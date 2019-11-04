@@ -89,7 +89,7 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
   for ( const LayerIdName &ql : queryableLayers )
   {
     QUrl url( QgsSettings().value( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
-    QUrlQuery query;
+    QUrlQuery query( url );
     query.addQueryItem( "type", "featuresearch" );
     query.addQueryItem( "searchText", searchtext );
     query.addQueryItem( "features", ql.first );

@@ -42,7 +42,7 @@ void KadasVBSCatalogProvider::load()
   QUrl url( mBaseUrl );
 //  QgsArcGisRestUtils::addToken( url ); // TODO
   QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
-  QUrlQuery query;
+  QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );
   QNetworkRequest req( url );
