@@ -324,7 +324,9 @@ void KadasMainWindow::updateWidgetPositions()
   // Resize mLayersWidget and mLayerTreeViewButton
   int distanceToTopBottom = 40;
   int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
-  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), distanceToTopBottom, mLayerTreeViewButton->width(), layerTreeHeight );
+  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
+  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
+  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
   mLayersWidget->setGeometry( mLayersWidget->pos().x(), distanceToTopBottom, mLayersWidget->width(), layerTreeHeight );
 
   // Resize info bar
@@ -680,6 +682,11 @@ void KadasMainWindow::toggleLayerTree()
     mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
     mLayerTreeViewButton->move( 0, mLayerTreeViewButton->y() );
   }
+  int distanceToTopBottom = 40;
+  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
+  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
+  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
+  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
 }
 
 void KadasMainWindow::checkOnTheFlyProjection()
