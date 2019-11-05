@@ -99,7 +99,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, axisRadiusMeters, bearing / 180. * M_PI );
         GeographicLib::GeodesicLine line = mGeod.InverseLine( wgsCenter.y(), wgsCenter.x(), wgsPoint.y(), wgsPoint.x() );
         double dist = line.Distance();
-        double sdist = 500000; // ~500km segments
+        double sdist = 100000; // ~100km segments
         int nSegments = qMax( 1, int( std::ceil( dist / sdist ) ) );
         QPolygonF poly;
         for ( int iSeg = 0; iSeg < nSegments; ++iSeg )

@@ -372,7 +372,7 @@ void KadasPolygonItem::recomputeDerived()
         }
         wgsPoints.append( t1.transform( part.front() ) );
 
-        double sdist = 500000; // 500km segments
+        double sdist = 100000; // 100km segments
         for ( int i = 0; i < nPoints; ++i )
         {
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
