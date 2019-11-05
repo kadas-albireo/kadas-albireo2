@@ -69,8 +69,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
       const QgsRectangle &gridRect = mLayer->mGridRect;
-      QgsPoint pTL = QgsPoint( mRendererContext.extent().xMinimum(), mRendererContext.extent().yMaximum() );
-      QgsPoint pBR = QgsPoint( mRendererContext.extent().xMaximum(), mRendererContext.extent().yMinimum() );
+      QgsPoint pTL = QgsPoint( mRendererContext.mapExtent().xMinimum(), mRendererContext.mapExtent().yMaximum() );
+      QgsPoint pBR = QgsPoint( mRendererContext.mapExtent().xMaximum(), mRendererContext.mapExtent().yMinimum() );
       QPointF screenTL = mapToPixel.transform( crst.transform( pTL ) ).toQPointF();
       QPointF screenBR = mapToPixel.transform( crst.transform( pBR ) ).toQPointF();
       QRectF screenRect( screenTL, screenBR );

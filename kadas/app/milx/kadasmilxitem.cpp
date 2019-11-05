@@ -288,7 +288,7 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   KadasMilxClient::NPointSymbolGraphic result;
 
   int dpi = context.painter()->device()->logicalDpiX();
-  QRect screenExtent = computeScreenExtent( context.extent(), context.mapToPixel() );
+  QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
   if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true ) )
   {
     return "";
