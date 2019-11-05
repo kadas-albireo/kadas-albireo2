@@ -75,6 +75,7 @@
 #include <kadas/app/globe/kadasglobeintegration.h>
 #endif
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
+#include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 #include <kadas/app/kadaspluginmanager.h>
 
@@ -484,8 +485,7 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mAction3D, m3DButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
   // signal connected by plugin
 
-  setActionToButton( mActionGrid, mGridButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_G ) );
-//  connect( mActionGrid, &QAction::triggered, mDecorationGrid, &QgsDecorationGrid::run ); // TODO
+  setActionToButton( mActionGrid, mGridButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_G ), [this] { return new KadasMapToolMapGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
   // Draw tab
   setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this] { return addPinTool(); } );

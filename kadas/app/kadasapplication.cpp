@@ -68,6 +68,7 @@
 #include <kadas/app/kadasvectorlayerproperties.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
+#include <kadas/app/mapgrid/kadasmapgridlayer.h>
 #include <kadas/app/kml/kadaskmlexport.h>
 #include <kadas/app/kml/kadaskmlexportdialog.h>
 #include <kadas/app/kml/kadaskmlimport.h>
@@ -277,6 +278,7 @@ void KadasApplication::init()
   pluginLayerRegistry()->addPluginLayerType( new KadasMilxLayerType() );
   pluginLayerRegistry()->addPluginLayerType( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
   pluginLayerRegistry()->addPluginLayerType( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
+  pluginLayerRegistry()->addPluginLayerType( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
 
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );

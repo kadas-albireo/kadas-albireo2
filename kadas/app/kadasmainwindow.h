@@ -72,6 +72,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
     QAction *actionBullseye() const { return mActionBullseye; }
     QAction *actionGuideGrid() const { return mActionGuideGrid; }
+    QAction *actionMapGrid() const { return mActionGrid; }
     QAction *actionDrawWaypoint() const { return mActionDrawWaypoint; }
     QAction *actionDrawRoute() const { return mActionDrawRoute; }
     QAction *actionDeleteItems() const { return mActionDeleteItems; }

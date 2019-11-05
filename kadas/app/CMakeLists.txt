@@ -32,7 +32,8 @@ FILE(GLOB kadas_SRC
   milx/*.cpp
   kml/*.cpp
   bullseye/*.cpp
-  guidegrid/*.cpp)
+  guidegrid/*.cpp
+  mapgrid/*.cpp)
 IF(WITH_GLOBE)
     FILE(GLOB globe_SRC globe/*.cpp)
     SET(kadas_SRC ${kadas_SRC} ${globe_SRC})
@@ -44,7 +45,8 @@ FILE(GLOB kadas_HDR
   milx/*.h
   kml/*.h
   bullseye/*.h
-  guidegrid/*.h)
+  guidegrid/*.h
+  mapgrid/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h)
     SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
@@ -55,7 +57,8 @@ FILE(GLOB kadas_UI
   ui/*.ui
   kml/*.ui
   bullseye/*.ui
-  guidegrid/*.ui)
+  guidegrid/*.ui
+  mapgrid/*.ui)
 IF(WITH_GLOBE)
     FILE(GLOB globe_UI globe/*.ui)
     SET(kadas_UI ${kadas_UI} ${globe_UI})

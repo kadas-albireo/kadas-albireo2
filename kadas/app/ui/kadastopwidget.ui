@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1513</width>
+    <width>1523</width>
     <height>133</height>
    </rect>
   </property>
@@ -2323,6 +2323,9 @@ Sight</string>
    </property>
   </action>
   <action name="mActionGrid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
      <normaloff>:/kadas/icons/grid</normaloff>:/kadas/icons/grid</iconset>
