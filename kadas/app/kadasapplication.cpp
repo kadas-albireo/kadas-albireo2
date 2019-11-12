@@ -29,6 +29,8 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
+#include <qgis/qgslayoutapputils.h>
+#include <qgis/qgslayoutundostack.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgsmessageviewer.h>
@@ -61,6 +63,7 @@
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadashandlebadlayers.h>
+#include <kadas/app/kadaslayoutdesignermanager.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
@@ -287,6 +290,9 @@ void KadasApplication::init()
   mMainWindow->show();
   splash.finish( mMainWindow );
   processEvents();
+
+  // Setup layout item widgets
+  QgsLayoutAppUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
   // Open startup project
   QgsProject::instance()->setDirty( false );
@@ -686,11 +692,7 @@ void KadasApplication::projectClose()
 {
   emit projectWillBeClosed();
 
-  // TODO
-//  deleteLayoutDesigners();
-
-  // ensure layout widgets are fully deleted
-//  QgsApplication::sendPostedEvents( nullptr, QEvent::DeferredDelete );
+  KadasLayoutDesignerManager::instance()->closeAllDesigners();
 
   unsetMapTool();
 
@@ -805,6 +807,7 @@ void KadasApplication::addDefaultPrintTemplates()
       QgsDebugMsg( QString( "Failed to load print template: %1" ).arg( printTemplate.fileName() ) );
       continue;
     }
+    layout->undoStack()->stack()->clear();
 
     QgsProject::instance()->layoutManager()->addLayout( layout );
   }
@@ -962,6 +965,11 @@ bool KadasApplication::deletePrintLayout( QgsPrintLayout *layout )
 QList<QgsPrintLayout *> KadasApplication::printLayouts() const
 {
   return QgsProject::instance()->layoutManager()->printLayouts();
+}
+
+void KadasApplication::showLayoutDesigner( QgsPrintLayout *layout )
+{
+  KadasLayoutDesignerManager::instance()->openDesigner( layout );
 }
 
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )

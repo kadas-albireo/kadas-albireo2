@@ -90,9 +90,10 @@ class KadasApplication : public QgsApplication
     void registerMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
     void unregisterMapLayerPropertiesFactory( QgsMapLayerConfigWidgetFactory *factory );
 
-    QgsPrintLayout *createNewPrintLayout( const QString &title );
+    QgsPrintLayout *createNewPrintLayout( const QString &title = QString() );
     bool deletePrintLayout( QgsPrintLayout *layout );
     QList<QgsPrintLayout *> printLayouts() const;
+    void showLayoutDesigner( QgsPrintLayout *layout );
 
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
 

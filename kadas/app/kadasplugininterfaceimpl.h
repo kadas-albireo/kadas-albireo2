@@ -294,6 +294,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     QgsPrintLayout *createNewPrintLayout( const QString &title ) override;
     bool deletePrintLayout( QgsPrintLayout *layout ) override;
     QList<QgsPrintLayout *> printLayouts() const override;
+    void showLayoutDesigner( QgsPrintLayout *layout ) override;
 };
 
 

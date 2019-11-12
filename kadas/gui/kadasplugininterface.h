@@ -84,6 +84,7 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
     virtual QgsPrintLayout *createNewPrintLayout( const QString &title ) = 0;
     virtual bool deletePrintLayout( QgsPrintLayout *layout ) = 0;
     virtual QList<QgsPrintLayout *> printLayouts() const = 0;
+    virtual void showLayoutDesigner( QgsPrintLayout *layout ) = 0;
 
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );

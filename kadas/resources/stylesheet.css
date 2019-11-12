@@ -12,10 +12,6 @@ QDockWidget #globeTitleWidget {
     background: #BEDCF6;
 }
 
-QDockWidget {
-    color: white;
-}
-
 QTreeView::indicator {
     width: 13px;
     height: 13px;

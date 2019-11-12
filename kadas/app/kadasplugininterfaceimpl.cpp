@@ -566,3 +566,8 @@ QList<QgsPrintLayout *> KadasPluginInterfaceImpl::printLayouts() const
 {
   return kApp->printLayouts();
 }
+
+void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
+{
+  kApp->showLayoutDesigner( layout );
+}
