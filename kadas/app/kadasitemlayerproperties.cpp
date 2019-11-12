@@ -1,5 +1,5 @@
 /***************************************************************************
-    kadasvectorlayerproperties.h
+    kadasitemlayerproperties.cpp
     ----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
@@ -14,27 +14,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASVECTORLAYERPROPERTIES_H
-#define KADASVECTORLAYERPROPERTIES_H
+#include <qgis/qgsrendererpropertiesdialog.h>
+#include <qgis/qgsstyle.h>
+#include <qgis/qgssymbolwidgetcontext.h>
 
-#include <kadas/gui/kadaslayerpropertiesdialog.h>
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/app/kadasitemlayerproperties.h>
 
-class QgsMapCanvas;
-class QgsRendererPropertiesDialog;
-class QgsVectorLayer;
-
-
-class KadasVectorLayerProperties : public KadasLayerPropertiesDialog
+KadasItemLayerProperties::KadasItemLayerProperties( KadasItemLayer *layer, QWidget *parent )
+  : KadasLayerPropertiesDialog( layer, parent )
 {
-    Q_OBJECT
-  public:
-    KadasVectorLayerProperties( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
-
-  private slots:
-    void apply() override;
-
-  private:
-    QgsRendererPropertiesDialog *mRendererDialog = nullptr;
-};
-
-#endif // KADASVECTORLAYERPROPERTIES_H
+  // Just to host the globe properties page
+}

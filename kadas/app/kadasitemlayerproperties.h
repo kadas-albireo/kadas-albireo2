@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasvectorlayerproperties.h
-    ----------------------------
+    kadasitemlayerproperties.h
+    --------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,27 +14,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASVECTORLAYERPROPERTIES_H
-#define KADASVECTORLAYERPROPERTIES_H
+#ifndef KADASITEMLAYERPROPERTIES_H
+#define KADASITEMLAYERPROPERTIES_H
 
 #include <kadas/gui/kadaslayerpropertiesdialog.h>
 
-class QgsMapCanvas;
-class QgsRendererPropertiesDialog;
-class QgsVectorLayer;
+class KadasItemLayer;
 
 
-class KadasVectorLayerProperties : public KadasLayerPropertiesDialog
+class KadasItemLayerProperties : public KadasLayerPropertiesDialog
 {
     Q_OBJECT
   public:
-    KadasVectorLayerProperties( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
-
-  private slots:
-    void apply() override;
-
-  private:
-    QgsRendererPropertiesDialog *mRendererDialog = nullptr;
+    KadasItemLayerProperties( KadasItemLayer *layer, QWidget *parent = nullptr );
 };
 
-#endif // KADASVECTORLAYERPROPERTIES_H
+#endif // KADASITEMLAYERPROPERTIES_H

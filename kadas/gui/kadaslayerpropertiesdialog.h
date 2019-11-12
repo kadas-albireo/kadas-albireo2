@@ -1,5 +1,5 @@
 /***************************************************************************
-    kadasvectorlayerproperties.h
+    kadaslayerpropertiesdialog.h
     ----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
@@ -14,27 +14,32 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASVECTORLAYERPROPERTIES_H
-#define KADASVECTORLAYERPROPERTIES_H
+#ifndef KADASLAYERPROPERTIESDIALOG_H
+#define KADASLAYERPROPERTIESDIALOG_H
 
-#include <kadas/gui/kadaslayerpropertiesdialog.h>
+#include <QDialog>
 
-class QgsMapCanvas;
-class QgsRendererPropertiesDialog;
-class QgsVectorLayer;
+#include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/ui_kadaslayerpropertiesdialog.h>
+
+class QgsMapLayerConfigWidget;
+class QgsMapLayerConfigWidgetFactory;
+class QgsMapLayer;
 
 
-class KadasVectorLayerProperties : public KadasLayerPropertiesDialog
+class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog, protected Ui::KadasLayerPropertiesBase
 {
     Q_OBJECT
   public:
-    KadasVectorLayerProperties( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    KadasLayerPropertiesDialog( QgsMapLayer *layer, QWidget *parent = nullptr );
+    void addPropertiesPageFactory( QgsMapLayerConfigWidgetFactory *factory );
 
-  private slots:
-    void apply() override;
+  protected slots:
+    virtual void apply();
 
   private:
-    QgsRendererPropertiesDialog *mRendererDialog = nullptr;
+    QgsMapLayer *mLayer = nullptr;
+    QList<QgsMapLayerConfigWidget *> mLayerPropertiesPages;
 };
 
-#endif // KADASVECTORLAYERPROPERTIES_H
+#endif // KADASLAYERPROPERTIESDIALOG_H

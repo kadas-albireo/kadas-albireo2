@@ -63,6 +63,7 @@
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadashandlebadlayers.h>
+#include <kadas/app/kadasitemlayerproperties.h>
 #include <kadas/app/kadaslayoutdesignermanager.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
@@ -849,63 +850,33 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   if ( !layer )
     return;
 
-  switch ( layer->type() )
+  KadasLayerPropertiesDialog *dialog = nullptr;
+
+  if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
-#if 0
-    case QgsMapLayerType::RasterLayer:
-    {
-      QgsRasterLayerProperties *rasterLayerPropertiesDialog = new QgsRasterLayerProperties( mapLayer, mMapCanvas, this );
-      // Cannot use exec here due to raster transparency map tool:
-      // in order to pass focus to the canvas, the dialog needs to
-      // be hidden and shown in non-modal mode.
-      rasterLayerPropertiesDialog->setModal( true );
-      rasterLayerPropertiesDialog->show();
-      // Delete (later, for safety) since dialog cannot be reused without
-      // updating code
-      connect( rasterLayerPropertiesDialog, &QgsRasterLayerProperties::accepted, [ rasterLayerPropertiesDialog ]
-      {
-        rasterLayerPropertiesDialog->deleteLater();
-      } );
-      connect( rasterLayerPropertiesDialog, &QgsRasterLayerProperties::rejected, [ rasterLayerPropertiesDialog ]
-      {
-        rasterLayerPropertiesDialog->deleteLater();
-      } );
-      break;
-    }
-#endif
-
-    case QgsMapLayerType::VectorLayer:
-    {
-      QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
-
-      KadasVectorLayerProperties vectorLayerPropertiesDialog( vlayer, mainWindow() );
-      for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
-      {
-        vectorLayerPropertiesDialog.addPropertiesPageFactory( factory );
-      }
-      vectorLayerPropertiesDialog.exec();
-      break;
-    }
-
-    case QgsMapLayerType::PluginLayer:
-    {
-      QgsPluginLayer *pl = qobject_cast<QgsPluginLayer *>( layer );
-      if ( !pl )
-        return;
-
-      QgsPluginLayerType *plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( pl->pluginLayerType() );
-      if ( !plt )
-        return;
-
-      if ( !plt->showLayerProperties( pl ) )
-      {
-        mainWindow()->messageBar()->pushMessage( tr( "Warning" ),
-            tr( "This layer doesn't have a properties dialog." ),
-            Qgis::Info, mainWindow()->messageTimeout() );
-      }
-      break;
-    }
+// TODO
   }
+  else if ( layer->type() == QgsMapLayerType::VectorLayer )
+  {
+    QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+    dialog = new KadasVectorLayerProperties( vlayer, mainWindow()->mapCanvas(), mainWindow() );
+  }
+  else if ( qobject_cast<KadasItemLayer *>( layer ) )
+  {
+    dialog = new KadasItemLayerProperties( static_cast<KadasItemLayer *>( layer ), mainWindow() );
+  }
+
+  if ( !dialog )
+  {
+    return;
+  }
+
+  for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+  {
+    dialog->addPropertiesPageFactory( factory );
+  }
+  dialog->exec();
+  delete dialog;
 }
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )

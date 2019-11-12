@@ -22,7 +22,6 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgslayertreeviewdefaultactions.h>
-#include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasterrenderer.h>
@@ -101,16 +100,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       {
         menu->addAction( QIcon( ":/kadas/icons/info" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }
-      if ( layer->type() == QgsMapLayerType::PluginLayer )
-      {
-        QgsPluginLayer *pluginLayer = static_cast<QgsPluginLayer *>( layer );
-        QgsPluginLayerType *plt = QgsApplication::pluginLayerRegistry()->pluginLayerType( pluginLayer->pluginLayerType() );
-        if ( plt && plt->showLayerProperties( pluginLayer ) )
-        {
-          menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
-        }
-      }
-      else
+      if ( qobject_cast<KadasItemLayer *>( layer ) || layer->type() == QgsMapLayerType::RasterLayer || layer->type() == QgsMapLayerType::VectorLayer )
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
       }
