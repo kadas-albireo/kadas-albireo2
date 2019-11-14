@@ -29,6 +29,10 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsvectorlayer.h>
 
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
+
+
 class KadasGlobeFeatureUtils
 {
   public:
@@ -82,7 +86,7 @@ class KadasGlobeFeatureUtils
       return retPoly;
     }
 
-    static inline osgEarth::Features::Geometry *geometryFromQgsGeometry( const QgsGeometry &geom )
+    static inline osgEarth::Features::Geometry *geometryFromQgsGeometry( const QgsAbstractGeometry *geom )
     {
 #if 0
       // test srid
@@ -93,19 +97,19 @@ class KadasGlobeFeatureUtils
       std::cout << "srid = " << srid << std::endl;
 #endif
 
-      switch ( QgsWkbTypes::flatType( geom.constGet()->wkbType() ) )
+      switch ( QgsWkbTypes::flatType( geom->wkbType() ) )
       {
         case QgsWkbTypes::Point:
         {
           osgEarth::Features::PointSet *pointSet = new osgEarth::Features::PointSet();
-          pointSet->push_back( pointFromQgsPoint( *static_cast<const QgsPoint *>( geom.constGet() ) ) );
+          pointSet->push_back( pointFromQgsPoint( *static_cast<const QgsPoint *>( geom ) ) );
           return pointSet;
         }
 
         case QgsWkbTypes::MultiPoint:
         {
           osgEarth::Features::PointSet *pointSet = new osgEarth::Features::PointSet();
-          const QgsMultiPoint *multiPoint = static_cast<const QgsMultiPoint *>( geom.constGet() );
+          const QgsMultiPoint *multiPoint = static_cast<const QgsMultiPoint *>( geom );
           for ( int i = 0, n = multiPoint->numGeometries(); i < n; ++i )
           {
             pointSet->push_back( pointFromQgsPoint( *static_cast<const QgsPoint *>( multiPoint->geometryN( i ) ) ) );
@@ -117,13 +121,13 @@ class KadasGlobeFeatureUtils
         case QgsWkbTypes::CircularString:
         case QgsWkbTypes::CompoundCurve:
         {
-          return lineStringFromQgsLineString( static_cast<const QgsLineString *>( geom.constGet() ) );
+          return lineStringFromQgsLineString( static_cast<const QgsLineString *>( geom ) );
         }
 
         case QgsWkbTypes::MultiLineString:
         {
           osgEarth::Features::MultiGeometry *multiGeometry = new osgEarth::Features::MultiGeometry();
-          const QgsMultiLineString *multiLineString = static_cast<const QgsMultiLineString *>( geom.constGet() );
+          const QgsMultiLineString *multiLineString = static_cast<const QgsMultiLineString *>( geom );
           for ( int i = 0, n = multiLineString->numGeometries(); i < n; ++i )
           {
             multiGeometry->getComponents().push_back( lineStringFromQgsLineString( static_cast<const QgsLineString *>( multiLineString->geometryN( i ) ) ) );
@@ -134,13 +138,14 @@ class KadasGlobeFeatureUtils
         case QgsWkbTypes::Polygon:
         case QgsWkbTypes::CurvePolygon:
         {
-          return polygonFromQgsPolygon( static_cast<const QgsPolygon *>( geom.constGet() ) );
+          return polygonFromQgsPolygon( static_cast<const QgsPolygon *>( geom ) );
         }
 
         case QgsWkbTypes::MultiPolygon:
+        case QgsWkbTypes::MultiSurface:
         {
           osgEarth::Features::MultiGeometry *multiGeometry = new osgEarth::Features::MultiGeometry();
-          const QgsMultiPolygon *multiPolygon = static_cast<const QgsMultiPolygon *>( geom.constGet() );
+          const QgsMultiPolygon *multiPolygon = static_cast<const QgsMultiPolygon *>( geom );
           for ( int i = 0, n = multiPolygon->numGeometries(); i < n; ++i )
           {
             multiGeometry->getComponents().push_back( polygonFromQgsPolygon( static_cast<const QgsPolygon *>( multiPolygon->geometryN( i ) ) ) );
@@ -154,9 +159,9 @@ class KadasGlobeFeatureUtils
       return 0;
     }
 
-    static osgEarth::Features::Feature *featureFromQgsFeature( QgsVectorLayer *layer, QgsFeature &feat )
+    static osgEarth::Features::Feature *featureFromQgsFeature( QgsVectorLayer *layer, const QgsFeature &feat )
     {
-      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( feat.geometry() );
+      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( feat.geometry().constGet() );
       osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( layer->crs().toWkt().toStdString() );
       osgEarth::Features::Feature *retFeat = new osgEarth::Features::Feature( nGeom, ref, osgEarth::Style(), feat.id() );
 
@@ -168,6 +173,23 @@ class KadasGlobeFeatureUtils
         setFeatureField( retFeat, fields.at( idx ), attrs[idx] );
       }
       retFeat->setUserValue( "qgisLayerId", layer->id().toStdString() );
+
+      return retFeat;
+    }
+
+    static osgEarth::Features::Feature *featureFromItem( const QString &layerId, KadasItemLayer::ItemId itemId, KadasGeometryItem *item, const osgEarth::Style &baseStyle )
+    {
+      osgEarth::Style style = baseStyle;
+      osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
+      QColor color = item->geometryType() == QgsWkbTypes::LineGeometry ? item->outline().color() : item->fill().color();
+      poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+
+      const QgsAbstractGeometry *geom = item->geometry();
+      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( geom );
+      osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( item->crs().toWkt().toStdString() );
+      osgEarth::Features::Feature *retFeat = new osgEarth::Features::Feature( nGeom, ref, style, itemId );
+
+      retFeat->setUserValue( "qgisLayerId", layerId.toStdString() );
 
       return retFeat;
     }

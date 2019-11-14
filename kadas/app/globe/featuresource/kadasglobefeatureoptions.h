@@ -20,7 +20,7 @@
 #include <osgEarth/Common>
 #include <osgEarthFeatures/FeatureSource>
 
-class QgsVectorLayer;
+class QgsMapLayer;
 
 class KadasGlobeFeatureOptions : public osgEarth::Features::FeatureSourceOptions
 {
@@ -49,15 +49,19 @@ class KadasGlobeFeatureOptions : public osgEarth::Features::FeatureSourceOptions
     {
       osgEarth::Config conf = osgEarth::Features::FeatureSourceOptions::getConfig();
       conf.set( "layerId", mLayerId );
-      conf.setNonSerializable( "layer", new RefPtr< QgsVectorLayer >( mLayer ) );
+      conf.setNonSerializable( "layer", new RefPtr< QgsMapLayer >( mLayer ) );
+      conf.set( "style", mStyle );
       return conf;
     }
 
     osgEarth::optional<std::string> &layerId() { return mLayerId; }
     const osgEarth::optional<std::string> &layerId() const { return mLayerId; }
 
-    QgsVectorLayer *layer() const { return mLayer; }
-    void setLayer( QgsVectorLayer *layer ) { mLayer = layer; }
+    QgsMapLayer *layer() const { return mLayer; }
+    void setLayer( QgsMapLayer *layer ) { mLayer = layer; }
+
+    osgEarth::optional<osgEarth::Style> &style() { return mStyle; }
+    const osgEarth::optional<osgEarth::Style> &style() const { return mStyle; }
 
   protected:
     void mergeConfig( const osgEarth::Config &conf ) override
@@ -70,12 +74,14 @@ class KadasGlobeFeatureOptions : public osgEarth::Features::FeatureSourceOptions
     void fromConfig( const osgEarth::Config &conf )
     {
       conf.get( "layerId", mLayerId );
-      RefPtr< QgsVectorLayer > *layer_ptr = conf.getNonSerializable< RefPtr< QgsVectorLayer > >( "layer" );
-      mLayer = layer_ptr ? layer_ptr->ptr() : 0;
+      RefPtr< QgsMapLayer > *layer_ptr = conf.getNonSerializable< RefPtr< QgsMapLayer > >( "layer" );
+      mLayer = layer_ptr ? layer_ptr->ptr() : nullptr;
+      conf.get( "style", mStyle );
     }
 
     osgEarth::optional<std::string> mLayerId;
-    QgsVectorLayer *mLayer = nullptr;
+    QgsMapLayer *mLayer = nullptr;
+    osgEarth::optional<osgEarth::Style> mStyle;
 };
 
 #endif // KADASGLOBEFEATUREOPTIONS_H

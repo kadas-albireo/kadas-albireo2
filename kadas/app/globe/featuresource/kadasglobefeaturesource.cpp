@@ -24,120 +24,148 @@
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/app/globe/featuresource/kadasglobefeaturecursor.h>
+#include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/app/globe/featuresource/kadasglobefeaturesource.h>
 #include <kadas/app/globe/featuresource/kadasglobefeatureutils.h>
 
 
-KadasGlobeFeatureSource::KadasGlobeFeatureSource( const KadasGlobeFeatureOptions &options )
-  : mOptions( options )
-  , mLayer( 0 )
-{
-}
-
 osgEarth::Status KadasGlobeFeatureSource::initialize( const osgDB::Options *dbOptions )
 {
-  Q_UNUSED( dbOptions )
-  mLayer = mOptions.layer();
-
-  connect( mLayer, &QgsVectorLayer::attributeValueChanged, this, &KadasGlobeFeatureSource::attributeValueChanged );
-  connect( mLayer, &QgsVectorLayer::geometryChanged, this, &KadasGlobeFeatureSource::geometryChanged );
-
-  // create the profile
-  osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( mLayer->crs().toWkt().toStdString() );
+  osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( mOptions.layer()->crs().toWkt().toStdString() );
   if ( 0 == ref )
   {
     std::cout << "Cannot find the spatial reference" << std::endl;
     return osgEarth::Status( osgEarth::Status::ConfigurationError );
   }
-  QgsRectangle ext = mLayer->extent();
+  QgsRectangle ext = mOptions.layer()->extent();
   osgEarth::GeoExtent geoext( ref, ext.xMinimum(), ext.yMinimum(), ext.xMaximum(), ext.yMaximum() );
-  mSchema = KadasGlobeFeatureUtils::schemaForFields( mLayer->fields() );
   setFeatureProfile( new osgEarth::Features::FeatureProfile( geoext ) );
-  return osgEarth::Status( osgEarth::Status::NoError );
+  return osgEarth::Status::NoError;
 }
 
 osgEarth::Features::FeatureCursor *KadasGlobeFeatureSource::createFeatureCursor( const osgEarth::Symbology::Query &query, osgEarth::ProgressCallback *progress )
 {
-  QgsFeatureRequest request;
-
-  if ( query.expression().isSet() )
-  {
-    QgsDebugMsg( QString( "Ignoring query expression '%1'" ). arg( query.expression().value().c_str() ) );
-  }
-
-  if ( query.bounds().isSet() )
-  {
-    QgsRectangle bounds( query.bounds()->xMin(), query.bounds()->yMin(), query.bounds()->xMax(), query.bounds()->yMax() );
-    request.setFilterRect( bounds );
-  }
-
-  QgsFeatureIterator it = mLayer->getFeatures( request );
-  return new KadasGlobeFeatureCursor( mLayer, it, progress );
+  return new KadasGlobeFeatureCursor( this, progress );
 }
 
-osgEarth::Features::Feature *KadasGlobeFeatureSource::getFeature( osgEarth::Features::FeatureID fid )
-{
-  QgsFeature feat;
-  mLayer->getFeatures( QgsFeatureRequest().setFilterFid( fid ) ).nextFeature( feat );
-  osgEarth::Features::Feature *feature = KadasGlobeFeatureUtils::featureFromQgsFeature( mLayer, feat );
-  FeatureMap_t::iterator it = mFeatures.find( fid );
-  if ( it == mFeatures.end() )
-  {
-    mFeatures.insert( std::make_pair( fid, osg::observer_ptr<osgEarth::Features::Feature>( feature ) ) );
-  }
-  else
-  {
-    it->second = osg::observer_ptr<osgEarth::Features::Feature>( feature );
-  }
-  return feature;
-}
+///////////////////////////////////////////////////////////////////////////////
 
-osgEarth::Features::Geometry::Type KadasGlobeFeatureSource::getGeometryType() const
+KadasGlobeVectorFeatureSource::KadasGlobeVectorFeatureSource( const KadasGlobeFeatureOptions &options )
+  : KadasGlobeFeatureSource( options )
 {
-  switch ( mLayer->geometryType() )
+  QgsVectorLayer *layer = qobject_cast<QgsVectorLayer *>( mOptions.layer() );
+  connect( layer, &QgsVectorLayer::featureAdded, this, &KadasGlobeVectorFeatureSource::featureAdded );
+  connect( layer, &QgsVectorLayer::featureDeleted, this, &KadasGlobeVectorFeatureSource::featureDeleted );
+  connect( layer, &QgsVectorLayer::attributeValueChanged, this, &KadasGlobeVectorFeatureSource::attributeValueChanged );
+  connect( layer, &QgsVectorLayer::geometryChanged, this, &KadasGlobeVectorFeatureSource::geometryChanged );
+
+  switch ( layer->geometryType() )
   {
     case  QgsWkbTypes::PointGeometry:
-      return osgEarth::Features::Geometry::TYPE_POINTSET;
-
+      mGeomType = osgEarth::Features::Geometry::TYPE_POINTSET; break;
     case QgsWkbTypes::LineGeometry:
-      return osgEarth::Features::Geometry::TYPE_LINESTRING;
-
+      mGeomType = osgEarth::Features::Geometry::TYPE_LINESTRING; break;
     case QgsWkbTypes::PolygonGeometry:
-      return osgEarth::Features::Geometry::TYPE_POLYGON;
-
+      mGeomType = osgEarth::Features::Geometry::TYPE_POLYGON; break;
     default:
-      return osgEarth::Features::Geometry::TYPE_UNKNOWN;
+      mGeomType = osgEarth::Features::Geometry::TYPE_UNKNOWN; break;
   }
 
-  return osgEarth::Features::Geometry::TYPE_UNKNOWN;
+  mSchema = KadasGlobeFeatureUtils::schemaForFields( layer->fields() );
+
+  // Populate initial cache with featureIds, features are build on-demand
+  for ( const QgsFeatureId &featureId : layer->allFeatureIds() )
+  {
+    mFeatures.insert( featureId, nullptr );
+  }
 }
 
-int KadasGlobeFeatureSource::getFeatureCount() const
+osgEarth::Features::Feature *KadasGlobeVectorFeatureSource::loadFeature( osgEarth::Features::FeatureID featureId )
 {
-  return mLayer->featureCount();
+  QgsVectorLayer *layer = qobject_cast<QgsVectorLayer *>( mOptions.layer() );
+  QgsFeature feature = layer->getFeature( featureId );
+  osgEarth::Features::Feature *feat = KadasGlobeFeatureUtils::featureFromQgsFeature( layer, feature );
+  mFeatures.insert( featureId, feat );
+  return feat;
 }
 
-void KadasGlobeFeatureSource::attributeValueChanged( const QgsFeatureId &featureId, int idx, const QVariant &value )
+void KadasGlobeVectorFeatureSource::featureAdded( const QgsFeatureId &featureId )
 {
-  FeatureMap_t::iterator it = mFeatures.find( featureId );
+  loadFeature( featureId );
+}
+
+void KadasGlobeVectorFeatureSource::featureDeleted( const QgsFeatureId &featureId )
+{
+  mFeatures.remove( featureId );
+}
+
+void KadasGlobeVectorFeatureSource::attributeValueChanged( const QgsFeatureId &featureId, int idx, const QVariant &value )
+{
+  QgsVectorLayer *layer = qobject_cast<QgsVectorLayer *>( mOptions.layer() );
+  FeatureMap::iterator it = mFeatures.find( featureId );
   if ( it != mFeatures.end() )
   {
-    osgEarth::Features::Feature *feature = it->second.get();
-    KadasGlobeFeatureUtils::setFeatureField( feature, mLayer->fields().at( idx ), value );
+    osgEarth::Features::Feature *feature = it.value().get();
+    KadasGlobeFeatureUtils::setFeatureField( feature, layer->fields().at( idx ), value );
   }
 }
 
-void KadasGlobeFeatureSource::geometryChanged( const QgsFeatureId &featureId, const QgsGeometry &geometry )
+void KadasGlobeVectorFeatureSource::geometryChanged( const QgsFeatureId &featureId, const QgsGeometry &geometry )
 {
-  FeatureMap_t::iterator it = mFeatures.find( featureId );
+  FeatureMap::iterator it = mFeatures.find( featureId );
   if ( it != mFeatures.end() )
   {
-    osgEarth::Features::Feature *feature = it->second.get();
-    feature->setGeometry( KadasGlobeFeatureUtils::geometryFromQgsGeometry( geometry ) );
+    osgEarth::Features::Feature *feature = it.value().get();
+    feature->setGeometry( KadasGlobeFeatureUtils::geometryFromQgsGeometry( geometry.constGet() ) );
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+KadasGlobeItemFeatureSource::KadasGlobeItemFeatureSource( const KadasGlobeFeatureOptions &options )
+  : KadasGlobeFeatureSource( options )
+{
+  KadasItemLayer *layer = qobject_cast<KadasItemLayer *>( mOptions.layer() );
+
+  connect( layer, &KadasItemLayer::itemAdded, this, &KadasGlobeItemFeatureSource::itemAdded );
+  connect( layer, &KadasItemLayer::itemRemoved, this, &KadasGlobeItemFeatureSource::itemRemoved );
+
+  // Populate initial cache with featureIds, features are build on-demand
+  for ( auto it = layer->items().begin(), itEnd = layer->items().end(); it != itEnd; ++it )
+  {
+    if ( dynamic_cast<KadasGeometryItem *>( it.value() ) )
+    {
+      mFeatures.insert( it.key(), nullptr );
+    }
+  }
+}
+
+osgEarth::Features::Feature *KadasGlobeItemFeatureSource::loadFeature( osgEarth::Features::FeatureID featureId )
+{
+  KadasItemLayer *layer = qobject_cast<KadasItemLayer *>( mOptions.layer() );
+
+  KadasGeometryItem *item = dynamic_cast<KadasGeometryItem *>( layer->items()[featureId] );
+  if ( !item )
+  {
+    return nullptr;
+  }
+  osgEarth::Features::Feature *feat = KadasGlobeFeatureUtils::featureFromItem( layer->id(), featureId, item, mOptions.style().get() );
+  mFeatures.insert( featureId, feat );
+  return feat;
+}
+
+void KadasGlobeItemFeatureSource::itemAdded( KadasItemLayer::ItemId itemId )
+{
+  loadFeature( itemId );
+}
+
+void KadasGlobeItemFeatureSource::itemRemoved( KadasItemLayer::ItemId itemId )
+{
+  mFeatures.remove( itemId );
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 class KadasGlobeFeatureSourceFactory : public osgEarth::Features::FeatureSourceDriver
 {
@@ -152,9 +180,19 @@ class KadasGlobeFeatureSourceFactory : public osgEarth::Features::FeatureSourceD
       // this function seems to be called for every plugin
       // we declare supporting the special extension "osgearth_feature_qgis"
       if ( !acceptsExtension( osgDB::getLowerCaseFileExtension( file_name ) ) )
+      {
         return osgDB::ReaderWriter::ReadResult::FILE_NOT_HANDLED;
+      }
+      KadasGlobeFeatureOptions featureOptions = getFeatureSourceOptions( options );
 
-      return osgDB::ReaderWriter::ReadResult( new KadasGlobeFeatureSource( getFeatureSourceOptions( options ) ) );
+      if ( dynamic_cast<QgsVectorLayer *>( featureOptions.layer() ) )
+      {
+        return osgDB::ReaderWriter::ReadResult( new KadasGlobeVectorFeatureSource( featureOptions ) );
+      }
+      else
+      {
+        return osgDB::ReaderWriter::ReadResult( new KadasGlobeItemFeatureSource( featureOptions ) );
+      }
     }
 };
 

@@ -534,43 +534,9 @@ void KadasGlobeIntegration::updateTileStats( int queued, int tot )
     mStatsLabel->setText( QString( "Queued tiles: %1\nTot tiles: %2" ).arg( queued ).arg( tot ).toStdString() );
 }
 
-void KadasGlobeIntegration::addModelLayer( QgsVectorLayer *vLayer, KadasGlobeVectorLayerConfig *layerConfig )
+void KadasGlobeIntegration::addModelLayer( QgsMapLayer *layer, KadasGlobeVectorLayerConfig *layerConfig )
 {
-  KadasGlobeFeatureOptions featureOpt;
-  featureOpt.setLayer( vLayer );
   osgEarth::Style style;
-
-  QgsRenderContext ctx;
-  if ( !vLayer->renderer()->symbols( ctx ).isEmpty() )
-  {
-    for ( QgsSymbol *sym : vLayer->renderer()->symbols( ctx ) )
-    {
-      if ( sym->type() == QgsSymbol::Line )
-      {
-        osgEarth::LineSymbol *ls = style.getOrCreateSymbol<osgEarth::LineSymbol>();
-        QColor color = sym->color();
-        ls->stroke()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() * vLayer->opacity() );
-        ls->stroke()->width() = 1.0f;
-      }
-      else if ( sym->type() == QgsSymbol::Fill )
-      {
-        // TODO access border color, etc.
-        osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
-        QColor color = sym->color();
-        poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() * vLayer->opacity() );
-        style.addSymbol( poly );
-      }
-    }
-  }
-  else
-  {
-    osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
-    poly->fill()->color() = osg::Vec4f( 1.f, 0, 0, vLayer->opacity() );
-    style.addSymbol( poly );
-    osgEarth::LineSymbol *ls = style.getOrCreateSymbol<osgEarth::LineSymbol>();
-    ls->stroke()->color() = osg::Vec4f( 1.f, 0, 0, vLayer->opacity() );
-    ls->stroke()->width() = 1.0f;
-  }
 
   osgEarth::AltitudeSymbol *altitudeSymbol = style.getOrCreateSymbol<osgEarth::AltitudeSymbol>();
   altitudeSymbol->clamping() = layerConfig->altitudeClamping;
@@ -579,7 +545,6 @@ void KadasGlobeIntegration::addModelLayer( QgsVectorLayer *vLayer, KadasGlobeVec
   altitudeSymbol->verticalOffset() = layerConfig->verticalOffset;
   altitudeSymbol->verticalScale() = layerConfig->verticalScale;
   altitudeSymbol->clampingResolution() = layerConfig->clampingResolution;
-  style.addSymbol( altitudeSymbol );
 
   if ( layerConfig->extrusionEnabled )
   {
@@ -597,10 +562,10 @@ void KadasGlobeIntegration::addModelLayer( QgsVectorLayer *vLayer, KadasGlobeVec
 
     extrusionSymbol->flatten() = layerConfig->extrusionFlatten;
     extrusionSymbol->wallGradientPercentage() = layerConfig->extrusionWallGradient;
-    style.addSymbol( extrusionSymbol );
   }
 
-  if ( layerConfig->labelingEnabled )
+  QgsVectorLayer *vLayer = qobject_cast<QgsVectorLayer *>( layer );
+  if ( vLayer && layerConfig->labelingEnabled )
   {
     osgEarth::TextSymbol *textSymbol = style.getOrCreateSymbol<osgEarth::TextSymbol>();
     textSymbol->declutter() = layerConfig->labelingDeclutter;
@@ -615,18 +580,31 @@ void KadasGlobeIntegration::addModelLayer( QgsVectorLayer *vLayer, KadasGlobeVec
     textSymbol->halo() = stroke;
     textSymbol->haloOffset() = lyr.format().buffer().size();
   }
+  if ( vLayer )
+  {
+    QgsRenderContext ctx;
+    for ( QgsSymbol *sym : vLayer->renderer()->symbols( ctx ) )
+    {
+      osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
+      QColor color = sym->color();
+      poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() );
+    }
+  }
 
   osgEarth::RenderSymbol *renderSymbol = style.getOrCreateSymbol<osgEarth::RenderSymbol>();
   renderSymbol->lighting() = layerConfig->lightingEnabled;
   renderSymbol->backfaceCulling() = false;
-  style.addSymbol( renderSymbol );
+
+
+  KadasGlobeFeatureOptions featureOpt;
+  featureOpt.setLayer( layer );
+  featureOpt.style() = style;
 
   osgEarth::Drivers::FeatureGeomModelOptions geomOpt;
   geomOpt.featureOptions() = featureOpt;
+
   geomOpt.styles() = new osgEarth::StyleSheet();
   geomOpt.styles()->addStyle( style );
-
-  geomOpt.featureIndexing() = osgEarth::Features::FeatureSourceIndexOptions();
 
 #if 0
   FeatureDisplayLayout layout;
@@ -635,7 +613,7 @@ void KadasGlobeIntegration::addModelLayer( QgsVectorLayer *vLayer, KadasGlobeVec
   geomOpt.layout() = layout;
 #endif
 
-  osgEarth::ModelLayerOptions modelOptions( vLayer->id().toStdString(), geomOpt );
+  osgEarth::ModelLayerOptions modelOptions( layer->id().toStdString(), geomOpt );
 
   osgEarth::ModelLayer *nLayer = new osgEarth::ModelLayer( modelOptions );
 
@@ -679,17 +657,16 @@ void KadasGlobeIntegration::updateLayers()
       QgsMapLayer *mapLayer = QgsProject::instance()->mapLayer( layerId );
       connect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
 
-      KadasGlobeVectorLayerConfig *layerConfig = 0;
+      KadasGlobeVectorLayerConfig *layerConfig = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
       if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
       {
-        layerConfig = KadasGlobeVectorLayerConfig::getConfig( static_cast<QgsVectorLayer *>( mapLayer ) );
         connect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
       }
 
       if ( layerConfig && ( layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelSimple || layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced ) )
       {
         if ( !mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() ) )
-          addModelLayer( static_cast<QgsVectorLayer *>( mapLayer ), layerConfig );
+          addModelLayer( mapLayer, layerConfig );
       }
       else
       {
@@ -722,11 +699,7 @@ void KadasGlobeIntegration::layerChanged()
   }
   if ( mMapNode )
   {
-    KadasGlobeVectorLayerConfig *layerConfig = 0;
-    if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-    {
-      layerConfig = KadasGlobeVectorLayerConfig::getConfig( static_cast<QgsVectorLayer *>( mapLayer ) );
-    }
+    KadasGlobeVectorLayerConfig *layerConfig = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
 
     if ( layerConfig && ( layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelSimple || layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced ) )
     {
@@ -745,7 +718,7 @@ void KadasGlobeIntegration::layerChanged()
       {
         mMapNode->getMap()->removeLayer( layer );
       }
-      addModelLayer( static_cast<QgsVectorLayer *>( mapLayer ), layerConfig );
+      addModelLayer( mapLayer, layerConfig );
     }
     else
     {

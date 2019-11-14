@@ -109,7 +109,7 @@ class KadasGlobeIntegration : public QObject
     void setupProxy();
     void addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler );
     void addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler = 0 );
-    void addModelLayer( QgsVectorLayer *mapLayer, KadasGlobeVectorLayerConfig *layerConfig );
+    void addModelLayer( QgsMapLayer *layer, KadasGlobeVectorLayerConfig *layerConfig );
     void setupControls();
     void applyProjectSettings();
     QgsRectangle getQGISLayerExtent() const;

@@ -17,6 +17,7 @@
 #ifndef KADASGLOBEFEATURESOURCE_H
 #define KADASGLOBEFEATURESOURCE_H
 
+#include <osgEarthFeatures/FeatureCursor>
 #include <osgEarthFeatures/FeatureSource>
 #include <osgEarth/Version>
 #include <QObject>
@@ -24,43 +25,104 @@
 #include <qgis/qgsfeatureid.h>
 #include <qgis/qgsgeometry.h>
 
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/globe/featuresource/kadasglobefeatureoptions.h>
-
 
 class KadasGlobeFeatureSource : public QObject, public osgEarth::Features::FeatureSource
 {
     Q_OBJECT
   public:
-    KadasGlobeFeatureSource( const KadasGlobeFeatureOptions &options = osgEarth::Features::ConfigOptions() );
+    typedef QMap<osgEarth::Features::FeatureID, osg::ref_ptr<osgEarth::Features::Feature> > FeatureMap;
 
-    osgEarth::Features::FeatureCursor *createFeatureCursor( const osgEarth::Symbology::Query &query, osgEarth::ProgressCallback *progress ) override;
-
-    int getFeatureCount() const override;
-    osgEarth::Features::Feature *getFeature( osgEarth::Features::FeatureID fid ) override;
-    osgEarth::Features::Geometry::Type getGeometryType() const override;
-
-    QgsVectorLayer *layer() const { return mLayer; }
-
-    const char *className() const override { return "QGISFeatureSource"; }
-    const char *libraryName() const override { return "QGIS"; }
+    KadasGlobeFeatureSource( const KadasGlobeFeatureOptions &options = osgEarth::Features::ConfigOptions() ) : mOptions( options ) {}
 
     osgEarth::Status initialize( const osgDB::Options *dbOptions ) override;
+    osgEarth::Features::FeatureCursor *createFeatureCursor( const osgEarth::Symbology::Query &query, osgEarth::ProgressCallback *progress ) override;
 
-  protected:
+    const char *libraryName() const override { return "Kadas"; }
+    int getFeatureCount() const override { return mFeatures.size(); }
+    osgEarth::Features::Feature *getFeature( osgEarth::Features::FeatureID fid ) override { return mFeatures.value( fid ); }
+    osgEarth::Features::Geometry::Type getGeometryType() const override { return mGeomType; }
     const osgEarth::Features::FeatureSchema &getSchema() const override { return mSchema; }
 
-    ~KadasGlobeFeatureSource() {}
+    const FeatureMap &features() const { return mFeatures; }
+
+    virtual osgEarth::Features::Feature *loadFeature( osgEarth::Features::FeatureID featureId ) = 0;
+
+  protected:
+    KadasGlobeFeatureOptions mOptions;
+    osgEarth::Features::Geometry::Type mGeomType = osgEarth::Features::Geometry::TYPE_UNKNOWN;
+    osgEarth::Features::FeatureSchema mSchema;
+    FeatureMap mFeatures;
+};
+
+
+class KadasGlobeFeatureCursor : public osgEarth::Features::FeatureCursor
+{
+  public:
+    KadasGlobeFeatureCursor( KadasGlobeFeatureSource *source, osgEarth::ProgressCallback *progress )
+      : FeatureCursor( progress ), mSource( source )
+    {
+      mIterator = mSource->features().begin();
+      progress->reportProgress( mCounter, mSource->getFeatureCount() );
+    }
+
+    bool hasMore() const override
+    {
+      return mIterator != mSource->features().end() && !_progress->isCanceled();
+    }
+
+    osgEarth::Features::Feature *nextFeature() override
+    {
+      osgEarth::Features::Feature *feat = mIterator.value();
+      if ( !feat )
+      {
+        feat = mSource->loadFeature( mIterator.key() );
+      }
+      _progress->reportProgress( ++mCounter, mSource->getFeatureCount() );
+      ++mIterator;
+      return feat;
+    }
 
   private:
-    KadasGlobeFeatureOptions mOptions;
-    QgsVectorLayer *mLayer = nullptr;
-    osgEarth::Features::FeatureSchema mSchema;
-    typedef std::map<osgEarth::Features::FeatureID, osg::observer_ptr<osgEarth::Features::Feature> > FeatureMap_t;
-    FeatureMap_t mFeatures;
+    KadasGlobeFeatureSource *mSource;
+    KadasGlobeFeatureSource::FeatureMap::const_iterator mIterator;
+    int mCounter = 0;
+};
+
+
+class KadasGlobeVectorFeatureSource : public KadasGlobeFeatureSource
+{
+    Q_OBJECT
+  public:
+    KadasGlobeVectorFeatureSource( const KadasGlobeFeatureOptions &options = osgEarth::Features::ConfigOptions() );
+    const char *className() const override { return "KadasVectorFeatureSource"; }
+
+    osgEarth::Features::Feature *loadFeature( osgEarth::Features::FeatureID featureId ) override;
 
   private slots:
+    void featureAdded( const QgsFeatureId &featureId );
+    void featureDeleted( const QgsFeatureId &featureId );
     void attributeValueChanged( const QgsFeatureId &featureId, int idx, const QVariant &value );
     void geometryChanged( const QgsFeatureId &featureId, const QgsGeometry &geometry );
+};
+
+
+class KadasGlobeItemFeatureSource : public KadasGlobeFeatureSource
+{
+    Q_OBJECT
+  public:
+    KadasGlobeItemFeatureSource( const KadasGlobeFeatureOptions &options = osgEarth::Features::ConfigOptions() );
+    const char *className() const override { return "KadasVectorFeatureSource"; }
+
+    // Per-feature styles
+    bool hasEmbeddedStyles() const override { return true; }
+
+    osgEarth::Features::Feature *loadFeature( osgEarth::Features::FeatureID featureId ) override;
+
+  private slots:
+    void itemAdded( KadasItemLayer::ItemId itemId );
+    void itemRemoved( KadasItemLayer::ItemId itemId );
 };
 
 #endif // KADASGLOBEFEATURESOURCE_H

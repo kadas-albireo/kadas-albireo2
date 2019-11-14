@@ -15,17 +15,18 @@
  ***************************************************************************/
 
 #include <qgis/qgsproject.h>
-#include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsmaplayer.h>
 
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
 
 
 Q_DECLARE_METATYPE( KadasGlobeVectorLayerConfig * )
 
-KadasGlobeVectorLayerConfig *KadasGlobeVectorLayerConfig::getConfig( QgsVectorLayer *layer )
+KadasGlobeVectorLayerConfig *KadasGlobeVectorLayerConfig::getConfig( QgsMapLayer *layer )
 {
   KadasGlobeVectorLayerConfig *layerConfig = layer->property( "globe-config" ).value<KadasGlobeVectorLayerConfig *>();
-  if ( !layerConfig )
+  if ( !layerConfig && ( layer->type() == QgsMapLayerType::VectorLayer || qobject_cast<KadasItemLayer *>( layer ) ) )
   {
     layerConfig = new KadasGlobeVectorLayerConfig( layer );
     layer->setProperty( "globe-config", QVariant::fromValue<KadasGlobeVectorLayerConfig *>( layerConfig ) );
@@ -35,7 +36,7 @@ KadasGlobeVectorLayerConfig *KadasGlobeVectorLayerConfig::getConfig( QgsVectorLa
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasGlobeVectorLayerPropertiesPage::KadasGlobeVectorLayerPropertiesPage( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
+KadasGlobeVectorLayerPropertiesPage::KadasGlobeVectorLayerPropertiesPage( QgsMapLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
   : QgsMapLayerConfigWidget( layer, canvas, parent )
   , mLayer( layer )
 {
@@ -185,7 +186,7 @@ KadasGlobeLayerPropertiesFactory::KadasGlobeLayerPropertiesFactory( QObject *par
 QgsMapLayerConfigWidget *KadasGlobeLayerPropertiesFactory::createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const
 {
   Q_UNUSED( dockWidget )
-  KadasGlobeVectorLayerPropertiesPage *propsPage = new KadasGlobeVectorLayerPropertiesPage( qobject_cast<QgsVectorLayer *>( layer ), canvas, parent );
+  KadasGlobeVectorLayerPropertiesPage *propsPage = new KadasGlobeVectorLayerPropertiesPage( layer, canvas, parent );
   connect( propsPage, &KadasGlobeVectorLayerPropertiesPage::layerSettingsChanged, this, &KadasGlobeLayerPropertiesFactory::layerSettingsChanged );
   return propsPage;
 }
@@ -202,93 +203,85 @@ QString KadasGlobeLayerPropertiesFactory::title() const
 
 bool KadasGlobeLayerPropertiesFactory::supportsLayer( QgsMapLayer *layer ) const
 {
-  return layer->type() == QgsMapLayerType::VectorLayer;
+  return layer->type() == QgsMapLayerType::VectorLayer || qobject_cast<KadasItemLayer *>( layer );
 }
 
 void KadasGlobeLayerPropertiesFactory::readGlobeVectorLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )
 {
-  if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
+  KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
+
+  QDomElement globeElem = elem.firstChildElement( "globe" );
+  if ( !globeElem.isNull() )
   {
-    QgsVectorLayer *vLayer = static_cast<QgsVectorLayer *>( mapLayer );
-    KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( vLayer );
+    QDomElement renderingModeElem = globeElem.firstChildElement( "renderingMode" );
+    config->renderingMode = static_cast<KadasGlobeVectorLayerConfig::RenderingMode>( renderingModeElem.attribute( "mode" ).toInt() );
 
-    QDomElement globeElem = elem.firstChildElement( "globe" );
-    if ( !globeElem.isNull() )
+    QDomElement modelRenderingElem = globeElem.firstChildElement( "modelRendering" );
+    if ( !modelRenderingElem.isNull() )
     {
-      QDomElement renderingModeElem = globeElem.firstChildElement( "renderingMode" );
-      config->renderingMode = static_cast<KadasGlobeVectorLayerConfig::RenderingMode>( renderingModeElem.attribute( "mode" ).toInt() );
+      QDomElement altitudeElem = modelRenderingElem.firstChildElement( "altitude" );
+      config->altitudeClamping = static_cast<osgEarth::Symbology::AltitudeSymbol::Clamping>( altitudeElem.attribute( "clamping" ).toInt() );
+      config->altitudeTechnique = static_cast<osgEarth::Symbology::AltitudeSymbol::Technique>( altitudeElem.attribute( "technique" ).toInt() );
+      config->altitudeBinding = static_cast<osgEarth::Symbology::AltitudeSymbol::Binding>( altitudeElem.attribute( "binding" ).toInt() );
+      config->verticalOffset = altitudeElem.attribute( "verticalOffset" ).toFloat();
+      config->verticalScale = altitudeElem.attribute( "verticalScale" ).toFloat();
+      config->clampingResolution = altitudeElem.attribute( "clampingResolution" ).toFloat();
 
-      QDomElement modelRenderingElem = globeElem.firstChildElement( "modelRendering" );
-      if ( !modelRenderingElem.isNull() )
-      {
-        QDomElement altitudeElem = modelRenderingElem.firstChildElement( "altitude" );
-        config->altitudeClamping = static_cast<osgEarth::Symbology::AltitudeSymbol::Clamping>( altitudeElem.attribute( "clamping" ).toInt() );
-        config->altitudeTechnique = static_cast<osgEarth::Symbology::AltitudeSymbol::Technique>( altitudeElem.attribute( "technique" ).toInt() );
-        config->altitudeBinding = static_cast<osgEarth::Symbology::AltitudeSymbol::Binding>( altitudeElem.attribute( "binding" ).toInt() );
-        config->verticalOffset = altitudeElem.attribute( "verticalOffset" ).toFloat();
-        config->verticalScale = altitudeElem.attribute( "verticalScale" ).toFloat();
-        config->clampingResolution = altitudeElem.attribute( "clampingResolution" ).toFloat();
+      QDomElement extrusionElem = modelRenderingElem.firstChildElement( "extrusion" );
+      config->extrusionEnabled = extrusionElem.attribute( "enabled" ).toInt() == 1;
+      config->extrusionHeight = extrusionElem.attribute( "height", QString( "10" ) ).trimmed();
+      if ( config->extrusionHeight.isEmpty() )
+        config->extrusionHeight = "10";
+      config->extrusionFlatten = extrusionElem.attribute( "flatten" ).toInt() == 1;
+      config->extrusionWallGradient = extrusionElem.attribute( "wall-gradient" ).toDouble();
 
-        QDomElement extrusionElem = modelRenderingElem.firstChildElement( "extrusion" );
-        config->extrusionEnabled = extrusionElem.attribute( "enabled" ).toInt() == 1;
-        config->extrusionHeight = extrusionElem.attribute( "height", QString( "10" ) ).trimmed();
-        if ( config->extrusionHeight.isEmpty() )
-          config->extrusionHeight = "10";
-        config->extrusionFlatten = extrusionElem.attribute( "flatten" ).toInt() == 1;
-        config->extrusionWallGradient = extrusionElem.attribute( "wall-gradient" ).toDouble();
+      QDomElement labelingElem = modelRenderingElem.firstChildElement( "labeling" );
+      config->labelingEnabled = labelingElem.attribute( "enabled", "0" ).toInt() == 1;
+      config->labelingField = labelingElem.attribute( "field" );
+      config->labelingDeclutter = labelingElem.attribute( "declutter", "1" ).toInt() == 1;
 
-        QDomElement labelingElem = modelRenderingElem.firstChildElement( "labeling" );
-        config->labelingEnabled = labelingElem.attribute( "enabled", "0" ).toInt() == 1;
-        config->labelingField = labelingElem.attribute( "field" );
-        config->labelingDeclutter = labelingElem.attribute( "declutter", "1" ).toInt() == 1;
-
-        config->lightingEnabled = modelRenderingElem.attribute( "lighting", "1" ).toInt() == 1;
-      }
+      config->lightingEnabled = modelRenderingElem.attribute( "lighting", "1" ).toInt() == 1;
     }
   }
 }
 
 void KadasGlobeLayerPropertiesFactory::writeGlobeVectorLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc )
 {
-  if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-  {
-    QgsVectorLayer *vLayer = static_cast<QgsVectorLayer *>( mapLayer );
-    KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( vLayer );
+  KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
 
-    QDomElement globeElem = doc.createElement( "globe" );
+  QDomElement globeElem = doc.createElement( "globe" );
 
-    QDomElement renderingModeElem = doc.createElement( "renderingMode" );
-    renderingModeElem.setAttribute( "mode", config->renderingMode );
-    globeElem.appendChild( renderingModeElem );
+  QDomElement renderingModeElem = doc.createElement( "renderingMode" );
+  renderingModeElem.setAttribute( "mode", config->renderingMode );
+  globeElem.appendChild( renderingModeElem );
 
-    QDomElement modelRenderingElem = doc.createElement( "modelRendering" );
+  QDomElement modelRenderingElem = doc.createElement( "modelRendering" );
 
-    QDomElement altitudeElem = doc.createElement( "altitude" );
-    altitudeElem.setAttribute( "clamping", config->altitudeClamping );
-    altitudeElem.setAttribute( "technique", config->altitudeTechnique );
-    altitudeElem.setAttribute( "binding", config->altitudeBinding );
-    altitudeElem.setAttribute( "verticalOffset", config->verticalOffset );
-    altitudeElem.setAttribute( "verticalScale", config->verticalScale );
-    altitudeElem.setAttribute( "clampingResolution", config->clampingResolution );
-    modelRenderingElem.appendChild( altitudeElem );
+  QDomElement altitudeElem = doc.createElement( "altitude" );
+  altitudeElem.setAttribute( "clamping", config->altitudeClamping );
+  altitudeElem.setAttribute( "technique", config->altitudeTechnique );
+  altitudeElem.setAttribute( "binding", config->altitudeBinding );
+  altitudeElem.setAttribute( "verticalOffset", config->verticalOffset );
+  altitudeElem.setAttribute( "verticalScale", config->verticalScale );
+  altitudeElem.setAttribute( "clampingResolution", config->clampingResolution );
+  modelRenderingElem.appendChild( altitudeElem );
 
-    QDomElement extrusionElem = doc.createElement( "extrusion" );
-    extrusionElem.setAttribute( "enabled", config->extrusionEnabled );
-    extrusionElem.setAttribute( "height", config->extrusionHeight );
-    extrusionElem.setAttribute( "flatten", config->extrusionFlatten );
-    extrusionElem.setAttribute( "wall-gradient", config->extrusionWallGradient );
-    modelRenderingElem.appendChild( extrusionElem );
+  QDomElement extrusionElem = doc.createElement( "extrusion" );
+  extrusionElem.setAttribute( "enabled", config->extrusionEnabled );
+  extrusionElem.setAttribute( "height", config->extrusionHeight );
+  extrusionElem.setAttribute( "flatten", config->extrusionFlatten );
+  extrusionElem.setAttribute( "wall-gradient", config->extrusionWallGradient );
+  modelRenderingElem.appendChild( extrusionElem );
 
-    QDomElement labelingElem = doc.createElement( "labeling" );
-    labelingElem.setAttribute( "enabled", config->labelingEnabled );
-    labelingElem.setAttribute( "field", config->labelingField );
-    labelingElem.setAttribute( "declutter", config->labelingDeclutter );
-    modelRenderingElem.appendChild( labelingElem );
+  QDomElement labelingElem = doc.createElement( "labeling" );
+  labelingElem.setAttribute( "enabled", config->labelingEnabled );
+  labelingElem.setAttribute( "field", config->labelingField );
+  labelingElem.setAttribute( "declutter", config->labelingDeclutter );
+  modelRenderingElem.appendChild( labelingElem );
 
-    modelRenderingElem.setAttribute( "lighting", config->lightingEnabled );
+  modelRenderingElem.setAttribute( "lighting", config->lightingEnabled );
 
-    globeElem.appendChild( modelRenderingElem );
+  globeElem.appendChild( modelRenderingElem );
 
-    elem.appendChild( globeElem );
-  }
+  elem.appendChild( globeElem );
 }

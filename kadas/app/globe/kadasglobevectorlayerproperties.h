@@ -30,7 +30,6 @@ class QDomDocument;
 class QDomElement;
 class QListWidgetItem;
 class QgsMapLayer;
-class QgsVectorLayer;
 class KadasGlobeVectorLayerConfig;
 
 class KadasGlobeVectorLayerConfig : public QObject
@@ -44,46 +43,31 @@ class KadasGlobeVectorLayerConfig : public QObject
       RenderingModeModelAdvanced
     };
 
-    KadasGlobeVectorLayerConfig( QObject *parent = nullptr )
-      : QObject( parent )
-      , renderingMode( RenderingModeRasterized )
-      , altitudeClamping( osgEarth::Symbology::AltitudeSymbol::CLAMP_TO_TERRAIN )
-      , altitudeTechnique( osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_DRAPE )
-      , altitudeBinding( osgEarth::Symbology::AltitudeSymbol::BINDING_VERTEX )
-      , verticalOffset( 0.0 )
-      , verticalScale( 0.0 )
-      , clampingResolution( 0.0 )
-      , extrusionEnabled( false )
-      , extrusionHeight( "10" )
-      , extrusionFlatten( false )
-      , extrusionWallGradient( 0.5 )
-      , labelingEnabled( false )
-      , labelingDeclutter( false )
-      , lightingEnabled( true )
+    KadasGlobeVectorLayerConfig( QObject *parent = nullptr ) : QObject( parent )
     {
     }
 
-    RenderingMode renderingMode;
-    osgEarth::Symbology::AltitudeSymbol::Clamping altitudeClamping;
-    osgEarth::Symbology::AltitudeSymbol::Technique altitudeTechnique;
-    osgEarth::Symbology::AltitudeSymbol::Binding altitudeBinding;
+    RenderingMode renderingMode = RenderingModeRasterized;
+    osgEarth::Symbology::AltitudeSymbol::Clamping altitudeClamping = osgEarth::Symbology::AltitudeSymbol::CLAMP_TO_TERRAIN;
+    osgEarth::Symbology::AltitudeSymbol::Technique altitudeTechnique = osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_DRAPE;
+    osgEarth::Symbology::AltitudeSymbol::Binding altitudeBinding = osgEarth::Symbology::AltitudeSymbol::BINDING_VERTEX;
 
-    float verticalOffset;
-    float verticalScale;
-    float clampingResolution;
+    float verticalOffset = 0.0;
+    float verticalScale = 0.0;
+    float clampingResolution = 0.0;
 
-    bool extrusionEnabled;
-    QString extrusionHeight;
-    bool extrusionFlatten;
-    float extrusionWallGradient;
+    bool extrusionEnabled = false;
+    QString extrusionHeight = "10";
+    bool extrusionFlatten = false;
+    float extrusionWallGradient = 0.5;
 
-    bool labelingEnabled;
+    bool labelingEnabled = false;
     QString labelingField;
-    bool labelingDeclutter;
+    bool labelingDeclutter = false;
 
-    bool lightingEnabled;
+    bool lightingEnabled = true;
 
-    static KadasGlobeVectorLayerConfig *getConfig( QgsVectorLayer *layer );
+    static KadasGlobeVectorLayerConfig *getConfig( QgsMapLayer *layer );
 };
 
 
@@ -92,7 +76,7 @@ class KadasGlobeVectorLayerPropertiesPage : public QgsMapLayerConfigWidget, priv
     Q_OBJECT
 
   public:
-    explicit KadasGlobeVectorLayerPropertiesPage( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    explicit KadasGlobeVectorLayerPropertiesPage( QgsMapLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 
   public slots:
     virtual void apply();
@@ -106,7 +90,7 @@ class KadasGlobeVectorLayerPropertiesPage : public QgsMapLayerConfigWidget, priv
     void layerSettingsChanged( QgsMapLayer * );
 
   private:
-    QgsVectorLayer *mLayer = nullptr;
+    QgsMapLayer *mLayer = nullptr;
 };
 
 
