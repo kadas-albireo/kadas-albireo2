@@ -433,6 +433,7 @@ void KadasGlobeIntegration::syncExtent()
   osgEarth::Util::EarthManipulator *manip = dynamic_cast<osgEarth::Util::EarthManipulator *>( mOsgViewer->getCameraManipulator() );
   manip->setRotation( osg::Quat() );
   manip->setViewpoint( viewpoint, 4.0 );
+  mOsgViewer->requestRedraw();
 }
 
 void KadasGlobeIntegration::setupControls()
