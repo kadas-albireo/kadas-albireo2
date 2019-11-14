@@ -46,7 +46,6 @@ class KadasGlobeDialog: public QDialog, private Ui::KadasGlobeDialogBase
     QList<LayerDataSource> getImageryDataSources() const;
     QList<LayerDataSource> getElevationDataSources() const;
     double getVerticalScale() const;
-    bool getFrustumHighlighting() const;
 
   signals:
     void settingsApplied();

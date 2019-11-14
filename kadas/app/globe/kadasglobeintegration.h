@@ -28,7 +28,6 @@ class QgsMapLayer;
 class QgsPointXY;
 class QgsRectangle;
 class QgsVectorLayer;
-class KadasGlobeFrustumHighlightCallback;
 class KadasGlobeLayerPropertiesFactory;
 class KadasGlobeTileSource;
 class KadasGlobeVectorLayerConfig;
@@ -65,9 +64,6 @@ class KadasGlobeIntegration : public QObject
     KadasGlobeIntegration( QAction *action3D, QObject *parent = nullptr );
     ~KadasGlobeIntegration();
 
-    //! Enable or disable frustum highlight
-    void enableFrustumHighlight( bool statu );
-
     //! emits signal with current mouse coordinates
     void showCurrentCoordinates( const osgEarth::GeoPoint &geoPoint );
 
@@ -103,7 +99,6 @@ class KadasGlobeIntegration : public QObject
 
     //! Creates additional pages in the layer properties for adjusting 3D properties
     KadasGlobeLayerPropertiesFactory *mLayerPropertiesFactory = nullptr;
-    osg::ref_ptr<KadasGlobeFrustumHighlightCallback> mFrustumHighlightCallback;
     osg::ref_ptr<osgEarth::Util::Controls::LabelControl> mStatsLabel;
 
     void setupProxy();

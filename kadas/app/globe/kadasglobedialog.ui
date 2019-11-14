@@ -636,13 +636,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxFrustumHighlighting">
-         <property name="text">
-          <string>Enable frustum highlighting</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacerAdvancedTab">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

@@ -132,7 +132,6 @@ void KadasGlobeDialog::restoreSavedSettings()
   // Advanced
   sliderScrollSensitivity->setValue( settings.value( "/Globe/scrollSensitivity", 20 ).toInt() );
   checkBoxInvertScroll->setChecked( settings.value( "/Globe/invertScrollWheel", 0 ).toInt() );
-  checkBoxFrustumHighlighting->setChecked( settings.value( "/Globe/frustum-highlighting", false ).toBool() );
 }
 
 void KadasGlobeDialog::on_buttonBox_accepted()
@@ -168,7 +167,6 @@ void KadasGlobeDialog::apply()
   // Advanced settings
   settings.setValue( "/Globe/scrollSensitivity", sliderScrollSensitivity->value() );
   settings.setValue( "/Globe/invertScrollWheel", checkBoxInvertScroll->checkState() );
-  settings.setValue( "/Globe/frustum-highlighting", checkBoxFrustumHighlighting->isChecked() );
 
   writeProjectSettings();
 
@@ -499,11 +497,6 @@ float KadasGlobeDialog::getScrollSensitivity() const
 bool KadasGlobeDialog::getInvertScrollWheel() const
 {
   return checkBoxInvertScroll->checkState();
-}
-
-bool KadasGlobeDialog::getFrustumHighlighting() const
-{
-  return checkBoxFrustumHighlighting->isChecked();
 }
 
 /// STEREO ////////////////////////////////////////////////////////////////////

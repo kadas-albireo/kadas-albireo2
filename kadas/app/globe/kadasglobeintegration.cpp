@@ -63,7 +63,6 @@
 #include <kadas/app/globe/kadasglobeintegration.h>
 #include <kadas/app/globe/kadasglobedialog.h>
 #include <kadas/app/globe/kadasglobefeatureidentify.h>
-#include <kadas/app/globe/kadasglobefrustumhighlight.h>
 #include <kadas/app/globe/kadasglobeinteractionhandlers.h>
 #include <kadas/app/globe/kadasglobetilesource.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
@@ -122,8 +121,6 @@ void KadasGlobeIntegration::run()
   osgEarth::Util::EarthManipulator *manip = new osgEarth::Util::EarthManipulator();
   mOsgViewer->setCameraManipulator( manip );
 
-  setupProxy();
-
   // Tile stats label
   mStatsLabel = new osgEarth::Util::Controls::LabelControl( "", 10 );
   mStatsLabel->setPosition( 0, 0 );
@@ -170,11 +167,6 @@ void KadasGlobeIntegration::run()
   mQgisMapLayer = new osgEarth::ImageLayer( options, mTileSource );
   map->addLayer( mQgisMapLayer );
 
-
-  // Create the frustum highlight callback
-  mFrustumHighlightCallback = new KadasGlobeFrustumHighlightCallback(
-    mOsgViewer, mMapNode->getTerrain(), kApp->mainWindow()->mapCanvas(), QColor( 0, 0, 0, 50 ) );
-
   mRootNode->addChild( osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer ) );
 
   mOsgViewer->setSceneData( mRootNode );
@@ -205,6 +197,7 @@ void KadasGlobeIntegration::run()
   mDockWidget->setWidget( mViewerWidget );
   mViewerWidget->setParent( mDockWidget );
 
+  setupProxy();
   setupControls();
   applySettings();
   updateLayers();
@@ -242,9 +235,6 @@ void KadasGlobeIntegration::applySettings()
     settings->bindScroll( osgEarth::Util::EarthManipulator::ACTION_ZOOM_OUT, osgGA::GUIEventAdapter::SCROLL_UP );
     settings->bindScroll( osgEarth::Util::EarthManipulator::ACTION_ZOOM_IN, osgGA::GUIEventAdapter::SCROLL_DOWN );
   }
-
-  // Advanced settings
-  enableFrustumHighlight( mSettingsDialog->getFrustumHighlighting() );
 
   applyProjectSettings();
 }
@@ -810,7 +800,6 @@ void KadasGlobeIntegration::reset()
   mQgisMapLayer = nullptr;
   mTileSource = nullptr;
   mVerticalScale = nullptr;
-  mFrustumHighlightCallback = nullptr;
   mViewerWidget = nullptr;
   mDockWidget = nullptr;
   mImagerySources.clear();
@@ -820,12 +809,4 @@ void KadasGlobeIntegration::reset()
   disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
   delete KadasGlobeTileStatistics::instance();
 #endif
-}
-
-void KadasGlobeIntegration::enableFrustumHighlight( bool status )
-{
-  if ( status )
-    mMapNode->getTerrainEngine()->addUpdateCallback( mFrustumHighlightCallback );
-  else
-    mMapNode->getTerrainEngine()->removeUpdateCallback( mFrustumHighlightCallback );
 }
