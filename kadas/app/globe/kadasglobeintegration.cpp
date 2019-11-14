@@ -15,28 +15,20 @@
  ***************************************************************************/
 
 #include <qgis/qgsdistancearea.h>
-#include <qgis/qgsgeometry.h>
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
-#include <qgis/qgsrenderer.h>
 #include <qgis/qgssettings.h>
-#include <qgis/qgssymbol.h>
-#include <qgis/qgsvectorlayer.h>
-#include <qgis/qgsvectorlayerlabeling.h>
 
 #include <QAction>
 #include <QDir>
 #include <QDockWidget>
-#include <QStringList>
 
 #include <osgGA/StateSetManipulator>
 
-#include <osgEarth/ElevationQuery>
-#include <osgEarth/Notify>
 #include <osgEarth/Map>
 #include <osgEarth/MapNode>
 #include <osgEarth/Registry>
@@ -45,7 +37,6 @@
 #include <osgEarthDrivers/cache_filesystem/FileSystemCache>
 #include <osgEarthDrivers/engine_mp/MPTerrainEngineOptions>
 #include <osgEarthDrivers/gdal/GDALOptions>
-#include <osgEarthDrivers/model_feature_geom/FeatureGeomModelOptions>
 #include <osgEarthDrivers/sky_simple/SimpleSkyOptions>
 #include <osgEarthDrivers/tms/TMSOptions>
 #include <osgEarthDrivers/wms/WMSOptions>
@@ -63,10 +54,9 @@
 #include <kadas/app/globe/kadasglobeintegration.h>
 #include <kadas/app/globe/kadasglobedialog.h>
 #include <kadas/app/globe/kadasglobeinteractionhandlers.h>
-#include <kadas/app/globe/kadasglobetilesource.h>
+#include <kadas/app/globe/kadasglobeprojectlayermanager.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
 #include <kadas/app/globe/kadasglobewidget.h>
-#include <kadas/app/globe/featuresource/kadasglobefeatureoptions.h>
 
 
 KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent )
@@ -77,6 +67,8 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
 
   mLayerPropertiesFactory = new KadasGlobeLayerPropertiesFactory( this );
   kApp->registerMapLayerPropertiesFactory( mLayerPropertiesFactory );
+
+  mProjectLayerManager = new KadasGlobeProjectLayerManager( this );
 
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
   connect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
@@ -92,12 +84,27 @@ KadasGlobeIntegration::~KadasGlobeIntegration()
     delete mDockWidget;
     reset();
   }
-  delete mLayerPropertiesFactory;
-  mLayerPropertiesFactory = nullptr;
   delete mSettingsDialog;
-  mSettingsDialog = nullptr;
+}
 
-  disconnect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
+void KadasGlobeIntegration::reset()
+{
+  mStatsLabel = nullptr;
+  mProjectLayerManager->reset();
+  mOsgViewer = nullptr;
+  mMapNode = nullptr;
+  mRootNode = nullptr;
+  mSkyNode = nullptr;
+  mBaseLayer = nullptr;
+  mVerticalScale = nullptr;
+  mViewerWidget = nullptr;
+  mDockWidget = nullptr;
+  mImagerySources.clear();
+  mElevationSources.clear();
+#ifdef GLOBE_SHOW_TILE_STATS
+  disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
+  delete KadasGlobeTileStatistics::instance();
+#endif
 }
 
 void KadasGlobeIntegration::run()
@@ -127,9 +134,9 @@ void KadasGlobeIntegration::run()
 
   mDockWidget = new KadasGlobeWidget( kApp->mainWindow() );
   connect( mDockWidget, &KadasGlobeWidget::destroyed, this, &KadasGlobeIntegration::reset );
-  connect( mDockWidget, &KadasGlobeWidget::layersChanged, this, &KadasGlobeIntegration::updateLayers );
+  connect( mDockWidget, &KadasGlobeWidget::layersChanged, mProjectLayerManager, [this] { mProjectLayerManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::showSettings, this, &KadasGlobeIntegration::showSettings );
-  connect( mDockWidget, &KadasGlobeWidget::refresh, this, &KadasGlobeIntegration::rebuildQGISLayer );
+  connect( mDockWidget, &KadasGlobeWidget::refresh, mProjectLayerManager, [this] { mProjectLayerManager->hardRefresh( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::syncExtent, this, &KadasGlobeIntegration::syncExtent );
   kApp->mainWindow()->addDockWidget( Qt::RightDockWidgetArea, mDockWidget );
 
@@ -145,26 +152,12 @@ void KadasGlobeIntegration::run()
   osgEarth::Map *map = new osgEarth::Map( mapOptions );
 
   // The MapNode will render the Map object in the scene graph.
-  osgEarth::MapNodeOptions mapNodeOptions;
-  mMapNode = new osgEarth::MapNode( map, mapNodeOptions );
+  mMapNode = new osgEarth::MapNode( map );
 
   mRootNode = new osg::Group();
   mRootNode->addChild( mMapNode );
 
   osgEarth::Registry::instance()->unRefImageDataAfterApply() = false;
-
-  // Add draped layer
-  osgEarth::TileSourceOptions opts;
-  opts.L2CacheSize() = 0;
-  mTileSource = new KadasGlobeTileSource( kApp->mainWindow()->mapCanvas(), opts );
-  mTileSource->open();
-
-  osgEarth::ImageLayerOptions options( "QGIS" );
-  options.driver()->L2CacheSize() = 0;
-  options.tileSize() = 128;
-  options.cachePolicy() = osgEarth::CachePolicy::USAGE_NO_CACHE;
-  mQgisMapLayer = new osgEarth::ImageLayer( options, mTileSource );
-  map->addLayer( mQgisMapLayer );
 
   mRootNode->addChild( osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer ) );
 
@@ -199,7 +192,8 @@ void KadasGlobeIntegration::run()
   setupProxy();
   setupControls();
   applySettings();
-  updateLayers();
+
+  mProjectLayerManager->init( mMapNode, mDockWidget->getSelectedLayerIds() );
 }
 
 void KadasGlobeIntegration::showSettings()
@@ -212,6 +206,27 @@ void KadasGlobeIntegration::projectRead()
   setGlobeEnabled( false ); // Hide globe when new projects loaded, on some systems it is very slow loading a new project with globe enabled
   mSettingsDialog->readProjectSettings();
   applyProjectSettings();
+}
+
+void KadasGlobeIntegration::addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler )
+{
+  control->setPosition( x, y );
+  control->setHeight( h );
+  control->setWidth( w );
+  control->addEventHandler( handler );
+  osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control );
+}
+
+void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler )
+{
+  osg::Image *image = osgDB::readImageFile( imgPath );
+  osgEarth::Util::Controls::ImageControl *control = new KadasGlobeNavigationControl( image );
+  control->setPosition( x, y );
+  control->setWidth( image->s() );
+  control->setHeight( image->t() );
+  if ( handler )
+    control->addEventHandler( handler );
+  osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control );
 }
 
 void KadasGlobeIntegration::applySettings()
@@ -255,7 +270,7 @@ void KadasGlobeIntegration::applyProjectSettings()
       map->getLayers( list );
       for ( osgEarth::ImageLayerVector::iterator i = list.begin(); i != list.end(); ++i )
       {
-        if ( *i != mQgisMapLayer )
+        if ( *i != mProjectLayerManager->drapedLayer() )
           map->removeLayer( *i );
       }
       if ( !list.empty() )
@@ -376,22 +391,9 @@ void KadasGlobeIntegration::applyProjectSettings()
   }
 }
 
-QgsRectangle KadasGlobeIntegration::getQGISLayerExtent() const
+void KadasGlobeIntegration::showCurrentCoordinates( double lon, double lat )
 {
-  QList<QgsRectangle> extents = mLayerExtents.values();
-  QgsRectangle fullExtent = extents.isEmpty() ? QgsRectangle() : extents.front();
-  for ( int i = 1, n = extents.size(); i < n; ++i )
-  {
-    if ( !extents[i].isNull() )
-      fullExtent.combineExtentWith( extents[i] );
-  }
-  return fullExtent;
-}
-
-void KadasGlobeIntegration::showCurrentCoordinates( const osgEarth::GeoPoint &geoPoint )
-{
-  osg::Vec3d pos = geoPoint.vec3d();
-  emit xyCoordinates( QgsCoordinateTransform( QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() ).transform( QgsPointXY( pos.x(), pos.y() ) ) );
+  emit xyCoordinates( QgsCoordinateTransform( QgsCoordinateReferenceSystem( "EPSG:4326" ), kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() ).transform( lon, lat ) );
 }
 
 void KadasGlobeIntegration::syncExtent()
@@ -417,7 +419,6 @@ void KadasGlobeIntegration::syncExtent()
   QgsPointXY ll = QgsPointXY( extent.xMinimum(), extent.yMinimum() );
   QgsPointXY ul = QgsPointXY( extent.xMinimum(), extent.yMaximum() );
   double height = dist.measureLine( ll, ul );
-//  double height = dist.computeDistanceBearing( ll, ul );
 
   double camViewAngle = 30;
   double camDistance = height / tan( camViewAngle * osg::PI / 180 ); //c = b*cotan(B(rad))
@@ -432,27 +433,6 @@ void KadasGlobeIntegration::syncExtent()
   osgEarth::Util::EarthManipulator *manip = dynamic_cast<osgEarth::Util::EarthManipulator *>( mOsgViewer->getCameraManipulator() );
   manip->setRotation( osg::Quat() );
   manip->setViewpoint( viewpoint, 4.0 );
-}
-
-void KadasGlobeIntegration::addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler )
-{
-  control->setPosition( x, y );
-  control->setHeight( h );
-  control->setWidth( w );
-  control->addEventHandler( handler );
-  osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control );
-}
-
-void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler )
-{
-  osg::Image *image = osgDB::readImageFile( imgPath );
-  osgEarth::Util::Controls::ImageControl *control = new KadasGlobeNavigationControl( image );
-  control->setPosition( x, y );
-  control->setWidth( image->s() );
-  control->setHeight( image->t() );
-  if ( handler )
-    control->addEventHandler( handler );
-  osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control );
 }
 
 void KadasGlobeIntegration::setupControls()
@@ -507,272 +487,6 @@ void KadasGlobeIntegration::setupProxy()
   settings.endGroup();
 }
 
-void KadasGlobeIntegration::refreshQGISMapLayer( const QgsRectangle &dirtyRect )
-{
-  if ( mTileSource )
-  {
-    mOsgViewer->getDatabasePager()->clear();
-    mTileSource->refresh( dirtyRect );
-    mOsgViewer->requestRedraw();
-  }
-}
-
-void KadasGlobeIntegration::updateTileStats( int queued, int tot )
-{
-  if ( mStatsLabel )
-    mStatsLabel->setText( QString( "Queued tiles: %1\nTot tiles: %2" ).arg( queued ).arg( tot ).toStdString() );
-}
-
-void KadasGlobeIntegration::addModelLayer( QgsMapLayer *layer, KadasGlobeVectorLayerConfig *layerConfig )
-{
-  osgEarth::Style style;
-
-  osgEarth::AltitudeSymbol *altitudeSymbol = style.getOrCreateSymbol<osgEarth::AltitudeSymbol>();
-  altitudeSymbol->clamping() = layerConfig->altitudeClamping;
-  altitudeSymbol->technique() = layerConfig->altitudeTechnique;
-  altitudeSymbol->binding() = layerConfig->altitudeBinding;
-  altitudeSymbol->verticalOffset() = layerConfig->verticalOffset;
-  altitudeSymbol->verticalScale() = layerConfig->verticalScale;
-  altitudeSymbol->clampingResolution() = layerConfig->clampingResolution;
-
-  if ( layerConfig->extrusionEnabled )
-  {
-    osgEarth::ExtrusionSymbol *extrusionSymbol = style.getOrCreateSymbol<osgEarth::ExtrusionSymbol>();
-    bool extrusionHeightOk = false;
-    float extrusionHeight = layerConfig->extrusionHeight.toFloat( &extrusionHeightOk );
-    if ( extrusionHeightOk )
-    {
-      extrusionSymbol->height() = extrusionHeight;
-    }
-    else
-    {
-      extrusionSymbol->heightExpression() = layerConfig->extrusionHeight.toStdString();
-    }
-
-    extrusionSymbol->flatten() = layerConfig->extrusionFlatten;
-    extrusionSymbol->wallGradientPercentage() = layerConfig->extrusionWallGradient;
-  }
-
-  QgsVectorLayer *vLayer = qobject_cast<QgsVectorLayer *>( layer );
-  if ( vLayer && layerConfig->labelingEnabled )
-  {
-    osgEarth::TextSymbol *textSymbol = style.getOrCreateSymbol<osgEarth::TextSymbol>();
-    textSymbol->declutter() = layerConfig->labelingDeclutter;
-    QgsPalLayerSettings lyr = vLayer->labeling()->settings();
-    textSymbol->content() = QString( "[%1]" ).arg( lyr.fieldName ).toStdString();
-    textSymbol->font() = lyr.format().font().family().toStdString();
-    textSymbol->size() = lyr.format().font().pointSize();
-    textSymbol->alignment() = osgEarth::TextSymbol::ALIGN_CENTER_TOP;
-    osgEarth::Stroke stroke;
-    QColor bufferColor = lyr.format().buffer().color();
-    stroke.color() = osgEarth::Symbology::Color( bufferColor.redF(), bufferColor.greenF(), bufferColor.blueF(), bufferColor.alphaF() );
-    textSymbol->halo() = stroke;
-    textSymbol->haloOffset() = lyr.format().buffer().size();
-  }
-  if ( vLayer )
-  {
-    QgsRenderContext ctx;
-    for ( QgsSymbol *sym : vLayer->renderer()->symbols( ctx ) )
-    {
-      osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
-      QColor color = sym->color();
-      poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() );
-    }
-  }
-
-  osgEarth::RenderSymbol *renderSymbol = style.getOrCreateSymbol<osgEarth::RenderSymbol>();
-  renderSymbol->lighting() = layerConfig->lightingEnabled;
-  renderSymbol->backfaceCulling() = false;
-
-
-  KadasGlobeFeatureOptions featureOpt;
-  featureOpt.setLayer( layer );
-  featureOpt.style() = style;
-
-  osgEarth::Drivers::FeatureGeomModelOptions geomOpt;
-  geomOpt.featureOptions() = featureOpt;
-
-  geomOpt.styles() = new osgEarth::StyleSheet();
-  geomOpt.styles()->addStyle( style );
-
-#if 0
-  FeatureDisplayLayout layout;
-  layout.tileSizeFactor() = 45.0;
-  layout.addLevel( FeatureLevel( 0.0f, 200000.0f ) );
-  geomOpt.layout() = layout;
-#endif
-
-  osgEarth::ModelLayerOptions modelOptions( layer->id().toStdString(), geomOpt );
-
-  osgEarth::ModelLayer *nLayer = new osgEarth::ModelLayer( modelOptions );
-
-  mMapNode->getMap()->addLayer( nLayer );
-}
-
-void KadasGlobeIntegration::updateLayers()
-{
-  if ( mOsgViewer )
-  {
-    // Get previous full extent
-    QgsRectangle dirtyExtent = getQGISLayerExtent();
-    mLayerExtents.clear();
-
-    QList<QgsMapLayer *> drapedLayers;
-    QStringList selectedLayerIds = mDockWidget->getSelectedLayerIds();
-
-    // Disconnect any previous repaintRequested signals
-    for ( QgsMapLayer *mapLayer : mTileSource->layers() )
-    {
-      if ( mapLayer )
-        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
-      if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
-    }
-    osgEarth::ModelLayerVector modelLayers;
-    mMapNode->getMap()->getLayers( modelLayers );
-    for ( const osg::ref_ptr<osgEarth::ModelLayer> &modelLayer : modelLayers )
-    {
-      QgsMapLayer *mapLayer = QgsProject::instance()->mapLayer( QString::fromStdString( modelLayer->getName() ) );
-      if ( mapLayer )
-        disconnect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
-      if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-        disconnect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
-      if ( !selectedLayerIds.contains( QString::fromStdString( modelLayer->getName() ) ) )
-        mMapNode->getMap()->removeLayer( modelLayer );
-    }
-
-    for ( const QString &layerId : selectedLayerIds )
-    {
-      QgsMapLayer *mapLayer = QgsProject::instance()->mapLayer( layerId );
-      connect( mapLayer, &QgsMapLayer::repaintRequested, this, &KadasGlobeIntegration::layerChanged );
-
-      KadasGlobeVectorLayerConfig *layerConfig = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
-      if ( qobject_cast<QgsVectorLayer *>( mapLayer ) )
-      {
-        connect( static_cast<QgsVectorLayer *>( mapLayer ), &QgsVectorLayer::opacityChanged, this, &KadasGlobeIntegration::layerChanged );
-      }
-
-      if ( layerConfig && ( layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelSimple || layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced ) )
-      {
-        if ( !mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() ) )
-          addModelLayer( mapLayer, layerConfig );
-      }
-      else
-      {
-        drapedLayers.append( mapLayer );
-        QgsRectangle extent = QgsCoordinateTransform( mapLayer->crs(), QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), QgsProject::instance()->transformContext() ).transform( mapLayer->extent() );
-        mLayerExtents.insert( mapLayer->id(), extent );
-      }
-    }
-
-    mTileSource->setLayers( drapedLayers );
-    QgsRectangle newExtent = getQGISLayerExtent();
-    if ( dirtyExtent.isNull() )
-      dirtyExtent = newExtent;
-    else if ( !newExtent.isNull() )
-      dirtyExtent.combineExtentWith( newExtent );
-    refreshQGISMapLayer( dirtyExtent );
-  }
-}
-
-void KadasGlobeIntegration::layerChanged()
-{
-  QgsMapLayer *mapLayer = qobject_cast<QgsMapLayer *>( QObject::sender() );
-  if ( !mapLayer )
-  {
-    return;
-  }
-  if ( mapLayer->isEditable() )
-  {
-    return;
-  }
-  if ( mMapNode )
-  {
-    KadasGlobeVectorLayerConfig *layerConfig = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
-
-    if ( layerConfig && ( layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelSimple || layerConfig->renderingMode == KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced ) )
-    {
-      // If was previously a draped layer, refresh the draped layer
-      if ( mTileSource->layers().contains( mapLayer ) )
-      {
-        QList<QgsMapLayer *> layers = mTileSource->layers();
-        layers.removeAll( mapLayer );
-        mTileSource->setLayers( layers );
-        QgsRectangle dirtyExtent = mLayerExtents[mapLayer->id()];
-        mLayerExtents.remove( mapLayer->id() );
-        refreshQGISMapLayer( dirtyExtent );
-      }
-      osgEarth::Layer *layer = mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() );
-      if ( layer )
-      {
-        mMapNode->getMap()->removeLayer( layer );
-      }
-      addModelLayer( mapLayer, layerConfig );
-    }
-    else
-    {
-      // Re-insert into layer set if necessary
-      if ( !mTileSource->layers().contains( mapLayer ) )
-      {
-        QList<QgsMapLayer *> layers;
-        for ( const QString &layerId : mDockWidget->getSelectedLayerIds() )
-        {
-          if ( ! mMapNode->getMap()->getLayerByName( layerId.toStdString() ) )
-          {
-            QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-            if ( layer )
-            {
-              layers.append( layer );
-            }
-          }
-        }
-        mTileSource->setLayers( layers );
-        QgsRectangle extent = QgsCoordinateTransform( mapLayer->crs(), QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), QgsProject::instance()->transformContext() ).transform( mapLayer->extent() );
-        mLayerExtents.insert( mapLayer->id(), extent );
-      }
-      // Remove any model layer of that layer, in case one existed
-      osgEarth::Layer *layer = mMapNode->getMap()->getLayerByName( mapLayer->id().toStdString() );
-      if ( layer )
-      {
-        mMapNode->getMap()->removeLayer( layer );
-      }
-      QgsRectangle layerExtent = QgsCoordinateTransform( mapLayer->crs(), QgsCoordinateReferenceSystem( GEO_EPSG_CRS_AUTHID ), QgsProject::instance()->transformContext() ).transform( mapLayer->extent() );
-      QgsRectangle dirtyExtent = layerExtent;
-      if ( mLayerExtents.contains( mapLayer->id() ) )
-      {
-        if ( dirtyExtent.isNull() )
-          dirtyExtent = mLayerExtents[mapLayer->id()];
-        else if ( !mLayerExtents[mapLayer->id()].isNull() )
-          dirtyExtent.combineExtentWith( mLayerExtents[mapLayer->id()] );
-      }
-      mLayerExtents[mapLayer->id()] = layerExtent;
-      refreshQGISMapLayer( dirtyExtent );
-    }
-  }
-}
-
-void KadasGlobeIntegration::rebuildQGISLayer()
-{
-  if ( mMapNode )
-  {
-    mMapNode->getMap()->removeLayer( mQgisMapLayer );
-    mLayerExtents.clear();
-
-    osgEarth::TileSourceOptions opts;
-    opts.L2CacheSize() = 0;
-    mTileSource = new KadasGlobeTileSource( kApp->mainWindow()->mapCanvas(), opts );
-    mTileSource->open();
-
-    osgEarth::ImageLayerOptions options( "QGIS" );
-    options.driver()->L2CacheSize() = 0;
-    options.tileSize() = 128;
-    options.cachePolicy() = osgEarth::CachePolicy::USAGE_NO_CACHE;
-    mQgisMapLayer = new osgEarth::ImageLayer( options, mTileSource );
-    mMapNode->getMap()->addLayer( mQgisMapLayer );
-    updateLayers();
-  }
-}
-
 void KadasGlobeIntegration::setGlobeEnabled( bool enabled )
 {
   if ( enabled )
@@ -785,27 +499,11 @@ void KadasGlobeIntegration::setGlobeEnabled( bool enabled )
   }
 }
 
-void KadasGlobeIntegration::reset()
+void KadasGlobeIntegration::updateTileStats( int queued, int tot )
 {
-  mStatsLabel = nullptr;
-  mMapNode->getMap()->removeLayer( mQgisMapLayer ); // abort any rendering
-  mTileSource->waitForFinished();
-  mOsgViewer = nullptr;
-  mMapNode = nullptr;
-  mRootNode = nullptr;
-  mSkyNode = nullptr;
-  mBaseLayer = nullptr;
-  mBaseLayerUrl.clear();
-  mQgisMapLayer = nullptr;
-  mTileSource = nullptr;
-  mVerticalScale = nullptr;
-  mViewerWidget = nullptr;
-  mDockWidget = nullptr;
-  mImagerySources.clear();
-  mElevationSources.clear();
-  mLayerExtents.clear();
-#ifdef GLOBE_SHOW_TILE_STATS
-  disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
-  delete KadasGlobeTileStatistics::instance();
-#endif
+  if ( mStatsLabel )
+  {
+    mStatsLabel->setText( QString( "Queued tiles: %1\nTot tiles: %2" ).arg( queued ).arg( tot ).toStdString() );
+    mOsgViewer->requestRedraw();
+  }
 }

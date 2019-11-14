@@ -22,7 +22,7 @@
 #include <osgEarth/Version>
 
 #include <QImage>
-#include <QStringList>
+#include <QSet>
 #include <QLabel>
 #include <QMutex>
 
@@ -31,7 +31,6 @@
 //#define GLOBE_SHOW_TILE_STATS
 
 class QgsCoordinateTransform;
-class QgsMapCanvas;
 class QgsMapLayer;
 class QgsMapRenderer;
 class QgsMapSettings;
@@ -90,7 +89,7 @@ class KadasGlobeTileUpdateManager : public QObject
   public:
     KadasGlobeTileUpdateManager( QObject *parent = nullptr );
     ~KadasGlobeTileUpdateManager();
-    void updateLayerSet( const QList<QPointer<QgsMapLayer>> &layers ) { mLayers = layers; }
+    void updateLayerSet( const QSet<QString> &layerIds ) { mLayerIds = layerIds; }
     void addTile( KadasGlobeTileImage *tile );
     void removeTile( KadasGlobeTileImage *tile );
     void waitForFinished() const;
@@ -100,7 +99,7 @@ class KadasGlobeTileUpdateManager : public QObject
     void cancelRendering();
 
   private:
-    QList<QPointer<QgsMapLayer>> mLayers;
+    QSet<QString> mLayerIds;
     QList<KadasGlobeTileImage *> mTileQueue;
     KadasGlobeTileImage *mCurrentTile = nullptr;
     QgsMapRendererParallelJob *mRenderer = nullptr;
@@ -114,7 +113,7 @@ class KadasGlobeTileUpdateManager : public QObject
 class KadasGlobeTileSource : public osgEarth::TileSource
 {
   public:
-    KadasGlobeTileSource( QgsMapCanvas *canvas, const osgEarth::TileSourceOptions &options = osgEarth::TileSourceOptions() );
+    KadasGlobeTileSource( const osgEarth::TileSourceOptions &options = osgEarth::TileSourceOptions() );
     osgEarth::Status initialize( const osgDB::Options *dbOptions ) override;
     osg::Image *createImage( const osgEarth::TileKey &key, osgEarth::ProgressCallback *progress ) override;
     osg::HeightField *createHeightField( const osgEarth::TileKey &/*key*/, osgEarth::ProgressCallback * /*progress*/ ) override { return 0; }
@@ -123,8 +122,8 @@ class KadasGlobeTileSource : public osgEarth::TileSource
     osgEarth::CachePolicy getCachePolicyHint( const osgEarth::Profile * /*profile*/ ) const override { return osgEarth::CachePolicy::NO_CACHE; }
 
     void refresh( const QgsRectangle &dirtyExtent );
-    void setLayers( const QList<QgsMapLayer *> &layers );
-    QList<QgsMapLayer *> layers() const;
+    void setLayers( const QSet<QString> &layerIds );
+    const QSet<QString> &layers() const { return mLayerIds; }
 
     void waitForFinished() const
     {
@@ -134,10 +133,9 @@ class KadasGlobeTileSource : public osgEarth::TileSource
   private:
     friend class KadasGlobeTileImage;
 
+    QSet<QString> mLayerIds;
     QMutex mTileListLock;
     QList<KadasGlobeTileImage *> mTiles;
-    QgsMapCanvas *mCanvas = nullptr;
-    QList<QPointer<QgsMapLayer>> mLayers;
     KadasGlobeTileUpdateManager mTileUpdateManager;
 
     void addTile( KadasGlobeTileImage *tile );

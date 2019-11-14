@@ -24,13 +24,9 @@
 #include <kadas/app/globe/kadasglobedialog.h>
 
 class QAction;
-class QgsMapLayer;
 class QgsPointXY;
-class QgsRectangle;
-class QgsVectorLayer;
 class KadasGlobeLayerPropertiesFactory;
-class KadasGlobeTileSource;
-class KadasGlobeVectorLayerConfig;
+class KadasGlobeProjectLayerManager;
 class KadasGlobeWidget;
 
 namespace osg { class Group; }
@@ -38,7 +34,6 @@ namespace osgViewer { class Viewer; }
 
 namespace osgEarth
 {
-  class GeoPoint;
   class ImageLayer;
   class MapNode;
   namespace QtGui { class ViewerWidget; }
@@ -64,26 +59,23 @@ class KadasGlobeIntegration : public QObject
     KadasGlobeIntegration( QAction *action3D, QObject *parent = nullptr );
     ~KadasGlobeIntegration();
 
-    //! emits signal with current mouse coordinates
-    void showCurrentCoordinates( const osgEarth::GeoPoint &geoPoint );
-
-    //! Gets the OSG viewer
-    osgViewer::Viewer *osgViewer() { return mOsgViewer; }
-    //! Gets OSG map node
     osgEarth::MapNode *mapNode() { return mMapNode; }
+    osgViewer::Viewer *osgViewer() { return mOsgViewer; }
+    void showCurrentCoordinates( double lon, double lat );
 
   public slots:
-    void run();
-    void updateLayers();
-    void showSettings();
     void syncExtent();
+
+  signals:
+    void xyCoordinates( const QgsPointXY &p );
 
   private:
     osgEarth::QtGui::ViewerWidget *mViewerWidget = nullptr;
     KadasGlobeWidget *mDockWidget = nullptr;
     KadasGlobeDialog *mSettingsDialog = nullptr;
+    KadasGlobeLayerPropertiesFactory *mLayerPropertiesFactory = nullptr;
+    KadasGlobeProjectLayerManager *mProjectLayerManager = nullptr;
 
-    QString mBaseLayerUrl;
     QList<KadasGlobeDialog::LayerDataSource> mImagerySources;
     QList<KadasGlobeDialog::LayerDataSource> mElevationSources;
 
@@ -92,36 +84,23 @@ class KadasGlobeIntegration : public QObject
     osg::ref_ptr<osg::Group> mRootNode;
     osg::ref_ptr<osgEarth::Util::SkyNode> mSkyNode;
     osg::ref_ptr<osgEarth::ImageLayer> mBaseLayer;
-    osg::ref_ptr<osgEarth::ImageLayer> mQgisMapLayer;
-    osg::ref_ptr<KadasGlobeTileSource> mTileSource;
-    QMap<QString, QgsRectangle> mLayerExtents;
     osg::ref_ptr<osgEarth::Util::VerticalScale> mVerticalScale;
-
-    //! Creates additional pages in the layer properties for adjusting 3D properties
-    KadasGlobeLayerPropertiesFactory *mLayerPropertiesFactory = nullptr;
     osg::ref_ptr<osgEarth::Util::Controls::LabelControl> mStatsLabel;
 
-    void setupProxy();
     void addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler );
     void addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler = 0 );
-    void addModelLayer( QgsMapLayer *layer, KadasGlobeVectorLayerConfig *layerConfig );
-    void setupControls();
     void applyProjectSettings();
-    QgsRectangle getQGISLayerExtent() const;
+    void setupControls();
+    void setupProxy();
 
   private slots:
-    void setGlobeEnabled( bool enabled );
-    void reset();
-    void projectRead();
     void applySettings();
-    void layerChanged();
-    void rebuildQGISLayer();
-    void refreshQGISMapLayer( const QgsRectangle &dirtyRect );
+    void projectRead();
+    void reset();
+    void run();
+    void setGlobeEnabled( bool enabled );
+    void showSettings();
     void updateTileStats( int queued, int tot );
-
-  signals:
-    //! emits current mouse position
-    void xyCoordinates( const QgsPointXY &p );
 };
 
 #endif // KADASGLOBEINTEGRATION_H

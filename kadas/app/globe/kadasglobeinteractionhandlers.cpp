@@ -59,7 +59,7 @@ bool KadasGlobeQueryCoordinatesHandler::handle( const osgGA::GUIEventAdapter &ea
     {
       osgEarth::GeoPoint isectPoint;
       isectPoint.fromWorld( mGlobe->mapNode()->getMapSRS()->getGeodeticSRS(), hits.begin()->getWorldIntersectPoint() );
-      mGlobe->showCurrentCoordinates( isectPoint );
+      mGlobe->showCurrentCoordinates( isectPoint.x(), isectPoint.y() );
     }
   }
   return false;

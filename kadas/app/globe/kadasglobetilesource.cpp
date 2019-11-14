@@ -19,9 +19,9 @@
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
-#include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmaprenderercustompainterjob.h>
 #include <qgis/qgsmaprendererparalleljob.h>
+#include <qgis/qgsproject.h>
 
 #include <kadas/app/globe/kadasglobetilesource.h>
 
@@ -72,9 +72,18 @@ KadasGlobeTileImage::KadasGlobeTileImage( KadasGlobeTileSource *tileSource, cons
   mTileSource->mTileUpdateManager.addTile( const_cast<KadasGlobeTileImage *>( this ) );
   mDpi = 72;
 #else
+  QList<QgsMapLayer *> layers;
+  for ( const QString &layerId : mTileSource->layers() )
+  {
+    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
+    if ( layer )
+    {
+      layers.append( layer );
+    }
+  }
   QImage qImage( mTileData, mTileSize, mTileSize, QImage::Format_ARGB32_Premultiplied );
   QPainter painter( &qImage );
-  QgsMapRendererCustomPainterJob job( createSettings( qImage.logicalDpiX(), mTileSource->layers() ), &painter );
+  QgsMapRendererCustomPainterJob job( createSettings( qImage.logicalDpiX(), layers ), &painter );
   job.renderSynchronously();
 
   setImage( mTileSize, mTileSize, 1, 4, // width, height, depth, internal_format
@@ -195,11 +204,12 @@ void KadasGlobeTileUpdateManager::start()
     KadasGlobeTileStatistics::instance()->updateQueueTileCount( mTileQueue.size() );
 #endif
     QList<QgsMapLayer *> layers;
-    for ( QPointer<QgsMapLayer> layer : mLayers )
+    for ( const QString &layerId : mLayerIds )
     {
-      if ( !layer.isNull() )
+      QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
+      if ( layer )
       {
-        layers.append( layer.data() );
+        layers.append( layer );
       }
     }
     mRenderer = new QgsMapRendererParallelJob( mCurrentTile->createSettings( mCurrentTile->dpi(), layers ) );
@@ -229,9 +239,8 @@ void KadasGlobeTileUpdateManager::renderingFinished()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasGlobeTileSource::KadasGlobeTileSource( QgsMapCanvas *canvas, const osgEarth::TileSourceOptions &options )
+KadasGlobeTileSource::KadasGlobeTileSource( const osgEarth::TileSourceOptions &options )
   : TileSource( options )
-  , mCanvas( canvas )
 {
   osgEarth::GeoExtent geoextent( osgEarth::SpatialReference::get( "wgs84" ), -180., -90., 180., 90. );
   osgEarth::DataExtentList extents;
@@ -276,29 +285,31 @@ void KadasGlobeTileSource::refresh( const QgsRectangle &dirtyExtent )
   mTileListLock.unlock();
 }
 
-void KadasGlobeTileSource::setLayers( const QList<QgsMapLayer *> &layers )
+void KadasGlobeTileSource::setLayers( const QSet<QString> &layerIds )
 {
-  mLayers.clear();
-  for ( QgsMapLayer *layer : layers )
+  // Compute damaged extent
+  QgsRectangle dirtyRect;
+  QgsCoordinateReferenceSystem crs84( "EPSG:4326" );
+  // Damage extent of draped layer: removed and added layers
+  QSet<QString> changedLayers = QSet<QString>( mLayerIds ).subtract( layerIds ).unite( QSet<QString>( layerIds ).subtract( mLayerIds ) );
+  for ( const QString &layerId : changedLayers )
   {
-    mLayers.append( QPointer<QgsMapLayer>( layer ) );
-  }
-  mTileUpdateManager.updateLayerSet( mLayers );
-}
-
-QList<QgsMapLayer *> KadasGlobeTileSource::layers() const
-{
-  QList<QgsMapLayer *> layers;
-  for ( QPointer<QgsMapLayer> layer : mLayers )
-  {
-    if ( !layer.isNull() )
+    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
+    if ( layer )
     {
-      layers.append( layer.data() );
+      QgsRectangle layerExtent = QgsCoordinateTransform( layer->crs(), crs84, QgsProject::instance() ).transformBoundingBox( layer->extent() );
+      if ( dirtyRect.isNull() )
+        dirtyRect = layerExtent;
+      else
+        dirtyRect.combineExtentWith( layerExtent );
     }
   }
-  return layers;
-}
 
+  // Update layers and refresh
+  mLayerIds = layerIds;
+  mTileUpdateManager.updateLayerSet( layerIds );
+  refresh( dirtyRect );
+}
 
 void KadasGlobeTileSource::addTile( KadasGlobeTileImage *tile )
 {
