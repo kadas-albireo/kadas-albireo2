@@ -99,16 +99,16 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
   return new Renderer( this, rendererContext );
 }
 
-QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
   if ( mIsApproved )
   {
     // No items can be picked from approved layer
-    return QString();
+    return ITEM_ID_NULL;
   }
   QPoint screenPos = mapSettings.mapToPixel().transform( pickRect.center() ).toQPointF().toPoint();
   QList<KadasMilxClient::NPointSymbol> symbols;
-  QMap<int, QString> itemIdMap;
+  QMap<int, ItemId> itemIdMap;
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
   {
     const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( it.value() );
@@ -124,7 +124,7 @@ QString KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
   {
     return itemIdMap[selectedSymbol];
   }
-  return QString();
+  return ITEM_ID_NULL;
 }
 
 void KadasMilxLayer::setApproved( bool approved )

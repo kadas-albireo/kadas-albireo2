@@ -24,6 +24,7 @@
 #include <qgis/qgswkbtypes.h>
 
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/kadasitemlayer.h>
 
 class QgsMapLayer;
 class QgsMapCanvas;
@@ -41,7 +42,7 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         const QgsAbstractGeometry *geom = nullptr;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
-        QString itemId;
+        KadasItemLayer::ItemId itemId;
     };
 
     static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );

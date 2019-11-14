@@ -34,7 +34,7 @@
 #include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
 
 
-KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer )
+KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasItemLayer::ItemId &itemId, KadasItemLayer *layer )
   : QgsMapTool( canvas )
   , mLayer( layer )
 {
@@ -119,8 +119,8 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
-    QString itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
-    if ( !itemId.isEmpty() )
+    KadasItemLayer::ItemId itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
+    if ( itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       KadasMapItem *otherItem = mLayer->takeItem( itemId );
       KadasMapCanvasItemManager::removeItem( mItem );

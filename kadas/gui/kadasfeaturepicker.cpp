@@ -62,7 +62,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
 {
   PickResult pickResult;
   pickResult.itemId = layer->pickItem( filterRect, canvas->mapSettings() );
-  if ( !pickResult.itemId.isEmpty() )
+  if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     pickResult.layer = layer;
     pickResult.crs = layer->items()[pickResult.itemId]->crs();

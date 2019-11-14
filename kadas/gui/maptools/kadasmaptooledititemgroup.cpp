@@ -118,8 +118,8 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
       }
     }
     // Then, test layer for new items to select
-    QString itemId = mLayer->pickItem( filterRect, mCanvas->mapSettings() );
-    if ( !itemId.isEmpty() )
+    KadasItemLayer::ItemId itemId = mLayer->pickItem( filterRect, mCanvas->mapSettings() );
+    if ( itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       KadasMapItem *item = mLayer->takeItem( itemId );
       item->setSelected( true );

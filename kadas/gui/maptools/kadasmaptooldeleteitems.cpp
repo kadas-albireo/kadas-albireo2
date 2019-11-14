@@ -68,7 +68,7 @@ void KadasMapToolDeleteItems::activate()
 
 void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect, const QgsCoordinateReferenceSystem &crs )
 {
-  QMap<KadasItemLayer *, QStringList> delItems;
+  QMap<KadasItemLayer *, QList<KadasItemLayer::ItemId>> delItems;
 
   for ( QgsMapLayer *layer : canvas()->layers() )
   {
@@ -114,7 +114,7 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect, const
         if ( it.value()->isChecked() )
         {
           KadasItemLayer *layer = it.key();
-          for ( const QString &itemId : delItems[layer] )
+          for ( const KadasItemLayer::ItemId &itemId : delItems[layer] )
           {
             delete layer->takeItem( itemId );
           }

@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 %End
   public:
-    KadasMapToolEditItem( QgsMapCanvas *canvas, const QString &itemId, KadasItemLayer *layer );
+    KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasItemLayer::ItemId &itemId, KadasItemLayer *layer );
     KadasMapToolEditItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer );
 
     virtual void activate();

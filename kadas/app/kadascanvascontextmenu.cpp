@@ -45,7 +45,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
   : mMapPos( mapPos ), mCanvas( canvas )
 {
   mPickResult = KadasFeaturePicker::pick( mCanvas, canvasPos, mapPos );
-  KadasMapItem *pickedItem = !mPickResult.itemId.isEmpty() ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
+  KadasMapItem *pickedItem = mPickResult.itemId != KadasItemLayer::ITEM_ID_NULL ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
   QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry;
   if ( mPickResult.geom )
   {

@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QUuid>
+#include "kadasitemlayer.h"
 
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
@@ -78,12 +78,28 @@ KadasItemLayer::~KadasItemLayer()
 
 void KadasItemLayer::addItem( KadasMapItem *item )
 {
-  mItems.insert( QUuid::createUuid().toString(), item );
+  ItemId id = ITEM_ID_NULL;
+  if ( !mFreeIds.isEmpty() )
+  {
+    id = mFreeIds.takeLast();
+  }
+  else
+  {
+    id = ++mIdCounter;
+  }
+  mItems.insert( id, item );
+  emit itemAdded( id );
 }
 
-KadasMapItem *KadasItemLayer::takeItem( const QString &itemId )
+KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
 {
-  return mItems.take( itemId );
+  KadasMapItem *item = mItems.take( itemId );
+  if ( item )
+  {
+    mFreeIds.append( itemId );
+    emit itemRemoved( itemId );
+  }
+  return item;
 }
 
 KadasItemLayer *KadasItemLayer::clone() const
@@ -124,6 +140,11 @@ QgsRectangle KadasItemLayer::extent() const
 
 bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
 {
+  qDeleteAll( mItems );
+  mItems.clear();
+  mIdCounter = 0;
+  mFreeIds.clear();
+
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
   QDomNodeList itemEls = layerEl.elementsByTagName( "MapItem" );
@@ -131,7 +152,6 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
   {
     QDomElement itemEl = itemEls.at( i ).toElement();
     QString name = itemEl.attribute( "name" );
-    QString id = itemEl.attribute( "id" );
     QString crs = itemEl.attribute( "crs" );
     QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
     KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
@@ -140,16 +160,16 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
       KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
       if ( item->deserialize( data.object() ) )
       {
-        mItems.insert( id, item );
+        mItems.insert( ++mIdCounter, item );
       }
       else
       {
-        QgsDebugMsg( "Item deserialization failed: " + id );
+        QgsDebugMsg( QString( "Item deserialization failed: %1" ).arg( i ) );
       }
     }
     else
     {
-      QgsDebugMsg( "Unknown item: " + id );
+      QgsDebugMsg( QString( "Unknown item: %1" ).arg( i ) );
     }
   }
   return true;
@@ -165,7 +185,6 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   {
     QDomElement itemEl = document.createElement( "MapItem" );
     itemEl.setAttribute( "name", it.value()->metaObject()->className() );
-    itemEl.setAttribute( "id", it.key() );
     itemEl.setAttribute( "crs", it.value()->crs().authid() );
     QJsonDocument doc;
     doc.setObject( it.value()->serialize() );
@@ -175,7 +194,7 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return true;
 }
 
-QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
   KadasMapRect rect( pickRect.xMinimum(), pickRect.yMinimum(), pickRect.xMaximum(), pickRect.yMaximum() );
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
@@ -185,10 +204,10 @@ QString KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSett
       return it.key();
     }
   }
-  return QString();
+  return ITEM_ID_NULL;
 }
 
-QString KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const
 {
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mapSettings );
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
