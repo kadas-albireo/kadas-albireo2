@@ -62,7 +62,6 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/globe/kadasglobeintegration.h>
 #include <kadas/app/globe/kadasglobedialog.h>
-#include <kadas/app/globe/kadasglobefeatureidentify.h>
 #include <kadas/app/globe/kadasglobeinteractionhandlers.h>
 #include <kadas/app/globe/kadasglobetilesource.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
