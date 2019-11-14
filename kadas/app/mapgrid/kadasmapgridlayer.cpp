@@ -469,7 +469,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       path.addText( pos, font, text );
       mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
       mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->setPen( Qt::transparent );
+      mRendererContext.painter()->setPen( Qt::NoPen );
       mRendererContext.painter()->drawPath( path );
     }
 };

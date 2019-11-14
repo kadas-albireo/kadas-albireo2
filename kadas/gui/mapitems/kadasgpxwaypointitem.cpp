@@ -77,7 +77,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     context.painter()->setPen( QPen( bufferColor, 2 ) );
     context.painter()->setBrush( mIconBrush );
     context.painter()->drawPath( path );
-    context.painter()->setPen( Qt::transparent );
+    context.painter()->setPen( Qt::NoPen );
     context.painter()->drawPath( path );
   }
 }

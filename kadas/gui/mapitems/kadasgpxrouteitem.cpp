@@ -108,7 +108,7 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
         context.painter()->rotate( angle );
         context.painter()->setPen( QPen( bufferColor, 2 ) );
         context.painter()->drawPath( path );
-        context.painter()->setPen( Qt::transparent );
+        context.painter()->setPen( Qt::NoPen );
         context.painter()->drawPath( path );
         context.painter()->restore();
 
