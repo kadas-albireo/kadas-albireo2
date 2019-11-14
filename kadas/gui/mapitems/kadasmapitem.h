@@ -122,6 +122,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_OBJECT
     Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
+    Q_PROPERTY( QString authId READ authId WRITE setAuthId )
 
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
@@ -184,6 +185,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* z-index */
     void setZIndex( int zIndex );
     int zIndex() const { return mZIndex; }
+
+    /* authid */
+    void setAuthId( const QString &authId );
+    QString authId() const { return mCrs.authid(); }
 
     /* Trigger a redraw */
     void update();

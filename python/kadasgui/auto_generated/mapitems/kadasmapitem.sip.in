@@ -172,6 +172,12 @@ z-index */
 %End
     int zIndex() const;
 
+    void setAuthId( const QString &authId );
+%Docstring
+authid */
+%End
+    QString authId() const;
+
     void update();
 %Docstring
 Trigger a redraw */
