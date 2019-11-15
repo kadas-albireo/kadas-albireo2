@@ -439,9 +439,9 @@ QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QStr
     QApplication::restoreOverrideCursor( );
   }
 
-  QStringList sublayers = layer->dataProvider()->subLayers();
-  if ( authok && layer && layer->isValid() )
+  if ( authok && layer->isValid() )
   {
+    QStringList sublayers = layer->dataProvider()->subLayers();
     QgsDebugMsg( QStringLiteral( "got valid layer with %1 sublayers" ).arg( sublayers.count() ) );
 
     // If the newly created layer has more than 1 layer of data available, we show the
