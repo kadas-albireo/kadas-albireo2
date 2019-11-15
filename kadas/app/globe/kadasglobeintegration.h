@@ -70,6 +70,7 @@ class KadasGlobeIntegration : public QObject
     void xyCoordinates( const QgsPointXY &p );
 
   private:
+    QAction *mAction3D = nullptr;
     osgEarth::QtGui::ViewerWidget *mViewerWidget = nullptr;
     KadasGlobeWidget *mDockWidget = nullptr;
     KadasGlobeDialog *mSettingsDialog = nullptr;

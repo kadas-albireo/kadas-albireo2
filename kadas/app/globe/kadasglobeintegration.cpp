@@ -60,7 +60,7 @@
 
 
 KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent )
-  : QObject( parent )
+  : QObject( parent ), mAction3D( action3D )
 {
   mSettingsDialog = new KadasGlobeDialog( kApp->mainWindow(), QgsGuiUtils::ModalDialogFlags );
   connect( mSettingsDialog, &KadasGlobeDialog::settingsApplied, this, &KadasGlobeIntegration::applySettings );
@@ -132,7 +132,7 @@ void KadasGlobeIntegration::run()
   mStatsLabel->setPosition( 0, 0 );
   osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( mStatsLabel.get() );
 
-  mDockWidget = new KadasGlobeWidget( kApp->mainWindow() );
+  mDockWidget = new KadasGlobeWidget( mAction3D, kApp->mainWindow() );
   connect( mDockWidget, &KadasGlobeWidget::destroyed, this, &KadasGlobeIntegration::reset );
   connect( mDockWidget, &KadasGlobeWidget::layersChanged, mProjectLayerManager, [this] { mProjectLayerManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::showSettings, this, &KadasGlobeIntegration::showSettings );

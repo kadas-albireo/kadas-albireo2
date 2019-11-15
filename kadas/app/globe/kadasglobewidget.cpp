@@ -31,7 +31,7 @@
 #include <kadas/app/globe/kadasglobewidget.h>
 
 
-KadasGlobeWidget::KadasGlobeWidget( QWidget *parent )
+KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   : QDockWidget( tr( "Globe" ), parent )
 {
   setWindowTitle( tr( "Globe" ) );
@@ -69,7 +69,7 @@ KadasGlobeWidget::KadasGlobeWidget( QWidget *parent )
   closeButton->setIcon( QIcon( ":/images/themes/default/mActionRemove.svg" ) );
   closeButton->setIconSize( QSize( 12, 12 ) );
   closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QToolButton::clicked, this, &KadasGlobeWidget::deleteLater );
+  connect( closeButton, &QToolButton::clicked, this, [action3D] { action3D->trigger(); } );
 
   QWidget *titleWidget = new QWidget( this );
   titleWidget->setObjectName( "globeTitleWidget" );

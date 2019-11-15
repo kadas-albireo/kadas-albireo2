@@ -25,7 +25,7 @@ class KadasGlobeWidget : public QDockWidget
 {
     Q_OBJECT
   public:
-    KadasGlobeWidget( QWidget *parent = nullptr );
+    KadasGlobeWidget( QAction *action3D, QWidget *parent = nullptr );
     QStringList getSelectedLayerIds() const;
 
   signals:
