@@ -309,11 +309,14 @@ void KadasApplication::init()
     if ( !onlineTestUrl.isEmpty() )
     {
       QEventLoop eventLoop;
+      QTimer timeout;
       QNetworkReply *reply = QgsNetworkAccessManager::instance()->head( QNetworkRequest( onlineTestUrl ) );
       QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
+      QObject::connect( &timeout, &QTimer::timeout, &eventLoop, &QEventLoop::quit );
+      timeout.start( 10000 );
       eventLoop.exec();
 
-      if ( reply->error() == QNetworkReply::NoError )
+      if ( reply->error() == QNetworkReply::NoError && timeout.isActive() )
       {
         projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
         settings.setValue( "/kadas/isOffline", false );
