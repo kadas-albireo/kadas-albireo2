@@ -224,7 +224,7 @@ void KadasGpxIntegration::exportGpx()
   KadasItemLayer *layer = static_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
 
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
-  QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), lastDir, tr( "GPX Files (*.gpx)" ) );
+  QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), QDir( lastDir ).absoluteFilePath( layer->name() + ".gpx" ), tr( "GPX Files (*.gpx)" ) );
   if ( filename.isEmpty() )
   {
     return;
