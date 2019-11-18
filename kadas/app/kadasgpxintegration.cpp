@@ -106,7 +106,7 @@ void KadasGpxIntegration::importGpx()
 
   for ( const QString &filename : filenames )
   {
-    KadasItemLayer *layer = kApp->getOrCreateItemLayer( QFileInfo( filename ).fileName() );
+    KadasItemLayer *layer = kApp->getOrCreateItemLayer( QFileInfo( filename ).baseName() );
 
     QFile file( filename );
     if ( !file.open( QIODevice::ReadOnly ) )
