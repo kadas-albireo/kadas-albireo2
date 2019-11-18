@@ -27,6 +27,34 @@
 #include <kadas/gui/mapitems/kadascircularsectoritem.h>
 
 
+static double toGeoAngle( double arad )
+{
+  double ageo = -arad / M_PI * 180 + 90.;
+  while ( ageo < 0 )
+  {
+    ageo += 360.;
+  }
+  while ( ageo >= 360 )
+  {
+    ageo -= 360.;
+  }
+  return ageo;
+}
+
+static double toRadAngle( double ageo )
+{
+  double arad = - ( ageo - 90. ) / 180. * M_PI;
+  while ( arad < 0 )
+  {
+    arad += 2 * M_PI;
+  }
+  while ( arad >= 2 * M_PI )
+  {
+    arad -= 2 * M_PI;
+  }
+  return arad;
+}
+
 KADAS_REGISTER_MAP_ITEM( KadasCircularSectorItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCircularSectorItem( crs ); } );
 
 QJsonObject KadasCircularSectorItem::State::serialize() const
@@ -159,8 +187,8 @@ bool KadasCircularSectorItem::startPart( const AttribValues &values, const QgsMa
   state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
   state()->centers.append( center );
   state()->radii.append( qSqrt( center.sqrDist( rPos ) ) );
-  state()->startAngles.append( values[AttrA1] / 180 * M_PI );
-  state()->stopAngles.append( values[AttrA2] / 180. * M_PI );
+  state()->startAngles.append( toRadAngle( values[AttrA1] ) );
+  state()->stopAngles.append( toRadAngle( values[AttrA2] ) );
   if ( state()->stopAngles.last() <= state()->startAngles.last() )
   {
     state()->stopAngles.last() += 2 * M_PI;
@@ -216,8 +244,8 @@ void KadasCircularSectorItem::setCurrentAttributes( const AttribValues &values, 
   state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
   state()->centers.last() = center;
   state()->radii.last() = qSqrt( center.sqrDist( rPos ) );
-  state()->startAngles.last() = values[AttrA1] / 180 * M_PI;
-  state()->stopAngles.last() = values[AttrA2] / 180. * M_PI;
+  state()->startAngles.last() = toRadAngle( values[AttrA1] );
+  state()->stopAngles.last() = toRadAngle( values[AttrA2] );
   if ( state()->stopAngles.last() <= state()->startAngles.last() )
   {
     state()->stopAngles.last() += 2 * M_PI;
@@ -272,8 +300,8 @@ KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition( con
     attributes.insert( AttrR, qSqrt( mapCenter.sqrDist( mapRPos ) ) );
     if ( constState()->sectorStatus == State::HaveRadius )
     {
-      attributes.insert( AttrA1, constState()->startAngles.last() / M_PI * 180. );
-      attributes.insert( AttrA2, constState()->stopAngles.last() / M_PI * 180. );
+      attributes.insert( AttrA1, toGeoAngle( constState()->startAngles.last() ) );
+      attributes.insert( AttrA2, toGeoAngle( constState()->stopAngles.last() ) );
     }
     else
     {
@@ -350,7 +378,7 @@ void KadasCircularSectorItem::recomputeDerived()
     QgsCompoundCurve *exterior = new QgsCompoundCurve();
     if ( stopAngle - startAngle < 2 * M_PI - std::numeric_limits<float>::epsilon() )
     {
-      double alphaMid = 0.5 * ( startAngle + stopAngle );
+      double alphaMid = 0.5 * ( startAngle + 2 * M_PI + stopAngle );
       QgsPoint pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
                                   center.y() + radius * qSin( startAngle ) );
       QgsPoint pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
