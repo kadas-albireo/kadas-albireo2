@@ -94,7 +94,10 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   QgsAbstractGeometry *paintGeom = mGeometry->clone();
   paintGeom->transform( context.coordinateTransform() );
   paintGeom->transform( context.mapToPixel().transform() );
-  paintGeom->draw( *context.painter() );
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != QgsWkbTypes::PointGeometry )
+  {
+    paintGeom->draw( *context.painter() );
+  }
 
   // Draw vertices
   QgsVertexId vertexId;
