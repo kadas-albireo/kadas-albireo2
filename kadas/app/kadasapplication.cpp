@@ -81,14 +81,7 @@
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
 {
-  QStringList elements = subLayerDef.split( QgsDataProvider::SUBLAYER_SEPARATOR );
-  // merge back parts of the name that may have been split
-  while ( elements.size() > 5 )
-  {
-    elements[1] += ":" + elements[2];
-    elements.removeAt( 2 );
-  }
-  return elements;
+  return subLayerDef.split( QgsDataProvider::SUBLAYER_SEPARATOR );
 }
 
 static void setupVectorLayer( const QString &vectorLayerPath,
