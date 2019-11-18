@@ -875,7 +875,7 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   {
     QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), "" );
     button->setText( tr( "Favorite" ) );
-    button->setIcon( QIcon( ":/kadas/kadas/favorit.png" ) );
+    button->setIcon( QIcon( ":/kadas/icons/favorite" ) );
     button->setDefaultAction( 0 );
     button->setIconSize( QSize( 16, 16 ) );
     button->setEnabled( false );
