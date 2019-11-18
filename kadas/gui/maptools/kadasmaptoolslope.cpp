@@ -33,6 +33,8 @@ KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )
   : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
 {
   setCursor( Qt::ArrowCursor );
+  setUndoRedoVisible( false );
+  setToolLabel( tr( "Compute slope" ) );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolSlope::drawFinished );
 }
 

@@ -82,6 +82,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     void setMultipart( bool multipart );
     void setSnappingEnabled( bool snapping );
     void setSelectItems( bool select );
+    void setToolLabel( const QString &label );
+    void setUndoRedoVisible( bool undoRedoVisible );
     // TODO: creator should be optional
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
 %MethodCode

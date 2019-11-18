@@ -30,6 +30,7 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   : KadasMapToolCreateItem( canvas, lineFactory( canvas ) )
 {
   setSelectItems( false );
+  setToolLabel( tr( "Measure height profile" ) );
 
   mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::ICON_CIRCLE, this );
   mPosMarker->setZIndex( 100 );

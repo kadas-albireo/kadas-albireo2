@@ -85,6 +85,8 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setSnappingEnabled( bool snapping ) { mSnapping = snapping; }
     void setSelectItems( bool select ) { mSelectItems = select; }
+    void setToolLabel( const QString &label ) { mToolLabel = label; }
+    void setUndoRedoVisible( bool undoRedoVisible ) { mUndoRedoVisible = undoRedoVisible; }
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
 #else
@@ -170,10 +172,12 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     bool mShowLayerSelection = false;
     KadasLayerSelectionWidget::LayerFilter mLayerSelectionFilter = nullptr;
     KadasLayerSelectionWidget::LayerCreator mLayerCreator = nullptr;
+    QString mToolLabel;
 
     bool mMultipart = false;
     bool mSnapping = false;
     bool mSelectItems = true;
+    bool mUndoRedoVisible = true;
 
   private slots:
     void inputChanged();

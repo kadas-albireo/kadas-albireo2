@@ -80,6 +80,14 @@ void KadasMapToolCreateItem::activate()
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
+  if ( !mToolLabel.isEmpty() )
+  {
+    QLabel *label = new QLabel( mToolLabel );
+    QFont font = label->font();
+    font.setBold( true );
+    label->setFont( font );
+    mBottomBar->layout()->addWidget( label );
+  }
   if ( mShowLayerSelection )
   {
     KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerTreeView, mLayerSelectionFilter, mLayerCreator );
@@ -95,21 +103,24 @@ void KadasMapToolCreateItem::activate()
     mBottomBar->layout()->addWidget( mEditor );
   }
 
-  QPushButton *undoButton = new QPushButton();
-  undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
-  undoButton->setToolTip( tr( "Undo" ) );
-  undoButton->setEnabled( false );
-  connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
-  connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-  mBottomBar->layout()->addWidget( undoButton );
+  if ( mUndoRedoVisible )
+  {
+    QPushButton *undoButton = new QPushButton();
+    undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
+    undoButton->setToolTip( tr( "Undo" ) );
+    undoButton->setEnabled( false );
+    connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
+    connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
+    mBottomBar->layout()->addWidget( undoButton );
 
-  QPushButton *redoButton = new QPushButton();
-  redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
-  redoButton->setToolTip( tr( "Redo" ) );
-  redoButton->setEnabled( false );
-  connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
-  connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-  mBottomBar->layout()->addWidget( redoButton );
+    QPushButton *redoButton = new QPushButton();
+    redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
+    redoButton->setToolTip( tr( "Redo" ) );
+    redoButton->setEnabled( false );
+    connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
+    connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
+    mBottomBar->layout()->addWidget( redoButton );
+  }
 
   QPushButton *closeButton = new QPushButton();
   closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );

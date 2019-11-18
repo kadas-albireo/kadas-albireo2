@@ -142,6 +142,7 @@ KadasMapToolViewshed::KadasMapToolViewshed( QgsMapCanvas *mapCanvas )
   : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
 {
   setCursor( Qt::ArrowCursor );
+  setToolLabel( tr( "Compute viewshed" ) );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolViewshed::drawFinished );
 }
 

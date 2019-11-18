@@ -163,6 +163,17 @@ KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode meas
 {
   setMultipart( measureMode != MeasureAzimuth );
   setSnappingEnabled( true );
+  switch ( measureMode )
+  {
+    case MeasureLine:
+      setToolLabel( tr( "Measure line" ) ); break;
+    case MeasurePolygon:
+      setToolLabel( tr( "Measure polygon" ) ); break;
+    case MeasureCircle:
+      setToolLabel( tr( "Measure circle" ) ); break;
+    case MeasureAzimuth:
+      setToolLabel( tr( "Measure azimuth" ) ); break;
+  };
 }
 
 KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const
