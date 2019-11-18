@@ -32,14 +32,14 @@ class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
     void contextMenuRequested( QPoint pos );
 
   protected:
-    virtual void paintEvent( QPaintEvent *e );
-    virtual void enterEvent( QEvent *event );
-    virtual void leaveEvent( QEvent *event );
-    virtual void focusInEvent( QFocusEvent *event );
-    virtual void focusOutEvent( QFocusEvent *event );
-    virtual void mouseMoveEvent( QMouseEvent *event );
-    virtual void mousePressEvent( QMouseEvent *event );
-    virtual void contextMenuEvent( QContextMenuEvent *event );
+    virtual void paintEvent( QPaintEvent *e ) override;
+    virtual void enterEvent( QEvent *event ) override;
+    virtual void leaveEvent( QEvent *event ) override;
+    virtual void focusInEvent( QFocusEvent *event ) override;
+    virtual void focusOutEvent( QFocusEvent *event ) override;
+    virtual void mouseMoveEvent( QMouseEvent *event ) override;
+    virtual void mousePressEvent( QMouseEvent *event ) override;
+    virtual void contextMenuEvent( QContextMenuEvent *event ) override;
 };
 
 #endif // KADASRIBBONBUTTON_H
