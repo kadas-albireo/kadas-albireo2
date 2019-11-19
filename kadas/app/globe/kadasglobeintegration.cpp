@@ -140,7 +140,7 @@ void KadasGlobeIntegration::run()
   connect( mDockWidget, &KadasGlobeWidget::layersChanged, mProjectLayerManager, [this] { mProjectLayerManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::layersChanged, mBillboardManager, [this] { mBillboardManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::showSettings, this, &KadasGlobeIntegration::showSettings );
-  connect( mDockWidget, &KadasGlobeWidget::refresh, mProjectLayerManager, [this] { mProjectLayerManager->hardRefresh( mDockWidget->getSelectedLayerIds() ); } );
+  connect( mDockWidget, &KadasGlobeWidget::refresh, mProjectLayerManager, [this] { mMapNode->getTerrainEngine()->dirtyTerrain(); } );
   connect( mDockWidget, &KadasGlobeWidget::syncExtent, this, &KadasGlobeIntegration::syncExtent );
 
   QString cacheDirectory = settings.value( "cache/directory" ).toString();

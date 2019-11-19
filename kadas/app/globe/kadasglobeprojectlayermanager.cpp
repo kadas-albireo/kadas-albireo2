@@ -31,42 +31,6 @@ void KadasGlobeProjectLayerManager::init( osg::ref_ptr<osgEarth::MapNode> mapNod
 {
   mMapNode = mapNode;
   mLayerSignalScope = new QObject( this );
-  hardRefresh( visibleLayerIds );
-}
-
-void KadasGlobeProjectLayerManager::reset()
-{
-  delete mLayerSignalScope;
-  mLayerSignalScope = nullptr;
-  mMapNode->getMap()->removeLayer( mDrapedLayer ); // abort any rendering
-  mTileSource->waitForFinished();
-  mDrapedLayer = nullptr;
-  mTileSource = nullptr;
-  mMapNode = nullptr;
-}
-
-void KadasGlobeProjectLayerManager::hardRefresh( const QStringList &visibleLayerIds )
-{
-  if ( !mMapNode )
-    return;
-
-  // Remove draped layer
-  if ( mDrapedLayer )
-  {
-    mMapNode->getMap()->removeLayer( mDrapedLayer );
-    mDrapedLayer = nullptr;
-  }
-
-  // Remove model layers
-  osgEarth::ModelLayerVector modelLayers;
-  mMapNode->getMap()->getLayers( modelLayers );
-  for ( const osg::ref_ptr<osgEarth::ModelLayer> &modelLayer : modelLayers )
-  {
-    mMapNode->getMap()->removeLayer( modelLayer );
-  }
-
-  delete mLayerSignalScope;
-  mLayerSignalScope = new QObject( this );
 
   osgEarth::TileSourceOptions opts;
   opts.L2CacheSize() = 0;
@@ -80,6 +44,17 @@ void KadasGlobeProjectLayerManager::hardRefresh( const QStringList &visibleLayer
   mMapNode->getMap()->addLayer( mDrapedLayer );
 
   updateLayers( visibleLayerIds );
+}
+
+void KadasGlobeProjectLayerManager::reset()
+{
+  delete mLayerSignalScope;
+  mLayerSignalScope = nullptr;
+  mMapNode->getMap()->removeLayer( mDrapedLayer ); // abort any rendering
+  mTileSource->waitForFinished();
+  mDrapedLayer = nullptr;
+  mTileSource = nullptr;
+  mMapNode = nullptr;
 }
 
 void KadasGlobeProjectLayerManager::updateLayers( const QStringList &visibleLayerIds )

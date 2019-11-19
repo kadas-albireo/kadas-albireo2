@@ -37,7 +37,6 @@ class KadasGlobeProjectLayerManager : public QObject
     osg::ref_ptr<osgEarth::ImageLayer> drapedLayer() const { return mDrapedLayer; }
 
   public slots:
-    void hardRefresh( const QStringList &visibleLayerIds );
     void updateLayers( const QStringList &visibleLayerIds );
 
   private:
