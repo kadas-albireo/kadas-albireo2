@@ -227,7 +227,7 @@ void KadasGlobeIntegration::addControl( osgEarth::Util::Controls::Control *contr
 void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler )
 {
   osg::Image *image = osgDB::readImageFile( imgPath );
-  osgEarth::Util::Controls::ImageControl *control = new KadasGlobeNavigationControl( image );
+  osgEarth::Util::Controls::ImageControl *control = new KadasGlobeNavigationControl( mOsgViewer, image );
   control->setPosition( x, y );
   control->setWidth( image->s() );
   control->setHeight( image->t() );
@@ -452,20 +452,20 @@ void KadasGlobeIntegration::setupControls()
   int imgLeft = 16;
   int imgTop = 20;
   addImageControl( imgDir + "/YawPitchWheel.png", 16, 20 );
-  addControl( new KadasGlobeNavigationControl, imgLeft, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, -1., 0 ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, 1., 0 ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeRotateControlHandler( manip, 0, 0 ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, -1. ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, 1. ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, -1., 0 ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobeRotateControlHandler( manip, 1., 0 ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeRotateControlHandler( manip, 0, 0 ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 20, imgTop, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, -1. ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobeRotateControlHandler( manip, 0, 1. ) );
 
   // Move controls
   imgTop = 80;
   addImageControl( imgDir + "/MoveWheel.png", imgLeft, imgTop );
-  addControl( new KadasGlobeNavigationControl, imgLeft, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, 1., 0 ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, -1., 0 ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop, 24, 19, new KadasGlobePanControlHandler( manip, 0, -1. ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobePanControlHandler( manip, 0, 1. ) );
-  addControl( new KadasGlobeNavigationControl, imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeHomeControlHandler( manip ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, 1., 0 ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 36, imgTop + 18, 20, 22, new KadasGlobePanControlHandler( manip, -1., 0 ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 20, imgTop, 24, 19, new KadasGlobePanControlHandler( manip, 0, -1. ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 16, imgTop + 36, 24, 19, new KadasGlobePanControlHandler( manip, 0, 1. ) );
+  addControl( new KadasGlobeNavigationControl( mOsgViewer ), imgLeft + 20, imgTop + 18, 16, 22, new KadasGlobeHomeControlHandler( manip ) );
 
   // Zoom controls
   imgLeft = 28;

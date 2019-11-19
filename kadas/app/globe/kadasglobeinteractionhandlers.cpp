@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QTimer>
 #include <osgEarthUtil/EarthManipulator>
 
 #include <kadas/app/globe/kadasglobeintegration.h>
@@ -100,13 +101,21 @@ bool KadasGlobeKeyboardControlHandler::handle( const osgGA::GUIEventAdapter &ea,
   return false;
 }
 
+KadasGlobeNavigationControl::~KadasGlobeNavigationControl()
+{
+  delete mIntervalTimer;
+}
+
 bool KadasGlobeNavigationControl::handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa, osgEarth::Util::Controls::ControlContext &cx )
 {
   if ( ea.getEventType() == osgGA::GUIEventAdapter::PUSH )
   {
     mMousePressed = true;
-    // FIXME, should this work?
-    aa.requestContinuousUpdate( true );
+    delete mIntervalTimer;
+    mIntervalTimer = new QTimer();
+    QObject::connect( mIntervalTimer, &QTimer::timeout, mIntervalTimer, [this] { mOsgViewer->requestRedraw(); } );
+    mIntervalTimer->setSingleShot( false );
+    mIntervalTimer->start( 10 );
   }
   else if ( ea.getEventType() == osgGA::GUIEventAdapter::FRAME && mMousePressed )
   {
@@ -136,8 +145,8 @@ bool KadasGlobeNavigationControl::handle( const osgGA::GUIEventAdapter &ea, osgG
       }
     }
     mMousePressed = false;
-    // FIXME, should this work?
-    aa.requestContinuousUpdate( false );
+    delete mIntervalTimer;
+    mIntervalTimer = nullptr;
   }
   return Control::handle( ea, aa, cx );
 }

@@ -17,7 +17,10 @@
 #ifndef KADASGLOBEINTERACTIONHANDLERS_H
 #define KADASGLOBEINTERACTIONHANDLERS_H
 
+#include <osgViewer/Viewer>
 #include <osgEarthUtil/Controls>
+
+class QTimer;
 
 namespace osgEarth { namespace Util { class EarthManipulator; } }
 class KadasGlobeIntegration;
@@ -115,13 +118,16 @@ class KadasGlobeKeyboardControlHandler : public osgGA::GUIEventHandler
 class KadasGlobeNavigationControl : public osgEarth::Util::Controls::ImageControl
 {
   public:
-    KadasGlobeNavigationControl( osg::Image *image = 0 ) : ImageControl( image ),  mMousePressed( false ) {}
+    KadasGlobeNavigationControl( osg::ref_ptr<osgViewer::Viewer> viewer, osg::Image *image = nullptr ) : ImageControl( image ),  mOsgViewer( viewer ) {}
+    ~KadasGlobeNavigationControl();
 
   protected:
     bool handle( const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &aa, osgEarth::Util::Controls::ControlContext &cx ) override;
 
   private:
-    bool mMousePressed;
+    bool mMousePressed = false;
+    osg::ref_ptr<osgViewer::Viewer> mOsgViewer;
+    QTimer *mIntervalTimer = nullptr;
 };
 
 
