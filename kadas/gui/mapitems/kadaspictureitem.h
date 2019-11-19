@@ -46,6 +46,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
     QString itemName() const override { return tr( "Picture" ); }
 
+    QImage symbolImage() const override { return mImage; }
+
     KadasItemRect boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;

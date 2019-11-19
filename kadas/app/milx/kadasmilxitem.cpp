@@ -154,6 +154,11 @@ void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
   update();
 }
 
+QPointF KadasMilxItem::symbolAnchor() const
+{
+  return QPointF( double( mCachedGraphicOffset.x() ) / mCachedGraphic.width(), double( mCachedGraphicOffset.y() ) / mCachedGraphic.height() );
+}
+
 KadasItemPos KadasMilxItem::position() const
 {
   double x = 0., y = 0.;
@@ -312,8 +317,8 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
 
   if ( !isMultiPoint() )
   {
-    double hotSpotX = 0.5 * result.graphic.width();
-    double hotSpotY = 0.5 * result.graphic.height();
+    double hotSpotX = result.offset.x();
+    double hotSpotY = result.offset.y();
 
     QString id = QUuid::createUuid().toString();
     id = id.mid( 1, id.length() - 2 );
@@ -446,6 +451,7 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
 void KadasMilxItem::endPart()
 {
   state()->drawStatus = State::Finished;
+  mIsPointSymbol = !isMultiPoint();
 }
 
 KadasMapItem::AttribDefs KadasMilxItem::drawAttribs() const

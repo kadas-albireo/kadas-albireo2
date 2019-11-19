@@ -61,6 +61,19 @@ void KadasTextItem::setFont( const QFont &font )
   update();
 }
 
+QImage KadasTextItem::symbolImage() const
+{
+  QImage image( constState()->size, QImage::Format_ARGB32 );
+  image.fill( Qt::transparent );
+  QPainter painter( &image );
+
+  painter.setBrush( QBrush( mFillColor ) );
+  painter.setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
+  painter.setFont( mFont );
+  painter.drawText( QRect( 0, 0, constState()->size.width(), constState()->size.height() ), mText );
+  return image;
+}
+
 void KadasTextItem::render( QgsRenderContext &context ) const
 {
   QgsPointXY mapPos = context.coordinateTransform().transform( constState()->pos );

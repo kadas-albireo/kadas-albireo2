@@ -51,8 +51,9 @@
 #include <kadas/core/kadas.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/globe/kadasglobeintegration.h>
+#include <kadas/app/globe/kadasglobebillboardmanager.h>
 #include <kadas/app/globe/kadasglobedialog.h>
+#include <kadas/app/globe/kadasglobeintegration.h>
 #include <kadas/app/globe/kadasglobeinteractionhandlers.h>
 #include <kadas/app/globe/kadasglobeprojectlayermanager.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
@@ -69,6 +70,7 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
   kApp->registerMapLayerPropertiesFactory( mLayerPropertiesFactory );
 
   mProjectLayerManager = new KadasGlobeProjectLayerManager( this );
+  mBillboardManager = new KadasGlobeBillboardManager( this );
 
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
   connect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
@@ -91,6 +93,7 @@ void KadasGlobeIntegration::reset()
 {
   mStatsLabel = nullptr;
   mProjectLayerManager->reset();
+  mBillboardManager->reset();
   mOsgViewer = nullptr;
   mMapNode = nullptr;
   mRootNode = nullptr;
@@ -135,11 +138,10 @@ void KadasGlobeIntegration::run()
   mDockWidget = new KadasGlobeWidget( mAction3D, kApp->mainWindow() );
   connect( mDockWidget, &KadasGlobeWidget::destroyed, this, &KadasGlobeIntegration::reset );
   connect( mDockWidget, &KadasGlobeWidget::layersChanged, mProjectLayerManager, [this] { mProjectLayerManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
+  connect( mDockWidget, &KadasGlobeWidget::layersChanged, mBillboardManager, [this] { mBillboardManager->updateLayers( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::showSettings, this, &KadasGlobeIntegration::showSettings );
   connect( mDockWidget, &KadasGlobeWidget::refresh, mProjectLayerManager, [this] { mProjectLayerManager->hardRefresh( mDockWidget->getSelectedLayerIds() ); } );
   connect( mDockWidget, &KadasGlobeWidget::syncExtent, this, &KadasGlobeIntegration::syncExtent );
-  kApp->mainWindow()->addDockWidget( Qt::RightDockWidgetArea, mDockWidget );
-
 
   QString cacheDirectory = settings.value( "cache/directory" ).toString();
   if ( cacheDirectory.isEmpty() )
@@ -194,6 +196,7 @@ void KadasGlobeIntegration::run()
   applySettings();
 
   mProjectLayerManager->init( mMapNode, mDockWidget->getSelectedLayerIds() );
+  mBillboardManager->init( mMapNode, mDockWidget->getSelectedLayerIds() );
 }
 
 void KadasGlobeIntegration::showSettings()

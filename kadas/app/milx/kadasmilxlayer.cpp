@@ -40,10 +40,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasMapItem *> items = mLayer->items().values();
       QList<KadasMilxClient::NPointSymbol> symbols;
       QList<KadasMilxItem *> renderItems;
-      // TODO
-//      QStringList flags = mRendererContext.customRenderFlags().split( ";" );
-//      bool omitSinglePoint = flags.contains( "globe" ) || flags.contains( "kml" );
-      bool omitSinglePoint = false;
+      bool omitSinglePoint = mRendererContext.customRenderFlags().contains( "globe" );
       for ( int i = 0, n = items.size(); i < n; ++i )
       {
         KadasMilxItem *item = dynamic_cast<KadasMilxItem *>( items[i] );

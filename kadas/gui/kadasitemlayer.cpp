@@ -37,9 +37,10 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     {
       QList<KadasMapItem *> items = mLayer->mItems.values();
       qStableSort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
+      bool omitSinglePoint = mRendererContext.customRenderFlags().contains( "globe" );
       for ( const KadasMapItem *item : items )
       {
-        if ( item )
+        if ( item && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
           mRendererContext.painter()->save();
           mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );

@@ -178,6 +178,10 @@ authid */
 %End
     QString authId() const;
 
+    bool isPointSymbol() const;
+    virtual QImage symbolImage() const;
+    QPointF symbolAnchor() const;
+
     void update();
 %Docstring
 Trigger a redraw */

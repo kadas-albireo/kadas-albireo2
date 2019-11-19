@@ -190,6 +190,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setAuthId( const QString &authId );
     QString authId() const { return mCrs.authid(); }
 
+    bool isPointSymbol() const { return mIsPointSymbol; }
+    virtual QImage symbolImage() const { return QImage(); }
+    QPointF symbolAnchor() const { return QPointF( 0.5, 0.5 ); }
+
     /* Trigger a redraw */
     void update();
 
@@ -288,6 +292,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool mSelected = false;
     int mZIndex = 0;
     QgsMapLayer *mAssociatedLayer = nullptr;
+    bool mIsPointSymbol = false;
 
     virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
 

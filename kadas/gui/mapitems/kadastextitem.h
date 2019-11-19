@@ -42,6 +42,8 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
     void setFont( const QFont &font );
     const QFont &font() const { return mFont; }
 
+    QImage symbolImage() const override;
+
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;

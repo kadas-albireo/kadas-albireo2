@@ -25,6 +25,7 @@
 
 class QAction;
 class QgsPointXY;
+class KadasGlobeBillboardManager;
 class KadasGlobeLayerPropertiesFactory;
 class KadasGlobeProjectLayerManager;
 class KadasGlobeWidget;
@@ -76,6 +77,7 @@ class KadasGlobeIntegration : public QObject
     KadasGlobeDialog *mSettingsDialog = nullptr;
     KadasGlobeLayerPropertiesFactory *mLayerPropertiesFactory = nullptr;
     KadasGlobeProjectLayerManager *mProjectLayerManager = nullptr;
+    KadasGlobeBillboardManager *mBillboardManager = nullptr;
 
     QList<KadasGlobeDialog::LayerDataSource> mImagerySources;
     QList<KadasGlobeDialog::LayerDataSource> mElevationSources;
