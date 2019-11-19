@@ -46,9 +46,6 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1. ) );
 
-      const QStringList &flags = mRendererContext.customRenderFlags();
-      bool adaptLabelsToScreen = !( flags.contains( "globe" ) || flags.contains( "kml" ) );
-
       switch ( mLayer->mGridType )
       {
         case GridLV03:
@@ -102,13 +99,28 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       double yStart = qFloor( area.yMinimum() / mLayer->intervalY() ) * mLayer->intervalY();
       double yEnd = qCeil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
 
+      // If chosen intervals would result in over 100 grid lines, reduce interval
+      double intervalX = mLayer->intervalX();
+      int numX = qRound( ( xEnd - xStart ) / intervalX ) + 1;
+      while ( numX > 100 )
+      {
+        intervalX *= 2;
+        numX = qRound( ( xEnd - xStart ) / intervalX ) + 1;
+      }
+      double intervalY = mLayer->intervalY();
+      int numY = qRound( ( yEnd - yStart ) / intervalY ) + 1;
+      while ( numY > 100 )
+      {
+        intervalY *= 2;
+        numY = qRound( ( yEnd - yStart ) / intervalY ) + 1;
+      }
+
       // Vertical lines
-      int numX = qRound( ( xEnd - xStart ) / mLayer->intervalX() ) + 1;
-      double ySegmentLength = mLayer->intervalY() / qCeil( mLayer->intervalY() / segmentLength );
+      double ySegmentLength = intervalY / qCeil( intervalY / segmentLength );
       for ( int ix = 0; ix <= numX; ++ix )
       {
         QPolygonF poly;
-        double x = xStart + ix * mLayer->intervalX();
+        double x = xStart + ix * intervalX;
         double y = yStart;
         while ( y - ySegmentLength <= area.yMaximum() )
         {
@@ -151,13 +163,12 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       // Horizontal lines
-      int numY = qRound( ( yEnd - yStart ) / mLayer->intervalY() ) + 1;
-      double xSegmentLength = mLayer->intervalX() / qCeil( mLayer->intervalX() / segmentLength );
+      double xSegmentLength = intervalX / qCeil( intervalX / segmentLength );
       for ( int iy = numY; iy >= 0; --iy )
       {
         QPolygonF poly;
         double x = xStart;
-        double y = yStart + iy * mLayer->intervalY();
+        double y = yStart + iy * intervalY;
         while ( x - xSegmentLength <= area.xMaximum() )
         {
           QgsPointXY p = crst.transform( x, y );
@@ -198,7 +209,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
       }
 
-      if ( mLayer->mLabelingMode == LabelingEnabled )
+      const QStringList &renderFlags = mRendererContext.customRenderFlags();
+      bool drawLabels = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) );
+
+      if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
       {
         QFont font = mRendererContext.painter()->font();
         font.setBold( true );
@@ -305,10 +319,17 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
     void drawMgrsGrid()
     {
+      const QStringList &renderFlags = mRendererContext.customRenderFlags();
+      bool adaptToScreen = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) );
+
       QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
       QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), QgsCoordinateTransform::ReverseTransform );
       QRectF screenExtent = computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
       double mapScale = mRendererContext.rendererScale();
+      if ( !adaptToScreen )
+      {
+        area = area.buffered( area.width() );
+      }
 
       QList<QPolygonF> zoneLines;
       QList<QPolygonF> subZoneLines;
@@ -397,7 +418,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         const QPointF &maxPos = zoneLabel.maxPos;
         QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
         QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-        adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        if ( adaptToScreen )
+        {
+          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        }
         labelPos.rx() -= fm.width( zoneLabel.label );
         labelPos.ry() += fm.height();
         if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
@@ -414,52 +438,58 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         const QPointF &maxPos = subZoneLabel.maxPos;
         QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
         QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-        adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        if ( adaptToScreen )
+        {
+          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        }
         if ( labelPos.x() + fm.width( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
         {
           drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
         }
       }
 
-      font.setPointSizeF( gridLabelSize );
-      for ( const KadasLatLonToUTM::GridLabel &gridLabel : gridLabels )
+      if ( adaptToScreen )
       {
-        const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
-        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
-        const QRectF &visibleRect = screenExtent;
-        int i = 1, n = gridLine.size();
-        QPointF pp = labelPos;
-        if ( gridLabel.horiz && labelPos.x() < visibleRect.x() )
+        font.setPointSizeF( gridLabelSize );
+        for ( const KadasLatLonToUTM::GridLabel &gridLabel : gridLabels )
         {
-          for ( ; i < n; ++i )
+          const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
+          QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
+          const QRectF &visibleRect = screenExtent;
+          int i = 1, n = gridLine.size();
+          QPointF pp = labelPos;
+          if ( gridLabel.horiz && labelPos.x() < visibleRect.x() )
           {
-            QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
-            if ( pn.x() > visibleRect.x() )
+            for ( ; i < n; ++i )
             {
-              double lambda = ( visibleRect.x() - pp.x() ) / ( pn.x() - pp.x() );
-              labelPos = QPointF( pp.x() + lambda * ( pn.x() - pp.x() ), pp.y() + lambda * ( pn.y() - pp.y() ) );
-              break;
+              QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
+              if ( pn.x() > visibleRect.x() )
+              {
+                double lambda = ( visibleRect.x() - pp.x() ) / ( pn.x() - pp.x() );
+                labelPos = QPointF( pp.x() + lambda * ( pn.x() - pp.x() ), pp.y() + lambda * ( pn.y() - pp.y() ) );
+                break;
+              }
+              pp = pn;
             }
-            pp = pn;
           }
-        }
-        else if ( !gridLabel.horiz && labelPos.y() > visibleRect.y() + visibleRect.height() )
-        {
-          for ( ; i < n; ++i )
+          else if ( !gridLabel.horiz && labelPos.y() > visibleRect.y() + visibleRect.height() )
           {
-            QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
-            if ( pn.y() < visibleRect.y() + visibleRect.height() )
+            for ( ; i < n; ++i )
             {
-              double lambda = ( visibleRect.y() + visibleRect.height() - pp.y() ) / ( pn.y() - pp.y() );
-              labelPos = QPointF( pp.x() + lambda * ( pn.x() - pp.x() ), pp.y() + lambda * ( pn.y() - pp.y() ) );
-              break;
+              QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
+              if ( pn.y() < visibleRect.y() + visibleRect.height() )
+              {
+                double lambda = ( visibleRect.y() + visibleRect.height() - pp.y() ) / ( pn.y() - pp.y() );
+                labelPos = QPointF( pp.x() + lambda * ( pn.x() - pp.x() ), pp.y() + lambda * ( pn.y() - pp.y() ) );
+                break;
+              }
+              pp = pn;
             }
-            pp = pn;
           }
-        }
-        if ( i < n )
-        {
-          drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+          if ( i < n )
+          {
+            drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+          }
         }
       }
     }
