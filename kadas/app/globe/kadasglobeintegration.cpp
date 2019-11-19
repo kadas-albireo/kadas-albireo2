@@ -35,7 +35,7 @@
 #include <osgEarth/TerrainEngineNode>
 #include <osgEarth/TileSource>
 #include <osgEarthDrivers/cache_filesystem/FileSystemCache>
-#include <osgEarthDrivers/engine_mp/MPTerrainEngineOptions>
+#include <osgEarthDrivers/engine_rex/RexTerrainEngineOptions>
 #include <osgEarthDrivers/gdal/GDALOptions>
 #include <osgEarthDrivers/sky_simple/SimpleSkyOptions>
 #include <osgEarthDrivers/tms/TMSOptions>
@@ -154,7 +154,11 @@ void KadasGlobeIntegration::run()
   osgEarth::Map *map = new osgEarth::Map( mapOptions );
 
   // The MapNode will render the Map object in the scene graph.
-  mMapNode = new osgEarth::MapNode( map );
+  osgEarth::MapNodeOptions mapNodeOptions;
+  osgEarth::Drivers::RexTerrainEngine::RexTerrainEngineOptions terrainOptions;
+  terrainOptions.morphImagery() = false;
+  mapNodeOptions.setTerrainOptions( terrainOptions );
+  mMapNode = new osgEarth::MapNode( map, mapNodeOptions );
 
   mRootNode = new osg::Group();
   mRootNode->addChild( mMapNode );
