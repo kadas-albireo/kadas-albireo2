@@ -191,6 +191,10 @@ void KadasGlobeIntegration::run()
   mDockWidget->setWidget( mViewerWidget );
   mViewerWidget->setParent( mDockWidget );
 
+  int viewerWidth = kApp->mainWindow()->mapCanvas()->width() / 2.;
+  kApp->mainWindow()->addDockWidget( Qt::RightDockWidgetArea, mDockWidget );
+  kApp->mainWindow()->resizeDocks( {mDockWidget}, {viewerWidth}, Qt::Horizontal );
+
   setupProxy();
   setupControls();
   applySettings();

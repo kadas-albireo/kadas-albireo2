@@ -35,7 +35,7 @@
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 
 KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
-  : QDockWidget( parent ), mNumber( number ), mId( id ), mMasterCanvas( masterCanvas ), mUnsetFixedSize( true )
+  : QDockWidget( parent ), mNumber( number ), mId( id ), mMasterCanvas( masterCanvas )
 {
   QgsSettings settings;
 
@@ -280,8 +280,7 @@ void KadasMapWidget::showEvent( QShowEvent * )
   {
     // Clear previously set fixed size - which was just used to enforce the initial dimensions...
     mUnsetFixedSize = false;
-    setFixedSize( QSize() );
-    setMinimumSize( 200, 200 );
+    setMinimumSize( 100, 100 );
     setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
   }
 }

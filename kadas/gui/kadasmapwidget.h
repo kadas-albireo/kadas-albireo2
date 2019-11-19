@@ -70,7 +70,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     QLineEdit *mTitleLineEdit;
     QgsMapCanvas *mMapCanvas;
     QStringList mInitialLayers;
-    bool mUnsetFixedSize;
+    bool mUnsetFixedSize = true;
 
   private slots:
     void setCanvasLocked( bool locked );

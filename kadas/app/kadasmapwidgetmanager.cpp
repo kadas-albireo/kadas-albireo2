@@ -75,17 +75,17 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
   }
   QSize initialSize;
   Qt::DockWidgetArea addArea;
-  if ( nBottom >= nRight - 1 )
+  if ( nRight == 0 || nBottom > nRight )
   {
     addArea = Qt::RightDockWidgetArea;
-    initialSize.setHeight( ( mMasterCanvas->height() + bottomAreaHeight ) / ( nRight + 1 ) );
-    initialSize.setWidth( nRight > 0 ? rightAreaWidth : mMasterCanvas->width() / 2 );
+    initialSize.setHeight( mMasterCanvas->height() / ( nRight + 1 ) );
+    initialSize.setWidth( nRight == 0 ? 0.5 * mMasterCanvas->width() : rightAreaWidth );
   }
   else
   {
     addArea = Qt::BottomDockWidgetArea;
-    initialSize.setHeight( nBottom > 0 ? bottomAreaHeight : mMasterCanvas->height() / 2 );
-    initialSize.setWidth( mMasterCanvas->width() / ( nBottom + 1 ) );
+    initialSize.setHeight( nBottom == 0 ? 0.5 * mMasterCanvas->height() : bottomAreaHeight );
+    initialSize.setWidth( ( mMasterCanvas->width() + rightAreaWidth ) / ( nBottom + 1 ) );
   }
 
   // Set initial layers
@@ -97,9 +97,25 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
       initialLayers.append( layerTreeLayer->layer()->id() );
     }
   }
-  mapWidget->setFixedSize( initialSize );
+  if ( addArea == Qt::RightDockWidgetArea )
+  {
+    mapWidget->setFixedHeight( initialSize.height() ); // fixed size unfixed in KadasMapWidget::showEvent
+  }
+  else
+  {
+    mapWidget->setFixedWidth( initialSize.width() ); // fixed size unfixed in KadasMapWidget::showEvent
+  }
   mMainWindow->addDockWidget( addArea, mapWidget );
-  mapWidget->resize( initialSize );
+  if ( addArea == Qt::RightDockWidgetArea )
+  {
+    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
+    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
+  }
+  else
+  {
+    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
+    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
+  }
   mMapWidgets.append( mapWidget );
   return mapWidget;
 }
