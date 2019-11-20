@@ -209,6 +209,10 @@ bool KadasGlobeLayerPropertiesFactory::supportsLayer( QgsMapLayer *layer ) const
 void KadasGlobeLayerPropertiesFactory::readGlobeVectorLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )
 {
   KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
+  if ( !config )
+  {
+    return;
+  }
 
   QDomElement globeElem = elem.firstChildElement( "globe" );
   if ( !globeElem.isNull() )
@@ -248,6 +252,10 @@ void KadasGlobeLayerPropertiesFactory::readGlobeVectorLayerConfig( QgsMapLayer *
 void KadasGlobeLayerPropertiesFactory::writeGlobeVectorLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc )
 {
   KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( mapLayer );
+  if ( !config )
+  {
+    return;
+  }
 
   QDomElement globeElem = doc.createElement( "globe" );
 
