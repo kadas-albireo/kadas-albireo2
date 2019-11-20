@@ -542,6 +542,35 @@ void KadasPluginInterfaceImpl::removeAction( QAction *action, ActionClassicMenuL
   }
 }
 
+void KadasPluginInterfaceImpl::removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
+{
+  if ( ribbonTabLocation != NO_TAB )
+  {
+    // Add action to ribbon tabs
+    QWidget *targetTabWidget = getRibbonTabWidget( ribbonTabLocation, customName );
+    if ( targetTabWidget )
+    {
+      kApp->mainWindow()->removeMenuButtonFromTab( menu, targetTabWidget );
+    }
+  }
+  else
+  {
+    // Add action to classic app menu
+    QMenu *targetMenu = getClassicMenu( classicMenuLocation, customName );
+    if ( targetMenu )
+    {
+      for ( QAction *action : targetMenu->actions() )
+      {
+        if ( action->menu() == menu )
+        {
+          targetMenu->removeAction( action );
+          break;
+        }
+      }
+    }
+  }
+}
+
 QAction *KadasPluginInterfaceImpl::findAction( const QString &name )
 {
   return kApp->mainWindow()->findChild<QAction *>( name );

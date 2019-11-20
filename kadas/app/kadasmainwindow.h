@@ -58,6 +58,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void addActionToTab( QAction *action, QWidget *tabWidget );
     void addMenuButtonToTab( const QString &text, const QIcon &icon, QMenu *menu, QWidget *tabWidget );
     void removeActionFromTab( QAction *action, QWidget *tabWidget );
+    void removeMenuButtonFromTab( QMenu *menu, QWidget *tabWidget );
     QMenu *pluginsMenu();
 
     QTabWidget *ribbonTabWidget() const { return mRibbonWidget; }

@@ -650,18 +650,27 @@ void KadasMainWindow::addMenuButtonToTab( const QString &text, const QIcon &icon
 
 void KadasMainWindow::removeActionFromTab( QAction *action, QWidget *tabWidget )
 {
-  const QObjectList &c = tabWidget->children();
-  QObjectList::const_iterator cIt = c.constBegin();
-  for ( ; cIt != c.constEnd(); ++cIt )
+  for ( QObject *obj : tabWidget->children() )
   {
-    KadasRibbonButton *b = dynamic_cast<KadasRibbonButton *>( *cIt );
-    if ( b )
+    KadasRibbonButton *b = dynamic_cast<KadasRibbonButton *>( obj );
+    if ( b && b->defaultAction() == action )
     {
-      if ( b->defaultAction() == action )
-      {
-        delete b;
-        return;
-      }
+      mAddedActions.remove( action->objectName() );
+      delete b;
+      return;
+    }
+  }
+}
+
+void KadasMainWindow::removeMenuButtonFromTab( QMenu *menu, QWidget *tabWidget )
+{
+  for ( QObject *obj : tabWidget->children() )
+  {
+    KadasRibbonButton *b = dynamic_cast<KadasRibbonButton *>( obj );
+    if ( b && b->menu() == menu )
+    {
+      delete b;
+      return;
     }
   }
 }

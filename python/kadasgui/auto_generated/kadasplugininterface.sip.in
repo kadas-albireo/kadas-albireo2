@@ -77,6 +77,7 @@ Generic action adder
 %Docstring
 Generic action remover
 %End
+    virtual void removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
 
     virtual QAction *findAction( const QString &name ) = 0;
 %Docstring
