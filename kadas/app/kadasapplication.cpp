@@ -293,6 +293,7 @@ void KadasApplication::init()
   if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
   {
     projectOpen( arguments()[1] );
+    QgsProject::instance()->setDirty( false );
   }
   else
   {
@@ -331,7 +332,6 @@ void KadasApplication::init()
 
   // TODO: QgsApplication::setMaxThreads( QgsSettings().value( "/Qgis/max_threads", -1 ).toInt() );
 
-  QgsProject::instance()->setDirty( false );
   updateWindowTitle();
 
   QObject::connect( this, &QApplication::lastWindowClosed, this, &QApplication::quit );

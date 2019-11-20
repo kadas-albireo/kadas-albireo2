@@ -409,8 +409,13 @@ void KadasMainWindow::showEvent( QShowEvent * )
   mGpsIntegration->initGui();
 }
 
-void KadasMainWindow::closeEvent( QCloseEvent * )
+void KadasMainWindow::closeEvent( QCloseEvent *ev )
 {
+  if ( !kApp->projectSaveDirty() )
+  {
+    ev->ignore();
+    return;
+  }
   QgsSettings().setValue( "/kadas/windowgeometry", saveGeometry() );
 }
 

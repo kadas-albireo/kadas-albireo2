@@ -74,6 +74,7 @@ class KadasApplication : public QgsApplication
     bool projectOpen( const QString &projectFile = QString() );
     void projectClose();
     bool projectSave( const QString &fileName = QString(), bool promptFileName = false );
+    bool projectSaveDirty();
 
     void addDefaultPrintTemplates();
 
@@ -123,7 +124,6 @@ class KadasApplication : public QgsApplication
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
     void loadPythonSupport();
     bool showZipSublayerSelectionDialog( const QString &path ) const;
-    bool projectSaveDirty();
 
     static QgsMessageOutput *messageOutputViewer();
 
