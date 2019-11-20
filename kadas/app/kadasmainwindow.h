@@ -152,8 +152,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QMap<QString, QAction *> mAddedActions;
 
     KadasPluginManager *mPluginManager = nullptr;
-
-    friend class KadasGpsIntegration;
 };
 
 #endif // KADASMAINWINDOW_H

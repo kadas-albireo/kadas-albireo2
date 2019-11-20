@@ -102,7 +102,7 @@ void KadasMainWindow::init()
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
-  mGpsIntegration = new KadasGpsIntegration( this );
+  mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
   mSearchWidget->init( mMapCanvas );
 

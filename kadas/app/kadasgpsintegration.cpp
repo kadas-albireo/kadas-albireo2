@@ -20,12 +20,12 @@
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasmainwindow.h>
 
-KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow )
-  : QObject( mainWindow ), mMainWindow( mainWindow )
+KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps )
+  : QObject( mainWindow ), mMainWindow( mainWindow ), mGpsToolButton( gpsToolButton ), mActionEnableGps( actionEnableGps )
 {
   mCanvasGPSDisplay = new KadasCanvasGPSDisplay( mMainWindow->mapCanvas(), this );
 
-  connect( mMainWindow->mGpsToolButton, &QToolButton::toggled, this, &KadasGpsIntegration::enableGPS );
+  connect( mGpsToolButton, &QToolButton::toggled, this, &KadasGpsIntegration::enableGPS );
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsConnected, this, &KadasGpsIntegration::gpsDetected );
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsDisconnected, this, &KadasGpsIntegration::gpsDisconnected );
   connect( mCanvasGPSDisplay, &KadasCanvasGPSDisplay::gpsConnectionFailed, this, &KadasGpsIntegration::gpsConnectionFailed );
@@ -39,12 +39,12 @@ void KadasGpsIntegration::initGui()
 
 void KadasGpsIntegration::enableGPS( bool enabled )
 {
-  mMainWindow->mGpsToolButton->blockSignals( true );
-  mMainWindow->mActionEnableGPS->blockSignals( true );
-  mMainWindow->mGpsToolButton->setChecked( enabled );
-  mMainWindow->mActionEnableGPS->setChecked( enabled );
-  mMainWindow->mGpsToolButton->blockSignals( false );
-  mMainWindow->mActionEnableGPS->blockSignals( false );
+  mGpsToolButton->blockSignals( true );
+  mActionEnableGps->blockSignals( true );
+  mGpsToolButton->setChecked( enabled );
+  mActionEnableGps->setChecked( enabled );
+  mGpsToolButton->blockSignals( false );
+  mActionEnableGps->blockSignals( false );
   if ( enabled )
   {
     setGPSIcon( Qt::blue );
@@ -73,12 +73,12 @@ void KadasGpsIntegration::gpsDisconnected()
 void KadasGpsIntegration::gpsConnectionFailed()
 {
   mMainWindow->messageBar()->pushMessage( tr( "Connection to GPS device failed" ), Qgis::Critical, mMainWindow->messageTimeout() );
-  mMainWindow->mGpsToolButton->blockSignals( true );
-  mMainWindow->mActionEnableGPS->blockSignals( true );
-  mMainWindow->mGpsToolButton->setChecked( false );
-  mMainWindow->mActionEnableGPS->setChecked( false );
-  mMainWindow->mGpsToolButton->blockSignals( false );
-  mMainWindow->mActionEnableGPS->blockSignals( false );
+  mGpsToolButton->blockSignals( true );
+  mActionEnableGps->blockSignals( true );
+  mGpsToolButton->setChecked( false );
+  mActionEnableGps->setChecked( false );
+  mGpsToolButton->blockSignals( false );
+  mActionEnableGps->blockSignals( false );
   setGPSIcon( Qt::black );
 }
 
@@ -108,7 +108,7 @@ void KadasGpsIntegration::moveWithGPS( bool enabled )
 
 void KadasGpsIntegration::setGPSIcon( const QColor &color )
 {
-  QPixmap pixmap( mMainWindow->mGpsToolButton->size() );
+  QPixmap pixmap( mGpsToolButton->size() );
   pixmap.fill( color );
-  mMainWindow->mGpsToolButton->setIcon( QIcon( pixmap ) );
+  mGpsToolButton->setIcon( QIcon( pixmap ) );
 }

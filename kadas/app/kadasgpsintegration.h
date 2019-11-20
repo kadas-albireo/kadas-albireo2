@@ -21,6 +21,8 @@
 
 #include <qgis/qgsgpsconnection.h>
 
+class QAction;
+class QToolButton;
 class KadasCanvasGPSDisplay;
 class KadasMainWindow;
 
@@ -28,7 +30,7 @@ class KadasGpsIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasGpsIntegration( KadasMainWindow *mainWindow );
+    KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps );
     void initGui();
 
   public slots:
@@ -41,6 +43,8 @@ class KadasGpsIntegration : public QObject
 
     KadasMainWindow *mMainWindow;
     KadasCanvasGPSDisplay *mCanvasGPSDisplay = nullptr;
+    QToolButton *mGpsToolButton = nullptr;
+    QAction *mActionEnableGps = nullptr;
 
   private slots:
     void gpsDetected();
