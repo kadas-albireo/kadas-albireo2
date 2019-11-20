@@ -544,6 +544,7 @@ void KadasMainWindow::configureButtons()
   // Settings tab
   setActionToButton( mActionPluginManager, mPluginManagerButton, QKeySequence( Qt::CTRL + Qt::Key_S, Qt::CTRL + Qt::Key_P ) );
   connect( mActionPluginManager, &QAction::toggled, this, &KadasMainWindow::showPluginManager );
+  connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mActionPluginManager->setChecked( false ); } );
 
   //help tab
   setActionToButton( mActionHelp, mHelpButton );
@@ -1012,11 +1013,6 @@ QgsMapTool *KadasMainWindow::addPictureTool()
 
 void KadasMainWindow::showPluginManager( bool show )
 {
-  if ( !mPluginManager && !show )
-  {
-    return;
-  }
-
   if ( show )
   {
     if ( !mPluginManager )
@@ -1025,7 +1021,7 @@ void KadasMainWindow::showPluginManager( bool show )
     }
     mPluginManager->show();
   }
-  else
+  else if ( mPluginManager )
   {
     mPluginManager->hide();
   }
