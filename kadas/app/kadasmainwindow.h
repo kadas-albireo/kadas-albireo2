@@ -141,17 +141,16 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
     KadasCoordinateDisplayer *mCoordinateDisplayer = nullptr;
     KadasGpsIntegration *mGpsIntegration = nullptr;
+    KadasGpxIntegration *mGpxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
-    KadasGpxIntegration *mGpxIntegration = nullptr;
-    QgsDecorationGrid *mDecorationGrid = nullptr;
+    KadasPluginManager *mPluginManager = nullptr;
 
     QTimer mLoadingTimer;
     QPoint mResizePressPos;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
 
-    KadasPluginManager *mPluginManager = nullptr;
 };
 
 #endif // KADASMAINWINDOW_H
