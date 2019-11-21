@@ -42,7 +42,7 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         const QgsAbstractGeometry *geom = nullptr;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
-        KadasItemLayer::ItemId itemId;
+        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
     };
 
     static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
