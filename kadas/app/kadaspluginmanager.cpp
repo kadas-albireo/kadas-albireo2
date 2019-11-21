@@ -44,17 +44,19 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
   mAvailablePlugins = availablePlugins();
 
   QStringList installedPlugins = p->pluginList();
-  QSet<QString> installedPluginNames;
+  QMap<QString, PluginInfo> installedPluginInfo; // name/pluginInfo
 
   QStringList::const_iterator installedIt = installedPlugins.constBegin();
   for ( ; installedIt != installedPlugins.constEnd(); ++installedIt )
   {
-    QString pluginName = p->getPluginMetadata( *installedIt, "name" );
-    QString pluginDescription = p->getPluginMetadata( *installedIt, "description" );
-    installedPluginNames.insert( pluginName );
+    PluginInfo pi;
+    pi.name = p->getPluginMetadata( *installedIt, "name" );
+    pi.description = p->getPluginMetadata( *installedIt, "description" );
+    pi.version = p->getPluginMetadata( *installedIt, "version" );
+    installedPluginInfo.insert( pi.name, pi );
     QTreeWidgetItem *installedItem = new QTreeWidgetItem();
-    installedItem->setText( 0, pluginName );
-    installedItem->setToolTip( 0, pluginDescription );
+    installedItem->setText( 0, pi.name );
+    installedItem->setToolTip( 0, pi.description );
     installedItem->setData( 0, Qt::UserRole, *installedIt );
     if ( p->isPluginEnabled( *installedIt ) )
     {
@@ -67,16 +69,28 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     mInstalledTreeWidget->addTopLevelItem( installedItem );
   }
 
-  QMap<QString, QPair< QString, QString > >::const_iterator pluginIt = mAvailablePlugins.constBegin();
+  QMap<QString, PluginInfo >::const_iterator pluginIt = mAvailablePlugins.constBegin();
   for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
   {
     QTreeWidgetItem *availableItem = new QTreeWidgetItem();
     availableItem->setText( 0, pluginIt.key() );
-    availableItem->setToolTip( 0, pluginIt->first );
+    availableItem->setToolTip( 0, pluginIt.value().description );
     mAvailableTreeWidget->addTopLevelItem( availableItem );
-    if ( installedPluginNames.contains( pluginIt.key() ) )
+    if ( installedPluginInfo.contains( pluginIt.key() ) )
     {
       setItemRemoveable( availableItem );
+
+      QString repoVersion = pluginIt.value().version;
+      QString installedVersion = installedPluginInfo.value( pluginIt.key() ).version;
+
+      if ( updateAvailable( installedVersion, repoVersion ) )
+      {
+        setItemUpdateable( availableItem );
+      }
+      else
+      {
+        setItemNotUpdateable( availableItem );
+      }
     }
     else
     {
@@ -92,7 +106,7 @@ KadasPluginManager::KadasPluginManager(): KadasBottomBar( 0 )
 {
 }
 
-QMap< QString, QPair< QString, QString > > KadasPluginManager::availablePlugins()
+QMap< QString, KadasPluginManager::PluginInfo > KadasPluginManager::availablePlugins()
 {
   QgsSettings s;
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
@@ -104,7 +118,7 @@ QMap< QString, QPair< QString, QString > > KadasPluginManager::availablePlugins(
   e.exec();
 
   QString pluginContent = nf.contentAsString();
-  QMap< QString, QPair< QString, QString > > pluginMap;
+  QMap< QString, PluginInfo > pluginMap;
 
   //Dom document
   QDomDocument xml;
@@ -117,10 +131,12 @@ QMap< QString, QPair< QString, QString > > KadasPluginManager::availablePlugins(
   for ( int i = 0; i < pluginNodeList.size(); ++i )
   {
     QDomElement pluginElem  = pluginNodeList.at( i ).toElement();
-    QString pluginName = pluginElem.attribute( "name" );
-    QString pluginDescription = pluginElem.firstChildElement( "description" ).text();
-    QString downloadUrl = pluginElem.firstChildElement( "download_url" ).text();
-    pluginMap.insert( pluginName, qMakePair( pluginDescription, downloadUrl ) );
+    KadasPluginManager::PluginInfo p;
+    p.name = pluginElem.attribute( "name" );
+    p.version = pluginElem.attribute( "version" );
+    p.description = pluginElem.firstChildElement( "description" ).text();
+    p.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
+    pluginMap.insert( p.name, p );
   }
   return pluginMap;
 }
@@ -163,6 +179,33 @@ void KadasPluginManager::on_mCloseButton_clicked()
   }
 }
 
+void KadasPluginManager::updateButtonClicked()
+{
+  QString pluginName = sender()->property( "PluginName" ).toString();
+  if ( pluginName.isEmpty() )
+  {
+    return;
+  }
+
+  QString downloadPath = mAvailablePlugins.value( pluginName ).downloadLink;
+  QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
+
+  //get module name
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  if ( installed.size() < 1 )
+  {
+    return;
+  }
+  QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
+  updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip );
+
+  QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  if ( available.size() > 0 )
+  {
+    setItemNotUpdateable( available.at( 0 ) );
+  }
+}
+
 void KadasPluginManager::installButtonClicked()
 {
   QString pluginName = sender()->property( "PluginName" ).toString();
@@ -175,8 +218,8 @@ void KadasPluginManager::installButtonClicked()
 
   if ( installed.size() < 1 ) //not yet installed
   {
-    QString downloadPath = mAvailablePlugins.value( pluginName ).second;
-    QString pluginTooltip = mAvailablePlugins.value( pluginName ).first;
+    QString downloadPath = mAvailablePlugins.value( pluginName ).downloadLink;
+    QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
     if ( downloadPath.isEmpty() )
     {
       return;
@@ -278,6 +321,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   if ( availableItem.size() > 0 )
   {
     setItemRemoveable( availableItem.at( 0 ) );
+    setItemNotUpdateable( availableItem.at( 0 ) );
   }
 }
 
@@ -311,7 +355,14 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   if ( availableItem.size() > 0 )
   {
     setItemInstallable( availableItem.at( 0 ) );
+    availableItem.at( 0 )->setText( 2, "" );
   }
+}
+
+void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip )
+{
+  uninstallPlugin( pluginName, moduleName );
+  installPlugin( pluginName, downloadUrl, pluginTooltip );
 }
 
 void KadasPluginManager::setItemInstallable( QTreeWidgetItem *item )
@@ -349,4 +400,36 @@ void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem *item )
   {
     item->setCheckState( 1, Qt::Checked );
   }
+}
+
+void KadasPluginManager::setItemUpdateable( QTreeWidgetItem *item )
+{
+  if ( item )
+  {
+    QPushButton *b = new QPushButton( tr( "Update" ) );
+    b->setProperty( "PluginName", item->text( 0 ) );
+    QObject::connect( b, &QPushButton::clicked, this, &KadasPluginManager::updateButtonClicked );
+    mAvailableTreeWidget->setItemWidget( item, 2, b );
+  }
+}
+
+void KadasPluginManager::setItemNotUpdateable( QTreeWidgetItem *item )
+{
+  if ( item )
+  {
+    mAvailableTreeWidget->removeItemWidget( item, 2 );
+    item->setText( 2, tr( "up-to-date" ) );
+  }
+}
+
+bool KadasPluginManager::updateAvailable( const QString &installedVersion, const QString &repoVersion )
+{
+  QVersionNumber installed = QVersionNumber::fromString( installedVersion );
+  QVersionNumber repo = QVersionNumber::fromString( repoVersion );
+  if ( installed.isNull() || repo.isNull() )
+  {
+    return false;
+  }
+
+  return ( repo > installed );
 }
