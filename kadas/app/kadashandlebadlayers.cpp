@@ -68,7 +68,7 @@ KadasHandleBadLayers::KadasHandleBadLayers( const QList<QDomNode> &layers )
 
     QString name = node.namedItem( QStringLiteral( "layername" ) ).toElement().text();
     QString type = node.toElement().attribute( QStringLiteral( "type" ) );
-    QString datasource = node.namedItem( QStringLiteral( "datasource" ) ).toElement().text();
+    QString datasource = QgsProject::instance()->readPath( node.namedItem( QStringLiteral( "datasource" ) ).toElement().text() );
     QString provider = node.namedItem( QStringLiteral( "provider" ) ).toElement().text();
     bool providerFileBased = ( provider == QStringLiteral( "gdal" ) || provider == QStringLiteral( "ogr" ) || provider == QStringLiteral( "mdal" ) );
 
