@@ -33,6 +33,7 @@ FILE(GLOB kadas_SRC
   kml/*.cpp
   bullseye/*.cpp
   guidegrid/*.cpp
+  iamauth/*.cpp
   mapgrid/*.cpp)
 IF(WITH_GLOBE)
     FILE(GLOB globe_SRC globe/*.cpp)
@@ -46,6 +47,7 @@ FILE(GLOB kadas_HDR
   kml/*.h
   bullseye/*.h
   guidegrid/*.h
+  iamauth/*.h
   mapgrid/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h)
@@ -89,6 +91,12 @@ INCLUDE_DIRECTORIES(${CAIRO_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBRSVG_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${GEOS_INCLUDE_DIR})
 
+IF(WIN32)
+  FIND_PACKAGE(Qt5AxContainer REQUIRED)
+  SET(AXCONTAINER_LIBRARY Qt5::AxContainer)
+ENDIF(WIN32)
+
+
 ADD_EXECUTABLE(kadas
     ${kadas_SRC}
     ${kadas_HDR}
@@ -105,6 +113,7 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Sql
   Qt5::OpenGL
   Qt5::PrintSupport
+  ${AXCONTAINER_LIBRARY}
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}
   ${CRASHRPT_LIBRARY}

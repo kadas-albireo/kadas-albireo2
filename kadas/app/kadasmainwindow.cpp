@@ -75,6 +75,7 @@
 #include <kadas/app/globe/kadasglobeintegration.h>
 #endif
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
+#include <kadas/app/iamauth/kadasiamauth.h>
 #include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 #include <kadas/app/kadaspluginmanager.h>
@@ -216,6 +217,9 @@ void KadasMainWindow::init()
   milxUi.mWorkModeCombo = mWorkModeCombo;
   KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
   Q_UNUSED( milx );
+
+  // IAM Auth
+  new KadasIamAuth( mLoginButton, mRefreshCatalogButton, this );
 
 #ifdef WITH_GLOBE
   // Globe
