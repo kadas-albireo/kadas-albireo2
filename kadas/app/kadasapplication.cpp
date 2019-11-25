@@ -168,10 +168,9 @@ void KadasApplication::init()
 
   // Create / migrate settings
   QgsSettings settings;
-
   QFile srcSettings;
   bool settingsEmpty = false;
-  if ( QFile( settings.fileName() ).exists() )
+  if ( settings.value( "timestamp", 0 ).toInt() > 0 )
   {
     QgsDebugMsg( "Patching settings" );
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_patch.ini" ) );
@@ -203,8 +202,8 @@ void KadasApplication::init()
         settings.endGroup();
       }
     }
+    settings.sync();
   }
-  settings.sync();
 
   // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
   QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
