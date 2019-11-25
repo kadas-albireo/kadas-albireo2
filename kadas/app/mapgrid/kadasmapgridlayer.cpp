@@ -40,7 +40,6 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
     bool render() override
     {
-      static int labelBoxSize = mLayer->mFontSize + 5;
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
