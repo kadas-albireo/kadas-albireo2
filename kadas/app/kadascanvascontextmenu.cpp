@@ -63,7 +63,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
       addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasCanvasContextMenu::copyItemPosition );
       addAction( QIcon( ":/images/themes/default/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::convertPinToWaypoint );
     }
-    else if ( dynamic_cast<KadasGpxWaypointItem *>( pickedItem ) )
+    else if ( dynamic_cast<KadasPointItem *>( pickedItem ) )
     {
       addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::convertWaypointToPin );
     }
@@ -168,18 +168,21 @@ void KadasCanvasContextMenu::identify()
 void KadasCanvasContextMenu::convertWaypointToPin()
 {
   KadasMapItem *pickedItem = static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  KadasGpxWaypointItem *waypoint = dynamic_cast<KadasGpxWaypointItem *>( pickedItem );
+  KadasPointItem *pointItem = dynamic_cast<KadasPointItem *>( pickedItem );
 
   KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   pin->setEditor( "KadasSymbolAttributesEditor" );
-  pin->setName( waypoint->name() );
-  QgsCoordinateTransform crst( waypoint->crs(), pin->crs(), QgsProject::instance()->transformContext() );
-  pin->setPosition( KadasItemPos::fromPoint( crst.transform( waypoint->position() ) ) );
+  if ( dynamic_cast<KadasGpxWaypointItem *>( pointItem ) )
+  {
+    pin->setName( static_cast<KadasGpxWaypointItem *>( pointItem )->name() );
+  }
+  QgsCoordinateTransform crst( pointItem->crs(), pin->crs(), QgsProject::instance()->transformContext() );
+  pin->setPosition( KadasItemPos::fromPoint( crst.transform( pointItem->position() ) ) );
   kApp->getOrCreateItemLayer( tr( "Pins" ) )->addItem( pin );
 
   kApp->getOrCreateItemLayer( tr( "Pins" ) )->triggerRepaint();
   mPickResult.layer->triggerRepaint();
-  delete waypoint;
+  delete pointItem;
 }
 
 void KadasCanvasContextMenu::convertPinToWaypoint()
