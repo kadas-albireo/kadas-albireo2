@@ -15,10 +15,10 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QDir>
 #include <QDomDocument>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QSet>
 #include <QTreeWidgetItem>
 #include <quazip5/quazipfile.h>
 
@@ -43,11 +43,13 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
 
   mAvailablePlugins = availablePlugins();
 
-  QStringList installedPlugins = p->pluginList();
+  //detect user plugins
+  QDir userPluginDir( p->homePluginsPath() );
+  QStringList installedUserPlugins = userPluginDir.entryList( QDir::Dirs | QDir::NoDotAndDotDot );
   QMap<QString, PluginInfo> installedPluginInfo; // name/pluginInfo
 
-  QStringList::const_iterator installedIt = installedPlugins.constBegin();
-  for ( ; installedIt != installedPlugins.constEnd(); ++installedIt )
+  QStringList::const_iterator installedIt = installedUserPlugins.constBegin();
+  for ( ; installedIt != installedUserPlugins.constEnd(); ++installedIt )
   {
     PluginInfo pi;
     pi.name = p->getPluginMetadata( *installedIt, "name" );
