@@ -1368,7 +1368,7 @@ Sight</string>
         </widget>
         <widget class="QWidget" name="mGpsTab">
          <attribute name="title">
-          <string>&amp;GPS</string>
+          <string>&amp;Navigation</string>
          </attribute>
          <layout class="QHBoxLayout" name="hboxLayout_gps">
           <property name="leftMargin">
@@ -1410,7 +1410,7 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>Toggle GPS</string>
+             <string>Toggle Geolocation</string>
             </property>
             <property name="iconSize">
              <size>
@@ -1441,7 +1441,7 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>Move with GPS</string>
+             <string>Move with Geolocation</string>
             </property>
             <property name="iconSize">
              <size>
@@ -2373,7 +2373,7 @@ Sight</string>
      <normaloff>:/kadas/icons/gps</normaloff>:/kadas/icons/gps</iconset>
    </property>
    <property name="text">
-    <string>Enable GPS</string>
+    <string>Toggle Geolocation</string>
    </property>
    <property name="toolTip">
     <string>Toggle GPS</string>
@@ -2388,7 +2388,7 @@ Sight</string>
      <normaloff>:/kadas/icons/gps_sync</normaloff>:/kadas/icons/gps_sync</iconset>
    </property>
    <property name="text">
-    <string>Move with GPS</string>
+    <string>Move with Geolocation</string>
    </property>
    <property name="toolTip">
     <string>Move with GPS</string>

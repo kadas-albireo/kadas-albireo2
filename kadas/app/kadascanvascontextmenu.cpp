@@ -195,9 +195,9 @@ void KadasCanvasContextMenu::convertPinToWaypoint()
   waypoint->setName( pin->name() );
   QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
   waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
-  kApp->getOrCreateItemLayer( tr( "GPS Routes" ) )->addItem( waypoint );
+  kApp->getOrCreateItemLayer( tr( "Routes" ) )->addItem( waypoint );
 
-  kApp->getOrCreateItemLayer( tr( "GPS Routes" ) )->triggerRepaint();
+  kApp->getOrCreateItemLayer( tr( "Routes" ) )->triggerRepaint();
   mPickResult.layer->triggerRepaint();
   delete pin;
 }

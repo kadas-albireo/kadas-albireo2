@@ -65,7 +65,7 @@ KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *acti
 
 KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
 {
-  return kApp->getOrCreateItemLayer( tr( "GPS Routes" ) );
+  return kApp->getOrCreateItemLayer( tr( "Routes" ) );
 }
 
 void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
