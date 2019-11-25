@@ -22,7 +22,6 @@ SET (TARGET_MOC_HDRS
 )
 
 SET(TARGET_HDRS
-    kadasglobefeaturecursor.h
     kadasglobefeatureoptions.h
     kadasglobefeatureutils.h
 )
@@ -34,6 +33,8 @@ SET(TARGET_SRC ${TARGET_SRC} ${TARGET_MOC_SRCS})
 SET(TARGET_COMMON_LIBRARIES ${TARGET_COMMON_LIBRARIES}
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}
+  kadas_core
+  kadas_gui
   ${OSGDB_LIBRARY}
   ${OSG_LIBRARY}
   ${OSGEARTH_LIBRARY}
