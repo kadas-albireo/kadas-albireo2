@@ -39,6 +39,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     void deactivate() override;
 
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
+    void canvasDoubleClickEvent( QgsMapMouseEvent *e ) override;
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyPressEvent( QKeyEvent *e ) override;

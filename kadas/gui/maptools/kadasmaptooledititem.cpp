@@ -168,6 +168,11 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
   }
 }
 
+void KadasMapToolEditItem::canvasDoubleClickEvent( QgsMapMouseEvent *e )
+{
+  mItem->onDoubleClick( mCanvas->mapSettings() );
+}
+
 void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( mIgnoreNextMoveEvent )

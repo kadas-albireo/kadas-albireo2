@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDesktopServices>
 #include <QImageReader>
 #include <QMenu>
 
@@ -465,6 +466,11 @@ void KadasPictureItem::populateContextMenu( QMenu *menu, const EditContext &cont
   QAction *lockedAction = menu->addAction( tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
   lockedAction->setCheckable( true );
   lockedAction->setChecked( mPosLocked );
+}
+
+void KadasPictureItem::onDoubleClick( const QgsMapSettings &mapSettings )
+{
+  QDesktopServices::openUrl( QUrl::fromLocalFile( mFilePath ) );
 }
 
 KadasMapItem::AttribValues KadasPictureItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const

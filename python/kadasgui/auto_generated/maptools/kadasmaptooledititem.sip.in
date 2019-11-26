@@ -39,6 +39,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual void canvasPressEvent( QgsMapMouseEvent *e );
 
+    virtual void canvasDoubleClickEvent( QgsMapMouseEvent *e );
+
     virtual void canvasMoveEvent( QgsMapMouseEvent *e );
 
     virtual void canvasReleaseEvent( QgsMapMouseEvent *e );

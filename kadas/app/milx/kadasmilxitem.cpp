@@ -635,6 +635,19 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
 }
 
+void KadasMilxItem::onDoubleClick( const QgsMapSettings &mapSettings )
+{
+  QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
+  int dpi = mapSettings.outputDpi();
+  KadasMilxClient::NPointSymbolGraphic result;
+  WId winId = QApplication::topLevelWidgets().front()->winId();
+  KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
+  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, result, winId ) )
+  {
+    updateSymbol( mapSettings, result );
+  }
+}
+
 KadasMapItem::AttribValues KadasMilxItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   if ( context.attributes.size() == 1 )
