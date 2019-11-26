@@ -44,8 +44,10 @@
 
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadaslineitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
 
 
@@ -507,10 +509,14 @@ void KadasHeightProfileDialog::addToCanvas()
   mPlot->render( &image );
   mPlotMarker->setVisible( true );
   mPlot->replot();
-  // TODO
-//  QgsImageAnnotationItem* item = new QgsImageAnnotationItem( mTool->canvas() );
-//  item->setImage( image );
-//  item->setMapPosition( mTool->canvas()->mapSettings().extent().center() );
+
+  QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
+  image.save( filename );
+
+  KadasSymbolItem *item = new KadasSymbolItem( mTool->canvas()->mapSettings().destinationCrs() );
+  item->setFilePath( filename );
+  item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer )->addItem( item );
 }
 
 void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
