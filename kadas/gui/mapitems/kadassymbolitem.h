@@ -48,6 +48,9 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif
 
+    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
+    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
+
   private:
     QString mFilePath;
     QString mName;

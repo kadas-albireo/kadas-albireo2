@@ -394,14 +394,24 @@ KadasMapPos KadasPictureItem::positionFromDrawAttribs( const AttribValues &value
 
 KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  double mup = mapSettings.mapUnitsPerPixel();
+  double tol = pickTolSqr( mapSettings );
+  QList<KadasMapPos> corners = cornerPoints( mapSettings );
+  for ( int i = 0, n = corners.size(); i < n; ++i )
+  {
+    if ( pos.sqrDist( corners[i] ) < tol )
+    {
+      return EditContext( QgsVertexId( 0, 0, 1 + i ), corners[i], KadasMapItem::AttribDefs(), Qt::SizeAllCursor );
+    }
+  }
   KadasMapPos testPos = toMapPos( constState()->pos, mapSettings );
-  if ( !mPosLocked && pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
+  bool frameClicked = intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings );
+  if ( !mPosLocked && ( ( !mFrame && frameClicked ) || pos.sqrDist( testPos ) < tol ) )
   {
     return EditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
-  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  if ( frameClicked )
   {
+    double mup = mapSettings.mapUnitsPerPixel();
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
     KadasMapPos framePos( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
     return EditContext( QgsVertexId(), framePos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
@@ -414,6 +424,20 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
   if ( context.vidx.vertex == 0 )
   {
     state()->pos = toItemPos( newPoint, mapSettings );
+    update();
+  }
+  else if ( context.vidx.vertex >= 1 && context.vidx.vertex <= 4 )
+  {
+    QImageReader reader( mFilePath );
+
+    QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( toMapPos( position(), mapSettings ) );
+    state()->size.setWidth( 2 * qAbs( halfSize.x() ) );
+    state()->size.setHeight( state()->size.width() / double( reader.size().width() ) * reader.size().height() );
+
+    reader.setBackgroundColor( Qt::white );
+    reader.setScaledSize( state()->size );
+    mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+
     update();
   }
   else

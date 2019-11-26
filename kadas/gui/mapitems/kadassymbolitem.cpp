@@ -75,7 +75,7 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   if ( mScalable )
   {
     QSvgRenderer svgRenderer( mFilePath );
-    QSize renderSize = svgRenderer.viewBox().size() * scale;
+    QSize renderSize = constState()->size;
     svgRenderer.render( context.painter(), QRectF( 0, 0, renderSize.width(), renderSize.height() ) );
 
   }
@@ -146,6 +146,44 @@ QString KadasSymbolItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip 
 
   return outString;
 }
+
+KadasMapItem::EditContext KadasSymbolItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
+{
+  double tol = pickTolSqr( mapSettings );
+  QList<KadasMapPos> corners = rotatedCornerPoints( constState()->angle, mapSettings );
+  for ( int i = 0, n = corners.size(); i < n; ++i )
+  {
+    if ( pos.sqrDist( corners[i] ) < tol )
+    {
+      return EditContext( QgsVertexId( 0, 0, 2 + i ), corners[i], KadasMapItem::AttribDefs(), Qt::SizeAllCursor );
+    }
+  }
+  return KadasAnchoredItem::getEditContext( pos, mapSettings );
+}
+
+void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
+{
+  if ( context.vidx.vertex >= 2 && context.vidx.vertex <= 5 )
+  {
+    QImageReader reader( mFilePath );
+
+    QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( toMapPos( position(), mapSettings ) );
+    halfSize = halfSize.rotateBy( state()->angle / 180. * M_PI );
+    state()->size.setWidth( 2 * qAbs( halfSize.x() ) );
+    state()->size.setHeight( state()->size.width() / double( reader.size().width() ) * reader.size().height() );
+
+    reader.setBackgroundColor( Qt::white );
+    reader.setScaledSize( state()->size );
+    mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+
+    update();
+  }
+  else
+  {
+    KadasAnchoredItem::edit( context, newPoint, mapSettings );
+  }
+}
+
 
 KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
   : KadasSymbolItem( crs, parent )
