@@ -65,7 +65,7 @@ KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *acti
 
 KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
 {
-  return kApp->getOrCreateItemLayer( tr( "Routes" ) );
+  return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer );
 }
 
 void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
@@ -77,7 +77,7 @@ void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<Kad
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
     KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return kApp->getOrCreateItemLayer( name ); };
+    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return KadasItemLayerRegistry::getOrCreateItemLayer( name ); };
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
@@ -106,7 +106,7 @@ void KadasGpxIntegration::importGpx()
 
   for ( const QString &filename : filenames )
   {
-    KadasItemLayer *layer = kApp->getOrCreateItemLayer( QFileInfo( filename ).baseName() );
+    KadasItemLayer *layer = KadasItemLayerRegistry::getOrCreateItemLayer( QFileInfo( filename ).baseName() );
 
     QFile file( filename );
     if ( !file.open( QIODevice::ReadOnly ) )

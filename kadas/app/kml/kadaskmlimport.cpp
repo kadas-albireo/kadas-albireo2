@@ -92,7 +92,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
   }
 
   QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-  KadasItemLayer *itemLayer = kApp->getOrCreateItemLayer( filename );
+  KadasItemLayer *itemLayer = KadasItemLayerRegistry::getOrCreateItemLayer( filename );
   QgsCoordinateTransform itemCrst( crsWgs84, itemLayer->crs(), QgsProject::instance()->transformContext() );
 
   // Styles / StyleMaps with id
@@ -208,7 +208,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           item->setIconSize( 10 + 2 * style.outlineSize );
           item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
           item->setIconFill( QBrush( style.fillColor ) );
-          kApp->getOrCreateItemLayer( filename )->addItem( item );
+          KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
         }
         else if ( dynamic_cast<QgsLineString *>( geom ) )
         {
@@ -225,7 +225,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           item->addPartFromGeometry( *geom );
           item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
           item->setFill( QBrush( style.fillColor ) );
-          kApp->getOrCreateItemLayer( filename )->addItem( item );
+          KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
         }
       }
       qDeleteAll( geoms );

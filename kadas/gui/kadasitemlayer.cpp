@@ -237,3 +237,56 @@ QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
 
   return outString;
 }
+
+
+KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer layer )
+{
+  KadasItemLayer *itemLayer = getItemLayer( standardLayerNames()[layer] );
+  if ( !itemLayer && standardLayerNames().contains( layer ) )
+  {
+    itemLayer = new KadasItemLayer( standardLayerNames()[layer], QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+    layerIdMap()[standardLayerNames()[layer]] = itemLayer->id();
+    QgsProject::instance()->addMapLayer( itemLayer );
+  }
+  return itemLayer;
+}
+
+KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( const QString &layerName )
+{
+  KadasItemLayer *itemLayer = getItemLayer( layerName );
+  if ( !itemLayer )
+  {
+    itemLayer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+    layerIdMap()[layerName] = itemLayer->id();
+    QgsProject::instance()->addMapLayer( itemLayer );
+  }
+  return itemLayer;
+}
+
+KadasItemLayer *KadasItemLayerRegistry::getItemLayer( const QString &layerName )
+{
+  if ( layerIdMap().contains( layerName ) )
+  {
+    return qobject_cast<KadasItemLayer *> ( QgsProject::instance()->mapLayer( layerIdMap()[layerName] ) );
+  }
+  return nullptr;
+}
+
+const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
+{
+  static QMap<StandardLayer, QString> names =
+  {
+    {RedliningLayer, tr( "Redlining" )},
+    {SymbolsLayer, tr( "Symbols" )},
+    {PicturesLayer, tr( "Pictures" )},
+    {PinsLayer, tr( "Pins" )},
+    {RoutesLayer, tr( "Routes" )}
+  };
+  return names;
+}
+
+QMap<QString, QString> &KadasItemLayerRegistry::layerIdMap()
+{
+  static QMap<QString, QString> map;
+  return map;
+}

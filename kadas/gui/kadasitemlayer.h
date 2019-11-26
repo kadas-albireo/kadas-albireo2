@@ -176,4 +176,18 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
 };
 
+class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
+{
+    Q_OBJECT
+  public:
+    enum StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
+    static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
+    static KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
+
+  private:
+    static KadasItemLayer *getItemLayer( const QString &layerName );
+    static const QMap<StandardLayer, QString> &standardLayerNames();
+    static QMap<QString, QString> &layerIdMap();
+};
+
 #endif // KADASITEMLAYER_H

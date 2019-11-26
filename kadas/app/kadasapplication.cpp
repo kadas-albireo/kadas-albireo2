@@ -520,27 +520,6 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
   }
 }
 
-KadasItemLayer *KadasApplication::getItemLayer( const QString &layerName ) const
-{
-  if ( mItemLayerMap.contains( layerName ) )
-  {
-    return qobject_cast<KadasItemLayer *> ( QgsProject::instance()->mapLayer( mItemLayerMap[layerName] ) );
-  }
-  return nullptr;
-}
-
-KadasItemLayer *KadasApplication::getOrCreateItemLayer( const QString &layerName )
-{
-  KadasItemLayer *layer = getItemLayer( layerName );
-  if ( !layer )
-  {
-    layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    mItemLayerMap[layerName] = layer->id();
-    QgsProject::instance()->addMapLayer( layer );
-  }
-  return layer;
-}
-
 KadasItemLayer *KadasApplication::selectItemLayer()
 {
   QDialog dialog;
@@ -1080,7 +1059,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, 0.5, 0.5 );
       item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
     }
   }
   else
@@ -1094,7 +1073,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
     }
   }
   return nullptr;

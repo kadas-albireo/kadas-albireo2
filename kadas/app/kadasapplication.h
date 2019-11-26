@@ -62,8 +62,6 @@ class KadasApplication : public QgsApplication
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
-    KadasItemLayer *getItemLayer( const QString &layerName ) const;
-    KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
     KadasItemLayer *selectItemLayer();
 
     void exportToKml();

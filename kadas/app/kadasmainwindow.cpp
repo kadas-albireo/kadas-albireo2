@@ -986,7 +986,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
     item->setEditor( "KadasSymbolAttributesEditor" );
     return item;
   };
-  return new KadasMapToolCreateItem( mapCanvas(), factory, kApp->getOrCreateItemLayer( tr( "Pins" ) ) );
+  return new KadasMapToolCreateItem( mapCanvas(), factory, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer ) );
 }
 
 QgsMapTool *KadasMainWindow::addPictureTool()
@@ -1014,13 +1014,13 @@ QgsMapTool *KadasMainWindow::addPictureTool()
     KadasSymbolItem *item = new KadasSymbolItem( crs );
     item->setFilePath( filename );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "SVG graphics" ) ) );
+    return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
   }
   else
   {
     KadasPictureItem *item = new KadasPictureItem( crs );
     item->setup( filename, KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, kApp->getOrCreateItemLayer( tr( "Pictures" ) ) );
+    return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
   }
 }
 

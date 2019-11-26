@@ -160,6 +160,19 @@ class KadasItemLayerType : KadasPluginLayerType
     virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
 };
 
+class KadasItemLayerRegistry : QObject
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasitemlayer.h"
+%End
+  public:
+    enum StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
+    static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
+    static KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
+
+};
+
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *

@@ -178,9 +178,9 @@ void KadasCanvasContextMenu::convertWaypointToPin()
   }
   QgsCoordinateTransform crst( pointItem->crs(), pin->crs(), QgsProject::instance()->transformContext() );
   pin->setPosition( KadasItemPos::fromPoint( crst.transform( pointItem->position() ) ) );
-  kApp->getOrCreateItemLayer( tr( "Pins" ) )->addItem( pin );
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
 
-  kApp->getOrCreateItemLayer( tr( "Pins" ) )->triggerRepaint();
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->triggerRepaint();
   mPickResult.layer->triggerRepaint();
   delete pointItem;
 }
@@ -195,9 +195,9 @@ void KadasCanvasContextMenu::convertPinToWaypoint()
   waypoint->setName( pin->name() );
   QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
   waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
-  kApp->getOrCreateItemLayer( tr( "Routes" ) )->addItem( waypoint );
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->addItem( waypoint );
 
-  kApp->getOrCreateItemLayer( tr( "Routes" ) )->triggerRepaint();
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->triggerRepaint();
   mPickResult.layer->triggerRepaint();
   delete pin;
 }
