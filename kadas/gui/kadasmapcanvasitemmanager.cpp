@@ -31,6 +31,7 @@ void KadasMapCanvasItemManager::addItem( KadasMapItem *item )
   connect( item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed );
   emit instance()->itemAdded( item );
 }
+
 void KadasMapCanvasItemManager::removeItem( KadasMapItem *item )
 {
   emit instance()->itemWillBeRemoved( item );
@@ -39,7 +40,7 @@ void KadasMapCanvasItemManager::removeItem( KadasMapItem *item )
 
 void KadasMapCanvasItemManager::removeItemAfterRefresh( KadasMapItem *item, QgsMapCanvas *canvas )
 {
-  if ( !canvas->mapSettings().hasValidSettings() )
+  if ( !canvas->mapSettings().hasValidSettings() || canvas->isFrozen() )
   {
     // Canvas does not refresh if settings are invalid...
     removeItem( item );

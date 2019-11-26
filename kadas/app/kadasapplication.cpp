@@ -667,6 +667,8 @@ void KadasApplication::projectClose()
 {
   emit projectWillBeClosed();
 
+  mMainWindow->mapCanvas()->freeze( true );
+
   KadasLayoutDesignerManager::instance()->closeAllDesigners();
 
   unsetMapTool();
@@ -676,7 +678,6 @@ void KadasApplication::projectClose()
   KadasMapCanvasItemManager::clear();
 
   // clear out any stuff from project
-  mMainWindow->mapCanvas()->freeze( true );
   mMainWindow->mapCanvas()->setLayers( QList<QgsMapLayer *>() );
   mMainWindow->mapCanvas()->clearCache();
   mMainWindow->mapCanvas()->freeze( false );

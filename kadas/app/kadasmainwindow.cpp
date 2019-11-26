@@ -420,6 +420,7 @@ void KadasMainWindow::closeEvent( QCloseEvent *ev )
     ev->ignore();
     return;
   }
+  kApp->projectClose();
   QgsSettings().setValue( "/kadas/windowgeometry", saveGeometry() );
 }
 
