@@ -33,7 +33,6 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
   public:
 
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );
-    ~KadasMapToolHeightProfile();
 
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;

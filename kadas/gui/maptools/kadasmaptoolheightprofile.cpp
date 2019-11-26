@@ -52,11 +52,6 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory( QgsM
   };
 }
 
-KadasMapToolHeightProfile::~KadasMapToolHeightProfile()
-{
-  delete mPosMarker;
-}
-
 void KadasMapToolHeightProfile::activate()
 {
   mPicking = false;
@@ -70,6 +65,8 @@ void KadasMapToolHeightProfile::deactivate()
   mDialog->close();
   mDialog->setPoints( QList<QgsPointXY>(), mCanvas->mapSettings().destinationCrs() );
   KadasMapToolCreateItem::deactivate();
+  delete mPosMarker;
+  mPosMarker = nullptr;
 }
 
 void KadasMapToolHeightProfile::setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs )
