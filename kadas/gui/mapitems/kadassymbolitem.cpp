@@ -81,6 +81,7 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   }
   else
   {
+    context.painter()->setRenderHint( QPainter::SmoothPixmapTransform, true );
     context.painter()->drawImage( 0, 0, mImage );
   }
 }
