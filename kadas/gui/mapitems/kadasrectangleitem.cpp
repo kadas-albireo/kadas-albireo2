@@ -262,7 +262,30 @@ KadasMapPos KadasRectangleItem::positionFromEditAttribs( const EditContext &cont
 
 void KadasRectangleItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 {
-  // TODO
+  QList<const QgsPolygon *> geoms;
+  if ( dynamic_cast<const QgsGeometryCollection *>( &geom ) )
+  {
+    const QgsGeometryCollection &collection = dynamic_cast<const QgsGeometryCollection &>( geom );
+    for ( int i = 0, n = collection.numGeometries(); i < n; ++i )
+    {
+      if ( dynamic_cast<const QgsPolygon *>( collection.geometryN( i ) ) )
+      {
+        geoms.append( static_cast<const QgsPolygon *>( collection.geometryN( i ) ) );
+      }
+    }
+  }
+  else if ( dynamic_cast<const QgsPolygon *>( &geom ) )
+  {
+    geoms.append( static_cast<const QgsPolygon *>( &geom ) );
+  }
+  for ( const QgsPolygon *poly : geoms )
+  {
+    QgsRectangle bbox = poly->boundingBox();
+    state()->p1.append( KadasItemPos( bbox.xMinimum(), bbox.yMinimum() ) );
+    state()->p2.append( KadasItemPos( bbox.xMaximum(), bbox.yMaximum() ) );
+    endPart();
+  }
+  recomputeDerived();
 }
 
 const QgsMultiPolygon *KadasRectangleItem::geometry() const
