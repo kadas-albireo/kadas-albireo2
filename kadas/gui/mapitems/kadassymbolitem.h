@@ -29,7 +29,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
-    void setup( const QString &path, double anchorX, double anchorY );
+    void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
     QString itemName() const override { return tr( "Symbol" ); }
 

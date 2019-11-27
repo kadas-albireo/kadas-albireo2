@@ -37,23 +37,39 @@ KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObje
   clear();
 }
 
-void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY )
+void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY, int width, int height )
 {
   mAnchorX = anchorX;
   mAnchorY = anchorY;
-  setFilePath( path );
+
+  mFilePath = path;
+  QImageReader reader( path );
+  mScalable = reader.format() == "svg";
+  reader.setBackgroundColor( Qt::transparent );
+  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+
+  if ( width > 0 )
+  {
+    state()->size.setWidth( width );
+    state()->size.setHeight( reader.size().height() * double( width ) / reader.size().width() );
+  }
+  else if ( height > 0 )
+  {
+    state()->size.setHeight( height );
+    state()->size.setWidth( reader.size().width() * double( height ) / reader.size().height() );
+  }
+  else
+  {
+    state()->size = reader.size();
+  }
+
+  update();
+
 }
 
 void KadasSymbolItem::setFilePath( const QString &path )
 {
-  mFilePath = path;
-  QImageReader reader( path );
-  mScalable = reader.format() == "svg";
-  state()->size = reader.size();
-  reader.setBackgroundColor( Qt::transparent );
-  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
-
-  update();
+  setup( path, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
 }
 
 void KadasSymbolItem::render( QgsRenderContext &context ) const

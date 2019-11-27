@@ -28,7 +28,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
-    void setup( const QString &path, double anchorX, double anchorY );
+    void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
     virtual QString itemName() const;
 
