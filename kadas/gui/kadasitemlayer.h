@@ -183,10 +183,10 @@ class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
     enum StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
     static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
     static KadasItemLayer *getOrCreateItemLayer( const QString &layerName );
+    static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
 
   private:
     static KadasItemLayer *getItemLayer( const QString &layerName );
-    static const QMap<StandardLayer, QString> &standardLayerNames();
     static QMap<QString, QString> &layerIdMap();
 };
 
