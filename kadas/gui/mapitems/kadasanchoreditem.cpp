@@ -78,6 +78,12 @@ void KadasAnchoredItem::setPosition( const KadasItemPos &pos )
   update();
 }
 
+void KadasAnchoredItem::setAngle( double angle )
+{
+  state()->angle = angle;
+  update();
+}
+
 KadasItemRect KadasAnchoredItem::boundingBox() const
 {
   return KadasItemRect( constState()->pos, constState()->pos );
