@@ -85,10 +85,12 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   context.painter()->setBrush( QBrush( mFillColor ) );
   context.painter()->setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
   context.painter()->setFont( mFont );
-  QPainterPath path;
-  path.addText( -0.5 * bbox.width(), baselineOffset, mFont, mText );
   context.painter()->translate( pos );
   context.painter()->rotate( -constState()->angle );
+  QPainterPath path;
+  path.addText( -0.5 * bbox.width(), baselineOffset, mFont, mText );
+  context.painter()->drawPath( path );
+  context.painter()->setPen( Qt::transparent );
   context.painter()->drawPath( path );
 }
 
