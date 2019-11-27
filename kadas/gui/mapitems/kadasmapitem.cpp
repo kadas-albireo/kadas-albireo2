@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
@@ -72,17 +73,23 @@ QJsonObject KadasMapItem::serialize() const
       {
         value = QJsonValue( variant.toDouble() );
       }
+      else if ( prop.type() == QVariant::Pen )
+      {
+        QPen pen = variant.value<QPen>();
+        value = QString( "%1;%2;%3" ).arg( pen.color().name( QColor::HexArgb ) ).arg( pen.width() ).arg( pen.style() );
+      }
+      else if ( prop.type() == QVariant::Brush )
+      {
+        QBrush brush = variant.value<QBrush>();
+        value = QString( "%1;%2" ).arg( brush.color().name( QColor::HexArgb ) ).arg( brush.style() );
+      }
       else if ( variant.canConvert( QVariant::String ) )
       {
         value = QJsonValue( variant.toString() );
       }
       else
       {
-        // Serialize non-convertible types as base64 encoded binary strings
-        QByteArray data;
-        QDataStream ds( &data, QIODevice::WriteOnly );
-        ds << variant;
-        value = QJsonValue( QString( data.toBase64() ) );
+        QgsDebugMsg( QString( "Skipping unserializable property: %1" ).arg( prop.name() ) );
       }
     }
     props[prop.name()] = value;
@@ -106,19 +113,22 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
     {
       prop.write( this, QVariant::fromValue( QgsProject::instance()->readPath( value.toString() ) ) );
     }
-    else if ( variant.toJsonValue().isUndefined() && value.type() == QJsonValue::String )
+    else if ( prop.type() == QVariant::Pen )
     {
-      // Deserialize non-convertible types from base64 encoded binary strings
-      QByteArray ba = QByteArray::fromBase64( value.toString().toLocal8Bit() );
-      if ( !ba.isNull() )
+      QStringList penStr = value.toString().split( ";" );
+      if ( penStr.size() == 3 )
       {
-        QDataStream ds( &ba, QIODevice::ReadOnly );
-        ds >> variant;
-        prop.write( this, variant );
+        QPen pen( QColor( penStr[0] ), penStr[1].toInt(), static_cast<Qt::PenStyle>( penStr[2].toInt() ) );
+        prop.write( this, QVariant::fromValue( pen ) );
       }
-      else
+    }
+    else if ( prop.type() == QVariant::Brush )
+    {
+      QStringList brushStr = value.toString().split( ";" );
+      if ( brushStr.size() == 2 )
       {
-        prop.write( this, value.toVariant() );
+        QBrush brush( QColor( brushStr[0] ), static_cast<Qt::BrushStyle>( brushStr[1].toInt() ) );
+        prop.write( this, QVariant::fromValue( brush ) );
       }
     }
     else
