@@ -154,11 +154,13 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
     QDomElement itemEl = itemEls.at( i ).toElement();
     QString name = itemEl.attribute( "name" );
     QString crs = itemEl.attribute( "crs" );
+    QString editor = itemEl.attribute( "editor" );
     QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
     KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
     if ( factory )
     {
       KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
+      item->setEditor( editor );
       if ( item->deserialize( data.object() ) )
       {
         mItems.insert( ++mIdCounter, item );
@@ -187,6 +189,7 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
     QDomElement itemEl = document.createElement( "MapItem" );
     itemEl.setAttribute( "name", it.value()->metaObject()->className() );
     itemEl.setAttribute( "crs", it.value()->crs().authid() );
+    itemEl.setAttribute( "editor", it.value()->editor() );
     QJsonDocument doc;
     doc.setObject( it.value()->serialize() );
     itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
