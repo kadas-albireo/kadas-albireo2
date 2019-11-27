@@ -431,7 +431,11 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
   {
     QImageReader reader( mFilePath );
 
-    QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( toMapPos( position(), mapSettings ) );
+    double mup = mapSettings.mapUnitsPerPixel();
+    KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
+    KadasMapPos frameCenter( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
+
+    QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter );
     state()->size.setWidth( 2 * qAbs( halfSize.x() ) );
     state()->size.setHeight( state()->size.width() / double( reader.size().width() ) * reader.size().height() );
 
