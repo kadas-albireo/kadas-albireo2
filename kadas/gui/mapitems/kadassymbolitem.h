@@ -41,7 +41,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     const QString &remarks() const { return mRemarks; }
 
     QImage symbolImage() const override { return mImage; }
-    QPointF symbolAnchor() const { return QPointF( anchorX(), anchorY() ); }
+    QPointF symbolAnchor() const override { return QPointF( anchorX(), anchorY() ); }
 
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN

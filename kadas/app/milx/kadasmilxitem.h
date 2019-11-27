@@ -45,7 +45,7 @@ class KadasMilxItem : public KadasMapItem
     QString itemName() const override { return mMilitaryName; }
 
     QImage symbolImage() const override { return mCachedGraphic; }
-    QPointF symbolAnchor() const;
+    QPointF symbolAnchor() const override;
 
     KadasItemRect boundingBox() const override;
     Margin margin() const override;
