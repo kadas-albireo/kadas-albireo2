@@ -31,7 +31,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
-    void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50 );
+    void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50, int width = 0, int height = 0 );
 
     const QString &filePath() const { return mFilePath; }
     void setFilePath( const QString &filePath );

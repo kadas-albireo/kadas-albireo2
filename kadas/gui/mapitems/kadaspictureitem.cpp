@@ -69,25 +69,39 @@ KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QOb
   clear();
 }
 
-void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv, double offsetX, double offsetY )
+void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv, double offsetX, double offsetY, int width, int height )
 {
   mFilePath = path;
   QImageReader reader( path );
 
-  // Scale such that largest dimension is max 64px
-  QSize size = reader.size();
-  if ( size.width() > size.height() )
+  // If a size is given, set size while maintaining aspect ratio (width prevails over height)
+  if ( width > 0 )
   {
-    size.setHeight( ( 64. * size.height() ) / size.width() );
-    size.setWidth( 64 );
+    state()->size.setWidth( width );
+    state()->size.setHeight( reader.size().height() * double( width ) / reader.size().width() );
+  }
+  else if ( height > 0 )
+  {
+    state()->size.setHeight( height );
+    state()->size.setWidth( reader.size().width() * double( height ) / reader.size().height() );
   }
   else
   {
-    size.setWidth( ( 64. * size.width() ) / size.height() );
-    size.setHeight( 64 );
-  }
+    // Scale such that largest dimension is max 64px
+    QSize size = reader.size();
+    if ( size.width() > size.height() )
+    {
+      size.setHeight( ( 64. * size.height() ) / size.width() );
+      size.setWidth( 64 );
+    }
+    else
+    {
+      size.setWidth( ( 64. * size.width() ) / size.height() );
+      size.setHeight( 64 );
+    }
 
-  state()->size = size;
+    state()->size = size;
+  }
 
   state()->pos = fallbackPos;
   QgsPointXY wgsPos;
@@ -102,7 +116,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   mOffsetY = offsetY;
 
   reader.setBackgroundColor( Qt::white );
-  reader.setScaledSize( size );
+  reader.setScaledSize( state()->size );
   mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
   update();
