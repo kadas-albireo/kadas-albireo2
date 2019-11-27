@@ -642,7 +642,10 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer( false );
 
   QgsProjectDirtyBlocker dirtyBlocker( QgsProject::instance() );
+
+  QString resolverId = QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
   bool success = QgsProject::instance()->read( fileName );
+  QgsPathResolver::removePathPreprocessor( resolverId );
 
   if ( success )
   {
@@ -1409,6 +1412,30 @@ bool KadasApplication::showZipSublayerSelectionDialog( const QString &path ) con
   }
 
   return true;
+}
+
+QString KadasApplication::migrateDatasource( const QString &path ) const
+{
+  static QMap<QString, QString> dataSourceMap = dataSourceMigrationMap();
+  QString normPath = path.toLower().replace( "\\", "/" );
+  return dataSourceMap.value( normPath, path );
+}
+
+QMap<QString, QString> KadasApplication::dataSourceMigrationMap() const
+{
+  QMap<QString, QString> dataSourceMap;
+  QFile migrationsFile( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "datasource_migrations.json" ) );
+  if ( migrationsFile.open( QIODevice::ReadOnly ) )
+  {
+    QJsonDocument doc = QJsonDocument::fromJson( migrationsFile.readAll() );
+    QJsonArray entries = doc.array();
+    for ( int i = 0, n = entries.size(); i < n; ++i )
+    {
+      QJsonObject entry = entries.at( i ).toObject();
+      dataSourceMap.insert( entry.value( "old" ).toString(), entry.value( "new" ).toString() );
+    }
+  }
+  return dataSourceMap;
 }
 
 void KadasApplication::loadPythonSupport()

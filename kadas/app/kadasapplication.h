@@ -122,6 +122,8 @@ class KadasApplication : public QgsApplication
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
     void loadPythonSupport();
     bool showZipSublayerSelectionDialog( const QString &path ) const;
+    QString migrateDatasource( const QString &path ) const;
+    QMap<QString, QString> dataSourceMigrationMap() const;
 
     static QgsMessageOutput *messageOutputViewer();
 
