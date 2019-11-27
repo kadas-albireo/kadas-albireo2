@@ -243,7 +243,7 @@ void KadasGlobeDialog::writeProjectSettings()
     QTreeWidgetItem *item = mImageryTreeView->topLevelItem( row );
     QString key = QString( "/imageryDatasources/L%1" ).arg( row );
     QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/type", item->text( 0 ) );
-    QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/uri", item->text( 1 ) );
+    QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/uri", QgsProject::instance()->writePath( item->text( 1 ) ) );
   }
 
   // Elevation settings
@@ -253,7 +253,7 @@ void KadasGlobeDialog::writeProjectSettings()
     QTreeWidgetItem *item = mElevationTreeView->topLevelItem( row );
     QString key = QString( "/elevationDatasources/L%1" ).arg( row );
     QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/type", item->text( 0 ) );
-    QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/uri", item->text( 1 ) );
+    QgsProject::instance()->writeEntry( "Globe-Plugin", key + "/uri", QgsProject::instance()->writePath( item->text( 1 ) ) );
   }
 
 #if OSGEARTH_VERSION_GREATER_OR_EQUAL( 2, 5, 0 )
@@ -433,7 +433,7 @@ QList<KadasGlobeDialog::LayerDataSource> KadasGlobeDialog::getImageryDataSources
     QString key = QString( "/imageryDatasources/L%1" ).arg( i );
     LayerDataSource datasource;
     datasource.type  = QgsProject::instance()->readEntry( "Globe-Plugin", key + "/type" );
-    datasource.uri   = QgsProject::instance()->readEntry( "Globe-Plugin", key + "/uri" );
+    datasource.uri   = QgsProject::instance()->readPath( QgsProject::instance()->readEntry( "Globe-Plugin", key + "/uri" ) );
     datasources.append( datasource );
   }
   return datasources;
@@ -448,7 +448,7 @@ QList<KadasGlobeDialog::LayerDataSource> KadasGlobeDialog::getElevationDataSourc
     QString key = QString( "/elevationDatasources/L%1" ).arg( i );
     LayerDataSource datasource;
     datasource.type  = QgsProject::instance()->readEntry( "Globe-Plugin", key + "/type" );
-    datasource.uri   = QgsProject::instance()->readEntry( "Globe-Plugin", key + "/uri" );
+    datasource.uri   = QgsProject::instance()->readPath( QgsProject::instance()->readEntry( "Globe-Plugin", key + "/uri" ) );
     datasources.append( datasource );
   }
   return datasources;
