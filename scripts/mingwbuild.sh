@@ -91,6 +91,7 @@ mkdir -p $builddir
 mingw$bits-make -C$builddir -j$njobs DESTDIR="${installroot}" install VERBOSE=1
 
 # Strip debuginfo
+binaries=$(find $installprefix -name '*.exe' -or -name '*.dll' -or -name '*.pyd')
 for f in $binaries
 do
     case $(mingw-objdump -h $f 2>/dev/null | egrep -o '(debug[\.a-z_]*|gnu.version)') in
