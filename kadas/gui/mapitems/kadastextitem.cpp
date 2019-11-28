@@ -80,7 +80,7 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   QPointF pos = context.mapToPixel().transform( mapPos ).toQPointF();
   QFontMetrics metrics( mFont );
   QRect bbox = metrics.boundingRect( mText );
-  int baselineOffset = metrics.ascent() - 0.5 * metrics.height();
+  int baselineOffset = metrics.ascent() - mAnchorY * metrics.height();
 
   context.painter()->setBrush( QBrush( mFillColor ) );
   context.painter()->setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
@@ -88,7 +88,7 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   context.painter()->translate( pos );
   context.painter()->rotate( -constState()->angle );
   QPainterPath path;
-  path.addText( -0.5 * bbox.width(), baselineOffset, mFont, mText );
+  path.addText( -mAnchorX * bbox.width(), baselineOffset, mFont, mText );
   context.painter()->drawPath( path );
   context.painter()->setPen( Qt::transparent );
   context.painter()->drawPath( path );
