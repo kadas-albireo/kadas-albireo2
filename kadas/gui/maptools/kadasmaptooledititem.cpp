@@ -21,6 +21,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgssnappingutils.h>
 
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasclipboard.h>
@@ -58,6 +59,8 @@ void KadasMapToolEditItem::activate()
   mStateHistory = new KadasStateHistory( this );
   mStateHistory->push( mItem->constState()->clone() );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditItem::stateChanged );
+
+  mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
 
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
@@ -180,7 +183,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  KadasMapPos pos( e->mapPoint().x(), e->mapPoint().y() );
+  KadasMapPos pos = transformMousePoint( e->mapPoint() );
 
   if ( e->buttons() == Qt::LeftButton )
   {
@@ -349,4 +352,17 @@ void KadasMapToolEditItem::deleteItem()
   delete mItem;
   mItem = nullptr;
   canvas()->unsetMapTool( this );
+}
+
+KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos ) const
+{
+  if ( mSnapping )
+  {
+    QgsPointLocator::Match m = mCanvas->snappingUtils()->snapToMap( mapPos );
+    if ( m.isValid() )
+    {
+      mapPos = m.point();
+    }
+  }
+  return KadasMapPos( mapPos.x(), mapPos.y() );
 }

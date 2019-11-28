@@ -51,6 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasItemLayer *mLayer = nullptr;
     KadasMapItem *mItem = nullptr;
     KadasMapItem::EditContext mEditContext;
+    bool mSnapping = false;
 
     KadasFloatingInputWidget *mInputWidget = nullptr;
     KadasMapItemEditor *mEditor = nullptr;
@@ -60,6 +61,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasMapItem::AttribValues collectAttributeValues() const;
     void setupNumericInput();
     void clearNumericInput();
+    KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
 
   private slots:
     void inputChanged();
