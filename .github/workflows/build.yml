@@ -1,0 +1,59 @@
+name: Kadas Build
+on: [push]
+
+jobs:
+  build:
+    name: MinGW build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build kadas2-mingw-buildenv
+        run: docker build -t kadas2-mingw-buildenv .
+      - name: Download QGIS build
+        run: |
+          mkdir dist
+          curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .html_url >dist/qgis-release.txt
+          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[0].browser_download_url)
+          wget --no-verbose $ASSET_URL
+          unzip qgis-portable-win64.zip -d dist
+      - name: Version number
+        id: version_number
+        run: |
+          if [ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]; then VERSION=$(basename ${{ github.ref }}); else VERSION=$(date +%Y%m%d%S); fi
+          echo "##[set-output name=version;]$VERSION"
+      - name: Build application
+        run: docker run -v $PWD:/workspace -e QGIS_INSTALL_PREFIX=/workspace/dist kadas2-mingw-buildenv scripts/mingwbuild.sh x86_64 nodebug 4
+      - name: Package application
+        run: docker run -v $PWD:/workspace kadas2-mingw-buildenv packaging/kadas_release.sh
+      - name: Create portable zip
+        run: (cd dist && zip -r - *) > kadas-portable-win64.zip
+      - name: Create debugsym zip
+        run: (cd dist_debug && zip -r - *) > kadas-portable-win64-debugsym.zip
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version_number.outputs.version }}
+          release_name: Build ${{ steps.version_number.outputs.version }}
+          draft: false
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./kadas-portable-win64.zip
+          asset_name: kadas-portable-win64.zip
+          asset_content_type: application/zip
+      - name: Upload debugsym release asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./kadas-portable-win64-debugsym.zip
+          asset_name: kadas-portable-win64-debugsym.zip
+          asset_content_type: application/zip

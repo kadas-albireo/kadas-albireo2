@@ -5,6 +5,7 @@ debug=false
 if [ "$2" == "debug" ]; then
   debug=true
 fi
+njobs=${3:-$(($(grep -c ^processor /proc/cpuinfo) * 3 / 2))}
 
 if [ "$arch" == "i686" ]; then
     bits=32
@@ -23,7 +24,7 @@ fi
 # Do copies instead of links if building inside container
 if [ -f /.dockerenv ]; then
     lnk() {
-        cp -a "$1" "$2"
+        cp -aL "$1" "$2"
     }
 else
     lnk() {
@@ -87,7 +88,6 @@ mkdir -p $builddir
 )
 
 
-njobs=$(($(grep -c ^processor /proc/cpuinfo) * 3 / 2))
 mingw$bits-make -C$builddir -j$njobs DESTDIR="${installroot}" install VERBOSE=1
 
 binaries=$(find $installprefix -name '*.exe' -or -name '*.dll' -or -name '*.pyd')
