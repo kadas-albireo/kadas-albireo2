@@ -1006,6 +1006,9 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   {
     return nullptr;
   }
+  QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
+  QFile( attachedPath ).remove();
+  QFile( filename ).copy( attachedPath );
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
   QString errMsg;
   QgsCoordinateReferenceSystem crs( "EPSG:3857" );
@@ -1013,14 +1016,14 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
   {
     KadasSymbolItem *item = new KadasSymbolItem( crs );
-    item->setFilePath( filename );
+    item->setFilePath( attachedPath );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
     return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
   }
   else
   {
     KadasPictureItem *item = new KadasPictureItem( crs );
-    item->setup( filename, KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
+    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
     return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
   }
 }
