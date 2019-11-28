@@ -31,6 +31,7 @@ class KadasProjectMigration
     static void migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach );
     static QDomElement replaceAnnotationLayer( QDomDocument &doc, QDomElement &root, const QString &layerId );
     static QMap<QString, QString> deserializeLegacyRedliningFlags( const QString &flagsStr );
+    static bool shouldAttach( const QString &baseDir, const QString &filePath );
 };
 
 #endif // KADASPROJECTMIGRATION_H

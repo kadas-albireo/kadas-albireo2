@@ -99,10 +99,9 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
     QString datasourceText = datasourceEl.text();
 
     // If datasource is relative to basedir, mark it as to be attached
-    QFile file( QDir( basedir ).absoluteFilePath( datasourceText ) );
-    if ( !datasourceText.isEmpty() && file.exists() )
+    if ( shouldAttach( basedir, datasourceText ) )
     {
-      QString fullPath = file.fileName();
+      QString fullPath = QDir( basedir ).absoluteFilePath( datasourceText );
       QDomElement newDatasourceEl = doc.createElement( "datasource" );
       newDatasourceEl.appendChild( doc.createTextNode( fullPath ) );
       maplayer.replaceChild( newDatasourceEl, datasourceEl );
@@ -332,10 +331,9 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
 
       // If file is relative to the basedir, mark it as to be attached
       QString fileName = svgItemEl.attribute( "file" );
-      QFile file( QDir( basedir ).absoluteFilePath( fileName ) );
-      if ( file.exists() )
+      if ( shouldAttach( basedir, fileName ) )
       {
-        fileName = file.fileName();
+        fileName = QDir( basedir ).absoluteFilePath( fileName );
         filesToAttach.append( fileName );
       }
       int width = annotationItemEl.attribute( "frameWidth" ).toInt();
@@ -388,10 +386,9 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
 
       // If file is relative to the basedir, mark it as to be attached
       QString fileName = imageItemEl.attribute( "file" );
-      QFile file( QDir( basedir ).absoluteFilePath( fileName ) );
-      if ( file.exists() )
+      if ( shouldAttach( basedir, fileName ) )
       {
-        fileName = file.fileName();
+        fileName = QDir( basedir ).absoluteFilePath( fileName );
         filesToAttach.append( fileName );
       }
 
@@ -517,4 +514,11 @@ QMap<QString, QString> KadasProjectMigration::deserializeLegacyRedliningFlags( c
     flagsMap.insert( flag.left( pos ), pos >= 0 ? flag.mid( pos + 1 ) : QString() );
   }
   return flagsMap;
+}
+
+bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString &filePath )
+{
+  QFile file( QDir( baseDir ).absoluteFilePath( filePath ) );
+  // Attach files relative to base dir smaller than 10 MB
+  return QFileInfo( filePath ).isRelative() && file.exists() && file.size() < 10 * 1024 * 1024;
 }
