@@ -163,6 +163,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         textItem->setAngle( flags["rotation"].toDouble() );
         textItem->setOutlineColor( outline );
         textItem->setFillColor( fill );
+        textItem->setAnchorX( 0 );
+        textItem->setAnchorY( 1. );
 
         QFont font;
         font.setBold( flags["bold"].toInt() != 0 );
