@@ -40,7 +40,7 @@ class KadasMilxLayer : public KadasItemLayer
     bool isApproved() const { return mIsApproved; }
 
     void exportToMilxly( QDomElement &milxLayerEl, int dpi );
-    bool importFromMilxly( QDomElement &milxLayerEl, int dpi, QString &errorMsg );
+    bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
 
   signals:
     void approvedChanged( bool approved );
