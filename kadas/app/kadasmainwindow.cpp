@@ -138,7 +138,7 @@ void KadasMainWindow::init()
   mSpinBoxDecimalPlaces->setValue( QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
   connect( mSpinBoxDecimalPlaces, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
 
-  mSnappingCheckbox->setChecked( QgsSettings().value( "/Qgis/snapping/enabled", false ).toBool() );
+  mSnappingCheckbox->setChecked( QgsSettings().value( "/kadas/snapping_enabled", false ).toBool() );
   connect( mSnappingCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onSnappingChanged );
 
   mInfoBar = new QgsMessageBar( mMapCanvas );
@@ -189,9 +189,10 @@ void KadasMainWindow::init()
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( QgsSnappingConfig::AllLayers );
   snappingConfig.setType( QgsSnappingConfig::Vertex );
-  int snappingRadius = QgsSettings().value( "/Qgis/snapping/radius", 10 ).toInt();
+  int snappingRadius = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
   snappingConfig.setUnits( QgsTolerance::Pixels );
+  snappingConfig.setEnabled( true );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
   mPluginsToolButton->setMenu( new QMenu() );
@@ -878,7 +879,7 @@ void KadasMainWindow::onDecimalPlacesChanged( int places )
 
 void KadasMainWindow::onSnappingChanged( bool enabled )
 {
-  QgsSettings().setValue( "/Qgis/snapping/enabled", enabled );
+  QgsSettings().setValue( "/kadas/snapping_enabled", enabled );
 }
 
 void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )

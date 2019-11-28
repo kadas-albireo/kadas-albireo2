@@ -77,6 +77,7 @@ void KadasMapToolCreateItem::activate()
       mInputWidget->setFocusedInputField( mInputWidget->inputField( mDrawAttribs.begin().key() ) );
     }
   }
+  mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
   mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
