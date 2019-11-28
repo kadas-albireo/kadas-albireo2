@@ -768,7 +768,6 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
   if ( QgsProject::instance()->write() )
   {
     mMainWindow->messageBar()->pushMessage( tr( "Project saved" ), "", Qgis::Info, mMainWindow->messageTimeout() );
-    mMainWindow->statusBar()->showMessage( tr( "Project saved to %1" ).arg( QDir::toNativeSeparators( QgsProject::instance()->fileName() ) ), 5000 );
   }
   else
   {
@@ -777,7 +776,6 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
                            QgsProject::instance()->error() );
     return false;
   }
-
   return true;
 }
 
