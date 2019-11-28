@@ -212,9 +212,5 @@ done
 IFS=$SAVEIFS
 )
 
-# Data files
-mkdir -p $installprefix/share/
-lnk /usr/share/gdal $installprefix/share/gdal
-
 # Sort origins file
 cat $installprefix/origins.txt | sort | uniq > $installprefix/origins.new && mv $installprefix/origins.new $installprefix/origins.txt
