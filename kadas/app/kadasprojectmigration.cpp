@@ -475,6 +475,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
     QgsReadWriteContext context;
     layer.writeXml( newMapLayerEl, doc, context );
     newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "id" ).cloneNode() );
+    newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "layername" ).cloneNode() );
 
     projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
   }
@@ -492,13 +493,13 @@ QDomElement KadasProjectMigration::replaceAnnotationLayer( QDomDocument &doc, QD
     QString layerName = mapLayerEl.firstChildElement( "layername" ).text();
     if ( mapLayerEl.firstChildElement( "id" ).text() == layerId )
     {
-
       QDomElement newMapLayerEl = doc.createElement( "maplayer" );
       newMapLayerEl.setAttribute( "name", "KadasItemLayer" );
       newMapLayerEl.setAttribute( "type", "plugin" );
       newMapLayerEl.setAttribute( "title", layerName );
       newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "srs" ).cloneNode() );
       newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "id" ).cloneNode() );
+      newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "layername" ).cloneNode() );
 
       projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
       return newMapLayerEl;
