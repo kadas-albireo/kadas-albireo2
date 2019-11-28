@@ -68,6 +68,7 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
+#include <kadas/app/kadasprojectmigration.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasvectorlayerproperties.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
@@ -643,13 +644,38 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   QgsProjectDirtyBlocker dirtyBlocker( QgsProject::instance() );
 
+  QStringList filesToAttach;
+  QString migratedFileName = KadasProjectMigration::migrateProject( fileName, filesToAttach );
+
   QString resolverId = QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
-  bool success = QgsProject::instance()->read( fileName );
+  QString attachResolverId = QgsPathResolver::setPathPreprocessor( [filesToAttach]( const QString & path )
+  {
+    if ( filesToAttach.contains( path ) )
+    {
+      QString attachedFile = QgsProject::instance()->createAttachedFile( QFileInfo( path ).fileName() );
+      QFile( attachedFile ).remove();
+      QFile( path ).copy( attachedFile );
+      return attachedFile;
+    }
+    return path;
+  } );
+  bool success = QgsProject::instance()->read( migratedFileName );
   QgsPathResolver::removePathPreprocessor( resolverId );
+  QgsPathResolver::removePathPreprocessor( attachResolverId );
 
   if ( success )
   {
     emit projectRead();
+
+    if ( migratedFileName != fileName )
+    {
+      mMainWindow->messageBar()->pushMessage( tr( "Project migrated" ), tr( "The project was created with an older version of KADAS and automatically migrated." ) );
+      QFileInfo finfo( fileName );
+      QgsProject::instance()->setFileName( QDir( finfo.path() ).absoluteFilePath( finfo.baseName() + ".qgz" ) );
+      QgsProject::instance()->setDirty( true );
+      updateWindowTitle();
+      QFile( migratedFileName ).remove();
+    }
   }
 
   mMainWindow->layerTreeMapCanvasBridge()->setCanvasLayers();
