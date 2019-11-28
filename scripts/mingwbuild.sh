@@ -90,8 +90,6 @@ mkdir -p $builddir
 
 mingw$bits-make -C$builddir -j$njobs DESTDIR="${installroot}" install VERBOSE=1
 
-binaries=$(find $installprefix -name '*.exe' -or -name '*.dll' -or -name '*.pyd')
-
 # Strip debuginfo
 for f in $binaries
 do
@@ -153,7 +151,21 @@ function autoLinkDeps {
     return 0
 }
 
+
+# Install python libs
+(
+cd $MINGWROOT
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+for file in $(find lib/python${pyver} -type f); do
+    mkdir -p "$installprefix/$(dirname $file)"
+    lnk "$MINGWROOT/$file" "$installprefix/$file"
+done
+IFS=$SAVEIFS
+)
+
 echo "Linking dependencies..."
+binaries=$(find $installprefix -name '*.exe' -or -name '*.dll' -or -name '*.pyd')
 for binary in $binaries; do
     autoLinkDeps $binary
 done
@@ -199,18 +211,6 @@ lnk $MINGWROOT/bin/$osgPlugins $installprefix/bin/$osgPlugins
 mkdir -p $installprefix/share/qt5/translations/
 cp -a $MINGWROOT/share/qt5/translations/qt_*.qm  $installprefix/share/qt5/translations
 cp -a $MINGWROOT/share/qt5/translations/qtbase_*.qm  $installprefix/share/qt5/translations
-
-# Install python libs
-(
-cd $MINGWROOT
-SAVEIFS=$IFS
-IFS=$(echo -en "\n\b")
-for file in $(find lib/python${pyver} -type f); do
-    mkdir -p "$installprefix/$(dirname $file)"
-    lnk "$MINGWROOT/$file" "$installprefix/$file"
-done
-IFS=$SAVEIFS
-)
 
 # Sort origins file
 cat $installprefix/origins.txt | sort | uniq > $installprefix/origins.new && mv $installprefix/origins.new $installprefix/origins.txt
