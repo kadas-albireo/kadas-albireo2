@@ -13,9 +13,12 @@ jobs:
         run: |
           mkdir dist
           curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .html_url >dist/qgis-release.txt
-          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[0].browser_download_url)
+          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[1].browser_download_url)
           wget --no-verbose $ASSET_URL
           unzip qgis-portable-win64.zip -d dist
+          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[0].browser_download_url)
+          wget --no-verbose $ASSET_URL
+          unzip qgis-portable-win64-debugsym.zip -d dist
       - name: Version number
         id: version_number
         run: |
