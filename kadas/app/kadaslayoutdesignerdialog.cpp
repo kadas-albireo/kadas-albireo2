@@ -60,6 +60,7 @@
 #include <qgis/qgspanelwidgetstack.h>
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsprojectviewsettings.h>
 #include <qgis/qgssettings.h>
 
 #include <kadas/app/kadasapplication.h>
@@ -1770,8 +1771,8 @@ QVector<double> KadasLayoutDesignerDialog::predefinedScales() const
 {
   QgsProject *project = mLayout->layoutProject();
   // first look at project's scales
-  QVector< double > projectScales = project->mapScales();
-  bool hasProjectScales( project->useProjectScales() );
+  QVector< double > projectScales = project->viewSettings()->mapScales();
+  bool hasProjectScales( project->viewSettings()->useProjectScales() );
   if ( !hasProjectScales || projectScales.isEmpty() )
   {
     // default to global map tool scales
