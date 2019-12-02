@@ -163,6 +163,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     class Renderer;
 
     QMap<ItemId, KadasMapItem *> mItems;
+    QMap<ItemId, QgsRectangle> mItemBounds;
     ItemId mIdCounter = 0;
     QVector<ItemId> mFreeIds;
 };

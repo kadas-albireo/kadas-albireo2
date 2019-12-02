@@ -89,6 +89,8 @@ void KadasItemLayer::addItem( KadasMapItem *item )
     id = ++mIdCounter;
   }
   mItems.insert( id, item );
+  QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
+  mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
   emit itemAdded( id );
 }
 
@@ -98,6 +100,7 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
   if ( item )
   {
     mFreeIds.append( itemId );
+    mItemBounds.remove( itemId );
     emit itemRemoved( itemId );
   }
   return item;
@@ -123,16 +126,15 @@ QgsMapLayerRenderer *KadasItemLayer::createMapRenderer( QgsRenderContext &render
 QgsRectangle KadasItemLayer::extent() const
 {
   QgsRectangle rect;
-  for ( const KadasMapItem *item : mItems.values() )
+  for ( const QgsRectangle &itemBBox : mItemBounds.values() )
   {
-    QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
     if ( rect.isNull() )
     {
-      rect = trans.transformBoundingBox( item->boundingBox() );
+      rect = itemBBox;
     }
     else
     {
-      rect.combineExtentWith( trans.transformBoundingBox( item->boundingBox() ) );
+      rect.combineExtentWith( itemBBox );
     }
   }
   return rect;
