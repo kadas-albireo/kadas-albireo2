@@ -166,6 +166,12 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* Hit test, rect in item crs */
     virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const = 0;
 
+#ifndef SIP_RUN
+    // TODO: SIP
+    /* Return the item point to the specified one */
+    virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
+#endif
+
     /* Render the item */
     virtual void render( QgsRenderContext &context ) const = 0;
 

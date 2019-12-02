@@ -249,6 +249,27 @@ bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &
   return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
 }
 
+QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+{
+  double minDistSq = std::numeric_limits<double>::max();
+  KadasMapPos minPos;
+  QgsVertexId vidx;
+  QgsPoint p;
+  QgsPointXY testPosScreen = settings.mapToPixel().transform( pos );
+  for ( const KadasItemPos &pos : constState()->points )
+  {
+    KadasMapPos mapPos = toMapPos( KadasItemPos::fromPoint( pos ), settings );
+    QgsPointXY itemPosScreen = settings.mapToPixel().transform( mapPos );
+    double distSq = itemPosScreen.sqrDist( testPosScreen );
+    if ( distSq < minDistSq )
+    {
+      minDistSq = distSq;
+      minPos = mapPos;
+    }
+  }
+  return qMakePair( minPos, qSqrt( minDistSq ) );
+}
+
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
   KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs() );

@@ -264,6 +264,30 @@ KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) con
     {
       mapPos = m.point();
     }
+    else
+    {
+      double minDist = std::numeric_limits<double>::max();
+      QgsPointXY minPos;
+      double snapTol = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
+      for ( QgsMapLayer *layer : mCanvas->layers() )
+      {
+        KadasItemLayer *itemLayer = qobject_cast<KadasItemLayer *>( layer );
+        if ( !itemLayer )
+        {
+          continue;
+        }
+        QPair<QgsPointXY, double> result = itemLayer->snapToVertex( mapPos, mCanvas->mapSettings(), snapTol );
+        if ( result.second < minDist )
+        {
+          minPos = result.first;
+          minDist = result.second;
+        }
+      }
+      if ( minDist < snapTol )
+      {
+        mapPos = minPos;
+      }
+    }
   }
   return KadasMapPos( mapPos.x(), mapPos.y() );
 }

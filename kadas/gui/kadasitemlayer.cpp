@@ -227,6 +227,29 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsPointXY &mapPos, const
   return pickItem( filterRect, mapSettings );
 }
 
+QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
+{
+  QgsCoordinateTransform crst( crs(), settings.destinationCrs(), mTransformContext );
+  QgsPointXY layerPos = crst.transform( mapPos );
+  double minDist = std::numeric_limits<double>::max();
+  QgsPointXY minPos;
+  for ( auto it = mItemBounds.begin(), itEnd = mItemBounds.end(); it != itEnd; ++it )
+  {
+    QgsRectangle bbox = crst.transformBoundingBox( it.value() );
+    bbox.grow( settings.mapUnitsPerPixel() * tolPixels );
+    if ( bbox.contains( mapPos ) )
+    {
+      QgsCoordinateTransform crst( settings.destinationCrs(), mItems[it.key()]->crs(), transformContext() );
+      QPair<KadasMapPos, double> result = mItems[it.key()]->closestPoint( KadasMapPos::fromPoint( mapPos ), settings );
+      if ( result.second < minDist && result.second < tolPixels )
+      {
+        minDist = result.second;
+        minPos = result.first;
+      }
+    }
+  }
+  return qMakePair( minPos, minDist );
+}
 QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
   QString outString;

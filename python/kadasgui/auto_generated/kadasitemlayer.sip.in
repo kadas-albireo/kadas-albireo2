@@ -140,6 +140,7 @@ class KadasItemLayer : KadasPluginLayer
     KadasItemLayer::ItemId pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
 
 
+
   signals:
     void itemAdded( KadasItemLayer::ItemId itemId );
     void itemRemoved( KadasItemLayer::ItemId itemId );

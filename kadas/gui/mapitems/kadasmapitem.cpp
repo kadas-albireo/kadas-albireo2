@@ -183,6 +183,15 @@ void KadasMapItem::clear()
   update();
 }
 
+QPair<KadasMapPos, double> KadasMapItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+{
+  KadasMapPos mapPos = toMapPos( position(), settings );
+  QgsPointXY itemPosScreen = settings.mapToPixel().transform( mapPos );
+  QgsPointXY testPosScreen = settings.mapToPixel().transform( pos );
+  double dist = qSqrt( itemPosScreen.sqrDist( testPosScreen ) );
+  return qMakePair( mapPos, dist );
+}
+
 void KadasMapItem::update()
 {
   emit changed();

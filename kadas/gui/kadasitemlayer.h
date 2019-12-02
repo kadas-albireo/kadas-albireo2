@@ -151,6 +151,11 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer::ItemId pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
 
 #ifndef SIP_RUN
+    // TODO: SIP
+    QPair<QgsPointXY, double> snapToVertex( const QgsPointXY &pos, const QgsMapSettings &settings, double tolPixels ) const;
+#endif
+
+#ifndef SIP_RUN
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
 #endif
 

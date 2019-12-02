@@ -268,6 +268,27 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
   return intersects;
 }
 
+QPair<KadasMapPos, double> KadasGeometryItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+{
+  double minDistSq = std::numeric_limits<double>::max();
+  KadasMapPos minPos;
+  QgsVertexId vidx;
+  QgsPoint p;
+  QgsPointXY testPosScreen = settings.mapToPixel().transform( pos );
+  while ( mGeometry->nextVertex( vidx, p ) )
+  {
+    KadasMapPos mapPos = toMapPos( KadasItemPos::fromPoint( p ), settings );
+    QgsPointXY itemPosScreen = settings.mapToPixel().transform( mapPos );
+    double distSq = itemPosScreen.sqrDist( testPosScreen );
+    if ( distSq < minDistSq )
+    {
+      minDistSq = distSq;
+      minPos = mapPos;
+    }
+  }
+  return qMakePair( minPos, qSqrt( minDistSq ) );
+}
+
 void KadasGeometryItem::clear()
 {
   delete mState;
