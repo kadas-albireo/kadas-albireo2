@@ -23,6 +23,7 @@
 
 #include <kadas/gui/kadas_gui.h>
 
+class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
@@ -51,6 +52,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void updateLineOfSight();
     void copyToClipboard();
     void addToCanvas();
+    void toggleNodeMarkers();
 
   private:
     class ScaleDraw;
@@ -69,6 +71,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     double mTotLength;
     QgsCoordinateReferenceSystem mPointsCrs;
     int mNSamples;
+    QCheckBox *mNodeMarkersCheckbox = nullptr;;
     QGroupBox *mLineOfSightGroupBoxgroupBox;
     QDoubleSpinBox *mObserverHeightSpinBox;
     QDoubleSpinBox *mTargetHeightSpinBox;

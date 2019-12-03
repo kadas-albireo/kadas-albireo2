@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -122,6 +123,11 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mPlotMarker->setItemAttribute( QwtPlotItem::Margins );
   mPlotMarker->attach( mPlot );
   mPlotMarker->setLabelAlignment( Qt::AlignTop | Qt::AlignHCenter );
+
+  mNodeMarkersCheckbox = new QCheckBox( tr( "Show vertex lines" ) );
+  mNodeMarkersCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_nodemarkers", true ).toBool() );
+  connect( mNodeMarkersCheckbox, &QCheckBox::toggled, this, &KadasHeightProfileDialog::toggleNodeMarkers );
+  vboxLayout->addWidget( mNodeMarkersCheckbox );
 
   mLineOfSightGroupBoxgroupBox = new QGroupBox( this );
   mLineOfSightGroupBoxgroupBox->setTitle( tr( "Line of sight" ) );
@@ -347,18 +353,21 @@ void KadasHeightProfileDialog::replot()
   GDALClose( raster );
 
   // Node markers
-  x = 0;
-  for ( int i = 0, n = mPoints.size() - 2; i < n; ++i )
+  if ( mNodeMarkersCheckbox->isChecked() )
   {
-    x += mSegmentLengths[i];
-    QwtPlotMarker *nodeMarker = new QwtPlotMarker();
-    nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
-    nodeMarker->setLineStyle( QwtPlotMarker::VLine );
-    int idx = qMin( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
-    QPointF sample = mPlotCurve->data()->sample( idx );
-    nodeMarker->setValue( sample );
-    nodeMarker->attach( mPlot );
-    mNodeMarkers.append( nodeMarker );
+    x = 0;
+    for ( int i = 0, n = mPoints.size() - 2; i < n; ++i )
+    {
+      x += mSegmentLengths[i];
+      QwtPlotMarker *nodeMarker = new QwtPlotMarker();
+      nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
+      nodeMarker->setLineStyle( QwtPlotMarker::VLine );
+      int idx = qMin( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
+      QPointF sample = mPlotCurve->data()->sample( idx );
+      nodeMarker->setValue( sample );
+      nodeMarker->attach( mPlot );
+      mNodeMarkers.append( nodeMarker );
+    }
   }
 
   updateLineOfSight( );
@@ -529,4 +538,12 @@ void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
   {
     QDialog::keyPressEvent( ev );
   }
+}
+
+void KadasHeightProfileDialog::toggleNodeMarkers()
+{
+  QgsSettings().setValue( "/kadas/heightprofile_nodemarkers", mNodeMarkersCheckbox->isChecked() );
+  qDeleteAll( mNodeMarkers );
+  mNodeMarkers.clear();
+  replot();
 }
