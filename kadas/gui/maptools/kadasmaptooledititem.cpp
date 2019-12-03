@@ -371,7 +371,7 @@ KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos ) const
       for ( QgsMapLayer *layer : mCanvas->layers() )
       {
         KadasItemLayer *itemLayer = qobject_cast<KadasItemLayer *>( layer );
-        if ( !layer )
+        if ( !itemLayer )
         {
           continue;
         }
