@@ -37,6 +37,7 @@ class KadasCanvasContextMenu : public QMenu
   private slots:
     void convertPinToWaypoint();
     void convertWaypointToPin();
+    void convertCircleToPolygon();
     void copyCoordinates( const QgsPointXY &mapPos );
     void copyItemPosition();
     void copyMap();

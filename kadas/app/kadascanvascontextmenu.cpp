@@ -15,9 +15,12 @@
  ***************************************************************************/
 
 #include <QClipboard>
+#include <QInputDialog>
 
 #include <qgis/qgsgeometryrubberband.h>
+#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
@@ -25,8 +28,10 @@
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadascircleitem.h>
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
+#include <kadas/gui/mapitems/kadaspolygonitem.h>
 #include <kadas/gui/mapitems/kadasselectionrectitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
@@ -66,6 +71,10 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
     else if ( dynamic_cast<KadasPointItem *>( pickedItem ) )
     {
       addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::convertWaypointToPin );
+    }
+    else if ( dynamic_cast<KadasCircleItem *>( pickedItem ) )
+    {
+      addAction( QIcon( ":/kadas/icons/polygon" ), tr( "Convert to polygon" ), this, &KadasCanvasContextMenu::convertCircleToPolygon );
     }
     addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasCanvasContextMenu::cutItem );
     addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyItem );
@@ -183,6 +192,42 @@ void KadasCanvasContextMenu::convertWaypointToPin()
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->triggerRepaint();
   mPickResult.layer->triggerRepaint();
   delete pointItem;
+}
+
+void KadasCanvasContextMenu::convertCircleToPolygon()
+{
+  KadasMapItem *pickedItem = static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId];
+  KadasCircleItem *circleItem = static_cast<KadasCircleItem *>( pickedItem );
+  if ( circleItem->constState()->centers.isEmpty() )
+  {
+    return;
+  }
+  bool ok = false;
+  int num = QInputDialog::getInt( kApp->mainWindow(), tr( "Vertex Count" ), tr( "Number of polygon vertices:" ), 10, 3, 10000, 1, &ok );
+  if ( !ok )
+  {
+    return;
+  }
+  KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
+  KadasItemPos pos = circleItem->constState()->centers.front();
+  double r = circleItem->constState()->radii.front();
+
+  QgsLineString *ring = new QgsLineString();
+  for ( int i = 0; i < num; ++i )
+  {
+    ring->addVertex( QgsPoint( pos.x() + r * qCos( ( 2. * i ) / num * M_PI ), pos.y() + r * qSin( ( 2. * i ) / num * M_PI ) ) );
+  }
+  ring->addVertex( QgsPoint( pos.x() + r, pos.y() ) );
+  QgsPolygon poly;
+  poly.setExteriorRing( ring );
+
+  polygonitem->addPartFromGeometry( poly );
+  polygonitem->setOutline( circleItem->outline() );
+  polygonitem->setFill( circleItem->fill() );
+
+  static_cast<KadasItemLayer *>( mPickResult.layer )->addItem( polygonitem );
+  delete static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
+  mPickResult.layer->triggerRepaint();
 }
 
 void KadasCanvasContextMenu::convertPinToWaypoint()
