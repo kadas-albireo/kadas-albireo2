@@ -115,6 +115,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void showScale( double scale );
     void switchToTabForTool( QgsMapTool *tool );
     void toggleLayerTree();
+    void toggleFullscreen();
+    void endFullscreen();
     void checkOnTheFlyProjection();
     void showPluginManager( bool show );
 
@@ -152,6 +154,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QPoint mResizePressPos;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
+    bool mFullscreen = false;
 
 };
 

@@ -249,6 +249,8 @@ void KadasMainWindow::init()
   connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
+  connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
+  connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
 
   QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
   for ( const QString &catalogUri : catalogUris )
@@ -322,13 +324,16 @@ void KadasMainWindow::updateWidgetPositions()
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
 
-  // Resize mLayersWidget and mLayerTreeViewButton
+  // Resize mLayersWidget and reposition mLayerTreeViewButton
   int distanceToTopBottom = 40;
   int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
   int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
   int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
   mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
   mLayersWidget->setGeometry( mLayersWidget->pos().x(), distanceToTopBottom, mLayersWidget->width(), layerTreeHeight );
+
+  // Reposition mRibbonbarButton
+  mRibbonbarButton->move( 0.5 * mMapCanvas->width() - 0.5 * mRibbonbarButton->width(), 0 );
 
   // Resize info bar
   double barwidth = 0.5 * mMapCanvas->width();
@@ -706,6 +711,34 @@ void KadasMainWindow::toggleLayerTree()
   int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
   int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
   mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
+}
+
+void KadasMainWindow::toggleFullscreen()
+{
+  if ( !mFullscreen )
+  {
+    mRibbonWidget->setMaximumHeight( 45 );
+    mFavoriteBackgroundWidget->hide();
+    mFavoritesSearchBackgroundWidget->layout()->setContentsMargins( 0, 0, 0, 0 );
+    mFullscreen = true;
+    mRibbonbarButton->setIcon( QIcon( ":/kadas/icons/downarrow" ) );
+  }
+  else
+  {
+    mRibbonWidget->setMaximumHeight( QWIDGETSIZE_MAX );
+    mFavoriteBackgroundWidget->show();
+    mFavoritesSearchBackgroundWidget->layout()->setContentsMargins( 0, 10, 0, 10 );
+    mFullscreen = false;
+    mRibbonbarButton->setIcon( QIcon( ":/kadas/icons/uparrow" ) );
+  }
+}
+
+void KadasMainWindow::endFullscreen()
+{
+  if ( mFullscreen )
+  {
+    toggleFullscreen();
+  }
 }
 
 void KadasMainWindow::checkOnTheFlyProjection()
