@@ -195,11 +195,6 @@ void KadasMainWindow::init()
   snappingConfig.setEnabled( true );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
-  mPluginsToolButton->setMenu( new QMenu() );
-  mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
-  mPluginsToolButton->setFixedHeight( 45 );
-  mPluginsWidget->hide();
-
   // Redlining
   mRedliningIntegration = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
 
@@ -344,9 +339,6 @@ void KadasMainWindow::updateWidgetPositions()
 
   // Move loading label
   mLoadingLabel->move( mMapCanvas->width() - 5 - mLoadingLabel->width(), mMapCanvas->height() - 5 - mLoadingLabel->height() );
-
-  // Move plugins button
-  mPluginsToolButton->move( this->width() - mPluginsToolButton->width(), 0 );
 }
 
 void KadasMainWindow::mousePressEvent( QMouseEvent *event )
@@ -683,8 +675,14 @@ void KadasMainWindow::removeMenuButtonFromTab( QMenu *menu, QWidget *tabWidget )
 
 QMenu *KadasMainWindow::pluginsMenu()
 {
-  // Only show the button if it is actually needed
-  mPluginsWidget->show();
+  if ( !mPluginsToolButton )
+  {
+    mPluginsToolButton = new QToolButton();
+    mPluginsToolButton->setObjectName( "mPluginsToolButton" );
+    mPluginsToolButton->setMenu( new QMenu() );
+    mPluginsToolButton->setPopupMode( QToolButton::InstantPopup );
+    mRibbonWidget->setCornerWidget( mPluginsToolButton );
+  }
   return mPluginsToolButton->menu();
 }
 

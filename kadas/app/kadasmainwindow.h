@@ -146,6 +146,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
+    QToolButton *mPluginsToolButton = nullptr;
 
     QTimer mLoadingTimer;
     QPoint mResizePressPos;

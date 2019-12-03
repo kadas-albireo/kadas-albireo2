@@ -81,7 +81,16 @@ QPushButton#mLayerTreeViewButton {
   border-bottom-left-radius: 0px;
 }
 
-QPushButton#mLayerTreeViewButton:pressed
+QPushButton#mRibbonbarButton {
+  background-color: #263B4E;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+QPushButton#mLayerTreeViewButton:pressed,
+QPushButton#mRibbonbarButton:pressed
 {
   background-color: #16232f;
 }
@@ -150,17 +159,6 @@ QPushButton#mLayerTreeViewButton:pressed
   background-color: #BEDCF6;
 }
 
-#mPluginsToolButton {
-  background: #BEDCF6 url(:/kadas/icons/plugin_b) center center no-repeat;
-  color: black;
-  border: none;
-}
-
-#mPluginsToolButton:pressed {
-   background: #263B4E url(:/kadas/icons/plugin_w) center center no-repeat;
-  color: white;
-}
-
 #mRibbonWidget QTabBar::tab:!selected {
     background-color: #BEDCF6; /* make non-selected tabs look smaller */
     height: 45px;
@@ -175,7 +173,12 @@ QPushButton#mLayerTreeViewButton:pressed
     color: gray;
 }
 
-#mRibbonWidget > QWidget {
+
+#mRibbonWidget::pane {
+    background-color: #263B4E;
+}
+
+#mRibbonWidget::pane > QWidget > QWidget {
   background-color: #263B4E;
 }
 
@@ -298,10 +301,19 @@ QPushButton#mLayerTreeViewButton:pressed
     color: #263B4E;
 }
 
-#mRibbonWidget::pane {
-    /* Don't remove this, it is needed. */
+
+#mPluginsToolButton {
+  background: #BEDCF6 url(:/kadas/icons/plugin_w) center center no-repeat;
+  color: red;
+  border: none;
+  height: 45px;
+  padding: 10px;
 }
 
+#mPluginsToolButton:pressed {
+  background: #263B4E url(:/kadas/icons/plugin_b) center center no-repeat;
+  color: white;
+}
 
 /** Status bar **/
 #mStatusWidget {
