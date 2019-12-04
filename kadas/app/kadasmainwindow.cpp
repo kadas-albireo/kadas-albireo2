@@ -70,6 +70,7 @@
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
+#include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
 #ifdef WITH_GLOBE
@@ -80,7 +81,6 @@
 #include <kadas/app/kml/kadaskmlintegration.h>
 #include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
-#include <kadas/app/kadaspluginmanager.h>
 
 KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
 {
@@ -221,7 +221,8 @@ void KadasMainWindow::init()
   Q_UNUSED( milx );
 
   // IAM Auth
-  new KadasIamAuth( mLoginButton, mRefreshCatalogButton, this );
+  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mRefreshCatalogButton, this );
+  Q_UNUSED( iamAuth );
 
 #ifdef WITH_GLOBE
   // Globe
