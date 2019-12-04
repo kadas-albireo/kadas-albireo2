@@ -386,15 +386,6 @@ void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
 
 void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
 {
-  KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
-  if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) && button && button->objectName().startsWith( "mFavoriteButton" ) )
-  {
-    event->acceptProposedAction();
-  }
-  if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
-  {
-    event->acceptProposedAction();
-  }
   for ( QgsCustomDropHandler *handler : mCustomDropHandlers )
   {
     if ( handler && handler->canHandleMimeData( event->mimeData() ) )
@@ -403,10 +394,32 @@ void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
       return;
     }
   }
+
+  KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
+  if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) && button && button->objectName().startsWith( "mFavoriteButton" ) )
+  {
+    event->acceptProposedAction();
+  }
+  else if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
+  {
+    event->acceptProposedAction();
+  }
+  else if ( event->mimeData()->hasUrls() )
+  {
+    event->acceptProposedAction();
+  }
 }
 
 void KadasMainWindow::dropEvent( QDropEvent *event )
 {
+  for ( QgsCustomDropHandler *handler : mCustomDropHandlers )
+  {
+    if ( handler->handleMimeDataV2( event->mimeData() ) )
+    {
+      return;
+    }
+  }
+
   if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) )
   {
     QString actionName = QString::fromLocal8Bit( event->mimeData()->data( "application/qgis-kadas-button" ).data() );
@@ -422,10 +435,8 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       setActionToButton( action, button );
       QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
     }
-    return;
   }
-
-  if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
+  else if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
   {
     QgsMimeDataUtils::UriList list = QgsMimeDataUtils::decodeUriList( event->mimeData() );
     if ( !list.isEmpty() )
@@ -434,12 +445,23 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       addCatalogLayer( list.front(), metadataUrl );
     }
   }
-
-  for ( QgsCustomDropHandler *handler : mCustomDropHandlers )
+  else
   {
-    if ( handler->handleMimeDataV2( event->mimeData() ) )
+    for ( const QUrl &url : event->mimeData()->urls() )
     {
-      return;
+      QString fileName = url.toLocalFile();
+      if ( fileName.isEmpty() )
+      {
+        continue;
+      }
+      if ( QgsRasterLayer::isValidRasterFileName( fileName ) )
+      {
+        kApp->addRasterLayer( fileName, QFileInfo( fileName ).completeBaseName(), QString() );
+      }
+      else
+      {
+        kApp->addVectorLayer( fileName, QFileInfo( fileName ).baseName(), "ogr" );
+      }
     }
   }
 }
