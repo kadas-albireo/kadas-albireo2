@@ -542,7 +542,6 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionMilx, mMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_S ) );
   setActionToButton( mActionSaveMilx, mSaveMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_E ) );
   setActionToButton( mActionLoadMilx, mLoadMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_I ) );
-  setActionToButton( mActionImportOVL, mOvlButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_O ) );
 
   // Settings tab
   setActionToButton( mActionPluginManager, mPluginManagerButton, QKeySequence( Qt::CTRL + Qt::Key_S, Qt::CTRL + Qt::Key_P ) );

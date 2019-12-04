@@ -1710,31 +1710,6 @@ Sight</string>
            </widget>
           </item>
           <item>
-           <widget class="KadasRibbonButton" name="mOvlButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Import OVL</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QGridLayout" name="mGridLayoutMssOptions">
             <item row="0" column="1">
              <widget class="QSlider" name="mSymbolSizeSlider">
@@ -2237,15 +2212,6 @@ Sight</string>
    </property>
    <property name="toolTip">
     <string>Save Map to Image</string>
-   </property>
-  </action>
-  <action name="mActionImportOVL">
-   <property name="icon">
-    <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/kadas/icons/ovl_import</normaloff>:/kadas/icons/ovl_import</iconset>
-   </property>
-   <property name="text">
-    <string>Import OVL</string>
    </property>
   </action>
   <action name="mActionZoomLast">
