@@ -37,6 +37,7 @@
 
 #include <gdal.h>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
@@ -171,10 +172,24 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
 
   vboxLayout->addWidget( mLineOfSightGroupBoxgroupBox );
 
+  QHBoxLayout *hboxLayout = new QHBoxLayout();
+
+  mProgressBar = new QProgressBar();
+  mProgressBar->hide();
+  hboxLayout->addWidget( mProgressBar );
+
+  mCancelButton = new QPushButton();
+  mCancelButton->setCheckable( true );
+  mCancelButton->setIcon( QgsApplication::getThemeIcon( "/mTaskCancel.svg" ) );
+  mCancelButton->hide();
+  hboxLayout->addWidget( mCancelButton );
+
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
   QPushButton *copyButton = bbox->addButton( tr( "Copy to clipboard" ), QDialogButtonBox::ActionRole );
   QPushButton *addButton = bbox->addButton( tr( "Add to map" ), QDialogButtonBox::ActionRole );
-  vboxLayout->addWidget( bbox );
+  hboxLayout->addWidget( bbox );
+
+  vboxLayout->addLayout( hboxLayout );
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
   connect( copyButton, &QPushButton::clicked, this, &KadasHeightProfileDialog::copyToClipboard );
@@ -305,20 +320,15 @@ void KadasHeightProfileDialog::replot()
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
 
-  QProgressBar p;
-  p.setWindowTitle( tr( "Calculating profile" ) );
-  p.setWindowModality( Qt::ApplicationModal );
-  p.show();
-
-  p.setRange( 0, mPoints.size() - 1 );
-  QApplication::setOverrideCursor( Qt::WaitCursor );
+  mProgressBar->setValue( 0 );
+  mProgressBar->setRange( 0, mNSamples );
+  mProgressBar->show();
+  mCancelButton->show();
 
   QVector<QPointF> samples;
   double x = 0;
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
   {
-    p.setValue( i );
-    QApplication::processEvents();
     if ( x >= mSegmentLengths[i] )
     {
       continue;
@@ -327,6 +337,12 @@ void KadasHeightProfileDialog::replot()
     QgsVector dir = QgsVector( mPoints[i + 1] - mPoints[i] ).normalized();
     while ( x < mSegmentLengths[i] )
     {
+      mProgressBar->setValue( mProgressBar->value() + 1 );
+      QApplication::processEvents();
+      if ( mCancelButton->isChecked() )
+      {
+        break;
+      }
       QgsPointXY p = mPoints[i] + dir * x;
       // Transform geo position to raster CRS
       QgsPointXY pRaster = QgsCoordinateTransform( mPointsCrs, rasterCrs, QgsProject::instance() ).transform( p );
@@ -356,7 +372,14 @@ void KadasHeightProfileDialog::replot()
       x += mTotLength / mNSamples;
     }
     x -= mSegmentLengths[i];
+    if ( mCancelButton->isChecked() )
+    {
+      break;
+    }
   }
+  mCancelButton->setChecked( false );
+  mCancelButton->hide();
+  mProgressBar->hide();
 
   static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->setSamples( samples );
   int nSamples = samples.size();
@@ -368,8 +391,6 @@ void KadasHeightProfileDialog::replot()
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
 
   GDALClose( raster );
-
-  QApplication::restoreOverrideCursor();
 
   // Node markers
   if ( mNodeMarkersCheckbox->isChecked() )

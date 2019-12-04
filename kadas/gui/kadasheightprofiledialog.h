@@ -27,6 +27,7 @@ class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
+class QProgressBar;
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMarker;
@@ -58,24 +59,26 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     class ScaleDraw;
     enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
 
-    KadasMapToolHeightProfile *mTool;
-    QwtPlot *mPlot;
-    QwtPlotCurve *mPlotCurve;
+    KadasMapToolHeightProfile *mTool = nullptr;
+    QwtPlot *mPlot = nullptr;
+    QwtPlotCurve *mPlotCurve = nullptr;
     QVector<QwtPlotCurve *> mLinesOfSight;
     QVector<KadasLineItem *> mLinesOfSightRB;
-    QwtPlotMarker *mPlotMarker;
-    QwtPlotMarker *mLineOfSightMarker;
+    QwtPlotMarker *mPlotMarker = nullptr;
+    QwtPlotMarker *mLineOfSightMarker = nullptr;
     QList<QwtPlotMarker *> mNodeMarkers;
     QList<QgsPointXY> mPoints;
     QVector<double> mSegmentLengths;
     double mTotLength;
     QgsCoordinateReferenceSystem mPointsCrs;
     int mNSamples;
-    QCheckBox *mNodeMarkersCheckbox = nullptr;;
-    QGroupBox *mLineOfSightGroupBoxgroupBox;
-    QDoubleSpinBox *mObserverHeightSpinBox;
-    QDoubleSpinBox *mTargetHeightSpinBox;
-    QComboBox *mHeightModeCombo;
+    QCheckBox *mNodeMarkersCheckbox = nullptr;
+    QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
+    QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
+    QDoubleSpinBox *mTargetHeightSpinBox = nullptr;
+    QComboBox *mHeightModeCombo = nullptr;
+    QProgressBar *mProgressBar = nullptr;
+    QPushButton *mCancelButton = nullptr;
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H
