@@ -394,6 +394,14 @@ void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
   {
     event->acceptProposedAction();
   }
+  for ( QgsCustomDropHandler *handler : mCustomDropHandlers )
+  {
+    if ( handler && handler->canHandleMimeData( event->mimeData() ) )
+    {
+      event->acceptProposedAction();
+      return;
+    }
+  }
 }
 
 void KadasMainWindow::dropEvent( QDropEvent *event )
@@ -423,6 +431,14 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
     {
       QString metadataUrl = event->mimeData()->property( "metadataUrl" ).toString();
       addCatalogLayer( list.front(), metadataUrl );
+    }
+  }
+
+  for ( QgsCustomDropHandler *handler : mCustomDropHandlers )
+  {
+    if ( handler->handleMimeDataV2( event->mimeData() ) )
+    {
+      return;
     }
   }
 }
@@ -1062,6 +1078,16 @@ QgsMapTool *KadasMainWindow::addPictureTool()
     item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
     return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
   }
+}
+
+void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
+{
+  mCustomDropHandlers.append( handler );
+}
+
+void KadasMainWindow::removeCustomDropHandler( QgsCustomDropHandler *handler )
+{
+  mCustomDropHandlers.removeAll( handler );
 }
 
 void KadasMainWindow::showPluginManager( bool show )

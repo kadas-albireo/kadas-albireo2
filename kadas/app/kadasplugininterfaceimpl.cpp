@@ -301,12 +301,12 @@ QgsLayoutDesignerInterface *KadasPluginInterfaceImpl::openLayoutDesigner( QgsMas
 
 void KadasPluginInterfaceImpl::registerCustomDropHandler( QgsCustomDropHandler *handler )
 {
-  // TODO
+  kApp->mainWindow()->addCustomDropHandler( handler );
 }
 
 void KadasPluginInterfaceImpl::unregisterCustomDropHandler( QgsCustomDropHandler *handler )
 {
-  // TODO
+  kApp->mainWindow()->removeCustomDropHandler( handler );
 }
 
 void KadasPluginInterfaceImpl::registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler )

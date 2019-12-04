@@ -92,6 +92,9 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
 
+    void addCustomDropHandler( QgsCustomDropHandler *handler );
+    void removeCustomDropHandler( QgsCustomDropHandler *handler );
+
   public slots:
     void zoomFull();
     void zoomIn();
@@ -154,6 +157,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QPoint mResizePressPos;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
+    QList<QgsCustomDropHandler *> mCustomDropHandlers;
     bool mFullscreen = false;
 
 };
