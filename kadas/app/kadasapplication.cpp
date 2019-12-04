@@ -547,6 +547,30 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
   }
 }
 
+QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::addImageItem( const QString &filename ) const
+{
+  QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
+  QFile( attachedPath ).remove();
+  QFile( filename ).copy( attachedPath );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  QString errMsg;
+  QgsCoordinateReferenceSystem crs( "EPSG:3857" );
+  QgsCoordinateTransform crst( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );
+  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
+  {
+    KadasSymbolItem *item = new KadasSymbolItem( crs );
+    item->setFilePath( attachedPath );
+    item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
+    return qMakePair( item, KadasItemLayerRegistry::SymbolsLayer );
+  }
+  else
+  {
+    KadasPictureItem *item = new KadasPictureItem( crs );
+    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
+    return qMakePair( item, KadasItemLayerRegistry::PicturesLayer );
+  }
+}
+
 KadasItemLayer *KadasApplication::selectItemLayer()
 {
   QDialog dialog;

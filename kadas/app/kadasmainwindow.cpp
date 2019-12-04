@@ -447,6 +447,23 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
   }
   else
   {
+    QSet<QString> mapItemFormats;
+    for ( const QByteArray &format : QImageReader::supportedImageFormats() )
+    {
+      mapItemFormats.insert( QString( "%1" ).arg( QString( format ).toLower() ) );
+    }
+    mapItemFormats.insert( ".svg" );  // Ensure svg is present
+    mapItemFormats.remove( ".tif" ); // Remove tif to ensure it is opened as raster layer
+
+    static QMap<QString, QString> worldFileSuffixes =
+    {
+      {"gif", "gfw"},
+      {"jpg", "jgw"},
+      {"jp2", "j2w"},
+      {"png", "pgw"},
+      {"tif", "tfw"},
+    };
+
     for ( const QUrl &url : event->mimeData()->urls() )
     {
       QString fileName = url.toLocalFile();
@@ -454,7 +471,25 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       {
         continue;
       }
-      if ( QgsRasterLayer::isValidRasterFileName( fileName ) )
+
+      QFileInfo finfo( fileName );
+      QString suffix = finfo.suffix();
+      bool addAsMapItem = mapItemFormats.contains( suffix );
+      // Don't add as map item if a matching world file exists
+      if ( worldFileSuffixes.contains( suffix ) )
+      {
+        QString worldFileName = finfo.dir().absoluteFilePath( QString( "%1.%2" ).arg( finfo.baseName() ).arg( worldFileSuffixes.value( suffix ) ) );
+        if ( QFile( worldFileName ).exists() )
+        {
+          addAsMapItem = false;
+        }
+      }
+      if ( addAsMapItem )
+      {
+        QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( fileName );
+        KadasItemLayerRegistry::getOrCreateItemLayer( pair.second )->addItem( pair.first );
+      }
+      else if ( QgsRasterLayer::isValidRasterFileName( fileName ) )
       {
         kApp->addRasterLayer( fileName, QFileInfo( fileName ).completeBaseName(), QString() );
       }
@@ -1081,26 +1116,8 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   {
     return nullptr;
   }
-  QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
-  QFile( attachedPath ).remove();
-  QFile( filename ).copy( attachedPath );
-  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-  QString errMsg;
-  QgsCoordinateReferenceSystem crs( "EPSG:3857" );
-  QgsCoordinateTransform crst( mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );
-  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
-  {
-    KadasSymbolItem *item = new KadasSymbolItem( crs );
-    item->setFilePath( attachedPath );
-    item->setPosition( KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
-  }
-  else
-  {
-    KadasPictureItem *item = new KadasPictureItem( crs );
-    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mapCanvas()->extent().center() ) ) );
-    return new KadasMapToolEditItem( mapCanvas(), item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
-  }
+  QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
+  return new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) );
 }
 
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
