@@ -59,8 +59,15 @@ KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *acti
 
   connect( actionWaypoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, waypointFactory ); } );
   connect( actionRoute, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, routeFactory ); } );
-  connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::exportGpx );
-  connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::importGpx );
+  connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
+  connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
+
+  kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
+}
+
+KadasGpxIntegration::~KadasGpxIntegration()
+{
+  kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
 }
 
 KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
@@ -89,7 +96,7 @@ void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<Kad
   }
 }
 
-void KadasGpxIntegration::importGpx()
+void KadasGpxIntegration::openGpx()
 {
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QStringList filenames = QFileDialog::getOpenFileNames( kApp->mainWindow(), tr( "Import GPX" ), lastDir, tr( "GPX Files (*.gpx)" ) );
@@ -99,98 +106,102 @@ void KadasGpxIntegration::importGpx()
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filenames[0] ).absolutePath() );
 
-  int nWpts = 0;
-  int nRtes = 0;
-  int nTracks = 0;
-  QStringList failed;
-
+  QStringList errors;
   for ( const QString &filename : filenames )
   {
-    KadasItemLayer *layer = KadasItemLayerRegistry::getOrCreateItemLayer( QFileInfo( filename ).baseName() );
-
-    QFile file( filename );
-    if ( !file.open( QIODevice::ReadOnly ) )
+    QString errorMsg;
+    if ( !importGpx( filename, errorMsg ) )
     {
-      failed.append( filename );
-      continue;
-    }
-
-    QDomDocument doc;
-    if ( !doc.setContent( &file ) )
-    {
-      failed.append( filename );
-      continue;
-    }
-    QDomNodeList wpts = doc.elementsByTagName( "wpt" );
-    for ( int i = 0, n = wpts.size(); i < n; ++i )
-    {
-      QDomElement wptEl = wpts.at( i ).toElement();
-      double lat = wptEl.attribute( "lat" ).toDouble();
-      double lon = wptEl.attribute( "lon" ).toDouble();
-      QString name = wptEl.firstChildElement( "name" ).text();
-
-      KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-      waypoint->setName( name );
-      waypoint->addPartFromGeometry( QgsPoint( lon, lat ) );
-      layer->addItem( waypoint );
-      ++nWpts;
-    }
-    QDomNodeList rtes = doc.elementsByTagName( "rte" );
-    for ( int i = 0, n = rtes.size(); i < n; ++i )
-    {
-      QgsLineString line;
-      QDomElement rteEl = rtes.at( i ).toElement();
-      QString name = rteEl.firstChildElement( "name" ).text();
-      QString number = rteEl.firstChildElement( "name" ).text();
-      QDomNodeList rtepts = rteEl.elementsByTagName( "rtept" );
-      for ( int j = 0, m = rtepts.size(); j < m; ++j )
-      {
-        QDomElement rteptEl = rtepts.at( j ).toElement();
-        double lat = rteptEl.attribute( "lat" ).toDouble();
-        double lon = rteptEl.attribute( "lon" ).toDouble();
-        line.addVertex( QgsPoint( lon, lat ) );
-      }
-      KadasGpxRouteItem *route = new KadasGpxRouteItem();
-      route->setName( name );
-      route->setNumber( number );
-      route->addPartFromGeometry( line );
-      layer->addItem( route );
-      ++nRtes;
-    }
-    QDomNodeList trks = doc.elementsByTagName( "trk" );
-    for ( int i = 0, n = trks.size(); i < n; ++i )
-    {
-      QgsLineString line;
-      QDomElement trkEl = trks.at( i ).toElement();
-      QString name = trkEl.firstChildElement( "name" ).text();
-      QString number = trkEl.firstChildElement( "name" ).text();
-      QDomNodeList trkpts = trkEl.firstChildElement( "trkseg" ).elementsByTagName( "trkpt" );
-      for ( int j = 0, m = trkpts.size(); j < m; ++j )
-      {
-        QDomElement trkptEl = trkpts.at( j ).toElement();
-        double lat = trkptEl.attribute( "lat" ).toDouble();
-        double lon = trkptEl.attribute( "lon" ).toDouble();
-        line.addVertex( QgsPoint( lon, lat ) );
-      }
-      KadasGpxRouteItem *route = new KadasGpxRouteItem();
-      route->setName( name );
-      route->setNumber( number );
-      route->addPartFromGeometry( line );
-      layer->addItem( route );
-      ++nTracks;
+      errors.append( QString( "%1: %2" ).arg( QFileInfo( filename ).completeBaseName() ).arg( errorMsg ) );
     }
   }
-  if ( !failed.isEmpty() )
+
+  if ( errors.isEmpty() )
   {
-    QMessageBox::information( kApp->mainWindow(), tr( "GPX import" ), tr( "%1 waypoints, %2 routes and %3 tracks were read.\n\nThe following files could not be imported:\n %4" ).arg( nWpts ).arg( nRtes ).arg( nTracks ).arg( failed.join( "\n " ) ) );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "GPX import completed" ), Qgis::Info, 5 );
   }
   else
   {
-    kApp->mainWindow()->messageBar()->pushInfo( tr( "GPX import complete" ), tr( "%1 waypoints, %2 routes and %3 tracks were read." ).arg( nWpts ).arg( nRtes ).arg( nTracks ) );
+    QMessageBox::critical( kApp->mainWindow(), tr( "GPX import failed" ), tr( "The following files could not be imported:\n%1" ).arg( errors.join( "\n" ) ) );
   }
 }
 
-void KadasGpxIntegration::exportGpx()
+bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg )
+{
+  KadasItemLayer *layer = KadasItemLayerRegistry::getOrCreateItemLayer( QFileInfo( filename ).baseName() );
+
+  QFile file( filename );
+  if ( !file.open( QIODevice::ReadOnly ) )
+  {
+    errorMsg = tr( "Failed to open the input file." );
+    return false;
+  }
+
+  QDomDocument doc;
+  if ( !doc.setContent( &file ) )
+  {
+    errorMsg = tr( "Failed to read input file." );
+    return false;
+  }
+  QDomNodeList wpts = doc.elementsByTagName( "wpt" );
+  for ( int i = 0, n = wpts.size(); i < n; ++i )
+  {
+    QDomElement wptEl = wpts.at( i ).toElement();
+    double lat = wptEl.attribute( "lat" ).toDouble();
+    double lon = wptEl.attribute( "lon" ).toDouble();
+    QString name = wptEl.firstChildElement( "name" ).text();
+
+    KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
+    waypoint->setName( name );
+    waypoint->addPartFromGeometry( QgsPoint( lon, lat ) );
+    layer->addItem( waypoint );
+  }
+  QDomNodeList rtes = doc.elementsByTagName( "rte" );
+  for ( int i = 0, n = rtes.size(); i < n; ++i )
+  {
+    QgsLineString line;
+    QDomElement rteEl = rtes.at( i ).toElement();
+    QString name = rteEl.firstChildElement( "name" ).text();
+    QString number = rteEl.firstChildElement( "name" ).text();
+    QDomNodeList rtepts = rteEl.elementsByTagName( "rtept" );
+    for ( int j = 0, m = rtepts.size(); j < m; ++j )
+    {
+      QDomElement rteptEl = rtepts.at( j ).toElement();
+      double lat = rteptEl.attribute( "lat" ).toDouble();
+      double lon = rteptEl.attribute( "lon" ).toDouble();
+      line.addVertex( QgsPoint( lon, lat ) );
+    }
+    KadasGpxRouteItem *route = new KadasGpxRouteItem();
+    route->setName( name );
+    route->setNumber( number );
+    route->addPartFromGeometry( line );
+    layer->addItem( route );
+  }
+  QDomNodeList trks = doc.elementsByTagName( "trk" );
+  for ( int i = 0, n = trks.size(); i < n; ++i )
+  {
+    QgsLineString line;
+    QDomElement trkEl = trks.at( i ).toElement();
+    QString name = trkEl.firstChildElement( "name" ).text();
+    QString number = trkEl.firstChildElement( "name" ).text();
+    QDomNodeList trkpts = trkEl.firstChildElement( "trkseg" ).elementsByTagName( "trkpt" );
+    for ( int j = 0, m = trkpts.size(); j < m; ++j )
+    {
+      QDomElement trkptEl = trkpts.at( j ).toElement();
+      double lat = trkptEl.attribute( "lat" ).toDouble();
+      double lon = trkptEl.attribute( "lon" ).toDouble();
+      line.addVertex( QgsPoint( lon, lat ) );
+    }
+    KadasGpxRouteItem *route = new KadasGpxRouteItem();
+    route->setName( name );
+    route->setNumber( number );
+    route->addPartFromGeometry( line );
+    layer->addItem( route );
+  }
+  return true;
+}
+
+void KadasGpxIntegration::saveGpx()
 {
   QDialog dialog;
   dialog.setWindowTitle( tr( "Export to GPX" ) );
@@ -238,7 +249,7 @@ void KadasGpxIntegration::exportGpx()
   QFile file( filename );
   if ( !file.open( QIODevice::WriteOnly ) )
   {
-    kApp->mainWindow()->messageBar()->pushCritical( tr( "GPX export failed" ), tr( "Cannot write to file" ) );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "GPX export failed" ), tr( "Cannot write to file" ), Qgis::Critical, 5 );
     return;
   }
 
@@ -247,9 +258,6 @@ void KadasGpxIntegration::exportGpx()
   gpxEl.setAttribute( "version", "1.1" );
   gpxEl.setAttribute( "creator", "kadas" );
   doc.appendChild( gpxEl );
-
-  int nWaypoints = 0;
-  int nRoutes = 0;
 
   for ( const KadasMapItem *item : layer->items() )
   {
@@ -265,7 +273,6 @@ void KadasGpxIntegration::exportGpx()
       nameEl.appendChild( nameText );
       wptEl.appendChild( nameEl );
       gpxEl.appendChild( wptEl );
-      ++nWaypoints;
     }
     if ( dynamic_cast<const KadasGpxRouteItem *>( item ) )
     {
@@ -289,11 +296,54 @@ void KadasGpxIntegration::exportGpx()
         rteEl.appendChild( rteptEl );
       }
       gpxEl.appendChild( rteEl );
-      ++nRoutes;
     }
   }
 
   file.write( doc.toString().toLocal8Bit() );
 
-  kApp->mainWindow()->messageBar()->pushInfo( tr( "GPX export complete" ), tr( "%1 waypoints and %2 routes were written." ).arg( nWaypoints ).arg( nRoutes ) );
+  kApp->mainWindow()->messageBar()->pushMessage( tr( "GPX export completed" ), Qgis::Info, 5 );
 }
+
+bool KadasGpxDropHandler::canHandleMimeData( const QMimeData *data )
+{
+  for ( const QUrl &url : data->urls() )
+  {
+    if ( url.toLocalFile().endsWith( ".gpx", Qt::CaseInsensitive ) )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool KadasGpxDropHandler::handleMimeDataV2( const QMimeData *data )
+{
+  int handled = 0;
+  for ( const QUrl &url : data->urls() )
+  {
+    QString path = url.toLocalFile();
+    QStringList errors;
+    if ( path.endsWith( ".gpx", Qt::CaseInsensitive ) )
+    {
+      ++handled;
+      QString errMsg;
+      if ( !KadasGpxIntegration::importGpx( path, errMsg ) )
+      {
+        errors.append( QString( "%1: %2" ).arg( QFileInfo( path ).fileName() ).arg( errMsg ) );
+      }
+    }
+    if ( handled > 0 )
+    {
+      if ( errors.isEmpty() )
+      {
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "GPX import completed" ), Qgis::Info, 5 );
+      }
+      else
+      {
+        QMessageBox::critical( kApp->mainWindow(), tr( "GPX import failed" ), tr( "The following files could not be imported:\n%1" ).arg( errors.join( "\n" ) ) );
+      }
+    }
+  }
+  return handled > 0;
+}
+
