@@ -27,6 +27,7 @@
 #include <qgis/qgslayertreeviewdefaultactions.h>
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmessagebar.h>
+#include <qgis/qgsmimedatautils.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssnappingutils.h>
@@ -384,6 +385,10 @@ void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
   {
     event->acceptProposedAction();
   }
+  if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
+  {
+    event->acceptProposedAction();
+  }
 }
 
 void KadasMainWindow::dropEvent( QDropEvent *event )
@@ -402,6 +407,17 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       button->setEnabled( true );
       setActionToButton( action, button );
       QgsSettings().setValue( "/kadas/favoriteAction/" + button->objectName(), actionName );
+    }
+    return;
+  }
+
+  if ( event->mimeData()->hasFormat( "application/x-vnd.qgis.qgis.uri" ) )
+  {
+    QgsMimeDataUtils::UriList list = QgsMimeDataUtils::decodeUriList( event->mimeData() );
+    if ( !list.isEmpty() )
+    {
+      QString metadataUrl = event->mimeData()->property( "metadataUrl" ).toString();
+      addCatalogLayer( list.front(), metadataUrl );
     }
   }
 }
