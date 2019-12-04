@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <QKeySequence>
 #include <QShortcut>
 
@@ -49,6 +50,13 @@ KadasKmlIntegration::KadasKmlIntegration( QToolButton *kmlButton, QObject *paren
   mKMLButton->setIcon( QIcon( ":/kadas/icons/kml" ) );
   mKMLButton->setMenu( kmlMenu );
   mKMLButton->setPopupMode( QToolButton::InstantPopup );
+
+  kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
+}
+
+KadasKmlIntegration::~KadasKmlIntegration()
+{
+  kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
 }
 
 void KadasKmlIntegration::exportToKml()
@@ -98,4 +106,47 @@ void KadasKmlIntegration::importFromKml()
     kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import failed" ), errMsg, Qgis::Critical, 4 );
   }
   kApp->restoreOverrideCursor();
+}
+
+bool KadasKmlDropHandler::canHandleMimeData( const QMimeData *data )
+{
+  for ( const QUrl &url : data->urls() )
+  {
+    if ( url.toLocalFile().endsWith( ".kmz", Qt::CaseInsensitive ) || url.toLocalFile().endsWith( ".kml", Qt::CaseInsensitive ) )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool KadasKmlDropHandler::handleMimeDataV2( const QMimeData *data )
+{
+  int handled = 0;
+  for ( const QUrl &url : data->urls() )
+  {
+    QString path = url.toLocalFile();
+    QStringList errors;
+    if ( path.endsWith( ".kmz", Qt::CaseInsensitive ) || path.endsWith( ".kml", Qt::CaseInsensitive ) )
+    {
+      ++handled;
+      QString errMsg;
+      if ( !KadasKMLImport().importFile( path, errMsg ) )
+      {
+        errors.append( QString( "%1: %2" ).arg( QFileInfo( path ).fileName() ).arg( errMsg ) );
+      }
+    }
+    if ( handled > 0 )
+    {
+      if ( errors.isEmpty() )
+      {
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 4 );
+      }
+      else
+      {
+        QMessageBox::critical( kApp->mainWindow(), tr( "KML import failed" ), tr( "The following files could not be imported:\n%1" ).arg( errors.join( "\n" ) ) );
+      }
+    }
+  }
+  return handled > 0;
 }
