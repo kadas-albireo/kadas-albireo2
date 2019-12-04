@@ -25,6 +25,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/core/kadaslatlontoutm.h>
 
@@ -142,7 +143,12 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
     }
     return 0;
   }
-  QString rasterFile = layer->source();
+
+  QString rasterFile = Kadas::gdalSource( layer );
+  if ( rasterFile.isNull() )
+  {
+    return 0;
+  }
   GDALDatasetH raster = GDALOpen( rasterFile.toLocal8Bit().data(), GA_ReadOnly );
   if ( !raster )
   {

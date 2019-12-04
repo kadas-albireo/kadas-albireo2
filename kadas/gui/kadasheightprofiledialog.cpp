@@ -24,6 +24,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -43,6 +44,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvector.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/gui/kadasheightprofiledialog.h>
 #include <kadas/gui/kadasitemlayer.h>
@@ -258,7 +260,12 @@ void KadasHeightProfileDialog::replot()
     emit mTool->messageEmitted( tr( "No heightmap is defined in the project." ), Qgis::Warning );
     return;
   }
-  QString rasterFile = layer->source();
+  QString rasterFile = Kadas::gdalSource( layer );
+  if ( rasterFile.isNull() )
+  {
+    return;
+  }
+
   GDALDatasetH raster = GDALOpen( rasterFile.toLocal8Bit().data(), GA_ReadOnly );
   if ( !raster )
   {
@@ -298,10 +305,20 @@ void KadasHeightProfileDialog::replot()
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
 
+  QProgressBar p;
+  p.setWindowTitle( tr( "Calculating profile" ) );
+  p.setWindowModality( Qt::ApplicationModal );
+  p.show();
+
+  p.setRange( 0, mPoints.size() - 1 );
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+
   QVector<QPointF> samples;
   double x = 0;
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
   {
+    p.setValue( i );
+    QApplication::processEvents();
     if ( x >= mSegmentLengths[i] )
     {
       continue;
@@ -351,6 +368,8 @@ void KadasHeightProfileDialog::replot()
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
 
   GDALClose( raster );
+
+  QApplication::restoreOverrideCursor();
 
   // Node markers
   if ( mNodeMarkersCheckbox->isChecked() )

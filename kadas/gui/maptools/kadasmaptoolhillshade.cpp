@@ -29,6 +29,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/analysis/kadashillshadefilter.h>
+#include <kadas/core/kadas.h>
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 
@@ -118,7 +119,13 @@ void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordi
   QString outputFileName = QString( "hillshade_%1-%2_%3-%4.tif" ).arg( extent.xMinimum() ).arg( extent.xMaximum() ).arg( extent.yMinimum() ).arg( extent.yMaximum() );
   QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
-  KadasHillshadeFilter hillshade( layer->source(), outputFile, "GTiff", spinHorAngle->value(), spinVerAngle->value(), extent, crs );
+  QString gdalSource = Kadas::gdalSource( layer );
+  if ( gdalSource.isNull() )
+  {
+    return;
+  }
+
+  KadasHillshadeFilter hillshade( gdalSource, outputFile, "GTiff", spinHorAngle->value(), spinVerAngle->value(), extent, crs );
   QProgressDialog p( tr( "Calculating hillshade..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Hillshade" ) );
   p.setWindowModality( Qt::ApplicationModal );

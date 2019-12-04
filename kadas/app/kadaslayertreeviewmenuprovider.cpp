@@ -87,7 +87,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
 
 
-      if ( layer->type() == QgsMapLayerType::RasterLayer && layer->providerType() == "gdal" )
+      if ( layer->type() == QgsMapLayerType::RasterLayer && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
       {
         menu->addAction( actionLayerUseAsHeightmap( menu ) );
       }

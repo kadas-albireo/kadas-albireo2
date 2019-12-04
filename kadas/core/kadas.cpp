@@ -20,6 +20,7 @@
 #include <QStandardPaths>
 
 #include <qgis/qgssettings.h>
+#include <qgis/qgsrasterlayer.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadas_config.h>
@@ -83,4 +84,57 @@ QString Kadas::pkgResourcePath()
 QString Kadas::projectTemplatesPath()
 {
   return QDir( pkgDataPath() ).absoluteFilePath( "project_templates" );
+}
+
+QString Kadas::gdalSource( const QgsMapLayer *layer )
+{
+  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  {
+    return QString();
+  }
+
+  QString providerType  = layer->providerType();
+  QString layerSource = layer->source();
+  if ( providerType == "gdal" )
+  {
+    return layerSource;
+  }
+  else if ( providerType == "wcs" )
+  {
+    QgsDataSourceUri uri;
+    uri.setEncodedUri( layerSource );
+
+    QString wcsUrl;
+    if ( !uri.hasParam( "url" ) )
+    {
+      return QString();
+    }
+    wcsUrl = uri.param( "url" );
+    if ( !wcsUrl.endsWith( "?" ) && !wcsUrl.endsWith( "&" ) )
+    {
+      if ( wcsUrl.contains( "?" ) )
+      {
+        wcsUrl.append( "&" );
+      }
+      else
+      {
+        wcsUrl.append( "?" );
+      }
+    }
+    QString gdalSource = QString( "WCS:%1" ).arg( wcsUrl );
+    if ( uri.hasParam( "version" ) )
+    {
+      gdalSource.append( QString( "&version=%1" ).arg( uri.param( "version" ) ) );
+    }
+    if ( uri.hasParam( "identifier" ) )
+    {
+      gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
+    }
+    if ( uri.hasParam( "crs" ) )
+    {
+      gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
+    }
+    return gdalSource;
+  }
+  return QString();
 }

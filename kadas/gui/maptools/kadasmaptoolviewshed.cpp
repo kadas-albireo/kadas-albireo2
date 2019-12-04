@@ -32,6 +32,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 #include <kadas/gui/mapitems/kadascircularsectoritem.h>
@@ -216,7 +217,14 @@ void KadasMapToolViewshed::drawFinished()
   bool displayVisible = viewshedDialog.getDisplayMode() == KadasViewshedDialog::DisplayVisibleArea;
   int accuracyFactor = viewshedDialog.getAccuracyFactor();
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  bool success = KadasViewshedFilter::computeViewshed( layer->source(), outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, filterRegion, displayVisible, accuracyFactor, &p );
+
+  QString gdalSource = Kadas::gdalSource( layer );
+  if ( gdalSource.isNull() )
+  {
+    return;
+  }
+
+  bool success = KadasViewshedFilter::computeViewshed( gdalSource, outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, filterRegion, displayVisible, accuracyFactor, &p );
   QApplication::restoreOverrideCursor();
   if ( success )
   {

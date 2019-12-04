@@ -21,6 +21,8 @@
 
 #include <kadas/core/kadas_core.h>
 
+class QgsMapLayer;
+
 class KADAS_CORE_EXPORT Kadas
 {
   public:
@@ -48,6 +50,9 @@ class KADAS_CORE_EXPORT Kadas
 
     // Path where project templates are stored
     static QString projectTemplatesPath();
+
+    // Returns gdal source string for raster layer or null string in case of error
+    static QString gdalSource( const QgsMapLayer *layer );
 };
 
 #endif // KADAS_H
