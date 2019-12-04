@@ -77,6 +77,7 @@
 #endif
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
 #include <kadas/app/iamauth/kadasiamauth.h>
+#include <kadas/app/kml/kadaskmlintegration.h>
 #include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 #include <kadas/app/kadaspluginmanager.h>
@@ -195,6 +196,10 @@ void KadasMainWindow::init()
   snappingConfig.setUnits( QgsTolerance::Pixels );
   snappingConfig.setEnabled( true );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
+
+  // KML
+  KadasKmlIntegration *kmlIntegration = new KadasKmlIntegration( mKMLButton, this );
+  Q_UNUSED( kmlIntegration );
 
   // Redlining
   mRedliningIntegration = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
@@ -477,22 +482,6 @@ void KadasMainWindow::configureButtons()
 
   connect( mActionSaveMapExtent, &QAction::triggered, kApp, &KadasApplication::saveMapAsImage );
   setActionToButton( mActionSaveMapExtent, mSaveMapExtentButton );
-
-  QMenu *kmlMenu = new QMenu();
-
-  QAction *actionExportKml = new QAction( tr( "KML Export" ), kmlMenu );
-  connect( actionExportKml, &QAction::triggered, kApp, &KadasApplication::exportToKml );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_E, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionExportKml, &QAction::trigger );
-  kmlMenu->addAction( actionExportKml );
-
-  QAction *actionImportKml = new QAction( tr( "KML Import" ), kmlMenu );
-  connect( actionImportKml, &QAction::triggered, kApp, &KadasApplication::importFromKml );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_I, Qt::CTRL + Qt::Key_K ), this ), &QShortcut::activated, actionImportKml, &QAction::trigger );
-  kmlMenu->addAction( actionImportKml );
-
-  mKMLButton->setIcon( QIcon( ":/kadas/icons/kml" ) );
-  mKMLButton->setMenu( kmlMenu );
-  mKMLButton->setPopupMode( QToolButton::InstantPopup );
 
   // View tab
   setActionToButton( mActionZoomLast, mZoomLastButton, QKeySequence( Qt::CTRL + Qt::Key_PageUp ) );

@@ -64,9 +64,6 @@ class KadasApplication : public QgsApplication
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     KadasItemLayer *selectItemLayer();
 
-    void exportToKml();
-    void importFromKml();
-
     void projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile );
     bool projectOpen( const QString &projectFile = QString() );
