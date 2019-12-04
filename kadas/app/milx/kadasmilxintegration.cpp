@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QDialog>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QSlider>
 #include <QTabWidget>
@@ -39,7 +40,7 @@
 #include <kadas/app/ui_KadasMilxExportDialog.h>
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
-  : QObject( parent ), mUi( ui ), mMilxLibrary( 0 )
+  : QObject( parent ), mUi( ui ), mMilxLibrary( nullptr )
 {
   if ( !KadasMilxClient::init() )
   {
@@ -48,8 +49,8 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   }
 
   connect( mUi.mActionMilx, &QAction::triggered, this, &KadasMilxIntegration::createMilx );
-  connect( mUi.mActionSaveMilx, &QAction::triggered, this, &KadasMilxIntegration::saveMilx );
-  connect( mUi.mActionLoadMilx, &QAction::triggered, this, &KadasMilxIntegration::loadMilx );
+  connect( mUi.mActionSaveMilx, &QAction::triggered, this, &KadasMilxIntegration::saveMilxly );
+  connect( mUi.mActionLoadMilx, &QAction::triggered, this, &KadasMilxIntegration::openMilxly );
 
   mUi.mRibbonWidget->setTabEnabled( mUi.mRibbonWidget->indexOf( mUi.mMssTab ), true );
 
@@ -71,10 +72,13 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   {
     return new KadasMilxEditor( item, type, mMilxLibrary );
   } );
+
+  kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
 }
 
 KadasMilxIntegration::~KadasMilxIntegration()
 {
+  kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
   KadasMilxClient::quit();
 }
 
@@ -158,7 +162,7 @@ void KadasMilxIntegration::refreshMilxLayers()
   }
 }
 
-void KadasMilxIntegration::saveMilx()
+void KadasMilxIntegration::saveMilxly()
 {
   kApp->unsetMapTool();
 
@@ -313,13 +317,13 @@ void KadasMilxIntegration::saveMilx()
   {
     delete dev;
     delete zip;
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), tr( "Failed to write output." ), Qgis::Critical, 5 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export failed" ), tr( "Failed to write output." ), Qgis::Critical, 5 );
     return;
   }
   if ( valid )
   {
     dev->write( outputXml.toUtf8() );
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Completed" ), "", Qgis::Info, 5 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export completed" ), "", Qgis::Info, 5 );
     if ( !messages.isEmpty() )
     {
       showMessageDialog( tr( "Export Messages" ), tr( "The following messages were emitted while exporting:" ), messages );
@@ -338,7 +342,7 @@ void KadasMilxIntegration::saveMilx()
   delete zip;
 }
 
-void KadasMilxIntegration::loadMilx()
+void KadasMilxIntegration::openMilxly()
 {
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString filter = tr( "MilX Layer Files (*.milxly *.milxlyz)" );
@@ -349,6 +353,19 @@ void KadasMilxIntegration::loadMilx()
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
+  QString errorMsg;
+  if ( !importMilxly( filename, errorMsg ) )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX import failed" ), errorMsg, Qgis::Critical, 5 );
+  }
+  else
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX import completed" ), "", Qgis::Info, 5 );
+  }
+}
+
+bool KadasMilxIntegration::importMilxly( const QString &filename, QString &errorMsg )
+{
   QIODevice *dev = 0;
   if ( filename.endsWith( ".milxlyz", Qt::CaseInsensitive ) )
   {
@@ -361,8 +378,8 @@ void KadasMilxIntegration::loadMilx()
   if ( !dev->open( QIODevice::ReadOnly ) )
   {
     delete dev;
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), tr( "Failed to open the input file for reading." ), Qgis::Critical, 5 );
-    return;
+    errorMsg = tr( "Failed to open the input file." );
+    return false;
   }
   QString inputXml = QString::fromUtf8( dev->readAll().data() );
   delete dev;
@@ -371,17 +388,17 @@ void KadasMilxIntegration::loadMilx()
   QString messages;
   if ( !KadasMilxClient::upgradeMilXFile( inputXml, outputXml, valid, messages ) )
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), tr( "Failed to read input." ), Qgis::Critical, 5 );
-    return;
+    errorMsg = tr( "Failed to read input file." );
+    return false;
   }
   if ( !valid )
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), "", Qgis::Critical, 5 );
     if ( !messages.isEmpty() )
     {
       showMessageDialog( tr( "Import Failed" ), tr( "The import failed:" ), messages );
     }
-    return;
+    errorMsg = tr( "MilX upgrade failed" );
+    return false;
   }
 
   QDomDocument doc;
@@ -389,9 +406,8 @@ void KadasMilxIntegration::loadMilx()
 
   if ( doc.isNull() )
   {
-    QString errorMsg = tr( "The file could not be parsed." );
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), errorMsg, Qgis::Critical, 5 );
-    return;
+    errorMsg = tr( "The file could not be parsed." );
+    return false;
   }
 
   QDomElement milxDocumentEl = doc.firstChildElement( "MilXDocument_Layer" );
@@ -402,14 +418,12 @@ void KadasMilxIntegration::loadMilx()
   KadasMilxClient::getCurrentLibraryVersionTag( verTag );
   if ( fileMssVer != verTag )
   {
-    QString errorMsg = tr( "Unexpected MSS library version tag." );
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), errorMsg, Qgis::Critical, 5 );
-    return;
+    errorMsg = tr( "Unexpected MSS library version tag." );
+    return false;
   }
   int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
 
   QDomNodeList milxLayerEls = milxDocumentEl.elementsByTagName( "MilXLayer" );
-  QString errorMsg;
   QList<KadasMilxLayer *> importedLayers;
   QList< QPair<QString, QString> > cartouches;
   for ( int iLayer = 0, nLayers = milxLayerEls.count(); iLayer < nLayers; ++iLayer )
@@ -465,7 +479,7 @@ void KadasMilxIntegration::loadMilx()
         }
       }
     }
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Completed" ), "", Qgis::Info, 5 );
+
     if ( !messages.isEmpty() )
     {
       showMessageDialog( tr( "Import Messages" ), tr( "The following messages were emitted while importing:" ), messages );
@@ -474,8 +488,8 @@ void KadasMilxIntegration::loadMilx()
   else
   {
     qDeleteAll( importedLayers );
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Import Failed" ), errorMsg, Qgis::Critical, 5 );
   }
+  return true;
 }
 
 void KadasMilxIntegration::showMessageDialog( const QString &title, const QString &body, const QString &messages )
@@ -493,3 +507,47 @@ void KadasMilxIntegration::showMessageDialog( const QString &title, const QStrin
   connect( bbox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject );
   dialog.exec();
 }
+
+bool KadasMilxDropHandler::canHandleMimeData( const QMimeData *data )
+{
+  for ( const QUrl &url : data->urls() )
+  {
+    if ( url.toLocalFile().endsWith( ".milxly", Qt::CaseInsensitive ) || url.toLocalFile().endsWith( ".milxlyz", Qt::CaseInsensitive ) )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool KadasMilxDropHandler::handleMimeDataV2( const QMimeData *data )
+{
+  int handled = 0;
+  for ( const QUrl &url : data->urls() )
+  {
+    QString path = url.toLocalFile();
+    QStringList errors;
+    if ( path.endsWith( ".milxly", Qt::CaseInsensitive ) || path.endsWith( ".milxlyz", Qt::CaseInsensitive ) )
+    {
+      ++handled;
+      QString errMsg;
+      if ( !KadasMilxIntegration::importMilxly( path, errMsg ) )
+      {
+        errors.append( QString( "%1: %2" ).arg( QFileInfo( path ).fileName() ).arg( errMsg ) );
+      }
+    }
+    if ( handled > 0 )
+    {
+      if ( errors.isEmpty() )
+      {
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX import completed" ), Qgis::Info, 5 );
+      }
+      else
+      {
+        QMessageBox::critical( kApp->mainWindow(), tr( "MilX import failed" ), tr( "The following files could not be imported:\n%1" ).arg( errors.join( "\n" ) ) );
+      }
+    }
+  }
+  return handled > 0;
+}
+

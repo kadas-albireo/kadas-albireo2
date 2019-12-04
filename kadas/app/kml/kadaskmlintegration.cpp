@@ -70,11 +70,11 @@ void KadasKmlIntegration::exportToKml()
   KadasKMLExport kmlExport;
   if ( kmlExport.exportToFile( d.getFilename(), d.getSelectedLayers(), d.getExportScale() ) )
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML export completed" ), Qgis::Info, 4 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML export completed" ), Qgis::Info, 5 );
   }
   else
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML export failed" ), Qgis::Critical, 4 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML export failed" ), Qgis::Critical, 5 );
   }
   kApp->restoreOverrideCursor();
 }
@@ -99,11 +99,11 @@ void KadasKmlIntegration::importFromKml()
   kApp->setOverrideCursor( Qt::BusyCursor );
   if ( KadasKMLImport().importFile( filename, errMsg ) )
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 4 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 5 );
   }
   else
   {
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import failed" ), errMsg, Qgis::Critical, 4 );
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import failed" ), errMsg, Qgis::Critical, 5 );
   }
   kApp->restoreOverrideCursor();
 }
@@ -140,7 +140,7 @@ bool KadasKmlDropHandler::handleMimeDataV2( const QMimeData *data )
     {
       if ( errors.isEmpty() )
       {
-        kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 4 );
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "KML import completed" ), Qgis::Info, 5 );
       }
       else
       {

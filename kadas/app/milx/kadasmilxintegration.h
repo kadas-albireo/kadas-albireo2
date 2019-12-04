@@ -19,6 +19,8 @@
 
 #include <QObject>
 
+#include <qgis/qgscustomdrophandler.h>
+
 class QAction;
 class QComboBox;
 class QSlider;
@@ -26,6 +28,14 @@ class QTabWidget;
 class QgsMapLayer;
 class KadasMilxLayer;
 class KadasMilxLibrary;
+
+
+class KadasMilxDropHandler : public QgsCustomDropHandler
+{
+  public:
+    bool canHandleMimeData( const QMimeData *data ) override;
+    bool handleMimeDataV2( const QMimeData *data ) override;
+};
 
 class KadasMilxIntegration : public QObject
 {
@@ -45,19 +55,22 @@ class KadasMilxIntegration : public QObject
     KadasMilxIntegration( const MilxUi &ui, QObject *parent = nullptr );
     ~KadasMilxIntegration();
 
+    static bool importMilxly( const QString &filename, QString &errorMsg );
+
   private:
     MilxUi mUi;
     KadasMilxLibrary *mMilxLibrary;
+    KadasMilxDropHandler mDropHandler;
     KadasMilxLayer *getLayer();
     KadasMilxLayer *getOrCreateLayer();
 
     void refreshMilxLayers();
-    void showMessageDialog( const QString &title, const QString &body, const QString &messages );
+    static void showMessageDialog( const QString &title, const QString &body, const QString &messages );
 
   private slots:
     void createMilx( bool active );
-    void saveMilx();
-    void loadMilx();
+    void saveMilxly();
+    void openMilxly();
     void setMilXSymbolSize( int value );
     void setMilXLineWidth( int value );
     void setMilXWorkMode( int idx );
