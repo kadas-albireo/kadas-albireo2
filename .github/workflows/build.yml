@@ -9,27 +9,48 @@ jobs:
       - uses: actions/checkout@v1
       - name: Build kadas2-mingw-buildenv
         run: docker build -t kadas2-mingw-buildenv .
-      - name: Download QGIS build
-        run: |
-          mkdir dist
-          curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .html_url >dist/qgis-release.txt
-          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[1].browser_download_url)
-          wget --no-verbose $ASSET_URL
-          unzip qgis-portable-win64.zip -d dist
-          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/latest | jq -r .assets[0].browser_download_url)
-          wget --no-verbose $ASSET_URL
-          unzip qgis-portable-win64-debugsym.zip -d dist
       - name: Version number
         id: version_number
         run: |
-          if [ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]; then VERSION=$(basename ${{ github.ref }}); else VERSION=$(date +%Y%m%d%S); fi
+          if [ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]; then
+            VERSION=$(basename ${{ github.ref }})
+            QGIS_VERSION=$VERSION
+          else
+            VERSION=ci-latest-$(basename ${{ github.ref }})
+            QGIS_VERSION=ci-latest-kadas_modifications
+            PREV_RELEASE=$(curl -s https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$VERSION | jq -r .url)
+            # Reset ci-latest tag
+            git config --global user.email "ci@github.com"
+            git config --global user.name "Github CI"
+            # Workaround for "could not read Username for 'https://github.com': No such device or address"
+            git remote set-url origin https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
+            git tag -d $VERSION || true
+            git push origin :$VERSION || true
+            git tag -m $VERSION $VERSION
+            git push --tags
+          fi
           echo "##[set-output name=version;]$VERSION"
+          echo "##[set-output name=qgis_version;]$QGIS_VERSION"
+          echo "##[set-output name=prev_release;]${PREV_RELEASE/null/}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download QGIS build
+        run: |
+          QGIS_VERSION=${{ steps.version_number.outputs.qgis_version }}
+          mkdir kadas
+          curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .html_url >kadas/qgis-release.txt
+          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[1].browser_download_url)
+          wget --no-verbose $ASSET_URL
+          unzip qgis-portable-win64.zip && mv QGIS-Portable/* kadas/
+          ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[0].browser_download_url)
+          wget --no-verbose $ASSET_URL
+          unzip qgis-portable-win64-debugsym.zip -d kadas
       - name: Build application
-        run: docker run -v $PWD:/workspace -e QGIS_INSTALL_PREFIX=/workspace/dist kadas2-mingw-buildenv scripts/mingwbuild.sh x86_64 nodebug 4
+        run: docker run -v $PWD:/workspace -e QGIS_INSTALL_PREFIX=/workspace/kadas kadas2-mingw-buildenv scripts/mingwbuild.sh x86_64 nodebug 4
       - name: Package application
         run: docker run -v $PWD:/workspace kadas2-mingw-buildenv packaging/kadas_release.sh
       - name: Create portable zip
-        run: (cd dist && zip -r - *) > kadas-portable-win64.zip
+        run: zip -r kadas-portable-win64.zip kadas
       - name: Create debugsym zip
         run: (cd dist_debug && zip -r - *) > kadas-portable-win64-debugsym.zip
       - name: Create release
@@ -39,7 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.version_number.outputs.version }}
-          release_name: Build ${{ steps.version_number.outputs.version }}
+          release_name: CI Build
           draft: false
           prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Upload release asset
@@ -60,3 +81,8 @@ jobs:
           asset_path: ./kadas-portable-win64-debugsym.zip
           asset_name: kadas-portable-win64-debugsym.zip
           asset_content_type: application/zip
+      - name: Delete previous release
+        run: |
+          curl -s -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -X DELETE ${{ steps.version_number.outputs.prev_release }}
+        if: steps.version_number.outputs.prev_release != ''
