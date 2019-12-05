@@ -42,6 +42,7 @@ jobs:
           ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[1].browser_download_url)
           wget --no-verbose $ASSET_URL
           unzip qgis-portable-win64.zip && mv QGIS-Portable/* kadas/
+          cp COPYING README.md kadas/
           ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[0].browser_download_url)
           wget --no-verbose $ASSET_URL
           unzip qgis-portable-win64-debugsym.zip -d kadas
