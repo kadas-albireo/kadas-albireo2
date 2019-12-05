@@ -37,21 +37,21 @@ jobs:
       - name: Download QGIS build
         run: |
           QGIS_VERSION=${{ steps.version_number.outputs.qgis_version }}
-          mkdir kadas
-          curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .html_url >kadas/qgis-release.txt
+          mkdir dist
+          curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .html_url >dist/qgis-release.txt
           ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[1].browser_download_url)
           wget --no-verbose $ASSET_URL
-          unzip qgis-portable-win64.zip && mv QGIS-Portable/* kadas/
-          cp COPYING README.md kadas/
+          unzip qgis-portable-win64.zip && mv QGIS-Portable/* dist/
+          cp COPYING README.md dist/
           ASSET_URL=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases/tags/$QGIS_VERSION | jq -r .assets[0].browser_download_url)
           wget --no-verbose $ASSET_URL
-          unzip qgis-portable-win64-debugsym.zip -d kadas
+          unzip qgis-portable-win64-debugsym.zip -d dist
       - name: Build application
-        run: docker run -v $PWD:/workspace -e QGIS_INSTALL_PREFIX=/workspace/kadas kadas2-mingw-buildenv scripts/mingwbuild.sh x86_64 nodebug 4
+        run: docker run -v $PWD:/workspace -e QGIS_INSTALL_PREFIX=/workspace/dist kadas2-mingw-buildenv scripts/mingwbuild.sh x86_64 nodebug 4
       - name: Package application
         run: docker run -v $PWD:/workspace kadas2-mingw-buildenv packaging/kadas_release.sh
       - name: Create portable zip
-        run: zip -r kadas-portable-win64.zip kadas
+        run: mv kadas k && mv dist kadas && zip -r kadas-portable-win64.zip kadas
       - name: Create debugsym zip
         run: (cd dist_debug && zip -r - *) > kadas-portable-win64-debugsym.zip
       - name: Create release
