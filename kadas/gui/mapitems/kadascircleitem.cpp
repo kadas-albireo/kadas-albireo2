@@ -160,7 +160,7 @@ void KadasCircleItem::setCurrentAttributes( const AttribValues &values, const Qg
   KadasItemPos center = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
   KadasItemPos rPos = toItemPos( KadasMapPos( values[AttrX] + values[AttrR], values[AttrY] ), mapSettings );
   state()->centers.last() = center;
-  state()->radii.last() = qSqrt( rPos.sqrDist( rPos ) );
+  state()->radii.last() = qSqrt( center.sqrDist( rPos ) );
   recomputeDerived();
 }
 
