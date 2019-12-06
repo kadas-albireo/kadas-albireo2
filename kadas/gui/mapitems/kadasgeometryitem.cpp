@@ -26,6 +26,8 @@
 #include <qgis/qgsgeometryutils.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmulticurve.h>
+#include <qgis/qgsmultisurface.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
@@ -262,7 +264,22 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
                        << QgsPoint( r.xMinimum(), r.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
-  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( mGeometry );
+  QgsGeometryEngine *geomEngine = nullptr;
+  if ( ( mBrush.color().alpha() == 0 || mBrush.style() == Qt::NoBrush ) && dynamic_cast<QgsMultiSurface *>( mGeometry ) )
+  {
+    QgsMultiSurface *multiSurface = static_cast<QgsMultiSurface *>( mGeometry );
+    QgsMultiCurve multiCurve;
+    for ( int i = 0, n = multiSurface->numGeometries(); i < n; ++i )
+    {
+      QgsCurvePolygon *surface = dynamic_cast<QgsCurvePolygon *>( multiSurface->geometryN( i ) );
+      multiCurve.addGeometry( surface->exteriorRing()->clone() );
+    }
+    geomEngine = QgsGeometry::createGeometryEngine( &multiCurve );
+  }
+  else
+  {
+    geomEngine = QgsGeometry::createGeometryEngine( mGeometry );
+  }
   bool intersects = geomEngine->intersects( &filterRect );
   delete geomEngine;
   return intersects;
