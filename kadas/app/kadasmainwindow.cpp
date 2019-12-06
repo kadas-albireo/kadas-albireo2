@@ -939,7 +939,6 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
         }
       }
     }
-    // TODO
     // If action is not associated to a kadas button, try with redlining and gpx route editor
     if ( tool->action()->parent() == mRedliningIntegration )
     {
