@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxeditor.h                                     *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -11,7 +11,7 @@
 
 
 
-class Kadas
+class KadasMilxEditor : KadasMapItemEditor
 {
 %Docstring
 *************************************************************************
@@ -25,31 +25,23 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/core/kadas.h"
+#include "kadas/gui/milx/kadasmilxeditor.h"
 %End
   public:
-    static const char *KADAS_VERSION;
-    static const int KADAS_VERSION_INT;
-    static const char *KADAS_RELEASE_NAME;
-    static const char *KADAS_FULL_RELEASE_NAME;
-    static const char *KADAS_DEV_VERSION;
-    static const char *KADAS_BUILD_DATE;
+    KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilxLibrary *library, QWidget *parent = 0 );
 
-    static QString configPath();
+  public slots:
+    virtual void syncItemToWidget();
 
-    static QString pkgDataPath();
+    virtual void syncWidgetToItem();
 
-    static QString pkgResourcePath();
 
-    static QString projectTemplatesPath();
-
-    static QString gdalSource( const QgsMapLayer *layer );
 };
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxeditor.h                                     *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

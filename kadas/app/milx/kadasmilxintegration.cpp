@@ -29,14 +29,14 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxeditor.h>
+#include <kadas/gui/milx/kadasmilxitem.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
+#include <kadas/gui/milx/kadasmilxlibrary.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/milx/kadasmilxclient.h>
-#include <kadas/app/milx/kadasmilxeditor.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
-#include <kadas/app/milx/kadasmilxitem.h>
-#include <kadas/app/milx/kadasmilxlayer.h>
-#include <kadas/app/milx/kadasmilxlibrary.h>
 #include <kadas/app/ui_KadasMilxExportDialog.h>
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
@@ -66,7 +66,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
-  mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow() );
+  mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId(), kApp->mainWindow() );
 
   KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
   {

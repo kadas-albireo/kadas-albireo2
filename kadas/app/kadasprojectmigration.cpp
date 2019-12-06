@@ -42,10 +42,10 @@
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitems/kadastextitem.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasprojectmigration.h>
-#include <kadas/app/milx/kadasmilxlayer.h>
 
 
 QString KadasProjectMigration::migrateProject( const QString &fileName, QStringList &filesToAttach )

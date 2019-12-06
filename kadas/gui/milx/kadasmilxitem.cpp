@@ -25,8 +25,8 @@
 
 #include <quazip5/quazipfile.h>
 
+#include <kadas/gui/milx/kadasmilxitem.h>
 #include <kadas/app/kadasapplication.h>
-#include <kadas/app/milx/kadasmilxitem.h>
 
 
 KADAS_REGISTER_MAP_ITEM( KadasMilxItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasMilxItem(); } );
@@ -96,13 +96,13 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
   for ( QJsonValue attrVal : json["attributes"].toArray() )
   {
     QJsonArray attr = attrVal.toArray();
-    attributes.insert( static_cast<KadasMilxClient::AttributeType>( attr.at( 0 ).toInt() ), attr.at( 1 ).toDouble() );
+    attributes.insert( static_cast<KadasMilxAttrType>( attr.at( 0 ).toInt() ), attr.at( 1 ).toDouble() );
   }
   for ( QJsonValue attrPtVal : json["attributePoints"].toArray() )
   {
     QJsonArray attrPt = attrPtVal.toArray();
     QJsonArray pt = attrPt.at( 1 ).toArray();
-    attributePoints.insert( static_cast<KadasMilxClient::AttributeType>( attrPt.at( 0 ).toInt() ), KadasItemPos( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
+    attributePoints.insert( static_cast<KadasMilxAttrType>( attrPt.at( 0 ).toInt() ), KadasItemPos( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
   }
   for ( QJsonValue val : json["controlPoints"].toArray() )
   {
@@ -122,7 +122,7 @@ KadasMilxItem::KadasMilxItem( QObject *parent )
   clear();
 }
 
-void KadasMilxItem::setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc )
+void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
 {
   mMssString = symbolDesc.symbolXml;
   mMilitaryName = symbolDesc.militaryName;
@@ -512,9 +512,9 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
     if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
-      double min = it.key() == KadasMilxClient::AttributeAttitude ? std::numeric_limits<double>::lowest() : 0;
+      double min = it.key() == MilxAttributeAttitude ? std::numeric_limits<double>::lowest() : 0;
       double max = std::numeric_limits<double>::max();
-      int decimals = it.key() == KadasMilxClient::AttributeAttitude ? 1 : 0;
+      int decimals = it.key() == MilxAttributeAttitude ? 1 : 0;
       attributes.insert( it.key(), NumericAttribute{KadasMilxClient::attributeName( it.key() ), min, max, decimals } );
       return EditContext( QgsVertexId( 0, 1, it.key() ), testPos, attributes );
     }
@@ -591,7 +591,7 @@ void KadasMilxItem::edit( const EditContext &context, const AttribValues &values
   if ( values.size() == 1 )
   {
     // Single attribute
-    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( values.firstKey() );
+    KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( values.firstKey() );
     state()->attributes[attr] = values[values.firstKey()];
 
     KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
@@ -674,7 +674,7 @@ KadasMapItem::AttribValues KadasMilxItem::editAttribsFromPosition( const EditCon
   if ( context.attributes.size() == 1 )
   {
     // Single attribute
-    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( context.attributes.firstKey() );
+    KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( context.attributes.firstKey() );
     AttribValues values;
     values.insert( attr, constState()->attributes[attr] );
     return values;
@@ -690,7 +690,7 @@ KadasMapPos KadasMilxItem::positionFromEditAttribs( const EditContext &context, 
   if ( values.size() == 1 )
   {
     // Single attribute
-    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( values.firstKey() );
+    KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( values.firstKey() );
     return toMapPos( constState()->attributePoints[attr], mapSettings );
   }
   else
@@ -721,7 +721,7 @@ QList< QPair<int, double> > KadasMilxItem::computeScreenAttributes( const QgsMap
   for ( auto it = constState()->attributes.begin(), itEnd = constState()->attributes.end(); it != itEnd; ++it )
   {
     double value = it.value();
-    if ( it.key() != KadasMilxClient::AttributeAttitude )
+    if ( it.key() != MilxAttributeAttitude )
     {
       value = value * m2p;
     }
@@ -834,6 +834,25 @@ KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const Qg
 
   item->state()->userOffset = QPoint( offsetX, offsetY );
 
+  finalize( item, isCorridor );
+
+  return item;
+}
+
+KadasMilxItem *KadasMilxItem::fromMssStringAndPoints( const QString &mssString, const QList<KadasItemPos> &points )
+{
+  KadasMilxItem *item = new KadasMilxItem();
+
+  item->mMssString = mssString;
+  item->state()->points = points;
+
+  finalize( item, false );
+
+  return item;
+}
+
+void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
+{
   if ( item->state()->points.size() > 1 )
   {
     if ( isCorridor )
@@ -861,7 +880,7 @@ KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const Qg
         for ( auto it = item->constState()->attributes.begin(), itEnd = item->constState()->attributes.end(); it != itEnd; ++it )
         {
           double value = it.value();
-          if ( it.key() != KadasMilxClient::AttributeAttitude )
+          if ( it.key() != MilxAttributeAttitude )
           {
             value = value / ellipsoidDist * screenDist;
           }
@@ -892,8 +911,6 @@ KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const Qg
   }
 
   item->state()->drawStatus = State::DrawStatus::Finished;
-
-  return item;
 }
 
 void KadasMilxItem::posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
@@ -921,6 +938,14 @@ QRect KadasMilxItem::computeScreenExtent( const QgsRectangle &mapExtent, const Q
   int yMin = qMin( qMin( topLeft.y(), topRight.y() ), qMin( bottomLeft.y(), bottomRight.y() ) );
   int yMax = qMax( qMax( topLeft.y(), topRight.y() ), qMax( bottomLeft.y(), bottomRight.y() ) );
   return QRect( xMin, yMin, xMax - xMin, yMax - yMin ).normalized();
+}
+
+bool KadasMilxItem::validateMssString( const QString &mssString, QString &adjustedMssString, QString &messages )
+{
+  bool valid = false;
+  QString libVersion;
+  KadasMilxClient::getCurrentLibraryVersionTag( libVersion );
+  return KadasMilxClient::validateSymbolXml( mssString, libVersion, adjustedMssString, valid, messages ) && valid;
 }
 
 double KadasMilxItem::metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const
@@ -955,7 +980,7 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   for ( auto it = result.attributes.begin(), itEnd = result.attributes.end(); it != itEnd; ++it )
   {
     double value = it.value();
-    if ( it.key() != KadasMilxClient::AttributeAttitude )
+    if ( it.key() != MilxAttributeAttitude )
     {
       value /= m2p;
     }

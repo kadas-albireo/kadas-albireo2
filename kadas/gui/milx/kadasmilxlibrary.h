@@ -27,19 +27,23 @@ class QgsFilterLineEdit;
 
 class KadasMilxLibraryLoader;
 
-#include <kadas/app/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
 
-class KadasMilxLibrary : public QFrame
+class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
 {
     Q_OBJECT
   public:
-    KadasMilxLibrary( QWidget *parent = 0 );
+    KadasMilxLibrary( WId winId, QWidget *parent = 0 );
     ~KadasMilxLibrary();
     void focusFilter();
 
   signals:
-    void symbolSelected( const KadasMilxClient::SymbolDesc &symbolDesc );
+    void symbolSelected( const KadasMilxSymbolDesc &symbolDesc );
     void visibilityChanged( bool visible );
+
+  protected:
+    void showEvent( QShowEvent * ) { emit visibilityChanged( true ); }
+    void hideEvent( QHideEvent * ) { emit visibilityChanged( false ); }
 
   private:
     class TreeFilterProxyModel;
@@ -50,15 +54,13 @@ class KadasMilxLibrary : public QFrame
     static const int SymbolPointCountRole;
     static const int SymbolVariablePointsRole;
 
-    KadasMilxLibraryLoader *mLoader;
-    QgsFilterLineEdit *mFilterLineEdit;
-    QTreeView *mTreeView;
-    QStandardItemModel *mGalleryModel;
-    QStandardItemModel *mLoadingModel;
-    TreeFilterProxyModel *mFilterProxyModel;
-
-    void showEvent( QShowEvent * ) { emit visibilityChanged( true ); }
-    void hideEvent( QHideEvent * ) { emit visibilityChanged( false ); }
+    WId mWinId;
+    KadasMilxLibraryLoader *mLoader = nullptr;
+    QgsFilterLineEdit *mFilterLineEdit = nullptr;
+    QTreeView *mTreeView = nullptr;
+    QStandardItemModel *mGalleryModel = nullptr;
+    QStandardItemModel *mLoadingModel = nullptr;
+    TreeFilterProxyModel *mFilterProxyModel = nullptr;
 
   private slots:
     void filterChanged( const QString &text );
@@ -68,7 +70,9 @@ class KadasMilxLibrary : public QFrame
 };
 
 
-class KadasMilxLibraryLoader : public QThread
+#ifndef SIP_RUN
+
+class KADAS_GUI_EXPORT KadasMilxLibraryLoader : public QThread
 {
     Q_OBJECT
   public:
@@ -82,5 +86,7 @@ class KadasMilxLibraryLoader : public QThread
     void run() override;
     QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false );
 };
+
+#endif // SIP_RUN
 
 #endif // KADASMILXLIBRARY_H

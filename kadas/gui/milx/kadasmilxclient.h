@@ -26,14 +26,34 @@
 #include <QPixmap>
 #include <QThread>
 
+#include <kadas/gui/kadas_gui.h>
+
 class QNetworkSession;
 class QRect;
 class QProcess;
 class QStringList;
 class QTcpSocket;
 
+struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
+{
+  QString symbolXml;
+  QString name;
+  QString militaryName;
+  QImage icon;
+  bool hasVariablePoints;
+  int minNumPoints;
+};
 
-class KadasMilxClientWorker : public QObject
+#ifndef SIP_RUN
+
+typedef int KadasMilxAttrType;
+constexpr KadasMilxAttrType MilxAttributeUnknown = 0;
+constexpr KadasMilxAttrType MilxAttributeWidth = 1;
+constexpr KadasMilxAttrType MilxAttributeLength = 2;
+constexpr KadasMilxAttrType MilxAttributeRadius = 4;
+constexpr KadasMilxAttrType MilxAttributeAttitude = 8;
+
+class KADAS_GUI_EXPORT KadasMilxClientWorker : public QObject
 {
     Q_OBJECT
   public:
@@ -58,20 +78,10 @@ class KadasMilxClientWorker : public QObject
 };
 
 
-class KadasMilxClient : public QThread
+class KADAS_GUI_EXPORT KadasMilxClient : public QThread
 {
     Q_OBJECT
   public:
-    struct SymbolDesc
-    {
-      QString symbolXml;
-      QString name;
-      QString militaryName;
-      QImage icon;
-      bool hasVariablePoints;
-      int minNumPoints;
-    };
-
     struct NPointSymbol
     {
       NPointSymbol( const QString &_xml, const QList<QPoint> &_points, const QList<int> &_controlPoints, const QList< QPair<int, double> > &_attributes, bool _finalized, bool _colored )
@@ -85,27 +95,18 @@ class KadasMilxClient : public QThread
       bool colored;
     };
 
-    enum AttributeType
-    {
-      AttributeUnknown = 0,
-      AttributeWidth = 1,
-      AttributeLength = 2,
-      AttributeRadius = 4,
-      AttributeAttitude = 8
-    };
-
     struct NPointSymbolGraphic
     {
       QImage graphic;
       QPoint offset;
       QList<QPoint> adjustedPoints;
       QList<int> controlPoints;
-      QMap<AttributeType, double> attributes;
-      QMap<AttributeType, QPoint> attributePoints;
+      QMap<KadasMilxAttrType, double> attributes;
+      QMap<KadasMilxAttrType, QPoint> attributePoints;
     };
 
-    static QString attributeName( AttributeType idx );
-    static AttributeType attributeIdx( const QString &name );
+    static QString attributeName( KadasMilxAttrType idx );
+    static KadasMilxAttrType attributeIdx( const QString &name );
 
     static void setSymbolSize( int value ) { instance()->mSymbolSize = value; instance()->setSymbolOptions( instance()->mSymbolSize, instance()->mLineWidth, instance()->mWorkMode ); }
     static void setLineWidth( int value ) { instance()->mLineWidth = value; instance()->setSymbolOptions( instance()->mSymbolSize, instance()->mLineWidth, instance()->mWorkMode ); }
@@ -114,8 +115,8 @@ class KadasMilxClient : public QThread
     static void setWorkMode( int workMode ) { instance()->mWorkMode = workMode; instance()->setSymbolOptions( instance()->mSymbolSize, instance()->mLineWidth, instance()->mWorkMode ); }
 
     static bool init();
-    static bool getSymbolMetadata( const QString &symbolId, SymbolDesc &result );
-    static bool getSymbolsMetadata( const QStringList &symbolIds, QList<SymbolDesc> &result );
+    static bool getSymbolMetadata( const QString &symbolId, KadasMilxSymbolDesc &result );
+    static bool getSymbolsMetadata( const QStringList &symbolIds, QList<KadasMilxSymbolDesc> &result );
     static bool getMilitaryName( const QString &symbolXml, QString &militaryName );
     static bool getControlPointIndices( const QString &symbolXml, int nPoints, QList<int> &controlPoints );
     static bool getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor );
@@ -127,7 +128,7 @@ class KadasMilxClient : public QThread
     static bool canDeletePoint( const NPointSymbol &symbol, int index, bool &canDelete );
     static bool deletePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int index, NPointSymbolGraphic &result );
     static bool editSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, NPointSymbolGraphic &result, WId parentWid );
-    static bool createSymbol( QString &symbolId, SymbolDesc &result, WId parentWid );
+    static bool createSymbol( QString &symbolId, KadasMilxSymbolDesc &result, WId parentWid );
 
     static bool updateSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, NPointSymbolGraphic &result, bool returnPoints );
     static bool updateSymbols( const QRect &visibleExtent, int dpi, double scaleFactor, const QList<NPointSymbol> &symbols, QList<NPointSymbolGraphic> &result );
@@ -161,4 +162,5 @@ class KadasMilxClient : public QThread
     bool setSymbolOptions( int symbolSize, int lineWidth, int workMode );
 };
 
+#endif // SIP_RUN
 #endif // KADASMILXCLIENT_H

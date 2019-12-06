@@ -6,6 +6,7 @@ FILE(GLOB kadas_gui_SRC
   mapitems/*.cpp
   mapitemeditors/*.cpp
   maptools/*.cpp
+  milx/*.cpp
   search/*.cpp
 )
 LIST(SORT kadas_gui_SRC)
@@ -16,6 +17,7 @@ FILE(GLOB kadas_gui_HDR
   mapitems/*.h
   mapitemeditors/*.h
   maptools/*.h
+  milx/*.h
   search/*.h
 )
 LIST(SORT kadas_gui_HDR)
@@ -32,6 +34,8 @@ INCLUDE_DIRECTORIES(${GeographicLib_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${QWT_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${EXIV2_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CAIRO_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${LIBRSVG_INCLUDE_DIRS})
 
 ADD_LIBRARY(kadas_gui SHARED
     ${kadas_gui_SRC}
@@ -51,6 +55,8 @@ TARGET_LINK_LIBRARIES(kadas_gui
   ${GDAL_LDFLAGS}
   ${EXIV2_LDFLAGS}
   ${QUAZIP_LIBRARIES}
+  ${CAIRO_LIBRARIES}
+  ${LIBRSVG_LIBRARIES}
   kadas_core
   kadas_analysis
 )

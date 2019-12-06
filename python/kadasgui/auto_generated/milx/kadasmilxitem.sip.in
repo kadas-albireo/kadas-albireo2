@@ -1,0 +1,134 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/milx/kadasmilxitem.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+class KadasMilxItem : KadasMapItem
+{
+
+%TypeHeaderCode
+#include "kadas/gui/milx/kadasmilxitem.h"
+%End
+  public:
+    KadasMilxItem( QObject *parent = 0 );
+    void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
+
+    const QString &mssString() const;
+    void setMssString( const QString &mssString );
+    const QString &militaryName() const;
+    void setMilitaryName( const QString &militaryName );
+    int minNPoints() const;
+    void setMinNPoints( int minNPoints );
+    bool hasVariablePoints() const;
+    void setHasVariablePoints( bool hasVariablePoints );
+
+    virtual QString itemName() const;
+
+    virtual QImage symbolImage() const;
+    virtual QPointF symbolAnchor() const;
+
+
+    virtual KadasItemRect boundingBox() const;
+
+    virtual Margin margin() const;
+
+
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
+
+
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
+
+
+    virtual void render( QgsRenderContext &context ) const;
+
+
+    struct State : KadasMapItem::State
+    {
+      QList<KadasItemPos> points;
+      QMap<int, double> attributes;
+      QMap<int, KadasItemPos> attributePoints;
+      QList<int> controlPoints;
+      QPoint userOffset;
+      int pressedPoints;
+
+      virtual void assign( const KadasMapItem::State *other );
+      virtual State *clone() const /Factory/;
+      virtual QJsonObject serialize() const;
+
+      virtual bool deserialize( const QJsonObject &json );
+
+    };
+    virtual void setState( const KadasMapItem::State *state );
+
+    const State *constState() const;
+
+    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );
+
+    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings );
+
+    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings );
+
+    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings );
+
+    virtual bool continuePart( const QgsMapSettings &mapSettings );
+
+    virtual void endPart();
+
+
+    virtual AttribDefs drawAttribs() const;
+
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
+
+    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
+
+    virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings );
+
+    virtual void onDoubleClick( const QgsMapSettings &mapSettings );
+
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
+    virtual KadasItemPos position() const;
+
+    virtual void setPosition( const KadasItemPos &pos );
+
+
+    bool isMultiPoint() const;
+
+    void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;
+    static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
+    static KadasMilxItem *fromMssStringAndPoints( const QString &mssString, const QList<KadasItemPos> &points );
+
+    static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
+
+    static bool validateMssString( const QString &mssString, QString &adjustedMssString /Out/, QString &messages /Out/ );
+
+  protected:
+    virtual KadasMapItem *_clone() const;
+    virtual KadasMilxItem::State *createEmptyState() const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/milx/kadasmilxitem.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

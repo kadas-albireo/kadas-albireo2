@@ -18,13 +18,13 @@
 #define KADASMILXEDITOR_H
 
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/app/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
 
 class QToolButton;
 class KadasMilxLibrary;
 
 
-class KadasMilxEditor : public KadasMapItemEditor
+class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor
 {
   public:
     KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilxLibrary *library, QWidget *parent = nullptr );
@@ -35,12 +35,12 @@ class KadasMilxEditor : public KadasMapItemEditor
 
   private slots:
     void toggleLibrary( bool enabled );
-    void symbolSelected( const KadasMilxClient::SymbolDesc &symbolTemplate );
+    void symbolSelected( const KadasMilxSymbolDesc &symbolTemplate );
 
   private:
     KadasMilxLibrary *mLibrary = nullptr;
     QToolButton *mSymbolButton = nullptr;
-    KadasMilxClient::SymbolDesc mSelectedSymbol;
+    KadasMilxSymbolDesc mSelectedSymbol;
 
 };
 

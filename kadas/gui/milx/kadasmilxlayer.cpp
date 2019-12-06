@@ -22,9 +22,9 @@
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
 
-#include <kadas/app/milx/kadasmilxclient.h>
-#include <kadas/app/milx/kadasmilxitem.h>
-#include <kadas/app/milx/kadasmilxlayer.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxitem.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
 
 
 class KadasMilxLayer::Renderer : public QgsMapLayerRenderer

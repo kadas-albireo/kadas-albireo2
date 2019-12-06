@@ -17,6 +17,7 @@
 
 #ifndef KADASMILXINTERFACE_H
 #define KADASMILXINTERFACE_H
+#ifndef SIP_RUN
 
 #include <qglobal.h>
 
@@ -86,4 +87,5 @@ MilXServerReply MILX_REPLY_UPGRADE_MILXLY = 151; // {MILX_REPLY_UPGRADE_MILXLY, 
 MilXServerReply MILX_REPLY_DOWNGRADE_MILXLY = 152; // {MILX_REPLY_DOWNGRADE_MILXLY, OutputXml:QString, valid:bool, messages:QString}
 MilXServerReply MILX_REPLY_VALIDATE_SYMBOLXML = 153; // {MILX_REPLY_VALIDATE_SYMBOLXML, AdjustedSymbolXml:QString, valid:bool, messages:QString}
 
+#endif // SIP_RUN
 #endif // KADASMILXINTERFACE_H

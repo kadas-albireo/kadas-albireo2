@@ -14,6 +14,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QDir>
+#include <QDomDocument>
+#include <QPainter>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
@@ -22,9 +26,7 @@
 #include <qgis/qgsfilterlineedit.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/milx/kadasmilxlibrary.h>
+#include <kadas/gui/milx/kadasmilxlibrary.h>
 
 const int KadasMilxLibrary::SymbolXmlRole = Qt::UserRole + 1;
 const int KadasMilxLibrary::SymbolMilitaryNameRole = Qt::UserRole + 2;
@@ -74,8 +76,8 @@ class KadasMilxLibrary::TreeFilterProxyModel : public QSortFilterProxyModel
 };
 
 
-KadasMilxLibrary::KadasMilxLibrary( QWidget *parent )
-  : QFrame( parent ), mLoader( 0 )
+KadasMilxLibrary::KadasMilxLibrary( WId winId, QWidget *parent )
+  : QFrame( parent ), mWinId( winId )
 {
   setWindowFlags( Qt::Popup );
   setFrameShape( QFrame::Panel );
@@ -173,7 +175,7 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
       item = item->child( indexStack[i].row() );
     }
 
-    KadasMilxClient::SymbolDesc symbolDesc;
+    KadasMilxSymbolDesc symbolDesc;
     symbolDesc.symbolXml = item->data( SymbolXmlRole ).toString();
     if ( symbolDesc.symbolXml.isEmpty() )
     {
@@ -182,8 +184,7 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
     hide();
     if ( symbolDesc.symbolXml == "<custom>" )
     {
-      WId wid = kApp->mainWindow()->winId();
-      if ( !KadasMilxClient::createSymbol( symbolDesc.symbolXml, symbolDesc, wid ) )
+      if ( !KadasMilxClient::createSymbol( symbolDesc.symbolXml, symbolDesc, mWinId ) )
       {
         return;
       }
@@ -266,7 +267,7 @@ void KadasMilxLibraryLoader::run()
 #ifdef __MINGW32__
   QString galleryPath = QDir( QString( "%1/../opt/mss/MilXGalleryFiles" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
 #else
-  QString galleryPath = QDir( QgsApplication::applicationDirPath() ).absoluteFilePath( "MilXGalleryFiles" );
+  QString galleryPath = QDir( QApplication::applicationDirPath() ).absoluteFilePath( "MilXGalleryFiles" );
 #endif
   if ( !QDir( galleryPath ).exists() )
   {
@@ -322,9 +323,9 @@ void KadasMilxLibraryLoader::run()
             {
               symbolXmls.append( memberNodes.at( iMember ).toElement().attribute( "MssStringXML" ) );
             }
-            QList<KadasMilxClient::SymbolDesc> symbolDescs;
+            QList<KadasMilxSymbolDesc> symbolDescs;
             KadasMilxClient::getSymbolsMetadata( symbolXmls, symbolDescs );
-            for ( const KadasMilxClient::SymbolDesc &symbolDesc : symbolDescs )
+            for ( const KadasMilxSymbolDesc &symbolDesc : symbolDescs )
             {
               if ( mAborted )
                 return;

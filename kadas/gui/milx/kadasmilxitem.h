@@ -18,10 +18,10 @@
 #define KADASMILXITEM_H
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/app/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
 
 // MilX items always in EPSG:4326
-class KadasMilxItem : public KadasMapItem
+class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 {
     Q_OBJECT
     Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
@@ -31,7 +31,7 @@ class KadasMilxItem : public KadasMapItem
 
   public:
     KadasMilxItem( QObject *parent = nullptr );
-    void setSymbol( const KadasMilxClient::SymbolDesc &symbolDesc );
+    void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
 
     const QString &mssString() const { return mMssString; }
     void setMssString( const QString &mssString );
@@ -59,14 +59,21 @@ class KadasMilxItem : public KadasMapItem
 #endif
 
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
     // State interface
     struct State : KadasMapItem::State
     {
       QList<KadasItemPos> points;
-      QMap<KadasMilxClient::AttributeType, double> attributes;
-      QMap<KadasMilxClient::AttributeType, KadasItemPos> attributePoints;
+#ifndef SIP_RUN
+      QMap<KadasMilxAttrType, double> attributes;
+      QMap<KadasMilxAttrType, KadasItemPos> attributePoints;
+#else
+      QMap<int, double> attributes;
+      QMap<int, KadasItemPos> attributePoints;
+#endif
       QList<int> controlPoints;
       QPoint userOffset;
       int pressedPoints = 0;
@@ -104,25 +111,31 @@ class KadasMilxItem : public KadasMapItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     bool isMultiPoint() const;
-    KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
 
     void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;
     static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
+    static KadasMilxItem *fromMssStringAndPoints( const QString &mssString, const QList<KadasItemPos> &points );
 
     static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
 
+    static bool validateMssString( const QString &mssString, QString &adjustedMssString SIP_OUT, QString &messages SIP_OUT );
+
+  protected:
+    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
+    KadasMilxItem::State *createEmptyState() const override { return new State(); } SIP_FACTORY
+
   private:
+    friend class KadasMilxLayer;
+
     enum AttribIds
     {
       AttrX = -2,
       AttrY = -1,
-      AttrW = KadasMilxClient::AttributeWidth,
-      AttrL = KadasMilxClient::AttributeLength,
-      AttrR = KadasMilxClient::AttributeRadius,
-      AttrA = KadasMilxClient::AttributeAttitude
+      AttrW = MilxAttributeWidth,
+      AttrL = MilxAttributeLength,
+      AttrR = MilxAttributeRadius,
+      AttrA = MilxAttributeAttitude
     };
 
     QString mMssString;
@@ -137,15 +150,15 @@ class KadasMilxItem : public KadasMapItem
 
     Margin mMargin;
 
-    State *state() { return static_cast<State *>( mState ); }
+    KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
 
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
-
-    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
-
+    QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
+    QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
+    KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
 
+    static void finalize( KadasMilxItem *item, bool isCorridor );
     static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 

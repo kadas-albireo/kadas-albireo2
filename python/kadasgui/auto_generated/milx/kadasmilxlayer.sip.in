@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxlayer.h                                      *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -9,9 +9,7 @@
 
 
 
-
-
-class Kadas
+class KadasMilxLayer : KadasItemLayer
 {
 %Docstring
 *************************************************************************
@@ -25,31 +23,52 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/core/kadas.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 %End
   public:
-    static const char *KADAS_VERSION;
-    static const int KADAS_VERSION_INT;
-    static const char *KADAS_RELEASE_NAME;
-    static const char *KADAS_FULL_RELEASE_NAME;
-    static const char *KADAS_DEV_VERSION;
-    static const char *KADAS_BUILD_DATE;
+    static QString layerType();
 
-    static QString configPath();
+    KadasMilxLayer( const QString &name = "MilX" );
+    virtual QString layerTypeKey() const;
+    virtual bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context );
 
-    static QString pkgDataPath();
+    virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
 
-    static QString pkgResourcePath();
 
-    static QString projectTemplatesPath();
+    virtual QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext );
 
-    static QString gdalSource( const QgsMapLayer *layer );
+    virtual ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+
+
+    void setApproved( bool approved );
+    bool isApproved() const;
+
+    void exportToMilxly( QDomElement &milxLayerEl, int dpi );
+    bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
+
+  signals:
+    void approvedChanged( bool approved );
+
+};
+
+
+class KadasMilxLayerType : KadasPluginLayerType
+{
+
+%TypeHeaderCode
+#include "kadas/gui/milx/kadasmilxlayer.h"
+%End
+  public:
+    KadasMilxLayerType();
+    virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
+    virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
+
 };
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxlayer.h                                      *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

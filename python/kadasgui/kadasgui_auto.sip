@@ -57,6 +57,12 @@
 %Include auto_generated/kadascanvasgpsdisplay.sip
 %Include auto_generated/kadassearchprovider.sip
 %Include auto_generated/kadasitemlayer.sip
+%Include auto_generated/milx/kadasmilxeditor.sip
+%Include auto_generated/milx/kadasmilxlibrary.sip
+%Include auto_generated/milx/kadasmilxlayer.sip
+%Include auto_generated/milx/kadasmilxinterface.sip
+%Include auto_generated/milx/kadasmilxclient.sip
+%Include auto_generated/milx/kadasmilxitem.sip
 %Include auto_generated/kadasattributetabledialog.sip
 %Include auto_generated/kadasribbonbutton.sip
 %Include auto_generated/kadasclipboard.sip

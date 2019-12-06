@@ -20,7 +20,7 @@
 #include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/kadasitemlayer.h>
 
-class KadasMilxLayer : public KadasItemLayer
+class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 {
     Q_OBJECT
 
@@ -52,7 +52,7 @@ class KadasMilxLayer : public KadasItemLayer
 };
 
 
-class KadasMilxLayerType : public KadasPluginLayerType
+class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType
 {
   public:
     KadasMilxLayerType()

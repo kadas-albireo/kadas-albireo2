@@ -33,8 +33,8 @@
 
 #include <qgis/qgssettings.h>
 
-#include <kadas/app/milx/kadasmilxclient.h>
-#include <kadas/app/milx/kadasmilxinterface.h>
+#include <kadas/gui/milx/kadasmilxclient.h>
+#include <kadas/gui/milx/kadasmilxinterface.h>
 
 
 KadasMilxClientWorker::KadasMilxClientWorker( bool sync )
@@ -333,30 +333,30 @@ bool KadasMilxClient::processRequest( const QByteArray &request, QByteArray &res
   }
 }
 
-QString KadasMilxClient::attributeName( AttributeType idx )
+QString KadasMilxClient::attributeName( KadasMilxAttrType idx )
 {
-  if ( idx == AttributeWidth )
+  if ( idx == MilxAttributeWidth )
     return "Width";
-  else if ( idx == AttributeLength )
+  else if ( idx == MilxAttributeLength )
     return "Length";
-  else if ( idx == AttributeRadius )
+  else if ( idx == MilxAttributeRadius )
     return "Radius";
-  else if ( idx == AttributeAttitude )
+  else if ( idx == MilxAttributeAttitude )
     return "Attitude";
   return "";
 }
 
-KadasMilxClient::AttributeType KadasMilxClient::attributeIdx( const QString &name )
+KadasMilxAttrType KadasMilxClient::attributeIdx( const QString &name )
 {
   if ( name == "Width" )
-    return AttributeWidth;
+    return MilxAttributeWidth;
   else if ( name == "Length" )
-    return AttributeLength;
+    return MilxAttributeLength;
   else if ( name == "Radius" )
-    return AttributeRadius;
+    return MilxAttributeRadius;
   else if ( name == "Attitude" )
-    return AttributeAttitude;
-  return AttributeUnknown;
+    return MilxAttributeAttitude;
+  return MilxAttributeUnknown;
 }
 
 bool KadasMilxClient::init()
@@ -366,7 +366,7 @@ bool KadasMilxClient::init()
   return result && instance()->mAsyncWorker.initialize();
 }
 
-bool KadasMilxClient::getSymbolMetadata( const QString &symbolId, SymbolDesc &result )
+bool KadasMilxClient::getSymbolMetadata( const QString &symbolId, KadasMilxSymbolDesc &result )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
@@ -386,7 +386,7 @@ bool KadasMilxClient::getSymbolMetadata( const QString &symbolId, SymbolDesc &re
   return true;
 }
 
-bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<SymbolDesc> &result )
+bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<KadasMilxSymbolDesc> &result )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
@@ -410,7 +410,7 @@ bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<Sy
   for ( int i = 0; i < nResults; ++i )
   {
     QByteArray svgxml;
-    SymbolDesc desc;
+    KadasMilxSymbolDesc desc;
     desc.symbolXml = symbolIds[i];
     ostream >> desc.name >> desc.militaryName >> svgxml >> desc.hasVariablePoints >> desc.minNumPoints;
     desc.icon = renderSvg( svgxml );
@@ -554,7 +554,7 @@ bool KadasMilxClient::editSymbol( const QRect &visibleExtent, int dpi, const NPo
   return true;
 }
 
-bool KadasMilxClient::createSymbol( QString &symbolId, SymbolDesc &result, WId parentWid )
+bool KadasMilxClient::createSymbol( QString &symbolId, KadasMilxSymbolDesc &result, WId parentWid )
 {
 #ifdef Q_OS_WIN
   WId wid = parentWid;
@@ -880,12 +880,12 @@ void KadasMilxClient::deserializeSymbol( QDataStream &ostream, NPointSymbolGraph
   result.graphic = renderSvg( svgxml );
   for ( const auto &pair : attributes )
   {
-    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( pair.first );
+    KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( pair.first );
     result.attributes.insert( attr, pair.second );
   }
   for ( const auto &pair : attributePoints )
   {
-    KadasMilxClient::AttributeType attr = static_cast<KadasMilxClient::AttributeType>( pair.first );
+    KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( pair.first );
     result.attributePoints.insert( attr, pair.second );
   }
 }

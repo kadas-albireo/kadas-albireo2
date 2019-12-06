@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxlibrary.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -11,7 +11,8 @@
 
 
 
-class Kadas
+
+class KadasMilxLibrary : QFrame
 {
 %Docstring
 *************************************************************************
@@ -25,31 +26,29 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/core/kadas.h"
+#include "kadas/gui/milx/kadasmilxlibrary.h"
 %End
   public:
-    static const char *KADAS_VERSION;
-    static const int KADAS_VERSION_INT;
-    static const char *KADAS_RELEASE_NAME;
-    static const char *KADAS_FULL_RELEASE_NAME;
-    static const char *KADAS_DEV_VERSION;
-    static const char *KADAS_BUILD_DATE;
+    KadasMilxLibrary( WId winId, QWidget *parent = 0 );
+    ~KadasMilxLibrary();
+    void focusFilter();
 
-    static QString configPath();
+  signals:
+    void symbolSelected( const KadasMilxSymbolDesc &symbolDesc );
+    void visibilityChanged( bool visible );
 
-    static QString pkgDataPath();
+  protected:
+    void showEvent( QShowEvent * );
+    void hideEvent( QHideEvent * );
 
-    static QString pkgResourcePath();
-
-    static QString projectTemplatesPath();
-
-    static QString gdalSource( const QgsMapLayer *layer );
 };
+
+
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/core/kadas.h                                                   *
+ * kadas/gui/milx/kadasmilxlibrary.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
