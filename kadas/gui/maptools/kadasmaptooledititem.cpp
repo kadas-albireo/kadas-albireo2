@@ -68,7 +68,7 @@ void KadasMapToolEditItem::activate()
   KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
   if ( factory )
   {
-    mEditor = factory( mItem, KadasMapItemEditor::CreateItemEditor );
+    mEditor = factory( mItem, KadasMapItemEditor::EditItemEditor );
     mEditor->syncItemToWidget();
     mBottomBar->layout()->addWidget( mEditor );
   }
