@@ -35,7 +35,11 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     {}
     bool render() override
     {
-      QList<KadasMapItem *> items = mLayer->mItems.values();
+      QList<KadasMapItem *> items;
+      for ( ItemId id : mLayer->mItemOrder )
+      {
+        items.append( mLayer->mItems[id] );
+      }
       qStableSort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
       bool omitSinglePoint = mRendererContext.customRenderFlags().contains( "globe" );
       for ( const KadasMapItem *item : items )
@@ -89,6 +93,7 @@ void KadasItemLayer::addItem( KadasMapItem *item )
     id = ++mIdCounter;
   }
   mItems.insert( id, item );
+  mItemOrder.append( id );
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
   emit itemAdded( id );
@@ -101,6 +106,7 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
   {
     mFreeIds.append( itemId );
     mItemBounds.remove( itemId );
+    mItemOrder.removeOne( itemId );
     emit itemRemoved( itemId );
   }
   return item;
@@ -203,11 +209,12 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
 KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
 {
   KadasMapRect rect( pickRect.xMinimum(), pickRect.yMinimum(), pickRect.xMaximum(), pickRect.yMaximum() );
-  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
+  for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
   {
-    if ( it.value()->intersects( rect, mapSettings ) )
+    KadasMapItem *item = mItems[*it];
+    if ( item->intersects( rect, mapSettings ) )
     {
-      return it.key();
+      return *it;
     }
   }
   return ITEM_ID_NULL;
