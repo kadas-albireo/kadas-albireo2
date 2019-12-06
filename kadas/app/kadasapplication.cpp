@@ -1448,7 +1448,12 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
 QMap<QString, QString> KadasApplication::dataSourceMigrationMap() const
 {
   QMap<QString, QString> dataSourceMap;
-  QFile migrationsFile( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "datasource_migrations.json" ) );
+  QString migrationsFilename = qgetenv( "KADAS_DATASOURCE_MIGRATIONS" );
+  if ( migrationsFilename.isEmpty() )
+  {
+    migrationsFilename = "datasource_migrations.json";
+  }
+  QFile migrationsFile( QDir( Kadas::pkgDataPath() ).absoluteFilePath( migrationsFilename ) );
   if ( migrationsFile.open( QIODevice::ReadOnly ) )
   {
     QJsonDocument doc = QJsonDocument::fromJson( migrationsFile.readAll() );
