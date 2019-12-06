@@ -139,14 +139,9 @@ void KadasMapToolCreateItem::deactivate()
   delete mBottomBar;
   mBottomBar = nullptr;
   mEditor = nullptr;
-  if ( mItem && mItem->constState()->drawStatus == KadasMapItem::State::Finished )
+  if ( mItem )
   {
     commitItem();
-  }
-  else
-  {
-    delete mItem;
-    mItem = nullptr;
   }
   delete mStateHistory;
   mStateHistory = nullptr;
@@ -409,13 +404,13 @@ void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geo
 void KadasMapToolCreateItem::commitItem()
 {
   mItem->setSelected( false );
-  if ( mLayer )
+  if ( mLayer && mItem->constState()->drawStatus == KadasMapItem::State::Finished )
   {
     mLayer->addItem( mItem );
     mLayer->triggerRepaint();
     KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
   }
-  if ( !mLayer )
+  else
   {
     KadasMapCanvasItemManager::removeItem( mItem );
     delete mItem;
