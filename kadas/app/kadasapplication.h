@@ -111,9 +111,7 @@ class KadasApplication : public QgsApplication
     KadasMainWindow *mMainWindow = nullptr;
     KadasMessageLogViewer *mMessageLogViewer = nullptr;
     bool mBlockActiveLayerChanged = false;
-    QDateTime mProjectLastModified;
     KadasMapToolPan *mMapToolPan = nullptr;
-    QMap<QString, QString> mItemLayerMap;
     QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
