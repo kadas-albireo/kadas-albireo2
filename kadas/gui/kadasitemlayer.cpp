@@ -172,6 +172,7 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
       if ( item->deserialize( data.object() ) )
       {
         mItems.insert( ++mIdCounter, item );
+        mItemOrder.append( mIdCounter );
       }
       else
       {
@@ -192,14 +193,15 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   layerEl.setAttribute( "type", "plugin" );
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
-  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
+  for ( auto it = mItemOrder.begin(), itEnd = mItemOrder.end(); it != itEnd; ++it )
   {
+    KadasMapItem *mapItem = mItems[*it];
     QDomElement itemEl = document.createElement( "MapItem" );
-    itemEl.setAttribute( "name", it.value()->metaObject()->className() );
-    itemEl.setAttribute( "crs", it.value()->crs().authid() );
-    itemEl.setAttribute( "editor", it.value()->editor() );
+    itemEl.setAttribute( "name", mapItem->metaObject()->className() );
+    itemEl.setAttribute( "crs", mapItem->crs().authid() );
+    itemEl.setAttribute( "editor", mapItem->editor() );
     QJsonDocument doc;
-    doc.setObject( it.value()->serialize() );
+    doc.setObject( mapItem->serialize() );
     itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
     layerEl.appendChild( itemEl );
   }
