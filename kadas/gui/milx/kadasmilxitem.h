@@ -64,7 +64,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 #endif
 
     // State interface
-    struct State : KadasMapItem::State
+    struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<KadasItemPos> points;
 #ifndef SIP_RUN
