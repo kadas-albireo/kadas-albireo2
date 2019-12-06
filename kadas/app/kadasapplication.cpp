@@ -59,6 +59,7 @@
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
@@ -74,7 +75,6 @@
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
 #include <kadas/app/mapgrid/kadasmapgridlayer.h>
-#include <kadas/app/milx/kadasmilxlayer.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
