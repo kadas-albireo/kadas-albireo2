@@ -295,6 +295,7 @@ void KadasApplication::init()
   mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
+  QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
 
   // Register plugin layers
   pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
@@ -648,7 +649,6 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   QStringList filesToAttach;
   QString migratedFileName = KadasProjectMigration::migrateProject( fileName, filesToAttach );
 
-  QString resolverId = QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
   QString attachResolverId = QgsPathResolver::setPathPreprocessor( [filesToAttach]( const QString & path )
   {
     if ( filesToAttach.contains( path ) )
@@ -661,7 +661,6 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     return path;
   } );
   bool success = QgsProject::instance()->read( migratedFileName );
-  QgsPathResolver::removePathPreprocessor( resolverId );
   QgsPathResolver::removePathPreprocessor( attachResolverId );
 
   if ( success )
