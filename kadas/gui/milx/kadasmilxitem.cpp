@@ -471,8 +471,11 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasMilxItem::endPart()
 {
-  state()->drawStatus = State::Finished;
-  mIsPointSymbol = !isMultiPoint();
+  if ( !mMssString.isEmpty() )
+  {
+    state()->drawStatus = State::Finished;
+    mIsPointSymbol = !isMultiPoint();
+  }
 }
 
 KadasMapItem::AttribDefs KadasMilxItem::drawAttribs() const
