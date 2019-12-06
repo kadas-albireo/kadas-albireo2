@@ -46,7 +46,6 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
   QImageReader reader( path );
   mScalable = reader.format() == "svg";
   reader.setBackgroundColor( Qt::transparent );
-  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
   if ( width > 0 )
   {
@@ -62,6 +61,7 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
   {
     state()->size = reader.size();
   }
+  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
   update();
 
