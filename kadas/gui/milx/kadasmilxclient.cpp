@@ -241,7 +241,7 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
       return false;
     }
     response += mTcpSocket->readAll();
-    if ( requiredSize == 0 )
+    if ( requiredSize == 0 && !response.isEmpty() )
     {
       requiredSize = *reinterpret_cast<qint32 *>( response.left( sizeof( qint32 ) ).data() );
       response = response.mid( sizeof( qint32 ) );
