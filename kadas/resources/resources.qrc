@@ -27,7 +27,6 @@
         <file alias="icons/guide_grid">icons/guide_grid.png</file>
         <file alias="icons/hillshade">icons/hillshade.png</file>
         <file alias="icons/downarrow">icons/downarrow.png</file>
-        <file alias="icons/ovl_import">icons/ovl_import.png</file>
         <file alias="icons/next_extent">icons/next_extent.png</file>
         <file alias="icons/zoom_out">icons/zoom_out.png</file>
         <file alias="icons/heightprofile">icons/heightprofile.png</file>
