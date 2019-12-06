@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
 #include <QIcon>
@@ -883,7 +884,10 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 {
-  // TODO
+  if ( layer && !layer->metadataUrl().isEmpty() )
+  {
+    QDesktopServices::openUrl( layer->metadataUrl() );
+  }
 }
 
 void KadasApplication::showMessageLog()

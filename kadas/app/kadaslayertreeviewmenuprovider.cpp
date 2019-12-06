@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QDesktopServices>
 #include <QMenu>
 #include <QWidgetAction>
 
@@ -213,11 +212,7 @@ void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()
 
 void KadasLayerTreeViewMenuProvider::showLayerInfo()
 {
-  QgsMapLayer *layer = mView->currentLayer();
-  if ( layer && !layer->metadataUrl().isEmpty() )
-  {
-    QDesktopServices::openUrl( layer->metadataUrl() );
-  }
+  kApp->showLayerInfo( mView->currentLayer() );
 }
 
 void KadasLayerTreeViewMenuProvider::showLayerProperties()
