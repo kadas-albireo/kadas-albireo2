@@ -97,7 +97,7 @@ void KadasMainWindow::init()
 
   QWidget *statusWidget = new QWidget();
   KadasStatusWidget::setupUi( statusWidget );
-  statusBar()->addPermanentWidget( statusWidget, 1 );
+  statusBar()->addPermanentWidget( statusWidget, 0 );
 
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->setMapUpdateInterval( 1000 );
