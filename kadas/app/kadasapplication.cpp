@@ -22,6 +22,7 @@
 #include <QImageReader>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QStatusBar>
 
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
@@ -276,7 +277,7 @@ void KadasApplication::init()
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::updateWmtsZoomResolutions );
-  connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::updateWindowTitle );
+  connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::projectDirtyChanged );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   // Unset any active tool before writing project to ensure that any pending edits are committed
@@ -363,6 +364,8 @@ void KadasApplication::init()
   updateWindowTitle();
 
   QObject::connect( this, &QApplication::lastWindowClosed, this, &QApplication::quit );
+  mAutosaveTimer.setSingleShot( true );
+  connect( &mAutosaveTimer, &QTimer::timeout, this, &KadasApplication::autosave );
 }
 
 KadasApplication::~KadasApplication()
@@ -640,6 +643,18 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   projectClose();
 
+  QString openFileName = fileName;
+  QFileInfo finfo( fileName );
+  QString autosaveFile( finfo.dir().absoluteFilePath( QString( "~%1" ).arg( finfo.fileName() ) ) );
+  if ( QFile::exists( autosaveFile ) && QFileInfo( autosaveFile ).lastModified() > finfo.lastModified() )
+  {
+    QMessageBox::StandardButton response = QMessageBox::question( mMainWindow, tr( "Project recovery" ), tr( "A more recent automatic backup of the project exists. Open the backup instead?" ) );
+    if ( response == QMessageBox::Yes )
+    {
+      openFileName = autosaveFile;
+    }
+  }
+
   QApplication::setOverrideCursor( Qt::WaitCursor );
   mMainWindow->mapCanvas()->freeze( true );
   bool autoSetupOnFirstLayer = mMainWindow->layerTreeMapCanvasBridge()->autoSetupOnFirstLayer();
@@ -648,7 +663,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   QgsProjectDirtyBlocker dirtyBlocker( QgsProject::instance() );
 
   QStringList filesToAttach;
-  QString migratedFileName = KadasProjectMigration::migrateProject( fileName, filesToAttach );
+  QString migratedFileName = KadasProjectMigration::migrateProject( openFileName, filesToAttach );
 
   QString attachResolverId = QgsPathResolver::setPathPreprocessor( [filesToAttach]( const QString & path )
   {
@@ -668,7 +683,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   {
     emit projectRead();
 
-    if ( migratedFileName != fileName )
+    if ( migratedFileName != openFileName )
     {
       mMainWindow->messageBar()->pushMessage( tr( "Project migrated" ), tr( "The project was created with an older version of KADAS and automatically migrated." ) );
       QFileInfo finfo( fileName );
@@ -676,6 +691,12 @@ bool KadasApplication::projectOpen( const QString &projectFile )
       QgsProject::instance()->setDirty( true );
       updateWindowTitle();
       QFile( migratedFileName ).remove();
+    }
+    else if ( openFileName != fileName )
+    {
+      QgsProject::instance()->setFileName( fileName );
+      QgsProject::instance()->setDirty( true );
+      updateWindowTitle();
     }
   }
 
@@ -695,6 +716,8 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
 void KadasApplication::projectClose()
 {
+  mAutosaveTimer.stop();
+
   emit projectWillBeClosed();
 
   mMainWindow->mapCanvas()->freeze( true );
@@ -731,6 +754,10 @@ bool KadasApplication::projectSaveDirty()
     if ( response == QMessageBox::Save )
     {
       return projectSave();
+    }
+    else if ( response == QMessageBox::Discard )
+    {
+      cleanupAutosave();
     }
     else if ( response == QMessageBox::Cancel )
     {
@@ -769,6 +796,7 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
   if ( QgsProject::instance()->write() )
   {
     mMainWindow->messageBar()->pushMessage( tr( "Project saved" ), "", Qgis::Info, mMainWindow->messageTimeout() );
+    cleanupAutosave();
   }
   else
   {
@@ -952,6 +980,39 @@ void KadasApplication::showLayoutDesigner( QgsPrintLayout *layout )
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )
 {
   mMainWindow->messageBar()->pushMessage( message, level, mMainWindow->messageTimeout() );
+}
+
+void KadasApplication::projectDirtyChanged()
+{
+  updateWindowTitle();
+  mAutosaveTimer.start( 5000 );
+}
+
+void KadasApplication::autosave()
+{
+  if ( !QgsProject::instance()->fileName().isEmpty() && QgsProject::instance()->isDirty() )
+  {
+    mMainWindow->statusBar()->showMessage( tr( "Autosaving project..." ), 3000 );
+    QString prevFilename = QgsProject::instance()->fileName();
+    QFileInfo finfo( prevFilename );
+    QgsProject::instance()->setFileName( finfo.dir().absoluteFilePath( QString( "~%1" ).arg( finfo.fileName() ) ) );
+    QgsProject::instance()->write();
+    // Immediately remove the backup created by QgsProject::write
+    QFile( QgsProject::instance()->fileName() + "~" ).remove();
+    QgsProject::instance()->setFileName( prevFilename );
+    QgsProject::instance()->setDirty();
+    mAutosaveTimer.stop(); // Stop timer triggered by projectDirtyChanged()
+  }
+}
+
+void KadasApplication::cleanupAutosave()
+{
+  mAutosaveTimer.stop();
+  QFileInfo finfo( QgsProject::instance()->fileName() );
+  if ( finfo.exists() )
+  {
+    QFile( finfo.dir().absoluteFilePath( QString( "~%1" ).arg( finfo.fileName() ) ) ).remove();
+  }
 }
 
 void KadasApplication::onActiveLayerChanged( QgsMapLayer *layer )

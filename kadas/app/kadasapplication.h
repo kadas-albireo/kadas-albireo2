@@ -113,6 +113,7 @@ class KadasApplication : public QgsApplication
     bool mBlockActiveLayerChanged = false;
     KadasMapToolPan *mMapToolPan = nullptr;
     QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
+    QTimer mAutosaveTimer;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
@@ -120,14 +121,17 @@ class KadasApplication : public QgsApplication
     bool showZipSublayerSelectionDialog( const QString &path ) const;
     QString migrateDatasource( const QString &path ) const;
     QMap<QString, QString> dataSourceMigrationMap() const;
+    void cleanupAutosave();
 
     static QgsMessageOutput *messageOutputViewer();
 
   private slots:
+    void autosave();
     void onActiveLayerChanged( QgsMapLayer *layer );
     void onFocusChanged( QWidget * /*old*/, QWidget *now );
     void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
     void handleItemPicked( const KadasFeaturePicker::PickResult &result );
+    void projectDirtyChanged();
     void showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos );
     void updateWindowTitle();
     void cleanup();
