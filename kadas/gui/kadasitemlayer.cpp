@@ -259,7 +259,7 @@ QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos
   }
   return qMakePair( minPos, minDist );
 }
-QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, const QgsRectangle &exportRect ) const
 {
   QString outString;
   QTextStream outStream( &outString );
@@ -267,6 +267,14 @@ QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
   outStream << "<name>" << name() << "</name>" << "\n";
   for ( const KadasMapItem *item : mItems )
   {
+    if ( !exportRect.isEmpty() )
+    {
+      QgsRectangle testRect = QgsCoordinateTransform( crs(), item->crs(), mTransformContext ).transformBoundingBox( exportRect );
+      if ( !testRect.intersects( item->boundingBox() ) )
+      {
+        continue;
+      }
+    }
     outStream << item->asKml( context, kmzZip );
   }
   outStream << "</Folder>" << "\n";

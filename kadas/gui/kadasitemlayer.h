@@ -156,7 +156,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
 #endif
 
 #ifndef SIP_RUN
-    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const;
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr, const QgsRectangle &exportRect = QgsRectangle() ) const;
 #endif
 
   signals:

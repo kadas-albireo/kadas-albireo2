@@ -32,7 +32,7 @@
 #include <kadas/app/kml/kadaskmlexport.h>
 #include <kadas/app/kml/kadaskmllabeling.h>
 
-bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLayer *> &layers, double exportScale )
+bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLayer *> &layers, double exportScale, const QgsCoordinateReferenceSystem &mapCrs, const QgsRectangle &exportMapRect )
 {
   // Prepare outputs
   bool kmz = filename.endsWith( ".kmz", Qt::CaseInsensitive );
@@ -82,7 +82,13 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
   for ( QgsMapLayer *ml : layers )
   {
-    QgsRectangle layerExtent = QgsCoordinateTransform( ml->crs(), crsWgs84, QgsProject::instance() ).transform( ml->extent() );
+    QgsRectangle layerExtent = ml->extent();
+    if ( !exportMapRect.isEmpty() )
+    {
+      QgsCoordinateTransform crst( mapCrs, ml->crs(), QgsProject::instance() );
+      layerExtent = layerExtent.intersect( crst.transformBoundingBox( exportMapRect ) );
+    }
+    layerExtent = QgsCoordinateTransform( ml->crs(), crsWgs84, QgsProject::instance() ).transformBoundingBox( layerExtent );
     if ( fullExtent.isEmpty() )
       fullExtent = layerExtent;
     else
@@ -118,9 +124,13 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   int drawingOrder = 0;
   for ( QgsMapLayer *ml : layers )
   {
-    QgsCoordinateTransform crst( ml->crs(), crsWgs84, QgsProject::instance() );
-    QgsRectangle layerExtent = crst.transform( ml->extent() );
-    rc.setCoordinateTransform( crst );
+    QgsRectangle exportRect;
+    if ( !exportMapRect.isEmpty() )
+    {
+      exportRect = QgsCoordinateTransform( mapCrs, ml->crs(), QgsProject::instance() ).transformBoundingBox( exportMapRect );
+    }
+    QgsCoordinateTransform crst84( ml->crs(), crsWgs84, QgsProject::instance() );
+    rc.setCoordinateTransform( crst84 );
 
     if ( dynamic_cast<QgsVectorLayer *>( ml ) )
     {
@@ -144,15 +154,22 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
 
       outStream << "<Folder>" << "\n";
       outStream << "<name>" << vl->name() << "</name>" << "\n";
-      writeVectorLayerFeatures( vl, outStream, rc, engine );
+      writeVectorLayerFeatures( vl, outStream, rc, engine, exportRect );
       outStream << "</Folder>" << "\n";
     }
     else if ( dynamic_cast<KadasItemLayer *>( ml ) )
     {
-      outStream << static_cast<KadasItemLayer *>( ml )->asKml( rc, quaZip );
+      outStream << static_cast<KadasItemLayer *>( ml )->asKml( rc, quaZip, exportRect );
     }
     else if ( kmz && dynamic_cast<QgsRasterLayer *>( ml ) ) // Non-vector layers only supported in KMZ
     {
+      QgsRectangle layerExtent = ml->extent();
+      if ( !exportRect.isEmpty() )
+      {
+        layerExtent = layerExtent.intersect( exportRect );
+      }
+      layerExtent = crst84.transform( layerExtent );
+
       progress.setLabelText( tr( "Rendering layer %1..." ).arg( ml->name() ) );
       progress.setRange( 0, 0 );
       QApplication::processEvents();
@@ -232,7 +249,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   return success;
 }
 
-void KadasKMLExport::writeVectorLayerFeatures( QgsVectorLayer *vl, QTextStream &outStream, QgsRenderContext &rc, QgsLabelingEngine &labelingEngine )
+void KadasKMLExport::writeVectorLayerFeatures( QgsVectorLayer *vl, QTextStream &outStream, QgsRenderContext &rc, QgsLabelingEngine &labelingEngine, const QgsRectangle &exportRect )
 {
   QgsFeatureRenderer *renderer = vl->renderer();
   if ( !renderer )
@@ -243,7 +260,12 @@ void KadasKMLExport::writeVectorLayerFeatures( QgsVectorLayer *vl, QTextStream &
 
   QgsCoordinateTransform ct( vl->crs(), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
 
-  QgsFeatureIterator it = vl->getFeatures();
+  QgsFeatureRequest request;
+  if ( !exportRect.isEmpty() )
+  {
+    request.setFilterRect( exportRect );
+  }
+  QgsFeatureIterator it = vl->getFeatures( request );
   QgsFeature f;
   QgsExpressionContext ectx;
   QgsExpression expr( QString( "\"%1\"" ).arg( vl->customProperty( "labeling/fieldName" ).toString() ) );

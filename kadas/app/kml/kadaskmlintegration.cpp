@@ -61,14 +61,19 @@ KadasKmlIntegration::~KadasKmlIntegration()
 
 void KadasKmlIntegration::exportToKml()
 {
-  KadasKMLExportDialog d( kApp->mainWindow()->mapCanvas()->layers() );
-  if ( d.exec() != QDialog::Accepted )
+  KadasKMLExportDialog d( kApp->mainWindow()->mapCanvas()->layers(), kApp->mainWindow() );
+  d.show();
+  QEventLoop loop;
+  connect( &d, &QDialog::accepted, &loop, &QEventLoop::quit );
+  connect( &d, &QDialog::rejected, &loop, &QEventLoop::quit );
+  loop.exec();
+  if ( d.result() != QDialog::Accepted )
   {
     return;
   }
   kApp->setOverrideCursor( Qt::BusyCursor );
   KadasKMLExport kmlExport;
-  if ( kmlExport.exportToFile( d.getFilename(), d.getSelectedLayers(), d.getExportScale() ) )
+  if ( kmlExport.exportToFile( d.getFilename(), d.getSelectedLayers(), d.getExportScale(), kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs(), d.getFilterRect() ) )
   {
     kApp->mainWindow()->messageBar()->pushMessage( tr( "KML export completed" ), Qgis::Info, 5 );
   }

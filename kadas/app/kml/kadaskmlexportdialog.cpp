@@ -22,6 +22,9 @@
 #include <QFileDialog>
 
 #include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/maptools/kadasmaptoolselectrect.h>
+#include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kml/kadaskmlexportdialog.h>
 
 KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent, Qt::WindowFlags f )
@@ -40,14 +43,77 @@ KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLa
     bool slow = largefile || layer->source().contains( "url=http" );
     QListWidgetItem *item = new QListWidgetItem( layer->name() );
     item->setCheckState( slow || !activeLayers.contains( layer ) ? Qt::Unchecked : Qt::Checked );
-    item->setIcon( slow ? QIcon( ":/images/themes/default/mIconWarn.png" ) : QIcon() );
+    item->setIcon( slow ? QIcon( ":/images/themes/default/mIconWarning.svg" ) : QIcon() );
     item->setData( Qt::UserRole, layer->id() );
     mLayerListWidget->addItem( item );
   }
   mButtonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
-  mComboBoxExportScale->setScale( 1. / 25000 );
+  mComboBoxExportScale->setScale( 25000 );
+
+  mLineEditXMin->setValidator( new QDoubleValidator );
+  mLineEditYMin->setValidator( new QDoubleValidator );
+  mLineEditXMax->setValidator( new QDoubleValidator );
+  mLineEditYMax->setValidator( new QDoubleValidator );
+
+  mRectTool = new KadasMapToolSelectRect( kApp->mainWindow()->mapCanvas() );
+  kApp->mainWindow()->mapCanvas()->setMapTool( mRectTool );
 
   connect( mFileSelectionButton, &QAbstractButton::clicked, this, &KadasKMLExportDialog::selectFile );
+  connect( mGroupBoxExtent, &QGroupBox::toggled, this, &KadasKMLExportDialog::extentToggled );
+  connect( mRectTool, &KadasMapToolSelectRect::rectChanged, this, &KadasKMLExportDialog::extentChanged );
+  connect( mRectTool, &QgsMapTool::deactivated, this, &QDialog::reject );
+  connect( mLineEditXMin, &QLineEdit::textEdited, this, &KadasKMLExportDialog::extentEdited );
+  connect( mLineEditXMax, &QLineEdit::textEdited, this, &KadasKMLExportDialog::extentEdited );
+  connect( mLineEditYMin, &QLineEdit::textEdited, this, &KadasKMLExportDialog::extentEdited );
+  connect( mLineEditYMax, &QLineEdit::textEdited, this, &KadasKMLExportDialog::extentEdited );
+}
+
+KadasKMLExportDialog::~KadasKMLExportDialog()
+{
+  if ( mRectTool )
+  {
+    kApp->mainWindow()->mapCanvas()->unsetMapTool( mRectTool );
+  }
+}
+
+void KadasKMLExportDialog::extentChanged( const QgsRectangle &extent )
+{
+  if ( !extent.isNull() )
+  {
+    int decs = kApp->mainWindow()->mapCanvas()->mapSettings().mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+    mLineEditXMin->setText( QString::number( extent.xMinimum(), 'f', decs ) );
+    mLineEditYMin->setText( QString::number( extent.yMinimum(), 'f', decs ) );
+    mLineEditXMax->setText( QString::number( extent.xMaximum(), 'f', decs ) );
+    mLineEditYMax->setText( QString::number( extent.yMaximum(), 'f', decs ) );
+  }
+  else
+  {
+    mLineEditXMin->setText( "" );
+    mLineEditYMin->setText( "" );
+    mLineEditXMax->setText( "" );
+    mLineEditYMax->setText( "" );
+  }
+}
+
+void KadasKMLExportDialog::extentEdited()
+{
+  double xmin = mLineEditXMin->text().toDouble();
+  double ymin = mLineEditYMin->text().toDouble();
+  double xmax = mLineEditXMax->text().toDouble();
+  double ymax = mLineEditYMax->text().toDouble();
+  mRectTool->setRect( QgsRectangle( xmin, ymin, xmax, ymax ) );
+}
+
+void KadasKMLExportDialog::extentToggled( bool checked )
+{
+  if ( checked )
+  {
+    mRectTool->setRect( kApp->mainWindow()->mapCanvas()->extent() );
+  }
+  else
+  {
+    mRectTool->clear();
+  }
 }
 
 void KadasKMLExportDialog::selectFile()
@@ -118,4 +184,9 @@ QList<QgsMapLayer *> KadasKMLExportDialog::getSelectedLayers() const
     }
   }
   return layerList;
+}
+
+const QgsRectangle &KadasKMLExportDialog::getFilterRect() const
+{
+  return mRectTool->rect();
 }
