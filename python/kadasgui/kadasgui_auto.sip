@@ -34,6 +34,7 @@
 %Include auto_generated/maptools/kadasmaptoolheightprofile.sip
 %Include auto_generated/maptools/kadasmaptooldeleteitems.sip
 %Include auto_generated/maptools/kadasmaptoolslope.sip
+%Include auto_generated/maptools/kadasmaptoolselectrect.sip
 %Include auto_generated/maptools/kadasmaptoolhillshade.sip
 %Include auto_generated/maptools/kadasmaptoolviewshed.sip
 %Include auto_generated/maptools/kadasmaptoolcreateitem.sip
