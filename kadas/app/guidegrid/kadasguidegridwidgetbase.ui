@@ -23,7 +23,34 @@
    <property name="bottomMargin">
     <number>2</number>
    </property>
-   <item row="2" column="0" colspan="2">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="layerSelectionWidgetHolder">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
     <widget class="QWidget" name="widgetLayerSetup" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -360,37 +387,13 @@
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxLabelPos"/>
+         </item>
         </layout>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <layout class="QHBoxLayout" name="layerSelectionWidgetHolder">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-    </layout>
-   </item>
-   <item row="0" column="1">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
     </widget>
    </item>
   </layout>

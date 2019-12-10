@@ -124,6 +124,8 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   {
     ui.comboBoxColLabels->addItem( QChar( c ) );
   }
+  ui.comboBoxLabelPos->addItem( tr( "Inside" ), KadasGuideGridLayer::LabelsInside );
+  ui.comboBoxLabelPos->addItem( tr( "Outside" ), KadasGuideGridLayer::LabelsOutside );
 
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
@@ -155,6 +157,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
   connect( ui.comboBoxRowLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxColLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
 
   connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::setCurrentLayer );
@@ -218,6 +221,9 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.comboBoxColLabels->blockSignals( true );
   ui.comboBoxColLabels->setCurrentText( QString( labelingMode.second ) );
   ui.comboBoxColLabels->blockSignals( false );
+  ui.comboBoxLabelPos->blockSignals( true );
+  ui.comboBoxLabelPos->setCurrentIndex( ui.comboBoxLabelPos->findData( mCurrentLayer->labelingPos() ) );
+  ui.comboBoxLabelPos->blockSignals( false );
   updateIntervals();
   ui.widgetLayerSetup->setEnabled( true );
 }
@@ -415,5 +421,6 @@ void KadasGuideGridWidget::updateLabeling()
     return;
   }
   mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().front(), ui.comboBoxColLabels->currentText().front() );
+  mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
   mCurrentLayer->triggerRepaint();
 }

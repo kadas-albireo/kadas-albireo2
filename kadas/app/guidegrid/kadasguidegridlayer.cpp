@@ -106,11 +106,19 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         double sx1 = vLine1.first().x();
         double sx2 = vLine2.first().x();
         QString label = gridLabel( mLayer->mColChar, col - 1 );
-        if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
+        if ( mLayer->mLabelingPos == LabelsOutside )
+        {
+          mRendererContext.painter()->drawText( QRectF( sx1, sy1 - labelBoxSize, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+        }
+        else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx1, sy1, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
         }
-        if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
+        if ( mLayer->mLabelingPos == LabelsOutside )
+        {
+          mRendererContext.painter()->drawText( QRectF( sx1, sy2, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+        }
+        else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx1, sy2 - labelBoxSize, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
         }
@@ -138,11 +146,19 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         double sy1 = hLine1.first().y();
         double sy2 = hLine2.first().y();
         QString label = gridLabel( mLayer->mRowChar, row - 1 );
-        if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
+        if ( mLayer->mLabelingPos == LabelsOutside )
+        {
+          mRendererContext.painter()->drawText( QRectF( sx1 - labelBoxSize, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+        }
+        else if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx1, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
         }
-        if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
+        if ( mLayer->mLabelingPos == LabelsOutside )
+        {
+          mRendererContext.painter()->drawText( QRectF( sx2, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+        }
+        else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx2 - labelBoxSize, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
         }
@@ -217,6 +233,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mColor = mColor;
   layer->mRowChar = mRowChar;
   layer->mColChar = mColChar;
+  layer->mLabelingPos = mLabelingPos;
   return layer;
 }
 
@@ -242,6 +259,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
   mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
   mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
+  mLabelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
   if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
   {
     // Compatibility
@@ -310,6 +328,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
   layerEl.setAttribute( "colChar", QString( mColChar ) );
   layerEl.setAttribute( "rowChar", QString( mRowChar ) );
+  layerEl.setAttribute( "labelingPos", mLabelingPos );
   return true;
 }
 

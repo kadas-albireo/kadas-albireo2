@@ -23,6 +23,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
+    enum LabelingPos {LabelsInside, LabelsOutside};
     static QString layerType() { return "guide_grid"; }
 
     KadasGuideGridLayer( const QString &name );
@@ -42,11 +43,13 @@ class KadasGuideGridLayer : public KadasPluginLayer
     const QColor &color() const { return mColor; }
     int fontSize() const { return mFontSize; }
     QPair<QChar, QChar> labelingMode() const { return qMakePair( mRowChar, mColChar ); }
+    LabelingPos labelingPos() const { return mLabelingPos; }
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
     void setLabelingMode( QChar rowChar, QChar colChar ) { mRowChar = rowChar; mColChar = colChar; }
+    void setLabelingPos( LabelingPos pos ) { mLabelingPos = pos; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -64,6 +67,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     QColor mColor = Qt::red;
     QChar mRowChar = 'A';
     QChar mColChar = '1';
+    LabelingPos mLabelingPos = LabelsInside;
 };
 
 
