@@ -157,8 +157,9 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
   connect( ui.comboBoxRowLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxColLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
-  connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
+  connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.checkBoxQuadrants, &QCheckBox::toggled, this, &KadasGuideGridWidget::updateLabeling );
 
   connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::setCurrentLayer );
 
@@ -224,6 +225,9 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.comboBoxLabelPos->blockSignals( true );
   ui.comboBoxLabelPos->setCurrentIndex( ui.comboBoxLabelPos->findData( mCurrentLayer->labelingPos() ) );
   ui.comboBoxLabelPos->blockSignals( false );
+  ui.checkBoxQuadrants->blockSignals( true );
+  ui.checkBoxQuadrants->setChecked( mCurrentLayer->labelQuadrants() );
+  ui.checkBoxQuadrants->blockSignals( false );
   updateIntervals();
   ui.widgetLayerSetup->setEnabled( true );
 }
@@ -422,5 +426,6 @@ void KadasGuideGridWidget::updateLabeling()
   }
   mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().front(), ui.comboBoxColLabels->currentText().front() );
   mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
+  mCurrentLayer->setLabelQuadrants( ui.checkBoxQuadrants->isChecked() );
   mCurrentLayer->triggerRepaint();
 }

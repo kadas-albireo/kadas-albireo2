@@ -44,12 +44,14 @@ class KadasGuideGridLayer : public KadasPluginLayer
     int fontSize() const { return mFontSize; }
     QPair<QChar, QChar> labelingMode() const { return qMakePair( mRowChar, mColChar ); }
     LabelingPos labelingPos() const { return mLabelingPos; }
+    bool labelQuadrants() const { return mLabelQuadrants; }
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
     void setLabelingMode( QChar rowChar, QChar colChar ) { mRowChar = rowChar; mColChar = colChar; }
     void setLabelingPos( LabelingPos pos ) { mLabelingPos = pos; }
+    void setLabelQuadrants( bool labelQuadrants ) { mLabelQuadrants = labelQuadrants; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -68,6 +70,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     QChar mRowChar = 'A';
     QChar mColChar = '1';
     LabelingPos mLabelingPos = LabelsInside;
+    bool mLabelQuadrants = false;
 };
 
 

@@ -390,6 +390,13 @@
          <item>
           <widget class="QComboBox" name="comboBoxLabelPos"/>
          </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxQuadrants">
+           <property name="text">
+            <string>Quadrants</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

@@ -63,6 +63,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       static int labelBoxSize = mLayer->mFontSize + 5;
+      static int smallLabelBoxSize = 0.5 * ( mLayer->mFontSize + 5 );
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
@@ -71,6 +72,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       const QStringList &flags = mRendererContext.customRenderFlags();
       bool adaptLabelsToScreen = !( flags.contains( "globe" ) || flags.contains( "kml" ) );
 
+      QFont smallFont;
+      smallFont.setPixelSize( 0.5 * mLayer->mFontSize );
       QFont font;
       font.setPixelSize( mLayer->mFontSize );
       mRendererContext.painter()->setFont( font );
@@ -123,6 +126,32 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           mRendererContext.painter()->drawText( QRectF( sx1, sy2 - labelBoxSize, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
         }
 
+        if ( mLayer->mLabelQuadrants )
+        {
+          mRendererContext.painter()->save();
+          mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
+          mRendererContext.painter()->setFont( smallFont );
+          QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
+          int alignCenter = Qt::AlignHCenter | Qt::AlignVCenter;
+          QPolygonF vLineMid;
+          for ( int i = 0, n = vLine1.size(); i < n; ++i )
+          {
+            vLineMid.append( 0.5 * ( vLine1.at( i ) + vLine2.at( i ) ) );
+            if ( i < n - 1 )
+            {
+              mRendererContext.painter()->drawText( QRectF( vLine1.at( i ), smallLabelBox ), alignCenter, "A" );
+              mRendererContext.painter()->drawText( QRectF( QPointF( vLine2.at( i ).x() - smallLabelBoxSize, vLine2.at( i ).y() ), smallLabelBox ), alignCenter, "B" );
+
+              mRendererContext.painter()->drawText( QRectF( QPointF( vLine1.at( i + 1 ).x(), vLine1.at( i + 1 ).y() - smallLabelBoxSize ), smallLabelBox ), alignCenter, "D" );
+              mRendererContext.painter()->drawText( QRectF( QPointF( vLine2.at( i + 1 ).x() - smallLabelBoxSize, vLine2.at( i + 1 ).y() - smallLabelBoxSize ), smallLabelBox ), alignCenter, "C" );
+            }
+          }
+          QPainterPath path;
+          path.addPolygon( vLineMid );
+          mRendererContext.painter()->drawPath( path );
+          mRendererContext.painter()->restore();
+        }
+
         vLine1 = vLine2;
       }
 
@@ -161,6 +190,21 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx2 - labelBoxSize, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+        }
+
+        if ( mLayer->mLabelQuadrants )
+        {
+          mRendererContext.painter()->save();
+          mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
+          QPolygonF hLineMid;
+          for ( int i = 0, n = hLine1.size(); i < n; ++i )
+          {
+            hLineMid.append( 0.5 * ( hLine1.at( i ) + hLine2.at( i ) ) );
+          }
+          QPainterPath path;
+          path.addPolygon( hLineMid );
+          mRendererContext.painter()->drawPath( path );
+          mRendererContext.painter()->restore();
         }
 
         hLine1 = hLine2;
@@ -234,6 +278,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mRowChar = mRowChar;
   layer->mColChar = mColChar;
   layer->mLabelingPos = mLabelingPos;
+  layer->mLabelQuadrants = mLabelQuadrants;
   return layer;
 }
 
@@ -260,6 +305,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
   mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
   mLabelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
+  mLabelQuadrants = layerEl.attribute( "labelQuadrans" ).toInt();
   if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
   {
     // Compatibility
@@ -329,6 +375,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "colChar", QString( mColChar ) );
   layerEl.setAttribute( "rowChar", QString( mRowChar ) );
   layerEl.setAttribute( "labelingPos", mLabelingPos );
+  layerEl.setAttribute( "labelQuadrants", mLabelQuadrants );
   return true;
 }
 
