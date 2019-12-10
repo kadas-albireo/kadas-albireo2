@@ -115,6 +115,7 @@
         <file alias="icons/info">icons/info.svg</file>
         <file alias="icons/rename">icons/rename.svg</file>
         <file alias="icons/polygon">icons/polygon.svg</file>
+        <file alias="icons/switch">icons/switch.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

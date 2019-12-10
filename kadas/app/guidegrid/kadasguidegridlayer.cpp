@@ -24,18 +24,26 @@
 
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
 
-static QString alphaLabel( int i )
+static QString gridLabel( QChar firstChar, int offset )
 {
-  QString label;
-  do
+  if ( firstChar >= '0' && firstChar <= '9' )
   {
-    i -= 1;
-    int res = i % 26;
-    label.prepend( QChar( 'A' + res ) );
-    i /= 26;
+    return QString::number( firstChar.digitValue() + offset );
   }
-  while ( i > 0 );
-  return label;
+  else
+  {
+    QString label;
+    offset += firstChar.toLatin1() - 'A' + 1;
+    do
+    {
+      offset -= 1;
+      int res = offset % 26;
+      label.prepend( QChar( 'A' + res ) );
+      offset /= 26;
+    }
+    while ( offset > 0 );
+    return label;
+  }
 }
 
 class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
@@ -97,7 +105,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 
         double sx1 = vLine1.first().x();
         double sx2 = vLine2.first().x();
-        QString label = mLayer->mLabellingMode == KadasGuideGridLayer::LABEL_A_1 ? alphaLabel( col ) : QString( "%1" ).arg( col );
+        QString label = gridLabel( mLayer->mColChar, col - 1 );
         if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx1, sy1, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
@@ -129,7 +137,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 
         double sy1 = hLine1.first().y();
         double sy2 = hLine2.first().y();
-        QString label = mLayer->mLabellingMode == KadasGuideGridLayer::LABEL_1_A ? alphaLabel( row ) : QString( "%1" ).arg( row );
+        QString label = gridLabel( mLayer->mRowChar, row - 1 );
         if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
         {
           mRendererContext.painter()->drawText( QRectF( sx1, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
@@ -207,7 +215,8 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mRowSizeLocked = mRowSizeLocked;
   layer->mFontSize = mFontSize;
   layer->mColor = mColor;
-  layer->mLabellingMode = mLabellingMode;
+  layer->mRowChar = mRowChar;
+  layer->mColChar = mColChar;
   return layer;
 }
 
@@ -231,7 +240,24 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mRowSizeLocked = layerEl.attribute( "rowSizeLocked", "0" ).toInt();
   mFontSize = layerEl.attribute( "fontSize" ).toInt();
   mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
-  mLabellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
+  mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
+  mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
+  if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
+  {
+    // Compatibility
+    enum LabellingMode { LABEL_A_1, LABEL_1_A };
+    int labellingMode =  static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
+    if ( labellingMode == LABEL_A_1 )
+    {
+      mRowChar = 'A';
+      mColChar = '1';
+    }
+    else
+    {
+      mRowChar = '1';
+      mColChar = 'A';
+    }
+  }
 
   setCrs( QgsCoordinateReferenceSystem( layerEl.attribute( "crs" ) ) );
   return true;
@@ -261,14 +287,7 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  if ( mLabellingMode == KadasGuideGridLayer::LABEL_1_A )
-  {
-    return QList<IdentifyResult>() << IdentifyResult( tr( "Cell %1, %2" ).arg( alphaLabel( 1 + j ) ).arg( 1 + i ), attrs, QgsGeometry( bbox ) );
-  }
-  else
-  {
-    return QList<IdentifyResult>() << IdentifyResult( tr( "Cell %1, %2" ).arg( 1 + j ).arg( alphaLabel( 1 + i ) ), attrs, QgsGeometry( bbox ) );
-  }
+  return QList<IdentifyResult>() << IdentifyResult( tr( "Cell %1, %2" ).arg( gridLabel( mRowChar, j ) ).arg( gridLabel( mColChar, i ) ), attrs, QgsGeometry( bbox ) );
 }
 
 bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*document*/, const QgsReadWriteContext &context ) const
@@ -289,7 +308,8 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "crs", crs().authid() );
   layerEl.setAttribute( "fontSize", mFontSize );
   layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
-  layerEl.setAttribute( "labellingMode", static_cast<int>( mLabellingMode ) );
+  layerEl.setAttribute( "colChar", QString( mColChar ) );
+  layerEl.setAttribute( "rowChar", QString( mRowChar ) );
   return true;
 }
 

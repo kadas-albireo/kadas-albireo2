@@ -24,7 +24,6 @@ class KadasGuideGridLayer : public KadasPluginLayer
     Q_OBJECT
   public:
     static QString layerType() { return "guide_grid"; }
-    enum LabellingMode { LABEL_A_1, LABEL_1_A };
 
     KadasGuideGridLayer( const QString &name );
     void setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked );
@@ -42,12 +41,12 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
     const QColor &color() const { return mColor; }
     int fontSize() const { return mFontSize; }
-    LabellingMode labelingMode() const { return mLabellingMode; }
+    QPair<QChar, QChar> labelingMode() const { return qMakePair( mRowChar, mColChar ); }
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
-    void setLabelingMode( LabellingMode labelingMode ) { mLabellingMode = labelingMode; }
+    void setLabelingMode( QChar rowChar, QChar colChar ) { mRowChar = rowChar; mColChar = colChar; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -63,7 +62,8 @@ class KadasGuideGridLayer : public KadasPluginLayer
     bool mRowSizeLocked = false;
     int mFontSize = 30;
     QColor mColor = Qt::red;
-    LabellingMode mLabellingMode = LABEL_A_1;
+    QChar mRowChar = 'A';
+    QChar mColChar = '1';
 };
 
 

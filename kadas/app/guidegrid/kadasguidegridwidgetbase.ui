@@ -340,18 +340,25 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBoxLabeling">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item>
-            <property name="text">
-             <string notr="true">A- x 1-</string>
-            </property>
+            <widget class="QComboBox" name="comboBoxRowLabels"/>
            </item>
            <item>
-            <property name="text">
-             <string notr="true">1- x A-</string>
-            </property>
+            <widget class="QToolButton" name="toolButtonSwitchLabels">
+             <property name="icon">
+              <iconset resource="../../resources/resources.qrc">
+               <normaloff>:/kadas/icons/switch</normaloff>:/kadas/icons/switch</iconset>
+             </property>
+            </widget>
            </item>
-          </widget>
+           <item>
+            <widget class="QComboBox" name="comboBoxColLabels"/>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

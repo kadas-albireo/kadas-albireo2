@@ -78,12 +78,13 @@ class KadasGuideGridWidget : public KadasBottomBar
     void setCurrentLayer( QgsMapLayer *layer );
     void topLeftEdited();
     void bottomRightEdited();
+    void switchLabels();
     void updateIntervals();
     void updateBottomRight();
     void updateLockIcon( bool locked );
     void updateColor( const QColor &color );
     void updateFontSize( int fontSize );
-    void updateLabeling( int labelingMode );
+    void updateLabeling();
     void pickTopLeftPos() { emit requestPick( KadasMapToolGuideGrid::PICK_TOP_LEFT ); }
     void pickBottomRight() { emit requestPick( KadasMapToolGuideGrid::PICK_BOTTOM_RIGHT ); }
 };
