@@ -25,7 +25,7 @@ KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
 {
   mUi.setupUi( this );
   connect( mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
-  connect( mUi.mTextEditRemarks, &QPlainTextEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
+  connect( mUi.mTextEditRemarks, &QTextBrowser::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
   connect( item, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   setEnabled( false );
 }
@@ -38,7 +38,7 @@ void KadasSymbolAttributesEditor::adjustVisiblity()
 void KadasSymbolAttributesEditor::reset()
 {
   mUi.mLineEditName->setText( "" );
-  mUi.mTextEditRemarks->setPlainText( "" );
+  mUi.mTextEditRemarks->setHtml( "" );
 }
 
 void KadasSymbolAttributesEditor::syncItemToWidget()
@@ -52,7 +52,7 @@ void KadasSymbolAttributesEditor::syncItemToWidget()
   mUi.mLineEditName->setText( symbolItem->name() );
   mUi.mLineEditName->blockSignals( false );
   mUi.mTextEditRemarks->blockSignals( true );
-  mUi.mTextEditRemarks->setPlainText( symbolItem->remarks() );
+  mUi.mTextEditRemarks->setHtml( symbolItem->remarks() );
   mUi.mTextEditRemarks->blockSignals( false );
 }
 
@@ -64,5 +64,5 @@ void KadasSymbolAttributesEditor::syncWidgetToItem()
     return;
   }
   symbolItem->setName( mUi.mLineEditName->text() );
-  symbolItem->setRemarks( mUi.mTextEditRemarks->toPlainText() );
+  symbolItem->setRemarks( mUi.mTextEditRemarks->toHtml() );
 }

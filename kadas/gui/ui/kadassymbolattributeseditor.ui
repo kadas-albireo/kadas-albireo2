@@ -50,7 +50,7 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QPlainTextEdit" name="mTextEditRemarks">
+    <widget class="KadasTextBrowser" name="mTextEditRemarks">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -61,6 +61,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KadasTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header location="global">kadas/gui/kadastextbrowser.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
