@@ -66,5 +66,6 @@
 %Include auto_generated/milx/kadasmilxitem.sip
 %Include auto_generated/kadasattributetabledialog.sip
 %Include auto_generated/kadasribbonbutton.sip
+%Include auto_generated/kadastextbrowser.sip
 %Include auto_generated/kadasclipboard.sip
 %Include auto_generated/kadasprojecttemplateselectiondialog.sip
