@@ -159,7 +159,7 @@ void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *i
   QString pluginModule = item->data( 0, Qt::UserRole ).toString();
   if ( p->isPluginLoaded( pluginModule ) )
   {
-    if ( p->unloadPlugin( pluginModule ) )
+    if ( p->disablePlugin( pluginModule ) )
     {
       setItemActivatable( item );
     }
