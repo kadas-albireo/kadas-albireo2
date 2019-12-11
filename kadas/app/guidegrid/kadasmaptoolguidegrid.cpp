@@ -170,7 +170,13 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
 QgsMapLayer *KadasGuideGridWidget::createLayer( QString layerName )
 {
   KadasGuideGridLayer *guideGridLayer = new KadasGuideGridLayer( layerName );
-  guideGridLayer->setup( mCanvas->extent(), 10, 10, mCanvas->mapSettings().destinationCrs(), false, false );
+  QgsRectangle extent = mCanvas->extent();
+  // Adapt extent horizontally so that cells are square
+  double cellSize = extent.height() / 10.;
+  double xCenter = extent.center().x();
+  extent.setXMinimum( xCenter - 5 * cellSize );
+  extent.setXMaximum( xCenter + 5 * cellSize );
+  guideGridLayer->setup( extent, 10, 10, mCanvas->mapSettings().destinationCrs(), false, false );
   return guideGridLayer;
 }
 
