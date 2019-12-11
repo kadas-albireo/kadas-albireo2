@@ -21,6 +21,9 @@
 
 #include <QTextBrowser>
 
+// TODO: sip generates wrong code, errors out with sipNameNr_XXXX was not declared.
+#ifndef SIP_RUN
+
 class KADAS_GUI_EXPORT KadasTextBrowser : public QTextBrowser
 {
     Q_OBJECT
@@ -33,7 +36,11 @@ class KADAS_GUI_EXPORT KadasTextBrowser : public QTextBrowser
     void keyPressEvent( QKeyEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
     void insertFromMimeData( const QMimeData *source ) override;
+
+  private:
     const QRegExp &urlRegEx() const;
 };
+
+#endif // SIP_RUN
 
 #endif // KADASTEXTBROWSER_H
