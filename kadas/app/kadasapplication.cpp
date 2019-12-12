@@ -716,7 +716,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
 void KadasApplication::projectClose()
 {
-  mAutosaveTimer.stop();
+  cleanupAutosave();
 
   emit projectWillBeClosed();
 
