@@ -59,6 +59,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
       menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
+      menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
     }
     else if ( QgsLayerTree::isLayer( node ) && QgsLayerTree::toLayer( node )->layer() )
     {
@@ -83,7 +84,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
-      menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayer );
+      menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
 
 
       if ( layer->type() == QgsMapLayerType::RasterLayer && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
@@ -166,10 +167,23 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
   return heightmapAction;
 }
 
-void KadasLayerTreeViewMenuProvider::removeLayer()
+void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()
 {
-  QgsMapLayer *layer = mView->currentLayer();
-  QgsProject::instance()->removeMapLayer( layer );
+  // look for layers recursively so we catch also those that are within selected groups
+  const QList<QgsMapLayer *> selectedLayers = mView->selectedLayersRecursive();
+  const QList<QgsLayerTreeNode *> selectedNodes = mView->selectedNodes( true );
+
+  if ( selectedNodes.isEmpty() )
+  {
+    return;
+  }
+
+  for ( QgsLayerTreeNode *node : selectedNodes )
+  {
+    QgsLayerTreeGroup *parentGroup = qobject_cast<QgsLayerTreeGroup *>( node->parent() );
+    if ( parentGroup )
+      parentGroup->removeChildNode( node );
+  }
 }
 
 void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )

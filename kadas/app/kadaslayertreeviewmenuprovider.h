@@ -33,7 +33,7 @@ class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMen
     QgsLayerTreeView *mView = nullptr;
 
   private slots:
-    void removeLayer();
+    void removeLayerTreeItems();
     void setLayerTransparency( int value );
     void setLayerUseAsHeightmap( bool enabled );
     void showLayerAttributeTable();
