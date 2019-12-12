@@ -1222,10 +1222,17 @@ void KadasApplication::cleanup()
 
 QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const
 {
-  QList<QgsMapLayer *> result;
-  QgsSettings settings;
+  QList< QgsMapLayer * > result;
+  if ( !layer )
+    return result;
 
   QStringList sublayers = layer->subLayers();
+  QgsDebugMsg( QStringLiteral( "raster has %1 sublayers" ).arg( layer->subLayers().size() ) );
+
+  if ( sublayers.empty() )
+    return result;
+
+  QgsSettings settings;
 
   // We initialize a selection dialog and display it.
   QgsSublayersDialog chooseSublayersDialog( QgsSublayersDialog::Gdal, QStringLiteral( "gdal" ), mMainWindow );
@@ -1248,32 +1255,32 @@ QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRaste
     {
       name = name.mid( name.indexOf( path ) + path.length() + 1 );
     }
+    else if ( name.startsWith( QLatin1String( "GPKG" ), Qt::CaseInsensitive ) )
+    {
+      const auto parts { name.split( ':' ) };
+      if ( parts.count() >= 3 )
+      {
+        name = parts.at( parts.count( ) - 1 );
+      }
+    }
     else
     {
       // remove driver name and file name
-      name.remove( name.split( QgsDataProvider::SUBLAYER_SEPARATOR ) [0] );
+      name.remove( name.split( QgsDataProvider::SUBLAYER_SEPARATOR )[0] );
       name.remove( path );
     }
     // remove any : or " left over
     if ( name.startsWith( ':' ) )
-    {
       name.remove( 0, 1 );
-    }
 
     if ( name.startsWith( '\"' ) )
-    {
       name.remove( 0, 1 );
-    }
 
     if ( name.endsWith( ':' ) )
-    {
       name.chop( 1 );
-    }
 
     if ( name.endsWith( '\"' ) )
-    {
       name.chop( 1 );
-    }
 
     names << name;
 
@@ -1291,7 +1298,14 @@ QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRaste
     QRegExp rx( "\"(.*)\"" );
     QString uri, name;
 
+    QgsLayerTreeGroup *group = nullptr;
+    bool addToGroup = settings.value( QStringLiteral( "/qgis/openSublayersInGroup" ), true ).toBool();
+
     const auto constSelection = chooseSublayersDialog.selection();
+    if ( !constSelection.isEmpty() && addToGroup )
+    {
+      group = QgsProject::instance()->layerTreeRoot()->insertGroup( 0, layer->name() );
+    }
     for ( const QgsSublayersDialog::LayerDefinition &def : constSelection )
     {
       int i = def.layerId;
@@ -1309,7 +1323,11 @@ QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRaste
       QgsRasterLayer *rlayer = new QgsRasterLayer( sublayers[i], name );
       if ( rlayer && rlayer->isValid() )
       {
-        result << rlayer;
+        QgsProject::instance()->addMapLayer( rlayer, !addToGroup );
+        if ( addToGroup )
+        {
+          group->addLayer( rlayer );
+        }
       }
     }
   }
