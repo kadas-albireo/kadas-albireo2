@@ -106,6 +106,8 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void openMessageLog() override;
     virtual void showLayoutManager() override;
 
+    bool saveProject() override;
+
     virtual QgsLayoutDesignerInterface *openLayoutDesigner( QgsMasterLayoutInterface *layout ) override;
 
     virtual void registerCustomDropHandler( QgsCustomDropHandler *handler ) override;

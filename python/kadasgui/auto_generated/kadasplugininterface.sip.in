@@ -94,6 +94,8 @@ Generic object finder
     virtual QList<QgsPrintLayout *> printLayouts() const = 0;
     virtual void showLayoutDesigner( QgsPrintLayout *layout ) = 0;
 
+    virtual bool saveProject() = 0;
+
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );

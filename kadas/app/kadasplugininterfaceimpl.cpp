@@ -293,6 +293,11 @@ void KadasPluginInterfaceImpl::showLayoutManager()
   // TODO
 }
 
+bool KadasPluginInterfaceImpl::saveProject()
+{
+  return kApp->projectSave();
+}
+
 QgsLayoutDesignerInterface *KadasPluginInterfaceImpl::openLayoutDesigner( QgsMasterLayoutInterface *layout )
 {
   // TODO
