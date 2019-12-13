@@ -30,9 +30,11 @@ dnf install -y \
   mingw64-python3-GeographicLib \
   mingw64-python3-homography \
   mingw64-python3-lxml \
+  mingw64-python3-numpy \
   mingw64-python3-opencv \
   mingw64-python3-OWSLib \
   mingw64-python3-pyyaml \
+  mingw64-python3-requests \
   mingw64-python3-qscintilla-qt5 \
   mingw64-python3-qt5 \
   mingw64-python3-six \
