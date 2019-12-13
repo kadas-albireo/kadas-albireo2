@@ -793,7 +793,13 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QgsProject::instance()->setFileName( fileName );
   }
 
-  if ( QgsProject::instance()->write() )
+  mMainWindow->mapCanvas()->freeze( true );
+
+  bool success = QgsProject::instance()->write();
+
+  mMainWindow->mapCanvas()->freeze( false );
+
+  if ( success )
   {
     mMainWindow->messageBar()->pushMessage( tr( "Project saved" ), "", Qgis::Info, mMainWindow->messageTimeout() );
     cleanupAutosave();
@@ -803,9 +809,8 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QMessageBox::critical( mMainWindow,
                            tr( "Unable to save project %1" ).arg( QDir::toNativeSeparators( QgsProject::instance()->fileName() ) ),
                            QgsProject::instance()->error() );
-    return false;
   }
-  return true;
+  return success;
 }
 
 void KadasApplication::addDefaultPrintTemplates()
