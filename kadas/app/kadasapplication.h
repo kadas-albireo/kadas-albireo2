@@ -114,6 +114,7 @@ class KadasApplication : public QgsApplication
     KadasMapToolPan *mMapToolPan = nullptr;
     QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
     QTimer mAutosaveTimer;
+    bool mAutosaving = false;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
@@ -136,6 +137,7 @@ class KadasApplication : public QgsApplication
     void updateWindowTitle();
     void cleanup();
     void updateWmtsZoomResolutions() const;
+    void unsetMapToolOnSave();
 };
 
 #endif // KADASAPPLICATION_H

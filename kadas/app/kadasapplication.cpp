@@ -281,7 +281,7 @@ void KadasApplication::init()
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   // Unset any active tool before writing project to ensure that any pending edits are committed
-  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::unsetMapTool );
+  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::unsetMapToolOnSave );
   connect( this, &KadasApplication::focusChanged, this, &KadasApplication::onFocusChanged );
   connect( this, &QApplication::aboutToQuit, this, &KadasApplication::cleanup );
 
@@ -992,6 +992,7 @@ void KadasApplication::autosave()
 {
   if ( !QgsProject::instance()->fileName().isEmpty() && QgsProject::instance()->isDirty() )
   {
+    mAutosaving = true;
     mMainWindow->statusBar()->showMessage( tr( "Autosaving project..." ), 3000 );
     QString prevFilename = QgsProject::instance()->fileName();
     QFileInfo finfo( prevFilename );
@@ -1002,6 +1003,7 @@ void KadasApplication::autosave()
     QgsProject::instance()->setFileName( prevFilename );
     QgsProject::instance()->setDirty();
     mAutosaveTimer.stop(); // Stop timer triggered by projectDirtyChanged()
+    mAutosaving = false;
   }
 }
 
@@ -1066,6 +1068,14 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
       connect( static_cast<KadasMapToolPan *>( newTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
       connect( static_cast<KadasMapToolPan *>( newTool ), &KadasMapToolPan::contextMenuRequested, this, &KadasApplication::showCanvasContextMenu );
     }
+  }
+}
+
+void KadasApplication::unsetMapToolOnSave()
+{
+  if ( !mAutosaving )
+  {
+    unsetMapTool();
   }
 }
 
