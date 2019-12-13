@@ -27,7 +27,7 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
 
   public:
-    KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs );
 
     // Item anchor point, as factors of its width/height
     double anchorX() const { return mAnchorX; }

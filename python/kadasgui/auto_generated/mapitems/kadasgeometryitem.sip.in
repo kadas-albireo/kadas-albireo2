@@ -41,7 +41,7 @@ the Free Software Foundation; either version 2 of the License, or     *
       ICON_FULL_TRIANGLE
     };
 
-    KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasGeometryItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasGeometryItem();
 
     virtual KadasItemRect boundingBox() const;

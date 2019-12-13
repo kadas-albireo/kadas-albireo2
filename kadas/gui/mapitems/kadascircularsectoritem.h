@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     Q_OBJECT
 
   public:
-    KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
 
     QString itemName() const override { return tr( "Circular Sector" ); }
 

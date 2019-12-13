@@ -116,8 +116,8 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasMilxItem::KadasMilxItem( QObject *parent )
-  : KadasMapItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
+KadasMilxItem::KadasMilxItem()
+  : KadasMapItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) )
 {
   clear();
 }

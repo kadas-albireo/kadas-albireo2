@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
   public:
-    KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasPictureItem( const QgsCoordinateReferenceSystem &crs );
     void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50, int width = 0, int height = 0 );
 
     const QString &filePath() const { return mFilePath; }

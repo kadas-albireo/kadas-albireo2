@@ -125,7 +125,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_PROPERTY( QString authId READ authId WRITE setAuthId )
 
   public:
-    KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
+    KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
     QJsonObject serialize() const;

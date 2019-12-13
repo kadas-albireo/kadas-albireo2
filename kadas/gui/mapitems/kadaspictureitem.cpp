@@ -62,8 +62,8 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasMapItem( crs, parent )
+KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasMapItem( crs )
 {
   mIsPointSymbol = true;
   clear();

@@ -16,7 +16,7 @@ class KadasMilxItem : KadasMapItem
 #include "kadas/gui/milx/kadasmilxitem.h"
 %End
   public:
-    KadasMilxItem( QObject *parent = 0 );
+    KadasMilxItem();
     void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
 
     const QString &mssString() const;

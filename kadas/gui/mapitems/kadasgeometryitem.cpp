@@ -55,8 +55,8 @@ void KadasGeometryItem::registerMetaTypes()
   }
 }
 
-KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasMapItem( crs, parent )
+KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasMapItem( crs )
   , mPen( QPen( Qt::red, 4 ) )
   , mBrush( QColor( 255, 0, 0, 127 ) )
   , mIconSize( 10 )

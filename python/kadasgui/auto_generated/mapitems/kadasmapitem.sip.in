@@ -108,7 +108,7 @@ class KadasMapItem : QObject /Abstract/
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
-    KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent );
+    KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
     QJsonObject serialize() const;

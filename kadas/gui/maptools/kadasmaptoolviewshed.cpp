@@ -248,7 +248,7 @@ void KadasMapToolViewshed::drawFinished()
     layer->setRenderer( renderer );
     QgsProject::instance()->addMapLayer( layer );
 
-    KadasPinItem *pin = new KadasPinItem( canvasCrs, this );
+    KadasPinItem *pin = new KadasPinItem( canvasCrs );
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );
     KadasMapCanvasItemManager::addItem( pin );

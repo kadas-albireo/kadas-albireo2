@@ -25,7 +25,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
     Q_OBJECT
 
   public:
-    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs );
 
     void setSelectedItems( const QList<KadasMapItem *> &items );
 

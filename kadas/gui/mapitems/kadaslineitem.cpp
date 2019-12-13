@@ -73,8 +73,8 @@ bool KadasLineItem::State::deserialize( const QJsonObject &json )
   return true;
 }
 
-KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject *parent )
-  : KadasGeometryItem( crs, parent )
+KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic )
+  : KadasGeometryItem( crs )
 {
   mGeodesic = geodesic;
   clear();

@@ -79,7 +79,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
     addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasCanvasContextMenu::cutItem );
     addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyItem );
     addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteItem );
-    mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs(), this );
+    mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
     mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
     KadasMapCanvasItemManager::addItem( mSelRect );
   }

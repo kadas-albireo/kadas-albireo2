@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 %End
   public:
-    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs );
 
     void setSelectedItems( const QList<KadasMapItem *> &items );
 

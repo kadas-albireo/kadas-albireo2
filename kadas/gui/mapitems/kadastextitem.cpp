@@ -25,8 +25,8 @@
 
 KADAS_REGISTER_MAP_ITEM( KadasTextItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasTextItem( crs ); } );
 
-KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasAnchoredItem( crs, parent )
+KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasAnchoredItem( crs )
 {
   clear();
 }

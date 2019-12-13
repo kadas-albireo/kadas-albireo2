@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
     Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
-    KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false, QObject *parent = nullptr );
+    KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
 
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );

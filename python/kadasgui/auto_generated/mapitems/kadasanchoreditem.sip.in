@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadasanchoreditem.h"
 %End
   public:
-    KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs );
 
     double anchorX() const;
     void setAnchorX( double anchorX );

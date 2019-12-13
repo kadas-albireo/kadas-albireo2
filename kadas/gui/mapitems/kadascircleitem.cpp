@@ -69,8 +69,8 @@ bool KadasCircleItem::State::deserialize( const QJsonObject &json )
   return centers.size() == radii.size();
 }
 
-KadasCircleItem::KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic, QObject *parent )
-  : KadasGeometryItem( crs, parent )
+KadasCircleItem::KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic )
+  : KadasGeometryItem( crs )
 {
   mGeodesic = geodesic;
   clear();

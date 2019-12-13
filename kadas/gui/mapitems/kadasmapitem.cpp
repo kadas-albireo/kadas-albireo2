@@ -22,8 +22,8 @@
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
 
-KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : QObject( parent ), mCrs( crs )
+KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs )
+  : mCrs( crs )
 {
 }
 

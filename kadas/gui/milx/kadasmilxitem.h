@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
 
   public:
-    KadasMilxItem( QObject *parent = nullptr );
+    KadasMilxItem();
     void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
 
     const QString &mssString() const { return mMssString; }

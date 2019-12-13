@@ -31,8 +31,8 @@
 KADAS_REGISTER_MAP_ITEM( KadasSymbolItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasSymbolItem( crs ); } );
 KADAS_REGISTER_MAP_ITEM( KadasPinItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPinItem( crs ); } );
 
-KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasAnchoredItem( crs, parent )
+KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasAnchoredItem( crs )
 {
   clear();
 }
@@ -201,8 +201,8 @@ void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPo
 }
 
 
-KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasSymbolItem( crs, parent )
+KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasSymbolItem( crs )
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
 }

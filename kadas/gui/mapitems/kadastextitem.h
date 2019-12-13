@@ -29,7 +29,7 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem
     Q_PROPERTY( QFont font READ font WRITE setFont )
 
   public:
-    KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasTextItem( const QgsCoordinateReferenceSystem &crs );
 
     QString itemName() const override { return tr( "Text" ); }
 

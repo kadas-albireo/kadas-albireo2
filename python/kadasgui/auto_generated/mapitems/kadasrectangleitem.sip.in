@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
 %End
   public:
-    KadasRectangleItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );
 
     virtual QString itemName() const;
 

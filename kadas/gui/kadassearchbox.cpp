@@ -180,6 +180,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 
 KadasSearchBox::~KadasSearchBox()
 {
+  clearSearch();
   qDeleteAll( mSearchProviders );
 }
 
@@ -456,7 +457,7 @@ void KadasSearchBox::resultSelected()
     {
       if ( !mPin )
       {
-        mPin = new KadasSymbolItem( mMapCanvas->mapSettings().destinationCrs(), this );
+        mPin = new KadasSymbolItem( mMapCanvas->mapSettings().destinationCrs() );
         mPin->setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
         KadasMapCanvasItemManager::addItem( mPin );
       }

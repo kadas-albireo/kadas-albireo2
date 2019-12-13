@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadastextitem.h"
 %End
   public:
-    KadasTextItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasTextItem( const QgsCoordinateReferenceSystem &crs );
 
     virtual QString itemName() const;
 

@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
 
   public:
-    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
     QString itemName() const override { return tr( "Symbol" ); }
@@ -67,7 +67,7 @@ class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
     Q_OBJECT
 
   public:
-    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = nullptr );
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs );
 };
 
 

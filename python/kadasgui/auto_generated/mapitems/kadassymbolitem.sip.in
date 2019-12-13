@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 %End
   public:
-    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
     virtual QString itemName() const;
@@ -60,7 +60,7 @@ class KadasPinItem : KadasSymbolItem
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 %End
   public:
-    KadasPinItem( const QgsCoordinateReferenceSystem &crs, QObject *parent = 0 );
+    KadasPinItem( const QgsCoordinateReferenceSystem &crs );
 };
 
 

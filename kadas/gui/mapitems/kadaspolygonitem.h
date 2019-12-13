@@ -27,7 +27,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
-    KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false, QObject *parent = nullptr );
+    KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
 
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );

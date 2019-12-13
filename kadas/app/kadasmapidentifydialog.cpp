@@ -152,7 +152,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
 {
   clear();
 
-  mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs(), this );
+  mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
   mClickPosPin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
   KadasMapCanvasItemManager::addItem( mClickPosPin );
 

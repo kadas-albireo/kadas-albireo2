@@ -122,8 +122,8 @@ bool KadasCircularSectorItem::State::deserialize( const QJsonObject &json )
   return centers.size() == radii.size() && centers.size() == startAngles.size() && centers.size() == stopAngles.size();
 }
 
-KadasCircularSectorItem::KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs, QObject *parent )
-  : KadasGeometryItem( crs, parent )
+KadasCircularSectorItem::KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasGeometryItem( crs )
 {
   clear();
 }
