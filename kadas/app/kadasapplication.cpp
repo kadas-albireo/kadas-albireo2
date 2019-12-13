@@ -277,7 +277,7 @@ void KadasApplication::init()
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::updateWmtsZoomResolutions );
-  connect( QgsProject::instance(), &QgsProject::isDirtyChanged, this, &KadasApplication::projectDirtyChanged );
+  connect( QgsProject::instance(), &QgsProject::dirtySet, this, &KadasApplication::projectDirtySet );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   // Unset any active tool before writing project to ensure that any pending edits are committed
@@ -982,7 +982,7 @@ void KadasApplication::displayMessage( const QString &message, Qgis::MessageLeve
   mMainWindow->messageBar()->pushMessage( message, level, mMainWindow->messageTimeout() );
 }
 
-void KadasApplication::projectDirtyChanged()
+void KadasApplication::projectDirtySet()
 {
   updateWindowTitle();
   mAutosaveTimer.start( 5000 );

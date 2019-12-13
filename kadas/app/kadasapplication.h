@@ -132,7 +132,7 @@ class KadasApplication : public QgsApplication
     void onFocusChanged( QWidget * /*old*/, QWidget *now );
     void onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldTool );
     void handleItemPicked( const KadasFeaturePicker::PickResult &result );
-    void projectDirtyChanged();
+    void projectDirtySet();
     void showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos );
     void updateWindowTitle();
     void cleanup();
