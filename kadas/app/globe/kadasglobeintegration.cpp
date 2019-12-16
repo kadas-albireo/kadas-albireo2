@@ -181,16 +181,6 @@ void KadasGlobeIntegration::run()
   mOsgViewer->getDatabasePager()->setDoPreCompile( true );
 
   mViewerWidget = new osgEarth::QtGui::ViewerWidget( mOsgViewer );
-  QGLFormat glf = QGLFormat::defaultFormat();
-  glf.setVersion( 3, 3 );
-  glf.setProfile( QGLFormat::CoreProfile );
-  if ( settings.value( "/Globe/anti-aliasing", true ).toBool() &&
-       settings.value( "/Globe/anti-aliasing-level", "" ).toInt() > 0 )
-  {
-    glf.setSampleBuffers( true );
-    glf.setSamples( settings.value( "/Globe/anti-aliasing-level", "" ).toInt() );
-  }
-  mViewerWidget->setFormat( glf );
 
   mDockWidget->setWidget( mViewerWidget );
   mViewerWidget->setParent( mDockWidget );
