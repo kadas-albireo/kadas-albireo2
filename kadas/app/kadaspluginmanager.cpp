@@ -100,7 +100,7 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     }
   }
 
-  mInstalledTreeWidget->resizeColumnToContents( 0 );
+  mInstalledTreeWidget->header()->setStretchLastSection( true );
   mAvailableTreeWidget->resizeColumnToContents( 0 );
 }
 
@@ -145,7 +145,7 @@ QMap< QString, KadasPluginManager::PluginInfo > KadasPluginManager::availablePlu
 
 void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *item, int column )
 {
-  if ( column != 1 )
+  if ( column != 0 )
   {
     return;
   }
@@ -392,7 +392,7 @@ void KadasPluginManager::setItemActivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setCheckState( 1, Qt::Unchecked );
+    item->setCheckState( 0, Qt::Unchecked );
   }
 }
 
@@ -400,7 +400,7 @@ void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setCheckState( 1, Qt::Checked );
+    item->setCheckState( 0, Qt::Checked );
   }
 }
 
