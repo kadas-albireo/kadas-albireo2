@@ -43,6 +43,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsrasterlayerproperties.h>
 #include <qgis/qgssublayersdialog.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsziputils.h>
@@ -890,7 +891,8 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 
   if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
-// TODO
+    QgsRasterLayerProperties dialog( layer, mainWindow()->mapCanvas(), mMainWindow );
+    dialog.exec();
   }
   else if ( layer->type() == QgsMapLayerType::VectorLayer )
   {
