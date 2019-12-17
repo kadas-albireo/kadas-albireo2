@@ -97,7 +97,6 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
   }
 
-  show();
   setFixedWidth( 300 );
 }
 
