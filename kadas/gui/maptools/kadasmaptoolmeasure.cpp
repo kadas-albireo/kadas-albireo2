@@ -126,7 +126,7 @@ void KadasMeasureWidget::setDistanceUnit( int index )
 void KadasMeasureWidget::setAngleUnit( int index )
 {
   QgsUnitTypes::AngleUnit unit = static_cast<QgsUnitTypes::AngleUnit>( mUnitComboBox->itemData( index ).toInt() );
-  QgsSettings().setValue( "/kadas/last_angle_unit", unit );
+  QgsSettings().setValue( "/kadas/last_azimuth_unit", unit );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
