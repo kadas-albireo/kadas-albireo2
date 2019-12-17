@@ -133,8 +133,12 @@ KadasMapItem::Margin KadasAnchoredItem::margin() const
 
 QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settings ) const
 {
-  QList<KadasMapPos> points = rotatedCornerPoints( constState()->angle, settings );
   QList<Node> nodes;
+  if ( constState()->drawStatus == State::Empty )
+  {
+    return nodes;
+  }
+  QList<KadasMapPos> points = rotatedCornerPoints( constState()->angle, settings );
   nodes.append( {points[0]} );
   nodes.append( {points[1]} );
   nodes.append( {points[2]} );
