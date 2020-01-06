@@ -600,14 +600,15 @@ KadasItemLayer *KadasApplication::selectItemLayer()
   }
 }
 
-void KadasApplication::projectNew( bool askToSave )
+bool KadasApplication::projectNew( bool askToSave )
 {
   if ( askToSave && !projectSaveDirty() )
   {
-    return;
+    return false;
   }
 
   projectClose();
+  return true;
 }
 
 bool KadasApplication::projectCreateFromTemplate( const QString &templateFile )

@@ -245,9 +245,9 @@ bool KadasPluginInterfaceImpl::addProject( const QString &project )
   return kApp->projectOpen( project );
 }
 
-void KadasPluginInterfaceImpl::newProject( bool promptToSaveFlag )
+bool KadasPluginInterfaceImpl::newProject( bool promptToSaveFlag )
 {
-  kApp->projectNew( promptToSaveFlag );
+  return kApp->projectNew( promptToSaveFlag );
 }
 
 void KadasPluginInterfaceImpl::reloadConnections( )

@@ -65,7 +65,7 @@ class KadasApplication : public QgsApplication
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectItemLayer();
 
-    void projectNew( bool askToSave );
+    bool projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile );
     bool projectOpen( const QString &projectFile = QString() );
     void projectClose();

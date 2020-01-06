@@ -90,7 +90,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QgsMeshLayer *addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
 
     virtual bool addProject( const QString &project ) override;
-    virtual void newProject( bool promptToSaveFlag = false ) override;
+    virtual bool newProject( bool promptToSaveFlag = false ) override;
 
     virtual void reloadConnections( ) override;
     virtual bool setActiveLayer( QgsMapLayer *layer ) override;
