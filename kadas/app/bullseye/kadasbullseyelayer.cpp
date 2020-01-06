@@ -87,7 +87,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         if ( labelRings )
         {
           QString label = QString( "%1 nm" ).arg( ( iRing + 1 ) * mLayer->mInterval, 0, 'f', 2 );
-          double x = poly.last().x() - 0.5 * metrics.width( label );
+          double x = poly.last().x() - 0.5 * metrics.horizontalAdvance( label );
           mRendererContext.painter()->drawText( x, poly.last().y() - 0.25 * metrics.height(), label );
         }
       }
@@ -124,7 +124,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
           double dy = n > 1 ? poly[n - 1].y() - poly[n - 2].y() : 0;
           double l = std::sqrt( dx * dx + dy * dy );
           double d = mLayer->mFontSize;
-          double w = metrics.width( label );
+          double w = metrics.horizontalAdvance( label );
           double x = n < 2 ? poly.last().x() : poly.last().x() + d * dx / l;
           double y = n < 2 ? poly.last().y() : poly.last().y() + d * dy / l;
           mRendererContext.painter()->drawText( x - 0.5 * w, y - d, w, 2 * d, Qt::AlignCenter | Qt::AlignHCenter, label );

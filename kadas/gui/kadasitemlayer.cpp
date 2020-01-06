@@ -40,7 +40,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
       {
         items.append( mLayer->mItems[id] );
       }
-      qStableSort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
+      std::stable_sort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
       bool omitSinglePoint = mRendererContext.customRenderFlags().contains( "globe" );
       for ( const KadasMapItem *item : items )
       {

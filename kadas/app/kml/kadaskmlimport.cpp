@@ -322,7 +322,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   QString vrtString;
   QTextStream vrtStream( &vrtString, QIODevice::WriteOnly );
   vrtStream << "<VRTDataset rasterXSize=\"" << totSize.width() << "\" rasterYSize=\"" << totSize.height() << "\">" << endl;
-  vrtStream << " <SRS>" << QgsCoordinateReferenceSystem( "EPSG:4326" ).toProj4().toHtmlEscaped() << "</SRS>" << endl;
+  vrtStream << " <SRS>" << QgsCoordinateReferenceSystem( "EPSG:4326" ).toProj().toHtmlEscaped() << "</SRS>" << endl;
   vrtStream << " <GeoTransform>" << endl;
   vrtStream << "  " << overlayData.bbox.xMinimum() << "," << ( overlayData.bbox.width() / totSize.width() ) << ", 0," << endl;
   vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << endl;

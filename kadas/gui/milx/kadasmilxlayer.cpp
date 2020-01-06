@@ -211,7 +211,7 @@ bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, 
     QString zoneLetter = utmZone.right( 1 ).toUpper();
     QString zoneNumber = utmZone.left( utmZone.length() - 1 );
     QString projZone = zoneNumber + ( zoneLetter == "S" ? " +south" : "" );
-    srcCrs.createFromProj4( QString( "+proj=utm +zone=%1 +datum=WGS84 +units=m +no_defs" ).arg( projZone ) );
+    srcCrs.createFromProj( QString( "+proj=utm +zone=%1 +datum=WGS84 +units=m +no_defs" ).arg( projZone ) );
   }
   QgsCoordinateTransform crst( srcCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), mTransformContext );
 

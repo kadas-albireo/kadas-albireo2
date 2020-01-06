@@ -536,7 +536,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mMenuProvider = new QgsLayoutAppMenuProvider( iface() );
   mView->setMenuProvider( mMenuProvider );
 
-  int minDockWidth( fontMetrics().width( QStringLiteral( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ) ) );
+  int minDockWidth( fontMetrics().horizontalAdvance( QStringLiteral( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ) ) );
 
   setTabPosition( Qt::AllDockWidgetAreas, QTabWidget::North );
   mGeneralDock = new QgsDockWidget( tr( "Layout" ), this );

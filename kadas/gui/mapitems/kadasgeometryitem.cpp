@@ -417,7 +417,7 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
   int width = 0;
   for ( const QString &line : measurements )
   {
-    width = qMax( width, metrics.width( line ) );
+    width = qMax( width, metrics.horizontalAdvance( line ) );
   }
   if ( !measurements.isEmpty() )
   {

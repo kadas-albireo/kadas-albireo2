@@ -238,7 +238,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         for ( const GridLabel &label : rightLabels )
         {
           QPointF pos = label.screenPos;
-          pos.rx() -= fm.width( label.text ) + screenMargin;
+          pos.rx() -= fm.horizontalAdvance( label.text ) + screenMargin;
           pos.ry() += fm.descent();
           if ( pos.y() > lastDrawY )
           {
@@ -250,24 +250,24 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         for ( const GridLabel &label : bottomLabels )
         {
           QPointF pos = label.screenPos;
-          pos.rx() -= 0.5 * fm.width( label.text );
+          pos.rx() -= 0.5 * fm.horizontalAdvance( label.text );
           pos.ry() -= fm.descent() + screenMargin;
           if ( pos.x() > lastDrawX )
           {
             drawGridLabel( pos, label.text, font, bufferColor );
-            lastDrawX = pos.x() + fm.width( label.text ) + labelMargin;
+            lastDrawX = pos.x() + fm.horizontalAdvance( label.text ) + labelMargin;
           }
         }
         lastDrawX = std::numeric_limits<double>::lowest();
         for ( const GridLabel &label : topLabels )
         {
           QPointF pos = label.screenPos;
-          pos.rx() -= 0.5 * fm.width( label.text );
+          pos.rx() -= 0.5 * fm.horizontalAdvance( label.text );
           pos.ry() += fm.ascent() + screenMargin;
           if ( pos.x() > lastDrawX )
           {
             drawGridLabel( pos, label.text, font, bufferColor );
-            lastDrawX = pos.x() + fm.width( label.text ) + labelMargin;
+            lastDrawX = pos.x() + fm.horizontalAdvance( label.text ) + labelMargin;
           }
         }
       }
@@ -421,7 +421,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         {
           adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
         }
-        labelPos.rx() -= fm.width( zoneLabel.label );
+        labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
         labelPos.ry() += fm.height();
         if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
         {
@@ -441,7 +441,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         {
           adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
         }
-        if ( labelPos.x() + fm.width( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
+        if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
         {
           drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
         }

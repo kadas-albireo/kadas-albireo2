@@ -35,7 +35,7 @@ void KadasTextItem::setText( const QString &text )
 {
   mText = text;
   QFontMetrics metrics( mFont );
-  state()->size.setWidth( metrics.width( mText ) );
+  state()->size.setWidth( metrics.horizontalAdvance( mText ) );
   state()->size.setHeight( metrics.height() );
   update();
 }
@@ -56,7 +56,7 @@ void KadasTextItem::setFont( const QFont &font )
 {
   mFont = font;
   QFontMetrics metrics( mFont );
-  state()->size.setWidth( metrics.width( mText ) );
+  state()->size.setWidth( metrics.horizontalAdvance( mText ) );
   state()->size.setHeight( metrics.height() );
   update();
 }

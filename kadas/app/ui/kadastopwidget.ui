@@ -647,7 +647,6 @@
          </layout>
          <zorder>mPrintButton</zorder>
          <zorder>mKMLButton</zorder>
-         <zorder>horizontalSpacer</zorder>
          <zorder>mNewButton</zorder>
          <zorder>mOpenButton</zorder>
          <zorder>mSaveButton</zorder>
