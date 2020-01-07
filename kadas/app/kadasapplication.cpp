@@ -46,6 +46,7 @@
 #include <qgis/qgsrasterlayerproperties.h>
 #include <qgis/qgssublayersdialog.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsvectorlayerproperties.h>
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
@@ -74,7 +75,6 @@
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadasprojectmigration.h>
 #include <kadas/app/kadaspythonintegration.h>
-#include <kadas/app/kadasvectorlayerproperties.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
 #include <kadas/app/mapgrid/kadasmapgridlayer.h>
@@ -888,8 +888,6 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   if ( !layer )
     return;
 
-  KadasLayerPropertiesDialog *dialog = nullptr;
-
   if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
     QgsRasterLayerProperties dialog( layer, mainWindow()->mapCanvas(), mMainWindow );
@@ -897,25 +895,22 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   }
   else if ( layer->type() == QgsMapLayerType::VectorLayer )
   {
-    QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
-    dialog = new KadasVectorLayerProperties( vlayer, mainWindow()->mapCanvas(), mainWindow() );
+    QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
+    for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+    {
+      dialog.addPropertiesPageFactory( factory );
+    }
+    dialog.exec();
   }
   else if ( qobject_cast<KadasItemLayer *>( layer ) )
   {
-    dialog = new KadasItemLayerProperties( static_cast<KadasItemLayer *>( layer ), mainWindow() );
+    KadasItemLayerProperties dialog( static_cast<KadasItemLayer *>( layer ), mainWindow() );
+    for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+    {
+      dialog.addPropertiesPageFactory( factory );
+    }
+    dialog.exec();
   }
-
-  if ( !dialog )
-  {
-    return;
-  }
-
-  for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
-  {
-    dialog->addPropertiesPageFactory( factory );
-  }
-  dialog->exec();
-  delete dialog;
 }
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
