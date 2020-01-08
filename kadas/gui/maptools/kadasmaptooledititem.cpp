@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QPushButton>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
@@ -148,9 +149,9 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       {
         menu.addSeparator();
       }
-      menu.addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
-      menu.addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
-      menu.addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
       if ( clickedAction )

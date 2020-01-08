@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QToolButton>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
@@ -45,7 +46,7 @@ KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsL
   if ( creator )
   {
     QToolButton *newLayerButton = new QToolButton();
-    newLayerButton->setIcon( QIcon( ":/images/themes/default/mActionAdd.svg" ) );
+    newLayerButton->setIcon( QgsApplication::getThemeIcon( "/mActionAdd.svg" ) );
     connect( newLayerButton, &QToolButton::clicked, this, &KadasLayerSelectionWidget::createLayer );
     layout()->addWidget( newLayerButton );
   }

@@ -16,6 +16,7 @@
 
 #include <QMenu>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
@@ -381,7 +382,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
 
 void KadasGuideGridLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
   {
     mActionGuideGridTool->trigger();
   } );

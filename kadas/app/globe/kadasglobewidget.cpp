@@ -46,27 +46,27 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   QToolButton *syncButton = new QToolButton( this );
   syncButton->setAutoRaise( true );
   syncButton->setToolTip( tr( "Sync extent" ) );
-  syncButton->setIcon( QIcon( ":/images/themes/default/sync_views.svg" ) );
+  syncButton->setIcon( QgsApplication::getThemeIcon( "/sync_views.svg" ) );
   syncButton->setIconSize( QSize( 16, 16 ) );
   connect( syncButton, &QToolButton::clicked, this, &KadasGlobeWidget::syncExtent );
 
   QToolButton *refreshButton = new QToolButton( this );
   refreshButton->setAutoRaise( true );
   refreshButton->setToolTip( tr( "Reload scene" ) );
-  refreshButton->setIcon( QIcon( ":/images/themes/default/mActionReload.svg" ) );
+  refreshButton->setIcon( QgsApplication::getThemeIcon( "/mActionReload.svg" ) );
   refreshButton->setIconSize( QSize( 16, 16 ) );
   connect( refreshButton, &QToolButton::clicked, this, &KadasGlobeWidget::refresh );
 
   QToolButton *settingsButton = new QToolButton( this );
   settingsButton->setAutoRaise( true );
   settingsButton->setToolTip( tr( "Globe settings" ) );
-  settingsButton->setIcon( QIcon( ":/images/themes/default/mActionOptions.svg" ) );
+  settingsButton->setIcon( QgsApplication::getThemeIcon( "/mActionOptions.svg" ) );
   settingsButton->setIconSize( QSize( 16, 16 ) );
   connect( settingsButton, &QToolButton::clicked, this, &KadasGlobeWidget::showSettings );
 
   QToolButton *closeButton = new QToolButton( this );
   closeButton->setAutoRaise( true );
-  closeButton->setIcon( QIcon( ":/images/themes/default/mActionRemove.svg" ) );
+  closeButton->setIcon( QgsApplication::getThemeIcon( "/mActionRemove.svg" ) );
   closeButton->setIconSize( QSize( 12, 12 ) );
   closeButton->setToolTip( tr( "Close" ) );
   connect( closeButton, &QToolButton::clicked, this, [action3D] { action3D->trigger(); } );

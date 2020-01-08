@@ -20,6 +20,7 @@
 #include <GeographicLib/Geodesic.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmapcanvas.h>
@@ -235,7 +236,7 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
 
 void KadasBullseyeLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
   {
     mActionBullseyeTool->trigger();
   } );

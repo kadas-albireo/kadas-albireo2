@@ -22,6 +22,7 @@
 #include <QStackedWidget>
 #include <QToolButton>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreelayer.h>
 #include <qgis/qgsmapcanvas.h>
@@ -67,7 +68,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   mCloseButton = new QToolButton( this );
   mCloseButton->setAutoRaise( true );
-  mCloseButton->setIcon( QIcon( ":/images/themes/default/mActionRemove.svg" ) );
+  mCloseButton->setIcon( QgsApplication::getThemeIcon( "/mActionRemove.svg" ) );
   mCloseButton->setIconSize( QSize( 12, 12 ) );
   mCloseButton->setToolTip( tr( "Close" ) );
   connect( mCloseButton, &QToolButton::clicked, this, &KadasMapWidget::closeMapWidget );

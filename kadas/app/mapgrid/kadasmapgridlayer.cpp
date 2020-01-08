@@ -17,6 +17,7 @@
 #include <QMenu>
 #include <QVector2D>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinateformatter.h>
 #include <qgis/qgsgeometryutils.h>
 #include <qgis/qgslinestring.h>
@@ -573,7 +574,7 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
 
 void KadasMapGridLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
   {
     mActionMapGridTool->trigger();
   } );

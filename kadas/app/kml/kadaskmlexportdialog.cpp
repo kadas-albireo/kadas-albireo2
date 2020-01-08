@@ -43,7 +43,7 @@ KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLa
     bool slow = largefile || layer->source().contains( "url=http" );
     QListWidgetItem *item = new QListWidgetItem( layer->name() );
     item->setCheckState( slow || !activeLayers.contains( layer ) ? Qt::Unchecked : Qt::Checked );
-    item->setIcon( slow ? QIcon( ":/images/themes/default/mIconWarning.svg" ) : QIcon() );
+    item->setIcon( slow ? QgsApplication::getThemeIcon( "/mIconWarning.svg" ) : QIcon() );
     item->setData( Qt::UserRole, layer->id() );
     mLayerListWidget->addItem( item );
   }

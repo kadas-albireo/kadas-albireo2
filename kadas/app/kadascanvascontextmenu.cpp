@@ -57,16 +57,16 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
     geomType = QgsWkbTypes::geometryType( mPickResult.geom->wkbType() );
   }
 
-  addAction( QIcon( ":/images/themes/default/mActionIdentify.svg" ), tr( "Identify" ), this, SLOT( identify() ) );
+  addAction( QgsApplication::getThemeIcon( "/mActionIdentify.svg" ), tr( "Identify" ), this, SLOT( identify() ) );
   addSeparator();
 
   if ( pickedItem )
   {
-    addAction( QIcon( ":/images/themes/default/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
+    addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
     if ( dynamic_cast<KadasPinItem *>( pickedItem ) )
     {
       addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasCanvasContextMenu::copyItemPosition );
-      addAction( QIcon( ":/images/themes/default/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::convertPinToWaypoint );
+      addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::convertPinToWaypoint );
     }
     else if ( dynamic_cast<KadasPointItem *>( pickedItem ) )
     {
@@ -76,16 +76,16 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
     {
       addAction( QIcon( ":/kadas/icons/polygon" ), tr( "Convert to polygon" ), this, &KadasCanvasContextMenu::convertCircleToPolygon );
     }
-    addAction( QIcon( ":/images/themes/default/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasCanvasContextMenu::cutItem );
-    addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyItem );
-    addAction( QIcon( ":/images/themes/default/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteItem );
+    addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasCanvasContextMenu::cutItem );
+    addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyItem );
+    addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteItem );
     mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
     mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
     KadasMapCanvasItemManager::addItem( mSelRect );
   }
   else if ( mPickResult.feature.isValid() && mPickResult.layer )
   {
-    addAction( QIcon( ":/images/themes/default/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyFeature );
+    addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyFeature );
     QgsCoordinateTransform ct( mPickResult.layer->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
     QgsAbstractGeometry *geom = mPickResult.feature.geometry().constGet()->clone();
     geom->transform( ct );
@@ -99,7 +99,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
   {
     if ( !KadasClipboard::instance()->isEmpty() )
     {
-      addAction( QIcon( ":/images/themes/default/mActionEditPaste.svg" ), tr( "Paste" ), this, &KadasCanvasContextMenu::paste );
+      addAction( QgsApplication::getThemeIcon( "/mActionEditPaste.svg" ), tr( "Paste" ), this, &KadasCanvasContextMenu::paste );
     }
     QMenu *drawMenu = new QMenu();
     addAction( tr( "Draw" ) )->setMenu( drawMenu );
@@ -112,7 +112,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this, &KadasCanvasContextMenu::drawPolygon );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this, &KadasCanvasContextMenu::drawCircle );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
-    addAction( QIcon( ":/images/themes/default/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
+    addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
   }
   addSeparator();
   if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry || geomType == QgsWkbTypes::PolygonGeometry )
@@ -159,7 +159,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
   {
     addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), this, [this] { copyCoordinates( mMapPos ); } );
     addAction( QIcon( ":/kadas/icons/copy_map" ), tr( "Copy map" ), this, &KadasCanvasContextMenu::copyMap );
-    addAction( QIcon( ":/images/themes/default/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
+    addAction( QgsApplication::getThemeIcon( "/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
   }
 }
 

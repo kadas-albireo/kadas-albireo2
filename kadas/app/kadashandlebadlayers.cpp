@@ -91,7 +91,7 @@ KadasHandleBadLayers::KadasHandleBadLayers( const QList<QDomNode> &layers )
 
     if ( providerFileBased )
     {
-      item = new QTableWidgetItem( QIcon( ":/images/themes/default/mActionFileOpen.svg" ), QString() );
+      item = new QTableWidgetItem( QgsApplication::getThemeIcon( "/mActionFileOpen.svg" ), QString() );
       item->setData( FileBasedRole, true );
       mLayerList->setItem( i, 3, item );
     }
