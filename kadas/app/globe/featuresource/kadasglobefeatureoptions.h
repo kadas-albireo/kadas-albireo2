@@ -18,6 +18,7 @@
 #define KADASGLOBEFEATUREOPTIONS_H
 
 #include <osgEarth/Common>
+#include <osgEarth/Version>
 #include <osgEarthFeatures/FeatureSource>
 
 class QgsMapLayer;
@@ -49,8 +50,16 @@ class KadasGlobeFeatureOptions : public osgEarth::Features::FeatureSourceOptions
     {
       osgEarth::Config conf = osgEarth::Features::FeatureSourceOptions::getConfig();
       conf.set( "layerId", mLayerId );
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+      conf.updateNonSerializable( "layer", new RefPtr< QgsMapLayer >( mLayer ) );
+#else
       conf.setNonSerializable( "layer", new RefPtr< QgsMapLayer >( mLayer ) );
+#endif
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+      conf.setObj( "style", mStyle );
+#else
       conf.set( "style", mStyle );
+#endif
       return conf;
     }
 
@@ -73,10 +82,18 @@ class KadasGlobeFeatureOptions : public osgEarth::Features::FeatureSourceOptions
   private:
     void fromConfig( const osgEarth::Config &conf )
     {
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+      conf.getIfSet( "layerId", mLayerId );
+#else
       conf.get( "layerId", mLayerId );
+#endif
       RefPtr< QgsMapLayer > *layer_ptr = conf.getNonSerializable< RefPtr< QgsMapLayer > >( "layer" );
       mLayer = layer_ptr ? layer_ptr->ptr() : nullptr;
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+      conf.getObjIfSet( "style", mStyle );
+#else
       conf.get( "style", mStyle );
+#endif
     }
 
     osgEarth::optional<std::string> mLayerId;

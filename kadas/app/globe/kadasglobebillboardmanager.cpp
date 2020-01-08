@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <osgEarth/Version>
+
 #include <qgis/qgsproject.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -133,7 +135,11 @@ void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItem
   osgEarth::Style pin;
   pin.getOrCreateSymbol<osgEarth::IconSymbol>()->setImage( osgImage );
 
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+  osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = new osgEarth::Annotation::PlaceNode( mMapNode, geop, "", pin );
+#else
   osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = new osgEarth::Annotation::PlaceNode( geop, "", pin );
+#endif
   placeNode->setOcclusionCulling( true );
 
   mRegistry[layerId][itemId] = placeNode;

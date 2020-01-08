@@ -44,10 +44,17 @@ osgEarth::Status KadasGlobeFeatureSource::initialize( const osgDB::Options *dbOp
   return osgEarth::Status::NoError;
 }
 
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+osgEarth::Features::FeatureCursor *KadasGlobeFeatureSource::createFeatureCursor( const osgEarth::Symbology::Query &query )
+{
+  return new KadasGlobeFeatureCursor( this );
+}
+#else
 osgEarth::Features::FeatureCursor *KadasGlobeFeatureSource::createFeatureCursor( const osgEarth::Symbology::Query &query, osgEarth::ProgressCallback *progress )
 {
   return new KadasGlobeFeatureCursor( this, progress );
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 

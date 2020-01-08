@@ -34,6 +34,7 @@
 #include <osgEarth/Registry>
 #include <osgEarth/TerrainEngineNode>
 #include <osgEarth/TileSource>
+#include <osgEarth/Version>
 #include <osgEarthDrivers/cache_filesystem/FileSystemCache>
 #include <osgEarthDrivers/engine_rex/RexTerrainEngineOptions>
 #include <osgEarthDrivers/gdal/GDALOptions>
@@ -181,6 +182,18 @@ void KadasGlobeIntegration::run()
   mOsgViewer->getDatabasePager()->setDoPreCompile( true );
 
   mViewerWidget = new osgEarth::QtGui::ViewerWidget( mOsgViewer );
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+  QGLFormat glf = QGLFormat::defaultFormat();
+  glf.setVersion( 3, 3 );
+  glf.setProfile( QGLFormat::CoreProfile );
+  if ( settings.value( "/Globe/anti-aliasing", true ).toBool() &&
+       settings.value( "/Globe/anti-aliasing-level", "" ).toInt() > 0 )
+  {
+    glf.setSampleBuffers( true );
+    glf.setSamples( settings.value( "/Globe/anti-aliasing-level", "" ).toInt() );
+  }
+  mViewerWidget->setFormat( glf );
+#endif
 
   mDockWidget->setWidget( mViewerWidget );
   mViewerWidget->setParent( mDockWidget );
@@ -362,7 +375,9 @@ void KadasGlobeIntegration::applyProjectSettings()
       if ( !mSkyNode.get() )
       {
         osgEarth::SimpleSky::SimpleSkyOptions skyOpts;
+#if OSGEARTH_VERSION_GREATER_OR_EQUAL(2, 10, 0)
         skyOpts.moonImageURI() = QString( "%1/globe/moon.jpg" ).arg( Kadas::pkgResourcePath() ).toStdString();
+#endif
         mSkyNode = osgEarth::Util::SkyNode::create( skyOpts, mMapNode );
         mSkyNode->attach( mOsgViewer );
         mRootNode->addChild( mSkyNode );

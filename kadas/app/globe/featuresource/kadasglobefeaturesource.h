@@ -37,7 +37,11 @@ class KadasGlobeFeatureSource : public QObject, public osgEarth::Features::Featu
     KadasGlobeFeatureSource( const KadasGlobeFeatureOptions &options = osgEarth::Features::ConfigOptions() ) : mOptions( options ) {}
 
     osgEarth::Status initialize( const osgDB::Options *dbOptions ) override;
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+    osgEarth::Features::FeatureCursor *createFeatureCursor( const osgEarth::Symbology::Query &query ) override;
+#else
     osgEarth::Features::FeatureCursor *createFeatureCursor( const osgEarth::Symbology::Query &query, osgEarth::ProgressCallback *progress ) override;
+#endif
 
     const char *libraryName() const override { return "Kadas"; }
     int getFeatureCount() const override { return mFeatures.size(); }
@@ -60,16 +64,27 @@ class KadasGlobeFeatureSource : public QObject, public osgEarth::Features::Featu
 class KadasGlobeFeatureCursor : public osgEarth::Features::FeatureCursor
 {
   public:
-    KadasGlobeFeatureCursor( KadasGlobeFeatureSource *source, osgEarth::ProgressCallback *progress )
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+    KadasGlobeFeatureCursor( KadasGlobeFeatureSource *source )
+      : mSource( source )
+#else
+    KadasGlobeFeatureCursor( KadasGlobeFeatureSource * source, osgEarth::ProgressCallback * progress )
       : FeatureCursor( progress ), mSource( source )
+#endif
     {
       mIterator = mSource->features().begin();
+#if OSGEARTH_VERSION_GREATER_OR_EQUAL(2, 10, 0)
       progress->reportProgress( mCounter, mSource->getFeatureCount() );
+#endif
     }
 
     bool hasMore() const override
     {
+#if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
+      return mIterator != mSource->features().end();
+#else
       return mIterator != mSource->features().end() && !_progress->isCanceled();
+#endif
     }
 
     osgEarth::Features::Feature *nextFeature() override
@@ -79,7 +94,9 @@ class KadasGlobeFeatureCursor : public osgEarth::Features::FeatureCursor
       {
         feat = mSource->loadFeature( mIterator.key() );
       }
+#if OSGEARTH_VERSION_GREATER_OR_EQUAL(2, 10, 0)
       _progress->reportProgress( ++mCounter, mSource->getFeatureCount() );
+#endif
       ++mIterator;
       return feat;
     }
