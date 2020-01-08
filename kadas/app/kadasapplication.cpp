@@ -891,11 +891,38 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   if ( layer->type() == QgsMapLayerType::RasterLayer )
   {
     QgsRasterLayerProperties dialog( layer, mainWindow()->mapCanvas(), mMainWindow );
+    // Omit some panels
+    QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
+    QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
+    QList<int> panelIndices;
+    panelIndices << hideDialogPanel( "mOptsPage_Rendering", stackedWidget );
+    panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
+    std::sort( panelIndices.begin(), panelIndices.end() );
+    for ( int i = panelIndices.length() - 1; i >= 0; --i )
+    {
+      delete optionsWidget->item( panelIndices[i] );
+    }
+
     dialog.exec();
   }
   else if ( layer->type() == QgsMapLayerType::VectorLayer )
   {
     QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
+    // Omit some panels
+    QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
+    QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
+    QList<int> panelIndices;
+    panelIndices << hideDialogPanel( "mOptsPage_AttributesForm", stackedWidget );
+    panelIndices << hideDialogPanel( "mOptsPage_AuxiliaryStorage", stackedWidget );
+    panelIndices << hideDialogPanel( "mOptsPage_Variables", stackedWidget );
+    panelIndices << hideDialogPanel( "mOptsPage_DataDependencies", stackedWidget );
+    panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
+    std::sort( panelIndices.begin(), panelIndices.end() );
+    for ( int i = panelIndices.length() - 1; i >= 0; --i )
+    {
+      delete optionsWidget->item( panelIndices[i] );
+    }
+
     for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
     {
       dialog.addPropertiesPageFactory( factory );
@@ -911,6 +938,14 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     }
     dialog.exec();
   }
+}
+
+int KadasApplication::hideDialogPanel( const QString &name, QStackedWidget *stackedWidget )
+{
+  QWidget *widget = stackedWidget->findChild<QWidget *>( name );
+  int index = stackedWidget->indexOf( widget );
+  widget->hide();
+  return index;
 }
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )

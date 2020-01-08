@@ -31,6 +31,7 @@ class KadasMessageLogViewer;
 class QgsMessageOutput;
 class QgsPrintLayout;
 class QgsRasterLayer;
+class QStackedWidget;
 class QgsVectorLayer;
 class KadasClipboard;
 class KadasGpxIntegration;
@@ -123,6 +124,7 @@ class KadasApplication : public QgsApplication
     QString migrateDatasource( const QString &path ) const;
     QMap<QString, QString> dataSourceMigrationMap() const;
     void cleanupAutosave();
+    int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
 
     static QgsMessageOutput *messageOutputViewer();
 
