@@ -28,6 +28,7 @@ KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( int id, int decima
 {
   QDoubleValidator *validator = new QDoubleValidator( min, max, decimals );
   setValidator( validator );
+  setAlignment( Qt::AlignRight );
   connect( this, &KadasFloatingInputWidgetField::returnPressed, this, &KadasFloatingInputWidgetField::checkInputChanged );
 }
 
@@ -77,12 +78,13 @@ KadasFloatingInputWidget::KadasFloatingInputWidget( QgsMapCanvas *canvas )
   move( -1000, -1000 );
 }
 
-int KadasFloatingInputWidget::addInputField( const QString &label, KadasFloatingInputWidgetField *widget, bool initiallyfocused )
+int KadasFloatingInputWidget::addInputField( const QString &label, KadasFloatingInputWidgetField *widget, const QString &suffix, bool initiallyfocused )
 {
   QGridLayout *gridLayout = static_cast<QGridLayout *>( layout() );
   int row = gridLayout->isEmpty() ? 0 : gridLayout->rowCount();
   gridLayout->addWidget( new QLabel( label ), row, 0, 1, 1 );;
   gridLayout->addWidget( widget, row, 1, 1, 1 );
+  gridLayout->addWidget( new QLabel( suffix ), row, 2, 1, 1 );
   mInputFields.insert( widget->id(), widget );
   if ( initiallyfocused )
   {

@@ -209,12 +209,16 @@ Trigger a redraw */
     struct NumericAttribute
     {
       QString name;
+      enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      Type type;
       double min;
       double max;
       int decimals;
+      static QString suffix( Type type, const QgsMapSettings &mapSettings );
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
+
 
     virtual void clear();
     virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) = 0;

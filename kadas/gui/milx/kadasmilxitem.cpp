@@ -517,7 +517,16 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
       double min = it.key() == MilxAttributeAttitude ? std::numeric_limits<double>::lowest() : 0;
       double max = std::numeric_limits<double>::max();
       int decimals = it.key() == MilxAttributeAttitude ? 1 : 0;
-      attributes.insert( it.key(), NumericAttribute{KadasMilxClient::attributeName( it.key() ), min, max, decimals } );
+      NumericAttribute::Type type = NumericAttribute::TypeOther;
+      if ( it.key() == MilxAttributeLength || it.key() == MilxAttributeWidth || it.key() == MilxAttributeRadius )
+      {
+        type = NumericAttribute::TypeDistance;
+      }
+      else if ( it.key() == MilxAttributeAttitude )
+      {
+        type = NumericAttribute::TypeAngle;
+      }
+      attributes.insert( it.key(), NumericAttribute{KadasMilxClient::attributeName( it.key() ), type, min, max, decimals } );
       return EditContext( QgsVertexId( 0, 1, it.key() ), testPos, attributes );
     }
   }

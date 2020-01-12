@@ -224,12 +224,16 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     struct NumericAttribute
     {
       QString name;
+      enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      Type type = TypeCoordinate;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
       int decimals = 0;
+      static QString suffix( Type type, const QgsMapSettings &mapSettings );
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
+
 
     // Draw interface (coordinates in map crs, attribute distances in map units)
     virtual void clear();

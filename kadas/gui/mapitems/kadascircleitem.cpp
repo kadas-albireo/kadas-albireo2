@@ -180,7 +180,7 @@ KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
   AttribDefs attributes;
   attributes.insert( AttrX, NumericAttribute{"x"} );
   attributes.insert( AttrY, NumericAttribute{"y"} );
-  attributes.insert( AttrR, NumericAttribute{"r", 0} );
+  attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::TypeDistance, 0} );
   return attributes;
 }
 
@@ -217,7 +217,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     if ( pos.sqrDist( ringPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrR, NumericAttribute{"r", 0} );
+      attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::TypeDistance, 0} );
       return EditContext( QgsVertexId( iPart, 0, 1 ), ringPos, attributes );
     }
 

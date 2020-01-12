@@ -281,7 +281,7 @@ void KadasMapToolEditItem::setupNumericInput()
       const KadasMapItem::NumericAttribute &attribute = it.value();
       KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.decimals, attribute.min, attribute.max );
       connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolEditItem::inputChanged );
-      mInputWidget->addInputField( attribute.name + ":", attrEdit );
+      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( attribute.type, mCanvas->mapSettings() ) );
     }
     if ( !attributes.isEmpty() )
     {

@@ -54,7 +54,7 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
 {
   public:
     KadasFloatingInputWidget( QgsMapCanvas *canvas );
-    int addInputField( const QString &label, KadasFloatingInputWidgetField *widget, bool initiallyfocused = false );
+    int addInputField( const QString &label, KadasFloatingInputWidgetField *widget, const QString &suffix, bool initiallyfocused = false );
     void setInputFieldVisible( int idx, bool visible );
     void setFocusedInputField( KadasFloatingInputWidgetField *widget );
     void ensureFocus();

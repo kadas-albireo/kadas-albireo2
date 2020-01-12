@@ -256,3 +256,19 @@ KadasMapItem::Registry *KadasMapItem::registry()
   static Registry instance;
   return &instance;
 };
+
+QString KadasMapItem::NumericAttribute::suffix( Type type, const QgsMapSettings &mapSettings )
+{
+  switch ( type )
+  {
+    case TypeCoordinate:
+      return QString();
+    case TypeDistance:
+      return QgsUnitTypes::toAbbreviatedString( mapSettings.destinationCrs().mapUnits() );
+    case TypeAngle:
+      return QString( "°" );
+    case TypeOther:
+      return QString();
+  }
+  return QString();
+}

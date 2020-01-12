@@ -70,7 +70,7 @@ void KadasMapToolCreateItem::activate()
       KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.decimals, attribute.min, attribute.max );
       connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged );
       connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput );
-      mInputWidget->addInputField( attribute.name + ":", attrEdit );
+      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( attribute.type, mCanvas->mapSettings() ) );
     }
     if ( !mDrawAttribs.isEmpty() )
     {
