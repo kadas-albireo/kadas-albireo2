@@ -115,6 +115,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setPainter( &painter );
   rc.setRendererScale( exportScale );
   rc.setExtent( fullExtent );
+  rc.setMapExtent( fullExtent );
   rc.setScaleFactor( 96.0 / 25.4 );
   rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
                                    fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
