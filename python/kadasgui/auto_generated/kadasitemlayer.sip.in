@@ -141,6 +141,9 @@ class KadasItemLayer : KadasPluginLayer
 
 
 
+    void setSymbolScale( double scale );
+    double symbolScale() const;
+
   signals:
     void itemAdded( KadasItemLayer::ItemId itemId );
     void itemRemoved( KadasItemLayer::ItemId itemId );
@@ -159,6 +162,7 @@ class KadasItemLayerType : KadasPluginLayerType
   public:
     KadasItemLayerType();
     virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
+    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 };
 
 class KadasItemLayerRegistry : QObject

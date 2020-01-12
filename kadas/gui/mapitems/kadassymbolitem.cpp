@@ -83,10 +83,9 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
 
-  double scale = 1.0; // TODO
-  context.painter()->scale( scale, scale );
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->rotate( -constState()->angle );
+  context.painter()->scale( mSymbolScale, mSymbolScale );
   context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
   if ( mScalable )
   {

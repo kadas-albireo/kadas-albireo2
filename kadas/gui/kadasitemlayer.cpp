@@ -14,7 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "kadasitemlayer.h"
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMenu>
+#include <QSlider>
+#include <QWidgetAction>
 
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
@@ -96,6 +100,7 @@ void KadasItemLayer::addItem( KadasMapItem *item )
   mItemOrder.append( id );
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
+  item->setSymbolScale( mSymbolScale );
   emit itemAdded( id );
 }
 
@@ -259,6 +264,7 @@ QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos
   }
   return qMakePair( minPos, minDist );
 }
+
 QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, const QgsRectangle &exportRect ) const
 {
   QString outString;
@@ -283,6 +289,15 @@ QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, 
   return outString;
 }
 
+void KadasItemLayer::setSymbolScale( double scale )
+{
+  mSymbolScale = scale;
+  for ( KadasMapItem *item : mItems )
+  {
+    item->setSymbolScale( scale );
+  }
+  triggerRepaint();
+}
 
 KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer layer )
 {
@@ -334,4 +349,34 @@ QMap<QString, QString> &KadasItemLayerRegistry::layerIdMap()
 {
   static QMap<QString, QString> map;
   return map;
+}
+
+void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
+{
+  if ( dynamic_cast<KadasItemLayer *>( layer ) )
+  {
+    KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( layer );
+
+    QWidget *transpWidget = new QWidget();
+    QHBoxLayout *transpLayout = new QHBoxLayout( transpWidget );
+
+    QLabel *transpLabel = new QLabel( tr( "Symbol scale:" ) );
+    transpLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+    transpLayout->addWidget( transpLabel );
+
+    QSlider *scaleSlider = new QSlider( Qt::Horizontal );
+    scaleSlider->setRange( -10, 10 );
+    scaleSlider->setValue( log10( itemLayer->symbolScale() ) * 10 );
+    scaleSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    scaleSlider->setTracking( false );
+    connect( scaleSlider, &QSlider::valueChanged, this, [ = ]( double value )
+    {
+      itemLayer->setSymbolScale( pow( 10., value / 10. ) );
+    } );
+    transpLayout->addWidget( scaleSlider );
+
+    QWidgetAction *scaleAction = new QWidgetAction( menu );
+    scaleAction->setDefaultWidget( transpWidget );
+    menu->addAction( scaleAction );
+  }
 }

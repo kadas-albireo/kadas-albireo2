@@ -170,6 +170,12 @@ void KadasMapItem::setZIndex( int zIndex )
   update();
 }
 
+void KadasMapItem::setSymbolScale( double scale )
+{
+  mSymbolScale = scale;
+  update();
+}
+
 void KadasMapItem::setState( const State *state )
 {
   mState->assign( state );

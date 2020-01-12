@@ -87,6 +87,7 @@ void KadasTextItem::render( QgsRenderContext &context ) const
   context.painter()->setFont( mFont );
   context.painter()->translate( pos );
   context.painter()->rotate( -constState()->angle );
+  context.painter()->scale( mSymbolScale, mSymbolScale );
   QPainterPath path;
   path.addText( -mAnchorX * bbox.width(), baselineOffset, mFont, mText );
   context.painter()->drawPath( path );

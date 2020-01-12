@@ -91,10 +91,10 @@ KadasItemRect KadasAnchoredItem::boundingBox() const
 
 QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const
 {
-  double dx1 = - mAnchorX * constState()->size.width();
-  double dx2 = + ( 1. - mAnchorX ) * constState()->size.width();
-  double dy1 = - ( 1. - mAnchorY ) * constState()->size.height();
-  double dy2 = + mAnchorY * constState()->size.height();
+  double dx1 = - mAnchorX  * constState()->size.width() * mSymbolScale;
+  double dx2 = + ( 1. - mAnchorX ) * constState()->size.width() * mSymbolScale;
+  double dy1 = - ( 1. - mAnchorY ) * constState()->size.height() * mSymbolScale;
+  double dy2 = + mAnchorY * constState()->size.height() * mSymbolScale;
 
   KadasMapPos mapPos = toMapPos( position(), settings );
   double x = mapPos.x();
@@ -112,10 +112,10 @@ QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const Q
 
 KadasMapItem::Margin KadasAnchoredItem::margin() const
 {
-  double left = -mAnchorX * constState()->size.width();
-  double top = -mAnchorY * constState()->size.height();
-  double right = ( 1. - mAnchorX ) * constState()->size.width();
-  double bottom = ( 1. - mAnchorY ) * constState()->size.height();
+  double left = -mAnchorX * constState()->size.width() * mSymbolScale;
+  double top = -mAnchorY * constState()->size.height() * mSymbolScale;
+  double right = ( 1. - mAnchorX ) * constState()->size.width() * mSymbolScale;
+  double bottom = ( 1. - mAnchorY ) * constState()->size.height() * mSymbolScale;
 
   double cosa = qCos( constState()->angle / 180 * M_PI );
   double sina = qSin( constState()->angle / 180 * M_PI );

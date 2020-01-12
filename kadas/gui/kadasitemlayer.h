@@ -159,6 +159,9 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr, const QgsRectangle &exportRect = QgsRectangle() ) const;
 #endif
 
+    void setSymbolScale( double scale );
+    double symbolScale() const { return mSymbolScale; }
+
   signals:
     void itemAdded( KadasItemLayer::ItemId itemId );
     void itemRemoved( KadasItemLayer::ItemId itemId );
@@ -172,6 +175,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QMap<ItemId, QgsRectangle> mItemBounds;
     ItemId mIdCounter = 0;
     QVector<ItemId> mFreeIds;
+    double mSymbolScale = 1.0;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
@@ -181,6 +185,7 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
       : KadasPluginLayerType( KadasItemLayer::layerType() ) {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
+    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject

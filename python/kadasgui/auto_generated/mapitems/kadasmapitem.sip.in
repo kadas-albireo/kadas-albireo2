@@ -173,6 +173,12 @@ z-index */
 %End
     int zIndex() const;
 
+    void setSymbolScale( double scale );
+%Docstring
+symbol scale */
+%End
+    double symbolScale() const;
+
     void setAuthId( const QString &authId );
 %Docstring
 authid */
