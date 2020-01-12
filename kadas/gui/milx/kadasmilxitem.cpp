@@ -427,8 +427,7 @@ void KadasMilxItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings 
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
   // Last possible non-control point
-  int index = constState()->points.size() - 1;
-  for ( ; constState()->controlPoints.contains( index ); --index );
+  int index = state()->pressedPoints;
 
   QPoint screenPoint = mapSettings.mapToPixel().transform( p ).toQPointF().toPoint();
   KadasMilxClient::NPointSymbolGraphic result;
