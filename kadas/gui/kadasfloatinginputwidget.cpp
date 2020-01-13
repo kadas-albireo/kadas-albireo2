@@ -29,6 +29,7 @@ KadasFloatingInputWidgetField::KadasFloatingInputWidgetField( int id, int decima
   QDoubleValidator *validator = new QDoubleValidator( min, max, decimals );
   setValidator( validator );
   setAlignment( Qt::AlignRight );
+  setFixedWidth( 80 );
   connect( this, &KadasFloatingInputWidgetField::returnPressed, this, &KadasFloatingInputWidgetField::checkInputChanged );
 }
 
