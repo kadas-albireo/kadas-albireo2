@@ -221,7 +221,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     const State *constState() const { return mState; }
     virtual void setState( const State *state );
 
-    struct NumericAttribute
+    struct KADAS_GUI_EXPORT NumericAttribute
     {
       QString name;
       enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
