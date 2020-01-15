@@ -127,7 +127,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   {
     opacity = static_cast<KadasPluginLayer *>( layer )->opacity();
   }
-  else if ( qobject_cast<QgsRasterLayer *>( layer ) )
+  else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {
     opacity = static_cast<QgsRasterLayer *>( layer )->renderer()->opacity() * 100;
   }
@@ -203,7 +203,7 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
   {
     static_cast<KadasPluginLayer *>( layer )->setOpacity( 100 - value );
   }
-  else if ( qobject_cast<QgsRasterLayer *>( layer ) )
+  else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {
     static_cast<QgsRasterLayer *>( layer )->renderer()->setOpacity( 1. - value / 100. );
   }
