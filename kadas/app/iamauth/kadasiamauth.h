@@ -19,8 +19,8 @@
 
 #include <QObject>
 
-class StackedDialog;
 class QToolButton;
+class StackedDialog;
 struct IDispatch;
 
 
@@ -28,16 +28,19 @@ class KadasIamAuth : public QObject
 {
     Q_OBJECT
   public:
-    KadasIamAuth( QToolButton *loginButton, QToolButton *refreshButton, QObject *parent );
+    KadasIamAuth( QToolButton *loginButton, QToolButton *logoutButton, QToolButton *refreshButton, QObject *parent );
 
   private:
     QToolButton *mLoginButton = nullptr;
+    QToolButton *mLogoutButton = nullptr;
     QToolButton *mRefreshButton = nullptr;
     StackedDialog *mLoginDialog = nullptr;
 
   private slots:
     void performLogin();
+    void performLogout();
     void checkLoginComplete( QString );
+    void checkLogoutComplete();
     void handleNewWindow( IDispatch **ppDisp, bool &cancel, uint dwFlags, QString bstrUrlContext, QString bstrUrl );
     void handleWindowClose( bool isChild, bool &cancel );
 };

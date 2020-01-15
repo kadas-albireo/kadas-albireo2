@@ -221,7 +221,7 @@ void KadasMainWindow::init()
   Q_UNUSED( milx );
 
   // IAM Auth
-  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mRefreshCatalogButton, this );
+  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mRefreshCatalogButton, this );
   Q_UNUSED( iamAuth );
 
 #ifdef WITH_GLOBE

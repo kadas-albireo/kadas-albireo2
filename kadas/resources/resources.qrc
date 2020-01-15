@@ -8,7 +8,8 @@
         <file alias="icons/viewshed">icons/viewshed.png</file>
         <file alias="icons/favorite">icons/favorite.png</file>
         <file alias="icons/gpx_import">icons/gpx_import.png</file>
-        <file alias="icons/login">icons/login.png</file>
+        <file alias="icons/login">icons/login.svg</file>
+        <file alias="icons/logout">icons/logout.svg</file>
         <file alias="icons/globe">icons/globe.png</file>
         <file alias="icons/uparrow_disabled">icons/uparrow_disabled.png</file>
         <file alias="icons/downarrow_disabled">icons/downarrow_disabled.png</file>

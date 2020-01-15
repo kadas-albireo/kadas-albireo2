@@ -21,9 +21,8 @@
 
 #include <QAxObject>
 #include <QAxWidget>
+#endif
 #include <QDialog>
-#include <QNetworkCookie>
-#include <QNetworkCookieJar>
 #include <QStackedLayout>
 #include <QToolButton>
 
@@ -34,22 +33,6 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/iamauth/kadasiamauth.h>
-
-
-class WebAxWidget : public QAxWidget
-{
-  public:
-    WebAxWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 )
-      : QAxWidget( parent, f ) { }
-  protected:
-    virtual bool translateKeyEvent( int message, int keycode ) const
-    {
-      if ( message >= WM_KEYFIRST && message <= WM_KEYLAST )
-        return true;
-      else
-        return QAxWidget::translateKeyEvent( message, keycode );
-    }
-};
 
 
 class StackedDialog : public QDialog
@@ -79,48 +62,114 @@ class StackedDialog : public QDialog
 };
 
 
-
-KadasIamAuth::KadasIamAuth( QToolButton *loginButton, QToolButton *refreshButton, QObject *parent )
-  : QObject( parent ), mLoginButton( loginButton ), mRefreshButton( refreshButton )
+class KadasNetworkCookieJar : public QNetworkCookieJar
 {
+  public:
+    using QNetworkCookieJar::QNetworkCookieJar;
+
+    void clear()
+    {
+      QList<QNetworkCookie> cookies = allCookies();
+      for ( QNetworkCookie cookie : cookies )
+      {
+        deleteCookie( cookie );
+      }
+    }
+};
+
+#ifdef Q_OS_WIN
+
+class WebWidget : public QAxWidget
+{
+  public:
+    WebWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 )
+      : QAxWidget( parent, f )
+    {
+      setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
+    }
+
+    void navigate( const QString &location )
+    {
+      dynamicCall( "Navigate(const QString&)", location );
+    }
+    QString location()
+    {
+      return dynamicCall( "LocationURL()" ).toString();
+    }
+    QStringList cookies()
+    {
+      QAxObject *document = querySubObject( "Document()" );
+      return document->property( "cookie" ).toString().split( QRegExp( "\\s*;\\s*" ) );
+    }
+  protected:
+    virtual bool translateKeyEvent( int message, int keycode ) const
+    {
+      if ( message >= WM_KEYFIRST && message <= WM_KEYLAST )
+        return true;
+      else
+        return QAxWidget::translateKeyEvent( message, keycode );
+    }
+};
+
+#else
+
+class WebWidget : public QWidget
+{
+  public:
+    void navigate( const QString &location ) {}
+    QString location() { return QString(); }
+    QStringList cookies() { return QStringList(); }
+};
+
+#endif
+
+KadasIamAuth::KadasIamAuth( QToolButton *loginButton, QToolButton *logoutButton, QToolButton *refreshButton, QObject *parent )
+  : QObject( parent ), mLoginButton( loginButton ), mLogoutButton( logoutButton ), mRefreshButton( refreshButton )
+{
+  mLogoutButton->hide();
+#ifdef Q_OS_WIN
   if ( QgsSettings().value( "/iamauth/loginurl", "" ).toString().isEmpty() )
+#else
+  if ( true )
+#endif
   {
     mLoginButton->hide();
   }
   else
   {
     connect( mLoginButton, &QToolButton::clicked, this, &KadasIamAuth::performLogin );
+    connect( mLogoutButton, &QToolButton::clicked, this, &KadasIamAuth::performLogout );
   }
 }
 
 
 void KadasIamAuth::performLogin()
 {
+#ifdef Q_OS_WIN
   mLoginDialog = new StackedDialog( kApp->mainWindow() );
   mLoginDialog->setWindowTitle( tr( "eIAM Authentication" ) );
   mLoginDialog->resize( 1000, 480 );
 
-  WebAxWidget *webWidget = new WebAxWidget();
-  webWidget->setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
-  webWidget->dynamicCall( "Navigate(const QString&)", QgsSettings().value( "/iamauth/loginurl", "" ).toString() );
+  WebWidget *webWidget = new WebWidget();
+  webWidget->navigate( QgsSettings().value( "/iamauth/loginurl", "" ).toString() );
   connect( webWidget, SIGNAL( NavigateComplete( QString ) ), this, SLOT( checkLoginComplete( QString ) ) );
   connect( webWidget, SIGNAL( NewWindow3( IDispatch **, bool &, uint, QString, QString ) ), this, SLOT( handleNewWindow( IDispatch **, bool &, uint, QString, QString ) ) );
   connect( webWidget, SIGNAL( WindowClosing( bool, bool & ) ), this, SLOT( handleWindowClose( bool, bool & ) ) );
   mLoginDialog->pushWidget( webWidget );
   mLoginDialog->exec();
+#endif
 }
 
 void KadasIamAuth::checkLoginComplete( QString /*addr*/ )
 {
   if ( mLoginDialog )
   {
-    WebAxWidget *webWidget = static_cast<WebAxWidget *>( QObject::sender() );
-    QUrl url( webWidget->dynamicCall( "LocationURL()" ).toString() );
+    WebWidget *webWidget = static_cast<WebWidget *>( QObject::sender() );
+    QUrl url( webWidget->location() );
     QUrl baseUrl;
     baseUrl.setScheme( url.scheme() );
     baseUrl.setHost( url.host() );
-    QAxObject *document = webWidget->querySubObject( "Document()" );
-    QStringList cookies = document->property( "cookie" ).toString().split( QRegExp( "\\s*;\\s*" ) );
+    QStringList cookies = webWidget->cookies();
     for ( const QString &cookie : cookies )
     {
       QStringList pair = cookie.split( "=" );
@@ -137,20 +186,9 @@ void KadasIamAuth::checkLoginComplete( QString /*addr*/ )
         {
           jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
         }
+        mLoginButton->hide();
+        mLogoutButton->show();
         mRefreshButton->click();
-        /*
-        QWebView* view = new QWebView();
-        QWebPage* page = new QWebPage();
-        page->setNetworkAccessManager( QgsNetworkAccessManager::instance() );
-        view->setPage( page );
-        QNetworkRequest req;
-        req.setUrl( QUrl( "https://www.arcgis.com/sharing/rest/search" ) );
-        QSslConfiguration conf = req.sslConfiguration();
-        conf.setPeerVerifyMode( QSslSocket::VerifyNone );
-        req.setSslConfiguration( conf );
-        view->load( req );
-        view->show();
-        view->setAttribute( Qt::WA_DeleteOnClose );*/
       }
     }
   }
@@ -158,10 +196,10 @@ void KadasIamAuth::checkLoginComplete( QString /*addr*/ )
 
 void KadasIamAuth::handleNewWindow( IDispatch **ppDisp, bool & /*cancel*/, uint /*dwFlags*/, QString /*bstrUrlContext*/, QString /*bstrUrl*/ )
 {
+#ifdef Q_OS_WIN
   if ( mLoginDialog )
   {
-    WebAxWidget *webWidget = new WebAxWidget;
-    webWidget->setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
+    WebWidget *webWidget = new WebWidget;
     connect( webWidget, SIGNAL( NavigateComplete( QString ) ), this, SLOT( checkLoginComplete( QString ) ) );
     connect( webWidget, SIGNAL( NewWindow3( IDispatch **, bool &, uint, QString, QString ) ), this, SLOT( handleNewWindow( IDispatch **, bool &, uint, QString, QString ) ) );
     connect( webWidget, SIGNAL( WindowClosing( bool, bool & ) ), this, SLOT( handleWindowClose( bool, bool & ) ) );
@@ -171,6 +209,7 @@ void KadasIamAuth::handleNewWindow( IDispatch **ppDisp, bool & /*cancel*/, uint 
     *ppDisp = appDisp;
     mLoginDialog->pushWidget( webWidget );
   }
+#endif
 }
 
 void KadasIamAuth::handleWindowClose( bool /*isChild*/, bool & /*cancel*/ )
@@ -181,32 +220,29 @@ void KadasIamAuth::handleWindowClose( bool /*isChild*/, bool & /*cancel*/ )
   }
 }
 
-#else
-
-#include <QToolButton>
-
-#include <kadas/app/iamauth/kadasiamauth.h>
-
-KadasIamAuth::KadasIamAuth( QToolButton *loginButton, QToolButton *refreshButton, QObject *parent )
-  : QObject( parent ), mLoginButton( loginButton ), mRefreshButton( refreshButton )
+void KadasIamAuth::performLogout()
 {
-  mLoginButton->hide();
+  QString url = QgsSettings().value( "/iamauth/logouturl", "" ).toString();
+  if ( url.isEmpty() )
+  {
+    return;
+  }
+  QNetworkRequest req;
+  req.setUrl( QUrl( url ) );
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
+  connect( reply, &QNetworkReply::finished, this, &KadasIamAuth::checkLogoutComplete );
 }
 
-void KadasIamAuth::performLogin()
+void KadasIamAuth::checkLogoutComplete()
 {
+  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  if ( reply->error() == QNetworkReply::NoError )
+  {
+    QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
+    static_cast<KadasNetworkCookieJar *>( jar )->clear();
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "Logout successful" ), Qgis::Info, 5 );
+    mLogoutButton->hide();
+    mLoginButton->show();
+  }
+  reply->deleteLater();
 }
-
-void KadasIamAuth::checkLoginComplete( QString /*addr*/ )
-{
-}
-
-void KadasIamAuth::handleNewWindow( IDispatch **ppDisp, bool & /*cancel*/, uint /*dwFlags*/, QString /*bstrUrlContext*/, QString /*bstrUrl*/ )
-{
-}
-
-void KadasIamAuth::handleWindowClose( bool /*isChild*/, bool & /*cancel*/ )
-{
-}
-
-#endif

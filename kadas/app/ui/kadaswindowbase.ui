@@ -444,11 +444,22 @@
                <item>
                 <widget class="QToolButton" name="mLoginButton">
                  <property name="toolTip">
-                  <string>SAML Authentication</string>
+                  <string>Login</string>
                  </property>
                  <property name="icon">
                   <iconset resource="../../resources/resources.qrc">
                    <normaloff>:/kadas/icons/login</normaloff>:/kadas/icons/login</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="mLogoutButton">
+                 <property name="toolTip">
+                  <string>Logout</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../resources/resources.qrc">
+                   <normaloff>:/kadas/icons/logout</normaloff>:/kadas/icons/logout</iconset>
                  </property>
                 </widget>
                </item>
