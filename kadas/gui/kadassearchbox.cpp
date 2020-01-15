@@ -159,7 +159,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   connect( mTreeWidget, &TreeWidget::itemSelectionChanged, this, &KadasSearchBox::resultSelected );
   connect( mTreeWidget, &TreeWidget::itemClicked, this, &KadasSearchBox::resultActivated );
   connect( mTreeWidget, &TreeWidget::itemActivated, this, &KadasSearchBox::resultActivated );
-  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasSearchBox::clearSearch );
+  connect( QgsProject::instance(), &QgsProject::cleared, this, &KadasSearchBox::clearSearch );
 
   int frameWidth = mSearchBox->style()->pixelMetric( QStyle::PM_DefaultFrameWidth );
   mSearchBox->setStyleSheet( QString( "QLineEdit { padding-right: %1px; } " ).arg( mSearchButton->sizeHint().width() + frameWidth + 5 ) );

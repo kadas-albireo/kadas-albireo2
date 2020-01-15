@@ -724,6 +724,12 @@ void KadasApplication::projectClose()
 
   mMainWindow->mapCanvas()->freeze( true );
 
+  // Avoid unnecessary layer changed handling for each layer removed - instead,
+  // defer the handling until we've removed all layers
+  mBlockActiveLayerChanged = true;
+  QgsProject::instance()->clear();
+  mBlockActiveLayerChanged = false;
+
   KadasLayoutDesignerManager::instance()->closeAllDesigners();
 
   unsetMapTool();
@@ -736,12 +742,6 @@ void KadasApplication::projectClose()
   mMainWindow->mapCanvas()->setLayers( QList<QgsMapLayer *>() );
   mMainWindow->mapCanvas()->clearCache();
   mMainWindow->mapCanvas()->freeze( false );
-
-  // Avoid unnecessary layer changed handling for each layer removed - instead,
-  // defer the handling until we've removed all layers
-  mBlockActiveLayerChanged = true;
-  QgsProject::instance()->clear();
-  mBlockActiveLayerChanged = false;
 
   onActiveLayerChanged( currentLayer() );
 }
