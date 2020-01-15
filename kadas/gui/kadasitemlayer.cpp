@@ -244,7 +244,7 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsPointXY &mapPos, const
 QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
 {
   QgsCoordinateTransform crst( crs(), settings.destinationCrs(), mTransformContext );
-  QgsPointXY layerPos = crst.transform( mapPos );
+  QgsPointXY layerPos = crst.transform( mapPos, QgsCoordinateTransform::ReverseTransform );
   double minDist = std::numeric_limits<double>::max();
   QgsPointXY minPos;
   for ( auto it = mItemBounds.begin(), itEnd = mItemBounds.end(); it != itEnd; ++it )
@@ -253,7 +253,6 @@ QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos
     bbox.grow( settings.mapUnitsPerPixel() * tolPixels );
     if ( bbox.contains( mapPos ) )
     {
-      QgsCoordinateTransform crst( settings.destinationCrs(), mItems[it.key()]->crs(), transformContext() );
       QPair<KadasMapPos, double> result = mItems[it.key()]->closestPoint( KadasMapPos::fromPoint( mapPos ), settings );
       if ( result.second < minDist && result.second < tolPixels )
       {

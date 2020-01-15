@@ -59,7 +59,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasMilxClient::NPointSymbolGraphic> result;
       int dpi = mRendererContext.painter()->device()->logicalDpiX();
       double scaleFactor = double( mRendererContext.painter()->device()->logicalDpiX() ) / double( QApplication::desktop()->logicalDpiX() );
-      QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.coordinateTransform().transform( mRendererContext.mapExtent() ), mRendererContext.mapToPixel() );
+      QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
       if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, scaleFactor, symbols, result ) )
       {
         return false;
