@@ -495,7 +495,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       }
       else
       {
-        kApp->addVectorLayer( fileName, QFileInfo( fileName ).baseName(), "ogr" );
+        kApp->addVectorLayer( fileName, QFileInfo( fileName ).completeBaseName(), "ogr" );
       }
     }
   }
