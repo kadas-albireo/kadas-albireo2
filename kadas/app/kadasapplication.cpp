@@ -152,12 +152,12 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 
 void KadasApplication::init()
 {
+  QgsApplication::init();
+  QgsApplication::initQgis();
+
   // Install crash reporter
   KadasCrashRpt crashReporter;
   crashReporter.install();
-
-  QgsApplication::init();
-  QgsApplication::initQgis();
 
   QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
       const QgsCoordinateReferenceSystem & destinationCrs,
