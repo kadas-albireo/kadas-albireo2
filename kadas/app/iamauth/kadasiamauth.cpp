@@ -63,22 +63,6 @@ class StackedDialog : public QDialog
     QStackedLayout *mLayout = nullptr;
 };
 
-
-class KadasNetworkCookieJar : public QNetworkCookieJar
-{
-  public:
-    using QNetworkCookieJar::QNetworkCookieJar;
-
-    void clear()
-    {
-      QList<QNetworkCookie> cookies = allCookies();
-      for ( QNetworkCookie cookie : cookies )
-      {
-        deleteCookie( cookie );
-      }
-    }
-};
-
 #ifdef Q_OS_WIN
 
 class WebWidget : public QAxWidget
@@ -247,7 +231,15 @@ void KadasIamAuth::checkLogoutComplete()
   if ( reply->error() == QNetworkReply::NoError )
   {
     QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-    static_cast<KadasNetworkCookieJar *>( jar )->clear();
+    QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
+    for ( const QString &url : cookieUrls )
+    {
+      QList<QNetworkCookie> cookies = jar->cookiesForUrl( url );
+      for ( QNetworkCookie cookie : cookies )
+      {
+        jar->deleteCookie( cookie );
+      }
+    }
     kApp->mainWindow()->messageBar()->pushMessage( tr( "Logout successful" ), Qgis::Info, 5 );
     mLogoutButton->hide();
     mLoginButton->show();
