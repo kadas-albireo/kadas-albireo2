@@ -282,14 +282,13 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     QString fileName = zip.getCurrentFileName();
     QString absoluteFilePath = pp + "/" + fileName;
 
+    if ( moduleName.isEmpty() )
+    {
+      moduleName = QFileInfo( fileName ).path();;
+    }
+
     if ( fileName.endsWith( "/" ) )
     {
-      if ( moduleName.isEmpty() )
-      {
-        moduleName = fileName; moduleName.chop( 1 );
-      }
-      QDir pluginDir( absoluteFilePath );
-      pluginDir.mkdir( absoluteFilePath );
       continue;
     }
 
@@ -304,6 +303,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
 
     QByteArray ba = zFile.readAll();
     zFile.close();
+    QDir().mkpath( QFileInfo( absoluteFilePath ).absolutePath() );
     QFile dstFile( absoluteFilePath );
     if ( !dstFile.open( QIODevice::WriteOnly ) )
     {
