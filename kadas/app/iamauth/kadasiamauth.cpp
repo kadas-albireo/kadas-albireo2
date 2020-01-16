@@ -251,6 +251,7 @@ void KadasIamAuth::checkLogoutComplete()
     kApp->mainWindow()->messageBar()->pushMessage( tr( "Logout successful" ), Qgis::Info, 5 );
     mLogoutButton->hide();
     mLoginButton->show();
+    mRefreshButton->click();
   }
   reply->deleteLater();
 }
