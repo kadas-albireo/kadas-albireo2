@@ -22,11 +22,13 @@
 #include <QTreeWidgetItem>
 #include <quazip5/quazipfile.h>
 
+#include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsnetworkcontentfetcher.h>
 #include <qgis/qgssettings.h>
 
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 
@@ -247,6 +249,11 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   }
 
   QString pp = p->homePluginsPath();
+  if ( !QDir().mkpath( pp ) )
+  {
+    kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error creating plugin directory" ) );
+    return;
+  }
 
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
@@ -255,6 +262,12 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   nf.fetchContent( repositoryUrl );
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
   e.exec();
+
+  if ( nf.reply()->error() != QNetworkReply::NoError )
+  {
+    kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error downloading plugin: %1" ).arg( nf.reply()->error() ) );
+    return;
+  }
 
   QByteArray pluginData = nf.reply()->readAll();
   QBuffer buf( &pluginData );
