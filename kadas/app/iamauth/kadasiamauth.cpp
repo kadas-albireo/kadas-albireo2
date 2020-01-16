@@ -275,6 +275,7 @@ void KadasIamAuth::injectAuthToken( QNetworkRequest *request )
         query.addQueryItem( "token", tokenRe.cap( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
+        QgsDebugMsg( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) );
         break;
       }
     }
