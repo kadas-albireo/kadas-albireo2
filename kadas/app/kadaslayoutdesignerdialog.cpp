@@ -32,7 +32,6 @@
 #include <qgis/qgsdockwidget.h>
 #include <qgis/qgsgui.h>
 #include <qgis/qgsfileutils.h>
-#include <qgis/qgslayoutappmenuprovider.h>
 #include <qgis/qgslayoutaddpagesdialog.h>
 #include <qgis/qgslayoutguidewidget.h>
 #include <qgis/qgslayoutimageexportoptionsdialog.h>
@@ -64,6 +63,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadaslayoutappmenuprovider.h>
 #include <kadas/app/kadaslayoutdesignerdialog.h>
 #include <kadas/app/kadasmainwindow.h>
 
@@ -533,7 +533,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
 
   connect( mActionToggleFullScreen, &QAction::toggled, this, &KadasLayoutDesignerDialog::toggleFullScreen );
 
-  mMenuProvider = new QgsLayoutAppMenuProvider( iface() );
+  mMenuProvider = new KadasLayoutAppMenuProvider( this );
   mView->setMenuProvider( mMenuProvider );
 
   int minDockWidth( fontMetrics().horizontalAdvance( QStringLiteral( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ) ) );

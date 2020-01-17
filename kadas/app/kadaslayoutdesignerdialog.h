@@ -31,7 +31,6 @@ class QToolButton;
 class QUndoView;
 
 class QgsDockWidget;
-class QgsLayoutAppMenuProvider;
 class QgsLayoutItemsListView;
 class QgsLayoutPropertiesWidget;
 class QgsLayoutRuler;
@@ -45,6 +44,7 @@ class QgsLayoutViewToolZoom;
 class QgsPanelWidgetStack;
 class QgsPrintLayout;
 
+class KadasLayoutAppMenuProvider;
 class KadasAppLayoutDesignerInterface;
 
 class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesignerBase
@@ -266,7 +266,7 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     QMap< QString, QToolButton * > mItemGroupToolButtons;
     QMap< QString, QMenu * > mItemGroupSubmenus;
 
-    QgsLayoutAppMenuProvider *mMenuProvider = nullptr;
+    KadasLayoutAppMenuProvider *mMenuProvider = nullptr;
 
     QgsDockWidget *mItemDock = nullptr;
     QgsPanelWidgetStack *mItemPropertiesStack = nullptr;
