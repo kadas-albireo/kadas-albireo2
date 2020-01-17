@@ -36,7 +36,6 @@
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadaslayertreemodel.h>
 #include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/kadasprojecttemplateselectiondialog.h>
@@ -67,6 +66,7 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
+#include <kadas/app/kadaslayertreemodel.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>

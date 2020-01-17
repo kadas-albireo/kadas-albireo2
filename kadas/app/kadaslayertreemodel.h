@@ -18,9 +18,8 @@
 #define KADASLAYERTREEMODEL_H
 
 #include <qgis/qgslayertreemodel.h>
-#include <kadas/gui/kadas_gui.h>
 
-class KADAS_GUI_EXPORT KadasLayerTreeModel : public QgsLayerTreeModel
+class KadasLayerTreeModel : public QgsLayerTreeModel
 {
     Q_OBJECT
 

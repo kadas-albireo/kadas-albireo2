@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadas/gui/kadaslayertreemodel.h>
+#include <kadas/app/kadaslayertreemodel.h>
 
 KadasLayerTreeModel::KadasLayerTreeModel( QgsLayerTree *rootNode, QObject *parent )
   : QgsLayerTreeModel( rootNode, parent )
