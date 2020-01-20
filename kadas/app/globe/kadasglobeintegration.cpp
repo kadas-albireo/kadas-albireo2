@@ -165,6 +165,14 @@ void KadasGlobeIntegration::run()
   mRootNode = new osg::Group();
   mRootNode->addChild( mMapNode );
 
+  osgEarth::Viewpoint vp;
+  double vp_x = settings.value( "/Globe/home-viewpoint-x" ).toDouble();
+  double vp_y = settings.value( "/Globe/home-viewpoint-y" ).toDouble();
+  vp.focalPoint()->set( mMapNode->getMapSRS()->getGeodeticSRS(), vp_x, vp_y, 0, osgEarth::ALTMODE_ABSOLUTE );
+  vp.pitch() = -90.;
+  vp.range() = 20000000;
+  manip->setHomeViewpoint( vp );
+
   osgEarth::Registry::instance()->unRefImageDataAfterApply() = false;
 
   mRootNode->addChild( osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer ) );
