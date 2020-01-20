@@ -724,6 +724,8 @@ void KadasApplication::projectClose()
 
   mMainWindow->mapCanvas()->freeze( true );
 
+  unsetMapTool();
+
   // Avoid unnecessary layer changed handling for each layer removed - instead,
   // defer the handling until we've removed all layers
   mBlockActiveLayerChanged = true;
@@ -731,8 +733,6 @@ void KadasApplication::projectClose()
   mBlockActiveLayerChanged = false;
 
   KadasLayoutDesignerManager::instance()->closeAllDesigners();
-
-  unsetMapTool();
 
   mMainWindow->mapCanvas()->clearExtentHistory();
 
