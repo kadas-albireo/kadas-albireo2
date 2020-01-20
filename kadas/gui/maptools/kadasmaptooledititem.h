@@ -52,6 +52,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasMapItem *mItem = nullptr;
     KadasMapItem::EditContext mEditContext;
     bool mSnapping = false;
+    Qt::MouseButton mPressedButton = Qt::NoButton;
 
     KadasFloatingInputWidget *mInputWidget = nullptr;
     KadasMapItemEditor *mEditor = nullptr;

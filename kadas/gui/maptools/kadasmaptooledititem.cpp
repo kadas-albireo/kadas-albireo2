@@ -121,6 +121,14 @@ void KadasMapToolEditItem::deactivate()
 
 void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
+  if ( mPressedButton != Qt::NoButton )
+  {
+    // HACK: On windows, after dismissing the context menu, a left-click press + move event is triggered without a right-click release event.
+    // We don't want any actions to be performed when the menu is dismissed, so ignore this event.
+    mIgnoreNextMoveEvent = true;
+    return;
+  }
+  mPressedButton = e->button();
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
     KadasItemLayer::ItemId itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
@@ -234,6 +242,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
 
 void KadasMapToolEditItem::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
+  mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
     mStateHistory->push( mItem->constState()->clone() );
