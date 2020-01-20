@@ -19,6 +19,7 @@
 #include <QMenu>
 #include <QPushButton>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -143,9 +144,9 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
     if ( mSelectionRect->intersects( filterRect, mCanvas->mapSettings() ) )
     {
       QMenu menu;
-      menu.addAction( tr( "Cut Selection" ), this, &KadasMapToolEditItemGroup::cutItems );
-      menu.addAction( tr( "Copy Selection" ), this, &KadasMapToolEditItemGroup::copyItems );
-      menu.addAction( tr( "Delete Selection" ), this, &KadasMapToolEditItemGroup::deleteItems );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItemGroup::cutItems );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItemGroup::copyItems );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItemGroup::deleteItems );
       menu.exec( e->globalPos() );
     }
     else
