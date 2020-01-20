@@ -659,11 +659,12 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( tr( "Reset offset" ), [ = ]
+    QAction *action = menu->addAction( tr( "Reset offset" ), [ = ]
     {
       state()->userOffset = QPoint();
       update();
     } );
+    action->setEnabled( !constState()->userOffset.isNull() );
   }
 }
 
