@@ -354,7 +354,7 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   QDir pluginDir( p->homePluginsPath() + "/" + moduleName );
   if ( !pluginDir.removeRecursively() )
   {
-    QMessageBox::critical( this, tr( "Plugin deinstallation failed" ), tr( "The deinstallation of the plugin '%1' faild" ).arg( pluginName ) );
+    QMessageBox::critical( this, tr( "Plugin deinstallation failed" ), tr( "The deinstallation of the plugin '%1' failed" ).arg( pluginName ) );
     return;
   }
 

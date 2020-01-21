@@ -47,7 +47,7 @@
      </property>
      <column>
       <property name="text">
-       <string>1</string>
+       <string/>
       </property>
      </column>
     </widget>
@@ -59,17 +59,17 @@
      </property>
      <column>
       <property name="text">
-       <string>plugin</string>
+       <string notr="true">plugin</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>install</string>
+       <string notr="true">install</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>update</string>
+       <string notr="true">update</string>
       </property>
      </column>
     </widget>

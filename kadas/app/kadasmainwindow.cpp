@@ -1071,7 +1071,7 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     btn->setFlat( true );
     QgsMessageBarItem *item = new QgsMessageBarItem(
       tr( "Unknown layer projection" ),
-      tr( "The projection of the layer %1 could not be recognized, its and features might be misplaced." ).arg( layer->name() ),
+      tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ),
       btn, Qgis::Warning, messageTimeout() );
     connect( btn, &QPushButton::clicked, [ = ]
     {
