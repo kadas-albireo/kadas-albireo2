@@ -71,7 +71,7 @@ class KadasGlobeVectorLayerConfig : public QObject
 };
 
 
-class KadasGlobeVectorLayerPropertiesPage : public QgsMapLayerConfigWidget, private Ui::QgsGlobeVectorLayerPropertiesPage
+class KadasGlobeVectorLayerPropertiesPage : public QgsMapLayerConfigWidget, private Ui::KadasGlobeVectorLayerPropertiesPage
 {
     Q_OBJECT
 
