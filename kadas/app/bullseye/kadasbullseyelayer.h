@@ -75,6 +75,8 @@ class KadasBullseyeLayer : public KadasPluginLayer
 
 class KadasBullseyeLayerType : public KadasPluginLayerType
 {
+    Q_OBJECT
+
   public:
     KadasBullseyeLayerType( QAction *actionBullseyeTool )
       : KadasPluginLayerType( KadasBullseyeLayer::layerType() ), mActionBullseyeTool( actionBullseyeTool ) {}

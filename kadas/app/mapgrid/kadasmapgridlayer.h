@@ -68,6 +68,8 @@ class KadasMapGridLayer : public KadasPluginLayer
 
 class KadasMapGridLayerType : public KadasPluginLayerType
 {
+    Q_OBJECT
+
   public:
     KadasMapGridLayerType( QAction *actionMapGridTool )
       : KadasPluginLayerType( KadasMapGridLayer::layerType() ), mActionMapGridTool( actionMapGridTool ) {}

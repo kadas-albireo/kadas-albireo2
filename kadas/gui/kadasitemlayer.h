@@ -180,6 +180,8 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
 
 class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
 {
+    Q_OBJECT
+
   public:
     KadasItemLayerType()
       : KadasPluginLayerType( KadasItemLayer::layerType() ) {}

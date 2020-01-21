@@ -32,6 +32,8 @@ class KadasMainWindow;
 
 class KadasGpxDropHandler : public QgsCustomDropHandler
 {
+    Q_OBJECT
+
   public:
     bool canHandleMimeData( const QMimeData *data ) override;
     bool handleMimeDataV2( const QMimeData *data ) override;

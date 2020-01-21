@@ -76,6 +76,8 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
 class KadasGuideGridLayerType : public KadasPluginLayerType
 {
+    Q_OBJECT
+
   public:
     KadasGuideGridLayerType( QAction *actionGuideGridTool )
       : KadasPluginLayerType( KadasGuideGridLayer::layerType() ), mActionGuideGridTool( actionGuideGridTool ) {}

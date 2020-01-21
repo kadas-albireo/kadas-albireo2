@@ -26,6 +26,8 @@ class KadasMilxLibrary;
 
 class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor
 {
+    Q_OBJECT
+
   public:
     KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilxLibrary *library, QWidget *parent = nullptr );
 

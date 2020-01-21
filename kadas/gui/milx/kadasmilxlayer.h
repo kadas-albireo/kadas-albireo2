@@ -54,6 +54,8 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 
 class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType
 {
+    Q_OBJECT
+
   public:
     KadasMilxLayerType()
       : KadasPluginLayerType( KadasMilxLayer::layerType() ) {}

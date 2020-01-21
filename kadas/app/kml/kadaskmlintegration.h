@@ -26,6 +26,8 @@ class QToolButton;
 
 class KadasKmlDropHandler : public QgsCustomDropHandler
 {
+    Q_OBJECT
+
   public:
     bool canHandleMimeData( const QMimeData *data ) override;
     bool handleMimeDataV2( const QMimeData *data ) override;
@@ -33,6 +35,8 @@ class KadasKmlDropHandler : public QgsCustomDropHandler
 
 class KadasKmlIntegration : public QObject
 {
+    Q_OBJECT
+
   public:
     KadasKmlIntegration( QToolButton *kmlButton, QObject *parent = nullptr );
     ~KadasKmlIntegration();

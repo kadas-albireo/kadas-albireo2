@@ -27,6 +27,8 @@ class QgsVectorLayer;
 
 class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDialog
 {
+    Q_OBJECT
+
   public:
     KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 };

@@ -30,6 +30,8 @@ class KadasSelectionRectItem;
 
 class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
 {
+    Q_OBJECT
+
   public:
     KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer );
 

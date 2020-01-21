@@ -21,6 +21,8 @@
 
 class KadasMessageLogViewer : public QgsMessageLogViewer
 {
+    Q_OBJECT
+
   public:
     KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl = 0 );
 
