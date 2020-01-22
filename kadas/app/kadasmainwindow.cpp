@@ -970,6 +970,7 @@ void KadasMainWindow::onLanguageChanged( int idx )
   if ( locale.isEmpty() )
   {
     QgsSettings().setValue( "/locale/overrideFlag", false );
+    QgsSettings().setValue( "/locale/userLocale", "" );
   }
   else
   {

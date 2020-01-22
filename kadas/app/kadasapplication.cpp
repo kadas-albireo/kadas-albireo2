@@ -153,11 +153,26 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 void KadasApplication::init()
 {
   QgsApplication::init();
-  QgsApplication::initQgis();
+
+  // Translations
+  QString translationsPath;
+  if ( isRunningFromBuildDir() )
+  {
+    translationsPath = QDir( applicationDirPath() ).absoluteFilePath( "../locale" );
+  }
+  else
+  {
+    translationsPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "locale" );
+  }
+  QTranslator *translator = new QTranslator( this );
+  translator->load( QString( "%1_%2" ).arg( Kadas::KADAS_RELEASE_NAME, translation() ), translationsPath );
+  QApplication::instance()->installTranslator( translator );
 
   // Install crash reporter
   KadasCrashRpt crashReporter;
   crashReporter.install();
+
+  QgsApplication::initQgis();
 
   QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
       const QgsCoordinateReferenceSystem & destinationCrs,
@@ -253,20 +268,6 @@ void KadasApplication::init()
       }
     }
   }
-
-  // Setup localization
-  QString userLocale = settings.value( "locale/userLocale", QLocale::system().name() ).toString();
-
-  QString qtTranslationsPath = QLibraryInfo::location( QLibraryInfo::TranslationsPath );
-  QTranslator qtTranslator;
-  qtTranslator.load( "qt_" + userLocale, qtTranslationsPath );
-  qtTranslator.load( "qtbase_" + userLocale, qtTranslationsPath );
-  installTranslator( &qtTranslator );
-
-  QString i18nPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "i18n" );
-  QTranslator appTranslator;
-  appTranslator.load( QString( "%1_%2" ).arg( Kadas::KADAS_RELEASE_NAME ), userLocale, i18nPath );
-  installTranslator( &appTranslator );
 
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );

@@ -69,8 +69,14 @@ LIST(SORT kadas_UI)
 
 SET(kadas_RCC_SRC ../resources/resources.qrc)
 
+FILE(GLOB kadas_TS ${CMAKE_SOURCE_DIR}/locale/*.ts)
+LIST(SORT kadas_TS)
+SET_SOURCE_FILES_PROPERTIES(${kadas_TS} PROPERTIES OUTPUT_LOCATION ${KADAS_OUTPUT_DIRECTORY}/locale)
+
+
 QT5_ADD_RESOURCES(kadas_RCC ${kadas_RCC_SRC})
 QT5_WRAP_UI(kadas_UI_HDR ${kadas_UI})
+QT5_ADD_TRANSLATION(kadas_QM ${kadas_TS})
 
 IF(MINGW)
   ENABLE_LANGUAGE(RC)
@@ -104,6 +110,7 @@ ADD_EXECUTABLE(kadas
     ${kadas_UI_HDR}
     ${kadas_RCC_SRC}
     ${kadas_RCC}
+    ${kadas_QM}
 )
 
 TARGET_LINK_LIBRARIES(kadas
@@ -138,3 +145,4 @@ ADD_SUBDIRECTORY(globe/featuresource)
 ENDIF(WITH_GLOBE)
 
 INSTALL(TARGETS kadas DESTINATION bin)
+INSTALL(FILES ${kadas_QM} DESTINATION share/kadas/locale)
