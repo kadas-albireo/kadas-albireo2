@@ -210,7 +210,7 @@ void KadasCanvasContextMenu::convertCircleToPolygon()
   }
   KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
   KadasItemPos pos = circleItem->constState()->centers.front();
-  double r = circleItem->constState()->radii.front();
+  double r = qSqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
 
   QgsLineString *ring = new QgsLineString();
   for ( int i = 0; i < num; ++i )

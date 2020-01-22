@@ -83,7 +83,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     struct State : KadasMapItem::State
     {
       QList<KadasItemPos> centers;
-      QList<double> radii;
+      QList<KadasItemPos> ringpos;
       virtual void assign( const KadasMapItem::State *other );
       virtual State *clone() const /Factory/;
       virtual QJsonObject serialize() const;

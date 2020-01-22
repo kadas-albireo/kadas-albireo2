@@ -66,7 +66,7 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       QList<KadasItemPos> centers;
-      QList<double> radii;
+      QList<KadasItemPos> ringpos;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
       QJsonObject serialize() const override;
@@ -87,8 +87,8 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 
     QgsMultiSurface *geometry();
     State *state() { return static_cast<State *>( mState ); }
-    void computeCircle( const KadasItemPos &center, double radius, QgsMultiSurface *multiGeom );
-    void computeGeoCircle( const KadasItemPos &center, double radius, QgsMultiSurface *multiGeom );
+    void computeCircle( const KadasItemPos &center, const KadasItemPos &ringpos, QgsMultiSurface *multiGeom );
+    void computeGeoCircle( const KadasItemPos &center, const KadasItemPos &ringpos, QgsMultiSurface *multiGeom );
 };
 
 #endif // KADASCIRCLEITEM_H
