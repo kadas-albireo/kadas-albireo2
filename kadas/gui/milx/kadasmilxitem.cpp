@@ -305,6 +305,7 @@ void KadasMilxItem::setState( const KadasMapItem::State *state )
 {
   mCachedGraphic = QImage();
   KadasMapItem::setState( state );
+  mIsPointSymbol = !isMultiPoint();
 }
 
 QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
