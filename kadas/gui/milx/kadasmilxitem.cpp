@@ -310,11 +310,20 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
     return "";
   }
 
-  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs() );
+  // Render symbols to a world-wide extent to ensure they are not cut off
+  QgsRectangle worldExtent( -180., -90., 180., 90. );
+  QgsRenderContext exportContext = context;
+  exportContext.setExtent( worldExtent );
+  exportContext.setMapExtent( worldExtent );
+  double factor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceDegrees, QgsUnitTypes::DistanceMeters ) * context.scaleFactor() * 1000 / context.rendererScale();
+  exportContext.setMapToPixel( QgsMapToPixel( 1.0 / factor, worldExtent.center().x(), worldExtent.center().y(),
+                               worldExtent.width() * factor, worldExtent.height() * factor, 0 ) );
+
+  KadasMilxClient::NPointSymbol symbol = toSymbol( exportContext.mapToPixel(), exportContext.coordinateTransform().destinationCrs() );
   KadasMilxClient::NPointSymbolGraphic result;
 
-  int dpi = context.painter()->device()->logicalDpiX();
-  QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
+  int dpi = exportContext.painter()->device()->logicalDpiX();
+  QRect screenExtent = computeScreenExtent( exportContext.mapExtent(), exportContext.mapToPixel() );
   if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true ) )
   {
     return "";
@@ -377,8 +386,8 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   {
     QPoint offset = result.adjustedPoints.front() + result.offset;
 
-    QgsPointXY pNW = context.mapToPixel().toMapCoordinates( offset.x(), offset.y() );
-    QgsPointXY pSE = context.mapToPixel().toMapCoordinates( offset.x() + result.graphic.width(), offset.y() + result.graphic.height() );
+    QgsPointXY pNW = exportContext.mapToPixel().toMapCoordinates( offset.x(), offset.y() );
+    QgsPointXY pSE = exportContext.mapToPixel().toMapCoordinates( offset.x() + result.graphic.width(), offset.y() + result.graphic.height() );
 
     outStream << "<GroundOverlay>" << "\n";
     outStream << "<name>" << militaryName() << "</name>" << "\n";
