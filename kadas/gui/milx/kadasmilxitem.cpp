@@ -156,7 +156,7 @@ void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
 
 QPointF KadasMilxItem::symbolAnchor() const
 {
-  return QPointF( double( mCachedGraphicOffset.x() ) / mCachedGraphic.width(), double( mCachedGraphicOffset.y() ) / mCachedGraphic.height() );
+  return QPointF( double( -mCachedGraphicOffset.x() ) / mCachedGraphic.width(), double( -mCachedGraphicOffset.y() ) / mCachedGraphic.height() );
 }
 
 KadasItemPos KadasMilxItem::position() const
