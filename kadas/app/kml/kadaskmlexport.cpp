@@ -82,24 +82,21 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
   for ( QgsMapLayer *ml : layers )
   {
-    QgsRectangle layerExtent = ml->extent();
+    QgsRectangle layerExtent = QgsCoordinateTransform( ml->crs(), crsWgs84, QgsProject::instance() ).transformBoundingBox( ml->extent() );
     if ( !exportMapRect.isEmpty() )
     {
-      QgsCoordinateTransform crst( mapCrs, ml->crs(), QgsProject::instance() );
-      layerExtent = layerExtent.intersect( crst.transformBoundingBox( exportMapRect ) );
+      layerExtent = layerExtent.intersect( exportMapRect );
     }
-    layerExtent = QgsCoordinateTransform( ml->crs(), crsWgs84, QgsProject::instance() ).transformBoundingBox( layerExtent );
     if ( fullExtent.isEmpty() )
       fullExtent = layerExtent;
     else
       fullExtent.combineExtentWith( layerExtent );
   }
+  int dpi = 96;
+  double factor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceDegrees, QgsUnitTypes::DistanceMeters ) * dpi / 25.4 * 1000 / exportScale;
   QgsMapSettings settings;
   settings.setDestinationCrs( crsWgs84 );
   settings.setExtent( fullExtent );
-  settings.setOutputDpi( 96 );
-  int dpi = 96;
-  double factor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceDegrees, QgsUnitTypes::DistanceMeters ) * dpi / 25.4 * 1000 / exportScale;
   settings.setOutputSize( QSize( fullExtent.width() * factor, fullExtent.height() * factor ) );
   settings.setOutputDpi( dpi );
 
@@ -116,7 +113,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setRendererScale( exportScale );
   rc.setExtent( fullExtent );
   rc.setMapExtent( fullExtent );
-  rc.setScaleFactor( 96.0 / 25.4 );
+  rc.setScaleFactor( dpi / 25.4 );
   rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
                                    fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
   rc.setCustomRenderFlags( QStringList() << "kml" );
