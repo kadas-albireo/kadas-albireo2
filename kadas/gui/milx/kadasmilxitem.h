@@ -41,6 +41,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     void setMinNPoints( int minNPoints );
     bool hasVariablePoints() const { return mHasVariablePoints; }
     void setHasVariablePoints( bool hasVariablePoints );
+    void updateCache( const KadasMilxClient::NPointSymbolGraphic &graphic, const QgsRectangle &extent ) const;
 
     QString itemName() const override { return mMilitaryName; }
 

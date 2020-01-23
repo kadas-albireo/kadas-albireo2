@@ -154,6 +154,13 @@ void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
   update();
 }
 
+void KadasMilxItem::updateCache( const KadasMilxClient::NPointSymbolGraphic &graphic, const QgsRectangle &extent ) const
+{
+  mCachedGraphic = graphic.graphic;
+  mCachedGraphicOffset = graphic.offset;
+  mCachedExtent = extent;
+}
+
 QPointF KadasMilxItem::symbolAnchor() const
 {
   return QPointF( double( -mCachedGraphicOffset.x() ) / mCachedGraphic.width(), double( -mCachedGraphicOffset.y() ) / mCachedGraphic.height() );
@@ -283,9 +290,7 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
     {
       return;
     }
-    mCachedGraphic = result.graphic;
-    mCachedGraphicOffset = result.offset;
-    mCachedExtent = context.mapExtent();
+    updateCache( result, context.mapExtent() );
   }
   QPoint renderPos = symbol.points.front() + mCachedGraphicOffset;
   if ( !isMultiPoint() )
