@@ -117,15 +117,16 @@ void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItem
 
   osgEarth::GeoPoint geop( osgEarth::SpatialReference::get( "wgs84" ), pos.x(), pos.y(), 0, osgEarth::ALTMODE_RELATIVE );
   QImage image = item->symbolImage();
-  if ( item->symbolAnchor().x() != 0.5 )
+  int offset = item->symbolAnchor().x() * image.width() - image.width() / 2;
+  if ( offset != 0 )
   {
-    int offset = item->symbolAnchor().x() * image.width() + image.width() / 2;
     QImage newimage( image.width() + 2 * qAbs( offset ), image.height(), image.format() );
     newimage.fill( Qt::transparent );
     QPainter p( &newimage );
-    p.drawImage( offset < 0 ? 0 : 2 * offset, 0, image );
+    p.drawImage( offset > 0 ? 0 : 2 * offset, 0, image );
     image = newimage;
   }
+
   unsigned char *imgbuf = new unsigned char[image.bytesPerLine() * image.height()];
   std::memcpy( imgbuf, image.bits(), image.bytesPerLine() * image.height() );
   osg::Image *osgImage = new osg::Image;
