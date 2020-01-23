@@ -347,8 +347,8 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
 
   if ( !isMultiPoint() )
   {
-    double hotSpotX = result.offset.x();
-    double hotSpotY = result.offset.y();
+    double hotSpotX = -result.offset.x();
+    double hotSpotY = -result.offset.y();
 
     QString id = QUuid::createUuid().toString();
     id = id.mid( 1, id.length() - 2 );
