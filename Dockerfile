@@ -51,6 +51,7 @@ dnf install -y \
   mingw64-qt5-qtserialport \
   mingw64-qt5-qtsvg \
   mingw64-qt5-qttools \
+  mingw64-qt5-qttools-tools \
   mingw64-qt5-qttranslations \
   mingw64-qt5-qtwebkit \
   mingw64-qt5-qtxmlpatterns \
