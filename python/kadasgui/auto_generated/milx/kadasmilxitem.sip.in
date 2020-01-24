@@ -31,8 +31,8 @@ class KadasMilxItem : KadasMapItem
     virtual QString itemName() const;
 
     virtual QImage symbolImage() const;
-    virtual QPointF symbolAnchor() const;
 
+    virtual QPointF symbolAnchor() const;
 
     virtual KadasItemRect boundingBox() const;
 

@@ -154,18 +154,6 @@ void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
   update();
 }
 
-void KadasMilxItem::updateCache( const KadasMilxClient::NPointSymbolGraphic &graphic, const QgsRectangle &extent ) const
-{
-  mCachedGraphic = graphic.graphic;
-  mCachedGraphicOffset = graphic.offset;
-  mCachedExtent = extent;
-}
-
-QPointF KadasMilxItem::symbolAnchor() const
-{
-  return QPointF( double( -mCachedGraphicOffset.x() ) / mCachedGraphic.width(), double( -mCachedGraphicOffset.y() ) / mCachedGraphic.height() );
-}
-
 KadasItemPos KadasMilxItem::position() const
 {
   double x = 0., y = 0.;
@@ -280,30 +268,25 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
   KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs() );
-  if ( mCachedGraphic.isNull() || context.mapExtent() != mCachedExtent )
-  {
-    KadasMilxClient::NPointSymbolGraphic result;
+  KadasMilxClient::NPointSymbolGraphic result;
 
-    int dpi = context.painter()->device()->logicalDpiX();
-    QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
-    if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
-    {
-      return;
-    }
-    updateCache( result, context.mapExtent() );
+  int dpi = context.painter()->device()->logicalDpiX();
+  QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
+  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+  {
+    return;
   }
-  QPoint renderPos = symbol.points.front() + mCachedGraphicOffset;
+  QPoint renderPos = symbol.points.front() + result.offset;
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
     context.painter()->drawLine( symbol.points.front(), symbol.points.front() - constState()->userOffset );
   }
-  context.painter()->drawImage( renderPos, mCachedGraphic );
+  context.painter()->drawImage( renderPos, result.graphic );
 }
 
 void KadasMilxItem::setState( const KadasMapItem::State *state )
 {
-  mCachedGraphic = QImage();
   KadasMapItem::setState( state );
   mIsPointSymbol = !isMultiPoint();
 }
@@ -1038,8 +1021,25 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   mMargin.right = qMax( 0, symbolBounds.right() - pointBounds.right() );
   mMargin.bottom = qMax( 0, symbolBounds.bottom() - pointBounds.bottom() );
 
-  // Invalidate cache
-  mCachedGraphic = QImage();
+  // Clear cache
+  mSymbolGraphic = QImage();
 
   update();
+}
+
+QImage KadasMilxItem::symbolImage() const
+{
+  if ( isPointSymbol() && mSymbolGraphic.isNull() )
+  {
+    // Update symbol
+    KadasMilxClient::NPointSymbol symbol( mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
+    QRect screenExtent( 0, 0, 100, 100 );
+    KadasMilxClient::NPointSymbolGraphic result;
+    if ( KadasMilxClient::updateSymbol( screenExtent, 96, symbol, result, false ) )
+    {
+      mSymbolGraphic = result.graphic;
+      mSymbolAnchor = QPointF( double( -result.offset.x() ) / mSymbolGraphic.width(), double( -result.offset.y() ) / mSymbolGraphic.height() );
+    }
+  }
+  return mSymbolGraphic;
 }

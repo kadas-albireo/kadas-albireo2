@@ -45,8 +45,8 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     QString itemName() const override { return mMilitaryName; }
 
-    QImage symbolImage() const override { return mCachedGraphic; }
-    QPointF symbolAnchor() const override;
+    QImage symbolImage() const override;
+    QPointF symbolAnchor() const override { return mSymbolAnchor; }
 
     KadasItemRect boundingBox() const override;
     Margin margin() const override;
@@ -145,9 +145,8 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     bool mHasVariablePoints = false;
 
     // Symbol cache
-    mutable QImage mCachedGraphic;
-    mutable QPoint mCachedGraphicOffset;
-    mutable QgsRectangle mCachedExtent;
+    mutable QImage mSymbolGraphic;
+    mutable QPointF mSymbolAnchor;
 
     Margin mMargin;
 

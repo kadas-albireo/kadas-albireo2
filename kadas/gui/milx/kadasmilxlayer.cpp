@@ -76,7 +76,6 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
           mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
-        renderItems[i]->updateCache( result[i], mRendererContext.mapExtent() );
       }
       mRendererContext.painter()->restore();
       return true;
