@@ -123,7 +123,7 @@ void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItem
     QImage newimage( image.width() + 2 * qAbs( offset ), image.height(), image.format() );
     newimage.fill( Qt::transparent );
     QPainter p( &newimage );
-    p.drawImage( offset > 0 ? 0 : 2 * offset, 0, image );
+    p.drawImage( offset > 0 ? 0 : 2 * -offset, 0, image );
     image = newimage;
   }
 
