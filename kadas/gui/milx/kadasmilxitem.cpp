@@ -142,18 +142,6 @@ void KadasMilxItem::setMilitaryName( const QString &militaryName )
   update();
 }
 
-void KadasMilxItem::setMinNPoints( int minNPoints )
-{
-  mMinNPoints = minNPoints;
-  update();
-}
-
-void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
-{
-  mHasVariablePoints = hasVariablePoints;
-  update();
-}
-
 KadasItemPos KadasMilxItem::position() const
 {
   double x = 0., y = 0.;

@@ -26,8 +26,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     Q_OBJECT
     Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
     Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
-    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
-    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
 
   public:
     KadasMilxItem();
@@ -37,11 +35,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     void setMssString( const QString &mssString );
     const QString &militaryName() const { return mMilitaryName; }
     void setMilitaryName( const QString &militaryName );
-    int minNPoints() const { return mMinNPoints; }
-    void setMinNPoints( int minNPoints );
-    bool hasVariablePoints() const { return mHasVariablePoints; }
-    void setHasVariablePoints( bool hasVariablePoints );
-    void updateCache( const KadasMilxClient::NPointSymbolGraphic &graphic, const QgsRectangle &extent ) const;
 
     QString itemName() const override { return mMilitaryName; }
 
@@ -141,6 +134,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     QString mMssString;
     QString mMilitaryName;
+    // These are only used when first drawing
     int mMinNPoints = -1;
     bool mHasVariablePoints = false;
 

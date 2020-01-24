@@ -23,10 +23,6 @@ class KadasMilxItem : KadasMapItem
     void setMssString( const QString &mssString );
     const QString &militaryName() const;
     void setMilitaryName( const QString &militaryName );
-    int minNPoints() const;
-    void setMinNPoints( int minNPoints );
-    bool hasVariablePoints() const;
-    void setHasVariablePoints( bool hasVariablePoints );
 
     virtual QString itemName() const;
 
