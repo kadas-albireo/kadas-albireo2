@@ -32,12 +32,20 @@ class KadasGlobeBillboardManager : public QObject
     void reset();
     void updateLayers( const QStringList &layerIds );
 
+  private slots:
+    void addCanvasBillboard( const KadasMapItem *item );
+    void removeCanvasBillboard( const KadasMapItem *item );
+    void updateCanvasBillboard();
+
   private:
-    void addBillboard( const QString &layerId, KadasItemLayer::ItemId itemId );
-    void removeBillboard( const QString &layerId, KadasItemLayer::ItemId itemId );
+    void addLayerBillboard( const QString &layerId, KadasItemLayer::ItemId itemId );
+    void removeLayerBillboard( const QString &layerId, KadasItemLayer::ItemId itemId );
+
+    osg::ref_ptr<osgEarth::Annotation::PlaceNode> createBillboard( const KadasMapItem *item );
 
     typedef QMap<QString, QMap<KadasItemLayer::ItemId, osg::ref_ptr<osgEarth::Annotation::PlaceNode>>> BillboardRegistry;
     BillboardRegistry mRegistry;
+    QMap<const KadasMapItem *, osg::ref_ptr<osgEarth::Annotation::PlaceNode>> mCanvasItemsRegistry;
     osg::ref_ptr<osgEarth::MapNode> mMapNode;
     osg::ref_ptr<osg::Group> mGroup;
     QObject *mSignalScope = nullptr;

@@ -18,6 +18,7 @@
 
 #include <qgis/qgsproject.h>
 
+#include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/app/globe/kadasglobebillboardmanager.h>
 
@@ -32,10 +33,19 @@ void KadasGlobeBillboardManager::init( osg::ref_ptr<osgEarth::MapNode> mapNode, 
   mGroup = new osg::Group;
   mMapNode->addChild( mGroup );
   updateLayers( visibleLayerIds );
+  for ( KadasMapItem *item : KadasMapCanvasItemManager::items() )
+  {
+    addCanvasBillboard( item );
+  }
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasGlobeBillboardManager::addCanvasBillboard );
+  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasGlobeBillboardManager::removeCanvasBillboard );
 }
 
 void KadasGlobeBillboardManager::reset()
 {
+  disconnect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasGlobeBillboardManager::addCanvasBillboard );
+  disconnect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasGlobeBillboardManager::removeCanvasBillboard );
+
   delete mSignalScope;
   mSignalScope = nullptr;
   if ( mGroup )
@@ -78,7 +88,7 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
     }
     for ( KadasItemLayer::ItemId itemId : layer->items().keys() )
     {
-      addBillboard( layer->id(), itemId );
+      addLayerBillboard( layer->id(), itemId );
     }
   }
 
@@ -90,12 +100,12 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
     {
       continue;
     }
-    connect( layer, &KadasItemLayer::itemAdded, mSignalScope, [layerId, this]( KadasItemLayer::ItemId id ) { addBillboard( layerId, id ); } );
-    connect( layer, &KadasItemLayer::itemRemoved, mSignalScope, [layerId, this]( KadasItemLayer::ItemId id ) { removeBillboard( layerId, id ); } );
+    connect( layer, &KadasItemLayer::itemAdded, mSignalScope, [layerId, this]( KadasItemLayer::ItemId id ) { addLayerBillboard( layerId, id ); } );
+    connect( layer, &KadasItemLayer::itemRemoved, mSignalScope, [layerId, this]( KadasItemLayer::ItemId id ) { removeLayerBillboard( layerId, id ); } );
   }
 }
 
-void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItemLayer::ItemId itemId )
+void KadasGlobeBillboardManager::addLayerBillboard( const QString &layerId, KadasItemLayer::ItemId itemId )
 {
   KadasItemLayer *layer = qobject_cast<KadasItemLayer *>( QgsProject::instance()->mapLayer( layerId ) );
   if ( !layer )
@@ -110,6 +120,65 @@ void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItem
     return;
   }
 
+  osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = createBillboard( item );
+
+  mRegistry[layerId][itemId] = placeNode;
+  mGroup->addChild( placeNode );
+}
+
+void KadasGlobeBillboardManager::removeLayerBillboard( const QString &layerId, KadasItemLayer::ItemId itemId )
+{
+  if ( mRegistry.contains( layerId ) && mRegistry[layerId].contains( itemId ) )
+  {
+    mGroup->removeChild( mRegistry[layerId][itemId] );
+    mRegistry[layerId].remove( itemId );
+    if ( mRegistry[layerId].isEmpty() )
+    {
+      mRegistry.remove( layerId );
+    }
+  }
+}
+
+void KadasGlobeBillboardManager::addCanvasBillboard( const KadasMapItem *item )
+{
+  if ( item && item->isPointSymbol() )
+  {
+    osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = createBillboard( item );
+    connect( item, &KadasMapItem::changed, this, &KadasGlobeBillboardManager::updateCanvasBillboard );
+    mCanvasItemsRegistry.insert( item, placeNode );
+    mGroup->addChild( placeNode );
+  }
+}
+
+void KadasGlobeBillboardManager::removeCanvasBillboard( const KadasMapItem *item )
+{
+  if ( mCanvasItemsRegistry.contains( item ) )
+  {
+    mGroup->removeChild( mCanvasItemsRegistry[item] );
+    mCanvasItemsRegistry.remove( item );
+  }
+}
+
+void KadasGlobeBillboardManager::updateCanvasBillboard()
+{
+  KadasMapItem *item = qobject_cast<KadasMapItem *>( QObject::sender() );
+  if ( !item && !mCanvasItemsRegistry.contains( item ) )
+  {
+    return;
+  }
+  osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = mCanvasItemsRegistry[item];
+
+  QgsCoordinateReferenceSystem crs84( "EPSG:4326" );
+
+  QgsCoordinateTransform crst( item->crs(), crs84, QgsProject::instance() );
+  QgsPointXY pos = crst.transform( item->position() );
+
+  osgEarth::GeoPoint geop( osgEarth::SpatialReference::get( "wgs84" ), pos.x(), pos.y(), 0, osgEarth::ALTMODE_RELATIVE );
+  placeNode->setPosition( geop );
+}
+
+osg::ref_ptr<osgEarth::Annotation::PlaceNode> KadasGlobeBillboardManager::createBillboard( const KadasMapItem *item )
+{
   QgsCoordinateReferenceSystem crs84( "EPSG:4326" );
 
   QgsCoordinateTransform crst( item->crs(), crs84, QgsProject::instance() );
@@ -143,19 +212,5 @@ void KadasGlobeBillboardManager::addBillboard( const QString &layerId, KadasItem
 #endif
   placeNode->setOcclusionCulling( true );
 
-  mRegistry[layerId][itemId] = placeNode;
-  mGroup->addChild( placeNode );
-}
-
-void KadasGlobeBillboardManager::removeBillboard( const QString &layerId, KadasItemLayer::ItemId itemId )
-{
-  if ( mRegistry.contains( layerId ) && mRegistry[layerId].contains( itemId ) )
-  {
-    mGroup->removeChild( mRegistry[layerId][itemId] );
-    mRegistry[layerId].remove( itemId );
-    if ( mRegistry[layerId].isEmpty() )
-    {
-      mRegistry.remove( layerId );
-    }
-  }
+  return placeNode;
 }
