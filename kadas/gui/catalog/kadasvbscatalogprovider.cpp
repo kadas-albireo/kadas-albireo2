@@ -40,7 +40,6 @@ void KadasVBSCatalogProvider::load()
 {
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
-//  QgsArcGisRestUtils::addToken( url ); // TODO
   QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
@@ -184,8 +183,6 @@ void KadasVBSCatalogProvider::readAMSCapabilities( const QString &amsUrl, const 
   mPendingTasks += 1;
   QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
   QUrl url( amsUrl + "?f=json" );
-
-//  QgsArcGisRestUtils::addToken( url ); // TODO
 
   QNetworkRequest req( url );
   QNetworkReply *reply = nam->get( req );

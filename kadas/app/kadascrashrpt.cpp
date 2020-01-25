@@ -32,9 +32,6 @@
 // Define the callback function that will be called on crash
 int CALLBACK CrashCallback( CR_CRASH_CALLBACK_INFO *pInfo )
 {
-  // TODO: Attempt to save the project
-  // QgsProject::instance()->
-
   // Return CR_CB_DODEFAULT to generate error report
   return CR_CB_DODEFAULT;
 }

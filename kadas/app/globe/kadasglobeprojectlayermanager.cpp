@@ -112,9 +112,6 @@ void KadasGlobeProjectLayerManager::updateLayers( const QStringList &visibleLaye
 
   // Set new layers for draped layer
   mTileSource->setLayers( newDrapedLayerIds );
-
-  // TODO?
-  // mOsgViewer->requestRedraw();
 }
 
 void KadasGlobeProjectLayerManager::updateLayer( const QString &layerId )
@@ -164,9 +161,6 @@ void KadasGlobeProjectLayerManager::updateLayer( const QString &layerId )
       mTileSource->refresh( extent );
     }
   }
-
-  // TODO?
-  // mOsgViewer->requestRedraw();
 }
 
 
