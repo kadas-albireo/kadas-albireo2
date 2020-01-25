@@ -122,18 +122,16 @@ void KadasMainWindow::init()
   mLanguageCombo->addItem( "Deutsch", "de" );
   mLanguageCombo->addItem( QString( "Fran%1ais" ).arg( QChar( 0x00E7 ) ), "fr" );
   mLanguageCombo->addItem( "Italiano", "it" );
-  QString userLocale = QgsSettings().value( "/locale/userLocale", "en" ).toString();
-  if ( userLocale.isEmpty() )
+  bool customLocale = QgsSettings().value( "/locale/overrideFlag", false ).toBool();
+  if ( !customLocale )
   {
     mLanguageCombo->setCurrentIndex( 0 );
   }
   else
   {
+    QString userLocale = QgsSettings().value( "/locale/userLocale", "" ).toString();
     int idx = mLanguageCombo->findData( userLocale.left( 2 ).toLower() );
-    if ( idx >= 0 )
-    {
-      mLanguageCombo->setCurrentIndex( idx );
-    }
+    mLanguageCombo->setCurrentIndex( qMax( 0, idx ) );
   }
   connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
@@ -970,7 +968,7 @@ void KadasMainWindow::onLanguageChanged( int idx )
   if ( locale.isEmpty() )
   {
     QgsSettings().setValue( "/locale/overrideFlag", false );
-    QgsSettings().setValue( "/locale/userLocale", "" );
+    QgsSettings().setValue( "/locale/userLocale", QLocale::system().name() );
   }
   else
   {

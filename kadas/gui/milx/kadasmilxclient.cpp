@@ -175,7 +175,7 @@ bool KadasMilxClientWorker::initialize()
 
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
   istream << MILX_REQUEST_INIT;
   istream << lang;
   istream << MILX_INTERFACE_VERSION;

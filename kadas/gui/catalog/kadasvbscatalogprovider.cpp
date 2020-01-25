@@ -40,7 +40,7 @@ void KadasVBSCatalogProvider::load()
 {
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
-  QString lang = QgsSettings().value( "/locale/currentLang", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );

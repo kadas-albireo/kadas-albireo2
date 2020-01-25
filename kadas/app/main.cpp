@@ -45,6 +45,10 @@ int main( int argc, char *argv[] )
   {
     locale = settings.value( "/locale/userLocale", locale ).toString();
   }
+  else
+  {
+    settings.setValue( "/locale/userLocale", locale );
+  }
   KadasApplication::setTranslation( locale );
 
   KadasApplication app( argc, argv );
