@@ -403,6 +403,10 @@ void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geo
 
 void KadasMapToolCreateItem::commitItem()
 {
+  if ( !mItem )
+  {
+    return;
+  }
   mItem->setSelected( false );
   if ( mLayer && mItem->constState()->drawStatus == KadasMapItem::State::Finished )
   {
