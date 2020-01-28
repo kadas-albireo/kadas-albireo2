@@ -290,7 +290,7 @@ KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) con
 KadasMapItem *KadasMapToolCreateItem::takeItem()
 {
   KadasMapItem *item = mItem;
-  KadasMapCanvasItemManager::removeItemAfterRefresh( item, mCanvas );
+  KadasMapCanvasItemManager::removeItem( item );
   mItem = nullptr;
   clear();
   return item;
