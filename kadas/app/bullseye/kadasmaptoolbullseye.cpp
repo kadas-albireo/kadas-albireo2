@@ -29,7 +29,7 @@
 KadasMapToolBullseye::KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : QgsMapTool( canvas )
 {
-  if ( !layer )
+  if ( !dynamic_cast<KadasBullseyeLayer *>( layer ) )
   {
     for ( QgsMapLayer *projLayer : QgsProject::instance()->mapLayers() )
     {
