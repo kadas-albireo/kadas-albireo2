@@ -369,7 +369,24 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  return QList<IdentifyResult>() << IdentifyResult( tr( "Cell %1, %2" ).arg( gridLabel( mRowChar, j ) ).arg( gridLabel( mColChar, i ) ), attrs, QgsGeometry( bbox ) );
+  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mRowChar, j ) ).arg( gridLabel( mColChar, i ) );
+  if ( mLabelQuadrants )
+  {
+    bool left = pos.x() <= mGridRect.xMinimum() + ( i + 0.5 ) * colWidth;
+    bool top = pos.y() >= mGridRect.yMaximum() - ( j + 0.5 ) * rowHeight;
+    QString quadrantLabel;
+    if ( left )
+    {
+      quadrantLabel = top ? "A" : "D";
+    }
+    else
+    {
+      quadrantLabel = top ? "B" : "C";
+    }
+    text += tr( " (Quadrant %1)" ).arg( quadrantLabel );
+  }
+
+  return QList<IdentifyResult>() << IdentifyResult( text, attrs, QgsGeometry( bbox ) );
 }
 
 bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*document*/, const QgsReadWriteContext &context ) const
