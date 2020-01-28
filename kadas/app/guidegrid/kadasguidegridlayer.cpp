@@ -69,15 +69,21 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1. ) );
+      mRendererContext.painter()->setBrush( mLayer->mColor );
 
       const QStringList &flags = mRendererContext.customRenderFlags();
       bool adaptLabelsToScreen = !( flags.contains( "globe" ) || flags.contains( "kml" ) );
 
+      QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+
       QFont smallFont;
       smallFont.setPixelSize( 0.5 * mLayer->mFontSize );
+      QFontMetrics smallFontMetrics( smallFont );
+
       QFont font;
       font.setPixelSize( mLayer->mFontSize );
-      mRendererContext.painter()->setFont( font );
+      QFontMetrics fontMetrics( font );
+
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
       const QgsRectangle &gridRect = mLayer->mGridRect;
@@ -112,26 +118,25 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         QString label = gridLabel( mLayer->mColChar, col - 1 );
         if ( mLayer->mLabelingPos == LabelsOutside )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1, sy1 - labelBoxSize, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
         }
         else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1, sy1, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
         }
         if ( mLayer->mLabelingPos == LabelsOutside )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1, sy2, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
         }
         else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1, sy2 - labelBoxSize, sx2 - sx1, labelBoxSize ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
         }
 
         if ( mLayer->mLabelQuadrants )
         {
           mRendererContext.painter()->save();
           mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
-          mRendererContext.painter()->setFont( smallFont );
           QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
           int alignCenter = Qt::AlignHCenter | Qt::AlignVCenter;
           QPolygonF vLineMid;
@@ -140,11 +145,10 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
             vLineMid.append( 0.5 * ( vLine1.at( i ) + vLine2.at( i ) ) );
             if ( i < n - 1 )
             {
-              mRendererContext.painter()->drawText( QRectF( vLine1.at( i ), smallLabelBox ), alignCenter, "A" );
-              mRendererContext.painter()->drawText( QRectF( QPointF( vLine2.at( i ).x() - smallLabelBoxSize, vLine2.at( i ).y() ), smallLabelBox ), alignCenter, "B" );
-
-              mRendererContext.painter()->drawText( QRectF( QPointF( vLine1.at( i + 1 ).x(), vLine1.at( i + 1 ).y() - smallLabelBoxSize ), smallLabelBox ), alignCenter, "D" );
-              mRendererContext.painter()->drawText( QRectF( QPointF( vLine2.at( i + 1 ).x() - smallLabelBoxSize, vLine2.at( i + 1 ).y() - smallLabelBoxSize ), smallLabelBox ), alignCenter, "C" );
+              drawGridLabel( vLine1.at( i ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i ).y() + 0.5 * smallLabelBoxSize, "A", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine2.at( i ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i ).y() + 0.5 * smallLabelBoxSize, "B", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine1.at( i + 1 ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "D", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine2.at( i + 1 ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "C", smallFont, smallFontMetrics, bufferColor );
             }
           }
           QPainterPath path;
@@ -178,19 +182,19 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         QString label = gridLabel( mLayer->mRowChar, row - 1 );
         if ( mLayer->mLabelingPos == LabelsOutside )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1 - labelBoxSize, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
         }
         else if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
         {
-          mRendererContext.painter()->drawText( QRectF( sx1, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
         }
         if ( mLayer->mLabelingPos == LabelsOutside )
         {
-          mRendererContext.painter()->drawText( QRectF( sx2, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
         }
         else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
         {
-          mRendererContext.painter()->drawText( QRectF( sx2 - labelBoxSize, sy1, labelBoxSize, sy2 - sy1 ), Qt::AlignHCenter | Qt::AlignVCenter, label );
+          drawGridLabel( sx2 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
         }
 
         if ( mLayer->mLabelQuadrants )
@@ -212,6 +216,19 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       mRendererContext.painter()->restore();
       return true;
+    }
+    void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
+    {
+      QPainterPath path;
+      x -= 0.5 * metrics.horizontalAdvance( text );
+      y += 0.5 * metrics.ascent();
+      path.addText( x, y, font, text );
+      mRendererContext.painter()->save();
+      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
+      mRendererContext.painter()->drawPath( path );
+      mRendererContext.painter()->setPen( Qt::NoPen );
+      mRendererContext.painter()->drawPath( path );
+      mRendererContext.painter()->restore();
     }
 
   private:
