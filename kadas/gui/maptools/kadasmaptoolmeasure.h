@@ -41,6 +41,8 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     void syncItemToWidget() override {}
     void syncWidgetToItem() override;
 
+    void setItem( KadasMapItem *item ) override;
+
   signals:
     void clearRequested();
     void pickRequested();

@@ -113,6 +113,15 @@ void KadasMeasureWidget::syncWidgetToItem()
   }
 }
 
+void KadasMeasureWidget::setItem( KadasMapItem *item )
+{
+  KadasMapItemEditor::setItem( item );
+  if ( !mMeasureAzimuth )
+  {
+    connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
+  }
+}
+
 void KadasMeasureWidget::setDistanceUnit( int index )
 {
   QgsUnitTypes::DistanceUnit unit = static_cast<QgsUnitTypes::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
