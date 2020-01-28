@@ -112,8 +112,8 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
     mPosLocked = true;
   }
 
-  mOffsetX = offsetX;
-  mOffsetY = offsetY;
+  state()->offsetX = offsetX;
+  state()->offsetY = offsetY;
 
   reader.setBackgroundColor( Qt::white );
   reader.setScaledSize( state()->size );
@@ -124,19 +124,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
 
 void KadasPictureItem::setFilePath( const QString &filePath )
 {
-  setup( filePath, constState()->pos, true, mOffsetX, mOffsetY );
-  update();
-}
-
-void KadasPictureItem::setOffsetX( double offsetX )
-{
-  mOffsetX = offsetX;
-  update();
-}
-
-void KadasPictureItem::setOffsetY( double offsetY )
-{
-  mOffsetY = offsetY;
+  setup( filePath, constState()->pos, true, state()->offsetX, state()->offsetY );
   update();
 }
 
@@ -145,8 +133,8 @@ void KadasPictureItem::setFrameVisible( bool frame )
   mFrame = frame;
   if ( !frame )
   {
-    mOffsetX = 0;
-    mOffsetY = 0;
+    state()->offsetX = 0;
+    state()->offsetY = 0;
   }
   update();
 }
@@ -164,6 +152,19 @@ void KadasPictureItem::setPosition( const KadasItemPos &pos )
   update();
 }
 
+void KadasPictureItem::setState( const KadasMapItem::State *state )
+{
+  const KadasPictureItem::State *pictureState = dynamic_cast<const KadasPictureItem::State *>( state );
+  if ( pictureState && pictureState->size != constState()->size )
+  {
+    QImageReader reader( mFilePath );
+    reader.setBackgroundColor( Qt::white );
+    reader.setScaledSize( pictureState->size );
+    mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+  }
+  KadasMapItem::setState( state );
+}
+
 KadasItemRect KadasPictureItem::boundingBox() const
 {
   return KadasItemRect( constState()->pos, constState()->pos );
@@ -174,10 +175,10 @@ KadasMapItem::Margin KadasPictureItem::margin() const
   double framePadding = mFrame ? sFramePadding : 0;
   return Margin
   {
-    qCeil( qMax( 0., 0.5 * constState()->size.width() - mOffsetX + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() + mOffsetY + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.width() + mOffsetX + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() - mOffsetY + framePadding ) )
+    qCeil( qMax( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) ),
+    qCeil( qMax( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) ),
+    qCeil( qMax( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) ),
+    qCeil( qMax( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) )
   };
 }
 
@@ -188,10 +189,10 @@ QList<KadasMapPos> KadasPictureItem::cornerPoints( const QgsMapSettings &setting
   double halfH = 0.5 * constState()->size.height();
   double mup = settings.mapUnitsPerPixel();
 
-  KadasMapPos p1( mapPos.x() + ( mOffsetX - halfW ) * mup, mapPos.y() + ( mOffsetY - halfH ) * mup );
-  KadasMapPos p2( mapPos.x() + ( mOffsetX + halfW ) * mup, mapPos.y() + ( mOffsetY - halfH ) * mup );
-  KadasMapPos p3( mapPos.x() + ( mOffsetX + halfW ) * mup, mapPos.y() + ( mOffsetY + halfH ) * mup );
-  KadasMapPos p4( mapPos.x() + ( mOffsetX - halfW ) * mup, mapPos.y() + ( mOffsetY + halfH ) * mup );
+  KadasMapPos p1( mapPos.x() + ( constState()->offsetX - halfW ) * mup, mapPos.y() + ( constState()->offsetY - halfH ) * mup );
+  KadasMapPos p2( mapPos.x() + ( constState()->offsetX + halfW ) * mup, mapPos.y() + ( constState()->offsetY - halfH ) * mup );
+  KadasMapPos p3( mapPos.x() + ( constState()->offsetX + halfW ) * mup, mapPos.y() + ( constState()->offsetY + halfH ) * mup );
+  KadasMapPos p4( mapPos.x() + ( constState()->offsetX - halfW ) * mup, mapPos.y() + ( constState()->offsetY + halfH ) * mup );
 
   return QList<KadasMapPos>() << p1 << p2 << p3 << p4;
 }
@@ -244,6 +245,8 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
 
   double w = constState()->size.width();
   double h = constState()->size.height();
+  double offsetX = constState()->offsetX;
+  double offsetY = constState()->offsetY;
 
   // Draw frame
   if ( mFrame )
@@ -253,29 +256,29 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
     context.painter()->setPen( QPen( Qt::black, 1 ) );
     context.painter()->setBrush( Qt::white );
     QPolygonF poly;
-    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
-    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
-    poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY - 0.5 * frameh ) );
-    poly.append( QPointF( mOffsetX + 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
-    poly.append( QPointF( mOffsetX - 0.5 * framew, -mOffsetY + 0.5 * frameh ) );
+    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY + 0.5 * frameh ) );
+    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY - 0.5 * frameh ) );
+    poly.append( QPointF( offsetX + 0.5 * framew, -offsetY - 0.5 * frameh ) );
+    poly.append( QPointF( offsetX + 0.5 * framew, -offsetY + 0.5 * frameh ) );
+    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY + 0.5 * frameh ) );
     // Draw frame triangle
-    if ( qAbs( mOffsetX ) > qAbs( 0.5 * framew ) || qAbs( mOffsetY ) > qAbs( 0.5 * frameh ) )
+    if ( qAbs( offsetX ) > qAbs( 0.5 * framew ) || qAbs( offsetY ) > qAbs( 0.5 * frameh ) )
     {
       QgsPointXY framePos;
       QgsVector baseDir;
       // Determine triangle quadrant
-      int quadrant = qRound( qAtan2( -mOffsetY, mOffsetX ) / M_PI * 180 / 90 );
+      int quadrant = qRound( qAtan2( -offsetY, offsetX ) / M_PI * 180 / 90 );
       if ( quadrant < 0 ) { quadrant += 4; }
       if ( quadrant == 0 || quadrant == 2 )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
       {
         baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
-        framePos.setX( quadrant == 0 ? mOffsetX - 0.5 * framew : mOffsetX + 0.5 * framew );
-        framePos.setY( qMin( qMax( -mOffsetY - 0.5 * frameh + sArrowWidth, 0. ), -mOffsetY + 0.5 * frameh - sArrowWidth ) );
+        framePos.setX( quadrant == 0 ? offsetX - 0.5 * framew : offsetX + 0.5 * framew );
+        framePos.setY( qMin( qMax( -offsetY - 0.5 * frameh + sArrowWidth, 0. ), -offsetY + 0.5 * frameh - sArrowWidth ) );
       }
       else     // Triangle above (quadrant = 1) or below (quadrant = 3)
       {
-        framePos.setX( qMin( qMax( mOffsetX - 0.5 * framew + sArrowWidth, 0. ), mOffsetX + 0.5 * framew - sArrowWidth ) );
-        framePos.setY( quadrant == 1 ? -mOffsetY - 0.5 * frameh : -mOffsetY + 0.5 * frameh );
+        framePos.setX( qMin( qMax( offsetX - 0.5 * framew + sArrowWidth, 0. ), offsetX + 0.5 * framew - sArrowWidth ) );
+        framePos.setY( quadrant == 1 ? -offsetY - 0.5 * frameh : -offsetY + 0.5 * frameh );
         baseDir = QgsVector( quadrant == 1 ? 1 : -1, 0 );
       }
       int inspos = quadrant + 1;
@@ -288,7 +291,7 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
     context.painter()->drawPath( path );
   }
 
-  context.painter()->drawImage( mOffsetX - 0.5 * w - 0.5, -mOffsetY - 0.5 * h - 0.5, mImage );
+  context.painter()->drawImage( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5, mImage );
 }
 
 QString KadasPictureItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
@@ -428,7 +431,7 @@ KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &p
   {
     double mup = mapSettings.mapUnitsPerPixel();
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
-    KadasMapPos framePos( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
+    KadasMapPos framePos( mapPos.x() + constState()->offsetX * mup, mapPos.y() + constState()->offsetY * mup );
     return EditContext( QgsVertexId(), framePos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
   }
   return EditContext();
@@ -447,7 +450,7 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
 
     double mup = mapSettings.mapUnitsPerPixel();
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
-    KadasMapPos frameCenter( mapPos.x() + mOffsetX * mup, mapPos.y() + mOffsetY * mup );
+    KadasMapPos frameCenter( mapPos.x() + constState()->offsetX * mup, mapPos.y() + constState()->offsetY * mup );
 
     QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter );
     state()->size.setWidth( 2 * qAbs( halfSize.x() ) );
@@ -464,8 +467,8 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
     QgsCoordinateTransform crst( crs(), mapSettings.destinationCrs(), QgsProject::instance() );
     QgsPointXY screenPos = mapSettings.mapToPixel().transform( newPoint );
     QgsPointXY screenAnchor = mapSettings.mapToPixel().transform( toMapPos( constState()->pos, mapSettings ) );
-    mOffsetX = screenPos.x() - screenAnchor.x();
-    mOffsetY = screenAnchor.y() - screenPos.y();
+    state()->offsetX = screenPos.x() - screenAnchor.x();
+    state()->offsetY = screenAnchor.y() - screenPos.y();
     update();
   }
 }

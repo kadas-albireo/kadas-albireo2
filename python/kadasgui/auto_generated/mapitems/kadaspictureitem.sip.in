@@ -32,10 +32,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     const QString &filePath() const;
     void setFilePath( const QString &filePath );
-    double offsetX() const;
-    void setOffsetX( double offsetX );
-    double offsetY() const;
-    void setOffsetY( double offsetY );
     bool frameVisible() const;
     void setFrameVisible( bool frame );
     bool positionLocked() const;
@@ -96,10 +92,13 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void setPosition( const KadasItemPos &pos );
 
 
+
     struct State : KadasMapItem::State
     {
       KadasItemPos pos;
       double angle;
+      double offsetX;
+      double offsetY;
       QSize size;
       virtual void assign( const KadasMapItem::State *other );
       virtual State *clone() const /Factory/;
@@ -109,6 +108,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     };
     const State *constState() const;
+    virtual void setState( const KadasMapItem::State *state );
+
 
   protected:
     virtual KadasMapItem *_clone() const;

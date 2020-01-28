@@ -24,8 +24,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 {
     Q_OBJECT
     Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
-    Q_PROPERTY( double offsetX READ offsetX WRITE setOffsetX )
-    Q_PROPERTY( double offsetY READ offsetY WRITE setOffsetY )
     Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
     Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
@@ -35,10 +33,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
 
     const QString &filePath() const { return mFilePath; }
     void setFilePath( const QString &filePath );
-    double offsetX() const { return mOffsetX; }
-    void setOffsetX( double offsetX );
-    double offsetY() const { return mOffsetY; }
-    void setOffsetY( double offsetY );
     bool frameVisible() const { return mFrame; }
     void setFrameVisible( bool frame );
     bool positionLocked() const { return mPosLocked; }
@@ -80,10 +74,13 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     KadasItemPos position() const override { return constState()->pos; }
     void setPosition( const KadasItemPos &pos ) override;
 
+
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       KadasItemPos pos;
-      double angle;
+      double angle = 0.;
+      double offsetX = 0.;
+      double offsetY = 0.;
       QSize size;
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
@@ -91,6 +88,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
       bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
+    void setState( const KadasMapItem::State *state ) override;
 
   protected:
     KadasMapItem *_clone() const override { return new KadasPictureItem( crs() ); } SIP_FACTORY
@@ -99,8 +97,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
   private:
     enum AttribIds {AttrX, AttrY};
     QString mFilePath;
-    double mOffsetX = 0;
-    double mOffsetY = 0;
     QImage mImage;
     bool mFrame = true;
     bool mPosLocked = false;
