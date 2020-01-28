@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsgeometrycollection.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
@@ -325,14 +326,14 @@ void KadasSearchBox::startSearch()
   mNumRunningProviders = mSearchProviders.count();
 
   KadasSearchProvider::SearchRegion searchRegion;
-  if ( mFilterTool )
+  if ( mFilterItem )
   {
-    QgsPolygonXY poly;
-    const KadasMapToolCreateItem *filterTool = mFilterTool;
-    if ( filterTool->currentItem() && dynamic_cast<const KadasGeometryItem *>( filterTool->currentItem() ) )
+    const QgsAbstractGeometry *geom = mFilterItem->geometry();
+    if ( dynamic_cast<const QgsGeometryCollection *>( geom ) && static_cast<const QgsGeometryCollection *>( geom )->numGeometries() > 0 )
     {
-      poly = QgsGeometry( static_cast<const KadasGeometryItem *>( filterTool->currentItem() )->geometry()->clone() ).asPolygon();
+      geom = static_cast<const QgsGeometryCollection *>( geom )->geometryN( 0 );
     }
+    QgsPolygonXY poly = QgsGeometry( geom->clone() ).asPolygon();
     if ( !poly.isEmpty() )
     {
       searchRegion.polygon = poly.front();
@@ -584,7 +585,7 @@ void KadasSearchBox::setFilterTool()
 
 void KadasSearchBox::filterToolFinished()
 {
-  mFilterItem = mFilterTool->takeItem();
+  mFilterItem = dynamic_cast<KadasGeometryItem *>( mFilterTool->takeItem() );
   mFilterButton->defaultAction()->setChecked( false );
   mFilterButton->defaultAction()->setCheckable( false );
   mMapCanvas->unsetMapTool( mFilterTool );
