@@ -99,6 +99,9 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       double yStart = qFloor( area.yMinimum() / mLayer->intervalY() ) * mLayer->intervalY();
       double yEnd = qCeil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
 
+      const QStringList &renderFlags = mRendererContext.customRenderFlags();
+      bool drawLabels = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) || mRendererContext.flags() & QgsRenderContext::RenderPreviewJob );
+
       // If chosen intervals would result in over 100 grid lines, reduce interval
       double intervalX = mLayer->intervalX();
       int numX = qRound( ( xEnd - xStart ) / intervalX ) + 1;
@@ -130,7 +133,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
         mRendererContext.painter()->drawPolyline( poly );
 
-        if ( mLayer->mLabelingMode == LabelingEnabled )
+        if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
         {
           int iSegment = 0, nSegments = poly.size() - 1;
           // Bottom edge label pos
@@ -177,7 +180,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
         mRendererContext.painter()->drawPolyline( poly );
 
-        if ( mLayer->mLabelingMode == LabelingEnabled )
+        if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
         {
           int iSegment = 0, nSegments = poly.size() - 1;
           // Left edge label pos
@@ -208,9 +211,6 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
           }
         }
       }
-
-      const QStringList &renderFlags = mRendererContext.customRenderFlags();
-      bool drawLabels = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) );
 
       if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
       {
@@ -374,7 +374,8 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       // Draw labels
-      if ( mLayer->mLabelingMode != LabelingEnabled )
+      bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
+      if ( previewJob || mLayer->mLabelingMode != LabelingEnabled )
       {
         return;
       }
