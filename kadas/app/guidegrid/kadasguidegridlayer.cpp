@@ -62,6 +62,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       {
         return true;
       }
+      bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
 
       static int labelBoxSize = mLayer->mFontSize + 5;
       static int smallLabelBoxSize = 0.5 * ( mLayer->mFontSize + 5 );
@@ -113,24 +114,27 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         path.addPolygon( vLine2 );
         mRendererContext.painter()->drawPath( path );
 
-        double sx1 = vLine1.first().x();
-        double sx2 = vLine2.first().x();
-        QString label = gridLabel( mLayer->mColChar, col - 1 );
-        if ( mLayer->mLabelingPos == LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
+        if ( !previewJob )
         {
-          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
-        }
-        else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
-        {
-          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
-        }
-        if ( mLayer->mLabelingPos == LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
-        {
-          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
-        }
-        else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
-        {
-          drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          double sx1 = vLine1.first().x();
+          double sx2 = vLine2.first().x();
+          QString label = gridLabel( mLayer->mColChar, col - 1 );
+          if ( mLayer->mLabelingPos == LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
+          {
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          }
+          else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
+          {
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          }
+          if ( mLayer->mLabelingPos == LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
+          {
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          }
+          else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
+          {
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          }
         }
 
         if ( mLayer->mLabelQuadrants )
@@ -177,24 +181,27 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         path.addPolygon( hLine2 );
         mRendererContext.painter()->drawPath( path );
 
-        double sy1 = hLine1.first().y();
-        double sy2 = hLine2.first().y();
-        QString label = gridLabel( mLayer->mRowChar, row - 1 );
-        if ( mLayer->mLabelingPos == LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
+        if ( !previewJob )
         {
-          drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
-        }
-        else if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
-        {
-          drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
-        }
-        if ( mLayer->mLabelingPos == LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
-        {
-          drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
-        }
-        else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
-        {
-          drawGridLabel( sx2 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
+          double sy1 = hLine1.first().y();
+          double sy2 = hLine2.first().y();
+          QString label = gridLabel( mLayer->mRowChar, row - 1 );
+          if ( mLayer->mLabelingPos == LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
+          {
+            drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
+          }
+          else if ( sx1 < vLine1.last().x() - 2 * labelBoxSize )
+          {
+            drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
+          }
+          if ( mLayer->mLabelingPos == LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
+          {
+            drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
+          }
+          else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
+          {
+            drawGridLabel( sx2 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
+          }
         }
 
         if ( mLayer->mLabelQuadrants )
