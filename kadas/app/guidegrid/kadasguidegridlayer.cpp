@@ -168,7 +168,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         mRendererContext.painter()->drawPath( path );
       }
       double sx1 = adaptLabelsToScreen ? qMax( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
-      double sx2 = adaptLabelsToScreen ? qMin( vLine1.last().x(), screenRect.right() ) : vLine1.last().x();
+      double sx2 = adaptLabelsToScreen ? qMin( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
       for ( int row = 1; row <= mLayer->mRows; ++row )
       {
         double y = gridRect.yMaximum() - row * iy;
