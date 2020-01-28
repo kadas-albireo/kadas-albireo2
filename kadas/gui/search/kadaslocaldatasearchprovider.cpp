@@ -91,7 +91,7 @@ void KadasLocalDataSearchCrawler::run()
     QStringList conditions;
     for ( int idx = 0, nFields = fields.count(); idx < nFields; ++idx )
     {
-      conditions.append( QString( "regexp_matchi( \"%1\" ,'%2')" ).arg( fields[idx].name(), escapedSearchText ) );
+      conditions.append( QString( "\"%1\" ILIKE '%%2%'" ).arg( fields[idx].name(), escapedSearchText ) );
     }
     QString exprText = conditions.join( " OR " );
 
@@ -110,10 +110,7 @@ void KadasLocalDataSearchCrawler::run()
       QgsGeometry filterGeom( poly );
 
       req.setFilterRect( filterGeom.boundingBox() );
-      QgsExpression expr( exprText );
-      QgsExpressionContext ectx;
-      ectx.setFields( vlayer->fields() );
-      expr.prepare( &ectx );
+      req.setFilterExpression( exprText );
       QgsFeatureIterator it = vlayer->getFeatures( req );
       while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
       {
@@ -123,8 +120,7 @@ void KadasLocalDataSearchCrawler::run()
           break;
         }
         locker.unlock();
-        ectx.setFeature( feature );
-        if ( expr.evaluate( &ectx ).toBool() && filterGeom.contains( feature.geometry() ) )
+        if ( filterGeom.contains( feature.geometry() ) )
         {
           buildResult( feature, vlayer );
           ++resultCount;
