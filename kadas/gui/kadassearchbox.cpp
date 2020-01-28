@@ -114,6 +114,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mClearButton->installEventFilter( this );
 
   QMenu *filterMenu = new QMenu( mSearchBox );
+  filterMenu->addAction( tr( "Filter for dataset searches:" ) )->setEnabled( false );
   QActionGroup *filterActionGroup = new QActionGroup( filterMenu );
   QAction *noFilterAction = new QAction( QIcon( ":/kadas/icons/search_filter_none" ), tr( "No filter" ), filterMenu );
   filterActionGroup->addAction( noFilterAction );
