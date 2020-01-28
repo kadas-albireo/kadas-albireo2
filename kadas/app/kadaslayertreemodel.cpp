@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgslayertree.h>
+
 #include <kadas/app/kadaslayertreemodel.h>
 
 KadasLayerTreeModel::KadasLayerTreeModel( QgsLayerTree *rootNode, QObject *parent )
@@ -24,7 +26,8 @@ KadasLayerTreeModel::KadasLayerTreeModel( QgsLayerTree *rootNode, QObject *paren
 
 QVariant KadasLayerTreeModel::data( const QModelIndex &index, int role ) const
 {
-  if ( role == Qt::DecorationRole )
+  QgsLayerTreeNode *node = index2node( index );
+  if ( QgsLayerTree::isLayer( node ) && role == Qt::DecorationRole )
   {
     // Hide legend icons
     return QVariant();
