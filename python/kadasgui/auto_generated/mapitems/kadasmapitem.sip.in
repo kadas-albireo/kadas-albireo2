@@ -214,7 +214,8 @@ Trigger a redraw */
       double min;
       double max;
       int decimals;
-      static QString suffix( Type type, const QgsMapSettings &mapSettings );
+      int precision( const QgsMapSettings &mapSettings ) const;
+      QString suffix( const QgsMapSettings &mapSettings ) const;
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;

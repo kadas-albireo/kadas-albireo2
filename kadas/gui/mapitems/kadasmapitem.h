@@ -228,8 +228,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       Type type = TypeCoordinate;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
-      int decimals = 0;
-      static QString suffix( Type type, const QgsMapSettings &mapSettings );
+      int decimals = -1;
+      int precision( const QgsMapSettings &mapSettings ) const;
+      QString suffix( const QgsMapSettings &mapSettings ) const;
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;

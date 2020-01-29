@@ -257,7 +257,20 @@ KadasMapItem::Registry *KadasMapItem::registry()
   return &instance;
 };
 
-QString KadasMapItem::NumericAttribute::suffix( Type type, const QgsMapSettings &mapSettings )
+int KadasMapItem::NumericAttribute::precision( const QgsMapSettings &mapSettings ) const
+{
+  if ( decimals >= 0 )
+  {
+    return decimals;
+  }
+  if ( type == TypeCoordinate )
+  {
+    return mapSettings.destinationCrs().mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+  }
+  return 0;
+}
+
+QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSettings ) const
 {
   switch ( type )
   {

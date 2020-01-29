@@ -67,10 +67,10 @@ void KadasMapToolCreateItem::activate()
     for ( auto it = mDrawAttribs.begin(), itEnd = mDrawAttribs.end(); it != itEnd; ++it )
     {
       const KadasMapItem::NumericAttribute &attribute = it.value();
-      KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.decimals, attribute.min, attribute.max );
+      KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
       connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged );
       connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput );
-      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( attribute.type, mCanvas->mapSettings() ) );
+      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
     }
     if ( !mDrawAttribs.isEmpty() )
     {
