@@ -794,6 +794,18 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
 
   mMainWindow->mapCanvas()->freeze( true );
 
+  // Extract print layouts and save then as attached files
+  const QList<QgsPrintLayout *> layouts = QgsProject::instance()->layoutManager()->printLayouts();
+  QgsReadWriteContext context;
+  context.setPathResolver( QgsProject::instance()->pathResolver() );
+  for ( QgsPrintLayout *layout : layouts )
+  {
+    QString templateName = QgsProject::instance()->createAttachedFile( layout->name().replace( " ", "_" ) + ".qpt" );
+    if ( layout->saveAsTemplate( templateName, context ) )
+    {
+      QgsProject::instance()->layoutManager()->removeLayout( layout );
+    }
+  }
   bool success = QgsProject::instance()->write();
 
   mMainWindow->mapCanvas()->freeze( false );
@@ -817,35 +829,9 @@ void KadasApplication::addDefaultPrintTemplates()
   QDir printTemplatesDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "print_templates" ) );
   for ( const QString &entry : printTemplatesDir.entryList( QStringList( "*.qpt" ), QDir::Files | QDir::NoDotAndDotDot ) )
   {
-    QFile printTemplate( printTemplatesDir.absoluteFilePath( entry ) );
-    if ( !printTemplate.open( QIODevice::ReadOnly ) )
-    {
-      QgsDebugMsg( QString( "Failed to open print template: %1" ).arg( printTemplate.fileName() ) );
-      continue;
-    }
-
-    QDomDocument doc;
-    doc.setContent( &printTemplate );
-    QDomNodeList layoutEls = doc.elementsByTagName( "Layout" );
-    if ( layoutEls.isEmpty() )
-    {
-      QgsDebugMsg( QString( "Empty print template: %1" ).arg( printTemplate.fileName() ) );
-      continue;
-    }
-
-    QDomElement layoutEl = layoutEls.at( 0 ).toElement();
-    QgsPrintLayout *layout = new QgsPrintLayout( QgsProject::instance() );
-    layout->setName( layoutEl.attribute( "name" ) );
-
-    if ( layout->loadFromTemplate( doc, QgsReadWriteContext() ).isEmpty() )
-    {
-      delete layout;
-      QgsDebugMsg( QString( "Failed to load print template: %1" ).arg( printTemplate.fileName() ) );
-      continue;
-    }
-    layout->undoStack()->stack()->clear();
-
-    QgsProject::instance()->layoutManager()->addLayout( layout );
+    QString attachedFile = QgsProject::instance()->createAttachedFile( entry );
+    QFile( attachedFile ).remove();
+    QFile( printTemplatesDir.absoluteFilePath( entry ) ).copy( attachedFile );
   }
 }
 
