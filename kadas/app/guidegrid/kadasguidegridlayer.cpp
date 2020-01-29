@@ -142,7 +142,6 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           mRendererContext.painter()->save();
           mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
           QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
-          int alignCenter = Qt::AlignHCenter | Qt::AlignVCenter;
           QPolygonF vLineMid;
           for ( int i = 0, n = vLine1.size(); i < n; ++i )
           {

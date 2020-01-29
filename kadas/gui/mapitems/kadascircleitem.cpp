@@ -121,7 +121,6 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
   QList<Node> points;
   for ( int i = 0, n = constState()->centers.size(); i < n; ++i )
   {
-    const KadasItemPos &center = constState()->centers[i];
     points.append( {toMapPos( constState()->centers[i], settings )} );
     points.append( {toMapPos( constState()->ringpos[i], settings )} );
   }
