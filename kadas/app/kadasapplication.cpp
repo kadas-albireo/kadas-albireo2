@@ -370,11 +370,6 @@ void KadasApplication::init()
   connect( &mAutosaveTimer, &QTimer::timeout, this, &KadasApplication::autosave );
 }
 
-KadasApplication::~KadasApplication()
-{
-  projectClose();
-}
-
 QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString &layerName, const QString &providerKey ) const
 {
   QgsSettings settings;
