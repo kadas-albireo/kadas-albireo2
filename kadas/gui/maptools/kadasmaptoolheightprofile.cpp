@@ -121,7 +121,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
       {
         mPosMarker->clear();
         mPosMarker->addPartFromGeometry( minPos );
-        mDialog->setMarkerPos( minIdx, minPos );
+        mDialog->setMarkerPos( minIdx, minPos, mCanvas->mapSettings().destinationCrs() );
       }
     }
     KadasMapToolCreateItem::canvasMoveEvent( e );

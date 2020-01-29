@@ -223,9 +223,10 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
   replot();
 }
 
-void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p )
+void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
-  double x = qSqrt( p.sqrDist( mPoints[segment] ) );
+  QgsPointXY pos = QgsCoordinateTransform( crs, mPointsCrs, QgsProject::instance() ).transform( p );
+  double x = qSqrt( pos.sqrDist( mPoints[segment] ) );
   for ( int i = 0; i < segment; ++i )
   {
     x += mSegmentLengths[i];
