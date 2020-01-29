@@ -19,6 +19,7 @@
 #include <QSettings>
 
 #include <qgis/qgslogger.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgsuserprofilemanager.h>
 
 #include <kadas/core/kadas.h>
@@ -51,7 +52,7 @@ int main( int argc, char *argv[] )
   }
   KadasApplication::setTranslation( locale );
 
-  KadasApplication app( argc, argv );
+  KadasApplication *app = new KadasApplication( argc, argv );
 
 #ifdef __MINGW32__
   QString gdalDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
@@ -60,6 +61,9 @@ int main( int argc, char *argv[] )
   qputenv( "PROJ_LIB", projDir.toLocal8Bit() );
 #endif
 
-  app.init();
-  return app.exec();
+  app->init();
+  int status = app->exec();
+  delete app;
+  delete QgsProject::instance();
+  return status;
 }
