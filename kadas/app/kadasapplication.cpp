@@ -779,6 +779,7 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     {
       return false;
     }
+    settings.setValue( QStringLiteral( "UI/lastProjectDir" ), QFileInfo( path ).absolutePath() ) ;
     if ( !path.endsWith( ".qgz", Qt::CaseInsensitive ) )
     {
       path += ".qgz";
