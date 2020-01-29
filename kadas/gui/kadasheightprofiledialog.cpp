@@ -88,6 +88,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   setWindowTitle( tr( "Height profile" ) );
   setAttribute( Qt::WA_ShowWithoutActivating );
   QVBoxLayout *vboxLayout = new QVBoxLayout( this );
+  mNSamples = QgsSettings().value( "/kadas/heightprofile_samples", 1000 ).toInt();
 
   QPushButton *pickButton = new QPushButton( QgsApplication::getThemeIcon( "/mActionSelect.svg" ), tr( "Measure along existing line" ), this );
   connect( pickButton, &QPushButton::clicked, mTool, &KadasMapToolHeightProfile::pickLine );
