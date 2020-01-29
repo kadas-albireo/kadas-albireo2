@@ -83,7 +83,7 @@ class PaddedPlotMarker : public QwtPlotMarker
 };
 
 KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent, Qt::WindowFlags f )
-  : QDialog( parent, f ), mTool( tool ), mLineOfSightMarker( 0 ), mNSamples( 1000 )
+  : QDialog( parent, f ), mTool( tool )
 {
   setWindowTitle( tr( "Height profile" ) );
   setAttribute( Qt::WA_ShowWithoutActivating );

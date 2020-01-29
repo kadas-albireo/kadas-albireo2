@@ -69,9 +69,9 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QList<QwtPlotMarker *> mNodeMarkers;
     QList<QgsPointXY> mPoints;
     QVector<double> mSegmentLengths;
-    double mTotLength;
+    double mTotLength = 0.;
     QgsCoordinateReferenceSystem mPointsCrs;
-    int mNSamples;
+    int mNSamples = 1000;
     QCheckBox *mNodeMarkersCheckbox = nullptr;
     QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
     QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
