@@ -208,13 +208,16 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
   mPointsCrs = crs;
   mTotLength = 0;
   mSegmentLengths.clear();
+
   QgsDistanceArea da;
   da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
   da.setSourceCrs( crs, QgsProject::instance()->transformContext() );
+
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
   {
-    mSegmentLengths.append( da.measureLine( mPoints[i + 1], mPoints[i] ) );
+    mSegmentLengths.append( qSqrt( mPoints[i + 1].sqrDist( mPoints[i] ) ) );
     mTotLength += mSegmentLengths.back();
+    mTotLengthMeters += da.measureLine( mPoints[i], mPoints[i + 1] );
   }
   mLineOfSightGroupBoxgroupBox->setEnabled( points.size() == 2 );
   replot();
@@ -385,8 +388,8 @@ void KadasHeightProfileDialog::replot()
   static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->setSamples( samples );
   int nSamples = samples.size();
   mPlotMarker->setValue( 0, 0 );
-  mPlot->setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw( mTotLength, nSamples ) );
-  double step = qPow( 10, qFloor( log10( mTotLength ) ) ) / ( mTotLength ) * nSamples;
+  mPlot->setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw( mTotLengthMeters, nSamples ) );
+  double step = qPow( 10, qFloor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
   while ( nSamples / step < 10 ) { step /= 2.; }
   while ( nSamples / step > 10 ) { step *= 2.; }
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
@@ -448,7 +451,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
   for ( const QPointF &p : samples )
   {
-    pX.append( p.x() / mNSamples * mTotLength );
+    pX.append( p.x() / mNSamples * mTotLengthMeters );
     double hCorr = 0.87 * pX.last() * pX.last() / ( 2 * earthRadius ) * meterToDisplayUnit;
     pY.append( p.y() - hCorr );
   }
