@@ -150,6 +150,11 @@ KadasApplication::KadasApplication( int &argc, char **argv )
   : QgsApplication( argc, argv, true )
 {}
 
+KadasApplication::~KadasApplication()
+{
+  delete mMainWindow;
+}
+
 void KadasApplication::init()
 {
   QgsApplication::init();

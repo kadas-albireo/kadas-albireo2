@@ -87,6 +87,14 @@ KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
   KadasWindowBase::setupUi( this );
 }
 
+KadasMainWindow::~KadasMainWindow()
+{
+  // Delete these explicitly since they access kApp->mainWindow in their destructor
+  delete mGpxIntegration;
+  delete mKmlIntegration;
+  delete mMilxIntegration;
+}
+
 void KadasMainWindow::init()
 {
   // Split from constructor since certain calls may require kApp->mainWindow() to return a constructed instance
@@ -195,8 +203,7 @@ void KadasMainWindow::init()
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
   // KML
-  KadasKmlIntegration *kmlIntegration = new KadasKmlIntegration( mKMLButton, this );
-  Q_UNUSED( kmlIntegration );
+  mKmlIntegration = new KadasKmlIntegration( mKMLButton, this );
 
   // Redlining
   mRedliningIntegration = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
@@ -214,8 +221,7 @@ void KadasMainWindow::init()
   milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
   milxUi.mLineWidthSlider = mLineWidthSlider;
   milxUi.mWorkModeCombo = mWorkModeCombo;
-  KadasMilxIntegration *milx = new KadasMilxIntegration( milxUi, this );
-  Q_UNUSED( milx );
+  mMilxIntegration = new KadasMilxIntegration( milxUi, this );
 
   // IAM Auth
   KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mRefreshCatalogButton, this );

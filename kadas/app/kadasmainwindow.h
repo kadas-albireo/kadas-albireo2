@@ -33,6 +33,8 @@ class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
 class KadasGpxIntegration;
+class KadasKmlIntegration;
+class KadasMilxIntegration;
 class KadasMapItem;
 class KadasMapWidgetManager;
 class KadasPluginManager;
@@ -45,6 +47,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
   public:
     explicit KadasMainWindow( QSplashScreen *splash );
+    ~KadasMainWindow();
     void init();
 
     QgsMapCanvas *mapCanvas() const { return mMapCanvas; }
@@ -148,6 +151,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasCoordinateDisplayer *mCoordinateDisplayer = nullptr;
     KadasGpsIntegration *mGpsIntegration = nullptr;
     KadasGpxIntegration *mGpxIntegration = nullptr;
+    KadasKmlIntegration *mKmlIntegration = nullptr;
+    KadasMilxIntegration *mMilxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasPluginManager *mPluginManager = nullptr;

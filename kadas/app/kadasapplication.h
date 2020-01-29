@@ -53,6 +53,7 @@ class KadasApplication : public QgsApplication
     static bool isRunningFromBuildDir();
 
     KadasApplication( int &argc, char **argv );
+    ~KadasApplication();
 
     void init();
 
