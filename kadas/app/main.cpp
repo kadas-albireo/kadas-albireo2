@@ -40,15 +40,32 @@ int main( int argc, char *argv[] )
   QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
   QString rootProfileFolder = QgsUserProfileManager::resolveProfilesFolder( configLocalStorageLocation );
 
-  QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "default/%1/%1.ini" ).arg( Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
-  QString locale = QLocale::system().name();
-  if ( settings.value( "/locale/overrideFlag", false ).toBool() )
+  bool clearsettings = false;
+  QString profileName = "default";
+  for ( int i = 1; i < argc; ++i )
   {
-    locale = settings.value( "/locale/userLocale", locale ).toString();
+    if ( qstrcmp( argv[i], "--clearsettings" ) == 0 )
+    {
+      clearsettings = true;
+    }
+  }
+
+  QString locale = QLocale::system().name();
+  if ( clearsettings )
+  {
+    QDir( QString( "%1/%2" ).arg( rootProfileFolder, profileName ) ).removeRecursively();
   }
   else
   {
-    settings.setValue( "/locale/userLocale", locale );
+    QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/%2/%2.ini" ).arg( profileName, Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
+    if ( settings.value( "/locale/overrideFlag", false ).toBool() )
+    {
+      locale = settings.value( "/locale/userLocale", locale ).toString();
+    }
+    else
+    {
+      settings.setValue( "/locale/userLocale", locale );
+    }
   }
   KadasApplication::setTranslation( locale );
 
