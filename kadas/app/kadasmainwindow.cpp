@@ -278,7 +278,9 @@ void KadasMainWindow::init()
     }
     else if ( type == "vbs" )
     {
-      mCatalogBrowser->addProvider( new KadasVBSCatalogProvider( url, mCatalogBrowser ) );
+      KadasVBSCatalogProvider *vbsprovider = new KadasVBSCatalogProvider( url, mCatalogBrowser );
+      connect( vbsprovider, &KadasVBSCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
+      mCatalogBrowser->addProvider( vbsprovider );
     }
   }
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
@@ -1147,4 +1149,9 @@ void KadasMainWindow::showPluginManager( bool show )
   {
     mPluginManager->hide();
   }
+}
+
+void KadasMainWindow::showAuthenticatedUser( const QString &user )
+{
+  mLabelUsername->setText( user.isEmpty() ? "" : QString( "<small>%1<br />%2</small>" ).arg( tr( "Authenticated in as:" ), user ) );
 }

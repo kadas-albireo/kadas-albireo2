@@ -59,6 +59,7 @@ void KadasVBSCatalogProvider::replyFinished()
     QMap<QString, EntryMap> wmtsLayers;
     QMap<QString, EntryMap> wmsLayers;
     QMap<QString, EntryMap> amsLayers;
+    emit userChanged( listData["user"].toString() );
     for ( const QVariant &resultData : listData["results"].toList() )
     {
       QVariantMap resultMap = resultData.toMap();

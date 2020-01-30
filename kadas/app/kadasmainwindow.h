@@ -125,6 +125,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void endFullscreen();
     void checkOnTheFlyProjection();
     void showPluginManager( bool show );
+    void showAuthenticatedUser( const QString &user );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
