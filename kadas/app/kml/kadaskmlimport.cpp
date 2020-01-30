@@ -92,143 +92,154 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
   }
 
   QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-  KadasItemLayer *itemLayer = KadasItemLayerRegistry::getOrCreateItemLayer( filename );
-  QgsCoordinateTransform itemCrst( crsWgs84, itemLayer->crs(), QgsProject::instance()->transformContext() );
+  QDomNodeList placemarkEls = documentEl.elementsByTagName( "Placemark" );
+  if ( !placemarkEls.isEmpty() )
+  {
 
-  // Styles / StyleMaps with id
-  QMap<QString, StyleData> styleMap;
-  QDomNodeList styleEls = documentEl.elementsByTagName( "Style" );
-  for ( int iStyle = 0, nStyles = styleEls.size(); iStyle < nStyles; ++iStyle )
-  {
-    QDomElement styleEl = styleEls.at( iStyle ).toElement();
-    if ( !styleEl.attribute( "id" ).isEmpty() )
+    // Styles / StyleMaps with id
+    QMap<QString, StyleData> styleMap;
+    QDomNodeList styleEls = documentEl.elementsByTagName( "Style" );
+    for ( int iStyle = 0, nStyles = styleEls.size(); iStyle < nStyles; ++iStyle )
     {
-      styleMap.insert( QString( "#%1" ).arg( styleEl.attribute( "id" ) ), parseStyle( styleEl, zip ) );
+      QDomElement styleEl = styleEls.at( iStyle ).toElement();
+      if ( !styleEl.attribute( "id" ).isEmpty() )
+      {
+        styleMap.insert( QString( "#%1" ).arg( styleEl.attribute( "id" ) ), parseStyle( styleEl, zip ) );
+      }
     }
-  }
-  QDomNodeList styleMapEls = documentEl.elementsByTagName( "StyleMap" );
-  for ( int iStyleMap = 0, nStyleMaps = styleMapEls.size(); iStyleMap < nStyleMaps; ++iStyleMap )
-  {
-    QDomElement styleMapEl = styleMapEls.at( iStyleMap ).toElement();
-    if ( !styleMapEl.attribute( "id" ).isEmpty() )
+    QDomNodeList styleMapEls = documentEl.elementsByTagName( "StyleMap" );
+    for ( int iStyleMap = 0, nStyleMaps = styleMapEls.size(); iStyleMap < nStyleMaps; ++iStyleMap )
     {
-      QString id = QString( "#%1" ).arg( styleMapEl.attribute( "id" ) );
-      // Just pick the first item of the StyleMap
-      QDomElement pairEl = styleMapEl.firstChildElement( "Pair" );
-      QDomElement styleEl = pairEl.firstChildElement( "Style" );
-      QDomElement styleUrlEl = pairEl.firstChildElement( "styleUrl" );
+      QDomElement styleMapEl = styleMapEls.at( iStyleMap ).toElement();
+      if ( !styleMapEl.attribute( "id" ).isEmpty() )
+      {
+        QString id = QString( "#%1" ).arg( styleMapEl.attribute( "id" ) );
+        // Just pick the first item of the StyleMap
+        QDomElement pairEl = styleMapEl.firstChildElement( "Pair" );
+        QDomElement styleEl = pairEl.firstChildElement( "Style" );
+        QDomElement styleUrlEl = pairEl.firstChildElement( "styleUrl" );
+        if ( !styleEl.isNull() )
+        {
+          styleMap.insert( id, parseStyle( styleEl, zip ) );
+        }
+        else if ( !styleUrlEl.isNull() )
+        {
+          styleMap.insert( id, styleMap.value( styleUrlEl.text() ) );
+        }
+      }
+    }
+
+
+    // Placemarks
+    for ( int iPlacemark = 0, nPlacemarks = placemarkEls.size(); iPlacemark < nPlacemarks; ++iPlacemark )
+    {
+      QDomElement placemarkEl = placemarkEls.at( iPlacemark ).toElement();
+      QString name = placemarkEl.firstChildElement( "name" ).text();
+
+      QString layerName = filename;
+      // If tile contained in folder, group by folder
+      if ( placemarkEl.parentNode().nodeName() == "Folder" )
+      {
+        layerName = placemarkEl.parentNode().firstChildElement( "name" ).text();
+      }
+
+      KadasItemLayer *itemLayer = KadasItemLayerRegistry::getOrCreateItemLayer( layerName );
+      QgsCoordinateTransform itemCrst( crsWgs84, itemLayer->crs(), QgsProject::instance()->transformContext() );
+
+      // Geometry
+      QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl );
+
+      if ( geoms.isEmpty() )
+      {
+        // Placemark without geometry
+        QgsDebugMsg( "Could not parse placemark geometry" );
+        continue;
+      }
+
+      // Style
+      QDomElement styleEl = placemarkEl.firstChildElement( "Style" );
+      QDomElement styleUrlEl = placemarkEl.firstChildElement( "styleUrl" );
+      StyleData style;
       if ( !styleEl.isNull() )
       {
-        styleMap.insert( id, parseStyle( styleEl, zip ) );
+        style = parseStyle( styleEl, zip );
       }
       else if ( !styleUrlEl.isNull() )
       {
-        styleMap.insert( id, styleMap.value( styleUrlEl.text() ) );
+        style = styleMap.value( styleUrlEl.text() );
       }
-    }
-  }
 
+      QMap<QString, QString> attributes = parseExtendedData( placemarkEl );
 
-  // Placemarks
-  QDomNodeList placemarkEls = documentEl.elementsByTagName( "Placemark" );
-  for ( int iPlacemark = 0, nPlacemarks = placemarkEls.size(); iPlacemark < nPlacemarks; ++iPlacemark )
-  {
-    QDomElement placemarkEl = placemarkEls.at( iPlacemark ).toElement();
-    QString name = placemarkEl.firstChildElement( "name" ).text();
-
-    // Geometry
-    QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl );
-
-    if ( geoms.isEmpty() )
-    {
-      // Placemark without geometry
-      QgsDebugMsg( "Could not parse placemark geometry" );
-      continue;
-    }
-
-    // Style
-    QDomElement styleEl = placemarkEl.firstChildElement( "Style" );
-    QDomElement styleUrlEl = placemarkEl.firstChildElement( "styleUrl" );
-    StyleData style;
-    if ( !styleEl.isNull() )
-    {
-      style = parseStyle( styleEl, zip );
-    }
-    else if ( !styleUrlEl.isNull() )
-    {
-      style = styleMap.value( styleUrlEl.text() );
-    }
-
-    QMap<QString, QString> attributes = parseExtendedData( placemarkEl );
-
-    // If there is an icon and the geometry is a point, add as symbol item, otherwise as redlining symbol
-    if ( geoms.size() == 1 && !style.icon.isEmpty() && dynamic_cast<QgsPoint *>( geoms.front() ) )
-    {
-      QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );
-      KadasSymbolItem *item = new KadasSymbolItem( itemLayer->crs() );
-      item->setFilePath( style.icon );
-      item->setAnchorX( style.hotSpot.x() / item->constState()->size.width() );
-      item->setAnchorY( style.hotSpot.y() / item->constState()->size.height() );
-      item->setPosition( KadasItemPos::fromPoint( pos ) );
-      itemLayer->addItem( item );
-      delete geoms.front();
-    }
-    else
-    {
-      // TODO?
-      QStringList attributesList;
-      for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
+      // If there is an icon and the geometry is a point, add as symbol item, otherwise as redlining symbol
+      if ( geoms.size() == 1 && !style.icon.isEmpty() && dynamic_cast<QgsPoint *>( geoms.front() ) )
       {
-        attributesList.append( it.key().toHtmlEscaped() + "=" + it.value().replace( QRegularExpression( "^\\s*(.*[^\\s])\\s*$", QRegularExpression::MultilineOption ), "\\1" ).toHtmlEscaped() );
+        QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );
+        KadasSymbolItem *item = new KadasSymbolItem( itemLayer->crs() );
+        item->setFilePath( style.icon );
+        item->setAnchorX( style.hotSpot.x() / item->constState()->size.width() );
+        item->setAnchorY( style.hotSpot.y() / item->constState()->size.height() );
+        item->setPosition( KadasItemPos::fromPoint( pos ) );
+        itemLayer->addItem( item );
+        delete geoms.front();
       }
-      QString attributesStr = attributesList.join( "&" );
-
-      for ( QgsAbstractGeometry *geom : geoms )
+      else
       {
-        geom->transform( itemCrst );
+        // TODO?
+        QStringList attributesList;
+        for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
+        {
+          attributesList.append( it.key().toHtmlEscaped() + "=" + it.value().replace( QRegularExpression( "^\\s*(.*[^\\s])\\s*$", QRegularExpression::MultilineOption ), "\\1" ).toHtmlEscaped() );
+        }
+        QString attributesStr = attributesList.join( "&" );
 
-        if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
+        for ( QgsAbstractGeometry *geom : geoms )
         {
-          QgsPointXY pos = *static_cast<QgsPoint *>( geom );
-          KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
-          item->setEditor( "KadasRedliningTextEditor" );
-          item->setText( name );
-          item->setFillColor( style.labelColor );
-          QFont font = item->font();
-          font.setPointSizeF( font.pointSizeF() * style.labelScale );
-          item->setFont( font );
-          item->setPosition( KadasItemPos::fromPoint( pos ) );
-          itemLayer->addItem( item );
+          geom->transform( itemCrst );
+
+          if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
+          {
+            QgsPointXY pos = *static_cast<QgsPoint *>( geom );
+            KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
+            item->setEditor( "KadasRedliningTextEditor" );
+            item->setText( name );
+            item->setFillColor( style.labelColor );
+            QFont font = item->font();
+            font.setPointSizeF( font.pointSizeF() * style.labelScale );
+            item->setFont( font );
+            item->setPosition( KadasItemPos::fromPoint( pos ) );
+            itemLayer->addItem( item );
+          }
+          else if ( dynamic_cast<QgsPoint *>( geom ) )
+          {
+            KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
+            item->setEditor( "KadasRedliningItemEditor" );
+            item->addPartFromGeometry( *geom );
+            item->setIconSize( 10 + 2 * style.outlineSize );
+            item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
+            item->setIconFill( QBrush( style.fillColor ) );
+            KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
+          }
+          else if ( dynamic_cast<QgsLineString *>( geom ) )
+          {
+            KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
+            item->setEditor( "KadasRedliningItemEditor" );
+            item->addPartFromGeometry( *geom );
+            item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
+            itemLayer->addItem( item );
+          }
+          else if ( dynamic_cast<QgsPolygon *>( geom ) )
+          {
+            KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
+            item->setEditor( "KadasRedliningItemEditor" );
+            item->addPartFromGeometry( *geom );
+            item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
+            item->setFill( QBrush( style.fillColor ) );
+            KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
+          }
         }
-        else if ( dynamic_cast<QgsPoint *>( geom ) )
-        {
-          KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
-          item->setEditor( "KadasRedliningItemEditor" );
-          item->addPartFromGeometry( *geom );
-          item->setIconSize( 10 + 2 * style.outlineSize );
-          item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
-          item->setIconFill( QBrush( style.fillColor ) );
-          KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
-        }
-        else if ( dynamic_cast<QgsLineString *>( geom ) )
-        {
-          KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
-          item->setEditor( "KadasRedliningItemEditor" );
-          item->addPartFromGeometry( *geom );
-          item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
-          itemLayer->addItem( item );
-        }
-        else if ( dynamic_cast<QgsPolygon *>( geom ) )
-        {
-          KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
-          item->setEditor( "KadasRedliningItemEditor" );
-          item->addPartFromGeometry( *geom );
-          item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
-          item->setFill( QBrush( style.fillColor ) );
-          KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
-        }
+        qDeleteAll( geoms );
       }
-      qDeleteAll( geoms );
     }
   }
 
