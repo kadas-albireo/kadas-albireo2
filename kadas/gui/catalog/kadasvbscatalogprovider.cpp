@@ -43,6 +43,7 @@ void KadasVBSCatalogProvider::load()
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
+  query.addQueryItem( "timestamp", QString::number( QDateTime::currentSecsSinceEpoch() ) );
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
