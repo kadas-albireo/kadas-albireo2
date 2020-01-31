@@ -17,6 +17,7 @@
 
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QImageReader>
 #include <QUuid>
 
 #include <quazip5/quazipfile.h>
@@ -28,6 +29,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include <kadas/core/kadasalgorithms.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
@@ -309,17 +311,12 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
       continue;
     }
     QuaZipFile kmzTileFile( kmzZip );
-    QuaZipFile vsiTileFile( &vsiZip );
-    QuaZipNewInfo tileInfo( QFileInfo( tile.iconHref ).completeBaseName() + ".png" );
-    tileInfo.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
-    if ( !kmzTileFile.open( QIODevice::ReadOnly ) || !vsiTileFile.open( QIODevice::WriteOnly, tileInfo ) )
+    if ( !kmzTileFile.open( QIODevice::ReadOnly ) )
     {
       continue;
     }
-    QImage tileImage = QImage::fromData( kmzTileFile.readAll() );
-    tile.size = tileImage.size();
-    tileImage.save( &vsiTileFile, "PNG" );
-    vsiTileFile.close();
+    QImageReader reader( &kmzTileFile );
+    tile.size = reader.size();
   }
 
   // Get total size by assuming all tiles have same resolution
@@ -328,6 +325,74 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
     qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ),
     qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() )
   );
+
+  // Compute image rectangles and merge overlapping images
+  QList<KadasAlgorithms::Rect> rects;
+
+  for ( TileData &tile : overlayData.tiles )
+  {
+    int i = qRound( ( tile.bbox.xMinimum() - overlayData.bbox.xMinimum() ) / overlayData.bbox.width() * totSize.width() );
+    int j = qRound( ( overlayData.bbox.yMaximum() - tile.bbox.yMaximum() ) / overlayData.bbox.height() * totSize.height() );
+    rects.append( {i, j, i + tile.size.width(), j + tile.size.height(), &tile} );
+  }
+
+  const QList<KadasAlgorithms::Cluster> clusters = KadasAlgorithms::overlappingRects( rects );
+
+  QList<TileData> mergedTiles;
+  for ( const KadasAlgorithms::Cluster &cluster : clusters )
+  {
+    QImage outputImage;
+    TileData outputTile;
+    outputTile.iconHref = QFileInfo( reinterpret_cast<const TileData *>( cluster.rects.first().data )->iconHref ).completeBaseName() + ".png";
+    outputTile.bbox = reinterpret_cast<const TileData *>( cluster.rects.first().data )->bbox;
+    if ( cluster.rects.size() == 1 )
+    {
+      const TileData &tile = *reinterpret_cast<const TileData *>( cluster.rects.first().data );
+      if ( !kmzZip->setCurrentFile( tile.iconHref ) )
+      {
+        continue;
+      }
+      QuaZipFile kmzTileFile( kmzZip );
+      if ( !kmzTileFile.open( QIODevice::ReadOnly ) )
+      {
+        continue;
+      }
+      outputImage = QImage::fromData( kmzTileFile.readAll() );
+    }
+    else
+    {
+      outputImage = QImage( cluster.x2 - cluster.x1, cluster.y2 - cluster.y1, QImage::Format_ARGB32 );
+      outputImage.fill( Qt::transparent );
+      QPainter painter( &outputImage );
+      for ( const KadasAlgorithms::Rect &rect : cluster.rects )
+      {
+        const TileData &tile = *reinterpret_cast<const TileData *>( rect.data );
+        outputTile.bbox.combineExtentWith( tile.bbox );
+        if ( !kmzZip->setCurrentFile( tile.iconHref ) )
+        {
+          continue;
+        }
+        QuaZipFile kmzTileFile( kmzZip );
+        if ( !kmzTileFile.open( QIODevice::ReadOnly ) )
+        {
+          continue;
+        }
+        painter.drawImage( rect.x1 - cluster.x1, rect.y1 - cluster.y1, QImage::fromData( kmzTileFile.readAll() ) );
+      }
+    }
+    outputTile.size = outputImage.size();
+
+    QuaZipFile vsiTileFile( &vsiZip );
+    QuaZipNewInfo vsiTileInfo( outputTile.iconHref );
+    vsiTileInfo.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
+    if ( !vsiTileFile.open( QIODevice::WriteOnly, vsiTileInfo ) )
+    {
+      continue;
+    }
+    outputImage.save( &vsiTileFile, "PNG" );
+    vsiTileFile.close();
+    mergedTiles.append( outputTile );
+  }
 
   // Write vrt
   QString vrtString;
@@ -338,11 +403,12 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   vrtStream << "  " << overlayData.bbox.xMinimum() << "," << ( overlayData.bbox.width() / totSize.width() ) << ", 0," << endl;
   vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << endl;
   vrtStream << " </GeoTransform>" << endl;
+
   for ( const QPair<int, QString> &band : QList<QPair<int, QString>> {qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) )} )
   {
     vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << endl;
     vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << endl;
-    for ( const TileData &tile : overlayData.tiles )
+    for ( const TileData &tile : mergedTiles )
     {
       int i = qRound( ( tile.bbox.xMinimum() - overlayData.bbox.xMinimum() ) / overlayData.bbox.width() * totSize.width() );
       int j = qRound( ( overlayData.bbox.yMaximum() - tile.bbox.yMaximum() ) / overlayData.bbox.height() * totSize.height() );
