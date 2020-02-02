@@ -27,6 +27,7 @@
 #include <kadas/gui/kadasbottombar.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasfloatinginputwidget.h>
+#include <kadas/gui/kadasitemcontextmenuactions.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -41,6 +42,7 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasIte
   , mLayer( layer )
 {
   mItem = layer->takeItem( itemId );
+  connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
   layer->triggerRepaint();
   KadasMapCanvasItemManager::addItem( mItem );
 }
@@ -157,9 +159,7 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       {
         menu.addSeparator();
       }
-      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
-      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
-      menu.addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
+      KadasItemContextMenuActions actions( mCanvas, &menu, mItem, mLayer );
       QAction *clickedAction = menu.exec( e->globalPos() );
 
       if ( clickedAction )
@@ -360,6 +360,14 @@ void KadasMapToolEditItem::deleteItem()
   mEditor = nullptr;
 
   delete mItem;
+  mItem = nullptr;
+  canvas()->unsetMapTool( this );
+}
+
+void KadasMapToolEditItem::itemDestroyed()
+{
+  delete mEditor;
+  mEditor = nullptr;
   mItem = nullptr;
   canvas()->unsetMapTool( this );
 }

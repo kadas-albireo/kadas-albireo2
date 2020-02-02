@@ -65,6 +65,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
 
   private slots:
+    void itemDestroyed();
     void inputChanged();
     void stateChanged( KadasStateHistory::State *state );
     void copyItem();

@@ -18,24 +18,16 @@
 #include <QInputDialog>
 
 #include <qgis/qgsgeometryrubberband.h>
-#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
-#include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include <kadas/core/kadascoordinateformat.h>
 #include <kadas/gui/kadasclipboard.h>
+#include <kadas/gui/kadasitemcontextmenuactions.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadascircleitem.h>
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
 #include <kadas/gui/mapitems/kadasselectionrectitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
-#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
@@ -63,22 +55,8 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
   if ( pickedItem )
   {
     addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
-    if ( dynamic_cast<KadasPinItem *>( pickedItem ) )
-    {
-      addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasCanvasContextMenu::copyItemPosition );
-      addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::convertPinToWaypoint );
-    }
-    else if ( dynamic_cast<KadasPointItem *>( pickedItem ) )
-    {
-      addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::convertWaypointToPin );
-    }
-    else if ( dynamic_cast<KadasCircleItem *>( pickedItem ) )
-    {
-      addAction( QIcon( ":/kadas/icons/polygon" ), tr( "Convert to polygon" ), this, &KadasCanvasContextMenu::convertCircleToPolygon );
-    }
-    addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasCanvasContextMenu::cutItem );
-    addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyItem );
-    addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteItem );
+    KadasItemLayer *itemLayer = static_cast< KadasItemLayer * >( mPickResult.layer );
+    mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
     mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
     mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
     KadasMapCanvasItemManager::addItem( mSelRect );
@@ -157,7 +135,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoi
 
   if ( mPickResult.isEmpty() )
   {
-    addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), this, [this] { copyCoordinates( mMapPos ); } );
+    addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), this, &KadasCanvasContextMenu::copyCoordinates );
     addAction( QIcon( ":/kadas/icons/copy_map" ), tr( "Copy map" ), this, &KadasCanvasContextMenu::copyMap );
     addAction( QgsApplication::getThemeIcon( "/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
   }
@@ -174,87 +152,7 @@ void KadasCanvasContextMenu::identify()
   KadasMapIdentifyDialog::popup( mCanvas, mMapPos );
 }
 
-void KadasCanvasContextMenu::convertWaypointToPin()
-{
-  KadasMapItem *pickedItem = static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  KadasPointItem *pointItem = dynamic_cast<KadasPointItem *>( pickedItem );
-
-  KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-  pin->setEditor( "KadasSymbolAttributesEditor" );
-  if ( dynamic_cast<KadasGpxWaypointItem *>( pointItem ) )
-  {
-    pin->setName( static_cast<KadasGpxWaypointItem *>( pointItem )->name() );
-  }
-  QgsCoordinateTransform crst( pointItem->crs(), pin->crs(), QgsProject::instance()->transformContext() );
-  pin->setPosition( KadasItemPos::fromPoint( crst.transform( pointItem->position() ) ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
-
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->triggerRepaint();
-  mPickResult.layer->triggerRepaint();
-  delete pointItem;
-}
-
-void KadasCanvasContextMenu::convertCircleToPolygon()
-{
-  KadasMapItem *pickedItem = static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId];
-  KadasCircleItem *circleItem = static_cast<KadasCircleItem *>( pickedItem );
-  if ( circleItem->constState()->centers.isEmpty() )
-  {
-    return;
-  }
-  bool ok = false;
-  int num = QInputDialog::getInt( kApp->mainWindow(), tr( "Vertex Count" ), tr( "Number of polygon vertices:" ), 10, 3, 10000, 1, &ok );
-  if ( !ok )
-  {
-    return;
-  }
-  KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
-  KadasItemPos pos = circleItem->constState()->centers.front();
-  double r = qSqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
-
-  QgsLineString *ring = new QgsLineString();
-  for ( int i = 0; i < num; ++i )
-  {
-    ring->addVertex( QgsPoint( pos.x() + r * qCos( ( 2. * i ) / num * M_PI ), pos.y() + r * qSin( ( 2. * i ) / num * M_PI ) ) );
-  }
-  ring->addVertex( QgsPoint( pos.x() + r, pos.y() ) );
-  QgsPolygon poly;
-  poly.setExteriorRing( ring );
-
-  polygonitem->addPartFromGeometry( poly );
-  polygonitem->setOutline( circleItem->outline() );
-  polygonitem->setFill( circleItem->fill() );
-
-  static_cast<KadasItemLayer *>( mPickResult.layer )->addItem( polygonitem );
-  delete static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  mPickResult.layer->triggerRepaint();
-}
-
-void KadasCanvasContextMenu::convertPinToWaypoint()
-{
-  KadasMapItem *pickedItem = static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  KadasPinItem *pin = dynamic_cast<KadasPinItem *>( pickedItem );
-
-  KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-  waypoint->setEditor( "KadasGpxWaypointEditor" );
-  waypoint->setName( pin->name() );
-  QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
-  waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->addItem( waypoint );
-
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->triggerRepaint();
-  mPickResult.layer->triggerRepaint();
-  delete pin;
-}
-
-void KadasCanvasContextMenu::copyItemPosition()
-{
-  KadasMapItem *item = static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId];
-  QgsCoordinateTransform crst( item->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-  copyCoordinates( crst.transform( item->position() ) );
-}
-
-void KadasCanvasContextMenu::copyCoordinates( const QgsPointXY &mapPos )
+void KadasCanvasContextMenu::copyCoordinates()
 {
   const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
   QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mMapPos, mapCrs );
@@ -268,13 +166,6 @@ void KadasCanvasContextMenu::copyCoordinates( const QgsPointXY &mapPos )
   QApplication::clipboard()->setText( text );
 }
 
-void KadasCanvasContextMenu::cutItem()
-{
-  KadasMapItem *item = static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << item );
-  mPickResult.layer->triggerRepaint();
-}
-
 void KadasCanvasContextMenu::copyFeature()
 {
   QgsFeatureStore featureStore( static_cast<QgsVectorLayer *>( mPickResult.layer )->fields(), mPickResult.layer->crs() );
@@ -282,21 +173,9 @@ void KadasCanvasContextMenu::copyFeature()
   KadasClipboard::instance()->setStoredFeatures( featureStore );
 }
 
-void KadasCanvasContextMenu::copyItem()
-{
-  KadasMapItem *item = static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId]->clone();
-  KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << item );
-}
-
 void KadasCanvasContextMenu::copyMap()
 {
   kApp->saveMapToClipboard();
-}
-
-void KadasCanvasContextMenu::deleteItem()
-{
-  delete static_cast<KadasItemLayer *>( mPickResult.layer )->takeItem( mPickResult.itemId );
-  mPickResult.layer->triggerRepaint();
 }
 
 void KadasCanvasContextMenu::deleteItems()
