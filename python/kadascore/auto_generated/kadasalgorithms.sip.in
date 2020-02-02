@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/catalog/kadasvbscatalogprovider.h                          *
+ * kadas/core/kadasalgorithms.h                                         *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -10,7 +10,7 @@
 
 
 
-class KadasVBSCatalogProvider : KadasCatalogProvider
+class KadasAlgorithms
 {
 %Docstring
 *************************************************************************
@@ -24,22 +24,28 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/catalog/kadasvbscatalogprovider.h"
+#include "kadas/core/kadasalgorithms.h"
 %End
   public:
-    KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser );
-    virtual void load();
+    struct Rect
+    {
+      int x1, y1, x2, y2;
+      void *data;
+    };
+    struct Cluster
+    {
+      int x1, y1, x2, y2;
+      QList<Rect> rects;
+    };
 
-
-  signals:
-    void userChanged( const QString &user );
+    static QList<Cluster> overlappingRects( const QList<Rect> &rects );
 
 };
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/catalog/kadasvbscatalogprovider.h                          *
+ * kadas/core/kadasalgorithms.h                                         *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
