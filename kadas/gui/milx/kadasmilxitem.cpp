@@ -611,7 +611,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
 
-  menu->addAction( tr( "Symbol editor..." ), [ = ]
+  menu->addAction( QIcon( ":/kadas/icons/editor" ), tr( "Symbol editor..." ), [ = ]
   {
     KadasMilxClient::NPointSymbolGraphic result;
     WId winId = QApplication::topLevelWidgets().front()->winId();
@@ -624,7 +624,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   {
     if ( context.vidx.vertex >= 0 )
     {
-      QAction *actionDeletePoint = menu->addAction( tr( "Delete node" ), [ = ]
+      QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), [ = ]
       {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, result ) )
@@ -635,7 +635,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
     }
     else
     {
-      menu->addAction( tr( "Add node" ), [ = ]
+      menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), [ = ]
       {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, result ) )

@@ -272,7 +272,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   if ( context.vidx.vertex >= 0 )
   {
-    QAction *deleteNodeAction = menu->addAction( tr( "Delete node" ), menu, [this, context]
+    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context]
     {
       state()->points[context.vidx.part].removeAt( context.vidx.vertex );
       recomputeDerived();
@@ -281,7 +281,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( tr( "Add node" ), menu, [ = ]
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [ = ]
     {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
