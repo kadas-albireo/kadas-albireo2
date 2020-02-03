@@ -17,6 +17,8 @@
 #ifndef KADASALGORITHMS_H
 #define KADASALGORITHMS_H
 
+#ifndef SIP_RUN
+
 #include <QList>
 
 #include <kadas/core/kadas_core.h>
@@ -39,5 +41,7 @@ class KADAS_CORE_EXPORT KadasAlgorithms
     static QList<Cluster> overlappingRects( const QList<Rect> &rects );
 
 };
+
+#endif // SIP_RUN
 
 #endif // KADASALGORITHMS_H
