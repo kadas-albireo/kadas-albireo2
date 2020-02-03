@@ -66,6 +66,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
 
   private slots:
     void itemDestroyed();
+    void checkRemovedLayer( QgsMapLayer *layer );
     void inputChanged();
     void stateChanged( KadasStateHistory::State *state );
     void copyItem();

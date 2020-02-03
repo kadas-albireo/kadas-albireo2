@@ -41,6 +41,7 @@
 KadasMapToolEditItemGroup::KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer )
   : QgsMapTool( canvas ), mItems( items ), mLayer( layer )
 {
+  connect( QgsProject::instance(), qOverload<QgsMapLayer *>( &QgsProject::layerWillBeRemoved ), this, &KadasMapToolEditItemGroup::checkRemovedLayer );
 }
 
 void KadasMapToolEditItemGroup::activate()
@@ -303,4 +304,12 @@ void KadasMapToolEditItemGroup::updateSelection()
 {
   mStatusLabel->setText( tr( "%1 item(s) selected on layer %2" ).arg( mItems.size() ).arg( mLayer->name() ) );
   mSelectionRect->setSelectedItems( mItems );
+}
+
+void KadasMapToolEditItemGroup::checkRemovedLayer( QgsMapLayer *layer )
+{
+  if ( layer == mLayer )
+  {
+    canvas()->unsetMapTool( this );
+  }
 }

@@ -42,6 +42,7 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasIte
   , mLayer( layer )
 {
   mItem = layer->takeItem( itemId );
+  connect( QgsProject::instance(), qOverload<QgsMapLayer *>( &QgsProject::layerWillBeRemoved ), this, &KadasMapToolEditItem::checkRemovedLayer );
   layer->triggerRepaint();
   KadasMapCanvasItemManager::addItem( mItem );
 }
@@ -374,6 +375,14 @@ void KadasMapToolEditItem::itemDestroyed()
   mEditor = nullptr;
   mItem = nullptr;
   canvas()->unsetMapTool( this );
+}
+
+void KadasMapToolEditItem::checkRemovedLayer( QgsMapLayer *layer )
+{
+  if ( layer == mLayer )
+  {
+    canvas()->unsetMapTool( this );
+  }
 }
 
 KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos ) const

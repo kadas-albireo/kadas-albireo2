@@ -59,6 +59,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
     void deleteItems();
     void deselectItem( KadasMapItem *item, bool triggerRepaint = true );
     void updateSelection();
+    void checkRemovedLayer( QgsMapLayer *layer );
 };
 
 #endif // KADASMAPTOOLEDITITEMGROUP_H
