@@ -189,6 +189,7 @@ void KadasMainWindow::init()
 
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
+  connect( mLayerTreeView, &QAbstractItemView::doubleClicked, this, &KadasMainWindow::layerTreeViewDoubleClicked );
 
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem );
@@ -1086,6 +1087,15 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
       kApp->showLayerProperties( layer );
     } );
     mInfoBar->pushItem( item );
+  }
+}
+
+void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &index )
+{
+  QgsMapLayer *layer = mLayerTreeView->currentLayer();
+  if ( layer )
+  {
+    kApp->showLayerProperties( layer );
   }
 }
 
