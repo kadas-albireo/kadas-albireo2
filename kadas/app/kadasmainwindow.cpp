@@ -1153,5 +1153,5 @@ void KadasMainWindow::showPluginManager( bool show )
 
 void KadasMainWindow::showAuthenticatedUser( const QString &user )
 {
-  mLabelUsername->setText( user.isEmpty() ? "" : QString( "<small>%1<br />%2</small>" ).arg( tr( "Authenticated in as:" ), user ) );
+  mLabelUsername->setText( user.isEmpty() ? "" : QString( "<small>%1<br />%2</small>" ).arg( tr( "Authenticated as:" ), user ) );
 }
