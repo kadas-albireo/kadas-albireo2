@@ -122,6 +122,7 @@ class KadasItemLayer : KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     virtual QString layerTypeKey() const;
+
     void addItem( KadasMapItem *item /Transfer/ );
     KadasMapItem *takeItem( const ItemId &itemId ) /Transfer/;
     const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const;

@@ -30,6 +30,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     KadasMilxLayer( const QString &name = "MilX" );
     virtual QString layerTypeKey() const;
+
     virtual bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context );
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;

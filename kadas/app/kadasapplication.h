@@ -64,7 +64,7 @@ class KadasApplication : public QgsApplication
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
-    KadasItemLayer *selectItemLayer();
+    KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
 
     bool projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile );

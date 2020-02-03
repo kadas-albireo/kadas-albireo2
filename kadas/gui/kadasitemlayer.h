@@ -137,6 +137,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     QString layerTypeKey() const override { return layerType(); };
+    virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
     void addItem( KadasMapItem *item SIP_TRANSFER );
     KadasMapItem *takeItem( const ItemId &itemId ) SIP_TRANSFER;

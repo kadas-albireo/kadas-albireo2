@@ -91,6 +91,11 @@ KadasMilxLayer::KadasMilxLayer( const QString &name )
 {
 }
 
+bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
+{
+  return dynamic_cast<const KadasMilxItem *>( item );
+}
+
 QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
   return new Renderer( this, rendererContext );

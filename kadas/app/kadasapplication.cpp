@@ -579,14 +579,28 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
   }
 }
 
-KadasItemLayer *KadasApplication::selectItemLayer()
+KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasMapItem *> &items )
 {
   QDialog dialog;
   dialog.setWindowTitle( tr( "Select layer" ) );
   dialog.setLayout( new QVBoxLayout() );
   dialog.layout()->setMargin( 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
-  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); } );
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer * layer )
+  {
+    if ( !dynamic_cast<KadasItemLayer *>( layer ) )
+    {
+      return false;
+    }
+    for ( const KadasMapItem *item : items )
+    {
+      if ( !static_cast<KadasItemLayer *>( layer )->acceptsItem( item ) )
+      {
+        return false;
+      }
+    }
+    return true;
+  } );
   dialog.layout()->addWidget( layerSelectionWidget );
   QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
   connect( buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept );
@@ -1113,7 +1127,6 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
   if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
   {
-    KadasItemLayer *layer = kApp->selectItemLayer();
     QList<KadasMapItem *> items;
     QList<QgsPointXY> itemPos;
     QgsPointXY center;
@@ -1132,6 +1145,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
       items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
     }
+    KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
     if ( items.size() == 1 )
     {
       return new KadasMapToolEditItem( canvas, items.front(), layer );
@@ -1143,7 +1157,6 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   }
   else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
   {
-    KadasItemLayer *layer = kApp->selectItemLayer();
     QList<KadasMapItem *> items;
     const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
     for ( const QgsFeature &feature : featureStore.features() )
@@ -1167,6 +1180,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
         items.append( item );
       }
     }
+    KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
     if ( items.size() == 1 )
     {
       return new KadasMapToolEditItem( canvas, items.front(), layer );
