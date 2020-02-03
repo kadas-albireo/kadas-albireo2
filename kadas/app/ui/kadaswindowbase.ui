@@ -480,11 +480,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLabel" name="mLabelUsername">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
+                <widget class="QLabel" name="mLabelUsername"/>
                </item>
                <item>
                 <spacer name="horizontalSpacer">

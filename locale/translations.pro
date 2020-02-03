@@ -3,8 +3,10 @@ include(translations.pri)
 SOURCES += \
 ../kadas/core/kadaslatlontoutm.h \
 ../kadas/core/kadascoordinateformat.h \
+../kadas/core/kadasalgorithms.h \
 ../kadas/core/kadaslatlontoutm.cpp \
 ../kadas/core/kadasstatehistory.cpp \
+../kadas/core/kadasalgorithms.cpp \
 ../kadas/core/kadas.cpp \
 ../kadas/core/kadascoordinateformat.cpp \
 ../kadas/core/kadas.h \
@@ -18,6 +20,7 @@ SOURCES += \
 ../kadas/analysis/kadashillshadefilter.h \
 ../kadas/analysis/kadasviewshedfilter.cpp \
 ../kadas/analysis/kadasslopefilter.h \
+../kadas/gui/kadasitemcontextmenuactions.h \
 ../kadas/gui/kadasfloatinginputwidget.cpp \
 ../kadas/gui/kadasitemlayer.cpp \
 ../kadas/gui/kadasmapcanvasitem.h \
@@ -160,6 +163,7 @@ SOURCES += \
 ../kadas/gui/kadasclipboard.cpp \
 ../kadas/gui/kadascoordinateinput.cpp \
 ../kadas/gui/kadastextbrowser.h \
+../kadas/gui/kadasitemcontextmenuactions.cpp \
 ../kadas/gui/kadasribbonbutton.cpp \
 ../kadas/gui/kadasclipboard.h \
 ../kadas/gui/kadascatalogbrowser.cpp \
