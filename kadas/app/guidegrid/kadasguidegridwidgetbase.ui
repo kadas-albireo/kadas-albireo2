@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>546</width>
+    <width>630</width>
     <height>126</height>
    </rect>
   </property>
@@ -413,6 +413,25 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lineEditTopLeft</tabstop>
+  <tabstop>toolButtonPickTopLeft</tabstop>
+  <tabstop>spinBoxCols</tabstop>
+  <tabstop>spinBoxRows</tabstop>
+  <tabstop>lineEditBottomRight</tabstop>
+  <tabstop>toolButtonPickBottomRight</tabstop>
+  <tabstop>spinBoxWidth</tabstop>
+  <tabstop>toolButtonLockWidth</tabstop>
+  <tabstop>spinBoxHeight</tabstop>
+  <tabstop>toolButtonLockHeight</tabstop>
+  <tabstop>toolButtonColor</tabstop>
+  <tabstop>spinBoxFontSize</tabstop>
+  <tabstop>comboBoxRowLabels</tabstop>
+  <tabstop>toolButtonSwitchLabels</tabstop>
+  <tabstop>comboBoxColLabels</tabstop>
+  <tabstop>comboBoxLabelPos</tabstop>
+  <tabstop>checkBoxQuadrants</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources/resources.qrc"/>
  </resources>

@@ -68,6 +68,10 @@
    <header location="global">kadas/gui/kadastextbrowser.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mLineEditName</tabstop>
+  <tabstop>mTextEditRemarks</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

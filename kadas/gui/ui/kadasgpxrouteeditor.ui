@@ -129,6 +129,12 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mLineEditName</tabstop>
+  <tabstop>mLineEditNumber</tabstop>
+  <tabstop>mToolButtonColor</tabstop>
+  <tabstop>mSpinBoxSize</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

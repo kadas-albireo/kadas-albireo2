@@ -217,6 +217,14 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>comboBoxGridType</tabstop>
+  <tabstop>spinBoxIntervalX</tabstop>
+  <tabstop>spinBoxIntervalY</tabstop>
+  <tabstop>toolButtonColor</tabstop>
+  <tabstop>spinBoxFontSize</tabstop>
+  <tabstop>comboBoxLabeling</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

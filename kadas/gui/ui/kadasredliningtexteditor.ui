@@ -67,7 +67,7 @@
    <item row="1" column="2">
     <widget class="QPushButton" name="mPushButtonBold">
      <property name="icon">
-      <iconset>
+      <iconset resource="../../resources/resources.qrc">
        <normaloff>:/kadas/icons/textBold</normaloff>:/kadas/icons/textBold</iconset>
      </property>
      <property name="checkable">
@@ -78,7 +78,7 @@
    <item row="1" column="3">
     <widget class="QPushButton" name="mPushButtonItalic">
      <property name="icon">
-      <iconset>
+      <iconset resource="../../resources/resources.qrc">
        <normaloff>:/kadas/icons/textItalic</normaloff>:/kadas/icons/textItalic</iconset>
      </property>
      <property name="checkable">
@@ -170,6 +170,17 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <tabstops>
+  <tabstop>mLineEditText</tabstop>
+  <tabstop>mToolButtonFillColor</tabstop>
+  <tabstop>mToolButtonBorderColor</tabstop>
+  <tabstop>mFontComboBox</tabstop>
+  <tabstop>mSpinBoxSize</tabstop>
+  <tabstop>mPushButtonBold</tabstop>
+  <tabstop>mPushButtonItalic</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -263,6 +263,16 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>toolButtonPickCenter</tabstop>
+  <tabstop>spinBoxAxesInterval</tabstop>
+  <tabstop>spinBoxRings</tabstop>
+  <tabstop>spinBoxRingInterval</tabstop>
+  <tabstop>toolButtonColor</tabstop>
+  <tabstop>spinBoxLineWidth</tabstop>
+  <tabstop>comboBoxLabels</tabstop>
+  <tabstop>spinBoxFontSize</tabstop>
+ </tabstops>
  <resources>
   <include location="../../resources/resources.qrc"/>
  </resources>

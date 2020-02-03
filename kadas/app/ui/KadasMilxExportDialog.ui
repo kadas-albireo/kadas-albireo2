@@ -56,6 +56,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>listWidget</tabstop>
+  <tabstop>comboCartouche</tabstop>
+  <tabstop>comboMilxVersion</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
