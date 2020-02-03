@@ -86,14 +86,10 @@ void KadasKmlIntegration::exportToKml()
 
 void KadasKmlIntegration::importFromKml()
 {
-  QStringList filters;
-  filters.append( tr( "KMZ File (*.kmz)" ) );
-  filters.append( tr( "KML File (*.kml)" ) );
-
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString selectedFilter;
 
-  QString filename = QFileDialog::getOpenFileName( kApp->mainWindow(), tr( "Select KML/KMZ File" ), lastDir, filters.join( ";;" ), &selectedFilter );
+  QString filename = QFileDialog::getOpenFileName( kApp->mainWindow(), tr( "Select KML/KMZ File" ), lastDir, tr( "KML Files (*.kml *.kmz)" ), &selectedFilter );
   if ( filename.isEmpty() )
   {
     return;
