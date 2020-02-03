@@ -53,7 +53,7 @@ class KadasGlobeVectorLayerConfig : public QObject
     osgEarth::Symbology::AltitudeSymbol::Binding altitudeBinding = osgEarth::Symbology::AltitudeSymbol::BINDING_VERTEX;
 
     float verticalOffset = 0.0;
-    float verticalScale = 0.0;
+    float verticalScale = 1.0;
     float clampingResolution = 0.0;
 
     bool extrusionEnabled = false;

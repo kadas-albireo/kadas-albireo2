@@ -169,7 +169,7 @@ void KadasGlobeVectorLayerPropertiesPage::showRenderingModeWidget( int index )
     comboBoxAltitudeTechnique->setCurrentIndex( comboBoxAltitudeTechnique->findData( static_cast<int>( osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_GPU ) ) );
     spinBoxAltitudeResolution->setValue( 0 );
     spinBoxAltitudeOffset->setValue( 0 );
-    spinBoxAltitudeScale->setValue( 0 );
+    spinBoxAltitudeScale->setValue( 1 );
     checkBoxExtrusionFlatten->setChecked( false );
   }
 }

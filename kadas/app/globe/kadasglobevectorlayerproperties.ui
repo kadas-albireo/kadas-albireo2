@@ -123,12 +123,21 @@
             <property name="toolTip">
              <string>Vertical offset to apply to geometry Z</string>
             </property>
+            <property name="minimum">
+             <double>-9999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>9999.000000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="5" column="1">
            <widget class="QDoubleSpinBox" name="spinBoxAltitudeScale">
             <property name="toolTip">
              <string>Scale factor to apply to geometry Z</string>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
