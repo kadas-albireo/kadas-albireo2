@@ -115,7 +115,7 @@ void KadasWorldLocationSearchProvider::replyFinished()
 
 
     SearchResult searchResult;
-    searchResult.pos = QgsPointXY( itemAttrsMap["x"].toDouble(), itemAttrsMap["y"].toDouble() );
+    searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
     searchResult.zoomScale = 25000;
 
     searchResult.category = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;

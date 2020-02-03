@@ -127,14 +127,14 @@ void KadasLocationSearchProvider::replyFinished()
                                         mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
     }
     // When bbox is empty, fallback to pos + zoomScale is used
-    searchResult.pos = QgsPointXY( itemAttrsMap["y"].toDouble(), itemAttrsMap["x"].toDouble() );
+    searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
     searchResult.zoomScale = origin == "address" ? 5000 : 25000;
 
     searchResult.category = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
     searchResult.categoryPrecedence = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 100;
     searchResult.text = itemAttrsMap["label"].toString();
     searchResult.text.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
-    searchResult.crs = "EPSG:21781";
+    searchResult.crs = "EPSG:4326";
     searchResult.showPin = true;
     searchResult.fuzzy = fuzzy;
     emit searchResultFound( searchResult );
