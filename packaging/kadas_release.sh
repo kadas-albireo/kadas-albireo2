@@ -30,6 +30,7 @@ rm -f $distroot/share/qgis/FindQGIS.cmake
 # Remove unused translations
 find $distroot/share/qgis/i18n/ -type f -not -regex '^.*/qgis_\(de\|it\|fr\)\.qm$' -delete
 
+# Copy settings, templates, etc.
 cp -a $filesdir/* $distroot/share/kadas/
 
 # Copy proj datum grid shifts
