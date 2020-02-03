@@ -27,6 +27,8 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
   public:
     KadasGpxWaypointItem();
 
+    QString itemName() const override { return tr( "Waypoint" ); }
+
     const QString &name() const { return mName; }
     void setName( const QString &name );
 

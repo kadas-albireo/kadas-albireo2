@@ -28,6 +28,8 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasGpxWaypointItem();
 
+    virtual QString itemName() const;
+
     const QString &name() const;
     void setName( const QString &name );
 
