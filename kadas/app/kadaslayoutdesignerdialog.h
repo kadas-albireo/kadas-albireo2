@@ -221,7 +221,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     void exportToPdf();
 
     void pageSetup();
-    void pageOrientationChanged();
 
     void updateWindowTitle();
 
@@ -306,7 +305,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
 
     //! Page & Printer Setup
     std::unique_ptr< QPrinter > mPrinter;
-    bool mSetPageOrientation = false;
 
     QString mTitle;
     QString mSectionTitle;
@@ -333,7 +331,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     void loadPredefinedScalesFromProject();
     QVector<double> predefinedScales() const;
 
-    void setPrinterPageOrientation( QgsLayoutItemPage::Orientation orientation );
     QPrinter *printer();
 
     QString defaultExportPath() const;

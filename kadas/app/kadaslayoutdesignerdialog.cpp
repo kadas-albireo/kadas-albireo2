@@ -738,9 +738,6 @@ void KadasLayoutDesignerDialog::showItemOptions( QgsLayoutItem *item, bool bring
   widget->setDesignerInterface( iface() );
   widget->setMasterLayout( mLayout );
 
-  if ( QgsLayoutPagePropertiesWidget *ppWidget = qobject_cast< QgsLayoutPagePropertiesWidget * >( widget.get() ) )
-    connect( ppWidget, &QgsLayoutPagePropertiesWidget::pageOrientationChanged, this, &KadasLayoutDesignerDialog::pageOrientationChanged );
-
   widget->setDockMode( true );
   connect( item, &QgsLayoutItem::destroyed, widget.get(), [this]
   {
@@ -1209,14 +1206,11 @@ void KadasLayoutDesignerDialog::deleteLayout()
 
 void KadasLayoutDesignerDialog::print()
 {
-  if ( currentLayout()->pageCollection()->pageCount() == 0 )
+  if ( !currentLayout() || currentLayout()->pageCollection()->pageCount() == 0 )
     return;
 
   // get orientation from first page
-  QgsLayoutItemPage::Orientation orientation = currentLayout()->pageCollection()->page( 0 )->orientation();
-
-  //set printer page orientation
-  setPrinterPageOrientation( orientation );
+  printer()->setPageLayout( currentLayout()->pageCollection()->page( 0 )->pageLayout() );
 
   QPrintDialog printDialog( printer(), nullptr );
   if ( printDialog.exec() != QDialog::Accepted )
@@ -1455,19 +1449,11 @@ void KadasLayoutDesignerDialog::pageSetup()
 {
   if ( currentLayout() && currentLayout()->pageCollection()->pageCount() > 0 )
   {
-    // get orientation from first page
-    QgsLayoutItemPage::Orientation orientation = currentLayout()->pageCollection()->page( 0 )->orientation();
-    //set printer page orientation
-    setPrinterPageOrientation( orientation );
+    printer()->setPageLayout( currentLayout()->pageCollection()->page( 0 )->pageLayout() );
   }
 
   QPageSetupDialog pageSetupDialog( printer(), this );
   pageSetupDialog.exec();
-}
-
-void KadasLayoutDesignerDialog::pageOrientationChanged()
-{
-  mSetPageOrientation = false;
 }
 
 void KadasLayoutDesignerDialog::paste()
@@ -1790,25 +1776,6 @@ QVector<double> KadasLayoutDesignerDialog::predefinedScales() const
     }
   }
   return projectScales;
-}
-
-void KadasLayoutDesignerDialog::setPrinterPageOrientation( QgsLayoutItemPage::Orientation orientation )
-{
-  if ( !mSetPageOrientation )
-  {
-    switch ( orientation )
-    {
-      case QgsLayoutItemPage::Landscape:
-        printer()->setOrientation( QPrinter::Landscape );
-        break;
-
-      case QgsLayoutItemPage::Portrait:
-        printer()->setOrientation( QPrinter::Portrait );
-        break;
-    }
-
-    mSetPageOrientation = true;
-  }
 }
 
 QPrinter *KadasLayoutDesignerDialog::printer()
