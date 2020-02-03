@@ -109,9 +109,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   connect( mMasterCanvas, &QgsMapCanvas::extentsChanged, this, &KadasMapWidget::syncCanvasExtents );
   connect( mMasterCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMapWidget::updateMapProjection );
-//  connect( mMasterCanvas, &QgsMapCanvas::layersChanged, this, &KadasMapWidget::updateLayerSelectionMenu ); // TODO, neccessary?
-  connect( QgsProject::instance(), &QgsProject::layersAdded, this, &KadasMapWidget::updateLayerSelectionMenu );
-  connect( QgsProject::instance(), &QgsProject::layerRemoved, this, &KadasMapWidget::updateLayerSelectionMenu );
+  connect( QgsProject::instance()->layerTreeRoot(), &QgsLayerTree::layerOrderChanged, this, &KadasMapWidget::updateLayerSelectionMenu );
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, mMasterCanvas, &QgsMapCanvas::xyCoordinates );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMapWidget::addMapCanvasItem );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMapWidget::removeMapCanvasItem );
@@ -215,12 +213,6 @@ void KadasMapWidget::updateLayerSelectionMenu()
       prevDisabledLayers.append( action->data().toString() );
     }
   }
-  QStringList masterLayers;
-  for ( const QgsMapLayer *layer : mMasterCanvas->layers() )
-  {
-    masterLayers.append( layer->id() );
-  }
-
   mLayerSelectionMenu->clear();
   // Use layerTreeRoot to get layers ordered as in the layer tree
   for ( QgsLayerTreeLayer *layerTreeLayer : QgsProject::instance()->layerTreeRoot()->findLayers() )
@@ -240,7 +232,7 @@ void KadasMapWidget::updateLayerSelectionMenu()
     else
     {
       bool wasDisabled = prevDisabledLayers.contains( layer->id() );
-      bool isNewEnabledLayer = !prevLayers.contains( layer->id() ) && masterLayers.contains( layer->id() );
+      bool isNewEnabledLayer = !prevLayers.contains( layer->id() );
       layerAction->setChecked( ( prevLayers.contains( layer->id() ) && !wasDisabled ) || isNewEnabledLayer );
     }
     connect( layerAction, &QAction::toggled, this, &KadasMapWidget::updateLayerSet );
