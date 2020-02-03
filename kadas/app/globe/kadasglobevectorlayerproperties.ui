@@ -228,13 +228,6 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxLighting">
-         <property name="text">
-          <string>Lighting</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </widget>

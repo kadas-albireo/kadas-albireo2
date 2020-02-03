@@ -104,8 +104,6 @@ KadasGlobeVectorLayerPropertiesPage::KadasGlobeVectorLayerPropertiesPage( QgsMap
   checkBoxLabelingDeclutter->setChecked( false );
   groupBoxLabelingEnabled->setVisible( false );
   checkBoxLabelingDeclutter->setVisible( false );
-
-  checkBoxLighting->setChecked( layerConfig->lightingEnabled );
 }
 
 void KadasGlobeVectorLayerPropertiesPage::apply()
@@ -128,8 +126,6 @@ void KadasGlobeVectorLayerPropertiesPage::apply()
 
   layerConfig->labelingEnabled = groupBoxLabelingEnabled->isChecked();
   layerConfig->labelingDeclutter = checkBoxLabelingDeclutter->isChecked();
-
-  layerConfig->lightingEnabled = checkBoxLighting->isChecked();
 
   emit layerSettingsChanged( mLayer );
 }
@@ -161,7 +157,6 @@ void KadasGlobeVectorLayerPropertiesPage::showRenderingModeWidget( int index )
   stackedWidgetRenderingMode->setCurrentIndex( index != 0 );
   bool advanced = index == 2;
   groupBoxAltitude->setVisible( advanced );
-  checkBoxLighting->setVisible( advanced );
   checkBoxExtrusionFlatten->setVisible( advanced );
   if ( !advanced )
   {
