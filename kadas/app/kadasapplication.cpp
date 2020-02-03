@@ -1146,7 +1146,12 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
     }
     KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
-    if ( items.size() == 1 )
+    if ( !layer )
+    {
+      qDeleteAll( items );
+      return nullptr;
+    }
+    else if ( items.size() == 1 )
     {
       return new KadasMapToolEditItem( canvas, items.front(), layer );
     }
@@ -1181,7 +1186,12 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       }
     }
     KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
-    if ( items.size() == 1 )
+    if ( !layer )
+    {
+      qDeleteAll( items );
+      return nullptr;
+    }
+    else if ( items.size() == 1 )
     {
       return new KadasMapToolEditItem( canvas, items.front(), layer );
     }
