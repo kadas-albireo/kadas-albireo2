@@ -42,7 +42,6 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasIte
   , mLayer( layer )
 {
   mItem = layer->takeItem( itemId );
-  connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
   layer->triggerRepaint();
   KadasMapCanvasItemManager::addItem( mItem );
 }
@@ -160,7 +159,12 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
         menu.addSeparator();
       }
       KadasItemContextMenuActions actions( mCanvas, &menu, mItem, mLayer );
+      connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
       QAction *clickedAction = menu.exec( e->globalPos() );
+      if ( mItem )
+      {
+        disconnect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
+      }
 
       if ( clickedAction )
       {
