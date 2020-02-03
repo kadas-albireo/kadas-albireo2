@@ -903,7 +903,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     std::sort( panelIndices.begin(), panelIndices.end() );
     for ( int i = panelIndices.length() - 1; i >= 0; --i )
     {
-      delete optionsWidget->item( panelIndices[i] );
+      optionsWidget->item( panelIndices[i] )->setHidden( true );
     }
 
     dialog.exec();
@@ -923,7 +923,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     std::sort( panelIndices.begin(), panelIndices.end() );
     for ( int i = panelIndices.length() - 1; i >= 0; --i )
     {
-      delete optionsWidget->item( panelIndices[i] );
+      optionsWidget->item( panelIndices[i] )->setHidden( true );
     }
 
     for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
@@ -946,9 +946,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 int KadasApplication::hideDialogPanel( const QString &name, QStackedWidget *stackedWidget )
 {
   QWidget *widget = stackedWidget->findChild<QWidget *>( name );
-  int index = stackedWidget->indexOf( widget );
-  widget->hide();
-  return index;
+  return stackedWidget->indexOf( widget );
 }
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
