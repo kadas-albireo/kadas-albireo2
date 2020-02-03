@@ -30,7 +30,10 @@
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
+#include <kadas/gui/mapitems/kadaspointitem.h>
+#include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitems/kadasselectionrectitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
@@ -147,6 +150,30 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
       menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItemGroup::cutItems );
       menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItemGroup::copyItems );
       menu.addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItemGroup::deleteItems );
+
+      // Special actions
+      int nPoints = 0;
+      int nPins = 0;
+      for ( const KadasMapItem *item : mItems )
+      {
+        if ( dynamic_cast<const KadasPointItem *>( item ) )
+        {
+          ++nPoints;
+        }
+        else if ( dynamic_cast<const KadasPinItem *>( item ) )
+        {
+          ++nPins;
+        }
+      }
+      if ( nPoints == mItems.size() )
+      {
+        menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasMapToolEditItemGroup::createPinsFromPoints );
+      }
+      else if ( nPins == mItems.size() )
+      {
+        menu.addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasMapToolEditItemGroup::createWaypointsFromPins );
+      }
+
       menu.exec( e->globalPos() );
     }
     else
@@ -205,6 +232,41 @@ void KadasMapToolEditItemGroup::keyPressEvent( QKeyEvent *e )
   {
     deleteItems();
   }
+}
+
+void KadasMapToolEditItemGroup::createPinsFromPoints()
+{
+  for ( const KadasMapItem *item : mItems )
+  {
+    KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+    pin->setEditor( "KadasSymbolAttributesEditor" );
+    if ( dynamic_cast<const KadasGpxWaypointItem *>( item ) )
+    {
+      pin->setName( static_cast<const KadasGpxWaypointItem *>( item )->name() );
+    }
+    QgsCoordinateTransform crst( item->crs(), pin->crs(), QgsProject::instance()->transformContext() );
+    pin->setPosition( KadasItemPos::fromPoint( crst.transform( item->position() ) ) );
+    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
+  }
+
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->triggerRepaint();
+  deleteItems();
+}
+
+void KadasMapToolEditItemGroup::createWaypointsFromPins()
+{
+  for ( const KadasMapItem *item : mItems )
+  {
+    const KadasPinItem *pin = static_cast<const KadasPinItem *>( item );
+    KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
+    waypoint->setEditor( "KadasGpxWaypointEditor" );
+    waypoint->setName( pin->name() );
+    QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
+    waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
+    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->addItem( waypoint );
+  }
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer )->triggerRepaint();
+  deleteItems();
 }
 
 void KadasMapToolEditItemGroup::copyItems()
