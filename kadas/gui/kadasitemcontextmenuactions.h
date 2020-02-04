@@ -17,6 +17,8 @@
 #ifndef KADASITEMCONTEXTMENUACTIONS_H
 #define KADASITEMCONTEXTMENUACTIONS_H
 
+#ifndef SIP_RUN
+
 #include <QObject>
 
 #include <kadas/gui/kadas_gui.h>
@@ -52,5 +54,7 @@ class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
     KadasItemLayer *mLayer = nullptr;
     KadasItemLayer::ItemId mLayerItemId = KadasItemLayer::ITEM_ID_NULL;
 };
+
+#endif // SIP_RUN
 
 #endif // KADASITEMCONTEXTMENUACTIONS_H
