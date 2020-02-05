@@ -79,6 +79,9 @@ KadasMapIdentifyDialog::KadasMapIdentifyDialog( QgsMapCanvas *canvas, const QgsP
   connect( mTreeWidget, &QTreeWidget::itemClicked, this, &KadasMapIdentifyDialog::onItemClicked );
 
   collectInfo( mapPos );
+
+  connect( QgsProject::instance(), &QgsProject::cleared, this, &KadasMapIdentifyDialog::clear );
+  connect( QgsProject::instance(), &QgsProject::cleared, this, &QObject::deleteLater );
 }
 
 KadasMapIdentifyDialog::~KadasMapIdentifyDialog()

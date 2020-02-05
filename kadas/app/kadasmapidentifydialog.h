@@ -59,12 +59,12 @@ class KadasMapIdentifyDialog : public QDialog
     QNetworkReply *mRasterIdentifyReply = nullptr;
     QMap<QString, QTreeWidgetItem *> mLayerTreeItemMap;
 
-    void clear();
     void collectInfo( const QgsPointXY &mapPos );
     void addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
     void addVectorLayerResult( QgsVectorLayer *vLayer, const QgsFeature &feature );
 
   private slots:
+    void clear();
     void onItemClicked( QTreeWidgetItem *item, int /*col*/ );
     void rasterIdentifyFinished();
 };
