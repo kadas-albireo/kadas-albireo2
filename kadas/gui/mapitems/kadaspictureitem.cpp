@@ -462,7 +462,7 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
 
     update();
   }
-  else
+  else if ( mFrame )
   {
     QgsCoordinateTransform crst( crs(), mapSettings.destinationCrs(), QgsProject::instance() );
     QgsPointXY screenPos = mapSettings.mapToPixel().transform( newPoint );
