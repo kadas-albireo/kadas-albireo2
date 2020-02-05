@@ -98,14 +98,14 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
       QgsRectangle rect;
       rect.setMinimal();
       QgsLineString *exterior = new QgsLineString();
-      QgsCoordinateTransform ct = QgsCoordinateTransform( QgsCoordinateReferenceSystem( searchRegion.crs ), QgsCoordinateReferenceSystem( "EPSG:21781" ), QgsProject::instance() );
+      QgsCoordinateTransform ct = QgsCoordinateTransform( QgsCoordinateReferenceSystem( searchRegion.crs ), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
       for ( const QgsPointXY &p : searchRegion.polygon )
       {
         QgsPointXY pt = ct.transform( p );
         rect.include( pt );
         exterior->addVertex( QgsPoint( pt ) );
       }
-      query.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( rect.xMinimum() ).arg( rect.yMinimum() ).arg( rect.xMaximum() ).arg( rect.yMaximum() ) );
+      query.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( rect.xMinimum(), 0, 'f', 4 ).arg( rect.yMinimum(), 0, 'f', 4 ).arg( rect.xMaximum(), 0, 'f', 4 ).arg( rect.yMaximum(), 0, 'f', 4 ) );
       QgsPolygon *poly = new QgsPolygon();
       poly->setExteriorRing( exterior );
       mReplyFilter = new QgsGeometry( poly );
