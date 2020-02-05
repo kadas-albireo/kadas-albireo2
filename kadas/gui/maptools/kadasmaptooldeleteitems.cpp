@@ -31,6 +31,9 @@ KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
   : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
 {
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolDeleteItems::drawFinished );
+
+  setToolLabel( tr( "Delete map items" ) );
+  setUndoRedoVisible( false );
 }
 
 KadasMapToolDeleteItems::ItemFactory KadasMapToolDeleteItems::itemFactory( QgsMapCanvas *canvas ) const
