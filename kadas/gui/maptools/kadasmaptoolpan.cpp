@@ -70,13 +70,10 @@ void KadasMapToolPan::canvasPressEvent( QgsMapMouseEvent *e )
       }
       else if ( e->modifiers() == Qt::ControlModifier )
       {
-        QgsSettings settings;
-        int red = settings.value( "/Qgis/default_measure_color_red", 255 ).toInt();
-        int green = settings.value( "/Qgis/default_measure_color_green", 0 ).toInt();
-        int blue = settings.value( "/Qgis/default_measure_color_blue", 0 ).toInt();
-        mExtentRubberBand->setFillColor( QColor( red, green, blue, 63 ) );
-        mExtentRubberBand->setStrokeColor( QColor( red, green, blue, 255 ) );
-        mExtentRubberBand->setWidth( 3 );
+        mExtentRubberBand->setFillColor( Qt::transparent );
+        mExtentRubberBand->setStrokeColor( Qt::black );
+        mExtentRubberBand->setWidth( 2 );
+        mExtentRubberBand->setLineStyle( Qt::DashLine );
       }
       mExtentRect.setTopLeft( e->pos() );
       mExtentRect.setBottomRight( e->pos() );
