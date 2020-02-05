@@ -418,7 +418,7 @@ KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &p
   {
     if ( pos.sqrDist( corners[i] ) < tol )
     {
-      return EditContext( QgsVertexId( 0, 0, 1 + i ), corners[i], KadasMapItem::AttribDefs(), Qt::SizeAllCursor );
+      return EditContext( QgsVertexId( 0, 0, 1 + i ), corners[i], KadasMapItem::AttribDefs(), i % 2 == 0 ? Qt::SizeBDiagCursor : Qt::SizeFDiagCursor );
     }
   }
   KadasMapPos testPos = toMapPos( constState()->pos, mapSettings );

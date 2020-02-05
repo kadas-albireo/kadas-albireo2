@@ -242,7 +242,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
   }
   if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
   {
-    return EditContext( QgsVertexId( 0, 0, 0 ), toMapPos( constState()->pos, mapSettings ), drawAttribs() );
+    return EditContext( QgsVertexId( 0, 0, 0 ), toMapPos( constState()->pos, mapSettings ), drawAttribs(), Qt::ArrowCursor );
   }
   return EditContext();
 }

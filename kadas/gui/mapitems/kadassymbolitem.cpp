@@ -170,7 +170,8 @@ KadasMapItem::EditContext KadasSymbolItem::getEditContext( const KadasMapPos &po
   {
     if ( pos.sqrDist( corners[i] ) < tol )
     {
-      return EditContext( QgsVertexId( 0, 0, 2 + i ), corners[i], KadasMapItem::AttribDefs(), Qt::SizeAllCursor );
+      int res = ( int( qRound( constState()->angle + 45. ) ) / 90 ) % 2 == 0 ? 0 : 1;
+      return EditContext( QgsVertexId( 0, 0, 2 + i ), corners[i], KadasMapItem::AttribDefs(), i % 2 == res ? Qt::SizeBDiagCursor : Qt::SizeFDiagCursor );
     }
   }
   return KadasAnchoredItem::getEditContext( pos, mapSettings );

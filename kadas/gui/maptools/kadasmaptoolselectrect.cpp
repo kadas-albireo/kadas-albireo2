@@ -86,7 +86,7 @@ void KadasMapToolSelectRect::canvasMoveEvent( QgsMapMouseEvent *e )
       }
       else if ( r.contains( e->pos() ) )
       {
-        canvas()->setCursor( Qt::OpenHandCursor );
+        canvas()->setCursor( Qt::ArrowCursor );
       }
       else
       {
@@ -95,7 +95,7 @@ void KadasMapToolSelectRect::canvasMoveEvent( QgsMapMouseEvent *e )
     }
     else if ( r.contains( e->pos() ) )
     {
-      canvas()->setCursor( Qt::OpenHandCursor );
+      canvas()->setCursor( Qt::ArrowCursor );
     }
     else
     {
