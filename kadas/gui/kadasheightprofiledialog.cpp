@@ -502,6 +502,10 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   int iColor = 0;
   for ( const QVector<QPointF> &losSamples : losSampleSet )
   {
+    if ( losSamples.isEmpty() )
+    {
+      continue;
+    }
     QwtPlotCurve *curve = new QwtPlotCurve( tr( "Line of sight" ) );
     curve->setRenderHint( QwtPlotItem::RenderAntialiased );
     QPen losPen;
