@@ -482,7 +482,7 @@
 <context>
     <name>KadasCircleItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="353"/>
+        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="362"/>
         <source>Radius: %1</source>
         <translation>Radius: %1</translation>
     </message>
@@ -1501,7 +1501,7 @@
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="137"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="505"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="509"/>
         <source>Line of sight</source>
         <translation>Sichtbarkeit</translation>
     </message>
@@ -3478,22 +3478,27 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapToolDeleteItems</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="66"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="35"/>
+        <source>Delete map items</source>
+        <translation>Kartenelemente löschen</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="69"/>
         <source>Drag a rectangle around the items to delete</source>
         <translation>Ein Rechteck um die Elemente zeichen, die gelöscht werden sollen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="95"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="98"/>
         <source>Delete items</source>
         <translation>Elemente löschen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="97"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="100"/>
         <source>Do you want to delete the following items?</source>
         <translation>Sollen folgende Objekte gelöscht werden?</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="100"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooldeleteitems.cpp" line="103"/>
         <source>%1 item(s) from layer %2</source>
         <translation>%1 Objekt(e) der Ebene %2</translation>
     </message>
@@ -4420,7 +4425,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Text</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="183"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="184"/>
         <source>Drawing</source>
         <translation>Zeichnung</translation>
     </message>
