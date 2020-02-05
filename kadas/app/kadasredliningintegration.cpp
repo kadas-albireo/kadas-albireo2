@@ -83,7 +83,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
   mActionNewPoint = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point" ), this );
   mActionNewPoint->setCheckable( true );
-  connect( mActionNewPoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, pointFactory ); } );
+  connect( mActionNewPoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, pointFactory, false ); } );
 
   mActionNewSquare = new QAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square" ), this );
   mActionNewSquare->setCheckable( true );
@@ -115,7 +115,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
   mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
-  connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, textFactory ); } );
+  connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, textFactory, false ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   QMenu *menuNewMarker = new QMenu();
@@ -147,13 +147,14 @@ KadasMapItem *KadasRedliningIntegration::setEditorFactory( KadasMapItem *item ) 
   return item;
 }
 
-void KadasRedliningIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
+void KadasRedliningIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory, bool undoRedoVisible )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *> ( QObject::sender() );
   if ( active )
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
+    tool->setUndoRedoVisible( undoRedoVisible );
     KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return KadasItemLayerRegistry::getOrCreateItemLayer( name ); };
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );

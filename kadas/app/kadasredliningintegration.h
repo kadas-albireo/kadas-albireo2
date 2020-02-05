@@ -59,7 +59,7 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewText = nullptr;
 
     KadasMapItem *setEditorFactory( KadasMapItem *item ) const;
-    void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory );
+    void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory, bool undoRedoVisible = true );
 
   private slots:
     void activateNewButtonObject();
