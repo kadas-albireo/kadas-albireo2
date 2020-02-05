@@ -72,6 +72,13 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   mUi.mComboBoxFillStyle->setCurrentIndex( QgsSettings().value( "/Redlining/fill_style", "1" ).toInt() );
   connect( mUi.mComboBoxFillStyle, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
+  if ( geometryItem && geometryItem->geometryType() == QgsWkbTypes::LineGeometry )
+  {
+    mUi.mLabelFillColor->setVisible( false );
+    mUi.mToolButtonFillColor->setVisible( false );
+    mUi.mComboBoxFillStyle->setVisible( false );
+  }
+
   connect( this, &KadasRedliningItemEditor::styleChanged, this, &KadasRedliningItemEditor::syncWidgetToItem );
 
   toggleItemMeasurements( true );
