@@ -242,7 +242,11 @@ void KadasCircleItem::edit( const EditContext &context, const KadasMapPos &newPo
     KadasItemPos itemPos = toItemPos( newPoint, mapSettings );
     if ( context.vidx.vertex == 0 )
     {
+      double dx = itemPos.x() - state()->centers[context.vidx.part].x();
+      double dy = itemPos.y() - state()->centers[context.vidx.part].y();
       state()->centers[context.vidx.part] = itemPos;
+      state()->ringpos[context.vidx.part].setX( state()->ringpos[context.vidx.part].x() + dx );
+      state()->ringpos[context.vidx.part].setY( state()->ringpos[context.vidx.part].y() + dy );
     }
     else if ( context.vidx.vertex == 1 )
     {
@@ -269,7 +273,12 @@ void KadasCircleItem::edit( const EditContext &context, const AttribValues &valu
   {
     if ( context.vidx.vertex == 0 )
     {
-      state()->centers[context.vidx.part] = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+      KadasItemPos itemPos = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+      double dx = itemPos.x() - state()->centers[context.vidx.part].x();
+      double dy = itemPos.y() - state()->centers[context.vidx.part].y();
+      state()->centers[context.vidx.part] = itemPos;
+      state()->ringpos[context.vidx.part].setX( state()->ringpos[context.vidx.part].x() + dx );
+      state()->ringpos[context.vidx.part].setY( state()->ringpos[context.vidx.part].y() + dy );
     }
     else if ( context.vidx.vertex == 1 )
     {
