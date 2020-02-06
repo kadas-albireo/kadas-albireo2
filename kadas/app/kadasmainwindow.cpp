@@ -1129,7 +1129,8 @@ QgsMapTool *KadasMainWindow::addPictureTool()
     return nullptr;
   }
   QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
-  return new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) );
+  mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+  return nullptr;
 }
 
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
