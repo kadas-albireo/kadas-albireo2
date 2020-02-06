@@ -146,7 +146,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           for ( int i = 0, n = vLine1.size(); i < n; ++i )
           {
             vLineMid.append( 0.5 * ( vLine1.at( i ) + vLine2.at( i ) ) );
-            if ( i < n - 1 )
+            if ( i < n - 1 && 0.4 * qAbs( vLine1.at( i ).x() - vLine2.at( i ).x() ) > smallLabelBoxSize )
             {
               drawGridLabel( vLine1.at( i ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i ).y() + 0.5 * smallLabelBoxSize, "A", smallFont, smallFontMetrics, bufferColor );
               drawGridLabel( vLine2.at( i ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i ).y() + 0.5 * smallLabelBoxSize, "B", smallFont, smallFontMetrics, bufferColor );
