@@ -103,10 +103,12 @@ void KadasCircleItem::setPosition( const KadasItemPos &pos )
   KadasItemPos prevPos = position();
   double dx = pos.x() - prevPos.x();
   double dy = pos.y() - prevPos.y();
-  for ( KadasItemPos &center : state()->centers )
+  for ( int i = 0, n = state()->centers.size(); i < n; ++i )
   {
-    center.setX( center.x() + dx );
-    center.setY( center.y() + dy );
+    state()->centers[i].setX( state()->centers[i].x() + dx );
+    state()->centers[i].setY( state()->centers[i].y() + dy );
+    state()->ringpos[i].setX( state()->ringpos[i].x() + dx );
+    state()->ringpos[i].setY( state()->ringpos[i].y() + dy );
   }
   if ( mGeometry )
   {
