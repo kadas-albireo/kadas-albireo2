@@ -61,8 +61,8 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
       QFont font = mRendererContext.painter()->font();
       font.setPixelSize( mLayer->mFontSize );
-      mRendererContext.painter()->setFont( font );
       QFontMetrics metrics( mRendererContext.painter()->font() );
+      QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
 
       QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
       QgsCoordinateTransform ct( mLayer->crs(), crsWgs84, mRendererContext.transformContext() );
@@ -89,7 +89,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         {
           QString label = QString( "%1 nm" ).arg( ( iRing + 1 ) * mLayer->mInterval, 0, 'f', 2 );
           double x = poly.last().x() - 0.5 * metrics.horizontalAdvance( label );
-          mRendererContext.painter()->drawText( x, poly.last().y() - 0.25 * metrics.height(), label );
+          drawGridLabel( x, poly.last().y() - 0.25 * metrics.height(), label, font, bufferColor );
         }
       }
 
@@ -128,7 +128,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
           double w = metrics.horizontalAdvance( label );
           double x = n < 2 ? poly.last().x() : poly.last().x() + d * dx / l;
           double y = n < 2 ? poly.last().y() : poly.last().y() + d * dy / l;
-          mRendererContext.painter()->drawText( x - 0.5 * w, y - d, w, 2 * d, Qt::AlignCenter | Qt::AlignHCenter, label );
+          drawGridLabel( x - w, y + 0.5 * metrics.ascent(), label, font, bufferColor );
         }
       }
 
@@ -148,6 +148,18 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       QPointF sp1 = mapToPixel.transform( mRendererContext.coordinateTransform().transform( p1 ) ).toQPointF();
       QPointF sp2 = mapToPixel.transform( mRendererContext.coordinateTransform().transform( p2 ) ).toQPointF();
       return qMakePair( sp1, sp2 );
+    }
+    void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QColor &bufferColor )
+    {
+      QPainterPath path;
+      path.addText( x, y, font, text );
+      mRendererContext.painter()->save();
+      mRendererContext.painter()->setBrush( mLayer->mColor );
+      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
+      mRendererContext.painter()->drawPath( path );
+      mRendererContext.painter()->setPen( Qt::NoPen );
+      mRendererContext.painter()->drawPath( path );
+      mRendererContext.painter()->restore();
     }
 };
 
