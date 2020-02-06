@@ -75,6 +75,7 @@ class KadasMapGridLayerType : public KadasPluginLayerType
       : KadasPluginLayerType( KadasMapGridLayer::layerType() ), mActionMapGridTool( actionMapGridTool ) {}
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
     QgsPluginLayer *createLayer() override { return new KadasMapGridLayer( "" ); }
+    QgsPluginLayer *createLayer( const QString &uri ) override { return new KadasMapGridLayer( "" ); }
 
   private:
     QAction *mActionMapGridTool;
