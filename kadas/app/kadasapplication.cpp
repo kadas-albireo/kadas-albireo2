@@ -567,7 +567,7 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
   if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
   {
     KadasSymbolItem *item = new KadasSymbolItem( crs );
-    item->setFilePath( attachedPath );
+    item->setup( attachedPath, 0.5, 0.5, 0, 64 );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
     return qMakePair( item, KadasItemLayerRegistry::SymbolsLayer );
   }
