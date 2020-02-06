@@ -332,7 +332,7 @@ void KadasMainWindow::updateWidgetPositions()
 {
   // Make sure +/- buttons have constant distance to upper right corner of map canvas
   int distanceToRightBorder = 9;
-  int distanceToTop = 20;
+  int distanceToTop = 60;
   mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
