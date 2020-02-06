@@ -178,6 +178,9 @@ void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxAxesInterval->blockSignals( true );
   ui.spinBoxAxesInterval->setValue( mCurrentLayer->axesInterval() );
   ui.spinBoxAxesInterval->blockSignals( false );
+  ui.spinBoxLineWidth->blockSignals( true );
+  ui.spinBoxLineWidth->setValue( mCurrentLayer->lineWidth() );
+  ui.spinBoxLineWidth->blockSignals( false );
   ui.toolButtonColor->setColor( mCurrentLayer->color() );
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
   ui.comboBoxLabels->setCurrentIndex( ui.comboBoxLabels->findData( static_cast<int>( mCurrentLayer->labellingMode() ) ) );
