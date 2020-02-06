@@ -147,9 +147,12 @@ void KadasPictureItem::setPositionLocked( bool locked )
 
 void KadasPictureItem::setPosition( const KadasItemPos &pos )
 {
-  state()->pos = pos;
-  state()->drawStatus = State::DrawStatus::Finished;
-  update();
+  if ( !mPosLocked )
+  {
+    state()->pos = pos;
+    state()->drawStatus = State::DrawStatus::Finished;
+    update();
+  }
 }
 
 void KadasPictureItem::setState( const KadasMapItem::State *state )
