@@ -56,7 +56,6 @@
 %Include auto_generated/search/kadascoordinatesearchprovider.sip
 %Include auto_generated/kadaslayerpropertiesdialog.sip
 %Include auto_generated/kadascatalogbrowser.sip
-%Include auto_generated/kadascanvasgpsdisplay.sip
 %Include auto_generated/kadassearchprovider.sip
 %Include auto_generated/kadasitemlayer.sip
 %Include auto_generated/milx/kadasmilxeditor.sip

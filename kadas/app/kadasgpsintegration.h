@@ -23,34 +23,36 @@
 
 class QAction;
 class QToolButton;
-class KadasCanvasGPSDisplay;
 class KadasMainWindow;
+class KadasSymbolItem;
 
 class KadasGpsIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps );
+    KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps, QAction *actionMoveWithGps );
+    ~KadasGpsIntegration();
     void initGui();
 
-  public slots:
-    void enableGPS( bool enabled );
-    void moveWithGPS( bool enabled );
-
   private:
-    void initGPSDisplay();
+    void connectGPS();
+    void disconnectGPS();
+    void updateGpsFixIcon();
     void setGPSIcon( const QColor &color );
 
     KadasMainWindow *mMainWindow;
-    KadasCanvasGPSDisplay *mCanvasGPSDisplay = nullptr;
     QToolButton *mGpsToolButton = nullptr;
     QAction *mActionEnableGps = nullptr;
+    QAction *mActionMoveWithGps = nullptr;
+    QgsGpsConnection *mConnection = nullptr;
+    KadasSymbolItem *mMarker = nullptr;
+    QgsGpsInformation::FixStatus mCurFixStatus = QgsGpsInformation::NoFix;
 
   private slots:
-    void gpsDetected();
-    void gpsDisconnected();
+    void enableGPS( bool enabled );
+    void gpsConnected( QgsGpsConnection *connection );
     void gpsConnectionFailed();
-    void gpsFixChanged( QgsGpsInformation::FixStatus fixStatus );
+    void gpsStateChanged( const QgsGpsInformation &info );
 };
 
 #endif // KADASGPSINTEGRATION_H

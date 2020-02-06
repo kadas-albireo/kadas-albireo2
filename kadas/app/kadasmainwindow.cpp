@@ -113,7 +113,7 @@ void KadasMainWindow::init()
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
-  mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS );
+  mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS, mActionMoveWithGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
   mSearchWidget->init( mMapCanvas );
 
@@ -613,10 +613,7 @@ void KadasMainWindow::configureButtons()
 
   // GPS tab
   setActionToButton( mActionEnableGPS, mEnableGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_T ) );
-  connect( mActionEnableGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::enableGPS );
-
   setActionToButton( mActionMoveWithGPS, mMoveWithGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_M ) );
-  connect( mActionMoveWithGPS, &QAction::triggered, mGpsIntegration, &KadasGpsIntegration::moveWithGPS );
 
   setActionToButton( mActionDrawWaypoint, mDrawWaypointButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_W ) );
   setActionToButton( mActionDrawRoute, mDrawRouteButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_R ) );

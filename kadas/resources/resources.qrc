@@ -120,6 +120,7 @@
         <file alias="icons/editor">icons/editor.svg</file>
         <file alias="icons/delete_node">icons/delete_node.svg</file>
         <file alias="icons/add_node">icons/add_node.svg</file>
+        <file alias="icons/gpsarrow">icons/gpsarrow.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>
