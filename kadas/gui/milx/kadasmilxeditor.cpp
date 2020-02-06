@@ -26,13 +26,13 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
   : KadasMapItemEditor( item, parent )
   , mLibrary( library )
 {
+  setLayout( new QHBoxLayout() );
+  layout()->setSpacing( 2 );
+  layout()->setMargin( 0 );
   if ( type == KadasMapItemEditor::CreateItemEditor )
   {
-    setLayout( new QHBoxLayout() );
 
     layout()->addWidget( new QLabel( tr( "Symbol:" ) ) );
-    layout()->setSpacing( 2 );
-    layout()->setMargin( 0 );
 
     mSymbolButton = new QToolButton();
     mSymbolButton->setText( tr( "Select..." ) );
@@ -45,10 +45,22 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
     connect( mLibrary, &KadasMilxLibrary::symbolSelected, this, &KadasMilxEditor::symbolSelected );
     connect( mLibrary, &KadasMilxLibrary::visibilityChanged, mSymbolButton, &QToolButton::setChecked );
   }
+  else
+  {
+    mEditLabel = new QLabel( tr( "Edit %1" ).arg( mItem->itemName() ) );
+    QFont font = mEditLabel->font();
+    font.setBold( true );
+    mEditLabel->setFont( font );
+    layout()->addWidget( mEditLabel );
+  }
 }
 
 void KadasMilxEditor::syncItemToWidget()
 {
+  if ( mEditLabel )
+  {
+    mEditLabel->setText( tr( "Edit %1" ).arg( mItem->itemName() ) );
+  }
 }
 
 void KadasMilxEditor::syncWidgetToItem()

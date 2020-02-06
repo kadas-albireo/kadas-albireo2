@@ -75,6 +75,14 @@ void KadasMapToolEditItem::activate()
     mEditor->syncItemToWidget();
     mBottomBar->layout()->addWidget( mEditor );
   }
+  else
+  {
+    QLabel *label = new QLabel( tr( "Edit %1" ).arg( mItem->itemName() ) );
+    QFont font = label->font();
+    font.setBold( true );
+    label->setFont( font );
+    mBottomBar->layout()->addWidget( label );
+  }
   mItem->setSelected( true );
 
   QPushButton *undoButton = new QPushButton();

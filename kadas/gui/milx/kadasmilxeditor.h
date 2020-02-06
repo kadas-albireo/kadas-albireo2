@@ -20,6 +20,7 @@
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/milx/kadasmilxclient.h>
 
+class QLabel;
 class QToolButton;
 class KadasMilxLibrary;
 
@@ -42,6 +43,7 @@ class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor
   private:
     KadasMilxLibrary *mLibrary = nullptr;
     QToolButton *mSymbolButton = nullptr;
+    QLabel *mEditLabel = nullptr;
     KadasMilxSymbolDesc mSelectedSymbol;
 
 };
