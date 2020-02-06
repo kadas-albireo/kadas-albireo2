@@ -258,10 +258,15 @@ void KadasCircleItem::edit( const EditContext &context, const KadasMapPos &newPo
   {
     // Move geometry a whole
     KadasMapPos refMapPos = toMapPos( constState()->centers.front(), mapSettings );
-    for ( KadasItemPos &pos : state()->centers )
+    for ( int i = 0, n = state()->centers.size(); i < n; ++i )
     {
-      KadasMapPos mapPos = toMapPos( pos, mapSettings );
-      pos = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+      KadasMapPos mapPos = toMapPos( state()->centers[i], mapSettings );
+      KadasItemPos newCenter = toItemPos( KadasMapPos( newPoint.x() + mapPos.x() - refMapPos.x(), newPoint.y() + mapPos.y() - refMapPos.y() ), mapSettings );
+      double dx = newCenter.x() - state()->centers[i].x();
+      double dy = newCenter.y() - state()->centers[i].y();
+      state()->centers[i] = newCenter;
+      state()->ringpos[i].setX( state()->ringpos[i].x() + dx );
+      state()->ringpos[i].setY( state()->ringpos[i].y() + dy );
     }
     recomputeDerived();
   }
