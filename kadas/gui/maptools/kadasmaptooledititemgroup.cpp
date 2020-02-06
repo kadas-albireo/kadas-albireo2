@@ -192,7 +192,7 @@ void KadasMapToolEditItemGroup::canvasMoveEvent( QgsMapMouseEvent *e )
     for ( int i = 0, n = mItems.size(); i < n; ++i )
     {
       QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), mItems[i]->crs(), QgsProject::instance() );
-      QgsPointXY newPos = crst.transform( mItemRefPos[i] + delta, QgsCoordinateTransform::ReverseTransform );
+      QgsPointXY newPos = crst.transform( mItemRefPos[i] + delta );
       mItems[i]->setPosition( KadasItemPos::fromPoint( newPos ) );
     }
     mSelectionRect->update();
