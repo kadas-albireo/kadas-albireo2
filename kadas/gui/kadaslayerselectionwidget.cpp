@@ -136,6 +136,11 @@ void KadasLayerSelectionWidget::setSelectedLayer( QgsMapLayer *layer )
   mLayersCombo->setCurrentIndex( -1 );
   mLayersCombo->blockSignals( false );
   mLayersCombo->setCurrentIndex( idx );
+  // Ensure signal is also emitted when layer was not found
+  if ( idx == -1 )
+  {
+    emit selectedLayerChanged( nullptr );
+  }
 }
 
 void KadasLayerSelectionWidget::createLayer()
