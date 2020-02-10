@@ -123,6 +123,9 @@ void KadasGlobeIntegration::run()
 #endif
   QgsSettings settings;
 
+  // Workaround crash: https://github.com/gwaldron/osgearth/issues/1430
+  osg::DisplaySettings::instance()->setVertexBufferHint( osg::DisplaySettings::VERTEX_ARRAY_OBJECT );
+
   mOsgViewer = new osgViewer::Viewer();
   mOsgViewer->setThreadingModel( osgViewer::Viewer::SingleThreaded );
   mOsgViewer->setRunFrameScheme( osgViewer::Viewer::ON_DEMAND );
