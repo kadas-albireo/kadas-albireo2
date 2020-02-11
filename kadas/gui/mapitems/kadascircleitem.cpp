@@ -396,9 +396,7 @@ void KadasCircleItem::computeCircle( const KadasItemPos &center, const KadasItem
   double radius = qSqrt( ringpos.sqrDist( center ) );
   string->setPoints( QgsPointSequence()
                      << QgsPoint( center.x(), center.y() + radius )
-                     << QgsPoint( center.x() + radius, center.y() )
                      << QgsPoint( center.x(), center.y() - radius )
-                     << QgsPoint( center.x() - radius, center.y() )
                      << QgsPoint( center.x(), center.y() + radius )
                    );
   QgsCompoundCurve *curve = new QgsCompoundCurve();
