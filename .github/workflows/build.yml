@@ -23,8 +23,6 @@ jobs:
           echo "##[set-output name=version;]$VERSION"
           echo "##[set-output name=qgis_version;]$QGIS_VERSION"
           echo "##[set-output name=prev_release;]${PREV_RELEASE/null/}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download QGIS build
         run: |
           QGIS_VERSION=${{ steps.version_number.outputs.qgis_version }}
@@ -56,6 +54,8 @@ jobs:
           git push origin :$VERSION || true
           git tag -m $VERSION $VERSION
           git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(steps.version_number.outputs.version, 'ci-latest-')
       - name: Create release
         id: create_release

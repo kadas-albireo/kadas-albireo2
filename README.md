@@ -33,7 +33,7 @@ KADAS Albireo is mapping application based on [QGIS](http://qgis.org/) and targe
 
 ## Quick start for Windows x64
 
-* Download and extract the latest `kadas-portable-win64.zip` portable build from the releases](https://github.com/kadas-albireo/kadas-albireo2/releases) page.
+* Download and extract the latest `kadas-portable-win64.zip` portable build from the [releases](https://github.com/kadas-albireo/kadas-albireo2/releases) page.
 * Run `..\kadas\bin\kadas.exe`.
 * Read the [technical manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/technical/SUMMARY.md) to learn how to configure the application.
 
