@@ -19,15 +19,6 @@ jobs:
             VERSION=ci-latest-$(basename ${{ github.ref }})
             QGIS_VERSION=ci-latest-kadas_modifications
             PREV_RELEASE=$(curl -s https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$VERSION | jq -r .url)
-            # Reset ci-latest tag
-            git config --global user.email "ci@github.com"
-            git config --global user.name "Github CI"
-            # Workaround for "could not read Username for 'https://github.com': No such device or address"
-            git remote set-url origin https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
-            git tag -d $VERSION || true
-            git push origin :$VERSION || true
-            git tag -m $VERSION $VERSION
-            git push --tags
           fi
           echo "##[set-output name=version;]$VERSION"
           echo "##[set-output name=qgis_version;]$QGIS_VERSION"
@@ -54,6 +45,18 @@ jobs:
         run: mv kadas k && mv dist kadas && zip -r kadas-portable-win64.zip kadas
       - name: Create debugsym zip
         run: (cd dist_debug && zip -r - *) > kadas-portable-win64-debugsym.zip
+      - name: Reset ci-latest tag
+        run: |
+          VERSION=${{ steps.version_number.outputs.version }}
+          git config --global user.email "ci@github.com"
+          git config --global user.name "Github CI"
+          # Workaround for "could not read Username for 'https://github.com': No such device or address"
+          git remote set-url origin https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
+          git tag -d $VERSION || true
+          git push origin :$VERSION || true
+          git tag -m $VERSION $VERSION
+          git push --tags
+        if: startsWith(steps.version_number.outputs.version, 'ci-latest-')
       - name: Create release
         id: create_release
         uses: actions/create-release@v1.0.0
