@@ -2,7 +2,7 @@
 
 KADAS Albireo is mapping application based on [QGIS](http://qgis.org/) and targeted at non-specialized users, providing enhanced functionalities in areas such as drawing, measuring, terrain analysis, etc.
 
-![kadas-splash](https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/splash.png)
+![kadas-splash](kadas/resources/splash.png)
 
 ## Main features:
 
