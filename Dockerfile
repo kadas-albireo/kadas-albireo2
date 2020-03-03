@@ -31,6 +31,7 @@ dnf install -y \
   mingw64-python3-GeographicLib \
   mingw64-python3-homography \
   mingw64-python3-lxml \
+  mingw64-python3-markupsafe \
   mingw64-python3-numpy \
   mingw64-python3-opencv \
   mingw64-python3-OWSLib \
