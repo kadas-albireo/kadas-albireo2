@@ -119,7 +119,6 @@ void KadasCircleItem::setPosition( const KadasItemPos &pos )
 
 QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings ) const
 {
-  QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
   QList<Node> points;
   for ( int i = 0, n = constState()->centers.size(); i < n; ++i )
   {
