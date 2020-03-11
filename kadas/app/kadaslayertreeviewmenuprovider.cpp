@@ -121,7 +121,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   int opacity = 0;
   if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
-    opacity = static_cast<QgsVectorLayer *>( layer )->opacity();
+    opacity = static_cast<QgsVectorLayer *>( layer )->opacity() * 100;
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
@@ -197,7 +197,7 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
 
   if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
-    static_cast<QgsVectorLayer *>( layer )->setOpacity( 100 - value );
+    static_cast<QgsVectorLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
