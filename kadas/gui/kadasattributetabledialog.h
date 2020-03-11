@@ -23,6 +23,7 @@
 
 class QgsMapCanvas;
 class QgsVectorLayer;
+class QgsVectorLayerSelectionManager;
 
 
 class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDialog
@@ -31,6 +32,10 @@ class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDialog
 
   public:
     KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    ~KadasAttributeTableDialog();
+
+  private:
+    QgsVectorLayerSelectionManager *mFeatureSelectionManager = nullptr;
 };
 
 #endif // KADASATTRIBUTETABLEDIALOG_H

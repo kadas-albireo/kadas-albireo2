@@ -22,6 +22,7 @@
 #include <qgis/qgsattributetablefiltermodel.h>
 #include <qgis/qgsattributetablemodel.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsvectorlayerselectionmanager.h>
 
 #include <kadas/gui/kadasattributetabledialog.h>
 
@@ -49,5 +50,13 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
   layout()->addWidget( bbox );
 
+  mFeatureSelectionManager = new QgsVectorLayerSelectionManager( layer, this );
+  view->setFeatureSelectionManager( mFeatureSelectionManager );
+
   setAttribute( Qt::WA_DeleteOnClose );
+}
+
+KadasAttributeTableDialog::~KadasAttributeTableDialog()
+{
+  mFeatureSelectionManager->deselect( mFeatureSelectionManager->selectedFeatureIds() );
 }
