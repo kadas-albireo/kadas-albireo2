@@ -332,6 +332,15 @@ void KadasGlobeIntegration::applyProjectSettings()
         }
       }
     }
+    if ( mImagerySources.isEmpty() )
+    {
+      // Add world.tif to workaround a crash if no image layers are present...
+      osgEarth::Drivers::GDALOptions options;
+      std::string uri = QDir::cleanPath( Kadas::pkgResourcePath() + "/globe/world.tif" ).toStdString();
+      options.url() = uri;
+      osgEarth::ImageLayer *layer = new osgEarth::ImageLayer( uri, options );
+      mMapNode->getMap()->insertLayer( layer, 0 );
+    }
 
     // Elevation settings
     QList<KadasGlobeDialog::LayerDataSource> elevationDataSources = mSettingsDialog->getElevationDataSources();
