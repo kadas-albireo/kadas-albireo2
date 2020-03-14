@@ -191,7 +191,7 @@
 <context>
     <name>KadasAttributeTableDialog</name>
     <message>
-        <location filename="../kadas/gui/kadasattributetabledialog.cpp" line="31"/>
+        <location filename="../kadas/gui/kadasattributetabledialog.cpp" line="32"/>
         <source>Layer Attributes: %1</source>
         <translation>Attributi del layer: %1</translation>
     </message>
@@ -199,7 +199,7 @@
 <context>
     <name>KadasBullseyeLayerType</name>
     <message>
-        <location filename="../kadas/app/bullseye/kadasbullseyelayer.cpp" line="239"/>
+        <location filename="../kadas/app/bullseye/kadasbullseyelayer.cpp" line="251"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
@@ -482,7 +482,7 @@
 <context>
     <name>KadasCircleItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="362"/>
+        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="368"/>
         <source>Radius: %1</source>
         <translation>Raggio: %1</translation>
     </message>
@@ -526,14 +526,17 @@
 <context>
     <name>KadasCoordinateFormat</name>
     <message>
-        <location filename="../kadas/core/kadascoordinateformat.cpp" line="142"/>
         <source>No heightmap is defined in the project.</source>
-        <translation>Nessun modello di elevazione è specificato nel progetto.</translation>
+        <translation type="vanished">Nessun modello di elevazione è specificato nel progetto.</translation>
+    </message>
+    <message>
+        <source>Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation type="vanished">Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
         <location filename="../kadas/core/kadascoordinateformat.cpp" line="142"/>
-        <source>Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
-        <translation>Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
+        <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
         <location filename="../kadas/core/kadascoordinateformat.cpp" line="157"/>
@@ -1143,22 +1146,22 @@
 <context>
     <name>KadasGpsIntegration</name>
     <message>
-        <location filename="../kadas/app/kadasgpsintegration.cpp" line="51"/>
+        <location filename="../kadas/app/kadasgpsintegration.cpp" line="69"/>
         <source>Connecting to GPS device...</source>
         <translation>Connessione al dispositivo GPS...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpsintegration.cpp" line="57"/>
+        <location filename="../kadas/app/kadasgpsintegration.cpp" line="101"/>
         <source>GPS connection closed</source>
         <translation>Connessione GPS terminata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpsintegration.cpp" line="64"/>
+        <location filename="../kadas/app/kadasgpsintegration.cpp" line="82"/>
         <source>GPS device successfully connected</source>
         <translation>Connessione con dispositivo GPS stabilita</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpsintegration.cpp" line="75"/>
+        <location filename="../kadas/app/kadasgpsintegration.cpp" line="90"/>
         <source>Connection to GPS device failed</source>
         <translation>Connessione con dispositivo GPS fallita</translation>
     </message>
@@ -1542,8 +1545,12 @@
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="280"/>
+        <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
+    </message>
+    <message>
         <source>No heightmap is defined in the project.</source>
-        <translation>Nessun modello di elevazione è specificato nel progetto.</translation>
+        <translation type="vanished">Nessun modello di elevazione è specificato nel progetto.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="292"/>
@@ -1876,12 +1883,12 @@
         <translation>Layer:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="143"/>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="148"/>
         <source>Layer Name</source>
         <translation>Nome layer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="143"/>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="148"/>
         <source>Enter name of new layer:</source>
         <translation>Nome del nuovo layer:</translation>
     </message>
@@ -3325,57 +3332,55 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Aggiungi layer WCS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="844"/>
         <source>On the fly projection enabled</source>
-        <translation>Proiezione al volo automatica attivata</translation>
+        <translation type="vanished">Proiezione al volo automatica attivata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="844"/>
         <source>The following layers are being reprojected to the selected CRS: %1. Performance may suffer.</source>
-        <translation>I seguenti layer sono reprojettati al SR selezionato: %1. La prestazione potrebbe essere ridotta.</translation>
+        <translation type="vanished">I seguenti layer sono reprojettati al SR selezionato: %1. La prestazione potrebbe essere ridotta.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="987"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="984"/>
         <source>Language Changed</source>
         <translation>Lingua modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="987"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="984"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La nuova lingua verrà utilizzata al prossimo avvio dell&apos;applicazione.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1009"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1006"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1013"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1010"/>
         <source>Favorite</source>
         <translation>Preferito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1078"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1075"/>
         <source>Manually set projection</source>
         <translation>Seleziona la proiezione manualmente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1081"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1078"/>
         <source>Unknown layer projection</source>
         <translation>Proiezione del layer sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1082"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1079"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1129"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1126"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1166"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1164"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
     </message>
@@ -3506,17 +3511,22 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapToolEditItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="82"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="80"/>
+        <source>Edit %1</source>
+        <translation>Modifica %1</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="90"/>
         <source>Undo</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="90"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="98"/>
         <source>Redo</source>
         <translation>Ripeti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="98"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooledititem.cpp" line="106"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
@@ -3587,9 +3597,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Calcola ombreggiatura</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="86"/>
         <source>No heightmap is defined in the project.</source>
-        <translation>Nessun modello di elevazione è specificato nel progetto.</translation>
+        <translation type="vanished">Nessun modello di elevazione è specificato nel progetto.</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="86"/>
+        <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="91"/>
@@ -3666,9 +3680,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Calcola pendenza</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="81"/>
         <source>No heightmap is defined in the project.</source>
-        <translation>Nessun modello di elevazione è specificato nel progetto.</translation>
+        <translation type="vanished">Nessun modello di elevazione è specificato nel progetto.</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="81"/>
+        <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="95"/>
@@ -3699,9 +3717,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Calcola bacino visuale</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="165"/>
         <source>No heightmap is defined in the project.</source>
-        <translation>Nessun modello di elevazione è specificato nel progetto.</translation>
+        <translation type="vanished">Nessun modello di elevazione è specificato nel progetto.</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="165"/>
+        <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
+        <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="214"/>
@@ -3907,15 +3929,21 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMilxEditor</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="33"/>
+        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="35"/>
         <source>Symbol:</source>
         <translation>Simbolo:</translation>
     </message>
     <message>
         <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="38"/>
-        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="86"/>
+        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="98"/>
         <source>Select...</source>
         <translation>Seleziona...</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="50"/>
+        <location filename="../kadas/gui/milx/kadasmilxeditor.cpp" line="62"/>
+        <source>Edit %1</source>
+        <translation>Modifica %1</translation>
     </message>
 </context>
 <context>
@@ -4149,12 +4177,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasPictureItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="483"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="486"/>
         <source>Frame visible</source>
         <translation>Cornice visibile</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="487"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="490"/>
         <source>Position locked</source>
         <translation>Posizione bloccata</translation>
     </message>
@@ -4380,52 +4408,52 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRedliningIntegration</name>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="82"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="88"/>
         <source>Marker</source>
         <translation>Simbolo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="84"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="90"/>
         <source>Point</source>
         <translation>Punto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="88"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="94"/>
         <source>Square</source>
         <translation>Quadrato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="92"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="98"/>
         <source>Triangle</source>
         <translation>Triangolo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="96"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="102"/>
         <source>Line</source>
         <translation>Linea</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="101"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="107"/>
         <source>Rectangle</source>
         <translation>Rettangolo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="106"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="112"/>
         <source>Polygon</source>
         <translation>Poligono</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="111"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="117"/>
         <source>Circle</source>
         <translation>Cerchio</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="116"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="122"/>
         <source>Text</source>
         <translation>Testo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasredliningintegration.cpp" line="184"/>
+        <location filename="../kadas/app/kadasredliningintegration.cpp" line="190"/>
         <source>Drawing</source>
         <translation>Disegno</translation>
     </message>

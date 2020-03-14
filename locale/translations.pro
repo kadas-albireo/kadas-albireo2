@@ -30,7 +30,6 @@ SOURCES += \
 ../kadas/gui/kadaslayerselectionwidget.cpp \
 ../kadas/gui/kadassearchbox.h \
 ../kadas/gui/kadasmapwidget.h \
-../kadas/gui/kadascanvasgpsdisplay.cpp \
 ../kadas/gui/kadasmapcanvasitem.cpp \
 ../kadas/gui/kadasplugininterface.h \
 ../kadas/gui/kadaslayerpropertiesdialog.cpp \
@@ -141,7 +140,6 @@ SOURCES += \
 ../kadas/gui/kadasheightprofiledialog.cpp \
 ../kadas/gui/kadasmapcanvasitemmanager.cpp \
 ../kadas/gui/kadascatalogprovider.cpp \
-../kadas/gui/kadascanvasgpsdisplay.h \
 ../kadas/gui/kadassearchprovider.h \
 ../kadas/gui/kadasitemlayer.h \
 ../kadas/gui/milx/kadasmilxeditor.cpp \
