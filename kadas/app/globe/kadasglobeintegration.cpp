@@ -307,7 +307,7 @@ void KadasGlobeIntegration::applyProjectSettings()
       // Add image layers
       for ( const KadasGlobeDialog::LayerDataSource &datasource : mImagerySources )
       {
-        osgEarth::ImageLayer *layer = 0;
+        osgEarth::ImageLayer *layer = nullptr;
         if ( "Raster" == datasource.type )
         {
           osgEarth::Drivers::GDALOptions options;
@@ -326,7 +326,10 @@ void KadasGlobeIntegration::applyProjectSettings()
           options.url() = datasource.uri.toStdString();
           layer = new osgEarth::ImageLayer( datasource.uri.toStdString(), options );
         }
-        map->insertLayer( layer, 0 );
+        if ( layer )
+        {
+          map->insertLayer( layer, 0 );
+        }
       }
     }
 
