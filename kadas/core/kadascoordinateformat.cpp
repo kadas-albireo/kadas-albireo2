@@ -139,7 +139,7 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
   {
     if ( errMsg )
     {
-      *errMsg = tr( "No heightmap is defined in the project." ), tr( "Right-click a raster layer in the layer tree and select it to be used as heightmap." );
+      *errMsg = tr( "No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap." );
     }
     return 0;
   }
