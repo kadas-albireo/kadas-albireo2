@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
 #include <QProgressDialog>
 
 #include <cpl_string.h>
@@ -41,7 +42,7 @@ KadasNineCellFilter::KadasNineCellFilter( const QString &inputFile, const QgsCoo
 }
 
 
-int KadasNineCellFilter::processRaster( QProgressDialog *p )
+int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
 {
   GDALAllRegister();
 
@@ -50,12 +51,14 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   GDALDatasetH  inputDataset = openInputFile( xSize, ySize );
   if ( inputDataset == NULL )
   {
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to open input file" );
     return 1; //opening of input file failed
   }
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( inputDataset, &gtrans[0] ) != CE_None )
   {
     GDALClose( inputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Invalid input geotransform" );
     return 1;
   }
 
@@ -64,6 +67,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   if ( outputDriver == 0 )
   {
     GDALClose( inputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to open output driver" );
     return 2;
   }
 
@@ -73,6 +77,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   if ( !computeWindow( inputDataset, mFilterRegion, mFilterRegionCrs, rowStart, rowEnd, colStart, colEnd ) )
   {
     GDALClose( inputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to compute input window" );
     return 2;
   }
   xSize = colEnd - colStart;
@@ -82,6 +87,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   if ( outputDataset == NULL )
   {
     GDALClose( inputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to create output file" );
     return 3; //create operation on output file failed
   }
 
@@ -91,6 +97,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   {
     GDALClose( inputDataset );
     GDALClose( outputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to get input raster band" );
     return 4;
   }
   mInputNodataValue = GDALGetRasterNoDataValue( rasterBand, NULL );
@@ -100,6 +107,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   {
     GDALClose( inputDataset );
     GDALClose( outputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to create output raster band" );
     return 5;
   }
   //try to set -9999 as nodata value
@@ -145,6 +153,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   {
     GDALClose( inputDataset );
     GDALClose( outputDataset );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Too small input dataset" );
     return 6;
   }
 

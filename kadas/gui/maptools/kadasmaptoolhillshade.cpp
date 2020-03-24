@@ -130,9 +130,15 @@ void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordi
   p.setWindowTitle( tr( "Hillshade" ) );
   p.setWindowModality( Qt::ApplicationModal );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  hillshade.processRaster( &p );
+  QString errorMsg;
+  int status = hillshade.processRaster( &p, errorMsg );
   QApplication::restoreOverrideCursor();
-  if ( !p.wasCanceled() )
+
+  if ( status != 0 && !errorMsg.isEmpty() )
+  {
+    emit messageEmitted( tr( "Error: %1" ).arg( errorMsg ), Qgis::Critical );
+  }
+  if ( status == 0 )
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Hillshade [%1]" ).arg( extent.toString( true ) ) );
     if ( layer->isValid() && layer->renderer() )

@@ -96,9 +96,15 @@ void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinate
   p.setWindowTitle( tr( "Slope" ) );
   p.setWindowModality( Qt::ApplicationModal );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  slope.processRaster( &p );
+  QString errorMsg;
+  int status = slope.processRaster( &p, errorMsg );
   QApplication::restoreOverrideCursor();
-  if ( !p.wasCanceled() )
+
+  if ( status != 0 && !errorMsg.isEmpty() )
+  {
+    emit messageEmitted( tr( "Error: %1" ).arg( errorMsg ), Qgis::Critical );
+  }
+  if ( status == 0 )
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Slope [%1]" ).arg( extent.toString( true ) ) );
     QgsColorRampShader *rampShader = new QgsColorRampShader();
