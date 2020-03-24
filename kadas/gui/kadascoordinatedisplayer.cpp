@@ -56,14 +56,10 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLin
   crsSelectionMenu->addAction( "UTM" )->setData( static_cast<int>( UTM ) );
   crsSelectionMenu->addAction( "MGRS" )->setData( static_cast<int>( MGRS ) );
 
-  QFont font = mCoordinateLineEdit->font();
-  font.setPointSize( 9 );
-  mCoordinateLineEdit->setFont( font );
   mCoordinateLineEdit->setReadOnly( true );
   mCoordinateLineEdit->setAlignment( Qt::AlignCenter );
   mCoordinateLineEdit->setFixedWidth( 200 );
 
-  mHeightLineEdit->setFont( font );
   mHeightLineEdit->setReadOnly( true );
   mHeightLineEdit->setAlignment( Qt::AlignCenter );
   mHeightLineEdit->setFixedWidth( 100 );
