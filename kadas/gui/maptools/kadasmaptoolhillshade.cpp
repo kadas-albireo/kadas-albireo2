@@ -125,7 +125,7 @@ void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordi
     return;
   }
 
-  KadasHillshadeFilter hillshade( gdalSource, outputFile, "GTiff", spinHorAngle->value(), spinVerAngle->value(), extent, crs );
+  KadasHillshadeFilter hillshade( gdalSource, layer->crs(), outputFile, "GTiff", spinHorAngle->value(), spinVerAngle->value(), extent, crs );
   QProgressDialog p( tr( "Calculating hillshade..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Hillshade" ) );
   p.setWindowModality( Qt::ApplicationModal );

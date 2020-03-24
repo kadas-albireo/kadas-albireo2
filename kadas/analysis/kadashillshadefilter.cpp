@@ -16,9 +16,9 @@
 
 #include "kadashillshadefilter.h"
 
-KadasHillshadeFilter::KadasHillshadeFilter( const QString &inputFile, const QString &outputFile, const QString &outputFormat, double lightAzimuth,
+KadasHillshadeFilter::KadasHillshadeFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, double lightAzimuth,
     double lightAngle, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
-  : KadasNineCellFilter( inputFile, outputFile, outputFormat, filterRegion, filterRegionCrs )
+  : KadasNineCellFilter( inputFile, inputCrs, outputFile, outputFormat, filterRegion, filterRegionCrs )
   , mLightAzimuth( lightAzimuth )
   , mLightAngle( lightAngle )
 {

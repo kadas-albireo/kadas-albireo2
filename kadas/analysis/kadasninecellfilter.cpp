@@ -25,8 +25,9 @@
 #include <kadas/analysis/kadasninecellfilter.h>
 
 
-KadasNineCellFilter::KadasNineCellFilter( const QString &inputFile, const QString &outputFile, const QString &outputFormat, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs )
+KadasNineCellFilter::KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs )
   : mInputFile( inputFile )
+  , mInputCrs( inputCrs )
   , mOutputFile( outputFile )
   , mOutputFormat( outputFormat )
   , mFilterRegion( region )
@@ -108,18 +109,16 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
   // Autocompute the zFactor if it is -1
   if ( mZFactor == -1 )
   {
-    QString proj( GDALGetProjectionRef( inputDataset ) );
-    QgsCoordinateReferenceSystem rasterCrs( proj );
     QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-    if ( rasterCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
+    if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
     {
       mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceFeet );
     }
-    else if ( rasterCrs.mapUnits() == QgsUnitTypes::DistanceFeet && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceFeet && vertUnit == QgsUnitTypes::DistanceMeters )
     {
       mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceFeet, QgsUnitTypes::DistanceMeters );
     }
-    else if ( rasterCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceMeters )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
@@ -127,7 +126,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p )
       double latitude = gtrans[3] + px * gtrans[4] + py * gtrans[5];
       mZFactor = ( 111320 * std::cos( latitude * M_PI / 180. ) );
     }
-    else if ( rasterCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceFeet )
+    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceFeet )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
@@ -291,12 +290,7 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsRectangl
     return false;
   }
 
-  QgsCoordinateReferenceSystem rasterCrs( QString( GDALGetProjectionRef( dataset ) ) );
-  if ( !rasterCrs.isValid() )
-  {
-    return false;
-  }
-  QgsCoordinateTransform ct( regionCrs, rasterCrs, QgsProject::instance() );
+  QgsCoordinateTransform ct( regionCrs, mInputCrs, QgsProject::instance() );
 
   // Transform raster geo position to pixel coordinates
   QgsPointXY regionPoints[4] =
@@ -397,8 +391,7 @@ GDALDatasetH KadasNineCellFilter::openOutputFile( GDALDatasetH inputDataset, GDA
     mCellSizeY = -mCellSizeY;
   }
 
-  const char *projection = GDALGetProjectionRef( inputDataset );
-  GDALSetProjection( outputDataset, projection );
+  GDALSetProjection( outputDataset, mInputCrs.toWkt().toLocal8Bit().data() );
 
   return outputDataset;
 }

@@ -30,7 +30,7 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
 {
   public:
     /**Constructor that takes input file, output file and output format (GDAL string)*/
-    KadasNineCellFilter( const QString &inputFile, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
+    KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
     virtual ~KadasNineCellFilter() = default;
 
     /**Starts the calculation, reads from mInputFile and stores the result in mOutputFile
@@ -79,6 +79,7 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     float calcFirstDerY( float *x11, float *x21, float *x31, float *x12, float *x22, float *x32, float *x13, float *x23, float *x33 );
 
     QString mInputFile;
+    QgsCoordinateReferenceSystem mInputCrs;
     QString mOutputFile;
     QString mOutputFormat;
     QgsRectangle mFilterRegion;

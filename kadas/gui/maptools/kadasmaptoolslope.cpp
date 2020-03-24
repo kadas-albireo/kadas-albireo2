@@ -91,7 +91,7 @@ void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinate
     return;
   }
 
-  KadasSlopeFilter slope( gdalSource, outputFile, "GTiff", extent, crs );
+  KadasSlopeFilter slope( gdalSource, layer->crs(), outputFile, "GTiff", extent, crs );
   QProgressDialog p( tr( "Calculating slope..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Slope" ) );
   p.setWindowModality( Qt::ApplicationModal );

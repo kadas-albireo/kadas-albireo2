@@ -24,7 +24,7 @@
 class KADAS_ANALYSIS_EXPORT KadasHillshadeFilter: public KadasNineCellFilter
 {
   public:
-    KadasHillshadeFilter( const QString &inputFile, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,
+    KadasHillshadeFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,
                           double lightAngle = 40, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
 
     /**Calculates output value from nine input values. The input values and the output value can be equal to the
