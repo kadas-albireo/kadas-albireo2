@@ -503,22 +503,22 @@
 <context>
     <name>KadasCoordinateDisplayer</name>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="71"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="67"/>
         <source>Meters</source>
         <translation>Meter</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="72"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="68"/>
         <source>Feet</source>
         <translation>Fuss</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="159"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="155"/>
         <source>ft AMSL</source>
         <translation>ft ü.M.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="159"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="155"/>
         <source>m AMSL</source>
         <translation>m ü.M.</translation>
     </message>
@@ -3636,7 +3636,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Schummerung</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="137"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="139"/>
+        <source>Error: %1</source>
+        <translation>Fehler: %1</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolhillshade.cpp" line="143"/>
         <source>Hillshade [%1]</source>
         <translation>Schummerung [%1]</translation>
     </message>
@@ -3704,7 +3709,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Neigung</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="103"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="105"/>
+        <source>Error: %1</source>
+        <translation>Fehler: %1</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolslope.cpp" line="109"/>
         <source>Slope [%1]</source>
         <translation>Neigung [%1]</translation>
     </message>
@@ -4172,6 +4182,49 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="339"/>
         <source>More Symbols...</source>
         <translation>Mehr Symbole...</translation>
+    </message>
+</context>
+<context>
+    <name>KadasNineCellFilter</name>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="54"/>
+        <source>Unable to open input file</source>
+        <translation>Eingabedatei konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="61"/>
+        <source>Invalid input geotransform</source>
+        <translation>Ungültige Geotransformation in der Eingabedatei</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="70"/>
+        <source>Unable to open output driver</source>
+        <translation>Ausgabetreiber konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="80"/>
+        <source>Unable to compute input window</source>
+        <translation>Eingabefenster konnte nicht berechnet werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="90"/>
+        <source>Unable to create output file</source>
+        <translation>Ausgabedatei konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="100"/>
+        <source>Unable to get input raster band</source>
+        <translation>Eingaberasterband konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="110"/>
+        <source>Unable to create output raster band</source>
+        <translation>Ausgaberasterband konnte nicht erstellt werden</translation>
+    </message>
+    <message>
+        <location filename="../kadas/analysis/kadasninecellfilter.cpp" line="156"/>
+        <source>Too small input dataset</source>
+        <translation>Zu kleiner Eingabedatensatz</translation>
     </message>
 </context>
 <context>
