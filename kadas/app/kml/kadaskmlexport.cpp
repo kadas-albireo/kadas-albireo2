@@ -449,7 +449,7 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
 
     int fill = 1; // TODO?
 
-    outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle><PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>" )
+    outStream << QString( "<LineStyle><color>%2</color><width>%1</width></LineStyle><PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>" )
               .arg( width ).arg( convertColor( outlineColor ) ).arg( fill ).arg( convertColor( fillColor ) );
   }
   outStream << "</Style>\n";
