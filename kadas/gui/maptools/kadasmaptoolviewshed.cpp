@@ -230,21 +230,26 @@ void KadasMapToolViewshed::drawFinished()
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
     QgsColorRampShader *rampShader = new QgsColorRampShader();
+    rampShader->setColorRampType( QgsColorRampShader::Exact );
     if ( displayVisible )
     {
       QList<QgsColorRampShader::ColorRampItem> colorRampItems = QList<QgsColorRampShader::ColorRampItem>()
           << QgsColorRampShader::ColorRampItem( 255, QColor( 0, 255, 0 ), tr( "Visible" ) );
+      rampShader->setSourceColorRamp( new QgsPresetSchemeColorRamp( {QColor( 0, 255, 0 )} ) );
       rampShader->setColorRampItemList( colorRampItems );
     }
     else
     {
       QList<QgsColorRampShader::ColorRampItem> colorRampItems = QList<QgsColorRampShader::ColorRampItem>()
           << QgsColorRampShader::ColorRampItem( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) );
+      rampShader->setSourceColorRamp( new QgsPresetSchemeColorRamp( {QColor( 255, 0, 0 )} ) );
       rampShader->setColorRampItemList( colorRampItems );
     }
     QgsRasterShader *shader = new QgsRasterShader();
     shader->setRasterShaderFunction( rampShader );
     QgsSingleBandPseudoColorRenderer *renderer = new QgsSingleBandPseudoColorRenderer( 0, 1, shader );
+    renderer->setClassificationMin( displayVisible ? 255 : 0 );
+    renderer->setClassificationMax( displayVisible ? 255 : 0 );
     layer->setRenderer( renderer );
     QgsProject::instance()->addMapLayer( layer );
 
