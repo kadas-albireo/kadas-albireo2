@@ -33,6 +33,10 @@ IF(NOT QUAZIP_FOUND)
   SET(QUAZIP_INCLUDE_DIR "" CACHE PATH "Path to the quazip headers")
 ENDIF(NOT QUAZIP_FOUND)
 
+if (NOT QUAZIP_INCLUDE_DIR OR NOT QUAZIP_LIBRARIES)
+    message(FATAL_ERROR "Could not find QuaZip5, make sure it's either found or define QUAZIP_INCLUDE_DIR and QUAZIP_LIBRARIES cache variables")
+endif()
+
 SET(CRASHRPT_LIBRARY "GdbCrashHandler" CACHE FILEPATH "Path to CrashRpt library")
 
 PKG_CHECK_MODULES(QCA qca2-qt5)
