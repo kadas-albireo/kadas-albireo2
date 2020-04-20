@@ -256,7 +256,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             points[1].setX( points[1].x() - points[0].distance( points[1] ) );
           }
 
-          QgsRectangle bbox = curve.boundingBox();
           QgsCircularString *ring = new QgsCircularString();
           ring->setPoints( points );
           geom = new QgsCurvePolygon();

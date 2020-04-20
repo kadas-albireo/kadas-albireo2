@@ -1103,7 +1103,7 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  KadasMapToolCreateItem::ItemFactory factory = [this]
+  KadasMapToolCreateItem::ItemFactory factory = []
   {
     KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
     item->setEditor( "KadasSymbolAttributesEditor" );
@@ -1122,7 +1122,7 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   }
   formats.insert( "*.svg" );  // Ensure svg is present
 
-  QString filter = QString( "Images (%1)" ).arg( QStringList( formats.toList() ).join( " " ) );
+  QString filter = QString( "Images (%1)" ).arg( QStringList( formats.values() ).join( " " ) );
   QString filename = QFileDialog::getOpenFileName( this, tr( "Select Image" ), lastDir, filter );
   if ( filename.isEmpty() )
   {
