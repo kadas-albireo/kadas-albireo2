@@ -28,6 +28,7 @@ KADAS_REGISTER_MAP_ITEM( KadasGpxWaypointItem, []( const QgsCoordinateReferenceS
 KadasGpxWaypointItem::KadasGpxWaypointItem()
   : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), ICON_CIRCLE )
 {
+  setEditor( "KadasGpxWaypointEditor" );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
 

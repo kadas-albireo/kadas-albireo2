@@ -191,7 +191,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           {
             geomItem = new KadasGpxWaypointItem();
             static_cast<KadasGpxWaypointItem *>( geomItem )->setName( redliningItemEl.attribute( "text" ) );
-            geomItem->setEditor( "KadasGpxWaypointEditor" );
           }
           else
           {
@@ -222,7 +221,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             geomItem = new KadasGpxRouteItem();
             static_cast<KadasGpxRouteItem *>( geomItem )->setName( redliningItemEl.attribute( "text" ) );
             static_cast<KadasGpxRouteItem *>( geomItem )->setNumber( flags["routeNumber"] );
-            geomItem->setEditor( "KadasGpxRouteEditor" );
           }
           else
           {

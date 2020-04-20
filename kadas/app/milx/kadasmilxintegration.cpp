@@ -113,9 +113,7 @@ void KadasMilxIntegration::createMilx( bool active )
 
     KadasMapToolCreateItem::ItemFactory itemFactory = [ = ]
     {
-      KadasMilxItem *item = new KadasMilxItem();
-      item->setEditor( "KadasMilxEditor" );
-      return item;
+      return new KadasMilxItem();
     };
     KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
     KadasLayerSelectionWidget::LayerCreator layerCreator = [ = ]( const QString & name ) { return new KadasMilxLayer( name ); };

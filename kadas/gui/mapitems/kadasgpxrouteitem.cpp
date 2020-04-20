@@ -28,6 +28,7 @@ KADAS_REGISTER_MAP_ITEM( KadasGpxRouteItem, []( const QgsCoordinateReferenceSyst
 KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
   : KadasLineItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
 {
+  setEditor( "KadasGpxRouteEditor" );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
 

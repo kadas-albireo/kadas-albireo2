@@ -119,6 +119,7 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
 KadasMilxItem::KadasMilxItem()
   : KadasMapItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) )
 {
+  setEditor( "KadasMilxEditor" );
   clear();
 }
 

@@ -260,7 +260,6 @@ void KadasMapToolEditItemGroup::createWaypointsFromPins()
   {
     const KadasPinItem *pin = static_cast<const KadasPinItem *>( item );
     KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-    waypoint->setEditor( "KadasGpxWaypointEditor" );
     waypoint->setName( pin->name() );
     QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
     waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
