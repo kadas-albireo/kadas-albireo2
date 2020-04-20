@@ -46,7 +46,7 @@ static QString resolveDataPath()
   }
   else
   {
-    return QDir( QString( "%1/../share/%2" ).arg( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
+    return QDir( QString( "%1/../share/%2" ).arg( QApplication::applicationDirPath(), QString( Kadas::KADAS_RELEASE_NAME ).toLower() ) ).absolutePath();
   }
 }
 
@@ -59,7 +59,7 @@ static QString resolveResourcePath()
   }
   else
   {
-    return QDir( QString( "%1/../share/%2/resources" ).arg( QApplication::applicationDirPath(), Kadas::KADAS_RELEASE_NAME ) ).absolutePath();
+    return QDir( QString( "%1/../share/%2/resources" ).arg( QApplication::applicationDirPath(), QString( Kadas::KADAS_RELEASE_NAME ).toLower() ) ).absolutePath();
   }
 }
 
