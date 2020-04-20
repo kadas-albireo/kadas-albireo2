@@ -29,13 +29,13 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/analysis/kadasninecellfilter.h"
 %End
   public:
-    KadasNineCellFilter(const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
+    KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
 %Docstring
 Constructor that takes input file, output file and output format (GDAL string)*/
 %End
     virtual ~KadasNineCellFilter();
 
-    int processRaster(QProgressDialog *p , QString &errorMsg);
+    int processRaster( QProgressDialog *p, QString &errorMsg );
 %Docstring
 Starts the calculation, reads from mInputFile and stores the result in mOutputFile
 @param p progress dialog that receives update and that is checked for abort. 0 if no progress bar is needed.
