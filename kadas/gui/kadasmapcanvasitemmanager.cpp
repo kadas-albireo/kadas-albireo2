@@ -15,9 +15,16 @@
  ***************************************************************************/
 
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsproject.h>
 
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
+
+KadasMapCanvasItemManager::KadasMapCanvasItemManager()
+{
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMapCanvasItemManager::readFromProject );
+  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasMapCanvasItemManager::writeToProject );
+}
 
 KadasMapCanvasItemManager *KadasMapCanvasItemManager::instance()
 {
@@ -69,5 +76,45 @@ void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
   if ( item )
   {
     removeItem( item );
+  }
+}
+
+void KadasMapCanvasItemManager::readFromProject( const QDomDocument &doc )
+{
+  QDomElement itemsEl = doc.firstChildElement( "qgis" ).firstChildElement( "MapCanvasItems" );
+  if ( !itemsEl.isNull() )
+  {
+    QDomNodeList items = itemsEl.elementsByTagName( "MapItem" );
+    for ( int i = 0, n = items.size(); i < n; ++i )
+    {
+      KadasMapItem *item = KadasMapItem::fromXml( items.at( i ).toElement() );
+      if ( item )
+      {
+        addItem( item );
+      }
+    }
+  }
+}
+
+void KadasMapCanvasItemManager::writeToProject( QDomDocument &doc )
+{
+  QDomElement root = doc.firstChildElement( "qgis" );
+  // Write all items associated to a layer
+  QList<const KadasMapItem *> items;
+  for ( const KadasMapItem *item : mMapItems )
+  {
+    if ( item->associatedLayer() )
+    {
+      items.append( item );
+    }
+  }
+  if ( !items.isEmpty() )
+  {
+    QDomElement itemsEl = doc.createElement( "MapCanvasItems" );
+    for ( const KadasMapItem *item : items )
+    {
+      itemsEl.appendChild( item->writeXml( doc ) );
+    }
+    root.appendChild( itemsEl );
   }
 }

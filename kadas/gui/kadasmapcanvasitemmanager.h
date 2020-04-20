@@ -23,6 +23,8 @@
 
 #include <kadas/gui/kadas_gui.h>
 
+class QDomDocument;
+
 class QgsMapCanvas;
 
 class KadasMapItem;
@@ -44,12 +46,14 @@ class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
     void itemWillBeRemoved( const KadasMapItem *item );
 
   private:
-    KadasMapCanvasItemManager() {} SIP_FORCE;
+    KadasMapCanvasItemManager() SIP_FORCE;
 
     QList<KadasMapItem *> mMapItems;
 
   private slots:
     void itemAboutToBeDestroyed();
+    void readFromProject( const QDomDocument &doc );
+    void writeToProject( QDomDocument &doc );
 };
 
 #endif // KADASMAPCANVASITEMMANAGER_H

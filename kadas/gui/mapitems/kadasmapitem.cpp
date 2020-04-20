@@ -285,3 +285,53 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
   }
   return QString();
 }
+
+QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
+{
+  QDomElement itemEl = document.createElement( "MapItem" );
+  itemEl.setAttribute( "name", metaObject()->className() );
+  itemEl.setAttribute( "crs", crs().authid() );
+  itemEl.setAttribute( "editor", editor() );
+  if ( associatedLayer() )
+  {
+    itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
+  }
+  QJsonDocument doc;
+  doc.setObject( serialize() );
+  itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+  return itemEl;
+}
+
+KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
+{
+  QDomElement itemEl = element;
+  QString name = itemEl.attribute( "name" );
+  QString crs = itemEl.attribute( "crs" );
+  QString editor = itemEl.attribute( "editor" );
+  QString layerId = itemEl.attribute( "associatedLayer" );
+  QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+  KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
+  if ( factory )
+  {
+    KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
+    item->setEditor( editor );
+    if ( !layerId.isEmpty() )
+    {
+      item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
+    }
+    if ( item->deserialize( data.object() ) )
+    {
+      return item;
+    }
+    else
+    {
+      delete item;
+      QgsDebugMsg( QString( "Item deserialization failed: %1" ).arg( name ) );
+    }
+  }
+  else
+  {
+    QgsDebugMsg( QString( "Unknown item: %1" ).arg( name ) );
+  }
+  return nullptr;
+}

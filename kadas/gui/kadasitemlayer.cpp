@@ -164,29 +164,11 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
   QDomNodeList itemEls = layerEl.elementsByTagName( "MapItem" );
   for ( int i = 0, n = itemEls.size(); i < n; ++i )
   {
-    QDomElement itemEl = itemEls.at( i ).toElement();
-    QString name = itemEl.attribute( "name" );
-    QString crs = itemEl.attribute( "crs" );
-    QString editor = itemEl.attribute( "editor" );
-    QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
-    KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
-    if ( factory )
+    KadasMapItem *item = KadasMapItem::fromXml( itemEls.at( i ).toElement() );
+    if ( item )
     {
-      KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
-      item->setEditor( editor );
-      if ( item->deserialize( data.object() ) )
-      {
-        mItems.insert( ++mIdCounter, item );
-        mItemOrder.append( mIdCounter );
-      }
-      else
-      {
-        QgsDebugMsg( QString( "Item deserialization failed: %1" ).arg( i ) );
-      }
-    }
-    else
-    {
-      QgsDebugMsg( QString( "Unknown item: %1" ).arg( i ) );
+      mItems.insert( ++mIdCounter, item );
+      mItemOrder.append( mIdCounter );
     }
   }
   return true;
@@ -200,15 +182,7 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   layerEl.setAttribute( "title", name() );
   for ( auto it = mItemOrder.begin(), itEnd = mItemOrder.end(); it != itEnd; ++it )
   {
-    KadasMapItem *mapItem = mItems[*it];
-    QDomElement itemEl = document.createElement( "MapItem" );
-    itemEl.setAttribute( "name", mapItem->metaObject()->className() );
-    itemEl.setAttribute( "crs", mapItem->crs().authid() );
-    itemEl.setAttribute( "editor", mapItem->editor() );
-    QJsonDocument doc;
-    doc.setObject( mapItem->serialize() );
-    itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
-    layerEl.appendChild( itemEl );
+    layerEl.appendChild( mItems[*it]->writeXml( document ) );
   }
   return true;
 }

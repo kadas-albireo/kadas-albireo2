@@ -299,6 +299,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     static Registry *registry();
 #endif
 
+    QDomElement writeXml( QDomDocument &document ) const;
+    static KadasMapItem *fromXml( const QDomElement &element );
+
   signals:
     void aboutToBeDestroyed();
     void changed();
