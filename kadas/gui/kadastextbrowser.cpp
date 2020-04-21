@@ -27,8 +27,6 @@
 KadasTextBrowser::KadasTextBrowser( QWidget *parent )
   : QTextBrowser( parent )
 {
-  setOpenLinks( true );
-  setOpenExternalLinks( true );
   setReadOnly( false );
 }
 
@@ -57,21 +55,35 @@ void KadasTextBrowser::contextMenuEvent( QContextMenuEvent *e )
   }
 }
 
-void KadasTextBrowser::keyPressEvent( QKeyEvent *e )
+void KadasTextBrowser::mousePressEvent( QMouseEvent *ev )
 {
-  if ( e->key() == Qt::Key_Control )
+  QString anchor = anchorAt( ev->pos() );
+  if ( ev->modifiers() == Qt::ControlModifier && !anchor.isEmpty() )
   {
-    setReadOnly( true );
-    e->accept();
-    return;
+    ev->ignore();
   }
-  setReadOnly( false );
-  QTextBrowser::keyPressEvent( e );
+  else
+  {
+    QTextBrowser::mousePressEvent( ev );
+  }
+}
+
+void KadasTextBrowser::mouseReleaseEvent( QMouseEvent *ev )
+{
+  QString anchor = anchorAt( ev->pos() );
+  if ( ev->modifiers() == Qt::ControlModifier && !anchor.isEmpty() )
+  {
+    QDesktopServices::openUrl( QUrl::fromUserInput( anchor ) );
+    ev->ignore();
+  }
+  else
+  {
+    QTextBrowser::mouseReleaseEvent( ev );
+  }
 }
 
 void KadasTextBrowser::keyReleaseEvent( QKeyEvent *e )
 {
-  setReadOnly( false );
   QTextBrowser::keyReleaseEvent( e );
   if ( e->key() == Qt::Key_Space || e->key() == Qt::Key_Return || e->key() == Qt::Key_Tab )
   {
@@ -87,7 +99,7 @@ void KadasTextBrowser::keyReleaseEvent( QKeyEvent *e )
     cursor.movePosition( QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, cursor.position() - c2.position() );
     if ( urlRegEx().indexIn( cursor.selectedText() ) != -1 )
     {
-      cursor.insertHtml( QString( "<a href=\"%1\">%1</a>" ).arg( cursor.selectedText() ) );
+      cursor.insertHtml( QString( "<a href=\"%1\" title=\"%2\">%1</a>" ).arg( cursor.selectedText() ).arg( tr( "Ctrl+Click to open hyperlink" ) ) );
       cursor.movePosition( QTextCursor::NextCharacter );
       setTextCursor( cursor );
     }
@@ -97,7 +109,7 @@ void KadasTextBrowser::keyReleaseEvent( QKeyEvent *e )
 void KadasTextBrowser::insertFromMimeData( const QMimeData *source )
 {
   QString text = source->text();
-  text.replace( urlRegEx(), "<a href=\"\\1\">\\1</a>" );
+  text.replace( urlRegEx(), QString( "<a href=\"\\1\" title=\"%1\">\\1</a>" ).arg( tr( "Ctrl+Click to open hyperlink" ) ) );
   insertHtml( text );
 }
 

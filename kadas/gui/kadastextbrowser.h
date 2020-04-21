@@ -33,9 +33,10 @@ class KADAS_GUI_EXPORT KadasTextBrowser : public QTextBrowser
 
   protected:
     void contextMenuEvent( QContextMenuEvent *e ) override;
-    void keyPressEvent( QKeyEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
     void insertFromMimeData( const QMimeData *source ) override;
+    void mousePressEvent( QMouseEvent *ev ) override;
+    void mouseReleaseEvent( QMouseEvent *ev ) override;
 
   private:
     const QRegExp &urlRegEx() const;
