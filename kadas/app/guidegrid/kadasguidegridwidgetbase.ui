@@ -340,6 +340,23 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="labelLineWidth">
+           <property name="text">
+            <string>Line width:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxLineWidth">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="labelFontSize">
            <property name="text">
             <string>Font size:</string>

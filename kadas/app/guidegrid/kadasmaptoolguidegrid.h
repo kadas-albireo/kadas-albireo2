@@ -83,6 +83,7 @@ class KadasGuideGridWidget : public KadasBottomBar
     void updateBottomRight();
     void updateLockIcon( bool locked );
     void updateColor( const QColor &color );
+    void updateLineWidth( int width );
     void updateFontSize( int fontSize );
     void updateLabeling();
     void pickTopLeftPos() { emit requestPick( KadasMapToolGuideGrid::PICK_TOP_LEFT ); }

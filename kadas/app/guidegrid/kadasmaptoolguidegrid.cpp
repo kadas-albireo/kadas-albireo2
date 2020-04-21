@@ -154,6 +154,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.toolButtonLockWidth, &QToolButton::toggled, this, &KadasGuideGridWidget::updateLockIcon );
 
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasGuideGridWidget::updateColor );
+  connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateLineWidth );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
   connect( ui.comboBoxRowLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxColLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
@@ -220,6 +221,9 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.toolButtonLockWidth->setIcon( QIcon( ui.toolButtonLockWidth->isChecked() ? ":/images/themes/default/locked.svg" : ":/images/themes/default/unlocked.svg" ) );
   ui.toolButtonLockWidth->blockSignals( false );
   ui.toolButtonColor->setColor( mCurrentLayer->color() );
+  ui.spinBoxLineWidth->blockSignals( true );
+  ui.spinBoxLineWidth->setValue( mCurrentLayer->lineWidth() );
+  ui.spinBoxLineWidth->blockSignals( false );
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
   QPair<QChar, QChar> labelingMode = mCurrentLayer->labelingMode();
   ui.comboBoxRowLabels->blockSignals( true );
@@ -391,6 +395,16 @@ void KadasGuideGridWidget::updateColor( const QColor &color )
     return;
   }
   mCurrentLayer->setColor( color );
+  mCurrentLayer->triggerRepaint();
+}
+
+void KadasGuideGridWidget::updateLineWidth( int width )
+{
+  if ( !mCurrentLayer )
+  {
+    return;
+  }
+  mCurrentLayer->setLineWidth( width );
   mCurrentLayer->triggerRepaint();
 }
 

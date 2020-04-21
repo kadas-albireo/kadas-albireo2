@@ -41,6 +41,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     bool rowSizeLocked() const { return mRowSizeLocked; }
 
     const QColor &color() const { return mColor; }
+    int lineWidth() const { return mLineWidth; }
     int fontSize() const { return mFontSize; }
     QPair<QChar, QChar> labelingMode() const { return qMakePair( mRowChar, mColChar ); }
     LabelingPos labelingPos() const { return mLabelingPos; }
@@ -48,6 +49,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
+    void setLineWidth( int lineWidth ) { mLineWidth = lineWidth; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
     void setLabelingMode( QChar rowChar, QChar colChar ) { mRowChar = rowChar; mColChar = colChar; }
     void setLabelingPos( LabelingPos pos ) { mLabelingPos = pos; }
@@ -67,6 +69,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     bool mRowSizeLocked = false;
     int mFontSize = 30;
     QColor mColor = Qt::red;
+    int mLineWidth = 1;
     QChar mRowChar = 'A';
     QChar mColChar = '1';
     LabelingPos mLabelingPos = LabelsInside;

@@ -69,7 +69,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1. ) );
+      mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
       mRendererContext.painter()->setBrush( mLayer->mColor );
 
       const QStringList &flags = mRendererContext.customRenderFlags();
@@ -140,7 +140,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         if ( mLayer->mLabelQuadrants )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
+          mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
           QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
           QPolygonF vLineMid;
           for ( int i = 0, n = vLine1.size(); i < n; ++i )
@@ -206,7 +206,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         if ( mLayer->mLabelQuadrants )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1., Qt::DashLine ) );
+          mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
           QPolygonF hLineMid;
           for ( int i = 0, n = hLine1.size(); i < n; ++i )
           {
@@ -299,6 +299,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mRowSizeLocked = mRowSizeLocked;
   layer->mFontSize = mFontSize;
   layer->mColor = mColor;
+  layer->mLineWidth = mLineWidth;
   layer->mRowChar = mRowChar;
   layer->mColChar = mColChar;
   layer->mLabelingPos = mLabelingPos;
@@ -326,6 +327,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mRowSizeLocked = layerEl.attribute( "rowSizeLocked", "0" ).toInt();
   mFontSize = layerEl.attribute( "fontSize" ).toInt();
   mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
+  mLineWidth = layerEl.attribute( "lineWidth", "1" ).toInt();
   mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
   mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
   mLabelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
@@ -413,6 +415,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "crs", crs().authid() );
   layerEl.setAttribute( "fontSize", mFontSize );
   layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
+  layerEl.setAttribute( "lineWidth", mLineWidth );
   layerEl.setAttribute( "colChar", QString( mColChar ) );
   layerEl.setAttribute( "rowChar", QString( mRowChar ) );
   layerEl.setAttribute( "labelingPos", mLabelingPos );
