@@ -178,10 +178,10 @@ KadasMapItem::Margin KadasPictureItem::margin() const
   double framePadding = mFrame ? sFramePadding : 0;
   return Margin
   {
-    qCeil( qMax( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) )
+    qCeil( qMax( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) * mSymbolScale ),
+    qCeil( qMax( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) * mSymbolScale ),
+    qCeil( qMax( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) * mSymbolScale ),
+    qCeil( qMax( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) * mSymbolScale )
   };
 }
 
@@ -190,12 +190,12 @@ QList<KadasMapPos> KadasPictureItem::cornerPoints( const QgsMapSettings &setting
   KadasMapPos mapPos = toMapPos( constState()->pos, settings );
   double halfW = 0.5 * constState()->size.width();
   double halfH = 0.5 * constState()->size.height();
-  double mup = settings.mapUnitsPerPixel();
+  double scale = settings.mapUnitsPerPixel() * mSymbolScale;
 
-  KadasMapPos p1( mapPos.x() + ( constState()->offsetX - halfW ) * mup, mapPos.y() + ( constState()->offsetY - halfH ) * mup );
-  KadasMapPos p2( mapPos.x() + ( constState()->offsetX + halfW ) * mup, mapPos.y() + ( constState()->offsetY - halfH ) * mup );
-  KadasMapPos p3( mapPos.x() + ( constState()->offsetX + halfW ) * mup, mapPos.y() + ( constState()->offsetY + halfH ) * mup );
-  KadasMapPos p4( mapPos.x() + ( constState()->offsetX - halfW ) * mup, mapPos.y() + ( constState()->offsetY + halfH ) * mup );
+  KadasMapPos p1( mapPos.x() + ( constState()->offsetX - halfW ) * scale, mapPos.y() + ( constState()->offsetY - halfH ) * scale );
+  KadasMapPos p2( mapPos.x() + ( constState()->offsetX + halfW ) * scale, mapPos.y() + ( constState()->offsetY - halfH ) * scale );
+  KadasMapPos p3( mapPos.x() + ( constState()->offsetX + halfW ) * scale, mapPos.y() + ( constState()->offsetY + halfH ) * scale );
+  KadasMapPos p4( mapPos.x() + ( constState()->offsetX - halfW ) * scale, mapPos.y() + ( constState()->offsetY + halfH ) * scale );
 
   return QList<KadasMapPos>() << p1 << p2 << p3 << p4;
 }
@@ -245,6 +245,7 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
   context.painter()->translate( pos.x(), pos.y() );
+  context.painter()->scale( mSymbolScale, mSymbolScale );
 
   double w = constState()->size.width();
   double h = constState()->size.height();
