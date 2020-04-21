@@ -4,186 +4,186 @@
 <context>
     <name>KadasApplication</name>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="186"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="201"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="208"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="185"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="200"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="207"/>
         <source>Transform unavailable</source>
         <translation>Transformation non disponible</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="186"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="185"/>
         <source>Transform between %1 and %2 requires missing grid %3.</source>
         <translation>La transformation entre %1 et %2 nécessite la grille %3.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="194"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="193"/>
         <source>Preferred transform unavailable</source>
         <translation>Transformation préférentielle non disponible</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="194"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="193"/>
         <source>Preferred transform between %1 and %2 unavailable.</source>
         <translation>Transformation préférée entre %1 et %2 non disponible.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="201"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="200"/>
         <source>Transform between %1 and %2 unavailable: %3.</source>
         <translation>Transformation entre %1 et %2 non disponible: %3.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="208"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="207"/>
         <source>Transform between %1 and %2 unavailable.</source>
         <translation>Transformation entre %1 et %2 non disponible.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="419"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="498"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="418"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="497"/>
         <source>Invalid Layer</source>
         <translation>Couche non valide</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="459"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="458"/>
         <source>Remote layer</source>
         <translation>Couche distante</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="459"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="458"/>
         <source>Loading %1, please wait...</source>
         <translation>Chargement de %1, veuillez patienter…</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="585"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="584"/>
         <source>Select layer</source>
         <translation>Sélectionner une couche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="588"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="587"/>
         <source>Select layer to paste items to:</source>
         <translation>Sélectionner la couche dans laquelle coller les éléments:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="653"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="796"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="652"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="795"/>
         <source>Choose a KADAS Project</source>
         <translation>Choisir un projet KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="653"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="652"/>
         <source>KADAS project files</source>
         <translation>Fichier projet KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="669"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="668"/>
         <source>Project recovery</source>
         <translation>Récupération de projet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="669"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="668"/>
         <source>A more recent automatic backup of the project exists. Open the backup instead?</source>
         <translation>Une sauvegarde automatique plus récente du projet existe. Ouvrir la sauvegarde à la place?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="706"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="705"/>
         <source>Project migrated</source>
         <translation>Projet migré</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="706"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="705"/>
         <source>The project was created with an older version of KADAS and automatically migrated.</source>
         <translation>Le projet a été créé avec une version précédente de KADAS et a été automatiquement migré.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="729"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="728"/>
         <source>Unable to open project</source>
         <translation>Impossible d&apos;ouvrir le projet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="770"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="769"/>
         <source>Save Project</source>
         <translation>Enregistrer le projet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="770"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="769"/>
         <source>Do you want to save the current project?</source>
         <translation>Enregistrer le projet courant?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="796"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="795"/>
         <source>Kadas project files</source>
         <translation>Fichier projet Kadas</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="835"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="834"/>
         <source>Project saved</source>
         <translation>Projet enregistrée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="841"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="840"/>
         <source>Unable to save project %1</source>
         <translation>Impossible d&apos;enregistrer le projet %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="860"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="859"/>
         <source>Choose an Image File</source>
         <translation>Choisir une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="866"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="865"/>
         <source>Map image saved to %1</source>
         <translation>Carte sauvegardée sous %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="876"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="875"/>
         <source>Map image saved to clipboard</source>
         <translation>Carte enregistrée dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1035"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1034"/>
         <source>Autosaving project...</source>
         <translation>Sauvegarde automatique...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1262"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1261"/>
         <source>&lt;New Project&gt;</source>
         <translation>&lt;Nouveau Projet&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1269"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
         <source>Offline</source>
         <translation>Hors ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1269"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
         <source>Online</source>
         <translation>En ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1488"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1487"/>
         <source>%1 is not a valid or recognized data source</source>
         <translation>%1 n&apos;est pas une source de données valide ou reconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1489"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1488"/>
         <source>Invalid Data Source</source>
         <translation>Source de données non valide</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1539"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1538"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1543"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1542"/>
         <source>Vector</source>
         <translation>Vecteur</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1619"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
         <source>Python unavailable</source>
         <translation>Python pas disponible</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1619"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
         <source>Failed to load python support</source>
         <translation>Echec du chargement du support Python</translation>
     </message>
@@ -1169,17 +1169,17 @@
 <context>
     <name>KadasGpxDropHandler</name>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="339"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="335"/>
         <source>GPX import completed</source>
         <translation>Import GPX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="343"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="339"/>
         <source>GPX import failed</source>
         <translation>L&apos;import GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="343"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="339"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -1190,28 +1190,28 @@
 <context>
     <name>KadasGpxIntegration</name>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="102"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="98"/>
         <source>Import GPX</source>
         <translation>importer GPX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="102"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="238"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="98"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="234"/>
         <source>GPX Files (*.gpx)</source>
         <translation>Fichiers GPX (*.gpx)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="121"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="117"/>
         <source>GPX import completed</source>
         <translation>Import GPX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="125"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="121"/>
         <source>GPX import failed</source>
         <translation>L&apos;import GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="125"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="121"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -1219,38 +1219,38 @@
 </translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="136"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="132"/>
         <source>Failed to open the input file.</source>
         <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="143"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="139"/>
         <source>Failed to read input file.</source>
         <translation>Impossible de lire fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="207"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="238"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="203"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="234"/>
         <source>Export to GPX</source>
         <translation>Exporter vers GPX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="224"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="220"/>
         <source>Select layer to export:</source>
         <translation>Sélectionner la couche à exporter:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="252"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="248"/>
         <source>GPX export failed</source>
         <translation>L&apos;export GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="252"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="248"/>
         <source>Cannot write to file</source>
         <translation>Impossible d&apos;enregistrer le fichier</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="304"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="300"/>
         <source>GPX export completed</source>
         <translation>Export GPX terminé</translation>
     </message>
@@ -1279,8 +1279,12 @@
     </message>
     <message>
         <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="115"/>
+        <source>Line width:</source>
+        <translation>Largeur des lignes:</translation>
+    </message>
+    <message>
         <source>Size:</source>
-        <translation>Dimension:</translation>
+        <translation type="vanished">Dimension:</translation>
     </message>
 </context>
 <context>
@@ -1325,12 +1329,12 @@
 <context>
     <name>KadasGuideGridLayer</name>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="378"/>
+        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="381"/>
         <source>Cell %1, %2</source>
         <translation>Cellule %1, %2</translation>
     </message>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="392"/>
+        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="395"/>
         <source> (Quadrant %1)</source>
         <translation> (Quadrant %1)</translation>
     </message>
@@ -1338,7 +1342,7 @@
 <context>
     <name>KadasGuideGridLayerType</name>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="425"/>
+        <location filename="../kadas/app/guidegrid/kadasguidegridlayer.cpp" line="429"/>
         <source>Edit</source>
         <translation>Éditer</translation>
     </message>
@@ -1361,7 +1365,7 @@
         <translation>À l&apos;extérieur</translation>
     </message>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasmaptoolguidegrid.cpp" line="167"/>
+        <location filename="../kadas/app/guidegrid/kadasmaptoolguidegrid.cpp" line="168"/>
         <source>Guidegrid</source>
         <translation>Grille de conduite</translation>
     </message>
@@ -1415,16 +1419,21 @@
     </message>
     <message>
         <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="345"/>
+        <source>Line width:</source>
+        <translation>Largeur des lignes:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="362"/>
         <source>Font size:</source>
         <translation>Taille de police:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="365"/>
+        <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="382"/>
         <source>Labeling:</source>
         <translation>Étiquetage:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="396"/>
+        <location filename="../kadas/app/guidegrid/kadasguidegridwidgetbase.ui" line="413"/>
         <source>Quadrants</source>
         <translation>Quadrants</translation>
     </message>
@@ -1621,12 +1630,12 @@
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemcontextmenuactions.cpp" line="152"/>
+        <location filename="../kadas/gui/kadasitemcontextmenuactions.cpp" line="151"/>
         <source>Vertex Count</source>
         <translation>Nombre de sommets</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemcontextmenuactions.cpp" line="152"/>
+        <location filename="../kadas/gui/kadasitemcontextmenuactions.cpp" line="151"/>
         <source>Number of polygon vertices:</source>
         <translation>Nombre de sommets de polygone:</translation>
     </message>
@@ -1634,27 +1643,27 @@
 <context>
     <name>KadasItemLayerRegistry</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="338"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="312"/>
         <source>Redlining</source>
         <translation>Redlining</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="339"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="313"/>
         <source>Symbols</source>
         <translation>Symbole</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="340"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="314"/>
         <source>Pictures</source>
         <translation>Illustrations</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="341"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="315"/>
         <source>Pins</source>
         <translation>Épingles</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="342"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="316"/>
         <source>Routes</source>
         <translation>Itinéraires (Routes)</translation>
     </message>
@@ -1662,7 +1671,7 @@
 <context>
     <name>KadasItemLayerType</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="362"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="336"/>
         <source>Symbol scale:</source>
         <translation>Échelle des symboles:</translation>
     </message>
@@ -3334,12 +3343,14 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Ajouter une couche WCS</translation>
     </message>
     <message>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>On the fly projection enabled</source>
-        <translation type="vanished">Reprojection à la volée activée</translation>
+        <translation>Reprojection à la volée activée</translation>
     </message>
     <message>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>The following layers are being reprojected to the selected CRS: %1. Performance may suffer.</source>
-        <translation type="vanished">Les couches suivantes sont projetées aux SCR sélectionné: %1. La performance peut souffrir.</translation>
+        <translation>Les couches suivantes sont projetées aux SCR sélectionné: %1. La performance peut souffrir.</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="984"/>
@@ -3578,7 +3589,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Convertir à waypoint</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooledititemgroup.cpp" line="305"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooledititemgroup.cpp" line="304"/>
         <source>%1 item(s) selected on layer %2</source>
         <translation>%1 entité(s) sélectionnée(s) dans la couche %2</translation>
     </message>
@@ -3758,22 +3769,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Bassin visuel [%1]</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="236"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="237"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="242"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="244"/>
         <source>Invisible</source>
         <translation>Invisible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="258"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="263"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="258"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="263"/>
         <source>Failed to compute viewshed.</source>
         <translation>Impossible de calculer le bassin visuel.</translation>
     </message>
@@ -3921,17 +3932,17 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxDropHandler</name>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="543"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="542"/>
         <source>MilX import completed</source>
         <translation>Import MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="547"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="546"/>
         <source>MilX import failed</source>
         <translation>L&apos;import MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="547"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="546"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -3985,144 +3996,144 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxIntegration</name>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="173"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="172"/>
         <source>Don&apos;t add</source>
         <translation>Ne pas ajouter</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="209"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="208"/>
         <source>Compressed MilX Layer (*.milxlyz)</source>
         <translation>Couce MilX comprimé (*.milxlyz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="210"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="209"/>
         <source>MilX Layer (*.milxly)</source>
         <translation>Couce MilX comprimé (*.milxlyz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="215"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="214"/>
         <source>Select Output</source>
         <translation>Sélectionner le fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="252"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="334"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="337"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="251"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="333"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="336"/>
         <source>Export Failed</source>
         <translation>L&apos;export a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="252"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="251"/>
         <source>Failed to open the output file for writing.</source>
         <translation>Impossible d&apos;ouvrir le fichier de sortie pour l&apos;écriture.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="320"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="319"/>
         <source>MilX export failed</source>
         <translation>L&apos;export MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="320"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="319"/>
         <source>Failed to write output.</source>
         <translation>Impossible d&apos;écrire la sortie.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="326"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="325"/>
         <source>MilX export completed</source>
         <translation>Export MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="329"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="328"/>
         <source>Export Messages</source>
         <translation>Messages d&apos;exportation</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="329"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="328"/>
         <source>The following messages were emitted while exporting:</source>
         <translation>Les messages suivants ont été émis lors de l&apos;exportation:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="337"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="336"/>
         <source>The export failed:</source>
         <translation>L&apos;export a échoué:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="348"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="347"/>
         <source>MilX Layer Files (*.milxly *.milxlyz)</source>
         <translation>Fichiers de couche MilX (*.milxly *.milxlyz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="349"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="348"/>
         <source>Select Milx Layer File</source>
         <translation>Sélectionner fichier de couche MilX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="359"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="358"/>
         <source>MilX import failed</source>
         <translation>L&apos;import MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="363"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="362"/>
         <source>MilX import completed</source>
         <translation>Import MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="381"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="380"/>
         <source>Failed to open the input file.</source>
         <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="391"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="390"/>
         <source>Failed to read input file.</source>
         <translation>Impossible de lire fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="398"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="397"/>
         <source>Import Failed</source>
         <translation>L&apos;import a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="398"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="397"/>
         <source>The import failed:</source>
         <translation>L&apos;import a échoué:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="400"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="399"/>
         <source>MilX upgrade failed</source>
         <translation>Mise à jour MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="409"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="408"/>
         <source>The file could not be parsed.</source>
         <translation>Le fichier n&apos;a pu être analysée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="421"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="420"/>
         <source>Unexpected MSS library version tag.</source>
         <translation>Version tag de bibliothèque MSS inattendu.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="457"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="456"/>
         <source>Import cartouche</source>
         <translation>Importer cartouche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="460"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="459"/>
         <source>Import cartouche from MilX layer:</source>
         <translation>Importer le cartouche depuis la couche MilX:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="462"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="461"/>
         <source>Don&apos;t import</source>
         <translation>Ne pas importer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="485"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="484"/>
         <source>Import Messages</source>
         <translation>Messages d&apos;importation</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="485"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="484"/>
         <source>The following messages were emitted while importing:</source>
         <translation>Les messages suivants ont été émis lors de l&apos;importation:</translation>
     </message>
@@ -4130,22 +4141,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="614"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="615"/>
         <source>Symbol editor...</source>
         <translation>Editeur de symbole...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="627"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="628"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="638"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="639"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="648"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="649"/>
         <source>Reset offset</source>
         <translation>Supprimer offset</translation>
     </message>
@@ -4233,12 +4244,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPictureItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="486"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="487"/>
         <source>Frame visible</source>
         <translation>Encadrement visible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="490"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="491"/>
         <source>Position locked</source>
         <translation>Position bloquée</translation>
     </message>
@@ -4523,8 +4534,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     </message>
     <message>
         <location filename="../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp" line="34"/>
+        <source>Line width:</source>
+        <translation>Largeur des lignes:</translation>
+    </message>
+    <message>
         <source>Border width:</source>
-        <translation>Dimension contour:</translation>
+        <translation type="vanished">Dimension contour:</translation>
     </message>
 </context>
 <context>
