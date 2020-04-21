@@ -138,52 +138,57 @@
         <translation>Cartina salvata negli appunti</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1034"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1036"/>
         <source>Autosaving project...</source>
         <translation>Salvataggio automatico...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1261"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1050"/>
+        <source>Unsaved project from template, autosave disabled</source>
+        <translation>Progetto non salvato da modello, autosave disabilitato</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
         <source>&lt;New Project&gt;</source>
         <translation>&lt;Nuovo progetto&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1275"/>
         <source>Offline</source>
         <translation>Disconnesso</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1275"/>
         <source>Online</source>
         <translation>Connesso</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1487"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1494"/>
         <source>%1 is not a valid or recognized data source</source>
         <translation>%1 è una sorgente dati non valida o sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1488"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1495"/>
         <source>Invalid Data Source</source>
         <translation>Sorgente dati non valida</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1538"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1545"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1542"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1549"/>
         <source>Vector</source>
         <translation>Vettore</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1625"/>
         <source>Python unavailable</source>
         <translation>Python non disponibile</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1625"/>
         <source>Failed to load python support</source>
         <translation>Impossibile caricare il supporto Python</translation>
     </message>
@@ -3341,14 +3346,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Aggiungi layer WCS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>On the fly projection enabled</source>
-        <translation>Proiezione al volo automatica attivata</translation>
+        <translation type="vanished">Proiezione al volo automatica attivata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>The following layers are being reprojected to the selected CRS: %1. Performance may suffer.</source>
-        <translation>I seguenti layer sono reprojettati al SR selezionato: %1. La prestazione potrebbe essere ridotta.</translation>
+        <translation type="vanished">I seguenti layer sono reprojettati al SR selezionato: %1. La prestazione potrebbe essere ridotta.</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="984"/>
@@ -4734,14 +4737,20 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasTextBrowser</name>
     <message>
-        <location filename="../kadas/gui/kadastextbrowser.cpp" line="41"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="39"/>
         <source>Open link...</source>
         <translation>Apri link...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadastextbrowser.cpp" line="42"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="40"/>
         <source>Copy link location</source>
         <translation>Copia destinazione link</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="102"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="112"/>
+        <source>Ctrl+Click to open hyperlink</source>
+        <translation>Ctrl+Click per aprire il collegamento</translation>
     </message>
 </context>
 <context>

@@ -138,52 +138,57 @@
         <translation>Carte enregistrée dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1034"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1036"/>
         <source>Autosaving project...</source>
         <translation>Sauvegarde automatique...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1261"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1050"/>
+        <source>Unsaved project from template, autosave disabled</source>
+        <translation>Projet non sauvegardé du modèle, autosave désactivée</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
         <source>&lt;New Project&gt;</source>
         <translation>&lt;Nouveau Projet&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1275"/>
         <source>Offline</source>
         <translation>Hors ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1268"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1275"/>
         <source>Online</source>
         <translation>En ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1487"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1494"/>
         <source>%1 is not a valid or recognized data source</source>
         <translation>%1 n&apos;est pas une source de données valide ou reconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1488"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1495"/>
         <source>Invalid Data Source</source>
         <translation>Source de données non valide</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1538"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1545"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1542"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1549"/>
         <source>Vector</source>
         <translation>Vecteur</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1625"/>
         <source>Python unavailable</source>
         <translation>Python pas disponible</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1618"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1625"/>
         <source>Failed to load python support</source>
         <translation>Echec du chargement du support Python</translation>
     </message>
@@ -3343,14 +3348,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Ajouter une couche WCS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>On the fly projection enabled</source>
-        <translation>Reprojection à la volée activée</translation>
+        <translation type="vanished">Reprojection à la volée activée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="841"/>
         <source>The following layers are being reprojected to the selected CRS: %1. Performance may suffer.</source>
-        <translation>Les couches suivantes sont projetées aux SCR sélectionné: %1. La performance peut souffrir.</translation>
+        <translation type="vanished">Les couches suivantes sont projetées aux SCR sélectionné: %1. La performance peut souffrir.</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="984"/>
@@ -4737,14 +4740,20 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasTextBrowser</name>
     <message>
-        <location filename="../kadas/gui/kadastextbrowser.cpp" line="41"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="39"/>
         <source>Open link...</source>
         <translation>Ouvrir link...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadastextbrowser.cpp" line="42"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="40"/>
         <source>Copy link location</source>
         <translation>Coper link</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="102"/>
+        <location filename="../kadas/gui/kadastextbrowser.cpp" line="112"/>
+        <source>Ctrl+Click to open hyperlink</source>
+        <translation>Ctrl+Clic pour ouvrir l&apos;hyperlien</translation>
     </message>
 </context>
 <context>
