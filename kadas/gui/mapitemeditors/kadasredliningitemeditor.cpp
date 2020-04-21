@@ -31,7 +31,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );
   if ( geometryItem )
   {
-    mUi.mLabelSize->setText( geometryItem->geometryType() == QgsWkbTypes::PointGeometry ? tr( "Size:" ) : tr( "Border width:" ) );
+    mUi.mLabelSize->setText( geometryItem->geometryType() == QgsWkbTypes::PointGeometry ? tr( "Size:" ) : tr( "Line width:" ) );
   }
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( QgsSettings().value( "/Redlining/size", 1 ).toInt() );
