@@ -184,7 +184,7 @@ void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPo
     QImageReader reader( mFilePath );
 
     QgsVector halfSize = mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( toMapPos( position(), mapSettings ) );
-    halfSize = halfSize.rotateBy( state()->angle / 180. * M_PI );
+    halfSize = halfSize.rotateBy( state()->angle / 180. * M_PI ) / mSymbolScale;
     state()->size.setWidth( 2 * qAbs( halfSize.x() ) );
     state()->size.setHeight( state()->size.width() / double( reader.size().width() ) * reader.size().height() );
 
