@@ -231,7 +231,6 @@ void KadasGlobeIntegration::projectRead()
 {
   setGlobeEnabled( false ); // Hide globe when new projects loaded, on some systems it is very slow loading a new project with globe enabled
   mSettingsDialog->readProjectSettings();
-  applyProjectSettings();
 }
 
 void KadasGlobeIntegration::addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler )
