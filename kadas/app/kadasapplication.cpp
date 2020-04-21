@@ -1028,20 +1028,27 @@ void KadasApplication::projectDirtySet()
 
 void KadasApplication::autosave()
 {
-  if ( !QgsProject::instance()->fileName().isEmpty() && QgsProject::instance()->isDirty() )
+  if ( QgsProject::instance()->isDirty() )
   {
-    mAutosaving = true;
-    mMainWindow->statusBar()->showMessage( tr( "Autosaving project..." ), 3000 );
-    QString prevFilename = QgsProject::instance()->fileName();
-    QFileInfo finfo( prevFilename );
-    QgsProject::instance()->setFileName( finfo.dir().absoluteFilePath( QString( "~%1" ).arg( finfo.fileName() ) ) );
-    QgsProject::instance()->write();
-    // Immediately remove the backup created by QgsProject::write
-    QFile( QgsProject::instance()->fileName() + "~" ).remove();
-    QgsProject::instance()->setFileName( prevFilename );
-    QgsProject::instance()->setDirty();
-    mAutosaveTimer.stop(); // Stop timer triggered by projectDirtyChanged()
-    mAutosaving = false;
+    if ( !QgsProject::instance()->fileName().isEmpty() )
+    {
+      mAutosaving = true;
+      mMainWindow->statusBar()->showMessage( tr( "Autosaving project..." ), 3000 );
+      QString prevFilename = QgsProject::instance()->fileName();
+      QFileInfo finfo( prevFilename );
+      QgsProject::instance()->setFileName( finfo.dir().absoluteFilePath( QString( "~%1" ).arg( finfo.fileName() ) ) );
+      QgsProject::instance()->write();
+      // Immediately remove the backup created by QgsProject::write
+      QFile( QgsProject::instance()->fileName() + "~" ).remove();
+      QgsProject::instance()->setFileName( prevFilename );
+      QgsProject::instance()->setDirty();
+      mAutosaveTimer.stop(); // Stop timer triggered by projectDirtyChanged()
+      mAutosaving = false;
+    }
+    else
+    {
+      mMainWindow->statusBar()->showMessage( tr( "Unsaved project from template, autosave disabled" ), 3000 );
+    }
   }
 }
 
