@@ -4680,7 +4680,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadasstatuswidget.ui" line="71"/>
         <source>Mouse position:</source>
-        <translation>Cordonnée:</translation>
+        <translation>Coordonnée:</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadasstatuswidget.ui" line="175"/>
