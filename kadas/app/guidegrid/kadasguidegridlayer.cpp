@@ -64,8 +64,6 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
 
-      static int labelBoxSize = mLayer->mFontSize + 5;
-      static int smallLabelBoxSize = 0.5 * ( mLayer->mFontSize + 5 );
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
@@ -84,6 +82,9 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       QFont font;
       font.setPixelSize( mLayer->mFontSize );
       QFontMetrics fontMetrics( font );
+
+      const int labelBoxSize = fontMetrics.height();
+      const int smallLabelBoxSize = smallFontMetrics.height();
 
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
@@ -227,7 +228,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
     {
       QPainterPath path;
       x -= 0.5 * metrics.horizontalAdvance( text );
-      y += 0.5 * metrics.ascent();
+      y =  y - metrics.descent() + 0.5 * metrics.height();
       path.addText( x, y, font, text );
       mRendererContext.painter()->save();
       mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
