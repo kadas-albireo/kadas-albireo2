@@ -66,7 +66,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
-  mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId(), kApp->mainWindow() );
+  mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
   KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
   {
@@ -80,6 +80,7 @@ KadasMilxIntegration::~KadasMilxIntegration()
 {
   kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
   KadasMilxClient::quit();
+  delete mMilxLibrary;
 }
 
 KadasMilxLayer *KadasMilxIntegration::getLayer()
