@@ -67,9 +67,9 @@ class KADAS_GUI_EXPORT KadasMilxClientWorker : public QObject
 
   private:
     bool mSync;
-    QProcess *mProcess;
-    QNetworkSession *mNetworkSession;
-    QTcpSocket *mTcpSocket;
+    QProcess *mProcess = nullptr;
+    QNetworkSession *mNetworkSession = nullptr;
+    QTcpSocket *mTcpSocket = nullptr;
     QString mLastError;
     QString mLibraryVersionTag;
 

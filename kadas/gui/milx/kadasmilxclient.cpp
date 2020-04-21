@@ -38,7 +38,7 @@
 
 
 KadasMilxClientWorker::KadasMilxClientWorker( bool sync )
-  : mSync( sync ), mProcess( 0 ), mNetworkSession( 0 ), mTcpSocket( 0 )
+  : mSync( sync )
 {
 }
 
@@ -47,15 +47,15 @@ void KadasMilxClientWorker::cleanup()
   if ( mProcess )
   {
     mProcess->deleteLater();
-    mProcess = 0;
+    mProcess = nullptr;
   }
   if ( mTcpSocket )
   {
     mTcpSocket->deleteLater();
-    mTcpSocket = 0;
+    mTcpSocket = nullptr;
   }
   delete mNetworkSession;
-  mNetworkSession = 0;
+  mNetworkSession = nullptr;
 }
 
 bool KadasMilxClientWorker::initialize()
