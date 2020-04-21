@@ -174,8 +174,7 @@ void KadasApplication::init()
   QApplication::instance()->installTranslator( translator );
 
   // Install crash reporter
-  KadasCrashRpt crashReporter;
-  crashReporter.install();
+  KadasCrashRpt::install();
 
   QgsApplication::initQgis();
 

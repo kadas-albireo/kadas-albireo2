@@ -21,11 +21,7 @@
 class KadasCrashRpt
 {
   public:
-    ~KadasCrashRpt();
-    bool install();
-
-  private:
-    bool mHandlerInstalled = false;
+    static bool install();
 };
 
 #endif // KADASCRASHRPT_H
