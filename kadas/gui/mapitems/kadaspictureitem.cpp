@@ -295,7 +295,7 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
     context.painter()->drawPath( path );
   }
 
-  context.painter()->drawImage( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5, mImage );
+  context.painter()->drawImage( QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 ), mImage );
 }
 
 QString KadasPictureItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
