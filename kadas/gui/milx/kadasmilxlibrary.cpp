@@ -22,6 +22,7 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QtConcurrentRun>
 
 #include <qgis/qgsfilterlineedit.h>
 #include <qgis/qgssettings.h>
@@ -102,10 +103,6 @@ KadasMilxLibrary::KadasMilxLibrary( WId winId, QWidget *parent )
   layout->addWidget( mTreeView );
   connect( mTreeView, &QTreeView::clicked, this, &KadasMilxLibrary::itemClicked );
 
-  mGalleryModel = new QStandardItemModel( this );
-  mFilterProxyModel = new TreeFilterProxyModel( this );
-  mFilterProxyModel->setSourceModel( mGalleryModel );
-
   mLoadingModel = new QStandardItemModel( this );
   QStandardItem *loadingItem = new QStandardItem( tr( "Loading..." ) );
   loadingItem->setEnabled( false );
@@ -113,21 +110,16 @@ KadasMilxLibrary::KadasMilxLibrary( WId winId, QWidget *parent )
 
   setCursor( Qt::WaitCursor );
   mTreeView->setModel( mLoadingModel );
-  mLoader = new KadasMilxLibraryLoader( this );
-  connect( mLoader, &KadasMilxLibraryLoader::finished, this, &KadasMilxLibrary::loaderFinished );
-  mLoader->start();
+
+  mLibraryFuture.setFuture( QtConcurrent::run( [this] { return loadLibrary( mTreeView->iconSize() ); } ) );
+  connect( &mLibraryFuture, &QFutureWatcher<QStandardItemModel *>::finished, this, &KadasMilxLibrary::loaderFinished );
 }
 
 KadasMilxLibrary::~KadasMilxLibrary()
 {
-  if ( mLoader )
-  {
-    mLoader->abort();
-    while ( mLoader && !mLoader->isFinished() )
-    {
-      QApplication::instance()->processEvents( QEventLoop::ExcludeUserInputEvents );
-    }
-  }
+  mLoaderAborted = 1;
+  mLibraryFuture.cancel();
+  mLibraryFuture.waitForFinished();
 }
 
 void KadasMilxLibrary::focusFilter()
@@ -138,9 +130,12 @@ void KadasMilxLibrary::focusFilter()
 
 void KadasMilxLibrary::loaderFinished()
 {
-  mLoader->deleteLater();
-  mLoader = 0;
+  mGalleryModel = mLibraryFuture.result();
+  mGalleryModel->setParent( this );
+  mFilterProxyModel = new TreeFilterProxyModel( this );
+  mFilterProxyModel->setSourceModel( mGalleryModel );
   mTreeView->setModel( mFilterProxyModel );
+  delete mLoadingModel;
   unsetCursor();
 }
 
@@ -200,10 +195,90 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
   }
 }
 
-QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &value, const QImage &image, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool symbolHasVariablePoints )
+QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
+{
+  QStandardItemModel *model = new QStandardItemModel();
+
+#ifdef __MINGW32__
+  QString galleryPath = QDir( QString( "%1/../opt/mss/MilXGalleryFiles" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
+#else
+  QString galleryPath = QDir( QApplication::applicationDirPath() ).absoluteFilePath( "MilXGalleryFiles" );
+#endif
+  if ( !QDir( galleryPath ).exists() )
+  {
+    galleryPath = QgsSettings().value( "/milx/milx_gallery_path", "" ).toString();
+  }
+  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+
+  QDir galleryDir( galleryPath );
+  if ( galleryDir.exists() )
+  {
+    for ( const QString &galleryFileName : galleryDir.entryList( QStringList() << "*.xml", QDir::Files ) )
+    {
+      QString galleryFilePath = galleryDir.absoluteFilePath( galleryFileName );
+      QFile galleryFile( galleryFilePath );
+      if ( !galleryFilePath.endsWith( "_international.xml", Qt::CaseInsensitive ) && galleryFile.open( QIODevice::ReadOnly ) )
+      {
+        QImage galleryIcon( QString( galleryFilePath ).replace( QRegExp( ".xml$" ), ".png" ) );
+        QDomDocument doc;
+        doc.setContent( &galleryFile );
+        QDomElement mssGalleryEl = doc.firstChildElement( "MssGallery" );
+        QDomElement galleryNameEl = mssGalleryEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
+        if ( galleryNameEl.isNull() )
+        {
+          galleryNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
+        }
+        QStandardItem *galleryItem = addItem( model->invisibleRootItem(), galleryNameEl.text(), galleryIcon );
+
+        QDomNodeList sectionNodes = mssGalleryEl.elementsByTagName( "Section" );
+        for ( int iSection = 0, nSections = sectionNodes.size(); iSection < nSections; ++iSection )
+        {
+          QDomElement sectionEl = sectionNodes.at( iSection ).toElement();
+          QDomElement sectionNameEl = sectionEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
+          if ( sectionNameEl.isNull() )
+          {
+            sectionNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
+          }
+          QStandardItem *sectionItem = addItem( galleryItem, sectionNameEl.text() );
+
+          QDomNodeList subSectionNodes = sectionEl.elementsByTagName( "SubSection" );
+          for ( int iSubSection = 0, nSubSections = subSectionNodes.size(); iSubSection < nSubSections; ++iSubSection )
+          {
+            QDomElement subSectionEl = subSectionNodes.at( iSubSection ).toElement();
+            QDomElement subSectionNameEl = subSectionEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
+            if ( subSectionNameEl.isNull() )
+            {
+              subSectionNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
+            }
+            QStandardItem *subSectionItem = addItem( sectionItem, subSectionNameEl.text() );
+
+            QDomNodeList memberNodes = subSectionEl.elementsByTagName( "Member" );
+            QStringList symbolXmls;
+            for ( int iMember = 0, nMembers = memberNodes.size(); iMember < nMembers; ++iMember )
+            {
+              symbolXmls.append( memberNodes.at( iMember ).toElement().attribute( "MssStringXML" ) );
+            }
+            QList<KadasMilxSymbolDesc> symbolDescs;
+            KadasMilxClient::getSymbolsMetadata( symbolXmls, symbolDescs );
+            for ( const KadasMilxSymbolDesc &symbolDesc : symbolDescs )
+            {
+              if ( mLoaderAborted )
+                return model;
+              addItem( subSectionItem, symbolDesc.name, symbolDesc.icon, viewIconSize, true, symbolDesc.symbolXml, symbolDesc.militaryName, symbolDesc.minNumPoints, symbolDesc.hasVariablePoints );
+            }
+          }
+        }
+      }
+    }
+  }
+  addItem( model->invisibleRootItem(), tr( "More Symbols..." ), QImage( ":/images/themes/default/mActionAdd.svg" ), viewIconSize, true, "<custom>", tr( "More Symbols..." ) );
+  return model;
+}
+
+QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &value, const QImage &image, const QSize &viewIconSize, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool symbolHasVariablePoints )
 {
   QIcon icon;
-  QSize iconSize = isLeaf ? mTreeView->iconSize() : !image.isNull() ? QSize( 32, 32 ) : QSize( 1, 32 );
+  QSize iconSize = isLeaf ? viewIconSize : !image.isNull() ? QSize( 32, 32 ) : QSize( 1, 32 );
   QImage iconImage( iconSize, QImage::Format_ARGB32 );
   iconImage.fill( Qt::transparent );
   if ( !image.isNull() )
@@ -216,10 +291,6 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
       image );
   }
   icon = QIcon( QPixmap::fromImage( iconImage ) );
-  if ( !parent )
-  {
-    parent = mGalleryModel->invisibleRootItem();
-  }
   // Create category group item if necessary
   if ( !isLeaf )
   {
@@ -258,100 +329,4 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
     item->setIcon( icon );
     return item;
   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void KadasMilxLibraryLoader::run()
-{
-#ifdef __MINGW32__
-  QString galleryPath = QDir( QString( "%1/../opt/mss/MilXGalleryFiles" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
-#else
-  QString galleryPath = QDir( QApplication::applicationDirPath() ).absoluteFilePath( "MilXGalleryFiles" );
-#endif
-  if ( !QDir( galleryPath ).exists() )
-  {
-    galleryPath = QgsSettings().value( "/milx/milx_gallery_path", "" ).toString();
-  }
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
-
-  QDir galleryDir( galleryPath );
-  if ( galleryDir.exists() )
-  {
-    for ( const QString &galleryFileName : galleryDir.entryList( QStringList() << "*.xml", QDir::Files ) )
-    {
-      QString galleryFilePath = galleryDir.absoluteFilePath( galleryFileName );
-      QFile galleryFile( galleryFilePath );
-      if ( !galleryFilePath.endsWith( "_international.xml", Qt::CaseInsensitive ) && galleryFile.open( QIODevice::ReadOnly ) )
-      {
-        QImage galleryIcon( QString( galleryFilePath ).replace( QRegExp( ".xml$" ), ".png" ) );
-        QDomDocument doc;
-        doc.setContent( &galleryFile );
-        QDomElement mssGalleryEl = doc.firstChildElement( "MssGallery" );
-        QDomElement galleryNameEl = mssGalleryEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
-        if ( galleryNameEl.isNull() )
-        {
-          galleryNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
-        }
-        QStandardItem *galleryItem = addItem( 0, galleryNameEl.text(), galleryIcon );
-
-        QDomNodeList sectionNodes = mssGalleryEl.elementsByTagName( "Section" );
-        for ( int iSection = 0, nSections = sectionNodes.size(); iSection < nSections; ++iSection )
-        {
-          QDomElement sectionEl = sectionNodes.at( iSection ).toElement();
-          QDomElement sectionNameEl = sectionEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
-          if ( sectionNameEl.isNull() )
-          {
-            sectionNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
-          }
-          QStandardItem *sectionItem = addItem( galleryItem, sectionNameEl.text() );
-
-          QDomNodeList subSectionNodes = sectionEl.elementsByTagName( "SubSection" );
-          for ( int iSubSection = 0, nSubSections = subSectionNodes.size(); iSubSection < nSubSections; ++iSubSection )
-          {
-            QDomElement subSectionEl = subSectionNodes.at( iSubSection ).toElement();
-            QDomElement subSectionNameEl = subSectionEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
-            if ( subSectionNameEl.isNull() )
-            {
-              subSectionNameEl = mssGalleryEl.firstChildElement( "Name_EN" );
-            }
-            QStandardItem *subSectionItem = addItem( sectionItem, subSectionNameEl.text() );
-
-            QDomNodeList memberNodes = subSectionEl.elementsByTagName( "Member" );
-            QStringList symbolXmls;
-            for ( int iMember = 0, nMembers = memberNodes.size(); iMember < nMembers; ++iMember )
-            {
-              symbolXmls.append( memberNodes.at( iMember ).toElement().attribute( "MssStringXML" ) );
-            }
-            QList<KadasMilxSymbolDesc> symbolDescs;
-            KadasMilxClient::getSymbolsMetadata( symbolXmls, symbolDescs );
-            for ( const KadasMilxSymbolDesc &symbolDesc : symbolDescs )
-            {
-              if ( mAborted )
-                return;
-              addItem( subSectionItem, symbolDesc.name, symbolDesc.icon, true, symbolDesc.symbolXml, symbolDesc.militaryName, symbolDesc.minNumPoints, symbolDesc.hasVariablePoints );
-            }
-          }
-        }
-      }
-    }
-  }
-  addItem( 0, tr( "More Symbols..." ), QImage( ":/images/themes/default/mActionAdd.svg" ), true, "<custom>", tr( "More Symbols..." ) );
-}
-
-QStandardItem *KadasMilxLibraryLoader::addItem( QStandardItem *parent, const QString &value, const QImage &image, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool hasVariablePoints )
-{
-  QStandardItem *item;
-  QMetaObject::invokeMethod( mLibrary, "addItem",
-                             Qt::BlockingQueuedConnection,
-                             Q_RETURN_ARG( QStandardItem *, item ),
-                             Q_ARG( QStandardItem *, parent ),
-                             Q_ARG( QString, value ),
-                             Q_ARG( QImage, image ),
-                             Q_ARG( bool, isLeaf ),
-                             Q_ARG( QString, symbolXml ),
-                             Q_ARG( QString, symbolMilitaryName ),
-                             Q_ARG( int, symbolPointCount ),
-                             Q_ARG( bool, hasVariablePoints ) );
-  return item;
 }

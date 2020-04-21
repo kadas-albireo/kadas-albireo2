@@ -48,6 +48,7 @@ TARGET_LINK_LIBRARIES(kadas_gui
   Qt5::Network
   Qt5::Svg
   Qt5::Xml
+  Qt5::Concurrent
   ${QGIS_CORE_LIBRARY}
   ${QGIS_GUI_LIBRARY}
   ${GeographicLib_LIBRARIES}

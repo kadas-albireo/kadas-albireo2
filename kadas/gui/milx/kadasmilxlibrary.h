@@ -18,14 +18,13 @@
 #define KADASMILXLIBRARY_H
 
 #include <QFrame>
+#include <QFutureWatcher>
 #include <QThread>
 
 class QStandardItem;
 class QStandardItemModel;
 class QTreeView;
 class QgsFilterLineEdit;
-
-class KadasMilxLibraryLoader;
 
 #include <kadas/gui/milx/kadasmilxclient.h>
 
@@ -55,38 +54,23 @@ class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
     static const int SymbolVariablePointsRole;
 
     WId mWinId;
-    KadasMilxLibraryLoader *mLoader = nullptr;
     QgsFilterLineEdit *mFilterLineEdit = nullptr;
     QTreeView *mTreeView = nullptr;
     QStandardItemModel *mGalleryModel = nullptr;
     QStandardItemModel *mLoadingModel = nullptr;
     TreeFilterProxyModel *mFilterProxyModel = nullptr;
 
+    QAtomicInt mLoaderAborted = 0;
+    QFutureWatcher<QStandardItemModel *> mLibraryFuture;
+
   private slots:
     void filterChanged( const QString &text );
     void itemClicked( const QModelIndex &index );
-    void loaderFinished();
-    QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false );
-};
-
-
-#ifndef SIP_RUN
-
-class KADAS_GUI_EXPORT KadasMilxLibraryLoader : public QThread
-{
-    Q_OBJECT
-  public:
-    KadasMilxLibraryLoader( KadasMilxLibrary *library, QObject *parent = 0 ) : QThread( parent ), mAborted( false ), mLibrary( library ) {}
-    void abort() { mAborted = true; }
 
   private:
-    bool mAborted;
-    KadasMilxLibrary *mLibrary;
-
-    void run() override;
-    QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false );
+    QStandardItemModel *loadLibrary( const QSize &viewIconSize );
+    static QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), const QSize &viewIconSize = QSize(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false );
+    void loaderFinished();
 };
-
-#endif // SIP_RUN
 
 #endif // KADASMILXLIBRARY_H
