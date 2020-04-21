@@ -838,8 +838,8 @@ void KadasMainWindow::checkOnTheFlyProjection()
   }
   if ( !reprojLayers.isEmpty() )
   {
-    mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
-    mInfoBar->pushItem( mReprojMsgItem.data() );
+//    mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
+//    mInfoBar->pushItem( mReprojMsgItem.data() );
   }
 }
 
