@@ -312,10 +312,10 @@ KadasMilxClient::KadasMilxClient()
 
 KadasMilxClient::~KadasMilxClient()
 {
-  mAsyncWorker.cleanup();
-  mSyncWorker.cleanup();
   QThread::quit();
   wait();
+  mAsyncWorker.cleanup();
+  mSyncWorker.cleanup();
 }
 
 bool KadasMilxClient::processRequest( const QByteArray &request, QByteArray &response, quint8 expectedReply, bool async )
