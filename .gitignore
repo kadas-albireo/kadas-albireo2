@@ -3,3 +3,4 @@ build_mingw64
 dist
 dist_debug
 CMakeLists.txt.user
+.cmake
