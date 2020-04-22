@@ -36,6 +36,7 @@ int main( int argc, char *argv[] )
   QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, Kadas::configPath() );
 
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
+  QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
 
   QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
   QString rootProfileFolder = QgsUserProfileManager::resolveProfilesFolder( configLocalStorageLocation );
