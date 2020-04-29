@@ -366,8 +366,6 @@ void KadasApplication::init()
     }
   }
 
-  // TODO: QgsApplication::setMaxThreads( QgsSettings().value( "/Qgis/max_threads", -1 ).toInt() );
-
   updateWindowTitle();
 
   QObject::connect( this, &QApplication::lastWindowClosed, this, &QApplication::quit );

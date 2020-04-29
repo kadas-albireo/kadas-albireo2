@@ -343,8 +343,6 @@ void KadasMapIdentifyDialog::addVectorLayerResult( QgsVectorLayer *vLayer, const
   item->setExpanded( true );
 }
 
-// TODO: Redlining item attributes?
-
 void KadasMapIdentifyDialog::rasterIdentifyFinished()
 {
   if ( !mRasterIdentifyReply )
