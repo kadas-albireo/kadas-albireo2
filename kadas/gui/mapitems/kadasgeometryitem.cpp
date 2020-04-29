@@ -32,6 +32,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgssymbollayerutils.h>
 
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 
@@ -142,7 +143,7 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
 
   QString outString;
   QTextStream outStream( &outString );
-  outStream << "<Placemark>" << "\n";
+  outStream << "<Placemark>\n";
   outStream << QString( "<name>%1</name>\n" ).arg( itemName() );
   outStream << "<Style>";
   outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle><PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>" )
@@ -152,7 +153,14 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
   outStream << geom->asKML( 6 );
   delete geom;
-  outStream << "</Placemark>" << "\n";
+  outStream << "<ExtendedData>\n";
+  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">";
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>" ).arg( mIconType );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << "</SchemaData>";
+  outStream << "</ExtendedData>\n";
+  outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
 }

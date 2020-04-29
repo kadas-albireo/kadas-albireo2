@@ -190,6 +190,9 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         for ( QgsAbstractGeometry *geom : geoms )
         {
           geom->transform( itemCrst );
+          KadasGeometryItem::IconType iconType = static_cast<KadasGeometryItem::IconType>( attributes.value( "icon_type" ).toInt() );
+          Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
+          Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
 
           if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
           {
@@ -209,17 +212,18 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
+            item->setIconType( iconType );
             item->setIconSize( 10 + 2 * style.outlineSize );
-            item->setIconOutline( QPen( style.outlineColor, style.outlineSize ) );
-            item->setIconFill( QBrush( style.fillColor ) );
-            KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
+            item->setIconOutline( QPen( style.outlineColor, style.outlineSize / 4, outlineStyle ) );
+            item->setIconFill( QBrush( style.fillColor, fillStyle ) );
+            itemLayer->addItem( item );
           }
           else if ( dynamic_cast<QgsLineString *>( geom ) )
           {
             KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
-            item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
+            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
             itemLayer->addItem( item );
           }
           else if ( dynamic_cast<QgsPolygon *>( geom ) )
@@ -227,9 +231,9 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
-            item->setOutline( QPen( style.outlineColor, style.outlineSize ) );
-            item->setFill( QBrush( style.fillColor ) );
-            KadasItemLayerRegistry::getOrCreateItemLayer( filename )->addItem( item );
+            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
+            item->setFill( QBrush( style.fillColor, fillStyle ) );
+            itemLayer->addItem( item );
           }
         }
         qDeleteAll( geoms );
