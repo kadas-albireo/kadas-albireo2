@@ -117,6 +117,115 @@ class KADAS_GUI_EXPORT KadasItemRect
     double mYmax = 0.;
 };
 
+
+#ifdef SIP_RUN
+//
+// adapted from PyQt5 QPair<_TYPE1_, _TYPE2_> and QPair<float, float>
+//
+% MappedType QPair<KadasMapPos, double> / TypeHint = "Tuple[KadasMapPos, float]" /
+{
+  % TypeHeaderCode
+#include <QPair>
+  % End
+
+  % ConvertFromTypeCode
+  KadasMapPos *first = new KadasMapPos( sipCpp->first );
+  PyObject *t = sipBuildResult( NULL, "(Nf)", first, sipType_KadasMapPos,
+                                sipTransferObj, sipCpp->second );
+
+  if ( !t )
+  {
+    delete first;
+
+    return 0;
+  }
+
+  return t;
+  % End
+
+  % ConvertToTypeCode
+  if ( !sipIsErr )
+    return ( PySequence_Check( sipPy ) && !PyUnicode_Check( sipPy ) );
+
+  Py_ssize_t len = PySequence_Size( sipPy );
+
+  if ( len != 2 )
+  {
+    // A negative length should only be an internal error so let the
+    // original exception stand.
+    if ( len >= 0 )
+      PyErr_Format( PyExc_TypeError,
+                    "sequence has %zd elements but 2 elements are expected",
+                    len );
+
+    *sipIsErr = 1;
+
+    return 0;
+  }
+
+  PyObject *firstobj = PySequence_GetItem( sipPy, 0 );
+
+  if ( !firstobj )
+  {
+    *sipIsErr = 1;
+
+    return 0;
+  }
+
+  int firststate;
+  KadasMapPos *first = reinterpret_cast<KadasMapPos *>(
+    sipForceConvertToType( firstobj, sipType_KadasMapPos, sipTransferObj,
+                           SIP_NOT_NONE, &firststate, sipIsErr ) );
+
+  if ( *sipIsErr )
+  {
+    PyErr_Format( PyExc_TypeError,
+                  "the first element has type '%s' but 'KadasMapPos' is expected",
+                  sipPyTypeName( Py_TYPE( firstobj ) ) );
+
+    return 0;
+  }
+
+  PyObject *secondobj = PySequence_GetItem( sipPy, 1 );
+
+  if ( !secondobj )
+  {
+    sipReleaseType( first, sipType_KadasMapPos, firststate );
+    Py_DECREF( firstobj );
+    *sipIsErr = 1;
+
+    return 0;
+  }
+
+  double second = PyFloat_AsDouble( secondobj );
+
+  if ( PyErr_Occurred() )
+  {
+    if ( PyErr_ExceptionMatches( PyExc_TypeError ) )
+      PyErr_Format( PyExc_TypeError,
+                    "the second element has type '%s' but 'float' is expected",
+                    sipPyTypeName( Py_TYPE( secondobj ) ) );
+
+    Py_DECREF( secondobj );
+    sipReleaseType( first, sipType_KadasMapPos, firststate );
+    Py_DECREF( firstobj );
+    *sipIsErr = 1;
+
+    return 0;
+  }
+
+  *sipCppPtr = new QPair<KadasMapPos, double>( *first, second );
+
+  Py_DECREF( secondobj );
+  sipReleaseType( first, sipType_KadasMapPos, firststate );
+  Py_DECREF( firstobj );
+
+  return sipGetState( sipTransferObj );
+  % End
+};
+#endif
+
+
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
     Q_OBJECT
@@ -167,11 +276,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* Hit test, rect in item crs */
     virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const = 0;
 
-#ifndef SIP_RUN
-    // TODO: SIP
     /* Return the item point to the specified one */
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
-#endif
 
     /* Render the item */
     virtual void render( QgsRenderContext &context ) const = 0;

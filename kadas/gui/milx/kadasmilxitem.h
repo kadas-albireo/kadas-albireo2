@@ -47,10 +47,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
-#ifndef SIP_RUN
-    // TODO: SIP
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
-#endif
 
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
