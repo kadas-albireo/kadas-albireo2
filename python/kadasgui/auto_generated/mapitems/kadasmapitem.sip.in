@@ -267,8 +267,8 @@ Trigger a redraw */
     virtual void setPosition( const KadasItemPos &pos ) = 0;
 
 
-    QDomElement writeXml(QDomDocument &document) const;
-    static KadasMapItem* fromXml(const QDomElement& element);
+    QDomElement writeXml( QDomDocument &document ) const;
+    static KadasMapItem *fromXml( const QDomElement &element );
 
   signals:
     void aboutToBeDestroyed();

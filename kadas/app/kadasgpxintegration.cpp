@@ -26,6 +26,7 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipoint.h>
+#include <qgis/qgsproject.h>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
@@ -80,7 +81,10 @@ void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<Kad
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setAction( action );
     KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name ) { return KadasItemLayerRegistry::getOrCreateItemLayer( name ); };
+    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name )
+    {
+      return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
+    };
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
@@ -124,7 +128,9 @@ void KadasGpxIntegration::openGpx()
 
 bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg )
 {
-  KadasItemLayer *layer = KadasItemLayerRegistry::getOrCreateItemLayer( QFileInfo( filename ).baseName() );
+  QString layerName = QFileInfo( filename ).baseName();
+  KadasItemLayer *layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  QgsProject::instance()->addMapLayer( layer );
 
   QFile file( filename );
   if ( !file.open( QIODevice::ReadOnly ) )

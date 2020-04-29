@@ -133,6 +133,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
 
 
     // Placemarks
+    QMap<QString, KadasItemLayer *> placemarkLayers;
+
     for ( int iPlacemark = 0, nPlacemarks = placemarkEls.size(); iPlacemark < nPlacemarks; ++iPlacemark )
     {
       QDomElement placemarkEl = placemarkEls.at( iPlacemark ).toElement();
@@ -142,10 +144,16 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       // If tile contained in folder, group by folder
       if ( placemarkEl.parentNode().nodeName() == "Folder" )
       {
-        layerName = placemarkEl.parentNode().firstChildElement( "name" ).text();
+        layerName = QString( "%1 [%2]" ).arg( placemarkEl.parentNode().firstChildElement( "name" ).text() ).arg( filename );
       }
 
-      KadasItemLayer *itemLayer = KadasItemLayerRegistry::getOrCreateItemLayer( layerName );
+      KadasItemLayer *itemLayer = placemarkLayers.value( layerName, nullptr );
+      if ( !itemLayer )
+      {
+        itemLayer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+        QgsProject::instance()->addMapLayer( itemLayer );
+        placemarkLayers.insert( layerName, itemLayer );
+      }
       QgsCoordinateTransform itemCrst( crsWgs84, itemLayer->crs(), QgsProject::instance()->transformContext() );
 
       // Geometry
