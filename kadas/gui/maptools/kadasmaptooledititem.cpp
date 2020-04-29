@@ -43,6 +43,7 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasIte
 {
   mItem = layer->takeItem( itemId );
   connect( QgsProject::instance(), qOverload<QgsMapLayer *>( &QgsProject::layerWillBeRemoved ), this, &KadasMapToolEditItem::checkRemovedLayer );
+  connect( canvas, &QgsMapCanvas::layersChanged, this, &KadasMapToolEditItem::checkHiddenLayer );
   layer->triggerRepaint();
   KadasMapCanvasItemManager::addItem( mItem );
 }
@@ -388,6 +389,14 @@ void KadasMapToolEditItem::itemDestroyed()
 void KadasMapToolEditItem::checkRemovedLayer( QgsMapLayer *layer )
 {
   if ( layer == mLayer )
+  {
+    canvas()->unsetMapTool( this );
+  }
+}
+
+void KadasMapToolEditItem::checkHiddenLayer()
+{
+  if ( !mCanvas->layers().contains( mLayer ) )
   {
     canvas()->unsetMapTool( this );
   }
