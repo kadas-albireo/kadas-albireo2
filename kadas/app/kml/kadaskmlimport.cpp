@@ -187,14 +187,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       }
       else
       {
-        // TODO?
-        QStringList attributesList;
-        for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
-        {
-          attributesList.append( it.key().toHtmlEscaped() + "=" + it.value().replace( QRegularExpression( "^\\s*(.*[^\\s])\\s*$", QRegularExpression::MultilineOption ), "\\1" ).toHtmlEscaped() );
-        }
-        QString attributesStr = attributesList.join( "&" );
-
         for ( QgsAbstractGeometry *geom : geoms )
         {
           geom->transform( itemCrst );
