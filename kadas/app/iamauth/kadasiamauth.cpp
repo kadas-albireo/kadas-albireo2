@@ -139,7 +139,7 @@ void KadasIamAuth::performLogin()
 {
 #ifdef Q_OS_WIN
   mLoginDialog = new StackedDialog( kApp->mainWindow() );
-  mLoginDialog->setWindowTitle( tr( "eIAM Authentication" ) );
+  mLoginDialog->setWindowTitle( tr( "Authentication" ) );
   mLoginDialog->resize( 1000, 480 );
 
   WebWidget *webWidget = new WebWidget();
