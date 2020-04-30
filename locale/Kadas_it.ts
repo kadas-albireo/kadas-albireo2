@@ -2244,12 +2244,12 @@
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="485"/>
         <source>Show &amp;Grid</source>
-        <translation>Mostra &amp;reticolo</translation>
+        <translation>Mostra &amp;griglia</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="488"/>
         <source>Show grid</source>
-        <translation>Mostra reticolo</translation>
+        <translation>Mostra griglia</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="491"/>
@@ -2259,12 +2259,12 @@
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="499"/>
         <source>S&amp;nap to Grid</source>
-        <translation>A&amp;ggancia al reticolo</translation>
+        <translation>A&amp;ggancia alla griglia</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="502"/>
         <source>Snap to grid</source>
-        <translation>Aggancia al reticolo</translation>
+        <translation>Aggancia alla griglia</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslayoutdesignerbase.ui" line="505"/>
@@ -3431,11 +3431,16 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="123"/>
         <source>Map grid</source>
-        <translation>Reticolo</translation>
+        <translation>Griglia</translation>
     </message>
 </context>
 <context>
     <name>KadasMapGridWidgetBase</name>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="71"/>
+        <source>Interval Y:</source>
+        <translation>Intervallo Y:</translation>
+    </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="78"/>
         <source>Interval X:</source>
@@ -4870,7 +4875,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="832"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2301"/>
         <source>Grid</source>
-        <translation>Reticolo</translation>
+        <translation>Griglia</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="862"/>

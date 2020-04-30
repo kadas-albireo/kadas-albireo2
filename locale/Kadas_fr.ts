@@ -3439,6 +3439,11 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapGridWidgetBase</name>
     <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="71"/>
+        <source>Interval Y:</source>
+        <translation>Intervalle Y:</translation>
+    </message>
+    <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="78"/>
         <source>Interval X:</source>
         <translation>Intervalle X:</translation>
@@ -5278,7 +5283,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/kadaswindowbase.ui" line="408"/>
         <source>Add Local Layer</source>
-        <translation>Ajouter un couche local</translation>
+        <translation>Ajouter une couche locale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaswindowbase.ui" line="422"/>

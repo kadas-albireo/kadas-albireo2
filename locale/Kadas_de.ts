@@ -3437,6 +3437,11 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapGridWidgetBase</name>
     <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="71"/>
+        <source>Interval Y:</source>
+        <translation>Interval Y:</translation>
+    </message>
+    <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="78"/>
         <source>Interval X:</source>
         <translation>Interval X:</translation>
