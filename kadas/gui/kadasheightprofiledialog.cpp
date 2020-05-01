@@ -207,6 +207,7 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
   mPoints = points;
   mPointsCrs = crs;
   mTotLength = 0;
+  mTotLengthMeters = 0;
   mSegmentLengths.clear();
 
   QgsDistanceArea da;
