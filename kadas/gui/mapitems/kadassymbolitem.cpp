@@ -114,7 +114,7 @@ QString KadasSymbolItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip 
   QuaZipFile outputFile( kmzZip );
   QuaZipNewInfo info( fileName );
   info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
-  if ( !outputFile.open( QIODevice::WriteOnly, info ) || !mImage.save( &outputFile, "PNG" ) )
+  if ( !outputFile.open( QIODevice::WriteOnly, info ) || !mImage.scaled( constState()->size ).save( &outputFile, "PNG" ) )
   {
     return "";
   }
