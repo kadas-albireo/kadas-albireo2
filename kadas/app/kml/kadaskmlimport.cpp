@@ -24,6 +24,9 @@
 
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslogger.h>
+#include <qgis/qgsmultipoint.h>
+#include <qgis/qgsmultilinestring.h>
+#include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
@@ -157,7 +160,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       QgsCoordinateTransform itemCrst( crsWgs84, itemLayer->crs(), QgsProject::instance()->transformContext() );
 
       // Geometry
-      QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl );
+      int types = 0;
+      QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl, types );
 
       if ( geoms.isEmpty() )
       {
@@ -215,7 +219,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->setPosition( KadasItemPos::fromPoint( pos ) );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsPoint *>( geom ) )
+          else if ( dynamic_cast<QgsPoint *>( geom ) || dynamic_cast<QgsMultiPoint *>( geom ) )
           {
             KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
@@ -226,7 +230,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->setIconFill( QBrush( style.fillColor, fillStyle ) );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsLineString *>( geom ) )
+          else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
           {
             KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
@@ -234,7 +238,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsPolygon *>( geom ) )
+          else if ( dynamic_cast<QgsPolygon *>( geom ) || dynamic_cast<QgsMultiPolygon *>( geom ) )
           {
             KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
@@ -536,53 +540,86 @@ KadasKMLImport::StyleData KadasKMLImport::parseStyle( const QDomElement &styleEl
   return style;
 }
 
-QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement &containerEl )
+QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement &containerEl, int &types )
 {
   QList<QgsAbstractGeometry *> geoms;
+  QDomNodeList children = containerEl.childNodes();
 
-  QDomElement pointEl = containerEl.firstChildElement( "Point" );
-  if ( !pointEl.isNull() )
+  for ( int i = 0, n = children.size(); i < n; ++i )
   {
-    QVector<QgsPoint> points = parseCoordinates( pointEl );
-    if ( !points.isEmpty() )
+    QDomElement el = children.at( i ).toElement();
+
+    if ( el.tagName() == "Point" )
     {
-      geoms.append( points[0].clone() );
+      QVector<QgsPoint> points = parseCoordinates( el );
+      if ( !points.isEmpty() )
+      {
+        geoms.append( points[0].clone() );
+        types |= QgsWkbTypes::PointGeometry;
+      }
+    }
+
+    if ( el.tagName() == "LineString" )
+    {
+      QgsLineString *line = new QgsLineString();
+      line->setPoints( parseCoordinates( el ) );
+      geoms.append( line );
+      types |= QgsWkbTypes::LineGeometry;
+    }
+
+    if ( el.tagName() == "Polygon" )
+    {
+      QDomElement outerRingEl = el.firstChildElement( "outerBoundaryIs" ).firstChildElement( "LinearRing" );
+      QgsLineString *exterior = new QgsLineString();
+      exterior->setPoints( parseCoordinates( outerRingEl ) );
+      QgsPolygon *poly = new QgsPolygon();
+      poly->setExteriorRing( exterior );
+
+      QDomNodeList innerBoundaryEls = el.elementsByTagName( "innerBoundaryIs" );
+      for ( int iRing = 0, nRings = innerBoundaryEls.size(); iRing < nRings; ++iRing )
+      {
+        QDomElement innerRingEl = innerBoundaryEls.at( iRing ).toElement().firstChildElement( "LinearRing" );
+        QgsLineString *interior = new QgsLineString();
+        interior->setPoints( parseCoordinates( innerRingEl ) );
+        poly->addInteriorRing( interior );
+      }
+      geoms.append( poly );
+      types |= QgsWkbTypes::PolygonGeometry;
+    }
+
+    if ( el.tagName() == "MultiGeometry" )
+    {
+      int childTypes = 0;
+      QList<QgsAbstractGeometry *> multiGeoms = parseGeometries( el, childTypes );
+      QgsGeometryCollection *collection = nullptr;
+      if ( childTypes == QgsWkbTypes::PointGeometry )
+      {
+        collection = new QgsMultiPoint();
+      }
+      else if ( childTypes == QgsWkbTypes::LineGeometry )
+      {
+        collection = new QgsMultiLineString();
+      }
+      else if ( childTypes == QgsWkbTypes::PolygonGeometry )
+      {
+        collection = new QgsMultiPolygon();
+      }
+      else
+      {
+        // Mixed geometry collections ignored
+      }
+      if ( collection )
+      {
+        for ( QgsAbstractGeometry *geom : multiGeoms )
+        {
+          collection->addGeometry( geom );
+        }
+        geoms.append( collection );
+      }
     }
   }
 
-  QDomElement lineStringEl = containerEl.firstChildElement( "LineString" );
-  if ( !lineStringEl.isNull() )
-  {
-    QgsLineString *line = new QgsLineString();
-    line->setPoints( parseCoordinates( lineStringEl ) );
-    geoms.append( line );
-  }
 
-  QDomElement polygonEl = containerEl.firstChildElement( "Polygon" );
-  if ( !polygonEl.isNull() )
-  {
-    QDomElement outerRingEl = polygonEl.firstChildElement( "outerBoundaryIs" ).firstChildElement( "LinearRing" );
-    QgsLineString *exterior = new QgsLineString();
-    exterior->setPoints( parseCoordinates( outerRingEl ) );
-    QgsPolygon *poly = new QgsPolygon();
-    poly->setExteriorRing( exterior );
-
-    QDomNodeList innerBoundaryEls = polygonEl.elementsByTagName( "innerBoundaryIs" );
-    for ( int iRing = 0, nRings = innerBoundaryEls.size(); iRing < nRings; ++iRing )
-    {
-      QDomElement innerRingEl = innerBoundaryEls.at( iRing ).toElement().firstChildElement( "LinearRing" );
-      QgsLineString *interior = new QgsLineString();
-      interior->setPoints( parseCoordinates( innerRingEl ) );
-      poly->addInteriorRing( interior );
-    }
-    geoms.append( poly );
-  }
-
-  QDomElement multiGeometryEl = containerEl.firstChildElement( "MultiGeometry" );
-  if ( !multiGeometryEl.isNull() )
-  {
-    geoms.append( parseGeometries( multiGeometryEl ) );
-  }
   return geoms;
 }
 

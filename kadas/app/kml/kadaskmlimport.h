@@ -64,7 +64,7 @@ class KadasKMLImport : public QObject
     void buildVSIVRT( const QString &name, OverlayData &overlayData, QuaZip *kmzZip ) const;
     QVector<QgsPoint> parseCoordinates( const QDomElement &geomEl ) const;
     StyleData parseStyle( const QDomElement &styleEl, QuaZip *zip ) const;
-    QList<QgsAbstractGeometry *> parseGeometries( const QDomElement &containerEl );
+    QList<QgsAbstractGeometry *> parseGeometries( const QDomElement &containerEl, int &types );
     QMap<QString, QString> parseExtendedData( const QDomElement &placemarkEl );
     QColor parseColor( const QString &abgr ) const;
 };
