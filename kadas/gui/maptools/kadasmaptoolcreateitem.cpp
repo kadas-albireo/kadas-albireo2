@@ -487,4 +487,5 @@ void KadasMapToolCreateItem::stateChanged( KadasStateHistory::State *state )
 void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )
 {
   mLayer = dynamic_cast<KadasItemLayer *>( layer );
+  emit targetLayerChanged( layer );
 }

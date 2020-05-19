@@ -25,6 +25,7 @@ class QAction;
 class QToolButton;
 
 class QgsMapCanvas;
+class QgsMapLayer;
 
 class KadasItemLayer;
 class KadasMapItem;
@@ -58,12 +59,15 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewCircle = nullptr;
     QAction *mActionNewText = nullptr;
 
+    QPointer<KadasItemLayer> mLastLayer;
+
     KadasMapItem *setEditorFactory( KadasMapItem *item ) const;
     void toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory, bool undoRedoVisible = true );
 
   private slots:
     void activateNewButtonObject();
     void deactivateNewButtonObject();
+    void updateLastLayer( QgsMapLayer *layer );
 };
 
 #endif // KADASREDLININGINTEGRATION_H

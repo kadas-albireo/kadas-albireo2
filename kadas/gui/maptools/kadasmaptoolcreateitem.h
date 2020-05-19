@@ -143,6 +143,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
   signals:
     void cleared();
     void partFinished();
+    void targetLayerChanged( QgsMapLayer *layer );
 
   protected:
     void createItem();

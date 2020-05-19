@@ -144,7 +144,11 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
 KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
 {
-  return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RedliningLayer );
+  if ( !mLastLayer )
+  {
+    mLastLayer = KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RedliningLayer );
+  }
+  return mLastLayer;
 }
 
 KadasMapItem *KadasRedliningIntegration::setEditorFactory( KadasMapItem *item ) const
@@ -170,6 +174,7 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
     tool->setAction( action );
     connect( tool, &QgsMapTool::activated, this, &KadasRedliningIntegration::activateNewButtonObject );
     connect( tool, &QgsMapTool::deactivated, this, &KadasRedliningIntegration::deactivateNewButtonObject );
+    connect( tool, &KadasMapToolCreateItem::targetLayerChanged, this, &KadasRedliningIntegration::updateLastLayer );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
     kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
     canvas->setMapTool( tool );
@@ -193,4 +198,9 @@ void KadasRedliningIntegration::deactivateNewButtonObject()
   mButtonNewObject->setText( tr( "Drawing" ) );
   mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
   mButtonNewObject->setChecked( false );
+}
+
+void KadasRedliningIntegration::updateLastLayer( QgsMapLayer *layer )
+{
+  mLastLayer = dynamic_cast<KadasItemLayer *>( layer );
 }
