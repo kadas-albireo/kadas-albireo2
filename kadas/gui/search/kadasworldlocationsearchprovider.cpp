@@ -48,7 +48,7 @@ KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas
 void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
 {
   QString serviceUrl;
-  if ( QgsSettings().value( "/Qgis/isOffline" ).toBool() )
+  if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
   {
     serviceUrl = QgsSettings().value( "search/worldlocationofflinesearchurl", "http://localhost:5000/SearchServerWld" ).toString();
   }

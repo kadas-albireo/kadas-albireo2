@@ -53,7 +53,7 @@ KadasLocationSearchProvider::KadasLocationSearchProvider( QgsMapCanvas *mapCanva
 void KadasLocationSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
 {
   QString serviceUrl;
-  if ( QgsSettings().value( "/Qgis/isOffline" ).toBool() )
+  if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
   {
     serviceUrl = QgsSettings().value( "search/locationofflinesearchurl", "http://localhost:5000/SearchServerCh" ).toString();
   }
