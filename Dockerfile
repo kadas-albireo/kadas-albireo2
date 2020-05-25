@@ -37,6 +37,7 @@ dnf install -y \
   mingw64-python3-numpy \
   mingw64-python3-opencv \
   mingw64-python3-OWSLib \
+  mingw64-python3-pillow \
   mingw64-python3-psycopg2 \
   mingw64-python3-pygments \
   mingw64-python3-pytz \
