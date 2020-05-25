@@ -905,7 +905,7 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   // TODO
 //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
 //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, &KadasApplication::addRasterLayer );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString & uri, const QString & baseName, const QString & providerKey ) { kApp->addRasterLayer( uri, baseName, providerKey ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [ = ]( const QString & uri, const QString & layerName, const QString & providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );

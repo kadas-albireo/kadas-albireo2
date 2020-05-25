@@ -89,6 +89,9 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
 
     virtual bool saveProject() = 0;
 
+    virtual QgsVectorLayer *addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) = 0;
+    virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) = 0;
+
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );

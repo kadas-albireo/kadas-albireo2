@@ -373,7 +373,7 @@ void KadasApplication::init()
   connect( &mAutosaveTimer, &QTimer::timeout, this, &KadasApplication::autosave );
 }
 
-QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString &layerName, const QString &providerKey ) const
+QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet ) const
 {
   QgsSettings settings;
   QString baseName = settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() ? QgsMapLayer::formatLayerName( layerName ) : layerName;
@@ -413,10 +413,13 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
     }
     else
     {
-      QString title = tr( "Invalid Layer" );
-      QgsError error = layer->error();
-      mMainWindow->messageBar()->pushMessage( title, error.message( QgsErrorMessage::Text ),
-                                              Qgis::Critical, mMainWindow->messageTimeout() );
+      if ( !quiet )
+      {
+        QString title = tr( "Invalid Layer" );
+        QgsError error = layer->error();
+        mMainWindow->messageBar()->pushMessage( title, error.message( QgsErrorMessage::Text ),
+                                                Qgis::Critical, mMainWindow->messageTimeout() );
+      }
       delete layer;
       layer = nullptr;
     }
@@ -425,7 +428,7 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
   return layer;
 }
 
-QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey )  const
+QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet )  const
 {
   QgsSettings settings;
   QString baseName = settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() ? QgsMapLayer::formatLayerName( layerName ) : layerName;
@@ -492,10 +495,13 @@ QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QStr
   }
   else
   {
-    QString title = tr( "Invalid Layer" );
-    QgsError error = layer->error();
-    mMainWindow->messageBar()->pushMessage( title, error.message( QgsErrorMessage::Text ),
-                                            Qgis::Critical, mMainWindow->messageTimeout() );
+    if ( !quiet )
+    {
+      QString title = tr( "Invalid Layer" );
+      QgsError error = layer->error();
+      mMainWindow->messageBar()->pushMessage( title, error.message( QgsErrorMessage::Text ),
+                                              Qgis::Critical, mMainWindow->messageTimeout() );
+    }
     delete layer;
     layer = nullptr;
   }

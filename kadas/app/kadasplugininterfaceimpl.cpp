@@ -225,6 +225,11 @@ QgsVectorLayer *KadasPluginInterfaceImpl::addVectorLayer( const QString &vectorL
   return kApp->addVectorLayer( vectorLayerPath, baseName, providerKey );
 }
 
+QgsVectorLayer *KadasPluginInterfaceImpl::addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey )
+{
+  return kApp->addVectorLayer( vectorLayerPath, baseName, providerKey, true );
+}
+
 QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayer( const QString &rasterLayerPath, const QString &baseName )
 {
   return kApp->addRasterLayer( rasterLayerPath, baseName, QString() );
@@ -233,6 +238,11 @@ QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayer( const QString &rasterL
 QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayer( const QString &url, const QString &layerName, const QString &providerKey )
 {
   return kApp->addRasterLayer( url, layerName, providerKey );
+}
+
+QgsRasterLayer *KadasPluginInterfaceImpl::addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey )
+{
+  return kApp->addRasterLayer( url, layerName, providerKey, true );
 }
 
 QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey )
