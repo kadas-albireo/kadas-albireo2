@@ -41,7 +41,7 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     void reload();
 
   signals:
-    void layerSelected( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl );
+    void layerSelected( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
 
   private:
     class CatalogModel;

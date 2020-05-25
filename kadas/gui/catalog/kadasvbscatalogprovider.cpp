@@ -84,7 +84,7 @@ void KadasVBSCatalogProvider::replyFinished()
       }
       else if ( resultMap["type"].toString() == "ams" )
       {
-        amsLayers[resultMap["serviceUrl"].toString()].insert( resultMap["layerName"].toString(), ResultEntry( resultMap["category"].toString(), resultMap["title"].toString(), resultMap["position"].toString(), resultMap["metadataUrl"].toString() ) );
+        amsLayers[resultMap["serviceUrl"].toString()].insert( resultMap["layerName"].toString(), ResultEntry( resultMap["category"].toString(), resultMap["title"].toString(), resultMap["position"].toString(), resultMap["metadataUrl"].toString(), resultMap["flatten"].toBool() ) );
       }
     }
 
@@ -258,6 +258,18 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       }
     }
 
+    // Parse sublayers
+    QList<QVariantMap> sublayers;
+    for ( QVariant variant : serviceInfoMap["layers"].toList() )
+    {
+      QVariantMap entry = variant.toMap();
+      QVariantMap sublayer;
+      sublayer["id"] = entry["id"];
+      sublayer["parentLayerId"] = entry["parentLayerId"];
+      sublayer["name"] = entry["name"];
+      sublayers.append( sublayer );
+    }
+
     for ( const QString &layerName : entries->keys() )
     {
       QgsMimeDataUtils::Uri mimeDataUri;
@@ -269,6 +281,18 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
       QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
       mimeData->setProperty( "metadataUrl", entry.metadataUrl );
+      if ( !entry.flatten )
+      {
+        QVariantList entrySublayers;
+        for ( const QVariantMap &sublayer : sublayers )
+        {
+          if ( sublayer["id"].toInt() >= ( layerName.isEmpty() ? -1 : layerName.toInt() ) )
+          {
+            entrySublayers.append( sublayer );
+          }
+        }
+        mimeData->setProperty( "sublayers", entrySublayers );
+      }
       QStringList sortIndices = entry.sortIndices.split( "/" );
       mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), mimeDataUri.name, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }

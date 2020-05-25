@@ -43,13 +43,15 @@ class KadasCatalogBrowser::CatalogItem : public QStandardItem
 
     static const int s_uriRole;
     static const int s_metadataUrlRole;
+    static const int s_sublayersRole;
     static const int s_sortIndexRole;
 };
 
 
 const int KadasCatalogBrowser::CatalogItem::s_uriRole = Qt::UserRole + 1;
 const int KadasCatalogBrowser::CatalogItem::s_metadataUrlRole = Qt::UserRole + 2;
-const int KadasCatalogBrowser::CatalogItem::s_sortIndexRole = Qt::UserRole + 3;
+const int KadasCatalogBrowser::CatalogItem::s_sublayersRole = Qt::UserRole + 3;
+const int KadasCatalogBrowser::CatalogItem::s_sortIndexRole = Qt::UserRole + 4;
 
 
 class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
@@ -95,6 +97,7 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
         item->setToolTip( value );
         item->setData( QgsMimeDataUtils::decodeUriList( mimeData ).front().data(), CatalogItem::s_uriRole );
         item->setData( mimeData->property( "metadataUrl" ), CatalogItem::s_metadataUrlRole );
+        item->setData( mimeData->property( "sublayers" ), CatalogItem::s_sublayersRole );
         return item;
       }
     }
@@ -120,7 +123,8 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
         QgsMimeDataUtils::Uri uri( item->data( CatalogItem::s_uriRole ).toString() );
 
         QMimeData *data = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << uri );
-        data->setProperty( "metadataUrl", item->data( CatalogItem::s_metadataUrlRole ).toString() );
+        data->setProperty( "metadataUrl", item->data( CatalogItem::s_metadataUrlRole ) );
+        data->setProperty( "sublayers", item->data( CatalogItem::s_sublayersRole ) );
         return data;
       }
       return 0;
@@ -265,7 +269,7 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
     QgsMimeDataUtils::UriList uriList = QgsMimeDataUtils::decodeUriList( data );
     if ( !uriList.isEmpty() && !uriList[0].uri.isEmpty() )
     {
-      emit layerSelected( uriList[0], data->property( "metadataUrl" ).toString() );
+      emit layerSelected( uriList[0], data->property( "metadataUrl" ).toString(), data->property( "sublayers" ).toList() );
     }
     delete data;
   }
