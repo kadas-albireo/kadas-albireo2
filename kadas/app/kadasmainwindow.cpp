@@ -254,6 +254,7 @@ void KadasMainWindow::init()
   connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, qOverload<> ( &QTimer::start ) );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
+  connect( mMapCanvas, &QgsMapCanvas::currentLayerChanged, mLayerTreeView, &QgsLayerTreeView::setCurrentLayer );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
   connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mMapCanvas->unsetMapTool( mMapCanvas->mapTool() ); } );   // Clear tool when changing active kadas tab
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );

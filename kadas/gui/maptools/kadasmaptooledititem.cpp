@@ -41,6 +41,7 @@ KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasIte
   : QgsMapTool( canvas )
   , mLayer( layer )
 {
+  canvas->setCurrentLayer( layer );
   mItem = layer->takeItem( itemId );
   connect( QgsProject::instance(), qOverload<QgsMapLayer *>( &QgsProject::layerWillBeRemoved ), this, &KadasMapToolEditItem::checkRemovedLayer );
   connect( canvas, &QgsMapCanvas::layersChanged, this, &KadasMapToolEditItem::checkHiddenLayer );
