@@ -108,6 +108,9 @@ void KadasLayerSelectionWidget::repopulateLayers()
   mLayersCombo->setCurrentIndex( qMin( mLayersCombo->count() - 1, qMax( current, 0 ) ) );
   emit selectedLayerChanged( currentLayer );
   mLayersCombo->blockSignals( false );
+  mLayerTreeView->setLayerVisible( currentLayer, true );
+  mLayerTreeView->setCurrentLayer( currentLayer );
+  mCanvas->setCurrentLayer( currentLayer );
 }
 
 void KadasLayerSelectionWidget::layerSelectionChanged( int idx )
