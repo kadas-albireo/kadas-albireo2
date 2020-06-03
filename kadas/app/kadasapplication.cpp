@@ -27,6 +27,7 @@
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
 #include <qgis/qgsdataitem.h>
+#include <qgis/qgsgdalutils.h>
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
@@ -323,6 +324,10 @@ void KadasApplication::init()
 
   // Setup layout item widgets
   QgsLayoutAppUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
+
+  // Set GDAL proxy settings
+  QgsGdalUtils::setupProxy();
+
 
   // Open startup project
   QgsProject::instance()->setDirty( false );
