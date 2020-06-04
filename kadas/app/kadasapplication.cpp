@@ -776,12 +776,12 @@ bool KadasApplication::projectSaveDirty()
   {
     QMessageBox::StandardButton response = QMessageBox::question(
         mMainWindow, tr( "Save Project" ), tr( "Do you want to save the current project?" ),
-        QMessageBox::Save | QMessageBox::Cancel | QMessageBox::Discard );
-    if ( response == QMessageBox::Save )
+        QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
+    if ( response == QMessageBox::Yes )
     {
       return projectSave();
     }
-    else if ( response == QMessageBox::Discard )
+    else if ( response == QMessageBox::No )
     {
       cleanupAutosave();
     }
