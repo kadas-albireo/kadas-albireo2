@@ -195,7 +195,7 @@ void KadasPluginManager::updateButtonClicked()
   QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
 
   //get module name
-  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( installed.size() < 1 )
   {
     return;
@@ -203,7 +203,7 @@ void KadasPluginManager::updateButtonClicked()
   QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
   updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip );
 
-  QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( available.size() > 0 )
   {
     setItemNotUpdateable( available.at( 0 ) );
@@ -218,7 +218,7 @@ void KadasPluginManager::installButtonClicked()
     return;
   }
 
-  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
 
   if ( installed.size() < 1 ) //not yet installed
   {
@@ -332,7 +332,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   mInstalledTreeWidget->addTopLevelItem( installedItem );
 
   //change icon in mAvailableTreeWidget
-  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( availableItem.size() > 0 )
   {
     setItemRemoveable( availableItem.at( 0 ) );
@@ -359,14 +359,14 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   }
 
   //remove entry from mInstalledTreeWidget
-  QList<QTreeWidgetItem *> installedItem = mInstalledTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> installedItem = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( installedItem.size() > 0 )
   {
     delete mInstalledTreeWidget->takeTopLevelItem( mInstalledTreeWidget->indexOfTopLevelItem( installedItem.at( 0 ) ) );
   }
 
   //set icon to download in mAvailableTreeWidget
-  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchFixedString, 0 );
+  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( availableItem.size() > 0 )
   {
     setItemInstallable( availableItem.at( 0 ) );
