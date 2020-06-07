@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>com.sourcepole.kadas.desktop</id>
+  <name>Kadas Albireo</name>
+  <description>
+    <p>
+        KADAS Albireo is a mapping application based on QGIS and targeted at non-specialized users, providing enhanced functionalities in areas such as drawing, measuring, terrain analysis, etc.
+    </p>
+  </description>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <url type="bugtracker">https://github.com/kadas-albireo/kadas-albireo2/issues</url>
+  <url type="homepage">https://kadas.sourcepole.com</url>
+  <project_group/>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Redlining tools</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/redlining.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Georeferenced pictures</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/exif.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Multiple views</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/mapwindows.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Mesurement tools: Lines, circles, angles, areas</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/measure.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Geodectic distance measurement</caption>
+      <image>https://raw.githubusercontent.com/kadas-albireo/kadas-albireo2/gh-pages/images/distance.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Geodectic radius with real-time display</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/radius.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Terrain analysis. Line of Sight calculations</caption>
+      <image>https://raw.githubusercontent.com/kadas-albireo/kadas-albireo2/gh-pages/images/los.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Slopes</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/slope.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Search</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/search.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>GPS tools (GPX)</caption>
+      <image>https://raw.githubusercontent.com/kadas-albireo/kadas-albireo2/gh-pages/images/gpx.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Military symbols</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/milx.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>3D visualization and interaction</caption>
+      <image>https://raw.githubusercontent.com/kadas-albireo/kadas-albireo2/gh-pages/images/globe.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Printing</caption>
+      <image>https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/print.png</image>
+    </screenshot>
+  </screenshots>
+</component>
