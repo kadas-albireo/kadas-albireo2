@@ -1074,6 +1074,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
 
     QgsLayerTreeGroup *rootGroup = mLayerTreeView->layerTreeModel()->rootGroup();
+    int rootInsCount = 0;
     // Second pass: add groups/layers
     for ( auto it = entries.begin(), itEnd = entries.end(); it != itEnd; ++it )
     {
@@ -1084,7 +1085,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         QgsDataSourceUri dataSource( adjustedUri );
         dataSource.removeParam( "layer" );
         dataSource.setParam( "layer", QString::number( it.key() ) );
-        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? 0 : parent->children().count() ) );
+        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
         QgsRasterLayer *layer = kApp->addRasterLayer( dataSource.uri(), entry.name, uri.providerKey );
         if ( layer )
         {
