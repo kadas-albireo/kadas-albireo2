@@ -27,6 +27,20 @@
 
 int main( int argc, char *argv[] )
 {
+#ifdef Q_OS_WINDOWS
+  // Clean environment
+  QList<QByteArray> path = qgetenv( "PATH" ).split( ';' );
+  QList<QByteArray> cleanPath;
+  for ( const QByteArray &entry : path )
+  {
+    if ( entry.toLower().replace( '/', '\\' ).startsWith( "c:\\windows" ) )
+    {
+      cleanPath.append( entry );
+    }
+  }
+  qputenv( "PATH", cleanPath.join( ';' ) );
+#endif // Q_OS_WINDOWS
+
   // Setup application
   QApplication::setOrganizationName( Kadas::KADAS_RELEASE_NAME );
   QApplication::setOrganizationDomain( Kadas::KADAS_RELEASE_NAME );
