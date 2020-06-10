@@ -233,6 +233,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
     Q_PROPERTY( QString authId READ authId WRITE setAuthId )
+    Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
@@ -306,6 +307,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* authid */
     void setAuthId( const QString &authId );
     QString authId() const { return mCrs.authid(); }
+
+    /* tooltip */
+    void setTooltip( const QString &tooltip );
+    const QString &tooltip() const { return mTooltip; }
 
     bool isPointSymbol() const { return mIsPointSymbol; }
     virtual QImage symbolImage() const { return QImage(); }
@@ -417,6 +422,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QgsCoordinateReferenceSystem mCrs;
     bool mSelected = false;
     int mZIndex = 0;
+    QString mTooltip;
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
     bool mIsPointSymbol = false;

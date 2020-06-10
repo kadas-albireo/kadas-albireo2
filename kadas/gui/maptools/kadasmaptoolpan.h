@@ -57,6 +57,8 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
 
     bool gestureEvent( QGestureEvent *event ) override;
 
+    bool canvasToolTipEvent( QHelpEvent *e ) override;
+
   signals:
     void contextMenuRequested( QPoint screenPos, QgsPointXY mapPos );
     void itemPicked( const KadasFeaturePicker::PickResult &result );

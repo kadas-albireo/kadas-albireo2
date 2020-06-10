@@ -25,6 +25,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
+#include <kadas/core/kadascoordinateformat.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 
 
@@ -205,4 +206,23 @@ KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs )
   : KadasSymbolItem( crs )
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
+  connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
+}
+
+void KadasPinItem::updateTooltip()
+{
+  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( position(), crs() );
+  if ( posStr.isEmpty() )
+  {
+    posStr = QString( "%1 (%2)" ).arg( QgsPointXY( position() ).toString() ).arg( crs().authid() );
+  }
+  QString toolTipText = QString( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
+                        .arg( posStr )
+                        .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
+                        .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == QgsUnitTypes::DistanceFeet ? "ft" : "m" )
+                        .arg( name() )
+                        .arg( remarks() );
+  blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
+  setTooltip( toolTipText );
+  blockSignals( false );
 }

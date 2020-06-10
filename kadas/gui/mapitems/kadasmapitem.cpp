@@ -170,6 +170,12 @@ void KadasMapItem::setZIndex( int zIndex )
   update();
 }
 
+void KadasMapItem::setTooltip( const QString &tooltip )
+{
+  mTooltip = tooltip;
+  update();
+}
+
 void KadasMapItem::setSymbolScale( double scale )
 {
   mSymbolScale = scale;

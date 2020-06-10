@@ -18,6 +18,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 #include <QPinchGesture>
+#include <QToolTip>
 
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -174,6 +175,22 @@ bool KadasMapToolPan::gestureEvent( QGestureEvent *event )
     pinchTriggered( static_cast<QPinchGesture *>( gesture ) );
   }
   return true;
+}
+
+bool KadasMapToolPan::canvasToolTipEvent( QHelpEvent *e )
+{
+  QPoint canvasPos = e->pos();
+  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, canvasPos, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ) );
+  if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
+  {
+    QString tooltip = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId]->tooltip();
+    if ( !tooltip.isEmpty() )
+    {
+      QToolTip::showText( e->globalPos(), tooltip, mCanvas );
+      return true;
+    }
+  }
+  return false;
 }
 
 void KadasMapToolPan::pinchTriggered( QPinchGesture *gesture )

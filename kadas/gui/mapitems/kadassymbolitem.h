@@ -68,6 +68,9 @@ class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
 
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );
+
+  private slots:
+    void updateTooltip();
 };
 
 
