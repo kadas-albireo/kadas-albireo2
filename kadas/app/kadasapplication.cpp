@@ -277,6 +277,12 @@ void KadasApplication::init()
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
+  // Add network request logger
+  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest * req )
+  {
+    QgsDebugMsg( QString( "Network request: %1" ).arg( req->url().toString() ) );
+  } );
+
   // Setup gdal proxy settings
   Kadas::gdalProxyConfig();
 
