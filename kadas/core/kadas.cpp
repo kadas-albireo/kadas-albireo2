@@ -213,7 +213,14 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     }
     if ( uri.hasParam( "identifier" ) )
     {
-      gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
+      if ( wcsUrl.contains( "MapServer", Qt::CaseInsensitive ) )
+      {
+        gdalSource.append( QString( "&coverage=Coverage%1" ).arg( uri.param( "identifier" ) ) );
+      }
+      else
+      {
+        gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
+      }
     }
     if ( uri.hasParam( "crs" ) )
     {
