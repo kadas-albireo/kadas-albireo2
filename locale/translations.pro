@@ -109,7 +109,9 @@ SOURCES += \
 ../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp \
 ../kadas/gui/catalog/kadasvbscatalogprovider.h \
 ../kadas/gui/catalog/kadasarcgisrestcatalogprovider.h \
+../kadas/gui/catalog/kadasarcgisportalcatalogprovider.h \
 ../kadas/gui/catalog/kadasarcgisrestcatalogprovider.cpp \
+../kadas/gui/catalog/kadasarcgisportalcatalogprovider.cpp \
 ../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h \
 ../kadas/gui/catalog/kadasvbscatalogprovider.cpp \
 ../kadas/gui/ui/kadasgpxrouteeditor.ui \
