@@ -274,6 +274,9 @@ void KadasApplication::init()
     }
   }
 
+  // Add token injector
+  QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
+
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
@@ -1684,3 +1687,37 @@ QgsMessageOutput *KadasApplication::messageOutputViewer()
     return new QgsMessageOutputConsole();
   }
 }
+
+
+void KadasApplication::injectAuthToken( QNetworkRequest *request )
+{
+  QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+
+  QUrl url = request->url();
+  QgsDebugMsg( QString( "injectAuthToken: got url %1" ).arg( url.url() ) );
+  // Extract the token from the esri_auth cookie, if such cookie exists in the pool
+  QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
+  for ( const QNetworkCookie &cookie : cookies )
+  {
+    QgsDebugMsg( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ) );
+    QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
+    if ( data.startsWith( "esri_auth=" ) )
+    {
+      QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
+      if ( tokenRe.indexIn( QString( data ) ) != -1 )
+      {
+        QUrlQuery query( url );
+        if ( query.hasQueryItem( "token" ) )
+        {
+          continue;
+        }
+        query.addQueryItem( "token", tokenRe.cap( 1 ) );
+        url.setQuery( query );
+        request->setUrl( url );
+        QgsDebugMsg( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) );
+        break;
+      }
+    }
+  }
+}
+

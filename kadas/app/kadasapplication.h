@@ -24,6 +24,7 @@
 
 #include <kadas/gui/kadasfeaturepicker.h>
 
+class QNetworkRequest;
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
@@ -127,6 +128,7 @@ class KadasApplication : public QgsApplication
     int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
 
     static QgsMessageOutput *messageOutputViewer();
+    static void injectAuthToken( QNetworkRequest *request );
 
   private slots:
     void autosave();

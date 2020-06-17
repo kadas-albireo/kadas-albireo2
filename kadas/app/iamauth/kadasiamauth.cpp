@@ -126,8 +126,6 @@ KadasIamAuth::KadasIamAuth( QToolButton *loginButton, QToolButton *logoutButton,
     connect( mLoginButton, &QToolButton::clicked, this, &KadasIamAuth::performLogin );
     connect( mLogoutButton, &QToolButton::clicked, this, &KadasIamAuth::performLogout );
   }
-
-  mPreprocessorId = QgsNetworkAccessManager::setRequestPreprocessor( KadasIamAuth::injectAuthToken );
 }
 
 KadasIamAuth::~KadasIamAuth()
@@ -246,30 +244,4 @@ void KadasIamAuth::checkLogoutComplete()
     mRefreshButton->click();
   }
   reply->deleteLater();
-}
-
-void KadasIamAuth::injectAuthToken( QNetworkRequest *request )
-{
-  QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
-
-  QUrl url = request->url();
-  // Extract the token from the esri_auth cookie, if such cookie exists in the pool
-  QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
-  for ( const QNetworkCookie &cookie : cookies )
-  {
-    QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
-    if ( data.startsWith( "esri_auth=" ) )
-    {
-      QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
-      if ( tokenRe.indexIn( QString( data ) ) != -1 )
-      {
-        QUrlQuery query( url );
-        query.addQueryItem( "token", tokenRe.cap( 1 ) );
-        url.setQuery( query );
-        request->setUrl( url );
-        QgsDebugMsg( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) );
-        break;
-      }
-    }
-  }
 }

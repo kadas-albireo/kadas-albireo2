@@ -19,7 +19,6 @@
 
 #include <QObject>
 
-class QNetworkRequest;
 class QToolButton;
 class StackedDialog;
 struct IDispatch;
@@ -33,8 +32,6 @@ class KadasIamAuth : public QObject
     ~KadasIamAuth();
 
   private:
-    static void injectAuthToken( QNetworkRequest *request );
-
     QToolButton *mLoginButton = nullptr;
     QToolButton *mLogoutButton = nullptr;
     QToolButton *mRefreshButton = nullptr;
