@@ -17,6 +17,10 @@ ADD_LIBRARY(kadas_core SHARED
     ${kadas_core_HDR}
 )
 
+IF(MINGW)
+SET(PROXYDETECT_LIBRARIES pacparser winhttp)
+ENDIF(MINGW)
+
 TARGET_LINK_LIBRARIES(kadas_core
   Qt5::Widgets
   Qt5::Network
@@ -24,6 +28,7 @@ TARGET_LINK_LIBRARIES(kadas_core
   Qt5::Xml
   ${QGIS_CORE_LIBRARY}
   ${GDAL_LIBRARIES}
+  ${PROXYDETECT_LIBRARIES}
 )
 
 GENERATE_EXPORT_HEADER(

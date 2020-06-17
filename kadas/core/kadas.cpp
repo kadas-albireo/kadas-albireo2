@@ -17,7 +17,15 @@
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QSettings>
 #include <QStandardPaths>
+#ifdef Q_OS_WINDOWS
+#include <windows.h>
+#include <winhttp.h>
+#include <pacparser.h>
+#endif
 
 #include <qgis/qgssettings.h>
 #include <qgis/qgsrasterlayer.h>
@@ -137,4 +145,68 @@ QString Kadas::gdalSource( const QgsMapLayer *layer )
     return gdalSource;
   }
   return QString();
+}
+
+void Kadas::gdalProxyConfig()
+{
+  QSettings settings;
+  QString gdalHttpProxy = settings.value( "proxy/gdalHttpProxy", "" ).toString();
+  QString gdalProxyAuth = settings.value( "proxy/gdalProxyAuth", "" ).toString();
+  QString gdalProxyUserPwd = settings.value( "proxy/gdalProxyUserPwd", "" ).toString();
+
+#ifdef Q_OS_WINDOWS
+  if ( gdalHttpProxy.isEmpty() )
+  {
+    WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxyInfo;
+    WinHttpGetIEProxyConfigForCurrentUser( &proxyInfo );
+
+    QString pacUrl;
+    QString proxyBypass;
+
+    if ( proxyInfo.lpszProxy != NULL )
+    {
+      gdalHttpProxy = QString::fromWCharArray( proxyInfo.lpszProxy );
+      GlobalFree( proxyInfo.lpszProxy );
+    }
+
+    if ( proxyInfo.lpszProxyBypass != NULL )
+    {
+      proxyBypass = QString::fromWCharArray( proxyInfo.lpszProxyBypass );
+      GlobalFree( proxyInfo.lpszProxyBypass );
+    }
+
+    if ( proxyInfo.lpszAutoConfigUrl != NULL )
+    {
+      pacUrl = QString::fromWCharArray( proxyInfo.lpszAutoConfigUrl );
+      GlobalFree( proxyInfo.lpszAutoConfigUrl );
+    }
+
+    if ( !pacUrl.isEmpty() )
+    {
+      QNetworkAccessManager nam;
+      QNetworkReply *reply = nam.get( QNetworkRequest( pacUrl ) );
+      QEventLoop evloop;
+      QObject::connect( reply, &QNetworkReply::finished, &evloop, &QEventLoop::quit );
+      evloop.exec( QEventLoop::ExcludeUserInputEvents );
+      QByteArray data = reply->readAll();
+
+
+      pacparser_init();
+      pacparser_parse_pac_string( data.data() );
+      gdalHttpProxy = QString::fromLocal8Bit( pacparser_find_proxy( "http://example.com", "example.com" ) );
+      if ( gdalHttpProxy.startsWith( "PROXY", Qt::CaseInsensitive ) )
+      {
+        gdalHttpProxy = gdalHttpProxy.mid( 6 );
+      }
+      pacparser_cleanup();
+    }
+  }
+#endif
+
+  QgsDebugMsg( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ) );
+  QgsDebugMsg( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ) );
+  QgsDebugMsg( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ) );
+  qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
+  qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
+  qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
 }

@@ -277,6 +277,9 @@ void KadasApplication::init()
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
+  // Setup gdal proxy settings
+  Kadas::gdalProxyConfig();
+
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
@@ -327,10 +330,6 @@ void KadasApplication::init()
 
   // Setup layout item widgets
   QgsLayoutAppUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
-
-  // Set GDAL proxy settings
-  QgsGdalUtils::setupProxy();
-
 
   // Open startup project
   QgsProject::instance()->setDirty( false );

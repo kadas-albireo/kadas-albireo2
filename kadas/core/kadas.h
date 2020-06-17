@@ -53,6 +53,9 @@ class KADAS_CORE_EXPORT Kadas
 
     // Returns gdal source string for raster layer or null string in case of error
     static QString gdalSource( const QgsMapLayer *layer );
+
+    // Sets up gdal proxy environment variables
+    static void gdalProxyConfig();
 };
 
 #endif // KADAS_H
