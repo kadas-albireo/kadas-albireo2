@@ -1602,14 +1602,64 @@ bool KadasApplication::showZipSublayerSelectionDialog( const QString &path ) con
 
 QString KadasApplication::migrateDatasource( const QString &path ) const
 {
-  static QMap<QString, QString> dataSourceMap = dataSourceMigrationMap();
+  QTextStream( stdout ) << path << endl;
+  static DataSourceMigrations dataSourceMap = dataSourceMigrationMap();
+
+  // Try as file
   QString normPath = path.toLower().replace( "\\", "/" );
-  return dataSourceMap.value( normPath, path );
+  auto it = dataSourceMap.files.find( normPath );
+  if ( it != dataSourceMap.files.end() )
+  {
+    return it.value();
+  }
+
+  // Try as wms
+  QUrlQuery query( path );
+  if ( !query.isEmpty() )
+  {
+    QString url = query.queryItemValue( "url" ).toLower();
+    QString layers = query.queryItemValue( "layers" );
+    auto itUrl = dataSourceMap.wms.find( url );
+    if ( itUrl != dataSourceMap.wms.end() )
+    {
+      auto itId = itUrl.value().find( layers );
+      if ( itId != itUrl.value().end() )
+      {
+        QUrlQuery newParams( itId.value() );
+        for ( auto keyVal : newParams.queryItems() )
+        {
+          query.removeAllQueryItems( keyVal.first );
+          query.addQueryItem( keyVal.first, keyVal.second );
+        }
+        return query.toString();
+      }
+    }
+  }
+
+  // Try as ams
+  QgsDataSourceUri uri( path );
+  if ( uri.hasParam( "url" ) )
+  {
+    auto it = dataSourceMap.ams.find( uri.param( "url" ).toLower() );
+    if ( it != dataSourceMap.ams.end() )
+    {
+      QUrlQuery newParams( it.value() );
+      for ( auto keyVal : newParams.queryItems() )
+      {
+        uri.removeParam( keyVal.first );
+        uri.setParam( keyVal.first, keyVal.second );
+      }
+      return uri.uri();
+    }
+  }
+
+  // Return unchanged
+  return path;
 }
 
-QMap<QString, QString> KadasApplication::dataSourceMigrationMap() const
+KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap() const
 {
-  QMap<QString, QString> dataSourceMap;
+  DataSourceMigrations dataSourceMigrations;
   QString migrationsFilename = qgetenv( "KADAS_DATASOURCE_MIGRATIONS" );
   if ( migrationsFilename.isEmpty() )
   {
@@ -1619,14 +1669,37 @@ QMap<QString, QString> KadasApplication::dataSourceMigrationMap() const
   if ( migrationsFile.open( QIODevice::ReadOnly ) )
   {
     QJsonDocument doc = QJsonDocument::fromJson( migrationsFile.readAll() );
-    QJsonArray entries = doc.array();
-    for ( int i = 0, n = entries.size(); i < n; ++i )
+
+    QJsonArray fileEntries = doc.object()["files"].toArray();
+    for ( int i = 0, n = fileEntries.size(); i < n; ++i )
     {
-      QJsonObject entry = entries.at( i ).toObject();
-      dataSourceMap.insert( entry.value( "old" ).toString(), entry.value( "new" ).toString() );
+      QJsonObject entry = fileEntries.at( i ).toObject();
+      dataSourceMigrations.files.insert( entry.value( "old" ).toString(), entry.value( "new" ).toString() );
+    }
+
+    QJsonArray wmsEntries = doc.object()["wms"].toArray();
+    for ( int i = 0, n = wmsEntries.size(); i < n; ++i )
+    {
+      QJsonObject entry = wmsEntries.at( i ).toObject();
+      QString old_url = entry.value( "old_url" ).toString();
+      QString old_ident = entry.value( "old_ident" ).toString();
+      QString new_params = entry.value( "new_params" ).toString();
+      auto it = dataSourceMigrations.wms.find( old_url );
+      if ( it == dataSourceMigrations.wms.end() )
+      {
+        it = dataSourceMigrations.wms.insert( old_url, QMap<QString, QString>() );
+      }
+      it.value()[old_ident] = new_params;
+    }
+
+    QJsonArray amsEntries = doc.object()["ams"].toArray();
+    for ( int i = 0, n = amsEntries.size(); i < n; ++i )
+    {
+      QJsonObject entry = amsEntries.at( i ).toObject();
+      dataSourceMigrations.ams.insert( entry.value( "old_url" ).toString(), entry.value( "new_params" ).toString() );
     }
   }
-  return dataSourceMap;
+  return dataSourceMigrations;
 }
 
 void KadasApplication::loadPythonSupport()

@@ -108,6 +108,13 @@ class KadasApplication : public QgsApplication
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );
 
   private:
+    struct DataSourceMigrations
+    {
+      QMap<QString, QString> files;
+      QMap<QString, QMap<QString, QString>> wms;
+      QMap<QString, QString> ams;
+    };
+
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
@@ -123,7 +130,7 @@ class KadasApplication : public QgsApplication
     void loadPythonSupport();
     bool showZipSublayerSelectionDialog( const QString &path ) const;
     QString migrateDatasource( const QString &path ) const;
-    QMap<QString, QString> dataSourceMigrationMap() const;
+    DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();
     int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
 
