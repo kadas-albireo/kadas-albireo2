@@ -45,6 +45,7 @@
 #include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
+#include <kadas/gui/catalog/kadasarcgisportalcatalogprovider.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/mapitems/kadaspictureitem.h>
@@ -285,6 +286,12 @@ void KadasMainWindow::init()
       KadasVBSCatalogProvider *vbsprovider = new KadasVBSCatalogProvider( url, mCatalogBrowser );
       connect( vbsprovider, &KadasVBSCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
       mCatalogBrowser->addProvider( vbsprovider );
+    }
+    else if ( type == "arcgisportal" )
+    {
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser );
+      connect( portalprovider, &KadasArcGisPortalCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
+      mCatalogBrowser->addProvider( portalprovider );
     }
   }
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
