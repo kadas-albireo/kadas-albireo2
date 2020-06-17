@@ -85,13 +85,7 @@ void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinate
   QString outputFileName = QString( "slope_%1-%2_%3-%4.tif" ).arg( extent.xMinimum() ).arg( extent.xMaximum() ).arg( extent.yMinimum() ).arg( extent.yMaximum() );
   QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
-  QString gdalSource = Kadas::gdalSource( layer );
-  if ( gdalSource.isNull() )
-  {
-    return;
-  }
-
-  KadasSlopeFilter slope( gdalSource, layer->crs(), outputFile, "GTiff", extent, crs );
+  KadasSlopeFilter slope( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", extent, crs );
   QProgressDialog p( tr( "Calculating slope..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Slope" ) );
   p.setWindowModality( Qt::ApplicationModal );

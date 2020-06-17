@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/analysis/kadashillshadefilter.h"
 %End
   public:
-    KadasHillshadeFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,
+    KadasHillshadeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,
                           double lightAngle = 40, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
 
      virtual float processNineCellWindow( float *x11, float *x21, float *x31,

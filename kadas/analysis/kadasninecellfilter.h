@@ -25,12 +25,13 @@
 #include <kadas/analysis/kadas_analysis.h>
 
 class QProgressDialog;
+class QgsRasterLayer;
 
 class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
 {
   public:
     /**Constructor that takes input file, output file and output format (GDAL string)*/
-    KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
+    KadasNineCellFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
     virtual ~KadasNineCellFilter() = default;
 
     /**Starts the calculation, reads from mInputFile and stores the result in mOutputFile
@@ -67,9 +68,9 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     GDALDriverH openOutputDriver();
     /**Opens the output file and sets the same geotransform and CRS as the input data
       @return the output dataset or NULL in case of error*/
-    GDALDatasetH openOutputFile( GDALDatasetH inputDataset, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize );
+    GDALDatasetH openOutputFile( GDALDatasetH inputDataset, const QgsCoordinateReferenceSystem &inputCrs, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize );
     /**Computes the window of the raster which contains the specified region of the raster*/
-    bool computeWindow( GDALDatasetH dataset, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
+    bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
 
   protected:
 
@@ -78,8 +79,7 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     /**Calculates the first order derivative in y-direction according to Horn (1981)*/
     float calcFirstDerY( float *x11, float *x21, float *x31, float *x12, float *x22, float *x32, float *x13, float *x23, float *x33 );
 
-    QString mInputFile;
-    QgsCoordinateReferenceSystem mInputCrs;
+    const QgsRasterLayer *mLayer;
     QString mOutputFile;
     QString mOutputFormat;
     QgsRectangle mFilterRegion;

@@ -22,6 +22,9 @@
 #include <kadas/core/kadas_core.h>
 
 class QgsMapLayer;
+class QgsRasterLayer;
+
+typedef void *GDALDatasetH;
 
 class KADAS_CORE_EXPORT Kadas
 {
@@ -52,10 +55,7 @@ class KADAS_CORE_EXPORT Kadas
     static QString projectTemplatesPath();
 
     // Returns gdal source string for raster layer or null string in case of error
-    static QString gdalSource( const QgsMapLayer *layer );
-
-    // Sets up gdal proxy environment variables
-    static void gdalProxyConfig();
+    static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = nullptr );
 };
 
 #endif // KADAS_H

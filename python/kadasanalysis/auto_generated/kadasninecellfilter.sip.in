@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/analysis/kadasninecellfilter.h"
 %End
   public:
-    KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
+    KadasNineCellFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
 %Docstring
 Constructor that takes input file, output file and output format (GDAL string)*/
 %End

@@ -23,7 +23,9 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrasterlayer.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/analysis/kadasviewshedfilter.h>
 
 
@@ -47,18 +49,19 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed( const QString &inputFile, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool heightRelToTerr, double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor, QProgressDialog *progress )
+bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool heightRelToTerr, double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor, QProgressDialog *progress )
 {
   // Open input file
-  GDALDatasetH inputDataset = GDALOpen( inputFile.toLocal8Bit().data(), GA_ReadOnly );
-  if ( inputDataset == 0 )
+  GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
+  if ( inputDataset == nullptr )
   {
     QgsDebugMsg( "Failed to open input dataset" );
     return false;
   }
 
   // Transform positions and measurements to dataset CRS
-  QgsCoordinateReferenceSystem datasetCrs( QString( GDALGetProjectionRef( inputDataset ) ) );
+  QgsCoordinateReferenceSystem gdalCrs( QString( GDALGetProjectionRef( inputDataset ) ) );
+  QgsCoordinateReferenceSystem datasetCrs = layer->crs().authid() != gdalCrs.authid() ? gdalCrs : layer->crs();
   if ( !datasetCrs.isValid() )
   {
     QgsDebugMsg( "Could not determine input dataset CRS" );

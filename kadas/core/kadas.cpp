@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <gdal.h>
+
 #include <QApplication>
 #include <QDir>
 #include <QFile>
@@ -94,60 +96,7 @@ QString Kadas::projectTemplatesPath()
   return QDir( pkgDataPath() ).absoluteFilePath( "project_templates" );
 }
 
-QString Kadas::gdalSource( const QgsMapLayer *layer )
-{
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
-  {
-    return QString();
-  }
-
-  QString providerType  = layer->providerType();
-  QString layerSource = layer->source();
-  if ( providerType == "gdal" )
-  {
-    return layerSource;
-  }
-  else if ( providerType == "wcs" )
-  {
-    QgsDataSourceUri uri;
-    uri.setEncodedUri( layerSource );
-
-    QString wcsUrl;
-    if ( !uri.hasParam( "url" ) )
-    {
-      return QString();
-    }
-    wcsUrl = uri.param( "url" );
-    if ( !wcsUrl.endsWith( "?" ) && !wcsUrl.endsWith( "&" ) )
-    {
-      if ( wcsUrl.contains( "?" ) )
-      {
-        wcsUrl.append( "&" );
-      }
-      else
-      {
-        wcsUrl.append( "?" );
-      }
-    }
-    QString gdalSource = QString( "WCS:%1" ).arg( wcsUrl );
-    if ( uri.hasParam( "version" ) )
-    {
-      gdalSource.append( QString( "&version=%1" ).arg( uri.param( "version" ) ) );
-    }
-    if ( uri.hasParam( "identifier" ) )
-    {
-      gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
-    }
-    if ( uri.hasParam( "crs" ) )
-    {
-      gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
-    }
-    return gdalSource;
-  }
-  return QString();
-}
-
-void Kadas::gdalProxyConfig()
+static void gdalProxyConfig( const QUrl &url )
 {
   QSettings settings;
   QString gdalHttpProxy = settings.value( "proxy/gdalHttpProxy", "" ).toString();
@@ -193,14 +142,20 @@ void Kadas::gdalProxyConfig()
 
       pacparser_init();
       pacparser_parse_pac_string( data.data() );
-      gdalHttpProxy = QString::fromLocal8Bit( pacparser_find_proxy( "http://example.com", "example.com" ) );
+      gdalHttpProxy = QString::fromLocal8Bit( pacparser_find_proxy( url.url().toUtf8(), url.host().toUtf8() ) );
       if ( gdalHttpProxy.startsWith( "PROXY", Qt::CaseInsensitive ) )
       {
         gdalHttpProxy = gdalHttpProxy.mid( 6 );
       }
+      else if ( gdalHttpProxy.startsWith( "DIRECT", Qt::CaseInsensitive ) )
+      {
+        gdalHttpProxy = "";
+      }
       pacparser_cleanup();
     }
   }
+#else
+  Q_UNUSED( url )
 #endif
 
   QgsDebugMsg( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ) );
@@ -209,4 +164,67 @@ void Kadas::gdalProxyConfig()
   qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
   qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
   qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+}
+
+GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg )
+{
+  if ( !layer )
+  {
+    return nullptr;
+  }
+
+  QString providerType  = layer->providerType();
+  QString layerSource = layer->source();
+
+  QgsDataSourceUri uri;
+  uri.setEncodedUri( layerSource );
+  if ( uri.hasParam( "url" ) )
+  {
+    gdalProxyConfig( QUrl( uri.param( "url" ) ) );
+  }
+
+  if ( providerType == "gdal" )
+  {
+    return GDALOpen( layerSource.toUtf8().data(), GA_ReadOnly );
+  }
+  else if ( providerType == "wcs" )
+  {
+    QString wcsUrl;
+    if ( !uri.hasParam( "url" ) )
+    {
+      return nullptr;
+    }
+    wcsUrl = uri.param( "url" );
+    if ( !wcsUrl.endsWith( "?" ) && !wcsUrl.endsWith( "&" ) )
+    {
+      if ( wcsUrl.contains( "?" ) )
+      {
+        wcsUrl.append( "&" );
+      }
+      else
+      {
+        wcsUrl.append( "?" );
+      }
+    }
+    QString gdalSource = QString( "WCS:%1" ).arg( wcsUrl );
+    if ( uri.hasParam( "version" ) )
+    {
+      gdalSource.append( QString( "&version=%1" ).arg( uri.param( "version" ) ) );
+    }
+    if ( uri.hasParam( "identifier" ) )
+    {
+      gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
+    }
+    if ( uri.hasParam( "crs" ) )
+    {
+      gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
+    }
+    GDALDatasetH dataset = GDALOpen( gdalSource.toUtf8().data(), GA_ReadOnly );
+    if ( !dataset && errMsg )
+    {
+      *errMsg = QApplication::tr( "Failed to open raster file: %1" ).arg( layerSource );
+    }
+    return dataset;
+  }
+  return nullptr;
 }

@@ -218,13 +218,8 @@ void KadasMapToolViewshed::drawFinished()
   int accuracyFactor = viewshedDialog.getAccuracyFactor();
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
-  QString gdalSource = Kadas::gdalSource( layer );
-  if ( gdalSource.isNull() )
-  {
-    return;
-  }
 
-  bool success = KadasViewshedFilter::computeViewshed( gdalSource, outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, filterRegion, displayVisible, accuracyFactor, &p );
+  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, filterRegion, displayVisible, accuracyFactor, &p );
   QApplication::restoreOverrideCursor();
   if ( success )
   {

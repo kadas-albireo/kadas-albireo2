@@ -283,9 +283,6 @@ void KadasApplication::init()
     QgsDebugMsg( QString( "Network request: %1" ).arg( req->url().toString() ) );
   } );
 
-  // Setup gdal proxy settings
-  Kadas::gdalProxyConfig();
-
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();

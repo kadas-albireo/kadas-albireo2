@@ -22,13 +22,14 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrasterlayer.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/analysis/kadasninecellfilter.h>
 
 
-KadasNineCellFilter::KadasNineCellFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs )
-  : mInputFile( inputFile )
-  , mInputCrs( inputCrs )
+KadasNineCellFilter::KadasNineCellFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs )
+  : mLayer( layer )
   , mOutputFile( outputFile )
   , mOutputFormat( outputFormat )
   , mFilterRegion( region )
@@ -71,10 +72,13 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     return 2;
   }
 
+  QgsCoordinateReferenceSystem gdalCrs( QString( GDALGetProjectionRef( inputDataset ) ) );
+  QgsCoordinateReferenceSystem inputCrs = mLayer->crs().authid() != gdalCrs.authid() ? gdalCrs : mLayer->crs();
+
 
   //determine the window
   int rowStart, rowEnd, colStart, colEnd;
-  if ( !computeWindow( inputDataset, mFilterRegion, mFilterRegionCrs, rowStart, rowEnd, colStart, colEnd ) )
+  if ( !computeWindow( inputDataset, inputCrs, mFilterRegion, mFilterRegionCrs, rowStart, rowEnd, colStart, colEnd ) )
   {
     GDALClose( inputDataset );
     errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to compute input window" );
@@ -83,7 +87,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
   xSize = colEnd - colStart;
   ySize = rowEnd - rowStart;
 
-  GDALDatasetH outputDataset = openOutputFile( inputDataset, outputDriver, colStart, rowStart, xSize, ySize );
+  GDALDatasetH outputDataset = openOutputFile( inputDataset, inputCrs, outputDriver, colStart, rowStart, xSize, ySize );
   if ( outputDataset == NULL )
   {
     GDALClose( inputDataset );
@@ -118,15 +122,15 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
   if ( mZFactor == -1 )
   {
     QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-    if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
+    if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
     {
       mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceFeet );
     }
-    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceFeet && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceFeet && vertUnit == QgsUnitTypes::DistanceMeters )
     {
       mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceFeet, QgsUnitTypes::DistanceMeters );
     }
-    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceMeters )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
@@ -134,7 +138,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
       double latitude = gtrans[3] + px * gtrans[4] + py * gtrans[5];
       mZFactor = ( 111320 * std::cos( latitude * M_PI / 180. ) );
     }
-    else if ( mInputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceFeet )
+    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceFeet )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
@@ -263,7 +267,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
 
 GDALDatasetH KadasNineCellFilter::openInputFile( int &nCellsX, int &nCellsY )
 {
-  GDALDatasetH inputDataset = GDALOpen( mInputFile.toUtf8().constData(), GA_ReadOnly );
+  GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( mLayer );
   if ( inputDataset != NULL )
   {
     nCellsX = GDALGetRasterXSize( inputDataset );
@@ -279,7 +283,7 @@ GDALDatasetH KadasNineCellFilter::openInputFile( int &nCellsX, int &nCellsY )
   return inputDataset;
 }
 
-bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd )
+bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd )
 {
   int nCellsX = GDALGetRasterXSize( dataset );
   int nCellsY = GDALGetRasterYSize( dataset );
@@ -299,7 +303,7 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsRectangl
     return false;
   }
 
-  QgsCoordinateTransform ct( regionCrs, mInputCrs, QgsProject::instance() );
+  QgsCoordinateTransform ct( regionCrs, datasetCrs, QgsProject::instance() );
 
   // Transform raster geo position to pixel coordinates
   QgsPointXY regionPoints[4] =
@@ -357,7 +361,7 @@ GDALDriverH KadasNineCellFilter::openOutputDriver()
   return outputDriver;
 }
 
-GDALDatasetH KadasNineCellFilter::openOutputFile( GDALDatasetH inputDataset, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize )
+GDALDatasetH KadasNineCellFilter::openOutputFile( GDALDatasetH inputDataset, const QgsCoordinateReferenceSystem &inputCrs, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize )
 {
   if ( inputDataset == NULL )
   {
@@ -400,7 +404,7 @@ GDALDatasetH KadasNineCellFilter::openOutputFile( GDALDatasetH inputDataset, GDA
     mCellSizeY = -mCellSizeY;
   }
 
-  GDALSetProjection( outputDataset, mInputCrs.toWkt().toLocal8Bit().data() );
+  GDALSetProjection( outputDataset, inputCrs.toWkt().toLocal8Bit().data() );
 
   return outputDataset;
 }

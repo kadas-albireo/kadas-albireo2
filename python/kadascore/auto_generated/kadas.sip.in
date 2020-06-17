@@ -11,18 +11,10 @@
 
 
 
+typedef void *GDALDatasetH;
+
 class Kadas
 {
-%Docstring
-*************************************************************************
-
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
-
-**************************************************************************
-%End
 
 %TypeHeaderCode
 #include "kadas/core/kadas.h"
@@ -43,7 +35,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     static QString projectTemplatesPath();
 
-    static QString gdalSource( const QgsMapLayer *layer );
+    static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = 0 );
 };
 
 /************************************************************************

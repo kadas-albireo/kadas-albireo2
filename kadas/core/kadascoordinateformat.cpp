@@ -24,6 +24,7 @@
 #include <qgis/qgslogger.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrasterlayer.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
@@ -144,18 +145,9 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
     return 0;
   }
 
-  QString rasterFile = Kadas::gdalSource( layer );
-  if ( rasterFile.isNull() )
-  {
-    return 0;
-  }
-  GDALDatasetH raster = GDALOpen( rasterFile.toLocal8Bit().data(), GA_ReadOnly );
+  GDALDatasetH raster = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ), errMsg );
   if ( !raster )
   {
-    if ( errMsg )
-    {
-      *errMsg = tr( "Failed to open raster file: %1" ).arg( rasterFile );
-    }
     return 0;
   }
 

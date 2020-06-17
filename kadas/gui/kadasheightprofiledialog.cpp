@@ -42,6 +42,7 @@
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvector.h>
 
@@ -281,16 +282,12 @@ void KadasHeightProfileDialog::replot()
     emit mTool->messageEmitted( tr( "No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap." ), Qgis::Warning );
     return;
   }
-  QString rasterFile = Kadas::gdalSource( layer );
-  if ( rasterFile.isNull() )
-  {
-    return;
-  }
 
-  GDALDatasetH raster = GDALOpen( rasterFile.toLocal8Bit().data(), GA_ReadOnly );
+  QString errMsg;
+  GDALDatasetH raster = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ), &errMsg );
   if ( !raster )
   {
-    QMessageBox::warning( 0, tr( "Error" ), tr( "Failed to open raster file: %1" ).arg( rasterFile ) );
+    QMessageBox::warning( 0, tr( "Error" ), errMsg );
     return;
   }
 

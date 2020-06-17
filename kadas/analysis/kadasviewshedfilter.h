@@ -25,12 +25,13 @@
 #include <kadas/analysis/kadas_analysis.h>
 
 class QProgressDialog;
+class QgsRasterLayer;
 
 
 class KADAS_ANALYSIS_EXPORT KadasViewshedFilter
 {
   public:
-    static bool computeViewshed( const QString &inputFile,
+    static bool computeViewshed( const QgsRasterLayer *layer,
                                  const QString &outputFile, const QString &outputFormat,
                                  QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
                                  double observerHeight, double targetHeight, bool heightRelToTerr, double radius,

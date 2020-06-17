@@ -17,8 +17,8 @@
 #include <kadas/analysis/kadasslopefilter.h>
 
 
-KadasSlopeFilter::KadasSlopeFilter( const QString &inputFile, const QgsCoordinateReferenceSystem &inputCrs, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
-  : KadasNineCellFilter( inputFile, inputCrs, outputFile, outputFormat, filterRegion, filterRegionCrs )
+KadasSlopeFilter::KadasSlopeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
+  : KadasNineCellFilter( layer, outputFile, outputFormat, filterRegion, filterRegionCrs )
 {
 }
 
