@@ -58,11 +58,17 @@ void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, c
   }
 
   QUrl url( serviceUrl );
-  QUrlQuery query( serviceUrl );
+  QUrlQuery query( url );
+  query.removeAllQueryItems( "type" );
+  query.removeAllQueryItems( "searchText" );
+  query.removeAllQueryItems( "sr" );
   query.addQueryItem( "type", "locations" );
   query.addQueryItem( "searchText", searchtext );
   query.addQueryItem( "sr", "4326" );
-  query.addQueryItem( "limit", QString::number( sResultCountLimit ) );
+  if ( !query.hasQueryItem( "limit" ) )
+  {
+    query.addQueryItem( "limit", QString::number( sResultCountLimit ) );
+  }
   url.setQuery( query );
 
   QNetworkRequest req( url );
