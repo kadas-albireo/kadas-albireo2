@@ -296,6 +296,12 @@ authid */
 %End
     QString authId() const;
 
+    void setTooltip( const QString &tooltip );
+%Docstring
+tooltip */
+%End
+    const QString &tooltip() const;
+
     bool isPointSymbol() const;
     virtual QImage symbolImage() const;
     virtual QPointF symbolAnchor() const;

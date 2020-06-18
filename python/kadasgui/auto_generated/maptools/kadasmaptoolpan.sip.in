@@ -53,6 +53,9 @@ Overridden mouse release event
     virtual bool gestureEvent( QGestureEvent *event );
 
 
+    virtual bool canvasToolTipEvent( QHelpEvent *e );
+
+
   signals:
     void contextMenuRequested( QPoint screenPos, QgsPointXY mapPos );
     void itemPicked( const KadasFeaturePicker::PickResult &result );

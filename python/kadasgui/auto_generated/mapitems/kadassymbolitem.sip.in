@@ -61,6 +61,7 @@ class KadasPinItem : KadasSymbolItem
 %End
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );
+
 };
 
 
