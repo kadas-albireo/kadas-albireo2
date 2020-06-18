@@ -1602,7 +1602,6 @@ bool KadasApplication::showZipSublayerSelectionDialog( const QString &path ) con
 
 QString KadasApplication::migrateDatasource( const QString &path ) const
 {
-  QTextStream( stdout ) << path << endl;
   static DataSourceMigrations dataSourceMap = dataSourceMigrationMap();
 
   // Try as file

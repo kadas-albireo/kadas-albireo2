@@ -190,8 +190,6 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
 
   // Transform geo position to raster CRS
   QgsPointXY pRaster = QgsCoordinateTransform( crs, rasterCrs, QgsProject::instance() ).transform( p );
-  QgsDebugMsg( QString( "Transform %1 from %2 to %3 gives %4" ).arg( p.toString() )
-               .arg( crs.authid() ).arg( rasterCrs.authid() ).arg( pRaster.toString() ) );
 
   // Transform raster geo position to pixel coordinates
   double row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
