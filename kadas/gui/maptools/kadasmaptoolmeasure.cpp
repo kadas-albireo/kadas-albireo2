@@ -74,7 +74,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
     mUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
     mUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
     int defUnit = qMax( 0, QgsSettings().value( "/kadas/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt() );
-    mUnitComboBox->setCurrentIndex( defUnit );
+    mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
     connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
   }
 
