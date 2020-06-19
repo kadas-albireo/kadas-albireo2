@@ -115,7 +115,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
         for ( const QVariant &tagv : resultMap["tags"].toList() )
         {
           QString tag = tagv.toString();
-          if ( tag.startsWith( "milcatalog:" ) )
+          if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
           {
             auto it = mIsoTopics.find( tag.mid( 11 ) );
             if ( it != mIsoTopics.end() )
