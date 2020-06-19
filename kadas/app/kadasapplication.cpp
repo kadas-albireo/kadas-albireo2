@@ -255,6 +255,9 @@ void KadasApplication::init()
     settings.sync();
   }
 
+  // Ensure network access manager uses the correct proxy settings
+  QgsNetworkAccessManager::instance()->setupDefaultProxyAndCache();
+
   // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
   QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
   QgsDebugMsg( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ) );
