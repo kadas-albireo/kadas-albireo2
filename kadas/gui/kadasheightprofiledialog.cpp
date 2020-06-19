@@ -435,6 +435,12 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   }
 
   int nSamples = mPlotCurve->dataSize();
+  if ( nSamples < 2 )
+  {
+    mPlot->replot();
+    return;
+  }
+
   QVector<QPointF> samples = static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->samples();
 
   QVector< QVector<QPointF> > losSampleSet;
