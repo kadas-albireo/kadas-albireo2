@@ -81,7 +81,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
   if ( !computeWindow( inputDataset, inputCrs, mFilterRegion, mFilterRegionCrs, rowStart, rowEnd, colStart, colEnd ) )
   {
     GDALClose( inputDataset );
-    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to compute input window" );
+    errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to compute input window, no elevation data?" );
     return 2;
   }
   xSize = colEnd - colStart;
@@ -337,7 +337,7 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordina
   rowStart = qMax( rowStart, 0 );
   rowEnd = qMin( rowEnd + 1, nCellsY );
 
-  return true;
+  return colEnd > colStart && rowEnd > rowStart;
 }
 
 GDALDriverH KadasNineCellFilter::openOutputDriver()
