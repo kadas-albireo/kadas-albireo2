@@ -133,6 +133,7 @@ class KadasApplication : public QgsApplication
     DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();
     int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
+    void setLayerTreeInsertionPoint() const;
 
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
