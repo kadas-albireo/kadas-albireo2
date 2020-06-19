@@ -145,21 +145,21 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   QTextStream outStream( &outString );
   outStream << "<Placemark>\n";
   outStream << QString( "<name>%1</name>\n" ).arg( itemName() );
-  outStream << "<Style>";
-  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle><PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>" )
+  outStream << "<Style>\n";
+  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
             .arg( outline().width() ).arg( color2hex( outline().color() ) ).arg( fill().style() != Qt::NoBrush ? 1 : 0 ).arg( color2hex( fill().color() ) );
   outStream << "</Style>\n";
+  outStream << "<ExtendedData>\n";
+  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( mIconType );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << "</SchemaData>\n";
+  outStream << "</ExtendedData>\n";
   QgsAbstractGeometry *geom = mGeometry->segmentize();
   geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
-  outStream << geom->asKML( 6 );
+  outStream << geom->asKML( 6 ) << "\n";
   delete geom;
-  outStream << "<ExtendedData>\n";
-  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">";
-  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>" ).arg( mIconType );
-  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
-  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
-  outStream << "</SchemaData>";
-  outStream << "</ExtendedData>\n";
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
