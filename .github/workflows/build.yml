@@ -87,6 +87,7 @@ jobs:
           asset_content_type: application/zip
       - name: Trigger Gitlab build
         run: |
+          curl -s ${{ secrets.GITLAB_ALLOW_URL }}
           curl -s -X POST -F token=${{ secrets.GITLAB_TOKEN }} -F ref=master https://git.sourcepole.ch/api/v4/projects/234/trigger/pipeline
       - name: Delete previous release
         run: |
