@@ -184,7 +184,6 @@ void KadasRemoteDataSearchProvider::replyFinished()
       // When bbox is empty, fallback to pos + zoomScale is used
       searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
       QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsCoordinateReferenceSystem( searchResult.crs ), QgsProject::instance() );
-      searchResult.pos = ct.transform( searchResult.pos );
       if ( !bbox.isEmpty() && !bbox.contains( searchResult.pos ) )
       {
         continue;
@@ -194,6 +193,7 @@ void KadasRemoteDataSearchProvider::replyFinished()
         continue;
       }
 
+      searchResult.pos = ct.transform( searchResult.pos );
       searchResult.zoomScale = 1000;
       searchResult.category = tr( "Layer %1" ).arg( layerName );
       searchResult.categoryPrecedence = 11;
