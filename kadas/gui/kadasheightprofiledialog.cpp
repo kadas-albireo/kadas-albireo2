@@ -287,7 +287,7 @@ void KadasHeightProfileDialog::replot()
   GDALDatasetH raster = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ), &errMsg );
   if ( !raster )
   {
-    QMessageBox::warning( 0, tr( "Error" ), errMsg );
+    emit mTool->messageEmitted( tr( "Error: Unable to open heightmap." ), Qgis::Warning );
     return;
   }
 
