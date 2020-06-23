@@ -1,0 +1,3 @@
+[submodule "kadasrouting/libs/qgisvalhalla"]
+	path = kadasrouting/libs/qgisvalhalla
+	url = https://github.com/camptocamp/qgis-valhalla.git
