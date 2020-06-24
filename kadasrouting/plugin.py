@@ -6,10 +6,8 @@ from PyQt5.QtWidgets import QAction
 
 from kadas.kadasgui import KadasPluginInterface
 
+from kadasrouting.utilities import icon
 from kadasrouting.gui.shortestpathbottombar import ShortestPathBottomBar
-
-def icon(name):
-    return QIcon(os.path.join(os.path.dirname(__file__), "icons", name))
 
 class RoutingPlugin(QObject):
 
