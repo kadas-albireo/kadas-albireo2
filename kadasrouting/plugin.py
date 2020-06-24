@@ -20,7 +20,8 @@ class RoutingPlugin(QObject):
         self.shortestPathBar = None
 
     def initGui(self):
-        self.shortestAction = QAction(icon("shortest.png"), self.tr("Shortest path"))
+        # Routing menu
+        self.shortestAction = QAction(icon("routing.png"), self.tr("Routing"))
         self.shortestAction.setCheckable(True)
         self.shortestAction.toggled.connect(self.showShortest)
         self.iface.addAction(self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
