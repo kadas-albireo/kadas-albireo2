@@ -1,7 +1,15 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
-from kadas.kadasgui import KadasBottomBar
+from kadas.kadasgui import (
+    KadasBottomBar, 
+    KadasSearchBox, 
+    KadasCoordinateSearchProvider, 
+    KadasLocationSearchProvider, 
+    KadasLocalDataSearchProvider,
+    KadasPinSearchProvider,
+    KadasRemoteDataSearchProvider,
+    KadasWorldLocationSearchProvider)
 
 from kadasrouting.utilities import icon
 
@@ -54,5 +62,33 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         # Connections
         self.btnClose.clicked.connect(self.action.toggle)
 
-        self.originSearchBox = addSearchBox(self.originWidget)
+        # Search boxes
+        self.originSearchBox = KadasSearchBox(canvas)
+        self.originSearchBox.init(canvas)
+        self.originSearchBox.addSearchProvider(KadasCoordinateSearchProvider(canvas))
+        self.originSearchBox.addSearchProvider(KadasLocationSearchProvider(canvas))
+        self.originSearchBox.addSearchProvider(KadasLocalDataSearchProvider(canvas))
+        self.originSearchBox.addSearchProvider(KadasPinSearchProvider(canvas))
+        self.originSearchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
+        self.originSearchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
+        self.layout().addWidget(self.originSearchBox, 0, 1)
 
+        self.destinationSearchBox = KadasSearchBox(canvas)
+        self.destinationSearchBox.init(canvas)
+        self.destinationSearchBox.addSearchProvider(KadasCoordinateSearchProvider(canvas))
+        self.destinationSearchBox.addSearchProvider(KadasLocationSearchProvider(canvas))
+        self.destinationSearchBox.addSearchProvider(KadasLocalDataSearchProvider(canvas))
+        self.destinationSearchBox.addSearchProvider(KadasPinSearchProvider(canvas))
+        self.destinationSearchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
+        self.destinationSearchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
+        self.layout().addWidget(self.destinationSearchBox, 1, 1)
+
+        self.waypointsSearchBox = KadasSearchBox(canvas)
+        self.waypointsSearchBox.init(canvas)
+        self.waypointsSearchBox.addSearchProvider(KadasCoordinateSearchProvider(canvas))
+        self.waypointsSearchBox.addSearchProvider(KadasLocationSearchProvider(canvas))
+        self.waypointsSearchBox.addSearchProvider(KadasLocalDataSearchProvider(canvas))
+        self.waypointsSearchBox.addSearchProvider(KadasPinSearchProvider(canvas))
+        self.waypointsSearchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
+        self.waypointsSearchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
+        self.layout().addWidget(self.waypointsSearchBox, 2, 1)
