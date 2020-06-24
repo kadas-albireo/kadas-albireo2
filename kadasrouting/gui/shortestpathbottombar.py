@@ -34,7 +34,22 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         # Disable GPS buttons for now
         self.btnGPSOrigin.setEnabled(False)
         self.btnGPSDestination.setEnabled(False)
-        self.btnGPSWaypoints.setEnabled(False)    
+        self.btnGPSWaypoints.setEnabled(False)
+
+        # Tooltips
+        gps_tooltip = 'Get GPS location'
+        self.btnGPSOrigin.setToolTip(gps_tooltip)
+        self.btnGPSDestination.setToolTip(gps_tooltip)
+        self.btnGPSWaypoints.setToolTip(gps_tooltip)
+
+        pick_tooltip = 'Choose location on the map'
+        self.btnMapToolOrigin.setToolTip(pick_tooltip)
+        self.btnMapToolDestination.setToolTip(pick_tooltip)
+        self.btnMapToolWaypoints.setToolTip(pick_tooltip)
+
+        self.btnAddWaypoints.setToolTip('Add waypoint')
+
+        self.btnClose.setToolTip('CLose routing dialog')
 
         # Connections
         self.btnClose.clicked.connect(self.action.toggle)
