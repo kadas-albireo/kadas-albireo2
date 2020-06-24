@@ -63,3 +63,6 @@ ssh_config
 #QGIS Backup files
 *.qgs~
 *.qgz~
+
+# VS Code files
+.vscode/*
