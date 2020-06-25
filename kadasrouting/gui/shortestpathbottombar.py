@@ -10,10 +10,15 @@ from kadas.kadasgui import (
     KadasPinSearchProvider,
     KadasRemoteDataSearchProvider,
     KadasWorldLocationSearchProvider)
+from qgis.core import (QgsCoordinateReferenceSystem,
+                       QgsCoordinateTransform,
+                       QgsProject
+                       )
 
 from kadasrouting.utilities import icon
 
 from kadasrouting.gui.routingsearchbox import addSearchBox
+from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'shortestpathbottombar.ui'))
 
@@ -24,6 +29,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.setupUi(self)
         self.setStyleSheet("QFrame { background-color: orange; }")
         self.action = action
+        self.canvas = canvas
 
         # Config buttons (icons, actions, disable)
         # Icons
@@ -54,10 +60,11 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnMapToolOrigin.setToolTip(pick_tooltip)
         self.btnMapToolDestination.setToolTip(pick_tooltip)
         self.btnMapToolWaypoints.setToolTip(pick_tooltip)
+        self.btnMapToolOrigin.clicked.connect(self.selectPoint)
 
         self.btnAddWaypoints.setToolTip('Add waypoint')
 
-        self.btnClose.setToolTip('CLose routing dialog')
+        self.btnClose.setToolTip('Close routing dialog')
 
         # Connections
         self.btnClose.clicked.connect(self.action.toggle)
@@ -92,3 +99,22 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypointsSearchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
         self.waypointsSearchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
         self.layout().addWidget(self.waypointsSearchBox, 2, 1)
+
+        self.mapTool = PointCaptureMapTool(canvas)        
+        self.mapTool.canvasClicked.connect(self.updatePoint)
+        self.mapTool.complete.connect(self.pointPicked)
+
+    def selectPoint(self):
+        self.prevMapTool = self.canvas.mapTool()
+        self.canvas.setMapTool(self.mapTool)
+
+    def updatePoint(self, point, button):
+        outCrs = QgsCoordinateReferenceSystem(4326)
+        transform = QgsCoordinateTransform(QgsProject.instance().crs(), outCrs, QgsProject.instance())
+        wgspoint = transform.transform(point)
+        s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
+        #TODO set text
+
+    def pointPicked(self):        
+        self.canvas.setMapTool(self.prevMapTool)
+        
