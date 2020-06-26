@@ -3,7 +3,8 @@ from PyQt5.QtGui import QIcon
 
 from qgis.core import (QgsCoordinateReferenceSystem,
                        QgsCoordinateTransform,
-                       QgsProject
+                       QgsProject,
+                       QgsPointXY
                        )
 
 from kadasrouting.utilities import icon
@@ -18,7 +19,7 @@ from kadas.kadasgui import (
     KadasWorldLocationSearchProvider,
     KadasPinSearchProvider)
 
-def WrongPlaceException(Exception):
+class WrongLocationException(Exception):
     pass
 
 class LocationInputWidget(QWidget):
@@ -67,12 +68,11 @@ class LocationInputWidget(QWidget):
         transform = QgsCoordinateTransform(QgsProject.instance().crs(), outCrs, QgsProject.instance())
         wgspoint = transform.transform(point)
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
-        raise Exception(s)
         #TODO set text in search box
 
     def pointPicked(self):        
         self.canvas.setMapTool(self.prevMapTool)
 
-    def coords(self):
-        #geocode and return coordinates based on text in the text field, or raise WrongPlaceException
-        return 0,0
+    def valueAsPoint(self):
+        #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
+        return QgsPointXY(0,0)
