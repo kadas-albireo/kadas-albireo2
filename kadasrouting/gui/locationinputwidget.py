@@ -21,7 +21,7 @@ from kadas.kadasgui import (
 def WrongPlaceException(Exception):
     pass
 
-class RoutingSearchBox(QWidget):
+class LocationInputWidget(QWidget):
     
     def __init__(self, canvas):
         QWidget.__init__(self)
