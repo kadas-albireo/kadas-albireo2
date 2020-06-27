@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton 
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton
 from PyQt5.QtGui import QIcon
 
 from qgis.core import (QgsCoordinateReferenceSystem,
@@ -11,9 +11,9 @@ from kadasrouting.utilities import icon
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 from kadas.kadasgui import (
-    KadasSearchBox, 
-    KadasCoordinateSearchProvider, 
-    KadasLocationSearchProvider, 
+    KadasSearchBox,
+    KadasCoordinateSearchProvider,
+    KadasLocationSearchProvider,
     KadasLocalDataSearchProvider,
     KadasRemoteDataSearchProvider,
     KadasWorldLocationSearchProvider,
@@ -23,13 +23,13 @@ class WrongLocationException(Exception):
     pass
 
 class LocationInputWidget(QWidget):
-    
+
     def __init__(self, canvas):
         QWidget.__init__(self)
         self.canvas = canvas
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
-        self.searchBox = KadasSearchBox()       
+        self.searchBox = KadasSearchBox()
         self.searchBox.init(canvas)
         self.searchBox.addSearchProvider(KadasCoordinateSearchProvider(canvas))
         self.searchBox.addSearchProvider(KadasLocationSearchProvider(canvas))
@@ -38,7 +38,7 @@ class LocationInputWidget(QWidget):
         self.searchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
         self.searchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
         self.layout.addWidget(self.searchBox)
-        
+
         self.btnGPS = QToolButton()
         # Disable GPS buttons for now
         self.btnGPS.setEnabled(False)
@@ -47,7 +47,7 @@ class LocationInputWidget(QWidget):
 
         self.layout.addWidget(self.btnGPS)
 
-        self.btnMapTool = QToolButton()        
+        self.btnMapTool = QToolButton()
         self.btnMapTool.setToolTip('Choose location on the map')
         self.btnMapTool.setIcon(QIcon(":/kadas/icons/pick"))
         self.btnMapTool.clicked.connect(self.selectPoint)
@@ -55,7 +55,7 @@ class LocationInputWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.mapTool = PointCaptureMapTool(canvas)        
+        self.mapTool = PointCaptureMapTool(canvas)
         self.mapTool.canvasClicked.connect(self.updatePoint)
         self.mapTool.complete.connect(self.pointPicked)
 
@@ -70,9 +70,17 @@ class LocationInputWidget(QWidget):
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
         #TODO set text in search box
 
-    def pointPicked(self):        
+    def pointPicked(self):
         self.canvas.setMapTool(self.prevMapTool)
 
     def valueAsPoint(self):
         #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
         return QgsPointXY(0,0)
+
+    def text(self):
+        #TODO add getter for the searchbox text.
+        return ''
+
+    def setText(self):
+        #TODO add setter for the searchbox text. Currently searchbox doesn't publish its setText
+        pass

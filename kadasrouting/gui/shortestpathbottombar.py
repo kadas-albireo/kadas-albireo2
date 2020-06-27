@@ -42,11 +42,14 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
+        self.pushButtonClear.clicked.connect(self.clear)
+        self.btnAddWaypoints.cliecked.connect(self.addWaypoints)
+
     def calculate(self):
         try:
             points = [self.originSearchBox.valueAsPoint()]
             points.extend(self.waypoints)
-            points.append(self.destinationSearchBox.valueAsPoint())            
+            points.append(self.destinationSearchBox.valueAsPoint())
         except WrongLocationException as e:
             iface.messageBar().pushMessage("Error", "Invalid location", level=Qgis.Warning)
             return
@@ -65,5 +68,15 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         # functionality
         QgsProject.instance().addMapLayer(route)
 
+    def clear(self):
+        self.originSearchBox.searchBox.clearSearch()
+        self.destinationSearchBox.searchBox.clearSearch()
+        self.waypointsSearchBox.searchBox.clearSearch()
+        self.waypoints = []
+        self.lineEditWaypoints.clear()
 
-        
+    def addWaypoints(self):
+        """Add way point to the list of way points"""
+        self.waypoints.append(self.waypointsSearchBox.valueAsPoint())
+        self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ', ' + self.waypointsSearchBox.text())
+        self.waypointsSearchBox.clearSearch()
