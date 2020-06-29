@@ -1624,10 +1624,10 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
   }
 
   // Try as wms/wmts
-  QUrlQuery query( path.toLower() );
+  QUrlQuery query( path );
   if ( !query.isEmpty() )
   {
-    QString url = query.queryItemValue( "url" ).toLower();
+    QString url = query.queryItemValue( "url" );
     QString layers = query.queryItemValue( "layers" );
     auto itUrl = dataSourceMap.wms.find( url );
     if ( itUrl != dataSourceMap.wms.end() )
@@ -1650,7 +1650,7 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
   QgsDataSourceUri uri( path );
   if ( uri.hasParam( "url" ) )
   {
-    auto it = dataSourceMap.ams.find( uri.param( "url" ).toLower() );
+    auto it = dataSourceMap.ams.find( uri.param( "url" ) );
     if ( it != dataSourceMap.ams.end() )
     {
       QUrlQuery newParams( it.value() );
