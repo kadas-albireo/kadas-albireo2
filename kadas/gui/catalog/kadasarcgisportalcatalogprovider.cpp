@@ -44,7 +44,7 @@ KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QStrin
     for ( int line = 1, nLines = lines.size(); line < nLines; ++line ) // Skip first line (header)
     {
       QStringList fields = lines[line].split( ";" );
-      if ( fields.length() == 4 )
+      if ( fields.length() >= 4 )
       {
         mIsoTopics.insert( fields[0], {fields[1] + "/" + fields[2], fields[3]} );
       }
