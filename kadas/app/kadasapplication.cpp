@@ -386,7 +386,7 @@ void KadasApplication::init()
   connect( &mAutosaveTimer, &QTimer::timeout, this, &KadasApplication::autosave );
 }
 
-QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet ) const
+QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet, int insOffset ) const
 {
   QgsSettings settings;
   QString baseName = settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() ? QgsMapLayer::formatLayerName( layerName ) : layerName;
@@ -411,7 +411,7 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
 
   if ( layer->isValid() )
   {
-    setLayerTreeInsertionPoint();
+    setLayerTreeInsertionPoint( insOffset );
     QgsProject::instance()->addMapLayer( layer );
     QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mMainWindow->layerTreeView()->layerTreeModel()->rootGroup(), 0 ) );
   }
@@ -420,7 +420,7 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
     if ( layer->providerType() == QLatin1String( "gdal" ) && !layer->subLayers().empty() )
     {
       QList<QgsMapLayer *> subLayers = showGDALSublayerSelectionDialog( layer );
-      setLayerTreeInsertionPoint();
+      setLayerTreeInsertionPoint( insOffset );
       QgsProject::instance()->addMapLayers( subLayers );
       QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mMainWindow->layerTreeView()->layerTreeModel()->rootGroup(), 0 ) );
 
@@ -1806,7 +1806,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   }
 }
 
-void KadasApplication::setLayerTreeInsertionPoint() const
+void KadasApplication::setLayerTreeInsertionPoint( int offset ) const
 {
   // Set insertion point above the topmost raster or vector layer or group
   QgsLayerTreeGroup *rootGroup = mMainWindow->layerTreeView()->layerTreeModel()->rootGroup();
@@ -1829,5 +1829,5 @@ void KadasApplication::setLayerTreeInsertionPoint() const
       break;
     }
   }
-  QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( rootGroup, pos ) );
+  QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( rootGroup, pos + offset ) );
 }

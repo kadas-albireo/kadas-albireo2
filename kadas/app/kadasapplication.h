@@ -61,7 +61,7 @@ class KadasApplication : public QgsApplication
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
 
-    QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false ) const;
+    QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0 ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
@@ -133,7 +133,7 @@ class KadasApplication : public QgsApplication
     DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();
     int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
-    void setLayerTreeInsertionPoint() const;
+    void setLayerTreeInsertionPoint( int offset = 0 ) const;
 
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
