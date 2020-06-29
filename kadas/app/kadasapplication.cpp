@@ -1613,6 +1613,11 @@ bool KadasApplication::showZipSublayerSelectionDialog( const QString &path ) con
 
 QString KadasApplication::migrateDatasource( const QString &path ) const
 {
+  if ( path.isEmpty() )
+  {
+    return path;
+  }
+
   static DataSourceMigrations dataSourceMap = dataSourceMigrationMap();
 
   // Try as file
