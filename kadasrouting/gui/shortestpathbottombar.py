@@ -43,7 +43,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
         self.pushButtonClear.clicked.connect(self.clear)
-        self.btnAddWaypoints.cliecked.connect(self.addWaypoints)
+        self.btnAddWaypoints.clicked.connect(self.addWaypoints)
 
     def calculate(self):
         try:
