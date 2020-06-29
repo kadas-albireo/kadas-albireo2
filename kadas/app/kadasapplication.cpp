@@ -1623,8 +1623,8 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
     return it.value();
   }
 
-  // Try as wms
-  QUrlQuery query( path );
+  // Try as wms/wmts
+  QUrlQuery query( path.toLower() );
   if ( !query.isEmpty() )
   {
     QString url = query.queryItemValue( "url" ).toLower();
