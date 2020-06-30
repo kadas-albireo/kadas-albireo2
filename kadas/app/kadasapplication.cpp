@@ -171,7 +171,7 @@ void KadasApplication::init()
     translationsPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "locale" );
   }
   QTranslator *translator = new QTranslator( this );
-  translator->load( QString( "%1_%2" ).arg( Kadas::KADAS_RELEASE_NAME, translation() ), translationsPath );
+  translator->load( QString( "Kadas_%1" ).arg( translation() ), translationsPath );
   QApplication::instance()->installTranslator( translator );
 
   // Install crash reporter

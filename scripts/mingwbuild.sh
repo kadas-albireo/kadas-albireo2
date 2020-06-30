@@ -84,6 +84,8 @@ mkdir -p $builddir
     -DQWT_LDFLAGS=$MINGWROOT/bin/qwt-qt5.dll \
     -DQCA_INCLUDE_DIRS=$MINGWROOT/include/qt5/QtCrypto \
     -DQCA_LDFLAGS=$MINGWROOT/bin/libqca-qt5.dll \
+    -DKADAS_NAME="${KADAS_NAME:-Kadas}" \
+    -DKADAS_FULL_NAME="${KADAS_FULL_NAME:-Kadas Albireo}" \
     ..
 )
 

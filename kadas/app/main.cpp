@@ -42,8 +42,8 @@ int main( int argc, char *argv[] )
 #endif // Q_OS_WINDOWS
 
   // Setup application
-  QApplication::setOrganizationName( Kadas::KADAS_RELEASE_NAME );
-  QApplication::setOrganizationDomain( Kadas::KADAS_RELEASE_NAME );
+  QApplication::setOrganizationName( "Kadas" );
+  QApplication::setOrganizationDomain( "kadas.sourcepole.com" );
   QApplication::setApplicationName( Kadas::KADAS_RELEASE_NAME );
 
   QSettings::setDefaultFormat( QSettings::IniFormat );
@@ -72,7 +72,7 @@ int main( int argc, char *argv[] )
   }
   else
   {
-    QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/%2/%2.ini" ).arg( profileName, Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
+    QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/Kadas/%2.ini" ).arg( profileName, Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
     if ( settings.value( "/locale/overrideFlag", false ).toBool() )
     {
       locale = settings.value( "/locale/userLocale", locale ).toString();
