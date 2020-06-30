@@ -1,6 +1,7 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox
 
 from kadas.kadasgui import KadasBottomBar
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
@@ -43,6 +44,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
         self.pushButtonClear.clicked.connect(self.clear)
+        self.pushButtonReverse.clicked.connect(self.reverse)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
 
     def calculate(self):
@@ -88,3 +90,9 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypoints.append(self.waypointsSearchBox.valueAsPoint())
         self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ', ' + self.waypointsSearchBox.text())
         self.waypointsSearchBox.clearSearch()
+
+    def reverse(self):
+        """Reverse the origin and destination"""
+        #TODO: implement this
+        pass
+    
