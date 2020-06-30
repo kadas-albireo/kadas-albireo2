@@ -76,7 +76,7 @@ class LocationInputWidget(QWidget):
         # For some reason, the self.mapTool object is deleted by Qt after finishing the point selection.
         # This lines below makes sure that the self.mapTool exist
         if sip.isdeleted(self.mapTool):
-            self.searchBox('Map tool was destroyed, creating a new one')
+            self.showMessageBox('Map tool was destroyed, creating a new one')
             self.createMapTool()
         self.canvas.setMapTool(self.mapTool)
 
