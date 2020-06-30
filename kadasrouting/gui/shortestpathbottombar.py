@@ -53,7 +53,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
             points.extend(self.waypoints)
             points.append(self.destinationSearchBox.valueAsPoint())
         except WrongLocationException as e:
-            iface.messageBar().pushMessage("Error", "Invalid location", level=Qgis.Warning)
+            iface.messageBar().pushMessage("Error", "Invalid location %s" % str(e), level=Qgis.Warning)
             return
 
         shortest = self.radioButtonShortest.isChecked()
@@ -79,20 +79,25 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         QgsProject.instance().addMapLayer(route)
 
     def clear(self):
-        self.originSearchBox.searchBox.clearSearch()
-        self.destinationSearchBox.searchBox.clearSearch()
-        self.waypointsSearchBox.searchBox.clearSearch()
+        self.originSearchBox.clearSearchBox()
+        self.destinationSearchBox.clearSearchBox()
+        self.waypointsSearchBox.clearSearchBox()
         self.waypoints = []
         self.lineEditWaypoints.clear()
 
     def addWaypoints(self):
         """Add way point to the list of way points"""
+        if self.waypointsSearchBox.text() == '':
+            return
         self.waypoints.append(self.waypointsSearchBox.valueAsPoint())
-        self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ', ' + self.waypointsSearchBox.text())
-        self.waypointsSearchBox.clearSearch()
+        if self.lineEditWaypoints.text() == '':
+            self.lineEditWaypoints.setText(self.waypointsSearchBox.text())
+        else:
+            self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ';' + self.waypointsSearchBox.text())
+        self.waypointsSearchBox.clearSearchBox()
 
     def reverse(self):
         """Reverse the origin and destination"""
-        #TODO: implement this
-        pass
-    
+        originLocation = self.originSearchBox.text()
+        self.originSearchBox.setText(self.destinationSearchBox.text())
+        self.destinationSearchBox.setText(originLocation)

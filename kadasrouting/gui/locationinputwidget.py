@@ -103,15 +103,19 @@ class LocationInputWidget(QWidget):
             point = QgsPointXY(float(lon.strip()), float(lat.strip()))
             return point
         except:
-            raise WrongPlaceException()
+            raise WrongLocationException()
 
     def text(self):
         #TODO add getter for the searchbox text.
-        return ''
+        return self.searchBox.text()
 
-    def setText(self):
+    def setText(self, text):
         #TODO add setter for the searchbox text. Currently searchbox doesn't publish its setText
-        pass
+        self.searchBox.setText(text)
+
+    def clearSearchBox(self):
+        self.setText('')
 
     def showMessageBox(self, text):
         QMessageBox.information(iface.mainWindow(),  'Log', text)
+
