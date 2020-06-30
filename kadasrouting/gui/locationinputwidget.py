@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit
 from PyQt5.QtGui import QIcon
 
 from qgis.core import (QgsCoordinateReferenceSystem,
@@ -17,7 +17,8 @@ from kadas.kadasgui import (
     KadasLocalDataSearchProvider,
     KadasRemoteDataSearchProvider,
     KadasWorldLocationSearchProvider,
-    KadasPinSearchProvider)
+    KadasPinSearchProvider,
+    KadasSearchProvider)
 
 class WrongLocationException(Exception):
     pass
@@ -29,14 +30,7 @@ class LocationInputWidget(QWidget):
         self.canvas = canvas
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
-        self.searchBox = KadasSearchBox()
-        self.searchBox.init(canvas)
-        self.searchBox.addSearchProvider(KadasCoordinateSearchProvider(canvas))
-        self.searchBox.addSearchProvider(KadasLocationSearchProvider(canvas))
-        self.searchBox.addSearchProvider(KadasLocalDataSearchProvider(canvas))
-        self.searchBox.addSearchProvider(KadasPinSearchProvider(canvas))
-        self.searchBox.addSearchProvider(KadasRemoteDataSearchProvider(canvas))
-        self.searchBox.addSearchProvider(KadasWorldLocationSearchProvider(canvas))
+        self.searchBox = QLineEdit()
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -65,17 +59,23 @@ class LocationInputWidget(QWidget):
 
     def updatePoint(self, point, button):
         outCrs = QgsCoordinateReferenceSystem(4326)
-        transform = QgsCoordinateTransform(QgsProject.instance().crs(), outCrs, QgsProject.instance())
+        canvasCrs = self.canvas.mapSettings().destinationCrs()
+        transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
         wgspoint = transform.transform(point)
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
-        #TODO set text in search box
+        self.searchBox.setText(s)
 
     def pointPicked(self):
         self.canvas.setMapTool(self.prevMapTool)
 
     def valueAsPoint(self):
         #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
-        return QgsPointXY(0,0)
+        try:
+            lon, lat = self.searchBox.text().split(",")
+            point = QgsPointXY(float(lon.strip()), float(lat.strip()))
+            return point
+        except:
+            raise WrongPlaceException()
 
     def text(self):
         #TODO add getter for the searchbox text.

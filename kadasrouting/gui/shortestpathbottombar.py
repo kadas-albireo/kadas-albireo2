@@ -43,7 +43,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
         self.pushButtonClear.clicked.connect(self.clear)
-        self.btnAddWaypoints.cliecked.connect(self.addWaypoints)
+        self.btnAddWaypoints.clicked.connect(self.addWaypoints)
 
     def calculate(self):
         try:
@@ -55,11 +55,19 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
             return
 
         shortest = self.radioButtonShortest.isChecked()
-        vehicle = comboBoxVehicle.currentIndex()
+        '''
+        vehicle = self.comboBoxVehicle.currentIndex()
         costingOptions = vehicles.options[vehicle]
+        '''
+        costingOptions = {}
         valhalla = ValhallaClient()
-        route = valhalla.route(points, options, shortest)
-        self.processRouteResult(route)
+        try:
+            route = valhalla.route(points, costingOptions, shortest)
+            self.processRouteResult(route)
+        except:
+            #TODO more fine-grained error control
+            raise
+            iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
 
 
     def processRouteResult(self, route):
