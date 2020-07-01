@@ -46,10 +46,9 @@ class LocationInputWidget(QWidget):
         self.layout.addWidget(self.btnGPS)
 
         self.btnMapTool = QToolButton()
-        self.btnMapTool.setCheckable(True)
         self.btnMapTool.setToolTip('Choose location on the map')
         self.btnMapTool.setIcon(QIcon(":/kadas/icons/pick"))
-        self.btnMapTool.clicked.connect(self.btnMapToolClicked)
+        self.btnMapTool.clicked.connect(self.startSelectingPoint)
         self.layout.addWidget(self.btnMapTool)
 
         self.setLayout(self.layout)
@@ -64,19 +63,13 @@ class LocationInputWidget(QWidget):
         self.mapTool.canvasClicked.connect(self.updatePoint)
         self.mapTool.complete.connect(self.stopSelectingPoint)
 
-    def btnMapToolClicked(self):
-        if self.btnMapTool.isChecked():
-            self.startSelectingPoint()
-        else:
-            self.stopSelectingPoint()
-
     def startSelectingPoint(self):
         """Start selecting a point (when the map tool button is clicked)"""
         self.prevMapTool = self.canvas.mapTool()
         # For some reason, the self.mapTool object is deleted by Qt after finishing the point selection.
         # This lines below makes sure that the self.mapTool exist
         if sip.isdeleted(self.mapTool):
-            self.showMessageBox('Map tool was destroyed, creating a new one')
+            # self.showMessageBox('Map tool was destroyed, creating a new one')
             self.createMapTool()
         self.canvas.setMapTool(self.mapTool)
 
