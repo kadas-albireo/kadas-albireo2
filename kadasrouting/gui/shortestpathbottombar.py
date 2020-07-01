@@ -102,3 +102,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.originSearchBox.setText(self.destinationSearchBox.text())
         self.destinationSearchBox.setText(originLocation)
         self.waypoints.reverse()
+        waypointsCoordinates = []
+        for waypoint in self.waypoints:
+            waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
+        self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
