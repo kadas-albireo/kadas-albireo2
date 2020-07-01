@@ -97,7 +97,8 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypointsSearchBox.clearSearchBox()
 
     def reverse(self):
-        """Reverse the origin and destination"""
+        """Reverse route"""
         originLocation = self.originSearchBox.text()
         self.originSearchBox.setText(self.destinationSearchBox.text())
         self.destinationSearchBox.setText(originLocation)
+        self.waypoints.reverse()
