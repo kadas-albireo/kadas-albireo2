@@ -117,7 +117,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
           QString tag = tagv.toString();
           if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
           {
-            auto it = mIsoTopics.find( tag.mid( 11 ) );
+            auto it = mIsoTopics.find( tag.mid( 11 ).toUpper() );
             if ( it != mIsoTopics.end() )
             {
               category = it.value().category;
