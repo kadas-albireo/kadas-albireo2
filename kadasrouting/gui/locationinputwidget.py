@@ -11,7 +11,7 @@ from qgis.core import (QgsCoordinateReferenceSystem,
 
 from qgis.utils import iface
 
-from kadasrouting.utilities import icon
+from kadasrouting.utilities import icon, iconPath
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 from kadas.kadasgui import (
@@ -22,7 +22,11 @@ from kadas.kadasgui import (
     KadasRemoteDataSearchProvider,
     KadasWorldLocationSearchProvider,
     KadasPinSearchProvider,
-    KadasSearchProvider)
+    KadasSearchProvider,
+    KadasMapCanvasItemManager
+    )
+
+from kadas.kadasgui import KadasPinItem, KadasItemPos
 
 class WrongLocationException(Exception):
     pass
@@ -58,6 +62,8 @@ class LocationInputWidget(QWidget):
 
         self.createMapTool()
 
+        self.pin = None
+
     def createMapTool(self):
         self.mapTool = PointCaptureMapTool(self.canvas)
         self.mapTool.canvasClicked.connect(self.updatePoint)
@@ -82,6 +88,16 @@ class LocationInputWidget(QWidget):
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
         self.searchBox.setText(s)
         #TODO add point on the map canvas
+        KadasMapCanvasItemManager.removeItem(self.pin)
+        self.pin = KadasPinItem(canvasCrs)
+        self.pin.setPosition(KadasItemPos(point.x(), point.y()))
+        self.pin.setFilePath( iconPath('pin_start.svg') );
+        KadasMapCanvasItemManager.addItem(self.pin)
+
+        # mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+        # mClickPosPin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
+        # KadasMapCanvasItemManager::addItem( mClickPosPin );
+
 
     def stopSelectingPoint(self):
         """Finish selecting a point."""
