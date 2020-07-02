@@ -33,9 +33,10 @@ class WrongLocationException(Exception):
 
 class LocationInputWidget(QWidget):
 
-    def __init__(self, canvas):
+    def __init__(self, canvas, locationSymbolPath = ':/kadas/icons/pin_red'):
         QWidget.__init__(self)
         self.canvas = canvas
+        self.locationSymbolPath = locationSymbolPath
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
         self.searchBox = QLineEdit()
@@ -91,7 +92,9 @@ class LocationInputWidget(QWidget):
         KadasMapCanvasItemManager.removeItem(self.pin)
         self.pin = KadasPinItem(canvasCrs)
         self.pin.setPosition(KadasItemPos(point.x(), point.y()))
-        self.pin.setFilePath( iconPath('pin_start.svg') );
+        # self.pin.setFilePath( iconPath('pin_start.svg') );
+        # self.locationSymbolPath
+        self.pin.setFilePath( self.locationSymbolPath );
         KadasMapCanvasItemManager.addItem(self.pin)
 
         # mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );

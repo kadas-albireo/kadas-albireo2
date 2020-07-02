@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMessageBox
 from kadas.kadasgui import KadasBottomBar
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
+from kadasrouting.utilities import iconPath
 
 from qgis.utils import iface
 from qgis.core import Qgis, QgsProject
@@ -32,10 +33,10 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnClose.clicked.connect(self.action.toggle)
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.originSearchBox = LocationInputWidget(canvas)
+        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
         self.layout().addWidget(self.originSearchBox, 0, 1)
 
-        self.destinationSearchBox = LocationInputWidget(canvas)
+        self.destinationSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_destination.svg'))
         self.layout().addWidget(self.destinationSearchBox, 1, 1)
 
         self.waypointsSearchBox = LocationInputWidget(canvas)
