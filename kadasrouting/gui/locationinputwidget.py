@@ -3,11 +3,12 @@ from PyQt5.QtGui import QIcon
 
 import sip
 
-from qgis.core import (QgsCoordinateReferenceSystem,
-                       QgsCoordinateTransform,
-                       QgsProject,
-                       QgsPointXY
-                       )
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    QgsPointXY
+    )
 
 from qgis.utils import iface
 
@@ -23,10 +24,10 @@ from kadas.kadasgui import (
     KadasWorldLocationSearchProvider,
     KadasPinSearchProvider,
     KadasSearchProvider,
-    KadasMapCanvasItemManager
+    KadasMapCanvasItemManager,
+    KadasPinItem,
+    KadasItemPos
     )
-
-from kadas.kadasgui import KadasPinItem, KadasItemPos
 
 class WrongLocationException(Exception):
     pass
@@ -88,25 +89,26 @@ class LocationInputWidget(QWidget):
         wgspoint = transform.transform(point)
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
         self.searchBox.setText(s)
-        #TODO add point on the map canvas
-        KadasMapCanvasItemManager.removeItem(self.pin)
-        self.pin = KadasPinItem(canvasCrs)
-        self.pin.setPosition(KadasItemPos(point.x(), point.y()))
-        # self.pin.setFilePath( iconPath('pin_start.svg') );
-        # self.locationSymbolPath
-        self.pin.setFilePath( self.locationSymbolPath );
-        KadasMapCanvasItemManager.addItem(self.pin)
-
-        # mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
-        # mClickPosPin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
-        # KadasMapCanvasItemManager::addItem( mClickPosPin );
-
+        self.addPin(point)
 
     def stopSelectingPoint(self):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
         self.canvas.setMapTool(self.prevMapTool)
         self.prevMapTool = None
+
+    def addPin(self, point):
+        # Remove an existing pin first
+        self.removePin()
+        canvasCrs = self.canvas.mapSettings().destinationCrs()
+        self.pin = KadasPinItem(canvasCrs)
+        self.pin.setPosition(KadasItemPos(point.x(), point.y()))
+        self.pin.setFilePath(self.locationSymbolPath)
+        KadasMapCanvasItemManager.addItem(self.pin)
+
+    def removePin(self):
+        if self.pin:
+            KadasMapCanvasItemManager.removeItem(self.pin)
 
     def valueAsPoint(self):
         #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
@@ -130,4 +132,3 @@ class LocationInputWidget(QWidget):
 
     def showMessageBox(self, text):
         QMessageBox.information(iface.mainWindow(),  'Log', text)
-
