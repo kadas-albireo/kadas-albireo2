@@ -111,7 +111,7 @@ class KadasApplication : public QgsApplication
     struct DataSourceMigrations
     {
       QMap<QString, QString> files;
-      QMap<QString, QMap<QString, QString>> wms;
+      QMap<QString, QMap<QString, QPair<QString, QString>>> wms;
       QMap<QString, QString> ams;
     };
 

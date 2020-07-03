@@ -1640,11 +1640,15 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
       auto itId = itUrl.value().find( layers );
       if ( itId != itUrl.value().end() )
       {
-        QUrlQuery newParams( itId.value() );
+        QUrlQuery newParams( itId.value().first );
         for ( auto keyVal : newParams.queryItems() )
         {
           query.removeAllQueryItems( keyVal.first );
           query.addQueryItem( keyVal.first, keyVal.second );
+        }
+        for ( const QString &delParam : itId.value().second.split( "," ) )
+        {
+          query.removeAllQueryItems( delParam );
         }
         return query.toString();
       }
@@ -1699,12 +1703,13 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
       QString old_url = entry.value( "old_url" ).toString();
       QString old_ident = entry.value( "old_ident" ).toString();
       QString new_params = entry.value( "new_params" ).toString();
+      QString del_params = entry.value( "del_params" ).toString();
       auto it = dataSourceMigrations.wms.find( old_url );
       if ( it == dataSourceMigrations.wms.end() )
       {
-        it = dataSourceMigrations.wms.insert( old_url, QMap<QString, QString>() );
+        it = dataSourceMigrations.wms.insert( old_url, QMap<QString, QPair<QString, QString>>() );
       }
-      it.value()[old_ident] = new_params;
+      it.value()[old_ident] = qMakePair( new_params, del_params );
     }
 
     QJsonArray amsEntries = doc.object()["ams"].toArray();
