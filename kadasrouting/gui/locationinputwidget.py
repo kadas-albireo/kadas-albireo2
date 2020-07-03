@@ -63,7 +63,6 @@ class LocationInputWidget(QWidget):
 
         self.canvas.mapToolSet.connect(self._mapToolSet)
 
-        self.clickedPoint = None
         self.pin = None
 
     def _mapToolSet(self, new, old):
@@ -90,13 +89,10 @@ class LocationInputWidget(QWidget):
 
     def updatePoint(self, point, button):
         """When the map tool click the map canvas"""
-        if point.x() == 0:
-            showMessageBox('Boom')
-        self.clickedPoint = point
         outCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
-        wgspoint = transform.transform(self.clickedPoint)
+        wgspoint = transform.transform(point)
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
         self.searchBox.setText(s)
         self.addPin()
@@ -109,24 +105,17 @@ class LocationInputWidget(QWidget):
     def addPin(self):
         # Remove an existing pin first
         self.removePin()
-        # For some reasons, when the shortestpathbottombar is hidden, the self.clickedPoint become 0, 0
-        # No idea why
-        if self.clickedPoint and self.clickedPoint.x() != 0.0 and self.clickedPoint.y() != 0.0 :
-            canvasPoint = self.clickedPoint
-            pushMessage('clickedPoint exist %f, %f' % (self.clickedPoint.x(), self.clickedPoint.y()))
-        else:
-            try:
-                if not self.text():
-                    return
-                point = self.valueAsPoint()
-                pushMessage('Point in text box exist %f, %f' % (point.x(), point.y()))
-                inCrs = QgsCoordinateReferenceSystem(4326)
-                canvasCrs = self.canvas.mapSettings().destinationCrs()
-                transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
-                canvasPoint = transform.transform(point)
-            except WrongLocationException as e:
-                pushMessage('WrongLocationException: %s; Not adding the pin' % str(e))
+        try:
+            if not self.text():
                 return
+            point = self.valueAsPoint()
+            inCrs = QgsCoordinateReferenceSystem(4326)
+            canvasCrs = self.canvas.mapSettings().destinationCrs()
+            transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
+            canvasPoint = transform.transform(point)
+        except WrongLocationException as e:
+            pushMessage('WrongLocationException: %s; Not adding the pin' % str(e))
+            return
 
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         self.pin = KadasPinItem(canvasCrs)

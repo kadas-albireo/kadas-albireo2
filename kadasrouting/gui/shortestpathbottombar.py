@@ -151,6 +151,8 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         for waypoint in self.waypoints:
             waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
         self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
+        self.clearPins()
+        self.addPins()
 
     def addWaypointPin(self, waypoint):
         """Create a new pin for a waypoint with its symbology"""
@@ -176,7 +178,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
     def addPins(self):
         """Add pins for all stored points."""
-        # pushMessage('Origin line edit text #%s# and the clickedPoint #%s#' % (self.originSearchBox.text(), self.originSearchBox.clickedPoint))
         self.originSearchBox.addPin()
         self.destinationSearchBox.addPin()
         for waypoint in self.waypoints:
