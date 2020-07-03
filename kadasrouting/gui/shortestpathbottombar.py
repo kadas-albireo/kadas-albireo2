@@ -109,7 +109,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         canvasCrs = QgsCoordinateReferenceSystem(4326)
         waypointPin = KadasPinItem(canvasCrs)
         waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
-        waypointPin.setFilePath(':/kadas/icons/waypoint')
+        waypointPin.setup(':/kadas/icons/waypoint', waypointPin.anchorX(), waypointPin.anchorX(), 32, 32)
         self.waypointPins.append(waypointPin)
         KadasMapCanvasItemManager.addItem(waypointPin)
         
@@ -124,3 +124,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         for waypoint in self.waypoints:
             waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
         self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
+
+    def pushMessage(self, text):
+        iface.messageBar().pushMessage("Log", text, level=Qgis.Info)
