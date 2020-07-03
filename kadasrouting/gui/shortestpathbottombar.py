@@ -3,9 +3,11 @@ from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox
 
-from kadas.kadasgui import KadasBottomBar, KadasLayerSelectionWidget
+from kadas.kadasgui import (
+    KadasBottomBar, KadasPinItem, KadasItemPos, KadasMapCanvasItemManager, KadasLayerSelectionWidget)
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
+from kadasrouting.utilities import iconPath
 
 from qgis.utils import iface
 from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsWkbTypes, QgsLineSymbol, QgsSingleSymbolRenderer
@@ -23,6 +25,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.action = action
         self.canvas = canvas
         self.waypoints = []
+        self.waypointPins = []
 
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
@@ -40,9 +43,10 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
         self.originSearchBox = LocationInputWidget(canvas)
+        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
         self.layout().addWidget(self.originSearchBox, 2, 1)
 
-        self.destinationSearchBox = LocationInputWidget(canvas)
+        self.destinationSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_destination.svg'))
         self.layout().addWidget(self.destinationSearchBox, 3, 1)
 
         self.waypointsSearchBox = LocationInputWidget(canvas)
@@ -87,7 +91,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
             #TODO more fine-grained error control
             iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
 
-
     def processRouteResult(self, route):
         layer = self.layerSelector.getSelectedLayer()
         provider = layer.dataProvider()
@@ -105,21 +108,43 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypointsSearchBox.clearSearchBox()
         self.waypoints = []
         self.lineEditWaypoints.clear()
+        for waypointPin in self.waypointPins:
+            KadasMapCanvasItemManager.removeItem(waypointPin)
+        self.waypointPins = []
 
     def addWaypoints(self):
         """Add way point to the list of way points"""
         if self.waypointsSearchBox.text() == '':
             return
-        self.waypoints.append(self.waypointsSearchBox.valueAsPoint())
+        waypoint = self.waypointsSearchBox.valueAsPoint()
+        self.waypoints.append(waypoint)
         if self.lineEditWaypoints.text() == '':
             self.lineEditWaypoints.setText(self.waypointsSearchBox.text())
         else:
             self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ';' + self.waypointsSearchBox.text())
         self.waypointsSearchBox.clearSearchBox()
+        # Remove way point pin and create new one with another symbology
+        self.waypointsSearchBox.removePin()
 
+        # Create pin with waypoint symbology
+        canvasCrs = QgsCoordinateReferenceSystem(4326)
+        waypointPin = KadasPinItem(canvasCrs)
+        waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
+        waypointPin.setup(':/kadas/icons/waypoint', waypointPin.anchorX(), waypointPin.anchorX(), 32, 32)
+        self.waypointPins.append(waypointPin)
+        KadasMapCanvasItemManager.addItem(waypointPin)
+        
     def reverse(self):
         """Reverse route"""
         originLocation = self.originSearchBox.text()
         self.originSearchBox.setText(self.destinationSearchBox.text())
         self.destinationSearchBox.setText(originLocation)
         self.waypoints.reverse()
+        self.waypointPins.reverse()
+        waypointsCoordinates = []
+        for waypoint in self.waypoints:
+            waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
+        self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
+
+    def pushMessage(self, text):
+        iface.messageBar().pushMessage("Log", text, level=Qgis.Info)
