@@ -40,11 +40,13 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.setToolTip('Add waypoint')
         self.btnClose.setToolTip('Close routing dialog')
 
+        # self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
+
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(), 
-                                                        lambda x: isinstance(x, QgsVectorLayer) 
+        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
+                                                        lambda x: isinstance(x, QgsVectorLayer)
                                                             and x.geometryType() == QgsWkbTypes.LineGeometry,
                                                         self.createLayer);
         self.layerSelector.createLayerIfEmpty("Route")
@@ -66,15 +68,17 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.pushButtonReverse.clicked.connect(self.reverse)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
 
+        # Add pins if there is already chosen origin, destination, or waypoint
+        # self.addPins()
+
     def createLayer(self, name):
         layer = QgsVectorLayer("LineString", name, "memory")
-        props = {'line_color': '255,0,0,255', 'line_style': 'solid', 
+        props = {'line_color': '255,0,0,255', 'line_style': 'solid',
                 'line_width': '2', 'line_width_unit': 'MM'}
         symbol = QgsLineSymbol.createSimple(props)
         renderer = QgsSingleSymbolRenderer(symbol)
-        layer.setRenderer(renderer)        
+        layer.setRenderer(renderer)
         return layer
-
 
     def calculate(self):
         try:
@@ -109,7 +113,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         layer.updateExtents()
         layer.triggerRepaint()
 
-
     def clear(self):
         self.originSearchBox.clearSearchBox()
         self.destinationSearchBox.clearSearchBox()
@@ -133,17 +136,11 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         else:
             self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ';' + self.waypointsSearchBox.text())
         self.waypointsSearchBox.clearSearchBox()
-        # Remove way point pin and create new one with another symbology
+        # Remove way point pin from the location input widget
         self.waypointsSearchBox.removePin()
+        # Create/add new waypoint pin for the waypoint
+        self.addWaypointPin(waypoint)
 
-        # Create pin with waypoint symbology
-        canvasCrs = QgsCoordinateReferenceSystem(4326)
-        waypointPin = KadasPinItem(canvasCrs)
-        waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
-        waypointPin.setup(':/kadas/icons/waypoint', waypointPin.anchorX(), waypointPin.anchorX(), 32, 32)
-        self.waypointPins.append(waypointPin)
-        KadasMapCanvasItemManager.addItem(waypointPin)
-        
     def reverse(self):
         """Reverse route"""
         originLocation = self.originSearchBox.text()
@@ -158,3 +155,52 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
     def pushMessage(self, text):
         iface.messageBar().pushMessage("Log", text, level=Qgis.Info)
+
+    def addWaypointPin(self, waypoint):
+        """Create a new pin for a waypoint with its symbology"""
+                # Create pin with waypoint symbology
+        canvasCrs = QgsCoordinateReferenceSystem(4326)
+        waypointPin = KadasPinItem(canvasCrs)
+        waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
+        waypointPin.setup(':/kadas/icons/waypoint', waypointPin.anchorX(), waypointPin.anchorX(), 32, 32)
+        self.waypointPins.append(waypointPin)
+        KadasMapCanvasItemManager.addItem(waypointPin)
+
+    def clearPins(self):
+        """Remove all pins from the map
+        Not removing the point stored.
+        """
+        # remove origin pin
+        self.originSearchBox.removePin()
+        # remove destination poin
+        self.destinationSearchBox.removePin()
+        # remove waypoint pins
+        for waypointPin in self.waypointPins:
+            KadasMapCanvasItemManager.removeItem(waypointPin)
+
+    def addPins(self):
+        """Add pins for all stored points."""
+        # Add for origin
+        try:
+            originPoint = self.originSearchBox.valueAsPoint()
+            self.pushMessage('Origin point %f, %f' % (originPoint.x(), originPoint.y()))
+            self.originSearchBox.addPin(originPoint)
+        except Exception as e:
+            self.pushMessage('Can not add pin for origin because %s' % str(e))
+        # Add for destination
+        # try:
+        #     destinationPoint = self.destinationSearchBox.valueAsPoint()
+        #     self.destinationSearchBox.addPin(destinationPoint)
+        # except Exception as e:
+        #     self.pushMessage('Can not add pin for desination because %s' % str(e))
+        # # Add for waypoints
+        # for waypointPin in self.waypointPins:
+        #     self.addWaypointPin(waypointPin)
+
+    def actionToggled(self, toggled):
+        if toggled:
+            self.pushMessage('Toggled: %s. Should add pins' % toggled)
+            self.addPins()
+        else:
+            self.pushMessage('Toggled: %s. Should REMOVE pins' % toggled)
+            self.clearPins()
