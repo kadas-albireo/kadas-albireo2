@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QMessageBox, QLineEdit
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit
 from PyQt5.QtGui import QIcon
 
 import sip
@@ -10,9 +10,7 @@ from qgis.core import (
     QgsPointXY
     )
 
-from qgis.utils import iface
-
-from kadasrouting.utilities import icon, iconPath
+from kadasrouting.utilities import icon, iconPath, showMessageBox, pushMessage
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 from kadas.kadasgui import (
@@ -65,6 +63,7 @@ class LocationInputWidget(QWidget):
 
         self.canvas.mapToolSet.connect(self._mapToolSet)
 
+        self.clickedPoint = None
         self.pin = None
 
     def _mapToolSet(self, new, old):
@@ -91,25 +90,47 @@ class LocationInputWidget(QWidget):
 
     def updatePoint(self, point, button):
         """When the map tool click the map canvas"""
+        if point.x() == 0:
+            showMessageBox('Boom')
+        self.clickedPoint = point
         outCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
-        wgspoint = transform.transform(point)
+        wgspoint = transform.transform(self.clickedPoint)
         s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
         self.searchBox.setText(s)
-        self.addPin(point)
+        self.addPin()
 
     def stopSelectingPoint(self):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
         self.canvas.setMapTool(self.prevMapTool)               
 
-    def addPin(self, point):
+    def addPin(self):
         # Remove an existing pin first
         self.removePin()
+        # For some reasons, when the shortestpathbottombar is hidden, the self.clickedPoint become 0, 0
+        # No idea why
+        if self.clickedPoint and self.clickedPoint.x() != 0.0 and self.clickedPoint.y() != 0.0 :
+            canvasPoint = self.clickedPoint
+            pushMessage('clickedPoint exist %f, %f' % (self.clickedPoint.x(), self.clickedPoint.y()))
+        else:
+            try:
+                if not self.text():
+                    return
+                point = self.valueAsPoint()
+                pushMessage('Point in text box exist %f, %f' % (point.x(), point.y()))
+                inCrs = QgsCoordinateReferenceSystem(4326)
+                canvasCrs = self.canvas.mapSettings().destinationCrs()
+                transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
+                canvasPoint = transform.transform(point)
+            except WrongLocationException as e:
+                pushMessage('WrongLocationException: %s; Not adding the pin' % str(e))
+                return
+
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         self.pin = KadasPinItem(canvasCrs)
-        self.pin.setPosition(KadasItemPos(point.x(), point.y()))
+        self.pin.setPosition(KadasItemPos(canvasPoint.x(), canvasPoint.y()))
         self.pin.setFilePath(self.locationSymbolPath)
         KadasMapCanvasItemManager.addItem(self.pin)
 
@@ -136,6 +157,3 @@ class LocationInputWidget(QWidget):
 
     def clearSearchBox(self):
         self.setText('')
-
-    def showMessageBox(self, text):
-        QMessageBox.information(iface.mainWindow(),  'Log', text)

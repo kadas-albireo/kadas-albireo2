@@ -7,7 +7,7 @@ from kadas.kadasgui import (
     KadasBottomBar, KadasPinItem, KadasItemPos, KadasMapCanvasItemManager, KadasLayerSelectionWidget)
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath
+from kadasrouting.utilities import iconPath, pushMessage
 
 from qgis.utils import iface
 from qgis.core import (
@@ -40,7 +40,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.setToolTip('Add waypoint')
         self.btnClose.setToolTip('Close routing dialog')
 
-        # self.action.toggled.connect(self.actionToggled)
+        self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
 
         self.btnCalculate.clicked.connect(self.calculate)
@@ -52,7 +52,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.layerSelector.createLayerIfEmpty("Route")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
-        self.originSearchBox = LocationInputWidget(canvas)
         self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
         self.layout().addWidget(self.originSearchBox, 2, 1)
 
@@ -153,12 +152,9 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
             waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
         self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
 
-    def pushMessage(self, text):
-        iface.messageBar().pushMessage("Log", text, level=Qgis.Info)
-
     def addWaypointPin(self, waypoint):
         """Create a new pin for a waypoint with its symbology"""
-                # Create pin with waypoint symbology
+        # Create pin with waypoint symbology
         canvasCrs = QgsCoordinateReferenceSystem(4326)
         waypointPin = KadasPinItem(canvasCrs)
         waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
@@ -180,27 +176,14 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
     def addPins(self):
         """Add pins for all stored points."""
-        # Add for origin
-        try:
-            originPoint = self.originSearchBox.valueAsPoint()
-            self.pushMessage('Origin point %f, %f' % (originPoint.x(), originPoint.y()))
-            self.originSearchBox.addPin(originPoint)
-        except Exception as e:
-            self.pushMessage('Can not add pin for origin because %s' % str(e))
-        # Add for destination
-        # try:
-        #     destinationPoint = self.destinationSearchBox.valueAsPoint()
-        #     self.destinationSearchBox.addPin(destinationPoint)
-        # except Exception as e:
-        #     self.pushMessage('Can not add pin for desination because %s' % str(e))
-        # # Add for waypoints
-        # for waypointPin in self.waypointPins:
-        #     self.addWaypointPin(waypointPin)
+        # pushMessage('Origin line edit text #%s# and the clickedPoint #%s#' % (self.originSearchBox.text(), self.originSearchBox.clickedPoint))
+        self.originSearchBox.addPin()
+        self.destinationSearchBox.addPin()
+        for waypoint in self.waypoints:
+            self.addWaypointPin(waypoint)
 
     def actionToggled(self, toggled):
         if toggled:
-            self.pushMessage('Toggled: %s. Should add pins' % toggled)
             self.addPins()
         else:
-            self.pushMessage('Toggled: %s. Should REMOVE pins' % toggled)
             self.clearPins()
