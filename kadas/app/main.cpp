@@ -41,6 +41,8 @@ int main( int argc, char *argv[] )
   qputenv( "PATH", cleanPath.join( ';' ) );
 #endif // Q_OS_WINDOWS
 
+  QTextCodec::setCodecForLocale( QTextCodec::codecForName( "UTF-8" ) );
+
   // Setup application
   QApplication::setOrganizationName( "Kadas" );
   QApplication::setOrganizationDomain( "kadas.sourcepole.com" );
