@@ -10,7 +10,15 @@ from kadasrouting import vehicles
 from kadasrouting.utilities import iconPath
 
 from qgis.utils import iface
-from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsWkbTypes, QgsLineSymbol, QgsSingleSymbolRenderer
+from qgis.core import (
+    Qgis,
+    QgsProject,
+    QgsVectorLayer,
+    QgsWkbTypes,
+    QgsLineSymbol,
+    QgsSingleSymbolRenderer,
+    QgsCoordinateReferenceSystem
+    )
 
 from qgisvalhalla.client import ValhallaClient
 
