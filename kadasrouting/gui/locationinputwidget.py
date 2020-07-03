@@ -49,35 +49,36 @@ class LocationInputWidget(QWidget):
         self.btnMapTool.setCheckable(True)
         self.btnMapTool.setToolTip('Choose location on the map')
         self.btnMapTool.setIcon(QIcon(":/kadas/icons/pick"))
-        self.btnMapTool.clicked.connect(self.btnMapToolClicked)
+        self.btnMapTool.toggled.connect(self.btnMapToolClicked)
         self.layout.addWidget(self.btnMapTool)
 
         self.setLayout(self.layout)
 
-        self.prevMapTool = None
+        self.prevMapTool = self.canvas.mapTool()
         self.mapTool = None
 
-        self.createMapTool()
+        self.canvas.mapToolSet.connect(self._mapToolSet)
+
+    def _mapToolSet(self, new, old):
+        if not new == self.mapTool:
+            self.btnMapTool.blockSignals(True)
+            self.btnMapTool.setChecked(False)
+            self.btnMapTool.blockSignals(False)
 
     def createMapTool(self):
         self.mapTool = PointCaptureMapTool(self.canvas)
         self.mapTool.canvasClicked.connect(self.updatePoint)
         self.mapTool.complete.connect(self.stopSelectingPoint)
 
-    def btnMapToolClicked(self):
-        if self.btnMapTool.isChecked():
+    def btnMapToolClicked(self, checked):        
+        if checked:
             self.startSelectingPoint()
         else:
             self.stopSelectingPoint()
 
     def startSelectingPoint(self):
-        """Start selecting a point (when the map tool button is clicked)"""
-        self.prevMapTool = self.canvas.mapTool()
-        # For some reason, the self.mapTool object is deleted by Qt after finishing the point selection.
-        # This lines below makes sure that the self.mapTool exist
-        if sip.isdeleted(self.mapTool):
-            self.showMessageBox('Map tool was destroyed, creating a new one')
-            self.createMapTool()
+        """Start selecting a point (when the map tool button is clicked)"""        
+        self.createMapTool()        
         self.canvas.setMapTool(self.mapTool)
 
     def updatePoint(self, point, button):
@@ -93,8 +94,7 @@ class LocationInputWidget(QWidget):
     def stopSelectingPoint(self):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
-        self.canvas.setMapTool(self.prevMapTool)
-        self.prevMapTool = None
+        self.canvas.setMapTool(self.prevMapTool)               
 
     def valueAsPoint(self):
         #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
@@ -103,7 +103,7 @@ class LocationInputWidget(QWidget):
             point = QgsPointXY(float(lon.strip()), float(lat.strip()))
             return point
         except:
-            raise WrongLocationException()
+            raise WrongLocationException(self.searchBox.text())
 
     def text(self):
         #TODO add getter for the searchbox text.
