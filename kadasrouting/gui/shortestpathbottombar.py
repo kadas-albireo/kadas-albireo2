@@ -111,6 +111,8 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         for waypointPin in self.waypointPins:
             KadasMapCanvasItemManager.removeItem(waypointPin)
         self.waypointPins = []
+        KadasMapCanvasItemManager.removeItem(self.originSearchBox.pin)
+        KadasMapCanvasItemManager.removeItem(self.destinationSearchBox.pin)
 
     def addWaypoints(self):
         """Add way point to the list of way points"""
