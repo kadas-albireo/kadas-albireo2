@@ -7,7 +7,7 @@ from kadas.kadasgui import (
     KadasBottomBar, KadasPinItem, KadasItemPos, KadasMapCanvasItemManager, KadasLayerSelectionWidget)
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage
+from kadasrouting.utilities import iconPath, pushMessage, waitcursor
 
 from qgis.utils import iface
 from qgis.core import (
@@ -59,7 +59,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.layout().addWidget(self.destinationSearchBox, 3, 1)
 
         self.waypointsSearchBox = LocationInputWidget(canvas)
-        self.layout().addWidget(self.waypointsSearchBox, 4, 1)
+        self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
@@ -79,6 +79,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         layer.setRenderer(renderer)
         return layer
 
+    @waitcursor
     def calculate(self):
         try:
             points = [self.originSearchBox.valueAsPoint()]
