@@ -17,10 +17,10 @@ def showMessageBox(text):
     QMessageBox.information(iface.mainWindow(),  'Log', text)
 
 def pushMessage(text):
-    iface.messageBar().pushMessage("Log", text, level=Qgis.Info)
+    iface.messageBar().pushMessage("Info", text, level=Qgis.Info)
 
 def pushWarning(text):
-    iface.messageBar().pushMessage("Log", text, level=Qgis.Warning)    
+    iface.messageBar().pushMessage("Warning", text, level=Qgis.Warning)    
 
 def waitcursor(method):
     def func(*args, **kw):

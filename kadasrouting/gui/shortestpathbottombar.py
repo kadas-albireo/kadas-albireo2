@@ -35,6 +35,8 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypoints = []
         self.waypointPins = []
 
+        self.valhalla = ValhallaClient()
+
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
         self.btnAddWaypoints.setToolTip('Add waypoint')
@@ -80,6 +82,14 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         return layer
 
     @waitcursor
+    def _request(self, points, costingOptions, shortest):        
+        try:
+            route = self.valhalla.route(points, costingOptions, shortest)
+            self.processRouteResult(route)
+        except:
+            #TODO more fine-grained error control
+            iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
+
     def calculate(self):
         try:
             points = [self.originSearchBox.valueAsPoint()]
@@ -95,13 +105,9 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         costingOptions = vehicles.options[vehicle]
         '''
         costingOptions = {}
-        valhalla = ValhallaClient()
-        try:
-            route = valhalla.route(points, costingOptions, shortest)
-            self.processRouteResult(route)
-        except:
-            #TODO more fine-grained error control
-            iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
+        self._request(points, costingOptions, shortest)
+
+        
 
     def processRouteResult(self, route):
         layer = self.layerSelector.getSelectedLayer()
