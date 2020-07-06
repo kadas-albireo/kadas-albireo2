@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QEventLoop
 
 import sip
 
@@ -7,10 +8,20 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsProject,
-    QgsPointXY
+    QgsPointXY,
+    QgsGpsDetector,
+    QgsSettings
     )
 
-from kadasrouting.utilities import icon, iconPath, showMessageBox, pushMessage
+from kadasrouting.utilities import (
+    icon, 
+    iconPath, 
+    showMessageBox, 
+    pushMessage, 
+    pushWarning, 
+    waitcursor
+    )
+
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 from kadas.kadasgui import (
@@ -42,10 +53,9 @@ class LocationInputWidget(QWidget):
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
-        # Disable GPS buttons for now
-        self.btnGPS.setEnabled(False)
         self.btnGPS.setToolTip('Get GPS location')
         self.btnGPS.setIcon(icon("gps.png"))
+        self.btnGPS.clicked.connect(self.getCoordFromGPS)
 
         self.layout.addWidget(self.btnGPS)
 
@@ -64,12 +74,40 @@ class LocationInputWidget(QWidget):
         self.canvas.mapToolSet.connect(self._mapToolSet)
 
         self.pin = None
+        self._gpsConnection = None
 
     def _mapToolSet(self, new, old):
         if not new == self.mapTool:
             self.btnMapTool.blockSignals(True)
             self.btnMapTool.setChecked(False)
             self.btnMapTool.blockSignals(False)
+
+    @waitcursor
+    def _getGpsConnection(self):
+        if self._gpsConnection is None:
+            port = str(QgsSettings().value( "/kadas/gps_port", "" ));
+            gpsDetector = QgsGpsDetector(port)
+            loop = QEventLoop()
+            def gpsDetected(connection):
+                self._gpsConnection = connection
+                loop.exit()
+            def gpsDetectionFailed():
+                loop.exit()
+            gpsDetector.detected.connect(gpsDetected)
+            gpsDetector.detectionFailed.connect(gpsDetectionFailed)
+            gpsDetector.advance()
+            loop.exec_()
+        return self._gpsConnection
+
+    def getCoordFromGPS(self):
+        connection = self._getGpsConnection()
+        if connection:
+            info = connection.currentGPSInformation()
+            s = '{:.6f},{:.6f}'.format(info.longitude, info.latitude)
+            self.searchBox.setText(s)
+            self.addPin()
+        else:
+            pushWarning("Cannot connect to GPS")
 
     def createMapTool(self):
         self.mapTool = PointCaptureMapTool(self.canvas)
@@ -146,3 +184,4 @@ class LocationInputWidget(QWidget):
 
     def clearSearchBox(self):
         self.setText('')
+
