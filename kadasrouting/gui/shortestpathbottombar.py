@@ -4,10 +4,16 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox
 
 from kadas.kadasgui import (
-    KadasBottomBar, KadasPinItem, KadasItemPos, KadasMapCanvasItemManager, KadasLayerSelectionWidget)
+    KadasBottomBar, 
+    KadasPinItem, 
+    KadasItemPos, 
+    KadasMapCanvasItemManager, 
+    KadasLayerSelectionWidget, 
+    KadasItemLayer,
+    KadasLineItem)
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage, waitcursor
+from kadasrouting.utilities import iconPath, pushMessage, pushWarning, waitcursor
 
 from qgis.utils import iface
 from qgis.core import (
@@ -23,6 +29,21 @@ from qgis.core import (
 from qgisvalhalla.client import ValhallaClient
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'shortestpathbottombar.ui'))
+
+class ShortestPathLayer(KadasItemLayer):
+
+    def __init__(self, name):
+        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"))
+        self.response = None
+
+    def setResponse(self, response):
+        self.response = response
+
+    def clear(self):
+        items = self.items()
+        for itemId in items.keys():
+            self.takeItem(itemId)
+
 
 class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
@@ -48,9 +69,9 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnCalculate.clicked.connect(self.calculate)
 
         self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, QgsVectorLayer)
-                                                            and x.geometryType() == QgsWkbTypes.LineGeometry,
-                                                        self.createLayer);
+                                                        lambda x: isinstance(x, ShortestPathLayer),
+                                                        self.createLayer)
+        #self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
         self.layerSelector.createLayerIfEmpty("Route")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
@@ -73,30 +94,29 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         # self.addPins()
 
     def createLayer(self, name):
-        layer = QgsVectorLayer("LineString", name, "memory")
-        props = {'line_color': '255,0,0,255', 'line_style': 'solid',
-                'line_width': '2', 'line_width_unit': 'MM'}
-        symbol = QgsLineSymbol.createSimple(props)
-        renderer = QgsSingleSymbolRenderer(symbol)
-        layer.setRenderer(renderer)
+        layer = ShortestPathLayer(name)
         return layer
 
     @waitcursor
     def _request(self, points, costingOptions, shortest):        
         try:
-            route = self.valhalla.route(points, costingOptions, shortest)
-            self.processRouteResult(route)
+            route, response = self.valhalla.route(points, costingOptions, shortest)
+            self.processRouteResult(route, response)
         except:
             #TODO more fine-grained error control
             iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
 
     def calculate(self):
+        layer = self.layerSelector.getSelectedLayer()
+        if layer is None:
+            pushWarning("Please, select a valid destination layer")
+            return
         try:
             points = [self.originSearchBox.valueAsPoint()]
             points.extend(self.waypoints)
             points.append(self.destinationSearchBox.valueAsPoint())
         except WrongLocationException as e:
-            iface.messageBar().pushMessage("Error", "Invalid location %s" % str(e), level=Qgis.Warning)
+            pushWarning("Invalid location %s" % str(e))
             return
 
         shortest = self.radioButtonShortest.isChecked()
@@ -108,15 +128,19 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self._request(points, costingOptions, shortest)
 
         
-
-    def processRouteResult(self, route):
+    def processRouteResult(self, route, response):
         layer = self.layerSelector.getSelectedLayer()
-        provider = layer.dataProvider()
-        provider.truncate()
-        provider.deleteAttributes(provider.attributeIndexes())
-        provider.addFeatures(route.getFeatures())
-        layer.updateFields()
-        layer.updateExtents()
+        layer.clear()
+        layer.setResponse(response)
+        feature = list(route.getFeatures())[0]
+        item = KadasLineItem(QgsCoordinateReferenceSystem("EPSG:4326"), True)
+        item.addPartFromGeometry(feature.geometry().constGet())
+        item.setTooltip(f"Distance:{feature['DIST_KM']}<br/>Time:{feature['DURATION_H']}")
+        layer.addItem(item)
+        layer.addItem(self.originSearchBox.pin)
+        layer.addItem(self.destinationSearchBox.pin)
+        for pin in self.waypointPins:
+            layer.addItem(pin)
         layer.triggerRepaint()
 
     def clear(self):
