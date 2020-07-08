@@ -1,7 +1,7 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
 
 from kadas.kadasgui import (
     KadasBottomBar, 
@@ -90,8 +90,10 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.pushButtonReverse.clicked.connect(self.reverse)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
 
-        # Add pins if there is already chosen origin, destination, or waypoint
-        # self.addPins()
+        # Handling HiDPI screen, perhaps we can make a ratio of the screen size
+        size = QDesktopWidget().screenGeometry()
+        if size.width() >= 3200 or size.height() >= 1800:
+            self.setFixedSize(self.size() * 1.5)
 
     def createLayer(self, name):
         layer = ShortestPathLayer(name)
