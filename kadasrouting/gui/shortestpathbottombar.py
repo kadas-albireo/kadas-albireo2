@@ -135,7 +135,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         feature = list(route.getFeatures())[0]
         item = KadasLineItem(QgsCoordinateReferenceSystem("EPSG:4326"), True)
         item.addPartFromGeometry(feature.geometry().constGet())
-        item.setTooltip(f"Distance:{feature['DIST_KM']}<br/>Time:{feature['DURATION_H']}")
+        item.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
         layer.addItem(item)
         layer.addItem(self.originSearchBox.pin)
         layer.addItem(self.destinationSearchBox.pin)
