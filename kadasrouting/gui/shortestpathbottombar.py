@@ -109,10 +109,13 @@ class ShortestPathLayer(KadasItemLayer):
             pin.setPosition(KadasItemPos(canvasPoint.x(), canvasPoint.y()))
             if i == 0:                                
                 pin.setFilePath(iconPath('pin_origin.svg'))
+                pin.setName('Origin Point')
             elif i == len(points) - 1:
                 pin.setFilePath(iconPath('pin_destination.svg'))                
+                pin.setName('Destination Point')
             else:                
                 pin.setup(':/kadas/icons/waypoint', pin.anchorX(), pin.anchorX(), 32, 32)
+                pin.setName('Waypoint %d' % i)
             pin.hasChanged.connect(self.pinHasChanged)
             self.pins.append(pin)
             self.addItem(pin)
