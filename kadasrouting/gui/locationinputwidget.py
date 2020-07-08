@@ -50,6 +50,7 @@ class LocationInputWidget(QWidget):
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
         self.searchBox = QLineEdit()
+        self.searchBox.textChanged.connect(self.textChanged)
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -75,6 +76,9 @@ class LocationInputWidget(QWidget):
 
         self.pin = None
         self._gpsConnection = None
+
+    def textChanged(self, text):
+        self.addPin()
 
     def _mapToolSet(self, new, old):
         if not new == self.mapTool:
@@ -151,8 +155,9 @@ class LocationInputWidget(QWidget):
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
             canvasPoint = transform.transform(point)
+            self.searchBox.setStyleSheet("color: black;")
         except WrongLocationException as e:
-            pushMessage('WrongLocationException: %s; Not adding the pin' % str(e))
+            self.searchBox.setStyleSheet("color: red;")
             return
 
         canvasCrs = self.canvas.mapSettings().destinationCrs()

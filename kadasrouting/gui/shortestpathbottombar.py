@@ -1,6 +1,7 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QDesktopWidget
 
 from kadas.kadasgui import (
@@ -23,18 +24,39 @@ from qgis.core import (
     QgsWkbTypes,
     QgsLineSymbol,
     QgsSingleSymbolRenderer,
-    QgsCoordinateReferenceSystem
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsPointXY
     )
 
 from qgisvalhalla.client import ValhallaClient
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'shortestpathbottombar.ui'))
 
+class RoutePointMapItem(KadasPinItem):
+
+    hasChanged = pyqtSignal()
+
+    def itemName(self):
+        return "Route point"
+
+    def edit(self, context, pos, settings):
+        super().edit(context, pos, settings)
+        self.hasChanged.emit()
+
 class ShortestPathLayer(KadasItemLayer):
 
     def __init__(self, name):
         KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"))
         self.response = None
+        self.points = []
+        self.pins = []
+        self.shortest = False
+        self.costingOptions = {}        
+        self.valhalla = ValhallaClient()
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.updateFromPins)
 
     def setResponse(self, response):
         self.response = response
@@ -43,7 +65,58 @@ class ShortestPathLayer(KadasItemLayer):
         items = self.items()
         for itemId in items.keys():
             self.takeItem(itemId)
+        self.pins = []
+    
+    def pinHasChanged(self):
+        self.timer.start(1000)
 
+    @waitcursor
+    def updateFromPins(self):
+        outCrs = QgsCoordinateReferenceSystem(4326)
+        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+        transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
+        for i, pin in enumerate(self.pins):            
+            wgspoint = transform.transform(QgsPointXY(pin.position()))
+            self.points[i] = wgspoint
+        route, response = self.valhalla.route(self.points, self.costingOptions, self.shortest)
+        self.response = response
+        feature = list(route.getFeatures())[0]
+        self.lineItem.clear()
+        self.lineItem.addPartFromGeometry(feature.geometry().constGet())
+        self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
+        self.triggerRepaint()
+        
+
+    @waitcursor
+    def updateRoute(self, points, costingOptions, shortest):
+        route, response = self.valhalla.route(points, costingOptions, shortest)
+        self.clear()
+        self.response = response
+        self.costingOptions = costingOptions
+        self.shortest = shortest
+        self.points = points
+        feature = list(route.getFeatures())[0]
+        self.lineItem = KadasLineItem(QgsCoordinateReferenceSystem("EPSG:4326"), True)
+        self.lineItem.addPartFromGeometry(feature.geometry().constGet())
+        self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
+        self.addItem(self.lineItem)
+        inCrs = QgsCoordinateReferenceSystem(4326)
+        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+        transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
+        for i, pt in enumerate(points):
+            canvasPoint = transform.transform(pt)
+            pin = RoutePointMapItem(canvasCrs)            
+            pin.setPosition(KadasItemPos(canvasPoint.x(), canvasPoint.y()))
+            if i == 0:                                
+                pin.setFilePath(iconPath('pin_origin.svg'))
+            elif i == len(points) - 1:
+                pin.setFilePath(iconPath('pin_destination.svg'))                
+            else:                
+                pin.setup(':/kadas/icons/waypoint', pin.anchorX(), pin.anchorX(), 32, 32)
+            pin.hasChanged.connect(self.pinHasChanged)
+            self.pins.append(pin)
+            self.addItem(pin)
+        self.triggerRepaint()            
 
 class ShortestPathBottomBar(KadasBottomBar, WIDGET):
 
@@ -56,7 +129,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.waypoints = []
         self.waypointPins = []
 
-        self.valhalla = ValhallaClient()
 
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
@@ -99,15 +171,6 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         layer = ShortestPathLayer(name)
         return layer
 
-    @waitcursor
-    def _request(self, points, costingOptions, shortest):        
-        try:
-            route, response = self.valhalla.route(points, costingOptions, shortest)
-            self.processRouteResult(route, response)
-        except:
-            #TODO more fine-grained error control
-            iface.messageBar().pushMessage("Error", "Could not compute route", level=Qgis.Warning)
-
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
@@ -127,23 +190,12 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         costingOptions = vehicles.options[vehicle]
         '''
         costingOptions = {}
-        self._request(points, costingOptions, shortest)
-
-        
-    def processRouteResult(self, route, response):
-        layer = self.layerSelector.getSelectedLayer()
-        layer.clear()
-        layer.setResponse(response)
-        feature = list(route.getFeatures())[0]
-        item = KadasLineItem(QgsCoordinateReferenceSystem("EPSG:4326"), True)
-        item.addPartFromGeometry(feature.geometry().constGet())
-        item.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
-        layer.addItem(item)
-        layer.addItem(self.originSearchBox.pin)
-        layer.addItem(self.destinationSearchBox.pin)
-        for pin in self.waypointPins:
-            layer.addItem(pin)
-        layer.triggerRepaint()
+        try:
+            layer.updateRoute(points, costingOptions, shortest)
+        except:
+            raise
+            #TODO more fine-grained error control
+            pushWarning("Could not compute route")
 
     def clear(self):
         self.originSearchBox.clearSearchBox()
