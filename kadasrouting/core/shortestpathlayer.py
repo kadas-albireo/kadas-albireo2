@@ -19,7 +19,7 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsPointXY
     )
-
+from kadas.kadascore import KadasPluginLayerType
 from qgisvalhalla.client import ValhallaClient
 
 class RoutePointMapItem(KadasPinItem):
@@ -35,8 +35,10 @@ class RoutePointMapItem(KadasPinItem):
 
 class ShortestPathLayer(KadasItemLayer):
 
+    LAYER_TYPE="shortestpath"
+
     def __init__(self, name):
-        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"))
+        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), ShortestPathLayer.LAYER_TYPE)
         self.response = None
         self.points = []
         self.pins = []
@@ -109,3 +111,14 @@ class ShortestPathLayer(KadasItemLayer):
             self.pins.append(pin)
             self.addItem(pin)
         self.triggerRepaint()            
+
+class ShortestPathLayerType(KadasPluginLayerType):
+
+  def __init__(self):
+    KadasPluginLayerType.__init__(self, ShortestPathLayer.LAYER_TYPE)
+
+  def createLayer(self):
+    return ShortestPathLayer('')
+
+  def showLayerProperties(self, layer):
+    return True
