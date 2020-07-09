@@ -95,6 +95,9 @@ int main( int argc, char *argv[] )
   qputenv( "PROJ_LIB", projDir.toLocal8Bit() );
 #endif
 
+  // Set current dir equal to application dir path
+  QDir::setCurrent( QApplication::applicationDirPath() );
+
   app->init();
   int status = app->exec();
   delete app;
