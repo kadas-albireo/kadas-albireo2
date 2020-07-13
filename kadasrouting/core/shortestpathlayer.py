@@ -8,7 +8,7 @@ from kadas.kadasgui import (
     KadasItemLayer,
     KadasLineItem)
 
-from kadasrouting.utilities import iconPath, waitcursor
+from kadasrouting.utilities import iconPath, waitcursor, pushMessage
 from kadasrouting.valhalla.client import ValhallaClient
 
 from qgis.utils import iface
@@ -22,7 +22,7 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsPointXY
     )
-
+from kadas.kadascore import KadasPluginLayerType
 
 class RoutePointMapItem(KadasPinItem):
 
@@ -37,8 +37,10 @@ class RoutePointMapItem(KadasPinItem):
 
 class ShortestPathLayer(KadasItemLayer):
 
+    LAYER_TYPE="shortestpath"
+
     def __init__(self, name):
-        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"))
+        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), ShortestPathLayer.LAYER_TYPE)
         self.response = None
         self.points = []
         self.pins = []
@@ -117,3 +119,39 @@ class ShortestPathLayer(KadasItemLayer):
             self.pins.append(pin)
             self.addItem(pin)
         self.triggerRepaint()            
+
+    def layerType(self):
+        return ShortestPathLayer.LAYER_TYPE
+
+    def readXml(self, node):
+        KadasItemLayer.readXml(self, node)
+        # custom properties
+        # self.readImage( node.toElement().attribute("image_path", ".") )
+        # self.notes = node.toElement().attribute("notes", ".")
+        pushMessage('Notes found: %s' % self.notes)
+
+        return True
+
+    def writeXml(self, node, doc, context):
+        KadasItemLayer.writeXml(self, node, doc, context)
+        element = node.toElement()
+        # write plugin layer type to project  (essential to be read from project)
+        element.setAttribute("type", "plugin")
+        element.setAttribute("name", self.layerTypeKey())
+        pushMessage('Layer name: %s' % self.layerTypeKey())
+        self.notes = 'The number of points is %d' % len(self.points)
+        element.setAttribute("notes", len(self.notes))
+        pushMessage('Notes written: %s' % self.notes)
+        # custom properties
+        return True
+
+class ShortestPathLayerType(KadasPluginLayerType):
+
+  def __init__(self):
+    KadasPluginLayerType.__init__(self, ShortestPathLayer.LAYER_TYPE)
+
+  def createLayer(self):
+    return ShortestPathLayer('')
+
+  def showLayerProperties(self, layer):
+    return True
