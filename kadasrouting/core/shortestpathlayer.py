@@ -7,6 +7,7 @@ from kadas.kadasgui import (
     KadasLineItem)
 
 from kadasrouting.utilities import iconPath, waitcursor
+from kadasrouting.valhalla.client import ValhallaClient
 
 from qgis.utils import iface
 from qgis.core import (
@@ -20,7 +21,6 @@ from qgis.core import (
     QgsPointXY
     )
 
-from qgisvalhalla.client import ValhallaClient
 
 class RoutePointMapItem(KadasPinItem):
 
