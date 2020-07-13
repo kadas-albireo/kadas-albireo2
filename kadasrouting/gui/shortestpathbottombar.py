@@ -101,7 +101,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         costingOptions = {}
         try:
             layer.updateRoute(points, costingOptions, shortest)
-        except Exception as e:
+        except Exception as e:            
             logging.error(e, exc_info=True)
             #TODO more fine-grained error control            
             pushWarning("Could not compute route")

@@ -1,6 +1,7 @@
+import json
 import logging 
 
-from PyQt5.QtCore import QTimer, pyqtSignal
+from PyQt5.QtCore import QTimer, pyqtSignal, QVariant
 
 from kadas.kadasgui import (
     KadasPinItem, 
@@ -8,7 +9,14 @@ from kadas.kadasgui import (
     KadasItemLayer,
     KadasLineItem)
 
-from kadasrouting.utilities import iconPath, waitcursor, pushMessage
+from kadasrouting.utilities import (
+    iconPath, 
+    waitcursor, 
+    pushMessage, 
+    pushWarning,
+    transformToWGS, 
+    decodePolyline6)
+
 from kadasrouting.valhalla.client import ValhallaClient
 
 from qgis.utils import iface
@@ -20,8 +28,15 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
-    QgsPointXY
-    )
+    QgsPointXY,    
+    QgsGeometry,
+    QgsPointXY,
+    QgsGeometry,
+    QgsFeature,
+    QgsVectorLayer,
+    QgsField)
+
+
 from kadas.kadascore import KadasPluginLayerType
 
 class RoutePointMapItem(KadasPinItem):
@@ -45,7 +60,8 @@ class ShortestPathLayer(KadasItemLayer):
         self.points = []
         self.pins = []
         self.shortest = False
-        self.costingOptions = {}        
+        self.costingOptions = {}
+        self.lineItem = None
         self.valhalla = ValhallaClient()
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -66,18 +82,10 @@ class ShortestPathLayer(KadasItemLayer):
     @waitcursor
     def updateFromPins(self):
         try:
-            outCrs = QgsCoordinateReferenceSystem(4326)
-            canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
-            transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
-            for i, pin in enumerate(self.pins):            
-                wgspoint = transform.transform(QgsPointXY(pin.position()))
-                self.points[i] = wgspoint
-            route, response = self.valhalla.route(self.points, self.costingOptions, self.shortest)
-            self.response = response
-            feature = list(route.getFeatures())[0]
-            self.lineItem.clear()
-            self.lineItem.addPartFromGeometry(feature.geometry().constGet())
-            self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
+            for i, pin in enumerate(self.pins):
+                self.points[i] = QgsPointXY(pin.position())
+            response = self.valhalla.route(self.points, self.costingOptions, self.shortest)            
+            self.computeFromResponse(response)
             self.triggerRepaint()
         except Exception as e:
             logging.error(e, exc_info=True)
@@ -88,28 +96,30 @@ class ShortestPathLayer(KadasItemLayer):
 
     @waitcursor
     def updateRoute(self, points, costingOptions, shortest):
-        route, response = self.valhalla.route(points, costingOptions, shortest)
-        self.clear()
-        self.response = response
+        response = self.valhalla.route(points, costingOptions, shortest)
         self.costingOptions = costingOptions
         self.shortest = shortest
         self.points = points
+        self.computeFromResponse(response)
+        self.triggerRepaint()            
+
+    def computeFromResponse(self, response):
+        epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
+        self.clear()
+        self.response = response
+        route = self.createRouteFromResponse(response)
         feature = list(route.getFeatures())[0]
-        self.lineItem = KadasLineItem(QgsCoordinateReferenceSystem("EPSG:4326"), True)
+        self.lineItem = KadasLineItem(epsg4326, True)
         self.lineItem.addPartFromGeometry(feature.geometry().constGet())
         self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
         self.addItem(self.lineItem)
-        inCrs = QgsCoordinateReferenceSystem(4326)
-        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
-        transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
-        for i, pt in enumerate(points):
-            canvasPoint = transform.transform(pt)
-            pin = RoutePointMapItem(canvasCrs)            
-            pin.setPosition(KadasItemPos(canvasPoint.x(), canvasPoint.y()))
+        for i, pt in enumerate(self.points):
+            pin = RoutePointMapItem(epsg4326)
+            pin.setPosition(KadasItemPos(pt.x(), pt.y()))
             if i == 0:                                
                 pin.setFilePath(iconPath('pin_origin.svg'))
                 pin.setName('Origin Point')
-            elif i == len(points) - 1:
+            elif i == len(self.points) - 1:
                 pin.setFilePath(iconPath('pin_destination.svg'))                
                 pin.setName('Destination Point')
             else:                
@@ -118,18 +128,18 @@ class ShortestPathLayer(KadasItemLayer):
             pin.hasChanged.connect(self.pinHasChanged)
             self.pins.append(pin)
             self.addItem(pin)
-        self.triggerRepaint()            
 
-    def layerType(self):
+    def layerTypeKey(self):
         return ShortestPathLayer.LAYER_TYPE
 
-    def readXml(self, node):
-        KadasItemLayer.readXml(self, node)
-        # custom properties
-        # self.readImage( node.toElement().attribute("image_path", ".") )
-        # self.notes = node.toElement().attribute("notes", ".")
-        pushMessage('Notes found: %s' % self.notes)
-
+    def readXml(self, node, context):        
+        element = node.toElement()
+        response = json.loads(element.attribute("response"))
+        points = json.loads(element.attribute("points"))
+        self.points = [QgsGeometry.fromWkt(wkt).asPoint() for wkt in points]
+        self.costingOptions = json.loads(element.attribute("costingOptions"))
+        self.shortest = element.attribute("shortest")
+        self.computeFromResponse(response)        
         return True
 
     def writeXml(self, node, doc, context):
@@ -138,12 +148,49 @@ class ShortestPathLayer(KadasItemLayer):
         # write plugin layer type to project  (essential to be read from project)
         element.setAttribute("type", "plugin")
         element.setAttribute("name", self.layerTypeKey())
-        pushMessage('Layer name: %s' % self.layerTypeKey())
-        self.notes = 'The number of points is %d' % len(self.points)
-        element.setAttribute("notes", len(self.notes))
-        pushMessage('Notes written: %s' % self.notes)
-        # custom properties
+        element.setAttribute("response", json.dumps(self.response))
+        element.setAttribute("points", json.dumps([pt.asWkt() for pt in self.points]))
+        element.setAttribute("shortest", self.shortest)
+        element.setAttribute("costingOptions", json.dumps(self.costingOptions))
         return True
+
+
+    def createRouteFromResponse(self, response):
+        """
+        Build output layer based on response attributes for directions endpoint.
+
+        :param response: API response object
+        :type response: dict
+
+
+        :returns: Ouput layer with a single geometry containing the route.
+        :rtype: QgsVectorLayer
+        """
+        response_mini = response['trip']
+        feat = QgsFeature()
+        coordinates, distance, duration = [], 0, 0
+        for leg in response_mini['legs']:
+                coordinates.extend([
+                    list(reversed(coord))
+                    for coord in decodePolyline6(leg['shape'])
+                ])
+                duration += round(leg['summary']['time'] / 3600, 3)
+                distance += round(leg['summary']['length'], 3)
+
+        qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
+        feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+        feat.setAttributes([distance,
+                            duration
+                            ])
+
+        layer = QgsVectorLayer("LineString?crs=epsg:4326", "route", "memory")
+        provider = layer.dataProvider()
+        provider.addAttributes([QgsField("DIST_KM", QVariant.Double),
+                             QgsField("DURATION_H", QVariant.Double)])
+        layer.updateFields()
+        provider.addFeature(feat)
+        layer.updateExtents()
+        return layer
 
 class ShortestPathLayerType(KadasPluginLayerType):
 
@@ -152,6 +199,6 @@ class ShortestPathLayerType(KadasPluginLayerType):
 
   def createLayer(self):
     return ShortestPathLayer('')
-
+    
   def showLayerProperties(self, layer):
     return True
