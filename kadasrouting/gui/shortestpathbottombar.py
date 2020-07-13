@@ -1,4 +1,6 @@
 import os
+import logging
+
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
@@ -99,10 +101,11 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         costingOptions = {}
         try:
             layer.updateRoute(points, costingOptions, shortest)
-        except:
-            raise
-            #TODO more fine-grained error control
+        except Exception as e:
+            logging.error(e, exc_info=True)
+            #TODO more fine-grained error control            
             pushWarning("Could not compute route")
+            logging.error("Could not compute route")
 
     def clear(self):
         self.originSearchBox.clearSearchBox()

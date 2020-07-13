@@ -1,3 +1,5 @@
+import logging 
+
 from PyQt5.QtCore import QTimer, pyqtSignal
 
 from kadas.kadasgui import (
@@ -61,19 +63,25 @@ class ShortestPathLayer(KadasItemLayer):
 
     @waitcursor
     def updateFromPins(self):
-        outCrs = QgsCoordinateReferenceSystem(4326)
-        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
-        transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
-        for i, pin in enumerate(self.pins):            
-            wgspoint = transform.transform(QgsPointXY(pin.position()))
-            self.points[i] = wgspoint
-        route, response = self.valhalla.route(self.points, self.costingOptions, self.shortest)
-        self.response = response
-        feature = list(route.getFeatures())[0]
-        self.lineItem.clear()
-        self.lineItem.addPartFromGeometry(feature.geometry().constGet())
-        self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
-        self.triggerRepaint()
+        try:
+            outCrs = QgsCoordinateReferenceSystem(4326)
+            canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+            transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
+            for i, pin in enumerate(self.pins):            
+                wgspoint = transform.transform(QgsPointXY(pin.position()))
+                self.points[i] = wgspoint
+            route, response = self.valhalla.route(self.points, self.costingOptions, self.shortest)
+            self.response = response
+            feature = list(route.getFeatures())[0]
+            self.lineItem.clear()
+            self.lineItem.addPartFromGeometry(feature.geometry().constGet())
+            self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
+            self.triggerRepaint()
+        except Exception as e:
+            logging.error(e, exc_info=True)
+            #TODO more fine-grained error control            
+            pushWarning("Could not compute route")
+            logging.error("Could not compute route")
         
 
     @waitcursor

@@ -1,13 +1,25 @@
 # -*- coding: utf-8 -*-
 import os
+import logging
+
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
+
+from qgis.utils import iface
 
 from kadas.kadasgui import KadasPluginInterface
 
 from kadasrouting.utilities import icon
 from kadasrouting.gui.shortestpathbottombar import ShortestPathBottomBar
+
+logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
+try:
+    os.mkdir(os.path.dirname(logfile))
+except FileExistsError:
+    pass
+logging.basicConfig(filename=logfile,level=logging.DEBUG)
+
 
 class RoutingPlugin(QObject):
 
