@@ -40,7 +40,7 @@ class RoutingPlugin(QObject):
         self.iface.addAction(self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Reachibility menu
-        self.reachabilityAction = QAction(icon("routing.png"), self.tr("Reachability"))
+        self.reachabilityAction = QAction(icon("reachibility.png"), self.tr("Reachability"))
         self.reachabilityAction.setCheckable(True)
         self.reachabilityAction.toggled.connect(self.showShortest)
         self.iface.addAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
