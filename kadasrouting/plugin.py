@@ -15,6 +15,7 @@ from kadas.kadasgui import KadasPluginInterface
 from kadasrouting.utilities import icon, pushWarning
 from kadasrouting.core.shortestpathlayer import ShortestPathLayerType
 from kadasrouting.gui.shortestpathbottombar import ShortestPathBottomBar
+from kadasrouting.gui.reachibilitybottombar import ReachibilityBottomBar
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -31,6 +32,7 @@ class RoutingPlugin(QObject):
         
         self.iface = KadasPluginInterface.cast(iface)
         self.shortestPathBar = None
+        self.reachibilityBar = None
 
     def initGui(self):
         # Routing menu
@@ -42,7 +44,7 @@ class RoutingPlugin(QObject):
         # Reachibility menu
         self.reachabilityAction = QAction(icon("reachibility.png"), self.tr("Reachability"))
         self.reachabilityAction.setCheckable(True)
-        self.reachabilityAction.toggled.connect(self.showShortest)
+        self.reachabilityAction.toggled.connect(self.showReachibility)
         self.iface.addAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
@@ -60,3 +62,11 @@ class RoutingPlugin(QObject):
             if self.shortestPathBar is not None:
                 self.shortestPathBar.hide()
 
+    def showReachibility(self, show=True):
+        if show:
+            if self.reachibilityBar is None:
+                self.reachibilityBar = ReachibilityBottomBar(self.iface.mapCanvas(), self.reachabilityAction)
+            self.reachibilityBar.show()
+        else:
+            if self.reachibilityBar is not None:
+                self.reachibilityBar.hide()

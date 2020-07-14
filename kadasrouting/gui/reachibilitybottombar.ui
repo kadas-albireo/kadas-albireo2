@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>729</width>
-    <height>101</height>
+    <height>146</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -95,6 +95,9 @@
     <widget class="QCheckBox" name="checkBoxRemovePrevious">
      <property name="text">
       <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
