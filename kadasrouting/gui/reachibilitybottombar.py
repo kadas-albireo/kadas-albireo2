@@ -51,6 +51,10 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             ['Isochrone', 'Isodistance']
         )
 
+        self.lineEditIntervals.textChanged.connect(self.intervalChanges)
+        self.lineEditIntervals.setToolTip(
+            'Set interval in minutes, separated by ";" symbol')
+
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         # size = QDesktopWidget().screenGeometry()
         # if size.width() >= 3200 or size.height() >= 1800:
@@ -87,3 +91,24 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         #     self.addPins()
         # else:
         #     self.clearPins()
+
+    def intervalChanges(self):
+        try:
+            self.getInterval()
+            self.lineEditIntervals.setStyleSheet("color: black;")
+        except Exception as e:
+            pushMessage(str(e))
+            self.lineEditIntervals.setStyleSheet("color: red;")
+
+    def getInterval(self):
+        """Get interval of as a list of integer. 
+        It also make sure that the list is ascending
+        """
+        intervalText = self.lineEditIntervals.text()
+        # remove white space
+        intervalText = ''.join(intervalText.split())
+        interval = intervalText.split(';')
+        # try to convert to int
+        interval = [int(x) for x in interval if len(x) > 0]
+        # sort it
+        return sorted(interval)
