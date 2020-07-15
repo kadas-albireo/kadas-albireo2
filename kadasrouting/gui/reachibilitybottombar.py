@@ -42,7 +42,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
+        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))
         self.layout().addWidget(self.originSearchBox, 2, 1)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
