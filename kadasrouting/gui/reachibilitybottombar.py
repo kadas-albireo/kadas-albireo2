@@ -6,15 +6,15 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
-    KadasBottomBar, 
-    KadasPinItem, 
-    KadasItemPos, 
-    KadasMapCanvasItemManager, 
+    KadasBottomBar,
+    KadasPinItem,
+    KadasItemPos,
+    KadasMapCanvasItemManager,
     KadasLayerSelectionWidget
     )
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage, pushWarning
+from kadasrouting.utilities import iconPath, pushMessage, pushWarning, showMessageBox
 
 from qgis.utils import iface
 from qgis.core import (
@@ -65,6 +65,10 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
     def calculate(self):
         pushMessage('Calculating reachibility')
+        text = 'Calculating reachibility\n'
+        text += 'Interval is %s\n' % '  -- '.join([str(x) for x in self.getInterval()])
+        text += 'Mode is %s' % self.comboBoxReachibiliyMode.currentText()
+        showMessageBox(text)
 
     # def clearPins(self):
     #     """Remove all pins from the map
@@ -101,7 +105,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             self.lineEditIntervals.setStyleSheet("color: red;")
 
     def getInterval(self):
-        """Get interval of as a list of integer. 
+        """Get interval of as a list of integer.
         It also make sure that the list is ascending
         """
         intervalText = self.lineEditIntervals.text()
