@@ -68,6 +68,9 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         # Always set to center of map
         self.setCenter()
 
+        # Update the point when the canvas extent changed.
+        self.canvas.extentsChanged.connect(self.setCenter)
+
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
         if size.width() >= 3200 or size.height() >= 1800:
