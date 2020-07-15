@@ -21,6 +21,8 @@ from qgis.core import (
     Qgis,
     QgsProject,
     QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsRectangle
     )
 
 from kadasrouting.core.isochroneslayer import IsochronesLayer
@@ -44,7 +46,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))        
+        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))
         self.layout().addWidget(self.originSearchBox, 3, 1)
         self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
                                                         lambda x: isinstance(x, IsochronesLayer),
@@ -61,29 +63,47 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxReachibiliyMode.addItems(self.reachibilityMode.values())
         self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
-
-        self.lineEditIntervals.textChanged.connect(self.intervalChanges)
         self.setIntervalToolTip()
 
-        # Always set to center of map
-        self.setCenter()
+        self.lineEditIntervals.textChanged.connect(self.intervalChanges)
+        self.intervalChanges()
+
+        # Update center of map according to selected point
+        self.originSearchBox.searchBox.textChanged.connect(self.centerMap)
+
+        # Always set to center of map for the first time
+        self.setCenterAsSelected()
 
         # Update the point when the canvas extent changed.
-        self.canvas.extentsChanged.connect(self.setCenter)
+        self.canvas.extentsChanged.connect(self.setCenterAsSelected)
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size().width(), self.size().height() * 1.5)
 
-    def setCenter(self):
+    def setCenterAsSelected(self, point=None):
+        # Set the current center of the map as the selected point
         map_center = self.canvas.center()
         self.originSearchBox.updatePoint(map_center, None)
+
+    def centerMap(self):
+        """Pan map so that the current selected point as the center of the map canvas."""
+        # Get point from the widget
+        point = self.originSearchBox.valueAsPoint()
+        # Convert point to canvas CRS
+        inCrs = QgsCoordinateReferenceSystem(4326)
+        canvasCrs = self.canvas.mapSettings().destinationCrs()
+        transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
+        canvasPoint = transform.transform(point)
+        # Center the map to the converted point with the same zoom level
+        rect = QgsRectangle(canvasPoint, canvasPoint)
+        self.canvas.setExtent(rect)
+        self.canvas.refresh()
 
     def createLayer(self, name):
         layer = IsochronesLayer(name)
         return layer
-        
 
     def calculate(self):
         clear = self.checkBoxRemovePrevious.isChecked()
@@ -92,7 +112,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             pushWarning("Please, select a valid destination layer")
             return
         try:
-            point = self.originSearchBox.valueAsPoint()            
+            point = self.originSearchBox.valueAsPoint()
         except WrongLocationException as e:
             pushWarning("Invalid location %s" % str(e))
             return
@@ -102,30 +122,41 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
                 raise Exception()
         except Exception as e:
             pushWarning("Invalid intervals")
-            return            
+            return
         try:
             layer.updateRoute(point, intervals, clear)
-        except Exception as e:            
+        except Exception as e:
             logging.error(e, exc_info=True)
-            #TODO more fine-grained error control            
+            #TODO more fine-grained error control
             pushWarning("Could not compute isochrones")
 
     def actionToggled(self, toggled):
         if toggled:
-            self.setCenter()
+            self.setCenterAsSelected()
         else:
             self.originSearchBox.removePin()
 
     def intervalChanges(self):
+        """Slot when the text on the interval line edit changed.
+
+        It set the text color to red, disable the calculate button,
+        and update the calculate button tooltip.
+        """
         try:
-            self.getInterval()
+            interval = self.getInterval()
+            if len(interval) == 0:
+                raise Exception('Interval can not be empty')
             self.lineEditIntervals.setStyleSheet("color: black;")
+            self.btnCalculate.setEnabled(True)
+            self.btnCalculate.setToolTip('')
         except Exception as e:
             pushMessage(str(e))
             self.lineEditIntervals.setStyleSheet("color: red;")
+            self.btnCalculate.setEnabled(False)
+            self.btnCalculate.setToolTip('Please make sure the interval is correct.')
 
     def getInterval(self):
-        """Get interval of as a list of integer.
+        """Get interval of as a list of integer or float based on the current mode.
         It also make sure that the list is ascending
         """
         intervalText = self.lineEditIntervals.text()
@@ -142,6 +173,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         return sorted(interval)
 
     def setIntervalToolTip(self):
+        """Set the tool tip for interval line edit based on the current mode."""
         if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
             self.lineEditIntervals.setToolTip(
                 'Set interval as interger in minutes, separated by ";" symbol')
