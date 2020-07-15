@@ -69,9 +69,9 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         self.setCenter()
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
-        # size = QDesktopWidget().screenGeometry()
-        # if size.width() >= 3200 or size.height() >= 1800:
-        #     self.setFixedSize(self.size() / 1.5)
+        size = QDesktopWidget().screenGeometry()
+        if size.width() >= 3200 or size.height() >= 1800:
+            self.setFixedSize(self.size().width(), self.size().height() * 1.5)
 
     def setCenter(self):
         map_center = self.canvas.center()
