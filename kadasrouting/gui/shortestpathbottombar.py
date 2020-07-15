@@ -62,7 +62,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.destinationSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_destination.svg'))
         self.layout().addWidget(self.destinationSearchBox, 3, 1)
 
-        self.waypointsSearchBox = LocationInputWidget(canvas)
+        self.waypointsSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_bluegray.svg'))
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
