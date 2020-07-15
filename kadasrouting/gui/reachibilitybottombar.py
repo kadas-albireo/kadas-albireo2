@@ -6,15 +6,15 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
-    KadasBottomBar, 
-    KadasPinItem, 
-    KadasItemPos, 
-    KadasMapCanvasItemManager, 
+    KadasBottomBar,
+    KadasPinItem,
+    KadasItemPos,
+    KadasMapCanvasItemManager,
     KadasLayerSelectionWidget
     )
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage, pushWarning
+from kadasrouting.utilities import iconPath, pushMessage, pushWarning, showMessageBox
 
 from qgis.utils import iface
 from qgis.core import (
@@ -44,29 +44,38 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
+        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))        
+        self.layout().addWidget(self.originSearchBox, 3, 1)
         self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
                                                         lambda x: isinstance(x, IsochronesLayer),
                                                         self.createLayer)
         self.layerSelector.createLayerIfEmpty("Isochrones")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
-        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
-        self.layout().addWidget(self.originSearchBox, 3, 1)
-
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
-        self.comboBoxReachibiliyMode.addItems(
-            ['Isochrone', 'Isodistance']
-        )
+        self.reachibilityMode = {
+            'isochrone': self.tr('Isochrone'),
+            'isodistance': self.tr('Isodistance'),
+        }
+
+        self.comboBoxReachibiliyMode.addItems(self.reachibilityMode.values())
+        self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
 
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
-        self.lineEditIntervals.setToolTip(
-            'Set interval in minutes, separated by ";" symbol')
+        self.setIntervalToolTip()
+
+        # Always set to center of map
+        self.setCenter()
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         # size = QDesktopWidget().screenGeometry()
         # if size.width() >= 3200 or size.height() >= 1800:
         #     self.setFixedSize(self.size() / 1.5)
+
+    def setCenter(self):
+        map_center = self.canvas.center()
+        self.originSearchBox.updatePoint(map_center, None)
 
     def createLayer(self, name):
         layer = IsochronesLayer(name)
@@ -80,29 +89,29 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             pushWarning("Please, select a valid destination layer")
             return
         try:
-            point = self.originSearchBox.valueAsPoint()
-            intervals = self.getInterval()
+            point = self.originSearchBox.valueAsPoint()            
         except WrongLocationException as e:
             pushWarning("Invalid location %s" % str(e))
             return
+        try:
+            intervals = self.getInterval()
+            if len(intervals) == 0:
+                raise Exception()
+        except Exception as e:
+            pushWarning("Invalid intervals")
+            return            
         try:
             layer.updateRoute(point, intervals, clear)
         except Exception as e:            
             logging.error(e, exc_info=True)
             #TODO more fine-grained error control            
-            pushWarning("Could not compute isochrones")            
-
-    def clearPins(self):
-        self.originSearchBox.removePin()
-
-    def addPins(self):
-        self.originSearchBox.addPin()
+            pushWarning("Could not compute isochrones")
 
     def actionToggled(self, toggled):
         if toggled:
-            self.addPins()
+            self.setCenter()
         else:
-            self.clearPins()
+            self.originSearchBox.removePin()
 
     def intervalChanges(self):
         try:
@@ -113,14 +122,26 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             self.lineEditIntervals.setStyleSheet("color: red;")
 
     def getInterval(self):
-        """Get interval of as a list of integer. 
+        """Get interval of as a list of integer.
         It also make sure that the list is ascending
         """
         intervalText = self.lineEditIntervals.text()
         # remove white space
         intervalText = ''.join(intervalText.split())
         interval = intervalText.split(';')
-        # try to convert to int
-        interval = [int(x) for x in interval if len(x) > 0]
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
+            # try to convert to int for isochrone
+            interval = [int(x) for x in interval if len(x) > 0]
+        else:
+            # try to convert to float for isodistance
+            interval = [float(x) for x in interval if len(x) > 0]
         # sort it
         return sorted(interval)
+
+    def setIntervalToolTip(self):
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
+            self.lineEditIntervals.setToolTip(
+                'Set interval as interger in minutes, separated by ";" symbol')
+        else:
+            self.lineEditIntervals.setToolTip(
+                'Set interval as float in KM, separated by ";" symbol')
