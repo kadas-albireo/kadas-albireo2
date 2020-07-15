@@ -107,11 +107,21 @@ class ShortestPathLayer(KadasItemLayer):
         epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
         self.clear()
         self.response = response
-        route = self.createRouteFromResponse(response)
-        feature = list(route.getFeatures())[0]
+        response_mini = response['trip']
+        feat = QgsFeature()
+        coordinates, distance, duration = [], 0, 0
+        for leg in response_mini['legs']:
+                coordinates.extend([
+                    list(reversed(coord))
+                    for coord in decodePolyline6(leg['shape'])
+                ])
+                duration += round(leg['summary']['time'] / 3600, 3)
+                distance += round(leg['summary']['length'], 3)
+        qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
+        geom = QgsGeometry.fromPolylineXY(qgis_coords)
         self.lineItem = KadasLineItem(epsg4326, True)
-        self.lineItem.addPartFromGeometry(feature.geometry().constGet())
-        self.lineItem.setTooltip(f"Distance: {feature['DIST_KM']}<br/>Time: {feature['DURATION_H']}")
+        self.lineItem.addPartFromGeometry(geom.constGet())
+        self.lineItem.setTooltip(f"Distance: {distance}<br/>Time: {duration}")
         self.addItem(self.lineItem)
         for i, pt in enumerate(self.points):
             pin = RoutePointMapItem(epsg4326)
@@ -154,43 +164,6 @@ class ShortestPathLayer(KadasItemLayer):
         element.setAttribute("costingOptions", json.dumps(self.costingOptions))
         return True
 
-
-    def createRouteFromResponse(self, response):
-        """
-        Build output layer based on response attributes for directions endpoint.
-
-        :param response: API response object
-        :type response: dict
-
-
-        :returns: Ouput layer with a single geometry containing the route.
-        :rtype: QgsVectorLayer
-        """
-        response_mini = response['trip']
-        feat = QgsFeature()
-        coordinates, distance, duration = [], 0, 0
-        for leg in response_mini['legs']:
-                coordinates.extend([
-                    list(reversed(coord))
-                    for coord in decodePolyline6(leg['shape'])
-                ])
-                duration += round(leg['summary']['time'] / 3600, 3)
-                distance += round(leg['summary']['length'], 3)
-
-        qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
-        feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-        feat.setAttributes([distance,
-                            duration
-                            ])
-
-        layer = QgsVectorLayer("LineString?crs=epsg:4326", "route", "memory")
-        provider = layer.dataProvider()
-        provider.addAttributes([QgsField("DIST_KM", QVariant.Double),
-                             QgsField("DURATION_H", QVariant.Double)])
-        layer.updateFields()
-        provider.addFeature(feat)
-        layer.updateExtents()
-        return layer
 
 class ShortestPathLayerType(KadasPluginLayerType):
 

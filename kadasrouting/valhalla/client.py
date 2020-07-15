@@ -10,7 +10,7 @@ from qgis.core import (QgsPointXY,
 
 from .connectors import HttpConnector
 
-class RoutingException(Exception):
+class ValhallaException(Exception):
     pass
 
 TEST_URL = "https://valhalla.gis-ops.com/osm"
@@ -41,7 +41,15 @@ class ValhallaClient():
         try:
             response = self.connector.route(points, options, shortest)
         except Exception as e:
-            raise RoutingException(str(e))
+            raise ValhallaException(str(e))
+        return response
+
+    def isochrones(self, qgspoint, intervals):
+        points = self.pointsFromQgsPoints([qgspoint])
+        try:
+            response = self.connector.isochrones(points, intervals)
+        except Exception as e:
+            raise ValhallaException(str(e))
         return response
 
     def pointsFromQgsPoints(self, qgspoints):

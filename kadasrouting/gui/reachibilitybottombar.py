@@ -23,6 +23,8 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     )
 
+from kadasrouting.core.isochroneslayer import IsochronesLayer
+
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'reachibilitybottombar.ui'))
 
 class ReachibilityBottomBar(KadasBottomBar, WIDGET):
@@ -42,8 +44,14 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
+        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
+                                                        lambda x: isinstance(x, IsochronesLayer),
+                                                        self.createLayer)
+        self.layerSelector.createLayerIfEmpty("Isochrones")
+        self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
+
         self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
-        self.layout().addWidget(self.originSearchBox, 2, 1)
+        self.layout().addWidget(self.originSearchBox, 3, 1)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
@@ -61,36 +69,40 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         #     self.setFixedSize(self.size() / 1.5)
 
     def createLayer(self, name):
-        pushMessage('create layer')
+        layer = IsochronesLayer(name)
+        return layer
+        
 
     def calculate(self):
-        pushMessage('Calculating reachibility')
+        clear = self.checkBoxRemovePrevious.isChecked()
+        layer = self.layerSelector.getSelectedLayer()
+        if layer is None:
+            pushWarning("Please, select a valid destination layer")
+            return
+        try:
+            point = self.originSearchBox.valueAsPoint()
+            intervals = self.getInterval()
+        except WrongLocationException as e:
+            pushWarning("Invalid location %s" % str(e))
+            return
+        try:
+            layer.updateRoute(point, intervals, clear)
+        except Exception as e:            
+            logging.error(e, exc_info=True)
+            #TODO more fine-grained error control            
+            pushWarning("Could not compute isochrones")            
 
-    # def clearPins(self):
-    #     """Remove all pins from the map
-    #     Not removing the point stored.
-    #     """
-    #     # remove origin pin
-    #     self.originSearchBox.removePin()
-    #     # remove destination poin
-    #     self.destinationSearchBox.removePin()
-    #     # remove waypoint pins
-    #     for waypointPin in self.waypointPins:
-    #         KadasMapCanvasItemManager.removeItem(waypointPin)
+    def clearPins(self):
+        self.originSearchBox.removePin()
 
-    # def addPins(self):
-    #     """Add pins for all stored points."""
-    #     self.originSearchBox.addPin()
-    #     self.destinationSearchBox.addPin()
-    #     for waypoint in self.waypoints:
-    #         self.addWaypointPin(waypoint)
+    def addPins(self):
+        self.originSearchBox.addPin()
 
     def actionToggled(self, toggled):
-        pushMessage('action toggle')
-        # if toggled:
-        #     self.addPins()
-        # else:
-        #     self.clearPins()
+        if toggled:
+            self.addPins()
+        else:
+            self.clearPins()
 
     def intervalChanges(self):
         try:

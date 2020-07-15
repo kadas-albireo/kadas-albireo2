@@ -2,13 +2,14 @@ import subprocess
 
 class Connector():
 
-    def prepareParameters(self, points, shortest = False, options = None):
+    def prepareRouteParameters(self, points, shortest = False, options = None):
         options = options or {}
         profile = "auto_shorter" if shortest else "auto"
 
         params = dict(
-            costing=profile,
-            show_locations=True
+            costing = profile,
+            show_locations = True,
+            locations = points
         )
         params['locations'] = points
 
@@ -16,6 +17,16 @@ class Connector():
             params['costing_options'] = {profile: options}
 
         return params
+
+    def prepareIsochronesParameters(self, points, intervals):
+        params = dict(
+            costing = "auto",
+            locations = points,
+            polygons = True,
+            contours = [{"time": x} for x in intervals]
+        )
+        return params
+
 
 class ConsoleConnector(Connector):
 
@@ -37,7 +48,7 @@ class ConsoleConnector(Connector):
         responsedict = json.loads(response)
     
     def route(self, points, shortest, options):
-        params = self.prepareParameters(points, shortest, options)
+        params = self.prepareRouteParameters(points, shortest, options)
         response = _execute(["valhalla_run_route", "-j", json.dumps(params)])
         return response
 
@@ -57,6 +68,11 @@ class HttpConnector(Connector):
         return response.json()
 
     def route(self, points, options, shortest):
-        params = self.prepareParameters(points, options, shortest)
+        params = self.prepareRouteParameters(points, options, shortest)
         response = self._request("route", json.dumps(params))
+        return response
+
+    def isochrones(self, points, intervals):        
+        params = self.prepareIsochronesParameters(points, intervals)
+        response = self._request("isochrone", json.dumps(params))
         return response
