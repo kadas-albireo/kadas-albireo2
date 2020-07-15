@@ -47,13 +47,13 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
-        self.comboBoxReachibiliyMode.addItems(
-            ['Isochrone', 'Isodistance']
-        )
+        self.reachibilityMode = ['Isochrone', 'Isodistance']
+
+        self.comboBoxReachibiliyMode.addItems(self.reachibilityMode)
+        self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
 
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
-        self.lineEditIntervals.setToolTip(
-            'Set interval in minutes, separated by ";" symbol')
+        self.setIntervalToolTip()
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         # size = QDesktopWidget().screenGeometry()
@@ -108,7 +108,19 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         # remove white space
         intervalText = ''.join(intervalText.split())
         interval = intervalText.split(';')
-        # try to convert to int
-        interval = [int(x) for x in interval if len(x) > 0]
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode[0]:
+            # try to convert to int for isochrone
+            interval = [int(x) for x in interval if len(x) > 0]
+        else:
+            # try to convert to float for isodistance
+            interval = [float(x) for x in interval if len(x) > 0]
         # sort it
         return sorted(interval)
+
+    def setIntervalToolTip(self):
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode[0]:
+            self.lineEditIntervals.setToolTip(
+                'Set interval as interger in minutes, separated by ";" symbol')
+        else:
+            self.lineEditIntervals.setToolTip(
+                'Set interval as float in KM, separated by ";" symbol')
