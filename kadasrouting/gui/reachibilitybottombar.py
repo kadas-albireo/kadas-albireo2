@@ -47,9 +47,12 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
-        self.reachibilityMode = ['Isochrone', 'Isodistance']
+        self.reachibilityMode = {
+            'isochrone': self.tr('Isochrone'),
+            'isodistance': self.tr('Isodistance'),
+        }
 
-        self.comboBoxReachibiliyMode.addItems(self.reachibilityMode)
+        self.comboBoxReachibiliyMode.addItems(self.reachibilityMode.values())
         self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
 
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
@@ -112,7 +115,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         # remove white space
         intervalText = ''.join(intervalText.split())
         interval = intervalText.split(';')
-        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode[0]:
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
             # try to convert to int for isochrone
             interval = [int(x) for x in interval if len(x) > 0]
         else:
@@ -122,7 +125,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         return sorted(interval)
 
     def setIntervalToolTip(self):
-        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode[0]:
+        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
             self.lineEditIntervals.setToolTip(
                 'Set interval as interger in minutes, separated by ";" symbol')
         else:
