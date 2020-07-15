@@ -58,10 +58,17 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
         self.setIntervalToolTip()
 
+        # Always set to center of map
+        self.setCenter()
+
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         # size = QDesktopWidget().screenGeometry()
         # if size.width() >= 3200 or size.height() >= 1800:
         #     self.setFixedSize(self.size() / 1.5)
+
+    def setCenter(self):
+        map_center = self.canvas.center()
+        self.originSearchBox.updatePoint(map_center, None)
 
     def createLayer(self, name):
         pushMessage('create layer')
@@ -70,34 +77,17 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         pushMessage('Calculating reachibility')
         text = 'Calculating reachibility\n'
         text += 'Interval is %s\n' % '  -- '.join([str(x) for x in self.getInterval()])
-        text += 'Mode is %s' % self.comboBoxReachibiliyMode.currentText()
+        text += 'Mode is %s\n' % self.comboBoxReachibiliyMode.currentText()
+        center_point = self.originSearchBox.valueAsPoint()
+        text += 'Center is (%f, %f)\n' % (center_point.x(), center_point.y())
         showMessageBox(text)
-
-    # def clearPins(self):
-    #     """Remove all pins from the map
-    #     Not removing the point stored.
-    #     """
-    #     # remove origin pin
-    #     self.originSearchBox.removePin()
-    #     # remove destination poin
-    #     self.destinationSearchBox.removePin()
-    #     # remove waypoint pins
-    #     for waypointPin in self.waypointPins:
-    #         KadasMapCanvasItemManager.removeItem(waypointPin)
-
-    # def addPins(self):
-    #     """Add pins for all stored points."""
-    #     self.originSearchBox.addPin()
-    #     self.destinationSearchBox.addPin()
-    #     for waypoint in self.waypoints:
-    #         self.addWaypointPin(waypoint)
 
     def actionToggled(self, toggled):
         pushMessage('action toggle')
-        # if toggled:
-        #     self.addPins()
-        # else:
-        #     self.clearPins()
+        if toggled:
+            self.setCenter()
+        else:
+            self.originSearchBox.removePin()
 
     def intervalChanges(self):
         try:
