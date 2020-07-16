@@ -1,7 +1,8 @@
 import json
 import logging 
 
-from PyQt5.QtCore import QTimer, pyqtSignal, QVariant
+from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, Qt
+from PyQt5.QtGui import QColor, QPen, QBrush
 
 from kadas.kadasgui import (
     KadasPinItem, 
@@ -122,6 +123,11 @@ class ShortestPathLayer(KadasItemLayer):
         self.lineItem = KadasLineItem(epsg4326, True)
         self.lineItem.addPartFromGeometry(geom.constGet())
         self.lineItem.setTooltip(f"Distance: {distance}<br/>Time: {duration}")
+        # Line color: 005EFF
+        line_color = QColor(0, 94, 255)
+        self.lineItem.setOutline(QPen(line_color, 5))
+        self.lineItem.setFill(QBrush(line_color, Qt.SolidPattern))
+
         self.addItem(self.lineItem)
         for i, pt in enumerate(self.points):
             pin = RoutePointMapItem(epsg4326)
