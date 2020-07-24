@@ -118,10 +118,10 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             return
         try:
             intervals = self.getInterval()
-            if len(intervals) == 0:
-                raise Exception()
+            if not (1 <= len(intervals) <= 10):
+                raise Exception('Must have at least one and maximum 10 intervals.')
         except Exception as e:
-            pushWarning("Invalid intervals")
+            pushWarning("Invalid intervals: %s" % str(e))
             return
         try:
             layer.updateRoute(point, intervals, clear)
@@ -146,6 +146,8 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             interval = self.getInterval()
             if len(interval) == 0:
                 raise Exception('Interval can not be empty')
+            if len(interval) > 10:
+                raise Exception('Interval can not be more than 10')
             self.lineEditIntervals.setStyleSheet("color: black;")
             self.btnCalculate.setEnabled(True)
             self.btnCalculate.setToolTip('')
