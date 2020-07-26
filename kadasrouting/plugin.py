@@ -16,6 +16,7 @@ from kadasrouting.utilities import icon, pushWarning
 from kadasrouting.core.shortestpathlayer import ShortestPathLayerType
 from kadasrouting.gui.shortestpathbottombar import ShortestPathBottomBar
 from kadasrouting.gui.reachibilitybottombar import ReachibilityBottomBar
+from kadasrouting.gui.tspbottombar import TSPBottomBar
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -33,6 +34,7 @@ class RoutingPlugin(QObject):
         self.iface = KadasPluginInterface.cast(iface)
         self.shortestPathBar = None
         self.reachibilityBar = None
+        self.tspBar = None
 
     def initGui(self):
         # Routing menu
@@ -50,7 +52,7 @@ class RoutingPlugin(QObject):
         # TSP menu
         self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
         self.tspAction.setCheckable(True)
-        self.tspAction.toggled.connect(self.showReachibility)
+        self.tspAction.toggled.connect(self.showTSP)
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
@@ -76,3 +78,13 @@ class RoutingPlugin(QObject):
         else:
             if self.reachibilityBar is not None:
                 self.reachibilityBar.hide()
+
+
+    def showTSP(self, show=True):
+        if show:
+            if self.tspBar is None:
+                self.tspBar = TSPBottomBar(self.iface.mapCanvas(), self.tspAction)
+            self.tspBar.show()
+        else:
+            if self.tspBar is not None:
+                self.tspBar.hide()
