@@ -1,4 +1,5 @@
 import subprocess
+import logging
 
 class Connector():
 
@@ -63,6 +64,7 @@ class HttpConnector(Connector):
 
     def _request(self, endpoint, payload):
         url = f"{self.url}/{endpoint}?json={payload}"
+        logging.info('Requesting %s' % url)
         response = requests.get(url)
         response.raise_for_status()
         return response.json()
