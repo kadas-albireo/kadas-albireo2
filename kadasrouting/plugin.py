@@ -47,6 +47,12 @@ class RoutingPlugin(QObject):
         self.reachabilityAction.toggled.connect(self.showReachibility)
         self.iface.addAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
 
+        # TSP menu
+        self.tspAction = QAction(icon("reachibility.png"), self.tr("TSP"))
+        self.tspAction.setCheckable(True)
+        self.tspAction.toggled.connect(self.showReachibility)
+        self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
+
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(ShortestPathLayerType())
 
