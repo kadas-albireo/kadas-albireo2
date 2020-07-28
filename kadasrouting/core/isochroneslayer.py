@@ -43,6 +43,92 @@ from qgis.core import (
 
 from kadas.kadascore import KadasPluginLayerType
 
+LOG = logging.getLogger(__name__)
+
+class OverwriteError(Exception):
+    pass
+
+class IsochroneLayerGenerator(object):
+    def __init__(self, basename, overwrite = True):
+        self.setBasename(basename)
+        self.valhalla = ValhallaClient()
+        self.setOverwrite(overwrite)
+        self.crs = QgsCoordinateReferenceSystem("EPSG:4326")
+
+    def setOverwrite(self, overwrite):
+        """Set overwrite option as bool
+        """
+        if not isinstance(overwrite, bool):
+            raise TypeError('overwrite parameter is of wrong type. Was: {} , but should be "bool"'.format(type(overwrite)))
+        self.overwrite = overwrite
+
+    def getOverwrite(self):
+        return self.overwrite
+
+    def setBasename(self, basename):
+        """Set basename as string
+        """
+        self.basename = str(basename)
+
+    def createLayer(self, name):
+        layer = IsochronesLayer(name)
+        return layer
+
+    def getBasename(self):
+        """Get basename as string
+        """
+        return str(self.basename)
+
+    def setResponse(self, response):
+        self.response = response
+
+    def setFeatureToLayer(self, layer, feature):
+        item = KadasPolygonItem(self.crs, True)
+        item.addPartFromGeometry(feature.geometry().constGet())
+        item.setOutline(QPen(QColor(0,0,0)))
+        item.setFill(QBrush(QColor(f"#80" + feature["color"][1:])))
+        layer.addItem(item)
+
+    @staticmethod
+    def getFeaturesFromResponse(response):
+        """Return a list of features from a valhalla response object
+        """
+        fields = QgsFields()
+        fields.append(QgsField("opacity", QVariant.Double))
+        fields.append(QgsField("fill", QVariant.String))
+        fields.append(QgsField("fillOpacity", QVariant.Double))
+        fields.append(QgsField("fill-opacity", QVariant.Double))
+        fields.append(QgsField("contour", QVariant.Int)) #FIXME: in fact, due to a bug in qgis parser, we cannot use this field
+        fields.append(QgsField("color", QVariant.String))
+        fields.append(QgsField("fillColor", QVariant.String))        
+        codec = QTextCodec.codecForName("UTF-8");
+        features = QgsJsonUtils.stringToFeatureList(json.dumps(response), fields, codec)
+        # LOG.debug('features : {}'.format(features))
+        return features
+
+    @waitcursor
+    def generateIsochrones(self, point, intervals, overwrite = True):
+        self.setOverwrite(overwrite)
+        response = self.valhalla.isochrones(point, intervals)
+        features = self.getFeaturesFromResponse(response)
+        for feature in features:
+            # FIXME: we should use the 'contour' property in the feature to be sure of the contour line that we are
+            # drawing, but due to a bug in gqis json parser, this property appears to be always set to '0'
+            layername = '{} min - {}'.format(intervals.pop(), self.getBasename())
+            try:
+                layer =  QgsProject.instance().mapLayersByName(layername)[0] # FIXME: we do not consider if there are several layers with the same name here
+                if self.getOverwrite():
+                    QgsProject.instance().removeMapLayer( layer.id() )
+                else:
+                    raise OverwriteError('layer {} already exists and overwrite is {}'.format(layername, self.getOverwrite()))
+            except IndexError:
+                LOG.debug('this layer was not found: {}'.format(layername))
+            layer = self.createLayer(layername)
+            QgsProject.instance().addMapLayer(layer)
+            layer.clear()
+            self.setFeatureToLayer(layer, feature)
+            layer.triggerRepaint()
+
 
 class IsochronesLayer(KadasItemLayer):
 
@@ -52,45 +138,12 @@ class IsochronesLayer(KadasItemLayer):
         KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), 
                                 IsochronesLayer.LAYER_TYPE)
         self.response = None
-        self.valhalla = ValhallaClient()
-
-
-    def setResponse(self, response):
-        self.response = response
 
     def clear(self):
         items = self.items()
         for itemId in items.keys():
             self.takeItem(itemId)
         self.pins = []
-
-    @waitcursor
-    def updateRoute(self, point, intervals, clear):
-        response = self.valhalla.isochrones(point, intervals)
-        self.computeFromResponse(response, clear)
-        self.triggerRepaint()            
-
-    def computeFromResponse(self, response, clear):
-        epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
-        if clear:
-            self.clear()
-        self.response = response
-        fields = QgsFields()
-        fields.append(QgsField("opacity", QVariant.Double))
-        fields.append(QgsField("fill", QVariant.String))
-        fields.append(QgsField("fillOpacity", QVariant.Double))
-        fields.append(QgsField("fill-opacity", QVariant.Double))
-        fields.append(QgsField("contour", QVariant.Int))
-        fields.append(QgsField("color", QVariant.String))
-        fields.append(QgsField("fillColor", QVariant.String))        
-        codec = QTextCodec.codecForName("UTF-8");
-        features = QgsJsonUtils.stringToFeatureList(json.dumps(response), fields, codec)
-        for feature in features:
-            item = KadasPolygonItem(epsg4326, True)
-            item.addPartFromGeometry(feature.geometry().constGet())
-            item.setOutline(QPen(QColor(0,0,0)))
-            item.setFill(QBrush(QColor(f"#80" + feature["color"][1:])))
-            self.addItem(item)
 
     def layerTypeKey(self):
         return IsochronesLayer.LAYER_TYPE
@@ -115,8 +168,8 @@ class IsochronesLayerType(KadasPluginLayerType):
   def __init__(self):
     KadasPluginLayerType.__init__(self, IsochronesLayer.LAYER_TYPE)
 
-  def createLayer(self):
-    return IsochronesLayer('')
+  def createLayer(self, name=''):
+    return IsochronesLayer(name)
     
   def showLayerProperties(self, layer):
     return True
