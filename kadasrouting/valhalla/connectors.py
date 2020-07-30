@@ -1,5 +1,6 @@
 import subprocess
 import logging
+from kadasrouting.exceptions import Valhalla400Exception
 
 class Connector():
 
@@ -66,6 +67,9 @@ class HttpConnector(Connector):
         url = f"{self.url}/{endpoint}?json={payload}"
         logging.info('Requesting %s' % url)
         response = requests.get(url)
+        # Custom handling for Valhalla to raise the detailed message also.
+        if response.status_code == 400:
+            raise Valhalla400Exception(response.text)
         response.raise_for_status()
         return response.json()
 

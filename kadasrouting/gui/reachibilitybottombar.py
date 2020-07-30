@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 LOG = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ from qgis.core import (
     )
 
 from kadasrouting.core.isochroneslayer import IsochronesLayer, IsochroneLayerGenerator, OverwriteError
+
+from kadasrouting.exceptions import Valhalla400Exception
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'reachibilitybottombar.ui'))
 
@@ -127,7 +130,13 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         try:
             isochroneLayersGenerator.generateIsochrones(point, intervals, overwrite)
         except OverwriteError as e:
-            pushWarning("please change the basename or activate the overwrite checkbox")
+            pushWarning("Please change the basename or activate the overwrite checkbox")
+        except Valhalla400Exception as e:
+            # Expecting the content can be parsed as JSON, see
+            # https://valhalla.readthedocs.io/en/latest/api/turn-by-turn/api-reference/#http-status-codes-and-conditions
+            json_error = json.loads(str(e))
+            pushWarning(
+                'Can not generate the error because "%s"' % json_error.get('error'))
         except Exception as e:
             pushWarning("could not generate isochrones")
             raise Exception(e)

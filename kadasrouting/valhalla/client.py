@@ -8,10 +8,9 @@ from qgis.core import (QgsPointXY,
                        QgsVectorLayer,
                        QgsField)
 
-from .connectors import HttpConnector
+from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 
-class ValhallaException(Exception):
-    pass
+from .connectors import HttpConnector
 
 TEST_URL = "https://valhalla.gis-ops.com/osm"
 
@@ -48,6 +47,8 @@ class ValhallaClient():
         points = self.pointsFromQgsPoints([qgspoint])
         try:
             response = self.connector.isochrones(points, intervals)
+        except Valhalla400Exception as e:
+            raise e
         except Exception as e:
             raise ValhallaException(str(e))
         return response
