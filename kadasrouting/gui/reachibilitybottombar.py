@@ -1,11 +1,12 @@
 import os
 import logging
 import json
+import math
 
 LOG = logging.getLogger(__name__)
 
 from PyQt5 import uic
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QDesktopWidget, QLineEdit
 
 from kadas.kadasgui import (
@@ -127,8 +128,11 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
             pushWarning("Invalid intervals: %s" % str(e))
             return
         isochroneLayersGenerator = IsochroneLayerGenerator(self.getBasename())
+        colors = []
         try:
-            isochroneLayersGenerator.generateIsochrones(point, intervals, overwrite)
+            colors = self.getColorFromInterval()
+            LOG.debug('_'.join(colors))
+            isochroneLayersGenerator.generateIsochrones(point, intervals, colors, overwrite)
         except OverwriteError as e:
             pushWarning("Please change the basename or activate the overwrite checkbox")
         except Valhalla400Exception as e:
@@ -223,3 +227,28 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         else:
             self.lineEditIntervals.setToolTip(
                 'Set interval as float in KM, separated by ";" symbol')
+
+    def getColorFromInterval(self):
+        num_interval = len(self.getInterval())
+        # first generate the value for color based on HSV
+        # https://doc.qt.io/qt-5/qcolor.html#the-hsv-color-model
+        # starting with green v=120 to red v=0
+        if num_interval == 1:
+            return [0]
+        hsv_value = []
+        step = 120 / (num_interval - 1)
+        current_value = 0
+        while math.ceil(current_value) < 120:
+            hsv_value.append(int(current_value))
+            current_value += step
+        hsv_value.append(120)
+        hsv_value.reverse()
+        hsv_color = [QColor.fromHsv(h, 255, 204, 255) for h in hsv_value]
+        for i in hsv_color:
+            LOG.debug(i.getHsv())
+            LOG.debug(i.getRgb())
+        # get the RGB string format
+        rgb_color = [c.name() for c in hsv_color]
+        # remove the # char
+        rgb_value_valhalla = [c[1:] for c in rgb_color]
+        return rgb_value_valhalla

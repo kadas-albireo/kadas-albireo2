@@ -107,9 +107,9 @@ class IsochroneLayerGenerator(object):
         return features
 
     @waitcursor
-    def generateIsochrones(self, point, intervals, overwrite = True):
+    def generateIsochrones(self, point, intervals, colors, overwrite = True):
         self.setOverwrite(overwrite)
-        response = self.valhalla.isochrones(point, intervals)
+        response = self.valhalla.isochrones(point, intervals, colors)
         features = self.getFeaturesFromResponse(response)
         for feature in features:
             # FIXME: we should use the 'contour' property in the feature to be sure of the contour line that we are

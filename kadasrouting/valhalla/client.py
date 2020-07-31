@@ -43,10 +43,10 @@ class ValhallaClient():
             raise ValhallaException(str(e))
         return response
 
-    def isochrones(self, qgspoint, intervals):
+    def isochrones(self, qgspoint, intervals, colors):
         points = self.pointsFromQgsPoints([qgspoint])
         try:
-            response = self.connector.isochrones(points, intervals)
+            response = self.connector.isochrones(points, intervals, colors)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:

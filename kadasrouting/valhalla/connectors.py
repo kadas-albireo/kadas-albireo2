@@ -2,6 +2,8 @@ import subprocess
 import logging
 from kadasrouting.exceptions import Valhalla400Exception
 
+LOG = logging.getLogger(__name__)
+
 class Connector():
 
     def prepareRouteParameters(self, points, shortest = False, options = None):
@@ -20,12 +22,23 @@ class Connector():
 
         return params
 
-    def prepareIsochronesParameters(self, points, intervals):
+    def prepareIsochronesParameters(self, points, intervals, colors):
+        # build contour json
+        if len(intervals) != len(colors):
+            LOG.warning('The number of intervals and colors are different, use default color')
+            contours = [{"time": x} for x in intervals]
+        else:
+            contours = []
+            for i in range(0, len(intervals)):
+                contours.append({
+                    "time": intervals[i],
+                    "color": colors[i]
+                })
         params = dict(
             costing = "auto",
             locations = points,
             polygons = True,
-            contours = [{"time": x} for x in intervals]
+            contours = contours
         )
         return params
 
@@ -78,7 +91,7 @@ class HttpConnector(Connector):
         response = self._request("route", json.dumps(params))
         return response
 
-    def isochrones(self, points, intervals):        
-        params = self.prepareIsochronesParameters(points, intervals)
+    def isochrones(self, points, intervals, colors):        
+        params = self.prepareIsochronesParameters(points, intervals, colors)
         response = self._request("isochrone", json.dumps(params))
         return response
