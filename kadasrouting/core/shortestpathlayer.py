@@ -1,5 +1,6 @@
 import json
 import logging 
+import math
 
 from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
@@ -116,13 +117,18 @@ class ShortestPathLayer(KadasItemLayer):
                     list(reversed(coord))
                     for coord in decodePolyline6(leg['shape'])
                 ])
-                duration += round(leg['summary']['time'] / 3600, 3)
+                duration += leg['summary']['time']
                 distance += round(leg['summary']['length'], 3)
         qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
         geom = QgsGeometry.fromPolylineXY(qgis_coords)
         self.lineItem = KadasLineItem(epsg4326, True)
         self.lineItem.addPartFromGeometry(geom.constGet())
-        self.lineItem.setTooltip(f"Distance: {distance}<br/>Time: {duration}")
+        # Format string for duration
+        duration_hour = int(duration) // 3600
+        duration_minute = (int(duration) % 3600) // 60
+        formatted_hour = str(duration_hour) if duration_hour >= 10 else '0%d' % duration_hour
+        formatted_minute = str(duration_minute) if duration_minute >= 10 else '0%d' % duration_minute
+        self.lineItem.setTooltip(f"Distance: {distance} KM<br/>Time: {formatted_hour}h{formatted_minute}")
         # Line color: 005EFF
         line_color = QColor(0, 94, 255)
         self.lineItem.setOutline(QPen(line_color, 5))
