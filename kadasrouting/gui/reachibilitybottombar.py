@@ -230,11 +230,30 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
     def getColorFromInterval(self):
         num_interval = len(self.getInterval())
+        default_colors = [
+            '00cc00',  # green
+            '72dc00',
+            'eeee00',  # yellow
+            'da6400',
+            'cc0000'  # red
+        ]
+        if num_interval <= 5:
+            LOG.info('use default color')
+        if num_interval == 1:
+            return default_colors[0:1]
+        elif num_interval == 2:
+            return [default_colors[0], default_colors[4]]
+        elif num_interval == 3:
+            return [default_colors[0], default_colors[2],  default_colors[4]]
+        elif num_interval == 4:
+            return [default_colors[0], default_colors[1], default_colors[3], default_colors[4]]
+        elif num_interval == 5:
+            return default_colors
+
+        # For other case (color probably not so accurate)
         # first generate the value for color based on HSV
         # https://doc.qt.io/qt-5/qcolor.html#the-hsv-color-model
         # starting with green v=120 to red v=0
-        if num_interval == 1:
-            return [0]
         hsv_value = []
         step = 120 / (num_interval - 1)
         current_value = 0
@@ -244,9 +263,6 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         hsv_value.append(120)
         hsv_value.reverse()
         hsv_color = [QColor.fromHsv(h, 255, 204, 255) for h in hsv_value]
-        for i in hsv_color:
-            LOG.debug(i.getHsv())
-            LOG.debug(i.getRgb())
         # get the RGB string format
         rgb_color = [c.name() for c in hsv_color]
         # remove the # char
