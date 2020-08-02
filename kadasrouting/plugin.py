@@ -53,13 +53,15 @@ class RoutingPlugin(QObject):
         self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
         self.tspAction.setCheckable(True)
         self.tspAction.toggled.connect(self.showTSP)
-        self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
+        self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(ShortestPathLayerType())
 
     def unload(self):
-        self.iface.removeAction( self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.iface.removeAction(self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.iface.removeAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
+        self.iface.removeAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
     def showShortest(self, show=True):
         if show:
