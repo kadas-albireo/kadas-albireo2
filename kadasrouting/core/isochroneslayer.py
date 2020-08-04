@@ -86,7 +86,8 @@ class IsochroneLayerGenerator(object):
         item = KadasPolygonItem(self.crs, True)
         item.addPartFromGeometry(feature.geometry().constGet())
         item.setOutline(QPen(QColor(0,0,0)))
-        item.setFill(QBrush(QColor(f"#80" + feature["color"][1:])))
+        # Set opacity to 75% or C0 in hex (25% transparency)
+        item.setFill(QBrush(QColor(f"#C0" + feature["color"][1:])))
         layer.addItem(item)
 
     @staticmethod
