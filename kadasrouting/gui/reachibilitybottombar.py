@@ -230,41 +230,25 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
     def getColorFromInterval(self):
         num_interval = len(self.getInterval())
-        default_colors = [
-            '00cc00',  # green
-            '72dc00',
-            'eeee00',  # yellow
-            'da6400',
-            'cc0000'  # red
-        ]
-        if num_interval <= 5:
-            LOG.info('use default color')
-        if num_interval == 1:
-            return default_colors[0:1]
-        elif num_interval == 2:
-            return [default_colors[0], default_colors[4]]
-        elif num_interval == 3:
-            return [default_colors[0], default_colors[2],  default_colors[4]]
-        elif num_interval == 4:
-            return [default_colors[0], default_colors[1], default_colors[3], default_colors[4]]
-        elif num_interval == 5:
-            return default_colors
-
-        # For other case (color probably not so accurate)
-        # first generate the value for color based on HSV
-        # https://doc.qt.io/qt-5/qcolor.html#the-hsv-color-model
-        # starting with green v=120 to red v=0
-        hsv_value = []
-        step = 120 / (num_interval - 1)
-        current_value = 0
-        while math.ceil(current_value) < 120:
-            hsv_value.append(int(current_value))
-            current_value += step
-        hsv_value.append(120)
-        hsv_value.reverse()
-        hsv_color = [QColor.fromHsv(h, 255, 204, 255) for h in hsv_value]
-        # get the RGB string format
-        rgb_color = [c.name() for c in hsv_color]
-        # remove the # char
-        rgb_value_valhalla = [c[1:] for c in rgb_color]
-        return rgb_value_valhalla
+        first_color = '00CC00'
+        last_color = 'CC0000'
+        colors = {
+            1: [first_color],
+            2: [first_color, last_color],
+            3: [first_color, 'CCCC00', last_color],
+            4: [first_color, '88CC00', 'CC8800', last_color],
+            5: [first_color, '66CC00', 'CCCC00', 'CC6600', last_color],
+            6: [first_color, '51CC00', 'A3CC00', 'CCA300', 'CC5100', last_color],
+            7: [first_color, '43CC00', '88CC00', 'CCCC00', 'CC8800', 'CC4300', last_color],
+            8: [first_color, '3ACC00', '74CC00', 'AECC00', 'CCAE00', 'CC7400', 'CC3A00', last_color],
+            9: [first_color, '33CC00', '66CC00', '99CC00', 'CCCC00', 'CC9900', 'CC6600', 'CC3300', last_color],
+            10: [first_color, '2DCC00', '5ACC00', '88CC00', 'B5CC00', 'CCB500', 'CC8800', 'CC5A00', 'CC2D00',
+                last_color],
+            11: [first_color, '28CC00', '51CC00', '7ACC00', 'A3CC00', 'CCCC00', 'CCA300', 'CC7A00', 'CC5100',
+                'CC2800', last_color],
+            12: [first_color, '25CC00', '4ACC00', '6FCC00', '94CC00', 'B9CC00', 'CCB900', 'CC9400', 'CC6F00',
+                'CC4A00', 'CC2500', last_color]
+        }
+        if num_interval not in colors.keys():
+            return []
+        return colors[num_interval]
