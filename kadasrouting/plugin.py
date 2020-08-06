@@ -13,8 +13,9 @@ from qgis.core import QgsPluginLayerRegistry, QgsApplication
 from kadas.kadasgui import KadasPluginInterface
 
 from kadasrouting.utilities import icon, pushWarning
-from kadasrouting.core.shortestpathlayer import ShortestPathLayerType
-from kadasrouting.gui.shortestpathbottombar import ShortestPathBottomBar
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
+from kadasrouting.core.isochroneslayer import IsochronesLayerType
+from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachibilitybottombar import ReachibilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 
@@ -32,16 +33,16 @@ class RoutingPlugin(QObject):
         QObject.__init__(self)
         
         self.iface = KadasPluginInterface.cast(iface)
-        self.shortestPathBar = None
+        self.optimalRouteBar = None
         self.reachibilityBar = None
         self.tspBar = None
 
     def initGui(self):
         # Routing menu
-        self.shortestAction = QAction(icon("routing.png"), self.tr("Routing"))
-        self.shortestAction.setCheckable(True)
-        self.shortestAction.toggled.connect(self.showShortest)
-        self.iface.addAction(self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.optimalRouteAction = QAction(icon("routing.png"), self.tr("Routing"))
+        self.optimalRouteAction.setCheckable(True)
+        self.optimalRouteAction.toggled.connect(self.showOptimalRoute)
+        self.iface.addAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Reachibility menu
         self.reachabilityAction = QAction(icon("reachibility.png"), self.tr("Reachability"))
@@ -56,21 +57,22 @@ class RoutingPlugin(QObject):
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
-        reg.addPluginLayerType(ShortestPathLayerType())
+        reg.addPluginLayerType(OptimalRouteLayerType())
+        reg.addPluginLayerType(IsochronesLayerType())
 
     def unload(self):
-        self.iface.removeAction(self.shortestAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.iface.removeAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
         self.iface.removeAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
         self.iface.removeAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
-    def showShortest(self, show=True):
+    def showOptimalRoute(self, show=True):
         if show:
-            if self.shortestPathBar is None:
-                self.shortestPathBar = ShortestPathBottomBar(self.iface.mapCanvas(), self.shortestAction)
-            self.shortestPathBar.show()
+            if self.optimalRouteBar is None:
+                self.optimalRouteBar = OptimalRouteBottomBar(self.iface.mapCanvas(), self.optimalRouteAction)
+            self.optimalRouteBar.show()
         else:
-            if self.shortestPathBar is not None:
-                self.shortestPathBar.hide()
+            if self.optimalRouteBar is not None:
+                self.optimalRouteBar.hide()
 
     def showReachibility(self, show=True):
         if show:

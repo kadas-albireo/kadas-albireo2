@@ -23,7 +23,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     )
 
-from kadasrouting.core.shortestpathlayer import ShortestPathLayer, RoutePointMapItem
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, RoutePointMapItem
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'tspbottombar.ui'))
 
@@ -44,7 +44,7 @@ class TSPBottomBar(KadasBottomBar, WIDGET):
         self.btnCalculate.clicked.connect(self.calculate)
 
         self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, ShortestPathLayer),
+                                                        lambda x: isinstance(x, OptimalRouteLayer),
                                                         self.createLayer)
         self.layerSelector.createLayerIfEmpty("TSP")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
@@ -61,7 +61,7 @@ class TSPBottomBar(KadasBottomBar, WIDGET):
         self.pushButtonReset.clicked.connect(self.clear)
 
     def createLayer(self, name):
-        layer = ShortestPathLayer(name)
+        layer = OptimalRouteLayer(name)
         return layer
 
     def calculate(self):

@@ -53,12 +53,12 @@ class RoutePointMapItem(KadasPinItem):
         super().edit(context, pos, settings)
         self.hasChanged.emit()
 
-class ShortestPathLayer(KadasItemLayer):
+class OptimalRouteLayer(KadasItemLayer):
 
-    LAYER_TYPE="shortestpath"
+    LAYER_TYPE="optimalroute"
 
     def __init__(self, name):
-        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), ShortestPathLayer.LAYER_TYPE)
+        KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), OptimalRouteLayer.LAYER_TYPE)
         self.geom = None
         self.response = None
         self.points = []
@@ -154,7 +154,7 @@ class ShortestPathLayer(KadasItemLayer):
             self.addItem(pin)
 
     def layerTypeKey(self):
-        return ShortestPathLayer.LAYER_TYPE
+        return OptimalRouteLayer.LAYER_TYPE
 
     def readXml(self, node, context):        
         element = node.toElement()
@@ -189,13 +189,13 @@ class ShortestPathLayer(KadasItemLayer):
         layer.updateExtents()
         QgsProject.instance().addMapLayer(layer)
 
-class ShortestPathLayerType(KadasPluginLayerType):
+class OptimalRouteLayerType(KadasPluginLayerType):
 
     def __init__(self):
-        KadasPluginLayerType.__init__(self, ShortestPathLayer.LAYER_TYPE)
+        KadasPluginLayerType.__init__(self, OptimalRouteLayer.LAYER_TYPE)
 
     def createLayer(self):
-        return ShortestPathLayer('')
+        return OptimalRouteLayer('')
 
     def showLayerProperties(self, layer):
         return True

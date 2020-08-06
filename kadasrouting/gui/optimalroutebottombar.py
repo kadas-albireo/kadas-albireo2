@@ -23,11 +23,11 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     )
 
-from kadasrouting.core.shortestpathlayer import ShortestPathLayer, RoutePointMapItem
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, RoutePointMapItem
 
-WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'shortestpathbottombar.ui'))
+WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'optimalroutebottombar.ui'))
 
-class ShortestPathBottomBar(KadasBottomBar, WIDGET):
+class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
@@ -50,7 +50,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
         self.btnCalculate.clicked.connect(self.calculate)
 
         self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, ShortestPathLayer),
+                                                        lambda x: isinstance(x, OptimalRouteLayer),
                                                         self.createLayer)
         #self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
         self.layerSelector.createLayerIfEmpty("Route")
@@ -77,7 +77,7 @@ class ShortestPathBottomBar(KadasBottomBar, WIDGET):
             self.setFixedSize(self.size() * 1.5)
 
     def createLayer(self, name):
-        layer = ShortestPathLayer(name)
+        layer = OptimalRouteLayer(name)
         return layer
 
     def calculate(self):

@@ -3,6 +3,7 @@ import logging
 
 from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, QTextCodec
 from PyQt5.QtGui import QColor, QPen, QBrush
+from PyQt5.QtWidgets import QAction
 
 from kadas.kadasgui import (
     KadasPinItem, 
@@ -164,13 +165,16 @@ class IsochronesLayer(KadasItemLayer):
         element.setAttribute("response", json.dumps(self.response))
         return True
 
+
+
+
 class IsochronesLayerType(KadasPluginLayerType):
 
-  def __init__(self):
-    KadasPluginLayerType.__init__(self, IsochronesLayer.LAYER_TYPE)
+    def __init__(self):
+        KadasPluginLayerType.__init__(self, IsochronesLayer.LAYER_TYPE)
 
-  def createLayer(self, name=''):
-    return IsochronesLayer(name)
-    
-  def showLayerProperties(self, layer):
-    return True
+    def createLayer(self, name=''):
+        return IsochronesLayer(name)
+
+    def showLayerProperties(self, layer):
+        return True
