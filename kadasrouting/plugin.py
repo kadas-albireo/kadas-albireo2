@@ -15,7 +15,7 @@ from kadas.kadasgui import KadasPluginInterface
 from kadasrouting.utilities import icon, pushWarning
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
-from kadasrouting.gui.reachibilitybottombar import ReachibilityBottomBar
+from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
@@ -33,7 +33,7 @@ class RoutingPlugin(QObject):
         
         self.iface = KadasPluginInterface.cast(iface)
         self.optimalRouteBar = None
-        self.reachibilityBar = None
+        self.reachabilityBar = None
         self.tspBar = None
 
     def initGui(self):
@@ -43,10 +43,10 @@ class RoutingPlugin(QObject):
         self.optimalRouteAction.toggled.connect(self.showOptimalRoute)
         self.iface.addAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
-        # Reachibility menu
-        self.reachabilityAction = QAction(icon("reachibility.png"), self.tr("Reachability"))
+        # Reachability menu
+        self.reachabilityAction = QAction(icon("reachability.png"), self.tr("Reachability"))
         self.reachabilityAction.setCheckable(True)
-        self.reachabilityAction.toggled.connect(self.showReachibility)
+        self.reachabilityAction.toggled.connect(self.showReachability)
         self.iface.addAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
 
         # TSP menu
@@ -72,14 +72,14 @@ class RoutingPlugin(QObject):
             if self.optimalRouteBar is not None:
                 self.optimalRouteBar.hide()
 
-    def showReachibility(self, show=True):
+    def showReachability(self, show=True):
         if show:
-            if self.reachibilityBar is None:
-                self.reachibilityBar = ReachibilityBottomBar(self.iface.mapCanvas(), self.reachabilityAction)
-            self.reachibilityBar.show()
+            if self.reachabilityBar is None:
+                self.reachabilityBar = ReachabilityBottomBar(self.iface.mapCanvas(), self.reachabilityAction)
+            self.reachabilityBar.show()
         else:
-            if self.reachibilityBar is not None:
-                self.reachibilityBar.hide()
+            if self.reachabilityBar is not None:
+                self.reachabilityBar.hide()
 
 
     def showTSP(self, show=True):
