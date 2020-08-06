@@ -33,9 +33,9 @@ from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
 from kadasrouting.exceptions import Valhalla400Exception
 
-WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'reachibilitybottombar.ui'))
+WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'reachabilitybottombar.ui'))
 
-class ReachibilityBottomBar(KadasBottomBar, WIDGET):
+class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
@@ -45,7 +45,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         self.canvas = canvas
 
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnClose.setToolTip('Close reachibility dialog')
+        self.btnClose.setToolTip('Close reachability dialog')
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
@@ -57,12 +57,12 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
-        self.reachibilityMode = {
+        self.reachabilityMode = {
             'isochrone': self.tr('Isochrone'),
             'isodistance': self.tr('Isodistance'),
         }
 
-        self.comboBoxReachibiliyMode.addItems(self.reachibilityMode.values())
+        self.comboBoxReachibiliyMode.addItems(self.reachabilityMode.values())
         self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
         self.setIntervalToolTip()
 
@@ -205,7 +205,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         # remove white space
         intervalText = ''.join(intervalText.split())
         interval = intervalText.split(';')
-        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
+        if self.comboBoxReachibiliyMode.currentText() == self.reachabilityMode['isochrone']:
             # try to convert to int for isochrone
             interval = [int(x) for x in interval if len(x) > 0]
         else:
@@ -216,7 +216,7 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
     def setIntervalToolTip(self):
         """Set the tool tip for interval line edit based on the current mode."""
-        if self.comboBoxReachibiliyMode.currentText() == self.reachibilityMode['isochrone']:
+        if self.comboBoxReachibiliyMode.currentText() == self.reachabilityMode['isochrone']:
             self.lineEditIntervals.setToolTip(
                 'Set interval as interger in minutes, separated by ";" symbol')
         else:
