@@ -4,6 +4,7 @@ import math
 
 from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
+from PyQt5.QtWidgets import QAction
 
 from kadas.kadasgui import (
     KadasPinItem, 
@@ -58,6 +59,7 @@ class ShortestPathLayer(KadasItemLayer):
 
     def __init__(self, name):
         KadasItemLayer.__init__(self, name, QgsCoordinateReferenceSystem("EPSG:4326"), ShortestPathLayer.LAYER_TYPE)
+        self.geom = None
         self.response = None
         self.points = []
         self.pins = []
@@ -68,6 +70,8 @@ class ShortestPathLayer(KadasItemLayer):
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.updateFromPins)
+        self.actionAddAsRegularLayer = QAction("Add to project as regular layer")
+        self.actionAddAsRegularLayer.triggered.connect(self.addAsRegularLayer)
 
     def setResponse(self, response):
         self.response = response
@@ -94,7 +98,6 @@ class ShortestPathLayer(KadasItemLayer):
             #TODO more fine-grained error control            
             pushWarning("Could not compute route")
             logging.error("Could not compute route")
-        
 
     @waitcursor
     def updateRoute(self, points, costingOptions, shortest):
@@ -110,7 +113,6 @@ class ShortestPathLayer(KadasItemLayer):
         self.clear()
         self.response = response
         response_mini = response['trip']
-        feat = QgsFeature()
         coordinates, distance, duration = [], 0, 0
         for leg in response_mini['legs']:
                 coordinates.extend([
@@ -120,9 +122,9 @@ class ShortestPathLayer(KadasItemLayer):
                 duration += leg['summary']['time']
                 distance += round(leg['summary']['length'], 3)
         qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
-        geom = QgsGeometry.fromPolylineXY(qgis_coords)
+        self.geom = QgsGeometry.fromPolylineXY(qgis_coords)
         self.lineItem = KadasLineItem(epsg4326, True)
-        self.lineItem.addPartFromGeometry(geom.constGet())
+        self.lineItem.addPartFromGeometry(self.geom.constGet())
         # Format string for duration
         duration_hour = int(duration) // 3600
         duration_minute = (int(duration) % 3600) // 60
@@ -176,14 +178,29 @@ class ShortestPathLayer(KadasItemLayer):
         element.setAttribute("costingOptions", json.dumps(self.costingOptions))
         return True
 
+    def addAsRegularLayer(self):
+        layer = QgsVectorLayer("LineString?crs=epsg:4326&field=id:integer",
+                                self.name(), "memory")
+        pr = layer.dataProvider()
+        feature = QgsFeature()
+        feature.setAttributes([1])
+        feature.setGeometry(self.geom)
+        pr.addFeatures([feature])
+        layer.updateExtents()
+        QgsProject.instance().addMapLayer(layer)
 
 class ShortestPathLayerType(KadasPluginLayerType):
 
-  def __init__(self):
-    KadasPluginLayerType.__init__(self, ShortestPathLayer.LAYER_TYPE)
+    def __init__(self):
+        KadasPluginLayerType.__init__(self, ShortestPathLayer.LAYER_TYPE)
 
-  def createLayer(self):
-    return ShortestPathLayer('')
+    def createLayer(self):
+        return ShortestPathLayer('')
+
+    def showLayerProperties(self, layer):
+        return True
+
+    def addLayerTreeMenuActions(self, menu, layer):       
+        menu.addAction(layer.actionAddAsRegularLayer)    
+
     
-  def showLayerProperties(self, layer):
-    return True
