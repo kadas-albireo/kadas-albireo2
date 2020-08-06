@@ -29,7 +29,7 @@ from qgis.core import (
     QgsRectangle
     )
 
-from kadasrouting.core.isochroneslayer import IsochronesLayer, IsochroneLayerGenerator, OverwriteError
+from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
 from kadasrouting.exceptions import Valhalla400Exception
 
@@ -54,10 +54,6 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
 
         self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))
         self.layout().addWidget(self.originSearchBox, 3, 1)
-        # FIXME: I don't know if layerSelector is useful anymore
-        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, IsochronesLayer),
-                                                        self.createLayer)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
@@ -127,12 +123,11 @@ class ReachibilityBottomBar(KadasBottomBar, WIDGET):
         except Exception as e:
             pushWarning("Invalid intervals: %s" % str(e))
             return
-        isochroneLayersGenerator = IsochroneLayerGenerator(self.getBasename())
         colors = []
         try:
             colors = self.getColorFromInterval()
             LOG.debug('_'.join(colors))
-            isochroneLayersGenerator.generateIsochrones(point, intervals, colors, overwrite)
+            generateIsochrones(point, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             pushWarning("Please change the basename or activate the overwrite checkbox")
         except Valhalla400Exception as e:

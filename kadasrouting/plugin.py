@@ -14,7 +14,6 @@ from kadas.kadasgui import KadasPluginInterface
 
 from kadasrouting.utilities import icon, pushWarning
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
-from kadasrouting.core.isochroneslayer import IsochronesLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachibilitybottombar import ReachibilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
@@ -58,7 +57,6 @@ class RoutingPlugin(QObject):
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
-        reg.addPluginLayerType(IsochronesLayerType())
 
     def unload(self):
         self.iface.removeAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
