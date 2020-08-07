@@ -22,7 +22,7 @@ from qgis.utils import iface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
-    QgsCoordinateReferenceSystem,,
+    QgsCoordinateReferenceSystem,
     QgsPointXY,
     QgsGeometry,
     QgsFeature

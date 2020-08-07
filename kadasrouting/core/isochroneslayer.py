@@ -17,7 +17,8 @@ from qgis.core import (
     QgsFeature,
     QgsJsonUtils,
     QgsFields,
-    QgsField
+    QgsField,
+    QgsVectorLayer
 )
 
 LOG = logging.getLogger(__name__)
