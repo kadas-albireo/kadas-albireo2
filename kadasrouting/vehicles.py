@@ -1,7 +1,9 @@
 vehicles = []
 options = []
 
+
 def readVehicleData():
-	pass
+    pass
+
 
 readVehicleData()

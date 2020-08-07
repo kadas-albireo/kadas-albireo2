@@ -4,26 +4,33 @@ from qgis.PyQt.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from qgis.utils import iface
-from qgis.core import (QgsCoordinateReferenceSystem,
-                       QgsCoordinateTransform,
-                       QgsProject,
-                       Qgis
-                       )
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    Qgis,
+)
+
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
 
+
 def icon(name):
     return QIcon(iconPath(name))
 
+
 def showMessageBox(text):
-    QMessageBox.information(iface.mainWindow(),  'Log', text)
+    QMessageBox.information(iface.mainWindow(), "Log", text)
+
 
 def pushMessage(text):
     iface.messageBar().pushMessage("Info", text, level=Qgis.Info)
 
+
 def pushWarning(text):
-    iface.messageBar().pushMessage("Warning", text, level=Qgis.Warning)    
+    iface.messageBar().pushMessage("Warning", text, level=Qgis.Warning)
+
 
 def waitcursor(method):
     def func(*args, **kw):
@@ -35,7 +42,8 @@ def waitcursor(method):
         finally:
             QApplication.restoreOverrideCursor()
 
-    return func    
+    return func
+
 
 def transformToWGS(crs):
     """
@@ -51,7 +59,8 @@ def transformToWGS(crs):
     xformer = QgsCoordinateTransform(crs, outCrs, QgsProject.instance())
 
     return xformer
-    
+
+
 def _trans(value, index):
     """
     Copyright (c) 2014 Bruno M. Custódio
@@ -63,7 +72,7 @@ def _trans(value, index):
     while byte is None or byte >= 0x20:
         byte = ord(value[index]) - 63
         index += 1
-        result |= (byte & 0x1f) << shift
+        result |= (byte & 0x1F) << shift
         shift += 5
         comp = result & 1
 

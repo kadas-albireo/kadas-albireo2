@@ -10,17 +10,17 @@ from qgis.core import (
     QgsProject,
     QgsPointXY,
     QgsGpsDetector,
-    QgsSettings
-    )
+    QgsSettings,
+)
 
 from kadasrouting.utilities import (
-    icon, 
-    iconPath, 
-    showMessageBox, 
-    pushMessage, 
-    pushWarning, 
-    waitcursor
-    )
+    icon,
+    iconPath,
+    showMessageBox,
+    pushMessage,
+    pushWarning,
+    waitcursor,
+)
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
@@ -35,15 +35,16 @@ from kadas.kadasgui import (
     KadasSearchProvider,
     KadasMapCanvasItemManager,
     KadasPinItem,
-    KadasItemPos
-    )
+    KadasItemPos,
+)
+
 
 class WrongLocationException(Exception):
     pass
 
-class LocationInputWidget(QWidget):
 
-    def __init__(self, canvas, locationSymbolPath = ':/kadas/icons/pin_red'):
+class LocationInputWidget(QWidget):
+    def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red"):
         QWidget.__init__(self)
         self.canvas = canvas
         self.locationSymbolPath = locationSymbolPath
@@ -54,7 +55,7 @@ class LocationInputWidget(QWidget):
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
-        self.btnGPS.setToolTip('Get GPS location')
+        self.btnGPS.setToolTip("Get GPS location")
         self.btnGPS.setIcon(icon("gps.png"))
         self.btnGPS.clicked.connect(self.getCoordFromGPS)
 
@@ -62,7 +63,7 @@ class LocationInputWidget(QWidget):
 
         self.btnMapTool = QToolButton()
         self.btnMapTool.setCheckable(True)
-        self.btnMapTool.setToolTip('Choose location on the map')
+        self.btnMapTool.setToolTip("Choose location on the map")
         self.btnMapTool.setIcon(QIcon(":/kadas/icons/pick"))
         self.btnMapTool.toggled.connect(self.btnMapToolClicked)
         self.layout.addWidget(self.btnMapTool)
@@ -89,14 +90,17 @@ class LocationInputWidget(QWidget):
     @waitcursor
     def _getGpsConnection(self):
         if self._gpsConnection is None:
-            port = str(QgsSettings().value( "/kadas/gps_port", "" ));
+            port = str(QgsSettings().value("/kadas/gps_port", ""))
             gpsDetector = QgsGpsDetector(port)
             loop = QEventLoop()
+
             def gpsDetected(connection):
                 self._gpsConnection = connection
                 loop.exit()
+
             def gpsDetectionFailed():
                 loop.exit()
+
             gpsDetector.detected.connect(gpsDetected)
             gpsDetector.detectionFailed.connect(gpsDetectionFailed)
             gpsDetector.advance()
@@ -107,7 +111,7 @@ class LocationInputWidget(QWidget):
         connection = self._getGpsConnection()
         if connection:
             info = connection.currentGPSInformation()
-            s = '{:.6f},{:.6f}'.format(info.longitude, info.latitude)
+            s = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
             self.searchBox.setText(s)
             self.addPin()
         else:
@@ -118,15 +122,15 @@ class LocationInputWidget(QWidget):
         self.mapTool.canvasClicked.connect(self.updatePoint)
         self.mapTool.complete.connect(self.stopSelectingPoint)
 
-    def btnMapToolClicked(self, checked):        
+    def btnMapToolClicked(self, checked):
         if checked:
             self.startSelectingPoint()
         else:
             self.stopSelectingPoint()
 
     def startSelectingPoint(self):
-        """Start selecting a point (when the map tool button is clicked)"""        
-        self.createMapTool()        
+        """Start selecting a point (when the map tool button is clicked)"""
+        self.createMapTool()
         self.canvas.setMapTool(self.mapTool)
 
     def updatePoint(self, point, button):
@@ -135,14 +139,14 @@ class LocationInputWidget(QWidget):
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
         wgspoint = transform.transform(point)
-        s = '{:.6f},{:.6f}'.format(wgspoint.x(), wgspoint.y())
+        s = "{:.6f},{:.6f}".format(wgspoint.x(), wgspoint.y())
         self.searchBox.setText(s)
         self.addPin()
 
     def stopSelectingPoint(self):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
-        self.canvas.setMapTool(self.prevMapTool)               
+        self.canvas.setMapTool(self.prevMapTool)
 
     def addPin(self):
         # Remove an existing pin first
@@ -171,7 +175,7 @@ class LocationInputWidget(QWidget):
             KadasMapCanvasItemManager.removeItem(self.pin)
 
     def valueAsPoint(self):
-        #TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
+        # TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
         try:
             lon, lat = self.searchBox.text().split(",")
             point = QgsPointXY(float(lon.strip()), float(lat.strip()))
@@ -180,13 +184,12 @@ class LocationInputWidget(QWidget):
             raise WrongLocationException(self.searchBox.text())
 
     def text(self):
-        #TODO add getter for the searchbox text.
+        # TODO add getter for the searchbox text.
         return self.searchBox.text()
 
     def setText(self, text):
-        #TODO add setter for the searchbox text. Currently searchbox doesn't publish its setText
+        # TODO add setter for the searchbox text. Currently searchbox doesn't publish its setText
         self.searchBox.setText(text)
 
     def clearSearchBox(self):
-        self.setText('')
-
+        self.setText("")

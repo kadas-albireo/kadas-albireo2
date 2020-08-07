@@ -14,9 +14,12 @@ from kadas.kadasgui import (
     KadasPinItem,
     KadasItemPos,
     KadasMapCanvasItemManager,
-    KadasLayerSelectionWidget
-    )
-from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
+    KadasLayerSelectionWidget,
+)
+from kadasrouting.gui.locationinputwidget import (
+    LocationInputWidget,
+    WrongLocationException,
+)
 from kadasrouting import vehicles
 from kadasrouting.utilities import iconPath, pushMessage, pushWarning, showMessageBox
 
@@ -26,17 +29,19 @@ from qgis.core import (
     QgsProject,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
-    QgsRectangle
-    )
+    QgsRectangle,
+)
 
 from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
 from kadasrouting.exceptions import Valhalla400Exception
 
-WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'reachabilitybottombar.ui'))
+WIDGET, BASE = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "reachabilitybottombar.ui")
+)
+
 
 class ReachabilityBottomBar(KadasBottomBar, WIDGET):
-
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
@@ -45,25 +50,29 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         self.canvas = canvas
 
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnClose.setToolTip('Close reachability dialog')
+        self.btnClose.setToolTip("Close reachability dialog")
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
 
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('blue_cross.svg'))
+        self.originSearchBox = LocationInputWidget(
+            canvas, locationSymbolPath=iconPath("blue_cross.svg")
+        )
         self.layout().addWidget(self.originSearchBox, 3, 1)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
 
         self.reachabilityMode = {
-            'isochrone': self.tr('Isochrone'),
-            'isodistance': self.tr('Isodistance'),
+            "isochrone": self.tr("Isochrone"),
+            "isodistance": self.tr("Isodistance"),
         }
 
         self.comboBoxReachibiliyMode.addItems(self.reachabilityMode.values())
-        self.comboBoxReachibiliyMode.currentIndexChanged.connect(self.setIntervalToolTip)
+        self.comboBoxReachibiliyMode.currentIndexChanged.connect(
+            self.setIntervalToolTip
+        )
         self.setIntervalToolTip()
 
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
@@ -110,7 +119,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def calculate(self):
         overwrite = self.checkBoxRemovePrevious.isChecked()
-        LOG.debug('isochrones layer name = {}'.format(self.getBasename()))
+        LOG.debug("isochrones layer name = {}".format(self.getBasename()))
         try:
             point = self.originSearchBox.valueAsPoint()
         except WrongLocationException as e:
@@ -119,14 +128,14 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             intervals = self.getInterval()
             if not (1 <= len(intervals) <= 10):
-                raise Exception('Must have at least one and maximum 10 intervals.')
+                raise Exception("Must have at least one and maximum 10 intervals.")
         except Exception as e:
             pushWarning("Invalid intervals: %s" % str(e))
             return
         colors = []
         try:
             colors = self.getColorFromInterval()
-            LOG.debug('_'.join(colors))
+            LOG.debug("_".join(colors))
             generateIsochrones(point, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             pushWarning("Please change the basename or activate the overwrite checkbox")
@@ -135,7 +144,8 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             # https://valhalla.readthedocs.io/en/latest/api/turn-by-turn/api-reference/#http-status-codes-and-conditions
             json_error = json.loads(str(e))
             pushWarning(
-                'Can not generate the error because "%s"' % json_error.get('error'))
+                'Can not generate the error because "%s"' % json_error.get("error")
+            )
         except Exception as e:
             pushWarning("could not generate isochrones")
             raise Exception(e)
@@ -154,16 +164,16 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         """
         try:
             basename = self.getBasename()
-            if basename == '':
-                raise Exception('basename can not be empty')
+            if basename == "":
+                raise Exception("basename can not be empty")
             self.lineEditBasename.setStyleSheet("color: black;")
             self.btnCalculate.setEnabled(True)
-            self.btnCalculate.setToolTip('')
+            self.btnCalculate.setToolTip("")
         except Exception as e:
             pushMessage(str(e))
             self.lineEditBasename.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip('Please make sure the basename is correct.')
+            self.btnCalculate.setToolTip("Please make sure the basename is correct.")
 
     def getBasename(self):
         """Get basename as string
@@ -173,8 +183,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def setBasenameToolTip(self):
         """Set the tool tip for basename line edit based on the current mode."""
-        self.lineEditBasename.setToolTip(
-                'Set basename for the layer.')
+        self.lineEditBasename.setToolTip("Set basename for the layer.")
 
     def intervalChanges(self):
         """Slot when the text on the interval line edit changed.
@@ -185,17 +194,17 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             interval = self.getInterval()
             if len(interval) == 0:
-                raise Exception('Interval can not be empty')
+                raise Exception("Interval can not be empty")
             if len(interval) > 10:
-                raise Exception('Interval can not be more than 10')
+                raise Exception("Interval can not be more than 10")
             self.lineEditIntervals.setStyleSheet("color: black;")
             self.btnCalculate.setEnabled(True)
-            self.btnCalculate.setToolTip('')
+            self.btnCalculate.setToolTip("")
         except Exception as e:
             pushMessage(str(e))
             self.lineEditIntervals.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip('Please make sure the interval is correct.')
+            self.btnCalculate.setToolTip("Please make sure the interval is correct.")
 
     def getInterval(self):
         """Get interval of as a list of integer or float based on the current mode.
@@ -203,9 +212,12 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         """
         intervalText = self.lineEditIntervals.text()
         # remove white space
-        intervalText = ''.join(intervalText.split())
-        interval = intervalText.split(';')
-        if self.comboBoxReachibiliyMode.currentText() == self.reachabilityMode['isochrone']:
+        intervalText = "".join(intervalText.split())
+        interval = intervalText.split(";")
+        if (
+            self.comboBoxReachibiliyMode.currentText()
+            == self.reachabilityMode["isochrone"]
+        ):
             # try to convert to int for isochrone
             interval = [int(x) for x in interval if len(x) > 0]
         else:
@@ -216,17 +228,22 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def setIntervalToolTip(self):
         """Set the tool tip for interval line edit based on the current mode."""
-        if self.comboBoxReachibiliyMode.currentText() == self.reachabilityMode['isochrone']:
+        if (
+            self.comboBoxReachibiliyMode.currentText()
+            == self.reachabilityMode["isochrone"]
+        ):
             self.lineEditIntervals.setToolTip(
-                'Set interval as interger in minutes, separated by ";" symbol')
+                'Set interval as interger in minutes, separated by ";" symbol'
+            )
         else:
             self.lineEditIntervals.setToolTip(
-                'Set interval as float in KM, separated by ";" symbol')
+                'Set interval as float in KM, separated by ";" symbol'
+            )
 
     def getColorFromInterval(self):
         num_interval = len(self.getInterval())
-        first_color = '00CC00'
-        last_color = 'CC0000'
+        first_color = "00CC00"
+        last_color = "CC0000"
         colors = {
             1: [first_color],
             2: [first_color, last_color],

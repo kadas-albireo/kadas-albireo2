@@ -23,14 +23,13 @@ try:
     os.mkdir(os.path.dirname(logfile))
 except FileExistsError:
     pass
-logging.basicConfig(filename=logfile,level=logging.DEBUG)
+logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
 
 class RoutingPlugin(QObject):
-
     def __init__(self, iface):
         QObject.__init__(self)
-        
+
         self.iface = KadasPluginInterface.cast(iface)
         self.optimalRouteBar = None
         self.reachabilityBar = None
@@ -41,13 +40,19 @@ class RoutingPlugin(QObject):
         self.optimalRouteAction = QAction(icon("routing.png"), self.tr("Routing"))
         self.optimalRouteAction.setCheckable(True)
         self.optimalRouteAction.toggled.connect(self.showOptimalRoute)
-        self.iface.addAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.iface.addAction(
+            self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
 
         # Reachability menu
-        self.reachabilityAction = QAction(icon("reachability.png"), self.tr("Reachability"))
+        self.reachabilityAction = QAction(
+            icon("reachability.png"), self.tr("Reachability")
+        )
         self.reachabilityAction.setCheckable(True)
         self.reachabilityAction.toggled.connect(self.showReachability)
-        self.iface.addAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
+        self.iface.addAction(
+            self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
+        )
 
         # TSP menu
         self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
@@ -59,14 +64,22 @@ class RoutingPlugin(QObject):
         reg.addPluginLayerType(OptimalRouteLayerType())
 
     def unload(self):
-        self.iface.removeAction(self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
-        self.iface.removeAction(self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB)
-        self.iface.removeAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.iface.removeAction(
+            self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
+        self.iface.removeAction(
+            self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
+        )
+        self.iface.removeAction(
+            self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
 
     def showOptimalRoute(self, show=True):
         if show:
             if self.optimalRouteBar is None:
-                self.optimalRouteBar = OptimalRouteBottomBar(self.iface.mapCanvas(), self.optimalRouteAction)
+                self.optimalRouteBar = OptimalRouteBottomBar(
+                    self.iface.mapCanvas(), self.optimalRouteAction
+                )
             self.optimalRouteBar.show()
         else:
             if self.optimalRouteBar is not None:
@@ -75,12 +88,13 @@ class RoutingPlugin(QObject):
     def showReachability(self, show=True):
         if show:
             if self.reachabilityBar is None:
-                self.reachabilityBar = ReachabilityBottomBar(self.iface.mapCanvas(), self.reachabilityAction)
+                self.reachabilityBar = ReachabilityBottomBar(
+                    self.iface.mapCanvas(), self.reachabilityAction
+                )
             self.reachabilityBar.show()
         else:
             if self.reachabilityBar is not None:
                 self.reachabilityBar.hide()
-
 
     def showTSP(self, show=True):
         if show:

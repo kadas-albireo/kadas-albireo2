@@ -2,11 +2,7 @@
 
 ## Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
-from qgis.core import (QgsPointXY,
-                       QgsGeometry,
-                       QgsFeature,
-                       QgsVectorLayer,
-                       QgsField)
+from qgis.core import QgsPointXY, QgsGeometry, QgsFeature, QgsVectorLayer, QgsField
 
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 
@@ -14,11 +10,10 @@ from .connectors import HttpConnector
 
 TEST_URL = "https://valhalla.gis-ops.com/osm"
 
-class ValhallaClient():
 
-    def __init__(self, connector = None):
+class ValhallaClient:
+    def __init__(self, connector=None):
         self.connector = connector or HttpConnector(TEST_URL)
-
 
     def route(self, qgspoints, options, shortest=False):
         """
@@ -55,8 +50,8 @@ class ValhallaClient():
 
     def pointsFromQgsPoints(self, qgspoints):
         points = []
-        for qgspoint in qgspoints:     
-            points.append({"lon": round(qgspoint.x(), 6), "lat": round(qgspoint.y(), 6)})
+        for qgspoint in qgspoints:
+            points.append(
+                {"lon": round(qgspoint.x(), 6), "lat": round(qgspoint.y(), 6)}
+            )
         return points
-
-

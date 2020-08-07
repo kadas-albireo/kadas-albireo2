@@ -6,13 +6,16 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
-    KadasBottomBar, 
-    KadasPinItem, 
-    KadasItemPos, 
-    KadasMapCanvasItemManager, 
-    KadasLayerSelectionWidget
-    )
-from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
+    KadasBottomBar,
+    KadasPinItem,
+    KadasItemPos,
+    KadasMapCanvasItemManager,
+    KadasLayerSelectionWidget,
+)
+from kadasrouting.gui.locationinputwidget import (
+    LocationInputWidget,
+    WrongLocationException,
+)
 from kadasrouting import vehicles
 from kadasrouting.utilities import iconPath, pushMessage, pushWarning
 
@@ -21,14 +24,16 @@ from qgis.core import (
     Qgis,
     QgsProject,
     QgsCoordinateReferenceSystem,
-    )
+)
 
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, RoutePointMapItem
 
-WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'optimalroutebottombar.ui'))
+WIDGET, BASE = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
+)
+
 
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
-
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
@@ -38,31 +43,38 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.waypoints = []
         self.waypointPins = []
 
-
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnAddWaypoints.setToolTip('Add waypoint')
-        self.btnClose.setToolTip('Close routing dialog')
+        self.btnAddWaypoints.setToolTip("Add waypoint")
+        self.btnClose.setToolTip("Close routing dialog")
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
 
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, OptimalRouteLayer),
-                                                        self.createLayer)
-        #self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
+        self.layerSelector = KadasLayerSelectionWidget(
+            canvas,
+            iface.layerTreeView(),
+            lambda x: isinstance(x, OptimalRouteLayer),
+            self.createLayer,
+        )
         self.layerSelector.createLayerIfEmpty("Route")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
-        self.originSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_origin.svg'))
+        self.originSearchBox = LocationInputWidget(
+            canvas, locationSymbolPath=iconPath("pin_origin.svg")
+        )
         self.layout().addWidget(self.originSearchBox, 2, 1)
 
-        self.destinationSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_destination.svg'))
+        self.destinationSearchBox = LocationInputWidget(
+            canvas, locationSymbolPath=iconPath("pin_destination.svg")
+        )
         self.layout().addWidget(self.destinationSearchBox, 3, 1)
 
-        self.waypointsSearchBox = LocationInputWidget(canvas, locationSymbolPath=iconPath('pin_bluegray.svg'))
+        self.waypointsSearchBox = LocationInputWidget(
+            canvas, locationSymbolPath=iconPath("pin_bluegray.svg")
+        )
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
 
         self.comboBoxVehicles.addItems(vehicles.vehicles)
@@ -94,16 +106,16 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             return
 
         shortest = self.radioButtonShortest.isChecked()
-        '''
+        """
         vehicle = self.comboBoxVehicle.currentIndex()
         costingOptions = vehicles.options[vehicle]
-        '''
+        """
         costingOptions = {}
         try:
             layer.updateRoute(points, costingOptions, shortest)
-        except Exception as e:            
+        except Exception as e:
             logging.error(e, exc_info=True)
-            #TODO more fine-grained error control            
+            # TODO more fine-grained error control
             pushWarning("Could not compute route")
             logging.error("Could not compute route")
 
@@ -121,14 +133,16 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
     def addWaypoints(self):
         """Add way point to the list of way points"""
-        if self.waypointsSearchBox.text() == '':
+        if self.waypointsSearchBox.text() == "":
             return
         waypoint = self.waypointsSearchBox.valueAsPoint()
         self.waypoints.append(waypoint)
-        if self.lineEditWaypoints.text() == '':
+        if self.lineEditWaypoints.text() == "":
             self.lineEditWaypoints.setText(self.waypointsSearchBox.text())
         else:
-            self.lineEditWaypoints.setText(self.lineEditWaypoints.text() + ';' + self.waypointsSearchBox.text())
+            self.lineEditWaypoints.setText(
+                self.lineEditWaypoints.text() + ";" + self.waypointsSearchBox.text()
+            )
         self.waypointsSearchBox.clearSearchBox()
         # Remove way point pin from the location input widget
         self.waypointsSearchBox.removePin()
@@ -144,8 +158,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.waypointPins.reverse()
         waypointsCoordinates = []
         for waypoint in self.waypoints:
-            waypointsCoordinates.append('%f, %f' % (waypoint.x(), waypoint.y()))
-        self.lineEditWaypoints.setText(';'.join(waypointsCoordinates))
+            waypointsCoordinates.append("%f, %f" % (waypoint.x(), waypoint.y()))
+        self.lineEditWaypoints.setText(";".join(waypointsCoordinates))
         self.clearPins()
         self.addPins()
 
@@ -155,7 +169,13 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         canvasCrs = QgsCoordinateReferenceSystem(4326)
         waypointPin = KadasPinItem(canvasCrs)
         waypointPin.setPosition(KadasItemPos(waypoint.x(), waypoint.y()))
-        waypointPin.setup(':/kadas/icons/waypoint', waypointPin.anchorX(), waypointPin.anchorX(), 32, 32)
+        waypointPin.setup(
+            ":/kadas/icons/waypoint",
+            waypointPin.anchorX(),
+            waypointPin.anchorX(),
+            32,
+            32,
+        )
         self.waypointPins.append(waypointPin)
         KadasMapCanvasItemManager.addItem(waypointPin)
 
