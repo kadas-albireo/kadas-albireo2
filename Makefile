@@ -4,7 +4,7 @@ DIR := ${CURDIR}
 
 # LOCALES = space delimited list of iso codes to generate po files for
 # Please dont remove en here
-LOCALES = en fr de it
+LOCALES = en fr de it id
 
 #Qt .ts file updates - run to register new strings for translation in safe_qgis
 update-translation-strings:
