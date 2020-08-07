@@ -1,8 +1,7 @@
 import json
 import logging
-import math
 
-from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, Qt
+from PyQt5.QtCore import QTimer, pyqtSignal, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
 from PyQt5.QtWidgets import QAction
 
@@ -23,18 +22,10 @@ from qgis.utils import iface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
-    QgsWkbTypes,
-    QgsLineSymbol,
-    QgsSingleSymbolRenderer,
-    QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
+    QgsCoordinateReferenceSystem,,
     QgsPointXY,
     QgsGeometry,
-    QgsPointXY,
-    QgsGeometry,
-    QgsFeature,
-    QgsVectorLayer,
-    QgsField,
+    QgsFeature
 )
 
 

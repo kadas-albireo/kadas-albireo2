@@ -2,8 +2,6 @@
 
 ## Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
-from qgis.core import QgsPointXY, QgsGeometry, QgsFeature, QgsVectorLayer, QgsField
-
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 
 from .connectors import HttpConnector

@@ -1,46 +1,24 @@
 import json
 import logging
 
-from PyQt5.QtCore import QTimer, pyqtSignal, QVariant, QTextCodec
-from PyQt5.QtGui import QColor, QPen, QBrush
-from PyQt5.QtWidgets import QAction
-
-from kadas.kadasgui import KadasPinItem, KadasItemPos, KadasItemLayer, KadasPolygonItem
+from PyQt5.QtCore import QVariant, QTextCodec
+from PyQt5.QtGui import QColor
 
 from kadasrouting.utilities import (
-    iconPath,
-    waitcursor,
-    pushMessage,
-    pushWarning,
-    transformToWGS,
-    decodePolyline6,
+    waitcursor
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
 
-from qgis.utils import iface
 from qgis.core import (
     QgsProject,
-    QgsVectorLayer,
     QgsWkbTypes,
-    QgsLineSymbol,
     QgsSingleSymbolRenderer,
-    QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
-    QgsPointXY,
-    QgsGeometry,
-    QgsPointXY,
-    QgsGeometry,
     QgsFeature,
-    QgsVectorLayer,
-    QgsField,
     QgsJsonUtils,
-    QgsField,
     QgsFields,
+    QgsField
 )
-
-
-from kadas.kadascore import KadasPluginLayerType
 
 LOG = logging.getLogger(__name__)
 

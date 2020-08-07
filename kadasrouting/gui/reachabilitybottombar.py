@@ -3,38 +3,33 @@ import logging
 import json
 import math
 
-LOG = logging.getLogger(__name__)
-
 from PyQt5 import uic
-from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QDesktopWidget, QLineEdit
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QDesktopWidget
 
-from kadas.kadasgui import (
-    KadasBottomBar,
-    KadasPinItem,
-    KadasItemPos,
-    KadasMapCanvasItemManager,
-    KadasLayerSelectionWidget,
-)
 from kadasrouting.gui.locationinputwidget import (
     LocationInputWidget,
-    WrongLocationException,
+    WrongLocationException
 )
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage, pushWarning, showMessageBox
+from kadasrouting.utilities import (
+    iconPath,
+    pushMessage,
+    pushWarning
+)
 
-from qgis.utils import iface
 from qgis.core import (
-    Qgis,
     QgsProject,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
-    QgsRectangle,
+    QgsRectangle
 )
 
 from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
 from kadasrouting.exceptions import Valhalla400Exception
+
+LOG = logging.getLogger(__name__)
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "reachabilitybottombar.ui")
@@ -69,8 +64,8 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             "isodistance": self.tr("Isodistance"),
         }
 
-        self.comboBoxReachibiliyMode.addItems(self.reachabilityMode.values())
-        self.comboBoxReachibiliyMode.currentIndexChanged.connect(
+        self.comboBoxReachabilityMode.addItems(self.reachabilityMode.values())
+        self.comboBoxReachabilityMode.currentIndexChanged.connect(
             self.setIntervalToolTip
         )
         self.setIntervalToolTip()
@@ -112,10 +107,6 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         rect = QgsRectangle(canvasPoint, canvasPoint)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
-
-    def createLayer(self, name):
-        layer = IsochronesLayer(name)
-        return layer
 
     def calculate(self):
         overwrite = self.checkBoxRemovePrevious.isChecked()
@@ -178,8 +169,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
     def getBasename(self):
         """Get basename as string
         """
-        basenameText = self.lineEditBasename.text()
-        return str(basenameText)
+        return self.lineEditBasename.text()
 
     def setBasenameToolTip(self):
         """Set the tool tip for basename line edit based on the current mode."""
@@ -215,7 +205,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         intervalText = "".join(intervalText.split())
         interval = intervalText.split(";")
         if (
-            self.comboBoxReachibiliyMode.currentText()
+            self.comboBoxReachabilityMode.currentText()
             == self.reachabilityMode["isochrone"]
         ):
             # try to convert to int for isochrone
@@ -228,16 +218,14 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def setIntervalToolTip(self):
         """Set the tool tip for interval line edit based on the current mode."""
-        if (
-            self.comboBoxReachibiliyMode.currentText()
-            == self.reachabilityMode["isochrone"]
-        ):
+        if (self.comboBoxReachabilityMode.currentText()
+                == self.reachabilityMode["isochrone"]):
             self.lineEditIntervals.setToolTip(
-                'Set interval as interger in minutes, separated by ";" symbol'
+                'Set interval as integer in minutes, separated by ";" symbol'
             )
         else:
             self.lineEditIntervals.setToolTip(
-                'Set interval as float in KM, separated by ";" symbol'
+                'Set interval as float in Km, separated by ";" symbol'
             )
 
     def getColorFromInterval(self):

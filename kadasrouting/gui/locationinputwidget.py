@@ -2,8 +2,6 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QEventLoop
 
-import sip
-
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
@@ -15,9 +13,6 @@ from qgis.core import (
 
 from kadasrouting.utilities import (
     icon,
-    iconPath,
-    showMessageBox,
-    pushMessage,
     pushWarning,
     waitcursor,
 )
@@ -160,7 +155,7 @@ class LocationInputWidget(QWidget):
             transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
             canvasPoint = transform.transform(point)
             self.searchBox.setStyleSheet("color: black;")
-        except WrongLocationException as e:
+        except WrongLocationException:
             self.searchBox.setStyleSheet("color: red;")
             return
 

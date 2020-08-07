@@ -17,16 +17,14 @@ from kadasrouting.gui.locationinputwidget import (
     WrongLocationException,
 )
 from kadasrouting import vehicles
-from kadasrouting.utilities import iconPath, pushMessage, pushWarning
+from kadasrouting.utilities import iconPath, pushWarning
 
 from qgis.utils import iface
 from qgis.core import (
-    Qgis,
-    QgsProject,
     QgsCoordinateReferenceSystem,
 )
 
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, RoutePointMapItem
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
