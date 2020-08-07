@@ -111,20 +111,22 @@ class OptimalRouteLayer(KadasItemLayer):
         self.clear()
         self.response = response
         response_mini = response["trip"]
-        coordinates, distance, duration = [], 0, 0
+        coordinates = []
+        self.duration = 0
+        self.distance = 0
         for leg in response_mini["legs"]:
             coordinates.extend(
                 [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
             )
-            duration += leg["summary"]["time"]
-            distance += round(leg["summary"]["length"], 3)
+            self.duration += leg["summary"]["time"]
+            self.distance += round(leg["summary"]["length"], 3)
         qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
         self.geom = QgsGeometry.fromPolylineXY(qgis_coords)
         self.lineItem = KadasLineItem(epsg4326, True)
         self.lineItem.addPartFromGeometry(self.geom.constGet())
         # Format string for duration
-        duration_hour = int(duration) // 3600
-        duration_minute = (int(duration) % 3600) // 60
+        duration_hour = int(self.duration) // 3600
+        duration_minute = (int(self.duration) % 3600) // 60
         formatted_hour = (
             str(duration_hour) if duration_hour >= 10 else "0%d" % duration_hour
         )
@@ -132,7 +134,7 @@ class OptimalRouteLayer(KadasItemLayer):
             str(duration_minute) if duration_minute >= 10 else "0%d" % duration_minute
         )
         self.lineItem.setTooltip(
-            f"Distance: {distance} KM<br/>Time: {formatted_hour}h{formatted_minute}"
+            f"Distance: {self.distance} km<br/>Time: {formatted_hour}h{formatted_minute}"
         )
         # Line color: 005EFF
         line_color = QColor(0, 94, 255)
@@ -185,11 +187,12 @@ class OptimalRouteLayer(KadasItemLayer):
 
     def addAsRegularLayer(self):
         layer = QgsVectorLayer(
-            "LineString?crs=epsg:4326&field=id:integer", self.name(), "memory"
+            "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double", 
+            self.name(), "memory"
         )
         pr = layer.dataProvider()
         feature = QgsFeature()
-        feature.setAttributes([1])
+        feature.setAttributes([1, self.distance, self.duration])
         feature.setGeometry(self.geom)
         pr.addFeatures([feature])
         layer.updateExtents()
