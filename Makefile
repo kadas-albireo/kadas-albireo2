@@ -22,14 +22,13 @@ compile-translation-strings:
 test-translations:
 	@echo
 	@echo "----------------------------------------------------------------"
-	@echo "Missing translations - for more info run: make translation-stats"
+	@echo "Check missing translation"
 	@echo "----------------------------------------------------------------"
-	@python scripts/missing_translations.py `pwd` id
 	@python scripts/missing_translations.py `pwd` fr
-	@python scripts/missing_translations.py `pwd` af
-	@python scripts/missing_translations.py `pwd` es_ES
-	@python scripts/missing_translations.py `pwd` vi
-	@python scripts/missing_translations.py `pwd` pt
+	@python scripts/missing_translations.py `pwd` de
+	@python scripts/missing_translations.py `pwd` it
+	@python scripts/missing_translations.py `pwd` id
+	@rm ./kadasrouting/i18n/*qm
 
 # Run flake8 style checking
 flake8:
