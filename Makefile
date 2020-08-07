@@ -6,18 +6,18 @@ DIR := ${CURDIR}
 # Please dont remove en here
 LOCALES = en fr de it id
 
-#Qt .ts file updates - run to register new strings for translation in safe_qgis
+#Qt .ts file updates - run to register new strings for translation 
 update-translation-strings:
 	# update application strings
 	@echo "Checking current translation."
 	@scripts/update-strings.sh $(LOCALES)
 
-#Qt .qm file updates - run to create binary representation of translated strings for translation in safe_qgis
+#Qt .qm file updates - run to create binary representation of translated strings for translation
 compile-translation-strings:
 	@#Compile qt messages binary
 	@scripts/create_pro_file.sh
-	@lrelease-qt4 inasafe.pro
-	@rm inasafe.pro
+	@lrelease-qt4 kadasrouting.pro
+	@rm kadasrouting.pro
 
 test-translations:
 	@echo
