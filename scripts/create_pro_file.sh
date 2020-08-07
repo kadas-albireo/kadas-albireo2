@@ -7,7 +7,7 @@ PRO_FILE=kadasrouting.pro
 
 echo "SOURCES = \\" > ${PRO_FILE}
 
-# First add the SAFE files to the pro file
+# First add the PYTHON FILES to the pro file
 for FILE in ${PYFILES}
 do
   echo "    ${FILE} \\"  >> ${PRO_FILE}

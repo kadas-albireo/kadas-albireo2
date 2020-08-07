@@ -30,23 +30,6 @@ test-translations:
 	@python scripts/missing_translations.py `pwd` id
 	@rm ./kadasrouting/i18n/*qm
 
-# Run flake8 style checking
-flake8:
-	@echo
-	@echo "-----------"
-	@echo "Flake8 issues"
-	@echo "-----------"
-	@python3 -m flake8 --version
-	@python3 -m flake8
-
-pylint:
-	@echo
-	@echo "-----------------"
-	@echo "Pylint violations"
-	@echo "-----------------"
-	@pylint --version
-	@pylint --reports=n --rcfile=pylintrc safe realtime || true
-
 ##########################################################
 #
 # Make targets specific to Docker go below this point
