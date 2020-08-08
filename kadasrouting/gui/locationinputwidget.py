@@ -50,7 +50,7 @@ class LocationInputWidget(QWidget):
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
-        self.btnGPS.setToolTip("Get GPS location")
+        self.btnGPS.setToolTip(self.tr("Get GPS location"))
         self.btnGPS.setIcon(icon("gps.png"))
         self.btnGPS.clicked.connect(self.getCoordFromGPS)
 
@@ -58,7 +58,7 @@ class LocationInputWidget(QWidget):
 
         self.btnMapTool = QToolButton()
         self.btnMapTool.setCheckable(True)
-        self.btnMapTool.setToolTip("Choose location on the map")
+        self.btnMapTool.setToolTip(self.tr("Choose location on the map"))
         self.btnMapTool.setIcon(QIcon(":/kadas/icons/pick"))
         self.btnMapTool.toggled.connect(self.btnMapToolClicked)
         self.layout.addWidget(self.btnMapTool)
@@ -110,7 +110,7 @@ class LocationInputWidget(QWidget):
             self.searchBox.setText(s)
             self.addPin()
         else:
-            pushWarning("Cannot connect to GPS")
+            pushWarning(self.tr("Cannot connect to GPS"))
 
     def createMapTool(self):
         self.mapTool = PointCaptureMapTool(self.canvas)

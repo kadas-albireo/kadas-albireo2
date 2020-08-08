@@ -43,8 +43,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnAddWaypoints.setToolTip("Add waypoint")
-        self.btnClose.setToolTip("Close routing dialog")
+        self.btnAddWaypoints.setToolTip(self.tr("Add waypoint"))
+        self.btnClose.setToolTip(self.tr("Close routing dialog"))
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
@@ -57,7 +57,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             lambda x: isinstance(x, OptimalRouteLayer),
             self.createLayer,
         )
-        self.layerSelector.createLayerIfEmpty("Route")
+        self.layerSelector.createLayerIfEmpty(self.tr("Route"))
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 
         self.originSearchBox = LocationInputWidget(
@@ -93,14 +93,14 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
-            pushWarning("Please, select a valid destination layer")
+            pushWarning(self.tr("Please, select a valid destination layer"))
             return
         try:
             points = [self.originSearchBox.valueAsPoint()]
             points.extend(self.waypoints)
             points.append(self.destinationSearchBox.valueAsPoint())
         except WrongLocationException as e:
-            pushWarning("Invalid location %s" % str(e))
+            pushWarning(self.tr("Invalid location: {error_message}").format(error_message=error_message))
             return
 
         shortest = self.radioButtonShortest.isChecked()
@@ -114,7 +114,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         except Exception as e:
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
-            pushWarning("Could not compute route")
+            pushWarning(self.tr("Could not compute route"))
             logging.error("Could not compute route")
 
     def clear(self):

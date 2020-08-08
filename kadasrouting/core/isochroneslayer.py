@@ -61,9 +61,9 @@ def generateIsochrones(point, intervals, colors, basename, overwrite=True):
             if overwrite:
                 QgsProject.instance().removeMapLayer(existinglayer.id())
             else:
-                raise OverwriteError(
-                    "layer {} already exists and overwrite is {}".format(
-                        layername, overwrite
+                raise OverwriteError(self.tr(
+                    "layer {layername} already exists and overwrite is {overwrite}").format(
+                        layername=layername, overwrite=overwrite
                     )
                 )
         except IndexError:
