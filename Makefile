@@ -28,7 +28,8 @@ test-translations:
 	@python scripts/missing_translations.py `pwd` de
 	@python scripts/missing_translations.py `pwd` it
 	@python scripts/missing_translations.py `pwd` id
-	@rm ./kadasrouting/i18n/*qm
+	# Revert the changes
+	@git checkout ./kadasrouting/i18n/*qm
 
 ##########################################################
 #
