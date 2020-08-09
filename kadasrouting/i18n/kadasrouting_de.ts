@@ -30,7 +30,7 @@
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="41"/>
         <source>Fastest</source>
-        <translation>Am schnellsten</translation>
+        <translation>schnellste</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="51"/>
@@ -40,42 +40,42 @@
     <message>
         <location filename="../gui/reachabilitybottombar.ui" line="57"/>
         <source>From</source>
-        <translation type="unfinished"/>
+        <translation>Von</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="71"/>
         <source>Route type</source>
-        <translation type="unfinished"/>
+        <translation>Routentyp</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="102"/>
         <source>To</source>
-        <translation type="unfinished"/>
+        <translation>Nach</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="112"/>
         <source>Vehicle type</source>
-        <translation type="unfinished"/>
+        <translation>Fahrzeugtyp</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="119"/>
         <source>Waypoints</source>
-        <translation type="unfinished"/>
+        <translation>Wegpunkt</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="167"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Klar</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.ui" line="174"/>
         <source>Reverse</source>
-        <translation type="unfinished"/>
+        <translation>Umkehren</translation>
     </message>
     <message>
         <location filename="../gui/tspbottombar.ui" line="153"/>
         <source>Calculate</source>
-        <translation type="unfinished"/>
+        <translation>Berechnung</translation>
     </message>
     <message>
         <location filename="../gui/tspbottombar.ui" line="26"/>
