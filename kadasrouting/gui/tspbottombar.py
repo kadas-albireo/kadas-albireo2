@@ -36,7 +36,7 @@ class TSPBottomBar(KadasBottomBar, WIDGET):
         self.action = action
 
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnClose.setToolTip('Close TSP dialog')
+        self.btnClose.setToolTip(self.tr('Close TSP dialog'))
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)

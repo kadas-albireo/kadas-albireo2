@@ -25,11 +25,11 @@ def showMessageBox(text):
 
 
 def pushMessage(text):
-    iface.messageBar().pushMessage("Info", text, level=Qgis.Info)
+    iface.messageBar().pushMessage(self.tr("Info"), text, level=Qgis.Info)
 
 
 def pushWarning(text):
-    iface.messageBar().pushMessage("Warning", text, level=Qgis.Warning)
+    iface.messageBar().pushMessage(self.tr("Warning"), text, level=Qgis.Warning)
 
 
 def waitcursor(method):

@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[kadas-routing-plugin.kadasrouting-en-ts]
+file_filter = kadasrouting/i18n/kadasrouting_<lang>.ts
+minimum_perc = 0
+source_file = kadasrouting/i18n/kadasrouting_en.ts
+source_lang = en
+type = QT
+

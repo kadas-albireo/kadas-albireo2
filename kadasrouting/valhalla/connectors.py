@@ -21,9 +21,9 @@ class Connector:
     def prepareIsochronesParameters(self, points, intervals, colors):
         # build contour json
         if len(intervals) != len(colors):
-            LOG.warning(
+            LOG.warning(self.tr(
                 "The number of intervals and colors are different, using default color"
-            )
+            ))
             contours = [{"time": x} for x in intervals]
         else:
             contours = []

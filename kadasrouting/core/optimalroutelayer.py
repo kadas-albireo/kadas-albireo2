@@ -66,7 +66,7 @@ class OptimalRouteLayer(KadasItemLayer):
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.updateFromPins)
-        self.actionAddAsRegularLayer = QAction("Add to project as regular layer")
+        self.actionAddAsRegularLayer = QAction(self.tr("Add to project as regular layer"))
         self.actionAddAsRegularLayer.triggered.connect(self.addAsRegularLayer)
 
     def setResponse(self, response):
@@ -94,7 +94,7 @@ class OptimalRouteLayer(KadasItemLayer):
         except Exception as e:
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
-            pushWarning("Could not compute route")
+            pushWarning(self.tr("Could not compute route"))
             logging.error("Could not compute route")
 
     @waitcursor
@@ -133,9 +133,12 @@ class OptimalRouteLayer(KadasItemLayer):
         formatted_minute = (
             str(duration_minute) if duration_minute >= 10 else "0%d" % duration_minute
         )
-        self.lineItem.setTooltip(
-            f"Distance: {self.distance} km<br/>Time: {formatted_hour}h{formatted_minute}"
+        tooltip = self.tr("Distance: {distance} km<br/>Time: {formatted_hour}h{formatted_minute}").format(
+            distance=self.distance,
+            formatted_hour=formatted_hour,
+            formatted_minute=formatted_minute
         )
+        self.lineItem.setTooltip(tooltip)
         # Line color: 005EFF
         line_color = QColor(0, 94, 255)
         self.lineItem.setOutline(QPen(line_color, 5))
@@ -147,15 +150,15 @@ class OptimalRouteLayer(KadasItemLayer):
             pin.setPosition(KadasItemPos(pt.x(), pt.y()))
             if i == 0:
                 pin.setFilePath(iconPath("pin_origin.svg"))
-                pin.setName("Origin Point")
+                pin.setName(self.tr("Origin Point"))
             elif i == len(self.points) - 1:
                 pin.setFilePath(iconPath("pin_destination.svg"))
-                pin.setName("Destination Point")
+                pin.setName(self.tr("Destination Point"))
             else:
                 pin.setup(
                     ":/kadas/icons/waypoint", pin.anchorX(), pin.anchorX(), 32, 32
                 )
-                pin.setName("Waypoint %d" % i)
+                pin.setName(self.tr("Waypoint {point_index}").format(point_index=i))
             pin.hasChanged.connect(self.pinHasChanged)
             self.pins.append(pin)
             self.addItem(pin)

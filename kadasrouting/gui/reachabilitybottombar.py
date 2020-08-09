@@ -49,7 +49,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         self.canvas = canvas
 
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnClose.setToolTip("Close reachability dialog")
+        self.btnClose.setToolTip(self.tr("Close reachability dialog"))
 
         self.action.toggled.connect(self.actionToggled)
         self.btnClose.clicked.connect(self.action.toggle)
@@ -118,12 +118,12 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             point = self.originSearchBox.valueAsPoint()
         except WrongLocationException as e:
-            pushWarning("Invalid location %s" % str(e))
+            pushWarning(self.tr("Invalid location: {error_message}").format(error_message=str(e)))
             return
         try:
             intervals = self.getInterval()
             if not (1 <= len(intervals) <= 10):
-                raise Exception("Must have at least one and maximum 10 intervals.")
+                raise Exception(self.tr("Must have at least one and maximum 10 intervals."))
         except Exception as e:
             pushWarning("Invalid intervals: %s" % str(e))
             return
@@ -133,13 +133,14 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             LOG.debug("_".join(colors))
             generateIsochrones(point, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
-            pushWarning("Please change the basename or activate the overwrite checkbox")
+            pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
         except Valhalla400Exception as e:
             # Expecting the content can be parsed as JSON, see
             # https://valhalla.readthedocs.io/en/latest/api/turn-by-turn/api-reference/#http-status-codes-and-conditions
             json_error = json.loads(str(e))
             pushWarning(
-                'Can not generate the error because "%s"' % json_error.get("error")
+                self.tr('Can not generate the error because "{error_message}"').format(
+                    error_message=json_error.get("error"))
             )
         except Exception as e:
             pushWarning("could not generate isochrones")
@@ -160,7 +161,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             basename = self.getBasename()
             if basename == "":
-                raise Exception("basename can not be empty")
+                raise Exception(self.tr("basename can not be empty"))
             self.lineEditBasename.setStyleSheet("color: black;")
             self.btnCalculate.setEnabled(True)
             self.btnCalculate.setToolTip("")
@@ -168,7 +169,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             pushMessage(str(e))
             self.lineEditBasename.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip("Please make sure the basename is correct.")
+            self.btnCalculate.setToolTip(self.tr("Please make sure the basename is correct."))
 
     def getBasename(self):
         """Get basename as string
@@ -188,9 +189,9 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             interval = self.getInterval()
             if len(interval) == 0:
-                raise Exception("Interval can not be empty")
+                raise Exception(self.tr("Interval can not be empty"))
             if len(interval) > 10:
-                raise Exception("Interval can not be more than 10")
+                raise Exception(self.tr("Interval can not be more than 10"))
             self.lineEditIntervals.setStyleSheet("color: black;")
             self.btnCalculate.setEnabled(True)
             self.btnCalculate.setToolTip("")
@@ -198,7 +199,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             pushMessage(str(e))
             self.lineEditIntervals.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip("Please make sure the interval is correct.")
+            self.btnCalculate.setToolTip(self.tr("Please make sure the interval is correct."))
 
     def getInterval(self):
         """Get interval of as a list of integer or float based on the current mode.
@@ -225,11 +226,11 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         if (self.comboBoxReachabilityMode.currentText()
                 == self.reachabilityMode["isochrone"]):
             self.lineEditIntervals.setToolTip(
-                'Set interval as integer in minutes, separated by ";" symbol'
+                self.tr('Set interval as integer in minutes, separated by ";" symbol')
             )
         else:
             self.lineEditIntervals.setToolTip(
-                'Set interval as float in Km, separated by ";" symbol'
+                self.tr('Set interval as float in Km, separated by ";" symbol')
             )
 
     def getColorFromInterval(self):
