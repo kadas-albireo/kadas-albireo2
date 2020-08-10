@@ -34,6 +34,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
+        self.navigateBar = None
 
     def initGui(self):
         # Routing menu
@@ -59,6 +60,12 @@ class RoutingPlugin(QObject):
         self.tspAction.setCheckable(True)
         self.tspAction.toggled.connect(self.showTSP)
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+
+        # Navigation menu
+        self.navigateAction = QAction(icon("tsp.png"), self.tr("Navigate"))
+        self.navigateAction.setCheckable(True)
+        self.navigateAction.toggled.connect(self.showNavigate)
+        self.iface.addAction(self.navigateAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
@@ -104,3 +111,12 @@ class RoutingPlugin(QObject):
         else:
             if self.tspBar is not None:
                 self.tspBar.hide()
+
+    def showNavigate(self, show=True):
+        if show:
+            if self.navigateBar is None:
+                self.navigateBar = TSPBottomBar(self.iface.mapCanvas(), self.navigateAction)
+            self.navigateBar.show()
+        else:
+            if self.navigateBar is not None:
+                self.navigateBar.hide()
