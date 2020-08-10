@@ -62,7 +62,7 @@ class RoutingPlugin(QObject):
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
-        self.navigateAction = QAction(icon("tsp.png"), self.tr("Navigate"))
+        self.navigateAction = QAction(icon("navigate.png"), self.tr("Navigate"))
         self.navigateAction.setCheckable(True)
         self.navigateAction.toggled.connect(self.showNavigate)
         self.iface.addAction(self.navigateAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
