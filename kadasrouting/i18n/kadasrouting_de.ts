@@ -4,7 +4,7 @@
     <message>
         <location filename="../utilities.py" line="28"/>
         <source>Info</source>
-        <translation type="unfinished"/>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../utilities.py" line="32"/>
@@ -100,17 +100,17 @@
     <message>
         <location filename="../gui/tspbottombar.ui" line="93"/>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <location filename="../gui/tspbottombar.ui" line="140"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../gui/tspbottombar.ui" line="130"/>
         <source>Buffer</source>
-        <translation type="unfinished"/>
+        <translation>Puffer</translation>
     </message>
     <message>
         <location filename="../gui/reachabilitybottombar.ui" line="64"/>
@@ -130,7 +130,7 @@
     <message>
         <location filename="../gui/reachabilitybottombar.ui" line="94"/>
         <source>Intervals</source>
-        <translation type="unfinished"/>
+        <translation>Intervalle</translation>
     </message>
     <message>
         <location filename="../gui/reachabilitybottombar.ui" line="107"/>
@@ -153,17 +153,17 @@
     <message>
         <location filename="../gui/locationinputwidget.py" line="53"/>
         <source>Get GPS location</source>
-        <translation type="unfinished"/>
+        <translation>GPS-Standort abrufen</translation>
     </message>
     <message>
         <location filename="../gui/locationinputwidget.py" line="61"/>
         <source>Choose location on the map</source>
-        <translation type="unfinished"/>
+        <translation>Wählen Sie den Ort auf der Karte</translation>
     </message>
     <message>
         <location filename="../gui/locationinputwidget.py" line="113"/>
         <source>Cannot connect to GPS</source>
-        <translation type="unfinished"/>
+        <translation>Es kann keine Verbindung zum GPS hergestellt werden</translation>
     </message>
 </context>
 <context>
@@ -171,32 +171,32 @@
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="46"/>
         <source>Add waypoint</source>
-        <translation type="unfinished"/>
+        <translation>Wegpunkt hinzufügen</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="47"/>
         <source>Close routing dialog</source>
-        <translation type="unfinished"/>
+        <translation>Routing-Dialog schließen</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="60"/>
         <source>Route</source>
-        <translation type="unfinished"/>
+        <translation>Route</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="96"/>
         <source>Please, select a valid destination layer</source>
-        <translation type="unfinished"/>
+        <translation>Bitte wählen Sie eine gültige Zielebene aus</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="103"/>
         <source>Invalid location: {error_message}</source>
-        <translation type="unfinished"/>
+        <translation>Ungültiger Speicherort: {error_message}</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="117"/>
         <source>Could not compute route</source>
-        <translation type="unfinished"/>
+        <translation>Route konnte nicht berechnet werden</translation>
     </message>
 </context>
 <context>
@@ -204,27 +204,27 @@
     <message>
         <location filename="../core/optimalroutelayer.py" line="69"/>
         <source>Add to project as regular layer</source>
-        <translation type="unfinished"/>
+        <translation>Zum Projekt als reguläre Ebene hinzufügen</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="97"/>
         <source>Could not compute route</source>
-        <translation type="unfinished"/>
+        <translation>Route konnte nicht berechnet werden</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="136"/>
         <source>Distance: {distance} km&lt;br/&gt;Time: {formatted_hour}h{formatted_minute}</source>
-        <translation type="unfinished"/>
+        <translation>Entfernung:  {distance} km&lt;br/&gt;Zeit: {formatted_hour}h{formatted_minute}</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="153"/>
         <source>Origin Point</source>
-        <translation type="unfinished"/>
+        <translation>Ursprungspunkt</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="156"/>
         <source>Destination Point</source>
-        <translation type="unfinished"/>
+        <translation>Bestimmungsort</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="161"/>

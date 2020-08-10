@@ -28,7 +28,7 @@ test-translations:
 	@python scripts/missing_translations.py `pwd` de
 	@python scripts/missing_translations.py `pwd` it
 	@python scripts/missing_translations.py `pwd` id
-	# Revert the changes
+	# Revert the changes to qm files
 	@git checkout ./kadasrouting/i18n/*qm
 
 ##########################################################
