@@ -38,11 +38,12 @@ if os.path.exists(translation_path):
         raise Exception(message)
     # noinspection PyTypeChecker,PyCallByClass
     QCoreApplication.installTranslator(translator)
-else:
-    QMessageBox.information(
+elif not os.path.exists(translation_path) and locale_name != 'en':
+    # SHow warning if the non EN translation file is not found
+    QMessageBox.warning(
         None,
-        'Translation path',
-        'Translation path not found: %s' % translation_path)
+        'Translation file missing',
+        'Translation file is not found for %s in %s' % (locale_name.upper(), translation_path))
 
 def classFactory(iface):
     from .plugin import RoutingPlugin
