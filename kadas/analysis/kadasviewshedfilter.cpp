@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
 #include <QProgressDialog>
 
 #include <cstring>
@@ -159,11 +160,77 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
     QgsDebugMsg( "Too much memory required" );
     return false;
   }
+
+  if ( progress )
+  {
+    progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Loading elevation data..." ) );
+    progress->setRange( 0, hmapHeight );
+  }
+
+  // Read in lines of 4096 pixels max
+  CPLErr err = CE_None;
+  QVector<float> fullheightMap( hmapWidth * hmapHeight, noDataValue );
+  int maxLineSize = std::min( 4096, hmapWidth );
+  for ( int y = 0; y < hmapHeight; ++y )
+  {
+    if ( progress )
+    {
+      if ( progress->wasCanceled() )
+      {
+        QgsDebugMsg( "Canceled" );
+        GDALClose( inputDataset );
+        return false;
+      }
+      progress->setValue( y );
+      QApplication::processEvents();
+    }
+    for ( int x = 0; x < hmapWidth; x += maxLineSize )
+    {
+      int lineSize = std::min( maxLineSize, hmapWidth - x );
+      int bufOff = ( y * hmapWidth + x );
+      err = GDALRasterIOEx( inputBand, GF_Read, colStart + x, rowStart + y, lineSize, 1, &fullheightMap.data()[bufOff], lineSize, 1, GDT_Float32, 0, 0, nullptr );
+      if ( err != CE_None )
+      {
+        GDALClose( inputDataset );
+        QgsDebugMsg( "Failed to fetch raster pixels" );
+        return false;
+      }
+    }
+  }
+
+  // In-memory dataset from full heightmap
+  GDALDriverH driver = GDALGetDriverByName( "MEM" );
+  GDALDatasetH memdataset = GDALCreate( driver, "", hmapWidth, hmapHeight, 1, GDT_Float32, nullptr );
+  GDALRasterBandH memband = GDALGetRasterBand( memdataset, 1 );
+  int bsX, bsY;
+  GDALGetBlockSize( memband, &bsX, &bsY );
+  Q_ASSERT( bsY == 1 ); // Vertical block size for MEM dataset should be 1
+  int nXBlocks = ( hmapWidth + bsX - 1 ) / bsX;
+  for ( int y = 0; y < hmapHeight && err == CE_None; ++y )
+  {
+    for ( int iXBlock = 0; iXBlock < nXBlocks && err == CE_None; ++iXBlock )
+    {
+      err = GDALWriteBlock( memband, iXBlock, y, fullheightMap.data() + y * hmapWidth + iXBlock * bsX );
+    }
+  }
+
+  if ( err != CE_None )
+  {
+    GDALClose( memdataset );
+    GDALClose( inputDataset );
+    QgsDebugMsg( "Failed to copy band" );
+    return false;
+  }
+
+  // Downscale heightmap with rasterio
   QVector<float> heightmap( scaledHmapWidth * scaledHmapHeight, noDataValue );
   GDALRasterIOExtraArg rioargs;
   INIT_RASTERIO_EXTRA_ARG( rioargs );
   rioargs.eResampleAlg = GRIORA_Average;
-  CPLErr err = GDALRasterIOEx( inputBand, GF_Read, colStart, rowStart, hmapWidth, hmapHeight, heightmap.data(), scaledHmapWidth, scaledHmapHeight, GDT_Float32, 0, 0, &rioargs );
+
+  err = GDALRasterIOEx( memband, GF_Read, 0, 0, hmapWidth, hmapHeight, heightmap.data(), scaledHmapWidth, scaledHmapHeight, GDT_Float32, 0, 0, &rioargs );
+  GDALClose( memdataset );
+
   if ( err != CE_None )
   {
     GDALClose( inputDataset );
@@ -243,6 +310,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   int roi = .5 * qMin( hmapWidth, hmapHeight );
   if ( progress )
   {
+    progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
     progress->setRange( 0, 8 * roi );
   }
   QVector<unsigned char> viewshed( hmapWidth * hmapHeight, 255 * !displayVisible );
@@ -258,6 +326,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
         return false;
       }
       progress->setValue( radiusNumber );
+      QApplication::processEvents();
     }
     int target[2];
     if ( radiusNumber <= roi )
