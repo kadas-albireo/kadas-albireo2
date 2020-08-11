@@ -161,9 +161,18 @@ static void gdalProxyConfig( const QUrl &url )
   QgsDebugMsg( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ) );
   QgsDebugMsg( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ) );
   QgsDebugMsg( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ) );
-  qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
-  qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
-  qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+  if ( !gdalHttpProxy.isEmpty() )
+  {
+    qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
+  }
+  if ( !gdalProxyUserPwd.isEmpty() )
+  {
+    qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
+  }
+  if ( !gdalProxyAuth.isEmpty() )
+  {
+    qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+  }
 }
 
 GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg )
