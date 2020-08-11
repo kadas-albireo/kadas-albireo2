@@ -219,7 +219,8 @@ void KadasMapToolViewshed::drawFinished()
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
 
-  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, filterRegion, displayVisible, accuracyFactor, &p );
+  QString errMsg;
+  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, displayVisible, accuracyFactor );
   QApplication::restoreOverrideCursor();
   if ( success )
   {
@@ -253,9 +254,9 @@ void KadasMapToolViewshed::drawFinished()
     pin->setPosition( KadasItemPos::fromPoint( center ) );
     KadasMapCanvasItemManager::addItem( pin );
   }
-  else
+  else if ( !errMsg.isEmpty() )
   {
-    QMessageBox::critical( 0, tr( "Error" ), tr( "Failed to compute viewshed." ) );
+    QMessageBox::critical( 0, tr( "Error" ), tr( "Failed to compute viewshed: %1" ).arg( errMsg ) );
   }
   clear();
 }

@@ -50,13 +50,13 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool heightRelToTerr, double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor, QProgressDialog *progress )
+bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool heightRelToTerr, double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor )
 {
   // Open input file
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
   if ( inputDataset == nullptr )
   {
-    QgsDebugMsg( "Failed to open input dataset" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to open input dataset" );
     return false;
   }
 
@@ -65,7 +65,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   QgsCoordinateReferenceSystem datasetCrs = layer->crs().authid() != gdalCrs.authid() ? gdalCrs : layer->crs();
   if ( !datasetCrs.isValid() )
   {
-    QgsDebugMsg( "Could not determine input dataset CRS" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Could not determine input dataset CRS" );
     GDALClose( inputDataset );
     return false;
   }
@@ -84,7 +84,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( inputBand == NULL )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Failed to open input dataset band 1" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to open input dataset band 1" );
     return false;
   }
   float noDataValue = GDALGetRasterNoDataValue( inputBand, NULL );
@@ -94,7 +94,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( inputDataset, &gtrans[0] ) != CE_None )
   {
-    QgsDebugMsg( "Failed to query input dataset geotransform" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to query input dataset geotransform" );
     return false;
   }
   int terWidth = GDALGetRasterXSize( inputDataset );
@@ -145,7 +145,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( obs[0] < colStart || obs[0] > colEnd || obs[1] < rowStart || obs[1] > rowEnd )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Observer pos is outside vieweshed area, reprojection distortion?" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Observer pos is outside vieweshed area, reprojection distortion?" );
     return false;
   }
 
@@ -157,15 +157,12 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( scaledHmapWidth * scaledHmapHeight * sizeof( float ) > 1073741824 )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Too much memory required" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Too much memory required" );
     return false;
   }
 
-  if ( progress )
-  {
-    progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Loading elevation data..." ) );
-    progress->setRange( 0, hmapHeight );
-  }
+  progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Loading elevation data..." ) );
+  progress->setRange( 0, hmapHeight );
 
   // Read in lines of 4096 pixels max
   CPLErr err = CE_None;
@@ -173,17 +170,14 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   int maxLineSize = std::min( 4096, hmapWidth );
   for ( int y = 0; y < hmapHeight; ++y )
   {
-    if ( progress )
+    if ( progress->wasCanceled() )
     {
-      if ( progress->wasCanceled() )
-      {
-        QgsDebugMsg( "Canceled" );
-        GDALClose( inputDataset );
-        return false;
-      }
-      progress->setValue( y );
-      QApplication::processEvents();
+      GDALClose( inputDataset );
+      return false;
     }
+    progress->setValue( y );
+    QApplication::processEvents();
+
     for ( int x = 0; x < hmapWidth; x += maxLineSize )
     {
       int lineSize = std::min( maxLineSize, hmapWidth - x );
@@ -192,7 +186,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
       if ( err != CE_None )
       {
         GDALClose( inputDataset );
-        QgsDebugMsg( "Failed to fetch raster pixels" );
+        *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to fetch raster pixels" );
         return false;
       }
     }
@@ -218,7 +212,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   {
     GDALClose( memdataset );
     GDALClose( inputDataset );
-    QgsDebugMsg( "Failed to copy band" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to fetch raster pixels" );
     return false;
   }
 
@@ -234,7 +228,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( err != CE_None )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Failed to fetch raster pixels" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to fetch raster pixels" );
     return false;
   }
 
@@ -261,13 +255,13 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( outputDriver == 0 )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Failed to get driver for output" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to get driver for output" );
     return false;
   }
   if ( !CSLFetchBoolean( GDALGetMetadata( outputDriver, NULL ), GDAL_DCAP_CREATE, false ) )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Driver for output does not support creation" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Driver for output does not support creation" );
     return false;
   }
   char **papszOptions = CSLSetNameValue( 0, "COMPRESS", "LZW" );
@@ -275,7 +269,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   if ( outputDataset == NULL )
   {
     GDALClose( inputDataset );
-    QgsDebugMsg( "Failed to open output dataset" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to open output dataset" );
     return false;
   }
 
@@ -294,7 +288,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   {
     GDALClose( inputDataset );
     GDALClose( outputDataset );
-    QgsDebugMsg( "Failed to get output dataset band 1" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to get output dataset band 1" );
     return false;
   }
   GDALSetRasterNoDataValue( outputBand, 255 * !displayVisible );
@@ -308,26 +302,21 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
   // Compute viewshed
   int roi = .5 * qMin( hmapWidth, hmapHeight );
-  if ( progress )
-  {
-    progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
-    progress->setRange( 0, 8 * roi );
-  }
+  progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
+  progress->setRange( 0, 8 * roi );
+
   QVector<unsigned char> viewshed( hmapWidth * hmapHeight, 255 * !displayVisible );
   for ( int radiusNumber = 0; radiusNumber < 8 * roi; ++radiusNumber )
   {
-    if ( progress )
+    if ( progress->wasCanceled() )
     {
-      if ( progress->wasCanceled() )
-      {
-        QgsDebugMsg( "Canceled" );
-        GDALClose( inputDataset );
-        GDALClose( outputDataset );
-        return false;
-      }
-      progress->setValue( radiusNumber );
-      QApplication::processEvents();
+      GDALClose( inputDataset );
+      GDALClose( outputDataset );
+      return false;
     }
+    progress->setValue( radiusNumber );
+    QApplication::processEvents();
+
     int target[2];
     if ( radiusNumber <= roi )
     {
@@ -448,7 +437,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   GDALClose( outputDataset );
   if ( err != CE_None )
   {
-    QgsDebugMsg( "Failed to write to output dataset" );
+    *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to write to output dataset" );
     return false;
   }
   return true;
