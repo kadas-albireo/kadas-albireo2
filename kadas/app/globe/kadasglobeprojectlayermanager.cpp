@@ -61,13 +61,14 @@ void KadasGlobeProjectLayerManager::updateLayers( const QStringList &visibleLaye
 {
   if ( !mMapNode )
     return;
+  mCurrentVisibleLayerIds = visibleLayerIds;
 
   // Disconnect all previous repaintRequested signals
   delete mLayerSignalScope;
   mLayerSignalScope = new QObject( this );
 
   // Go over visible layers, determine whether they are to be rendered draped or as models
-  QSet<QString> newDrapedLayerIds;
+  QList<QString> newDrapedLayerIds;
   QSet<QString> newModelLayerIds;
   for ( const QString &layerId : visibleLayerIds )
   {
@@ -78,7 +79,7 @@ void KadasGlobeProjectLayerManager::updateLayers( const QStringList &visibleLaye
       if ( layerConfig && layerConfig->renderingMode != KadasGlobeVectorLayerConfig::RenderingModeRasterized )
         newModelLayerIds.insert( layerId );
       else
-        newDrapedLayerIds.insert( layerId );
+        newDrapedLayerIds.append( layerId );
 
       connect( mapLayer, &QgsMapLayer::repaintRequested, mLayerSignalScope, [this, layerId] { updateLayer( layerId ); } );
     }
@@ -128,8 +129,8 @@ void KadasGlobeProjectLayerManager::updateLayer( const QString &layerId )
     // If was previously a draped layer, remove it and refresh the draped layer
     if ( mTileSource->layers().contains( layerId ) )
     {
-      QSet<QString> newLayers =  mTileSource->layers();
-      newLayers.remove( layerId );
+      QList<QString> newLayers =  mTileSource->layers();
+      newLayers.removeOne( layerId );
       mTileSource->setLayers( newLayers );
     }
     // Rebuild model layer
@@ -151,9 +152,18 @@ void KadasGlobeProjectLayerManager::updateLayer( const QString &layerId )
     // Add it to the draped layer if necessary, else refresh area
     if ( !mTileSource->layers().contains( layerId ) )
     {
-      QSet<QString> newLayers =  mTileSource->layers();
+      QSet<QString> newLayers( mTileSource->layers().begin(), mTileSource->layers().end() );
       newLayers.insert( layerId );
-      mTileSource->setLayers( newLayers );
+      // Rebuild layers based on order in mCurrentVisibleLayerIds
+      QList<QString> drapedLayers;
+      for ( const QString &layer : mCurrentVisibleLayerIds )
+      {
+        if ( newLayers.contains( layer ) )
+        {
+          drapedLayers.append( layer );
+        }
+      }
+      mTileSource->setLayers( drapedLayers );
     }
     else
     {

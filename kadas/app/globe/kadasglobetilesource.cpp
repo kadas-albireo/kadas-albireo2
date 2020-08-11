@@ -285,13 +285,15 @@ void KadasGlobeTileSource::refresh( const QgsRectangle &dirtyExtent )
   mTileListLock.unlock();
 }
 
-void KadasGlobeTileSource::setLayers( const QSet<QString> &layerIds )
+void KadasGlobeTileSource::setLayers( const QList<QString> &layerIds )
 {
   // Compute damaged extent
   QgsRectangle dirtyRect;
   QgsCoordinateReferenceSystem crs84( "EPSG:4326" );
   // Damage extent of draped layer: removed and added layers
-  QSet<QString> changedLayers = QSet<QString>( mLayerIds ).subtract( layerIds ).unite( QSet<QString>( layerIds ).subtract( mLayerIds ) );
+  QSet<QString> oldLayers( mLayerIds.begin(), mLayerIds.end() );
+  QSet<QString> newLayers( layerIds.begin(), layerIds.end() );
+  QSet<QString> changedLayers = QSet<QString>( oldLayers ).subtract( newLayers ).unite( QSet<QString>( newLayers ).subtract( oldLayers ) );
   for ( const QString &layerId : changedLayers )
   {
     QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );

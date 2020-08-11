@@ -44,6 +44,7 @@ class KadasGlobeProjectLayerManager : public QObject
     osg::ref_ptr<osgEarth::ImageLayer> mDrapedLayer;
     osg::ref_ptr<KadasGlobeTileSource> mTileSource;
     QObject *mLayerSignalScope = nullptr;
+    QStringList mCurrentVisibleLayerIds;
 
     void addModelLayer( const QString &layerId );
     void updateLayer( const QString &layerId );
