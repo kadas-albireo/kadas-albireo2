@@ -76,39 +76,42 @@ KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent
   connect( action3D, &QAction::triggered, this, &KadasGlobeIntegration::setGlobeEnabled );
   connect( this, &KadasGlobeIntegration::xyCoordinates, kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::xyCoordinates );
   connect( kApp, &KadasApplication::projectRead, this, &KadasGlobeIntegration::projectRead );
-  connect( kApp, &KadasApplication::projectWillBeClosed, this, [action3D] { action3D->setChecked( false ); } );
+  connect( kApp, &KadasApplication::projectWillBeClosed, this, [this] { setGlobeEnabled( false ); } );
 }
 
 KadasGlobeIntegration::~KadasGlobeIntegration()
 {
-  if ( mDockWidget )
-  {
-    disconnect( mDockWidget, &QDockWidget::destroyed, this, &KadasGlobeIntegration::reset );
-    delete mDockWidget;
-    reset();
-  }
+  reset();
   delete mSettingsDialog;
 }
 
 void KadasGlobeIntegration::reset()
 {
-  mStatsLabel = nullptr;
-  mProjectLayerManager->reset();
-  mBillboardManager->reset();
-  mOsgViewer = nullptr;
-  mMapNode = nullptr;
-  mRootNode = nullptr;
-  mSkyNode = nullptr;
-  mBaseLayer = nullptr;
-  mVerticalScale = nullptr;
-  mViewerWidget = nullptr;
-  mDockWidget = nullptr;
-  mImagerySources.clear();
-  mElevationSources.clear();
+  if ( mDockWidget )
+  {
+    disconnect( mDockWidget, &QDockWidget::destroyed, this, &KadasGlobeIntegration::reset );
+    delete mDockWidget;
+    mAction3D->blockSignals( true );
+    mAction3D->setChecked( false );
+    mAction3D->blockSignals( false );
+    mStatsLabel = nullptr;
+    mProjectLayerManager->reset();
+    mBillboardManager->reset();
+    mOsgViewer = nullptr;
+    mMapNode = nullptr;
+    mRootNode = nullptr;
+    mSkyNode = nullptr;
+    mBaseLayer = nullptr;
+    mVerticalScale = nullptr;
+    mViewerWidget = nullptr;
+    mDockWidget = nullptr;
+    mImagerySources.clear();
+    mElevationSources.clear();
 #ifdef GLOBE_SHOW_TILE_STATS
-  disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
-  delete KadasGlobeTileStatistics::instance();
+    disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
+    delete KadasGlobeTileStatistics::instance();
 #endif
+  }
 }
 
 void KadasGlobeIntegration::run()
@@ -229,7 +232,6 @@ void KadasGlobeIntegration::showSettings()
 
 void KadasGlobeIntegration::projectRead()
 {
-  setGlobeEnabled( false ); // Hide globe when new projects loaded, on some systems it is very slow loading a new project with globe enabled
   mSettingsDialog->readProjectSettings();
 }
 
@@ -535,7 +537,7 @@ void KadasGlobeIntegration::setGlobeEnabled( bool enabled )
   }
   else if ( mDockWidget )
   {
-    mDockWidget->close(); // triggers reset
+    reset();
   }
 }
 

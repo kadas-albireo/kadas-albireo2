@@ -86,7 +86,6 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
 
   setTitleBarWidget( titleWidget );
   setMinimumSize( 128, 128 );
-  setAttribute( Qt::WA_DeleteOnClose );
 
   connect( kApp->mainWindow()->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasGlobeWidget::updateLayerSelectionMenu );
   connect( QgsProject::instance(), &QgsProject::layersAdded, this, &KadasGlobeWidget::updateLayerSelectionMenu );
