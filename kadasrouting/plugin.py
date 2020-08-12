@@ -17,6 +17,7 @@ from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
+from kadasrouting.gui.navigation import Navigation
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -34,6 +35,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
+        self.navigation = None
 
     def initGui(self):
         # Routing menu
@@ -59,6 +61,11 @@ class RoutingPlugin(QObject):
         self.tspAction.setCheckable(True)
         self.tspAction.toggled.connect(self.showTSP)
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+
+        self.navigateAction = QAction(self.tr("Navigation"))
+        self.navigateAction.setCheckable(True)
+        self.navigateAction.toggled.connect(self.showNavigation)
+        self.iface.addAction(self.navigateAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
@@ -104,3 +111,12 @@ class RoutingPlugin(QObject):
         else:
             if self.tspBar is not None:
                 self.tspBar.hide()
+
+    def showNavigation(self, show=True):
+        if show:
+            if self.navigation is None:
+                self.navigation = Navigation()
+            self.navigation.activateNavigation()
+        else:
+            if self.navigation is not None:
+                self.navigation.deactivateNavigation()

@@ -25,12 +25,15 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsPointXY,
     QgsGeometry,
-    QgsFeature
+    QgsFeature,
+    QgsDistanceArea,
+    QgsUnitTypes
 )
 
 
 from kadas.kadascore import KadasPluginLayerType
 
+MAX_DISTANCE_FOR_NAVIGATION = 200
 
 class RoutePointMapItem(KadasPinItem):
 
@@ -77,6 +80,7 @@ class OptimalRouteLayer(KadasItemLayer):
         for itemId in items.keys():
             self.takeItem(itemId)
         self.pins = []
+        self.maneuvers = {}
 
     def pinHasChanged(self):
         self.timer.start(1000)
@@ -115,9 +119,11 @@ class OptimalRouteLayer(KadasItemLayer):
         self.duration = 0
         self.distance = 0
         for leg in response_mini["legs"]:
-            coordinates.extend(
-                [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
-            )
+            leg_coordinates = [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
+            coordinates.extend(leg_coordinates)
+            qgis_leg_coords = [QgsPointXY(x, y) for x, y in leg_coordinates]
+            geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)    
+            self.maneuvers[geom] = leg["maneuvers"]
             self.duration += leg["summary"]["time"]
             self.distance += round(leg["summary"]["length"], 3)
         qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
@@ -162,6 +168,40 @@ class OptimalRouteLayer(KadasItemLayer):
             pin.hasChanged.connect(self.pinHasChanged)
             self.pins.append(pin)
             self.addItem(pin)
+
+
+    def maneuverForPoint(self, pt):
+        min_dist = MAX_DISTANCE_FOR_NAVIGATION
+        closest_leg = None
+        closest_segment = None
+        qgsdistance = QgsDistanceArea()
+        qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:4326"),
+                                QgsProject.instance().transformContext())
+        
+        for line in self.maneuvers.keys():
+            _, _pt, segment, _ = line.closestSegmentWithContext(pt)
+            dist = qgsdistance.convertLengthMeasurement(
+                        qgsdistance.measureLine(pt, _pt),
+                        QgsUnitTypes.DistanceMeters)
+            if dist < min_dist:
+                closest_leg = line
+                closest_segment = segment
+                closest_point = _pt
+                min_dist = dist
+
+        if closest_leg is not None:
+            leg_points = closest_leg.asPolyline()
+            for i, maneuver in enumerate(self.maneuvers[closest_leg][:-1]):
+                if (maneuver["begin_shape_index"] <= closest_segment
+                        and maneuver["end_shape_index"] > closest_segment):
+                    points = [closest_point]
+                    points.extend(leg_points[closest_segment:maneuver["end_shape_index"]])
+                    distance_to_next = qgsdistance.convertLengthMeasurement(
+                                                qgsdistance.measureLine(points),
+                                                QgsUnitTypes.DistanceMeters)                    
+                    return f"In {distance_to_next} m {self.maneuvers[closest_leg][i+1]['instruction']}"
+    
+        return "You are not in the route"
 
     def layerTypeKey(self):
         return OptimalRouteLayer.LAYER_TYPE
