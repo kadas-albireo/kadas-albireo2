@@ -38,8 +38,8 @@ if os.path.exists(translation_path):
         raise Exception(message)
     # noinspection PyTypeChecker,PyCallByClass
     QCoreApplication.installTranslator(translator)
-elif not os.path.exists(translation_path) and locale_name != 'en':
-    # SHow warning if the non EN translation file is not found
+elif not os.path.exists(translation_path) and locale_name.lower() in ['it', 'de', 'fr']:
+    # Show warning if the IT, FR, or DE translation file is not found and the current system on it
     QMessageBox.warning(
         None,
         'Translation file missing',
