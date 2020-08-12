@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-from qgis.PyQt.QtCore import Qt
+from PyQt5.QtCore import Qt, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QApplication
+
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -11,6 +12,7 @@ from qgis.core import (
     Qgis,
 )
 
+tr = lambda x: QCoreApplication.translate("", x)
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
@@ -25,11 +27,11 @@ def showMessageBox(text):
 
 
 def pushMessage(text):
-    iface.messageBar().pushMessage(self.tr("Info"), text, level=Qgis.Info)
+    iface.messageBar().pushMessage(tr("Info"), text, level=Qgis.Info)
 
 
 def pushWarning(text):
-    iface.messageBar().pushMessage(self.tr("Warning"), text, level=Qgis.Warning)
+    iface.messageBar().pushMessage(tr("Warning"), text, level=Qgis.Warning)
 
 
 def waitcursor(method):
