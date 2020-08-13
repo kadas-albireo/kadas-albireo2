@@ -35,7 +35,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
-        self.navigateBar = None
+        self.navigationBar = None
 
     def initGui(self):
         # Routing menu
@@ -63,10 +63,10 @@ class RoutingPlugin(QObject):
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
-        self.navigateAction = QAction(icon("navigate.png"), self.tr("Navigate"))
-        self.navigateAction.setCheckable(True)
-        self.navigateAction.toggled.connect(self.showNavigate)
-        self.iface.addAction(self.navigateAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
+        self.navigationAction.setCheckable(True)
+        self.navigationAction.toggled.connect(self.showNavigation)
+        self.iface.addAction(self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
@@ -86,7 +86,9 @@ class RoutingPlugin(QObject):
         if show:
             if self.optimalRouteBar is None:
                 self.optimalRouteBar = OptimalRouteBottomBar(
-                    self.iface.mapCanvas(), self.optimalRouteAction
+                    self.iface.mapCanvas(),
+                    self.optimalRouteAction,
+                    self
                 )
             self.optimalRouteBar.show()
         else:
@@ -113,11 +115,12 @@ class RoutingPlugin(QObject):
             if self.tspBar is not None:
                 self.tspBar.hide()
 
-    def showNavigate(self, show=True):
+    def showNavigation(self, show=True):
         if show:
-            if self.navigateBar is None:
-                self.navigateBar = NavigationBottomBar(self.iface.mapCanvas(), self.navigateAction)
-            self.navigateBar.show()
+            if self.navigationBar is None:
+                self.navigationBar = NavigationBottomBar(
+                    self.iface.mapCanvas(), self.navigationAction)
+            self.navigationBar.show()
         else:
-            if self.navigateBar is not None:
-                self.navigateBar.hide()
+            if self.navigationBar is not None:
+                self.navigationBar.hide()

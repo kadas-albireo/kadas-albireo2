@@ -33,7 +33,7 @@ from qgis.core import (
 
 from kadas.kadascore import KadasPluginLayerType
 
-MAX_DISTANCE_FOR_NAVIGATION = 200
+MAX_DISTANCE_FOR_NAVIGATION = 50
 
 class RoutePointMapItem(KadasPinItem):
 
@@ -202,7 +202,7 @@ class OptimalRouteLayer(KadasItemLayer):
                     distance_to_next = qgsdistance.convertLengthMeasurement(
                                                 qgsdistance.measureLine(points),
                                                 QgsUnitTypes.DistanceMeters)                    
-                    return f"In {distance_to_next} m {self.maneuvers[closest_leg][i+1]['instruction']}"
+                    return f"In {distance_to_next:.2f} m {self.maneuvers[closest_leg][i + 1]['instruction']}"
     
         return "You are not in the route"
 

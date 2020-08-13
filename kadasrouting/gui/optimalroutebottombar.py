@@ -32,11 +32,12 @@ WIDGET, BASE = uic.loadUiType(
 
 
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
-    def __init__(self, canvas, action):
+    def __init__(self, canvas, action, plugin):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
         self.setStyleSheet("QFrame { background-color: orange; }")
         self.action = action
+        self.plugin = plugin
         self.canvas = canvas
         self.waypoints = []
         self.waypointPins = []
@@ -93,9 +94,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         layer = OptimalRouteLayer(name)
         return layer
 
-    def selectedLayerChanged(self, layer):    	
-    	self.btnNavigate.setEnabled(layer.hasRoute())
-
+    def selectedLayerChanged(self, layer):    
+    	self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
+    
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
@@ -106,7 +107,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             points.extend(self.waypoints)
             points.append(self.destinationSearchBox.valueAsPoint())
         except WrongLocationException as e:
-            pushWarning(self.tr("Invalid location: {error_message}").format(error_message=error_message))
+            pushWarning(self.tr("Invalid location:") + str(e))
             return
 
         shortest = self.radioButtonShortest.isChecked()
@@ -204,7 +205,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
     def navigate(self):
     	self.action.toggle()
-    	navigateUsingRouteLayer(self.layerSelector.getSelectedLayer())
+    	self.plugin.navigationAction.toggle()
+    	#self.plugin.showNavigation(True)
+    	self.plugin.navigationBar.navigateForLayer(self.layerSelector.getSelectedLayer())
     	
     def actionToggled(self, toggled):
         if toggled:
