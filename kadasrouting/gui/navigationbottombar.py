@@ -47,7 +47,7 @@ class NavigationBottomBar(KadasBottomBar, WIDGET):
         self.layerSelector = KadasLayerSelectionWidget(
             canvas,
             iface.layerTreeView(),
-            lambda x: isinstance(x, OptimalRouteLayer),
+            lambda x: isinstance(x, OptimalRouteLayer) and x.hasRoute(),
             lambda: None
         )
         self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
@@ -102,6 +102,6 @@ class NavigationBottomBar(KadasBottomBar, WIDGET):
         self.layerSelector.setEnabled(not self.navigating)
         self.btnStartStop.setEnabled(isinstance(selectedLayer, OptimalRouteLayer))
         self.btnStartStop.setText("Stop" if self.navigating else "Start")
-        if not self.navigation:
+        if not self.navigating:
             self.textBrowser.setPlainText("Select a route and click on Start to navigate")
 

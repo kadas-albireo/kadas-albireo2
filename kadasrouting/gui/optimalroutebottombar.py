@@ -118,6 +118,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         costingOptions = {}
         try:
             layer.updateRoute(points, costingOptions, shortest)
+            self.btnNavigate.setEnabled(True)
         except Exception as e:
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
