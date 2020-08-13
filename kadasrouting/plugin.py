@@ -17,6 +17,7 @@ from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
+from kadasrouting.gui.navigationbottombar import NavigationBottomBar
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -115,7 +116,7 @@ class RoutingPlugin(QObject):
     def showNavigate(self, show=True):
         if show:
             if self.navigateBar is None:
-                self.navigateBar = TSPBottomBar(self.iface.mapCanvas(), self.navigateAction)
+                self.navigateBar = NavigationBottomBar(self.iface.mapCanvas(), self.navigateAction)
             self.navigateBar.show()
         else:
             if self.navigateBar is not None:

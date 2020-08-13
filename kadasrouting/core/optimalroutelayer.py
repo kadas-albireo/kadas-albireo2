@@ -78,6 +78,9 @@ class OptimalRouteLayer(KadasItemLayer):
             self.takeItem(itemId)
         self.pins = []
 
+    def hasRoute(self):
+        return self.geom is not None
+
     def pinHasChanged(self):
         self.timer.start(1000)
 

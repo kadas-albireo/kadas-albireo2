@@ -58,7 +58,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.createLayer,
         )
         self.layerSelector.createLayerIfEmpty(self.tr("Route"))
+        self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
+        self.btnNavigate.setEnabled(self.layerSelector.getSelectedLayer().hasRoute())
 
         self.originSearchBox = LocationInputWidget(
             canvas, locationSymbolPath=iconPath("pin_origin.svg")
@@ -80,6 +82,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.pushButtonClear.clicked.connect(self.clear)
         self.pushButtonReverse.clicked.connect(self.reverse)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
+        self.btnNavigate.clicked.connect(self.navigate)
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
@@ -89,6 +92,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)
         return layer
+
+    def selectedLayerChanged(self, layer):    	
+    	self.btnNavigate.setEnabled(layer.hasRoute())
 
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
@@ -196,6 +202,10 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         for waypoint in self.waypoints:
             self.addWaypointPin(waypoint)
 
+    def navigate(self):
+    	self.action.toggle()
+    	navigateUsingRouteLayer(self.layerSelector.getSelectedLayer())
+    	
     def actionToggled(self, toggled):
         if toggled:
             self.addPins()
