@@ -17,7 +17,7 @@ from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
-from kadasrouting.gui.navigation import Navigation
+from kadasrouting.gui.navigationbottombar import NavigationBottomBar
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -35,7 +35,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
-        self.navigation = None
+        self.navigateBar = None
 
     def initGui(self):
         # Routing menu
@@ -62,9 +62,10 @@ class RoutingPlugin(QObject):
         self.tspAction.toggled.connect(self.showTSP)
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
-        self.navigateAction = QAction(self.tr("Navigation"))
+        # Navigation menu
+        self.navigateAction = QAction(icon("navigate.png"), self.tr("Navigate"))
         self.navigateAction.setCheckable(True)
-        self.navigateAction.toggled.connect(self.showNavigation)
+        self.navigateAction.toggled.connect(self.showNavigate)
         self.iface.addAction(self.navigateAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         reg = QgsApplication.pluginLayerRegistry()
@@ -112,11 +113,11 @@ class RoutingPlugin(QObject):
             if self.tspBar is not None:
                 self.tspBar.hide()
 
-    def showNavigation(self, show=True):
+    def showNavigate(self, show=True):
         if show:
-            if self.navigation is None:
-                self.navigation = Navigation()
-            self.navigation.activateNavigation()
+            if self.navigateBar is None:
+                self.navigateBar = NavigationBottomBar(self.iface.mapCanvas(), self.navigateAction)
+            self.navigateBar.show()
         else:
-            if self.navigation is not None:
-                self.navigation.deactivateNavigation()
+            if self.navigateBar is not None:
+                self.navigateBar.hide()
