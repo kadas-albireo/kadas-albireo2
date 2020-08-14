@@ -69,6 +69,10 @@ class NavigationBottomBar(KadasBottomBar, WIDGET):
         self.navigating = True
         self.updateNavigation()
 
+    def show(self):
+        self.layerSelector.repopulateLayers()
+        super().show()
+
     ########## Temporary functionality to test navigation logic ######
 
     def showNavigationInfo(self, point, button):
