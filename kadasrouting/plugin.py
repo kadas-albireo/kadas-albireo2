@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import logging
+from functools import partial
 
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QIcon
@@ -40,8 +41,6 @@ class RoutingPlugin(QObject):
     def initGui(self):
         # Routing menu
         self.optimalRouteAction = QAction(icon("routing.png"), self.tr("Routing"))
-        self.optimalRouteAction.setCheckable(True)
-        self.optimalRouteAction.toggled.connect(self.showOptimalRoute)
         self.iface.addAction(
             self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
@@ -50,23 +49,25 @@ class RoutingPlugin(QObject):
         self.reachabilityAction = QAction(
             icon("reachability.png"), self.tr("Reachability")
         )
-        self.reachabilityAction.setCheckable(True)
-        self.reachabilityAction.toggled.connect(self.showReachability)
         self.iface.addAction(
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
         )
 
         # TSP menu
         self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
-        self.tspAction.setCheckable(True)
-        self.tspAction.toggled.connect(self.showTSP)
         self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
         self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
-        self.navigationAction.setCheckable(True)
-        self.navigationAction.toggled.connect(self.showNavigation)
         self.iface.addAction(self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+
+        self.actionsToggled = {self.navigationAction: self.showNavigation,
+                                self.reachabilityAction: self.showReachability,
+                                self.optimalRouteAction: self.showOptimalRoute,
+                                self.tspAction: self.showTSP}
+        for action in self.actionsToggled:
+            action.setCheckable(True)
+            action.toggled.connect(partial(self._showPanel, action))
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
@@ -81,6 +82,17 @@ class RoutingPlugin(QObject):
         self.iface.removeAction(
             self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
+
+    def _showPanel(self, action, show):
+        function = self.actionsToggled[action]
+        if show:
+            self._hidePanels(action)
+        function(show)
+
+    def _hidePanels(self, keep=None):        
+        for action in self.actionsToggled:
+            if action != keep:
+                action.setChecked(False)
 
     def showOptimalRoute(self, show=True):
         if show:
