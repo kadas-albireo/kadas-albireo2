@@ -13,7 +13,6 @@ from kadas.kadasgui import (
     KadasLayerSelectionWidget
     )
 from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
-from kadasrouting import vehicles
 from kadasrouting.utilities import iconPath, pushMessage, pushWarning
 
 from qgis.utils import iface

@@ -6,9 +6,8 @@ LOG = logging.getLogger(__name__)
 
 
 class Connector:
-    def prepareRouteParameters(self, points, shortest=False, options=None):
-        options = options or {}
-        profile = "auto_shorter" if shortest else "auto"
+    def prepareRouteParameters(self, points, profile="auto", options=None):
+        options = options or {}        
 
         params = dict(costing=profile, show_locations=True, locations=points)
         params["locations"] = points
@@ -53,8 +52,8 @@ class ConsoleConnector(Connector):
                 pass
         responsedict = json.loads(response)
 
-    def route(self, points, shortest, options):
-        params = self.prepareRouteParameters(points, shortest, options)
+    def route(self, points, profile, options):
+        params = self.prepareRouteParameters(points, profile, options)
         response = _execute(["valhalla_run_route", "-j", json.dumps(params)])
         return response
 
@@ -77,8 +76,8 @@ class HttpConnector(Connector):
         response.raise_for_status()
         return response.json()
 
-    def route(self, points, options, shortest):
-        params = self.prepareRouteParameters(points, options, shortest)
+    def route(self, points, profile, options):        
+        params = self.prepareRouteParameters(points, profile, options)
         response = self._request("route", json.dumps(params))
         return response
 

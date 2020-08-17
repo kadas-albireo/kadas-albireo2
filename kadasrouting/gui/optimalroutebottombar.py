@@ -16,7 +16,7 @@ from kadasrouting.gui.locationinputwidget import (
     LocationInputWidget,
     WrongLocationException,
 )
-from kadasrouting import vehicles
+from kadasrouting.core import vehicles
 from kadasrouting.utilities import iconPath, pushWarning
 
 from qgis.utils import iface
@@ -78,7 +78,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         )
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
 
-        self.comboBoxVehicles.addItems(vehicles.vehicles)
+        self.comboBoxVehicles.addItems(vehicles.vehicle_names())
 
         self.pushButtonClear.clicked.connect(self.clear)
         self.pushButtonReverse.clicked.connect(self.reverse)
@@ -111,13 +111,18 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             return
 
         shortest = self.radioButtonShortest.isChecked()
-        """
-        vehicle = self.comboBoxVehicle.currentIndex()
-        costingOptions = vehicles.options[vehicle]
-        """
-        costingOptions = {}
+
+        vehicle = self.comboBoxVehicles.currentIndex()
+        profile, costingOptions = vehicles.options_for_vehicle(vehicle)
+
+        if shortest:
+            if profile == "auto":
+                profile = "auto_shorter"
+            else:
+                pushWarning("Shortest path is not compatible with the selected vehicle")
+                return
         try:
-            layer.updateRoute(points, costingOptions, shortest)
+            layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
             logging.error(e, exc_info=True)

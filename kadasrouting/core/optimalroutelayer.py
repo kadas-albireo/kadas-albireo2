@@ -30,7 +30,6 @@ from qgis.core import (
     QgsUnitTypes
 )
 
-
 from kadas.kadascore import KadasPluginLayerType
 
 MAX_DISTANCE_FOR_NAVIGATION = 50
@@ -62,7 +61,7 @@ class OptimalRouteLayer(KadasItemLayer):
         self.response = None
         self.points = []
         self.pins = []
-        self.shortest = False
+        self.profile = None
         self.costingOptions = {}
         self.lineItem = None
         self.valhalla = ValhallaClient()
@@ -94,7 +93,7 @@ class OptimalRouteLayer(KadasItemLayer):
             for i, pin in enumerate(self.pins):
                 self.points[i] = QgsPointXY(pin.position())
             response = self.valhalla.route(
-                self.points, self.costingOptions, self.shortest
+                self.points, self, profile, self.costingOptions
             )
             self.computeFromResponse(response)
             self.triggerRepaint()
@@ -105,10 +104,10 @@ class OptimalRouteLayer(KadasItemLayer):
             logging.error("Could not compute route")
 
     @waitcursor
-    def updateRoute(self, points, costingOptions, shortest):
-        response = self.valhalla.route(points, costingOptions, shortest)
+    def updateRoute(self, points, profile, costingOptions):
+        response = self.valhalla.route(points, profile, costingOptions)
         self.costingOptions = costingOptions
-        self.shortest = shortest
+        self.profile = profile
         self.points = points
         self.computeFromResponse(response)
         self.triggerRepaint()
@@ -215,7 +214,7 @@ class OptimalRouteLayer(KadasItemLayer):
         points = json.loads(element.attribute("points"))
         self.points = [QgsGeometry.fromWkt(wkt).asPoint() for wkt in points]
         self.costingOptions = json.loads(element.attribute("costingOptions"))
-        self.shortest = element.attribute("shortest")
+        self.profile = element.attribute("profile")
         self.computeFromResponse(response)
         return True
 
@@ -227,7 +226,7 @@ class OptimalRouteLayer(KadasItemLayer):
         element.setAttribute("name", self.layerTypeKey())
         element.setAttribute("response", json.dumps(self.response))
         element.setAttribute("points", json.dumps([pt.asWkt() for pt in self.points]))
-        element.setAttribute("shortest", self.shortest)
+        element.setAttribute("profile", self.profile)
         element.setAttribute("costingOptions", json.dumps(self.costingOptions))
         return True
 

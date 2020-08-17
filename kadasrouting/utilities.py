@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import QLocale, QCoreApplication, QSettings, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QApplication
 
@@ -13,6 +13,18 @@ from qgis.core import (
 )
 
 tr = lambda x: QCoreApplication.translate("", x)
+
+def localeName():
+    override_flag = QSettings().value(
+        'locale/overrideFlag', True, type=bool)
+
+    if override_flag:
+        locale_name = QSettings().value('locale/userLocale', 'en_US', type=str)
+    else:
+        locale_name = QLocale.system().name()
+        locale_name = str(locale_name).split('_')[0]
+
+    return locale_name
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)

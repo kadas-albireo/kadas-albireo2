@@ -15,7 +15,7 @@ from kadasrouting.gui.locationinputwidget import (
     LocationInputWidget,
     WrongLocationException
 )
-from kadasrouting import vehicles
+from kadasrouting.core import vehicles
 from kadasrouting.utilities import (
     iconPath,
     pushMessage,
@@ -61,8 +61,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         )
         self.layout().addWidget(self.originSearchBox, 3, 1)
 
-        self.comboBoxVehicles.addItems(vehicles.vehicles)
-
+        self.comboBoxVehicles.addItems(vehicles.vehicleNames())
         self.reachabilityMode = {
             "isochrone": self.tr("Isochrone"),
             "isodistance": self.tr("Isodistance"),
