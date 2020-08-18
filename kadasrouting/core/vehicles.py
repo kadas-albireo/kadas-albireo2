@@ -31,6 +31,9 @@ def read_vehicles():
 def vehicle_names():    
     return [v[vehicle_name_column] for v in _vehicles]
 
+def vehicles():
+    return _vehicles
+
 def options_for_vehicle(i):
     vehicle = _vehicles[i]
     profile = vehicle[COST_MODEL]

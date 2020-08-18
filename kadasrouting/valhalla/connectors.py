@@ -1,6 +1,7 @@
 import subprocess
 import logging
 from kadasrouting.exceptions import Valhalla400Exception
+from kadasrouting.utilities import localeName
 
 LOG = logging.getLogger(__name__)
 
@@ -8,16 +9,15 @@ LOG = logging.getLogger(__name__)
 class Connector:
     def prepareRouteParameters(self, points, profile="auto", options=None):
         options = options or {}        
-
-        params = dict(costing=profile, show_locations=True, locations=points)
-        params["locations"] = points
-
+        locale_name = localeName()
+        params = dict(costing=profile, show_locations=True, locations=points,
+                        directions_options = {"language": locale_name})        
         if options:
             params["costing_options"] = {profile: options}
 
         return params
 
-    def prepareIsochronesParameters(self, points, intervals, colors):
+    def prepareIsochronesParameters(self, points, profile, options, intervals, colors):
         # build contour json
         if len(intervals) != len(colors):
             LOG.warning(self.tr(
@@ -29,8 +29,8 @@ class Connector:
             for i in range(0, len(intervals)):
                 contours.append({"time": intervals[i], "color": colors[i]})
         params = dict(
-            costing="auto", locations=points, polygons=True, contours=contours
-        )
+            costing=profile, locations=points, polygons=True, 
+            contours=contours, costing_options = {profile: options})
         return params
 
 
@@ -61,7 +61,6 @@ class ConsoleConnector(Connector):
 import requests
 import json
 
-
 class HttpConnector(Connector):
     def __init__(self, url):
         self.url = url
@@ -81,7 +80,8 @@ class HttpConnector(Connector):
         response = self._request("route", json.dumps(params))
         return response
 
-    def isochrones(self, points, intervals, colors):
-        params = self.prepareIsochronesParameters(points, intervals, colors)
+    def isochrones(self, points, profile, options, intervals, colors):
+        params = self.prepareIsochronesParameters(points, profile, options,
+                                                  intervals, colors)
         response = self._request("isochrone", json.dumps(params))
         return response

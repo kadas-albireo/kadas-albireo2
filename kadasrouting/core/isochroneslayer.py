@@ -49,8 +49,9 @@ def getFeaturesFromResponse(response):
 
 
 @waitcursor
-def generateIsochrones(point, intervals, colors, basename, overwrite=True):
-    response = valhalla.isochrones(point, intervals, colors)
+def generateIsochrones(point, profile, costingOptions, intervals,
+                        colors, basename, overwrite=True):
+    response = valhalla.isochrones(point, profile, costingOptions, intervals, colors)
     features = getFeaturesFromResponse(response)
     for interval, feature in zip(intervals[::-1], features):
         # FIXME: we should use the 'contour' property in the feature to be sure of the contour line that we are

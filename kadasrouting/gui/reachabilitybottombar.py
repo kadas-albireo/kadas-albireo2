@@ -29,7 +29,10 @@ from qgis.core import (
     QgsRectangle
 )
 
-from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
+from kadasrouting.core.isochroneslayer import(
+    generateIsochrones,
+    OverwriteError
+)
 
 from kadasrouting.exceptions import Valhalla400Exception
 
@@ -61,7 +64,13 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         )
         self.layout().addWidget(self.originSearchBox, 3, 1)
 
-        self.comboBoxVehicles.addItems(vehicles.vehicleNames())
+        self.comboBoxVehicles.addItems(vehicles.vehicle_names())
+        model = self.comboBoxVehicles.model()
+        for i, vehicle in enumerate(vehicles.vehicles()):
+            item = model.item(i)
+            item.setEnabled(vehicle[vehicles.COST_MODEL] in 
+                            ["auto", "bicycle", "pedestrian"])
+
         self.reachabilityMode = {
             "isochrone": self.tr("Isochrone"),
             "isodistance": self.tr("Isodistance"),
@@ -126,11 +135,24 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         except Exception as e:
             pushWarning("Invalid intervals: %s" % str(e))
             return
+
+        vehicle = self.comboBoxVehicles.currentIndex()
+        profile, costingOptions = vehicles.options_for_vehicle(vehicle)
+
+        if (self.comboBoxReachabilityMode.currentText()
+                == self.reachabilityMode["isodistance"]):
+            if profile == "auto":
+                profile = "auto_shorter"
+            else:
+                pushWarning("Isodistance mode is not compatible with the selected vehicle")
+                return
+
         colors = []
         try:
             colors = self.getColorFromInterval()
             LOG.debug("_".join(colors))
-            generateIsochrones(point, intervals, colors, self.getBasename(), overwrite)
+            generateIsochrones(point, profile, costingOptions, intervals, 
+                                colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
         except Valhalla400Exception as e:

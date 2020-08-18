@@ -13,33 +13,34 @@ class ValhallaClient:
     def __init__(self, connector=None):
         self.connector = connector or HttpConnector(TEST_URL)
 
-    def route(self, qgspoints, options, shortest=False):
+    def route(self, qgspoints, profile, options):
         """
         Computes a route
 
         :param points: A list of QgsPointsXY in epsg4326 crs with the points that define the route
         :type points: list
 
+        :param profile: the costing profile to use
+        :type profile: string
+
         :param options: The options for computing the route
         :type options: dict
 
-        :param points: If True, computes shortest length route instead of shorter time
-        :type points: bool
-
-        :returns: Ouput layer with a single geometry containing the route.
+        :returns: Output layer with a single geometry containing the route.
         :rtype: QgsVectorLayer
         """
         points = self.pointsFromQgsPoints(qgspoints)
         try:
-            response = self.connector.route(points, options, shortest)
+            response = self.connector.route(points, profile, options)
         except Exception as e:
             raise ValhallaException(str(e))
         return response
 
-    def isochrones(self, qgspoint, intervals, colors):
+    def isochrones(self, qgspoint, profile, costingOptions, intervals, colors):
         points = self.pointsFromQgsPoints([qgspoint])
         try:
-            response = self.connector.isochrones(points, intervals, colors)
+            response = self.connector.isochrones(points, profile, costingOptions, 
+                                                intervals, colors)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:
