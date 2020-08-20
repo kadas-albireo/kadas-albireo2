@@ -128,6 +128,8 @@ void KadasGpxIntegration::openGpx()
 
 bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg )
 {
+  kApp->unsetMapTool();
+
   QString layerName = QFileInfo( filename ).baseName();
   KadasItemLayer *layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   QgsProject::instance()->addMapLayer( layer );
@@ -205,6 +207,8 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
 
 void KadasGpxIntegration::saveGpx()
 {
+  kApp->unsetMapTool();
+
   QDialog dialog;
   dialog.setWindowTitle( tr( "Export to GPX" ) );
   dialog.setLayout( new QVBoxLayout );

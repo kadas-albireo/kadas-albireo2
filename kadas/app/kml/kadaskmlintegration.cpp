@@ -61,6 +61,8 @@ KadasKmlIntegration::~KadasKmlIntegration()
 
 void KadasKmlIntegration::exportToKml()
 {
+  kApp->unsetMapTool();
+
   KadasKMLExportDialog d( kApp->mainWindow()->mapCanvas()->layers(), kApp->mainWindow() );
   d.show();
   QEventLoop loop;
@@ -86,6 +88,8 @@ void KadasKmlIntegration::exportToKml()
 
 void KadasKmlIntegration::importFromKml()
 {
+  kApp->unsetMapTool();
+
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString selectedFilter;
 
