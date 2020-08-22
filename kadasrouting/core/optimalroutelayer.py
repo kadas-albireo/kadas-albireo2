@@ -34,6 +34,45 @@ from kadas.kadascore import KadasPluginLayerType
 
 MAX_DISTANCE_FOR_NAVIGATION = 50
 
+_icon_for_maneuver = {1: "direction_depart",
+                    2: "direction_depart_right",
+                    3: "direction_depart_left",
+                    4: "direction_arrive_straight",
+                    5: "direction_arrive_right",
+                    6: "direction_arrive_left",
+                    8: "direction_continue",
+                    9: "direction_turn_slight_right",
+                    10: "direction_turn_right",
+                    11: "direction_turn_sharp_right",
+                    12: "direction_uturn",
+                    13: "direction_uturn",
+                    14: "direction_turn_sharp_left",
+                    15: "direction_turn_left",
+                    16: "direction_turn_slight_left",
+                    17: "direction_on_ramp_straight",
+                    18: "direction_on_ramp_rigth",
+                    19: "direction_on_ramp_left",
+                    20: "direction_depart_right",
+                    21: "direction_depart_left"
+                    22: "direction_continue_straight",
+                    23: "direction_continue_right",
+                    24: "direction_continue_left",
+                    26: "direction_roundabout",
+                    27: "direction_roundabout",
+                    37: "direction_merge_right",
+                    38: "direction_merge_left"
+                    }
+
+def icon_path_for_maneuver(maneuvertype):
+    name = _icon_for_maneuver.get(maneuvertype, "dummy")
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ç
+                        "icons", "name" + ".png")
+    return path
+
+
+class NotInRouteException(Exception):
+    pass
+
 class RoutePointMapItem(KadasPinItem):
 
     hasChanged = pyqtSignal()
@@ -180,30 +219,47 @@ class OptimalRouteLayer(KadasItemLayer):
         qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:4326"),
                                 QgsProject.instance().transformContext())
         
-        for line in self.maneuvers.keys():
+        legs = list(self.maneuvers.keys())
+        for i, line in enumerate(legs):
             _, _pt, segment, _ = line.closestSegmentWithContext(pt)
             dist = qgsdistance.convertLengthMeasurement(
                         qgsdistance.measureLine(pt, _pt),
                         QgsUnitTypes.DistanceMeters)
             if dist < min_dist:
                 closest_leg = line
+                next_leg = None if i == len(legs) - 1 else legs[i + 1] 
                 closest_segment = segment
                 closest_point = _pt
                 min_dist = dist
 
         if closest_leg is not None:
             leg_points = closest_leg.asPolyline()
-            for i, maneuver in enumerate(self.maneuvers[closest_leg][:-1]):
+            maneuvers = self.maneuvers[closest_leg]
+            for i, maneuver in enumerate(maneuvers[:-1]):
                 if (maneuver["begin_shape_index"] <= closest_segment
                         and maneuver["end_shape_index"] > closest_segment):
                     points = [closest_point]
                     points.extend(leg_points[closest_segment:maneuver["end_shape_index"]])
                     distance_to_next = qgsdistance.convertLengthMeasurement(
                                                 qgsdistance.measureLine(points),
-                                                QgsUnitTypes.DistanceMeters)                    
-                    return f"In {distance_to_next:.2f} m {self.maneuvers[closest_leg][i + 1]['instruction']}"
+                                                QgsUnitTypes.DistanceMeters)
+                    message = maneuvers[i + 1]['instruction']
+                    if i == len(maneuvers) - 2:
+                        distance_to_next2 = None
+                        message2 = None                    
+                    else:
+                        next_maneuver = maneuvers[i + 2]
+                        next_maneuver_points = leg_points[maneuver["end_shape_index"]:
+                                                        next_maneuver["end_shape_index"]]
+                        distance_to_next2 = qgsdistance.convertLengthMeasurement(
+                                                qgsdistance.measureLine(next_maneuver_points),
+                                                QgsUnitTypes.DistanceMeters)
+                        message2 = next_maneuver['instruction']
+
+                    icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
+                    return distance_to_next, message, icon, distance_to_next2, message2
     
-        return "You are not in the route"
+        raise NotInRouteException()
 
     def layerTypeKey(self):
         return OptimalRouteLayer.LAYER_TYPE

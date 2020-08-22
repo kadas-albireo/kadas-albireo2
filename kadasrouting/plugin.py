@@ -18,7 +18,7 @@ from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
-from kadasrouting.gui.navigationbottombar import NavigationBottomBar
+from kadasrouting.gui.navigationpanel import NavigationPanel
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -36,7 +36,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
-        self.navigationBar = None
+        self.navigationPanel = None
 
     def initGui(self):
         # Routing menu
@@ -129,10 +129,17 @@ class RoutingPlugin(QObject):
 
     def showNavigation(self, show=True):
         if show:
-            if self.navigationBar is None:
-                self.navigationBar = NavigationBottomBar(
-                    self.iface.mapCanvas(), self.navigationAction)
-            self.navigationBar.show()
+            if self.navigationPanel is None:
+                self.navigationPanel = NavigationPanel()
+                def _resize():
+                    width = 200
+                    x = self.iface.mapCanvas().width() - width
+                    y = self.iface.mapCanvas().height() / 2
+                    self.navigationPanel.setGeometry(x, y, width, y)
+                self.iface.mapCanvas().extentsChanged.connect(_resize)
+                self.navigationPanel.setParent(self.iface.mapCanvas())
+                _resize()
+            self.navigationPanel.show()
         else:
-            if self.navigationBar is not None:
-                self.navigationBar.hide()
+            if self.navigationPanel is not None:
+                self.navigationPanel.hide()
