@@ -53,7 +53,7 @@ _icon_for_maneuver = {1: "direction_depart",
                     18: "direction_on_ramp_rigth",
                     19: "direction_on_ramp_left",
                     20: "direction_depart_right",
-                    21: "direction_depart_left"
+                    21: "direction_depart_left",
                     22: "direction_continue_straight",
                     23: "direction_continue_right",
                     24: "direction_continue_left",
@@ -65,7 +65,7 @@ _icon_for_maneuver = {1: "direction_depart",
 
 def icon_path_for_maneuver(maneuvertype):
     name = _icon_for_maneuver.get(maneuvertype, "dummy")
-    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ç
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                         "icons", "name" + ".png")
     return path
 
@@ -163,7 +163,7 @@ class OptimalRouteLayer(KadasItemLayer):
             leg_coordinates = [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
             coordinates.extend(leg_coordinates)
             qgis_leg_coords = [QgsPointXY(x, y) for x, y in leg_coordinates]
-            geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)    
+            geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)
             self.maneuvers[geom] = leg["maneuvers"]
             self.duration += leg["summary"]["time"]
             self.distance += round(leg["summary"]["length"], 3)
@@ -218,7 +218,7 @@ class OptimalRouteLayer(KadasItemLayer):
         qgsdistance = QgsDistanceArea()
         qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:4326"),
                                 QgsProject.instance().transformContext())
-        
+
         legs = list(self.maneuvers.keys())
         for i, line in enumerate(legs):
             _, _pt, segment, _ = line.closestSegmentWithContext(pt)
@@ -227,7 +227,7 @@ class OptimalRouteLayer(KadasItemLayer):
                         QgsUnitTypes.DistanceMeters)
             if dist < min_dist:
                 closest_leg = line
-                next_leg = None if i == len(legs) - 1 else legs[i + 1] 
+                next_leg = None if i == len(legs) - 1 else legs[i + 1]
                 closest_segment = segment
                 closest_point = _pt
                 min_dist = dist
@@ -246,7 +246,7 @@ class OptimalRouteLayer(KadasItemLayer):
                     message = maneuvers[i + 1]['instruction']
                     if i == len(maneuvers) - 2:
                         distance_to_next2 = None
-                        message2 = None                    
+                        message2 = None
                     else:
                         next_maneuver = maneuvers[i + 2]
                         next_maneuver_points = leg_points[maneuver["end_shape_index"]:
@@ -258,7 +258,7 @@ class OptimalRouteLayer(KadasItemLayer):
 
                     icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
                     return distance_to_next, message, icon, distance_to_next2, message2
-    
+
         raise NotInRouteException()
 
     def layerTypeKey(self):
@@ -288,7 +288,7 @@ class OptimalRouteLayer(KadasItemLayer):
 
     def addAsRegularLayer(self):
         layer = QgsVectorLayer(
-            "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double", 
+            "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double",
             self.name(), "memory"
         )
         pr = layer.dataProvider()
