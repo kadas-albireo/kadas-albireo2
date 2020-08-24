@@ -29,7 +29,7 @@ def read_vehicles():
                 _vehicles.append({k:v for k,v in zip(columns, row)})
 
 def vehicle_names():    
-    return [v[vehicle_name_column] for v in _vehicles]
+    return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles]
 
 def vehicles():
     return _vehicles
