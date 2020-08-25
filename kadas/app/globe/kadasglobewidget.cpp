@@ -42,6 +42,7 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   layerSelectionButton->setPopupMode( QToolButton::InstantPopup );
   mLayerSelectionMenu = new QMenu( layerSelectionButton );
   layerSelectionButton->setMenu( mLayerSelectionMenu );
+  mLayerSelectionMenu->installEventFilter( this );
 
   QToolButton *syncButton = new QToolButton( this );
   syncButton->setAutoRaise( true );
@@ -152,4 +153,22 @@ QStringList KadasGlobeWidget::getSelectedLayerIds() const
 void KadasGlobeWidget::contextMenuEvent( QContextMenuEvent *e )
 {
   e->accept();
+}
+
+bool KadasGlobeWidget::eventFilter( QObject *obj, QEvent *ev )
+{
+  if ( obj == mLayerSelectionMenu && ( ev->type() == QEvent::MouseButtonPress || ev->type() == QEvent::MouseButtonRelease ) )
+  {
+    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( ev );
+    QAction *action = mLayerSelectionMenu->actionAt( mouseEvent->pos() );
+    if ( action )
+    {
+      if ( ev->type() == QEvent::MouseButtonRelease )
+      {
+        action->trigger();
+      }
+      return true;
+    }
+  }
+  return QObject::eventFilter( obj, ev );
 }

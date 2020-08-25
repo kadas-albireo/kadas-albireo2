@@ -38,6 +38,7 @@ class KadasGlobeWidget : public QDockWidget
     QMenu *mLayerSelectionMenu = nullptr;
 
     void contextMenuEvent( QContextMenuEvent *e ) override;
+    bool eventFilter( QObject *obj, QEvent *ev ) override;
 
   private slots:
     void updateLayerSelectionMenu();
