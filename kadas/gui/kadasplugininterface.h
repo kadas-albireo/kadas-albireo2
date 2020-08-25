@@ -95,6 +95,7 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );
+    void projectWillBeClosed();
 };
 
 

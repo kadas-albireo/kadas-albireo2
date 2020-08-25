@@ -102,6 +102,7 @@ Generic object finder
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );
+    void projectWillBeClosed();
 };
 
 

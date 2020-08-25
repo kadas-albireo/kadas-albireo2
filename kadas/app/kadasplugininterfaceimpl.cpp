@@ -34,9 +34,9 @@
 
 KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
 {
-  connect( kApp, &KadasApplication::printLayoutAdded, this, &KadasPluginInterface::printLayoutAdded );
-  connect( kApp, &KadasApplication::printLayoutWillBeRemoved, this, &KadasPluginInterface::printLayoutWillBeRemoved );
-  // TODO
+  connect( app, &KadasApplication::printLayoutAdded, this, &KadasPluginInterface::printLayoutAdded );
+  connect( app, &KadasApplication::printLayoutWillBeRemoved, this, &KadasPluginInterface::printLayoutWillBeRemoved );
+  connect( app, &KadasApplication::projectWillBeClosed, this, &KadasPluginInterface::projectWillBeClosed );
 }
 
 QgsPluginManagerInterface *KadasPluginInterfaceImpl::pluginManagerInterface()
