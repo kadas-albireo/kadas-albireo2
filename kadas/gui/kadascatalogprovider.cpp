@@ -18,6 +18,7 @@
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmimedatautils.h>
+#include <qgis/qgslogger.h>
 
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/kadascatalogprovider.h>
@@ -112,9 +113,8 @@ QString KadasCatalogProvider::parseWMSNestedLayer( const QDomNode &layerItem ) c
   return subLayerParams;
 }
 
-bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, QString &title, QMimeData *&mimeData ) const
+bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, QMimeData *&mimeData ) const
 {
-  title = layerItem.firstChildElement( "Title" ).text();
   QString layerid = layerItem.firstChildElement( "Name" ).text();
   QString subLayerParams = QString( "&layers=%1&styles=" ).arg( layerid );
   QStringList supportedCrs;

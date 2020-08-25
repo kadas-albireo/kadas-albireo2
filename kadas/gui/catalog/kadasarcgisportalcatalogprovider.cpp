@@ -105,39 +105,56 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
     QMap<QString, EntryMap> amsLayers;
+    QMap<QString, EntryMap> wmtsLayers;
+    QMap<QString, EntryMap> wmsLayers;
     for ( const QVariant &resultData : rootMap["results"].toList() )
     {
       QVariantMap resultMap = resultData.toMap();
+      QString category;
+      QString position;
+      for ( const QVariant &tagv : resultMap["tags"].toList() )
+      {
+        QString tag = tagv.toString();
+        if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
+        {
+          auto it = mIsoTopics.find( tag.mid( 11 ).toUpper() );
+          if ( it != mIsoTopics.end() )
+          {
+            category = it.value().category;
+            position = it.value().sortIndices;
+          }
+          break;
+        }
+      }
+
+      QString metadataUrl = QgsSettings().value( "kadas/metadataBaseUrl" ).toString().arg( resultMap["id"].toString() );
+      bool flatten = false;
       if ( resultMap["type"].toString() == "Map Service" )
       {
-        QString category;
-        QString position;
-        for ( const QVariant &tagv : resultMap["tags"].toList() )
-        {
-          QString tag = tagv.toString();
-          if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
-          {
-            auto it = mIsoTopics.find( tag.mid( 11 ).toUpper() );
-            if ( it != mIsoTopics.end() )
-            {
-              category = it.value().category;
-              position = it.value().sortIndices;
-            }
-            break;
-          }
-        }
-
-        QString metadataUrl = QgsSettings().value( "kadas/metadataBaseUrl" ).toString().arg( resultMap["id"].toString() );
-        bool flatten = false;
         amsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
       }
-      // No other types supported for the moment
+      else if ( resultMap["type"].toString() == "WMS" )
+      {
+        wmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
+      }
+//      else if( resultMap["type"].toString() == "WMTS" )
+//      {
+//        wmtsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
+//      }
     }
 
     for ( const QString &amsUrl : amsLayers.keys() )
     {
       readAMSCapabilities( amsUrl, amsLayers[amsUrl] );
     }
+    for ( const QString &wmsUrl : wmsLayers.keys() )
+    {
+      readWMSCapabilities( wmsUrl, wmsLayers[wmsUrl] );
+    }
+//    for ( const QString &wmtsUrl : wmtsLayers.keys() )
+//    {
+//      readWMTSCapabilities( wmtsUrl, wmtsLayers[wmtsUrl] );
+//    }
 
     if ( rootMap["nextStart"].toInt() >= 0 )
     {
@@ -241,14 +258,43 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     doc.setContent( reply->readAll() );
     QStringList imgFormats = parseWMSFormats( doc );
     QStringList parentCrs;
-    for ( const QDomNode &layerItem : childrenByTagName( doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ), "Layer" ) )
+
+    QDomElement layerItem = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" );
+    QString layerName = layerItem.firstChildElement( "Name" ).text();
+
+    QString title;
+    QMimeData *mimeData;
+    // Assume entries contains just one entry (every WMS service just referenced by one item in the portal)
+    const ResultEntry &entry = entries->first();
+
+    if ( parseWMSLayerCapabilities( layerItem, entry.title, imgFormats, parentCrs, url, entry.metadataUrl, mimeData ) )
     {
-      searchMatchingWMSLayer( layerItem, *entries, url, imgFormats, parentCrs );
+
+      // Parse sublayers
+      QVariantList sublayers;
+      readWMSSublayers( layerItem, "-1", sublayers );
+      mimeData->setProperty( "sublayers", sublayers );
+      QStringList sortIndices = entry.sortIndices.split( "/" );
+      mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }
   }
 
   delete entries;
   endTask();
+}
+
+void KadasArcGisPortalCatalogProvider::readWMSSublayers( const QDomElement &layerItem, const QString &parentName, QVariantList &sublayers )
+{
+  for ( const QDomNode &subLayerItem : childrenByTagName( layerItem, "Layer" ) )
+  {
+    QVariantMap sublayer;
+    QString layerId = subLayerItem.firstChildElement( "Name" ).text();
+    sublayer["id"] = layerId;
+    sublayer["parentLayerId"] = parentName;
+    sublayer["name"] = subLayerItem.firstChildElement( "Title" ).text();
+    sublayers.append( sublayer );
+    readWMSSublayers( subLayerItem.toElement(), layerId, sublayers );
+  }
 }
 
 void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const QString &amsUrl, const EntryMap &entries )
@@ -361,37 +407,4 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 
   delete entries;
   endTask();
-}
-
-void KadasArcGisPortalCatalogProvider::searchMatchingWMSLayer( const QDomNode &layerItem, const EntryMap &entries, const QString &url, const QStringList &imgFormats, QStringList parentCrs )
-{
-  QString layerid = layerItem.firstChildElement( "Name" ).text();
-  if ( entries.contains( layerid ) )
-  {
-    QString title;
-    QMimeData *mimeData;
-    const ResultEntry &entry = entries[layerid];
-    if ( parseWMSLayerCapabilities( layerItem, imgFormats, parentCrs, url, entry.metadataUrl, title, mimeData ) )
-    {
-      QStringList sortIndices = entry.sortIndices.split( "/" );
-      mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entries[layerid].title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
-    }
-  }
-  for ( const QDomNode &crsItem : childrenByTagName( layerItem.toElement(), "CRS" ) )
-  {
-    parentCrs.append( crsItem.toElement().text() );
-  }
-  QDomElement srsElement = layerItem.firstChildElement( "SRS" );
-  if ( !srsElement.isNull() )
-  {
-    for ( const QString &authId : srsElement.text().split( "", QString::SkipEmptyParts ) )
-    {
-      parentCrs.append( authId );
-    }
-  }
-  for ( const QDomNode &subLayerItem : childrenByTagName( layerItem.toElement(), "Layer" ) )
-  {
-
-    searchMatchingWMSLayer( subLayerItem, entries, url, imgFormats, parentCrs );
-  }
 }

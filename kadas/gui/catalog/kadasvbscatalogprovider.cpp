@@ -307,10 +307,10 @@ void KadasVBSCatalogProvider::searchMatchingWMSLayer( const QDomNode &layerItem,
   QString layerid = layerItem.firstChildElement( "Name" ).text();
   if ( entries.contains( layerid ) )
   {
-    QString title;
     QMimeData *mimeData;
     const ResultEntry &entry = entries[layerid];
-    if ( parseWMSLayerCapabilities( layerItem, imgFormats, parentCrs, url, entry.metadataUrl, title, mimeData ) )
+    QString title = layerItem.firstChildElement( "Title" ).text();
+    if ( parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, entry.metadataUrl, mimeData ) )
     {
       QStringList sortIndices = entry.sortIndices.split( "/" );
       mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entries[layerid].title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );

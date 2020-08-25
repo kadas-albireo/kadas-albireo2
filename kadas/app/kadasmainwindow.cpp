@@ -1121,9 +1121,17 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QgsLayerTreeGroup *parent = entries.contains( entry.parentId ) ? entries[entry.parentId].group : rootGroup;
       if ( entry.leaf )
       {
-        QgsDataSourceUri dataSource( adjustedUri );
-        dataSource.removeParam( "layer" );
-        dataSource.setParam( "layer", QString::number( it.key() ) );
+        if ( uri.providerKey == "arcgismapserver" )
+        {
+          QgsDataSourceUri dataSource( adjustedUri );
+          dataSource.removeParam( "layer" );
+          dataSource.setParam( "layer", QString::number( it.key() ) );
+          adjustedUri = dataSource.uri();
+        }
+        else if ( uri.providerKey == "wms" )
+        {
+          adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + QString::number( it.key() ) );
+        }
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
         QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, entry.name, uri.providerKey, false, 0, false );
         if ( layer )

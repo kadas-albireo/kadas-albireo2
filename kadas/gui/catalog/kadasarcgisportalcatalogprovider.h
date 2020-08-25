@@ -65,7 +65,8 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     void readWMTSCapabilities( const QString &wmtsUrl, const EntryMap &entries );
     void readWMSCapabilities( const QString &wmsUrl, const EntryMap &entries );
     void readAMSCapabilities( const QString &amsUrl, const EntryMap &entries );
-    void searchMatchingWMSLayer( const QDomNode &layerItem, const EntryMap &entries, const QString &url, const QStringList &imgFormats, QStringList parentCrs );
+
+    void readWMSSublayers( const QDomElement &layerItem, const QString &parentName, QVariantList &sublayers );
 
   private slots:
     void readWMTSCapabilitiesDo();
