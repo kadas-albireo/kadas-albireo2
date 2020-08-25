@@ -1055,7 +1055,28 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
   }
 
-  if ( !sublayers.isEmpty() )
+  if ( sublayers.size() == 1 )
+  {
+    // If there is exactly one sublayer, add it directly
+    QVariantMap sublayer = sublayers[0].toMap();
+    if ( uri.providerKey == "arcgismapserver" )
+    {
+      QgsDataSourceUri dataSource( adjustedUri );
+      dataSource.removeParam( "layer" );
+      dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
+      adjustedUri = dataSource.uri();
+    }
+    else if ( uri.providerKey == "wms" )
+    {
+      adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
+    }
+    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+    if ( layer )
+    {
+      layer->setMetadataUrl( metadataUrl );
+    }
+  }
+  else if ( !sublayers.isEmpty() )
   {
     struct Entry
     {
@@ -1067,11 +1088,16 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QMap<int, Entry> entries;
 
     // First pass: build structure
+    int nToplevel = 0;
     for ( int i = 0, n = sublayers.size(); i < n; ++i )
     {
       QVariantMap sublayer = sublayers[i].toMap();
       int id = sublayer["id"].toInt();
       int parentId = sublayer["parentLayerId"].toInt();
+      if ( parentId == -1 )
+      {
+        nToplevel += 1;
+      }
       QString name = sublayer["name"].toString();
       if ( entries.contains( parentId ) )
       {
@@ -1081,6 +1107,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
 
     QgsLayerTreeGroup *rootGroup = mLayerTreeView->layerTreeModel()->rootGroup();
+    // If there are more than one toplevel items, add an extra enclosing group
+    if ( nToplevel > 1 )
+    {
+      int offset = kApp->computeLayerGroupInsertionOffset( rootGroup );
+      rootGroup = rootGroup->insertGroup( offset, uri.name );
+    }
     int rootInsCount = 0;
     // Second pass: add groups/layers
     for ( auto it = entries.begin(), itEnd = entries.end(); it != itEnd; ++it )
@@ -1092,7 +1124,8 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         QgsDataSourceUri dataSource( adjustedUri );
         dataSource.removeParam( "layer" );
         dataSource.setParam( "layer", QString::number( it.key() ) );
-        QgsRasterLayer *layer = kApp->addRasterLayer( dataSource.uri(), entry.name, uri.providerKey, false, rootInsCount++ );
+        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
+        QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, entry.name, uri.providerKey, false, 0, false );
         if ( layer )
         {
           layer->setMetadataUrl( metadataUrl );
@@ -1112,6 +1145,8 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       layer->setMetadataUrl( metadataUrl );
     }
   }
+  // Reset insertion point
+  QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
 }
 
 void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )
