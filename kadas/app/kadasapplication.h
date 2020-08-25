@@ -24,6 +24,7 @@
 
 #include <kadas/gui/kadasfeaturepicker.h>
 
+class QgsLayerTreeGroup;
 class QNetworkRequest;
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
@@ -61,8 +62,8 @@ class KadasApplication : public QgsApplication
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
 
-    QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0 ) const;
-    QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false ) const;
+    QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
+    QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
@@ -95,6 +96,8 @@ class KadasApplication : public QgsApplication
     void showLayoutDesigner( QgsPrintLayout *layout );
 
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
+
+    int computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const;
 
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
@@ -133,7 +136,6 @@ class KadasApplication : public QgsApplication
     DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();
     int hideDialogPanel( const QString &name, QStackedWidget *stackedWidget );
-    void setLayerTreeInsertionPoint( int offset = 0 ) const;
 
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
