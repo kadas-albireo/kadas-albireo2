@@ -4,12 +4,12 @@
     <message>
         <location filename="../utilities.py" line="28"/>
         <source>Info</source>
-        <translation type="unfinished"/>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../utilities.py" line="32"/>
         <source>Warning</source>
-        <translation type="unfinished"/>
+        <translation>Attention</translation>
     </message>
 </context>
 <context>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../valhalla/connectors.py" line="24"/>
         <source>The number of intervals and colors are different, using default color</source>
-        <translation type="unfinished"/>
+        <translation>Le nombre d&apos;intervalles et de couleurs est différent,   la couleur par défaut est utilisée</translation>
     </message>
 </context>
 <context>

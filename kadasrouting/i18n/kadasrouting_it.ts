@@ -191,7 +191,7 @@
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="103"/>
         <source>Invalid location: {error_message}</source>
-        <translation type="unfinished"/>
+        <translation>Posizione non valida {error_message}</translation>
     </message>
     <message>
         <location filename="../gui/optimalroutebottombar.py" line="117"/>
@@ -214,7 +214,7 @@
     <message>
         <location filename="../core/optimalroutelayer.py" line="136"/>
         <source>Distance: {distance} km&lt;br/&gt;Time: {formatted_hour}h{formatted_minute}</source>
-        <translation type="unfinished"/>
+        <translation>Distanza: {distance} km Tempo: {formatted_hour} h {formatted_minute}</translation>
     </message>
     <message>
         <location filename="../core/optimalroutelayer.py" line="153"/>
@@ -275,7 +275,7 @@
     <message>
         <location filename="../gui/reachabilitybottombar.py" line="141"/>
         <source>Can not generate the error because &quot;{error_message}&quot;</source>
-        <translation type="unfinished"/>
+        <translation>impossibile creare il messaggio di errore &quot;{error_message}&quot;</translation>
     </message>
     <message>
         <location filename="../gui/reachabilitybottombar.py" line="164"/>
@@ -318,7 +318,7 @@
     <message>
         <location filename="../plugin.py" line="40"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Calcolo rotta</translation>
     </message>
     <message>
         <location filename="../plugin.py" line="48"/>
@@ -328,7 +328,7 @@
     <message>
         <location filename="../plugin.py" line="58"/>
         <source>TSP</source>
-        <translation type="unfinished"/>
+        <translation>TSP</translation>
     </message>
 </context>
 <context>
