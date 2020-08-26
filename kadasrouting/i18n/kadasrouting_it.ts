@@ -323,7 +323,7 @@
     <message>
         <location filename="../plugin.py" line="48"/>
         <source>Reachability</source>
-        <translation type="unfinished"/>
+        <translation>Accessibilità</translation>
     </message>
     <message>
         <location filename="../plugin.py" line="58"/>
