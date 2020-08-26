@@ -18,7 +18,7 @@ WIDTH = "width_m"
 def read_vehicles():
     global _vehicles
     _vehicles = []
-    with open(vehicles_file) as csv_file:
+    with open(vehicles_file, encoding="utf8") as csv_file:
         reader = csv.reader(csv_file)
         first = True
         for row in reader:
@@ -28,7 +28,7 @@ def read_vehicles():
             else:
                 _vehicles.append({k:v for k,v in zip(columns, row)})
 
-def vehicle_names():    
+def vehicle_names():
     return [v[vehicle_name_column] for v in _vehicles]
 
 def vehicles():
@@ -45,9 +45,3 @@ def options_for_vehicle(i):
     return profile, costing_options
 
 read_vehicles()
-
-
-
-
-
-
