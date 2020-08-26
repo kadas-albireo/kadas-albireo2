@@ -53,9 +53,9 @@ class RoutingPlugin(QObject):
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
         )
 
-        # TSP menu
-        self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
-        self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        # TSP menu (disable TSP since it's removed from the project)
+        # self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
+        # self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
         self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
@@ -63,8 +63,9 @@ class RoutingPlugin(QObject):
 
         self.actionsToggled = {self.navigationAction: self.showNavigation,
                                 self.reachabilityAction: self.showReachability,
-                                self.optimalRouteAction: self.showOptimalRoute,
-                                self.tspAction: self.showTSP}
+                                self.optimalRouteAction: self.showOptimalRoute
+                                # self.tspAction: self.showTSP
+                                }
         for action in self.actionsToggled:
             action.setCheckable(True)
             action.toggled.connect(partial(self._showPanel, action))
@@ -79,9 +80,9 @@ class RoutingPlugin(QObject):
         self.iface.removeAction(
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
         )
-        self.iface.removeAction(
-            self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        )
+        # self.iface.removeAction(
+        #     self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        # )
 
     def _showPanel(self, action, show):
         function = self.actionsToggled[action]
