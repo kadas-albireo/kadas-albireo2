@@ -89,7 +89,7 @@ class RoutingPlugin(QObject):
             self._hidePanels(action)
         function(show)
 
-    def _hidePanels(self, keep=None):        
+    def _hidePanels(self, keep=None):
         for action in self.actionsToggled:
             if action != keep:
                 action.setChecked(False)
