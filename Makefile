@@ -4,9 +4,9 @@ DIR := ${CURDIR}
 
 # LOCALES = space delimited list of iso codes to generate po files for
 # Please dont remove en here
-LOCALES = en fr de it id
+LOCALES = en fr de it
 
-#Qt .ts file updates - run to register new strings for translation 
+#Qt .ts file updates - run to register new strings for translation
 update-translation-strings:
 	# update application strings
 	@echo "Checking current translation."
@@ -27,7 +27,6 @@ test-translations:
 	@python scripts/missing_translations.py `pwd` fr
 	@python scripts/missing_translations.py `pwd` de
 	@python scripts/missing_translations.py `pwd` it
-	@python scripts/missing_translations.py `pwd` id
 	# Revert the changes to qm files
 	@git checkout ./kadasrouting/i18n/*qm
 
