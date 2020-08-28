@@ -104,7 +104,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>10;20;30</string>
+      <string notr="true">10;20;30</string>
      </property>
     </widget>
    </item>

@@ -166,7 +166,7 @@ class OptimalRouteLayer(KadasItemLayer):
             leg_coordinates = [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
             coordinates.extend(leg_coordinates)
             qgis_leg_coords = [QgsPointXY(x, y) for x, y in leg_coordinates]
-            geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)    
+            geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)
             self.maneuvers[geom] = leg["maneuvers"]
             self.duration += leg["summary"]["time"]
             self.distance += round(leg["summary"]["length"], 3)
@@ -231,7 +231,7 @@ class OptimalRouteLayer(KadasItemLayer):
                         QgsUnitTypes.DistanceMeters)
             if dist < min_dist:
                 closest_leg = line
-                next_leg = None if i == len(legs) - 1 else legs[i + 1] 
+                next_leg = None if i == len(legs) - 1 else legs[i + 1]
                 closest_segment = segment
                 closest_point = _pt
                 min_dist = dist
@@ -283,7 +283,7 @@ class OptimalRouteLayer(KadasItemLayer):
                                     distleft=formatdist(distanceleft),
                                     eta=eta_string, x=closest_point.x(), y=closest_point.y())
                     return maneuver
-    
+
         raise NotInRouteException()
 
     def layerTypeKey(self):
@@ -313,7 +313,7 @@ class OptimalRouteLayer(KadasItemLayer):
 
     def addAsRegularLayer(self):
         layer = QgsVectorLayer(
-            "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double", 
+            "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double",
             self.name(), "memory"
         )
         pr = layer.dataProvider()
