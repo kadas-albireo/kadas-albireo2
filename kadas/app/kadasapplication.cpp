@@ -359,7 +359,7 @@ void KadasApplication::init()
       timeout.start( 10000 );
       eventLoop.exec();
 
-      if ( reply->error() == QNetworkReply::NoError && timeout.isActive() )
+      if ( reply->error() == QNetworkReply::NoError && timeout.isActive() && reply->isFinished() )
       {
         projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
         settings.setValue( "/kadas/isOffline", false );
