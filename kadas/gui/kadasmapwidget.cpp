@@ -89,7 +89,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   mMapCanvas = new QgsMapCanvas( this );
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->setMapUpdateInterval( 1000 );
+  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", "1000" ).toInt() );
   mMapCanvas->setPreviewJobsEnabled( true );
   // TODO ?
 //  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() );

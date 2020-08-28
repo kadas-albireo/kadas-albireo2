@@ -111,7 +111,7 @@ void KadasMainWindow::init()
   statusBar()->addPermanentWidget( statusWidget, 0 );
 
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->setMapUpdateInterval( 1000 );
+  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", "1000" ).toInt() );
   mMapCanvas->setPreviewJobsEnabled( true );
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
