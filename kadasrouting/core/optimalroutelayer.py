@@ -1,5 +1,7 @@
+import os
 import json
 import logging
+import datetime
 
 from PyQt5.QtCore import QTimer, pyqtSignal, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
@@ -32,7 +34,7 @@ from qgis.core import (
 
 from kadas.kadascore import KadasPluginLayerType
 
-MAX_DISTANCE_FOR_NAVIGATION = 50
+MAX_DISTANCE_FOR_NAVIGATION = 250
 
 _icon_for_maneuver = {1: "direction_depart",
                     2: "direction_depart_right",
@@ -53,7 +55,7 @@ _icon_for_maneuver = {1: "direction_depart",
                     18: "direction_on_ramp_rigth",
                     19: "direction_on_ramp_left",
                     20: "direction_depart_right",
-                    21: "direction_depart_left"
+                    21: "direction_depart_left",
                     22: "direction_continue_straight",
                     23: "direction_continue_right",
                     24: "direction_continue_left",
@@ -65,10 +67,11 @@ _icon_for_maneuver = {1: "direction_depart",
 
 def icon_path_for_maneuver(maneuvertype):
     name = _icon_for_maneuver.get(maneuvertype, "dummy")
-    path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ç
-                        "icons", "name" + ".png")
-    return path
-
+    return _icon_path(name)
+    
+def _icon_path(name):
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                        "icons", name + ".png")
 
 class NotInRouteException(Exception):
     pass
@@ -216,8 +219,9 @@ class OptimalRouteLayer(KadasItemLayer):
         closest_leg = None
         closest_segment = None
         qgsdistance = QgsDistanceArea()
-        qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem("EPSG:4326"),
+        qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem(4326),
                                 QgsProject.instance().transformContext())
+        qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
         
         legs = list(self.maneuvers.keys())
         for i, line in enumerate(legs):
@@ -236,28 +240,49 @@ class OptimalRouteLayer(KadasItemLayer):
             leg_points = closest_leg.asPolyline()
             maneuvers = self.maneuvers[closest_leg]
             for i, maneuver in enumerate(maneuvers[:-1]):
-                if (maneuver["begin_shape_index"] <= closest_segment
-                        and maneuver["end_shape_index"] > closest_segment):
+                if (maneuver["begin_shape_index"] < closest_segment
+                        and maneuver["end_shape_index"] >= closest_segment):
                     points = [closest_point]
                     points.extend(leg_points[closest_segment:maneuver["end_shape_index"]])
                     distance_to_next = qgsdistance.convertLengthMeasurement(
                                                 qgsdistance.measureLine(points),
                                                 QgsUnitTypes.DistanceMeters)
+
                     message = maneuvers[i + 1]['instruction']
                     if i == len(maneuvers) - 2:
                         distance_to_next2 = None
-                        message2 = None                    
+                        message2 = ""
+                        icon2 = _icon_path("transparentpixel")
                     else:
-                        next_maneuver = maneuvers[i + 2]
-                        next_maneuver_points = leg_points[maneuver["end_shape_index"]:
-                                                        next_maneuver["end_shape_index"]]
-                        distance_to_next2 = qgsdistance.convertLengthMeasurement(
-                                                qgsdistance.measureLine(next_maneuver_points),
-                                                QgsUnitTypes.DistanceMeters)
+                        next_maneuver = maneuvers[i + 2]                        
+                        distance_to_next2 = maneuvers[i + 1]['length'] * 1000
                         message2 = next_maneuver['instruction']
+                        icon2 = icon_path_for_maneuver(maneuvers[i + 2]["type"])
 
                     icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
-                    return distance_to_next, message, icon, distance_to_next2, message2
+
+                    speed = 25 #TODO
+                    time_to_next = distance_to_next / 1000 / speed * 3600
+                    maneuvers_ahead = maneuvers[i:]
+                    timeleft = time_to_next + sum([m["time"] for m in maneuvers_ahead])
+                    distanceleft = distance_to_next  + sum([m["length"] for m in maneuvers_ahead]) * 1000
+
+                    delta = datetime.timedelta(seconds = timeleft)
+                    timeleft_string = ":".join(str(delta).split(":")[:-1])
+                    eta = datetime.datetime.now() + delta
+                    eta_string = eta.strftime("%H:%M")
+
+                    def formatdist(d):
+                        if d is None:
+                            return ""
+                        return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)
+
+                    maneuver = dict(dist=formatdist(distance_to_next), message=message, icon=icon,
+                                    dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
+                                    speed=speed, timeleft=timeleft_string, 
+                                    distleft=formatdist(distanceleft),
+                                    eta=eta_string, x=closest_point.x(), y=closest_point.y())
+                    return maneuver
     
         raise NotInRouteException()
 
