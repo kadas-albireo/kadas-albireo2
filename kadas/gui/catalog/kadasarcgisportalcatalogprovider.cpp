@@ -54,6 +54,12 @@ KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QStrin
 
 void KadasArcGisPortalCatalogProvider::load()
 {
+  mAmsLayers.clear();
+  mWmtsLayers.clear();
+  mWmsLayers.clear();
+  mAmsLayerIds.clear();
+  mWmsLayerIds.clear();
+
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
@@ -104,19 +110,18 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
 
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
-    QMap<QString, EntryMap> amsLayers;
-    QMap<QString, EntryMap> wmtsLayers;
-    QMap<QString, EntryMap> wmsLayers;
     for ( const QVariant &resultData : rootMap["results"].toList() )
     {
       QVariantMap resultMap = resultData.toMap();
       QString category;
       QString position;
+      QString categoryId;
       for ( const QVariant &tagv : resultMap["tags"].toList() )
       {
         QString tag = tagv.toString();
         if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
         {
+          categoryId = tag;
           auto it = mIsoTopics.find( tag.mid( 11 ).toUpper() );
           if ( it != mIsoTopics.end() )
           {
@@ -131,30 +136,19 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       bool flatten = false;
       if ( resultMap["type"].toString() == "Map Service" )
       {
-        amsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
+        mAmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
+        mAmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString() );
       }
       else if ( resultMap["type"].toString() == "WMS" )
       {
-        wmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
+        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
+        mWmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
       }
 //      else if( resultMap["type"].toString() == "WMTS" )
 //      {
 //        wmtsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
 //      }
     }
-
-    for ( const QString &amsUrl : amsLayers.keys() )
-    {
-      readAMSCapabilities( amsUrl, amsLayers[amsUrl] );
-    }
-    for ( const QString &wmsUrl : wmsLayers.keys() )
-    {
-      readWMSCapabilities( wmsUrl, wmsLayers[wmsUrl] );
-    }
-//    for ( const QString &wmtsUrl : wmtsLayers.keys() )
-//    {
-//      readWMTSCapabilities( wmtsUrl, wmtsLayers[wmtsUrl] );
-//    }
 
     if ( rootMap["nextStart"].toInt() >= 0 )
     {
@@ -166,6 +160,38 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
+    // If the same layer (as identified by the milcatalog tag + title) already exists as a MapServer layer, don't list it again as WMS
+    for ( auto it = mWmsLayerIds.begin(), itEnd = mWmsLayerIds.end(); it != itEnd; ++it )
+    {
+      if ( mAmsLayerIds.contains( it.key() ) )
+      {
+        mWmsLayers[it.value().first].remove( it.value().second );
+        if ( mWmsLayers[it.value().first].isEmpty() )
+        {
+          mWmsLayers.remove( it.value().first );
+        }
+      }
+    }
+
+    for ( const QString &amsUrl : mAmsLayers.keys() )
+    {
+      readAMSCapabilities( amsUrl, mAmsLayers[amsUrl] );
+    }
+    for ( const QString &wmsUrl : mWmsLayers.keys() )
+    {
+      readWMSCapabilities( wmsUrl, mWmsLayers[wmsUrl] );
+    }
+    //    for ( const QString &wmtsUrl : wmtsLayers.keys() )
+    //    {
+    //      readWMTSCapabilities( wmtsUrl, wmtsLayers[wmtsUrl] );
+    //    }
+
+    mAmsLayers.clear();
+    mWmtsLayers.clear();
+    mWmsLayers.clear();
+    mAmsLayerIds.clear();
+    mWmsLayerIds.clear();
+
     endTask();
   }
   else

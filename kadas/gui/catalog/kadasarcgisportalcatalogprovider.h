@@ -17,6 +17,7 @@
 #ifndef KADASARCGISPORTALCATALOGPROVIDER_H
 #define KADASARCGISPORTALCATALOGPROVIDER_H
 
+#include <QSet>
 #include <kadas/gui/kadascatalogprovider.h>
 
 class QStandardItem;
@@ -59,6 +60,12 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 
     QString mBaseUrl;
     int mPendingTasks;
+
+    QMap<QString, EntryMap> mAmsLayers;
+    QMap<QString, EntryMap> mWmtsLayers;
+    QMap<QString, EntryMap> mWmsLayers;
+    QSet<QString> mAmsLayerIds;
+    QMap<QString, QPair<QString, QString>> mWmsLayerIds;
 
     void endTask();
 
