@@ -33,6 +33,7 @@ from kadas.kadasgui import (
     KadasItemPos,
 )
 
+from .gps import getGpsConnection
 
 class WrongLocationException(Exception):
     pass
@@ -82,28 +83,8 @@ class LocationInputWidget(QWidget):
             self.btnMapTool.setChecked(False)
             self.btnMapTool.blockSignals(False)
 
-    @waitcursor
-    def _getGpsConnection(self):
-        if self._gpsConnection is None:
-            port = str(QgsSettings().value("/kadas/gps_port", ""))
-            gpsDetector = QgsGpsDetector(port)
-            loop = QEventLoop()
-
-            def gpsDetected(connection):
-                self._gpsConnection = connection
-                loop.exit()
-
-            def gpsDetectionFailed():
-                loop.exit()
-
-            gpsDetector.detected.connect(gpsDetected)
-            gpsDetector.detectionFailed.connect(gpsDetectionFailed)
-            gpsDetector.advance()
-            loop.exec_()
-        return self._gpsConnection
-
     def getCoordFromGPS(self):
-        connection = self._getGpsConnection()
+        connection = getGpsConnection()
         if connection:
             info = connection.currentGPSInformation()
             s = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
