@@ -95,7 +95,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         return layer
 
     def selectedLayerChanged(self, layer):    
-    	self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
+        self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
     
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
@@ -210,11 +210,10 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.addWaypointPin(waypoint)
 
     def navigate(self):
-    	self.action.toggle()
-    	self.plugin.navigationAction.toggle()
-    	#self.plugin.showNavigation(True)
-    	self.plugin.navigationBar.navigateForLayer(self.layerSelector.getSelectedLayer())
-    	
+        self.action.toggle()
+        iface.setActiveLayer(self.layerSelector.getSelectedLayer())
+        self.plugin.navigationAction.toggle()       
+        
     def actionToggled(self, toggled):
         if toggled:
             self.addPins()
