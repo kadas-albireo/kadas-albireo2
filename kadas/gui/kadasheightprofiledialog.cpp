@@ -89,7 +89,6 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   setWindowTitle( tr( "Height profile" ) );
   setAttribute( Qt::WA_ShowWithoutActivating );
   QVBoxLayout *vboxLayout = new QVBoxLayout( this );
-  mNSamples = QgsSettings().value( "/kadas/heightprofile_samples", 1000 ).toInt();
 
   QPushButton *pickButton = new QPushButton( QgsApplication::getThemeIcon( "/mActionSelect.svg" ), tr( "Measure along existing line" ), this );
   connect( pickButton, &QPushButton::clicked, mTool, &KadasMapToolHeightProfile::pickLine );
@@ -222,6 +221,9 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
     mTotLengthMeters += da.measureLine( mPoints[i], mPoints[i + 1] );
   }
   mLineOfSightGroupBoxgroupBox->setEnabled( points.size() == 2 );
+
+  // At least heightprofile_samples samples or 1 sample per 10m, whichever is larger
+  mNSamples = std::max( QgsSettings().value( "/kadas/heightprofile_samples", 1000 ).toInt(), int( mTotLengthMeters / 10 ) );
   replot();
 }
 
