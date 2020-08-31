@@ -7,7 +7,13 @@ from PyQt5.QtCore import QTimer, pyqtSignal, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
 from PyQt5.QtWidgets import QAction
 
-from kadas.kadasgui import KadasPinItem, KadasItemPos, KadasItemLayer, KadasLineItem
+from kadas.kadasgui import (
+	KadasPinItem,
+	KadasItemPos,
+	KadasItemLayer,
+	KadasLineItem,
+	KadasGpxRouteItem
+)
 
 from kadasrouting.utilities import (
     iconPath,
@@ -172,8 +178,10 @@ class OptimalRouteLayer(KadasItemLayer):
             self.distance += round(leg["summary"]["length"], 3)
         qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
         self.geom = QgsGeometry.fromPolylineXY(qgis_coords)
-        self.lineItem = KadasLineItem(epsg4326, True)
+        self.lineItem = KadasGpxRouteItem()
         self.lineItem.addPartFromGeometry(self.geom.constGet())
+        self.lineItem.setName("route")
+        self.lineItem.setNumber("1")
         # Format string for duration
         duration_hour = int(self.duration) // 3600
         duration_minute = (int(self.duration) % 3600) // 60
@@ -214,7 +222,7 @@ class OptimalRouteLayer(KadasItemLayer):
             self.addItem(pin)
 
 
-    def maneuverForPoint(self, pt):
+    def maneuverForPoint(self, pt, speed):
         min_dist = MAX_DISTANCE_FOR_NAVIGATION
         closest_leg = None
         closest_segment = None
@@ -261,7 +269,6 @@ class OptimalRouteLayer(KadasItemLayer):
 
                     icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
 
-                    speed = 25 #TODO
                     time_to_next = distance_to_next / 1000 / speed * 3600
                     maneuvers_ahead = maneuvers[i:]
                     timeleft = time_to_next + sum([m["time"] for m in maneuvers_ahead])
