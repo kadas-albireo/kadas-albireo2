@@ -386,7 +386,7 @@ void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
   if ( event->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - event->pos() ).manhattanLength() >= QApplication::startDragDistance() )
   {
     KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
-    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) )
+    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) && button->defaultAction() )
     {
       QMimeData *mimeData = new QMimeData();
       mimeData->setData( "application/qgis-kadas-button", button->defaultAction()->objectName().toLocal8Bit() );
