@@ -85,7 +85,7 @@
 #include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
 
-KadasMainWindow::KadasMainWindow( QSplashScreen *splash )
+KadasMainWindow::KadasMainWindow()
 {
   KadasWindowBase::setupUi( this );
 }

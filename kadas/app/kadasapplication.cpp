@@ -289,7 +289,7 @@ void KadasApplication::init()
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
-  mMainWindow = new KadasMainWindow( &splash );
+  mMainWindow = new KadasMainWindow();
   mMainWindow->init();
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );

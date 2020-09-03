@@ -46,7 +46,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     Q_OBJECT
 
   public:
-    explicit KadasMainWindow( QSplashScreen *splash );
+    explicit KadasMainWindow();
     ~KadasMainWindow();
     void init();
 
