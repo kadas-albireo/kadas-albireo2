@@ -89,13 +89,12 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   mMapCanvas = new QgsMapCanvas( this );
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", "1000" ).toInt() );
-  mMapCanvas->setPreviewJobsEnabled( true );
-  // TODO ?
-//  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() );
-//  QgsMapCanvas::WheelAction wheelAction = static_cast<QgsMapCanvas::WheelAction>( settings.value( "/Qgis/wheel_action", "0" ).toInt() );
-//  double zoomFactor = settings.value( "/Qgis/zoom_factor", "2.0" ).toDouble();
-//  mMapCanvas->setWheelAction( wheelAction, zoomFactor );
+  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() ) ;
+  mMapCanvas->enableMapTileRendering( mMasterCanvas->mapSettings().flags() & QgsMapSettings::RenderMapTile );
+  mMapCanvas->setMapUpdateInterval( mMasterCanvas->mapUpdateInterval() );
+  mMapCanvas->setCachingEnabled( mMasterCanvas->isCachingEnabled() );
+  mMapCanvas->setParallelRenderingEnabled( mMasterCanvas->isParallelRenderingEnabled() );
+  mMapCanvas->setPreviewJobsEnabled( mMasterCanvas->previewJobsEnabled() );
   setWidget( mMapCanvas );
 
   KadasMapToolPan *mapTool = new KadasMapToolPan( mMapCanvas, false );

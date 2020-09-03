@@ -111,7 +111,11 @@ void KadasMainWindow::init()
   statusBar()->addPermanentWidget( statusWidget, 0 );
 
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", "1000" ).toInt() );
+  mMapCanvas->enableAntiAliasing( QgsSettings().value( "/kadas/mapAntialiasing", true ).toBool() ) ;
+  mMapCanvas->enableMapTileRendering( QgsSettings().value( "/kadas/mapTileRendering", true ).toBool() );
+  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", 250 ).toInt() );
+  mMapCanvas->setCachingEnabled( QgsSettings().value( "kadas/enableRenderCaching", true ).toBool() );
+  mMapCanvas->setParallelRenderingEnabled( QgsSettings().value( "kadas/parallelRendering", true ).toBool() );
   mMapCanvas->setPreviewJobsEnabled( true );
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
