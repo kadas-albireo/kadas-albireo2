@@ -61,7 +61,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.layerSelector.createLayerIfEmpty(self.tr("Route"))
         self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
-        self.btnNavigate.setEnabled(self.layerSelector.getSelectedLayer().hasRoute())
+        layer = self.layerSelector.getSelectedLayer()
+        self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
 
         self.originSearchBox = LocationInputWidget(
             canvas, locationSymbolPath=iconPath("pin_origin.svg")

@@ -133,10 +133,10 @@ class RoutingPlugin(QObject):
             if self.navigationPanel is None:
                 self.navigationPanel = NavigationPanel()
                 def _resize():
-                    width = 200
-                    x = self.iface.mapCanvas().width() - width
-                    y = self.iface.mapCanvas().height() / 2
-                    self.navigationPanel.setGeometry(x, y, width, y)
+                    x = self.iface.mapCanvas().width() - self.navigationPanel.FIXED_WIDTH
+                    y = self.iface.mapCanvas().height() / 3
+                    height = 2 * self.iface.mapCanvas().height() / 3
+                    self.navigationPanel.setGeometry(x, y, self.navigationPanel.FIXED_WIDTH, height)
                 self.iface.mapCanvas().extentsChanged.connect(_resize)
                 self.navigationPanel.setParent(self.iface.mapCanvas())
                 _resize()

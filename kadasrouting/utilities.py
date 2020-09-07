@@ -115,3 +115,8 @@ def decodePolyline6(expression, precision=6, is3d=False):
             coordinates.append((lat / factor, lng / factor, z / 100))
 
     return coordinates
+
+def formatdist(d):
+    if d is None:
+        return ""
+    return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)

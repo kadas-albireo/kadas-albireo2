@@ -22,6 +22,7 @@ from kadasrouting.utilities import (
     pushWarning,
     transformToWGS,
     decodePolyline6,
+    formatdist
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
@@ -278,11 +279,6 @@ class OptimalRouteLayer(KadasItemLayer):
                     timeleft_string = ":".join(str(delta).split(":")[:-1])
                     eta = datetime.datetime.now() + delta
                     eta_string = eta.strftime("%H:%M")
-
-                    def formatdist(d):
-                        if d is None:
-                            return ""
-                        return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)
 
                     maneuver = dict(dist=formatdist(distance_to_next), message=message, icon=icon,
                                     dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
