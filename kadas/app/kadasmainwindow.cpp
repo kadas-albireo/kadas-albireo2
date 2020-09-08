@@ -113,7 +113,7 @@ void KadasMainWindow::init()
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->enableAntiAliasing( QgsSettings().value( "/kadas/mapAntialiasing", true ).toBool() ) ;
   mMapCanvas->enableMapTileRendering( QgsSettings().value( "/kadas/mapTileRendering", true ).toBool() );
-  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", 250 ).toInt() );
+  mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", 500 ).toInt() );
   mMapCanvas->setCachingEnabled( QgsSettings().value( "kadas/enableRenderCaching", true ).toBool() );
   mMapCanvas->setParallelRenderingEnabled( QgsSettings().value( "kadas/parallelRendering", true ).toBool() );
   mMapCanvas->setPreviewJobsEnabled( true );
