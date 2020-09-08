@@ -64,8 +64,8 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     QMap<QString, EntryMap> mAmsLayers;
     QMap<QString, EntryMap> mWmtsLayers;
     QMap<QString, EntryMap> mWmsLayers;
-    QSet<QString> mAmsLayerIds;
-    QMap<QString, QPair<QString, QString>> mWmsLayerIds;
+    QMap<QString, QPair<QString, QString>> mAmsLayerIds;
+    QSet<QString> mWmsLayerIds;
 
     void endTask();
 

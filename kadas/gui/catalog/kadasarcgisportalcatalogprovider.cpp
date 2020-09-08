@@ -136,12 +136,12 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       bool flatten = false;
       if ( resultMap["type"].toString() == "Map Service" )
       {
+        mAmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
         mAmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
-        mAmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString() );
       }
       else if ( resultMap["type"].toString() == "WMS" )
       {
-        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
+        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString() );
         mWmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
       }
 //      else if( resultMap["type"].toString() == "WMTS" )
@@ -160,15 +160,15 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    // If the same layer (as identified by the milcatalog tag + title) already exists as a MapServer layer, don't list it again as WMS
-    for ( auto it = mWmsLayerIds.begin(), itEnd = mWmsLayerIds.end(); it != itEnd; ++it )
+    // If the same layer (as identified by the milcatalog tag + title) already exists as a WMS layer, don't list it again as MapServer
+    for ( auto it = mAmsLayerIds.begin(), itEnd = mAmsLayerIds.end(); it != itEnd; ++it )
     {
-      if ( mAmsLayerIds.contains( it.key() ) )
+      if ( mWmsLayerIds.contains( it.key() ) )
       {
-        mWmsLayers[it.value().first].remove( it.value().second );
-        if ( mWmsLayers[it.value().first].isEmpty() )
+        mAmsLayers[it.value().first].remove( it.value().second );
+        if ( mAmsLayers[it.value().first].isEmpty() )
         {
-          mWmsLayers.remove( it.value().first );
+          mAmsLayers.remove( it.value().first );
         }
       }
     }
@@ -411,7 +411,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
       const ResultEntry &entry = ( *entries ) [layerName];
       mimeDataUri.name = entry.title;
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4' tiled='false'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
       QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
       mimeData->setProperty( "metadataUrl", entry.metadataUrl );
       if ( !entry.flatten )
