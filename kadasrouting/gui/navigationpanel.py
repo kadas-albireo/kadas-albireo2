@@ -176,7 +176,7 @@ class NavigationPanel(BASE, WIDGET):
         layer = self.iface.activeLayer()
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
         self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
-        if isinstance(layer, OptimalRouteLayer):
+        if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
             except NotInRouteException:
