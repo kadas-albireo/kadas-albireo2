@@ -3,7 +3,7 @@ import os
 import logging
 from functools import partial
 
-from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QObject, QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
@@ -19,6 +19,7 @@ from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
+from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -103,6 +104,7 @@ class RoutingPlugin(QObject):
                     self.optimalRouteAction,
                     self
                 )
+            self.showDisclaimer()
             self.optimalRouteBar.show()
         else:
             if self.optimalRouteBar is not None:
@@ -114,6 +116,7 @@ class RoutingPlugin(QObject):
                 self.reachabilityBar = ReachabilityBottomBar(
                     self.iface.mapCanvas(), self.reachabilityAction
                 )
+            self.showDisclaimer()
             self.reachabilityBar.show()
         else:
             if self.reachabilityBar is not None:
@@ -123,6 +126,7 @@ class RoutingPlugin(QObject):
         if show:
             if self.tspBar is None:
                 self.tspBar = TSPBottomBar(self.iface.mapCanvas(), self.tspAction)
+            self.showDisclaimer()
             self.tspBar.show()
         else:
             if self.tspBar is not None:
@@ -140,7 +144,14 @@ class RoutingPlugin(QObject):
                 self.iface.mapCanvas().extentsChanged.connect(_resize)
                 self.navigationPanel.setParent(self.iface.mapCanvas())
                 _resize()
+            self.showDisclaimer()
             self.navigationPanel.show()
         else:
             if self.navigationPanel is not None:
                 self.navigationPanel.hide()
+
+    def showDisclaimer(self):
+        show = QSettings().value("kadasrouting/showDisclaimer", True)
+        if show:
+            dialog = DisclaimerDialog(iface.mainWindow())
+            dialog.exec_()
