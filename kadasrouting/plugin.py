@@ -151,7 +151,7 @@ class RoutingPlugin(QObject):
                 self.navigationPanel.hide()
 
     def showDisclaimer(self):
-        show = QSettings().value("kadasrouting/showDisclaimer", True)
+        show = QSettings().value("kadasrouting/showDisclaimer", True, type=bool)
         if show:
             dialog = DisclaimerDialog(iface.mainWindow())
             dialog.exec_()
