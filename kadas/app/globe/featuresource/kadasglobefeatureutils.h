@@ -27,6 +27,7 @@
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspolygon.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include <kadas/gui/kadasitemlayer.h>
@@ -161,8 +162,11 @@ class KadasGlobeFeatureUtils
 
     static osgEarth::Features::Feature *featureFromQgsFeature( QgsVectorLayer *layer, const QgsFeature &feat )
     {
-      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( feat.geometry().constGet() );
-      osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( layer->crs().toWkt().toStdString() );
+      QgsAbstractGeometry *wgsGeom = feat.geometry().constGet()->clone();
+      wgsGeom->transform( QgsCoordinateTransform( layer->crs(), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance()->transformContext() ) );
+      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( wgsGeom );
+      delete wgsGeom;
+      osgEarth::SpatialReference *ref = osgEarth::SpatialReference::get( "wgs84" );
       osgEarth::Features::Feature *retFeat = new osgEarth::Features::Feature( nGeom, ref, osgEarth::Style(), feat.id() );
 
       const QgsFields fields = layer->fields();
@@ -184,9 +188,11 @@ class KadasGlobeFeatureUtils
       QColor color = item->geometryType() == QgsWkbTypes::LineGeometry ? item->outline().color() : item->fill().color();
       poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() );
 
-      const QgsAbstractGeometry *geom = item->geometry();
-      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( geom );
-      osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( item->crs().toWkt().toStdString() );
+      QgsAbstractGeometry *wgsGeom = item->geometry()->clone();
+      wgsGeom->transform( QgsCoordinateTransform( item->crs(), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance()->transformContext() ) );
+      osgEarth::Features::Geometry *nGeom = geometryFromQgsGeometry( wgsGeom );
+      delete wgsGeom;
+      osgEarth::SpatialReference *ref = osgEarth::SpatialReference::get( "wgs84" );
       osgEarth::Features::Feature *retFeat = new osgEarth::Features::Feature( nGeom, ref, style, itemId );
 
       retFeat->setUserValue( "qgisLayerId", layerId.toStdString() );

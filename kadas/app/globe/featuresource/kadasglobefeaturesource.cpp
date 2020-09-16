@@ -32,13 +32,13 @@
 
 osgEarth::Status KadasGlobeFeatureSource::initialize( const osgDB::Options *dbOptions )
 {
-  osgEarth::SpatialReference *ref = osgEarth::SpatialReference::create( mOptions.layer()->crs().toWkt().toStdString() );
+  osgEarth::SpatialReference *ref = osgEarth::SpatialReference::get( "wgs84" );
   if ( 0 == ref )
   {
     std::cout << "Cannot find the spatial reference" << std::endl;
     return osgEarth::Status( osgEarth::Status::ConfigurationError );
   }
-  QgsRectangle ext = mOptions.layer()->extent();
+  QgsRectangle ext = QgsCoordinateTransform( mOptions.layer()->crs(), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance()->transformContext() ).transformBoundingBox( mOptions.layer()->extent() );
   osgEarth::GeoExtent geoext( ref, ext.xMinimum(), ext.yMinimum(), ext.xMaximum(), ext.yMaximum() );
   setFeatureProfile( new osgEarth::Features::FeatureProfile( geoext ) );
   return osgEarth::Status::NoError;
