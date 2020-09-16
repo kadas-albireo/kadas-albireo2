@@ -337,6 +337,9 @@ void KadasApplication::init()
   // Setup layout item widgets
   QgsLayoutAppUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
+  // Init KadasItemLayerRegistry
+  KadasItemLayerRegistry::init();
+
   // Open startup project
   QgsProject::instance()->setDirty( false );
   if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )

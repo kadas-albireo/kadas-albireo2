@@ -275,11 +275,14 @@ void KadasItemLayer::setSymbolScale( double scale )
 
 KadasItemLayerRegistry::KadasItemLayerRegistry()
 {
-  connect( QgsProject::instance(), &QgsProject::cleared, this, &KadasItemLayerRegistry::clear );
-  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasItemLayerRegistry::readFromProject );
-  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasItemLayerRegistry::writeToProject );
 }
 
+void KadasItemLayerRegistry::init()
+{
+  connect( QgsProject::instance(), &QgsProject::cleared, instance(), &KadasItemLayerRegistry::clear );
+  connect( QgsProject::instance(), &QgsProject::readProject, instance(), &KadasItemLayerRegistry::readFromProject );
+  connect( QgsProject::instance(), &QgsProject::writeProject, instance(), &KadasItemLayerRegistry::writeToProject );
+}
 void KadasItemLayerRegistry::clear()
 {
   mLayerIdMap.clear();
