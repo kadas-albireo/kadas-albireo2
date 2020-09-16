@@ -17,6 +17,7 @@
 #include <QBitmap>
 #include <QDragEnterEvent>
 #include <QPainter>
+#include <QPainterPath>
 
 #include <kadas/gui/kadasribbonbutton.h>
 
