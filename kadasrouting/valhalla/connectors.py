@@ -33,6 +33,9 @@ class Connector:
             contours=contours, costing_options = {profile: options})
         return params
 
+    def prepareMapmatchingParameters(self, line):
+        return {"encoded_polyline": line}
+
 
 class ConsoleConnector(Connector):
     def _execute(self, commands):
@@ -84,4 +87,9 @@ class HttpConnector(Connector):
         params = self.prepareIsochronesParameters(points, profile, options,
                                                   intervals, colors)
         response = self._request("isochrone", json.dumps(params))
+        return response
+
+    def mapmatching(self, line):
+        params = self.prepareMapmatchingParameters(line)
+        response = self._request("trace_route", json.dumps(params))
         return response

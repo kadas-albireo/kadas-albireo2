@@ -3,6 +3,7 @@
 ## Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
+from kadasrouting.utilities import encodePolyline6
 
 from .connectors import HttpConnector
 
@@ -46,6 +47,22 @@ class ValhallaClient:
         except Exception as e:
             raise ValhallaException(str(e))
         return response
+
+    def mapmatching(self, line):
+        try:
+            polyline6 = self.polyline6fromQgsPolylineXY(line)
+            response = self.connector.mapmatching(polyline6)
+        except Valhalla400Exception as e:
+            raise e
+        except Exception as e:
+            raise ValhallaException(str(e))
+        return response
+
+
+    def polyline6fromQgsPoylineXY(self, qgsline):
+        points = [(p.x(), p.y()) for p in qgsline]
+        encoded = encodePolyline6(points)
+        return encoded
 
     def pointsFromQgsPoints(self, qgspoints):
         points = []

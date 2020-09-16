@@ -39,7 +39,10 @@ from qgis.core import (
     QgsDistanceArea,
     QgsUnitTypes,
     QgsPointXY,
-    QgsPoint
+    QgsPoint,
+    QgsRectangle,
+    QgsVectorLayer,
+    QgsWkbTypes
 )
 
 route_html_template = '''
@@ -175,7 +178,21 @@ class NavigationPanel(BASE, WIDGET):
             return
         layer = self.iface.activeLayer()
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
-        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
+        origCrs = QgsCoordinateReferenceSystem(4326)
+        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+        transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
+        canvasPoint = transform.transform(point)
+        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))        
+        iface.mapCanvas().setCenter(canvasPoint)
+        iface.mapCanvas().setRotation(-gpsinfo.direction)
+        iface.mapCanvas().refresh()
+
+        if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
+            feature = next(layer.getFeatures(), None)
+            if feature:                            
+                geom = feature.geometry()
+                layer = self.getOptimalRouteLayerForGeometry(geom)
+                
         if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
@@ -185,9 +202,8 @@ class NavigationPanel(BASE, WIDGET):
             self.setWidgetsVisibility(False)
             html = route_html_template.format(**maneuver)
             self.textBrowser.setHtml(html)
-            self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())     
-            iface.mapCanvas().setRotation(-gpsinfo.direction)
-        else:
+            self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
+        elif isinstance(layer, KadasItemLayer):
             waypoints = self.waypointsFromLayer(layer)
             if waypoints:
                 if self.waypointLayer is None:
@@ -203,11 +219,20 @@ class NavigationPanel(BASE, WIDGET):
                 self.textBrowser.setHtml(html)
                 self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
                 self.labelWaypointName.setText(waypoint_name_html_template.format(name=waypointItem.name))
-                iface.mapCanvas().setRotation(-gpsinfo.direction)
                 self.setWidgetsVisibility(True)
-
             else:
                 self.setMessage("Select a route or waypoint layer for navigation")
+        else:
+            self.setMessage("Select a route or waypoint layer for navigation")
+
+    def getOptimalRouteLayerForGeometry(self, geom):
+        wkt = geom.asWkt()
+        if wkt in self.optimalRoutesCache:
+            return self.optimalRoutesCache[wkt]
+        layer = OptimalRouteLayer("")
+        layer.updateFromPolyline(geom.asPolyline())        
+        return layer
+
 
     def setCompass(self, heading, wpangle):
         compassPixmap = QPixmap(_icon_path("compass.png"))
@@ -239,10 +264,11 @@ class NavigationPanel(BASE, WIDGET):
     def selectedWaypointChanged(self, current, previous):
         for item, w in self.waypointWidgets:
             w.setIsItemSelected(current == item)
-            self.updateNavigationInfo(self.currentGpsInformation)
+        self.updateNavigationInfo(self.currentGpsInformation)
 
-    def waypointsFromLayer(self, layer):        
+    def waypointsFromLayer(self, layer):     
         try:
+            
             center = iface.mapCanvas().center()
             outCrs = QgsCoordinateReferenceSystem(4326)
             canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
@@ -258,9 +284,9 @@ class NavigationPanel(BASE, WIDGET):
             item3.addPartFromGeometry(QgsPoint(wgspoint.x() + 10, wgspoint.y() + 10))
             item3.setName("My Waypoint")
             return [item, item2, item3]
+
             return [item for item in layer.items() if isinstance(item, KadasGpxWaypointItem)]
         except Exception as e:
-            pushWarning(str(e))
             return []
 
     def populateWaypoints(self, waypoints):
@@ -318,6 +344,7 @@ class NavigationPanel(BASE, WIDGET):
 
     def stopNavigation(self):        
         iface.mapCanvas().setRotation(0)
+        iface.mapCanvas().refresh()
         if self.gpsConnection is not None:
             self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
         if self.centerPin is not None:

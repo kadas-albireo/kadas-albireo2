@@ -153,6 +153,16 @@ class OptimalRouteLayer(KadasItemLayer):
             logging.error("Could not compute route")
 
     @waitcursor
+    def updateFromPolyline(self, polyline):
+        try:
+            response = self.valhalla.mapmatching(polyline)
+            self.computeFromResponse(response)
+        except Exception as e:
+            logging.error(e, exc_info=True)
+            pushWarning(self.tr("Could not compute route from polyline"))
+            logging.error("Could not compute route from polyline")
+
+    @waitcursor
     def updateRoute(self, points, profile, costingOptions):
         response = self.valhalla.route(points, profile, costingOptions)
         self.costingOptions = costingOptions
