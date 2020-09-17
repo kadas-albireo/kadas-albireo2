@@ -1,4 +1,5 @@
 import json
+import logging
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit, QCompleter
 from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
@@ -38,18 +39,19 @@ from kadas.kadasgui import (
 
 from .gps import getGpsConnection
 
+LOG = logging.getLogger(__name__)
+
+
 class WrongLocationException(Exception):
     pass
 
 
-API_KEY = ''
-
-class SuggestionPlaceModel(QStandardItemModel):
+class SuggestionLocationModel(QStandardItemModel):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
     def __init__(self, parent=None):
-        super(SuggestionPlaceModel, self).__init__(parent)
+        super(SuggestionLocationModel, self).__init__(parent)
         self._manager = QtNetwork.QNetworkAccessManager(self)
         self._reply = None
 
@@ -58,7 +60,7 @@ class SuggestionPlaceModel(QStandardItemModel):
         self.clear()
         if self._reply is not None:
             self._reply.abort()
-        if text:
+        if len(text) >= 3 :
             r = self.create_request(text)
             self._reply = self._manager.get(r)
             self._reply.finished.connect(self.on_finished)
@@ -67,12 +69,12 @@ class SuggestionPlaceModel(QStandardItemModel):
         loop.exec_()
 
     def create_request(self, text):
-        url = QUrl("https://maps.googleapis.com/maps/api/place/autocomplete/json")
+        url = QUrl("https://api3.geo.admin.ch/rest/services/api/SearchServer")
         query = QUrlQuery()
-        query.addQueryItem("key", API_KEY)
-        query.addQueryItem("input", text)
-        query.addQueryItem("types", "geocode")
-        query.addQueryItem("language", "en")
+        query.addQueryItem("sr", "2056")
+        query.addQueryItem("searchText", text)
+        query.addQueryItem("lang", "en")
+        query.addQueryItem("type", "locations")
         url.setQuery(query)
         request = QtNetwork.QNetworkRequest(url)
         return request
@@ -82,10 +84,13 @@ class SuggestionPlaceModel(QStandardItemModel):
         reply = self.sender()
         if reply.error() == QtNetwork.QNetworkReply.NoError:
             data = json.loads(reply.readAll().data())
-            if data['status'] == 'OK':
-                for prediction in data['predictions']:
-                    self.appendRow(QStandardItem(prediction['description']))
-            self.error.emit(data['status'])
+            LOG.debug(data)
+            if data.get('status') != 'error':
+                for location in data['results']:
+                    label = location.get('attrs', {}).get('label', 'Unknown label')
+                    self.appendRow(QStandardItem(label))
+                    LOG.debug(label)
+                self.error.emit(data.get('detail', 'Unknown error detail'))
         self.finished.emit()
         reply.deleteLater()
         self._reply = None
@@ -106,15 +111,15 @@ class LocationInputWidget(QWidget):
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
 
-        self._model = SuggestionPlaceModel(self)
-        completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
-        completer.setModel(self._model)
+        self.completion_model = SuggestionLocationModel(self)
+        self.completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
+        self.completer.setModel(self.completion_model)
 
         self.searchBox = QLineEdit()
-        self.searchBox.setCompleter(completer)
+        self.searchBox.setCompleter(self.completer)
         # self.searchBox.textChanged.connect(self.textChanged)
         self.layout.addWidget(self.searchBox)
-        self._model.error.connect(pushWarning)
+        self.completion_model.error.connect(pushWarning)
 
         self.btnGPS = QToolButton()
         self.btnGPS.setToolTip(self.tr("Get GPS location"))
