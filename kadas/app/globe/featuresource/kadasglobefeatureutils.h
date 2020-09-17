@@ -44,7 +44,7 @@ class KadasGlobeFeatureUtils
 
     static inline osg::Vec3d pointFromQgsPoint( const QgsPoint &pt )
     {
-      return osg::Vec3d( pt.x(), pt.y(), pt.z() );
+      return osg::Vec3d( pt.x(), pt.y(), pt.is3D() ? pt.z() : 0 );
     }
 
     static inline osgEarth::Features::LineString *lineStringFromQgsLineString( const QgsLineString *lineString )
