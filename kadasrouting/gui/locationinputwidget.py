@@ -23,6 +23,8 @@ from kadasrouting.utilities import (
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
+from kadasrouting.gui.autocompletewidget import AutoCompleteWidget
+
 from kadas.kadasgui import (
     KadasSearchBox,
     KadasCoordinateSearchProvider,
@@ -46,63 +48,6 @@ class WrongLocationException(Exception):
     pass
 
 
-class SuggestionLocationModel(QStandardItemModel):
-    finished = pyqtSignal()
-    error = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        super(SuggestionLocationModel, self).__init__(parent)
-        self._manager = QtNetwork.QNetworkAccessManager(self)
-        self._reply = None
-
-    @pyqtSlot(str)
-    def search(self, text):
-        self.clear()
-        if self._reply is not None:
-            self._reply.abort()
-        if len(text) >= 3 :
-            r = self.create_request(text)
-            self._reply = self._manager.get(r)
-            self._reply.finished.connect(self.on_finished)
-        loop = QEventLoop()
-        self.finished.connect(loop.quit)
-        loop.exec_()
-
-    def create_request(self, text):
-        url = QUrl("https://api3.geo.admin.ch/rest/services/api/SearchServer")
-        query = QUrlQuery()
-        query.addQueryItem("sr", "2056")
-        query.addQueryItem("searchText", text)
-        query.addQueryItem("lang", "en")
-        query.addQueryItem("type", "locations")
-        url.setQuery(query)
-        request = QtNetwork.QNetworkRequest(url)
-        return request
-
-    @pyqtSlot()
-    def on_finished(self):
-        reply = self.sender()
-        if reply.error() == QtNetwork.QNetworkReply.NoError:
-            data = json.loads(reply.readAll().data())
-            LOG.debug(data)
-            if data.get('status') != 'error':
-                for location in data['results']:
-                    label = location.get('attrs', {}).get('label', 'Unknown label')
-                    self.appendRow(QStandardItem(label))
-                    LOG.debug(label)
-                self.error.emit(data.get('detail', 'Unknown error detail'))
-        self.finished.emit()
-        reply.deleteLater()
-        self._reply = None
-
-
-
-class Completer(QCompleter):
-    def splitPath(self, path):
-        self.model().search(path)
-        return super(Completer, self).splitPath(path)
-
-
 class LocationInputWidget(QWidget):
     def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red"):
         QWidget.__init__(self)
@@ -111,15 +56,9 @@ class LocationInputWidget(QWidget):
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
 
-        self.completion_model = SuggestionLocationModel(self)
-        self.completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
-        self.completer.setModel(self.completion_model)
-
-        self.searchBox = QLineEdit()
-        self.searchBox.setCompleter(self.completer)
+        self.searchBox = AutoCompleteWidget()
         # self.searchBox.textChanged.connect(self.textChanged)
         self.layout.addWidget(self.searchBox)
-        self.completion_model.error.connect(pushWarning)
 
         self.btnGPS = QToolButton()
         self.btnGPS.setToolTip(self.tr("Get GPS location"))
