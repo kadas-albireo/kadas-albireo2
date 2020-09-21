@@ -1,5 +1,6 @@
 import json
 from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
+from PyQt5.QtCore import Qt
 
 
 class SuggestionPlaceModel(QtGui.QStandardItemModel):
@@ -40,12 +41,17 @@ class SuggestionPlaceModel(QtGui.QStandardItemModel):
         reply = self.sender()
         if reply.error() == QtNetwork.QNetworkReply.NoError:
             data = json.loads(reply.readAll().data())
-            # LOG.debug(data)
             if data.get('status') != 'error':
                 for location in data['results']:
-                    label = location.get('attrs', {}).get('label', 'Unknown label')
-                    self.appendRow(QtGui.QStandardItem(label))
-                    # LOG.debug(label + str(self.rowCount()))
+                    attributes = location.get('attrs', {})
+                    label = attributes.get('label', 'Unknown label')
+                    # Create standard item to store the data
+                    item = QtGui.QStandardItem(label)
+                    item.setData(attributes.get('lat'), Qt.UserRole)
+                    item.setData(attributes.get('lon'), Qt.UserRole + 1)
+                    item.setData(attributes.get('x'), Qt.UserRole + 2)
+                    item.setData(attributes.get('y'), Qt.UserRole + 3)
+                    self.appendRow(item)
             else:
                 self.error.emit(data.get('detail', 'Unknown error detail'))
         self.finished.emit()
@@ -57,16 +63,10 @@ class Completer(QtWidgets.QCompleter):
         self.model().search(path)
         return super(Completer, self).splitPath(path)
 
-class AutoCompleteWidget(QtWidgets.QWidget):
+class AutoCompleteWidget(QtWidgets.QLineEdit):
     def __init__(self, parent=None):
         super(AutoCompleteWidget, self).__init__(parent)
         self._model = SuggestionPlaceModel(self)
         completer = Completer(self, caseSensitivity=QtCore.Qt.CaseInsensitive)
         completer.setModel(self._model)
-        lineedit = QtWidgets.QLineEdit()
-        lineedit.setCompleter(completer)
-        label = QtWidgets.QLabel()
-        self._model.error.connect(label.setText)
-        lay = QtWidgets.QFormLayout(self)
-        lay.addRow("Location: ", lineedit)
-        lay.addRow("Error: ", label)
+        self.setCompleter(completer)

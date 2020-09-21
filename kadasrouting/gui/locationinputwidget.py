@@ -3,7 +3,7 @@ import logging
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit, QCompleter
 from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QEventLoop, QUrl, pyqtSignal, pyqtSlot, Qt, QUrlQuery
+from PyQt5.QtCore import QEventLoop, QUrl, pyqtSignal, pyqtSlot, Qt, QUrlQuery, QModelIndex
 from PyQt5 import QtNetwork
 
 from qgis.core import (
@@ -57,6 +57,7 @@ class LocationInputWidget(QWidget):
         self.layout.setMargin(0)
 
         self.searchBox = AutoCompleteWidget()
+        self.searchBox.completer().activated[QModelIndex].connect(self.getLocation)
         # self.searchBox.textChanged.connect(self.textChanged)
         self.layout.addWidget(self.searchBox)
 
@@ -83,6 +84,15 @@ class LocationInputWidget(QWidget):
 
         self.pin = None
         self._gpsConnection = None
+
+    def getLocation(self, modelIndex):
+        item = self.searchBox.completer().model().itemData(modelIndex)
+        # LOG.debug(self.searchBox.completer().model().itemData(modelIndex))
+        # LOG.debug('name %s' % item.data(Qt.UserRole))
+        # LOG.debug('lat %s' % item.data(Qt.UserRole + 1))
+        # LOG.debug('lon %s' % item.data(Qt.UserRole + 2))
+        # LOG.debug('x %s' % item.data(Qt.UserRole + 3))
+        # LOG.debug('y %s' % item.data(Qt.UserRole + 4))
 
     def textChanged(self, text):
         self.addPin()
