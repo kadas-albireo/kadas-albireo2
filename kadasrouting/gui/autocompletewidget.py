@@ -1,9 +1,12 @@
 import json
+import logging
 
 from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, pyqtSlot, QUrl, QUrlQuery
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtWidgets import QCompleter, QLineEdit
+
+LOG = logging.getLogger(__name__)
 
 
 class SuggestionPlaceModel(QStandardItemModel):
@@ -36,6 +39,7 @@ class SuggestionPlaceModel(QStandardItemModel):
         query.addQueryItem("lang", "en")
         query.addQueryItem("type", "locations")
         url.setQuery(query)
+        LOG.debug(url.toString())
         request = QNetworkRequest(url)
         return request
 
@@ -57,6 +61,9 @@ class SuggestionPlaceModel(QStandardItemModel):
                     self.appendRow(item)
             else:
                 self.error.emit(data.get('detail', 'Unknown error detail'))
+                LOG.debug('Error happened but request is success %s' % data.get('detail', 'Unknown error detail'))
+        else:
+            LOG.debug('Error happened with the request. Error code %s' % reply.error())
         self.finished.emit()
         reply.deleteLater()
         self._reply = None

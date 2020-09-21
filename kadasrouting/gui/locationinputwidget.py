@@ -86,13 +86,12 @@ class LocationInputWidget(QWidget):
         self._gpsConnection = None
 
     def getLocation(self, modelIndex):
-        item = self.searchBox.completer().model().itemData(modelIndex)
-        # LOG.debug(self.searchBox.completer().model().itemData(modelIndex))
-        # LOG.debug('name %s' % item.data(Qt.UserRole))
-        # LOG.debug('lat %s' % item.data(Qt.UserRole + 1))
-        # LOG.debug('lon %s' % item.data(Qt.UserRole + 2))
-        # LOG.debug('x %s' % item.data(Qt.UserRole + 3))
-        # LOG.debug('y %s' % item.data(Qt.UserRole + 4))
+        label = modelIndex.data()
+        lat = modelIndex.data(Qt.UserRole)
+        lon = modelIndex.data(Qt.UserRole + 1)
+        x = modelIndex.data(Qt.UserRole + 2)
+        y = modelIndex.data(Qt.UserRole)
+        LOG.debug('label selected %s' % label)
 
     def textChanged(self, text):
         self.addPin()
