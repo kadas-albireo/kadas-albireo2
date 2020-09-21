@@ -102,6 +102,7 @@ static void gdalProxyConfig( const QUrl &url )
   QString gdalHttpProxy = settings.value( "proxy/gdalHttpProxy", "" ).toString();
   QString gdalProxyAuth = settings.value( "proxy/gdalProxyAuth", "" ).toString();
   QString gdalProxyUserPwd = settings.value( "proxy/gdalProxyUserPwd", "" ).toString();
+  QgsDebugMsg( "Querying gdalProxyConfig for " + url.toString() );
 
 #ifdef Q_OS_WINDOWS
   if ( gdalHttpProxy.isEmpty() )
@@ -132,6 +133,7 @@ static void gdalProxyConfig( const QUrl &url )
 
     if ( !pacUrl.isEmpty() )
     {
+      QgsDebugMsg( "Fetching PAC " + pacUrl );
       QNetworkAccessManager nam;
       QNetworkReply *reply = nam.get( QNetworkRequest( pacUrl ) );
       QEventLoop evloop;
@@ -143,6 +145,7 @@ static void gdalProxyConfig( const QUrl &url )
       pacparser_init();
       pacparser_parse_pac_string( data.data() );
       gdalHttpProxy = QString::fromLocal8Bit( pacparser_find_proxy( url.url().toUtf8(), url.host().toUtf8() ) );
+      QgsDebugMsg( "Fetching PAC " + gdalHttpProxy );
       if ( gdalHttpProxy.startsWith( "PROXY", Qt::CaseInsensitive ) )
       {
         gdalHttpProxy = gdalHttpProxy.mid( 6 );
