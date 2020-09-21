@@ -1,31 +1,31 @@
 ID,type_de,type_fr,type_it,type_en,max_weight_kg,width_m,height_m,length_m,fuel_capacity_l,radius,fuel_consumption_by100km,cost_model,max_speed_kmh
-28,ZU FUSS,Ã€ PIED,A PIEDI,WALK,,,,,,,,pedestrian,5
-29,FAHRRAD,VÃ‰LO,BICICLETTA,BICYCLE,120,0.700,1.200,2.000,,,,bicycle,25
-30,PW,VOITURE,AUTOMOBILE,CAR,2000,2.000,1.900,4.000,70,1400,5,auto,120
-1,Motrd BMW F 700 GS,Moto BMW F 700 GS,Moto BMW F 700 GS,Motorcycle BMW F 700 GS,436,0.930,1.210,2.390,16,350,4.5,motorcycle,120
-2,"LIEFERW KA 0,75T/4PL 4X4 GL MB G 300","VOIT LIVR CA 0,75T/4PL 4X4 TT MB G 300","AUTOFRG CA 0,75T/4PO 4X4 FSTR MB G 300","Deliv van KA 0,75T/4PL 4X4 GL MB G 300",3500,1.770,2.210,4.700,96,650,14,auto,120
-3,Kleinbus 10 Pl 4x4 Sprinter 316,minibus 10 pl 4x4 Sprinter 316,Frg 10 po 4x4 Sprinter 316,Minibus 10s 4x4 Sprinter 316,3500,1.990,2.430,5.910,100,550,12,auto OR auto_shorter,120
-4,Sanw L Mercedes Sprinter 516,Vhc san L Mercedes Sprinter 516,Veic san L Mercedes Sprinter 516,Amb L Mercedes Sprinter 516,5500,2.100,3.700,6.470,100,650,18,auto OR auto_shorter,120
-5,Lastw L 2t gl 4x4 Duro WE,cam L 2t tt 4x4 Duro WE,Lastw L 2t gl 4x4 Duro WE,Truck L 2t gl 4x4 Duro WE,6100,1.960,2.850,6.030,120,650,18,truck,80
-6,Lastw L 2.2t gl 4x4 DURO,cam L 2.2t tt 4x4 Duro,Autoc L 2.2 t fstr 4x4 Duro,Truck L 2.2t gl 4x4 DURO,5900,1.960,2.660,6.030,120,540,22,truck,80
-7,Lastw WA 4x4 Iveco,cam SI 4x4 Iveco,Autoc SI 4x4 Iveco,Truck WA 4x4 Iveco,18000,2.500,3.180,8.830,300,1000,30,truck,80
-8,Lastw WABRA/HA 6x6 Iveco,cam WABRA/crochet 6x6 Iveco,Autoc SS/GA pes 6x6 Iveco,Truck WABRA/HA 6x6 Iveco,26000,2.550,4.000,9.170,300,750,40,truck,80
-9,Lastw 14t gl 8x8 WABRA/HA,cam 14t gl 8x8 WABRA/HA,Autoc 14 t gl 8x8 WABRA/HA,Truck 14t gl 8x8 WABRA/HA,32000,2.550,4.000,9.450,400,850,45,truck,80
-10,Lastw 5.6t gl 4x4 Steyr,cam 5.6t tt 4x4 Steyr,Autoc 5.6 t fstr 4x4 Steyr,Truck 5.6t gl 4x4 Steyr,16000,2.500,3.520,7.900,320,900,35,truck,80
-11,Lastw 9.6t gl 6x6 Steyr,cam 9.6t tt 6x6 Steyrr,Autoc 9.6 t fstr 6x6 Steyr,Truck 9.6t gl 6x6 Steyr,22000,2.500,3.550,9.120,320,800,40,truck,80
-12,Lastw Verd F Seilw 5.5T 4X4 GL Iveco,cam Bache P Treuil 5.5T 4X4 TT Iveco,Autoc Tel P Verric 5.5T 4X4 FS Iveco,Truck Verd F Seilw 5.5T 4X4 GL Iveco,18000,2.550,3.750,8.380,400,1100,35,truck,80
-13,Lastw Verd 9T 6X6 GL Iveco,cam Bache 9T 6X6 TT Iveco,Autoc Telone 9T 6X6 Iveco,Truck Verd 9T 6X6 GL Iveco,25000,2.550,3.700,9.670,400,1000,40,truck,80
-14,Lastw Verd 7T 4X4 Iveco,cam Bache 7T 4X4 Iveco,Autoc Telone 7T 4X4 Iveco,Truck Verd 7T 4X4 Iveco,18000,2.550,3.650,8.200,400,1100,35,truck,80
-15,Lastw Verd Hebu 12T 6X6 Iveco,cam Bache Hay Elv 12T 6X6 Iveco,Autoc Tel Piat Elv 12T 6X6 Iveco,Truck Verd Hebu 12T 6X6 Iveco,26000,2.550,3.650,9.480,400,1000,40,truck,80
-16,Lastw WABRA Con 9.8T 6X6 Iveco,cam Si Mob/Con 9.8T 6X6 Iveco,Cam Si Mob/Con 9.8T 6X6 Iveco,Truck WABRA Con 9.8T 6X6 Iveco,26000,2.550,4.000,9.070,400,1000,40,truck,80
-17,Lastw WABRA Con 14T 8X8 Iveco,cam Si Mob/Con 14T 8X8 Iveco,Autoc Si Mob/Con 14T 8X8 Iveco,Truck WABRA Con 14T 8X8 Iveco,32000,2.550,4.000,9.800,400,850,45,truck,80
-18,Lastw Mu Ki 10T 6X6 Iveco,cam Ben Basc 10T 6X6 Iveco,Autoc Ben Ribalt 10T Iveco,Truck Mu Ki 10T 6X6 Iveco,26000,2.550,3.560,8.120,400,850,45,truck,80
-19,Lastw Ki 11T 6X6 Iveco,cam Benne 11T 6X6 Iveco,Autoc Ben Ribalt 11T 6X6 Iveco,Truck Ki 11T 6X6 Iveco,26000,2.550,3.560,8.120,400,850,45,truck,80
-20,Radspz 93 8x8 PIRANHA,char gren roues 93 8x8 PIRANHA,C arm gran 93 8x8 PIRANHA,WArm 93 8x8 PIRANHA,13500,2.630,2.880,6.980,190,320,59,truck,80
-21,Kdo 6x6 PIRANHA,char cdmt 6x6 PIRANHA,C arm cdo 6x6 PIRANHA,Cdo 6x6 PIRANHA,12000,2.630,2.750,6.230,190,470,40,truck,80
-22,AufklÃ¤rungsfahrzeug 93/97,VÃ©hicule dâ€™exploration,Veic espl 93/97,RecceV 93/97,5800,2.270,2.410,4.900,95,400,22,truck,80
-23,GMTF,GMTF,VTTP,GMTF,14000,2.540,3.470,7.020,180,600,20,truck,80
-24,Pz Hb M 109,ob bl M 109,Ob bl M 109,Tank how M 109,27000,3.180,3.500,9.050,500,340,145,truck,60
-25,Pz 87 Leopard,char 87 Leopard,C arm 87 Leopard,Tank 87 Leopard,55200,3.720,3.350,8.700,1160,340,220,truck,60
-26,Rpe Trspw M548,vhc chen trsp M548,Veic cing trsp M548,Cat TranspV M548,12800,2.690,3.810,5.900,360,500,70,truck,60
-27,Spz 2000,char gren 2000,C arm gran 2000,IFV 2000,28700,3.200,2.820,6.790,940,600,160,truck,70
+28,ZU FUSS,À PIED,A PIEDI,WALK,,,,,,,,pedestrian,5
+29,FAHRRAD,VÉLO,BICICLETTA,BICYCLE,120,0.7,1.2,2,,,,bicycle,25
+30,PW,VOITURE,AUTOMOBILE,CAR,2000,2,1.9,4,70,1400,5,auto,120
+1,Motrd BMW F 700 GS,Moto BMW F 700 GS,Moto BMW F 700 GS,Motorcycle BMW F 700 GS,436,0.93,1.21,2.39,16,350,4.5,motorcycle,120
+2,"LIEFERW KA 0,75T/4PL 4X4 GL MB G 300","VOIT LIVR CA 0,75T/4PL 4X4 TT MB G 300","AUTOFRG CA 0,75T/4PO 4X4 FSTR MB G 300","Deliv van KA 0,75T/4PL 4X4 GL MB G 300",3500,1.77,2.21,4.7,96,650,14,auto,120
+3,Kleinbus 10 Pl 4x4 Sprinter 316,minibus 10 pl 4x4 Sprinter 316,Frg 10 po 4x4 Sprinter 316,Minibus 10s 4x4 Sprinter 316,3500,1.99,2.43,5.91,100,550,12,auto,120
+4,Sanw L Mercedes Sprinter 516,Vhc san L Mercedes Sprinter 516,Veic san L Mercedes Sprinter 516,Amb L Mercedes Sprinter 516,5500,2.1,3.7,6.47,100,650,18,auto,100
+5,Lastw L 2t gl 4x4 Duro WE,cam L 2t tt 4x4 Duro WE,Lastw L 2t gl 4x4 Duro WE,Truck L 2t gl 4x4 Duro WE,6100,1.96,2.85,6.03,120,650,18,truck,80
+6,Lastw L 2.2t gl 4x4 DURO,cam L 2.2t tt 4x4 Duro,Autoc L 2.2 t fstr 4x4 Duro,Truck L 2.2t gl 4x4 DURO,5900,1.96,2.66,6.03,120,540,22,truck,80
+7,Lastw WA 4x4 Iveco,cam SI 4x4 Iveco,Autoc SI 4x4 Iveco,Truck WA 4x4 Iveco,18000,1.96,3.45,6.03,300,1000,30,truck,80
+8,Lastw WABRA/HA 6x6 Iveco,cam WABRA/crochet 6x6 Iveco,Autoc SS/GA pes 6x6 Iveco,Truck WABRA/HA 6x6 Iveco,26000,2.55,3.65,8.2,300,750,40,truck,80
+9,Lastw 14t gl 8x8 WABRA/HA,cam 14t gl 8x8 WABRA/HA,Autoc 14 t gl 8x8 WABRA/HA,Truck 14t gl 8x8 WABRA/HA,32000,2.55,3.86,9.8,400,850,45,truck,80
+10,Lastw 5.6t gl 4x4 Steyr,cam 5.6t tt 4x4 Steyr,Autoc 5.6 t fstr 4x4 Steyr,Truck 5.6t gl 4x4 Steyr,16000,2.5,3.52,7.9,320,900,35,truck,80
+11,Lastw 9.6t gl 6x6 Steyr,cam 9.6t tt 6x6 Steyrr,Autoc 9.6 t fstr 6x6 Steyr,Truck 9.6t gl 6x6 Steyr,22000,2.5,3.55,9.12,320,800,40,truck,80
+12,Lastw Verd F Seilw 5.5T 4X4 GL Iveco,cam Bache P Treuil 5.5T 4X4 TT Iveco,Autoc Tel P Verric 5.5T 4X4 FS Iveco,Truck Verd F Seilw 5.5T 4X4 GL Iveco,18000,2.55,3.75,8.38,400,1100,35,truck,80
+13,Lastw Verd 9T 6X6 GL Iveco,cam Bache 9T 6X6 TT Iveco,Autoc Telone 9T 6X6 Iveco,Truck Verd 9T 6X6 GL Iveco,25000,2.55,3.7,9.67,400,1000,40,truck,80
+14,Lastw Verd 7T 4X4 Iveco,cam Bache 7T 4X4 Iveco,Autoc Telone 7T 4X4 Iveco,Truck Verd 7T 4X4 Iveco,18000,2.55,3.65,8.2,400,1100,35,truck,80
+15,Lastw Verd Hebu 12T 6X6 Iveco,cam Bache Hay Elv 12T 6X6 Iveco,Autoc Tel Piat Elv 12T 6X6 Iveco,Truck Verd Hebu 12T 6X6 Iveco,26000,2.55,3.65,9.48,400,1000,40,truck,80
+16,Lastw WABRA Con 9.8T 6X6 Iveco,cam Si Mob/Con 9.8T 6X6 Iveco,Cam Si Mob/Con 9.8T 6X6 Iveco,Truck WABRA Con 9.8T 6X6 Iveco,26000,2.55,3.86,9.07,400,1000,40,truck,80
+17,Lastw WABRA Con 14T 8X8 Iveco,cam Si Mob/Con 14T 8X8 Iveco,Autoc Si Mob/Con 14T 8X8 Iveco,Truck WABRA Con 14T 8X8 Iveco,32000,2.55,3.62,9.8,400,850,45,truck,80
+18,Lastw Mu Ki 10T 6X6 Iveco,cam Ben Basc 10T 6X6 Iveco,Autoc Ben Ribalt 10T Iveco,Truck Mu Ki 10T 6X6 Iveco,26000,2.55,3.56,8.12,400,850,45,truck,80
+19,Lastw Ki 11T 6X6 Iveco,cam Benne 11T 6X6 Iveco,Autoc Ben Ribalt 11T 6X6 Iveco,Truck Ki 11T 6X6 Iveco,26000,2.55,3.56,8.12,400,850,45,truck,80
+20,Radspz 93 8x8 PIRANHA,char gren roues 93 8x8 PIRANHA,C arm gran 93 8x8 PIRANHA,WArm 93 8x8 PIRANHA,13500,2.63,2.88,6.98,190,320,59,truck,80
+21,Kdo 6x6 PIRANHA,char cdmt 6x6 PIRANHA,C arm cdo 6x6 PIRANHA,Cdo 6x6 PIRANHA,12000,2.63,2.75,6.23,190,470,40,truck,80
+22,Aufklärungsfahrzeug 93/97,Véhicule d’exploration,Veic espl 93/97,RecceV 93/97,5800,2.27,2.41,4.9,95,400,24,truck,80
+23,GMTF,GMTF,VTTP,GMTF,14000,2.54,3.47,7.02,180,600,20,truck,80
+24,Pz Hb M 109,ob bl M 109,Ob bl M 109,Tank how M 109,27000,3.18,3.5,9.05,500,340,145,truck,60
+25,Pz 87 Leopard,char 87 Leopard,C arm 87 Leopard,Tank 87 Leopard,55200,3.72,3.35,8.7,1160,340,220,truck,60
+26,Rpe Trspw M548,vhc chen trsp M548,Veic cing trsp M548,Cat TranspV M548,12800,2.69,3.81,5.9,360,500,70,truck,60
+27,Spz 2000,char gren 2000,C arm gran 2000,IFV 2000,28700,3.2,2.82,6.79,940,600,160,truck,70
