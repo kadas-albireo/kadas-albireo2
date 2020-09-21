@@ -6,6 +6,8 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtWidgets import QCompleter, QLineEdit
 
+from kadasrouting.utilities import strip_tags
+
 LOG = logging.getLogger(__name__)
 
 
@@ -53,11 +55,12 @@ class SuggestionPlaceModel(QStandardItemModel):
                     attributes = location.get('attrs', {})
                     label = attributes.get('label', 'Unknown label')
                     # Create standard item to store the data
-                    item = QStandardItem(label)
+                    item = QStandardItem(strip_tags(label))
                     item.setData(attributes.get('lat'), Qt.UserRole)
                     item.setData(attributes.get('lon'), Qt.UserRole + 1)
                     item.setData(attributes.get('x'), Qt.UserRole + 2)
                     item.setData(attributes.get('y'), Qt.UserRole + 3)
+                    item.setData(label, Qt.UserRole + 4)
                     self.appendRow(item)
             else:
                 self.error.emit(data.get('detail', 'Unknown error detail'))
