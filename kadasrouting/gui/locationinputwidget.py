@@ -149,13 +149,12 @@ class LocationInputWidget(QWidget):
         # Remove an existing pin first
         self.removePin()
         try:
-            if not self.text():
+            if not self.point:
                 return
-            point = self.valueAsPoint()
             inCrs = QgsCoordinateReferenceSystem(4326)
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
-            canvasPoint = transform.transform(point)
+            canvasPoint = transform.transform(self.point)
             self.searchBox.setStyleSheet("color: black;")
         except WrongLocationException:
             self.searchBox.setStyleSheet("color: red;")
@@ -192,12 +191,9 @@ class LocationInputWidget(QWidget):
         self.setText("")
 
     def setPoint(self, point):
-        # self.point = QgsPointXY(float(lon.strip()), float(lat.strip()))
         self.point = point
+        LOG.debug('Current point is %s' % self.point.asWkt())
+        self.addPin()
 
     def setPointFromLonLat(self, lon, lat):
-        # self.point = QgsPointXY(float(lon.strip()), float(lat.strip()))
         self.setPoint(QgsPointXY(lon, lat))
-
-    def point(self):
-        return self.point
