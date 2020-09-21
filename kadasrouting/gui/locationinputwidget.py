@@ -82,6 +82,7 @@ class LocationInputWidget(QWidget):
 
         self.canvas.mapToolSet.connect(self._mapToolSet)
 
+        self.point = None
         self.pin = None
         self._gpsConnection = None
 
@@ -92,6 +93,7 @@ class LocationInputWidget(QWidget):
         x = modelIndex.data(Qt.UserRole + 2)
         y = modelIndex.data(Qt.UserRole)
         LOG.debug('label selected %s' % label)
+        self.setPointFromLonLat(lon, lat)
 
     def textChanged(self, text):
         self.addPin()
@@ -188,3 +190,14 @@ class LocationInputWidget(QWidget):
 
     def clearSearchBox(self):
         self.setText("")
+
+    def setPoint(self, point):
+        # self.point = QgsPointXY(float(lon.strip()), float(lat.strip()))
+        self.point = point
+
+    def setPointFromLonLat(self, lon, lat):
+        # self.point = QgsPointXY(float(lon.strip()), float(lat.strip()))
+        self.setPoint(QgsPointXY(lon, lat))
+
+    def point(self):
+        return self.point
