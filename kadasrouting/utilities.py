@@ -155,4 +155,4 @@ def decodePolyline6(expression, precision=6, geojson=False):
     return PolylineCodec().decode(expression, precision, geojson)
 
 def encodePolyline6(coordinates, precision=6, geojson=False):
-    return PolylineCodec().encode(self, coordinates, precision, geojson)
+    return PolylineCodec().encode(coordinates, precision, geojson)

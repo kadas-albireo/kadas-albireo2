@@ -162,6 +162,7 @@ class NavigationPanel(BASE, WIDGET):
         self.listWaypoints.currentItemChanged.connect(self.selectedWaypointChanged)
         self.listWaypoints.setSpacing(5)
         self.waypointWidgets = []
+        self.optimalRoutesCache = {}
 
     def show(self):
         super().show()
@@ -187,7 +188,7 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
 
-        if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
+        if isinstance(layer, QgsVectorLayer):# and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
             if feature:                            
                 geom = feature.geometry()

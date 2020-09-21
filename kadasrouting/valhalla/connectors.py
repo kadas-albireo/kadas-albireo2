@@ -91,5 +91,10 @@ class HttpConnector(Connector):
 
     def mapmatching(self, line):
         params = self.prepareMapmatchingParameters(line)
-        response = self._request("trace_route", json.dumps(params))
-        return response
+        url = f"{self.url}/trace_route"
+        response = requests.post(url, json=params)
+        if response.status_code == 400:
+            raise Valhalla400Exception(response.text)
+        response.raise_for_status()
+        return response.json()
+

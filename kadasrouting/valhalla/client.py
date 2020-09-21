@@ -59,7 +59,7 @@ class ValhallaClient:
         return response
 
 
-    def polyline6fromQgsPoylineXY(self, qgsline):
+    def polyline6fromQgsPolylineXY(self, qgsline):
         points = [(p.x(), p.y()) for p in qgsline]
         encoded = encodePolyline6(points)
         return encoded
