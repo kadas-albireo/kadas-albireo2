@@ -14,7 +14,8 @@ from PyQt5.QtWidgets import (
     QListWidget,
     QWidget,
     QLabel,
-    QVBoxLayout
+    QVBoxLayout,
+    QInputDialog
 )
 
 from kadas.kadasgui import (    
@@ -29,6 +30,7 @@ from kadasrouting.utilities import pushWarning, formatdist
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
 from kadasrouting.gui.gps import getGpsConnection, getMockupGpsConnection
+from kadasrouting.core import vehicles
 
 from qgis.utils import iface
 
@@ -188,7 +190,7 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
 
-        if isinstance(layer, QgsVectorLayer):# and layer.geometryType() == QgsWkbTypes.LineGeometry:
+        if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
             if feature:                            
                 geom = feature.geometry()
@@ -230,9 +232,15 @@ class NavigationPanel(BASE, WIDGET):
         wkt = geom.asWkt()
         if wkt in self.optimalRoutesCache:
             return self.optimalRoutesCache[wkt]
-        layer = OptimalRouteLayer("")
-        layer.updateFromPolyline(geom.asPolyline())        
-        return layer
+        
+        name = self.iface.activeLayer().name()
+        value, ok = QInputDialog.getItem(self, f"Navigation", "Select Vehicle to use with layer '{name}'",
+                                         vehicles.vehicle_reduced_names())
+        if ok:
+            layer = OptimalRouteLayer("")
+            layer.updateFromPolyline(geom.asPolyline(), options)
+            self.optimalRoutesCache[wkt] = layer
+            return layer
 
 
     def setCompass(self, heading, wpangle):
@@ -269,7 +277,6 @@ class NavigationPanel(BASE, WIDGET):
 
     def waypointsFromLayer(self, layer):     
         try:
-            
             center = iface.mapCanvas().center()
             outCrs = QgsCoordinateReferenceSystem(4326)
             canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()

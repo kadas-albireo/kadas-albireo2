@@ -48,10 +48,10 @@ class ValhallaClient:
             raise ValhallaException(str(e))
         return response
 
-    def mapmatching(self, line):
+    def mapmatching(self, line, costingOptions):
         try:
             polyline6 = self.polyline6fromQgsPolylineXY(line)
-            response = self.connector.mapmatching(polyline6)
+            response = self.connector.mapmatching(polyline6, costingOptions)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:
