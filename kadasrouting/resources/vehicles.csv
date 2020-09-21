@@ -1,6 +1,6 @@
 ID,type_de,type_fr,type_it,type_en,max_weight_kg,width_m,height_m,length_m,fuel_capacity_l,radius,fuel_consumption_by100km,cost_model,max_speed_kmh
-28,ZU FUSS,À PIED,A PIEDI,WALK,,,,,,,,pedestrian,5
-29,FAHRRAD,VÉLO,BICICLETTA,BICYCLE,120,0.7,1.2,2,,,,bicycle,25
+28,ZU FUSS,Ã€ PIED,A PIEDI,WALK,,,,,,,,pedestrian,5
+29,FAHRRAD,VÃ‰LO,BICICLETTA,BICYCLE,120,0.7,1.2,2,,,,bicycle,25
 30,PW,VOITURE,AUTOMOBILE,CAR,2000,2,1.9,4,70,1400,5,auto,120
 1,Motrd BMW F 700 GS,Moto BMW F 700 GS,Moto BMW F 700 GS,Motorcycle BMW F 700 GS,436,0.93,1.21,2.39,16,350,4.5,motorcycle,120
 2,"LIEFERW KA 0,75T/4PL 4X4 GL MB G 300","VOIT LIVR CA 0,75T/4PL 4X4 TT MB G 300","AUTOFRG CA 0,75T/4PO 4X4 FSTR MB G 300","Deliv van KA 0,75T/4PL 4X4 GL MB G 300",3500,1.77,2.21,4.7,96,650,14,auto,120
@@ -23,7 +23,7 @@ ID,type_de,type_fr,type_it,type_en,max_weight_kg,width_m,height_m,length_m,fuel_
 19,Lastw Ki 11T 6X6 Iveco,cam Benne 11T 6X6 Iveco,Autoc Ben Ribalt 11T 6X6 Iveco,Truck Ki 11T 6X6 Iveco,26000,2.55,3.56,8.12,400,850,45,truck,80
 20,Radspz 93 8x8 PIRANHA,char gren roues 93 8x8 PIRANHA,C arm gran 93 8x8 PIRANHA,WArm 93 8x8 PIRANHA,13500,2.63,2.88,6.98,190,320,59,truck,80
 21,Kdo 6x6 PIRANHA,char cdmt 6x6 PIRANHA,C arm cdo 6x6 PIRANHA,Cdo 6x6 PIRANHA,12000,2.63,2.75,6.23,190,470,40,truck,80
-22,Aufklärungsfahrzeug 93/97,Véhicule d’exploration,Veic espl 93/97,RecceV 93/97,5800,2.27,2.41,4.9,95,400,24,truck,80
+22,AufklÃ¤rungsfahrzeug 93/97,VÃ©hicule dâ€™exploration,Veic espl 93/97,RecceV 93/97,5800,2.27,2.41,4.9,95,400,24,truck,80
 23,GMTF,GMTF,VTTP,GMTF,14000,2.54,3.47,7.02,180,600,20,truck,80
 24,Pz Hb M 109,ob bl M 109,Ob bl M 109,Tank how M 109,27000,3.18,3.5,9.05,500,340,145,truck,60
 25,Pz 87 Leopard,char 87 Leopard,C arm 87 Leopard,Tank 87 Leopard,55200,3.72,3.35,8.7,1160,340,220,truck,60
