@@ -109,9 +109,11 @@ class LocationInputWidget(QWidget):
         connection = getGpsConnection()
         if connection:
             info = connection.currentGPSInformation()
-            s = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
-            self.searchBox.setText(s)
-            self.addPin()
+            pointString = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
+            self.searchBox.setText(pointString)
+            self.setPoint(wgspoint)
+            # TODO: Perhaps put reverse geocoding here
+            self.setLocationName(pointString)
         else:
             pushWarning(self.tr("Cannot connect to GPS"))
 
