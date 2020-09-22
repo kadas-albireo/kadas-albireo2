@@ -49,8 +49,11 @@ class WrongLocationException(Exception):
 
 
 class LocationInputWidget(QWidget):
+    pointUpdated = pyqtSignal(QgsPointXY)
+
     def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red"):
         QWidget.__init__(self)
+        # UI
         self.canvas = canvas
         self.locationSymbolPath = locationSymbolPath
         self.layout = QHBoxLayout()
@@ -58,7 +61,6 @@ class LocationInputWidget(QWidget):
 
         self.searchBox = AutoCompleteWidget()
         self.searchBox.completer().activated[QModelIndex].connect(self.getLocation)
-        # self.searchBox.textChanged.connect(self.textChanged)
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -177,15 +179,6 @@ class LocationInputWidget(QWidget):
         if self.pin:
             KadasMapCanvasItemManager.removeItem(self.pin)
 
-    def valueAsPoint(self):
-        # TODO geocode and return coordinates based on text in the text field, or raise WrongPlaceException
-        try:
-            lon, lat = self.searchBox.text().split(",")
-            point = QgsPointXY(float(lon.strip()), float(lat.strip()))
-            return point
-        except:
-            raise WrongLocationException(self.searchBox.text())
-
     def text(self):
         # TODO add getter for the searchbox text.
         return self.searchBox.text()
@@ -200,6 +193,7 @@ class LocationInputWidget(QWidget):
     def setPoint(self, point):
         self.point = point
         LOG.debug('Current point is %s' % self.point.asWkt())
+        self.pointUpdated.emit(self.point)
         self.addPin()
 
     def setPointFromLonLat(self, lon, lat):

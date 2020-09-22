@@ -95,18 +95,18 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         layer = OptimalRouteLayer(name)
         return layer
 
-    def selectedLayerChanged(self, layer):    
+    def selectedLayerChanged(self, layer):
         self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
-    
+
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
             pushWarning(self.tr("Please, select a valid destination layer"))
             return
         try:
-            points = [self.originSearchBox.valueAsPoint()]
+            points = [self.originSearchBox.point]
             points.extend(self.waypoints)
-            points.append(self.destinationSearchBox.valueAsPoint())
+            points.append(self.destinationSearchBox.point)
         except WrongLocationException as e:
             pushWarning(self.tr("Invalid location:") + str(e))
             return
@@ -126,7 +126,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
-            logging.error(e, exc_info=True)            
+            logging.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
             logging.error("Could not compute route")
@@ -147,7 +147,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         """Add way point to the list of way points"""
         if self.waypointsSearchBox.text() == "":
             return
-        waypoint = self.waypointsSearchBox.valueAsPoint()
+        waypoint = self.waypointsSearchBox.point
         self.waypoints.append(waypoint)
         if self.lineEditWaypoints.text() == "":
             self.lineEditWaypoints.setText(self.waypointsSearchBox.text())
@@ -213,8 +213,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def navigate(self):
         self.action.toggle()
         iface.setActiveLayer(self.layerSelector.getSelectedLayer())
-        self.plugin.navigationAction.toggle()       
-        
+        self.plugin.navigationAction.toggle()
+
     def actionToggled(self, toggled):
         if toggled:
             self.addPins()
