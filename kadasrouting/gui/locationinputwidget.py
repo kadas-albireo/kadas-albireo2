@@ -84,6 +84,7 @@ class LocationInputWidget(QWidget):
 
         self.point = None
         self.pin = None
+        self.locationName = ''
         self._gpsConnection = None
 
     def getLocation(self, modelIndex):
@@ -121,9 +122,11 @@ class LocationInputWidget(QWidget):
 
     def btnMapToolClicked(self, checked):
         if checked:
+            self.searchBox.disableAutoComplete()
             self.startSelectingPoint()
         else:
             self.stopSelectingPoint()
+            self.searchBox.enableAutoComplete()
 
     def startSelectingPoint(self):
         """Start selecting a point (when the map tool button is clicked)"""
@@ -136,9 +139,11 @@ class LocationInputWidget(QWidget):
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
         wgspoint = transform.transform(point)
-        s = "{:.6f},{:.6f}".format(wgspoint.x(), wgspoint.y())
-        self.searchBox.setText(s)
-        self.addPin()
+        pointString = "{:.6f},{:.6f}".format(wgspoint.x(), wgspoint.y())
+        self.searchBox.setText(pointString)
+        self.setPoint(wgspoint)
+        # TODO: Perhaps put reverse geocoding here
+        self.setLocationName(pointString)
 
     def stopSelectingPoint(self):
         """Finish selecting a point."""
@@ -197,3 +202,6 @@ class LocationInputWidget(QWidget):
 
     def setPointFromLonLat(self, lon, lat):
         self.setPoint(QgsPointXY(lon, lat))
+
+    def setLocationName(self, name):
+        self.locationName = name

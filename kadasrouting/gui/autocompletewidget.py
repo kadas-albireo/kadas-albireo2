@@ -80,6 +80,19 @@ class AutoCompleteWidget(QLineEdit):
     def __init__(self, parent=None):
         super(AutoCompleteWidget, self).__init__(parent)
         self._model = SuggestionPlaceModel(self)
-        completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
-        completer.setModel(self._model)
-        self.setCompleter(completer)
+        self.setCompleter(self.createCompleter())
+
+    def enableAutoComplete(self):
+        LOG.debug('Auto complete is enabled')
+        self.setCompleter(self.createCompleter())
+
+    def disableAutoComplete(self):
+        LOG.debug('Auto complete is disabled')
+        self.setCompleter(None)
+
+    def createCompleter(self):
+        # Avoid deleted C++ object
+        self._model = SuggestionPlaceModel(self)
+        self._completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
+        self._completer.setModel(self._model)
+        return self._completer
