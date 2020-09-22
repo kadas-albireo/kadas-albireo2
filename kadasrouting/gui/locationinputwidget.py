@@ -60,7 +60,8 @@ class LocationInputWidget(QWidget):
         self.layout.setMargin(0)
 
         self.searchBox = AutoCompleteWidget()
-        self.searchBox.completer().activated[QModelIndex].connect(self.getLocation)
+        # self.searchBox.completer().activated[QModelIndex].connect(self.getLocation)
+        self.searchBox.setActivatedAction(self.getLocation)
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -126,14 +127,14 @@ class LocationInputWidget(QWidget):
 
     def btnMapToolClicked(self, checked):
         if checked:
-            self.searchBox.disableAutoComplete()
             self.startSelectingPoint()
         else:
             self.stopSelectingPoint()
-            self.searchBox.enableAutoComplete()
 
     def startSelectingPoint(self):
         """Start selecting a point (when the map tool button is clicked)"""
+        # Disable autocomplete first
+        self.searchBox.disableAutoComplete()
         self.createMapTool()
         self.canvas.setMapTool(self.mapTool)
 
@@ -153,6 +154,8 @@ class LocationInputWidget(QWidget):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
         self.canvas.setMapTool(self.prevMapTool)
+        # Enable autocomplete first
+        self.searchBox.enableAutoComplete()
 
     def addPin(self):
         # Remove an existing pin first

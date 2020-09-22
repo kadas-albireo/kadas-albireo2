@@ -1,7 +1,7 @@
 import json
 import logging
 
-from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, pyqtSlot, QUrl, QUrlQuery
+from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, pyqtSlot, QUrl, QUrlQuery, QModelIndex
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtWidgets import QCompleter, QLineEdit
@@ -80,19 +80,29 @@ class AutoCompleteWidget(QLineEdit):
     def __init__(self, parent=None):
         super(AutoCompleteWidget, self).__init__(parent)
         self._model = SuggestionPlaceModel(self)
-        self.setCompleter(self.createCompleter())
+        self._completer = self.setCompleter(self.createCompleter())
+        self._activatedAction = None
 
     def enableAutoComplete(self):
         LOG.debug('Auto complete is enabled')
         self.setCompleter(self.createCompleter())
+        self.completer().activated[QModelIndex].connect(self._activatedAction)
 
     def disableAutoComplete(self):
         LOG.debug('Auto complete is disabled')
         self.setCompleter(None)
 
     def createCompleter(self):
-        # Avoid deleted C++ object
+        # Avoid deleted C++ object issue
+        # The issue: the completer object is delted when the setCompleter set to None,
+        # although it is still referenced from the self._completer attribute
+        # not occurs in other Python intepreter (python 3.6 or QGIS 3.14), only in Kadas
         self._model = SuggestionPlaceModel(self)
         self._completer = Completer(self, caseSensitivity=Qt.CaseInsensitive)
         self._completer.setModel(self._model)
         return self._completer
+
+    def setActivatedAction(self, action):
+        """"Set the action slot for the completer activated signal"""
+        self._activatedAction = action
+        self.completer().activated[QModelIndex].connect(self._activatedAction)
