@@ -2,7 +2,8 @@ import os
 import logging
 
 from PyQt5 import uic
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
@@ -22,9 +23,16 @@ from kadasrouting.utilities import iconPath, pushWarning
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsWkbTypes,
+)
+from qgis.gui import(
+    QgsMapTool,
+    QgsRubberBand
 )
 
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
+
+AVOID_AREA_COLOR = QColor(255, 0, 0)
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
@@ -81,15 +89,60 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
         self.comboBoxVehicles.addItems(vehicles.vehicle_names())
 
-        self.pushButtonClear.clicked.connect(self.clear)
-        self.pushButtonReverse.clicked.connect(self.reverse)
+        self.btnPointsClear.clicked.connect(self.clearPoints)
+        self.btnReverse.clicked.connect(self.reverse)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnNavigate.clicked.connect(self.navigate)
+        self.btnAreasToAvoidClear.clicked.connect(self.clearAreasToAvoid)
+        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setMapTool)
+        self.btnAreasToAvoidFromLayer.clicked.connect(self.setAreasToAvoidFromLayer)
+
+
+        iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
+
+        self.areasToAvoidFootprint = QgsRubberBand(iface.mapCanvas(),
+                                                   QgsWkbTypes.PolygonGeometry)        
+        self.areasToAvoidFootprint.setStrokeColor(AVOID_AREA_COLOR)
+        self.areasToAvoidFootprint.setWidth(2)
+
+        self.updateAreasToAvoidLabel()
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size() * 1.5)
+
+    def setMapTool(self, checked):
+        if checked:
+            self.prevMapTool = iface.mapCanvas().mapTool()
+            self.mapTool = CapturePolygonMapTool(iface.mapCanvas())
+            self.mapTool.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
+            iface.mapCanvas().setMapTool(self.mapTool)
+        else:
+            iface.mapCanvas().setMapTool(self.prevMapTool)
+
+    def mapToolSet(self, new, old):
+        if new != self.mapTool:
+            self.btnAreasToAvoidFromCanvas.blockSignals(True)
+            self.btnAreasToAvoidFromCanvas.setChecked(False)
+            self.btnAreasToAvoidFromCanvas.blockSignals(False)          
+
+    def clearAreasToAvoid(self):
+        self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
+        self.updateAreasToAvoidLabel()
+
+    def setAreasToAvoidFromLayer(self):
+        pass
+
+    def setAreasToAvoidFromPolygon(self, polygon):
+        self.areasToAvoidFootprint.setToGeometry(polygon)
+        self.updateAreasToAvoidLabel()
+
+    def updateAreasToAvoidLabel(self):
+        if self.areasToAvoidFootprint.size():
+            self.labelAreasToAvoid.setText(self.tr("A polygon with an area to avoid has been defined"))
+        else:
+            self.labelAreasToAvoid.setText(self.tr("No areas to avoid have been defined"))
 
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)
@@ -120,8 +173,11 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             if profile == "auto":
                 profile = "auto_shorter"
             else:
-                pushWarning("Shortest path is not compatible with the selected vehicle")
+                pushWarning(self.tr("Shortest path is not compatible with the selected vehicle"))
                 return
+
+        #TODO: use areas to avoid
+
         try:
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
@@ -131,7 +187,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             pushWarning(self.tr("Could not compute route"))
             logging.error("Could not compute route")
 
-    def clear(self):
+    def clearPoints(self):
         self.originSearchBox.clearSearchBox()
         self.destinationSearchBox.clearSearchBox()
         self.waypointsSearchBox.clearSearchBox()
@@ -220,3 +276,64 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.addPins()
         else:
             self.clearPins()
+            self.setMapTool(False)
+
+RB_STROKE = QColor(204, 235, 239, 255)
+RB_FILL = QColor(204, 235, 239, 100)
+
+class CapturePolygonMapTool(QgsMapTool):
+    polygonSelected = pyqtSignal(object)
+
+    def __init__(self, canvas):
+        QgsMapTool.__init__(self, canvas)
+
+        self.canvas = canvas
+        self.extent = None
+        self.rubberBand = QgsRubberBand(self.canvas,
+                                         QgsWkbTypes.PolygonGeometry)
+        self.rubberBand.setFillColor(RB_FILL)
+        self.rubberBand.setStrokeColor(RB_STROKE)
+        self.rubberBand.setWidth(1)
+        self.vertex_count = 1  # two points are dropped initially
+
+    def canvasReleaseEvent(self, event):
+        if event.button() == Qt.RightButton:
+            if self.rubberBand is None:
+                return
+            # TODO: validate geom before firing signal
+            self.extent.removeDuplicateNodes()
+            self.polygonSelected.emit(self.extent)
+            self.rubberBand.reset(QgsWkbTypes.PolygonGeometry)
+            del self.rubberBand
+            self.rubberBand = None
+            self.vertex_count = 1  # two points are dropped initially
+            return
+        elif event.button() == Qt.LeftButton:
+            if self.rubberBand is None:
+                self.rubberBand = QgsRubberBand(
+                    self.canvas, QgsWkbTypes.PolygonGeometry)
+                self.rubberBand.setFillColor(RB_FILL)
+                self.rubberBand.setStrokeColor(RB_STROKE)
+                self.rubberBand.setWidth(1)
+            self.rubberBand.addPoint(event.mapPoint())
+            self.extent = self.rubberBand.asGeometry()
+            self.vertex_count += 1
+
+    def canvasMoveEvent(self, event):
+        if self.rubberBand is None:
+            pass
+        elif not self.rubberBand.numberOfVertices():
+            pass
+        elif self.rubberBand.numberOfVertices() == self.vertex_count:
+            if self.vertex_count == 2:
+                mouse_vertex = self.rubberBand.numberOfVertices() - 1
+                self.rubberBand.movePoint(mouse_vertex, event.mapPoint())
+            else:
+                self.rubberBand.addPoint(event.mapPoint())
+        else:
+            mouse_vertex = self.rubberBand.numberOfVertices() - 1
+            self.rubberBand.movePoint(mouse_vertex, event.mapPoint())
+
+    def deactivate(self):
+        QgsMapTool.deactivate(self)
+        self.deactivated.emit()
