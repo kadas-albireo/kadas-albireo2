@@ -7,7 +7,7 @@ from kadasrouting.utilities import encodePolyline6
 
 from .connectors import HttpConnector
 
-TEST_URL = "https://valhalla.gis-ops.com/osm"
+TEST_URL = "http://64.225.93.154:8002"
 
 
 class ValhallaClient:
@@ -48,10 +48,10 @@ class ValhallaClient:
             raise ValhallaException(str(e))
         return response
 
-    def mapmatching(self, line, costingOptions):
+    def mapmatching(self, line, profile, costingOptions):
         try:
             polyline6 = self.polyline6fromQgsPolylineXY(line)
-            response = self.connector.mapmatching(polyline6, costingOptions)
+            response = self.connector.mapmatching(polyline6, profile, costingOptions)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:

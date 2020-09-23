@@ -234,11 +234,12 @@ class NavigationPanel(BASE, WIDGET):
             return self.optimalRoutesCache[wkt]
         
         name = self.iface.activeLayer().name()
-        value, ok = QInputDialog.getItem(self, f"Navigation", "Select Vehicle to use with layer '{name}'",
+        value, ok = QInputDialog.getItem(iface.mainWindow(), f"Navigation", f"Select Vehicle to use with layer '{name}'",
                                          vehicles.vehicle_reduced_names())
         if ok:
+            profile, costingOptions = vehicles.options_for_vehicle_reduced(vehicles.vehicle_reduced_names().index(value))
             layer = OptimalRouteLayer("")
-            layer.updateFromPolyline(geom.asPolyline(), options)
+            layer.updateFromPolyline(geom.asPolyline(), profile, costingOptions)
             self.optimalRoutesCache[wkt] = layer
             return layer
 

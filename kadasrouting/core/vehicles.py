@@ -32,8 +32,7 @@ def read_vehicles():
                 first = False
             else:
                 _vehicles.append({k:v for k,v in zip(columns, row)})
-    for name in VEHICLE_REDUCED_NAMES:
-        _vehicles_reduced[name] = _vehicles[NAME]
+    _vehicles_reduced = [v for v in _vehicles if v["type_en"] in VEHICLE_REDUCED_NAMES]
 
 def vehicle_names():
     return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles]
@@ -52,7 +51,7 @@ def options_for_vehicle(i):
     return profile, costing_options
 
 def vehicle_reduced_names():
-    return VEHICLE_REDUCED_NAMES
+    return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles_reduced]
 
 def vehicles_reduced():
     return _vehicles_reduced
