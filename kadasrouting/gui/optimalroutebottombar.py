@@ -23,11 +23,19 @@ from kadasrouting.utilities import iconPath, pushWarning
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
     QgsWkbTypes,
+    QgsVectorLayer,
+    QgsFeatureRequest,
+    Qgis,
+    QgsProject,
+    QgsRectangle,
+    QgsGeometry
 )
 from qgis.gui import(
     QgsMapTool,
-    QgsRubberBand
+    QgsRubberBand,
+    QgsMapToolPan
 )
 
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
@@ -94,8 +102,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnNavigate.clicked.connect(self.navigate)
         self.btnAreasToAvoidClear.clicked.connect(self.clearAreasToAvoid)
-        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setMapTool)
-        self.btnAreasToAvoidFromLayer.clicked.connect(self.setAreasToAvoidFromLayer)
+        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
+        self.btnAreasToAvoidFromLayer.toggled.connect(self.setPolygonSelectionMapTool)
 
 
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
@@ -112,27 +120,43 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size() * 1.5)
 
-    def setMapTool(self, checked):
+    def setPolygonDrawingMapTool(self, checked):
         if checked:
             self.prevMapTool = iface.mapCanvas().mapTool()
-            self.mapTool = CapturePolygonMapTool(iface.mapCanvas())
-            self.mapTool.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
-            iface.mapCanvas().setMapTool(self.mapTool)
+            self.mapToolDrawPolygon = DrawPolygonMapTool(iface.mapCanvas())
+            self.mapToolDrawPolygon.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
+            iface.mapCanvas().setMapTool(self.mapToolDrawPolygon)
         else:
-            iface.mapCanvas().setMapTool(self.prevMapTool)
+            try:
+                iface.mapCanvas().setMapTool(self.prevMapTool)            
+            except:
+                iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
+
+    def setPolygonSelectionMapTool(self, checked):
+        if checked:
+            self.prevMapTool = iface.mapCanvas().mapTool()
+            self.mapToolSelectPolygon = SelectPolygonMapTool(iface.mapCanvas())
+            self.mapToolSelectPolygon.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
+            iface.mapCanvas().setMapTool(self.mapToolSelectPolygon)
+        else:
+            try:
+                iface.mapCanvas().setMapTool(self.prevMapTool)            
+            except:
+                iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def mapToolSet(self, new, old):
-        if new != self.mapTool:
+        if not isinstance(new, DrawPolygonMapTool):
             self.btnAreasToAvoidFromCanvas.blockSignals(True)
             self.btnAreasToAvoidFromCanvas.setChecked(False)
-            self.btnAreasToAvoidFromCanvas.blockSignals(False)          
+            self.btnAreasToAvoidFromCanvas.blockSignals(False)
+        if not isinstance(new, SelectPolygonMapTool):
+            self.btnAreasToAvoidFromLayer.blockSignals(True)
+            self.btnAreasToAvoidFromLayer.setChecked(False)
+            self.btnAreasToAvoidFromLayer.blockSignals(False)
 
     def clearAreasToAvoid(self):
         self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
         self.updateAreasToAvoidLabel()
-
-    def setAreasToAvoidFromLayer(self):
-        pass
 
     def setAreasToAvoidFromPolygon(self, polygon):
         self.areasToAvoidFootprint.setToGeometry(polygon)
@@ -276,12 +300,15 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.addPins()
         else:
             self.clearPins()
-            self.setMapTool(False)
+            self.clearAreasToAvoid()
+            self.setPolygonDrawingMapTool(False)
+            self.setPolygonSelectionMapTool(False)
 
 RB_STROKE = QColor(204, 235, 239, 255)
 RB_FILL = QColor(204, 235, 239, 100)
 
-class CapturePolygonMapTool(QgsMapTool):
+class DrawPolygonMapTool(QgsMapTool):
+
     polygonSelected = pyqtSignal(object)
 
     def __init__(self, canvas):
@@ -337,3 +364,43 @@ class CapturePolygonMapTool(QgsMapTool):
     def deactivate(self):
         QgsMapTool.deactivate(self)
         self.deactivated.emit()
+
+class SelectPolygonMapTool(QgsMapTool):
+    
+    polygonSelected = pyqtSignal(object)
+
+    def __init__(self, canvas):
+        QgsMapTool.__init__(self, canvas)
+
+        self.canvas = canvas
+        self.cursor = Qt.CrossCursor
+
+    def activate(self):
+        self.canvas.setCursor(self.cursor)
+
+    def canvasPressEvent(self, e):
+        layer = iface.activeLayer()
+        if not isinstance(layer, QgsVectorLayer) or layer.geometryType() != QgsWkbTypes.PolygonGeometry:
+            iface.messageBar().pushMessage("No layer selected or the current active layer is not a valid polygon layer",
+                                                  level = Qgis.Warning, duration = 5)
+            return
+
+        point = self.toMapCoordinates(e.pos())
+        searchRadius = self.canvas.extent().width() * .001
+        r = QgsRectangle()
+        r.setXMinimum(point.x() - searchRadius)
+        r.setXMaximum(point.x() + searchRadius)
+        r.setYMinimum(point.y() - searchRadius)
+        r.setYMaximum(point.y() + searchRadius)
+        r = self.toLayerCoordinates(layer, r)
+
+        features = (layer.getFeatures(QgsFeatureRequest().setFilterRect(r)
+                                .setFlags(QgsFeatureRequest.ExactIntersect)))
+        feature = next(features, None)
+        if feature is not None:
+            canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+            layerCrs = layer.crs()
+            transform = QgsCoordinateTransform(layerCrs, canvasCrs, QgsProject.instance())
+            canvasGeom = QgsGeometry(feature.geometry())
+            canvasGeom.transform(transform)
+            self.polygonSelected.emit(canvasGeom)
