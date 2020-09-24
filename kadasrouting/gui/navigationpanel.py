@@ -23,7 +23,7 @@ from kadas.kadasgui import (
 
 from kadasrouting.utilities import pushWarning, formatdist
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadasrouting.gui.gps import getGpsConnection, getMockupGpsConnection
+from kadasrouting.gui.gps import getMockupGpsConnection
 
 from qgis.utils import iface
 
@@ -42,12 +42,15 @@ route_html_template = '''
 <tbody>
 <tr>
 <td style="width: 100%; background-color: #333f4f; text-align: center;">
-git<p><img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+git<p>
+<img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" />
+</p>
 <h3 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h3>
 </td>
 </tr>
 <tr>
-<td style="width: 100%; background-color: #adb9ca; text-align: center;"><img src="{icon2}" width="32" height="32" />&nbsp;{dist2}<br/> {message2}</td>
+<td style="width: 100%; background-color: #adb9ca; text-align: center;">
+<img src="{icon2}" width="32" height="32" />&nbsp;{dist2}<br/> {message2}</td>
 </tr>
 <tr>
 <td style="width: 100%; background-color: #44546a;">
@@ -71,8 +74,10 @@ waypoint_html_template = '''
 <tr>
 <td style="width: 100%; background-color: #44546a;">
 <p style="text-align: center;">
-<span style="color: yellow; font-size:14pt;">Ground Heading </span><span style="color: #ffffff;"> {heading:.0f}°</span><br/>
-<span style="color: #adb9ca; font-size:14pt;">WP Angle </span><span style="color: #ffffff;"> {wpangle:.0f}°</span><br />
+<span style="color: yellow; font-size:14pt;">Ground Heading </span>
+<span style="color: #ffffff;"> {heading:.0f}°</span><br/>
+<span style="color: #adb9ca; font-size:14pt;">WP Angle </span>
+<span style="color: #ffffff;"> {wpangle:.0f}°</span><br />
 <span style="color: #ffffff;">Dist {distleft}</span><br />
 <span style="color: #ffffff;">Speed {speed:.2f} km/h</span><br />
 <span style="color: #ffffff;">ETA {eta}</span></p>

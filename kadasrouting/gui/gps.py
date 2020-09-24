@@ -22,7 +22,7 @@ def getGpsConnection():
     loop = QEventLoop()
 
     def gpsDetected(connection):
-        gpsConnection = connection
+        gpsConnection = connection  # NOQA
         loop.exit()
 
     def gpsDetectionFailed():

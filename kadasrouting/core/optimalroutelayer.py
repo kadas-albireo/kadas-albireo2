@@ -24,7 +24,6 @@ from kadasrouting.utilities import (
 
 from kadasrouting.valhalla.client import ValhallaClient
 
-from qgis.utils import iface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
