@@ -1,7 +1,6 @@
 import os
 import logging
 import json
-import math
 
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
@@ -29,7 +28,7 @@ from qgis.core import (
     QgsRectangle
 )
 
-from kadasrouting.core.isochroneslayer import(
+from kadasrouting.core.isochroneslayer import (
     generateIsochrones,
     OverwriteError
 )
@@ -68,7 +67,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         model = self.comboBoxVehicles.model()
         for i, vehicle in enumerate(vehicles.vehicles()):
             item = model.item(i)
-            item.setEnabled(vehicle[vehicles.COST_MODEL] in 
+            item.setEnabled(vehicle[vehicles.COST_MODEL] in
                             ["auto", "bicycle", "pedestrian"])
 
         self.reachabilityMode = {
@@ -151,8 +150,8 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             colors = self.getColorFromInterval()
             LOG.debug("_".join(colors))
-            generateIsochrones(point, profile, costingOptions, intervals, 
-                                colors, self.getBasename(), overwrite)
+            generateIsochrones(
+                point, profile, costingOptions, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
         except Valhalla400Exception as e:
@@ -269,11 +268,11 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             8: [first_color, '3ACC00', '74CC00', 'AECC00', 'CCAE00', 'CC7400', 'CC3A00', last_color],
             9: [first_color, '33CC00', '66CC00', '99CC00', 'CCCC00', 'CC9900', 'CC6600', 'CC3300', last_color],
             10: [first_color, '2DCC00', '5ACC00', '88CC00', 'B5CC00', 'CCB500', 'CC8800', 'CC5A00', 'CC2D00',
-                last_color],
+                 last_color],
             11: [first_color, '28CC00', '51CC00', '7ACC00', 'A3CC00', 'CCCC00', 'CCA300', 'CC7A00', 'CC5100',
-                'CC2800', last_color],
+                 'CC2800', last_color],
             12: [first_color, '25CC00', '4ACC00', '6FCC00', '94CC00', 'B9CC00', 'CCB900', 'CC9400', 'CC6F00',
-                'CC4A00', 'CC2500', last_color]
+                 'CC4A00', 'CC2500', last_color]
         }
         if num_interval not in colors.keys():
             return []
