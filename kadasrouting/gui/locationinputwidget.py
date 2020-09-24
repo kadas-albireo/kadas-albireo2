@@ -1,33 +1,21 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QEventLoop
 
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsProject,
-    QgsPointXY,
-    QgsGpsDetector,
-    QgsSettings,
+    QgsPointXY
 )
 
 from kadasrouting.utilities import (
     icon,
-    pushWarning,
-    waitcursor,
+    pushWarning
 )
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
 from kadas.kadasgui import (
-    KadasSearchBox,
-    KadasCoordinateSearchProvider,
-    KadasLocationSearchProvider,
-    KadasLocalDataSearchProvider,
-    KadasRemoteDataSearchProvider,
-    KadasWorldLocationSearchProvider,
-    KadasPinSearchProvider,
-    KadasSearchProvider,
     KadasMapCanvasItemManager,
     KadasPinItem,
     KadasItemPos,
@@ -157,7 +145,7 @@ class LocationInputWidget(QWidget):
             lon, lat = self.searchBox.text().split(",")
             point = QgsPointXY(float(lon.strip()), float(lat.strip()))
             return point
-        except:
+        except Exception:
             raise WrongLocationException(self.searchBox.text())
 
     def text(self):
