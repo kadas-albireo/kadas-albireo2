@@ -33,8 +33,10 @@ class Connector:
             contours=contours, costing_options = {profile: options})
         return params
 
-    def prepareMapmatchingParameters(self, line, profile, options):        
-        return {"encoded_polyline": line,
+    def prepareMapmatchingParameters(self, shape, profile, options):        
+        return {"shape": json.dumps(shape), 
+                "shape_match":"map_snap",
+                "costing": profile,
                 "costing_options": {profile: options}}
 
 
@@ -90,10 +92,9 @@ class HttpConnector(Connector):
         response = self._request("isochrone", json.dumps(params))
         return response
 
-    def mapmatching(self, line, profile, options):
-        params = self.prepareMapmatchingParameters(line, profile, options)
+    def mapmatching(self, shape, profile, options):
+        params = self.prepareMapmatchingParameters(shape, profile, options)
         url = f"{self.url}/trace_route"
-        #raise Exception(str(params))
         response = requests.post(url, json=params)
         if response.status_code == 400:
             raise Valhalla400Exception(response.text)

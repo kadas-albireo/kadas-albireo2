@@ -50,8 +50,13 @@ class ValhallaClient:
 
     def mapmatching(self, line, profile, costingOptions):
         try:
-            polyline6 = self.polyline6fromQgsPolylineXY(line)
-            response = self.connector.mapmatching(polyline6, profile, costingOptions)
+            pt = line[0]
+            shape = [{"lat": pt.y(), "lon":pt.x(), "type":"break"}]
+            for pt in line[1:-1]:
+                shape.append({"lat": pt.y(), "lon":pt.x(), "type":"via"})
+            pt = line[-1]
+            shape.append({"lat": pt.y(), "lon":pt.x(), "type":"break"})
+            response = self.connector.mapmatching(shape, profile, costingOptions)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:
