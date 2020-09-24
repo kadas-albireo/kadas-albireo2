@@ -35,6 +35,7 @@ from kadas.kadasgui import (
 
 from .gps import getGpsConnection
 
+
 class WrongLocationException(Exception):
     pass
 
