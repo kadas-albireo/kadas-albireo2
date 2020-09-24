@@ -60,8 +60,7 @@ class LocationInputWidget(QWidget):
         self.layout.setMargin(0)
 
         self.searchBox = AutoCompleteWidget()
-        # self.searchBox.completer().activated[QModelIndex].connect(self.getLocation)
-        self.searchBox.setActivatedAction(self.getLocation)
+        self.searchBox._completer.finished.connect(self.getLocation)
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -90,14 +89,13 @@ class LocationInputWidget(QWidget):
         self.locationName = ''
         self._gpsConnection = None
 
-    def getLocation(self, modelIndex):
-        label = modelIndex.data()
-        lat = modelIndex.data(Qt.UserRole)
-        lon = modelIndex.data(Qt.UserRole + 1)
-        x = modelIndex.data(Qt.UserRole + 2)
-        y = modelIndex.data(Qt.UserRole)
+    def getLocation(self, dictionary):
+        label = dictionary['label']
+        lat = dictionary['lat']
+        lon = dictionary['lon']
         LOG.debug('label selected %s' % label)
         self.setPointFromLonLat(lon, lat)
+        self.setLocationName(label)
 
     def textChanged(self, text):
         self.addPin()
