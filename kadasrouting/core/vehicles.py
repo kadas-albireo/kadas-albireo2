@@ -15,6 +15,7 @@ HEIGHT = "height_m"
 LENGTH = "length_m"
 WIDTH = "width_m"
 
+
 def read_vehicles():
     global _vehicles
     _vehicles = []
@@ -26,13 +27,16 @@ def read_vehicles():
                 columns = [s for s in row]
                 first = False
             else:
-                _vehicles.append({k:v for k,v in zip(columns, row)})
+                _vehicles.append({k: v for k, v in zip(columns, row)})
+
 
 def vehicle_names():
     return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles]
 
+
 def vehicles():
     return _vehicles
+
 
 def options_for_vehicle(i):
     vehicle = _vehicles[i]
@@ -43,5 +47,6 @@ def options_for_vehicle(i):
                            "width": vehicle[WIDTH],
                            "length": vehicle[LENGTH]}
     return profile, costing_options
+
 
 read_vehicles()
