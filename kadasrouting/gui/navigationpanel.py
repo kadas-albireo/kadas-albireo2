@@ -278,6 +278,7 @@ class NavigationPanel(BASE, WIDGET):
 
     def waypointsFromLayer(self, layer):     
         try:
+            '''
             center = iface.mapCanvas().center()
             outCrs = QgsCoordinateReferenceSystem(4326)
             canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
@@ -293,7 +294,7 @@ class NavigationPanel(BASE, WIDGET):
             item3.addPartFromGeometry(QgsPoint(wgspoint.x() + 10, wgspoint.y() + 10))
             item3.setName("My Waypoint")
             return [item, item2, item3]
-
+            '''
             return [item for item in layer.items() if isinstance(item, KadasGpxWaypointItem)]
         except Exception as e:
             return []
