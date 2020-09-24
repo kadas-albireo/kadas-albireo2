@@ -1,6 +1,6 @@
 import json
 import logging
-from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, pyqtSlot, QUrl, QUrlQuery
+from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, QUrl, QUrlQuery
 from PyQt5.QtCore import QObject, QTimer, QEvent, QPoint, QMetaObject
 from PyQt5.QtWidgets import QTreeWidget, QLineEdit, QApplication, QFrame, QTreeWidgetItem
 from PyQt5.QtNetwork import QNetworkAccessManager,QNetworkRequest, QNetworkReply
@@ -19,7 +19,6 @@ class SuggestCompletion(QObject):
     def __init__(self, parent):
         QObject.__init__(self, parent)
         self._parent = parent
-
         # editor (a QLineEdit)
         self._editor = parent
         # pop up
@@ -124,7 +123,6 @@ class SuggestCompletion(QObject):
             }
             self.finished.emit(selected)
 
-
     def auto_suggest(self):
         text = self._editor.text()
         url = QUrl("https://api3.geo.admin.ch/rest/services/api/SearchServer")
@@ -135,6 +133,7 @@ class SuggestCompletion(QObject):
         query.addQueryItem("type", "locations")
         query.addQueryItem("limit", "10")
         url.setQuery(query)
+        LOG.debug(url)
         self._network_manager.get(QNetworkRequest(url))
 
     def prevent_suggest(self):
@@ -154,16 +153,28 @@ class SuggestCompletion(QObject):
                         'lat': attributes.get('lat', 0.0)
                     }
                     choices.append(choice)
-            self.show_completion(choices)
+                self.show_completion(choices)
+            else:
+                error_detail = data.get('detail', 'No error detail.')
+                LOG.error(data)
+                self.error.emit(error_detail)
+        else:
+            try:
+                error_message = network_reply.readAll().data().decode("utf-8")
+                self.error.emit(error_message)
+                LOG.error(error_message)
+            except Exception as e:
+                LOG.debug(e)
+                self.error.emit(network_reply.errorString())
         network_reply.deleteLater();
 
 class AutoCompleteWidget(QLineEdit):
+
+    finished = pyqtSignal(dict)
+    error = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(AutoCompleteWidget, self).__init__(parent)
         self._completer = SuggestCompletion(self);
-
-    def enableAutoComplete(self):
-        LOG.debug('Auto complete is enabled')
-
-    def disableAutoComplete(self):
-        LOG.debug('Auto complete is disabled')
+        self._completer.finished.connect(self.finished.emit)
+        self._completer.error.connect(self.error.emit)

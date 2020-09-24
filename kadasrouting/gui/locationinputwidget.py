@@ -1,10 +1,9 @@
 import json
 import logging
 
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton, QLineEdit, QCompleter
-from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QEventLoop, QUrl, pyqtSignal, pyqtSlot, Qt, QUrlQuery, QModelIndex
-from PyQt5 import QtNetwork
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSignal
 
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -60,7 +59,8 @@ class LocationInputWidget(QWidget):
         self.layout.setMargin(0)
 
         self.searchBox = AutoCompleteWidget()
-        self.searchBox._completer.finished.connect(self.getLocation)
+        self.searchBox.finished.connect(self.getLocation)
+        self.searchBox.error.connect(pushWarning)
         self.layout.addWidget(self.searchBox)
 
         self.btnGPS = QToolButton()
@@ -93,7 +93,6 @@ class LocationInputWidget(QWidget):
         label = dictionary['label']
         lat = dictionary['lat']
         lon = dictionary['lon']
-        LOG.debug('label selected %s' % label)
         self.setPointFromLonLat(lon, lat)
         self.setLocationName(label)
 
@@ -131,8 +130,6 @@ class LocationInputWidget(QWidget):
 
     def startSelectingPoint(self):
         """Start selecting a point (when the map tool button is clicked)"""
-        # Disable autocomplete first
-        self.searchBox.disableAutoComplete()
         self.createMapTool()
         self.canvas.setMapTool(self.mapTool)
 
@@ -152,8 +149,6 @@ class LocationInputWidget(QWidget):
         """Finish selecting a point."""
         self.mapTool = self.canvas.mapTool()
         self.canvas.setMapTool(self.prevMapTool)
-        # Enable autocomplete first
-        self.searchBox.enableAutoComplete()
 
     def addPin(self):
         # Remove an existing pin first
