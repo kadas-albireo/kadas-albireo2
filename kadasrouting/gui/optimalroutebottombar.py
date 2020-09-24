@@ -95,9 +95,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         layer = OptimalRouteLayer(name)
         return layer
 
-    def selectedLayerChanged(self, layer):    
+    def selectedLayerChanged(self, layer):
         self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
-    
+
     def calculate(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
@@ -126,7 +126,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
-            logging.error(e, exc_info=True)            
+            logging.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
             logging.error("Could not compute route")
@@ -213,8 +213,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def navigate(self):
         self.action.toggle()
         iface.setActiveLayer(self.layerSelector.getSelectedLayer())
-        self.plugin.navigationAction.toggle()       
-        
+        self.plugin.navigationAction.toggle()
+
     def actionToggled(self, toggled):
         if toggled:
             self.addPins()
