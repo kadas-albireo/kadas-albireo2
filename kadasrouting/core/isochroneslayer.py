@@ -83,7 +83,7 @@ def generateIsochrones(point, profile, costingOptions, intervals, colors, basena
         QgsProject.instance().addMapLayer(layer)
         outlineColor = QColor(0, 0, 0)
         # Set opacity to 75% or C0 in hex (25% transparency)
-        fillColor = QColor(f"#C0" + feature["color"][1:])
+        fillColor = QColor("#C0" + feature["color"][1:])
         renderer = QgsSingleSymbolRenderer.defaultRenderer(QgsWkbTypes.PolygonGeometry)
         symbol = renderer.symbol()
         symbol.setColor(fillColor)

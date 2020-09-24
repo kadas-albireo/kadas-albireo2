@@ -153,6 +153,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             generateIsochrones(
                 point, profile, costingOptions, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
+            LOG.error(e)
             pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
         except Valhalla400Exception as e:
             # Expecting the content can be parsed as JSON, see
