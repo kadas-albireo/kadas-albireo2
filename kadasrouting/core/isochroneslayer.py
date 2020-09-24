@@ -4,9 +4,7 @@ import logging
 from PyQt5.QtCore import QVariant, QTextCodec
 from PyQt5.QtGui import QColor
 
-from kadasrouting.utilities import (
-    waitcursor
-)
+from kadasrouting.utilities import waitcursor, tr
 
 from kadasrouting.valhalla.client import ValhallaClient
 
@@ -39,7 +37,8 @@ def getFeaturesFromResponse(response):
     fields.append(QgsField("fill", QVariant.String))
     fields.append(QgsField("fillOpacity", QVariant.Double))
     fields.append(QgsField("fill-opacity", QVariant.Double))
-    fields.append(QgsField("contour", QVariant.Int))  # FIXME: in fact, due to a bug in qgis parser, we cannot use this field
+    # FIXME: in fact, due to a bug in qgis parser, we cannot use this field
+    fields.append(QgsField("contour", QVariant.Int))
     fields.append(QgsField("color", QVariant.String))
     fields.append(QgsField("fillColor", QVariant.String))
     codec = QTextCodec.codecForName("UTF-8")
@@ -49,8 +48,7 @@ def getFeaturesFromResponse(response):
 
 
 @waitcursor
-def generateIsochrones(point, profile, costingOptions, intervals,
-                        colors, basename, overwrite=True):
+def generateIsochrones(point, profile, costingOptions, intervals, colors, basename, overwrite=True):
     response = valhalla.isochrones(point, profile, costingOptions, intervals, colors)
     features = getFeaturesFromResponse(response)
     for interval, feature in zip(intervals[::-1], features):
@@ -58,11 +56,12 @@ def generateIsochrones(point, profile, costingOptions, intervals,
         # drawing, but due to a bug in qgis json parser, this property appears to be always set to '0'
         layername = "{} min - {}".format(interval, basename)
         try:
-            existinglayer = QgsProject.instance().mapLayersByName(layername)[0]  # FIXME: we do not consider if there are several layers with the same name here
+            # FIXME: we do not consider if there are several layers with the same name here
+            existinglayer = QgsProject.instance().mapLayersByName(layername)[0]
             if overwrite:
                 QgsProject.instance().removeMapLayer(existinglayer.id())
             else:
-                raise OverwriteError(self.tr(
+                raise OverwriteError(tr(
                     "layer {layername} already exists and overwrite is {overwrite}").format(
                         layername=layername, overwrite=overwrite
                     )

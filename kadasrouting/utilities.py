@@ -12,7 +12,10 @@ from qgis.core import (
     Qgis,
 )
 
-tr = lambda x: QCoreApplication.translate("", x)
+
+def tr(x):
+    return QCoreApplication.translate("", x)
+
 
 def localeName():
     override_flag = QSettings().value(
@@ -25,6 +28,7 @@ def localeName():
         locale_name = str(locale_name).split('_')[0]
 
     return locale_name
+
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
@@ -115,6 +119,7 @@ def decodePolyline6(expression, precision=6, is3d=False):
             coordinates.append((lat / factor, lng / factor, z / 100))
 
     return coordinates
+
 
 def formatdist(d):
     if d is None:

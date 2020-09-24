@@ -2,7 +2,7 @@
 
 import os
 
-from qgis.PyQt.QtCore import QLocale, QTranslator, QCoreApplication, QSettings
+from qgis.PyQt.QtCore import QTranslator, QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from kadasrouting.utilities import localeName
@@ -36,6 +36,7 @@ elif not os.path.exists(translation_path) and localeName().lower() in ['it', 'de
         None,
         'Translation file missing',
         'Translation file is not found for %s in %s' % (localeName().upper(), translation_path))
+
 
 def classFactory(iface):
     from .plugin import RoutingPlugin
