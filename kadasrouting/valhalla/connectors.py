@@ -34,7 +34,7 @@ class Connector:
         return params
 
     def prepareMapmatchingParameters(self, shape, profile, options):        
-        return {"shape": json.dumps(shape), 
+        return {"shape": shape, 
                 "shape_match":"map_snap",
                 "costing": profile,
                 "costing_options": {profile: options}}
