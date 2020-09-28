@@ -142,7 +142,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             try:
                 iface.mapCanvas().setMapTool(self.prevMapTool)
             except Exception as e:
-                logging.error("Could not compute route")
+                logging.error(e)
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def mapToolSet(self, new, old):

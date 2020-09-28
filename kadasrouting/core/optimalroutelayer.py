@@ -37,6 +37,8 @@ from qgis.core import (
 
 from kadas.kadascore import KadasPluginLayerType
 
+LOG = logging.getLogger(__name__)
+
 MAX_DISTANCE_FOR_NAVIGATION = 250
 
 _icon_for_maneuver = {
@@ -159,6 +161,7 @@ class OptimalRouteLayer(KadasItemLayer):
             response = self.valhalla.mapmatching(polyline, profile, costingOptions)
             self.computeFromResponse(response)
         except Exception as e:
+            LOG.warning(e)
             pushWarning(self.tr("Could not compute route from polyline"))
 
     @waitcursor

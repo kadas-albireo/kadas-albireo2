@@ -1,6 +1,7 @@
 import os
 import math
 import datetime
+import logging
 
 from PyQt5 import uic
 
@@ -40,6 +41,8 @@ from qgis.core import (
     QgsVectorLayer,
     QgsWkbTypes
 )
+
+LOG = logging.getLogger(__name__)
 
 route_html_template = '''
 <table border="0" style="border-collapse: collapse; width: 100%; height: 100%;">
@@ -237,7 +240,7 @@ class NavigationPanel(BASE, WIDGET):
         value, ok = QInputDialog.getItem(
             iface.mainWindow(),
             f"Navigation",
-            f"Select Vehicle to use with layer '{name}'",
+            "Select Vehicle to use with layer '{name}'".format({'name': name}),
             vehicles.vehicle_reduced_names())
         if ok:
             profile, costingOptions = vehicles.options_for_vehicle_reduced(
@@ -300,6 +303,7 @@ class NavigationPanel(BASE, WIDGET):
             '''
             return [item for item in layer.items() if isinstance(item, KadasGpxWaypointItem)]
         except Exception as e:
+            LOG.warning(e)
             return []
 
     def populateWaypoints(self, waypoints):
