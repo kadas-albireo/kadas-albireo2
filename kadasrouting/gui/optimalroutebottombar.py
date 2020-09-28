@@ -105,7 +105,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
         self.btnAreasToAvoidFromLayer.toggled.connect(self.setPolygonSelectionMapTool)
 
-
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
         self.areasToAvoidFootprint = QgsRubberBand(iface.mapCanvas(),
@@ -193,14 +192,10 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        if shortest:
-            if profile == "auto":
-                profile = "auto_shorter"
-            else:
-                pushWarning(self.tr("Shortest path is not compatible with the selected vehicle"))
-                return
-
         #TODO: use areas to avoid
+
+        if shortest:
+            costingOptions["shortest"] = True
 
         try:
             layer.updateRoute(points, profile, costingOptions)
