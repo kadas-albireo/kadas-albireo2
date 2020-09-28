@@ -33,6 +33,12 @@ class Connector:
             contours=contours, costing_options = {profile: options})
         return params
 
+    def prepareMapmatchingParameters(self, shape, profile, options):        
+        return {"shape": shape, 
+                "shape_match":"map_snap",
+                "costing": profile,
+                "costing_options": {profile: options}}
+
 
 class ConsoleConnector(Connector):
     def _execute(self, commands):
@@ -85,3 +91,13 @@ class HttpConnector(Connector):
                                                   intervals, colors)
         response = self._request("isochrone", json.dumps(params))
         return response
+
+    def mapmatching(self, shape, profile, options):
+        params = self.prepareMapmatchingParameters(shape, profile, options)
+        url = f"{self.url}/trace_route"
+        response = requests.post(url, json=params)
+        if response.status_code == 400:
+            raise Valhalla400Exception(response.text)
+        response.raise_for_status()
+        return response.json()
+

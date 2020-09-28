@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
+    <width>746</width>
     <height>291</height>
    </rect>
   </property>
@@ -147,6 +147,12 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
        </widget>
       </item>
      </layout>
@@ -168,14 +174,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="pushButtonClear">
+       <widget class="QPushButton" name="btnPointsClear">
         <property name="text">
          <string>Clear</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonReverse">
+       <widget class="QPushButton" name="btnReverse">
         <property name="text">
          <string>Reverse</string>
         </property>
@@ -228,6 +234,49 @@
      <property name="text">
       <string>Navigate</string>
      </property>
+    </widget>
+   </item>
+   <item row="4" column="4" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Areas to avoid</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btnAreasToAvoidFromLayer">
+        <property name="text">
+         <string>Select from Layer</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="btnAreasToAvoidFromCanvas">
+        <property name="text">
+         <string>Draw in Canvas</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="btnAreasToAvoidClear">
+        <property name="text">
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="labelAreasToAvoid">
+        <property name="text">
+         <string>No areas to avoid have been defined</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

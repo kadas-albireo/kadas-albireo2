@@ -3,10 +3,11 @@
 ## Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
+from kadasrouting.utilities import encodePolyline6
 
 from .connectors import HttpConnector
 
-TEST_URL = "https://valhalla.gis-ops.com/osm"
+TEST_URL = "http://64.225.93.154:8002"
 
 
 class ValhallaClient:
@@ -46,6 +47,27 @@ class ValhallaClient:
         except Exception as e:
             raise ValhallaException(str(e))
         return response
+
+    def mapmatching(self, line, profile, costingOptions):
+        try:
+            pt = line[0]
+            shape = [{"lat": pt.y(), "lon":pt.x(), "type":"break"}]
+            for pt in line[1:-1]:
+                shape.append({"lat": pt.y(), "lon":pt.x(), "type":"via"})
+            pt = line[-1]
+            shape.append({"lat": pt.y(), "lon":pt.x(), "type":"break"})
+            response = self.connector.mapmatching(shape, profile, costingOptions)
+        except Valhalla400Exception as e:
+            raise e
+        except Exception as e:
+            raise ValhallaException(str(e))
+        return response
+
+
+    def polyline6fromQgsPolylineXY(self, qgsline):
+        points = [(p.x(), p.y()) for p in qgsline]
+        encoded = encodePolyline6(points)
+        return encoded
 
     def pointsFromQgsPoints(self, qgspoints):
         points = []
