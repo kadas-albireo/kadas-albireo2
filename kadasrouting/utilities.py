@@ -4,6 +4,10 @@ import itertools
 import io
 import math
 
+
+from io import StringIO
+from html.parser import HTMLParser
+
 from PyQt5.QtCore import QLocale, QCoreApplication, QSettings, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QApplication
@@ -156,3 +160,26 @@ def decodePolyline6(expression, precision=6, geojson=False):
 
 def encodePolyline6(coordinates, precision=6, geojson=False):
     return PolylineCodec().encode(coordinates, precision, geojson)
+
+def formatdist(d):
+    if d is None:
+        return ""
+    return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.text = StringIO()
+    def handle_data(self, d):
+        self.text.write(d)
+    def get_data(self):
+        return self.text.getvalue()
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()

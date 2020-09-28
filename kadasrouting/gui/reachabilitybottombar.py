@@ -68,7 +68,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         model = self.comboBoxVehicles.model()
         for i, vehicle in enumerate(vehicles.vehicles()):
             item = model.item(i)
-            item.setEnabled(vehicle[vehicles.COST_MODEL] in 
+            item.setEnabled(vehicle[vehicles.COST_MODEL] in
                             ["auto", "bicycle", "pedestrian"])
 
         self.reachabilityMode = {
@@ -88,13 +88,13 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         self.basenameChanges()
 
         # Update center of map according to selected point
-        self.originSearchBox.searchBox.textChanged.connect(self.centerMap)
-
-        # Always set to center of map for the first time
-        self.setCenterAsSelected()
+        self.originSearchBox.pointUpdated.connect(self.centerMap)
 
         # Update the point when the canvas extent changed.
         self.canvas.extentsChanged.connect(self.setCenterAsSelected)
+
+        # Always set to center of map for the first time
+        self.setCenterAsSelected()
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
@@ -102,29 +102,37 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             self.setFixedSize(self.size().width(), self.size().height() * 1.5)
 
     def setCenterAsSelected(self, point=None):
-        # Set the current center of the map as the selected point
+        """Set the current center of the map as the selected point"""
         map_center = self.canvas.center()
         self.originSearchBox.updatePoint(map_center, None)
 
     def centerMap(self):
         """Pan map so that the current selected point as the center of the map canvas."""
         # Get point from the widget
-        point = self.originSearchBox.valueAsPoint()
+        point = self.originSearchBox.point
+
         # Convert point to canvas CRS
         inCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(inCrs, canvasCrs, QgsProject.instance())
         canvasPoint = transform.transform(point)
+
+        # First, disconnect the signal to avoid infinite circular function calling
+        self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
+
         # Center the map to the converted point with the same zoom level
         rect = QgsRectangle(canvasPoint, canvasPoint)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
+        # Reconnect the signal after recentering the map
+        self.canvas.extentsChanged.connect(self.setCenterAsSelected)
+
     def calculate(self):
         overwrite = self.checkBoxRemovePrevious.isChecked()
         LOG.debug("isochrones layer name = {}".format(self.getBasename()))
         try:
-            point = self.originSearchBox.valueAsPoint()
+            point = self.originSearchBox.point
         except WrongLocationException as e:
             pushWarning(self.tr("Invalid location: {error_message}").format(error_message=str(e)))
             return
@@ -151,7 +159,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             colors = self.getColorFromInterval()
             LOG.debug("_".join(colors))
-            generateIsochrones(point, profile, costingOptions, intervals, 
+            generateIsochrones(point, profile, costingOptions, intervals,
                                 colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
