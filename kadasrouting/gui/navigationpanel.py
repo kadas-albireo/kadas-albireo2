@@ -12,20 +12,20 @@ from PyQt5.QtWidgets import (
     QListWidgetItem,
     QListWidget,
     QLabel,
-    QVBoxLayout,
     QInputDialog
 )
 
 from kadas.kadasgui import (
     KadasPinItem,
     KadasItemPos,
+    KadasItemLayer,
     KadasMapCanvasItemManager,
     KadasPluginInterface,
     KadasGpxWaypointItem)
 
-from kadasrouting.utilities import pushWarning, formatdist
+from kadasrouting.utilities import formatdist
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadasrouting.gui.gps import getGpsConnection, getMockupGpsConnection
+from kadasrouting.gui.gps import getMockupGpsConnection
 from kadasrouting.core import vehicles
 
 from qgis.utils import iface
@@ -37,8 +37,6 @@ from qgis.core import (
     QgsDistanceArea,
     QgsUnitTypes,
     QgsPointXY,
-    QgsPoint,
-    QgsRectangle,
     QgsVectorLayer,
     QgsWkbTypes
 )
@@ -236,15 +234,18 @@ class NavigationPanel(BASE, WIDGET):
             return self.optimalRoutesCache[wkt]
 
         name = self.iface.activeLayer().name()
-        value, ok = QInputDialog.getItem(iface.mainWindow(), f"Navigation", f"Select Vehicle to use with layer '{name}'",
-                                         vehicles.vehicle_reduced_names())
+        value, ok = QInputDialog.getItem(
+            iface.mainWindow(),
+            f"Navigation",
+            f"Select Vehicle to use with layer '{name}'",
+            vehicles.vehicle_reduced_names())
         if ok:
-            profile, costingOptions = vehicles.options_for_vehicle_reduced(vehicles.vehicle_reduced_names().index(value))
+            profile, costingOptions = vehicles.options_for_vehicle_reduced(
+                vehicles.vehicle_reduced_names().index(value))
             layer = OptimalRouteLayer("")
             layer.updateFromPolyline(geom.asPolyline(), profile, costingOptions)
             self.optimalRoutesCache[wkt] = layer
             return layer
-
 
     def setCompass(self, heading, wpangle):
         compassPixmap = QPixmap(_icon_path("compass.png"))
