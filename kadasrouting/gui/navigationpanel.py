@@ -239,8 +239,8 @@ class NavigationPanel(BASE, WIDGET):
         name = self.iface.activeLayer().name()
         value, ok = QInputDialog.getItem(
             iface.mainWindow(),
-            f"Navigation",
-            "Select Vehicle to use with layer '{name}'".format({'name': name}),
+            "Navigation",
+            "Select Vehicle to use with layer '{name}'".format(name=name),
             vehicles.vehicle_reduced_names())
         if ok:
             profile, costingOptions = vehicles.options_for_vehicle_reduced(
