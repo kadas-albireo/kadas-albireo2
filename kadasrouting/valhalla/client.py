@@ -51,18 +51,17 @@ class ValhallaClient:
     def mapmatching(self, line, profile, costingOptions):
         try:
             pt = line[0]
-            shape = [{"lat": pt.y(), "lon":pt.x(), "type":"break"}]
+            shape = [{"lat": pt.y(), "lon": pt.x(), "type": "break"}]
             for pt in line[1:-1]:
-                shape.append({"lat": pt.y(), "lon":pt.x(), "type":"via"})
+                shape.append({"lat": pt.y(), "lon": pt.x(), "type": "via"})
             pt = line[-1]
-            shape.append({"lat": pt.y(), "lon":pt.x(), "type":"break"})
+            shape.append({"lat": pt.y(), "lon": pt.x(), "type": "break"})
             response = self.connector.mapmatching(shape, profile, costingOptions)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:
             raise ValhallaException(str(e))
         return response
-
 
     def polyline6fromQgsPolylineXY(self, qgsline):
         points = [(p.x(), p.y()) for p in qgsline]

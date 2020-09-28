@@ -1,4 +1,3 @@
-import json
 import logging
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton
@@ -29,11 +28,8 @@ from kadas.kadasgui import (
 
 from .gps import getGpsConnection
 
-<<<<<<< HEAD
 LOG = logging.getLogger(__name__)
 
-=======
->>>>>>> test-flake8
 
 class WrongLocationException(Exception):
     pass
@@ -103,7 +99,7 @@ class LocationInputWidget(QWidget):
             info = connection.currentGPSInformation()
             pointString = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
             self.searchBox.setText(pointString)
-            self.setPoint(wgspoint)
+            self.setPoint(QgsPointXY(info.longitude, info.latitude))
             # TODO: Perhaps put reverse geocoding here
             self.setLocationName(pointString)
         else:

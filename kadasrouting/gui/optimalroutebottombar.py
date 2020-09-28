@@ -108,7 +108,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
         self.areasToAvoidFootprint = QgsRubberBand(iface.mapCanvas(),
-                                                   QgsWkbTypes.PolygonGeometry)        
+                                                   QgsWkbTypes.PolygonGeometry)
         self.areasToAvoidFootprint.setStrokeColor(AVOID_AREA_COLOR)
         self.areasToAvoidFootprint.setWidth(2)
 
@@ -127,7 +127,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             iface.mapCanvas().setMapTool(self.mapToolDrawPolygon)
         else:
             try:
-                iface.mapCanvas().setMapTool(self.prevMapTool)            
+                iface.mapCanvas().setMapTool(self.prevMapTool)
             except:
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
@@ -139,7 +139,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             iface.mapCanvas().setMapTool(self.mapToolSelectPolygon)
         else:
             try:
-                iface.mapCanvas().setMapTool(self.prevMapTool)            
+                iface.mapCanvas().setMapTool(self.prevMapTool)
             except:
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
@@ -361,7 +361,7 @@ class DrawPolygonMapTool(QgsMapTool):
         self.deactivated.emit()
 
 class SelectPolygonMapTool(QgsMapTool):
-    
+
     polygonSelected = pyqtSignal(object)
 
     def __init__(self, canvas):

@@ -158,8 +158,8 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             colors = self.getColorFromInterval()
             LOG.debug("_".join(colors))
-            generateIsochrones(point, profile, costingOptions, intervals,
-                                colors, self.getBasename(), overwrite)
+            generateIsochrones(
+                point, profile, costingOptions, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
             LOG.error(e)
             pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))

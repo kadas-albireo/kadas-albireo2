@@ -39,9 +39,9 @@ class Connector:
             contours=contours, costing_options={profile: options})
         return params
 
-    def prepareMapmatchingParameters(self, shape, profile, options):        
-        return {"shape": shape, 
-                "shape_match":"map_snap",
+    def prepareMapmatchingParameters(self, shape, profile, options):
+        return {"shape": shape,
+                "shape_match": "map_snap",
                 "costing": profile,
                 "costing_options": {profile: options}}
 
@@ -107,4 +107,3 @@ class HttpConnector(Connector):
             raise Valhalla400Exception(response.text)
         response.raise_for_status()
         return response.json()
-
