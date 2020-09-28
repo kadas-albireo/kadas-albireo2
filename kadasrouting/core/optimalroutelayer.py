@@ -8,26 +8,22 @@ from PyQt5.QtGui import QColor, QPen, QBrush
 from PyQt5.QtWidgets import QAction
 
 from kadas.kadasgui import (
-	KadasPinItem,
-	KadasItemPos,
-	KadasItemLayer,
-	KadasLineItem,
-	KadasGpxRouteItem
+    KadasPinItem,
+    KadasItemPos,
+    KadasItemLayer,
+    KadasGpxRouteItem
 )
 
 from kadasrouting.utilities import (
     iconPath,
     waitcursor,
-    pushMessage,
     pushWarning,
-    transformToWGS,
     decodePolyline6,
     formatdist
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
 
-from qgis.utils import iface
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -41,47 +37,54 @@ from qgis.core import (
 
 from kadas.kadascore import KadasPluginLayerType
 
+LOG = logging.getLogger(__name__)
+
 MAX_DISTANCE_FOR_NAVIGATION = 250
 
-_icon_for_maneuver = {1: "direction_depart",
-                    2: "direction_depart_right",
-                    3: "direction_depart_left",
-                    4: "direction_arrive_straight",
-                    5: "direction_arrive_right",
-                    6: "direction_arrive_left",
-                    8: "direction_continue",
-                    9: "direction_turn_slight_right",
-                    10: "direction_turn_right",
-                    11: "direction_turn_sharp_right",
-                    12: "direction_uturn",
-                    13: "direction_uturn",
-                    14: "direction_turn_sharp_left",
-                    15: "direction_turn_left",
-                    16: "direction_turn_slight_left",
-                    17: "direction_on_ramp_straight",
-                    18: "direction_on_ramp_rigth",
-                    19: "direction_on_ramp_left",
-                    20: "direction_depart_right",
-                    21: "direction_depart_left",
-                    22: "direction_continue_straight",
-                    23: "direction_continue_right",
-                    24: "direction_continue_left",
-                    26: "direction_roundabout",
-                    27: "direction_roundabout",
-                    37: "direction_merge_right",
-                    38: "direction_merge_left"
-                    }
+_icon_for_maneuver = {
+    1: "direction_depart",
+    2: "direction_depart_right",
+    3: "direction_depart_left",
+    4: "direction_arrive_straight",
+    5: "direction_arrive_right",
+    6: "direction_arrive_left",
+    8: "direction_continue",
+    9: "direction_turn_slight_right",
+    10: "direction_turn_right",
+    11: "direction_turn_sharp_right",
+    12: "direction_uturn",
+    13: "direction_uturn",
+    14: "direction_turn_sharp_left",
+    15: "direction_turn_left",
+    16: "direction_turn_slight_left",
+    17: "direction_on_ramp_straight",
+    18: "direction_on_ramp_rigth",
+    19: "direction_on_ramp_left",
+    20: "direction_depart_right",
+    21: "direction_depart_left",
+    22: "direction_continue_straight",
+    23: "direction_continue_right",
+    24: "direction_continue_left",
+    26: "direction_roundabout",
+    27: "direction_roundabout",
+    37: "direction_merge_right",
+    38: "direction_merge_left"
+    }
+
 
 def icon_path_for_maneuver(maneuvertype):
     name = _icon_for_maneuver.get(maneuvertype, "dummy")
     return _icon_path(name)
-    
+
+
 def _icon_path(name):
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),
                         "icons", name + ".png")
 
+
 class NotInRouteException(Exception):
     pass
+
 
 class RoutePointMapItem(KadasPinItem):
 
@@ -142,7 +145,7 @@ class OptimalRouteLayer(KadasItemLayer):
             for i, pin in enumerate(self.pins):
                 self.points[i] = QgsPointXY(pin.position())
             response = self.valhalla.route(
-                self.points, self, profile, self.costingOptions
+                self.points, self.profile, self.costingOptions
             )
             self.computeFromResponse(response)
             self.triggerRepaint()
@@ -158,6 +161,7 @@ class OptimalRouteLayer(KadasItemLayer):
             response = self.valhalla.mapmatching(polyline, profile, costingOptions)
             self.computeFromResponse(response)
         except Exception as e:
+            LOG.warning(e)
             pushWarning(self.tr("Could not compute route from polyline"))
 
     @waitcursor
@@ -230,16 +234,16 @@ class OptimalRouteLayer(KadasItemLayer):
             self.pins.append(pin)
             self.addItem(pin)
 
-
     def maneuverForPoint(self, pt, speed):
         min_dist = MAX_DISTANCE_FOR_NAVIGATION
         closest_leg = None
         closest_segment = None
         qgsdistance = QgsDistanceArea()
-        qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem(4326),
-                                QgsProject.instance().transformContext())
+        qgsdistance.setSourceCrs(
+            QgsCoordinateReferenceSystem(4326),
+            QgsProject.instance().transformContext())
         qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
-        
+
         legs = list(self.maneuvers.keys())
         for i, line in enumerate(legs):
             _, _pt, segment, _ = line.closestSegmentWithContext(pt)
@@ -248,7 +252,8 @@ class OptimalRouteLayer(KadasItemLayer):
                         QgsUnitTypes.DistanceMeters)
             if dist < min_dist:
                 closest_leg = line
-                next_leg = None if i == len(legs) - 1 else legs[i + 1]
+                # FIXME: commented line below is never used
+                # next_leg = None if i == len(legs) - 1 else legs[i + 1]
                 closest_segment = segment
                 closest_point = _pt
                 min_dist = dist
@@ -271,7 +276,7 @@ class OptimalRouteLayer(KadasItemLayer):
                         message2 = ""
                         icon2 = _icon_path("transparentpixel")
                     else:
-                        next_maneuver = maneuvers[i + 2]                        
+                        next_maneuver = maneuvers[i + 2]
                         distance_to_next2 = maneuvers[i + 1]['length'] * 1000
                         message2 = next_maneuver['instruction']
                         icon2 = icon_path_for_maneuver(maneuvers[i + 2]["type"])
@@ -281,16 +286,16 @@ class OptimalRouteLayer(KadasItemLayer):
                     time_to_next = distance_to_next / 1000 / speed * 3600
                     maneuvers_ahead = maneuvers[i:]
                     timeleft = time_to_next + sum([m["time"] for m in maneuvers_ahead])
-                    distanceleft = distance_to_next  + sum([m["length"] for m in maneuvers_ahead]) * 1000
+                    distanceleft = distance_to_next + sum([m["length"] for m in maneuvers_ahead]) * 1000
 
-                    delta = datetime.timedelta(seconds = timeleft)
+                    delta = datetime.timedelta(seconds=timeleft)
                     timeleft_string = ":".join(str(delta).split(":")[:-1])
                     eta = datetime.datetime.now() + delta
                     eta_string = eta.strftime("%H:%M")
 
                     maneuver = dict(dist=formatdist(distance_to_next), message=message, icon=icon,
                                     dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
-                                    speed=speed, timeleft=timeleft_string, 
+                                    speed=speed, timeleft=timeleft_string,
                                     distleft=formatdist(distanceleft),
                                     eta=eta_string, x=closest_point.x(), y=closest_point.y())
                     return maneuver

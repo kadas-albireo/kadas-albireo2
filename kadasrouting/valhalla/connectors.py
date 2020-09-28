@@ -1,5 +1,8 @@
 import subprocess
 import logging
+import requests
+import json
+
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName
 
@@ -8,10 +11,13 @@ LOG = logging.getLogger(__name__)
 
 class Connector:
     def prepareRouteParameters(self, points, profile="auto", options=None):
-        options = options or {}        
+        options = options or {}
         locale_name = localeName()
-        params = dict(costing=profile, show_locations=True, locations=points,
-                        directions_options = {"language": locale_name})        
+        params = dict(
+            costing=profile,
+            show_locations=True,
+            locations=points,
+            directions_options={"language": locale_name})
         if options:
             params["costing_options"] = {profile: options}
 
@@ -29,13 +35,13 @@ class Connector:
             for i in range(0, len(intervals)):
                 contours.append({"time": intervals[i], "color": colors[i]})
         params = dict(
-            costing=profile, locations=points, polygons=True, 
-            contours=contours, costing_options = {profile: options})
+            costing=profile, locations=points, polygons=True,
+            contours=contours, costing_options={profile: options})
         return params
 
-    def prepareMapmatchingParameters(self, shape, profile, options):        
-        return {"shape": shape, 
-                "shape_match":"map_snap",
+    def prepareMapmatchingParameters(self, shape, profile, options):
+        return {"shape": shape,
+                "shape_match": "map_snap",
                 "costing": profile,
                 "costing_options": {profile: options}}
 
@@ -54,18 +60,19 @@ class ConsoleConnector(Connector):
             try:
                 for line in iter(proc.stdout.readline, ""):
                     response += line
-            except:
+            except Exception as e:
+                LOG.error(e)
                 pass
-        responsedict = json.loads(response)
+        # FIXME: the commented lines below is not used
+        # responsedict = json.loads(response)
 
     def route(self, points, profile, options):
-        params = self.prepareRouteParameters(points, profile, options)
-        response = _execute(["valhalla_run_route", "-j", json.dumps(params)])
-        return response
+        pass
+        # FIXME: the commented lines below is not finished
+        # params = self.prepareRouteParameters(points, profile, options)
+        # response = _execute(["valhalla_run_route", "-j", json.dumps(params)])
+        # return response
 
-
-import requests
-import json
 
 class HttpConnector(Connector):
     def __init__(self, url):
@@ -81,7 +88,7 @@ class HttpConnector(Connector):
         response.raise_for_status()
         return response.json()
 
-    def route(self, points, profile, options):        
+    def route(self, points, profile, options):
         params = self.prepareRouteParameters(points, profile, options)
         response = self._request("route", json.dumps(params))
         return response
@@ -100,4 +107,3 @@ class HttpConnector(Connector):
             raise Valhalla400Exception(response.text)
         response.raise_for_status()
         return response.json()
-

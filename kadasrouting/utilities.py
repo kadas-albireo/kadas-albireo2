@@ -20,7 +20,10 @@ from qgis.core import (
     Qgis,
 )
 
-tr = lambda x: QCoreApplication.translate("", x)
+
+def tr(x):
+    return QCoreApplication.translate("", x)
+
 
 def localeName():
     override_flag = QSettings().value(
@@ -33,6 +36,7 @@ def localeName():
         locale_name = str(locale_name).split('_')[0]
 
     return locale_name
+
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
@@ -82,16 +86,14 @@ def transformToWGS(crs):
 
     return xformer
 
-def formatdist(d):
-    if d is None:
-        return ""
-    return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)
 
 """
 Copyright (c) 2014 Bruno M. Custódio
 Copyright (c) 2016 Frederick Jansen
 https://github.com/hicsail/polyline/
 """
+
+
 class PolylineCodec(object):
     def _pcitr(self, iterable):
         return zip(iterable, itertools.islice(iterable, 1, None))
@@ -153,13 +155,16 @@ class PolylineCodec(object):
             self._write(output, curr[0], prev[0], factor)
             self._write(output, curr[1], prev[1], factor)
 
-        return output.getvalue()  
+        return output.getvalue()
+
 
 def decodePolyline6(expression, precision=6, geojson=False):
     return PolylineCodec().decode(expression, precision, geojson)
 
+
 def encodePolyline6(coordinates, precision=6, geojson=False):
     return PolylineCodec().encode(coordinates, precision, geojson)
+
 
 def formatdist(d):
     if d is None:
@@ -172,12 +177,15 @@ class MLStripper(HTMLParser):
         super().__init__()
         self.reset()
         self.strict = False
-        self.convert_charrefs= True
+        self.convert_charrefs = True
         self.text = StringIO()
+
     def handle_data(self, d):
         self.text.write(d)
+
     def get_data(self):
         return self.text.getvalue()
+
 
 def strip_tags(html):
     s = MLStripper()

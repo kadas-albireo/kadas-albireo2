@@ -1,4 +1,3 @@
-import json
 import logging
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QToolButton
@@ -9,15 +8,12 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsProject,
-    QgsPointXY,
-    QgsGpsDetector,
-    QgsSettings,
+    QgsPointXY
 )
 
 from kadasrouting.utilities import (
     icon,
-    pushWarning,
-    waitcursor,
+    pushWarning
 )
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
@@ -25,14 +21,6 @@ from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 from kadasrouting.gui.autocompletewidget import AutoCompleteWidget
 
 from kadas.kadasgui import (
-    KadasSearchBox,
-    KadasCoordinateSearchProvider,
-    KadasLocationSearchProvider,
-    KadasLocalDataSearchProvider,
-    KadasRemoteDataSearchProvider,
-    KadasWorldLocationSearchProvider,
-    KadasPinSearchProvider,
-    KadasSearchProvider,
     KadasMapCanvasItemManager,
     KadasPinItem,
     KadasItemPos,
@@ -111,7 +99,7 @@ class LocationInputWidget(QWidget):
             info = connection.currentGPSInformation()
             pointString = "{:.6f},{:.6f}".format(info.longitude, info.latitude)
             self.searchBox.setText(pointString)
-            self.setPoint(wgspoint)
+            self.setPoint(QgsPointXY(info.longitude, info.latitude))
             # TODO: Perhaps put reverse geocoding here
             self.setLocationName(pointString)
         else:

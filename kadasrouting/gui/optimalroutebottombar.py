@@ -32,7 +32,7 @@ from qgis.core import (
     QgsRectangle,
     QgsGeometry
 )
-from qgis.gui import(
+from qgis.gui import (
     QgsMapTool,
     QgsRubberBand,
     QgsMapToolPan
@@ -108,7 +108,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
         self.areasToAvoidFootprint = QgsRubberBand(iface.mapCanvas(),
-                                                   QgsWkbTypes.PolygonGeometry)        
+                                                   QgsWkbTypes.PolygonGeometry)
         self.areasToAvoidFootprint.setStrokeColor(AVOID_AREA_COLOR)
         self.areasToAvoidFootprint.setWidth(2)
 
@@ -127,8 +127,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             iface.mapCanvas().setMapTool(self.mapToolDrawPolygon)
         else:
             try:
-                iface.mapCanvas().setMapTool(self.prevMapTool)            
-            except:
+                iface.mapCanvas().setMapTool(self.prevMapTool)
+            except Exception as e:
+                logging.error(e)
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def setPolygonSelectionMapTool(self, checked):
@@ -139,8 +140,9 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             iface.mapCanvas().setMapTool(self.mapToolSelectPolygon)
         else:
             try:
-                iface.mapCanvas().setMapTool(self.prevMapTool)            
-            except:
+                iface.mapCanvas().setMapTool(self.prevMapTool)
+            except Exception as e:
+                logging.error(e)
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def mapToolSet(self, new, old):
@@ -192,7 +194,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        #TODO: use areas to avoid
+        # TODO: use areas to avoid
 
         if shortest:
             costingOptions["shortest"] = True
@@ -299,8 +301,10 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.setPolygonDrawingMapTool(False)
             self.setPolygonSelectionMapTool(False)
 
+
 RB_STROKE = QColor(204, 235, 239, 255)
 RB_FILL = QColor(204, 235, 239, 100)
+
 
 class DrawPolygonMapTool(QgsMapTool):
 
@@ -311,8 +315,8 @@ class DrawPolygonMapTool(QgsMapTool):
 
         self.canvas = canvas
         self.extent = None
-        self.rubberBand = QgsRubberBand(self.canvas,
-                                         QgsWkbTypes.PolygonGeometry)
+        self.rubberBand = QgsRubberBand(
+            self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rubberBand.setFillColor(RB_FILL)
         self.rubberBand.setStrokeColor(RB_STROKE)
         self.rubberBand.setWidth(1)
@@ -360,8 +364,9 @@ class DrawPolygonMapTool(QgsMapTool):
         QgsMapTool.deactivate(self)
         self.deactivated.emit()
 
+
 class SelectPolygonMapTool(QgsMapTool):
-    
+
     polygonSelected = pyqtSignal(object)
 
     def __init__(self, canvas):
@@ -376,8 +381,9 @@ class SelectPolygonMapTool(QgsMapTool):
     def canvasPressEvent(self, e):
         layer = iface.activeLayer()
         if not isinstance(layer, QgsVectorLayer) or layer.geometryType() != QgsWkbTypes.PolygonGeometry:
-            iface.messageBar().pushMessage("No layer selected or the current active layer is not a valid polygon layer",
-                                                  level = Qgis.Warning, duration = 5)
+            iface.messageBar().pushMessage(
+                "No layer selected or the current active layer is not a valid polygon layer",
+                level=Qgis.Warning, duration=5)
             return
 
         point = self.toMapCoordinates(e.pos())
@@ -389,8 +395,7 @@ class SelectPolygonMapTool(QgsMapTool):
         r.setYMaximum(point.y() + searchRadius)
         r = self.toLayerCoordinates(layer, r)
 
-        features = (layer.getFeatures(QgsFeatureRequest().setFilterRect(r)
-                                .setFlags(QgsFeatureRequest.ExactIntersect)))
+        features = (layer.getFeatures(QgsFeatureRequest().setFilterRect(r).setFlags(QgsFeatureRequest.ExactIntersect)))
         feature = next(features, None)
         if feature is not None:
             canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
