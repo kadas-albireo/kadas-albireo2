@@ -13,6 +13,7 @@ from PyQt5.QtCore import QEventLoop, pyqtSignal, QObject
 
 from kadasrouting.utilities import waitcursor
 
+
 @waitcursor
 def getGpsConnection():
     gpsConnection = None
@@ -21,7 +22,7 @@ def getGpsConnection():
     loop = QEventLoop()
 
     def gpsDetected(connection):
-        gpsConnection = connection
+        gpsConnection = connection  # NOQA
         loop.exit()
 
     def gpsDetectionFailed():
@@ -31,11 +32,13 @@ def getGpsConnection():
     gpsDetector.detectionFailed.connect(gpsDetectionFailed)
     gpsDetector.advance()
     loop.exec_()
-    
+
     return gpsConnection
+
 
 def getMockupGpsConnection():
     return GpsConnection()
+
 
 class GpsConnection(QObject):
 
@@ -56,5 +59,3 @@ class GpsConnection(QObject):
         info.elevation = 200
 
         return info
-
-

@@ -9,15 +9,12 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsProject,
-    QgsPointXY,
-    QgsGpsDetector,
-    QgsSettings,
+    QgsPointXY
 )
 
 from kadasrouting.utilities import (
     icon,
-    pushWarning,
-    waitcursor,
+    pushWarning
 )
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
@@ -25,14 +22,6 @@ from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 from kadasrouting.gui.autocompletewidget import AutoCompleteWidget
 
 from kadas.kadasgui import (
-    KadasSearchBox,
-    KadasCoordinateSearchProvider,
-    KadasLocationSearchProvider,
-    KadasLocalDataSearchProvider,
-    KadasRemoteDataSearchProvider,
-    KadasWorldLocationSearchProvider,
-    KadasPinSearchProvider,
-    KadasSearchProvider,
     KadasMapCanvasItemManager,
     KadasPinItem,
     KadasItemPos,
@@ -40,8 +29,11 @@ from kadas.kadasgui import (
 
 from .gps import getGpsConnection
 
+<<<<<<< HEAD
 LOG = logging.getLogger(__name__)
 
+=======
+>>>>>>> test-flake8
 
 class WrongLocationException(Exception):
     pass

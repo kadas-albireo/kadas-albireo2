@@ -1,30 +1,22 @@
 import os
-import logging
 
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
-    KadasBottomBar, 
-    KadasPinItem, 
-    KadasItemPos, 
-    KadasMapCanvasItemManager, 
+    KadasBottomBar,
+    KadasMapCanvasItemManager,
     KadasLayerSelectionWidget
     )
-from kadasrouting.gui.locationinputwidget import LocationInputWidget, WrongLocationException
-from kadasrouting.utilities import iconPath, pushMessage, pushWarning
+from kadasrouting.gui.locationinputwidget import LocationInputWidget
+from kadasrouting.utilities import iconPath, pushMessage
 
 from qgis.utils import iface
-from qgis.core import (
-    Qgis,
-    QgsProject,
-    QgsCoordinateReferenceSystem,
-    )
 
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, RoutePointMapItem
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
 
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'tspbottombar.ui'))
+
 
 class TSPBottomBar(KadasBottomBar, WIDGET):
 
@@ -42,9 +34,9 @@ class TSPBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
-        self.layerSelector = KadasLayerSelectionWidget(canvas, iface.layerTreeView(),
-                                                        lambda x: isinstance(x, OptimalRouteLayer),
-                                                        self.createLayer)
+        self.layerSelector = KadasLayerSelectionWidget(
+            canvas, iface.layerTreeView(),
+            lambda x: isinstance(x, OptimalRouteLayer), self.createLayer)
         self.layerSelector.createLayerIfEmpty("TSP")
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
 

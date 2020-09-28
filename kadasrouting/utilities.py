@@ -20,7 +20,10 @@ from qgis.core import (
     Qgis,
 )
 
-tr = lambda x: QCoreApplication.translate("", x)
+
+def tr(x):
+    return QCoreApplication.translate("", x)
+
 
 def localeName():
     override_flag = QSettings().value(
@@ -33,6 +36,7 @@ def localeName():
         locale_name = str(locale_name).split('_')[0]
 
     return locale_name
+
 
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
@@ -153,13 +157,14 @@ class PolylineCodec(object):
             self._write(output, curr[0], prev[0], factor)
             self._write(output, curr[1], prev[1], factor)
 
-        return output.getvalue()  
+        return output.getvalue()
 
 def decodePolyline6(expression, precision=6, geojson=False):
     return PolylineCodec().decode(expression, precision, geojson)
 
 def encodePolyline6(coordinates, precision=6, geojson=False):
     return PolylineCodec().encode(coordinates, precision, geojson)
+
 
 def formatdist(d):
     if d is None:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-## Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
+# Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 from kadasrouting.utilities import encodePolyline6
@@ -40,8 +40,8 @@ class ValhallaClient:
     def isochrones(self, qgspoint, profile, costingOptions, intervals, colors):
         points = self.pointsFromQgsPoints([qgspoint])
         try:
-            response = self.connector.isochrones(points, profile, costingOptions, 
-                                                intervals, colors)
+            response = self.connector.isochrones(
+                points, profile, costingOptions, intervals, colors)
         except Valhalla400Exception as e:
             raise e
         except Exception as e:
