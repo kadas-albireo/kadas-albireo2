@@ -5,7 +5,7 @@ import logging
 
 from PyQt5 import uic
 
-from PyQt5.QtGui import QPixmap, QTransform, QPainter
+from PyQt5.QtGui import QPixmap, QTransform, QPainter, QColor
 
 from PyQt5.QtCore import Qt, QSize
 
@@ -39,8 +39,11 @@ from qgis.core import (
     QgsUnitTypes,
     QgsPointXY,
     QgsVectorLayer,
-    QgsWkbTypes
+    QgsWkbTypes,
+    QgsGeometry
 )
+
+from qgis.gui import QgsRubberBand
 
 LOG = logging.getLogger(__name__)
 
@@ -169,6 +172,10 @@ class NavigationPanel(BASE, WIDGET):
         self.waypointWidgets = []
         self.optimalRoutesCache = {}
 
+        self.rubberband = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.LineGeometry)
+        self.rubberband.setStrokeColor(QColor(150, 0, 0))
+        self.rubberband.setWidth(2)
+
     def show(self):
         super().show()
         self.startNavigation()
@@ -192,12 +199,17 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setCenter(canvasPoint)
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
+        self.rubberband.reset(QgsWkbTypes.LineGeometry)
 
         if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
             if feature:
                 geom = feature.geometry()
                 layer = self.getOptimalRouteLayerForGeometry(geom)
+                if layer is not None:
+                    rubbergeom = QgsGeometry(layer.geom)
+                    rubbergeom.transform(transform)
+                    self.rubberband.setToGeometry(rubbergeom)
 
         if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
@@ -246,9 +258,17 @@ class NavigationPanel(BASE, WIDGET):
             profile, costingOptions = vehicles.options_for_vehicle_reduced(
                 vehicles.vehicle_reduced_names().index(value))
             layer = OptimalRouteLayer("")
-            layer.updateFromPolyline(geom.asPolyline(), profile, costingOptions)
-            self.optimalRoutesCache[wkt] = layer
-            return layer
+            try:
+                if geom.isMultipart():
+                    polyline = geom.asMultiPolyline()
+                    line = polyline[0]
+                else:
+                    line = geom.asPolyline()
+                layer.updateFromPolyline(line, profile, costingOptions)
+                self.optimalRoutesCache[wkt] = layer
+                return layer
+            except Exception:
+                return
 
     def setCompass(self, heading, wpangle):
         compassPixmap = QPixmap(_icon_path("compass.png"))
@@ -360,6 +380,7 @@ class NavigationPanel(BASE, WIDGET):
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def stopNavigation(self):
+        self.rubberband.reset(QgsWkbTypes.LineGeometry)
         iface.mapCanvas().setRotation(0)
         iface.mapCanvas().refresh()
         if self.gpsConnection is not None:

@@ -204,7 +204,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
-            raise e
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
