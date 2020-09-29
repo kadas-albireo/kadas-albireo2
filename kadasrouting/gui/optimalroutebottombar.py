@@ -23,14 +23,9 @@ from kadasrouting.utilities import iconPath, pushWarning
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsFeatureRequest,
-    Qgis,
-    QgsProject,
-    QgsRectangle,
-    QgsGeometry
+    QgsProject
 )
 from qgis.gui import (
     QgsMapTool,
@@ -103,7 +98,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnNavigate.clicked.connect(self.navigate)
         self.btnAreasToAvoidClear.clicked.connect(self.clearAreasToAvoid)
-        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)        
+        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
 
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
@@ -190,15 +185,17 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
+        '''
         areasToAvoid = None
         if self.radioAreasToAvoidPolygon.isChecked():
             areasToAvoid = self.areasToAvoid
-        elif self.radioAreasToAvoidLayer.isChecked():            
+        elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
             if avoidLayer is not None:
                 geoms = [f.geometry() for f in avoidLayer.getFeatures()]
-                areasToAvoid = QgsGeometry.collectGeometry(geoms)        
+                areasToAvoid = QgsGeometry.collectGeometry(geoms)
         # TODO: use areas to avoid
+        '''
 
         if shortest:
             costingOptions["shortest"] = True
