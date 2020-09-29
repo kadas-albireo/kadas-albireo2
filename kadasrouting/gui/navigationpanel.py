@@ -176,6 +176,9 @@ class NavigationPanel(BASE, WIDGET):
         self.rubberband.setStrokeColor(QColor(150, 0, 0))
         self.rubberband.setWidth(2)
 
+        self.chkShowWarnings.setChecked(True)
+        self.warningShown = False
+
     def show(self):
         super().show()
         self.startNavigation()
@@ -215,12 +218,13 @@ class NavigationPanel(BASE, WIDGET):
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
             except NotInRouteException:
-                self.setMessage("You are not in the route")
+                self.setMessage(self.tr("You are not in the route"))
                 return
             self.setWidgetsVisibility(False)
             html = route_html_template.format(**maneuver)
             self.textBrowser.setHtml(html)
             self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
+            self.setWarnings(maneuver["distleft"])
         elif isinstance(layer, KadasItemLayer):
             waypoints = self.waypointsFromLayer(layer)
             if waypoints:
@@ -238,10 +242,17 @@ class NavigationPanel(BASE, WIDGET):
                 self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
                 self.labelWaypointName.setText(waypoint_name_html_template.format(name=waypointItem.name))
                 self.setWidgetsVisibility(True)
+                self.setWarnings(instructions["distleft"])
             else:
-                self.setMessage("Select a route or waypoint layer for navigation")
+                self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
         else:
-            self.setMessage("Select a route or waypoint layer for navigation")
+            self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
+
+    def setWarnings(self, dist):
+        WARNING_DISTANCE = 200
+        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < WARNING_DISTANCE):
+            pushMessage(self.tr("In {} meters you will arrive at your destination".format(int(dist))))
+            self.warningShown = True
 
     def getOptimalRouteLayerForGeometry(self, geom):
         wkt = geom.asWkt()
@@ -300,6 +311,7 @@ class NavigationPanel(BASE, WIDGET):
     def selectedWaypointChanged(self, current, previous):
         for item, w in self.waypointWidgets:
             w.setIsItemSelected(current == item)
+        self.warningShown = False
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def waypointsFromLayer(self, layer):
@@ -355,6 +367,7 @@ class NavigationPanel(BASE, WIDGET):
         self.centerPin = None
         self.waypointLayer = None
         self.currentGpsInformation = None
+        self.warningShown = False
 
         self.setMessage("Connecting to GPS...")
         self.gpsConnection = getMockupGpsConnection()
@@ -377,6 +390,7 @@ class NavigationPanel(BASE, WIDGET):
 
     def currentLayerChanged(self, layer):
         self.waypointLayer = None
+        self.warningShown = False
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def stopNavigation(self):
@@ -385,8 +399,12 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().refresh()
         if self.gpsConnection is not None:
             self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
-        if self.centerPin is not None:
-            KadasMapCanvasItemManager.removeItem(self.centerPin)
+        try:
+            if self.centerPin is not None:
+                KadasMapCanvasItemManager.removeItem(self.centerPin)
+        except Exception:
+            # centerPin might have been deleted
+            pass
         self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
 
 

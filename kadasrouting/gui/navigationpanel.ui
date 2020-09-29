@@ -61,6 +61,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QCheckBox" name="chkShowWarnings">
+     <property name="text">
+      <string>Show Navigation Warnings</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
