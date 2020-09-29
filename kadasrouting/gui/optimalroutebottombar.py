@@ -57,6 +57,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.canvas = canvas
         self.waypoints = []
         self.waypointPins = []
+        self.areasToAvoid = None
 
         self.btnAddWaypoints.setIcon(QIcon(":/kadas/icons/add"))
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
@@ -102,8 +103,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnNavigate.clicked.connect(self.navigate)
         self.btnAreasToAvoidClear.clicked.connect(self.clearAreasToAvoid)
-        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
-        self.btnAreasToAvoidFromLayer.toggled.connect(self.setPolygonSelectionMapTool)
+        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)        
 
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
@@ -112,12 +112,31 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.areasToAvoidFootprint.setStrokeColor(AVOID_AREA_COLOR)
         self.areasToAvoidFootprint.setWidth(2)
 
-        self.updateAreasToAvoidLabel()
+        self.populateLayerSelector()
+        self.radioAreasToAvoidPolygon.toggled.connect(self._radioButtonsChanged)
+        self.radioAreasToAvoidLayer.toggled.connect(self._radioButtonsChanged)
+        self.radioAreasToAvoidNone.toggled.connect(self._radioButtonsChanged)
+        self.radioAreasToAvoidNone.setChecked(True)
 
         # Handling HiDPI screen, perhaps we can make a ratio of the screen size
         size = QDesktopWidget().screenGeometry()
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size() * 1.5)
+
+    def populateLayerSelector(self):
+        for layer in QgsProject.instance().mapLayers().values():
+            if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.PolygonGeometry:
+                self.comboAreasToAvoidLayers.addItem(layer.name(), layer)
+
+    def _radioButtonsChanged(self):
+        self.comboAreasToAvoidLayers.setEnabled(self.radioAreasToAvoidLayer.isChecked())
+        self.btnAreasToAvoidFromCanvas.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
+        self.btnAreasToAvoidClear.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
+        if self.radioAreasToAvoidPolygon.isChecked():
+            if self.areasToAvoid is not None:
+                self.areasToAvoidFootprint.setToGeometry(self.areasToAvoid)
+        else:
+            self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def setPolygonDrawingMapTool(self, checked):
         if checked:
@@ -131,41 +150,19 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             except:
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
-    def setPolygonSelectionMapTool(self, checked):
-        if checked:
-            self.prevMapTool = iface.mapCanvas().mapTool()
-            self.mapToolSelectPolygon = SelectPolygonMapTool(iface.mapCanvas())
-            self.mapToolSelectPolygon.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
-            iface.mapCanvas().setMapTool(self.mapToolSelectPolygon)
-        else:
-            try:
-                iface.mapCanvas().setMapTool(self.prevMapTool)            
-            except:
-                iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
-
     def mapToolSet(self, new, old):
         if not isinstance(new, DrawPolygonMapTool):
             self.btnAreasToAvoidFromCanvas.blockSignals(True)
             self.btnAreasToAvoidFromCanvas.setChecked(False)
             self.btnAreasToAvoidFromCanvas.blockSignals(False)
-        if not isinstance(new, SelectPolygonMapTool):
-            self.btnAreasToAvoidFromLayer.blockSignals(True)
-            self.btnAreasToAvoidFromLayer.setChecked(False)
-            self.btnAreasToAvoidFromLayer.blockSignals(False)
 
     def clearAreasToAvoid(self):
+        self.areasToAvoid = None
         self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
-        self.updateAreasToAvoidLabel()
 
     def setAreasToAvoidFromPolygon(self, polygon):
+        self.areasToAvoid = polygon
         self.areasToAvoidFootprint.setToGeometry(polygon)
-        self.updateAreasToAvoidLabel()
-
-    def updateAreasToAvoidLabel(self):
-        if self.areasToAvoidFootprint.size():
-            self.labelAreasToAvoid.setText(self.tr("A polygon with an area to avoid has been defined"))
-        else:
-            self.labelAreasToAvoid.setText(self.tr("No areas to avoid have been defined"))
 
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)
@@ -192,6 +189,14 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
+        areasToAvoid = None
+        if self.radioAreasToAvoidPolygon.isChecked():
+            areasToAvoid = self.areasToAvoid
+        elif self.radioAreasToAvoidLayer.isChecked():            
+            avoidLayer = self.comboAreasToAvoidLayers.currentData()
+            if avoidLayer is not None:
+                geoms = [f.geometry() for f in avoidLayer.getFeatures()]
+                areasToAvoid = QgsGeometry.collectGeometry(geoms)        
         #TODO: use areas to avoid
 
         if shortest:
@@ -201,6 +206,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
+            raise e
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
@@ -297,7 +303,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.clearPins()
             self.clearAreasToAvoid()
             self.setPolygonDrawingMapTool(False)
-            self.setPolygonSelectionMapTool(False)
 
 RB_STROKE = QColor(204, 235, 239, 255)
 RB_FILL = QColor(204, 235, 239, 100)
@@ -358,44 +363,6 @@ class DrawPolygonMapTool(QgsMapTool):
 
     def deactivate(self):
         QgsMapTool.deactivate(self)
+        if self.rubberBand is not None:
+            self.rubberBand.reset(QgsWkbTypes.PolygonGeometry)
         self.deactivated.emit()
-
-class SelectPolygonMapTool(QgsMapTool):
-    
-    polygonSelected = pyqtSignal(object)
-
-    def __init__(self, canvas):
-        QgsMapTool.__init__(self, canvas)
-
-        self.canvas = canvas
-        self.cursor = Qt.CrossCursor
-
-    def activate(self):
-        self.canvas.setCursor(self.cursor)
-
-    def canvasPressEvent(self, e):
-        layer = iface.activeLayer()
-        if not isinstance(layer, QgsVectorLayer) or layer.geometryType() != QgsWkbTypes.PolygonGeometry:
-            iface.messageBar().pushMessage("No layer selected or the current active layer is not a valid polygon layer",
-                                                  level = Qgis.Warning, duration = 5)
-            return
-
-        point = self.toMapCoordinates(e.pos())
-        searchRadius = self.canvas.extent().width() * .001
-        r = QgsRectangle()
-        r.setXMinimum(point.x() - searchRadius)
-        r.setXMaximum(point.x() + searchRadius)
-        r.setYMinimum(point.y() - searchRadius)
-        r.setYMaximum(point.y() + searchRadius)
-        r = self.toLayerCoordinates(layer, r)
-
-        features = (layer.getFeatures(QgsFeatureRequest().setFilterRect(r)
-                                .setFlags(QgsFeatureRequest.ExactIntersect)))
-        feature = next(features, None)
-        if feature is not None:
-            canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
-            layerCrs = layer.crs()
-            transform = QgsCoordinateTransform(layerCrs, canvasCrs, QgsProject.instance())
-            canvasGeom = QgsGeometry(feature.geometry())
-            canvasGeom.transform(transform)
-            self.polygonSelected.emit(canvasGeom)
