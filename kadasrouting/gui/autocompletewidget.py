@@ -1,9 +1,9 @@
 import json
 import logging
-from PyQt5.QtCore import Qt, pyqtSignal, QEventLoop, QUrl, QUrlQuery
+from PyQt5.QtCore import Qt, pyqtSignal, QUrl, QUrlQuery
 from PyQt5.QtCore import QObject, QTimer, QEvent, QPoint, QMetaObject
-from PyQt5.QtWidgets import QTreeWidget, QLineEdit, QApplication, QFrame, QTreeWidgetItem
-from PyQt5.QtNetwork import QNetworkAccessManager,QNetworkRequest, QNetworkReply
+from PyQt5.QtWidgets import QTreeWidget, QLineEdit, QFrame, QTreeWidgetItem
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtGui import QPalette
 
 from kadasrouting.utilities import strip_tags
@@ -22,28 +22,28 @@ class SuggestCompletion(QObject):
         # editor (a QLineEdit)
         self._editor = parent
         # pop up
-        self._popup = QTreeWidget();
+        self._popup = QTreeWidget()
         self._popup.setWindowFlags(Qt.Popup)
         self._popup.setFocusProxy(self._parent)
-        self._popup.setMouseTracking(True);
-        self._popup.setColumnCount(1);
-        self._popup.setUniformRowHeights(True);
-        self._popup.setRootIsDecorated(False);
-        self._popup.setEditTriggers(QTreeWidget.NoEditTriggers);
-        self._popup.setSelectionBehavior(QTreeWidget.SelectRows);
-        self._popup.setFrameStyle(QFrame.Box | QFrame.Plain);
-        self._popup.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff);
-        self._popup.header().hide();
+        self._popup.setMouseTracking(True)
+        self._popup.setColumnCount(1)
+        self._popup.setUniformRowHeights(True)
+        self._popup.setRootIsDecorated(False)
+        self._popup.setEditTriggers(QTreeWidget.NoEditTriggers)
+        self._popup.setSelectionBehavior(QTreeWidget.SelectRows)
+        self._popup.setFrameStyle(QFrame.Box | QFrame.Plain)
+        self._popup.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._popup.header().hide()
         # timer
         self._timer = None
-        self._timer = QTimer(self);
-        self._timer.setSingleShot(True);
-        self._timer.setInterval(500);
+        self._timer = QTimer(self)
+        self._timer.setSingleShot(True)
+        self._timer.setInterval(500)
         # network manager
         self._network_manager = QNetworkAccessManager(self)
 
         # signal and slot
-        self._popup.installEventFilter(self);
+        self._popup.installEventFilter(self)
         self._popup.itemClicked.connect(self.done_completion)
         self._timer.timeout.connect(self.auto_suggest)
         self._editor.textEdited.connect(self._timer.start)
@@ -147,7 +147,6 @@ class SuggestCompletion(QObject):
             if data.get('status') != 'error':
                 for location in data['results']:
                     attributes = location.get('attrs', {})
-                    label = attributes.get('label', 'Unknown label')
                     choice = {
                         'label': attributes.get('label', 'Unknown label'),
                         'lon': attributes.get('lon', 0.0),
@@ -167,7 +166,8 @@ class SuggestCompletion(QObject):
             except Exception as e:
                 LOG.debug(e)
                 self.error.emit(network_reply.errorString())
-        network_reply.deleteLater();
+        network_reply.deleteLater()
+
 
 class AutoCompleteWidget(QLineEdit):
 
@@ -176,6 +176,6 @@ class AutoCompleteWidget(QLineEdit):
 
     def __init__(self, parent=None):
         super(AutoCompleteWidget, self).__init__(parent)
-        self._completer = SuggestCompletion(self);
+        self._completer = SuggestCompletion(self)
         self._completer.finished.connect(self.finished.emit)
         self._completer.error.connect(self.error.emit)

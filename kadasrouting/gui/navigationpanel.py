@@ -1,6 +1,7 @@
 import os
 import math
 import datetime
+import logging
 
 from PyQt5 import uic
 
@@ -9,27 +10,23 @@ from PyQt5.QtGui import QPixmap, QTransform, QPainter
 from PyQt5.QtCore import Qt, QSize
 
 from PyQt5.QtWidgets import (
-    QTextBrowser, 
-    QListWidgetItem, 
+    QListWidgetItem,
     QListWidget,
-    QWidget,
     QLabel,
-    QVBoxLayout,
     QInputDialog
 )
 
-from kadas.kadasgui import (    
+from kadas.kadasgui import (
     KadasPinItem,
     KadasItemPos,
+    KadasItemLayer,
     KadasMapCanvasItemManager,
     KadasPluginInterface,
-    KadasGpxWaypointItem,
-    KadasItemLayer)
+    KadasGpxWaypointItem)
 
-from kadasrouting.utilities import pushWarning, formatdist
-from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
+from kadasrouting.utilities import formatdist
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadasrouting.gui.gps import getGpsConnection, getMockupGpsConnection
+from kadasrouting.gui.gps import getMockupGpsConnection
 from kadasrouting.core import vehicles
 
 from qgis.utils import iface
@@ -41,23 +38,26 @@ from qgis.core import (
     QgsDistanceArea,
     QgsUnitTypes,
     QgsPointXY,
-    QgsPoint,
-    QgsRectangle,
     QgsVectorLayer,
     QgsWkbTypes
 )
+
+LOG = logging.getLogger(__name__)
 
 route_html_template = '''
 <table border="0" style="border-collapse: collapse; width: 100%; height: 100%;">
 <tbody>
 <tr>
 <td style="width: 100%; background-color: #333f4f; text-align: center;">
-<p><img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" /></p>
+git<p>
+<img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" />
+</p>
 <h3 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h3>
 </td>
 </tr>
 <tr>
-<td style="width: 100%; background-color: #adb9ca; text-align: center;"><img src="{icon2}" width="32" height="32" />&nbsp;{dist2}<br/> {message2}</td>
+<td style="width: 100%; background-color: #adb9ca; text-align: center;">
+<img src="{icon2}" width="32" height="32" />&nbsp;{dist2}<br/> {message2}</td>
 </tr>
 <tr>
 <td style="width: 100%; background-color: #44546a;">
@@ -81,8 +81,10 @@ waypoint_html_template = '''
 <tr>
 <td style="width: 100%; background-color: #44546a;">
 <p style="text-align: center;">
-<span style="color: yellow; font-size:14pt;">Ground Heading </span><span style="color: #ffffff;"> {heading:.0f}°</span><br/>
-<span style="color: #adb9ca; font-size:14pt;">WP Angle </span><span style="color: #ffffff;"> {wpangle:.0f}°</span><br />
+<span style="color: yellow; font-size:14pt;">Ground Heading </span>
+<span style="color: #ffffff;"> {heading:.0f}°</span><br/>
+<span style="color: #adb9ca; font-size:14pt;">WP Angle </span>
+<span style="color: #ffffff;"> {wpangle:.0f}°</span><br />
 <span style="color: #ffffff;">Dist {distleft}</span><br />
 <span style="color: #ffffff;">Speed {speed:.2f} km/h</span><br />
 <span style="color: #ffffff;">ETA {eta}</span></p>
@@ -120,6 +122,7 @@ WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "navigationpanel.ui")
 )
 
+
 def _icon_path(name):
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),
                         "icons", name)
@@ -128,8 +131,8 @@ def _icon_path(name):
 def getInstructionsToWaypoint(waypoint, gpsinfo):
     point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
     qgsdistance = QgsDistanceArea()
-    qgsdistance.setSourceCrs(QgsCoordinateReferenceSystem(4326),
-                            QgsProject.instance().transformContext())
+    qgsdistance.setSourceCrs(
+        QgsCoordinateReferenceSystem(4326), QgsProject.instance().transformContext())
     qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
     wpangle = math.degrees(qgsdistance.bearing(point, waypoint))
     dist = qgsdistance.convertLengthMeasurement(
@@ -137,7 +140,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
                                         QgsUnitTypes.DistanceMeters)
 
     timeleft = dist / 1000 / gpsinfo.speed * 3600
-    delta = datetime.timedelta(seconds = timeleft)
+    delta = datetime.timedelta(seconds=timeleft)
     eta = datetime.datetime.now() + delta
     eta_string = eta.strftime("%H:%M")
 
@@ -151,7 +154,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
 class NavigationPanel(BASE, WIDGET):
 
     FIXED_WIDTH = 200
-    
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -185,17 +188,17 @@ class NavigationPanel(BASE, WIDGET):
         canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
         canvasPoint = transform.transform(point)
-        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))        
+        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
         iface.mapCanvas().setCenter(canvasPoint)
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
 
         if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
-            if feature:                            
+            if feature:
                 geom = feature.geometry()
                 layer = self.getOptimalRouteLayerForGeometry(geom)
-                
+
         if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
@@ -232,17 +235,20 @@ class NavigationPanel(BASE, WIDGET):
         wkt = geom.asWkt()
         if wkt in self.optimalRoutesCache:
             return self.optimalRoutesCache[wkt]
-        
+
         name = self.iface.activeLayer().name()
-        value, ok = QInputDialog.getItem(iface.mainWindow(), f"Navigation", f"Select Vehicle to use with layer '{name}'",
-                                         vehicles.vehicle_reduced_names())
+        value, ok = QInputDialog.getItem(
+            iface.mainWindow(),
+            "Navigation",
+            "Select Vehicle to use with layer '{name}'".format(name=name),
+            vehicles.vehicle_reduced_names())
         if ok:
-            profile, costingOptions = vehicles.options_for_vehicle_reduced(vehicles.vehicle_reduced_names().index(value))
+            profile, costingOptions = vehicles.options_for_vehicle_reduced(
+                vehicles.vehicle_reduced_names().index(value))
             layer = OptimalRouteLayer("")
             layer.updateFromPolyline(geom.asPolyline(), profile, costingOptions)
             self.optimalRoutesCache[wkt] = layer
             return layer
-
 
     def setCompass(self, heading, wpangle):
         compassPixmap = QPixmap(_icon_path("compass.png"))
@@ -256,13 +262,13 @@ class NavigationPanel(BASE, WIDGET):
         transform.rotate(-heading)
         transform.translate(-self.FIXED_WIDTH / 2, -self.FIXED_WIDTH / 2)
         painter.setTransform(transform)
-        painter.drawPixmap(0, 0, self.FIXED_WIDTH, self.FIXED_WIDTH, compassPixmap);
+        painter.drawPixmap(0, 0, self.FIXED_WIDTH, self.FIXED_WIDTH, compassPixmap)
         transform = QTransform()
         transform.translate(self.FIXED_WIDTH / 2, self.FIXED_WIDTH / 2)
         transform.rotate(wpangle-heading)
         transform.translate(-self.FIXED_WIDTH / 2, -self.FIXED_WIDTH / 2)
         painter.setTransform(transform)
-        painter.drawPixmap(0, 0, self.FIXED_WIDTH, self.FIXED_WIDTH, bearingPixmap);
+        painter.drawPixmap(0, 0, self.FIXED_WIDTH, self.FIXED_WIDTH, bearingPixmap)
         painter.end()
         self.labelCompass.setPixmap(pixmap)
         self.labelCompass.resize(QSize(self.FIXED_WIDTH, self.FIXED_WIDTH))
@@ -276,7 +282,7 @@ class NavigationPanel(BASE, WIDGET):
             w.setIsItemSelected(current == item)
         self.updateNavigationInfo(self.currentGpsInformation)
 
-    def waypointsFromLayer(self, layer):     
+    def waypointsFromLayer(self, layer):
         try:
             '''
             center = iface.mapCanvas().center()
@@ -284,19 +290,20 @@ class NavigationPanel(BASE, WIDGET):
             canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
             transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
             wgspoint = transform.transform(center)
-            item = KadasGpxWaypointItem()            
+            item = KadasGpxWaypointItem()
             item.addPartFromGeometry(QgsPoint(wgspoint.x() + 10, wgspoint.y() + 10))
             item.setName("Test Waypoint")
-            item2 = KadasGpxWaypointItem()            
+            item2 = KadasGpxWaypointItem()
             item2.addPartFromGeometry(QgsPoint(wgspoint.x() + 10, wgspoint.y() + 10))
             item2.setName("Another Waypoint")
-            item3 = KadasGpxWaypointItem()            
+            item3 = KadasGpxWaypointItem()
             item3.addPartFromGeometry(QgsPoint(wgspoint.x() + 10, wgspoint.y() + 10))
             item3.setName("My Waypoint")
             return [item, item2, item3]
             '''
             return [item for item in layer.items() if isinstance(item, KadasGpxWaypointItem)]
         except Exception as e:
+            LOG.warning(e)
             return []
 
     def populateWaypoints(self, waypoints):
@@ -314,28 +321,28 @@ class NavigationPanel(BASE, WIDGET):
     def setMessage(self, text):
         self.setWidgetsVisibility(False)
         self.textBrowser.setHtml(message_html_template.format(text=text))
-        self.textBrowser.setFixedHeight(self.height()) 
+        self.textBrowser.setFixedHeight(self.height())
 
     def setWidgetsVisibility(self, iswaypoints):
         self.labelWaypointName.setVisible(iswaypoints)
         self.labelCompass.setVisible(iswaypoints)
         self.listWaypoints.setVisible(iswaypoints)
-        self.labelWaypoints.setVisible(False)#iswaypoints)
+        self.labelWaypoints.setVisible(False)  # iswaypoints)
         color = "#adb9ca" if iswaypoints else "#333f4f"
         self.textBrowser.setStyleSheet("background-color: {};".format(color))
-        
+
     def startNavigation(self):
         self.centerPin = None
         self.waypointLayer = None
         self.currentGpsInformation = None
-        
+
         self.setMessage("Connecting to GPS...")
         self.gpsConnection = getMockupGpsConnection()
         if self.gpsConnection is None:
             self.setMessage("Cannot connect to GPS")
         else:
             self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
-            self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))            
+            self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
             self.centerPin.setup(
                 _icon_path("navigationcenter.svg"),
                 self.centerPin.anchorX(),
@@ -343,7 +350,7 @@ class NavigationPanel(BASE, WIDGET):
                 32,
                 32,
             )
-            
+
             KadasMapCanvasItemManager.addItem(self.centerPin)
             self.updateNavigationInfo(self.gpsConnection.currentGPSInformation())
         self.iface.layerTreeView().currentLayerChanged.connect(self.currentLayerChanged)
@@ -352,7 +359,7 @@ class NavigationPanel(BASE, WIDGET):
         self.waypointLayer = None
         self.updateNavigationInfo(self.currentGpsInformation)
 
-    def stopNavigation(self):        
+    def stopNavigation(self):
         iface.mapCanvas().setRotation(0)
         iface.mapCanvas().refresh()
         if self.gpsConnection is not None:
@@ -370,6 +377,7 @@ class WaypointItem(QListWidgetItem):
         self.point = QgsPointXY(pos.x(), pos.y())
         self.name = waypoint.name()
 
+
 class WaypointItemWidget(QLabel):
 
     def __init__(self, waypoint, gpsinfo):
@@ -378,7 +386,7 @@ class WaypointItemWidget(QLabel):
         self.setStyleSheet("background-color: #44546a;")
         self.waypoint = waypoint
         self.selected = False
-        self.setWaypointText(gpsinfo)        
+        self.setWaypointText(gpsinfo)
 
     def setWaypointText(self, gpsinfo):
         self.gpsinfo = gpsinfo
@@ -388,11 +396,10 @@ class WaypointItemWidget(QLabel):
         template = waypoint_miniature_selected_html_template if self.selected else waypoint_miniature_html_template
         self.setText(template.format(
                 name=self.waypoint.name(),
-                wpangle = instructions["wpangle"], 
+                wpangle=instructions["wpangle"],
                 dist=instructions["distleft"]))
         return
-        
+
     def setIsItemSelected(self, selected):
         self.selected = selected
         self.setWaypointText(self.gpsinfo)
-

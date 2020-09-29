@@ -18,6 +18,7 @@ HEIGHT = "height_m"
 LENGTH = "length_m"
 WIDTH = "width_m"
 
+
 def read_vehicles():
     global _vehicles
     _vehicles = []
@@ -31,14 +32,17 @@ def read_vehicles():
                 columns = [s for s in row]
                 first = False
             else:
-                _vehicles.append({k:v for k,v in zip(columns, row)})
+                _vehicles.append({k: v for k, v in zip(columns, row)})
     _vehicles_reduced = [v for v in _vehicles if v["type_en"] in VEHICLE_REDUCED_NAMES]
+
 
 def vehicle_names():
     return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles]
 
+
 def vehicles():
     return _vehicles
+
 
 def options_for_vehicle(i):
     vehicle = _vehicles[i]
@@ -50,16 +54,20 @@ def options_for_vehicle(i):
                            "length": vehicle[LENGTH]}
     return profile, costing_options
 
+
 def vehicle_reduced_names():
     return [v.get(vehicle_name_column, v["type_en"]) for v in _vehicles_reduced]
+
 
 def vehicles_reduced():
     return _vehicles_reduced
 
+
 def options_for_vehicle_reduced(i):
     vehicle = _vehicles_reduced[i]
     profile = vehicle[COST_MODEL]
-    costing_options = {}    
+    costing_options = {}
     return profile, costing_options
+
 
 read_vehicles()

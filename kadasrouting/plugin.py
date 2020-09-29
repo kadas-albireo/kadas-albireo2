@@ -4,16 +4,15 @@ import logging
 from functools import partial
 
 from PyQt5.QtCore import QObject, QSettings
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
 from qgis.utils import iface
 
-from qgis.core import QgsPluginLayerRegistry, QgsApplication
+from qgis.core import QgsApplication
 
 from kadas.kadasgui import KadasPluginInterface
 
-from kadasrouting.utilities import icon, pushWarning
+from kadasrouting.utilities import icon
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
@@ -62,11 +61,12 @@ class RoutingPlugin(QObject):
         self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
         self.iface.addAction(self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
-        self.actionsToggled = {self.navigationAction: self.showNavigation,
-                                self.reachabilityAction: self.showReachability,
-                                self.optimalRouteAction: self.showOptimalRoute
-                                # self.tspAction: self.showTSP
-                                }
+        self.actionsToggled = {
+            self.navigationAction: self.showNavigation,
+            self.reachabilityAction: self.showReachability,
+            self.optimalRouteAction: self.showOptimalRoute
+            # self.tspAction: self.showTSP
+            }
         for action in self.actionsToggled:
             action.setCheckable(True)
             action.toggled.connect(partial(self._showPanel, action))
@@ -136,6 +136,7 @@ class RoutingPlugin(QObject):
         if show:
             if self.navigationPanel is None:
                 self.navigationPanel = NavigationPanel()
+
                 def _resize():
                     x = self.iface.mapCanvas().width() - self.navigationPanel.FIXED_WIDTH
                     y = self.iface.mapCanvas().height() / 3
