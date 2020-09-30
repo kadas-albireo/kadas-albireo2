@@ -52,7 +52,7 @@ route_html_template = '''
 <tbody>
 <tr>
 <td style="width: 100%; background-color: #333f4f; text-align: center;">
-git<p>
+<p>
 <img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" />
 </p>
 <h3 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h3>
