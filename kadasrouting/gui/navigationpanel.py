@@ -24,7 +24,7 @@ from kadas.kadasgui import (
     KadasPluginInterface,
     KadasGpxWaypointItem)
 
-from kadasrouting.utilities import formatdist, pushMessage
+from kadasrouting.utilities import formatdist, pushMessage, iconPath
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
 from kadasrouting.gui.gps import getMockupGpsConnection
 from kadasrouting.core import vehicles
@@ -124,10 +124,6 @@ message_html_template = '''
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "navigationpanel.ui")
 )
-
-
-def _icon_path(name):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", name)
 
 
 def getInstructionsToWaypoint(waypoint, gpsinfo):
@@ -291,9 +287,9 @@ class NavigationPanel(BASE, WIDGET):
                 return
 
     def setCompass(self, heading, wpangle):
-        compassPixmap = QPixmap(_icon_path("compass.png"))
+        compassPixmap = QPixmap(iconPath("compass.png"))
         compassPixmap = compassPixmap.scaledToWidth(self.FIXED_WIDTH)
-        bearingPixmap = QPixmap(_icon_path("direction.png"))
+        bearingPixmap = QPixmap(iconPath("direction.png"))
         pixmap = QPixmap(self.FIXED_WIDTH, self.FIXED_WIDTH)
         pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)
@@ -386,7 +382,7 @@ class NavigationPanel(BASE, WIDGET):
             self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
             self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
             self.centerPin.setup(
-                _icon_path("navigationcenter.svg"),
+                iconPath("navigationcenter.svg"),
                 self.centerPin.anchorX(),
                 self.centerPin.anchorX(),
                 32,
