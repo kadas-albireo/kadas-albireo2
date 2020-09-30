@@ -24,7 +24,7 @@ from kadas.kadasgui import (
     KadasPluginInterface,
     KadasGpxWaypointItem)
 
-from kadasrouting.utilities import formatdist
+from kadasrouting.utilities import formatdist, pushMessage
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
 from kadasrouting.gui.gps import getMockupGpsConnection
 from kadasrouting.core import vehicles
