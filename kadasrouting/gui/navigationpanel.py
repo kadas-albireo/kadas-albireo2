@@ -127,8 +127,7 @@ WIDGET, BASE = uic.loadUiType(
 
 
 def _icon_path(name):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                        "icons", name)
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", name)
 
 
 def getInstructionsToWaypoint(waypoint, gpsinfo):
@@ -158,6 +157,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
 class NavigationPanel(BASE, WIDGET):
 
     FIXED_WIDTH = 200
+    WARNING_DISTANCE = 200
 
     def __init__(self):
         super().__init__()
@@ -197,7 +197,7 @@ class NavigationPanel(BASE, WIDGET):
         self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
         self.currentGpsInformation = gpsinfo
         if gpsinfo is None:
-            self.setMessage("Cannot connect to GPS")
+            self.setMessage(self.tr("Cannot connect to GPS"))
             return
         layer = self.iface.activeLayer()
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
@@ -259,9 +259,8 @@ class NavigationPanel(BASE, WIDGET):
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
 
     def setWarnings(self, dist):
-        WARNING_DISTANCE = 200
-        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < WARNING_DISTANCE):
-            pushMessage(self.tr("In {} meters you will arrive at your destination".format(int(dist))))
+        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < self.WARNING_DISTANCE):
+            pushMessage(self.tr("In {dist} meters you will arrive at your destination").format(dist=int(dist)))
             self.warningShown = True
 
     def getOptimalRouteLayerForGeometry(self, geom):
@@ -272,8 +271,8 @@ class NavigationPanel(BASE, WIDGET):
         name = self.iface.activeLayer().name()
         value, ok = QInputDialog.getItem(
             iface.mainWindow(),
-            "Navigation",
-            "Select Vehicle to use with layer '{name}'".format(name=name),
+            self.tr("Navigation"),
+            self.tr("Select Vehicle to use with layer '{name}'").format(name=name),
             vehicles.vehicle_reduced_names())
         if ok:
             profile, costingOptions = vehicles.options_for_vehicle_reduced(
@@ -379,10 +378,10 @@ class NavigationPanel(BASE, WIDGET):
         self.currentGpsInformation = None
         self.warningShown = False
 
-        self.setMessage("Connecting to GPS...")
+        self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getMockupGpsConnection()
         if self.gpsConnection is None:
-            self.setMessage("Cannot connect to GPS")
+            self.setMessage(self.tr("Cannot connect to GPS"))
         else:
             self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
             self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
