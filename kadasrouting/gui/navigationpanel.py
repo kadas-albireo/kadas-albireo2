@@ -228,7 +228,7 @@ class NavigationPanel(BASE, WIDGET):
             html = route_html_template.format(**maneuver)
             self.textBrowser.setHtml(html)
             self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
-            self.setWarnings(maneuver["distleft"])
+            self.setWarnings(maneuver["raw_distleft"])
         elif isinstance(layer, KadasItemLayer):
             waypoints = self.waypointsFromLayer(layer)
             if waypoints:
@@ -253,7 +253,6 @@ class NavigationPanel(BASE, WIDGET):
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
 
     def setWarnings(self, dist):
-        return
         WARNING_DISTANCE = 200
         if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < WARNING_DISTANCE):
             pushMessage(self.tr("In {} meters you will arrive at your destination".format(int(dist))))

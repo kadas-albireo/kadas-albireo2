@@ -71,5 +71,4 @@ class GpsConnection(QObject):
         return info
 
     def currentLocationChanged(self):
-        LOG.debug('Current GPS location is changed')
         self.statusChanged.emit(self.currentGPSInformation())

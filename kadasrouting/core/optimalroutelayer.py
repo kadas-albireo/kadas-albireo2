@@ -297,6 +297,7 @@ class OptimalRouteLayer(KadasItemLayer):
                                     dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
                                     speed=speed, timeleft=timeleft_string,
                                     distleft=formatdist(distanceleft),
+                                    raw_distleft=distanceleft,
                                     eta=eta_string, x=closest_point.x(), y=closest_point.y())
                     return maneuver
 
