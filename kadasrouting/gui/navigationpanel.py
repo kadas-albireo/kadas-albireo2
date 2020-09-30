@@ -188,6 +188,8 @@ class NavigationPanel(BASE, WIDGET):
         self.stopNavigation()
 
     def updateNavigationInfo(self, gpsinfo):
+        # prevent infinite loop for mocked gps
+        self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
         self.currentGpsInformation = gpsinfo
         if gpsinfo is None:
             self.setMessage("Cannot connect to GPS")
@@ -203,6 +205,8 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
+
+        self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
 
         if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
@@ -249,6 +253,7 @@ class NavigationPanel(BASE, WIDGET):
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
 
     def setWarnings(self, dist):
+        return
         WARNING_DISTANCE = 200
         if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < WARNING_DISTANCE):
             pushMessage(self.tr("In {} meters you will arrive at your destination".format(int(dist))))
@@ -398,7 +403,10 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(0)
         iface.mapCanvas().refresh()
         if self.gpsConnection is not None:
-            self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
+            try:
+                self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
+            except TypeError:
+                pass
         try:
             if self.centerPin is not None:
                 KadasMapCanvasItemManager.removeItem(self.centerPin)
