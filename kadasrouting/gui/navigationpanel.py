@@ -178,6 +178,10 @@ class NavigationPanel(BASE, WIDGET):
 
         self.chkShowWarnings.setChecked(True)
         self.warningShown = False
+        self.iface.messageBar().widgetRemoved.connect(self.setWarningShownOff)
+
+    def setWarningShownOff(self):
+        self.warningShown = False
 
     def show(self):
         super().show()
