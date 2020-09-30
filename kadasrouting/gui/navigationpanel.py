@@ -150,6 +150,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
     return {"heading": gpsinfo.direction,
             "wpangle": wpangle,
             "distleft": formatdist(dist),
+            "raw_distleft": dist,
             "speed": gpsinfo.speed,
             "eta": eta_string}
 
@@ -225,6 +226,7 @@ class NavigationPanel(BASE, WIDGET):
         if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
+                LOG.debug(maneuver)
             except NotInRouteException:
                 self.setMessage(self.tr("You are not in the route"))
                 return
@@ -250,7 +252,7 @@ class NavigationPanel(BASE, WIDGET):
                 self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
                 self.labelWaypointName.setText(waypoint_name_html_template.format(name=waypointItem.name))
                 self.setWidgetsVisibility(True)
-                self.setWarnings(instructions["distleft"])
+                self.setWarnings(instructions["raw_distleft"])
             else:
                 self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
         else:
