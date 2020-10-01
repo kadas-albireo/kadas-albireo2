@@ -24,7 +24,7 @@ from kadas.kadasgui import (
     KadasPluginInterface,
     KadasGpxWaypointItem)
 
-from kadasrouting.utilities import formatdist
+from kadasrouting.utilities import formatdist, pushMessage, iconPath
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
 from kadasrouting.gui.gps import getMockupGpsConnection
 from kadasrouting.core import vehicles
@@ -52,7 +52,7 @@ route_html_template = '''
 <tbody>
 <tr>
 <td style="width: 100%; background-color: #333f4f; text-align: center;">
-git<p>
+<p>
 <img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" />
 </p>
 <h3 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h3>
@@ -126,11 +126,6 @@ WIDGET, BASE = uic.loadUiType(
 )
 
 
-def _icon_path(name):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                        "icons", name)
-
-
 def getInstructionsToWaypoint(waypoint, gpsinfo):
     point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
     qgsdistance = QgsDistanceArea()
@@ -150,6 +145,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
     return {"heading": gpsinfo.direction,
             "wpangle": wpangle,
             "distleft": formatdist(dist),
+            "raw_distleft": dist,
             "speed": gpsinfo.speed,
             "eta": eta_string}
 
@@ -157,6 +153,7 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
 class NavigationPanel(BASE, WIDGET):
 
     FIXED_WIDTH = 200
+    WARNING_DISTANCE = 200
 
     def __init__(self):
         super().__init__()
@@ -176,6 +173,13 @@ class NavigationPanel(BASE, WIDGET):
         self.rubberband.setStrokeColor(QColor(150, 0, 0))
         self.rubberband.setWidth(2)
 
+        self.chkShowWarnings.setChecked(True)
+        self.warningShown = False
+        self.iface.messageBar().widgetRemoved.connect(self.setWarningShownOff)
+
+    def setWarningShownOff(self):
+        self.warningShown = False
+
     def show(self):
         super().show()
         self.startNavigation()
@@ -185,9 +189,11 @@ class NavigationPanel(BASE, WIDGET):
         self.stopNavigation()
 
     def updateNavigationInfo(self, gpsinfo):
+        # prevent infinite loop for mocked gps
+        self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
         self.currentGpsInformation = gpsinfo
         if gpsinfo is None:
-            self.setMessage("Cannot connect to GPS")
+            self.setMessage(self.tr("Cannot connect to GPS"))
             return
         layer = self.iface.activeLayer()
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
@@ -200,6 +206,8 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(-gpsinfo.direction)
         iface.mapCanvas().refresh()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
+
+        self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
 
         if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
@@ -214,13 +222,15 @@ class NavigationPanel(BASE, WIDGET):
         if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
+                LOG.debug(maneuver)
             except NotInRouteException:
-                self.setMessage("You are not in the route")
+                self.setMessage(self.tr("You are not in the route"))
                 return
             self.setWidgetsVisibility(False)
             html = route_html_template.format(**maneuver)
             self.textBrowser.setHtml(html)
             self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
+            self.setWarnings(maneuver["raw_distleft"])
         elif isinstance(layer, KadasItemLayer):
             waypoints = self.waypointsFromLayer(layer)
             if waypoints:
@@ -238,10 +248,16 @@ class NavigationPanel(BASE, WIDGET):
                 self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
                 self.labelWaypointName.setText(waypoint_name_html_template.format(name=waypointItem.name))
                 self.setWidgetsVisibility(True)
+                self.setWarnings(instructions["raw_distleft"])
             else:
-                self.setMessage("Select a route or waypoint layer for navigation")
+                self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
         else:
-            self.setMessage("Select a route or waypoint layer for navigation")
+            self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
+
+    def setWarnings(self, dist):
+        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < self.WARNING_DISTANCE):
+            pushMessage(self.tr("In {dist} meters you will arrive at your destination").format(dist=int(dist)))
+            self.warningShown = True
 
     def getOptimalRouteLayerForGeometry(self, geom):
         wkt = geom.asWkt()
@@ -251,8 +267,8 @@ class NavigationPanel(BASE, WIDGET):
         name = self.iface.activeLayer().name()
         value, ok = QInputDialog.getItem(
             iface.mainWindow(),
-            "Navigation",
-            "Select Vehicle to use with layer '{name}'".format(name=name),
+            self.tr("Navigation"),
+            self.tr("Select Vehicle to use with layer '{name}'").format(name=name),
             vehicles.vehicle_reduced_names())
         if ok:
             profile, costingOptions = vehicles.options_for_vehicle_reduced(
@@ -271,9 +287,9 @@ class NavigationPanel(BASE, WIDGET):
                 return
 
     def setCompass(self, heading, wpangle):
-        compassPixmap = QPixmap(_icon_path("compass.png"))
+        compassPixmap = QPixmap(iconPath("compass.png"))
         compassPixmap = compassPixmap.scaledToWidth(self.FIXED_WIDTH)
-        bearingPixmap = QPixmap(_icon_path("direction.png"))
+        bearingPixmap = QPixmap(iconPath("direction.png"))
         pixmap = QPixmap(self.FIXED_WIDTH, self.FIXED_WIDTH)
         pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)
@@ -300,6 +316,7 @@ class NavigationPanel(BASE, WIDGET):
     def selectedWaypointChanged(self, current, previous):
         for item, w in self.waypointWidgets:
             w.setIsItemSelected(current == item)
+        self.warningShown = False
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def waypointsFromLayer(self, layer):
@@ -355,16 +372,17 @@ class NavigationPanel(BASE, WIDGET):
         self.centerPin = None
         self.waypointLayer = None
         self.currentGpsInformation = None
+        self.warningShown = False
 
-        self.setMessage("Connecting to GPS...")
+        self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getMockupGpsConnection()
         if self.gpsConnection is None:
-            self.setMessage("Cannot connect to GPS")
+            self.setMessage(self.tr("Cannot connect to GPS"))
         else:
             self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
             self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
             self.centerPin.setup(
-                _icon_path("navigationcenter.svg"),
+                iconPath("navigationcenter.svg"),
                 self.centerPin.anchorX(),
                 self.centerPin.anchorX(),
                 32,
@@ -377,6 +395,7 @@ class NavigationPanel(BASE, WIDGET):
 
     def currentLayerChanged(self, layer):
         self.waypointLayer = None
+        self.warningShown = False
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def stopNavigation(self):
@@ -384,9 +403,16 @@ class NavigationPanel(BASE, WIDGET):
         iface.mapCanvas().setRotation(0)
         iface.mapCanvas().refresh()
         if self.gpsConnection is not None:
-            self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
-        if self.centerPin is not None:
-            KadasMapCanvasItemManager.removeItem(self.centerPin)
+            try:
+                self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
+            except TypeError:
+                pass
+        try:
+            if self.centerPin is not None:
+                KadasMapCanvasItemManager.removeItem(self.centerPin)
+        except Exception:
+            # centerPin might have been deleted
+            pass
         self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
 
 

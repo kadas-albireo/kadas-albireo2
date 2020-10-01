@@ -1,3 +1,5 @@
+import logging
+
 from qgis.core import (
     QgsSettings,
     QgsGpsDetector,
@@ -12,6 +14,8 @@ from qgis.utils import iface
 from PyQt5.QtCore import QEventLoop, pyqtSignal, QObject
 
 from kadasrouting.utilities import waitcursor
+
+LOG = logging.getLogger(__name__)
 
 
 @waitcursor
@@ -37,17 +41,23 @@ def getGpsConnection():
 
 
 def getMockupGpsConnection():
-    return GpsConnection()
+    return GpsConnection(iface.mapCanvas())
 
 
 class GpsConnection(QObject):
 
     statusChanged = pyqtSignal(object)
 
+    def __init__(self, canvas):
+        QObject.__init__(self)
+        self._canvas = canvas
+        # Update the point when the canvas extent changed.
+        self._canvas.extentsChanged.connect(self.currentLocationChanged)
+
     def currentGPSInformation(self):
-        center = iface.mapCanvas().center()
+        center = self._canvas.center()
         outCrs = QgsCoordinateReferenceSystem(4326)
-        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+        canvasCrs = self._canvas.mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(canvasCrs, outCrs, QgsProject.instance())
         wgspoint = transform.transform(center)
         info = QgsGpsInformation()
@@ -59,3 +69,6 @@ class GpsConnection(QObject):
         info.elevation = 200
 
         return info
+
+    def currentLocationChanged(self):
+        self.statusChanged.emit(self.currentGPSInformation())

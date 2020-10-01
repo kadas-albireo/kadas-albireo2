@@ -81,6 +81,9 @@ class RoutingPlugin(QObject):
         self.iface.removeAction(
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
         )
+        self.iface.removeAction(
+            self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
         # self.iface.removeAction(
         #     self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         # )
