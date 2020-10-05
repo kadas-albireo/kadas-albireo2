@@ -16,7 +16,7 @@ Currently, the installation only available from this repository.
 
 2. Installation
 
-   To install this plugin on [Kadas Albireo 2](https://github.com/kadas-albireo/kadas-albireo2), copy the copy the `kadasrouting` folder to the KADAS plugins folder located in your used folder. For example:
+   To install this plugin on [Kadas Albireo 2](https://github.com/kadas-albireo/kadas-albireo2), extract the zip file from step 1, then copy the `kadasrouting` folder to the KADAS plugins folder located in your used folder. For example:
    ```
    C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins
    ```
