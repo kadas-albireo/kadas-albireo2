@@ -185,7 +185,6 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             # Disconnect the signal to avoid the blue cross shown up
             self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
 
-
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
 
