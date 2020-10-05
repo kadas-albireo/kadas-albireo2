@@ -119,11 +119,13 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.setFixedSize(self.size() * 1.5)
 
     def populateLayerSelector(self):
+        self.comboAreasToAvoidLayers.clear()
         for layer in QgsProject.instance().mapLayers().values():
             if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.PolygonGeometry:
                 self.comboAreasToAvoidLayers.addItem(layer.name(), layer)
 
     def _radioButtonsChanged(self):
+        self.populateLayerSelector()
         self.comboAreasToAvoidLayers.setEnabled(self.radioAreasToAvoidLayer.isChecked())
         self.btnAreasToAvoidFromCanvas.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
         self.btnAreasToAvoidClear.setEnabled(self.radioAreasToAvoidPolygon.isChecked())

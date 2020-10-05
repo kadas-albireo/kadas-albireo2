@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>317</width>
-    <height>266</height>
+    <height>436</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,39 @@
    <property name="spacing">
     <number>0</number>
    </property>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkShowWarnings">
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Show Navigation Warnings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QLabel" name="labelWaypointName">
      <property name="text">
@@ -58,13 +91,6 @@
     <widget class="QListWidget" name="listWaypoints">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chkShowWarnings">
-     <property name="text">
-      <string>Show Navigation Warnings</string>
      </property>
     </widget>
    </item>
