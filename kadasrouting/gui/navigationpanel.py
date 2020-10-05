@@ -5,9 +5,18 @@ import logging
 
 from PyQt5 import uic
 
-from PyQt5.QtGui import QPixmap, QTransform, QPainter, QColor
+from PyQt5.QtGui import (
+    QPixmap,
+    QTransform,
+    QPainter,
+    QColor
+)
 
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import (
+    Qt,
+    QSize,
+    QSettings
+)
 
 from PyQt5.QtWidgets import (
     QListWidgetItem,
@@ -176,6 +185,17 @@ class NavigationPanel(BASE, WIDGET):
         self.chkShowWarnings.setChecked(True)
         self.warningShown = False
         self.iface.messageBar().widgetRemoved.connect(self.setWarningShownOff)
+        self.labelConfigureWarnings.linkActivated.connect(self.configureWarnings)
+
+    def configureWarnings(self, url):
+        threshold = QSettings().value("kadasrouting/warningThreshold", self.WARNING_DISTANCE, type=int)
+        value, ok = QInputDialog.getInt(
+            iface.mainWindow(),
+            self.tr("Navigation"),
+            self.tr("Set threshold for warnings (meters)"),
+            threshold)
+        if ok:
+            QSettings().setValue("kadasrouting/warningThreshold", value)
 
     def setWarningShownOff(self):
         self.warningShown = False
@@ -255,7 +275,8 @@ class NavigationPanel(BASE, WIDGET):
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
 
     def setWarnings(self, dist):
-        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < self.WARNING_DISTANCE):
+        threshold = QSettings().value("kadasrouting/warningThreshold", self.WARNING_DISTANCE, type=int)
+        if (self.chkShowWarnings.isChecked() and not self.warningShown and dist < threshold):
             pushMessage(self.tr("In {dist} meters you will arrive at your destination").format(dist=int(dist)))
             self.warningShown = True
 
