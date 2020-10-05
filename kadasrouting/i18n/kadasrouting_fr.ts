@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fr" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.0">
 <context>
     <name>@default</name>
     <message>
         <location filename="utilities.py" line="42"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="utilities.py" line="46"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement</translation>
     </message>
 </context>
 <context>
@@ -26,17 +25,17 @@
     <message>
         <location filename="disclaimerdialog.ui" line="14"/>
         <source>Disclaimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Décharge de responsabilité</translation>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="174"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="194"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
 </context>
 <context>
@@ -44,17 +43,17 @@
     <message>
         <location filename="navigationpanel.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="23"/>
         <source>Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de navigation</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="50"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Waypoints:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Points de navigation</translation>
     </message>
 </context>
 <context>
@@ -142,7 +141,7 @@
     <message>
         <location filename="tspbottombar.ui" line="130"/>
         <source>Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="64"/>
@@ -152,12 +151,12 @@
     <message>
         <location filename="reachabilitybottombar.ui" line="77"/>
         <source>isochrones</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="84"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="94"/>
@@ -177,7 +176,7 @@
     <message>
         <location filename="optimalroutebottombar.ui" line="229"/>
         <source>Navigate</source>
-        <translation type="unfinished"></translation>
+        <translation>Naviguer</translation>
     </message>
 </context>
 <context>
@@ -228,7 +227,7 @@
     <message>
         <location filename="optimalroutebottombar.py" line="111"/>
         <source>Invalid location:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -277,12 +276,12 @@
     <message>
         <location filename="reachabilitybottombar.py" line="75"/>
         <source>Isochrone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="76"/>
         <source>Isodistance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="55"/>
@@ -350,7 +349,7 @@
     <message>
         <location filename="plugin.py" line="44"/>
         <source>Routing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="plugin.py" line="50"/>
@@ -360,7 +359,7 @@
     <message>
         <location filename="plugin.py" line="62"/>
         <source>Navigate</source>
-        <translation type="unfinished"></translation>
+        <translation>Naviguer</translation>
     </message>
 </context>
 <context>

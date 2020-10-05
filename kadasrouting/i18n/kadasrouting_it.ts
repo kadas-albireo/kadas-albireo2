@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="it" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="it" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -26,17 +25,17 @@
     <message>
         <location filename="disclaimerdialog.ui" line="14"/>
         <source>Disclaimer</source>
-        <translation type="unfinished"></translation>
+        <translation>Disclaimer</translation>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="174"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation>Non mostrare più</translation>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="194"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudi</translation>
     </message>
 </context>
 <context>
@@ -49,12 +48,12 @@
     <message>
         <location filename="navigationpanel.ui" line="23"/>
         <source>Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Punto di navigazione</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="50"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Waypoints:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Punti di navigazione:</translation>
     </message>
 </context>
 <context>
