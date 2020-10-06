@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -15,7 +14,7 @@
     <message>
         <location filename="isochroneslayer.py" line="64"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
-        <translation type="unfinished">Ebene {layername} existiert bereits und wird überschrieben {overwrite}</translation>
+        <translation>Ebene {layername} exisistiert bereits und wird überschrieben {overwrite}</translation>
     </message>
 </context>
 <context>
@@ -64,7 +63,7 @@
     <message>
         <location filename="navigationpanel.ui" line="67"/>
         <source>Show Navigation Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnungen zur Navigation anzeigen</translation>
     </message>
 </context>
 <context>
@@ -192,27 +191,27 @@
     <message>
         <location filename="optimalroutebottombar.ui" line="242"/>
         <source>Areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation>Bereiche/Flächen meiden</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="248"/>
         <source>Draw in Canvas</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf Leinwand/Zeichenfläche zeichnen</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="265"/>
         <source>Polygon layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Polygonebene</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="272"/>
         <source>Custom polygon</source>
-        <translation type="unfinished"></translation>
+        <translation>Angepasstes Polygon</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="282"/>
         <source>No areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Bereiche/Flächen zu meiden</translation>
     </message>
 </context>
 <context>
@@ -238,37 +237,37 @@
     <message>
         <location filename="navigationpanel.py" line="380"/>
         <source>Cannot connect to GPS</source>
-        <translation type="unfinished">Es kann keine Verbindung zum GPS hergestellt werden</translation>
+        <translation>Keine GPS-Verbindung</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="227"/>
         <source>You are not in the route</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie befinden sich nicht auf der Route</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="255"/>
         <source>Select a route or waypoint layer for navigation</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie eine Route oder Ebene mit Zwischenzielen für die Navigation</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="259"/>
         <source>In {dist} meters you will arrive at your destination</source>
-        <translation type="unfinished"></translation>
+        <translation>In {dist} Metern haben Sie ihr Ziel erreicht</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="268"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigation</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="268"/>
         <source>Select Vehicle to use with layer &apos;{name}&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie den Fahrzeugtyp in Verbindung mit dem Layer &apos;{name}&apos;</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="377"/>
         <source>Connecting to GPS...</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstellen der Verbindung zum GPS...</translation>
     </message>
 </context>
 <context>
@@ -339,7 +338,7 @@
     <message>
         <location filename="optimalroutelayer.py" line="165"/>
         <source>Could not compute route from polyline</source>
-        <translation type="unfinished"></translation>
+        <translation>Für diese Polylinie konnte keine Route erstellt werden</translation>
     </message>
 </context>
 <context>

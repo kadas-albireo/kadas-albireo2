@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fr" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -15,7 +14,7 @@
     <message>
         <location filename="isochroneslayer.py" line="64"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
-        <translation type="unfinished">layer {layername} existe déjà et l&apos;écrasement est {overwrite}</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -36,7 +35,7 @@
     <message>
         <location filename="disclaimerdialog.ui" line="174"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="194"/>
@@ -64,7 +63,7 @@
     <message>
         <location filename="navigationpanel.ui" line="67"/>
         <source>Show Navigation Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -152,7 +151,7 @@
     <message>
         <location filename="tspbottombar.ui" line="130"/>
         <source>Buffer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="64"/>
@@ -162,12 +161,12 @@
     <message>
         <location filename="reachabilitybottombar.ui" line="77"/>
         <source>isochrones</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="84"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="94"/>
@@ -192,27 +191,27 @@
     <message>
         <location filename="optimalroutebottombar.ui" line="242"/>
         <source>Areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="248"/>
         <source>Draw in Canvas</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="265"/>
         <source>Polygon layer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="272"/>
         <source>Custom polygon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="282"/>
         <source>No areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -238,37 +237,37 @@
     <message>
         <location filename="navigationpanel.py" line="380"/>
         <source>Cannot connect to GPS</source>
-        <translation type="unfinished">Impossible de se connecter au GPS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="227"/>
         <source>You are not in the route</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="255"/>
         <source>Select a route or waypoint layer for navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="259"/>
         <source>In {dist} meters you will arrive at your destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="268"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="268"/>
         <source>Select Vehicle to use with layer &apos;{name}&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="377"/>
         <source>Connecting to GPS...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -301,7 +300,7 @@
     <message>
         <location filename="optimalroutebottombar.py" line="180"/>
         <source>Invalid location:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -339,7 +338,7 @@
     <message>
         <location filename="optimalroutelayer.py" line="165"/>
         <source>Could not compute route from polyline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -347,12 +346,12 @@
     <message>
         <location filename="reachabilitybottombar.py" line="74"/>
         <source>Isochrone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="75"/>
         <source>Isodistance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="54"/>
@@ -420,7 +419,7 @@
     <message>
         <location filename="plugin.py" line="43"/>
         <source>Routing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="plugin.py" line="49"/>
