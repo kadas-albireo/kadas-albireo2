@@ -143,21 +143,25 @@ class SuggestCompletion(QObject):
     def handle_network_data(self, network_reply):
         choices = []
         if network_reply.error() == QNetworkReply.NoError:
-            data = json.loads(network_reply.readAll().data())
-            if data.get('status') != 'error':
-                for location in data['results']:
-                    attributes = location.get('attrs', {})
-                    choice = {
-                        'label': attributes.get('label', 'Unknown label'),
-                        'lon': attributes.get('lon', 0.0),
-                        'lat': attributes.get('lat', 0.0)
-                    }
-                    choices.append(choice)
-                self.show_completion(choices)
-            else:
-                error_detail = data.get('detail', 'No error detail.')
-                LOG.error(data)
-                self.error.emit(error_detail)
+            try:
+                data = json.loads(network_reply.readAll().data())
+                if data.get('status') != 'error':
+                    for location in data['results']:
+                        attributes = location.get('attrs', {})
+                        choice = {
+                            'label': attributes.get('label', 'Unknown label'),
+                            'lon': attributes.get('lon', 0.0),
+                            'lat': attributes.get('lat', 0.0)
+                        }
+                        choices.append(choice)
+                    self.show_completion(choices)
+                else:
+                    error_detail = data.get('detail', 'No error detail.')
+                    LOG.error(data)
+                    self.error.emit(error_detail)
+            except json.decoder.JSONDecodeError as e:
+                LOG.error(e)
+                self.error.emit(e.msg)
         else:
             try:
                 error_message = network_reply.readAll().data().decode("utf-8")
