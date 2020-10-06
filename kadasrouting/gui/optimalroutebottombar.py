@@ -182,6 +182,10 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             pushWarning(self.tr("Invalid location:") + str(e))
             return
 
+        if None in points:
+            pushWarning(self.tr("Both origin and destination points are required"))
+            return
+
         shortest = self.radioButtonShortest.isChecked()
 
         vehicle = self.comboBoxVehicles.currentIndex()
@@ -206,6 +210,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
+            raise
             logging.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
