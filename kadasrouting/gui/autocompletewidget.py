@@ -170,7 +170,7 @@ class SuggestCompletion(QObject):
                     error_detail = data.get('detail', 'No error detail.')
                     LOG.error(data)
                     self.error.emit(error_detail)
-            except json.decoder.JSONDecodeError as e:
+            except json.decoder.JSONDecodeError:
                 data_string = data_raw.decode('utf-8')
                 LOG.error(data_string)
                 self.error.emit(strip_tags(data_string))
