@@ -5,14 +5,11 @@
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 from kadasrouting.utilities import encodePolyline6
 
-from .connectors import HttpConnector
-
-TEST_URL = "http://64.225.93.154:8002"
-
+from .connectors import ConsoleConnector
 
 class ValhallaClient:
     def __init__(self, connector=None):
-        self.connector = connector or HttpConnector(TEST_URL)
+        self.connector = connector or ConsoleConnector()
 
     def route(self, qgspoints, profile, options):
         """

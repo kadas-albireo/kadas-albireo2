@@ -1,3 +1,4 @@
+import os
 import subprocess
 import logging
 import requests
@@ -7,7 +8,6 @@ from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName
 
 LOG = logging.getLogger(__name__)
-
 
 class Connector:
     def prepareRouteParameters(self, points, profile="auto", options=None):
@@ -47,31 +47,34 @@ class Connector:
 
 
 class ConsoleConnector(Connector):
-    def _execute(self, commands):
-        response = ""
-        with subprocess.Popen(
-            commands,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stdin=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-        ) as proc:
-            try:
-                for line in iter(proc.stdout.readline, ""):
-                    response += line
-            except Exception as e:
-                LOG.error(e)
-                pass
-        # FIXME: the commented lines below is not used
-        # responsedict = json.loads(response)
+    def _execute(self, action, request):
+        valhallaPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                "executables", "valhalla")
+        os.chdir(valhallaPath)
+        valhallaExecutable = os.path.join(valhallaPath,  "valhalla_service.exe")
+        valhallaConfig = os.path.join(valhallaPath,  "valhalla.json")
+        commands = [valhallaExecutable, valhallaConfig, action, request]        
+        result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
+        response = json.loads(result.stdout.decode("utf-8"))
+        if "error" in response:
+            raise Exception(response["error"])        
+        return response
 
     def route(self, points, profile, options):
-        pass
-        # FIXME: the commented lines below is not finished
-        # params = self.prepareRouteParameters(points, profile, options)
-        # response = _execute(["valhalla_run_route", "-j", json.dumps(params)])
-        # return response
+        params = self.prepareRouteParameters(points, profile, options)
+        response = self._execute("route", json.dumps(params))
+        return response
+
+    def isochrones(self, points, profile, options, intervals, colors):
+        params = self.prepareIsochronesParameters(points, profile, options,
+                                                  intervals, colors)
+        response = self._execute("isochrone", json.dumps(params))
+        return response
+
+    def mapmatching(self, shape, profile, options):
+        params = self.prepareMapmatchingParameters(shape, profile, options)       
+        response = self._execute("trace_route", json.dumps(params))
+        return response
 
 
 class HttpConnector(Connector):
