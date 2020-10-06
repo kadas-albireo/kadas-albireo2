@@ -33,8 +33,6 @@ fi
 # Finally define which languages we are translating for
 
 echo "
-TRANSLATIONS = kadasrouting/i18n/kadasrouting_id.ts \\
-               kadasrouting/i18n/kadasrouting_fr.ts \\
+TRANSLATIONS = kadasrouting/i18n/kadasrouting_fr.ts \\
                kadasrouting/i18n/kadasrouting_de.ts \\
-               kadasrouting/i18n/kadasrouting_it.ts \\
-               kadasrouting/i18n/kadasrouting_id.ts" >> ${PRO_FILE}
+               kadasrouting/i18n/kadasrouting_it.ts" >> ${PRO_FILE}
