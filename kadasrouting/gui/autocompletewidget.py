@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QTreeWidget, QLineEdit, QFrame, QTreeWidgetItem
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtGui import QPalette
 
+from qgis.core import QgsSettings
+
 from kadasrouting.utilities import strip_tags
 
 LOG = logging.getLogger(__name__)
@@ -126,7 +128,15 @@ class SuggestCompletion(QObject):
     def auto_suggest(self):
         text = self._editor.text()
         if text:
-            url = QUrl("https://api3.geo.admin.ch/rest/services/api/SearchServer")
+            is_offline = QgsSettings().value("/kadas/isOffline")
+            LOG.debug('is_offline %s' % is_offline)
+            if is_offline:
+                url = QgsSettings().value(
+                    "search/locationofflinesearchurl", "http://localhost:5000/SearchServerCh")
+            else:
+                url = QgsSettings().value(
+                    "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer")
+            url = QUrl(url)
             query = QUrlQuery()
             query.addQueryItem("sr", "2056")
             query.addQueryItem("searchText", text)
@@ -143,8 +153,9 @@ class SuggestCompletion(QObject):
     def handle_network_data(self, network_reply):
         choices = []
         if network_reply.error() == QNetworkReply.NoError:
+            data_raw = network_reply.readAll().data()
             try:
-                data = json.loads(network_reply.readAll().data())
+                data = json.loads(data_raw)
                 if data.get('status') != 'error':
                     for location in data['results']:
                         attributes = location.get('attrs', {})
@@ -160,8 +171,9 @@ class SuggestCompletion(QObject):
                     LOG.error(data)
                     self.error.emit(error_detail)
             except json.decoder.JSONDecodeError as e:
-                LOG.error(e)
-                self.error.emit(e.msg)
+                data_string = data_raw.decode('utf-8')
+                LOG.error(data_string)
+                self.error.emit(strip_tags(data_string))
         else:
             try:
                 error_message = network_reply.readAll().data().decode("utf-8")
