@@ -7,6 +7,7 @@ from kadasrouting.utilities import encodePolyline6
 
 from .connectors import ConsoleConnector
 
+
 class ValhallaClient:
     def __init__(self, connector=None):
         self.connector = connector or ConsoleConnector()

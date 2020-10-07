@@ -9,6 +9,7 @@ from kadasrouting.utilities import localeName
 
 LOG = logging.getLogger(__name__)
 
+
 class Connector:
     def prepareRouteParameters(self, points, profile="auto", options=None):
         options = options or {}
@@ -48,16 +49,16 @@ class Connector:
 
 class ConsoleConnector(Connector):
     def _execute(self, action, request):
-        valhallaPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                "executables", "valhalla")
+        valhallaPath = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), "executables", "valhalla")
         os.chdir(valhallaPath)
         valhallaExecutable = os.path.join(valhallaPath,  "valhalla_service.exe")
         valhallaConfig = os.path.join(valhallaPath,  "valhalla.json")
-        commands = [valhallaExecutable, valhallaConfig, action, request]        
+        commands = [valhallaExecutable, valhallaConfig, action, request]
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
-            raise Exception(response["error"])        
+            raise Exception(response["error"])
         return response
 
     def route(self, points, profile, options):
@@ -72,7 +73,7 @@ class ConsoleConnector(Connector):
         return response
 
     def mapmatching(self, shape, profile, options):
-        params = self.prepareMapmatchingParameters(shape, profile, options)       
+        params = self.prepareMapmatchingParameters(shape, profile, options)
         response = self._execute("trace_route", json.dumps(params))
         return response
 
