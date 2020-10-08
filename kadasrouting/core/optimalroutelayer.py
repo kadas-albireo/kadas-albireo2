@@ -174,6 +174,8 @@ class OptimalRouteLayer(KadasItemLayer):
         self.triggerRepaint()
 
     def computeFromResponse(self, response):
+        if response is None:
+            return
         epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
         self.clear()
         self.response = response
