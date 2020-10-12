@@ -190,7 +190,7 @@ class NavigationPanel(BASE, WIDGET):
     def configureWarnings(self, url):
         threshold = QSettings().value("kadasrouting/warningThreshold", self.WARNING_DISTANCE, type=int)
         value, ok = QInputDialog.getInt(
-            iface.mainWindow(),
+            self.iface.mainWindow(),
             self.tr("Navigation"),
             self.tr("Set threshold for warnings (meters)"),
             threshold)
@@ -218,13 +218,13 @@ class NavigationPanel(BASE, WIDGET):
         layer = self.iface.activeLayer()
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
         origCrs = QgsCoordinateReferenceSystem(4326)
-        canvasCrs = iface.mapCanvas().mapSettings().destinationCrs()
+        canvasCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
         canvasPoint = transform.transform(point)
         self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
-        iface.mapCanvas().setCenter(canvasPoint)
-        iface.mapCanvas().setRotation(-gpsinfo.direction)
-        iface.mapCanvas().refresh()
+        self.iface.mapCanvas().setCenter(canvasPoint)
+        self.iface.mapCanvas().setRotation(-gpsinfo.direction)
+        self.iface.mapCanvas().refresh()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
 
         self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
@@ -287,7 +287,7 @@ class NavigationPanel(BASE, WIDGET):
 
         name = self.iface.activeLayer().name()
         value, ok = QInputDialog.getItem(
-            iface.mainWindow(),
+            self.iface.mainWindow(),
             self.tr("Navigation"),
             self.tr("Select Vehicle to use with layer '{name}'").format(name=name),
             vehicles.vehicle_reduced_names())
@@ -420,21 +420,26 @@ class NavigationPanel(BASE, WIDGET):
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def stopNavigation(self):
-        self.rubberband.reset(QgsWkbTypes.LineGeometry)
-        iface.mapCanvas().setRotation(0)
-        iface.mapCanvas().refresh()
+        # Disconnect everything
         if self.gpsConnection is not None:
             try:
                 self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
-            except TypeError:
-                pass
+            except TypeError as e:
+                LOG.debug(e)
         try:
             if self.centerPin is not None:
                 KadasMapCanvasItemManager.removeItem(self.centerPin)
         except Exception:
             # centerPin might have been deleted
             pass
-        self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
+        try:
+            self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
+        except TypeError as e:
+            LOG.debug(e)
+        # Finally, reset everything
+        self.rubberband.reset(QgsWkbTypes.LineGeometry)
+        self.iface.mapCanvas().setRotation(0)
+        self.iface.mapCanvas().refresh()
 
 
 class WaypointItem(QListWidgetItem):
