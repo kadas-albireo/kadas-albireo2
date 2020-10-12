@@ -3,7 +3,7 @@ import subprocess
 import logging
 import requests
 import json
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName
@@ -11,6 +11,7 @@ from qgis.core import QgsSettings
 
 LOG = logging.getLogger(__name__)
 APPDATA = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
+
 
 class Connector:
     def prepareRouteParameters(self, points, profile="auto", options=None):
@@ -52,16 +53,16 @@ class Connector:
 class ConsoleConnector(Connector):
     @staticmethod
     def createValhallaJsonConfig(content):
-        #FIXME: this comes from a global variable
+        # FIXME: this comes from a global variable
         if not os.path.exists(APPDATA):
             os.makedirs(APPDATA)
         outputFileName = os.path.join(APPDATA, 'valhalla.json')
-        templatePath =  os.path.join(os.path.dirname(os.path.dirname(__file__)), "valhalla")
+        templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)),"valhalla")
         templateFileLoader = FileSystemLoader(templatePath)
-        jinjaEnv = Environment(loader = templateFileLoader)
+        jinjaEnv = Environment(loader=templateFileLoader)
         valhallaConfigTemplate = jinjaEnv.get_template('valhalla.json.jinja')
         with open(outputFileName, 'w') as f:
-            f.write(valhallaConfigTemplate.render(valhallaTilesDir = content['valhallaTilesDir']))
+            f.write(valhallaConfigTemplate.render(valhallaTilesDir=content['valhallaTilesDir']))
         return outputFileName
 
 
@@ -71,7 +72,7 @@ class ConsoleConnector(Connector):
         os.chdir(valhallaPath)
         valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
         defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
-        valhallaConfig = ConsoleConnector.createValhallaJsonConfig({'valhallaTilesDir':QgsSettings().value(
+        valhallaConfig = ConsoleConnector.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
             "/kadas/valhalla_tiles_dir",
             defaultValhallaTilesDir)})
         commands = [valhallaExecutable, valhallaConfig, action, request]
