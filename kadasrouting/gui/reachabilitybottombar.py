@@ -195,7 +195,6 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             except TypeError as e:
                 LOG.debug('self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s' % e)
 
-
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
 
