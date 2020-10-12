@@ -117,7 +117,10 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         canvasPoint = transform.transform(point)
 
         # First, disconnect the signal to avoid infinite circular function calling
-        self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
+        try:
+            self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
+        except TypeError as e:
+            LOG.debug(e)
 
         # Center the map to the converted point with the same zoom level
         rect = QgsRectangle(canvasPoint, canvasPoint)
@@ -157,7 +160,6 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         colors = []
         try:
             colors = self.getColorFromInterval()
-            LOG.debug("_".join(colors))
             generateIsochrones(
                 point, profile, costingOptions, intervals, colors, self.getBasename(), overwrite)
         except OverwriteError as e:
@@ -180,10 +182,18 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             self.setCenterAsSelected()
             # Update the point when the canvas extent changed.
             self.canvas.extentsChanged.connect(self.setCenterAsSelected)
+            self.originSearchBox.pointUpdated.connect(self.centerMap)
         else:
             self.originSearchBox.removePin()
             # Disconnect the signal to avoid the blue cross shown up
-            self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
+            try:
+                self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
+            except TypeError as e:
+                LOG.debug('self.canvas.extentsChanged.disconnect(self.setCenterAsSelected) %s' % e)
+            try:
+                self.originSearchBox.pointUpdated.disconnect(self.centerMap)
+            except TypeError as e:
+                LOG.debug('self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s' % e)
 
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
