@@ -420,9 +420,7 @@ class NavigationPanel(BASE, WIDGET):
         self.updateNavigationInfo(self.currentGpsInformation)
 
     def stopNavigation(self):
-        self.rubberband.reset(QgsWkbTypes.LineGeometry)
-        self.iface.mapCanvas().setRotation(0)
-        self.iface.mapCanvas().refresh()
+        # Disconnect everything
         if self.gpsConnection is not None:
             try:
                 self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
@@ -438,6 +436,10 @@ class NavigationPanel(BASE, WIDGET):
             self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
         except TypeError as e:
             LOG.debug(e)
+        # Finally, reset everything
+        self.rubberband.reset(QgsWkbTypes.LineGeometry)
+        self.iface.mapCanvas().setRotation(0)
+        self.iface.mapCanvas().refresh()
 
 
 class WaypointItem(QListWidgetItem):
