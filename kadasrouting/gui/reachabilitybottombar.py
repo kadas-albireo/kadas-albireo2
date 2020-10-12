@@ -182,13 +182,19 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             self.setCenterAsSelected()
             # Update the point when the canvas extent changed.
             self.canvas.extentsChanged.connect(self.setCenterAsSelected)
+            self.originSearchBox.pointUpdated.connect(self.centerMap)
         else:
             self.originSearchBox.removePin()
             # Disconnect the signal to avoid the blue cross shown up
             try:
                 self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
             except TypeError as e:
-                LOG.debug(e)
+                LOG.debug('self.canvas.extentsChanged.disconnect(self.setCenterAsSelected) %s' % e)
+            try:
+                self.originSearchBox.pointUpdated.disconnect(self.centerMap)
+            except TypeError as e:
+                LOG.debug('self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s' % e)
+
 
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
