@@ -426,15 +426,18 @@ class NavigationPanel(BASE, WIDGET):
         if self.gpsConnection is not None:
             try:
                 self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
-            except TypeError:
-                pass
+            except TypeError as e:
+                LOG.debug(e)
         try:
             if self.centerPin is not None:
                 KadasMapCanvasItemManager.removeItem(self.centerPin)
         except Exception:
             # centerPin might have been deleted
             pass
-        self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
+        try:
+            self.iface.layerTreeView().currentLayerChanged.disconnect(self.currentLayerChanged)
+        except TypeError as e:
+            LOG.debug(e)
 
 
 class WaypointItem(QListWidgetItem):
