@@ -74,12 +74,13 @@ _icon_for_maneuver = {
 
 def icon_path_for_maneuver(maneuvertype):
     name = _icon_for_maneuver.get(maneuvertype, "dummy")
+    if name == 'dummy':
+        LOG.error('Icon for %s is not found' % maneuvertype)
     return _icon_path(name)
 
 
 def _icon_path(name):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                        "icons", name + ".png")
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", name + ".png")
 
 
 class NotInRouteException(Exception):
