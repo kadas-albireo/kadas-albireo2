@@ -57,14 +57,13 @@ class ConsoleConnector(Connector):
         if not os.path.exists(APPDATA):
             os.makedirs(APPDATA)
         outputFileName = os.path.join(APPDATA, 'valhalla.json')
-        templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)),"valhalla")
+        templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "valhalla")
         templateFileLoader = FileSystemLoader(templatePath)
         jinjaEnv = Environment(loader=templateFileLoader)
         valhallaConfigTemplate = jinjaEnv.get_template('valhalla.json.jinja')
         with open(outputFileName, 'w') as f:
             f.write(valhallaConfigTemplate.render(valhallaTilesDir=content['valhallaTilesDir']))
         return outputFileName
-
 
     def _execute(self, action, request):
         defaultValhallaExeDir = 'C:\\Program Files\\KadasAlbireo\\opt\\routing'
