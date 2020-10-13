@@ -162,6 +162,7 @@ class OptimalRouteLayer(KadasItemLayer):
             response = self.valhalla.mapmatching(polyline, profile, costingOptions)
             self.computeFromResponse(response)
         except Exception as e:
+
             LOG.warning(e)
             pushWarning(self.tr("Could not compute route from polyline"))
 
@@ -255,8 +256,6 @@ class OptimalRouteLayer(KadasItemLayer):
                         QgsUnitTypes.DistanceMeters)
             if dist < min_dist:
                 closest_leg = line
-                # FIXME: commented line below is never used
-                # next_leg = None if i == len(legs) - 1 else legs[i + 1]
                 closest_segment = segment
                 closest_point = _pt
                 min_dist = dist
@@ -287,7 +286,11 @@ class OptimalRouteLayer(KadasItemLayer):
                     icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
 
                     time_to_next = distance_to_next / 1000 / speed * 3600
-                    maneuvers_ahead = maneuvers[i:]
+                    try:
+                        maneuvers_ahead = maneuvers[i+1:]
+                    except IndexError:
+                        maneuvers_ahead = []
+
                     timeleft = time_to_next + sum([m["time"] for m in maneuvers_ahead])
                     distanceleft = distance_to_next + sum([m["length"] for m in maneuvers_ahead]) * 1000
 
