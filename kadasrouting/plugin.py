@@ -12,7 +12,7 @@ from qgis.core import QgsApplication
 
 from kadas.kadasgui import KadasPluginInterface
 
-from kadasrouting.utilities import icon, pushWarning
+from kadasrouting.utilities import icon, pushWarning, tr
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
@@ -28,6 +28,13 @@ except FileExistsError:
     pass
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
+def testclientavailability(method):
+    def func(*args, **kw):
+        if ValhallaClient.getInstance().isAvailable():            
+            method(*args, **kw)
+        else:
+            pushWarning(tr("Valhalla is not installed or it cannot be found"))
+    return func
 
 class RoutingPlugin(QObject):
     def __init__(self, iface):
@@ -100,6 +107,7 @@ class RoutingPlugin(QObject):
             if action != keep:
                 action.setChecked(False)
 
+    @testclientavailability
     def showOptimalRoute(self, show=True):
         if show:
             if self.optimalRouteBar is None:
@@ -114,6 +122,7 @@ class RoutingPlugin(QObject):
             if self.optimalRouteBar is not None:
                 self.optimalRouteBar.hide()
 
+    @testclientavailability
     def showReachability(self, show=True):
         if show:
             if self.reachabilityBar is None:
@@ -136,6 +145,7 @@ class RoutingPlugin(QObject):
             if self.tspBar is not None:
                 self.tspBar.hide()
 
+    @testclientavailability
     def showNavigation(self, show=True):
         if show:
             if self.navigationPanel is None:
@@ -161,10 +171,3 @@ class RoutingPlugin(QObject):
             dialog = DisclaimerDialog(iface.mainWindow())
             dialog.exec_()
 
-def testclientavailability(method):
-    def func(*args, **kw):
-        if ValhallaClient.getInstance().isAvailable():            
-            method(*args, **kw)
-        else:
-            pushWarning(self.tr("Valhalla is not installed or it cannot be found"))
-    return func

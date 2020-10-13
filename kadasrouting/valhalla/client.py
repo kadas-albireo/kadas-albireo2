@@ -24,7 +24,7 @@ class ValhallaClient:
         self.connector = connector or ConsoleConnector()
 
     def isAvailable(self):
-        return self, connector.isAvailable()
+        return self.connector.isAvailable()
 
     def route(self, qgspoints, profile, options):
         """

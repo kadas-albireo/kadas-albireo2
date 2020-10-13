@@ -57,7 +57,7 @@ class Connector:
 class ConsoleConnector(Connector):
 
     def isAvailable(self):
-        return os.path.exists(self._valhallaExecutablePath)
+        return os.path.exists(self._valhallaExecutablePath())
 
     def createValhallaJsonConfig(self, content):
         # FIXME: this comes from a global variable
@@ -82,15 +82,16 @@ class ConsoleConnector(Connector):
         return os.path.join(valhallaPath, "valhalla_service.exe")
 
     def _execute(self, action, request):
-        valhallaPath = self._valhallaExecutablePath()
-        os.chdir(os.path.dirname(valhallaPath))
-        defaultValhallaTilesDir = os.path.join(self._kadasFolder(), 'share', 'kadas', 
-            'routing', 'default', 'valhalla_tiles')
+        defaultValhallaExeDir = r'C:/Program Files/KadasAlbireo/opt/routing'
+        valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
+        valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
+        defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
+        os.chdir(valhallaPath)
         valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
             "/kadas/valhalla_tiles_dir",
             defaultValhallaTilesDir)})
-        commands = [valhallaPath, valhallaConfig, action, request]
-        #raise Exception(str(commands))
+        commands = [valhallaExecutable, valhallaConfig, action, request]   
+
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
