@@ -28,13 +28,15 @@ except FileExistsError:
     pass
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
+
 def testclientavailability(method):
     def func(*args, **kw):
-        if ValhallaClient.getInstance().isAvailable():            
+        if ValhallaClient.getInstance().isAvailable():
             method(*args, **kw)
         else:
             pushWarning(tr("Valhalla is not installed or it cannot be found"))
     return func
+
 
 class RoutingPlugin(QObject):
     def __init__(self, iface):
@@ -170,4 +172,3 @@ class RoutingPlugin(QObject):
         if show:
             dialog = DisclaimerDialog(iface.mainWindow())
             dialog.exec_()
-

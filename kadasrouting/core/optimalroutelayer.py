@@ -161,7 +161,7 @@ class OptimalRouteLayer(KadasItemLayer):
         try:
             response = self.valhalla.mapmatching(polyline, profile, costingOptions)
             self.computeFromResponse(response)
-        except Exception as e:            
+        except Exception as e:
             LOG.warning(e)
             pushWarning(self.tr("Could not compute route from polyline"))
 

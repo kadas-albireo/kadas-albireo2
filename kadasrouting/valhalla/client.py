@@ -11,14 +11,15 @@ from .connectors import ConsoleConnector
 class ValhallaClient:
 
     __instance = None
-    @staticmethod 
+
+    @staticmethod
     def getInstance():
         if ValhallaClient.__instance is None:
             ValhallaClient()
         return ValhallaClient.__instance
 
     def __init__(self, connector=None):
-        if ValhallaClient.__instance != None:
+        if ValhallaClient.__instance is not None:
             raise Exception("Singleton class")
         ValhallaClient.__instance = self
         self.connector = connector or ConsoleConnector()

@@ -72,12 +72,9 @@ class ConsoleConnector(Connector):
             f.write(valhallaConfigTemplate.render(valhallaTilesDir=content['valhallaTilesDir']))
         return outputFileName
 
-    def _kadasFolder(self):        
-        return os.path.join(os.environ['PROGRAMFILES'], 'KadasAlbireo')
-
     def _valhallaExecutablePath(self):
         kadasFolder = os.path.join(os.environ['PROGRAMFILES'], 'KadasAlbireo')
-        defaultValhallaExeDir = os.path.join(self._kadasFolder(), 'opt', 'routing')
+        defaultValhallaExeDir = os.path.join(kadasFolder, 'opt', 'routing')
         valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
         return os.path.join(valhallaPath, "valhalla_service.exe")
 
@@ -90,7 +87,7 @@ class ConsoleConnector(Connector):
         valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
             "/kadas/valhalla_tiles_dir",
             defaultValhallaTilesDir)})
-        commands = [valhallaExecutable, valhallaConfig, action, request]   
+        commands = [valhallaExecutable, valhallaConfig, action, request]
 
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
