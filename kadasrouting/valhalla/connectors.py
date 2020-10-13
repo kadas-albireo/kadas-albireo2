@@ -14,6 +14,10 @@ APPDATA = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
 
 
 class Connector:
+
+    def isAvailable(self):
+        return True
+
     def prepareRouteParameters(self, points, profile="auto", options=None):
         options = options or {}
         locale_name = localeName()
@@ -51,8 +55,11 @@ class Connector:
 
 
 class ConsoleConnector(Connector):
-    @staticmethod
-    def createValhallaJsonConfig(content):
+
+    def isAvailable(self):
+        return os.path.exists(self._valhallaExecutablePath)
+
+    def createValhallaJsonConfig(self, content):
         # FIXME: this comes from a global variable
         if not os.path.exists(APPDATA):
             os.makedirs(APPDATA)
@@ -65,16 +72,25 @@ class ConsoleConnector(Connector):
             f.write(valhallaConfigTemplate.render(valhallaTilesDir=content['valhallaTilesDir']))
         return outputFileName
 
-    def _execute(self, action, request):
-        defaultValhallaExeDir = 'C:\\Program Files\\KadasAlbireo\\opt\\routing'
+    def _kadasFolder(self):        
+        return os.path.join(os.environ['PROGRAMFILES'], 'KadasAlbireo')
+
+    def _valhallaExecutablePath(self):
+        kadasFolder = os.path.join(os.environ['PROGRAMFILES'], 'KadasAlbireo')
+        defaultValhallaExeDir = os.path.join(self._kadasFolder(), 'opt', 'routing')
         valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
-        os.chdir(valhallaPath)
-        valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
-        defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
-        valhallaConfig = ConsoleConnector.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
+        return os.path.join(valhallaPath, "valhalla_service.exe")
+
+    def _execute(self, action, request):
+        valhallaPath = self._valhallaExecutablePath()
+        os.chdir(os.path.dirname(valhallaPath))
+        defaultValhallaTilesDir = os.path.join(self._kadasFolder(), 'share', 'kadas', 
+            'routing', 'default', 'valhalla_tiles')
+        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
             "/kadas/valhalla_tiles_dir",
             defaultValhallaTilesDir)})
-        commands = [valhallaExecutable, valhallaConfig, action, request]
+        commands = [valhallaPath, valhallaConfig, action, request]
+        #raise Exception(str(commands))
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:

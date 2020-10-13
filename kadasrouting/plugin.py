@@ -12,13 +12,14 @@ from qgis.core import QgsApplication
 
 from kadas.kadasgui import KadasPluginInterface
 
-from kadasrouting.utilities import icon
+from kadasrouting.utilities import icon, pushWarning
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
+from kadasrouting.valhalla.client import ValhallaClient
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -159,3 +160,11 @@ class RoutingPlugin(QObject):
         if show:
             dialog = DisclaimerDialog(iface.mainWindow())
             dialog.exec_()
+
+def testclientavailability(method):
+    def func(*args, **kw):
+        if ValhallaClient.getInstance().isAvailable():            
+            method(*args, **kw)
+        else:
+            pushWarning(self.tr("Valhalla is not installed or it cannot be found"))
+    return func

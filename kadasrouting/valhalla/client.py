@@ -9,8 +9,22 @@ from .connectors import ConsoleConnector
 
 
 class ValhallaClient:
+
+    __instance = None
+    @staticmethod 
+    def getInstance():
+        if ValhallaClient.__instance is None:
+            ValhallaClient()
+        return ValhallaClient.__instance
+
     def __init__(self, connector=None):
+        if ValhallaClient.__instance != None:
+            raise Exception("Singleton class")
+        ValhallaClient.__instance = self
         self.connector = connector or ConsoleConnector()
+
+    def isAvailable(self):
+        return self, connector.isAvailable()
 
     def route(self, qgspoints, profile, options):
         """

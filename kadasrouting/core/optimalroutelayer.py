@@ -117,7 +117,7 @@ class OptimalRouteLayer(KadasItemLayer):
         self.profile = None
         self.costingOptions = {}
         self.lineItem = None
-        self.valhalla = ValhallaClient()
+        self.valhalla = ValhallaClient.getInstance()
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.updateFromPins)
@@ -161,8 +161,7 @@ class OptimalRouteLayer(KadasItemLayer):
         try:
             response = self.valhalla.mapmatching(polyline, profile, costingOptions)
             self.computeFromResponse(response)
-        except Exception as e:
-
+        except Exception as e:            
             LOG.warning(e)
             pushWarning(self.tr("Could not compute route from polyline"))
 
