@@ -26,7 +26,7 @@ class OverwriteError(Exception):
     pass
 
 
-valhalla = ValhallaClient()
+valhalla = ValhallaClient.getInstance()
 
 
 def getFeaturesFromResponse(response):

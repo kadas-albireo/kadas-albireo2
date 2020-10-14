@@ -12,13 +12,14 @@ from qgis.core import QgsApplication
 
 from kadas.kadasgui import KadasPluginInterface
 
-from kadasrouting.utilities import icon
+from kadasrouting.utilities import icon, pushWarning, tr
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
+from kadasrouting.valhalla.client import ValhallaClient
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
@@ -26,6 +27,15 @@ try:
 except FileExistsError:
     pass
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
+
+
+def testclientavailability(method):
+    def func(*args, **kw):
+        if ValhallaClient.getInstance().isAvailable():
+            method(*args, **kw)
+        else:
+            pushWarning(tr("Valhalla is not installed or it cannot be found"))
+    return func
 
 
 class RoutingPlugin(QObject):
@@ -99,6 +109,7 @@ class RoutingPlugin(QObject):
             if action != keep:
                 action.setChecked(False)
 
+    @testclientavailability
     def showOptimalRoute(self, show=True):
         if show:
             if self.optimalRouteBar is None:
@@ -113,6 +124,7 @@ class RoutingPlugin(QObject):
             if self.optimalRouteBar is not None:
                 self.optimalRouteBar.hide()
 
+    @testclientavailability
     def showReachability(self, show=True):
         if show:
             if self.reachabilityBar is None:
@@ -135,6 +147,7 @@ class RoutingPlugin(QObject):
             if self.tspBar is not None:
                 self.tspBar.hide()
 
+    @testclientavailability
     def showNavigation(self, show=True):
         if show:
             if self.navigationPanel is None:

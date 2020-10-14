@@ -3,14 +3,21 @@ import subprocess
 import logging
 import requests
 import json
+from jinja2 import Environment, FileSystemLoader
 
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName
+from qgis.core import QgsSettings
 
 LOG = logging.getLogger(__name__)
+APPDATA = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
 
 
 class Connector:
+
+    def isAvailable(self):
+        return True
+
     def prepareRouteParameters(self, points, profile="auto", options=None):
         options = options or {}
         locale_name = localeName()
@@ -48,13 +55,40 @@ class Connector:
 
 
 class ConsoleConnector(Connector):
+
+    def isAvailable(self):
+        return os.path.exists(self._valhallaExecutablePath())
+
+    def createValhallaJsonConfig(self, content):
+        # FIXME: this comes from a global variable
+        if not os.path.exists(APPDATA):
+            os.makedirs(APPDATA)
+        outputFileName = os.path.join(APPDATA, 'valhalla.json')
+        templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "valhalla")
+        templateFileLoader = FileSystemLoader(templatePath)
+        jinjaEnv = Environment(loader=templateFileLoader)
+        valhallaConfigTemplate = jinjaEnv.get_template('valhalla.json.jinja')
+        with open(outputFileName, 'w') as f:
+            f.write(valhallaConfigTemplate.render(valhallaTilesDir=content['valhallaTilesDir']))
+        return outputFileName
+
+    def _valhallaExecutablePath(self):
+        kadasFolder = os.path.join(os.environ['PROGRAMFILES'], 'KadasAlbireo')
+        defaultValhallaExeDir = os.path.join(kadasFolder, 'opt', 'routing')
+        valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
+        return os.path.join(valhallaPath, "valhalla_service.exe")
+
     def _execute(self, action, request):
-        valhallaPath = os.path.join(os.path.dirname(
-            os.path.dirname(__file__)), "executables", "valhalla")
+        defaultValhallaExeDir = r'C:/Program Files/KadasAlbireo/opt/routing'
+        valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
+        valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
+        defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
         os.chdir(valhallaPath)
-        valhallaExecutable = os.path.join(valhallaPath,  "valhalla_service.exe")
-        valhallaConfig = os.path.join(valhallaPath,  "valhalla.json")
+        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
+            "/kadas/valhalla_tiles_dir",
+            defaultValhallaTilesDir)})
         commands = [valhallaExecutable, valhallaConfig, action, request]
+
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
