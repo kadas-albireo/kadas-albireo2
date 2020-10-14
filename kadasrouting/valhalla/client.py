@@ -2,6 +2,8 @@
 
 # Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
 
+import math
+
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 from kadasrouting.utilities import encodePolyline6
 
@@ -62,6 +64,10 @@ class ValhallaClient:
         return response
 
     def mapmatching(self, line, profile, costingOptions):
+        MAX_POINTS = 100
+        if len(line) > MAX_POINTS:
+            stride = len(line) / MAX_POINTS
+            line = [line[math.floor(i * stride)] for i in range(MAX_POINTS)]
         try:
             pt = line[0]
             shape = [{"lat": pt.y(), "lon": pt.x(), "type": "break"}]
