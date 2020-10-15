@@ -10,7 +10,6 @@ from kadasrouting.utilities import localeName
 from qgis.core import QgsSettings
 
 LOG = logging.getLogger(__name__)
-APPDATA = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
 
 
 class Connector:
@@ -59,11 +58,20 @@ class ConsoleConnector(Connector):
     def isAvailable(self):
         return os.path.exists(self._valhallaExecutablePath())
 
+    def _appDataDir(self):
+        folder = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        return folder
+
+    def createMapmatchingParametersFile(self, params):
+        outputFileName = os.path.join(self._appDataDir(), 'params.json')
+        with open(outputFileName, 'w') as f:
+            json.dump(params, f)
+        return outputFileName
+
     def createValhallaJsonConfig(self, content):
-        # FIXME: this comes from a global variable
-        if not os.path.exists(APPDATA):
-            os.makedirs(APPDATA)
-        outputFileName = os.path.join(APPDATA, 'valhalla.json')
+        outputFileName = os.path.join(self._appDataDir(), 'valhalla.json')
         templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "valhalla")
         templateFileLoader = FileSystemLoader(templatePath)
         jinjaEnv = Environment(loader=templateFileLoader)
@@ -88,7 +96,6 @@ class ConsoleConnector(Connector):
             "/kadas/valhalla_tiles_dir",
             defaultValhallaTilesDir)})
         commands = [valhallaExecutable, valhallaConfig, action, request]
-
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
@@ -108,7 +115,8 @@ class ConsoleConnector(Connector):
 
     def mapmatching(self, shape, profile, options):
         params = self.prepareMapmatchingParameters(shape, profile, options)
-        response = self._execute("trace_route", json.dumps(params))
+        filename = self.createMapmatchingParametersFile(params)
+        response = self._execute("trace_route", filename)
         return response
 
 
