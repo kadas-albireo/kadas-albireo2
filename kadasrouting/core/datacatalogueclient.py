@@ -41,7 +41,7 @@ class DataCatalogueClient():
             return None
 
     def getAvailableTiles(self):
-        url = f'{self.url}/search?q=owner:"geosupport.fsta" tags:"valhalla"&f=pjson' 
+        url = f'{self.url}/search?q=owner:"geosupport.fsta" tags:"valhalla"&f=pjson'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
             raise Exception(response.error())
