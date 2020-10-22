@@ -35,6 +35,8 @@ from qgis.core import (
     QgsUnitTypes
 )
 
+from kadasrouting.exceptions import ValhallaException
+
 from kadas.kadascore import KadasPluginLayerType
 
 LOG = logging.getLogger(__name__)
@@ -167,12 +169,16 @@ class OptimalRouteLayer(KadasItemLayer):
 
     @waitcursor
     def updateRoute(self, points, profile, costingOptions):
-        response = self.valhalla.route(points, profile, costingOptions)
-        self.costingOptions = costingOptions
-        self.profile = profile
-        self.points = points
-        self.computeFromResponse(response)
-        self.triggerRepaint()
+        try:
+            response = self.valhalla.route(points, profile, costingOptions)
+            self.costingOptions = costingOptions
+            self.profile = profile
+            self.points = points
+            self.computeFromResponse(response)
+            self.triggerRepaint()
+        except ValhallaException as e:
+            pushWarning(str(e))
+            LOG.error(e)
 
     def computeFromResponse(self, response):
         if response is None:

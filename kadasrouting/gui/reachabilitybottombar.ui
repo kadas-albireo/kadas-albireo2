@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>729</width>
-    <height>176</height>
+    <width>647</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,40 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelFrom">
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" rowspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="labelBasename">
+     <property name="text">
+      <string>Basename</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLineEdit" name="lineEditBasename">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>isochrones</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="5">
     <widget class="QToolButton" name="btnClose">
      <property name="sizePolicy">
@@ -37,65 +71,24 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2" colspan="5">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" rowspan="7" colspan="2">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="labelFrom">
-     <property name="text">
-      <string>From</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QLabel" name="labelBasename">
-     <property name="text">
-      <string>Basename</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="4" rowspan="2">
-    <widget class="QLineEdit" name="lineEditBasename">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>isochrones</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" rowspan="2">
+   <item row="1" column="0">
     <widget class="QLabel" name="labelReachabilityMode">
      <property name="text">
       <string>Mode</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1" rowspan="2">
+   <item row="1" column="1">
     <widget class="QComboBox" name="comboBoxReachabilityMode"/>
    </item>
-   <item row="5" column="3">
+   <item row="1" column="3">
     <widget class="QLabel" name="labelIntervals">
      <property name="text">
       <string>Intervals</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="4" rowspan="2">
+   <item row="1" column="4">
     <widget class="QLineEdit" name="lineEditIntervals">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -108,24 +101,24 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" rowspan="2">
+   <item row="2" column="0">
     <widget class="QLabel" name="labelWith">
      <property name="text">
       <string>With</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1" rowspan="2">
+   <item row="2" column="1">
     <widget class="QComboBox" name="comboBoxVehicles"/>
    </item>
-   <item row="7" column="3">
+   <item row="2" column="3">
     <widget class="QLabel" name="labelRemovePrevious">
      <property name="text">
       <string>Remove previous isoline</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="4">
+   <item row="2" column="4">
     <widget class="QCheckBox" name="checkBoxRemovePrevious">
      <property name="text">
       <string/>
@@ -135,7 +128,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
+   <item row="3" column="4">
     <widget class="QPushButton" name="btnCalculate">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
