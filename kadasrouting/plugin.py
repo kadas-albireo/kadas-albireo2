@@ -16,6 +16,7 @@ from kadasrouting.utilities import icon, pushWarning, tr
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
+from kadasrouting.gui.datacataloguebottombar import DataCatalogueBottomBar
 from kadasrouting.gui.tspbottombar import TSPBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
@@ -46,6 +47,7 @@ class RoutingPlugin(QObject):
         self.optimalRouteBar = None
         self.reachabilityBar = None
         self.tspBar = None
+        self.dataCatalogueBar = None
         self.navigationPanel = None
 
     def initGui(self):
@@ -68,13 +70,25 @@ class RoutingPlugin(QObject):
         # self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
-        self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
-        self.iface.addAction(self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+        self.navigationAction = QAction(
+            icon("navigate.png"), self.tr("Navigate")
+        )
+        self.iface.addAction(
+            self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
+
+        self.dataCatalogueAction = QAction(
+            icon("navigate.png"), self.tr("Data catalogue")
+        )
+        self.iface.addAction(
+            self.dataCatalogueAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
 
         self.actionsToggled = {
             self.navigationAction: self.showNavigation,
             self.reachabilityAction: self.showReachability,
-            self.optimalRouteAction: self.showOptimalRoute
+            self.optimalRouteAction: self.showOptimalRoute,
+            self.dataCatalogueAction: self.showDataCatalogue
             # self.tspAction: self.showTSP
             }
         for action in self.actionsToggled:
@@ -93,6 +107,9 @@ class RoutingPlugin(QObject):
         )
         self.iface.removeAction(
             self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
+        self.iface.removeAction(
+            self.dataCatalogueAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
         # self.iface.removeAction(
         #     self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
@@ -166,6 +183,19 @@ class RoutingPlugin(QObject):
         else:
             if self.navigationPanel is not None:
                 self.navigationPanel.hide()
+
+    def showDataCatalogue(self, show=True):
+        if show:
+            if self.dataCatalogueBar is None:
+                self.dataCatalogueBar = DataCatalogueBottomBar(
+                    self.iface.mapCanvas(),
+                    self.dataCatalogueAction
+                )
+            self.showDisclaimer()
+            self.dataCatalogueBar.show()
+        else:
+            if self.dataCatalogueBar is not None:
+                self.dataCatalogueBar.hide()                
 
     def showDisclaimer(self):
         show = QSettings().value("kadasrouting/showDisclaimer", True, type=bool)

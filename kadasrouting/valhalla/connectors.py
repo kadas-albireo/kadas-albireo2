@@ -6,7 +6,7 @@ import json
 from jinja2 import Environment, FileSystemLoader
 
 from kadasrouting.exceptions import Valhalla400Exception
-from kadasrouting.utilities import localeName
+from kadasrouting.utilities import localeName, appDataDir
 from qgis.core import QgsSettings
 
 LOG = logging.getLogger(__name__)
@@ -58,20 +58,14 @@ class ConsoleConnector(Connector):
     def isAvailable(self):
         return os.path.exists(self._valhallaExecutablePath())
 
-    def _appDataDir(self):
-        folder = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        return folder
-
     def createMapmatchingParametersFile(self, params):
-        outputFileName = os.path.join(self._appDataDir(), 'params.json')
+        outputFileName = os.path.join(appDataDir(), 'params.json')
         with open(outputFileName, 'w') as f:
             json.dump(params, f)
         return outputFileName
 
     def createValhallaJsonConfig(self, content):
-        outputFileName = os.path.join(self._appDataDir(), 'valhalla.json')
+        outputFileName = os.path.join(appDataDir(), 'valhalla.json')
         templatePath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "valhalla")
         templateFileLoader = FileSystemLoader(templatePath)
         jinjaEnv = Environment(loader=templateFileLoader)

@@ -41,7 +41,6 @@ WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
 )
 
-
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def __init__(self, canvas, action, plugin):
         KadasBottomBar.__init__(self, canvas, "orange")
