@@ -240,7 +240,7 @@ void KadasGlobeProjectLayerManager::addModelLayer( const QString &layerId )
   osgEarth::RenderSymbol *renderSymbol = style.getOrCreateSymbol<osgEarth::RenderSymbol>();
   renderSymbol->lighting() = layerConfig->lightingEnabled;
   renderSymbol->backfaceCulling() = false;
-
+  style.addSymbol( renderSymbol );
 
   KadasGlobeFeatureOptions featureOpt;
   featureOpt.setLayer( mapLayer );
