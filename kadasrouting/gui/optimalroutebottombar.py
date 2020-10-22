@@ -252,10 +252,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.destinationSearchBox.setText(originLocation)
         self.waypoints.reverse()
         self.waypointPins.reverse()
-        waypointsCoordinates = []
-        for waypoint in self.waypoints:
-            waypointsCoordinates.append("%f, %f" % (waypoint.x(), waypoint.y()))
-        self.lineEditWaypoints.setText(";".join(waypointsCoordinates))
+        # Reverse the text on the line edit
+        self.lineEditWaypoints.setText(';'.join(reversed(self.lineEditWaypoints.text().split(';'))))
         self.clearPins()
         self.addPins()
 

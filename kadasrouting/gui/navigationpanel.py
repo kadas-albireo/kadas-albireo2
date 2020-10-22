@@ -25,19 +25,6 @@ from PyQt5.QtWidgets import (
     QInputDialog
 )
 
-from kadas.kadasgui import (
-    KadasPinItem,
-    KadasItemPos,
-    KadasItemLayer,
-    KadasMapCanvasItemManager,
-    KadasPluginInterface,
-    KadasGpxWaypointItem)
-
-from kadasrouting.utilities import formatdist, pushMessage, iconPath
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadasrouting.gui.gps import getMockupGpsConnection
-from kadasrouting.core import vehicles
-
 from qgis.utils import iface
 
 from qgis.core import (
@@ -53,6 +40,20 @@ from qgis.core import (
 )
 
 from qgis.gui import QgsRubberBand
+
+from kadas.kadasgui import (
+    KadasPinItem,
+    KadasItemPos,
+    KadasItemLayer,
+    KadasMapCanvasItemManager,
+    KadasPluginInterface,
+    KadasGpxWaypointItem)
+
+from kadasrouting.utilities import formatdist, pushMessage, iconPath
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
+from kadasrouting.gui.gps import getMockupGpsConnection
+from kadasrouting.core import vehicles
+from kadasrouting.utilities import tr
 
 LOG = logging.getLogger(__name__)
 
@@ -74,11 +75,11 @@ route_html_template = '''
 <tr>
 <td style="width: 100%; background-color: #44546a;">
 <p style="text-align: center;">
-<span style="color: #ffffff;">Speed {speed} km/h</span><br />
-<span style="color: #ffffff;">Time Left {timeleft}</span><br />
-<span style="color: #ffffff;">Dist Left {distleft}</span><br />
-<span style="color: #ffffff;">ETA {eta}</span></p>
-<p style="text-align: center;"><span style="color: #ffffff;">My Position:</span><br />
+<span style="color: #ffffff;">''' + tr('Speed') + ''' {speed} km/h</span><br />
+<span style="color: #ffffff;">''' + tr('Time Left') + ''' {timeleft}</span><br />
+<span style="color: #ffffff;">''' + tr('Dist Left') + ''' {distleft}</span><br />
+<span style="color: #ffffff;">''' + tr('ETA') + ''' {eta}</span></p>
+<p style="text-align: center;"><span style="color: #ffffff;">''' + tr('My Position:') + '''</span><br />
 <span style="color: #ffffff;">{x}</span><br />
 <span style="color: #ffffff;">{y}</span></p>
 </td>
@@ -93,13 +94,13 @@ waypoint_html_template = '''
 <tr>
 <td style="width: 100%; background-color: #44546a;">
 <p style="text-align: center;">
-<span style="color: yellow; font-size:14pt;">Ground Heading </span>
+<span style="color: yellow; font-size:14pt;">''' + tr('Ground Heading') + ''' </span>
 <span style="color: #ffffff;"> {heading:.0f}°</span><br/>
-<span style="color: #adb9ca; font-size:14pt;">WP Angle </span>
+<span style="color: #adb9ca; font-size:14pt;">''' + tr('WP Angle') + ''' </span>
 <span style="color: #ffffff;"> {wpangle:.0f}°</span><br />
-<span style="color: #ffffff;">Dist {distleft}</span><br />
-<span style="color: #ffffff;">Speed {speed:.2f} km/h</span><br />
-<span style="color: #ffffff;">ETA {eta}</span></p>
+<span style="color: #ffffff;">''' + tr('Dist') + ''' {distleft}</span><br />
+<span style="color: #ffffff;">''' + tr('Speed') + ''' {speed:.2f} km/h</span><br />
+<span style="color: #ffffff;">''' + tr('ETA') + ''' {eta}</span></p>
 </td>
 </tr>
 </tbody>
@@ -110,12 +111,12 @@ waypoint_name_html_template = '<h3 style="text-align: center;"><span style="colo
 
 waypoint_miniature_html_template = '''
 <span style="color: white;">{name}<br/>
-<span style="font-size:8pt;">Dist {dist} | {wpangle:.0f}°</span></span>
+<span style="font-size:8pt;">''' + tr('Dist') + ''' {dist} | {wpangle:.0f}°</span></span>
 '''
 
 waypoint_miniature_selected_html_template = '''
 <span style="color: white; font-weight: bold; ">{name}<br/>
-<span style="font-size:8pt;">Dist {dist} | {wpangle:.0f}°</span></span>
+<span style="font-size:8pt;">''' + tr('Dist') + ''' {dist} | {wpangle:.0f}°</span></span>
 '''
 
 message_html_template = '''
