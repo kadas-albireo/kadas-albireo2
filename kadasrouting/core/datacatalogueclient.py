@@ -20,151 +20,6 @@ from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
 
 from pyplugin_installer import unzip
 
-mockedResponse= {
-  "query": "tags:\"valhalla_network\"",
-  "total": 3,
-  "start": 1,
-  "num": 10,
-  "nextStart": -1,
-  "results": [
-    {
-      "id": "13d2b773e2b84ded916d11946ffb0c89",
-      "owner": "UE1644793@IFC1",
-      "created": 1603049721475,
-      "isOrgItem": True,
-      "modified": 1603049805298,
-      "guid": None,
-      "name": "monaco_tiles.zip",
-      "title": "Monaco Routing Network",
-      "type": "Code Sample",
-      "typeKeywords": [
-        "C",
-        "Code",
-        "Sample"
-      ],
-      "description": None,
-      "tags": ["valhalla_network"],
-      "snippet": None,
-      "thumbnail": None,
-      "documentation": None,
-      "extent": [],
-      "categories": [],
-      "spatialReference": None,
-      "accessInformation": None,
-      "licenseInfo": None,
-      "culture": "fr-ch",
-      "properties": None,
-      "url": None,
-      "proxyFilter": None,
-      "access": "public",
-      "size": -1,
-      "appCategories": [],
-      "industries": [],
-      "languages": [],
-      "largeThumbnail": None,
-      "banner": None,
-      "screenshots": [],
-      "listed": False,
-      "numComments": 0,
-      "numRatings": 0,
-      "avgRating": 0,
-      "numViews": 0,
-      "scoreCompleteness": 16,
-      "groupDesignations": None
-    },
-    {
-      "id": "5fcbbff3fc064932a0a09dbfce162db7",
-      "owner": "UE1644793@IFC1",
-      "created": 1603049474719,
-      "isOrgItem": True,
-      "modified": 1603049890819,
-      "guid": None,
-      "name": "andorra_tiles.zip",
-      "title": "Andorra Routing Network",
-      "type": "Code Sample",
-      "typeKeywords": [
-        "Code",
-        "Python",
-        "Sample"
-      ],
-      "description": "Example routing network for Valhalla Engine.",
-      "tags": ["valhalla_network"],
-      "snippet": None,
-      "thumbnail": None,
-      "documentation": None,
-      "extent": [],
-      "categories": [],
-      "spatialReference": None,
-      "accessInformation": None,
-      "licenseInfo": None,
-      "culture": "fr-ch",
-      "properties": None,
-      "url": None,
-      "proxyFilter": None,
-      "access": "public",
-      "size": -1,
-      "appCategories": [],
-      "industries": [],
-      "languages": [],
-      "largeThumbnail": None,
-      "banner": None,
-      "screenshots": [],
-      "listed": False,
-      "numComments": 0,
-      "numRatings": 0,
-      "avgRating": 0,
-      "numViews": 0,
-      "scoreCompleteness": 21,
-      "groupDesignations": None
-    },
-    {
-      "id": "ad8a2f8f41f249008a472de36113cd91",
-      "owner": "UE1644793@IFC1",
-      "created": 1603049576709,
-      "isOrgItem": True,
-      "modified": 1603049826946,
-      "guid": None,
-      "name": "liechtenstein_tiles.zip",
-      "title": "Liechtenstein Routing Network",
-      "type": "Code Sample",
-      "typeKeywords": [
-        "C",
-        "Code",
-        "Sample"
-      ],
-      "description": "Example routing network for Valhalla engine.",
-      "tags": ["valhalla_network"],
-      "snippet": None,
-      "thumbnail": None,
-      "documentation": None,
-      "extent": [],
-      "categories": [],
-      "spatialReference": None,
-      "accessInformation": None,
-      "licenseInfo": None,
-      "culture": "fr-ch",
-      "properties": None,
-      "url": None,
-      "proxyFilter": None,
-      "access": "public",
-      "size": -1,
-      "appCategories": [],
-      "industries": [],
-      "languages": [],
-      "largeThumbnail": None,
-      "banner": None,
-      "screenshots": [],
-      "listed": False,
-      "numComments": 0,
-      "numRatings": 0,
-      "avgRating": 0,
-      "numViews": 0,
-      "scoreCompleteness": 21,
-      "groupDesignations": None
-    }
-  ]
-}
-
 class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
@@ -187,12 +42,10 @@ class DataCatalogueClient():
         url = f'{self.url}/search?q=owner:"geosupport.fsta" tags:"valhalla"&f=pjson' 
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:        
-            responsejson = mockedResponse
-            #raise Exception(response.error())
-        else:
-            responsejson = json.loads(response.content.decode())            
+            raise Exception(response.error())
+        responsejson = json.loads(response.content.decode())            
         tiles = []
-        for i, result in enumerate(responsejson["results"]):
+        for result in responsejson["results"]:
             itemid = result["id"]
             timestamp = self.dataTimestamp(itemid)
             if timestamp is None:
@@ -206,7 +59,7 @@ class DataCatalogueClient():
                     "name": result["name"],
                     "title": result["title"],
                     "timestamp": int(result["modified"]),
-                    "status": i#status
+                    "status": status
                 })
         return tiles
 
