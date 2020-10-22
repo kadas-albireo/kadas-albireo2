@@ -16,17 +16,19 @@ from qgis.core import (
     QgsNetworkAccessManager
 )
 
-from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
+from kadasrouting.utilities import appDataDir, waitcursor
 
 from pyplugin_installer import unzip
+
 
 class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
 
-    DEFAULT_URL = "" #TODO
+    # TODO
+    DEFAULT_URL = ""
 
-    def __init__(self, url=None):       
+    def __init__(self, url=None):
         self.url = url or self.DEFAULT_URL
 
     def dataTimestamp(self, itemid):
@@ -41,9 +43,9 @@ class DataCatalogueClient():
     def getAvailableTiles(self):
         url = f'{self.url}/search?q=owner:"geosupport.fsta" tags:"valhalla"&f=pjson' 
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
-        if response.error() != QNetworkReply.NoError:        
+        if response.error() != QNetworkReply.NoError:
             raise Exception(response.error())
-        responsejson = json.loads(response.content.decode())            
+        responsejson = json.loads(response.content.decode())
         tiles = []
         for result in responsejson["results"]:
             itemid = result["id"]
@@ -65,9 +67,9 @@ class DataCatalogueClient():
 
     def install(self, itemid, timestamp):
         if self._downloadAndUnzip(itemid):
-            filename = os.path.join(self.folderForDataItem(itemid), "timestamp")            
+            filename = os.path.join(self.folderForDataItem(itemid), "timestamp")
             with open(filename, "w") as f:
-                f.write(timestamp)            
+                f.write(timestamp)
             return True
         else:
             return False
@@ -76,29 +78,29 @@ class DataCatalogueClient():
     def _downloadAndUnzip(self, itemid):
         url = f'{self.url}/content/items/{itemid}/data'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
-        if response.error() == QNetworkReply.NoError:   
-            request = reply.request()
+        if response.error() == QNetworkReply.NoError:
             tmpDir = QDir.tempPath()
             filename = f"{itemid}.zip"
             tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
             file = QFile(tmpPath)
             file.open(QFile.WriteOnly)
-            file.write(reply.readAll())
+            file.write(response.readAll())
             file.close()
             targetFolder = self.folderForDataItem(itemid)
             removed = QDir(targetFolder).removeRecursively()
             if not removed:
                 return False
-            unzip(tmpPath, targetFolder)              
+            unzip(tmpPath, targetFolder)
             QFile(tmpPath).remove()
             return True
         else:
             return False
 
-    def uninstall(self, itemid):                
+    def uninstall(self, itemid):
         return QFile(self.folderForDataItem(itemid)).removeRecursively()
 
     def folderForDataItem(self, itemid):
         return os.path.join(appDataDir(), "tiles", itemid)
-            
+
+
 dataCatalogueClient = DataCatalogueClient()

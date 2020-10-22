@@ -12,17 +12,17 @@ from kadas.kadasgui import (
     KadasBottomBar,
 )
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal
 
 from PyQt5.QtGui import (
     QIcon
 )
 
 from PyQt5.QtWidgets import (
-    QHBoxLayout, 
-    QLabel, 
-    QFrame, 
-    QPushButton, 
+    QHBoxLayout,
+    QLabel,
+    QFrame,
+    QPushButton,
     QListWidgetItem
 )
 
@@ -51,10 +51,10 @@ class DataItemWidget(QFrame):
         layout = QHBoxLayout()
         layout.setMargin(0)
         self.label = QLabel()
-        layout.addWidget(self.label)        
+        layout.addWidget(self.label)
         self.button = QPushButton()
         self.button.clicked.connect(self.buttonClicked)
-        self.updateContent(data)       
+        self.updateContent(data)
         layout.addStretch()
         layout.addWidget(self.button)
         self.setLayout(layout)
@@ -94,8 +94,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.listWidget.setStyleSheet("QListWidget { background-color: white; }")
         self.action = action
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
-        self.btnClose.setToolTip(self.tr("Close data catalogue dialog"))     
-        #self.action.toggled.connect(self.actionToggled)
+        self.btnClose.setToolTip(self.tr("Close data catalogue dialog"))
         self.btnClose.clicked.connect(self.action.toggle)
         self.populateList()
 
@@ -107,7 +106,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             pushWarning(str(e))
             return
 
-        for data in dataItems:          
+        for data in dataItems:
             item = DataItem(data)
             widget = DataItemWidget(data)
             widget.statusChanged.connect(self.statusChanged)
@@ -121,8 +120,3 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             if item.data["id"] == data["id"]:
                 widget = self.listWidget.itemWidget(item)
                 widget.updateContent(data)
-
-
-
-
-

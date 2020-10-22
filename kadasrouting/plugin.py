@@ -195,7 +195,7 @@ class RoutingPlugin(QObject):
             self.dataCatalogueBar.show()
         else:
             if self.dataCatalogueBar is not None:
-                self.dataCatalogueBar.hide()                
+                self.dataCatalogueBar.hide()
 
     def showDisclaimer(self):
         show = QSettings().value("kadasrouting/showDisclaimer", True, type=bool)

@@ -41,6 +41,7 @@ WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
 )
 
+
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def __init__(self, canvas, action, plugin):
         KadasBottomBar.__init__(self, canvas, "orange")
@@ -70,7 +71,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.createLayer,
         )
         self.layerSelector.createLayerIfEmpty(self.tr("Route"))
-        self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
+        self.layerSelector.selectedLayerChanged.connect(
+            self.selectedLayerChanged)
         self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
         layer = self.layerSelector.getSelectedLayer()
         self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
@@ -97,7 +99,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnNavigate.clicked.connect(self.navigate)
         self.btnAreasToAvoidClear.clicked.connect(self.clearAreasToAvoid)
-        self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
+        self.btnAreasToAvoidFromCanvas.toggled.connect(
+            self.setPolygonDrawingMapTool)
 
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
@@ -120,14 +123,18 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def populateLayerSelector(self):
         self.comboAreasToAvoidLayers.clear()
         for layer in QgsProject.instance().mapLayers().values():
-            if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.PolygonGeometry:
+            if (isinstance(layer, QgsVectorLayer) and
+                    layer.geometryType() == QgsWkbTypes.PolygonGeometry):
                 self.comboAreasToAvoidLayers.addItem(layer.name(), layer)
 
     def _radioButtonsChanged(self):
         self.populateLayerSelector()
-        self.comboAreasToAvoidLayers.setEnabled(self.radioAreasToAvoidLayer.isChecked())
-        self.btnAreasToAvoidFromCanvas.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
-        self.btnAreasToAvoidClear.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
+        self.comboAreasToAvoidLayers.setEnabled(
+            self.radioAreasToAvoidLayer.isChecked())
+        self.btnAreasToAvoidFromCanvas.setEnabled(
+            self.radioAreasToAvoidPolygon.isChecked())
+        self.btnAreasToAvoidClear.setEnabled(
+            self.radioAreasToAvoidPolygon.isChecked())
         if self.radioAreasToAvoidPolygon.isChecked():
             if self.areasToAvoid is not None:
                 self.areasToAvoidFootprint.setToGeometry(self.areasToAvoid)
@@ -138,7 +145,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         if checked:
             self.prevMapTool = iface.mapCanvas().mapTool()
             self.mapToolDrawPolygon = DrawPolygonMapTool(iface.mapCanvas())
-            self.mapToolDrawPolygon.polygonSelected.connect(self.setAreasToAvoidFromPolygon)
+            self.mapToolDrawPolygon.polygonSelected.connect(
+                self.setAreasToAvoidFromPolygon)
             iface.mapCanvas().setMapTool(self.mapToolDrawPolygon)
         else:
             try:
@@ -182,7 +190,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             return
 
         if None in points:
-            pushWarning(self.tr("Both origin and destination points are required"))
+            pushWarning(
+                self.tr("Both origin and destination points are required"))
             return
 
         shortest = self.radioButtonShortest.isChecked()
@@ -237,7 +246,8 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             self.lineEditWaypoints.setText(self.waypointsSearchBox.text())
         else:
             self.lineEditWaypoints.setText(
-                self.lineEditWaypoints.text() + ";" + self.waypointsSearchBox.text()
+                self.lineEditWaypoints.text() + ";"
+                + self.waypointsSearchBox.text()
             )
         self.waypointsSearchBox.clearSearchBox()
         # Remove way point pin from the location input widget
