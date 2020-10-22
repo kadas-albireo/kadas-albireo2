@@ -25,8 +25,7 @@ class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
 
-    # TODO
-    DEFAULT_URL = ""
+    DEFAULT_URL = "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest"
 
     def __init__(self, url=None):
         self.url = url or self.DEFAULT_URL
