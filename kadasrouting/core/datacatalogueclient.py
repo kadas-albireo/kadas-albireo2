@@ -39,7 +39,7 @@ class DataCatalogueClient():
         except Exception:
             return None
 
-    def getAvailableTiles(self): 
+    def getAvailableTiles(self):
         url = f'{self.url}/search?q=tags:"valhalla_network"&f=pjson'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
