@@ -39,12 +39,12 @@ class DataCatalogueClient():
         except Exception:
             return None
 
-    def getAvailableTiles(self):
-        url = f'{self.url}/search?q=owner:"geosupport.fsta" tags:"valhalla"&f=pjson'
+    def getAvailableTiles(self): 
+        url = f'{self.url}/search?q=tags:"valhalla_network"&f=pjson'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
-            raise Exception(response.error())
-        responsejson = json.loads(response.content.decode())
+            raise Exception("Response error:" + response.error())
+        responsejson = json.loads(response.content().data())
         tiles = []
         for result in responsejson["results"]:
             itemid = result["id"]
@@ -68,7 +68,7 @@ class DataCatalogueClient():
         if self._downloadAndUnzip(itemid):
             filename = os.path.join(self.folderForDataItem(itemid), "timestamp")
             with open(filename, "w") as f:
-                f.write(timestamp)
+                f.write(str(timestamp))
             return True
         else:
             return False
@@ -83,13 +83,13 @@ class DataCatalogueClient():
             tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
             file = QFile(tmpPath)
             file.open(QFile.WriteOnly)
-            file.write(response.readAll())
+            file.write(response.content().data())
             file.close()
             targetFolder = self.folderForDataItem(itemid)
             removed = QDir(targetFolder).removeRecursively()
             if not removed:
                 return False
-            unzip(tmpPath, targetFolder)
+            unzip.unzip(tmpPath, targetFolder)
             QFile(tmpPath).remove()
             return True
         else:
