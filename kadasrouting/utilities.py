@@ -38,6 +38,13 @@ def localeName():
     return locale_name
 
 
+def appDataDir():
+    folder = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    return folder
+
+
 def iconPath(name):
     return os.path.join(os.path.dirname(__file__), "icons", name)
 
