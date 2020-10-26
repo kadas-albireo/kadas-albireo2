@@ -77,6 +77,14 @@ class RoutingPlugin(QObject):
             self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
 
+        # Day and Night
+        self.dayNightAction = QAction(
+            icon("day-and-night.png"), self.tr("Day / Night")
+        )
+        self.iface.addAction(
+            self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
+
         self.dataCatalogueAction = QAction(
             icon("navigate.png"), self.tr("Data catalogue")
         )
@@ -88,7 +96,8 @@ class RoutingPlugin(QObject):
             self.navigationAction: self.showNavigation,
             self.reachabilityAction: self.showReachability,
             self.optimalRouteAction: self.showOptimalRoute,
-            self.dataCatalogueAction: self.showDataCatalogue
+            self.dataCatalogueAction: self.showDataCatalogue,
+            self.dayNightAction: self.toggleDayNight
             # self.tspAction: self.showTSP
             }
         for action in self.actionsToggled:
@@ -110,7 +119,10 @@ class RoutingPlugin(QObject):
         )
         self.iface.removeAction(
             self.dataCatalogueAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        )
+        ),
+        self.iface.removeAction(
+            self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        ),
         # self.iface.removeAction(
         #     self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         # )
@@ -202,3 +214,9 @@ class RoutingPlugin(QObject):
         if show:
             dialog = DisclaimerDialog(iface.mainWindow())
             dialog.exec_()
+
+    def toggleDayNight(self, day=True):
+        if day:
+            pushWarning('Show day map')
+        else:
+            pushWarning('show night map')
