@@ -77,7 +77,7 @@ class DataItemWidget(QFrame):
             if not ret:
                 pushWarning(self.tr("Cannot remove previous version of data"))
         else:
-            ret = dataCatalogueClient.install(self.data["id"])
+            ret = dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(self.tr("Cannot install data"))
         if ret:

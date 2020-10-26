@@ -31,10 +31,10 @@ class DataCatalogueClient():
         self.url = url or self.DEFAULT_URL
 
     def dataTimestamp(self, itemid):
-        filename = os.path.join(self.folderForDataItem(itemid), "timestamp")
+        filename = os.path.join(self.folderForDataItem(itemid), "metadata")
         try:
             with open(filename) as f:
-                timestamp = f.read()
+                timestamp = json.read(f)["modified"]
             return timestamp
         except Exception:
             return None
@@ -55,20 +55,17 @@ class DataCatalogueClient():
                 status = self.UPDATABLE
             else:
                 status = self.UP_TO_DATE
-            tiles.append({
-                    "id": itemid,
-                    "name": result["name"],
-                    "title": result["title"],
-                    "timestamp": int(result["modified"]),
-                    "status": status
-                })
+            tile = dict(result)
+            tile["status"] = status
+            tiles.append(tile)
         return tiles
 
-    def install(self, itemid, timestamp):
+    def install(self, data):
+        itemid = data["id"]
         if self._downloadAndUnzip(itemid):
-            filename = os.path.join(self.folderForDataItem(itemid), "timestamp")
+            filename = os.path.join(self.folderForDataItem(itemid), "metadata")
             with open(filename, "w") as f:
-                f.write(timestamp)
+                json.dump(data, f)
             return True
         else:
             return False
