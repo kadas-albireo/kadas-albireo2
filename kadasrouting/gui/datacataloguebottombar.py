@@ -12,8 +12,6 @@ from kadas.kadasgui import (
     KadasBottomBar,
 )
 
-from PyQt5.QtCore import pyqtSignal
-
 from PyQt5.QtGui import (
     QIcon
 )
@@ -43,8 +41,6 @@ class DataItem(QListWidgetItem):
 
 class DataItemWidget(QFrame):
 
-    statusChanged = pyqtSignal(dict)
-
     def __init__(self, data):
         QFrame.__init__(self)
         self.data = data
@@ -58,16 +54,17 @@ class DataItemWidget(QFrame):
         layout.addStretch()
         layout.addWidget(self.button)
         self.setLayout(layout)
+        self.setStyleSheet("QFrame { background-color: white; }")
 
-    def updateContent(self, data):
+    def updateContent(self):
         statuses = {
             DataCatalogueClient.NOT_INSTALLED: [self.tr("Install"), "black"],
             DataCatalogueClient.UPDATABLE: [self.tr("Update"), "orange"],
             DataCatalogueClient.UP_TO_DATE: [self.tr("Remove"), "green"]
         }
-        status = data['status']
-        date = datetime.datetime.fromtimestamp(data['timestamp'] / 1e3).strftime("%d-%m-%Y")
-        self.label.setText(f"<b>{data['title']} [{date}]</b>")
+        status = self.data['status']
+        date = datetime.datetime.fromtimestamp(self.data['timestamp'] / 1e3).strftime("%d-%m-%Y")
+        self.label.setText(f"<b>{self.data['title']} [{date}]</b>")
         self.label.setStyleSheet(f"color: {statuses[status][1]}")
         self.button.setText(statuses[status][0])
 
@@ -78,11 +75,12 @@ class DataItemWidget(QFrame):
             if not ret:
                 pushWarning(self.tr("Cannot remove previous version of data"))
         else:
-            ret = dataCatalogueClient.install(self.data["id"], self.data['timestamp'])
+            ret = dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(self.tr("Cannot install data"))
         if ret:
-            self.statusChanged.emit(self.data)
+            self.data['status'] = DataCatalogueClient.UP_TO_DATE
+            self.updateContent()
 
 
 class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
@@ -109,14 +107,6 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         for data in dataItems:
             item = DataItem(data)
             widget = DataItemWidget(data)
-            widget.statusChanged.connect(self.statusChanged)
             item.setSizeHint(widget.sizeHint())
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
-
-    def statusChanged(self, data):
-        for i in range(self.listWidget.count()):
-            item = self.listWidget.item(i)
-            if item.data["id"] == data["id"]:
-                widget = self.listWidget.itemWidget(item)
-                widget.updateContent(data)
