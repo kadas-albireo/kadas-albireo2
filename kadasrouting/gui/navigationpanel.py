@@ -245,7 +245,7 @@ class NavigationPanel(BASE, WIDGET):
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
                 LOG.debug(maneuver)
             except NotInRouteException:
-                self.setMessage(self.tr("You are not in the route"))
+                self.setMessage(self.tr("You are not on the route"))
                 return
             self.setWidgetsVisibility(False)
             html = route_html_template.format(**maneuver)
