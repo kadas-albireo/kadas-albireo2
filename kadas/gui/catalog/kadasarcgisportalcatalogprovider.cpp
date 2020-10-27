@@ -411,7 +411,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
       const ResultEntry &entry = ( *entries ) [layerName];
       mimeDataUri.name = entry.title;
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4' tiled='false'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
       QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
       mimeData->setProperty( "metadataUrl", entry.metadataUrl );
       if ( !entry.flatten )
