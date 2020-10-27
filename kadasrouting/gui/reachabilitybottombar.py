@@ -58,8 +58,9 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
         self.btnCalculate.clicked.connect(self.calculate)
 
+        # Set the anchor to 0.5, 0.5 because the center of the cross needs to be in the position
         self.originSearchBox = LocationInputWidget(
-            canvas, locationSymbolPath=iconPath("blue_cross.svg")
+            canvas, locationSymbolPath=iconPath("blue_cross.svg"), pinAnchorX=0.5, pinAnchorY=0.5
         )
         self.layout().addWidget(self.originSearchBox, 0, 1)
 

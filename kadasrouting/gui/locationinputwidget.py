@@ -38,11 +38,14 @@ class WrongLocationException(Exception):
 class LocationInputWidget(QWidget):
     pointUpdated = pyqtSignal(QgsPointXY)
 
-    def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red"):
+    def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red", pinAnchorX=0.5, pinAnchorY=1):
         QWidget.__init__(self)
         # UI
         self.canvas = canvas
         self.locationSymbolPath = locationSymbolPath
+        # By default the anchor is 0.5, 1 which means in the middle bottom of the symbol
+        self.pinAnchorX = pinAnchorX
+        self.pinAnchorY = pinAnchorY
         self.layout = QHBoxLayout()
         self.layout.setMargin(0)
 
@@ -156,7 +159,11 @@ class LocationInputWidget(QWidget):
         canvasCrs = self.canvas.mapSettings().destinationCrs()
         self.pin = KadasPinItem(canvasCrs)
         self.pin.setPosition(KadasItemPos(canvasPoint.x(), canvasPoint.y()))
+        self.pin.setAnchorX(self.pinAnchorX)
+        self.pin.setAnchorY(self.pinAnchorY)
         self.pin.setFilePath(self.locationSymbolPath)
+        LOG.debug('self.pin position %s, %s' % (self.pin.position().x(), self.pin.position().y()))
+        LOG.debug('pin anchor %s, %s' % (self.pin.anchorX(), self.pin.anchorY()))
         KadasMapCanvasItemManager.addItem(self.pin)
 
     def removePin(self):
