@@ -51,10 +51,14 @@ def getFeaturesFromResponse(response):
 def generateIsochrones(point, profile, costingOptions, intervals, colors, basename, overwrite=True):
     response = valhalla.isochrones(point, profile, costingOptions, intervals, colors)
     features = getFeaturesFromResponse(response)
+    if costingOptions.get('shortest'):
+        suffix = 'km'
+    else:
+        suffix = 'min'
     for interval, feature in zip(intervals[::-1], features):
         # FIXME: we should use the 'contour' property in the feature to be sure of the contour line that we are
         # drawing, but due to a bug in qgis json parser, this property appears to be always set to '0'
-        layername = "{} min - {}".format(interval, basename)
+        layername = "{} {} - {}".format(interval, suffix, basename)
         try:
             # FIXME: we do not consider if there are several layers with the same name here
             existinglayer = QgsProject.instance().mapLayersByName(layername)[0]
