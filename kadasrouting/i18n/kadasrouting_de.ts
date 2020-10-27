@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -20,47 +19,47 @@
     <message>
         <location filename="navigationpanel.py" line="102"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="79"/>
         <source>Time Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Zeit</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="80"/>
         <source>Dist Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Entfernung</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="103"/>
         <source>ETA</source>
-        <translation type="unfinished"></translation>
+        <translation>ETA</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="82"/>
         <source>My Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mein Standort</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="97"/>
         <source>Ground Heading</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewegungsrichtung</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="99"/>
         <source>WP Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Winkel des Wegpunktes</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="119"/>
         <source>Dist</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernung</translation>
     </message>
     <message>
         <location filename="plugin.py" line="38"/>
         <source>Valhalla is not installed or it cannot be found</source>
-        <translation type="unfinished"></translation>
+        <translation>Valhalla ist nicht installiert oder kann nicht gefunden werden</translation>
     </message>
 </context>
 <context>
@@ -76,7 +75,7 @@
     <message>
         <location filename="datacataloguebottombar.py" line="95"/>
         <source>Close data catalogue dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenkatalog schliessen</translation>
     </message>
 </context>
 <context>
@@ -84,27 +83,27 @@
     <message>
         <location filename="datacataloguebottombar.py" line="61"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>Installieren der Anwendung</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="62"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Update</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="63"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernen der Anwendung</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="76"/>
         <source>Cannot remove previous version of data</source>
-        <translation type="unfinished"></translation>
+        <translation>Alter Datensatz kann nicht gelöscht werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
         <source>Cannot install data</source>
-        <translation type="unfinished"></translation>
+        <translation>Daten können nicht installiert werden</translation>
     </message>
 </context>
 <context>
@@ -145,12 +144,12 @@
     <message>
         <location filename="navigationpanel.ui" line="48"/>
         <source>Show Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnungen anzeigen</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurieren</translation>
     </message>
 </context>
 <context>
@@ -303,7 +302,7 @@
     <message>
         <location filename="datacataloguebottombar.ui" line="43"/>
         <source>Routing Data Repository</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher für Routingdaten</translation>
     </message>
 </context>
 <context>
@@ -359,12 +358,12 @@
     <message>
         <location filename="navigationpanel.py" line="193"/>
         <source>Set threshold for warnings (meters)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grenzwert für Warnungen (Meter):</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="248"/>
         <source>You are not on the route</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie befinden sich nicht auf der Route</translation>
     </message>
 </context>
 <context>
@@ -402,7 +401,7 @@
     <message>
         <location filename="optimalroutebottombar.py" line="193"/>
         <source>Both origin and destination points are required</source>
-        <translation type="unfinished"></translation>
+        <translation>Start und Ziel müssen angegeben werden</translation>
     </message>
 </context>
 <context>
@@ -536,12 +535,12 @@
     <message>
         <location filename="plugin.py" line="88"/>
         <source>Data catalogue</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenkatalog</translation>
     </message>
     <message>
         <location filename="plugin.py" line="81"/>
         <source>Day / Night</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag / Nacht</translation>
     </message>
 </context>
 <context>
