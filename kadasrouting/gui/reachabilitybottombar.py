@@ -149,13 +149,8 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        if (self.comboBoxReachabilityMode.currentText()
-                == self.reachabilityMode["isodistance"]):
-            if profile == "auto":
-                profile = "auto_shorter"
-            else:
-                pushWarning("Isodistance mode is not compatible with the selected vehicle")
-                return
+        is_isodistance = self.comboBoxReachabilityMode.currentText() == self.reachabilityMode["isodistance"]
+        costingOptions['shortest'] = is_isodistance
 
         colors = []
         try:
