@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from PyQt5.QtCore import (
     QUrl,
@@ -20,12 +21,16 @@ from kadasrouting.utilities import appDataDir, waitcursor
 
 from pyplugin_installer import unzip
 
+LOG = logging.getLogger(__name__)
+
 
 class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
 
-    DEFAULT_URL = "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest"
+    # DEFAULT_URL = "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest"
+
+    DEFAULT_URL = 'https://ch-milgeo.maps.arcgis.com/sharing/rest'
 
     def __init__(self, url=None):
         self.url = url or self.DEFAULT_URL
@@ -40,11 +45,14 @@ class DataCatalogueClient():
             return None
 
     def getAvailableTiles(self):
-        url = f'{self.url}/search?q=tags:"valhalla_network"&f=pjson'
+        # https://ch-milgeo.maps.arcgis.com/sharing/rest/
+        # search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson
+        url = f'{self.url}/search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
             raise Exception("Response error:" + response.error())
         responsejson = json.loads(response.content().data())
+        LOG.debug('response from data repository: %s' % responsejson)
         tiles = []
         for result in responsejson["results"]:
             itemid = result["id"]
@@ -64,6 +72,7 @@ class DataCatalogueClient():
         itemid = data["id"]
         if self._downloadAndUnzip(itemid):
             filename = os.path.join(self.folderForDataItem(itemid), "metadata")
+            LOG.debug('install data on %s' % filename)
             with open(filename, "w") as f:
                 json.dump(data, f)
             return True
@@ -87,13 +96,16 @@ class DataCatalogueClient():
             if not removed:
                 return False
             unzip.unzip(tmpPath, targetFolder)
+            LOG.debug('unziped data to %s ' % targetFolder)
             QFile(tmpPath).remove()
             return True
         else:
             return False
 
     def uninstall(self, itemid):
-        return QFile(self.folderForDataItem(itemid)).removeRecursively()
+        path = self.folderForDataItem(itemid)
+        LOG.debug('uninstall/remove from %s' % path)
+        return QDir(self.folderForDataItem(itemid)).removeRecursively()
 
     def folderForDataItem(self, itemid):
         return os.path.join(appDataDir(), "tiles", itemid)
