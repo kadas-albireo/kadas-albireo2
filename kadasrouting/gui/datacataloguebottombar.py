@@ -4,7 +4,8 @@ import logging
 
 from kadasrouting.core.datacatalogueclient import (
     dataCatalogueClient,
-    DataCatalogueClient
+    DataCatalogueClient,
+    DEFAULT_DATA_TILES_PATH
 )
 
 from kadasrouting.utilities import pushWarning, pushMessage
@@ -77,15 +78,17 @@ class DataItemWidget(QFrame):
         self.radioButton.setText(f"{self.data['title']} [{date}]")
         self.radioButton.setStyleSheet(f"color: {statuses[status][1]}; font: bold")
         self.button.setText(statuses[status][0])
-        if self.data['id'] == 'default':
-            self.button.setEnabled(False)
-            self.button.setToolTip(self.tr('Default data tiles can not be removed'))
+        # Add addditional behaviour for radio button according to installation status
         if status == DataCatalogueClient.NOT_INSTALLED:
             self.radioButton.setDisabled(True)
             self.radioButton.setToolTip(self.tr('Please install the tiles first before using it.'))
         else:
             self.radioButton.setDisabled(False)
             self.radioButton.setToolTip('')
+        # Special handler for default data
+        if self.data['id'] == 'default':
+            self.button.setEnabled(False)
+            self.button.setToolTip(self.tr('Default data tiles can not be removed'))
 
     def buttonClicked(self):
         status = self.data['status']
@@ -132,9 +135,13 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
     def populateList(self):
         LOG.debug('populating list')
         self.listWidget.clear()
+        if os.path.exists(DEFAULT_DATA_TILES_PATH):
+            defaultStatus = DataCatalogueClient.UP_TO_DATE
+        else:
+            defaultStatus = DataCatalogueClient.NOT_INSTALLED
         # Add default data tile first
         defaultData = {
-                'status': DataCatalogueClient.UP_TO_DATE,
+                'status': defaultStatus,
                 'title': self.tr('Switzerland - Default'),
                 'id': 'default',
                 'modified': 1
