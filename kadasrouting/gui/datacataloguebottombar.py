@@ -80,6 +80,12 @@ class DataItemWidget(QFrame):
         if self.data['id'] == 'default':
             self.button.setEnabled(False)
             self.button.setToolTip(self.tr('Default data tiles can not be removed'))
+        if status == DataCatalogueClient.NOT_INSTALLED:
+            self.radioButton.setDisabled(True)
+            self.radioButton.setToolTip(self.tr('Please install the tiles first before using it.'))
+        else:
+            self.radioButton.setDisabled(False)
+            self.radioButton.setToolTip('')
 
     def buttonClicked(self):
         status = self.data['status']
