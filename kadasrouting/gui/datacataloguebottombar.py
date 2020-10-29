@@ -22,7 +22,9 @@ from PyQt5.QtWidgets import (
     QLabel,
     QFrame,
     QPushButton,
-    QListWidgetItem
+    QListWidgetItem,
+    QRadioButton,
+    QButtonGroup
 )
 
 from PyQt5 import uic
@@ -49,6 +51,8 @@ class DataItemWidget(QFrame):
         self.data = data
         layout = QHBoxLayout()
         layout.setMargin(0)
+        self.radioButton = QRadioButton()
+        layout.addWidget(self.radioButton)
         self.label = QLabel()
         layout.addWidget(self.label)
         self.button = QPushButton()
@@ -103,6 +107,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
         self.btnClose.setToolTip(self.tr("Close data catalogue dialog"))
         self.btnClose.clicked.connect(self.action.toggle)
+        self.radioButtonGroup = QButtonGroup(self)
         self.populateList()
 
     def populateList(self):
@@ -120,3 +125,4 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             item.setSizeHint(widget.sizeHint())
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
+            self.radioButtonGroup.addButton(widget.radioButton)
