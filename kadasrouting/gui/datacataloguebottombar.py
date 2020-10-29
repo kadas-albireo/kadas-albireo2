@@ -1,12 +1,13 @@
 import os
 import datetime
+import logging
 
 from kadasrouting.core.datacatalogueclient import (
     dataCatalogueClient,
     DataCatalogueClient
 )
 
-from kadasrouting.utilities import pushWarning
+from kadasrouting.utilities import pushWarning, pushMessage
 
 from kadas.kadasgui import (
     KadasBottomBar,
@@ -25,6 +26,8 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5 import uic
+
+LOG = logging.getLogger(__name__)
 
 
 WIDGET, BASE = uic.loadUiType(
@@ -50,7 +53,7 @@ class DataItemWidget(QFrame):
         layout.addWidget(self.label)
         self.button = QPushButton()
         self.button.clicked.connect(self.buttonClicked)
-        self.updateContent(data)
+        self.updateContent()
         layout.addStretch()
         layout.addWidget(self.button)
         self.setLayout(layout)
@@ -63,7 +66,7 @@ class DataItemWidget(QFrame):
             DataCatalogueClient.UP_TO_DATE: [self.tr("Remove"), "green"]
         }
         status = self.data['status']
-        date = datetime.datetime.fromtimestamp(self.data['timestamp'] / 1e3).strftime("%d-%m-%Y")
+        date = datetime.datetime.fromtimestamp(self.data['modified'] / 1e3).strftime("%d-%m-%Y")
         self.label.setText(f"<b>{self.data['title']} [{date}]</b>")
         self.label.setStyleSheet(f"color: {statuses[status][1]}")
         self.button.setText(statuses[status][0])
@@ -74,12 +77,18 @@ class DataItemWidget(QFrame):
             ret = dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
                 pushWarning(self.tr("Cannot remove previous version of data"))
+            else:
+                pushMessage(self.tr("Data is successfully removed"))
+                self.data['status'] = DataCatalogueClient.NOT_INSTALLED
         else:
             ret = dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(self.tr("Cannot install data"))
+            else:
+                pushMessage(self.tr("Data is successfully installed"))
+                self.data['status'] = DataCatalogueClient.UP_TO_DATE
+
         if ret:
-            self.data['status'] = DataCatalogueClient.UP_TO_DATE
             self.updateContent()
 
 
@@ -97,6 +106,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.populateList()
 
     def populateList(self):
+        LOG.debug('populating list')
         self.listWidget.clear()
         try:
             dataItems = dataCatalogueClient.getAvailableTiles()
