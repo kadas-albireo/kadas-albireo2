@@ -94,7 +94,9 @@ class ConsoleConnector(Connector):
         # Needed since it will be stored in a json file
         valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
         LOG.debug('using tiles in %s' % valhallaTilesDir)
-        LOG.debug('exist %s' % os.path.exists(valhallaTilesDir))
+        if not os.path.exists(valhallaTilesDir):
+            LOG.debug('exist %s' % os.path.exists(valhallaTilesDir))
+            raise Exception('Missing valhalla tiles on this directory %s' % valhallaTilesDir)
 
         os.chdir(valhallaPath)
         valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': valhallaTilesDir})
