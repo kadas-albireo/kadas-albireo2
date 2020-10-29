@@ -8,6 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName, appDataDir
 from qgis.core import QgsSettings
+from kadasrouting.core.datacatalogueclient import dataCatalogueClient
 
 LOG = logging.getLogger(__name__)
 
@@ -84,12 +85,21 @@ class ConsoleConnector(Connector):
         defaultValhallaExeDir = r'C:/Program Files/KadasAlbireo/opt/routing'
         valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
         valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
+
+        activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", '')
+        if not activeValhallaTilesID:
+            raise Exception('Missing valhalla tiles. Please choose one.')
+
         defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
+
+        valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
+        LOG.debug('using tiles in %s' % valhallaTilesDir)
+        LOG.debug('exist %s' % os.path.exists(valhallaTilesDir))
+
         os.chdir(valhallaPath)
-        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
-            "/kadas/valhalla_tiles_dir",
-            defaultValhallaTilesDir)})
+        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': valhallaTilesDir})
         commands = [valhallaExecutable, valhallaConfig, action, request]
+        LOG.debug('Run %s' % commands)
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
