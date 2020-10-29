@@ -5,9 +5,10 @@ import requests
 import json
 from jinja2 import Environment, FileSystemLoader
 
+from qgis.core import QgsSettings
+
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName, appDataDir, pushWarning
-from qgis.core import QgsSettings
 from kadasrouting.core.datacatalogueclient import dataCatalogueClient
 
 LOG = logging.getLogger(__name__)
@@ -88,14 +89,15 @@ class ConsoleConnector(Connector):
 
         activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", '')
         if not activeValhallaTilesID:
-            raise Exception(tr('Missing active valhalla tiles. Please choose one.'))
+            raise Exception(self.tr('Missing active valhalla tiles. Please choose one.'))
 
         valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
         # Needed since it will be stored in a json file
         valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
         LOG.debug('using tiles in %s' % valhallaTilesDir)
         if not os.path.exists(valhallaTilesDir):
-            message = tr('Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
+            message = self.tr(
+                'Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
             raise Exception(message)
 
         os.chdir(valhallaPath)

@@ -2,24 +2,14 @@ import os
 import json
 import logging
 
-from PyQt5.QtCore import (
-    QUrl,
-    QFile,
-    QDir
-)
+from pyplugin_installer import unzip
 
-from PyQt5.QtNetwork import (
-    QNetworkRequest,
-    QNetworkReply
-)
+from PyQt5.QtCore import QUrl, QFile, QDir
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
-from qgis.core import (
-    QgsNetworkAccessManager
-)
+from qgis.core import QgsNetworkAccessManager
 
 from kadasrouting.utilities import appDataDir, waitcursor
-
-from pyplugin_installer import unzip
 
 LOG = logging.getLogger(__name__)
 

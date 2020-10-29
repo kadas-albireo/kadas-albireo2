@@ -2,25 +2,10 @@ import os
 import datetime
 import logging
 
-from kadasrouting.core.datacatalogueclient import (
-    dataCatalogueClient,
-    DataCatalogueClient,
-    DEFAULT_DATA_TILES_PATH
-)
-
-from kadasrouting.utilities import pushWarning, pushMessage
-
-from kadas.kadasgui import (
-    KadasBottomBar,
-)
-
-from PyQt5.QtGui import (
-    QIcon
-)
-
+from PyQt5 import uic
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QHBoxLayout,
-    QLabel,
     QFrame,
     QPushButton,
     QListWidgetItem,
@@ -28,16 +13,20 @@ from PyQt5.QtWidgets import (
     QButtonGroup
 )
 
-from PyQt5 import uic
-
 from qgis.core import QgsSettings
+
+from kadas.kadasgui import KadasBottomBar
+
+from kadasrouting.utilities import pushWarning, pushMessage
+from kadasrouting.core.datacatalogueclient import (
+    dataCatalogueClient,
+    DataCatalogueClient,
+    DEFAULT_DATA_TILES_PATH
+)
 
 LOG = logging.getLogger(__name__)
 
-
-WIDGET, BASE = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "datacataloguebottombar.ui")
-)
+WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), "datacataloguebottombar.ui"))
 
 
 class DataItem(QListWidgetItem):
