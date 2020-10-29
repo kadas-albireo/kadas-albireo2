@@ -85,16 +85,17 @@ class DataItemWidget(QFrame):
         if status == DataCatalogueClient.UP_TO_DATE:
             ret = dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
-                pushWarning(self.tr("Cannot remove previous version of data"))
+                pushWarning(
+                    self.tr("Cannot remove previous version of tiles for {name}").format(name=self.data['title']))
             else:
-                pushMessage(self.tr("Data is successfully removed"))
+                pushMessage(self.tr("Tiles for {name} is successfully deleted").format(name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.NOT_INSTALLED
         else:
             ret = dataCatalogueClient.install(self.data)
             if not ret:
-                pushWarning(self.tr("Cannot install data"))
+                pushWarning(self.tr("Cannot install tiles for {name}").format(name=self.data['title']))
             else:
-                pushMessage(self.tr("Data is successfully installed"))
+                pushMessage(self.tr("Tiles for {name} is successfully installed").format(name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.UP_TO_DATE
 
         if ret:
