@@ -39,9 +39,11 @@ class DataCatalogueClient():
         filename = os.path.join(self.folderForDataItem(itemid), "metadata")
         try:
             with open(filename) as f:
-                timestamp = json.read(f)["modified"]
+                timestamp = json.load(f)["modified"]
+            LOG.debug('timestamp is %s' % timestamp)
             return timestamp
-        except Exception:
+        except Exception as e:
+            LOG.debug('metadata file is failed to read: %s' % e)
             return None
 
     def getAvailableTiles(self):
