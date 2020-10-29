@@ -90,9 +90,9 @@ class ConsoleConnector(Connector):
         if not activeValhallaTilesID:
             raise Exception('Missing valhalla tiles. Please choose one.')
 
-        defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
-
         valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
+        # Needed since it will be stored in a json file
+        valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
         LOG.debug('using tiles in %s' % valhallaTilesDir)
         LOG.debug('exist %s' % os.path.exists(valhallaTilesDir))
 

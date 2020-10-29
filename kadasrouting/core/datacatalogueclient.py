@@ -23,6 +23,9 @@ from pyplugin_installer import unzip
 
 LOG = logging.getLogger(__name__)
 
+# Obtained from Valhalla installer
+DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
+
 
 class DataCatalogueClient():
 
@@ -110,6 +113,8 @@ class DataCatalogueClient():
         return QDir(self.folderForDataItem(itemid)).removeRecursively()
 
     def folderForDataItem(self, itemid):
+        if itemid == 'default':
+            return DEFAULT_DATA_TILES_PATH
         return os.path.join(appDataDir(), "tiles", itemid)
 
 

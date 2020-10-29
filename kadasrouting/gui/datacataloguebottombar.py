@@ -79,6 +79,9 @@ class DataItemWidget(QFrame):
         self.label.setText(f"<b>{self.data['title']} [{date}]</b>")
         self.label.setStyleSheet(f"color: {statuses[status][1]}")
         self.button.setText(statuses[status][0])
+        if self.data['id'] == 'default':
+            self.button.setEnabled(False)
+            self.button.setToolTip(self.tr('Default data tiles can not be removed'))
 
     def buttonClicked(self):
         status = self.data['status']
@@ -125,8 +128,16 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
     def populateList(self):
         LOG.debug('populating list')
         self.listWidget.clear()
+        # Add default data tile first
+        defaultData = {
+                'status': DataCatalogueClient.UP_TO_DATE,
+                'title': self.tr('Switzerland - Default'),
+                'id': 'default',
+                'modified': 1
+            }
+        dataItems = [defaultData]
         try:
-            dataItems = dataCatalogueClient.getAvailableTiles()
+            dataItems.extend(dataCatalogueClient.getAvailableTiles())
         except Exception as e:
             pushWarning(str(e))
             return
