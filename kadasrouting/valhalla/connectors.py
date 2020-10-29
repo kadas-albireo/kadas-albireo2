@@ -6,7 +6,7 @@ import json
 from jinja2 import Environment, FileSystemLoader
 
 from kadasrouting.exceptions import Valhalla400Exception
-from kadasrouting.utilities import localeName, appDataDir
+from kadasrouting.utilities import localeName, appDataDir, pushWarning
 from qgis.core import QgsSettings
 from kadasrouting.core.datacatalogueclient import dataCatalogueClient
 
@@ -34,7 +34,7 @@ class Connector:
     def prepareIsochronesParameters(self, points, profile, options, intervals, colors):
         # build contour json
         if len(intervals) != len(colors):
-            LOG.warning(self.tr(
+            pushWarning(self.tr(
                 "The number of intervals and colors are different, using default color"
             ))
             contours = [{"time": x} for x in intervals]
@@ -88,15 +88,15 @@ class ConsoleConnector(Connector):
 
         activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", '')
         if not activeValhallaTilesID:
-            raise Exception('Missing valhalla tiles. Please choose one.')
+            raise Exception(tr('Missing active valhalla tiles. Please choose one.'))
 
         valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
         # Needed since it will be stored in a json file
         valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
         LOG.debug('using tiles in %s' % valhallaTilesDir)
         if not os.path.exists(valhallaTilesDir):
-            LOG.debug('exist %s' % os.path.exists(valhallaTilesDir))
-            raise Exception('Missing valhalla tiles on this directory %s' % valhallaTilesDir)
+            message = tr('Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
+            raise Exception(message)
 
         os.chdir(valhallaPath)
         valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': valhallaTilesDir})

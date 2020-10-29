@@ -101,7 +101,6 @@ class DataCatalogueClient():
             if not removed:
                 return False
             unzip.unzip(tmpPath, targetFolder)
-            LOG.debug('unziped data to %s ' % targetFolder)
             QFile(tmpPath).remove()
             return True
         else:

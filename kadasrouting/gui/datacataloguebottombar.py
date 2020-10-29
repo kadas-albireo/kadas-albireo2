@@ -115,7 +115,7 @@ class DataItemWidget(QFrame):
         if self.radioButton.isChecked():
             # Update Kadas setting
             QgsSettings().setValue("/kadas/activeValhallaTilesID", self.data['id'])
-            pushMessage('Active Valhalla tiles is set to %s' % self.data['title'])
+            pushMessage(self.tr('Active Valhalla tiles is set to {tile}').format(tile=self.data['title']))
 
 
 class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
