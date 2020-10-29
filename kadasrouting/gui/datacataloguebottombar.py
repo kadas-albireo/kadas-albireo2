@@ -56,8 +56,6 @@ class DataItemWidget(QFrame):
         self.radioButton = QRadioButton()
         self.radioButton.toggled.connect(self.radioButtonToggled)
         layout.addWidget(self.radioButton)
-        self.label = QLabel()
-        layout.addWidget(self.label)
         self.button = QPushButton()
         self.button.clicked.connect(self.buttonClicked)
         self.updateContent()
@@ -76,8 +74,8 @@ class DataItemWidget(QFrame):
         }
         status = self.data['status']
         date = datetime.datetime.fromtimestamp(self.data['modified'] / 1e3).strftime("%d-%m-%Y")
-        self.label.setText(f"<b>{self.data['title']} [{date}]</b>")
-        self.label.setStyleSheet(f"color: {statuses[status][1]}")
+        self.radioButton.setText(f"{self.data['title']} [{date}]")
+        self.radioButton.setStyleSheet(f"color: {statuses[status][1]}; font: bold")
         self.button.setText(statuses[status][0])
         if self.data['id'] == 'default':
             self.button.setEnabled(False)
