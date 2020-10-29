@@ -29,6 +29,8 @@ from PyQt5.QtWidgets import (
 
 from PyQt5 import uic
 
+from qgis.core import QgsSettings
+
 LOG = logging.getLogger(__name__)
 
 
@@ -52,6 +54,7 @@ class DataItemWidget(QFrame):
         layout = QHBoxLayout()
         layout.setMargin(0)
         self.radioButton = QRadioButton()
+        self.radioButton.toggled.connect(self.radioButtonToggled)
         layout.addWidget(self.radioButton)
         self.label = QLabel()
         layout.addWidget(self.label)
@@ -94,6 +97,12 @@ class DataItemWidget(QFrame):
 
         if ret:
             self.updateContent()
+
+    def radioButtonToggled(self):
+        if self.radioButton.isChecked():
+            # Update Kadas setting
+            QgsSettings().setValue("/kadas/activeValhallaTilesID", self.data['id'])
+            pushMessage('Active Valhalla tiles is set to %s' % self.data['title'])
 
 
 class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
