@@ -5,9 +5,11 @@ import requests
 import json
 from jinja2 import Environment, FileSystemLoader
 
-from kadasrouting.exceptions import Valhalla400Exception
-from kadasrouting.utilities import localeName, appDataDir
 from qgis.core import QgsSettings
+
+from kadasrouting.exceptions import Valhalla400Exception
+from kadasrouting.utilities import localeName, appDataDir, pushWarning
+from kadasrouting.core.datacatalogueclient import dataCatalogueClient
 
 LOG = logging.getLogger(__name__)
 
@@ -33,7 +35,7 @@ class Connector:
     def prepareIsochronesParameters(self, points, profile, options, intervals, colors):
         # build contour json
         if len(intervals) != len(colors):
-            LOG.warning(self.tr(
+            pushWarning(self.tr(
                 "The number of intervals and colors are different, using default color"
             ))
             contours = [{"time": x} for x in intervals]
@@ -84,12 +86,24 @@ class ConsoleConnector(Connector):
         defaultValhallaExeDir = r'C:/Program Files/KadasAlbireo/opt/routing'
         valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
         valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
-        defaultValhallaTilesDir = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default/valhalla_tiles'
+
+        activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", '')
+        if not activeValhallaTilesID:
+            raise Exception(self.tr('Missing active valhalla tiles. Please choose one.'))
+
+        valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
+        # Needed since it will be stored in a json file
+        valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
+        LOG.debug('using tiles in %s' % valhallaTilesDir)
+        if not os.path.exists(valhallaTilesDir):
+            message = self.tr(
+                'Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
+            raise Exception(message)
+
         os.chdir(valhallaPath)
-        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': QgsSettings().value(
-            "/kadas/valhalla_tiles_dir",
-            defaultValhallaTilesDir)})
+        valhallaConfig = self.createValhallaJsonConfig({'valhallaTilesDir': valhallaTilesDir})
         commands = [valhallaExecutable, valhallaConfig, action, request]
+        LOG.debug('Run %s' % commands)
         result = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:

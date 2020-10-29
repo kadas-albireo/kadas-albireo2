@@ -2,26 +2,19 @@ import os
 import json
 import logging
 
-from PyQt5.QtCore import (
-    QUrl,
-    QFile,
-    QDir
-)
+from pyplugin_installer import unzip
 
-from PyQt5.QtNetwork import (
-    QNetworkRequest,
-    QNetworkReply
-)
+from PyQt5.QtCore import QUrl, QFile, QDir
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
-from qgis.core import (
-    QgsNetworkAccessManager
-)
+from qgis.core import QgsNetworkAccessManager
 
 from kadasrouting.utilities import appDataDir, waitcursor
 
-from pyplugin_installer import unzip
-
 LOG = logging.getLogger(__name__)
+
+# Obtained from Valhalla installer
+DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
 
 class DataCatalogueClient():
@@ -39,9 +32,11 @@ class DataCatalogueClient():
         filename = os.path.join(self.folderForDataItem(itemid), "metadata")
         try:
             with open(filename) as f:
-                timestamp = json.read(f)["modified"]
+                timestamp = json.load(f)["modified"]
+            LOG.debug('timestamp is %s' % timestamp)
             return timestamp
-        except Exception:
+        except Exception as e:
+            LOG.debug('metadata file is failed to read: %s' % e)
             return None
 
     def getAvailableTiles(self):
@@ -96,7 +91,6 @@ class DataCatalogueClient():
             if not removed:
                 return False
             unzip.unzip(tmpPath, targetFolder)
-            LOG.debug('unziped data to %s ' % targetFolder)
             QFile(tmpPath).remove()
             return True
         else:
@@ -108,6 +102,8 @@ class DataCatalogueClient():
         return QDir(self.folderForDataItem(itemid)).removeRecursively()
 
     def folderForDataItem(self, itemid):
+        if itemid == 'default':
+            return DEFAULT_DATA_TILES_PATH
         return os.path.join(appDataDir(), "tiles", itemid)
 
 
