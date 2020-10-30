@@ -66,6 +66,7 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
 
     virtual QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) = 0;
     virtual QMenu *getSubMenu( QMenu *menu, const QString &submenuName ) = 0;
+    virtual QWidget *getRibbonWidget() = 0;
     virtual QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName ) = 0;
 
     //! Generic action adder

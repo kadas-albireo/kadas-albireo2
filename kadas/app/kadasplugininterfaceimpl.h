@@ -282,6 +282,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     // KADAS specific interface
     QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) override;
     QMenu *getSubMenu( QMenu *menu, const QString &submenuName ) override;
+    QWidget *getRibbonWidget() override;
     QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName ) override;
 
     //! Generic action adder

@@ -449,6 +449,11 @@ QMenu *KadasPluginInterfaceImpl::getSubMenu( QMenu *menu, const QString &submenu
   return submenu;
 }
 
+QWidget *KadasPluginInterfaceImpl::getRibbonWidget()
+{
+  return kApp->mainWindow()->ribbonTabWidget();
+}
+
 QWidget *KadasPluginInterfaceImpl::getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
 {
   QWidget *targetTabWidget = nullptr;
