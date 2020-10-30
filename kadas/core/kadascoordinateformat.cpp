@@ -65,10 +65,14 @@ void KadasCoordinateFormat::setHeightDisplayUnit( QgsUnitTypes::DistanceUnit hei
   emit heightDisplayUnitChanged( heightUnit );
 }
 
-void KadasCoordinateFormat::getCoordinateDisplayFormat( Format &format, QString &epsg ) const
+KadasCoordinateFormat::Format KadasCoordinateFormat::getCoordinateDisplayFormat() const
 {
-  format = mFormat;
-  epsg = mEpsg;
+  return mFormat;
+}
+
+const QString &KadasCoordinateFormat::getCoordinateDisplayCrs() const
+{
+  return mEpsg;
 }
 
 QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const
