@@ -39,6 +39,11 @@ KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
   connect( app, &KadasApplication::projectWillBeClosed, this, &KadasPluginInterface::projectWillBeClosed );
 }
 
+QAction *KadasPluginInterfaceImpl::actionShowPythonDialog()
+{
+  return kApp->mainWindow()->actionShowPythonConsole();
+}
+
 QgsPluginManagerInterface *KadasPluginInterfaceImpl::pluginManagerInterface()
 {
   // TODO

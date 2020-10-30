@@ -92,6 +92,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QAction *actionTerrainHillshade() const { return mActionHillshade; }
     QAction *actionTerrainViewshed() const { return mActionViewshed; }
 
+    QAction *actionShowPythonConsole() const { return mActionShowPythonConsole; }
+
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
 
@@ -159,6 +161,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
     QToolButton *mPluginsToolButton = nullptr;
+    QAction *mActionShowPythonConsole = nullptr;
 
     QTimer mLoadingTimer;
     QPoint mResizePressPos;

@@ -244,7 +244,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QAction *actionShowSelectedLayers() override { return nullptr; }
     virtual QAction *actionManagePlugins() override { return nullptr; }
     virtual QAction *actionPluginListSeparator() override { return nullptr; }
-    virtual QAction *actionShowPythonDialog() override { return nullptr; }
+    virtual QAction *actionShowPythonDialog() override;
     virtual QAction *actionToggleFullScreen() override { return nullptr; }
     virtual QAction *actionOptions() override { return nullptr; }
     virtual QAction *actionCustomProjection() override { return nullptr; }

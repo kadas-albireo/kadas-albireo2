@@ -15,9 +15,9 @@
 
 #include <Python.h>
 
-#include <QStringList>
 #include <QDir>
 #include <QStandardPaths>
+#include <QStringList>
 #include <QDebug>
 
 #include <qgis/qgis.h>
@@ -44,6 +44,11 @@ KadasPythonIntegration::~KadasPythonIntegration()
 #if SIP_VERSION >= 0x40e06
   exitPython();
 #endif
+}
+
+void KadasPythonIntegration::showConsole()
+{
+  runString( "import console\nconsole.show_console()\n", tr( "Failed to open Python console:" ), false );
 }
 
 bool KadasPythonIntegration::checkSystemImports()

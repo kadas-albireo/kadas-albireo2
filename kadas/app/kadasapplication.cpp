@@ -1773,6 +1773,11 @@ void KadasApplication::loadPythonSupport()
   }
 }
 
+void KadasApplication::showPythonConsole()
+{
+  mPythonIntegration->showConsole();
+}
+
 void KadasApplication::updateWmtsZoomResolutions() const
 {
   QList<double> resolutions;

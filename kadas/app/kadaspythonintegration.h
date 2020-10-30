@@ -41,6 +41,8 @@ class KadasPythonIntegration : public QObject
     void exitPython();
     bool isEnabled();
 
+    void showConsole();
+
     bool runString( const QString &command, QString msgOnError = QString(), bool single = true );
     bool runStringUnsafe( const QString &command, bool single = true );
     bool evalString( const QString &command, QString &result ) const;

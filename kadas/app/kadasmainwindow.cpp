@@ -74,6 +74,7 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadaspluginmanager.h>
+#include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
 #ifdef WITH_GLOBE
@@ -309,6 +310,10 @@ void KadasMainWindow::init()
   mSearchWidget->addSearchProvider( new KadasPinSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasWorldLocationSearchProvider( mMapCanvas ) );
+
+  mActionShowPythonConsole = new QAction( this );
+  QShortcut *pythonConsoleShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_P ), this );
+  connect( pythonConsoleShortcut, &QShortcut::activated, kApp, &KadasApplication::showPythonConsole );
 
   // Restore geometry
   restoreGeometry( QgsSettings().value( "/kadas/windowgeometry" ).toByteArray() );
