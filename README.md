@@ -43,3 +43,8 @@ Currently, the installation only available from this repository.
 ### Internationalisation (i18n)
 
 This plugin support 4 languages (DE, FR, IT, EN). See more about how to do translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
+
+
+### Credit
+
+- **Data Catalogue** icon is created on [LogoMakr.com](LogoMakr.com) with some modifications.

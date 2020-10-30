@@ -86,7 +86,7 @@ class RoutingPlugin(QObject):
         )
 
         self.dataCatalogueAction = QAction(
-            icon("navigate.png"), self.tr("Data catalogue")
+            icon("data-catalogue.png"), self.tr("Data catalogue")
         )
         self.iface.addAction(
             self.dataCatalogueAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
