@@ -508,7 +508,7 @@ QDomElement KadasProjectMigration::replaceAnnotationLayer( QDomDocument &doc, QD
 QMap<QString, QString> KadasProjectMigration::deserializeLegacyRedliningFlags( const QString &flagsStr )
 {
   QMap<QString, QString> flagsMap;
-  foreach ( const QString &flag, flagsStr.split( ",", QString::SkipEmptyParts ) )
+  foreach ( const QString &flag, flagsStr.split( ",", Qt::SkipEmptyParts ) )
   {
     int pos = flag.indexOf( "=" );
     flagsMap.insert( flag.left( pos ), pos >= 0 ? flag.mid( pos + 1 ) : QString() );

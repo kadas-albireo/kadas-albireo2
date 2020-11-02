@@ -25,7 +25,7 @@ class KadasGlobeDialog: public QDialog, private Ui::KadasGlobeDialogBase
 {
     Q_OBJECT
   public:
-    KadasGlobeDialog( QWidget *parent = nullptr, Qt::WindowFlags fl = 0 );
+    KadasGlobeDialog( QWidget *parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     struct LayerDataSource
     {

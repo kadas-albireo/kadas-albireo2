@@ -40,7 +40,7 @@
 class StackedDialog : public QDialog
 {
   public:
-    StackedDialog( QWidget *parent = 0, Qt::WindowFlags flags = 0 ) : QDialog( parent, flags )
+    StackedDialog( QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags() ) : QDialog( parent, flags )
     {
       mLayout = new QStackedLayout();
       setLayout( mLayout );

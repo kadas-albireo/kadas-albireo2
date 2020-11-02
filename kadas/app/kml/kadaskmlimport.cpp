@@ -405,32 +405,32 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   // Write vrt
   QString vrtString;
   QTextStream vrtStream( &vrtString, QIODevice::WriteOnly );
-  vrtStream << "<VRTDataset rasterXSize=\"" << totSize.width() << "\" rasterYSize=\"" << totSize.height() << "\">" << endl;
-  vrtStream << " <SRS>" << QgsCoordinateReferenceSystem( "EPSG:4326" ).toProj().toHtmlEscaped() << "</SRS>" << endl;
-  vrtStream << " <GeoTransform>" << endl;
-  vrtStream << "  " << overlayData.bbox.xMinimum() << "," << ( overlayData.bbox.width() / totSize.width() ) << ", 0," << endl;
-  vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << endl;
-  vrtStream << " </GeoTransform>" << endl;
+  vrtStream << "<VRTDataset rasterXSize=\"" << totSize.width() << "\" rasterYSize=\"" << totSize.height() << "\">" << Qt::endl;
+  vrtStream << " <SRS>" << QgsCoordinateReferenceSystem( "EPSG:4326" ).toProj().toHtmlEscaped() << "</SRS>" << Qt::endl;
+  vrtStream << " <GeoTransform>" << Qt::endl;
+  vrtStream << "  " << overlayData.bbox.xMinimum() << "," << ( overlayData.bbox.width() / totSize.width() ) << ", 0," << Qt::endl;
+  vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << Qt::endl;
+  vrtStream << " </GeoTransform>" << Qt::endl;
 
   for ( const QPair<int, QString> &band : QList<QPair<int, QString>> {qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) )} )
   {
-    vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << endl;
-    vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << endl;
+    vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << Qt::endl;
+    vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << Qt::endl;
     for ( const TileData &tile : mergedTiles )
     {
       int i = qRound( ( tile.bbox.xMinimum() - overlayData.bbox.xMinimum() ) / overlayData.bbox.width() * totSize.width() );
       int j = qRound( ( overlayData.bbox.yMaximum() - tile.bbox.yMaximum() ) / overlayData.bbox.height() * totSize.height() );
-      vrtStream << "  <SimpleSource>" << endl;
-      vrtStream << "   <SourceFilename relativeToVRT=\"1\">" << tile.iconHref << "</SourceFilename>" << endl;
-      vrtStream << "   <SourceBand>" << band.first << "</SourceBand>" << endl;
-      vrtStream << "   <SourceProperties RasterXSize=\"" << tile.size.width() << "\" RasterYSize=\"" << tile.size.height() << "\" DataType=\"Byte\" BlockXSize=\"" << tile.size.width() << "\" BlockYSize=\"1\" />" << endl;
-      vrtStream << "   <SrcRect xOff=\"0\" yOff=\"0\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << endl;
-      vrtStream << "   <DstRect xOff=\"" << i << "\" yOff=\"" << j << "\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << endl;
-      vrtStream << "  </SimpleSource>" << endl;
+      vrtStream << "  <SimpleSource>" << Qt::endl;
+      vrtStream << "   <SourceFilename relativeToVRT=\"1\">" << tile.iconHref << "</SourceFilename>" << Qt::endl;
+      vrtStream << "   <SourceBand>" << band.first << "</SourceBand>" << Qt::endl;
+      vrtStream << "   <SourceProperties RasterXSize=\"" << tile.size.width() << "\" RasterYSize=\"" << tile.size.height() << "\" DataType=\"Byte\" BlockXSize=\"" << tile.size.width() << "\" BlockYSize=\"1\" />" << Qt::endl;
+      vrtStream << "   <SrcRect xOff=\"0\" yOff=\"0\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
+      vrtStream << "   <DstRect xOff=\"" << i << "\" yOff=\"" << j << "\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
+      vrtStream << "  </SimpleSource>" << Qt::endl;
     }
-    vrtStream << " </VRTRasterBand>" << endl;
+    vrtStream << " </VRTRasterBand>" << Qt::endl;
   }
-  vrtStream << "</VRTDataset>" << endl;
+  vrtStream << "</VRTDataset>" << Qt::endl;
   vrtStream.flush();
 
   QuaZipFile vsiVrtFile( &vsiZip );
@@ -450,7 +450,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
 QVector<QgsPoint> KadasKMLImport::parseCoordinates( const QDomElement &geomEl ) const
 {
-  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegExp( "\\s+" ), QString::SkipEmptyParts );
+  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegExp( "\\s+" ), Qt::SkipEmptyParts );
   QVector<QgsPoint> points;
   for ( int i = 0, n = coordinates.size(); i < n; ++i )
   {

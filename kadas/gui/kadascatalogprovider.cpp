@@ -125,7 +125,7 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
   QDomElement srsElement = layerItem.firstChildElement( "SRS" );
   if ( !srsElement.isNull() )
   {
-    for ( const QString &authId : srsElement.text().split( "", QString::SkipEmptyParts ) )
+    for ( const QString &authId : srsElement.text().split( "", Qt::SkipEmptyParts ) )
     {
       supportedCrs.append( authId );
     }

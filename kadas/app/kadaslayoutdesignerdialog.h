@@ -53,7 +53,7 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
 
   public:
 
-    KadasLayoutDesignerDialog( QWidget *parent = nullptr, Qt::WindowFlags flags = nullptr );
+    KadasLayoutDesignerDialog( QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() );
 
     /**
      * Returns the designer interface for the dialog.

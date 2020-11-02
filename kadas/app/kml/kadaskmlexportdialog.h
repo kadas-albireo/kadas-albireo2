@@ -31,7 +31,7 @@ class KadasKMLExportDialog : public QDialog, private Ui::KadasKMLExportDialogBas
 {
     Q_OBJECT
   public:
-    KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent = 0, Qt::WindowFlags f = 0 );
+    KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() );
     ~KadasKMLExportDialog();
     QString getFilename() const { return mFileLineEdit->text(); }
     QList<QgsMapLayer *> getSelectedLayers() const;

@@ -64,7 +64,7 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
 
     // Detect ArcGIS Rest MapServer layers
     QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
-    QStringList urlParts = dataSource.param( "url" ).split( "/", QString::SkipEmptyParts );
+    QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
     int nParts = urlParts.size();
     if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
     {

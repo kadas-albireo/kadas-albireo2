@@ -49,13 +49,13 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       switch ( mLayer->mGridType )
       {
         case GridLV03:
-          drawCrsGrid( "EPSG:21781", 100000, QgsCoordinateFormatter::FormatPair, 0, 0 );
+          drawCrsGrid( "EPSG:21781", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
           break;
         case GridLV95:
-          drawCrsGrid( "EPSG:2056", 100000, QgsCoordinateFormatter::FormatPair, 0, 0 );
+          drawCrsGrid( "EPSG:2056", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
           break;
         case GridDD:
-          drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDecimalDegrees, 3, 0 );
+          drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDecimalDegrees, 3, QgsCoordinateFormatter::FormatFlags() );
           break;
         case GridDM:
           drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDegreesMinutes, 1, QgsCoordinateFormatter::FlagDegreesUseStringSuffix | QgsCoordinateFormatter::FlagDegreesPadMinutesSeconds );

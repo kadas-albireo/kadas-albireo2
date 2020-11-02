@@ -676,7 +676,7 @@ QStringList KadasPythonIntegration::listActivePlugins()
 
   QString output;
   evalString( QStringLiteral( "'\\n'.join(qgis.utils.active_plugins)" ), output );
-  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
+  return output.split( QChar( '\n' ), Qt::SkipEmptyParts );
 }
 
 QStringList KadasPythonIntegration::pluginList()
@@ -690,7 +690,7 @@ QStringList KadasPythonIntegration::pluginList()
 
   QString output;
   evalString( QStringLiteral( "'\\n'.join(qgis.utils.available_plugins)" ), output );
-  return output.split( QChar( '\n' ), QString::SkipEmptyParts );
+  return output.split( QChar( '\n' ), Qt::SkipEmptyParts );
 }
 
 bool KadasPythonIntegration::isPluginEnabled( const QString &packageName ) const

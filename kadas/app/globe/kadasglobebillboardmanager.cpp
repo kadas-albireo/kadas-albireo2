@@ -64,7 +64,8 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
 
 
   // Remove billboards for removed layers
-  QSet<QString> removedLayerIds = mRegistry.keys().toSet().subtract( layerIds.toSet() );
+  QList<QString> registeredBillboards = mRegistry.keys();
+  QSet<QString> removedLayerIds = QSet<QString>( registeredBillboards.begin(), registeredBillboards.end() ).subtract( QSet<QString>( layerIds.begin(), layerIds.end() ) );
   for ( const QString &layerId : removedLayerIds )
   {
     if ( mRegistry.contains( layerId ) )
@@ -78,7 +79,7 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
   }
 
   // Add billboards for new layers
-  QSet<QString> addedLayerIds = layerIds.toSet().subtract( mRegistry.keys().toSet() );
+  QSet<QString> addedLayerIds = QSet<QString>( layerIds.begin(), layerIds.end() ).subtract( QSet<QString>( registeredBillboards.begin(), registeredBillboards.end() ) );
   for ( const QString &layerId : addedLayerIds )
   {
     KadasItemLayer *layer = qobject_cast<KadasItemLayer *>( QgsProject::instance()->mapLayer( layerId ) );

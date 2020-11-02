@@ -24,7 +24,7 @@ class KadasMessageLogViewer : public QgsMessageLogViewer
     Q_OBJECT
 
   public:
-    KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl = 0 );
+    KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl = Qt::WindowFlags() );
 
   protected:
     void closeEvent( QCloseEvent *e ) override;

@@ -188,8 +188,8 @@ void KadasApplication::init()
 
   QgsCoordinateTransform::setCustomMissingPreferredGridHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
       const QgsCoordinateReferenceSystem & destinationCrs,
-      const QgsDatumTransform::TransformDetails & preferredOperation,
-      const QgsDatumTransform::TransformDetails & availableOperation )
+      const QgsDatumTransform::TransformDetails & /*preferredOperation*/,
+      const QgsDatumTransform::TransformDetails & /*availableOperation*/ )
   {
     mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
   } );
@@ -203,7 +203,7 @@ void KadasApplication::init()
 
   QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
       const QgsCoordinateReferenceSystem & destinationCrs,
-      const QgsDatumTransform::TransformDetails & desired )
+      const QgsDatumTransform::TransformDetails & /*desired*/ )
   {
     mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
   } );
@@ -272,7 +272,7 @@ void KadasApplication::init()
       QgsDebugMsg( QString( "Adding %1 certificates" ).arg( certs.size() ) );
       for ( const QSslCertificate &cert : certs )
       {
-        QSslSocket::addDefaultCaCertificate( cert );
+        QSslConfiguration::defaultConfiguration().addCaCertificate( cert );
       }
     }
   }
