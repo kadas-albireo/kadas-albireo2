@@ -257,14 +257,22 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
     def reverse(self):
         """Reverse route"""
-        originLocation = self.originSearchBox.text()
+        self.clearPins()
+
+        # Reverse origin and destination
+        originPointText = self.originSearchBox.text()
+        originPoint = self.originSearchBox.point
         self.originSearchBox.setText(self.destinationSearchBox.text())
-        self.destinationSearchBox.setText(originLocation)
+        self.originSearchBox.setPoint(self.destinationSearchBox.point)
+        self.destinationSearchBox.setText(originPointText)
+        self.destinationSearchBox.setPoint(originPoint)
+
+        # Reverse waypoints' order
         self.waypoints.reverse()
         self.waypointPins.reverse()
         # Reverse the text on the line edit
         self.lineEditWaypoints.setText(';'.join(reversed(self.lineEditWaypoints.text().split(';'))))
-        self.clearPins()
+
         self.addPins()
 
     def addWaypointPin(self, waypoint):
