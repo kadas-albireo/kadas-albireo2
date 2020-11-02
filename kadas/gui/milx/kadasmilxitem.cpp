@@ -910,6 +910,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
   }
 
   item->state()->drawStatus = State::DrawStatus::Finished;
+  item->mIsPointSymbol = !item->isMultiPoint();
 }
 
 void KadasMilxItem::posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
