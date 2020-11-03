@@ -193,27 +193,53 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     {
       const QgsRasterLayer *rlayer = static_cast<const QgsRasterLayer *>( layer );
 
-      // Detect ArcGIS Rest MapServer layers
-      QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
-      QStringList urlParts = dataSource.param( "url" ).split( "/", QString::SkipEmptyParts );
-      int nParts = urlParts.size();
-      if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
+      // Detect ArcGIS MapServer Layers
+      if ( rlayer->providerType() == "arcgismapserver" )
       {
-        rlayerIds.append( urlParts[nParts - 3] + ":" + urlParts[nParts - 2] );
-        rlayerMap.insert( urlParts[nParts - 2], rlayer->id() );
-      }
-
-      // Detect geo.admin.ch layers
-      dataSource.setEncodedUri( rlayer->dataProvider()->dataSourceUri() );
-      if ( dataSource.param( "url" ).contains( "geo.admin.ch" ) )
-      {
-        QStringList sublayerIds = dataSource.params( "layers" );
-        rlayerIds.append( sublayerIds );
-        for ( const QString &id : sublayerIds )
+        QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
+        QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
+        int nParts = urlParts.size();
+        // Example: https://<...>/services/<group>/<service>/MapServer
+        if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
         {
-          rlayerMap.insert( id, rlayer->id() );
+          QTextStream( stdout ) << "AMS " << ( urlParts[nParts - 3] + ":" + urlParts[nParts - 2] ) << Qt::endl;
+          rlayerIds.append( urlParts[nParts - 3] + ":" + urlParts[nParts - 2] );
+          rlayerMap.insert( urlParts[nParts - 2], rlayer->id() );
         }
       }
+
+      if ( rlayer->providerType() == "wms" )
+      {
+        QgsDataSourceUri dataSource;
+        dataSource.setEncodedUri( rlayer->dataProvider()->dataSourceUri() );
+        QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
+        int nParts = urlParts.size();
+        // Detect MapServer WMS Layers
+        // Example: https://<...>/services/<group>/<service>/MapServer/WMSServer
+        if ( nParts > 5 && urlParts[nParts - 1] == "WMSServer" && urlParts[nParts - 2] == "MapServer" && urlParts[nParts - 5] == "services" )
+        {
+          rlayerIds.append( urlParts[nParts - 4] + ":" + urlParts[nParts - 3] );
+          rlayerMap.insert( urlParts[nParts - 3], rlayer->id() );
+        }
+        // Detect MapServer WMTS Layers
+        // Example: https://<...>/rest/services/<group>/<service>/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+        else if ( nParts > 8 && urlParts[nParts - 1] == "WMTSCapabilities.xml" && urlParts[nParts - 4] == "MapServer" && urlParts[nParts - 7] == "services" )
+        {
+          rlayerIds.append( urlParts[nParts - 6] + ":" + urlParts[nParts - 5] );
+          rlayerMap.insert( urlParts[nParts - 5], rlayer->id() );
+        }
+        // Detect geo.admin.ch layers
+        else if ( nParts > 1 && urlParts[1].endsWith( "geo.admin.ch" ) )
+        {
+          QStringList sublayerIds = dataSource.params( "layers" );
+          rlayerIds.append( sublayerIds );
+          for ( const QString &id : sublayerIds )
+          {
+            rlayerMap.insert( id, rlayer->id() );
+          }
+        }
+      }
+
     }
     else if ( dynamic_cast<QgsVectorLayer *>( layer ) )
     {

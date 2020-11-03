@@ -63,21 +63,43 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
     }
 
     // Detect ArcGIS Rest MapServer layers
-    QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
-    QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
-    int nParts = urlParts.size();
-    if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
+    if ( rlayer->providerType() == "arcgismapserver" )
     {
-      queryableLayers.append( qMakePair( urlParts[nParts - 3] + ":" + urlParts[nParts - 2], rlayer->name() ) );
+      QgsDataSourceUri dataSource( rlayer->dataProvider()->dataSourceUri() );
+      QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
+      int nParts = urlParts.size();
+      // Example: https://<...>/services/<group>/<service>/MapServer
+      if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
+      {
+        queryableLayers.append( qMakePair( urlParts[nParts - 3] + ":" + urlParts[nParts - 2], rlayer->name() ) );
+      }
     }
 
-    // Detect geo.admin.ch layers
-    dataSource.setEncodedUri( rlayer->dataProvider()->dataSourceUri() );
-    if ( dataSource.param( "url" ).contains( "geo.admin.ch" ) )
+    if ( rlayer->providerType() == "wms" )
     {
-      for ( const QString &id : dataSource.params( "layers" ) )
+      QgsDataSourceUri dataSource;
+      dataSource.setEncodedUri( rlayer->dataProvider()->dataSourceUri() );
+      QStringList urlParts = dataSource.param( "url" ).split( "/", Qt::SkipEmptyParts );
+      int nParts = urlParts.size();
+      // Detect MapServer WMS Layers
+      // Example: https://<...>/services/<group>/<service>/MapServer/WMSServer
+      if ( nParts > 5 && urlParts[nParts - 1] == "WMSServer" && urlParts[nParts - 2] == "MapServer" && urlParts[nParts - 5] == "services" )
       {
-        queryableLayers.append( qMakePair( id, rlayer->name() ) );
+        queryableLayers.append( qMakePair( urlParts[nParts - 4] + ":" + urlParts[nParts - 3], rlayer->name() ) );
+      }
+      // Detect MapServer WMTS Layers
+      // Example: https://<...>/rest/services/<group>/<service>/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+      else if ( nParts > 8 && urlParts[nParts - 1] == "WMTSCapabilities.xml" && urlParts[nParts - 4] == "MapServer" && urlParts[nParts - 7] == "services" )
+      {
+        queryableLayers.append( qMakePair( urlParts[nParts - 6] + ":" + urlParts[nParts - 5], rlayer->name() ) );
+      }
+      // Detect geo.admin.ch layers
+      else if ( nParts > 1 && urlParts[1].endsWith( "geo.admin.ch" ) )
+      {
+        for ( const QString &id : dataSource.params( "layers" ) )
+        {
+          queryableLayers.append( qMakePair( id, rlayer->name() ) );
+        }
       }
     }
   }
