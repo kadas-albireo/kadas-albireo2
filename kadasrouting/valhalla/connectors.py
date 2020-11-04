@@ -5,6 +5,8 @@ import requests
 import json
 from jinja2 import Environment, FileSystemLoader
 
+from PyQt5.QtCore import QObject
+
 from qgis.core import QgsSettings
 
 from kadasrouting.exceptions import Valhalla400Exception
@@ -14,7 +16,7 @@ from kadasrouting.core.datacatalogueclient import dataCatalogueClient
 LOG = logging.getLogger(__name__)
 
 
-class Connector:
+class Connector(QObject):
 
     def isAvailable(self):
         return True
