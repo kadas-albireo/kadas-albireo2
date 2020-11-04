@@ -614,7 +614,7 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
-  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [this] { return kApp->paste(); } );
+  setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [] { return kApp->paste(); } );
   mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
 
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mapCanvas() ); } );
@@ -693,7 +693,7 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
     }
     else
     {
-      connect( action, &QAction::triggered, this, [this, toolFactory, action]
+      connect( action, &QAction::triggered, this, [this, toolFactory]
       {
         mMapCanvas->setMapTool( toolFactory() );
       } );
@@ -1207,7 +1207,7 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
   }
 }
 
-void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &index )
+void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &/*index*/ )
 {
   QgsMapLayer *layer = mLayerTreeView->currentLayer();
   if ( layer )
