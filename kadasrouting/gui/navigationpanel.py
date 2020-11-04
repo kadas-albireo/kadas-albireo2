@@ -80,8 +80,7 @@ route_html_template = '''
 <span style="color: #ffffff;">''' + tr('Dist Left') + ''' {distleft}</span><br />
 <span style="color: #ffffff;">''' + tr('ETA') + ''' {eta}</span></p>
 <p style="text-align: center;"><span style="color: #ffffff;">''' + tr('My Position:') + '''</span><br />
-<span style="color: #ffffff;">{x}</span><br />
-<span style="color: #ffffff;">{y}</span></p>
+<span style="color: #ffffff;">{displayed_point}</span></p>
 </td>
 </tr>
 </tbody>

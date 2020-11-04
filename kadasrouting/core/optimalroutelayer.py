@@ -37,7 +37,7 @@ from qgis.core import (
 
 from kadasrouting.exceptions import ValhallaException
 
-from kadas.kadascore import KadasPluginLayerType
+from kadas.kadascore import KadasPluginLayerType, KadasCoordinateFormat
 
 LOG = logging.getLogger(__name__)
 
@@ -304,12 +304,15 @@ class OptimalRouteLayer(KadasItemLayer):
                     eta = datetime.datetime.now() + delta
                     eta_string = eta.strftime("%H:%M")
 
+                    displayed_point = KadasCoordinateFormat.instance().getDisplayString(
+                        closest_point, QgsCoordinateReferenceSystem(4326))
+
                     maneuver = dict(dist=formatdist(distance_to_next), message=message, icon=icon,
                                     dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
                                     speed=speed, timeleft=timeleft_string,
                                     distleft=formatdist(distanceleft),
                                     raw_distleft=distanceleft,
-                                    eta=eta_string, x=closest_point.x(), y=closest_point.y())
+                                    eta=eta_string, displayed_point=displayed_point)
                     return maneuver
 
         raise NotInRouteException()
