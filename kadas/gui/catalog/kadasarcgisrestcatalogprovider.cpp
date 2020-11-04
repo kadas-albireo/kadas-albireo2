@@ -28,7 +28,7 @@
 #include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
 
 
-KadasArcGisRestCatalogProvider::KadasArcGisRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
+KadasArcGisRestCatalogProvider::KadasArcGisRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &/*params*/ )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
 {
 }

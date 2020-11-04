@@ -278,23 +278,28 @@ void KadasMainWindow::init()
     QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
     QString type = query.queryItemValue( "type" );
     QString url = query.queryItemValue( "url" );
+    QMap<QString, QString> params;
+    for ( const auto &pair : query.queryItems() )
+    {
+      params.insert( pair.first, pair.second );
+    }
     if ( type == "geoadmin" )
     {
-      mCatalogBrowser->addProvider( new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser ) );
+      mCatalogBrowser->addProvider( new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser, params ) );
     }
     else if ( type == "arcgisrest" )
     {
-      mCatalogBrowser->addProvider( new KadasArcGisRestCatalogProvider( url, mCatalogBrowser ) );
+      mCatalogBrowser->addProvider( new KadasArcGisRestCatalogProvider( url, mCatalogBrowser, params ) );
     }
     else if ( type == "vbs" )
     {
-      KadasVBSCatalogProvider *vbsprovider = new KadasVBSCatalogProvider( url, mCatalogBrowser );
+      KadasVBSCatalogProvider *vbsprovider = new KadasVBSCatalogProvider( url, mCatalogBrowser, params );
       connect( vbsprovider, &KadasVBSCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
       mCatalogBrowser->addProvider( vbsprovider );
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params );
       connect( portalprovider, &KadasArcGisPortalCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
       mCatalogBrowser->addProvider( portalprovider );
     }

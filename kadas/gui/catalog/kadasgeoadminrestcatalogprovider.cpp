@@ -24,7 +24,7 @@
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
 
-KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
+KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &/*params*/ )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
 {
 }

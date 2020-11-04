@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 {
     Q_OBJECT
   public:
-    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser );
+    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
 
   signals:
@@ -59,13 +59,14 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     QMap<QString, IsoTopicGroup> mIsoTopics;
 
     QString mBaseUrl;
+    QString mServicePreference;
     int mPendingTasks;
 
     QMap<QString, EntryMap> mAmsLayers;
     QMap<QString, EntryMap> mWmtsLayers;
     QMap<QString, EntryMap> mWmsLayers;
     QMap<QString, QPair<QString, QString>> mAmsLayerIds;
-    QSet<QString> mWmsLayerIds;
+    QMap<QString, QPair<QString, QString>> mWmsLayerIds;
 
     void endTask();
 

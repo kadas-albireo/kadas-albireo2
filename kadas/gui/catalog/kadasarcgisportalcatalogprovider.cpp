@@ -33,8 +33,8 @@
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasarcgisportalcatalogprovider.h>
 
-KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
-  : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
+KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params )
+  : KadasCatalogProvider( browser ), mBaseUrl( baseUrl ), mServicePreference( params.value( "preferred", "wms" ) )
 {
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QFile isoTopics( QDir( Kadas::pkgDataPath() ).absoluteFilePath( QString( "catalog/isoTopics_%1.csv" ).arg( lang ) ) );
@@ -141,7 +141,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       }
       else if ( resultMap["type"].toString() == "WMS" )
       {
-        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString() );
+        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
         mWmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
       }
 //      else if( resultMap["type"].toString() == "WMTS" )
@@ -160,15 +160,32 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    // If the same layer (as identified by the milcatalog tag + title) already exists as a WMS layer, don't list it again as MapServer
-    for ( auto it = mAmsLayerIds.begin(), itEnd = mAmsLayerIds.end(); it != itEnd; ++it )
+    // Prevent adding same layer (as identified by the milcatalog tag + title) twice in different service variants (WMS or MapServer). Preference according to config.
+    if ( mServicePreference == "wms" )
     {
-      if ( mWmsLayerIds.contains( it.key() ) )
+      for ( auto it = mAmsLayerIds.begin(), itEnd = mAmsLayerIds.end(); it != itEnd; ++it )
       {
-        mAmsLayers[it.value().first].remove( it.value().second );
-        if ( mAmsLayers[it.value().first].isEmpty() )
+        if ( mWmsLayerIds.contains( it.key() ) )
         {
-          mAmsLayers.remove( it.value().first );
+          mAmsLayers[it.value().first].remove( it.value().second );
+          if ( mAmsLayers[it.value().first].isEmpty() )
+          {
+            mAmsLayers.remove( it.value().first );
+          }
+        }
+      }
+    }
+    else if ( mServicePreference == "arcgismapserver" )
+    {
+      for ( auto it = mWmsLayerIds.begin(), itEnd = mWmsLayerIds.end(); it != itEnd; ++it )
+      {
+        if ( mAmsLayerIds.contains( it.key() ) )
+        {
+          mWmsLayers[it.value().first].remove( it.value().second );
+          if ( mWmsLayers[it.value().first].isEmpty() )
+          {
+            mWmsLayers.remove( it.value().first );
+          }
         }
       }
     }

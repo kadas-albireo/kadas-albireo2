@@ -31,7 +31,7 @@
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
-KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser )
+KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &/*params*/ )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
 {
 }

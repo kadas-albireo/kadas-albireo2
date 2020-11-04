@@ -25,7 +25,7 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
 {
     Q_OBJECT
   public:
-    KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser );
+    KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
   private slots:
     void replyFinished();
