@@ -97,12 +97,17 @@ class RoutingPlugin(QObject):
             self.reachabilityAction: self.showReachability,
             self.optimalRouteAction: self.showOptimalRoute,
             self.dataCatalogueAction: self.showDataCatalogue,
-            self.dayNightAction: self.toggleDayNight
             # self.tspAction: self.showTSP
             }
+
+        # Handling unique active action
         for action in self.actionsToggled:
             action.setCheckable(True)
             action.toggled.connect(partial(self._showPanel, action))
+
+        # Day Night action is independent
+        self.dayNightAction.setCheckable(True)
+        self.dayNightAction.toggled.connect(self.toggleDayNight)
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
