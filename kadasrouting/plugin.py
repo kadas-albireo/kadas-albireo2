@@ -122,7 +122,6 @@ class RoutingPlugin(QObject):
             self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
 
-
     def _showPanel(self, action, show):
         function = self.actionsToggled[action]
         if show:
