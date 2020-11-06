@@ -154,10 +154,18 @@ bool KadasMilxClientWorker::initialize()
   QTimer timeoutTimer;
   timeoutTimer.setSingleShot( true );
   connect( mTcpSocket, &QTcpSocket::disconnected, this, &KadasMilxClientWorker::cleanup );
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
   connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::errorOccurred ), this, &KadasMilxClientWorker::handleSocketError );
+#else
+  connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::error ), this, &KadasMilxClientWorker::handleSocketError );
+#endif
   {
     QEventLoop evLoop;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::errorOccurred ), &evLoop, &QEventLoop::quit );
+#else
+    connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::error ), &evLoop, &QEventLoop::quit );
+#endif
     connect( mTcpSocket, &QTcpSocket::disconnected, &evLoop, &QEventLoop::quit );
     connect( mTcpSocket, &QTcpSocket::connected, &evLoop, &QEventLoop::quit );
     connect( &timeoutTimer, &QTimer::timeout, &evLoop, &QEventLoop::quit );
