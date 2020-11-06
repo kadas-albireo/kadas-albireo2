@@ -17,7 +17,6 @@ from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.datacataloguebottombar import DataCatalogueBottomBar
-from kadasrouting.gui.tspbottombar import TSPBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
 from kadasrouting.valhalla.client import ValhallaClient
@@ -46,7 +45,6 @@ class RoutingPlugin(QObject):
         self.iface = KadasPluginInterface.cast(iface)
         self.optimalRouteBar = None
         self.reachabilityBar = None
-        self.tspBar = None
         self.dataCatalogueBar = None
         self.navigationPanel = None
 
@@ -64,10 +62,6 @@ class RoutingPlugin(QObject):
         self.iface.addAction(
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
         )
-
-        # TSP menu (disable TSP since it's removed from the project)
-        # self.tspAction = QAction(icon("tsp.png"), self.tr("TSP"))
-        # self.iface.addAction(self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Navigation menu
         self.navigationAction = QAction(
@@ -96,8 +90,7 @@ class RoutingPlugin(QObject):
             self.navigationAction: self.showNavigation,
             self.reachabilityAction: self.showReachability,
             self.optimalRouteAction: self.showOptimalRoute,
-            self.dataCatalogueAction: self.showDataCatalogue,
-            # self.tspAction: self.showTSP
+            self.dataCatalogueAction: self.showDataCatalogue
             }
 
         # Handling unique active action
@@ -124,13 +117,11 @@ class RoutingPlugin(QObject):
         )
         self.iface.removeAction(
             self.dataCatalogueAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        ),
+        )
         self.iface.removeAction(
             self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        ),
-        # self.iface.removeAction(
-        #     self.tspAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        # )
+        )
+
 
     def _showPanel(self, action, show):
         function = self.actionsToggled[action]
@@ -170,16 +161,6 @@ class RoutingPlugin(QObject):
         else:
             if self.reachabilityBar is not None:
                 self.reachabilityBar.hide()
-
-    def showTSP(self, show=True):
-        if show:
-            if self.tspBar is None:
-                self.tspBar = TSPBottomBar(self.iface.mapCanvas(), self.tspAction)
-            self.showDisclaimer()
-            self.tspBar.show()
-        else:
-            if self.tspBar is not None:
-                self.tspBar.hide()
 
     @testclientavailability
     def showNavigation(self, show=True):
