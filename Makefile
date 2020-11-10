@@ -65,3 +65,8 @@ qgis-docker-ci-update-string:
 shell:
 	@echo "Shell"
 	@docker run -t -i -v $(DIR):/home -w /home -e TX_TOKEN --entrypoint /bin/bash etrimaille/qgis-plugin-ci
+
+generate_vehicles_list:
+	@echo "Generating list of vehicle for the manual"
+	@echo "Copy the list below to the Kadas manual, kadas routing plugin section."
+	@python scripts/generate_vehicles_list.py
