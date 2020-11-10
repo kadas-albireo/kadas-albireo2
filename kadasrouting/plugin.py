@@ -28,6 +28,8 @@ except FileExistsError:
     pass
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
+LOG = logging.getLogger(__name__)
+
 
 def testclientavailability(method):
     def func(*args, **kw):
@@ -104,6 +106,13 @@ class RoutingPlugin(QObject):
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
+
+        try:
+            self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
+        except Exception as e:
+            LOG.debug('Can not connect to ribbon widget currentChange signal because %s' % e)
+            message = 'Changing tab will not close a routing plugin panel because your Kadas does not support it yet.'
+            pushWarning(message)
 
     def unload(self):
         self.iface.removeAction(
