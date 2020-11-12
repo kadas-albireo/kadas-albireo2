@@ -40,9 +40,34 @@ Currently, the installation only available from this repository.
    ```
 3. You can also use Linux with Windows Virtual Machine. You need to mount the directory where the source code located on the Linux file system to the Windows Virtual Machine. Then do step 2 to make it available on Kadas Albiero 2.
 
-### Internationalisation (i18n)
+## Internationalisation (i18n)
 
-This plugin support 4 languages (DE, FR, IT, EN). See more about how to do translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
+This plugin support 4 languages (DE, FR, IT, EN). The translation process is done on [this Transifex project](https://www.transifex.com/camptocamp/kadas-routing-plugin/dashboard/). Below are the commands that are used to manage the translation.
+
+> It requires `docker`. See [here](https://docs.docker.com/get-docker/) to see how to install `docker`.
+
+1. Updating string to be translated
+    ```bash
+    docker-update-translation-strings
+    ```
+2. Push string to be translated in Transifex
+   ```bash
+   make push-translation
+   ```
+3. Pull translated string from Transifex
+   ```bash
+   make pull-translation
+   ```
+4. Compile translated string so that it shown in the plugin
+   ```bash
+   make docker-compile-translation-strings
+   ```
+5. Extra: check the number of untranslated strings
+    ```bash
+    make docker-test-translation
+    ```
+
+See more about how to do translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
 
 
 ### Credit
