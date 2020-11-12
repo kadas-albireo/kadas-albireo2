@@ -54,11 +54,11 @@ This plugin support 4 languages (DE, FR, IT, EN). The translation process is don
    ```bash
    make push-translation
    ```
-3. Pull translated string from Transifex
+3. Pull the translated string from Transifex
    ```bash
    make pull-translation
    ```
-4. Compile translated string so that it shown in the plugin
+4. Compile translated string so that it is shown in the plugin
    ```bash
    make docker-compile-translation-strings
    ```
@@ -67,7 +67,7 @@ This plugin support 4 languages (DE, FR, IT, EN). The translation process is don
     make docker-test-translation
     ```
 
-See more about how to do translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
+See more about how to do the translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
 
 
 ### Credit
