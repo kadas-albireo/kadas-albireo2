@@ -4,10 +4,10 @@ Routing functionality for [KADAS Albireo 2](https://github.com/kadas-albireo/kad
 
 ## Installation
 
-These software are needed to make the plugin works properly:
+These softwares are needed to make the plugin works properly:
 
-1. **KadasLocationSearch**, to enable name based location search. It is usually shipped with Kadas. Without this, you can still choose a location using GPS or click on the map.
-2. **Valhalla**, to enable routing, reachability, and navigation functionality. It must be installed in the same machine. Read more about Valhalla [here](https://github.com/valhalla/valhalla).
+1. **KadasLocationSearch**, to enable name-based location search. It is usually shipped with Kadas. Without this, you can still choose a location using GPS or click on the map.
+2. **Valhalla**, to enable routing, reachability, and navigation functionality. It must be installed on the same machine. Read more about Valhalla [here](https://github.com/valhalla/valhalla).
 
 Currently, the installation only available from this repository.
 
@@ -21,7 +21,7 @@ Currently, the installation only available from this repository.
 
 2. Installation
 
-   To install this plugin on [Kadas Albireo 2](https://github.com/kadas-albireo/kadas-albireo2), extract the zip file from step 1, then copy the `kadasrouting` folder to the KADAS plugins folder located in your used folder. For example:
+   To install this plugin on [Kadas Albireo 2](https://github.com/kadas-albireo/kadas-albireo2), extract the zip file from step 1, then copy the `kadasrouting` folder to the KADAS plugins folder located in your user folder. For example:
    ```
    C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins
    ```
@@ -30,9 +30,9 @@ Currently, the installation only available from this repository.
 
 ### Setup Development Environment
 
-0. Install Kadas Albiero 2, currently it is only available on Windows. The following steps are intended to run on Windows machine.
+0. Install Kadas Albiero 2, currently, it is only available on Windows. The following steps are intended to run on a Windows machine.
 1. Get the source code (see the [first step](##installation) in the installation).
-2. Make a link of the `kadasrouting` to the Kadas's plugin directory by using `mklink` command. The format is
+2. Make a link of the `kadasrouting` to the Kadas's plugin directory by using the `mklink` command. The format is
    ```bash
    mklink /D TARGET_DIR SOURCE_DIR
    ```
@@ -49,9 +49,10 @@ Currently, the installation only available from this repository.
 
 **Note**
 
-The Kadas Albiero directory can be different. For example if you use the portable version of Kadas, it may be in this path:
+The Kadas Albiero directory can be different. For example, if you use the portable version of Kadas, it may be in this path:
 
 > C:\Users\fclementi\AppData\Roaming\Kadas\Kadas\profiles\default\python\plugins
+
 
 ### Internationalisation (i18n)
 
