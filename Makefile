@@ -38,15 +38,15 @@ test-translations:
 
 docker-update-translation-strings:
 	@echo "Update translation using docker"
-	@docker run -t -i -v $(DIR):/home kartoza/qt-translation make update-translation-strings
+	@docker run --rm -v $(DIR):/home kartoza/qt-translation make update-translation-strings
 
 docker-compile-translation-strings:
-	@echo "Update translation using docker"
-	@docker run -t -i -v $(DIR):/home kartoza/qt-translation make compile-translation-strings
+	@echo "Compile translation string using docker"
+	@docker run --rm -v $(DIR):/home kartoza/qt-translation make compile-translation-strings
 
 docker-test-translation:
-	@echo "Update translation using docker"
-	@docker run -t -i -v $(DIR):/home kartoza/qt-translation make test-translations
+	@echo "Test translation using docker"
+	@docker run --rm -v $(DIR):/home kartoza/qt-translation make test-translations
 
 push-translation:
 	@echo "Push translation source to Transifex"
@@ -55,16 +55,6 @@ push-translation:
 pull-translation:
 	@echo "Pull translated string from Transifex"
 	@tx pull -a -f
-
-# Make target below are using qgis-plugin-ci for translation, but it's not finished yet
-
-qgis-docker-ci-update-string:
-	@echo "Update string for translation"
-	@docker run -t -i -v $(DIR):/home -w /home etrimaille/qgis-plugin-ci push-translation ${TX_TOKEN}
-
-shell:
-	@echo "Shell"
-	@docker run -t -i -v $(DIR):/home -w /home -e TX_TOKEN --entrypoint /bin/bash etrimaille/qgis-plugin-ci
 
 generate_vehicles_list:
 	@echo "Generating list of vehicle for the manual"
