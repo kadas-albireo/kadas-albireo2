@@ -4,8 +4,6 @@ Routing functionality for [KADAS Albireo 2](https://github.com/kadas-albireo/kad
 
 ## Installation
 
-### Requirement
-
 These software are needed to make the plugin works properly:
 
 1. **KadasLocationSearch**, to enable name based location search. It is usually shipped with Kadas. Without this, you can still choose a location using GPS or click on the map.
@@ -34,13 +32,28 @@ Currently, the installation only available from this repository.
 
 0. Install Kadas Albiero 2, currently it is only available on Windows. The following steps are intended to run on Windows machine.
 1. Get the source code (see the [first step](##installation) in the installation).
-2. Make a link of the `kadasrouting` to the Kadas's plugin directory, for example:
+2. Make a link of the `kadasrouting` to the Kadas's plugin directory by using `mklink` command. The format is
+   ```bash
+   mklink /D TARGET_DIR SOURCE_DIR
    ```
+   For example:
+   ```bash
    mklink /D "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting" "C:\Users\fclementi\Documents\GitHub\kadas-routing-plugin\kadasrouting"
    ```
 3. You can also use Linux with Windows Virtual Machine. You need to mount the directory where the source code located on the Linux file system to the Windows Virtual Machine. Then do step 2 to make it available on Kadas Albiero 2.
 
-## Internationalisation (i18n)
+   For example (using [Virtual Box](https://www.virtualbox.org/)):
+   ```bash
+   mklink /D "\\VBOXSVR\kadas-routing-plugin\kadasrouting" "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting"
+   ```
+
+**Note**
+
+The Kadas Albiero directory can be different. For example if you use the portable version of Kadas, it may be in this path:
+
+> C:\Users\fclementi\AppData\Roaming\Kadas\Kadas\profiles\default\python\plugins
+
+### Internationalisation (i18n)
 
 This plugin support 4 languages (DE, FR, IT, EN). The translation process is done on [this Transifex project](https://www.transifex.com/camptocamp/kadas-routing-plugin/dashboard/). Below are the commands that are used to manage the translation.
 
