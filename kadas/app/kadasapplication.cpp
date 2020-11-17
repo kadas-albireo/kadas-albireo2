@@ -272,7 +272,11 @@ void KadasApplication::init()
       QgsDebugMsg( QString( "Adding %1 certificates" ).arg( certs.size() ) );
       for ( const QSslCertificate &cert : certs )
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
         QSslConfiguration::defaultConfiguration().addCaCertificate( cert );
+#else
+        QSslSocket::addDefaultCaCertificate( cert );
+#endif
       }
     }
   }
