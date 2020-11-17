@@ -53,7 +53,7 @@ class DataItemWidget(QFrame):
         layout.addWidget(self.button)
         self.setLayout(layout)
         self.setStyleSheet("QFrame { background-color: white; }")
-        if QgsSettings().value("/kadas/activeValhallaTilesID") == self.data['id']:
+        if QgsSettings().value("/kadas/activeValhallaTilesID", 'default') == self.data['id']:
             self.radioButton.setChecked(True)
 
     def updateContent(self):
