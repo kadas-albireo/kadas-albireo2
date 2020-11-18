@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fr" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -15,52 +14,52 @@
     <message>
         <location filename="isochroneslayer.py" line="68"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="101"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="79"/>
         <source>Time Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="80"/>
         <source>Dist Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="102"/>
         <source>ETA</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="82"/>
         <source>My Position:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="96"/>
         <source>Ground Heading</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="98"/>
         <source>WP Angle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="118"/>
         <source>Dist</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="plugin.py" line="37"/>
         <source>Valhalla is not installed or it cannot be found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -76,12 +75,12 @@
     <message>
         <location filename="connectors.py" line="94"/>
         <source>Missing active valhalla tiles. Please choose one.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="connectors.py" line="101"/>
         <source>Missing valhalla tiles on this directory: {directory}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -89,12 +88,12 @@
     <message>
         <location filename="datacataloguebottombar.py" line="119"/>
         <source>Close data catalogue dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="134"/>
         <source>Switzerland - Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -102,52 +101,52 @@
     <message>
         <location filename="datacataloguebottombar.py" line="61"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="62"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="63"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="73"/>
         <source>Please install the tiles first before using it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
         <source>Default data tiles can not be removed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="87"/>
         <source>Cannot remove previous version of tiles for {name}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="90"/>
         <source>Tiles for {name} is successfully deleted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="95"/>
         <source>Cannot install tiles for {name}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="97"/>
         <source>Tiles for {name} is successfully installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="107"/>
         <source>Active Valhalla tiles is set to {tile}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -160,7 +159,7 @@
     <message>
         <location filename="disclaimerdialog.ui" line="174"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="disclaimerdialog.ui" line="194"/>
@@ -188,12 +187,12 @@
     <message>
         <location filename="navigationpanel.ui" line="48"/>
         <source>Show Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="68"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -261,12 +260,12 @@
     <message>
         <location filename="reachabilitybottombar.ui" line="53"/>
         <source>isochrones</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="77"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.ui" line="87"/>
@@ -291,32 +290,32 @@
     <message>
         <location filename="optimalroutebottombar.ui" line="242"/>
         <source>Areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="248"/>
         <source>Draw in Canvas</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="265"/>
         <source>Polygon layer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="272"/>
         <source>Custom polygon</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="282"/>
         <source>No areas to avoid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="datacataloguebottombar.ui" line="43"/>
         <source>Routing Data Repository</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -342,42 +341,42 @@
     <message>
         <location filename="navigationpanel.py" line="401"/>
         <source>Cannot connect to GPS</source>
-        <translation type="unfinished">Impossible de se connecter au GPS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="275"/>
         <source>Select a route or waypoint layer for navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="280"/>
         <source>In {dist} meters you will arrive at your destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="289"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="289"/>
         <source>Select Vehicle to use with layer &apos;{name}&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="398"/>
         <source>Connecting to GPS...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="192"/>
         <source>Set threshold for warnings (meters)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="navigationpanel.py" line="247"/>
         <source>You are not on the route</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -410,12 +409,12 @@
     <message>
         <location filename="optimalroutebottombar.py" line="189"/>
         <source>Invalid location:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="optimalroutebottombar.py" line="193"/>
         <source>Both origin and destination points are required</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -453,7 +452,7 @@
     <message>
         <location filename="optimalroutelayer.py" line="168"/>
         <source>Could not compute route from polyline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -461,12 +460,12 @@
     <message>
         <location filename="reachabilitybottombar.py" line="75"/>
         <source>Isochrone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="76"/>
         <source>Isodistance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="reachabilitybottombar.py" line="54"/>
@@ -534,7 +533,7 @@
     <message>
         <location filename="plugin.py" line="53"/>
         <source>Routing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="plugin.py" line="59"/>
@@ -549,12 +548,12 @@
     <message>
         <location filename="plugin.py" line="82"/>
         <source>Data catalogue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="plugin.py" line="75"/>
         <source>Day / Night</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
