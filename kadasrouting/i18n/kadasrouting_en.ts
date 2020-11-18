@@ -58,7 +58,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugin.py" line="37"/>
+        <location filename="plugin.py" line="39"/>
         <source>Valhalla is not installed or it cannot be found</source>
         <translation type="unfinished"></translation>
     </message>
@@ -74,13 +74,8 @@
 <context>
     <name>ConsoleConnector</name>
     <message>
-        <location filename="connectors.py" line="94"/>
-        <source>Missing active valhalla tiles. Please choose one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="connectors.py" line="101"/>
-        <source>Missing valhalla tiles on this directory: {directory}</source>
+        <location filename="connectors.py" line="99"/>
+        <source>No map package on this directory: {directory}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -116,37 +111,37 @@
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="73"/>
-        <source>Please install the tiles first before using it.</source>
+        <source>Map package has to be installed first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
-        <source>Default data tiles can not be removed</source>
+        <source>The default map package can not be removed </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="87"/>
-        <source>Cannot remove previous version of tiles for {name}</source>
+        <source>Cannot remove previous version of the {name} map package</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="90"/>
-        <source>Tiles for {name} is successfully deleted</source>
+        <source>Map package {name} has been successfully deleted </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="95"/>
-        <source>Cannot install tiles for {name}</source>
+        <source>Cannot install map package {name}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="97"/>
-        <source>Tiles for {name} is successfully installed</source>
+        <source>Map package {name} has been successfully installed </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="107"/>
-        <source>Active Valhalla tiles is set to {tile}</source>
+        <source>Active map package is set to {tile}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -192,7 +187,7 @@
     </message>
     <message>
         <location filename="navigationpanel.ui" line="68"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -532,27 +527,27 @@
 <context>
     <name>RoutingPlugin</name>
     <message>
-        <location filename="plugin.py" line="53"/>
+        <location filename="plugin.py" line="55"/>
         <source>Routing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugin.py" line="59"/>
+        <location filename="plugin.py" line="61"/>
         <source>Reachability</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugin.py" line="67"/>
+        <location filename="plugin.py" line="69"/>
         <source>Navigate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugin.py" line="82"/>
+        <location filename="plugin.py" line="84"/>
         <source>Data catalogue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugin.py" line="75"/>
+        <location filename="plugin.py" line="77"/>
         <source>Day / Night</source>
         <translation type="unfinished"></translation>
     </message>

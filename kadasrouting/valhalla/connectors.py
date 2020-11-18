@@ -89,9 +89,7 @@ class ConsoleConnector(Connector):
         valhallaPath = QgsSettings().value("/kadas/valhalla_exe_dir", defaultValhallaExeDir)
         valhallaExecutable = os.path.join(valhallaPath, "valhalla_service.exe")
 
-        activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", '')
-        if not activeValhallaTilesID:
-            raise Exception(self.tr('Missing active valhalla tiles. Please choose one.'))
+        activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", 'default')
 
         valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
         # Needed since it will be stored in a json file
@@ -99,7 +97,7 @@ class ConsoleConnector(Connector):
         LOG.debug('using tiles in %s' % valhallaTilesDir)
         if not os.path.exists(valhallaTilesDir):
             message = self.tr(
-                'Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
+                'No map package on this directory: {directory}').format(directory=valhallaTilesDir)
             raise Exception(message)
 
         os.chdir(valhallaPath)

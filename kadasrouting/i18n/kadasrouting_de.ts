@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -58,7 +57,7 @@
         <translation>Entfernung</translation>
     </message>
     <message>
-        <location filename="plugin.py" line="37"/>
+        <location filename="plugin.py" line="39"/>
         <source>Valhalla is not installed or it cannot be found</source>
         <translation>Valhalla ist nicht installiert oder kann nicht gefunden werden</translation>
     </message>
@@ -74,14 +73,9 @@
 <context>
     <name>ConsoleConnector</name>
     <message>
-        <location filename="connectors.py" line="94"/>
-        <source>Missing active valhalla tiles. Please choose one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="connectors.py" line="101"/>
-        <source>Missing valhalla tiles on this directory: {directory}</source>
-        <translation type="unfinished"></translation>
+        <location filename="connectors.py" line="99"/>
+        <source>No map package on this directory: {directory}</source>
+        <translation>Kein Kartenpaket auf diesem Verzeichnis verfügbar: {directory}</translation>
     </message>
 </context>
 <context>
@@ -94,7 +88,7 @@
     <message>
         <location filename="datacataloguebottombar.py" line="134"/>
         <source>Switzerland - Default</source>
-        <translation type="unfinished"></translation>
+        <translation> Schweiz - Default</translation>
     </message>
 </context>
 <context>
@@ -116,38 +110,38 @@
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="73"/>
-        <source>Please install the tiles first before using it.</source>
-        <translation type="unfinished"></translation>
+        <source>Map package has to be installed first</source>
+        <translation>Das Kartenpaket muss erst noch installiert werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
-        <source>Default data tiles can not be removed</source>
-        <translation type="unfinished"></translation>
+        <source>The default map package can not be removed </source>
+        <translation>Das Default Kartenpaket kann nicht gelöscht werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="87"/>
-        <source>Cannot remove previous version of tiles for {name}</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot remove previous version of the {name} map package</source>
+        <translation>Die vorherige Version {name} des Kartenpakets kann nicht gelöscht werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="90"/>
-        <source>Tiles for {name} is successfully deleted</source>
-        <translation type="unfinished"></translation>
+        <source>Map package {name} has been successfully deleted </source>
+        <translation>Das Kartenpaket {name} wurde erfolgreich gelöscht</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="95"/>
-        <source>Cannot install tiles for {name}</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot install map package {name}</source>
+        <translation>Das Kartenpaket {name} kann nicht installiert werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="97"/>
-        <source>Tiles for {name} is successfully installed</source>
-        <translation type="unfinished"></translation>
+        <source>Map package {name} has been successfully installed </source>
+        <translation> Das Kartenpaket {name} wurde erfolgreich installiert</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="107"/>
-        <source>Active Valhalla tiles is set to {tile}</source>
-        <translation type="unfinished"></translation>
+        <source>Active map package is set to {tile}</source>
+        <translation>{tile} wurde als Kartenpaket ausgewählt</translation>
     </message>
 </context>
 <context>
@@ -183,7 +177,7 @@
     <message>
         <location filename="navigationpanel.ui" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Waypoints:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Wegpunkte:</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Wegpunkte:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="48"/>
@@ -192,8 +186,8 @@
     </message>
     <message>
         <location filename="navigationpanel.ui" line="68"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Konfigurieren</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Konfigurieren&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -532,27 +526,27 @@
 <context>
     <name>RoutingPlugin</name>
     <message>
-        <location filename="plugin.py" line="53"/>
+        <location filename="plugin.py" line="55"/>
         <source>Routing</source>
         <translation>Navigation</translation>
     </message>
     <message>
-        <location filename="plugin.py" line="59"/>
+        <location filename="plugin.py" line="61"/>
         <source>Reachability</source>
         <translation>Erreichbarkeit</translation>
     </message>
     <message>
-        <location filename="plugin.py" line="67"/>
+        <location filename="plugin.py" line="69"/>
         <source>Navigate</source>
         <translation>Navigieren</translation>
     </message>
     <message>
-        <location filename="plugin.py" line="82"/>
+        <location filename="plugin.py" line="84"/>
         <source>Data catalogue</source>
         <translation>Datenkatalog</translation>
     </message>
     <message>
-        <location filename="plugin.py" line="75"/>
+        <location filename="plugin.py" line="77"/>
         <source>Day / Night</source>
         <translation>Tag / Nacht</translation>
     </message>
