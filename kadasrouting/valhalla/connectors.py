@@ -97,7 +97,7 @@ class ConsoleConnector(Connector):
         LOG.debug('using tiles in %s' % valhallaTilesDir)
         if not os.path.exists(valhallaTilesDir):
             message = self.tr(
-                'Missing valhalla tiles on this directory: {directory}').format(directory=valhallaTilesDir)
+                'No map package on this directory: {directory}').format(directory=valhallaTilesDir)
             raise Exception(message)
 
         os.chdir(valhallaPath)

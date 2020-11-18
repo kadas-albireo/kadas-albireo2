@@ -70,14 +70,14 @@ class DataItemWidget(QFrame):
         # Add addditional behaviour for radio button according to installation status
         if status == DataCatalogueClient.NOT_INSTALLED:
             self.radioButton.setDisabled(True)
-            self.radioButton.setToolTip(self.tr('Please install the tiles first before using it.'))
+            self.radioButton.setToolTip(self.tr('Map package has to be installed first'))
         else:
             self.radioButton.setDisabled(False)
             self.radioButton.setToolTip('')
         # Special handler for default data
         if self.data['id'] == 'default':
             self.button.setEnabled(False)
-            self.button.setToolTip(self.tr('Default data tiles can not be removed'))
+            self.button.setToolTip(self.tr('The default map package can not be removed '))
 
     def buttonClicked(self):
         status = self.data['status']
@@ -85,16 +85,16 @@ class DataItemWidget(QFrame):
             ret = dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
                 pushWarning(
-                    self.tr("Cannot remove previous version of tiles for {name}").format(name=self.data['title']))
+                    self.tr("Cannot remove previous version of the {name} map package").format(name=self.data['title']))
             else:
-                pushMessage(self.tr("Tiles for {name} is successfully deleted").format(name=self.data['title']))
+                pushMessage(self.tr("Map package {name} has been successfully deleted ").format(name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.NOT_INSTALLED
         else:
             ret = dataCatalogueClient.install(self.data)
             if not ret:
-                pushWarning(self.tr("Cannot install tiles for {name}").format(name=self.data['title']))
+                pushWarning(self.tr("Cannot install map package {name}").format(name=self.data['title']))
             else:
-                pushMessage(self.tr("Tiles for {name} is successfully installed").format(name=self.data['title']))
+                pushMessage(self.tr("Map package {name} has been successfully installed ").format(name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.UP_TO_DATE
 
         if ret:
@@ -104,7 +104,7 @@ class DataItemWidget(QFrame):
         if self.radioButton.isChecked():
             # Update Kadas setting
             QgsSettings().setValue("/kadas/activeValhallaTilesID", self.data['id'])
-            pushMessage(self.tr('Active Valhalla tiles is set to {tile}').format(tile=self.data['title']))
+            pushMessage(self.tr('Active map package is set to {tile}').format(tile=self.data['title']))
 
 
 class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
