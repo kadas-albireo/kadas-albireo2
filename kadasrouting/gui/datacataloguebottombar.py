@@ -85,16 +85,19 @@ class DataItemWidget(QFrame):
             ret = dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
                 pushWarning(
-                    self.tr("Cannot remove previous version of the {name} map package").format(name=self.data['title']))
+                    self.tr("Cannot remove previous version of the {name} map package").format(
+                        name=self.data['title']))
             else:
-                pushMessage(self.tr("Map package {name} has been successfully deleted ").format(name=self.data['title']))
+                pushMessage(self.tr("Map package {name} has been successfully deleted ").format(
+                    name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.NOT_INSTALLED
         else:
             ret = dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(self.tr("Cannot install map package {name}").format(name=self.data['title']))
             else:
-                pushMessage(self.tr("Map package {name} has been successfully installed ").format(name=self.data['title']))
+                pushMessage(self.tr("Map package {name} has been successfully installed ").format(
+                    name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.UP_TO_DATE
 
         if ret:
