@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.0">
 <context>
     <name>@default</name>
     <message>
@@ -76,7 +75,7 @@
     <message>
         <location filename="connectors.py" line="99"/>
         <source>No map package on this directory: {directory}</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Kartenpaket auf diesem Verzeichnis verfügbar: {directory}</translation>
     </message>
 </context>
 <context>
@@ -89,7 +88,7 @@
     <message>
         <location filename="datacataloguebottombar.py" line="134"/>
         <source>Switzerland - Default</source>
-        <translation type="unfinished"></translation>
+        <translation> Schweiz - Default</translation>
     </message>
 </context>
 <context>
@@ -112,37 +111,37 @@
     <message>
         <location filename="datacataloguebottombar.py" line="73"/>
         <source>Map package has to be installed first</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Kartenpaket muss erst noch installiert werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
         <source>The default map package can not be removed </source>
-        <translation type="unfinished"></translation>
+        <translation>Das Default Kartenpaket kann nicht gelöscht werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="87"/>
         <source>Cannot remove previous version of the {name} map package</source>
-        <translation type="unfinished"></translation>
+        <translation>Die vorherige Version {name} des Kartenpakets kann nicht gelöscht werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="90"/>
         <source>Map package {name} has been successfully deleted </source>
-        <translation type="unfinished"></translation>
+        <translation>Das Kartenpaket {name} wurde erfolgreich gelöscht</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="95"/>
         <source>Cannot install map package {name}</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Kartenpaket {name} kann nicht installiert werden</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="97"/>
         <source>Map package {name} has been successfully installed </source>
-        <translation type="unfinished"></translation>
+        <translation> Das Kartenpaket {name} wurde erfolgreich installiert</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="107"/>
         <source>Active map package is set to {tile}</source>
-        <translation type="unfinished"></translation>
+        <translation>{tile} wurde als Kartenpaket ausgewählt</translation>
     </message>
 </context>
 <context>
@@ -178,7 +177,7 @@
     <message>
         <location filename="navigationpanel.ui" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Waypoints:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Wegpunkte:</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Wegpunkte:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="48"/>
@@ -188,7 +187,7 @@
     <message>
         <location filename="navigationpanel.ui" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Konfigurieren&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
