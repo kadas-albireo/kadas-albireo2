@@ -16,7 +16,10 @@ from qgis.core import (
     QgsJsonUtils,
     QgsFields,
     QgsField,
-    QgsVectorLayer
+    QgsVectorLayer,
+    QgsGeometry,
+    QgsSvgMarkerSymbolLayer,
+    QgsMarkerSymbolLayer
 )
 
 LOG = logging.getLogger(__name__)
@@ -93,3 +96,35 @@ def generateIsochrones(point, profile, costingOptions, intervals, colors, basena
         symbol.setColor(fillColor)
         symbol.symbolLayer(0).setStrokeColor(outlineColor)
         layer.setRenderer(renderer)
+
+    # Add center of reachability
+    center_point_layer_name = tr('Center of {basename}').format(basename=basename)
+    try:
+        existinglayer = QgsProject.instance().mapLayersByName(center_point_layer_name)[0]
+        if overwrite:
+            QgsProject.instance().removeMapLayer(existinglayer.id())
+        else:
+            raise OverwriteError(tr(
+                "layer {layername} already exists and overwrite is {overwrite}").format(
+                    layername=center_point_layer_name, overwrite=overwrite
+                )
+            )
+    except IndexError:
+        LOG.debug("this layer was not found: {}".format(center_point_layer_name))
+
+    center_point = QgsVectorLayer(
+        "Point?crs=epsg:4326",
+        center_point_layer_name,
+        "memory",
+    )
+    pr = center_point.dataProvider()
+    qgsfeature = QgsFeature()
+    qgsfeature.setGeometry(QgsGeometry.fromPointXY(point))
+    pr.addFeatures([qgsfeature])
+    # symbology
+    path = ":/kadas/icons/pin_red"
+    symbol = QgsSvgMarkerSymbolLayer(path)
+    symbol.setSize(10)
+    symbol.setVerticalAnchorPoint(QgsMarkerSymbolLayer.Bottom)
+    center_point.renderer().symbol().changeSymbolLayer(0, symbol)
+    QgsProject.instance().addMapLayer(center_point)
