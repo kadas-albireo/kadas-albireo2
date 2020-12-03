@@ -13,7 +13,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="isochroneslayer.py" line="68"/>
+        <location filename="isochroneslayer.py" line="107"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -62,6 +62,11 @@
         <source>Valhalla is not installed or it cannot be found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="isochroneslayer.py" line="101"/>
+        <source>Center of {basename}</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Connector</name>
@@ -82,12 +87,12 @@
 <context>
     <name>DataCatalogueBottomBar</name>
     <message>
-        <location filename="datacataloguebottombar.py" line="119"/>
+        <location filename="datacataloguebottombar.py" line="122"/>
         <source>Close data catalogue dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="134"/>
+        <location filename="datacataloguebottombar.py" line="137"/>
         <source>Switzerland - Default</source>
         <translation type="unfinished"></translation>
     </message>
@@ -125,22 +130,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="90"/>
+        <location filename="datacataloguebottombar.py" line="91"/>
         <source>Map package {name} has been successfully deleted </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="95"/>
+        <location filename="datacataloguebottombar.py" line="97"/>
         <source>Cannot install map package {name}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="97"/>
+        <location filename="datacataloguebottombar.py" line="99"/>
         <source>Map package {name} has been successfully installed </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="107"/>
+        <location filename="datacataloguebottombar.py" line="110"/>
         <source>Active map package is set to {tile}</source>
         <translation type="unfinished"></translation>
     </message>
