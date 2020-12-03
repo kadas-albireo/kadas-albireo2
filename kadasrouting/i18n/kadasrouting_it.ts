@@ -1,4 +1,5 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="it" version="2.0">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS><TS version="2.0" language="it" sourcelanguage="">
 <context>
     <name>@default</name>
     <message>
@@ -12,54 +13,59 @@
         <translation>Avviso</translation>
     </message>
     <message>
-        <location filename="isochroneslayer.py" line="68"/>
+        <location filename="isochroneslayer.py" line="107"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
-        <translation type="unfinished"/>
+        <translation>Il layer {layername} esiste già, e il paramtero &quot;sovrascrivi&quot; è {overwrite}</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="101"/>
         <source>Speed</source>
-        <translation type="unfinished"/>
+        <translation>vélocità</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="79"/>
         <source>Time Left</source>
-        <translation type="unfinished"/>
+        <translation>Tempo rimanente</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="80"/>
         <source>Dist Left</source>
-        <translation type="unfinished"/>
+        <translation>Distanza rimanente</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="102"/>
         <source>ETA</source>
-        <translation type="unfinished"/>
+        <translation>ETA</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="82"/>
         <source>My Position:</source>
-        <translation type="unfinished"/>
+        <translation>La mia posizione:</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="96"/>
         <source>Ground Heading</source>
-        <translation type="unfinished"/>
+        <translation>Direzione</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="98"/>
         <source>WP Angle</source>
-        <translation type="unfinished"/>
+        <translation>Angolo WP</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="118"/>
         <source>Dist</source>
-        <translation type="unfinished"/>
+        <translation>Dist</translation>
     </message>
     <message>
         <location filename="plugin.py" line="39"/>
         <source>Valhalla is not installed or it cannot be found</source>
-        <translation type="unfinished"/>
+        <translation>Valhalla non è installato o non è stato trovato</translation>
+    </message>
+    <message>
+        <location filename="isochroneslayer.py" line="101"/>
+        <source>Center of {basename}</source>
+        <translation>Centro di {basename}</translation>
     </message>
 </context>
 <context>
@@ -75,20 +81,20 @@
     <message>
         <location filename="connectors.py" line="99"/>
         <source>No map package on this directory: {directory}</source>
-        <translation type="unfinished"/>
+        <translation>Non ci sono pacchetti cartografici in questo repertorio: {directory}</translation>
     </message>
 </context>
 <context>
     <name>DataCatalogueBottomBar</name>
     <message>
-        <location filename="datacataloguebottombar.py" line="119"/>
+        <location filename="datacataloguebottombar.py" line="122"/>
         <source>Close data catalogue dialog</source>
-        <translation type="unfinished"/>
+        <translation>Chiudi il catalogo dei dati</translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="134"/>
+        <location filename="datacataloguebottombar.py" line="137"/>
         <source>Switzerland - Default</source>
-        <translation type="unfinished"/>
+        <translation>Svizzera - Default</translation>
     </message>
 </context>
 <context>
@@ -96,52 +102,52 @@
     <message>
         <location filename="datacataloguebottombar.py" line="61"/>
         <source>Install</source>
-        <translation type="unfinished"/>
+        <translation>Installa</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="62"/>
         <source>Update</source>
-        <translation type="unfinished"/>
+        <translation>Aggiorna</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="63"/>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Rimuovi</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="73"/>
         <source>Map package has to be installed first</source>
-        <translation type="unfinished"/>
+        <translation>Bisogna prima installare un pacchetto cartografico</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
         <source>The default map package can not be removed </source>
-        <translation type="unfinished"/>
+        <translation>Il pacchetto cartografico di default non può essere cancellato</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="87"/>
         <source>Cannot remove previous version of the {name} map package</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile cancellare la versione precedente del pacchetto cartografico {name}</translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="90"/>
+        <location filename="datacataloguebottombar.py" line="91"/>
         <source>Map package {name} has been successfully deleted </source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="datacataloguebottombar.py" line="95"/>
-        <source>Cannot install map package {name}</source>
-        <translation type="unfinished"/>
+        <translation>Il pacchetto cartografico {name} è stato cancellato con successo</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="97"/>
-        <source>Map package {name} has been successfully installed </source>
-        <translation type="unfinished"/>
+        <source>Cannot install map package {name}</source>
+        <translation>Impossiblile installare in pacchetto cartografico {name}</translation>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="107"/>
+        <location filename="datacataloguebottombar.py" line="99"/>
+        <source>Map package {name} has been successfully installed </source>
+        <translation>II pacchetto cartografico {name} è stato installato con successo</translation>
+    </message>
+    <message>
+        <location filename="datacataloguebottombar.py" line="110"/>
         <source>Active map package is set to {tile}</source>
-        <translation type="unfinished"/>
+        <translation>Il pacchetto cartografico attivo è {tile}</translation>
     </message>
 </context>
 <context>
@@ -182,12 +188,12 @@
     <message>
         <location filename="navigationpanel.ui" line="48"/>
         <source>Show Warnings</source>
-        <translation type="unfinished"/>
+        <translation>Mostra gli avvertimenti</translation>
     </message>
     <message>
         <location filename="navigationpanel.ui" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configurare&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -285,32 +291,32 @@
     <message>
         <location filename="optimalroutebottombar.ui" line="242"/>
         <source>Areas to avoid</source>
-        <translation type="unfinished"/>
+        <translation>Aree da evitare</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="248"/>
         <source>Draw in Canvas</source>
-        <translation type="unfinished"/>
+        <translation>Disegna sulla cartina</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="265"/>
         <source>Polygon layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer di poligoni</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="272"/>
         <source>Custom polygon</source>
-        <translation type="unfinished"/>
+        <translation>poligono personalizzato</translation>
     </message>
     <message>
         <location filename="optimalroutebottombar.ui" line="282"/>
         <source>No areas to avoid</source>
-        <translation type="unfinished"/>
+        <translation>Non ci sono aree da evitare</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.ui" line="43"/>
         <source>Routing Data Repository</source>
-        <translation type="unfinished"/>
+        <translation>Catalogo di dati per il routing</translation>
     </message>
 </context>
 <context>
@@ -336,42 +342,42 @@
     <message>
         <location filename="navigationpanel.py" line="401"/>
         <source>Cannot connect to GPS</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile collegarsi al GPS</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="275"/>
         <source>Select a route or waypoint layer for navigation</source>
-        <translation type="unfinished"/>
+        <translation>Selzionare una rotta o un layer di waypoints per navigazione</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="280"/>
         <source>In {dist} meters you will arrive at your destination</source>
-        <translation type="unfinished"/>
+        <translation>Arriverete alla vostra destinazione tra {dist} metri</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="289"/>
         <source>Navigation</source>
-        <translation type="unfinished"/>
+        <translation>Navigazione</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="289"/>
         <source>Select Vehicle to use with layer &apos;{name}&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Selezionare un veicolo da usare col layer &apos;{name}&apos;</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="398"/>
         <source>Connecting to GPS...</source>
-        <translation type="unfinished"/>
+        <translation>Connessione al GPS...</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="192"/>
         <source>Set threshold for warnings (meters)</source>
-        <translation type="unfinished"/>
+        <translation>Impostare limiti per avvertimenti (in metri)</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="247"/>
         <source>You are not on the route</source>
-        <translation type="unfinished"/>
+        <translation>Non vi trovate sulla rotta</translation>
     </message>
 </context>
 <context>
@@ -409,7 +415,7 @@
     <message>
         <location filename="optimalroutebottombar.py" line="193"/>
         <source>Both origin and destination points are required</source>
-        <translation type="unfinished"/>
+        <translation>I due parametri origine e destinazione sono necessari</translation>
     </message>
 </context>
 <context>
@@ -447,7 +453,7 @@
     <message>
         <location filename="optimalroutelayer.py" line="168"/>
         <source>Could not compute route from polyline</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile calcolare la rotta dalla polilinea</translation>
     </message>
 </context>
 <context>
@@ -543,12 +549,12 @@
     <message>
         <location filename="plugin.py" line="84"/>
         <source>Data catalogue</source>
-        <translation type="unfinished"/>
+        <translation>Catalogo dei dati</translation>
     </message>
     <message>
         <location filename="plugin.py" line="77"/>
         <source>Day / Night</source>
-        <translation type="unfinished"/>
+        <translation>Giorno / Notte</translation>
     </message>
 </context>
 </TS>
