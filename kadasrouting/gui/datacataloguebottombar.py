@@ -17,7 +17,7 @@ from qgis.core import QgsSettings
 
 from kadas.kadasgui import KadasBottomBar
 
-from kadasrouting.utilities import pushWarning, pushMessage
+from kadasrouting.utilities import pushWarning, pushMessage, icon
 from kadasrouting.core.datacatalogueclient import (
     dataCatalogueClient,
     DataCatalogueClient,
@@ -118,11 +118,20 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.setStyleSheet("QFrame { background-color: orange; }")
         self.listWidget.setStyleSheet("QListWidget { background-color: white; }")
         self.action = action
+        # Close button
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
         self.btnClose.setToolTip(self.tr("Close data catalogue dialog"))
         self.btnClose.clicked.connect(self.action.toggle)
+        # Reload button
+        self.reloadRepositoryButton.setIcon(icon("reload.png"))
+        self.reloadRepositoryButton.setToolTip(self.tr("Reload data catalogue with the selected repository"))
+        self.reloadRepositoryButton.clicked.connect(self.reloadRepository)
+
         self.radioButtonGroup = QButtonGroup(self)
         self.populateList()
+
+    def reloadRepository(self):
+        pass
 
     def populateList(self):
         LOG.debug('populating list')
