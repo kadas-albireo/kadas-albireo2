@@ -21,7 +21,9 @@ from kadasrouting.utilities import pushWarning, pushMessage, icon
 from kadasrouting.core.datacatalogueclient import (
     dataCatalogueClient,
     DataCatalogueClient,
-    DEFAULT_DATA_TILES_PATH
+    DEFAULT_DATA_TILES_PATH,
+    DEFAULT_REPOSTIORY_URLS,
+    DEFAULT_ACTIVE_REPOSITORY_URL
 )
 
 LOG = logging.getLogger(__name__)
@@ -127,11 +129,12 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.reloadRepositoryButton.setToolTip(self.tr("Reload data catalogue with the selected repository"))
         self.reloadRepositoryButton.clicked.connect(self.reloadRepository)
 
+        # Repository URLs combo box
+        self.repoUrlComboBox.setEditable(True)
+        self.populateListRepositoryURLs()
+
         self.radioButtonGroup = QButtonGroup(self)
         self.populateList()
-
-    def reloadRepository(self):
-        pass
 
     def populateList(self):
         LOG.debug('populating list')
@@ -163,4 +166,24 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             self.radioButtonGroup.addButton(widget.radioButton)
 
     def populateListRepositoryURLs(self):
-        pass
+        LOG.debug('Populating list of repository URLs')
+        self.repoUrlComboBox.clear()
+        active_repository_url = QgsSettings().value(
+            "/kadasrouting/active_repository_url", DEFAULT_ACTIVE_REPOSITORY_URL)
+        repository_urls = list(DEFAULT_REPOSTIORY_URLS)
+        if active_repository_url not in repository_urls:
+            repository_urls.append(active_repository_url)
+
+        self.repoUrlComboBox.addItems(repository_urls)
+        self.repoUrlComboBox.setCurrentText(active_repository_url)
+
+
+    def reloadRepository(self):
+        LOG.debug('Repository reloaded')
+        # Update the list
+        # Store the active repository URL
+        QgsSettings().setValue("/kadasrouting/active_repository_url", self.repoUrlComboBox.currentText())
+
+    def show(self):
+        KadasBottomBar.show(self)
+        self.populateListRepositoryURLs()
