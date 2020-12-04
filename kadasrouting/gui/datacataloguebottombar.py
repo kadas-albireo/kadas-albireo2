@@ -161,3 +161,6 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
             self.radioButtonGroup.addButton(widget.radioButton)
+
+    def populateListRepositoryURLs(self):
+        pass

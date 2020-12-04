@@ -16,17 +16,20 @@ LOG = logging.getLogger(__name__)
 # Obtained from Valhalla installer
 DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
+DEFAULT_REPOSTIORY_URLS = [
+    'https://ch-milgeo.maps.arcgis.com/sharing/rest',
+    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest'
+]
+
+DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSTIORY_URLS[0]
+
 
 class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
 
-    # DEFAULT_URL = "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest"
-
-    DEFAULT_URL = 'https://ch-milgeo.maps.arcgis.com/sharing/rest'
-
     def __init__(self, url=None):
-        self.url = url or self.DEFAULT_URL
+        self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
 
     def dataTimestamp(self, itemid):
         filename = os.path.join(self.folderForDataItem(itemid), "metadata")
