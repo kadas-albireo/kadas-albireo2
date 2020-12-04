@@ -31,8 +31,9 @@ class DataCatalogueClient():
     def __init__(self, url=None):
         self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
 
-    def dataTimestamp(self, itemid):
-        filename = os.path.join(self.folderForDataItem(itemid), "metadata")
+    @staticmethod
+    def dataTimestamp(itemid):
+        filename = os.path.join(DataCatalogueClient.folderForDataItem(itemid), "metadata")
         try:
             with open(filename) as f:
                 timestamp = json.load(f)["modified"]
@@ -89,7 +90,7 @@ class DataCatalogueClient():
             file.open(QFile.WriteOnly)
             file.write(response.content().data())
             file.close()
-            targetFolder = self.folderForDataItem(itemid)
+            targetFolder = DataCatalogueClient.folderForDataItem(itemid)
             removed = QDir(targetFolder).removeRecursively()
             if not removed:
                 return False
@@ -98,13 +99,14 @@ class DataCatalogueClient():
             return True
         else:
             return False
-
-    def uninstall(self, itemid):
-        path = self.folderForDataItem(itemid)
+    @staticmethod
+    def uninstall(itemid):
+        path = DataCatalogueClient.folderForDataItem(itemid)
         LOG.debug('uninstall/remove from %s' % path)
-        return QDir(self.folderForDataItem(itemid)).removeRecursively()
+        return QDir(DataCatalogueClient.folderForDataItem(itemid)).removeRecursively()
 
-    def folderForDataItem(self, itemid):
+    @staticmethod
+    def folderForDataItem(itemid):
         if itemid == 'default':
             return DEFAULT_DATA_TILES_PATH
         return os.path.join(appDataDir(), "tiles", itemid)

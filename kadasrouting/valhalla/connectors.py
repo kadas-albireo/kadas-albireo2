@@ -11,7 +11,7 @@ from qgis.core import QgsSettings
 
 from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName, appDataDir, pushWarning
-from kadasrouting.core.datacatalogueclient import dataCatalogueClient
+from kadasrouting.core.datacatalogueclient import DataCatalogueClient
 
 LOG = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class ConsoleConnector(Connector):
 
         activeValhallaTilesID = QgsSettings().value("/kadas/activeValhallaTilesID", 'default')
 
-        valhallaTilesDir = os.path.join(dataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
+        valhallaTilesDir = os.path.join(DataCatalogueClient.folderForDataItem(activeValhallaTilesID), 'valhalla_tiles')
         # Needed since it will be stored in a json file
         valhallaTilesDir = valhallaTilesDir.replace('\\', '/')
         LOG.debug('using tiles in %s' % valhallaTilesDir)
