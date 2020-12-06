@@ -158,7 +158,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         try:
             dataItems.extend(self.dataCatalogueClient.getAvailableTiles())
         except Exception as e:
-            pushWarning(str(e))
+            pushWarning('Cannot get tiles from the URL because %s ' % str(e))
             return
 
         for data in dataItems:

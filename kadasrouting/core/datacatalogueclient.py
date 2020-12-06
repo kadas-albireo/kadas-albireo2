@@ -49,7 +49,7 @@ class DataCatalogueClient():
         url = f'{self.url}/search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson'
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
-            raise Exception("Response error:" + response.error())
+            raise Exception(response.errorString())
         responsejson = json.loads(response.content().data())
         LOG.debug('response from data repository: %s' % responsejson)
         tiles = []
