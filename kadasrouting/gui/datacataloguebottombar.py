@@ -40,9 +40,10 @@ class DataItem(QListWidgetItem):
 
 class DataItemWidget(QFrame):
 
-    def __init__(self, data):
+    def __init__(self, data, data_catalogue_client):
         QFrame.__init__(self)
         self.data = data
+        self.dataCatalogueClient = data_catalogue_client
         layout = QHBoxLayout()
         layout.setMargin(0)
         self.radioButton = QRadioButton()
@@ -94,7 +95,7 @@ class DataItemWidget(QFrame):
                     name=self.data['title']))
                 self.data['status'] = DataCatalogueClient.NOT_INSTALLED
         else:
-            ret = dataCatalogueClient.install(self.data)
+            ret = self.dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(self.tr("Cannot install map package {name}").format(name=self.data['title']))
             else:
@@ -119,6 +120,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.setupUi(self)
         self.setStyleSheet("QFrame { background-color: orange; }")
         self.listWidget.setStyleSheet("QListWidget { background-color: white; }")
+        self.radioButtonGroup = QButtonGroup(self)
         self.action = action
         # Close button
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
@@ -129,12 +131,14 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.reloadRepositoryButton.setToolTip(self.tr("Reload data catalogue with the selected repository"))
         self.reloadRepositoryButton.clicked.connect(self.reloadRepository)
 
-        # Repository URLs combo box
+        # data catalogue client
+        self.dataCatalogueClient = None
+
+         # Repository URLs combo box
         self.repoUrlComboBox.setEditable(True)
         self.populateListRepositoryURLs()
-
-        self.radioButtonGroup = QButtonGroup(self)
-        self.populateList()
+        self.reloadRepository()
+        # self.populateList()
 
     def populateList(self):
         LOG.debug('populating list')
@@ -152,14 +156,14 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             }
         dataItems = [defaultData]
         try:
-            dataItems.extend(dataCatalogueClient.getAvailableTiles())
+            dataItems.extend(self.dataCatalogueClient.getAvailableTiles())
         except Exception as e:
             pushWarning(str(e))
             return
 
         for data in dataItems:
             item = DataItem(data)
-            widget = DataItemWidget(data)
+            widget = DataItemWidget(data, self.dataCatalogueClient)
             item.setSizeHint(widget.sizeHint())
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
@@ -177,12 +181,14 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.repoUrlComboBox.addItems(repository_urls)
         self.repoUrlComboBox.setCurrentText(active_repository_url)
 
-
     def reloadRepository(self):
         LOG.debug('Repository reloaded')
         # Update the list
+        active_repository_url = self.repoUrlComboBox.currentText()
         # Store the active repository URL
-        QgsSettings().setValue("/kadasrouting/active_repository_url", self.repoUrlComboBox.currentText())
+        QgsSettings().setValue("/kadasrouting/active_repository_url", active_repository_url)
+        self.dataCatalogueClient = DataCatalogueClient(active_repository_url)
+        self.populateList()
 
     def show(self):
         KadasBottomBar.show(self)
