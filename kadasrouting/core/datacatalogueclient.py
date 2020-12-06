@@ -99,6 +99,7 @@ class DataCatalogueClient():
             return True
         else:
             return False
+
     @staticmethod
     def uninstall(itemid):
         path = DataCatalogueClient.folderForDataItem(itemid)
