@@ -16,12 +16,12 @@ LOG = logging.getLogger(__name__)
 # Obtained from Valhalla installer
 DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
-DEFAULT_REPOSTIORY_URLS = [
+DEFAULT_REPOSITORY_URLS = [
     'https://ch-milgeo.maps.arcgis.com/sharing/rest/search',
     'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest/search'
 ]
 
-DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSTIORY_URLS[0]
+DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
 
 
 class DataCatalogueClient():
@@ -48,7 +48,7 @@ class DataCatalogueClient():
         url = QUrl(self.url)
         query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
         query.addQueryItem('f', 'pjson')
-        url.setQuery(query.query());
+        url.setQuery(query.query())
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
             raise Exception(response.errorString())

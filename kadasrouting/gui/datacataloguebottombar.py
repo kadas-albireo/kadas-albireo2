@@ -22,7 +22,7 @@ from kadasrouting.core.datacatalogueclient import (
     dataCatalogueClient,
     DataCatalogueClient,
     DEFAULT_DATA_TILES_PATH,
-    DEFAULT_REPOSTIORY_URLS,
+    DEFAULT_REPOSITORY_URLS,
     DEFAULT_ACTIVE_REPOSITORY_URL
 )
 
@@ -174,7 +174,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.repoUrlComboBox.clear()
         active_repository_url = QgsSettings().value(
             "/kadasrouting/active_repository_url", DEFAULT_ACTIVE_REPOSITORY_URL)
-        repository_urls = list(DEFAULT_REPOSTIORY_URLS)
+        repository_urls = list(DEFAULT_REPOSITORY_URLS)
         if active_repository_url not in repository_urls:
             repository_urls.append(active_repository_url)
 
