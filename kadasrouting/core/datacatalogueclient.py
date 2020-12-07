@@ -17,8 +17,8 @@ LOG = logging.getLogger(__name__)
 DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
 DEFAULT_REPOSITORY_URLS = [
-    'https://ch-milgeo.maps.arcgis.com/sharing/rest/search',
-    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest/search'
+    'https://ch-milgeo.maps.arcgis.com/sharing/rest',
+    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest'
 ]
 
 DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
@@ -45,7 +45,7 @@ class DataCatalogueClient():
 
     def getAvailableTiles(self):
         query = QUrlQuery()
-        url = QUrl(self.url)
+        url = QUrl(f'{self.url}/search')
         query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
         query.addQueryItem('f', 'pjson')
         url.setQuery(query.query())
