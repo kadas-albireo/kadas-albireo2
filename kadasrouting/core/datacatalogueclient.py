@@ -4,7 +4,7 @@ import logging
 
 from pyplugin_installer import unzip
 
-from PyQt5.QtCore import QUrl, QFile, QDir
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
@@ -17,8 +17,8 @@ LOG = logging.getLogger(__name__)
 DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
 DEFAULT_REPOSTIORY_URLS = [
-    'https://ch-milgeo.maps.arcgis.com/sharing/rest',
-    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest'
+    'https://ch-milgeo.maps.arcgis.com/sharing/rest/search',
+    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest/search'
 ]
 
 DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSTIORY_URLS[0]
@@ -44,9 +44,11 @@ class DataCatalogueClient():
             return None
 
     def getAvailableTiles(self):
-        # https://ch-milgeo.maps.arcgis.com/sharing/rest/
-        # search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson
-        url = f'{self.url}/search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson'
+        query = QUrlQuery()
+        url = QUrl(self.url)
+        query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
+        query.addQueryItem('f', 'pjson')
+        url.setQuery(query.query());
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
             raise Exception(response.errorString())
