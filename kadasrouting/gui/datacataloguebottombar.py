@@ -138,11 +138,8 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.repoUrlComboBox.setEditable(True)
         self.populateListRepositoryURLs()
         self.reloadRepository()
-        # self.populateList()
 
     def populateList(self):
-        LOG.debug('populating list')
-        self.listWidget.clear()
         if os.path.exists(DEFAULT_DATA_TILES_PATH):
             defaultStatus = DataCatalogueClient.UP_TO_DATE
         else:
@@ -159,8 +156,10 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             dataItems.extend(self.dataCatalogueClient.getAvailableTiles())
         except Exception as e:
             pushWarning('Cannot get tiles from the URL because %s ' % str(e))
-            return
+            return False
 
+        # Clear first before populating (in case failed request, the list is still there)
+        self.listWidget.clear()
         for data in dataItems:
             item = DataItem(data)
             widget = DataItemWidget(data, self.dataCatalogueClient)
@@ -168,9 +167,9 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
             self.radioButtonGroup.addButton(widget.radioButton)
+        return True
 
     def populateListRepositoryURLs(self):
-        LOG.debug('Populating list of repository URLs')
         self.repoUrlComboBox.clear()
         active_repository_url = QgsSettings().value(
             "/kadasrouting/active_repository_url", DEFAULT_ACTIVE_REPOSITORY_URL)
@@ -182,13 +181,13 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.repoUrlComboBox.setCurrentText(active_repository_url)
 
     def reloadRepository(self):
-        LOG.debug('Repository reloaded')
         # Update the list
         active_repository_url = self.repoUrlComboBox.currentText()
-        # Store the active repository URL
-        QgsSettings().setValue("/kadasrouting/active_repository_url", active_repository_url)
         self.dataCatalogueClient = DataCatalogueClient(active_repository_url)
-        self.populateList()
+        success = self.populateList()
+        # Store the active repository URL
+        if success:
+            QgsSettings().setValue("/kadasrouting/active_repository_url", active_repository_url)
 
     def show(self):
         KadasBottomBar.show(self)
