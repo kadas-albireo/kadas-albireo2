@@ -4,7 +4,7 @@ import logging
 
 from pyplugin_installer import unzip
 
-from PyQt5.QtCore import QUrl, QFile, QDir
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
@@ -16,20 +16,24 @@ LOG = logging.getLogger(__name__)
 # Obtained from Valhalla installer
 DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
+DEFAULT_REPOSITORY_URLS = [
+    'https://ch-milgeo.maps.arcgis.com/sharing/rest/search',
+    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest/search'
+]
+
+DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
+
 
 class DataCatalogueClient():
 
     NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
 
-    # DEFAULT_URL = "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest"
-
-    DEFAULT_URL = 'https://ch-milgeo.maps.arcgis.com/sharing/rest'
-
     def __init__(self, url=None):
-        self.url = url or self.DEFAULT_URL
+        self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
 
-    def dataTimestamp(self, itemid):
-        filename = os.path.join(self.folderForDataItem(itemid), "metadata")
+    @staticmethod
+    def dataTimestamp(itemid):
+        filename = os.path.join(DataCatalogueClient.folderForDataItem(itemid), "metadata")
         try:
             with open(filename) as f:
                 timestamp = json.load(f)["modified"]
@@ -40,12 +44,14 @@ class DataCatalogueClient():
             return None
 
     def getAvailableTiles(self):
-        # https://ch-milgeo.maps.arcgis.com/sharing/rest/
-        # search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson
-        url = f'{self.url}/search?q=owner:%22geosupport.fsta%22%20tags:%22valhalla%22&f=pjson'
+        query = QUrlQuery()
+        url = QUrl(self.url)
+        query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
+        query.addQueryItem('f', 'pjson')
+        url.setQuery(query.query())
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
-            raise Exception("Response error:" + response.error())
+            raise Exception(response.errorString())
         responsejson = json.loads(response.content().data())
         LOG.debug('response from data repository: %s' % responsejson)
         tiles = []
@@ -86,7 +92,7 @@ class DataCatalogueClient():
             file.open(QFile.WriteOnly)
             file.write(response.content().data())
             file.close()
-            targetFolder = self.folderForDataItem(itemid)
+            targetFolder = DataCatalogueClient.folderForDataItem(itemid)
             removed = QDir(targetFolder).removeRecursively()
             if not removed:
                 return False
@@ -96,12 +102,14 @@ class DataCatalogueClient():
         else:
             return False
 
-    def uninstall(self, itemid):
-        path = self.folderForDataItem(itemid)
+    @staticmethod
+    def uninstall(itemid):
+        path = DataCatalogueClient.folderForDataItem(itemid)
         LOG.debug('uninstall/remove from %s' % path)
-        return QDir(self.folderForDataItem(itemid)).removeRecursively()
+        return QDir(DataCatalogueClient.folderForDataItem(itemid)).removeRecursively()
 
-    def folderForDataItem(self, itemid):
+    @staticmethod
+    def folderForDataItem(itemid):
         if itemid == 'default':
             return DEFAULT_DATA_TILES_PATH
         return os.path.join(appDataDir(), "tiles", itemid)
