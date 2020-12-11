@@ -9,12 +9,9 @@ from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
 
-from kadasrouting.utilities import appDataDir, waitcursor
+from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
 
 LOG = logging.getLogger(__name__)
-
-# Obtained from Valhalla installer
-DEFAULT_DATA_TILES_PATH = r'C:/Program Files/KadasAlbireo/share/kadas/routing/default'
 
 DEFAULT_REPOSITORY_URLS = [
     'https://ch-milgeo.maps.arcgis.com/sharing/rest',
@@ -26,7 +23,12 @@ DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
 
 class DataCatalogueClient():
 
-    NOT_INSTALLED, UPDATABLE, UP_TO_DATE = range(3)
+    # Status of data tiles
+    NOT_INSTALLED = 0  # Available on remote repository, but not in local file system
+    UPDATABLE = 1  # There is a local copy, but the one in remote repository is newer
+    UP_TO_DATE = 2  # There is a local copy and is up to date compared to the one in remote repository
+    LOCAL_ONLY = 3  # The data is only available locally
+    LOCAL_DELETED = 4  # The local only data is deleted
 
     def __init__(self, url=None):
         self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
@@ -43,7 +45,24 @@ class DataCatalogueClient():
             LOG.debug('metadata file is failed to read: %s' % e)
             return None
 
-    def getAvailableTiles(self):
+    def getTiles(self):
+        try:
+            remote_tiles = self.getRemoteTiles()
+        except Exception as e:
+            pushWarning('Cannot get tiles from the URL because %s ' % str(e))
+            remote_tiles = []
+        local_tiles = self.getLocalTiles()
+        # Merge the tiles
+        all_tiles = []
+        all_tiles.extend(remote_tiles)
+        remote_tile_ids = [remote_tile['id'] for remote_tile in remote_tiles]
+        for local_tile in local_tiles:
+            if local_tile['id'] not in remote_tile_ids:
+                all_tiles.append(local_tile)
+
+        return all_tiles
+
+    def getRemoteTiles(self):
         query = QUrlQuery()
         url = QUrl(f'{self.url}/search')
         query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
@@ -68,6 +87,25 @@ class DataCatalogueClient():
             tile["status"] = status
             tiles.append(tile)
         return tiles
+
+    @staticmethod
+    def getLocalTiles():
+        folder_data = DataCatalogueClient.folderData()
+        data_dirs = [f.path for f in os.scandir(folder_data) if f.is_dir()]
+        LOG.debug(data_dirs)
+        local_tiles = []
+        for data_dir in data_dirs:
+            LOG.debug(type(data_dir))
+            try:
+                metadata_file = os.path.join(data_dir, "metadata")
+                LOG.debug(metadata_file)
+                with open(metadata_file) as f:
+                    tile = json.load(f)
+                    tile['status'] = DataCatalogueClient.LOCAL_ONLY
+                local_tiles.append(tile)
+            except Exception as e:
+                LOG.debug(e)
+        return local_tiles
 
     def install(self, data):
         itemid = data["id"]
@@ -110,6 +148,8 @@ class DataCatalogueClient():
 
     @staticmethod
     def folderForDataItem(itemid):
-        if itemid == 'default':
-            return DEFAULT_DATA_TILES_PATH
-        return os.path.join(appDataDir(), "tiles", itemid)
+        return os.path.join(DataCatalogueClient.folderData(), itemid)
+
+    @staticmethod
+    def folderData():
+        return os.path.join(appDataDir(), "tiles")
