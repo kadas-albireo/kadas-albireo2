@@ -77,9 +77,10 @@ class RoutingPlugin(QObject):
         self.dayNightAction = QAction(
             icon("day-and-night.png"), self.tr("Day / Night")
         )
-        self.iface.addAction(
-            self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        )
+        # Removed until we have one
+        # self.iface.addAction(
+        #     self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        # )
 
         self.dataCatalogueAction = QAction(
             icon("data-catalogue.png"), self.tr("Data catalogue")

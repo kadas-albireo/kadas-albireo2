@@ -1,4 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg viewBox="0 0 64.000001 64.000001" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
-  <path d="M 25.711 1.41 H 38.039 V 26.067 H 62.696 V 38.395 H 38.039 V 63.052 H 25.711 V 38.395 H 1.054 V 26.067 H 25.711 Z" style="fill: rgb(0, 0, 255);" bx:shape="cross 1.054 1.41 61.642 61.642 12.328 12.328 0.5 1@8d3c2460"/>
+<svg width="64.000001" height="64.000001" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="602" width="802" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path stroke-width="0" stroke="null" id="svg_1" fill=" rgb(0, 0, 255)" d="m28.82003,16.2634l6.35995,0l0,12.58938l12.72041,0l0,6.29444l-12.72041,0l0,12.58938l-6.35995,0l0,-12.58938l-12.72041,0l0,-6.29444l12.72041,0l0,-12.58938z"/>
+ </g>
 </svg>

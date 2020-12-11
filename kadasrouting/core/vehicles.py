@@ -13,10 +13,12 @@ vehicles_file = os.path.join(os.path.dirname(
 
 vehicle_name_column = f"type_{localeName()}".lower()
 
+# Column name from the vehicle CSV file
 COST_MODEL = "cost_model"
 HEIGHT = "height_m"
 LENGTH = "length_m"
 WIDTH = "width_m"
+MAX_SPEED = 'max_speed_kmh'
 
 
 def read_vehicles():
@@ -45,13 +47,21 @@ def vehicles():
 
 
 def options_for_vehicle(i):
+    # Ref: https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md
     vehicle = _vehicles[i]
     profile = vehicle[COST_MODEL]
     costing_options = {}
     if profile == "truck":
-        costing_options = {"height": vehicle[HEIGHT],
-                           "width": vehicle[WIDTH],
-                           "length": vehicle[LENGTH]}
+        costing_options['height'] = vehicle[HEIGHT]
+        costing_options['width'] = vehicle[WIDTH]
+        costing_options['length'] = vehicle[LENGTH]
+    # Max speed
+    if profile in ['auto', 'truck', 'motorcycle']:
+        costing_options['top_speed'] = vehicle[MAX_SPEED]
+    # Note for Max Speed:
+    # There is not max speed costing option for bicycle and pedestrian, but there are
+    # cycling_speed and walking_speed for the average speed on cycling or walking
+
     return profile, costing_options
 
 

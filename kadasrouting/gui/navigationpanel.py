@@ -65,7 +65,7 @@ route_html_template = '''
 <p>
 <img src="{icon}" alt="" width="100" height="100" style="display: block; margin-left: auto; margin-right: auto;" />
 </p>
-<h3 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h3>
+<h2 style="text-align: center;"><span style="color: #ffffff;">{dist}<br/>{message}</span></h>
 </td>
 </tr>
 <tr>
@@ -224,6 +224,8 @@ class NavigationPanel(BASE, WIDGET):
         self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
         self.iface.mapCanvas().setCenter(canvasPoint)
         self.iface.mapCanvas().setRotation(-gpsinfo.direction)
+        # Make sure the icon point up
+        self.centerPin.setAngle(0)
         self.iface.mapCanvas().refresh()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
 
@@ -409,7 +411,9 @@ class NavigationPanel(BASE, WIDGET):
                 32,
                 32,
             )
-
+            # For some reason the first time shown, the direction of the center pin is following the map canvas.
+            # The line below is needed to neutralize the direction of the center pin (to make it points up)
+            self.centerPin.setAngle(-self.gpsConnection.currentGPSInformation().direction)
             KadasMapCanvasItemManager.addItem(self.centerPin)
             self.updateNavigationInfo(self.gpsConnection.currentGPSInformation())
         self.iface.layerTreeView().currentLayerChanged.connect(self.currentLayerChanged)

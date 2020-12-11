@@ -65,11 +65,6 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         self.layout().addWidget(self.originSearchBox, 0, 1)
 
         self.comboBoxVehicles.addItems(vehicles.vehicle_names())
-        model = self.comboBoxVehicles.model()
-        for i, vehicle in enumerate(vehicles.vehicles()):
-            item = model.item(i)
-            item.setEnabled(vehicle[vehicles.COST_MODEL] in
-                            ["auto", "bicycle", "pedestrian"])
 
         self.reachabilityMode = {
             "isochrone": self.tr("Isochrone"),

@@ -113,6 +113,3 @@ class DataCatalogueClient():
         if itemid == 'default':
             return DEFAULT_DATA_TILES_PATH
         return os.path.join(appDataDir(), "tiles", itemid)
-
-
-dataCatalogueClient = DataCatalogueClient()
