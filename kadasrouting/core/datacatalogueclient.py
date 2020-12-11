@@ -91,6 +91,8 @@ class DataCatalogueClient():
     @staticmethod
     def getLocalTiles():
         folder_data = DataCatalogueClient.folderData()
+        if not os.path.exists(folder_data):
+            os.makedirs(folder_data)
         data_dirs = [f.path for f in os.scandir(folder_data) if f.is_dir()]
         LOG.debug(data_dirs)
         local_tiles = []
