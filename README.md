@@ -83,6 +83,9 @@ This plugin support 4 languages (DE, FR, IT, EN). The translation process is don
 
 See more about how to do the translation on this [wiki](https://github.com/camptocamp/kadas-routing-plugin/wiki/Internationalisation).
 
+### Updating data
+
+Vehicles data used by the plugin can be updated by replacing the ``resources/vehicles.csv`` file, provided that the new file has the same table structure.
 
 ### Credit
 
