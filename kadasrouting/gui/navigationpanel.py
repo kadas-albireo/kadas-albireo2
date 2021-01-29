@@ -69,17 +69,17 @@ route_html_template = '''
 </td>
 </tr>
 <tr>
-<td style="width: 100%; background-color: #adb9ca; text-align: center;">
+<td style="width: 100%; background-color: #adb9ca; text-align: left; font-size:12pt">''' + tr('Then') + '''
 <img src="{icon2}" width="32" height="32" />&nbsp;{dist2}<br/> {message2}</td>
 </tr>
 <tr>
 <td style="width: 100%; background-color: #44546a;">
-<p style="text-align: center;">
-<span style="color: #ffffff;">''' + tr('Speed') + ''' {speed} km/h</span><br />
-<span style="color: #ffffff;">''' + tr('Time Left') + ''' {timeleft}</span><br />
-<span style="color: #ffffff;">''' + tr('Dist Left') + ''' {distleft}</span><br />
-<span style="color: #ffffff;">''' + tr('ETA') + ''' {eta}</span></p>
-<p style="text-align: center;"><span style="color: #ffffff;">''' + tr('My Position:') + '''</span><br />
+<p style="text-align: left;">
+<span style="color: #ffffff; font-size:15pt">''' + tr('Speed') + ''' {speed} km/h</span><br />
+<span style="color: #ffffff; font-size:15pt">''' + tr('Time Left') + ''' {timeleft}</span><br />
+<span style="color: #ffffff; font-size:15pt">''' + tr('Dist Left') + ''' {distleft}</span><br />
+<span style="color: #ffffff; font-size:15pt">''' + tr('ETA') + ''' {eta}</span></p>
+<p style="text-align: left;"><span style="color: #ffffff; font-size:15pt">''' + tr('My Position:') + '''</span><br />
 <span style="color: #ffffff;">{displayed_point}</span></p>
 </td>
 </tr>
