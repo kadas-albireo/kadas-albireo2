@@ -307,6 +307,9 @@ class OptimalRouteLayer(KadasItemLayer):
                     displayed_point = KadasCoordinateFormat.instance().getDisplayString(
                         closest_point, QgsCoordinateReferenceSystem(4326))
 
+                    if ', ' not in displayed_point:
+                        displayed_point = displayed_point.replace(',', ', ')
+
                     # Remove '.' character
                     if message.endswith('.'):
                         message = message[:-1]
