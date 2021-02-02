@@ -131,20 +131,17 @@ class DataCatalogueClient():
 
     def log_progress(self, current, maximum):
         LOG.debug('Progress %s of %s' % (current, maximum))
-        if maximum > 0:
-            self.progress_bar.setValue((current / maximum) * 100)
+        self.progress_bar.setMaximum(maximum)
+        self.progress_bar.setValue(current)
 
     def download_finished(self):
-        self.progress_bar.setValue(100)
-        self.progess_message_bar.close()
-        self.iface.messageBar().clearWidgets()
+        self.progess_message_bar.dismiss()
         LOG.debug('Download finished')
 
     @waitcursor
     def _downloadAndUnzip(self, itemid):
         self.progress_bar = QProgressBar()
         self.progress_bar.setMinimum(0)
-        self.progress_bar.setMaximum(100)
         self.progress_bar.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.progess_message_bar = self.iface.messageBar().createMessage("Downloading...")
         self.progess_message_bar.layout().addWidget(self.progress_bar)
@@ -164,6 +161,7 @@ class DataCatalogueClient():
         loop = QEventLoop()
         downloader = QgsFileDownloader(QUrl(url), tmpPath)
         downloader.downloadProgress.connect(self.log_progress)
+        downloader.downloadCompleted.connect(self.download_finished)
         downloader.downloadCompleted.connect(partial(extract_data, tmpPath, itemid))
         downloader.downloadExited.connect(loop.quit)
         loop.exec_()
