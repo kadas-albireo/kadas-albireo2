@@ -4,10 +4,11 @@ import logging
 
 from pyplugin_installer import unzip
 
-from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery
+from functools import partial
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsNetworkAccessManager, QgsFileDownloader
 
 from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
 
@@ -111,7 +112,8 @@ class DataCatalogueClient():
 
     def install(self, data):
         itemid = data["id"]
-        if self._downloadAndUnzip(itemid):
+        self._downloadAndUnzip(itemid)
+        if os.path.exists(self.folderForDataItem(itemid)):
             filename = os.path.join(self.folderForDataItem(itemid), "metadata")
             LOG.debug('install data on %s' % filename)
             with open(filename, "w") as f:
@@ -120,27 +122,32 @@ class DataCatalogueClient():
         else:
             return False
 
+    def log_progress(self, current, maximum):
+        LOG.debug('Progress %s of %s' % (current, maximum))
+
+    def download_finished(self):
+        LOG.debug('Download finished')
+
     @waitcursor
     def _downloadAndUnzip(self, itemid):
-        url = f'{self.url}/content/items/{itemid}/data'
-        response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
-        if response.error() == QNetworkReply.NoError:
-            tmpDir = QDir.tempPath()
-            filename = f"{itemid}.zip"
-            tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
-            file = QFile(tmpPath)
-            file.open(QFile.WriteOnly)
-            file.write(response.content().data())
-            file.close()
+
+        def extract_data(tmpPath, itemid):
+            LOG.debug('Extract data')
             targetFolder = DataCatalogueClient.folderForDataItem(itemid)
             removed = QDir(targetFolder).removeRecursively()
-            if not removed:
-                return False
             unzip.unzip(tmpPath, targetFolder)
             QFile(tmpPath).remove()
-            return True
-        else:
-            return False
+
+        url = f'{self.url}/content/items/{itemid}/data'
+        tmpDir = QDir.tempPath()
+        filename = f"{itemid}.zip"
+        tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
+        loop = QEventLoop()
+        downloader = QgsFileDownloader(QUrl(url), tmpPath)
+        downloader.downloadProgress.connect(self.log_progress)
+        downloader.downloadCompleted.connect(partial(extract_data, tmpPath, itemid))
+        downloader.downloadExited.connect(loop.quit)
+        loop.exec_()
 
     @staticmethod
     def uninstall(itemid):
