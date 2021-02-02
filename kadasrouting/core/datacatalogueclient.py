@@ -5,11 +5,15 @@ import logging
 from pyplugin_installer import unzip
 
 from functools import partial
-from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop, Qt
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
+from PyQt5.QtWidgets import QProgressBar
 
-from qgis.core import QgsNetworkAccessManager, QgsFileDownloader
+from qgis.core import QgsNetworkAccessManager, QgsFileDownloader, Qgis
+from qgis.gui import QgsMessageBar
+from qgis.utils import iface
 
+from kadas.kadasgui import KadasPluginInterface
 from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
 
 LOG = logging.getLogger(__name__)
@@ -32,7 +36,10 @@ class DataCatalogueClient():
     LOCAL_DELETED = 4  # The local only data is deleted
 
     def __init__(self, url=None):
+        self.iface = KadasPluginInterface.cast(iface)
         self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
+        self.progress_bar = None
+        self.progess_message_bar = None
 
     @staticmethod
     def dataTimestamp(itemid):
@@ -124,12 +131,24 @@ class DataCatalogueClient():
 
     def log_progress(self, current, maximum):
         LOG.debug('Progress %s of %s' % (current, maximum))
+        if maximum > 0:
+            self.progress_bar.setValue((current / maximum) * 100)
 
     def download_finished(self):
+        self.progress_bar.setValue(100)
+        self.progess_message_bar.close()
+        self.iface.messageBar().clearWidgets()
         LOG.debug('Download finished')
 
     @waitcursor
     def _downloadAndUnzip(self, itemid):
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.progess_message_bar = self.iface.messageBar().createMessage("Downloading...")
+        self.progess_message_bar.layout().addWidget(self.progress_bar)
+        self.iface.messageBar().pushWidget(self.progess_message_bar, Qgis.Info)
 
         def extract_data(tmpPath, itemid):
             LOG.debug('Extract data')
