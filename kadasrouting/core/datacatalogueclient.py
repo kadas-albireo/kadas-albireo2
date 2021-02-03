@@ -10,7 +10,6 @@ from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 from PyQt5.QtWidgets import QProgressBar
 
 from qgis.core import QgsNetworkAccessManager, QgsFileDownloader, Qgis
-from qgis.gui import QgsMessageBar
 from qgis.utils import iface
 
 from kadas.kadasgui import KadasPluginInterface
@@ -166,7 +165,7 @@ class DataCatalogueClient():
             LOG.debug('Extract data')
             try:
                 targetFolder = DataCatalogueClient.folderForDataItem(itemid)
-                removed = QDir(targetFolder).removeRecursively()
+                QDir(targetFolder).removeRecursively()
                 unzip.unzip(tmpPath, targetFolder)
                 QFile(tmpPath).remove()
             except Exception as e:
