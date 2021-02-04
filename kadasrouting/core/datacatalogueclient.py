@@ -4,12 +4,16 @@ import logging
 
 from pyplugin_installer import unzip
 
-from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery
+from functools import partial
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop, Qt
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
+from PyQt5.QtWidgets import QProgressBar
 
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsNetworkAccessManager, QgsFileDownloader, Qgis
+from qgis.utils import iface
 
-from kadasrouting.utilities import appDataDir, waitcursor, pushWarning
+from kadas.kadasgui import KadasPluginInterface
+from kadasrouting.utilities import appDataDir, waitcursor, pushWarning, tr
 
 LOG = logging.getLogger(__name__)
 
@@ -31,7 +35,11 @@ class DataCatalogueClient():
     LOCAL_DELETED = 4  # The local only data is deleted
 
     def __init__(self, url=None):
+        self.iface = KadasPluginInterface.cast(iface)
         self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
+        self.progress_bar = None
+        self.progess_message_bar = None
+        self.downloader = None
 
     @staticmethod
     def dataTimestamp(itemid):
@@ -111,7 +119,8 @@ class DataCatalogueClient():
 
     def install(self, data):
         itemid = data["id"]
-        if self._downloadAndUnzip(itemid):
+        self._downloadAndUnzip(itemid)
+        if os.path.exists(self.folderForDataItem(itemid)):
             filename = os.path.join(self.folderForDataItem(itemid), "metadata")
             LOG.debug('install data on %s' % filename)
             with open(filename, "w") as f:
@@ -120,27 +129,60 @@ class DataCatalogueClient():
         else:
             return False
 
+    def update_progress(self, current, maximum):
+        LOG.debug('Progress %s of %s' % (current, maximum))
+        try:
+            self.progress_bar.setMaximum(maximum)
+            self.progress_bar.setValue(current)
+        except Exception as e:
+            LOG.debug('Error of update progress: %s' % e)
+
+    def download_finished(self):
+        self.progess_message_bar.dismiss()
+        LOG.debug('Download finished')
+
+    def download_canceled(self):
+        pushWarning(tr('Download is canceled!'))
+        LOG.debug('Download is canceled')
+
+    def widget_removed(self, widget_item):
+        if widget_item == self.progess_message_bar:
+            LOG.debug('Cancel download')
+            self.downloader.cancelDownload()
+
     @waitcursor
     def _downloadAndUnzip(self, itemid):
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.progess_message_bar = self.iface.messageBar().createMessage(tr("Downloading..."))
+        self.progess_message_bar.layout().addWidget(self.progress_bar)
+
+        self.iface.messageBar().pushWidget(self.progess_message_bar, Qgis.Info)
+        self.iface.messageBar().widgetRemoved.connect(self.widget_removed)
+
+        def extract_data(tmpPath, itemid):
+            LOG.debug('Extract data')
+            try:
+                targetFolder = DataCatalogueClient.folderForDataItem(itemid)
+                QDir(targetFolder).removeRecursively()
+                unzip.unzip(tmpPath, targetFolder)
+                QFile(tmpPath).remove()
+            except Exception as e:
+                LOG.debug('Error on extracting data %s' % e)
+
         url = f'{self.url}/content/items/{itemid}/data'
-        response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
-        if response.error() == QNetworkReply.NoError:
-            tmpDir = QDir.tempPath()
-            filename = f"{itemid}.zip"
-            tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
-            file = QFile(tmpPath)
-            file.open(QFile.WriteOnly)
-            file.write(response.content().data())
-            file.close()
-            targetFolder = DataCatalogueClient.folderForDataItem(itemid)
-            removed = QDir(targetFolder).removeRecursively()
-            if not removed:
-                return False
-            unzip.unzip(tmpPath, targetFolder)
-            QFile(tmpPath).remove()
-            return True
-        else:
-            return False
+        tmpDir = QDir.tempPath()
+        filename = f"{itemid}.zip"
+        tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
+        loop = QEventLoop()
+        self.downloader = QgsFileDownloader(QUrl(url), tmpPath)
+        self.downloader.downloadProgress.connect(self.update_progress)
+        self.downloader.downloadCompleted.connect(self.download_finished)
+        self.downloader.downloadCompleted.connect(partial(extract_data, tmpPath, itemid))
+        self.downloader.downloadCanceled.connect(self.download_canceled)
+        self.downloader.downloadExited.connect(loop.quit)
+        loop.exec_()
 
     @staticmethod
     def uninstall(itemid):
