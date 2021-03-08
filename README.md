@@ -44,7 +44,7 @@ Currently, the installation only available from this repository.
 
    For example (using [Virtual Box](https://www.virtualbox.org/)):
    ```bash
-   mklink /D "\\VBOXSVR\kadas-routing-plugin\kadasrouting" "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting"
+   mklink /D "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting" "\\VBOXSVR\kadas-routing-plugin\kadasrouting" 
    ```
 
 **Note**
