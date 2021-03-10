@@ -976,7 +976,6 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
     dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
-    panelIndices << hideDialogPanel( "mOptsPage_Rendering", stackedWidget );
     panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
     std::sort( panelIndices.begin(), panelIndices.end() );
     for ( int i = panelIndices.length() - 1; i >= 0; --i )
