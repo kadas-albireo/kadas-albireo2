@@ -974,6 +974,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     // Omit some panels
     QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
+    dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
     panelIndices << hideDialogPanel( "mOptsPage_Rendering", stackedWidget );
     panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
@@ -991,6 +992,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     // Omit some panels
     QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
+    dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
     panelIndices << hideDialogPanel( "mOptsPage_AttributesForm", stackedWidget );
     panelIndices << hideDialogPanel( "mOptsPage_AuxiliaryStorage", stackedWidget );
