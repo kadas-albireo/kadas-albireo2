@@ -976,7 +976,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
     dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
-    panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_Server", stackedWidget );
     std::sort( panelIndices.begin(), panelIndices.end() );
     for ( int i = panelIndices.length() - 1; i >= 0; --i )
     {
@@ -993,11 +993,11 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
     dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
-    panelIndices << hideDialogPanel( "mOptsPage_AttributesForm", stackedWidget );
-    panelIndices << hideDialogPanel( "mOptsPage_AuxiliaryStorage", stackedWidget );
-    panelIndices << hideDialogPanel( "mOptsPage_Variables", stackedWidget );
-    panelIndices << hideDialogPanel( "mOptsPage_DataDependencies", stackedWidget );
-    panelIndices << hideDialogPanel( "mOptsPage_Server", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_AttributesForm", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_AuxiliaryStorage", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_Variables", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_DataDependencies", stackedWidget );
+    panelIndices << dialogPanelIndex( "mOptsPage_Server", stackedWidget );
     std::sort( panelIndices.begin(), panelIndices.end() );
     for ( int i = panelIndices.length() - 1; i >= 0; --i )
     {
@@ -1021,7 +1021,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   }
 }
 
-int KadasApplication::hideDialogPanel( const QString &name, QStackedWidget *stackedWidget )
+int KadasApplication::dialogPanelIndex( const QString &name, QStackedWidget *stackedWidget )
 {
   QWidget *widget = stackedWidget->findChild<QWidget *>( name );
   return stackedWidget->indexOf( widget );
