@@ -695,7 +695,6 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile )
   if ( projectOpen( templateFile ) )
   {
     QgsProject::instance()->setFileName( QString() );
-    addDefaultPrintTemplates();
     return true;
   }
   return false;
@@ -790,6 +789,21 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   if ( !success )
   {
     QMessageBox::critical( mMainWindow, tr( "Unable to open project" ), QgsProject::instance()->error() );
+  }
+
+  // Add default print templates if none are loaded
+  bool haveLayouts = false;
+  for ( const QString &file : QgsProject::instance()->attachedFiles().keys() )
+  {
+    if ( file.endsWith( ".qpt" ) )
+    {
+      haveLayouts = true;
+      break;
+    }
+  }
+  if ( !haveLayouts )
+  {
+    addDefaultPrintTemplates();
   }
 
   return success;
