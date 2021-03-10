@@ -167,7 +167,8 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
 
 void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
 {
-  qreal s = ( mIconSize - 1 ) / 2;
+  qreal iconSize = mIconSize * mSymbolScale;
+  qreal s = ( iconSize - 1 ) / 2;
   p->save();
   p->setPen( mIconPen );
   p->setBrush( mIconBrush );
@@ -195,11 +196,11 @@ void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
       break;
 
     case ICON_FULL_BOX:
-      p->drawRect( x - s, y - s, mIconSize, mIconSize );
+      p->drawRect( x - s, y - s, iconSize, iconSize );
       break;
 
     case ICON_CIRCLE:
-      p->drawEllipse( x - s, y - s, mIconSize, mIconSize );
+      p->drawEllipse( x - s, y - s, iconSize, iconSize );
       break;
 
     case ICON_TRIANGLE:
@@ -224,13 +225,13 @@ KadasMapItem::Margin KadasGeometryItem::margin() const
   int maxMeasureLabelHeight = 0;
   if ( mMeasureGeometry )
   {
-    for ( const MeasurementLabel label : mMeasurementLabels )
+    for ( const MeasurementLabel &label : mMeasurementLabels )
     {
       maxMeasureLabelWidth = qMax( maxMeasureLabelWidth, label.width / 2 + 1 );
       maxMeasureLabelHeight = qMax( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
     }
   }
-  int maxPainterMargin = qMax( mIconType != ICON_NONE ? mIconSize : 0, mPen.width() ) / 2 + 1;
+  int maxPainterMargin = qCeil( qMax( mIconType != ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
   int maxW = qMax( maxMeasureLabelWidth, maxPainterMargin );
   int maxH = qMax( maxMeasureLabelHeight, maxPainterMargin );
   return Margin{ maxW, maxH, maxW, maxH };
