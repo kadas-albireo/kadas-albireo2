@@ -240,7 +240,7 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
       canvas()->unsetMapTool( this );
     }
   }
-  else if ( e->key() == Qt::Key_Z && e->modifiers() == Qt::ControlModifier )
+  else if ( ( e->key() == Qt::Key_Z && e->modifiers() == Qt::ControlModifier ) || e->key() == Qt::Key_Backspace )
   {
     mStateHistory->undo();
   }
