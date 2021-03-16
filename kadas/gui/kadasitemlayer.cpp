@@ -169,6 +169,8 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
     {
       mItems.insert( ++mIdCounter, item );
       mItemOrder.append( mIdCounter );
+      QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
+      mItemBounds.insert( mIdCounter, trans.transformBoundingBox( item->boundingBox() ) );
     }
   }
   return true;
