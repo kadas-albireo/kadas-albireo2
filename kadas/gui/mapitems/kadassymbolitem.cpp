@@ -77,6 +77,19 @@ void KadasSymbolItem::setFilePath( const QString &path )
   setup( path, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
 }
 
+void KadasSymbolItem::setState( const KadasMapItem::State *state )
+{
+  const KadasSymbolItem::State *symbolState = dynamic_cast<const KadasSymbolItem::State *>( state );
+  if ( symbolState && symbolState->size != constState()->size )
+  {
+    QImageReader reader( mFilePath );
+    reader.setBackgroundColor( Qt::white );
+    reader.setScaledSize( symbolState->size );
+    mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+  }
+  KadasMapItem::setState( state );
+}
+
 void KadasSymbolItem::render( QgsRenderContext &context ) const
 {
   if ( constState()->drawStatus == State::Empty )

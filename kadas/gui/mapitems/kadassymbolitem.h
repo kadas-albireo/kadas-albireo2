@@ -51,6 +51,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
 
+    void setState( const KadasMapItem::State *state );
+
   private:
     QString mFilePath;
     QString mName;
