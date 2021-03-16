@@ -167,7 +167,7 @@ void KadasCoordinateSearchProvider::startSearch( const QString &searchtext, cons
     utm.easting = mPatUTM2.cap( 3 ).replace( "'", "" ).toInt();
     utm.northing = mPatUTM2.cap( 4 ).replace( "'", "" ).toInt();
     utm.zoneNumber = mPatUTM2.cap( 1 ).toInt();
-    utm.zoneLetter = mPatUTM2.cap( 2 );
+    utm.zoneLetter = mPatUTM2.cap( 2 ).toUpper();
     bool ok = false;
     searchResult.pos = KadasLatLonToUTM::UTM2LL( utm, ok );
     if ( ok )
@@ -184,8 +184,8 @@ void KadasCoordinateSearchProvider::startSearch( const QString &searchtext, cons
     mgrs.easting = mPatMGRS.cap( 4 ).replace( "'", "" ).toInt();
     mgrs.northing = mPatMGRS.cap( 5 ).replace( "'", "" ).toInt();
     mgrs.zoneNumber = mPatMGRS.cap( 1 ).toInt();
-    mgrs.zoneLetter = mPatMGRS.cap( 2 );
-    mgrs.letter100kID = mPatMGRS.cap( 3 );
+    mgrs.zoneLetter = mPatMGRS.cap( 2 ).toUpper();
+    mgrs.letter100kID = mPatMGRS.cap( 3 ).toUpper();
     bool ok = false;
     KadasLatLonToUTM::UTMCoo utm = KadasLatLonToUTM::MGRS2UTM( mgrs, ok );
     if ( ok )
