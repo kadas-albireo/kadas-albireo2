@@ -114,6 +114,7 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mClearButton->setVisible( false );
   mClearButton->installEventFilter( this );
 
+#ifdef WITH_FILTERBUTTON
   QMenu *filterMenu = new QMenu( mSearchBox );
   filterMenu->addAction( tr( "Filter for dataset searches:" ) )->setEnabled( false );
   QActionGroup *filterActionGroup = new QActionGroup( filterMenu );
@@ -148,10 +149,13 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
   mFilterButton->setToolTip( tr( "Select Filter" ) );
   mFilterButton->setMenu( filterMenu );
   connect( filterMenu, &QMenu::triggered, mFilterButton, &QToolButton::setDefaultAction );
+#endif
 
   setLayout( new QHBoxLayout );
   layout()->addWidget( mSearchBox );
+#ifdef WITH_FILTERBUTTON
   layout()->addWidget( mFilterButton );
+#endif
   layout()->setContentsMargins( 0, 5, 0, 5 );
   layout()->setSpacing( 0 );
 
