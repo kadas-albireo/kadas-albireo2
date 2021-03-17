@@ -906,6 +906,7 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
   bool success = QgsProject::instance()->write();
 
   mMainWindow->mapCanvas()->freeze( false );
+  mMainWindow->mapCanvas()->refresh();
 
   if ( success )
   {
