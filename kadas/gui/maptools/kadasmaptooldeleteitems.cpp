@@ -23,6 +23,7 @@
 #include <qgis/qgsmapcanvas.h>
 
 #include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 
@@ -73,6 +74,8 @@ void KadasMapToolDeleteItems::activate()
 void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
 {
   QMap<KadasItemLayer *, QList<KadasItemLayer::ItemId>> delItems;
+  QList<KadasMapItem *> mapItems;
+  QList<KadasMapCanvasItem *> mapCanvasItems;
 
   for ( QgsMapLayer *layer : canvas()->layers() )
   {
@@ -87,6 +90,9 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
       if ( item->intersects( filterRect, canvas()->mapSettings() ) )
       {
         delItems[itemLayer].append( it.key() );
+        item->setSelected( true );
+        mapItems.append( item );
+        mapCanvasItems.append( new KadasMapCanvasItem( item, canvas() ) );
       }
     }
   }
@@ -125,6 +131,14 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
         }
       }
       canvas()->refresh();
+    }
+    else
+    {
+      for ( KadasMapItem *item : mapItems )
+      {
+        item->setSelected( false );
+      }
+      qDeleteAll( mapCanvasItems );
     }
   }
 }
