@@ -65,6 +65,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   mTitleLabel->installEventFilter( this );
   mTitleLineEdit->installEventFilter( this );
+  mLayerSelectionMenu->installEventFilter( this );
 
   mCloseButton = new QToolButton( this );
   mCloseButton->setAutoRaise( true );
@@ -303,6 +304,19 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
     mTitleLabel->setText( mTitleLineEdit->text() );
     mTitleStackedWidget->setCurrentWidget( mTitleLabel );
     return true;
+  }
+  else if ( obj == mLayerSelectionMenu && ( ev->type() == QEvent::MouseButtonPress || ev->type() == QEvent::MouseButtonRelease ) )
+  {
+    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( ev );
+    QAction *action = mLayerSelectionMenu->actionAt( mouseEvent->pos() );
+    if ( action )
+    {
+      if ( ev->type() == QEvent::MouseButtonRelease )
+      {
+        action->trigger();
+      }
+      return true;
+    }
   }
   else
   {
