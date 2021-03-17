@@ -225,12 +225,7 @@ QList<KadasMapItem::Node> KadasMilxItem::nodes( const QgsMapSettings &settings )
 
 bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
 {
-  QPoint screenPos = settings.mapToPixel().transform( rect.center() ).toQPointF().toPoint();
-  int selectedSymbol = -1;
-  QList<KadasMilxClient::NPointSymbol> symbols;
-  symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
-  QRect bbox;
-  return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
+  return QgsRectangle( toMapRect( boundingBox(), settings ) ).intersects( QgsRectangle( rect ) );
 }
 
 QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
