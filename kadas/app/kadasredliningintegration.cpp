@@ -165,7 +165,7 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, const std::functi
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
     tool->setUndoRedoVisible( undoRedoVisible );
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ); };
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name )
     {
       return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
