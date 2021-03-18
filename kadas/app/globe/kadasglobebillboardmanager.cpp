@@ -35,7 +35,10 @@ void KadasGlobeBillboardManager::init( osg::ref_ptr<osgEarth::MapNode> mapNode, 
   updateLayers( visibleLayerIds );
   for ( KadasMapItem *item : KadasMapCanvasItemManager::items() )
   {
-    addCanvasBillboard( item );
+    if ( !item->associatedLayer() && !item->ownerLayer() )
+    {
+      addCanvasBillboard( item );
+    }
   }
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasGlobeBillboardManager::addCanvasBillboard );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasGlobeBillboardManager::removeCanvasBillboard );
@@ -62,6 +65,7 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
   delete mSignalScope;
   mSignalScope = new QObject( this );
 
+  mCurrentLayers = layerIds;
 
   // Remove billboards for removed layers
   QList<QString> registeredBillboards = mRegistry.keys();
@@ -78,6 +82,18 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
     }
   }
 
+  // Remove billboards for items associated to an removed layer
+  for ( const KadasMapItem *item : mCanvasItemsRegistry.keys() )
+  {
+    if (
+      ( item->associatedLayer() && !mCurrentLayers.contains( item->associatedLayer()->id() ) ) ||
+      ( item->ownerLayer() && !mCurrentLayers.contains( item->ownerLayer()->id() ) )
+    )
+    {
+      removeCanvasBillboard( item );
+    }
+  }
+
   // Add billboards for new layers
   QSet<QString> addedLayerIds = QSet<QString>( layerIds.begin(), layerIds.end() ).subtract( QSet<QString>( registeredBillboards.begin(), registeredBillboards.end() ) );
   for ( const QString &layerId : addedLayerIds )
@@ -90,6 +106,21 @@ void KadasGlobeBillboardManager::updateLayers( const QStringList &layerIds )
     for ( KadasItemLayer::ItemId itemId : layer->items().keys() )
     {
       addLayerBillboard( layer->id(), itemId );
+    }
+  }
+
+  // Add billboards for items associated to an added layer
+  for ( const KadasMapItem *item : KadasMapCanvasItemManager::items() )
+  {
+    if ( !mCanvasItemsRegistry.contains( item ) )
+    {
+      if (
+        ( item->associatedLayer() && mCurrentLayers.contains( item->associatedLayer()->id() ) ) ||
+        ( item->ownerLayer() && mCurrentLayers.contains( item->ownerLayer()->id() ) )
+      )
+      {
+        addCanvasBillboard( item );
+      }
     }
   }
 
@@ -144,6 +175,13 @@ void KadasGlobeBillboardManager::addCanvasBillboard( const KadasMapItem *item )
 {
   if ( item && item->isPointSymbol() )
   {
+    if (
+      ( item->associatedLayer() && !mCurrentLayers.contains( item->associatedLayer()->id() ) ) ||
+      ( item->ownerLayer() && !mCurrentLayers.contains( item->ownerLayer()->id() ) )
+    )
+    {
+      return;
+    }
     osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = createBillboard( item );
     connect( item, &KadasMapItem::changed, this, &KadasGlobeBillboardManager::updateCanvasBillboard );
     mCanvasItemsRegistry.insert( item, placeNode );

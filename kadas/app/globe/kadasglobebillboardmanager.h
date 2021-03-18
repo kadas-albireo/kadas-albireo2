@@ -49,6 +49,7 @@ class KadasGlobeBillboardManager : public QObject
     osg::ref_ptr<osgEarth::MapNode> mMapNode;
     osg::ref_ptr<osg::Group> mGroup;
     QObject *mSignalScope = nullptr;
+    QStringList mCurrentLayers;
 };
 
 #endif // KADASGLOBEBILLBOARDMANAGER_H
