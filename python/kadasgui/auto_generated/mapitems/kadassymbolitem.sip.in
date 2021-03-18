@@ -50,6 +50,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
 
 
+    void setState( const KadasMapItem::State *state );
+
 };
 
 
