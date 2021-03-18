@@ -32,6 +32,7 @@ class QMenu;
 class QuaZip;
 class QgsRenderContext;
 struct QgsVertexId;
+class KadasItemLayer;
 class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapPos
@@ -292,6 +293,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void associateToLayer( QgsMapLayer *layer );
     QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }
 
+    /* Owner layer */
+    void setOwnerLayer( KadasItemLayer *layer );
+    KadasItemLayer *ownerLayer() const { return mOwnerLayer; }
+
     /* Selected state */
     void setSelected( bool selected );
     bool selected() const { return mSelected; }
@@ -425,6 +430,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QString mTooltip;
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
+    KadasItemLayer *mOwnerLayer = nullptr;
     bool mIsPointSymbol = false;
 
     virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;

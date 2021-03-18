@@ -17,6 +17,7 @@
 #include <qgis/qgsmapcanvas.h>
 
 #include <kadas/gui/kadasmapcanvasitem.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
 KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas )
@@ -32,7 +33,10 @@ void KadasMapCanvasItem::paint( QPainter *painter )
 {
   if ( mItem )
   {
-    if ( mItem->associatedLayer() && !mMapCanvas->layers().contains( mItem->associatedLayer() ) )
+    if (
+      ( mItem->associatedLayer() && !mMapCanvas->layers().contains( mItem->associatedLayer() ) ) ||
+      ( mItem->ownerLayer() && !mMapCanvas->layers().contains( mItem->ownerLayer() ) )
+    )
     {
       return;
     }

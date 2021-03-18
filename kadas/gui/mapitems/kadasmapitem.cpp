@@ -152,6 +152,11 @@ void KadasMapItem::associateToLayer( QgsMapLayer *layer )
   setParent( layer );
 }
 
+void KadasMapItem::setOwnerLayer( KadasItemLayer *layer )
+{
+  mOwnerLayer = layer;
+}
+
 void KadasMapItem::setSelected( bool selected )
 {
   mSelected = selected;
