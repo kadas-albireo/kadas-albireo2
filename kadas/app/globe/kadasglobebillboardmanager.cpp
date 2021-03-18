@@ -167,7 +167,11 @@ void KadasGlobeBillboardManager::updateCanvasBillboard()
   {
     return;
   }
-  osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = mCanvasItemsRegistry[item];
+  osg::ref_ptr<osgEarth::Annotation::PlaceNode> placeNode = mCanvasItemsRegistry.value( item );
+  if ( !placeNode )
+  {
+    return;
+  }
 
   QgsCoordinateReferenceSystem crs84( "EPSG:4326" );
 
