@@ -222,6 +222,7 @@ void KadasMapWidget::updateLayerSelectionMenu()
     {
       continue;
     }
+    connect( layer, &QgsMapLayer::nameChanged, this, &KadasMapWidget::updateLayerSelectionMenu, Qt::UniqueConnection );
     QAction *layerAction = new QAction( layer->name(), mLayerSelectionMenu );
     layerAction->setData( layer->id() );
     layerAction->setCheckable( true );

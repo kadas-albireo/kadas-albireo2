@@ -120,7 +120,10 @@ void KadasGlobeWidget::updateLayerSelectionMenu()
   {
     QgsMapLayer *layer = layerTreeLayer->layer();
     if ( !layer )
+    {
       continue;
+    }
+    connect( layer, &QgsMapLayer::nameChanged, this, &KadasGlobeWidget::updateLayerSelectionMenu, Qt::UniqueConnection );
     QAction *layerAction = new QAction( layer->name(), mLayerSelectionMenu );
     layerAction->setData( layer->id() );
     // Check if was not previously unchecked, unless it is a new layer with url=http in datasource
