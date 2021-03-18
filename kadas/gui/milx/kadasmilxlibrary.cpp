@@ -92,6 +92,7 @@ KadasMilxLibrary::KadasMilxLibrary( WId winId, QWidget *parent )
 
   mFilterLineEdit = new QgsFilterLineEdit( this );
   mFilterLineEdit->setPlaceholderText( tr( "Filter..." ) );
+  mFilterLineEdit->setEnabled( false );
   layout->addWidget( mFilterLineEdit );
   connect( mFilterLineEdit, &QLineEdit::textChanged, this, &KadasMilxLibrary::filterChanged );
 
@@ -135,6 +136,7 @@ void KadasMilxLibrary::loaderFinished()
   mFilterProxyModel = new TreeFilterProxyModel( this );
   mFilterProxyModel->setSourceModel( mGalleryModel );
   mTreeView->setModel( mFilterProxyModel );
+  mFilterLineEdit->setEnabled( true );
   delete mLoadingModel;
   unsetCursor();
 }
