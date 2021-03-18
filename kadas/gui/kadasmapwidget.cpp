@@ -319,10 +319,8 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
       return true;
     }
   }
-  else
-  {
-    return QObject::eventFilter( obj, ev );
-  }
+
+  return QObject::eventFilter( obj, ev );
 }
 
 void KadasMapWidget::addMapCanvasItem( const KadasMapItem *item )
