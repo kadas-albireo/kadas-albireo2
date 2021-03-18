@@ -126,13 +126,10 @@ KadasMapWidget::~KadasMapWidget()
   emit aboutToBeDestroyed();
 }
 
-void KadasMapWidget::setInitialLayers( const QStringList &initialLayers, bool updateMenu )
+void KadasMapWidget::setInitialLayers( const QStringList &initialLayers )
 {
   mInitialLayers = initialLayers;
-  if ( updateMenu )
-  {
-    updateLayerSelectionMenu();
-  }
+  updateLayerSelectionMenu();
 }
 
 QStringList KadasMapWidget::getLayers() const

@@ -37,7 +37,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
   public:
     KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent = 0 );
     ~KadasMapWidget();
-    void setInitialLayers( const QStringList &initialLayers, bool updateMenu = false );
+    void setInitialLayers( const QStringList &initialLayers );
     int getNumber() const { return mNumber; }
     const QString &id() const { return mId; }
     QStringList getLayers() const;

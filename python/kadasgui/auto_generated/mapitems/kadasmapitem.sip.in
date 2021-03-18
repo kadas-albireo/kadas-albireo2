@@ -272,7 +272,7 @@ Associate to layer */
 %End
     QgsMapLayer *associatedLayer() const;
 
-    void setOwnerLayer( KadasItemLayer* layer );
+    void setOwnerLayer( KadasItemLayer *layer );
 %Docstring
 Owner layer */
 %End
