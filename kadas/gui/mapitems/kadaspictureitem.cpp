@@ -46,6 +46,8 @@ QJsonObject KadasPictureItem::State::serialize() const
   json["status"] = drawStatus;
   json["pos"] = p;
   json["angle"] = angle;
+  json["offsetX"] = offsetX;
+  json["offsetY"] = offsetY;
   json["size"] = s;
   return json;
 }
@@ -56,6 +58,8 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
   QJsonArray p = json["pos"].toArray();
   pos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
   angle = json["angle"].toDouble();
+  offsetX = json["offsetX"].toDouble();
+  offsetY = json["offsetY"].toDouble();
   QJsonArray s = json["size"].toArray();
   size = QSize( s.at( 0 ).toDouble(), s.at( 1 ).toDouble() );
   return true;
