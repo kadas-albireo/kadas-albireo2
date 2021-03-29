@@ -154,6 +154,11 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 KadasApplication::~KadasApplication()
 {
   delete mMainWindow;
+
+  for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )
+  {
+    pluginLayerRegistry()->removePluginLayerType( layerType->name() );
+  }
 }
 
 void KadasApplication::init()
@@ -324,11 +329,16 @@ void KadasApplication::init()
   QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
 
   // Register plugin layers
-  pluginLayerRegistry()->addPluginLayerType( new KadasItemLayerType() );
-  pluginLayerRegistry()->addPluginLayerType( new KadasMilxLayerType() );
-  pluginLayerRegistry()->addPluginLayerType( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
-  pluginLayerRegistry()->addPluginLayerType( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
-  pluginLayerRegistry()->addPluginLayerType( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
+  mKadasPluginLayerTypes.append( new KadasItemLayerType() );
+  mKadasPluginLayerTypes.append( new KadasMilxLayerType() );
+  mKadasPluginLayerTypes.append( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
+  mKadasPluginLayerTypes.append( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
+  mKadasPluginLayerTypes.append( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
+
+  for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )
+  {
+    pluginLayerRegistry()->addPluginLayerType( layerType );
+  }
 
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );

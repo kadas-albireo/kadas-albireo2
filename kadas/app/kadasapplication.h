@@ -128,6 +128,7 @@ class KadasApplication : public QgsApplication
     QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
     QTimer mAutosaveTimer;
     bool mAutosaving = false;
+    QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
