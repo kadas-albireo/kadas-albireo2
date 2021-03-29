@@ -92,11 +92,13 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   connect( QgsProject::instance(), &QgsProject::layersAdded, this, &KadasGlobeWidget::updateLayerSelectionMenu );
   connect( QgsProject::instance(), &QgsProject::layerRemoved, this, &KadasGlobeWidget::updateLayerSelectionMenu );
 
-  updateLayerSelectionMenu();
+  buildLayerSelectionMenu( true );
 }
 
-void KadasGlobeWidget::updateLayerSelectionMenu()
+void KadasGlobeWidget::buildLayerSelectionMenu( bool initial )
 {
+  QgsMapCanvas *mainCanvas = kApp->mainWindow()->mapCanvas();
+
   QStringList prevLayers;
   QStringList prevDisabledLayerIds;
   QStringList prevEnabledLayerIds;
@@ -132,7 +134,15 @@ void KadasGlobeWidget::updateLayerSelectionMenu()
     bool isNew = !prevLayers.contains( layer->id() );
     bool isRemote = layer->source().contains( "url=http" );
     bool isHeightmap = layer->id() == heightmap;
-    layerAction->setChecked( !wasUnchecked && !( isNew && ( isRemote || isHeightmap ) ) );
+    bool isVisibleInMainCanvas = mainCanvas->layers().contains( layer );
+    if ( initial )
+    {
+      layerAction->setChecked( isVisibleInMainCanvas && !( isRemote || isHeightmap ) );
+    }
+    else
+    {
+      layerAction->setChecked( !wasUnchecked && !( isNew && ( isRemote || isHeightmap ) ) );
+    }
     connect( layerAction, &QAction::toggled, this, &KadasGlobeWidget::layersChanged );
     mLayerSelectionMenu->addAction( layerAction );
   }
