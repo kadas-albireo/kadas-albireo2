@@ -38,6 +38,11 @@ KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLa
     QgsMapLayer *layer = layerTreeLayer->layer();
     if ( !layer )
       continue;
+    else if ( dynamic_cast<KadasPluginLayer *>( layer ) && !dynamic_cast<KadasItemLayer *>( layer ) )
+    {
+      // Omit non-item plugin layers from export (i.e. guide grids etc),
+      continue;
+    }
     QFile file( layer->source() );
     bool largefile = file.exists() && file.size() > 50 * 1024 * 1024; // Local file larger than 50 MB
     bool slow = largefile || layer->source().contains( "url=http" );
