@@ -159,7 +159,8 @@ class DataCatalogueClient():
         self.progess_message_bar.layout().addWidget(self.progress_bar)
 
         self.iface.messageBar().pushWidget(self.progess_message_bar, Qgis.Info)
-        self.iface.messageBar().widgetRemoved.connect(self.widget_removed)
+        # FIXME: the signal is always emitted
+        # self.iface.messageBar().widgetRemoved.connect(self.widget_removed)
 
         def extract_data(tmpPath, itemid):
             LOG.debug('Extract data')
