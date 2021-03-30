@@ -114,6 +114,10 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMapWidget::addMapCanvasItem );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMapWidget::removeMapCanvasItem );
 
+  for ( QgsMapLayer *layer : mMasterCanvas->layers() )
+  {
+    mInitialLayers.append( layer->id() );
+  }
   updateLayerSelectionMenu();
   mMapCanvas->setRenderFlag( false );
   updateMapProjection();
