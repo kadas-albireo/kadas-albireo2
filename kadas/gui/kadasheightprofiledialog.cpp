@@ -581,6 +581,7 @@ void KadasHeightProfileDialog::addToCanvas()
   item->setFilePath( filename );
   item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer )->addItem( item );
+  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer )->triggerRepaint();
 }
 
 void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
