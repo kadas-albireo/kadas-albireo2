@@ -95,7 +95,7 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   buildLayerSelectionMenu( true );
 }
 
-void KadasGlobeWidget::buildLayerSelectionMenu( bool initial )
+void KadasGlobeWidget::buildLayerSelectionMenu( bool syncMainLayers )
 {
   QgsMapCanvas *mainCanvas = kApp->mainWindow()->mapCanvas();
 
@@ -116,6 +116,9 @@ void KadasGlobeWidget::buildLayerSelectionMenu( bool initial )
   }
 
   mLayerSelectionMenu->clear();
+  mLayerSelectionMenu->addAction( tr( "Sync with main view" ), this, [this] { buildLayerSelectionMenu( true ); } );
+  mLayerSelectionMenu->addSeparator();
+
   QString heightmap = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   // Use layerTreeRoot to get layers ordered as in the layer tree
   for ( QgsLayerTreeLayer *layerTreeLayer : QgsProject::instance()->layerTreeRoot()->findLayers() )
@@ -135,7 +138,7 @@ void KadasGlobeWidget::buildLayerSelectionMenu( bool initial )
     bool isRemote = layer->source().contains( "url=http" );
     bool isHeightmap = layer->id() == heightmap;
     bool isVisibleInMainCanvas = mainCanvas->layers().contains( layer );
-    if ( initial )
+    if ( syncMainLayers )
     {
       layerAction->setChecked( isVisibleInMainCanvas && !( isRemote || isHeightmap ) );
     }

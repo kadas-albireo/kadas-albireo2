@@ -215,6 +215,15 @@ void KadasMapWidget::updateLayerSelectionMenu()
     }
   }
   mLayerSelectionMenu->clear();
+  mLayerSelectionMenu->addAction( tr( "Sync with main view" ), this, [this]
+  {
+    for ( QgsMapLayer *layer : mMasterCanvas->layers() )
+    {
+      mInitialLayers.append( layer->id() );
+    }
+    updateLayerSelectionMenu();
+  } );
+  mLayerSelectionMenu->addSeparator();
   // Use layerTreeRoot to get layers ordered as in the layer tree
   for ( QgsLayerTreeLayer *layerTreeLayer : QgsProject::instance()->layerTreeRoot()->findLayers() )
   {

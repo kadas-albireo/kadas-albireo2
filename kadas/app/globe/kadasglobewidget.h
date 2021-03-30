@@ -39,7 +39,7 @@ class KadasGlobeWidget : public QDockWidget
 
     void contextMenuEvent( QContextMenuEvent *e ) override;
     bool eventFilter( QObject *obj, QEvent *ev ) override;
-    void buildLayerSelectionMenu( bool initial );
+    void buildLayerSelectionMenu( bool syncMainLayers );
 
   private slots:
     void updateLayerSelectionMenu() { buildLayerSelectionMenu( false ); }
