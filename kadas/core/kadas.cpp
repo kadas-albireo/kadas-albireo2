@@ -96,7 +96,7 @@ QString Kadas::projectTemplatesPath()
   return QDir( pkgDataPath() ).absoluteFilePath( "project_templates" );
 }
 
-static void gdalProxyConfig( const QUrl &url )
+void Kadas::gdalProxyConfig( const QUrl &url )
 {
   QSettings settings;
   QString gdalHttpProxy = settings.value( "proxy/gdalHttpProxy", "" ).toString();

@@ -35,6 +35,8 @@ class Kadas
 
     static QString projectTemplatesPath();
 
+    static void gdalProxyConfig( const QUrl& url );
+
     static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = 0 );
 };
 
