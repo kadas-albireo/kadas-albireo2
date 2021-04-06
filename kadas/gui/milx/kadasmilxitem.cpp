@@ -223,9 +223,16 @@ QList<KadasMapItem::Node> KadasMilxItem::nodes( const QgsMapSettings &settings )
   return nodes;
 }
 
-bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
+bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
 {
-  return QgsRectangle( toMapRect( boundingBox(), settings ) ).intersects( QgsRectangle( rect ) );
+  if ( contains )
+  {
+    return QgsRectangle( rect ).contains( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+  }
+  else
+  {
+    return QgsRectangle( rect ).intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+  }
 }
 
 QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const

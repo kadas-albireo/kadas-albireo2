@@ -255,7 +255,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
   emit geometryChanged();
 }
 
-bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
+bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( !mGeometry )
   {
@@ -287,9 +287,9 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
   }
   else
   {
-    geomEngine = QgsGeometry::createGeometryEngine( mGeometry );
+    geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
   }
-  bool intersects = geomEngine->intersects( &filterRect );
+  bool intersects = contains ? geomEngine->contains( mGeometry ) : geomEngine->intersects( mGeometry );
   delete geomEngine;
   return intersects;
 }

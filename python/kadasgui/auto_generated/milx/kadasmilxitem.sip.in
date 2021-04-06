@@ -38,7 +38,7 @@ class KadasMilxItem : KadasMapItem
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
 
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const;
 
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 

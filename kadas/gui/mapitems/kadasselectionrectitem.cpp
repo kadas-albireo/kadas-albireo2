@@ -118,7 +118,7 @@ KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
   return rect;
 }
 
-bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
+bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( mItems.isEmpty() )
   {
@@ -146,8 +146,8 @@ bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapS
                        << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
-  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &itemRect );
-  bool intersects = geomEngine->intersects( &filterRect );
+  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
+  bool intersects = contains ? geomEngine->contains( &itemRect ) : geomEngine->intersects( &filterRect );
   delete geomEngine;
   return intersects;
 }

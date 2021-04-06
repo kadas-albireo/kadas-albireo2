@@ -45,7 +45,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     KadasItemRect boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const override;
+    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;

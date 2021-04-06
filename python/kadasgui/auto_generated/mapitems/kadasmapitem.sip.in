@@ -250,7 +250,7 @@ Bounding box in geographic coordinates */
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const = 0;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
 %Docstring
 Hit test, rect in item crs */
 %End

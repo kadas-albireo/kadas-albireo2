@@ -216,7 +216,7 @@ QList<KadasMapItem::Node> KadasPictureItem::nodes( const QgsMapSettings &setting
   return nodes;
 }
 
-bool KadasPictureItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const
+bool KadasPictureItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->size.isEmpty() )
   {
@@ -237,8 +237,8 @@ bool KadasPictureItem::intersects( const KadasMapRect &rect, const QgsMapSetting
                        << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
-  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &imageRect );
-  bool intersects = geomEngine->intersects( &filterRect );
+  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
+  bool intersects = contains ? geomEngine->contains( &imageRect ) : geomEngine->intersects( &imageRect );
   delete geomEngine;
   return intersects;
 }

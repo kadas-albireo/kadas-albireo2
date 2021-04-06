@@ -87,7 +87,7 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
     for ( auto it = itemLayer->items().begin(), itEnd = itemLayer->items().end(); it != itEnd; ++it )
     {
       KadasMapItem *item = it.value();
-      if ( item->intersects( filterRect, canvas()->mapSettings() ) )
+      if ( item->intersects( filterRect, canvas()->mapSettings(), true ) )
       {
         delItems[itemLayer].append( it.key() );
         item->setSelected( true );

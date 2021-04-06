@@ -38,7 +38,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual Margin margin() const;
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings ) const;
+    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const;
 
     virtual void render( QgsRenderContext &context ) const;
 
