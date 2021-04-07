@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsgpsconnectionregistry.h>
 #include <qgis/qgsgpsdetector.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
@@ -78,6 +80,7 @@ void KadasGpsIntegration::connectGPS()
 
 void KadasGpsIntegration::gpsConnected( QgsGpsConnection *connection )
 {
+  QgsApplication::gpsConnectionRegistry()->registerConnection( connection );
   setGPSIcon( Qt::white );
   mMainWindow->messageBar()->pushMessage( tr( "GPS device successfully connected" ), Qgis::Info, mMainWindow->messageTimeout() );
 
@@ -95,6 +98,7 @@ void KadasGpsIntegration::disconnectGPS()
 {
   if ( mConnection )
   {
+    QgsApplication::gpsConnectionRegistry()->unregisterConnection( mConnection );
     mConnection->close();
     delete mConnection;
     mConnection = nullptr;
