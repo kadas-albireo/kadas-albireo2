@@ -1,7 +1,7 @@
 import json
 import logging
 
-from PyQt5.QtCore import QVariant, QTextCodec
+from PyQt5.QtCore import QTextCodec
 from PyQt5.QtGui import QColor
 
 from kadasrouting.utilities import waitcursor, tr
@@ -14,8 +14,6 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsFeature,
     QgsJsonUtils,
-    QgsFields,
-    QgsField,
     QgsVectorLayer,
     QgsGeometry,
     QgsSvgMarkerSymbolLayer,
