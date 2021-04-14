@@ -67,3 +67,6 @@ ssh_config
 # VS Code files
 .vscode/*
 */.vscode/*
+
+# Thumbs db
+*Thumbs*
