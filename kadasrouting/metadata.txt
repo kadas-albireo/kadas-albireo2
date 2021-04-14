@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=KADAS routing plugin
 about=KADAS routing plugin.
-version=0.1.0
+version=0.1.3
 author=CampToCamp
 email=info@camptocamp.com
 

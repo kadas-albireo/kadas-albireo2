@@ -1,7 +1,7 @@
 import json
 import logging
 
-from PyQt5.QtCore import QVariant, QTextCodec
+from PyQt5.QtCore import QTextCodec
 from PyQt5.QtGui import QColor
 
 from kadasrouting.utilities import waitcursor, tr
@@ -14,8 +14,6 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsFeature,
     QgsJsonUtils,
-    QgsFields,
-    QgsField,
     QgsVectorLayer,
     QgsGeometry,
     QgsSvgMarkerSymbolLayer,
@@ -35,18 +33,9 @@ valhalla = ValhallaClient.getInstance()
 def getFeaturesFromResponse(response):
     """Return a list of features from a valhalla response object
     """
-    fields = QgsFields()
-    fields.append(QgsField("opacity", QVariant.Double))
-    fields.append(QgsField("fill", QVariant.String))
-    fields.append(QgsField("fillOpacity", QVariant.Double))
-    fields.append(QgsField("fill-opacity", QVariant.Double))
-    # FIXME: in fact, due to a bug in qgis parser, we cannot use this field
-    fields.append(QgsField("contour", QVariant.Int))
-    fields.append(QgsField("color", QVariant.String))
-    fields.append(QgsField("fillColor", QVariant.String))
     codec = QTextCodec.codecForName("UTF-8")
+    fields = QgsJsonUtils.stringToFields(json.dumps(response), codec)
     features = QgsJsonUtils.stringToFeatureList(json.dumps(response), fields, codec)
-    # LOG.debug('features : {}'.format(features))
     return features
 
 
