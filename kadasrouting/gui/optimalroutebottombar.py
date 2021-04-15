@@ -41,6 +41,8 @@ WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
 )
 
+LOG = logging.getLogger(__name__)
+
 
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
     def __init__(self, canvas, action, plugin):
@@ -152,7 +154,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             try:
                 iface.mapCanvas().setMapTool(self.prevMapTool)
             except Exception as e:
-                logging.error(e)
+                LOG.error(e)
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def mapToolSet(self, new, old):
@@ -199,7 +201,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        '''
         areasToAvoid = None
         if self.radioAreasToAvoidPolygon.isChecked():
             areasToAvoid = self.areasToAvoid
@@ -209,7 +210,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
                 geoms = [f.geometry() for f in avoidLayer.getFeatures()]
                 areasToAvoid = QgsGeometry.collectGeometry(geoms)
         # TODO: use areas to avoid
-        '''
 
         if shortest:
             costingOptions["shortest"] = True
@@ -218,11 +218,11 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             layer.updateRoute(points, profile, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
-            raise
-            logging.error(e, exc_info=True)
+            LOG.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
-            logging.error("Could not compute route")
+            LOG.error("Could not compute route")
+            raise(e)
 
     def clearPoints(self):
         self.originSearchBox.clearSearchBox()
