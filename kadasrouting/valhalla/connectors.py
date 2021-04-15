@@ -21,7 +21,7 @@ class Connector(QObject):
     def isAvailable(self):
         return True
 
-    def prepareRouteParameters(self, points, profile="auto", options=None):
+    def prepareRouteParameters(self, points, profile="auto", avoid_polygons=None, options=None):
         options = options or {}
         locale_name = localeName()
         params = dict(
@@ -31,6 +31,8 @@ class Connector(QObject):
             directions_options={"language": locale_name})
         if options:
             params["costing_options"] = {profile: options}
+        if avoid_polygons:
+            params['avoid_polygons'] = avoid_polygons
 
         return params
 
@@ -114,8 +116,8 @@ class ConsoleConnector(Connector):
             raise Exception(response["error"])
         return response
 
-    def route(self, points, profile, options):
-        params = self.prepareRouteParameters(points, profile, options)
+    def route(self, points, profile, avoid_polygons, options):
+        params = self.prepareRouteParameters(points, profile, avoid_polygons, options)
         response = self._execute("route", json.dumps(params))
         return response
 
@@ -130,38 +132,3 @@ class ConsoleConnector(Connector):
         filename = self.createMapmatchingParametersFile(params)
         response = self._execute("trace_route", filename)
         return response
-
-
-class HttpConnector(Connector):
-    def __init__(self, url):
-        self.url = url
-
-    def _request(self, endpoint, payload):
-        url = f"{self.url}/{endpoint}?json={payload}"
-        logging.info("Requesting %s" % url)
-        response = requests.get(url)
-        # Custom handling for Valhalla to raise the detailed message also.
-        if response.status_code == 400:
-            raise Valhalla400Exception(response.text)
-        response.raise_for_status()
-        return response.json()
-
-    def route(self, points, profile, options):
-        params = self.prepareRouteParameters(points, profile, options)
-        response = self._request("route", json.dumps(params))
-        return response
-
-    def isochrones(self, points, profile, options, intervals, colors):
-        params = self.prepareIsochronesParameters(points, profile, options,
-                                                  intervals, colors)
-        response = self._request("isochrone", json.dumps(params))
-        return response
-
-    def mapmatching(self, shape, profile, options):
-        params = self.prepareMapmatchingParameters(shape, profile, options)
-        url = f"{self.url}/trace_route"
-        response = requests.post(url, json=params)
-        if response.status_code == 400:
-            raise Valhalla400Exception(response.text)
-        response.raise_for_status()
-        return response.json()

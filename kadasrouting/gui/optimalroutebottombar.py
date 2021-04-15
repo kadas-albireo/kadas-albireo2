@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, Qt
@@ -18,14 +19,15 @@ from kadasrouting.gui.locationinputwidget import (
     WrongLocationException,
 )
 from kadasrouting.core import vehicles
-from kadasrouting.utilities import iconPath, pushWarning
+from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
 
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsProject
+    QgsProject,
+    QgsGeometry
 )
 from qgis.gui import (
     QgsMapTool,
@@ -201,7 +203,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        areasToAvoid = None
         if self.radioAreasToAvoidPolygon.isChecked():
             areasToAvoid = self.areasToAvoid
         elif self.radioAreasToAvoidLayer.isChecked():
@@ -209,13 +210,27 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             if avoidLayer is not None:
                 geoms = [f.geometry() for f in avoidLayer.getFeatures()]
                 areasToAvoid = QgsGeometry.collectGeometry(geoms)
-        # TODO: use areas to avoid
+        else:
+            # No areas to avoid
+            areasToAvoid = None
+            areasToAvoidWGS = None
 
         if shortest:
             costingOptions["shortest"] = True
 
+        if areasToAvoid:
+            areasToAvoidJson = json.loads(areasToAvoid.asJson())
+            canvasCrs = self.canvas.mapSettings().destinationCrs()
+            transformer = transformToWGS(canvasCrs)
+            areasToAvoidWGS = []
+            for i, polygon in enumerate(areasToAvoidJson['coordinates']):
+                areasToAvoidWGS.append([])
+                for point in polygon:
+                    pointWGS = transformer.transform(point[0], point[1])
+                    areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
+
         try:
-            layer.updateRoute(points, profile, costingOptions)
+            layer.updateRoute(points, profile, areasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
             LOG.error(e, exc_info=True)

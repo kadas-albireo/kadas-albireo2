@@ -168,9 +168,9 @@ class OptimalRouteLayer(KadasItemLayer):
             pushWarning(self.tr("Could not compute route from polyline"))
 
     @waitcursor
-    def updateRoute(self, points, profile, costingOptions):
+    def updateRoute(self, points, profile, avoid_polygons, costingOptions):
         try:
-            response = self.valhalla.route(points, profile, costingOptions)
+            response = self.valhalla.route(points, profile, avoid_polygons, costingOptions)
             self.costingOptions = costingOptions
             self.profile = profile
             self.points = points
