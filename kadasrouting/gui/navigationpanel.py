@@ -212,6 +212,9 @@ class NavigationPanel(BASE, WIDGET):
         self.stopNavigation()
 
     def updateNavigationInfo(self):
+        if self.gpsConnection is None:
+            self.setMessage(self.tr("Cannot connect to GPS"))
+            return
         try:
             gpsinfo = self.gpsConnection.currentGPSInformation()
         except RuntimeError:
