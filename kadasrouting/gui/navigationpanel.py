@@ -15,7 +15,8 @@ from PyQt5.QtGui import (
 from PyQt5.QtCore import (
     Qt,
     QSize,
-    QSettings
+    QSettings,
+    QTimer
 )
 
 from PyQt5.QtWidgets import (
@@ -51,7 +52,7 @@ from kadas.kadasgui import (
 
 from kadasrouting.utilities import formatdist, pushMessage, iconPath
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadasrouting.gui.gps import getMockupGpsConnection
+from kadasrouting.gui.gps import getGpsConnection
 from kadasrouting.core import vehicles
 from kadasrouting.utilities import tr
 
@@ -178,6 +179,8 @@ class NavigationPanel(BASE, WIDGET):
         self.waypointWidgets = []
         self.optimalRoutesCache = {}
 
+        self.timer = QTimer()
+
         self.rubberband = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.LineGeometry)
         self.rubberband.setStrokeColor(QColor(150, 0, 0))
         self.rubberband.setWidth(2)
@@ -208,14 +211,18 @@ class NavigationPanel(BASE, WIDGET):
         super().hide()
         self.stopNavigation()
 
-    def updateNavigationInfo(self, gpsinfo):
-        # prevent infinite loop for mocked gps
-        self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
-        self.currentGpsInformation = gpsinfo
+    def updateNavigationInfo(self):
+        try:
+            gpsinfo = self.gpsConnection.currentGPSInformation()
+        except RuntimeError:
+            # if the GPS is closed in KADAS main interface, stop the navigation
+            self.stopNavigation()
+            return
         if gpsinfo is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
             return
         layer = self.iface.activeLayer()
+        LOG.debug('Debug: type(layer) = {}'.format(type(layer)))
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
         origCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
@@ -223,13 +230,13 @@ class NavigationPanel(BASE, WIDGET):
         canvasPoint = transform.transform(point)
         self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
         self.iface.mapCanvas().setCenter(canvasPoint)
-        self.iface.mapCanvas().setRotation(-gpsinfo.direction)
-        # Make sure the icon point up
-        self.centerPin.setAngle(0)
+        # stop rotating the map like a crazy when the user is almost still,
+        # i.e. rotate only if we move faster than 1m/s
+        if gpsinfo.speed > 1.0:
+            self.iface.mapCanvas().setRotation(-gpsinfo.direction)
+            self.centerPin.setAngle(0)
         self.iface.mapCanvas().refresh()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
-
-        self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
 
         if isinstance(layer, QgsVectorLayer) and layer.geometryType() == QgsWkbTypes.LineGeometry:
             feature = next(layer.getFeatures(), None)
@@ -334,13 +341,13 @@ class NavigationPanel(BASE, WIDGET):
 
     def updateWaypoints(self):
         for item, w in self.waypointWidgets:
-            w.setWaypointText(self.currentGpsInformation)
+            w.setWaypointText(self.gpsConnection.currentGPSInformation())
 
     def selectedWaypointChanged(self, current, previous):
         for item, w in self.waypointWidgets:
             w.setIsItemSelected(current == item)
         self.warningShown = False
-        self.updateNavigationInfo(self.currentGpsInformation)
+        self.updateNavigationInfo()
 
     def waypointsFromLayer(self, layer):
         try:
@@ -371,7 +378,7 @@ class NavigationPanel(BASE, WIDGET):
         self.waypointWidgets = []
         for waypoint in waypoints:
             item = WaypointItem(waypoint)
-            widget = WaypointItemWidget(waypoint, self.currentGpsInformation)
+            widget = WaypointItemWidget(waypoint, self.gpsConnection.currentGPSInformation())
             self.listWaypoints.addItem(item)
             item.setSizeHint(widget.sizeHint())
             self.listWaypoints.setItemWidget(item, widget)
@@ -394,15 +401,13 @@ class NavigationPanel(BASE, WIDGET):
     def startNavigation(self):
         self.centerPin = None
         self.waypointLayer = None
-        self.currentGpsInformation = None
         self.warningShown = False
 
         self.setMessage(self.tr("Connecting to GPS..."))
-        self.gpsConnection = getMockupGpsConnection()
+        self.gpsConnection = getGpsConnection()
         if self.gpsConnection is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
         else:
-            self.gpsConnection.statusChanged.connect(self.updateNavigationInfo)
             self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
             self.centerPin.setup(
                 iconPath("navigationcenter.svg"),
@@ -415,19 +420,21 @@ class NavigationPanel(BASE, WIDGET):
             # The line below is needed to neutralize the direction of the center pin (to make it points up)
             self.centerPin.setAngle(-self.gpsConnection.currentGPSInformation().direction)
             KadasMapCanvasItemManager.addItem(self.centerPin)
-            self.updateNavigationInfo(self.gpsConnection.currentGPSInformation())
+            self.updateNavigationInfo()
+            self.timer.start(1000)
+            self.timer.timeout.connect(self.updateNavigationInfo)
         self.iface.layerTreeView().currentLayerChanged.connect(self.currentLayerChanged)
 
     def currentLayerChanged(self, layer):
         self.waypointLayer = None
         self.warningShown = False
-        self.updateNavigationInfo(self.currentGpsInformation)
+        self.updateNavigationInfo()
 
     def stopNavigation(self):
-        # Disconnect everything
         if self.gpsConnection is not None:
             try:
-                self.gpsConnection.statusChanged.disconnect(self.updateNavigationInfo)
+                self.timer.timeout.disconnect(self.updateNavigationInfo)
+                self.timer.stop()
             except TypeError as e:
                 LOG.debug(e)
         try:
