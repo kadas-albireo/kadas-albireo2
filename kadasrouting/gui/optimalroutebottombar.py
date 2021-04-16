@@ -207,14 +207,22 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             areasToAvoid = self.areasToAvoid
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transformer = transformToWGS(canvasCrs)
+            if areasToAvoid is None:
+                # if the custom polygon button is checked, but no polygon has been drawn
+                pushWarning(self.tr("Custom polygon button is checked, but no polygon is drawn"))
+                return
             # make it a list to have the same data type as in the avoid layer
             areasToAvoid = [areasToAvoid]
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
-            layerCrs = avoidLayer.crs()
-            transformer = transformToWGS(layerCrs)
             if avoidLayer is not None:
+                layerCrs = avoidLayer.crs()
+                transformer = transformToWGS(layerCrs)
                 areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
+            else:
+                # If polygon layer button is checked, but no layer polygon is selected
+                pushWarning(self.tr("Polygon layer button is checked, but no layer polygon is selected"))
+                return
         else:
             # No areas to avoid
             areasToAvoid = None
@@ -236,7 +244,6 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
                         pointWGS = transformer.transform(point[0], point[1])
                         areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
                 allAreasToAvoidWGS.extend(areasToAvoidWGS)
-
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
