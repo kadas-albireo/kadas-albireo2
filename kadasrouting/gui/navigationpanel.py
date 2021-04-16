@@ -76,11 +76,11 @@ route_html_template = '''
 <tr>
 <td style="width: 100%; background-color: #44546a;">
 <p style="text-align: left;">
-<span style="color: #ffffff; font-size:15pt">''' + tr('Speed') + ''' {speed} km/h</span><br />
-<span style="color: #ffffff; font-size:15pt">''' + tr('Time Left') + ''' {timeleft}</span><br />
-<span style="color: #ffffff; font-size:15pt">''' + tr('Dist Left') + ''' {distleft}</span><br />
-<span style="color: #ffffff; font-size:15pt">''' + tr('ETA') + ''' {eta}</span></p>
-<p style="text-align: left;"><span style="color: #ffffff; font-size:15pt">''' + tr('My Position:') + '''</span><br />
+<span style="color: #ffffff; font-size:10pt">''' + tr('Speed') + ''' {speed:.2f} km/h</span><br />
+<span style="color: #ffffff; font-size:10pt">''' + tr('Time Left') + ''' {timeleft}</span><br />
+<span style="color: #ffffff; font-size:10pt">''' + tr('Dist Left') + ''' {distleft}</span><br />
+<span style="color: #ffffff; font-size:10pt">''' + tr('ETA') + ''' {eta}</span></p>
+<p style="text-align: left;"><span style="color: #ffffff; font-size:10pt">''' + tr('My Position:') + '''</span><br />
 <span style="color: #ffffff;">{displayed_point}</span></p>
 </td>
 </tr>
@@ -251,7 +251,7 @@ class NavigationPanel(BASE, WIDGET):
                     rubbergeom.transform(transform)
                     self.rubberband.setToGeometry(rubbergeom)
 
-        if isinstance(layer, OptimalRouteLayer) and layer.hasRoute():
+        if hasattr(layer, 'valhalla') and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
                 LOG.debug(maneuver)
