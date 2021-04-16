@@ -205,11 +205,14 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
 
         if self.radioAreasToAvoidPolygon.isChecked():
             areasToAvoid = self.areasToAvoid
+            canvasCrs = self.canvas.mapSettings().destinationCrs()
+            transformer = transformToWGS(canvasCrs)
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
+            canvasCrs = avoidLayer.crs()
+            transformer = transformToWGS(canvasCrs)
             if avoidLayer is not None:
-                geoms = [f.geometry() for f in avoidLayer.getFeatures()]
-                areasToAvoid = QgsGeometry.collectGeometry(geoms)
+                areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
         else:
             # No areas to avoid
             areasToAvoid = None
@@ -218,19 +221,22 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         if shortest:
             costingOptions["shortest"] = True
 
+        allAreasToAvoidWGS = []
         if areasToAvoid:
-            areasToAvoidJson = json.loads(areasToAvoid.asJson())
-            canvasCrs = self.canvas.mapSettings().destinationCrs()
-            transformer = transformToWGS(canvasCrs)
-            areasToAvoidWGS = []
-            for i, polygon in enumerate(areasToAvoidJson['coordinates']):
-                areasToAvoidWGS.append([])
-                for point in polygon:
-                    pointWGS = transformer.transform(point[0], point[1])
-                    areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
+            if type(areasToAvoid) != list:
+                areasToAvoid = [areasToAvoid]
+            for areasToAvoidGeom in areasToAvoid:
+                areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
+                areasToAvoidWGS = []
+                for i, polygon in enumerate(areasToAvoidJson['coordinates']):
+                    areasToAvoidWGS.append([])
+                    for point in polygon:
+                        pointWGS = transformer.transform(point[0], point[1])
+                        areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
+                allAreasToAvoidWGS.extend(areasToAvoidWGS)
 
         try:
-            layer.updateRoute(points, profile, areasToAvoidWGS, costingOptions)
+            layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
             LOG.error(e, exc_info=True)
