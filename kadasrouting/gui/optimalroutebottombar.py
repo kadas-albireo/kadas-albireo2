@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, Qt
@@ -18,7 +19,7 @@ from kadasrouting.gui.locationinputwidget import (
     WrongLocationException,
 )
 from kadasrouting.core import vehicles
-from kadasrouting.utilities import iconPath, pushWarning
+from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
 
 from qgis.utils import iface
 from qgis.core import (
@@ -40,6 +41,8 @@ AVOID_AREA_COLOR = QColor(255, 0, 0)
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
 )
+
+LOG = logging.getLogger(__name__)
 
 
 class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
@@ -152,7 +155,7 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
             try:
                 iface.mapCanvas().setMapTool(self.prevMapTool)
             except Exception as e:
-                logging.error(e)
+                LOG.error(e)
                 iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def mapToolSet(self, new, old):
@@ -199,30 +202,50 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        '''
-        areasToAvoid = None
         if self.radioAreasToAvoidPolygon.isChecked():
+            # Currently only single polygon is accepted
             areasToAvoid = self.areasToAvoid
+            canvasCrs = self.canvas.mapSettings().destinationCrs()
+            transformer = transformToWGS(canvasCrs)
+            # make it a list to have the same data type as in the avoid layer
+            areasToAvoid = [areasToAvoid]
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
+            layerCrs = avoidLayer.crs()
+            transformer = transformToWGS(layerCrs)
             if avoidLayer is not None:
-                geoms = [f.geometry() for f in avoidLayer.getFeatures()]
-                areasToAvoid = QgsGeometry.collectGeometry(geoms)
-        # TODO: use areas to avoid
-        '''
+                areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
+        else:
+            # No areas to avoid
+            areasToAvoid = None
+            areasToAvoidWGS = None
+            allAreasToAvoidWGS = None
 
         if shortest:
             costingOptions["shortest"] = True
 
+        # transform to WGS84 (Valhalla's requirement)
+        allAreasToAvoidWGS = []
+        if areasToAvoid:
+            for areasToAvoidGeom in areasToAvoid:
+                areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
+                areasToAvoidWGS = []
+                for i, polygon in enumerate(areasToAvoidJson['coordinates']):
+                    areasToAvoidWGS.append([])
+                    for point in polygon:
+                        pointWGS = transformer.transform(point[0], point[1])
+                        areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
+                allAreasToAvoidWGS.extend(areasToAvoidWGS)
+
         try:
-            layer.updateRoute(points, profile, costingOptions)
+            layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
         except Exception as e:
-            raise
-            logging.error(e, exc_info=True)
+            LOG.error(e, exc_info=True)
             # TODO more fine-grained error control
             pushWarning(self.tr("Could not compute route"))
-            logging.error("Could not compute route")
+            LOG.error("Could not compute route")
+            raise(e)
 
     def clearPoints(self):
         self.originSearchBox.clearSearchBox()
