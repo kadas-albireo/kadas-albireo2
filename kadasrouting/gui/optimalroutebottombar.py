@@ -228,14 +228,19 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         allAreasToAvoidWGS = []
         if areasToAvoid:
             for areasToAvoidGeom in areasToAvoid:
-                areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
-                areasToAvoidWGS = []
-                for i, polygon in enumerate(areasToAvoidJson['coordinates']):
-                    areasToAvoidWGS.append([])
-                    for point in polygon:
-                        pointWGS = transformer.transform(point[0], point[1])
-                        areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
-                allAreasToAvoidWGS.extend(areasToAvoidWGS)
+                try:
+                    areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
+                    areasToAvoidWGS = []
+                    for i, polygon in enumerate(areasToAvoidJson['coordinates']):
+                        areasToAvoidWGS.append([])
+                        for point in polygon:
+                            pointWGS = transformer.transform(point[0], point[1])
+                            areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
+                    allAreasToAvoidWGS.extend(areasToAvoidWGS)
+                except AttributeError:
+                    # if the custom polygon button is checked, but no polygon has been drawn
+                    pushWarning(self.tr("Custom polygon button is checked, but no polygon is drawn"))
+                    return
 
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
