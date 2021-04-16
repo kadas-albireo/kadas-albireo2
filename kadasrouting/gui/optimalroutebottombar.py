@@ -26,8 +26,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsProject,
-    QgsGeometry
+    QgsProject
 )
 from qgis.gui import (
     QgsMapTool,
@@ -204,27 +203,30 @@ class OptimalRouteBottomBar(KadasBottomBar, WIDGET):
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
         if self.radioAreasToAvoidPolygon.isChecked():
+            # Currently only single polygon is accepted
             areasToAvoid = self.areasToAvoid
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transformer = transformToWGS(canvasCrs)
+            # make it a list to have the same data type as in the avoid layer
+            areasToAvoid = [areasToAvoid]
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
-            canvasCrs = avoidLayer.crs()
-            transformer = transformToWGS(canvasCrs)
+            layerCrs = avoidLayer.crs()
+            transformer = transformToWGS(layerCrs)
             if avoidLayer is not None:
                 areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
         else:
             # No areas to avoid
             areasToAvoid = None
             areasToAvoidWGS = None
+            allAreasToAvoidWGS = None
 
         if shortest:
             costingOptions["shortest"] = True
 
+        # transform to WGS84 (Valhalla's requirement)
         allAreasToAvoidWGS = []
         if areasToAvoid:
-            if type(areasToAvoid) != list:
-                areasToAvoid = [areasToAvoid]
             for areasToAvoidGeom in areasToAvoid:
                 areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
                 areasToAvoidWGS = []

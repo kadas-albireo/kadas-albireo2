@@ -1,7 +1,6 @@
 import os
 import subprocess
 import logging
-import requests
 import json
 from jinja2 import Environment, FileSystemLoader
 
@@ -9,7 +8,6 @@ from PyQt5.QtCore import QObject
 
 from qgis.core import QgsSettings
 
-from kadasrouting.exceptions import Valhalla400Exception
 from kadasrouting.utilities import localeName, appDataDir, pushWarning
 from kadasrouting.core.datacatalogueclient import DataCatalogueClient
 
