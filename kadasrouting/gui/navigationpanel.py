@@ -1,9 +1,12 @@
 import os
 import math
 import datetime
+import json
 import logging
 
 from PyQt5 import uic
+import re
+from zipfile import ZipFile
 
 from PyQt5.QtGui import (
     QPixmap,
@@ -35,6 +38,7 @@ from qgis.core import (
     QgsDistanceArea,
     QgsUnitTypes,
     QgsPointXY,
+    QgsPoint,
     QgsVectorLayer,
     QgsWkbTypes,
     QgsGeometry
@@ -160,6 +164,32 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
             "eta": eta_string}
 
 
+class NavigationFromWaypointsLayer():
+    def __init__(self):
+        self.crs = QgsCoordinateReferenceSystem(4326)
+        mapItemRegex = r'^<MapItem(.*)CDATA(.*)]><\/MapItem>'
+        # parse project
+        with ZipFile(QgsProject.instance().fileName()) as qgzPrj:
+            prjName = [x for x in qgzPrj.namelist() if 'qgs' in x][0]
+            project_contents = str(qgzPrj.read(prjName)).split('\\n')
+            self.mapItems = [ self._create_gpx_waypoints(json.loads(re.match(mapItemRegex, i.strip())[2])) for i in project_contents if 'MapItem' in i ]
+
+    def _create_gpx_waypoints(self, map_item):
+        item = KadasGpxWaypointItem()
+        for p in map_item[0]['state']['points']:
+            if isinstance(p[0], float):
+                item.addPartFromGeometry(QgsPoint(p[0], p[1]))
+            elif isinstance(p[0], list):
+                for p_ in p:
+                    item.addPartFromGeometry(QgsPoint(p_[0], p_[1]))
+        item.setName(map_item[0]['props']['name']) 
+        return item
+
+    def items(self):
+        for i in self.mapItems:
+            yield i
+
+
 class NavigationPanel(BASE, WIDGET):
 
     FIXED_WIDTH = 200
@@ -173,6 +203,7 @@ class NavigationPanel(BASE, WIDGET):
         self.listWaypoints.setStyleSheet("background-color: #adb9ca;")
         self.iface = KadasPluginInterface.cast(iface)
         self.gpsConnection = None
+        self.navLayer = None
         self.listWaypoints.setSelectionMode(QListWidget.SingleSelection)
         self.listWaypoints.currentItemChanged.connect(self.selectedWaypointChanged)
         self.listWaypoints.setSpacing(5)
@@ -263,11 +294,12 @@ class NavigationPanel(BASE, WIDGET):
             self.textBrowser.setHtml(html)
             self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
             self.setWarnings(maneuver["raw_distleft"])
-        elif isinstance(layer, KadasItemLayer):
-            waypoints = self.waypointsFromLayer(layer)
+        #FIXME: we could have some better way of differentiating this...
+        elif layer.name() == 'Routes':
+            waypoints = self.waypointsFromLayer(self.navLayer)
             if waypoints:
                 if self.waypointLayer is None:
-                    self.waypointLayer = layer
+                    self.waypointLayer = self.navLayer
                     self.populateWaypoints(waypoints)
                 else:
                     self.updateWaypoints()
@@ -408,6 +440,8 @@ class NavigationPanel(BASE, WIDGET):
 
         self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getGpsConnection()
+        #FIXME: should not initialize this if unused
+        self.navLayer = NavigationFromWaypointsLayer()
         if self.gpsConnection is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
         else:
