@@ -321,6 +321,7 @@ void KadasHeightProfileDialog::replot()
   // Get vertical unit
   QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
   double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, vertDisplayUnit );
+  double noDataValue = GDALGetRasterNoDataValue( band, NULL );
   mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
@@ -366,6 +367,15 @@ void KadasHeightProfileDialog::replot()
       }
       else
       {
+        // replace nodata value with 0 
+        for ( int j = 0; j < 4; ++j )
+        {
+          if (pixValues[j] == noDataValue )
+          {
+            pixValues[j] = 0;
+          }
+        }
+
         // Interpolate values
         double lambdaR = row - qFloor( row );
         double lambdaC = col - qFloor( col );
