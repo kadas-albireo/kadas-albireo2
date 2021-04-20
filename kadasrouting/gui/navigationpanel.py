@@ -465,7 +465,6 @@ class NavigationPanel(BASE, WIDGET):
 
         self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getGpsConnection()
-        # FIXME: should not initialize this if unused
         try:
             if iface.activeLayer().name() == 'Routes':
                 self.navLayer = NavigationFromWaypointsLayer()
