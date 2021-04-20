@@ -49,7 +49,6 @@ from qgis.gui import QgsRubberBand
 from kadas.kadasgui import (
     KadasPinItem,
     KadasItemPos,
-    KadasItemLayer,
     KadasMapCanvasItemManager,
     KadasPluginInterface,
     KadasGpxWaypointItem)
@@ -168,8 +167,8 @@ class NavigationFromWaypointsLayer():
     def __init__(self):
         self.crs = QgsCoordinateReferenceSystem(4326)
         itemRegex = {
-            'KadasGpxRouteItemRegex': r'^<MapItem name="KadasGpxRouteItem"(.*)CDATA(.*)]><\/MapItem>',
-            'KadasGpxWaypointItemRegex': r'^<MapItem name="KadasGpxWaypointItem"(.*)CDATA(.*)]><\/MapItem>'
+            'KadasGpxRouteItemRegex': r'^<MapItem(.*)name="KadasGpxRouteItem"(.*)CDATA(.*)]><\/MapItem>',
+            'KadasGpxWaypointItemRegex': r'^<MapItem(.*)name="KadasGpxWaypointItem"(.*)CDATA(.*)]><\/MapItem>'
         }
         # parse project
         with ZipFile(QgsProject.instance().fileName()) as qgzPrj:
@@ -178,15 +177,16 @@ class NavigationFromWaypointsLayer():
             self.mapItems = []
             for i in project_contents:
                 if 'MapItem' in i:
-                    for k,v in itemRegex.items():
+                    for k, v in itemRegex.items():
                         if k == 'KadasGpxRouteItemRegex':
                             # TODO: this is a placeholder if we must implement the
                             # feature also for route items and not only for Waypoint Items
+                            # we'll need to differentiate the routes computed with valhalla from
+                            # the other ones...
                             continue
                         catched = re.match(itemRegex[k], i.strip())
                         if catched:
-                            self.mapItems.append(self._create_gpx_waypoints(json.loads(catched[2]),k))
-
+                            self.mapItems.append(self._create_gpx_waypoints(json.loads(catched[3]), k))
 
     def _create_gpx_waypoints(self, map_item, key):
         item = KadasGpxWaypointItem()
@@ -194,12 +194,12 @@ class NavigationFromWaypointsLayer():
             p = map_item[0]['state']['points'][0]
             item.addPartFromGeometry(QgsPoint(p[0], p[1]))
         elif key == 'KadasGpxRouteItemRegex':
-            #FIXME: this will need more stuff to work, for the routes we must
+            # FIXME: this will need more stuff to work, for the routes we must
             # add a way to track the passed waypoints, and use the layer internal points
             # as polyline instead
             for p in map_item[0]['state']['points'][0]:
                 item.addPartFromGeometry(QgsPoint(p[0], p[1]))
-        item.setName(map_item[0]['props']['name']) 
+        item.setName(map_item[0]['props']['name'])
         return item
 
     def items(self):
@@ -311,8 +311,12 @@ class NavigationPanel(BASE, WIDGET):
             self.textBrowser.setHtml(html)
             self.textBrowser.setFixedHeight(self.textBrowser.document().size().height())
             self.setWarnings(maneuver["raw_distleft"])
-        #FIXME: we could have some better way of differentiating this...
-        elif layer.name() == 'Routes':
+        # FIXME: we could have some better way of differentiating this...
+        elif not isinstance(layer, type(None)):
+            if layer.name() != 'Routes':
+                self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
+                self.stopNavigation()
+                return
             waypoints = self.waypointsFromLayer(self.navLayer)
             if waypoints:
                 if self.waypointLayer is None:
@@ -331,7 +335,9 @@ class NavigationPanel(BASE, WIDGET):
                 self.setWidgetsVisibility(True)
                 self.setWarnings(instructions["raw_distleft"])
             else:
-                self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
+                self.setMessage(self.tr("The 'Routes' layer has no waypoints. Hint: save your project."))
+                self.stopNavigation()
+                return
         else:
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
             self.stopNavigation()
@@ -459,7 +465,7 @@ class NavigationPanel(BASE, WIDGET):
 
         self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getGpsConnection()
-        #FIXME: should not initialize this if unused
+        # FIXME: should not initialize this if unused
         try:
             if iface.activeLayer().name() == 'Routes':
                 self.navLayer = NavigationFromWaypointsLayer()
@@ -468,9 +474,9 @@ class NavigationPanel(BASE, WIDGET):
         except FileNotFoundError:
             self.setMessage(self.tr("You must save your project to use waypoint layers for navigation"))
             return
-        # except TypeError:
-        #     self.setMessage(self.tr("There are no waypoints in the 'Routes' layer"))
-        #     return
+        except TypeError:
+            self.setMessage(self.tr("There are no waypoints in the 'Routes' layer"))
+            return
         if self.gpsConnection is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
         else:
