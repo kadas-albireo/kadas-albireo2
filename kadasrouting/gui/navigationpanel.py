@@ -167,21 +167,38 @@ def getInstructionsToWaypoint(waypoint, gpsinfo):
 class NavigationFromWaypointsLayer():
     def __init__(self):
         self.crs = QgsCoordinateReferenceSystem(4326)
-        mapItemRegex = r'^<MapItem(.*)CDATA(.*)]><\/MapItem>'
+        itemRegex = {
+            'KadasGpxRouteItemRegex': r'^<MapItem name="KadasGpxRouteItem"(.*)CDATA(.*)]><\/MapItem>',
+            'KadasGpxWaypointItemRegex': r'^<MapItem name="KadasGpxWaypointItem"(.*)CDATA(.*)]><\/MapItem>'
+        }
         # parse project
         with ZipFile(QgsProject.instance().fileName()) as qgzPrj:
             prjName = [x for x in qgzPrj.namelist() if 'qgs' in x][0]
             project_contents = str(qgzPrj.read(prjName)).split('\\n')
-            self.mapItems = [ self._create_gpx_waypoints(json.loads(re.match(mapItemRegex, i.strip())[2])) for i in project_contents if 'MapItem' in i ]
+            self.mapItems = []
+            for i in project_contents:
+                if 'MapItem' in i:
+                    for k,v in itemRegex.items():
+                        if k == 'KadasGpxRouteItemRegex':
+                            # TODO: this is a placeholder if we must implement the
+                            # feature also for route items and not only for Waypoint Items
+                            continue
+                        catched = re.match(itemRegex[k], i.strip())
+                        if catched:
+                            self.mapItems.append(self._create_gpx_waypoints(json.loads(catched[2]),k))
 
-    def _create_gpx_waypoints(self, map_item):
+
+    def _create_gpx_waypoints(self, map_item, key):
         item = KadasGpxWaypointItem()
-        for p in map_item[0]['state']['points']:
-            if isinstance(p[0], float):
+        if key == 'KadasGpxWaypointItemRegex':
+            p = map_item[0]['state']['points'][0]
+            item.addPartFromGeometry(QgsPoint(p[0], p[1]))
+        elif key == 'KadasGpxRouteItemRegex':
+            #FIXME: this will need more stuff to work, for the routes we must
+            # add a way to track the passed waypoints, and use the layer internal points
+            # as polyline instead
+            for p in map_item[0]['state']['points'][0]:
                 item.addPartFromGeometry(QgsPoint(p[0], p[1]))
-            elif isinstance(p[0], list):
-                for p_ in p:
-                    item.addPartFromGeometry(QgsPoint(p_[0], p_[1]))
         item.setName(map_item[0]['props']['name']) 
         return item
 
@@ -317,6 +334,8 @@ class NavigationPanel(BASE, WIDGET):
                 self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
         else:
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
+            self.stopNavigation()
+            return
 
     def setWarnings(self, dist):
         threshold = QSettings().value("kadasrouting/warningThreshold", self.WARNING_DISTANCE, type=int)
@@ -441,7 +460,17 @@ class NavigationPanel(BASE, WIDGET):
         self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getGpsConnection()
         #FIXME: should not initialize this if unused
-        self.navLayer = NavigationFromWaypointsLayer()
+        try:
+            if iface.activeLayer().name() == 'Routes':
+                self.navLayer = NavigationFromWaypointsLayer()
+        except AttributeError:
+            pass
+        except FileNotFoundError:
+            self.setMessage(self.tr("You must save your project to use waypoint layers for navigation"))
+            return
+        # except TypeError:
+        #     self.setMessage(self.tr("There are no waypoints in the 'Routes' layer"))
+        #     return
         if self.gpsConnection is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
         else:
