@@ -3,6 +3,7 @@ import math
 import datetime
 import json
 import logging
+import tempfile
 
 from PyQt5 import uic
 import re
@@ -170,23 +171,34 @@ class NavigationFromWaypointsLayer():
             'KadasGpxRouteItemRegex': r'^<MapItem(.*)name="KadasGpxRouteItem"(.*)CDATA(.*)]><\/MapItem>',
             'KadasGpxWaypointItemRegex': r'^<MapItem(.*)name="KadasGpxWaypointItem"(.*)CDATA(.*)]><\/MapItem>'
         }
+        orig_project = {
+            'filename': QgsProject.instance().fileName(),
+        }
+        tmp_file = tempfile.NamedTemporaryFile(suffix = '.qgz')
+
+        QgsProject.instance().setFileName(tmp_file.name)
+        QgsProject.instance().write()
+
         # parse project
-        with ZipFile(QgsProject.instance().fileName()) as qgzPrj:
+        with ZipFile(tmp_file.name) as qgzPrj:
             prjName = [x for x in qgzPrj.namelist() if 'qgs' in x][0]
             project_contents = str(qgzPrj.read(prjName)).split('\\n')
-            self.mapItems = []
-            for i in project_contents:
-                if 'MapItem' in i:
-                    for k, v in itemRegex.items():
-                        if k == 'KadasGpxRouteItemRegex':
-                            # TODO: this is a placeholder if we must implement the
-                            # feature also for route items and not only for Waypoint Items
-                            # we'll need to differentiate the routes computed with valhalla from
-                            # the other ones...
-                            continue
-                        catched = re.match(itemRegex[k], i.strip())
-                        if catched:
-                            self.mapItems.append(self._create_gpx_waypoints(json.loads(catched[3]), k))
+
+        self.mapItems = []
+        for i in project_contents:
+            if 'MapItem' in i:
+                for k, v in itemRegex.items():
+                    if k == 'KadasGpxRouteItemRegex':
+                        # TODO: this is a placeholder if we must implement the
+                        # feature also for route items and not only for Waypoint Items
+                        # we'll need to differentiate the routes computed with valhalla from
+                        # the other ones...
+                        continue
+                    catched = re.match(itemRegex[k], i.strip())
+                    if catched:
+                        self.mapItems.append(self._create_gpx_waypoints(json.loads(catched[3]), k))
+        QgsProject.instance().setFileName(orig_project['filename'])
+
 
     def _create_gpx_waypoints(self, map_item, key):
         item = KadasGpxWaypointItem()
@@ -335,7 +347,7 @@ class NavigationPanel(BASE, WIDGET):
                 self.setWidgetsVisibility(True)
                 self.setWarnings(instructions["raw_distleft"])
             else:
-                self.setMessage(self.tr("The 'Routes' layer has no waypoints. Hint: save your project."))
+                self.setMessage(self.tr("The 'Routes' layer has no waypoints."))
                 self.stopNavigation()
                 return
         else:
