@@ -226,7 +226,8 @@ class NavigationFromWaypointsLayer:
         try:
             os.remove(tmp_file.name)
         except FileNotFoundError:
-            pass # if the file is not there we don't worry
+            # if the file is not there we don't worry
+            pass
 
     def _create_gpx_waypoints(self, map_item, key):
         item = KadasGpxWaypointItem()
