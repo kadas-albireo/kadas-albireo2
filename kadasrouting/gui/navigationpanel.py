@@ -207,7 +207,6 @@ class NavigationFromWaypointsLayer:
         with ZipFile(tmp_file.name) as qgzPrj:
             prjName = [x for x in qgzPrj.namelist() if "qgs" in x][0]
             project_contents = str(qgzPrj.read(prjName)).split("\\n")
-
         self.mapItems = []
         for i in project_contents:
             if "MapItem" in i:
@@ -224,6 +223,10 @@ class NavigationFromWaypointsLayer:
                             self._create_gpx_waypoints(json.loads(catched[3]), k)
                         )
         QgsProject.instance().setFileName(orig_project["filename"])
+        try:
+            os.remove(tmp_file.name)
+        except FileNotFoundError:
+            pass # if the file is not there we don't worry
 
     def _create_gpx_waypoints(self, map_item, key):
         item = KadasGpxWaypointItem()
