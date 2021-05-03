@@ -6,11 +6,12 @@ from qgis.PyQt.QtCore import QSettings
 
 from kadasrouting.utilities import localeName
 
-WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), "disclaimerdialog.ui"))
+WIDGET, BASE = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "disclaimerdialog.ui")
+)
 
 
 class DisclaimerDialog(BASE, WIDGET):
-
     def __init__(self, parent=None):
         super(DisclaimerDialog, self).__init__(parent)
         self.setupUi(self)
@@ -23,5 +24,7 @@ class DisclaimerDialog(BASE, WIDGET):
         self.btnClose.clicked.connect(self.closeClicked)
 
     def closeClicked(self):
-        QSettings().setValue("kadasrouting/showDisclaimer", not self.checkBox.isChecked())
+        QSettings().setValue(
+            "kadasrouting/showDisclaimer", not self.checkBox.isChecked()
+        )
         self.close()

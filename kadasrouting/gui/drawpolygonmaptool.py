@@ -26,13 +26,9 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsWkbTypes,
     QgsVectorLayer,
-    QgsProject
+    QgsProject,
 )
-from qgis.gui import (
-    QgsMapTool,
-    QgsRubberBand,
-    QgsMapToolPan
-)
+from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolPan
 
 RB_STROKE = QColor(204, 235, 239, 255)
 RB_FILL = QColor(204, 235, 239, 100)
@@ -47,8 +43,7 @@ class DrawPolygonMapTool(QgsMapTool):
 
         self.canvas = canvas
         self.extent = None
-        self.rubberBand = QgsRubberBand(
-            self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubberBand = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rubberBand.setFillColor(RB_FILL)
         self.rubberBand.setStrokeColor(RB_STROKE)
         self.rubberBand.setWidth(1)
@@ -69,7 +64,8 @@ class DrawPolygonMapTool(QgsMapTool):
         elif event.button() == Qt.LeftButton:
             if self.rubberBand is None:
                 self.rubberBand = QgsRubberBand(
-                    self.canvas, QgsWkbTypes.PolygonGeometry)
+                    self.canvas, QgsWkbTypes.PolygonGeometry
+                )
                 self.rubberBand.setFillColor(RB_FILL)
                 self.rubberBand.setStrokeColor(RB_STROKE)
                 self.rubberBand.setWidth(1)

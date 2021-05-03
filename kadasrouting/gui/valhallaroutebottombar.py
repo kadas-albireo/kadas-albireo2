@@ -37,11 +37,13 @@ from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 AVOID_AREA_COLOR = QColor(255, 0, 0)
 LOG = logging.getLogger(__name__)
 
+
 class ValhallaRouteBottomBar(KadasBottomBar):
     """
     This is a meta class and should not be instanciated by itself, as it is has no
     UI file associated with it. Use this only as Parent class.
     """
+
     def __init__(self, canvas, action, plugin):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)

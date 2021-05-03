@@ -48,10 +48,10 @@ LOG = logging.getLogger(__name__)
 # radioPatrolAreaPolygon QRadioButton -> activate btnPatrolAreaCanvas and btnPatrolAreaClear
 # radioPatrolAreaLayer QRadioButton -> activate comboPatrolAreaLayers
 
+
 class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
     def __init__(self, canvas, action, plugin):
         super().__init__(canvas, action, plugin)
-
 
 
 # class CPBottomBar(KadasBottomBar, WIDGET):

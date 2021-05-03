@@ -26,20 +26,19 @@ def tr(x):
 
 
 def localeName():
-    override_flag = QSettings().value(
-        'locale/overrideFlag', True, type=bool)
+    override_flag = QSettings().value("locale/overrideFlag", True, type=bool)
 
     if override_flag:
-        locale_name = QSettings().value('locale/userLocale', 'en_US', type=str)
+        locale_name = QSettings().value("locale/userLocale", "en_US", type=str)
     else:
         locale_name = QLocale.system().name()
-        locale_name = str(locale_name).split('_')[0]
+        locale_name = str(locale_name).split("_")[0]
 
     return locale_name
 
 
 def appDataDir():
-    folder = os.path.expandvars('%APPDATA%\\KADAS\\routing\\')
+    folder = os.path.expandvars("%APPDATA%\\KADAS\\routing\\")
     if not os.path.exists(folder):
         os.makedirs(folder)
     return folder
@@ -117,7 +116,7 @@ class PolylineCodec(object):
         coord = coord if coord >= 0 else ~coord
 
         while coord >= 0x20:
-            output.write(chr((0x20 | (coord & 0x1f)) + 63))
+            output.write(chr((0x20 | (coord & 0x1F)) + 63))
             coord >>= 5
 
         output.write(chr(coord + 63))
@@ -128,14 +127,21 @@ class PolylineCodec(object):
         while byte is None or byte >= 0x20:
             byte = ord(value[index]) - 63
             index += 1
-            result |= (byte & 0x1f) << shift
+            result |= (byte & 0x1F) << shift
             shift += 5
             comp = result & 1
 
         return ~(result >> 1) if comp else (result >> 1), index
 
     def decode(self, expression, precision=6, geojson=False):
-        coordinates, index, lat, lng, length, factor = [], 0, 0, 0, len(expression), float(10 ** precision)
+        coordinates, index, lat, lng, length, factor = (
+            [],
+            0,
+            0,
+            0,
+            len(expression),
+            float(10 ** precision),
+        )
 
         while index < length:
             lat_change, index = self._trans(expression, index)
@@ -176,7 +182,7 @@ def encodePolyline6(coordinates, precision=6, geojson=False):
 def formatdist(d):
     if d is None:
         return ""
-    return "{d:.1f} km".format(d=d/1000) if d > 1000 else "{d:.0f} m".format(d=d)
+    return "{d:.1f} km".format(d=d / 1000) if d > 1000 else "{d:.0f} m".format(d=d)
 
 
 class MLStripper(HTMLParser):

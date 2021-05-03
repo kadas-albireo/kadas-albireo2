@@ -8,13 +8,10 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsProject,
-    QgsPointXY
+    QgsPointXY,
 )
 
-from kadasrouting.utilities import (
-    icon,
-    pushWarning
-)
+from kadasrouting.utilities import icon, pushWarning
 
 from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
 
@@ -38,7 +35,13 @@ class WrongLocationException(Exception):
 class LocationInputWidget(QWidget):
     pointUpdated = pyqtSignal(QgsPointXY)
 
-    def __init__(self, canvas, locationSymbolPath=":/kadas/icons/pin_red", pinAnchorX=0.5, pinAnchorY=1):
+    def __init__(
+        self,
+        canvas,
+        locationSymbolPath=":/kadas/icons/pin_red",
+        pinAnchorX=0.5,
+        pinAnchorY=1,
+    ):
         QWidget.__init__(self)
         # UI
         self.canvas = canvas
@@ -77,13 +80,13 @@ class LocationInputWidget(QWidget):
 
         self.point = None
         self.pin = None
-        self.locationName = ''
+        self.locationName = ""
         self._gpsConnection = None
 
     def getLocation(self, dictionary):
-        label = dictionary['label']
-        lat = dictionary['lat']
-        lon = dictionary['lon']
+        label = dictionary["label"]
+        lat = dictionary["lat"]
+        lon = dictionary["lon"]
         self.setPointFromLonLat(lon, lat)
         self.setLocationName(label)
 
@@ -162,8 +165,11 @@ class LocationInputWidget(QWidget):
         self.pin.setAnchorX(self.pinAnchorX)
         self.pin.setAnchorY(self.pinAnchorY)
         self.pin.setFilePath(self.locationSymbolPath)
-        LOG.debug('self.pin position %s, %s' % (self.pin.position().x(), self.pin.position().y()))
-        LOG.debug('pin anchor %s, %s' % (self.pin.anchorX(), self.pin.anchorY()))
+        LOG.debug(
+            "self.pin position %s, %s"
+            % (self.pin.position().x(), self.pin.position().y())
+        )
+        LOG.debug("pin anchor %s, %s" % (self.pin.anchorX(), self.pin.anchorY()))
         KadasMapCanvasItemManager.addItem(self.pin)
 
     def removePin(self):
@@ -183,7 +189,7 @@ class LocationInputWidget(QWidget):
 
     def setPoint(self, point):
         self.point = point
-        LOG.debug('Current point is %s' % self.point.asWkt())
+        LOG.debug("Current point is %s" % self.point.asWkt())
         self.pointUpdated.emit(self.point)
         self.addPin()
 

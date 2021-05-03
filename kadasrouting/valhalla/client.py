@@ -57,7 +57,8 @@ class ValhallaClient:
         points = self.pointsFromQgsPoints([qgspoint])
         try:
             response = self.connector.isochrones(
-                points, profile, costingOptions, intervals, colors)
+                points, profile, costingOptions, intervals, colors
+            )
         except Valhalla400Exception as e:
             raise e
         except Exception as e:

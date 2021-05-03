@@ -70,7 +70,14 @@ class SuggestCompletion(QObject):
                 self._editor.setFocus()
                 self._popup.hide()
                 consumed = True
-            elif key in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Home, Qt.Key_End, Qt.Key_PageUp, Qt.Key_PageDown]:
+            elif key in [
+                Qt.Key_Up,
+                Qt.Key_Down,
+                Qt.Key_Home,
+                Qt.Key_End,
+                Qt.Key_PageUp,
+                Qt.Key_PageDown,
+            ]:
                 pass
             else:
                 self._editor.setFocus()
@@ -92,9 +99,9 @@ class SuggestCompletion(QObject):
 
         for choice in choices:
             item = QTreeWidgetItem(self._popup)
-            item.setText(0, strip_tags(choice['label']))
-            item.setData(0, Qt.UserRole, choice['lon'])
-            item.setData(0, Qt.UserRole + 1, choice['lat'])
+            item.setText(0, strip_tags(choice["label"]))
+            item.setData(0, Qt.UserRole, choice["lon"])
+            item.setData(0, Qt.UserRole + 1, choice["lat"])
             item.setForeground(0, color)
 
         self._popup.setCurrentItem(self._popup.topLevelItem(0))
@@ -117,25 +124,25 @@ class SuggestCompletion(QObject):
             lon = item.data(0, Qt.UserRole)
             lat = item.data(0, Qt.UserRole + 1)
             self._editor.setText(label)
-            QMetaObject.invokeMethod(self._editor, 'returnPressed')
-            selected = {
-                'label': label,
-                'lon': lon,
-                'lat': lat
-            }
+            QMetaObject.invokeMethod(self._editor, "returnPressed")
+            selected = {"label": label, "lon": lon, "lat": lat}
             self.finished.emit(selected)
 
     def auto_suggest(self):
         text = self._editor.text()
         if text:
             is_offline = QgsSettings().value("/kadas/isOffline")
-            LOG.debug('is_offline %s' % is_offline)
+            LOG.debug("is_offline %s" % is_offline)
             if is_offline:
                 url = QgsSettings().value(
-                    "search/locationofflinesearchurl", "http://localhost:5000/SearchServerCh")
+                    "search/locationofflinesearchurl",
+                    "http://localhost:5000/SearchServerCh",
+                )
             else:
                 url = QgsSettings().value(
-                    "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer")
+                    "search/locationsearchurl",
+                    "https://api3.geo.admin.ch/rest/services/api/SearchServer",
+                )
             url = QUrl(url)
             query = QUrlQuery()
             query.addQueryItem("sr", "2056")
@@ -156,22 +163,22 @@ class SuggestCompletion(QObject):
             data_raw = network_reply.readAll().data()
             try:
                 data = json.loads(data_raw)
-                if data.get('status') != 'error':
-                    for location in data['results']:
-                        attributes = location.get('attrs', {})
+                if data.get("status") != "error":
+                    for location in data["results"]:
+                        attributes = location.get("attrs", {})
                         choice = {
-                            'label': attributes.get('label', 'Unknown label'),
-                            'lon': attributes.get('lon', 0.0),
-                            'lat': attributes.get('lat', 0.0)
+                            "label": attributes.get("label", "Unknown label"),
+                            "lon": attributes.get("lon", 0.0),
+                            "lat": attributes.get("lat", 0.0),
                         }
                         choices.append(choice)
                     self.show_completion(choices)
                 else:
-                    error_detail = data.get('detail', 'No error detail.')
+                    error_detail = data.get("detail", "No error detail.")
                     LOG.error(data)
                     self.error.emit(error_detail)
             except json.decoder.JSONDecodeError:
-                data_string = data_raw.decode('utf-8')
+                data_string = data_raw.decode("utf-8")
                 LOG.error(data_string)
                 self.error.emit(strip_tags(data_string))
         else:
