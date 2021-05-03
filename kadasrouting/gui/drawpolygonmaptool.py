@@ -1,37 +1,15 @@
-import os
 import logging
-import json
 
-from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QDesktopWidget
+from PyQt5.QtGui import QColor
 
-from kadas.kadasgui import (
-    KadasBottomBar,
-    KadasPinItem,
-    KadasItemPos,
-    KadasMapCanvasItemManager,
-    KadasLayerSelectionWidget,
-)
-from kadasrouting.gui.locationinputwidget import (
-    LocationInputWidget,
-    WrongLocationException,
-)
-from kadasrouting.core import vehicles
-from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
-
-from qgis.utils import iface
-from qgis.core import (
-    QgsCoordinateReferenceSystem,
-    QgsWkbTypes,
-    QgsVectorLayer,
-    QgsProject,
-)
-from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolPan
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsMapTool, QgsRubberBand
 
 RB_STROKE = QColor(204, 235, 239, 255)
 RB_FILL = QColor(204, 235, 239, 100)
+
+LOG = logging.getLogger(__name__)
 
 
 class DrawPolygonMapTool(QgsMapTool):

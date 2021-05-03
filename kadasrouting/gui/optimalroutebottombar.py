@@ -1,38 +1,25 @@
 import os
 import logging
-import json
 
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
-    KadasBottomBar,
     KadasPinItem,
     KadasItemPos,
     KadasMapCanvasItemManager,
-    KadasLayerSelectionWidget,
 )
-from kadasrouting.gui.locationinputwidget import (
-    LocationInputWidget,
-    WrongLocationException,
-)
-from kadasrouting.core import vehicles
-from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
+from kadasrouting.gui.locationinputwidget import LocationInputWidget
+from kadasrouting.utilities import iconPath
 
 from qgis.utils import iface
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsWkbTypes,
-    QgsVectorLayer,
-    QgsProject,
 )
-from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolPan
+from qgis.gui import QgsRubberBand
 
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
-from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 
 AVOID_AREA_COLOR = QColor(255, 0, 0)
 

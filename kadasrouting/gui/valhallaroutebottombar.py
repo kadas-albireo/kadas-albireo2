@@ -1,16 +1,11 @@
-import os
 import logging
 import json
 
-from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import (
     KadasBottomBar,
-    KadasPinItem,
-    KadasItemPos,
     KadasMapCanvasItemManager,
     KadasLayerSelectionWidget,
 )
@@ -23,12 +18,11 @@ from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
 
 from qgis.utils import iface
 from qgis.core import (
-    QgsCoordinateReferenceSystem,
     QgsWkbTypes,
     QgsVectorLayer,
     QgsProject,
 )
-from qgis.gui import QgsMapTool, QgsRubberBand, QgsMapToolPan
+from qgis.gui import QgsRubberBand, QgsMapToolPan
 
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
 from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool

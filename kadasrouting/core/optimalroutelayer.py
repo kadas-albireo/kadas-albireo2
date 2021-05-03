@@ -280,7 +280,7 @@ class OptimalRouteLayer(KadasItemLayer):
                 ):
                     points = [closest_point]
                     points.extend(
-                        leg_points[closest_segment : maneuver["end_shape_index"]]
+                        leg_points[closest_segment: maneuver["end_shape_index"]]
                     )
                     distance_to_next = qgsdistance.convertLengthMeasurement(
                         qgsdistance.measureLine(points), QgsUnitTypes.DistanceMeters
@@ -301,7 +301,7 @@ class OptimalRouteLayer(KadasItemLayer):
 
                     time_to_next = distance_to_next / 1000 / speed * 3600
                     try:
-                        maneuvers_ahead = maneuvers[i + 1 :]
+                        maneuvers_ahead = maneuvers[i + 1:]
                     except IndexError:
                         maneuvers_ahead = []
 
