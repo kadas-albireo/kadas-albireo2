@@ -47,11 +47,13 @@ class OptimalRouteBottomBar(ValhallaRouteBottomBar, WIDGET):
         )
 
     def clearPoints(self):
-        super().clearPoints()
         self.waypointsSearchBox.clearSearchBox()
+        self.waypoints = []
         self.lineEditWaypoints.clear()
         for waypointPin in self.waypointPins:
             KadasMapCanvasItemManager.removeItem(waypointPin)
+        self.waypointPins = []
+        super().clearPoints()
 
     def addWaypoints(self):
         """Add way point to the list of way points"""
@@ -101,13 +103,13 @@ class OptimalRouteBottomBar(ValhallaRouteBottomBar, WIDGET):
         """Remove all pins from the map
         Not removing the point stored.
         """
-        super().clearPins()
         # remove waypoint pins
         for waypointPin in self.waypointPins:
             KadasMapCanvasItemManager.removeItem(waypointPin)
+        super().clearPins()
 
     def addPins(self):
         """Add pins for all stored points."""
-        super().addPins()
         for waypoint in self.waypoints:
             self.addWaypointPin(waypoint)
+        super().addPins()
