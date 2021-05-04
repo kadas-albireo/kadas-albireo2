@@ -166,7 +166,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.areasToAvoid.append(polygon)
         footprint = self.createFootprintArea()
         footprint.setToGeometry(polygon)
-        print(self.areasToAvoidFootprint)
         self.areasToAvoidFootprint.append(footprint)
 
     def createLayer(self, name):
@@ -176,7 +175,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
     def selectedLayerChanged(self, layer):
         self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
 
-    def calculate(self):
+    def prepareValhalla(self):
         layer = self.layerSelector.getSelectedLayer()
         if layer is None:
             pushWarning(self.tr("Please, select a valid destination layer"))
@@ -246,6 +245,10 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                         pointWGS = transformer.transform(point[0], point[1])
                         areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
                 allAreasToAvoidWGS.extend(areasToAvoidWGS)
+        return layer, points, profile, allAreasToAvoidWGS, costingOptions
+
+    def calculate(self):
+        layer, points, profile, allAreasToAvoidWGS, costingOptions = self.prepareValhalla()
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)

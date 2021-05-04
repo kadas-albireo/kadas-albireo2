@@ -19,7 +19,7 @@ class Connector(QObject):
         return True
 
     def prepareRouteParameters(
-        self, points, profile="auto", avoid_polygons=None, options=None
+        self, points, profile="auto", avoid_polygons=None, options=None, patrol_polygon=None
     ):
         options = options or {}
         locale_name = localeName()
@@ -33,6 +33,8 @@ class Connector(QObject):
             params["costing_options"] = {profile: options}
         if avoid_polygons:
             params["avoid_polygons"] = avoid_polygons
+        if patrol_polygon:
+            params["chinese_postman_polygon"] = patrol_polygon
 
         return params
 
@@ -145,8 +147,8 @@ class ConsoleConnector(Connector):
             raise Exception(response["error"])
         return response
 
-    def route(self, points, profile, avoid_polygons, options):
-        params = self.prepareRouteParameters(points, profile, avoid_polygons, options)
+    def route(self, points, profile, avoid_polygons, options, patrol_polygon = []):
+        params = self.prepareRouteParameters(points, profile, avoid_polygons, options, patrol_polygon)
         response = self._execute("route", json.dumps(params))
         return response
 

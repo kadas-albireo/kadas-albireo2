@@ -27,7 +27,7 @@ class ValhallaClient:
     def isAvailable(self):
         return self.connector.isAvailable()
 
-    def route(self, qgspoints, profile, avoid_polygons, options):
+    def route(self, qgspoints, profile, avoid_polygons, options, patrol_polygons = []):
         """
         Computes a route
 
@@ -45,10 +45,13 @@ class ValhallaClient:
 
         :returns: Output layer with a single geometry containing the route.
         :rtype: QgsVectorLayer
+
+        :param patrol_polygons: polygons for chinese postman
+        :type patrol_polygons: list, default = []
         """
         points = self.pointsFromQgsPoints(qgspoints)
         try:
-            response = self.connector.route(points, profile, avoid_polygons, options)
+            response = self.connector.route(points, profile, avoid_polygons, options, patrol_polygons)
         except Exception as e:
             raise ValhallaException(str(e))
         return response
