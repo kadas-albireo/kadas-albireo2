@@ -42,9 +42,7 @@ class OptimalRouteBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
-        self.areasToAvoidFootprint = QgsRubberBand(
-            iface.mapCanvas(), QgsWkbTypes.PolygonGeometry
-        )
+
 
     def clearPoints(self):
         self.waypointsSearchBox.clearSearchBox()

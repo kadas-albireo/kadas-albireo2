@@ -48,7 +48,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.patrolArea = None
         self.waypoints = []
         self.waypointPins = []
-        self.areasToAvoid = None
+        self.areasToAvoid = []
 
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
         self.btnClose.setToolTip(self.tr("Close routing dialog"))
@@ -90,11 +90,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
 
         iface.mapCanvas().mapToolSet.connect(self.mapToolSet)
 
-        self.areasToAvoidFootprint = QgsRubberBand(
-            iface.mapCanvas(), QgsWkbTypes.PolygonGeometry
-        )
-        self.areasToAvoidFootprint.setStrokeColor(AVOID_AREA_COLOR)
-        self.areasToAvoidFootprint.setWidth(2)
+        self.areasToAvoidFootprint = []
 
         self.populateLayerSelector()
         self.radioAreasToAvoidPolygon.toggled.connect(self._radioButtonsChanged)
@@ -106,6 +102,13 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         size = QDesktopWidget().screenGeometry()
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size() * 1.5)
+
+    @staticmethod
+    def createFootprintArea():
+        footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
+        footprint.setStrokeColor(AVOID_AREA_COLOR)
+        footprint.setWidth(2)
+        return footprint
 
     def populateLayerSelector(self):
         self.comboAreasToAvoidLayers.clear()
@@ -124,10 +127,14 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         )
         self.btnAreasToAvoidClear.setEnabled(self.radioAreasToAvoidPolygon.isChecked())
         if self.radioAreasToAvoidPolygon.isChecked():
-            if self.areasToAvoid is not None:
-                self.areasToAvoidFootprint.setToGeometry(self.areasToAvoid)
+            if self.areasToAvoid:
+                for geometry in self.areasToAvoid:
+                    footprint = self.createFootprintArea()
+                    footprint.setToGeometry(geometry)
+                    self.areasToAvoidFootprint.append(footprint)
         else:
-            self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
+            for footprint in self.areasToAvoidFootprint:
+                footprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def setPolygonDrawingMapTool(self, checked):
         if checked:
@@ -151,12 +158,17 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             self.btnAreasToAvoidFromCanvas.blockSignals(False)
 
     def clearAreasToAvoid(self):
-        self.areasToAvoid = None
-        self.areasToAvoidFootprint.reset(QgsWkbTypes.PolygonGeometry)
+        self.areasToAvoid = []
+        for footprint in self.areasToAvoidFootprint:
+            footprint.reset(QgsWkbTypes.PolygonGeometry)
+        self.areasToAvoidFootprint = []
 
     def setAreasToAvoidFromPolygon(self, polygon):
-        self.areasToAvoid = polygon
-        self.areasToAvoidFootprint.setToGeometry(polygon)
+        self.areasToAvoid.append(polygon)
+        footprint = self.createFootprintArea()
+        footprint.setToGeometry(polygon)
+        print(self.areasToAvoidFootprint)
+        self.areasToAvoidFootprint.append(footprint)
 
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)
@@ -200,8 +212,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                     self.tr("Custom polygon button is checked, but no polygon is drawn")
                 )
                 return
-            # make it a list to have the same data type as in the avoid layer
-            areasToAvoid = [areasToAvoid]
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
             if avoidLayer is not None:
