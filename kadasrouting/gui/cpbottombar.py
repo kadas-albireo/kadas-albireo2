@@ -98,16 +98,25 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
                 )
                 return
         elif self.radioPatrolAreaLayer.isChecked():
-            avoidLayer = self.comboPatrolAreaLayers.currentData()
-            if avoidLayer is not None:
-                layerCrs = avoidLayer.crs()
+            patrolLayer = self.comboPatrolAreaLayers.currentData()
+            if patrolLayer is not None:
+                layerCrs = patrolLayer.crs()
                 transformer = transformToWGS(layerCrs)
-                patrolArea = [f.geometry() for f in avoidLayer.getFeatures()]
+                patrolFeatures = [f for f in patrolLayer.getFeatures()]
+                if len(patrolFeatures) != 1:
+                    pushWarning(
+                        self.tr(
+                            "The polygon layer for Patrol must contain exactly only one polygon."
+                        )
+                    )
+                    return
+                else:
+                    patrolArea = patrolFeatures[0].geometry()
             else:
                 # If polygon layer button is checked, but no layer polygon is selected
                 pushWarning(
                     self.tr(
-                        "Polygon layer button is checked, but no layer polygon is selected"
+                        "Polygon layer button is checked for Patrol, but no layer polygon is selected"
                     )
                 )
                 return
@@ -118,21 +127,21 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             allPatrolAreaWGS = None
 
         # transform to WGS84 (Valhalla's requirement)
-        allPatrolAreaWGS = []
         if patrolArea:
-            for patrolAreaGeom in patrolArea:
-                patrolAreaJson = json.loads(patrolAreaGeom.asJson())
-                patrolAreaWGS = []
-                for i, polygon in enumerate(patrolAreaJson["coordinates"]):
-                    patrolAreaWGS.append([])
-                    for point in polygon:
-                        pointWGS = transformer.transform(point[0], point[1])
-                        patrolAreaWGS[i].append([pointWGS.x(), pointWGS.y()])
-                allPatrolAreaWGS.extend(patrolAreaWGS)
-        return layer, points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS
+            patrolAreaJson = json.loads(patrolArea.asJson())
+            patrolAreaWGS = []
+            for i, polygon in enumerate(patrolAreaJson["coordinates"]):
+                for point in polygon:
+                    pointWGS = transformer.transform(point[0], point[1])
+                    patrolAreaWGS.append([pointWGS.x(), pointWGS.y()])
+        return layer, points, profile, allAreasToAvoidWGS, costingOptions, patrolAreaWGS
 
     def calculate(self):
-        layer, points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS = self.prepareValhalla()
+        try:
+            layer, points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS = self.prepareValhalla()
+        except TypeError:
+            pushWarning(self.tr("Could not compute patrol: no polygon selected"))
+            return
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS)
             self.btnNavigate.setEnabled(True)
