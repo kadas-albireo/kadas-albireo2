@@ -3,13 +3,11 @@ import logging
 import json
 
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
 from qgis.core import QgsWkbTypes, QgsProject, QgsVectorLayer
 from qgis.utils import iface
-
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapToolPan
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
 from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 from kadasrouting.utilities import pushWarning, transformToWGS
@@ -26,15 +24,17 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
     def __init__(self, canvas, action, plugin):
         self.default_layer_name = "Patrol"
         self.patrolArea = None
-        self.patrolFootprint = self.createFootprintArea(color = PATROL_AREA_COLOR)
+        self.patrolFootprint = self.createFootprintArea(color=PATROL_AREA_COLOR)
         super().__init__(canvas, action, plugin)
-        
+
         self.btnPatrolAreaClear.clicked.connect(self.clearPatrol)
-        self.btnPatrolAreaCanvas.toggled.connect(self.setPatrolPolygonDrawingMapTool) # todo: use new instance of drawing tool
-        
+        self.btnPatrolAreaCanvas.toggled.connect(
+            self.setPatrolPolygonDrawingMapTool
+        )  # todo: use new instance of drawing tool
+
         self.radioPatrolAreaPolygon.toggled.connect(self._radioButtonsPatrolChanged)
         self.radioPatrolAreaLayer.toggled.connect(self._radioButtonsPatrolChanged)
-    
+
     def populatePatrolLayerSelector(self):
         self.comboPatrolAreaLayers.clear()
         for layer in QgsProject.instance().mapLayers().values():
@@ -70,9 +70,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
     def _radioButtonsPatrolChanged(self):
         self.populatePatrolLayerSelector()
         self.comboPatrolAreaLayers.setEnabled(self.radioPatrolAreaLayer.isChecked())
-        self.btnPatrolAreaCanvas.setEnabled(
-            self.radioPatrolAreaPolygon.isChecked()
-        )
+        self.btnPatrolAreaCanvas.setEnabled(self.radioPatrolAreaPolygon.isChecked())
         self.btnPatrolAreaClear.setEnabled(self.radioPatrolAreaPolygon.isChecked())
         if self.radioPatrolAreaPolygon.isChecked():
             if self.patrolArea is not None:
@@ -85,7 +83,13 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.patrolFootprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def prepareValhalla(self):
-        layer, points, profile, allAreasToAvoidWGS, costingOptions = super().prepareValhalla()
+        (
+            layer,
+            points,
+            profile,
+            allAreasToAvoidWGS,
+            costingOptions,
+        ) = super().prepareValhalla()
         if self.radioPatrolAreaPolygon.isChecked():
             # Currently only single polygon is accepted
             patrolArea = self.patrolArea
@@ -124,7 +128,6 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             # No areas to avoid
             patrolArea = None
             patrolAreaWGS = None
-            allPatrolAreaWGS = None
 
         # transform to WGS84 (Valhalla's requirement)
         if patrolArea:
@@ -138,12 +141,21 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
 
     def calculate(self):
         try:
-            layer, points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS = self.prepareValhalla()
+            (
+                layer,
+                points,
+                profile,
+                allAreasToAvoidWGS,
+                costingOptions,
+                allPatrolAreaWGS,
+            ) = self.prepareValhalla()
         except TypeError:
             pushWarning(self.tr("Could not compute patrol: no polygon selected"))
             return
         try:
-            layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS)
+            layer.updateRoute(
+                points, profile, allAreasToAvoidWGS, costingOptions, allPatrolAreaWGS
+            )
             self.btnNavigate.setEnabled(True)
         except Exception as e:
             LOG.error(e, exc_info=True)
@@ -151,4 +163,3 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             pushWarning(self.tr("Could not compute route"))
             LOG.error("Could not compute route")
             raise (e)
-

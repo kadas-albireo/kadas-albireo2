@@ -27,7 +27,7 @@ class ValhallaClient:
     def isAvailable(self):
         return self.connector.isAvailable()
 
-    def route(self, qgspoints, profile, avoid_polygons, options, patrol_polygons = []):
+    def route(self, qgspoints, profile, avoid_polygons, options, patrol_polygons=[]):
         """
         Computes a route
 
@@ -51,7 +51,9 @@ class ValhallaClient:
         """
         points = self.pointsFromQgsPoints(qgspoints)
         try:
-            response = self.connector.route(points, profile, avoid_polygons, options, patrol_polygons)
+            response = self.connector.route(
+                points, profile, avoid_polygons, options, patrol_polygons
+            )
         except Exception as e:
             raise ValhallaException(str(e))
         return response

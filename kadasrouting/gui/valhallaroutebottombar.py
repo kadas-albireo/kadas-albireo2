@@ -103,7 +103,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             self.setFixedSize(self.size() * 1.5)
 
     @staticmethod
-    def createFootprintArea(color = AVOID_AREA_COLOR):
+    def createFootprintArea(color=AVOID_AREA_COLOR):
         footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
         footprint.setStrokeColor(color)
         footprint.setWidth(2)
@@ -248,7 +248,13 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         return layer, points, profile, allAreasToAvoidWGS, costingOptions
 
     def calculate(self):
-        layer, points, profile, allAreasToAvoidWGS, costingOptions = self.prepareValhalla()
+        (
+            layer,
+            points,
+            profile,
+            allAreasToAvoidWGS,
+            costingOptions,
+        ) = self.prepareValhalla()
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)

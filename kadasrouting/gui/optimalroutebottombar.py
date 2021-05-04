@@ -12,11 +12,7 @@ from kadas.kadasgui import (
 from kadasrouting.gui.locationinputwidget import LocationInputWidget
 from kadasrouting.utilities import iconPath
 
-from qgis.utils import iface
-from qgis.core import (
-    QgsCoordinateReferenceSystem,
-    QgsWkbTypes,
-)
+from qgis.core import QgsCoordinateReferenceSystem
 
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
 
@@ -39,7 +35,6 @@ class OptimalRouteBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
-
 
     def clearPoints(self):
         self.waypointsSearchBox.clearSearchBox()
