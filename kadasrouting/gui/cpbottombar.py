@@ -81,7 +81,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             self.patrolFootprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def clearPatrol(self):
-        self.patrol = None
+        self.patrolArea = None
         self.patrolFootprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def prepareValhalla(self):
