@@ -45,7 +45,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.action = action
         self.plugin = plugin
         self.canvas = canvas
-        self.patrolArea = None
         self.waypoints = []
         self.waypointPins = []
         self.areasToAvoid = []
@@ -104,9 +103,9 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             self.setFixedSize(self.size() * 1.5)
 
     @staticmethod
-    def createFootprintArea():
+    def createFootprintArea(color = AVOID_AREA_COLOR):
         footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
-        footprint.setStrokeColor(AVOID_AREA_COLOR)
+        footprint.setStrokeColor(color)
         footprint.setWidth(2)
         return footprint
 

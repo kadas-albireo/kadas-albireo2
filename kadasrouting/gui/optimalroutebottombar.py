@@ -2,7 +2,7 @@ import os
 import logging
 
 from PyQt5 import uic
-from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtGui import QIcon
 
 from kadas.kadasgui import (
     KadasPinItem,
@@ -17,11 +17,8 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsWkbTypes,
 )
-from qgis.gui import QgsRubberBand
 
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
-
-AVOID_AREA_COLOR = QColor(255, 0, 0)
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
