@@ -130,10 +130,10 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         if patrolArea:
             patrolAreaJson = json.loads(patrolArea.asJson())
             patrolAreaWGS = []
-            for i, polygon in enumerate(patrolAreaJson["coordinates"]):
-                for point in polygon:
-                    pointWGS = transformer.transform(point[0], point[1])
-                    patrolAreaWGS.append([pointWGS.x(), pointWGS.y()])
+            polygon = patrolAreaJson["coordinates"][0]
+            for point in polygon:
+                pointWGS = transformer.transform(point[0], point[1])
+                patrolAreaWGS.append([pointWGS.x(), pointWGS.y()])
         return layer, points, profile, allAreasToAvoidWGS, costingOptions, patrolAreaWGS
 
     def calculate(self):
