@@ -231,7 +231,12 @@ bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &
   }
   else
   {
-    return QgsRectangle( rect ).intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+    QPoint screenPos = settings.mapToPixel().transform( rect.center() ).toQPointF().toPoint();
+    int selectedSymbol = -1;
+    QList<KadasMilxClient::NPointSymbol> symbols;
+    symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
+    QRect bbox;
+    return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
   }
 }
 
