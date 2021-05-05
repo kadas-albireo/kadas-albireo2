@@ -34,6 +34,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
 
         self.radioPatrolAreaPolygon.toggled.connect(self._radioButtonsPatrolChanged)
         self.radioPatrolAreaLayer.toggled.connect(self._radioButtonsPatrolChanged)
+        self.radioPatrolAreaPolygon.setChecked(True)
 
     def populatePatrolLayerSelector(self):
         self.comboPatrolAreaLayers.clear()
