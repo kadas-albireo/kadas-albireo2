@@ -163,3 +163,10 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             pushWarning(self.tr("Could not compute route"))
             LOG.error("Could not compute route")
             raise (e)
+
+    def actionToggled(self, toggled):
+        super().actionToggled(toggled)
+        if toggled:
+            pass
+        else:
+            self.clearPatrol()
