@@ -7,19 +7,14 @@ from PyQt5.QtCore import QTimer, pyqtSignal, Qt
 from PyQt5.QtGui import QColor, QPen, QBrush
 from PyQt5.QtWidgets import QAction
 
-from kadas.kadasgui import (
-    KadasPinItem,
-    KadasItemPos,
-    KadasItemLayer,
-    KadasGpxRouteItem
-)
+from kadas.kadasgui import KadasPinItem, KadasItemPos, KadasItemLayer, KadasGpxRouteItem
 
 from kadasrouting.utilities import (
     iconPath,
     waitcursor,
     pushWarning,
     decodePolyline6,
-    formatdist
+    formatdist,
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
@@ -32,7 +27,7 @@ from qgis.core import (
     QgsGeometry,
     QgsFeature,
     QgsDistanceArea,
-    QgsUnitTypes
+    QgsUnitTypes,
 )
 
 from kadasrouting.exceptions import ValhallaException
@@ -70,19 +65,21 @@ _icon_for_maneuver = {
     26: "direction_roundabout",
     27: "direction_roundabout",
     37: "direction_merge_right",
-    38: "direction_merge_left"
-    }
+    38: "direction_merge_left",
+}
 
 
 def icon_path_for_maneuver(maneuvertype):
     name = _icon_for_maneuver.get(maneuvertype, "dummy")
-    if name == 'dummy':
-        LOG.error('Icon for %s is not found' % maneuvertype)
+    if name == "dummy":
+        LOG.error("Icon for %s is not found" % maneuvertype)
     return _icon_path(name)
 
 
 def _icon_path(name):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", name + ".png")
+    return os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "icons", name + ".png"
+    )
 
 
 class NotInRouteException(Exception):
@@ -123,7 +120,9 @@ class OptimalRouteLayer(KadasItemLayer):
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.updateFromPins)
-        self.actionAddAsRegularLayer = QAction(self.tr("Add to project as regular layer"))
+        self.actionAddAsRegularLayer = QAction(
+            self.tr("Add to project as regular layer")
+        )
         self.actionAddAsRegularLayer.triggered.connect(self.addAsRegularLayer)
 
     def setResponse(self, response):
@@ -168,9 +167,13 @@ class OptimalRouteLayer(KadasItemLayer):
             pushWarning(self.tr("Could not compute route from polyline"))
 
     @waitcursor
-    def updateRoute(self, points, profile, avoid_polygons, costingOptions):
+    def updateRoute(
+        self, points, profile, avoid_polygons, costingOptions, patrol_polygons=[]
+    ):
         try:
-            response = self.valhalla.route(points, profile, avoid_polygons, costingOptions)
+            response = self.valhalla.route(
+                points, profile, avoid_polygons, costingOptions, patrol_polygons
+            )
             self.costingOptions = costingOptions
             self.profile = profile
             self.points = points
@@ -191,7 +194,9 @@ class OptimalRouteLayer(KadasItemLayer):
         self.duration = 0
         self.distance = 0
         for leg in response_mini["legs"]:
-            leg_coordinates = [list(reversed(coord)) for coord in decodePolyline6(leg["shape"])]
+            leg_coordinates = [
+                list(reversed(coord)) for coord in decodePolyline6(leg["shape"])
+            ]
             coordinates.extend(leg_coordinates)
             qgis_leg_coords = [QgsPointXY(x, y) for x, y in leg_coordinates]
             geom = QgsGeometry.fromPolylineXY(qgis_leg_coords)
@@ -213,10 +218,12 @@ class OptimalRouteLayer(KadasItemLayer):
         formatted_minute = (
             str(duration_minute) if duration_minute >= 10 else "0%d" % duration_minute
         )
-        tooltip = self.tr("Distance: {distance} km<br/>Time: {formatted_hour}h{formatted_minute}").format(
+        tooltip = self.tr(
+            "Distance: {distance} km<br/>Time: {formatted_hour}h{formatted_minute}"
+        ).format(
             distance=self.distance,
             formatted_hour=formatted_hour,
-            formatted_minute=formatted_minute
+            formatted_minute=formatted_minute,
         )
         self.lineItem.setTooltip(tooltip)
         # Line color: 005EFF
@@ -249,16 +256,16 @@ class OptimalRouteLayer(KadasItemLayer):
         closest_segment = None
         qgsdistance = QgsDistanceArea()
         qgsdistance.setSourceCrs(
-            QgsCoordinateReferenceSystem(4326),
-            QgsProject.instance().transformContext())
+            QgsCoordinateReferenceSystem(4326), QgsProject.instance().transformContext()
+        )
         qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
 
         legs = list(self.maneuvers.keys())
         for i, line in enumerate(legs):
             _, _pt, segment, _ = line.closestSegmentWithContext(pt)
             dist = qgsdistance.convertLengthMeasurement(
-                        qgsdistance.measureLine(pt, _pt),
-                        QgsUnitTypes.DistanceMeters)
+                qgsdistance.measureLine(pt, _pt), QgsUnitTypes.DistanceMeters
+            )
             if dist < min_dist:
                 closest_leg = line
                 closest_segment = segment
@@ -269,35 +276,42 @@ class OptimalRouteLayer(KadasItemLayer):
             leg_points = closest_leg.asPolyline()
             maneuvers = self.maneuvers[closest_leg]
             for i, maneuver in enumerate(maneuvers[:-1]):
-                if (maneuver["begin_shape_index"] < closest_segment
-                        and maneuver["end_shape_index"] >= closest_segment):
+                if (
+                    maneuver["begin_shape_index"] < closest_segment
+                    and maneuver["end_shape_index"] >= closest_segment
+                ):
                     points = [closest_point]
-                    points.extend(leg_points[closest_segment:maneuver["end_shape_index"]])
+                    points.extend(
+                        leg_points[closest_segment: maneuver["end_shape_index"]]
+                    )
                     distance_to_next = qgsdistance.convertLengthMeasurement(
-                                                qgsdistance.measureLine(points),
-                                                QgsUnitTypes.DistanceMeters)
+                        qgsdistance.measureLine(points), QgsUnitTypes.DistanceMeters
+                    )
 
-                    message = maneuvers[i + 1]['instruction']
+                    message = maneuvers[i + 1]["instruction"]
                     if i == len(maneuvers) - 2:
                         distance_to_next2 = None
                         message2 = ""
                         icon2 = _icon_path("transparentpixel")
                     else:
                         next_maneuver = maneuvers[i + 2]
-                        distance_to_next2 = maneuvers[i + 1]['length'] * 1000
-                        message2 = next_maneuver['instruction']
+                        distance_to_next2 = maneuvers[i + 1]["length"] * 1000
+                        message2 = next_maneuver["instruction"]
                         icon2 = icon_path_for_maneuver(maneuvers[i + 2]["type"])
 
                     icon = icon_path_for_maneuver(maneuvers[i + 1]["type"])
 
                     time_to_next = distance_to_next / 1000 / speed * 3600
                     try:
-                        maneuvers_ahead = maneuvers[i+1:]
+                        maneuvers_ahead = maneuvers[i + 1:]
                     except IndexError:
                         maneuvers_ahead = []
 
                     timeleft = time_to_next + sum([m["time"] for m in maneuvers_ahead])
-                    distanceleft = distance_to_next + sum([m["length"] for m in maneuvers_ahead]) * 1000
+                    distanceleft = (
+                        distance_to_next
+                        + sum([m["length"] for m in maneuvers_ahead]) * 1000
+                    )
 
                     delta = datetime.timedelta(seconds=timeleft)
                     timeleft_string = ":".join(str(delta).split(":")[:-1])
@@ -305,23 +319,32 @@ class OptimalRouteLayer(KadasItemLayer):
                     eta_string = eta.strftime("%H:%M")
 
                     displayed_point = KadasCoordinateFormat.instance().getDisplayString(
-                        closest_point, QgsCoordinateReferenceSystem(4326))
+                        closest_point, QgsCoordinateReferenceSystem(4326)
+                    )
 
-                    if ', ' not in displayed_point:
-                        displayed_point = displayed_point.replace(',', ', ')
+                    if ", " not in displayed_point:
+                        displayed_point = displayed_point.replace(",", ", ")
 
                     # Remove '.' character
-                    if message.endswith('.'):
+                    if message.endswith("."):
                         message = message[:-1]
-                    if message2.endswith('.'):
+                    if message2.endswith("."):
                         message2 = message2[:-1]
 
-                    maneuver = dict(dist=formatdist(distance_to_next), message=message, icon=icon,
-                                    dist2=formatdist(distance_to_next2), message2=message2, icon2=icon2,
-                                    speed=speed, timeleft=timeleft_string,
-                                    distleft=formatdist(distanceleft),
-                                    raw_distleft=distanceleft,
-                                    eta=eta_string, displayed_point=displayed_point)
+                    maneuver = dict(
+                        dist=formatdist(distance_to_next),
+                        message=message,
+                        icon=icon,
+                        dist2=formatdist(distance_to_next2),
+                        message2=message2,
+                        icon2=icon2,
+                        speed=speed,
+                        timeleft=timeleft_string,
+                        distleft=formatdist(distanceleft),
+                        raw_distleft=distanceleft,
+                        eta=eta_string,
+                        displayed_point=displayed_point,
+                    )
                     return maneuver
 
         raise NotInRouteException()
@@ -354,7 +377,8 @@ class OptimalRouteLayer(KadasItemLayer):
     def addAsRegularLayer(self):
         layer = QgsVectorLayer(
             "LineString?crs=epsg:4326&field=id:integer&field=distance:double&field=duration:double",
-            self.name(), "memory"
+            self.name(),
+            "memory",
         )
         pr = layer.dataProvider()
         feature = QgsFeature()

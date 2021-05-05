@@ -15,6 +15,7 @@ from kadas.kadasgui import KadasPluginInterface
 from kadasrouting.utilities import icon, pushWarning, tr
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
+from kadasrouting.gui.cpbottombar import CPBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
 from kadasrouting.gui.datacataloguebottombar import DataCatalogueBottomBar
 from kadasrouting.gui.navigationpanel import NavigationPanel
@@ -37,6 +38,7 @@ def testclientavailability(method):
             method(*args, **kw)
         else:
             pushWarning(tr("Valhalla is not installed or it cannot be found"))
+
     return func
 
 
@@ -46,6 +48,7 @@ class RoutingPlugin(QObject):
 
         self.iface = KadasPluginInterface.cast(iface)
         self.optimalRouteBar = None
+        self.cpBar = None
         self.reachabilityBar = None
         self.dataCatalogueBar = None
         self.navigationPanel = None
@@ -57,6 +60,10 @@ class RoutingPlugin(QObject):
             self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
 
+        # Chinese Postaman menu
+        self.cpAction = QAction(icon("chinesepostman.png"), self.tr("Chinese Postman"))
+        self.iface.addAction(self.cpAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
+
         # Reachability menu
         self.reachabilityAction = QAction(
             icon("reachability.png"), self.tr("Reachability")
@@ -66,17 +73,13 @@ class RoutingPlugin(QObject):
         )
 
         # Navigation menu
-        self.navigationAction = QAction(
-            icon("navigate.png"), self.tr("Navigate")
-        )
+        self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
         self.iface.addAction(
             self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
 
         # Day and Night
-        self.dayNightAction = QAction(
-            icon("day-and-night.png"), self.tr("Day / Night")
-        )
+        self.dayNightAction = QAction(icon("day-and-night.png"), self.tr("Day / Night"))
         # Removed until we have one
         # self.iface.addAction(
         #     self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
@@ -93,8 +96,9 @@ class RoutingPlugin(QObject):
             self.navigationAction: self.showNavigation,
             self.reachabilityAction: self.showReachability,
             self.optimalRouteAction: self.showOptimalRoute,
-            self.dataCatalogueAction: self.showDataCatalogue
-            }
+            self.cpAction: self.showCP,
+            self.dataCatalogueAction: self.showDataCatalogue,
+        }
 
         # Handling unique active action
         for action in self.actionsToggled:
@@ -111,13 +115,18 @@ class RoutingPlugin(QObject):
         try:
             self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
         except Exception as e:
-            LOG.debug('Can not connect to ribbon widget currentChange signal because %s' % e)
-            message = 'Changing tab will not close a routing plugin panel because your Kadas does not support it yet.'
+            LOG.debug(
+                "Can not connect to ribbon widget currentChange signal because %s" % e
+            )
+            message = "Changing tab will not close a routing plugin panel because your Kadas does not support it yet."
             pushWarning(message)
 
     def unload(self):
         self.iface.removeAction(
             self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
+        self.iface.removeAction(
+            self.cpAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
         self.iface.removeAction(
             self.reachabilityAction, self.iface.PLUGIN_MENU, self.iface.ANALYSIS_TAB
@@ -148,15 +157,24 @@ class RoutingPlugin(QObject):
         if show:
             if self.optimalRouteBar is None:
                 self.optimalRouteBar = OptimalRouteBottomBar(
-                    self.iface.mapCanvas(),
-                    self.optimalRouteAction,
-                    self
+                    self.iface.mapCanvas(), self.optimalRouteAction, self
                 )
             self.showDisclaimer()
             self.optimalRouteBar.show()
         else:
             if self.optimalRouteBar is not None:
                 self.optimalRouteBar.hide()
+
+    @testclientavailability
+    def showCP(self, show=True):
+        if show:
+            if self.cpBar is None:
+                self.cpBar = CPBottomBar(self.iface.mapCanvas(), self.cpAction, self)
+            self.showDisclaimer()
+            self.cpBar.show()
+        else:
+            if self.cpBar is not None:
+                self.cpBar.hide()
 
     @testclientavailability
     def showReachability(self, show=True):
@@ -178,10 +196,16 @@ class RoutingPlugin(QObject):
                 self.navigationPanel = NavigationPanel()
 
                 def _resize():
-                    x = self.iface.mapCanvas().width() - self.navigationPanel.FIXED_WIDTH
+                    x = (
+                        self.iface.mapCanvas().width()
+                        - self.navigationPanel.FIXED_WIDTH
+                    )
                     y = self.iface.mapCanvas().height() / 3
                     height = 2 * self.iface.mapCanvas().height() / 3
-                    self.navigationPanel.setGeometry(x, y, self.navigationPanel.FIXED_WIDTH, height)
+                    self.navigationPanel.setGeometry(
+                        x, y, self.navigationPanel.FIXED_WIDTH, height
+                    )
+
                 self.iface.mapCanvas().extentsChanged.connect(_resize)
                 self.navigationPanel.setParent(self.iface.mapCanvas())
                 _resize()
@@ -195,8 +219,7 @@ class RoutingPlugin(QObject):
         if show:
             if self.dataCatalogueBar is None:
                 self.dataCatalogueBar = DataCatalogueBottomBar(
-                    self.iface.mapCanvas(),
-                    self.dataCatalogueAction
+                    self.iface.mapCanvas(), self.dataCatalogueAction
                 )
             self.showDisclaimer()
             self.dataCatalogueBar.show()
@@ -212,6 +235,6 @@ class RoutingPlugin(QObject):
 
     def toggleDayNight(self, day=True):
         if day:
-            pushWarning('Show day map')
+            pushWarning("Show day map")
         else:
-            pushWarning('show night map')
+            pushWarning("show night map")

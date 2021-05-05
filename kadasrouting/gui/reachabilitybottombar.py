@@ -6,32 +6,23 @@ from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
 
-from kadas.kadasgui import (
-    KadasBottomBar
-)
+from kadas.kadasgui import KadasBottomBar
 
 from kadasrouting.gui.locationinputwidget import (
     LocationInputWidget,
-    WrongLocationException
+    WrongLocationException,
 )
 from kadasrouting.core import vehicles
-from kadasrouting.utilities import (
-    iconPath,
-    pushMessage,
-    pushWarning
-)
+from kadasrouting.utilities import iconPath, pushMessage, pushWarning
 
 from qgis.core import (
     QgsProject,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
-    QgsRectangle
+    QgsRectangle,
 )
 
-from kadasrouting.core.isochroneslayer import (
-    generateIsochrones,
-    OverwriteError
-)
+from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
 from kadasrouting.exceptions import Valhalla400Exception
 
@@ -60,7 +51,10 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
         # Set the anchor to 0.5, 0.5 because the center of the cross needs to be in the position
         self.originSearchBox = LocationInputWidget(
-            canvas, locationSymbolPath=iconPath("blue_cross.svg"), pinAnchorX=0.5, pinAnchorY=0.5
+            canvas,
+            locationSymbolPath=iconPath("blue_cross.svg"),
+            pinAnchorX=0.5,
+            pinAnchorY=0.5,
         )
         self.layout().addWidget(self.originSearchBox, 0, 1)
 
@@ -132,12 +126,18 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         try:
             point = self.originSearchBox.point
         except WrongLocationException as e:
-            pushWarning(self.tr("Invalid location: {error_message}").format(error_message=str(e)))
+            pushWarning(
+                self.tr("Invalid location: {error_message}").format(
+                    error_message=str(e)
+                )
+            )
             return
         try:
             intervals = self.getInterval()
             if not (1 <= len(intervals) <= 10):
-                raise Exception(self.tr("Must have at least one and maximum 10 intervals."))
+                raise Exception(
+                    self.tr("Must have at least one and maximum 10 intervals.")
+                )
         except Exception as e:
             pushWarning("Invalid intervals: %s" % str(e))
             return
@@ -145,24 +145,37 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         vehicle = self.comboBoxVehicles.currentIndex()
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
-        is_isodistance = self.comboBoxReachabilityMode.currentText() == self.reachabilityMode["isodistance"]
-        costingOptions['shortest'] = is_isodistance
+        is_isodistance = (
+            self.comboBoxReachabilityMode.currentText()
+            == self.reachabilityMode["isodistance"]
+        )
+        costingOptions["shortest"] = is_isodistance
 
         colors = []
         try:
             colors = self.getColorFromInterval()
             generateIsochrones(
-                point, profile, costingOptions, intervals, colors, self.getBasename(), overwrite)
+                point,
+                profile,
+                costingOptions,
+                intervals,
+                colors,
+                self.getBasename(),
+                overwrite,
+            )
         except OverwriteError as e:
             LOG.error(e)
-            pushWarning(self.tr('Please change the basename or activate the overwrite checkbox'))
+            pushWarning(
+                self.tr("Please change the basename or activate the overwrite checkbox")
+            )
         except Valhalla400Exception as e:
             # Expecting the content can be parsed as JSON, see
             # https://valhalla.readthedocs.io/en/latest/api/turn-by-turn/api-reference/#http-status-codes-and-conditions
             json_error = json.loads(str(e))
             pushWarning(
                 self.tr('Can not generate the error because "{error_message}"').format(
-                    error_message=json_error.get("error"))
+                    error_message=json_error.get("error")
+                )
             )
         except Exception as e:
             pushWarning("could not generate isochrones")
@@ -180,11 +193,17 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             try:
                 self.canvas.extentsChanged.disconnect(self.setCenterAsSelected)
             except TypeError as e:
-                LOG.debug('self.canvas.extentsChanged.disconnect(self.setCenterAsSelected) %s' % e)
+                LOG.debug(
+                    "self.canvas.extentsChanged.disconnect(self.setCenterAsSelected) %s"
+                    % e
+                )
             try:
                 self.originSearchBox.pointUpdated.disconnect(self.centerMap)
             except TypeError as e:
-                LOG.debug('self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s' % e)
+                LOG.debug(
+                    "self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s"
+                    % e
+                )
 
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
@@ -203,11 +222,12 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             pushMessage(str(e))
             self.lineEditBasename.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip(self.tr("Please make sure the basename is correct."))
+            self.btnCalculate.setToolTip(
+                self.tr("Please make sure the basename is correct.")
+            )
 
     def getBasename(self):
-        """Get basename as string
-        """
+        """Get basename as string"""
         return self.lineEditBasename.text()
 
     def setBasenameToolTip(self):
@@ -233,7 +253,9 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
             pushMessage(str(e))
             self.lineEditIntervals.setStyleSheet("color: red;")
             self.btnCalculate.setEnabled(False)
-            self.btnCalculate.setToolTip(self.tr("Please make sure the interval is correct."))
+            self.btnCalculate.setToolTip(
+                self.tr("Please make sure the interval is correct.")
+            )
 
     def getInterval(self):
         """Get interval of as a list of integer or float based on the current mode.
@@ -257,8 +279,10 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
 
     def setIntervalToolTip(self):
         """Set the tool tip for interval line edit based on the current mode."""
-        if (self.comboBoxReachabilityMode.currentText()
-                == self.reachabilityMode["isochrone"]):
+        if (
+            self.comboBoxReachabilityMode.currentText()
+            == self.reachabilityMode["isochrone"]
+        ):
             self.lineEditIntervals.setToolTip(
                 self.tr('Set interval as integer in minutes, separated by ";" symbol')
             )
@@ -274,19 +298,79 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         colors = {
             1: [first_color],
             2: [first_color, last_color],
-            3: [first_color, 'CCCC00', last_color],
-            4: [first_color, '88CC00', 'CC8800', last_color],
-            5: [first_color, '66CC00', 'CCCC00', 'CC6600', last_color],
-            6: [first_color, '51CC00', 'A3CC00', 'CCA300', 'CC5100', last_color],
-            7: [first_color, '43CC00', '88CC00', 'CCCC00', 'CC8800', 'CC4300', last_color],
-            8: [first_color, '3ACC00', '74CC00', 'AECC00', 'CCAE00', 'CC7400', 'CC3A00', last_color],
-            9: [first_color, '33CC00', '66CC00', '99CC00', 'CCCC00', 'CC9900', 'CC6600', 'CC3300', last_color],
-            10: [first_color, '2DCC00', '5ACC00', '88CC00', 'B5CC00', 'CCB500', 'CC8800', 'CC5A00', 'CC2D00',
-                 last_color],
-            11: [first_color, '28CC00', '51CC00', '7ACC00', 'A3CC00', 'CCCC00', 'CCA300', 'CC7A00', 'CC5100',
-                 'CC2800', last_color],
-            12: [first_color, '25CC00', '4ACC00', '6FCC00', '94CC00', 'B9CC00', 'CCB900', 'CC9400', 'CC6F00',
-                 'CC4A00', 'CC2500', last_color]
+            3: [first_color, "CCCC00", last_color],
+            4: [first_color, "88CC00", "CC8800", last_color],
+            5: [first_color, "66CC00", "CCCC00", "CC6600", last_color],
+            6: [first_color, "51CC00", "A3CC00", "CCA300", "CC5100", last_color],
+            7: [
+                first_color,
+                "43CC00",
+                "88CC00",
+                "CCCC00",
+                "CC8800",
+                "CC4300",
+                last_color,
+            ],
+            8: [
+                first_color,
+                "3ACC00",
+                "74CC00",
+                "AECC00",
+                "CCAE00",
+                "CC7400",
+                "CC3A00",
+                last_color,
+            ],
+            9: [
+                first_color,
+                "33CC00",
+                "66CC00",
+                "99CC00",
+                "CCCC00",
+                "CC9900",
+                "CC6600",
+                "CC3300",
+                last_color,
+            ],
+            10: [
+                first_color,
+                "2DCC00",
+                "5ACC00",
+                "88CC00",
+                "B5CC00",
+                "CCB500",
+                "CC8800",
+                "CC5A00",
+                "CC2D00",
+                last_color,
+            ],
+            11: [
+                first_color,
+                "28CC00",
+                "51CC00",
+                "7ACC00",
+                "A3CC00",
+                "CCCC00",
+                "CCA300",
+                "CC7A00",
+                "CC5100",
+                "CC2800",
+                last_color,
+            ],
+            12: [
+                first_color,
+                "25CC00",
+                "4ACC00",
+                "6FCC00",
+                "94CC00",
+                "B9CC00",
+                "CCB900",
+                "CC9400",
+                "CC6F00",
+                "CC4A00",
+                "CC2500",
+                last_color,
+            ],
         }
         if num_interval not in colors.keys():
             return []

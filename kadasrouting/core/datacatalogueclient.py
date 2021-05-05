@@ -18,14 +18,14 @@ from kadasrouting.utilities import appDataDir, waitcursor, pushWarning, tr
 LOG = logging.getLogger(__name__)
 
 DEFAULT_REPOSITORY_URLS = [
-    'https://ch-milgeo.maps.arcgis.com/sharing/rest',
-    'https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest'
+    "https://ch-milgeo.maps.arcgis.com/sharing/rest",
+    "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest",
 ]
 
 DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
 
 
-class DataCatalogueClient():
+class DataCatalogueClient:
 
     # Status of data tiles
     NOT_INSTALLED = 0  # Available on remote repository, but not in local file system
@@ -43,44 +43,46 @@ class DataCatalogueClient():
 
     @staticmethod
     def dataTimestamp(itemid):
-        filename = os.path.join(DataCatalogueClient.folderForDataItem(itemid), "metadata")
+        filename = os.path.join(
+            DataCatalogueClient.folderForDataItem(itemid), "metadata"
+        )
         try:
             with open(filename) as f:
                 timestamp = json.load(f)["modified"]
-            LOG.debug('timestamp is %s' % timestamp)
+            LOG.debug("timestamp is %s" % timestamp)
             return timestamp
         except Exception as e:
-            LOG.debug('metadata file is failed to read: %s' % e)
+            LOG.debug("metadata file is failed to read: %s" % e)
             return None
 
     def getTiles(self):
         try:
             remote_tiles = self.getRemoteTiles()
         except Exception as e:
-            pushWarning('Cannot get tiles from the URL because %s ' % str(e))
+            pushWarning("Cannot get tiles from the URL because %s " % str(e))
             remote_tiles = []
         local_tiles = self.getLocalTiles()
         # Merge the tiles
         all_tiles = []
         all_tiles.extend(remote_tiles)
-        remote_tile_ids = [remote_tile['id'] for remote_tile in remote_tiles]
+        remote_tile_ids = [remote_tile["id"] for remote_tile in remote_tiles]
         for local_tile in local_tiles:
-            if local_tile['id'] not in remote_tile_ids:
+            if local_tile["id"] not in remote_tile_ids:
                 all_tiles.append(local_tile)
 
         return all_tiles
 
     def getRemoteTiles(self):
         query = QUrlQuery()
-        url = QUrl(f'{self.url}/search')
-        query.addQueryItem('q', 'owner:%22geosupport.fsta%22%20tags:%22valhalla%22')
-        query.addQueryItem('f', 'pjson')
+        url = QUrl(f"{self.url}/search")
+        query.addQueryItem("q", "owner:%22geosupport.fsta%22%20tags:%22valhalla%22")
+        query.addQueryItem("f", "pjson")
         url.setQuery(query.query())
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
         if response.error() != QNetworkReply.NoError:
             raise Exception(response.errorString())
         responsejson = json.loads(response.content().data())
-        LOG.debug('response from data repository: %s' % responsejson)
+        LOG.debug("response from data repository: %s" % responsejson)
         tiles = []
         for result in responsejson["results"]:
             itemid = result["id"]
@@ -111,7 +113,7 @@ class DataCatalogueClient():
                 LOG.debug(metadata_file)
                 with open(metadata_file) as f:
                     tile = json.load(f)
-                    tile['status'] = DataCatalogueClient.LOCAL_ONLY
+                    tile["status"] = DataCatalogueClient.LOCAL_ONLY
                 local_tiles.append(tile)
             except Exception as e:
                 LOG.debug(e)
@@ -122,7 +124,7 @@ class DataCatalogueClient():
         self._downloadAndUnzip(itemid)
         if os.path.exists(self.folderForDataItem(itemid)):
             filename = os.path.join(self.folderForDataItem(itemid), "metadata")
-            LOG.debug('install data on %s' % filename)
+            LOG.debug("install data on %s" % filename)
             with open(filename, "w") as f:
                 json.dump(data, f)
             return True
@@ -130,24 +132,24 @@ class DataCatalogueClient():
             return False
 
     def update_progress(self, current, maximum):
-        LOG.debug('Progress %s of %s' % (current, maximum))
+        LOG.debug("Progress %s of %s" % (current, maximum))
         try:
             self.progress_bar.setMaximum(maximum)
             self.progress_bar.setValue(current)
         except Exception as e:
-            LOG.debug('Error of update progress: %s' % e)
+            LOG.debug("Error of update progress: %s" % e)
 
     def download_finished(self):
         self.progess_message_bar.dismiss()
-        LOG.debug('Download finished')
+        LOG.debug("Download finished")
 
     def download_canceled(self):
-        pushWarning(tr('Download is canceled!'))
-        LOG.debug('Download is canceled')
+        pushWarning(tr("Download is canceled!"))
+        LOG.debug("Download is canceled")
 
     def widget_removed(self, widget_item):
         if widget_item == self.progess_message_bar:
-            LOG.debug('Cancel download')
+            LOG.debug("Cancel download")
             self.downloader.cancelDownload()
 
     @waitcursor
@@ -155,7 +157,9 @@ class DataCatalogueClient():
         self.progress_bar = QProgressBar()
         self.progress_bar.setMinimum(0)
         self.progress_bar.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.progess_message_bar = self.iface.messageBar().createMessage(tr("Downloading..."))
+        self.progess_message_bar = self.iface.messageBar().createMessage(
+            tr("Downloading...")
+        )
         self.progess_message_bar.layout().addWidget(self.progress_bar)
 
         self.iface.messageBar().pushWidget(self.progess_message_bar, Qgis.Info)
@@ -163,16 +167,16 @@ class DataCatalogueClient():
         # self.iface.messageBar().widgetRemoved.connect(self.widget_removed)
 
         def extract_data(tmpPath, itemid):
-            LOG.debug('Extract data')
+            LOG.debug("Extract data")
             try:
                 targetFolder = DataCatalogueClient.folderForDataItem(itemid)
                 QDir(targetFolder).removeRecursively()
                 unzip.unzip(tmpPath, targetFolder)
                 QFile(tmpPath).remove()
             except Exception as e:
-                LOG.debug('Error on extracting data %s' % e)
+                LOG.debug("Error on extracting data %s" % e)
 
-        url = f'{self.url}/content/items/{itemid}/data'
+        url = f"{self.url}/content/items/{itemid}/data"
         tmpDir = QDir.tempPath()
         filename = f"{itemid}.zip"
         tmpPath = QDir.cleanPath(os.path.join(tmpDir, filename))
@@ -180,7 +184,9 @@ class DataCatalogueClient():
         self.downloader = QgsFileDownloader(QUrl(url), tmpPath)
         self.downloader.downloadProgress.connect(self.update_progress)
         self.downloader.downloadCompleted.connect(self.download_finished)
-        self.downloader.downloadCompleted.connect(partial(extract_data, tmpPath, itemid))
+        self.downloader.downloadCompleted.connect(
+            partial(extract_data, tmpPath, itemid)
+        )
         self.downloader.downloadCanceled.connect(self.download_canceled)
         self.downloader.downloadExited.connect(loop.quit)
         loop.exec_()
@@ -188,7 +194,7 @@ class DataCatalogueClient():
     @staticmethod
     def uninstall(itemid):
         path = DataCatalogueClient.folderForDataItem(itemid)
-        LOG.debug('uninstall/remove from %s' % path)
+        LOG.debug("uninstall/remove from %s" % path)
         return QDir(DataCatalogueClient.folderForDataItem(itemid)).removeRecursively()
 
     @staticmethod

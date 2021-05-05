@@ -8,8 +8,9 @@ _vehicles_reduced = []
 
 VEHICLE_REDUCED_NAMES = ["WALK", "BICYCLE", "CAR"]
 
-vehicles_file = os.path.join(os.path.dirname(
-            os.path.dirname(__file__)), "resources", "vehicles.csv")
+vehicles_file = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "resources", "vehicles.csv"
+)
 
 vehicle_name_column = f"type_{localeName()}".lower()
 
@@ -18,7 +19,7 @@ COST_MODEL = "cost_model"
 HEIGHT = "height_m"
 LENGTH = "length_m"
 WIDTH = "width_m"
-MAX_SPEED = 'max_speed_kmh'
+MAX_SPEED = "max_speed_kmh"
 
 
 def read_vehicles():
@@ -52,12 +53,12 @@ def options_for_vehicle(i):
     profile = vehicle[COST_MODEL]
     costing_options = {}
     if profile == "truck":
-        costing_options['height'] = vehicle[HEIGHT]
-        costing_options['width'] = vehicle[WIDTH]
-        costing_options['length'] = vehicle[LENGTH]
+        costing_options["height"] = vehicle[HEIGHT]
+        costing_options["width"] = vehicle[WIDTH]
+        costing_options["length"] = vehicle[LENGTH]
     # Max speed
-    if profile in ['auto', 'truck', 'motorcycle']:
-        costing_options['top_speed'] = vehicle[MAX_SPEED]
+    if profile in ["auto", "truck", "motorcycle"]:
+        costing_options["top_speed"] = vehicle[MAX_SPEED]
     # Note for Max Speed:
     # There is not max speed costing option for bicycle and pedestrian, but there are
     # cycling_speed and walking_speed for the average speed on cycling or walking

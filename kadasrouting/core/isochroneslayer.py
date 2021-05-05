@@ -17,7 +17,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsGeometry,
     QgsSvgMarkerSymbolLayer,
-    QgsMarkerSymbolLayer
+    QgsMarkerSymbolLayer,
 )
 
 LOG = logging.getLogger(__name__)
@@ -31,8 +31,7 @@ valhalla = ValhallaClient.getInstance()
 
 
 def getFeaturesFromResponse(response):
-    """Return a list of features from a valhalla response object
-    """
+    """Return a list of features from a valhalla response object"""
     codec = QTextCodec.codecForName("UTF-8")
     fields = QgsJsonUtils.stringToFields(json.dumps(response), codec)
     features = QgsJsonUtils.stringToFeatureList(json.dumps(response), fields, codec)
@@ -40,13 +39,15 @@ def getFeaturesFromResponse(response):
 
 
 @waitcursor
-def generateIsochrones(point, profile, costingOptions, intervals, colors, basename, overwrite=True):
+def generateIsochrones(
+    point, profile, costingOptions, intervals, colors, basename, overwrite=True
+):
     response = valhalla.isochrones(point, profile, costingOptions, intervals, colors)
     features = getFeaturesFromResponse(response)
-    if costingOptions.get('shortest'):
-        suffix = 'km'
+    if costingOptions.get("shortest"):
+        suffix = "km"
     else:
-        suffix = 'min'
+        suffix = "min"
     for interval, feature in zip(intervals[::-1], features):
         # FIXME: we should use the 'contour' property in the feature to be sure of the contour line that we are
         # drawing, but due to a bug in qgis json parser, this property appears to be always set to '0'
@@ -57,10 +58,10 @@ def generateIsochrones(point, profile, costingOptions, intervals, colors, basena
             if overwrite:
                 QgsProject.instance().removeMapLayer(existinglayer.id())
             else:
-                raise OverwriteError(tr(
-                    "layer {layername} already exists and overwrite is {overwrite}").format(
-                        layername=layername, overwrite=overwrite
-                    )
+                raise OverwriteError(
+                    tr(
+                        "layer {layername} already exists and overwrite is {overwrite}"
+                    ).format(layername=layername, overwrite=overwrite)
                 )
         except IndexError:
             LOG.debug("this layer was not found: {}".format(layername))
@@ -87,16 +88,18 @@ def generateIsochrones(point, profile, costingOptions, intervals, colors, basena
         layer.setRenderer(renderer)
 
     # Add center of reachability
-    center_point_layer_name = tr('Center of {basename}').format(basename=basename)
+    center_point_layer_name = tr("Center of {basename}").format(basename=basename)
     try:
-        existinglayer = QgsProject.instance().mapLayersByName(center_point_layer_name)[0]
+        existinglayer = QgsProject.instance().mapLayersByName(center_point_layer_name)[
+            0
+        ]
         if overwrite:
             QgsProject.instance().removeMapLayer(existinglayer.id())
         else:
-            raise OverwriteError(tr(
-                "layer {layername} already exists and overwrite is {overwrite}").format(
-                    layername=center_point_layer_name, overwrite=overwrite
-                )
+            raise OverwriteError(
+                tr(
+                    "layer {layername} already exists and overwrite is {overwrite}"
+                ).format(layername=center_point_layer_name, overwrite=overwrite)
             )
     except IndexError:
         LOG.debug("this layer was not found: {}".format(center_point_layer_name))
