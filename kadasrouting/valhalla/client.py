@@ -27,7 +27,7 @@ class ValhallaClient:
     def isAvailable(self):
         return self.connector.isAvailable()
 
-    def route(self, qgspoints, profile, avoid_polygons, options, patrol_polygons=[]):
+    def route(self, qgspoints, profile, avoid_polygons, options, patrol_polygons=None):
         """
         Computes a route
 
@@ -47,7 +47,7 @@ class ValhallaClient:
         :rtype: QgsVectorLayer
 
         :param patrol_polygons: polygons for chinese postman
-        :type patrol_polygons: list, default = []
+        :type patrol_polygons: list, default = None
         """
         points = self.pointsFromQgsPoints(qgspoints)
         try:

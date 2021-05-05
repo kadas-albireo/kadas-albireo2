@@ -152,7 +152,7 @@ class ConsoleConnector(Connector):
             raise Exception(response["error"])
         return response
 
-    def route(self, points, profile, avoid_polygons, options, patrol_polygon=[]):
+    def route(self, points, profile, avoid_polygons, options, patrol_polygon=None):
         params = self.prepareRouteParameters(
             points, profile, avoid_polygons, options, patrol_polygon
         )
