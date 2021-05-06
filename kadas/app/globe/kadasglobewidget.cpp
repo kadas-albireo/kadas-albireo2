@@ -140,7 +140,7 @@ void KadasGlobeWidget::buildLayerSelectionMenu( bool syncMainLayers )
     bool isVisibleInMainCanvas = mainCanvas->layers().contains( layer );
     if ( syncMainLayers )
     {
-      layerAction->setChecked( isVisibleInMainCanvas && !( isRemote || isHeightmap ) );
+      layerAction->setChecked( isVisibleInMainCanvas );
     }
     else
     {
