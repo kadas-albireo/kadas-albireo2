@@ -4031,12 +4031,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="208"/>
         <source>Compressed MilX Layer (*.milxlyz)</source>
-        <translation>Couce MilX comprimé (*.milxlyz)</translation>
+        <translation>Couche MilX comprimé (*.milxlyz)</translation>
     </message>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="209"/>
         <source>MilX Layer (*.milxly)</source>
-        <translation>Couce MilX comprimé (*.milxlyz)</translation>
+        <translation>Couche MilX (*.milxly)</translation>
     </message>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="214"/>
