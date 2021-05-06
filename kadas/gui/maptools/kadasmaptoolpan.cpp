@@ -159,7 +159,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
     }
     else if ( mAllowItemInteraction && mPickClick )
     {
-      KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), QgsWkbTypes::UnknownGeometry );
+      KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), QgsWkbTypes::UnknownGeometry );
       if ( !result.isEmpty() )
       {
         emit itemPicked( result );
@@ -182,7 +182,7 @@ bool KadasMapToolPan::gestureEvent( QGestureEvent *event )
 bool KadasMapToolPan::canvasToolTipEvent( QHelpEvent *e )
 {
   QPoint canvasPos = e->pos();
-  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, canvasPos, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ) );
+  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ) );
   if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     QString tooltip = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId]->tooltip();

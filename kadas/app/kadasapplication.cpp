@@ -1351,7 +1351,7 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
 
 void KadasApplication::showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos )
 {
-  KadasCanvasContextMenu( mMainWindow->mapCanvas(), screenPos, mapPos ).exec( mMainWindow->mapCanvas()->mapToGlobal( screenPos ) );
+  KadasCanvasContextMenu( mMainWindow->mapCanvas(), mapPos ).exec( mMainWindow->mapCanvas()->mapToGlobal( screenPos ) );
 }
 
 void KadasApplication::updateWindowTitle()

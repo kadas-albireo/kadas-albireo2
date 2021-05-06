@@ -254,6 +254,7 @@ Bounding box in geographic coordinates */
 %Docstring
 Hit test, rect in item crs */
 %End
+    virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings) const;
 
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 %Docstring

@@ -35,7 +35,7 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const override;
+    ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const override;
 
     void setApproved( bool approved );
     bool isApproved() const { return mIsApproved; }

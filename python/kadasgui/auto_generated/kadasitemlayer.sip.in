@@ -137,8 +137,7 @@ class KadasItemLayer : KadasPluginLayer
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
 
-    virtual KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
-    KadasItemLayer::ItemId pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
+    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const;
 
 
 

@@ -32,7 +32,7 @@ class KadasCanvasContextMenu : public QMenu
 {
     Q_OBJECT
   public:
-    KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos );
+    KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
     ~KadasCanvasContextMenu();
 
   private slots:

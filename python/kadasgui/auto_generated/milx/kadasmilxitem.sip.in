@@ -40,6 +40,8 @@ class KadasMilxItem : KadasMapItem
 
     virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const;
 
+    virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings) const;
+
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
 

@@ -91,22 +91,14 @@ void KadasMapToolEditItemGroup::deactivate()
 
 void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
 {
-  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mCanvas->mapSettings() );
-  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
-  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
-  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  KadasMapRect filterRect;
-  filterRect.setXMinimum( e->mapPoint().x() - radiusmu );
-  filterRect.setXMaximum( e->mapPoint().x() + radiusmu );
-  filterRect.setYMinimum( e->mapPoint().y() - radiusmu );
-  filterRect.setYMaximum( e->mapPoint().y() + radiusmu );
+  KadasMapPos hitPos = KadasMapPos::fromPoint( e->mapPoint() );
 
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
     // First, test selected items
     for ( KadasMapItem *item : mItems )
     {
-      if ( item->intersects( filterRect, mCanvas->mapSettings() ) )
+      if ( item->hitTest( hitPos, mCanvas->mapSettings() ) )
       {
         deselectItem( item );
         updateSelection();
@@ -123,7 +115,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
       }
     }
     // Then, test layer for new items to select
-    KadasItemLayer::ItemId itemId = mLayer->pickItem( filterRect, mCanvas->mapSettings() );
+    KadasItemLayer::ItemId itemId = mLayer->pickItem( hitPos, mCanvas->mapSettings() );
     if ( itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       KadasMapItem *item = mLayer->takeItem( itemId );
@@ -145,7 +137,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
   }
   else if ( e->button() == Qt::RightButton )
   {
-    if ( mSelectionRect->intersects( filterRect, mCanvas->mapSettings() ) )
+    if ( mSelectionRect->hitTest( hitPos, mCanvas->mapSettings() ) )
     {
       QMenu menu;
       menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItemGroup::cutItems );

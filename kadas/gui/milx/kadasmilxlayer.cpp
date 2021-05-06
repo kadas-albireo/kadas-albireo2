@@ -101,14 +101,14 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
   return new Renderer( this, rendererContext );
 }
 
-KadasItemLayer::ItemId KadasMilxLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const
 {
   if ( mIsApproved )
   {
     // No items can be picked from approved layer
     return ITEM_ID_NULL;
   }
-  QPoint screenPos = mapSettings.mapToPixel().transform( pickRect.center() ).toQPointF().toPoint();
+  QPoint screenPos = mapSettings.mapToPixel().transform( mapPos ).toQPointF().toPoint();
   QList<KadasMilxClient::NPointSymbol> symbols;
   QMap<int, ItemId> itemIdMap;
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )

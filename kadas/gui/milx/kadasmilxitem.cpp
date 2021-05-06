@@ -231,13 +231,18 @@ bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &
   }
   else
   {
-    QPoint screenPos = settings.mapToPixel().transform( rect.center() ).toQPointF().toPoint();
-    int selectedSymbol = -1;
-    QList<KadasMilxClient::NPointSymbol> symbols;
-    symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
-    QRect bbox;
-    return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
+    return QgsRectangle( rect ).intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
   }
+}
+
+bool KadasMilxItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+{
+  QPoint screenPos = settings.mapToPixel().transform( pos ).toQPointF().toPoint();
+  int selectedSymbol = -1;
+  QList<KadasMilxClient::NPointSymbol> symbols;
+  symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
+  QRect bbox;
+  return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
 }
 
 QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
@@ -524,7 +529,7 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
       return EditContext( QgsVertexId( 0, 1, it.key() ), testPos, attributes );
     }
   }
-  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  if ( hitTest( pos, mapSettings ) )
   {
     KadasMapPos refPos = toMapPos( constState()->points.front(), mapSettings );
     if ( !isMultiPoint() )

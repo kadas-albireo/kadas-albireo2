@@ -26,6 +26,7 @@
 class QMenu;
 class QuaZip;
 class KadasMapItem;
+class KadasMapPos;
 
 #ifdef SIP_RUN
 //
@@ -148,8 +149,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QgsRectangle extent() const override;
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
-    virtual KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
-    KadasItemLayer::ItemId pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const;
+    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const;
 
 #ifndef SIP_RUN
     // TODO: SIP

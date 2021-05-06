@@ -136,7 +136,7 @@ void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
   }
   else
   {
-    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, e->pos(), toMapCoordinates( e->pos() ), QgsWkbTypes::LineGeometry );
+    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), QgsWkbTypes::LineGeometry );
     if ( pickResult.geom )
     {
       setGeometry( *pickResult.geom, pickResult.crs );

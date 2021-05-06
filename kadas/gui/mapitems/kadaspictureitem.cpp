@@ -430,7 +430,7 @@ KadasMapItem::EditContext KadasPictureItem::getEditContext( const KadasMapPos &p
     }
   }
   KadasMapPos testPos = toMapPos( constState()->pos, mapSettings );
-  bool frameClicked = intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings );
+  bool frameClicked = hitTest( pos, mapSettings );
   if ( !mPosLocked && ( ( !mFrame && frameClicked ) || pos.sqrDist( testPos ) < tol ) )
   {
     return EditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );

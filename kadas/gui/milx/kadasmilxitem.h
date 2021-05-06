@@ -47,6 +47,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
 
     void render( QgsRenderContext &context ) const override;

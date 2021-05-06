@@ -192,32 +192,17 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return true;
 }
 
-KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const
 {
-  KadasMapRect rect( pickRect.xMinimum(), pickRect.yMinimum(), pickRect.xMaximum(), pickRect.yMaximum() );
   for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
   {
     KadasMapItem *item = mItems[*it];
-    if ( item->intersects( rect, mapSettings ) )
+    if ( item->hitTest( mapPos, mapSettings ) )
     {
       return *it;
     }
   }
   return ITEM_ID_NULL;
-}
-
-KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) const
-{
-  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mapSettings );
-  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
-  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
-  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  QgsRectangle filterRect;
-  filterRect.setXMinimum( mapPos.x() - radiusmu );
-  filterRect.setXMaximum( mapPos.x() + radiusmu );
-  filterRect.setYMinimum( mapPos.y() - radiusmu );
-  filterRect.setYMaximum( mapPos.y() + radiusmu );
-  return pickItem( filterRect, mapSettings );
 }
 
 QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const

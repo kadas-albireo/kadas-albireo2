@@ -240,7 +240,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
     attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) ), NumericAttribute::TypeAngle} );
     return EditContext( QgsVertexId( 0, 0, 1 ), rotateHandlePos, attributes );
   }
-  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  if ( hitTest( pos, mapSettings ) )
   {
     return EditContext( QgsVertexId( 0, 0, 0 ), toMapPos( constState()->pos, mapSettings ), drawAttribs(), Qt::ArrowCursor );
   }

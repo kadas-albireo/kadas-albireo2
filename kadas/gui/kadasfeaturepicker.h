@@ -45,11 +45,11 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
     };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
+    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
 
   private:
-    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const QgsRectangle &filterRect );
-    static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, QgsRenderContext &renderContext, const QgsRectangle &filterRect, QgsWkbTypes::GeometryType geomType );
+    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos );
+    static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
 };
 
 #endif // KADASFEATUREPICKER_H

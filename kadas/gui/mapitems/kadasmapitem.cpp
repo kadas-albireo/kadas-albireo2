@@ -18,6 +18,7 @@
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettings.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
@@ -241,6 +242,20 @@ KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsM
 double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
 {
   return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();
+}
+
+bool KadasMapItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+{
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( settings );
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+  KadasMapRect filterRect;
+  filterRect.setXMinimum( pos.x() - radiusmu );
+  filterRect.setXMaximum( pos.x() + radiusmu );
+  filterRect.setYMinimum( pos.y() - radiusmu );
+  filterRect.setYMaximum( pos.y() + radiusmu );
+  return intersects( filterRect, settings );
 }
 
 double KadasMapItem::pickTol( const QgsMapSettings &settings ) const

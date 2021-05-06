@@ -145,7 +145,7 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
   mPressedButton = e->button();
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
-    KadasItemLayer::ItemId itemId = mLayer->pickItem( e->mapPoint(), mCanvas->mapSettings() );
+    KadasItemLayer::ItemId itemId = mLayer->pickItem( KadasMapPos::fromPoint( e->mapPoint() ), mCanvas->mapSettings() );
     if ( itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       KadasMapItem *otherItem = mLayer->takeItem( itemId );

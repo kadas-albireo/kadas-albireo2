@@ -277,6 +277,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     /* Hit test, rect in item crs */
     virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     /* Return the item point to the specified one */
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;

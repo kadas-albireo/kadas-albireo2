@@ -38,10 +38,10 @@
 #include <kadas/app/kadasmapidentifydialog.h>
 #include <kadas/app/kadasredliningintegration.h>
 
-KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos )
+KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )
 {
-  mPickResult = KadasFeaturePicker::pick( mCanvas, canvasPos, mapPos );
+  mPickResult = KadasFeaturePicker::pick( mCanvas, mapPos );
   KadasMapItem *pickedItem = mPickResult.itemId != KadasItemLayer::ITEM_ID_NULL ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
   QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry;
   if ( mPickResult.geom )
