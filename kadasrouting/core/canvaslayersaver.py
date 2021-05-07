@@ -1,4 +1,3 @@
-import os
 from qgis.core import (
     QgsVectorLayer,
     QgsCoordinateReferenceSystem,

@@ -37,6 +37,7 @@ AVOID_AREA_STYLE = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "resources", "avoid_area.qml"
 )
 
+
 class ValhallaRouteBottomBar(KadasBottomBar):
     """
     This is a meta class and should not be instanciated by itself, as it is has no
