@@ -14,7 +14,6 @@ from kadas.kadasgui import KadasPluginInterface
 
 from kadasrouting.utilities import icon, pushWarning, tr
 from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
-from kadasrouting.core.isochroneslayer import MemoryPolygonLayerType
 from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
 from kadasrouting.gui.cpbottombar import CPBottomBar
 from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
@@ -58,7 +57,6 @@ class RoutingPlugin(QObject):
 
         # auto saver for memory layers
         self._saver = MemoryLayerSaver(iface)
-
 
     def initGui(self):
         # Routing menu
@@ -118,11 +116,9 @@ class RoutingPlugin(QObject):
 
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
-        reg.addPluginLayerType(MemoryPolygonLayerType())
 
         # auto saver for memory layers
         self._saver.attachToProject()
-
 
         try:
             self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
@@ -153,7 +149,6 @@ class RoutingPlugin(QObject):
             self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
         self._saver.detachFromProject()
-
 
     def _showPanel(self, action, show):
         function = self.actionsToggled[action]
