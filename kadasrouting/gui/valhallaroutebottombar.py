@@ -183,7 +183,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             self.areasToAvoid,
             crs=self.canvas.mapSettings().destinationCrs(),
             color=AVOID_AREA_COLOR,
-            style=AVOID_AREA_STYLE
+            style=AVOID_AREA_STYLE,
         )
 
     def createLayer(self, name):
@@ -221,7 +221,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             areasToAvoid = self.areasToAvoid
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transformer = transformToWGS(canvasCrs)
-            print(f'from canvas: {areasToAvoid}')
             if areasToAvoid is None:
                 # if the custom polygon button is checked, but no polygon has been drawn
                 pushWarning(
@@ -234,7 +233,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                 layerCrs = avoidLayer.crs()
                 transformer = transformToWGS(layerCrs)
                 areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
-                print(f'from layer: {areasToAvoid}')
             else:
                 # If polygon layer button is checked, but no layer polygon is selected
                 pushWarning(
