@@ -3,6 +3,9 @@ credits to C. Crook for the original qgis MemoryLayerSaver plugin
 https://github.com/ccrook/QGIS-MemoryLayerSaver-Plugin
 """
 
+# flake8: noqa
+# as this file was copied from https://github.com/ccrook/QGIS-MemoryLayerSaver-Plugin
+# we accept a bad formatting
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *

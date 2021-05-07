@@ -22,7 +22,7 @@ from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
 from kadasrouting.valhalla.client import ValhallaClient
 
-from .MemoryLayerSaver import MemoryLayerSaver
+from kadasrouting.core.memorylayersaver import MemoryLayerSaver
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:

@@ -11,6 +11,8 @@ from qgis.gui import QgsMapToolPan
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
 from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 from kadasrouting.utilities import pushWarning, transformToWGS
+from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
+
 
 # Royal Blue
 PATROL_AREA_COLOR = QColor(65, 105, 225)
@@ -28,6 +30,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         super().__init__(canvas, action, plugin)
 
         self.btnPatrolAreaClear.clicked.connect(self.clearPatrol)
+        self.btnPatrolAreaSave.clicked.connect(self.savePatrolAreaLayer)
         self.btnPatrolAreaCanvas.toggled.connect(
             self.setPatrolPolygonDrawingMapTool
         )  # todo: use new instance of drawing tool
@@ -73,6 +76,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.comboPatrolAreaLayers.setEnabled(self.radioPatrolAreaLayer.isChecked())
         self.btnPatrolAreaCanvas.setEnabled(self.radioPatrolAreaPolygon.isChecked())
         self.btnPatrolAreaClear.setEnabled(self.radioPatrolAreaPolygon.isChecked())
+        self.btnPatrolAreaSave.setEnabled(self.radioPatrolAreaPolygon.isChecked())
         if self.radioPatrolAreaPolygon.isChecked():
             if self.patrolArea is not None:
                 self.patrolFootprint.setToGeometry(self.patrolArea)
@@ -82,6 +86,15 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
     def clearPatrol(self):
         self.patrolArea = None
         self.patrolFootprint.reset(QgsWkbTypes.PolygonGeometry)
+
+    def savePatrolAreaLayer(self):
+        name = "patrol_area"
+        CanvasLayerSaver(
+            name,
+            [self.patrolArea],
+            crs=self.canvas.mapSettings().destinationCrs(),
+            color=PATROL_AREA_COLOR
+        )
 
     def prepareValhalla(self):
         (
