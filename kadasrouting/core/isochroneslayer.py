@@ -18,6 +18,7 @@ from qgis.core import (
     QgsGeometry,
     QgsSvgMarkerSymbolLayer,
     QgsMarkerSymbolLayer,
+    QgsPluginLayerType,
 )
 
 LOG = logging.getLogger(__name__)
@@ -120,3 +121,4 @@ def generateIsochrones(
     symbol.setVerticalAnchorPoint(QgsMarkerSymbolLayer.Bottom)
     center_point.renderer().symbol().changeSymbolLayer(0, symbol)
     QgsProject.instance().addMapLayer(center_point)
+
