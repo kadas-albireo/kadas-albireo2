@@ -16,7 +16,9 @@ from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
 
 # Royal Blue
 PATROL_AREA_COLOR = QColor(65, 105, 225)
-
+PATROL_AREA_STYLE = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "resources", "patrol_area.qml"
+)
 WIDGET, BASE = uic.loadUiType(os.path.join(os.path.dirname(__file__), "cpbottombar.ui"))
 
 LOG = logging.getLogger(__name__)
@@ -93,7 +95,8 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             name,
             [self.patrolArea],
             crs=self.canvas.mapSettings().destinationCrs(),
-            color=PATROL_AREA_COLOR
+            color=PATROL_AREA_COLOR,
+            style=PATROL_AREA_STYLE
         )
 
     def prepareValhalla(self):

@@ -1,3 +1,4 @@
+import os
 import logging
 import json
 
@@ -32,6 +33,9 @@ from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 AVOID_AREA_COLOR = QColor(255, 0, 0)
 LOG = logging.getLogger(__name__)
 
+AVOID_AREA_STYLE = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "resources", "avoid_area.qml"
+)
 
 class ValhallaRouteBottomBar(KadasBottomBar):
     """
@@ -177,7 +181,8 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             name,
             self.areasToAvoid,
             crs=self.canvas.mapSettings().destinationCrs(),
-            color=AVOID_AREA_COLOR
+            color=AVOID_AREA_COLOR,
+            style=AVOID_AREA_STYLE
         )
 
     def createLayer(self, name):

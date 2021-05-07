@@ -1,3 +1,4 @@
+import os
 from qgis.core import (
     QgsVectorLayer,
     QgsCoordinateReferenceSystem,
@@ -12,11 +13,19 @@ from kadasrouting.utilities import transformToWGS
 
 
 class CanvasLayerSaver():
-    def __init__(self, name, features=None, crs=QgsCoordinateReferenceSystem(4326), color=QColor('lightGray')):
+    def __init__(
+                self,
+                name,
+                features=None,
+                crs=QgsCoordinateReferenceSystem(4326),
+                color=QColor('lightGray'),
+                style=None
+            ):
         self.name = name
         self.color = color
         self.transformer = transformToWGS(crs)
         self.features = features
+        self.style = style
         self.addPolygonLayer()
 
     def addPolygonLayer(self):
@@ -48,14 +57,16 @@ class CanvasLayerSaver():
 
         self.layer.updateExtents()
         QgsProject.instance().addMapLayer(self.layer)
-        # FIXME: the style rendering could be dynamic or a parameter of the constructor
-        renderer = QgsSingleSymbolRenderer.defaultRenderer(QgsWkbTypes.PolygonGeometry)
-        symbol = renderer.symbol()
-        symbol.setColor(self.color)
-        symbol.symbolLayer(0).setStrokeColor(self.color)
-        symbol.symbolLayer(0).setFillColor(QColor(0, 0, 0, 0))
-        symbol.symbolLayer(0).setStrokeWidth(0.5)
-        self.layer.setRenderer(renderer)
+        if self.style:
+            self.layer.loadNamedStyle(self.style)
+        else:
+            renderer = QgsSingleSymbolRenderer.defaultRenderer(QgsWkbTypes.PolygonGeometry)
+            symbol = renderer.symbol()
+            symbol.setColor(self.color)
+            symbol.symbolLayer(0).setStrokeColor(self.color)
+            symbol.symbolLayer(0).setFillColor(QColor(0, 0, 0, 0))
+            symbol.symbolLayer(0).setStrokeWidth(0.5)
+            self.layer.setRenderer(renderer)
 
     def reprojectToWGS84(self, geom):
         geomType = geom.type()
