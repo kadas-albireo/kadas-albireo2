@@ -140,6 +140,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                     footprint.setToGeometry(geometry)
                     self.areasToAvoidFootprint.append(footprint)
         else:
+            iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
             for footprint in self.areasToAvoidFootprint:
                 footprint.reset(QgsWkbTypes.PolygonGeometry)
 
@@ -185,6 +186,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             color=AVOID_AREA_COLOR,
             style=AVOID_AREA_STYLE,
         )
+        iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)

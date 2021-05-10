@@ -83,6 +83,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             if self.patrolArea is not None:
                 self.patrolFootprint.setToGeometry(self.patrolArea)
         else:
+            iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
             self.patrolFootprint.reset(QgsWkbTypes.PolygonGeometry)
 
     def clearPatrol(self):
@@ -98,6 +99,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             color=PATROL_AREA_COLOR,
             style=PATROL_AREA_STYLE
         )
+        iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
     def prepareValhalla(self):
         (
