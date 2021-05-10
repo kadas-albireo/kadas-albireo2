@@ -546,6 +546,7 @@ void KadasMainWindow::closeEvent( QCloseEvent *ev )
   }
   kApp->projectClose();
   QgsSettings().setValue( "/kadas/windowgeometry", saveGeometry() );
+  emit closed();
 }
 
 void KadasMainWindow::restoreFavoriteButton( QToolButton *button )

@@ -104,6 +104,7 @@ Generic object finder
     void printLayoutAdded( QgsPrintLayout *layout );
     void printLayoutWillBeRemoved( QgsPrintLayout *layout );
     void projectWillBeClosed();
+    void mainWindowClosed();
 };
 
 

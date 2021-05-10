@@ -37,6 +37,7 @@ KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
   connect( app, &KadasApplication::printLayoutAdded, this, &KadasPluginInterface::printLayoutAdded );
   connect( app, &KadasApplication::printLayoutWillBeRemoved, this, &KadasPluginInterface::printLayoutWillBeRemoved );
   connect( app, &KadasApplication::projectWillBeClosed, this, &KadasPluginInterface::projectWillBeClosed );
+  connect( app->mainWindow(), &KadasMainWindow::closed, this, &KadasPluginInterface::mainWindowClosed );
 }
 
 QAction *KadasPluginInterfaceImpl::actionShowPythonDialog()

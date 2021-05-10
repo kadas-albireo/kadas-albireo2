@@ -100,6 +100,9 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
 
+  signals:
+    void closed();
+
   public slots:
     void zoomFull();
     void zoomIn();
