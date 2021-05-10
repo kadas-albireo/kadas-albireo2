@@ -48,6 +48,12 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pickResult;
 }
 
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
+{
+  Q_UNUSED( canvasPos );
+  return pick( canvas, mapPos, geomType );
+}
+
 KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos )
 {
   PickResult pickResult;

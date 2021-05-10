@@ -150,6 +150,10 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const;
+#ifndef SIP_RUN
+    [[deprecated( "Use variant taking the mapPos as first parameter instead" )]]
+#endif
+    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 #ifndef SIP_RUN
     // TODO: SIP

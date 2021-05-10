@@ -205,6 +205,11 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, cons
   return ITEM_ID_NULL;
 }
 
+KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
+{
+  return pickItem( KadasMapPos::fromPoint( pickRect.center() ), mapSettings );
+}
+
 QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
 {
   QgsCoordinateTransform crst( crs(), settings.destinationCrs(), mTransformContext );
