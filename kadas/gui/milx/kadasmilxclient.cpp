@@ -44,15 +44,25 @@ KadasMilxClientWorker::KadasMilxClientWorker( bool sync )
 
 void KadasMilxClientWorker::cleanup()
 {
+  if ( mTcpSocket )
+  {
+    disconnect( mTcpSocket, &QTcpSocket::disconnected, this, &KadasMilxClientWorker::cleanup );
+  }
   if ( mProcess )
   {
-    mProcess->deleteLater();
-    mProcess = nullptr;
+    disconnect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
   }
   if ( mTcpSocket )
   {
+    mTcpSocket->close();
     mTcpSocket->deleteLater();
     mTcpSocket = nullptr;
+  }
+  if ( mProcess )
+  {
+    mProcess->waitForFinished();
+    mProcess->deleteLater();
+    mProcess = nullptr;
   }
   delete mNetworkSession;
   mNetworkSession = nullptr;
@@ -81,7 +91,7 @@ bool KadasMilxClientWorker::initialize()
   else
   {
     mProcess = new QProcess( this );
-    connect( mProcess, qOverload<int>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
+    connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
     {
 #ifdef __MINGW32__
       QString serverDir = QDir( QString( "%1/../opt/mss/" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
@@ -313,17 +323,16 @@ KadasMilxClient *KadasMilxClient::instance()
 KadasMilxClient::KadasMilxClient()
   : mAsyncWorker( false ), mSyncWorker( true )
 {
-  ;
   mSyncWorker.moveToThread( this );
   start();
 }
 
 KadasMilxClient::~KadasMilxClient()
 {
+  QMetaObject::invokeMethod( &mSyncWorker, "cleanup", Qt::BlockingQueuedConnection );
+  mAsyncWorker.cleanup();
   QThread::quit();
   wait();
-  mAsyncWorker.cleanup();
-  mSyncWorker.cleanup();
 }
 
 bool KadasMilxClient::processRequest( const QByteArray &request, QByteArray &response, quint8 expectedReply, bool async )
