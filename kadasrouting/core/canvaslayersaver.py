@@ -11,15 +11,15 @@ from PyQt5.QtGui import QColor
 from kadasrouting.utilities import transformToWGS
 
 
-class CanvasLayerSaver():
+class CanvasLayerSaver:
     def __init__(
-                self,
-                name,
-                features=None,
-                crs=QgsCoordinateReferenceSystem(4326),
-                color=QColor('lightGray'),
-                style=None
-            ):
+        self,
+        name,
+        features=None,
+        crs=QgsCoordinateReferenceSystem(4326),
+        color=QColor("lightGray"),
+        style=None,
+    ):
         self.name = name
         self.color = color
         self.transformer = transformToWGS(crs)
@@ -44,13 +44,12 @@ class CanvasLayerSaver():
         pr = self.layer.dataProvider()
         if self.features:
             for feature in self.features:
-                print(feature)
                 if isinstance(feature, QgsFeature):
                     geom = feature.geometry()
                     feature.setGeometry(self.reprojectToWGS84(geom))
                     pr.addFeatures([feature])
                 elif isinstance(feature, QgsGeometry):
-                    qgsFeature = QgsFeature()
+                    qgsFeature = QgsFeature(self.layer)
                     qgsFeature.setGeometry(self.reprojectToWGS84(feature))
                     pr.addFeatures([qgsFeature])
 
@@ -59,7 +58,9 @@ class CanvasLayerSaver():
         if self.style:
             self.layer.loadNamedStyle(self.style)
         else:
-            renderer = QgsSingleSymbolRenderer.defaultRenderer(QgsWkbTypes.PolygonGeometry)
+            renderer = QgsSingleSymbolRenderer.defaultRenderer(
+                QgsWkbTypes.PolygonGeometry
+            )
             symbol = renderer.symbol()
             symbol.setColor(self.color)
             symbol.symbolLayer(0).setStrokeColor(self.color)
