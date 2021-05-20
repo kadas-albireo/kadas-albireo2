@@ -44,6 +44,7 @@ class Connector(QObject):
         return params
 
     def prepareIsochronesParameters(self, points, profile, options, intervals, colors):
+        travel_constraint = "distance" if options.get('shortest') else "time"
         # build contour json
         if len(intervals) != len(colors):
             pushWarning(
@@ -51,11 +52,11 @@ class Connector(QObject):
                     "The number of intervals and colors are different, using default color"
                 )
             )
-            contours = [{"time": x} for x in intervals]
+            contours = [{travel_constraint: x} for x in intervals]
         else:
             contours = []
             for i in range(0, len(intervals)):
-                contours.append({"time": intervals[i], "color": colors[i]})
+                contours.append({travel_constraint: intervals[i], "color": colors[i]})
         params = dict(
             costing=profile,
             locations=points,
