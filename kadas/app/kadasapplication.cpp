@@ -1810,8 +1810,15 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
     }
   }
 
+  // Perform string replacements
+  QString newPath = path;
+  for ( const QPair<QString, QString> &entry : dataSourceMap.strings )
+  {
+    newPath.replace( entry.first, entry.second, Qt::CaseInsensitive );
+  }
+
   // Return unchanged
-  return path;
+  return newPath;
 }
 
 KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap() const
@@ -1855,6 +1862,13 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
     {
       QJsonObject entry = amsEntries.at( i ).toObject();
       dataSourceMigrations.ams.insert( entry.value( "old_url" ).toString(), entry.value( "new_params" ).toString() );
+    }
+
+    QJsonArray stringEntries = doc.object()["strings"].toArray();
+    for ( int i = 0, n = stringEntries.size(); i < n; ++i )
+    {
+      QJsonObject entry = stringEntries.at( i ).toObject();
+      dataSourceMigrations.strings.append( qMakePair( entry.value( "old" ).toString(), entry.value( "new" ).toString() ) );
     }
   }
   return dataSourceMigrations;

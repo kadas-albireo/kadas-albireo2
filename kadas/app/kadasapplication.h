@@ -117,6 +117,7 @@ class KadasApplication : public QgsApplication
       QMap<QString, QString> files;
       QMap<QString, QMap<QString, QPair<QString, QString>>> wms;
       QMap<QString, QString> ams;
+      QList<QPair<QString, QString>> strings;
     };
 
     KadasPluginInterface *mPythonInterface = nullptr;
