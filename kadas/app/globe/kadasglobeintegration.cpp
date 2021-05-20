@@ -37,6 +37,7 @@
 #include <osgEarth/Version>
 #include <osgEarthDrivers/cache_filesystem/FileSystemCache>
 #include <osgEarthDrivers/engine_mp/MPTerrainEngineOptions>
+#include <osgEarthDrivers/engine_rex/RexTerrainEngineOptions>
 #include <osgEarthDrivers/gdal/GDALOptions>
 #include <osgEarthDrivers/sky_simple/SimpleSkyOptions>
 #include <osgEarthDrivers/tms/TMSOptions>
@@ -400,7 +401,7 @@ void KadasGlobeIntegration::applyProjectSettings()
       if ( !mSkyNode.get() )
       {
         osgEarth::SimpleSky::SimpleSkyOptions skyOpts;
-#if OSGEARTH_VERSION_GREATER_OR_EQUAL(2, 10, 0)
+#if OSGEARTH_VERSION_GREATER_OR_EQUAL(2, 10, 1)
         skyOpts.moonImageURI() = QString( "%1/globe/moon.jpg" ).arg( Kadas::pkgResourcePath() ).toStdString();
 #endif
         mSkyNode = osgEarth::Util::SkyNode::create( skyOpts, mMapNode );
