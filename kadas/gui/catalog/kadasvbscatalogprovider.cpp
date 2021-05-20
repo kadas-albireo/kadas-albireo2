@@ -60,17 +60,6 @@ void KadasVBSCatalogProvider::replyFinished()
     QMap<QString, EntryMap> wmtsLayers;
     QMap<QString, EntryMap> wmsLayers;
     QMap<QString, EntryMap> amsLayers;
-    emit userChanged( listData["user"].toString() );
-    QString cookie = listData["esri_auth"].toString();
-    if ( !cookie.isEmpty() )
-    {
-      QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-      QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
-      for ( const QString &url : cookieUrls )
-      {
-        jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
-      }
-    }
     for ( const QVariant &resultData : listData["results"].toList() )
     {
       QVariantMap resultMap = resultData.toMap();

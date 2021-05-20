@@ -84,30 +84,6 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
 
   if ( reply->error() == QNetworkReply::NoError )
   {
-    QList<QByteArray> setCookieFields = reply->rawHeader( "Set-Cookie" ).split( ';' );
-    QgsDebugMsg( QString( "Set-Cookie header: %1" ).arg( QString::fromUtf8( reply->rawHeader( "Set-Cookie" ) ) ) );
-    if ( setCookieFields.length() > 0 && setCookieFields[0].startsWith( "esri_auth=" ) )
-    {
-      QJsonDocument esriAuth = QJsonDocument::fromJson( QUrl::fromPercentEncoding( setCookieFields[0] ).toUtf8().mid( 10 ) );
-      QString username = esriAuth.object()["email"].toString().replace( QRegExp( "@.*$" ), "" );
-      QgsDebugMsg( QString( "Extracted username from Set-Cookie: %1" ).arg( username ) );
-      emit userChanged( username );
-
-      QString token = esriAuth.object()["token"].toString();
-      QgsDebugMsg( QString( "Extracted token from Set-Cookie: %1" ).arg( token ) );
-      if ( !token.isEmpty() )
-      {
-        QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-        QString cookie = QString( "esri_auth=\"token\": \"%1\"" ).arg( token );
-        QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
-        for ( const QString &url : cookieUrls )
-        {
-          QgsDebugMsg( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) );
-          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
-        }
-      }
-    }
-
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
     for ( const QVariant &resultData : rootMap["results"].toList() )

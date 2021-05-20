@@ -28,9 +28,6 @@ class KADAS_GUI_EXPORT KadasVBSCatalogProvider : public KadasCatalogProvider
     KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
 
-  signals:
-    void userChanged( const QString &user );
-
   private slots:
     void replyFinished();
 

@@ -29,9 +29,6 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
 
-  signals:
-    void userChanged( const QString &user );
-
   private slots:
     void replyFinished();
 

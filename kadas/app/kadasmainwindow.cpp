@@ -294,20 +294,16 @@ void KadasMainWindow::init()
     else if ( type == "vbs" )
     {
       KadasVBSCatalogProvider *vbsprovider = new KadasVBSCatalogProvider( url, mCatalogBrowser, params );
-      connect( vbsprovider, &KadasVBSCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
       mCatalogBrowser->addProvider( vbsprovider );
     }
     else if ( type == "arcgisportal" )
     {
       KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params );
-      connect( portalprovider, &KadasArcGisPortalCatalogProvider::userChanged, this, &KadasMainWindow::showAuthenticatedUser );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
-  mCatalogBrowser->reload();
-
 
   mSearchWidget->addSearchProvider( new KadasCoordinateSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );

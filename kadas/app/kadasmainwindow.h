@@ -96,9 +96,12 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
+    KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
+
+    void showAuthenticatedUser( const QString &user );
 
   signals:
     void closed();
@@ -131,7 +134,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void endFullscreen();
     void checkOnTheFlyProjection();
     void showPluginManager( bool show );
-    void showAuthenticatedUser( const QString &user );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;

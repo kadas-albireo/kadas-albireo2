@@ -143,6 +143,8 @@ class KadasApplication : public QgsApplication
     static void injectAuthToken( QNetworkRequest *request );
 
   private slots:
+    void extractPortalToken();
+    void loadStartupProject();
     void autosave();
     void onActiveLayerChanged( QgsMapLayer *layer );
     void onFocusChanged( QWidget * /*old*/, QWidget *now );

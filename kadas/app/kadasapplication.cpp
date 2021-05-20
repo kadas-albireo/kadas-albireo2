@@ -354,6 +354,75 @@ void KadasApplication::init()
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
 
+  // Extract portal token if necessary before loading startup project
+  QString tokenUrl = settings.value( "/kadas/portalTokenUrl" ).toString();
+  if ( !tokenUrl.isEmpty() )
+  {
+    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
+    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
+    connect( reply, &QNetworkReply::finished, this, &KadasApplication::extractPortalToken );
+  }
+  else
+  {
+    loadStartupProject();
+  }
+}
+
+void KadasApplication::extractPortalToken()
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  if ( reply->error() == QNetworkReply::NoError )
+  {
+    QList<QByteArray> setCookieFields = reply->rawHeader( "Set-Cookie" ).split( ';' );
+    QgsDebugMsg( QString( "Set-Cookie header: %1" ).arg( QString::fromUtf8( reply->rawHeader( "Set-Cookie" ) ) ) );
+    if ( setCookieFields.length() > 0 && setCookieFields[0].startsWith( "esri_auth=" ) )
+    {
+      QJsonDocument esriAuth = QJsonDocument::fromJson( QUrl::fromPercentEncoding( setCookieFields[0] ).toUtf8().mid( 10 ) );
+      QString username = esriAuth.object()["email"].toString().replace( QRegExp( "@.*$" ), "" );
+      QgsDebugMsg( QString( "Extracted username from Set-Cookie: %1" ).arg( username ) );
+      mMainWindow->showAuthenticatedUser( username );
+
+      QString token = esriAuth.object()["token"].toString();
+      QgsDebugMsg( QString( "Extracted token from Set-Cookie: %1" ).arg( token ) );
+      if ( !token.isEmpty() )
+      {
+        QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
+        QString cookie = QString( "esri_auth=\"token\": \"%1\"" ).arg( token );
+        QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
+        for ( const QString &url : cookieUrls )
+        {
+          QgsDebugMsg( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) );
+          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
+        }
+      }
+    }
+    else
+    {
+      QVariantMap listData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+      mMainWindow->showAuthenticatedUser( listData["user"].toString() );
+      QgsDebugMsg( QString( "Extracted username: %1" ).arg( listData["user"].toString() ) );
+      QString cookie = listData["esri_auth"].toString();
+      if ( !cookie.isEmpty() )
+      {
+        QgsDebugMsg( QString( "Extracted cookie: %1" ).arg( cookie ) );
+        QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
+        QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
+        for ( const QString &url : cookieUrls )
+        {
+          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
+        }
+      }
+    }
+  }
+  loadStartupProject();
+}
+
+void KadasApplication::loadStartupProject()
+{
+  mMainWindow->catalogBrowser()->reload();
+
+  QgsSettings settings;
+
   // Open startup project
   QgsProject::instance()->setDirty( false );
   if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
