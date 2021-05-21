@@ -157,7 +157,6 @@ class ConsoleConnector(Connector):
         params = self.prepareRouteParameters(
             points, profile, avoid_polygons, options, patrol_polygon
         )
-        print(params)
         response = self._execute("route", json.dumps(params))
         return response
 

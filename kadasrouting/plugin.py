@@ -22,6 +22,8 @@ from kadasrouting.gui.navigationpanel import NavigationPanel
 from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
 from kadasrouting.valhalla.client import ValhallaClient
 
+from kadasrouting.core.memorylayersaver import MemoryLayerSaver
+
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
     os.mkdir(os.path.dirname(logfile))
@@ -53,6 +55,9 @@ class RoutingPlugin(QObject):
         self.dataCatalogueBar = None
         self.navigationPanel = None
 
+        # auto saver for memory layers
+        self._saver = MemoryLayerSaver(iface)
+
     def initGui(self):
         # Routing menu
         self.optimalRouteAction = QAction(icon("routing.png"), self.tr("Routing"))
@@ -61,7 +66,7 @@ class RoutingPlugin(QObject):
         )
 
         # Chinese Postaman menu
-        self.cpAction = QAction(icon("chinesepostman.png"), self.tr("Chinese Postman"))
+        self.cpAction = QAction(icon("chinesepostman.png"), self.tr("Patrol"))
         self.iface.addAction(self.cpAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Reachability menu
@@ -112,6 +117,9 @@ class RoutingPlugin(QObject):
         reg = QgsApplication.pluginLayerRegistry()
         reg.addPluginLayerType(OptimalRouteLayerType())
 
+        # auto saver for memory layers
+        self._saver.attachToProject()
+
         try:
             self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
         except Exception as e:
@@ -140,6 +148,7 @@ class RoutingPlugin(QObject):
         self.iface.removeAction(
             self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
+        self._saver.detachFromProject()
 
     def _showPanel(self, action, show):
         function = self.actionsToggled[action]
