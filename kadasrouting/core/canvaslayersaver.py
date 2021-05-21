@@ -11,7 +11,6 @@ from PyQt5.QtGui import QColor
 from kadasrouting.utilities import transformToWGS, pushWarning
 
 
-
 class CanvasLayerSaver:
     def __init__(
         self,
