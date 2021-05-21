@@ -208,7 +208,7 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
                 )
 
     def setBasename(self):
-        self.lineEditBasename.insert(self.comboBoxReachabilityMode.currentText())
+        self.lineEditBasename.setText(self.comboBoxReachabilityMode.currentText())
 
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
