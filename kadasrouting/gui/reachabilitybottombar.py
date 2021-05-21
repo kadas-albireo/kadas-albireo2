@@ -69,7 +69,9 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
         self.comboBoxReachabilityMode.currentIndexChanged.connect(
             self.setIntervalToolTip
         )
+        self.comboBoxReachabilityMode.currentIndexChanged.connect(self.setBasename)
         self.setIntervalToolTip()
+        self.setBasename()
 
         self.lineEditIntervals.textChanged.connect(self.intervalChanges)
         self.intervalChanges()
@@ -204,6 +206,9 @@ class ReachabilityBottomBar(KadasBottomBar, WIDGET):
                     "self.originSearchBox.pointUpdated.disconnect(self.centerMap) %s"
                     % e
                 )
+
+    def setBasename(self):
+        self.lineEditBasename.setText(self.comboBoxReachabilityMode.currentText())
 
     def basenameChanges(self):
         """Slot when the text on the basename line edit changed.
