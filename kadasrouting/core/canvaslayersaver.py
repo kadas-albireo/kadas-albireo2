@@ -8,7 +8,8 @@ from qgis.core import (
     QgsGeometry,
 )
 from PyQt5.QtGui import QColor
-from kadasrouting.utilities import transformToWGS
+from kadasrouting.utilities import transformToWGS, pushWarning
+
 
 
 class CanvasLayerSaver:
@@ -49,7 +50,7 @@ class CanvasLayerSaver:
                     feature.setGeometry(self.reprojectToWGS84(geom))
                     pr.addFeatures([feature])
                 elif isinstance(feature, QgsGeometry):
-                    qgsFeature = QgsFeature(self.layer)
+                    qgsFeature = QgsFeature()
                     qgsFeature.setGeometry(self.reprojectToWGS84(feature))
                     pr.addFeatures([qgsFeature])
 
@@ -87,3 +88,7 @@ class CanvasLayerSaver:
             return QgsGeometry.fromPolylineXY(newGeom)
         elif geomType == QgsWkbTypes.PolygonGeometry:
             return QgsGeometry.fromPolygonXY([newGeom])
+        else:
+            # TODO, from qgis 3.18 it will be possible to use the method
+            # QgsWkbTypes.translatedDisplayString() to have much nicer error message
+            pushWarning("not implemented: cannot save layer type: {}".format(geomType))
