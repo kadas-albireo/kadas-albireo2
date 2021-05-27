@@ -131,7 +131,7 @@ class SuggestCompletion(QObject):
     def auto_suggest(self):
         text = self._editor.text()
         if text:
-            is_offline = QgsSettings().value("/kadas/isOffline")
+            is_offline = False if QgsSettings().value("/kadas/isOffline") == "false" else True
             LOG.debug("is_offline %s" % is_offline)
             if is_offline:
                 url = QgsSettings().value(
