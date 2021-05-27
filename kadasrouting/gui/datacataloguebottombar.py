@@ -192,6 +192,8 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
 
         # Repository URLs combo box
         self.repoUrlComboBox.setEditable(True)
+        self.searchComboBox.setEditable(True)
+
         self.populateListRepositoryURLs()
         self.reloadRepository()
 
