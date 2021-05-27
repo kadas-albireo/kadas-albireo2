@@ -18,11 +18,17 @@ from kadasrouting.utilities import appDataDir, waitcursor, pushWarning, tr
 LOG = logging.getLogger(__name__)
 
 DEFAULT_REPOSITORY_URLS = [
-    "https://ch-milgeo.maps.arcgis.com/sharing/rest",
     "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest",
+    "https://ch-milgeo.maps.arcgis.com/sharing/rest",
+]
+
+DEFAULT_SEARCH_STRINGS = [
+    "tags:%22valhalla_network%22",
+    "owner:%22geosupport.fsta%22%20tags:%22valhalla%22"
 ]
 
 DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
+DEFAULT_ACTIVE_SEARCH_STRING = DEFAULT_SEARCH_STRINGS[0]
 
 
 class DataCatalogueClient:
@@ -34,9 +40,10 @@ class DataCatalogueClient:
     LOCAL_ONLY = 3  # The data is only available locally
     LOCAL_DELETED = 4  # The local only data is deleted
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, search_str=None):
         self.iface = KadasPluginInterface.cast(iface)
         self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
+        self.search_str = search_str or DEFAULT_ACTIVE_SEARCH_STRING
         self.progress_bar = None
         self.progess_message_bar = None
         self.downloader = None
@@ -75,7 +82,7 @@ class DataCatalogueClient:
     def getRemoteTiles(self):
         query = QUrlQuery()
         url = QUrl(f"{self.url}/search")
-        query.addQueryItem("q", "owner:%22geosupport.fsta%22%20tags:%22valhalla%22")
+        query.addQueryItem("q", self.search_str)
         query.addQueryItem("f", "pjson")
         url.setQuery(query.query())
         response = QgsNetworkAccessManager.blockingGet(QNetworkRequest(QUrl(url)))
