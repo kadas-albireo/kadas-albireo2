@@ -22,6 +22,8 @@ from kadasrouting.core.datacatalogueclient import (
     DataCatalogueClient,
     DEFAULT_REPOSITORY_URLS,
     DEFAULT_ACTIVE_REPOSITORY_URL,
+    DEFAULT_SEARCH_STRINGS,
+    DEFAULT_ACTIVE_SEARCH_STRING
 )
 
 LOG = logging.getLogger(__name__)
@@ -209,25 +211,41 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
 
     def populateListRepositoryURLs(self):
         self.repoUrlComboBox.clear()
+        self.searchComboBox.clear()
         active_repository_url = QgsSettings().value(
             "/kadasrouting/active_repository_url", DEFAULT_ACTIVE_REPOSITORY_URL
         )
-        repository_urls = list(DEFAULT_REPOSITORY_URLS)
-        if active_repository_url not in repository_urls:
-            repository_urls.append(active_repository_url)
+        active_search_string = QgsSettings().value(
+            "/kadasrouting/active_search_string", DEFAULT_ACTIVE_SEARCH_STRING
+        )
+        self.repository_urls = list(DEFAULT_REPOSITORY_URLS)
+        if active_repository_url not in self.repository_urls:
+            self.repository_urls.append(active_repository_url)
+        self.search_strings = list(DEFAULT_SEARCH_STRINGS)
+        if active_search_string not in self.search_strings:
+            self.search_strings.append(active_search_string)
 
-        self.repoUrlComboBox.addItems(repository_urls)
+        self.repoUrlComboBox.addItems(self.repository_urls)
         self.repoUrlComboBox.setCurrentText(active_repository_url)
+        self.searchComboBox.addItems(self.search_strings)
+        self.searchComboBox.setCurrentText(active_search_string)
 
     def reloadRepository(self):
         # Update the list
         active_repository_url = self.repoUrlComboBox.currentText()
-        self.dataCatalogueClient = DataCatalogueClient(active_repository_url)
+        active_search_string = self.searchComboBox.currentText()
+        self.dataCatalogueClient = DataCatalogueClient(
+            active_repository_url,
+            active_search_string
+        )
         success = self.populateList()
         # Store the active repository URL
         if success:
             QgsSettings().setValue(
                 "/kadasrouting/active_repository_url", active_repository_url
+            )
+            QgsSettings().setValue(
+                "/kadasrouting/active_search_string", active_search_string
             )
 
     def show(self):
