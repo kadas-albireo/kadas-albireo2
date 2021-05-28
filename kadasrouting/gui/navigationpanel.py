@@ -47,6 +47,10 @@ from kadasrouting.core import vehicles
 from kadasrouting.utilities import tr
 
 LOG = logging.getLogger(__name__)
+GPS_MIN_SPEED = (
+    1.0  # speed above which we start to rotate the map and projecting the point
+)
+REFRESH_RATE_S = 1.0  # navigation panel refresh rate (in seconds)
 
 route_html_template = (
     """
@@ -319,6 +323,20 @@ class NavigationPanel(BASE, WIDGET):
         layer = self.iface.activeLayer()
         LOG.debug("Debug: type(layer) = {}".format(type(layer)))
         point = QgsPointXY(gpsinfo.longitude, gpsinfo.latitude)
+        if gpsinfo.speed > GPS_MIN_SPEED:
+            # if we are moving, it is better for the user experience to
+            # project the current point using the speed vector instead
+            # of using 'point' directly, otherwise we get to feel of being
+            # "behind the current position"
+            qgsdistance = QgsDistanceArea()
+            qgsdistance.setSourceCrs(
+                QgsCoordinateReferenceSystem(4326),
+                QgsProject.instance().transformContext(),
+            )
+            qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
+            point = qgsdistance.computeSpheroidProject(
+                point, gpsinfo.speed * REFRESH_RATE_S, math.radians(gpsinfo.direction)
+            )
         origCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
         transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
@@ -327,7 +345,7 @@ class NavigationPanel(BASE, WIDGET):
         self.iface.mapCanvas().setCenter(canvasPoint)
         # stop rotating the map like a crazy when the user is almost still,
         # i.e. rotate only if we move faster than 1m/s
-        if gpsinfo.speed > 1.0:
+        if gpsinfo.speed > GPS_MIN_SPEED:
             self.iface.mapCanvas().setRotation(-gpsinfo.direction)
             self.centerPin.setAngle(0)
         self.iface.mapCanvas().refresh()
@@ -569,7 +587,7 @@ class NavigationPanel(BASE, WIDGET):
             )
             KadasMapCanvasItemManager.addItem(self.centerPin)
             self.updateNavigationInfo()
-            self.timer.start(1000)
+            self.timer.start(REFRESH_RATE_S * 1000)
             self.timer.timeout.connect(self.updateNavigationInfo)
         self.iface.layerTreeView().currentLayerChanged.connect(self.currentLayerChanged)
 
