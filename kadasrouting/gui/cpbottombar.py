@@ -97,7 +97,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             [self.patrolArea],
             crs=self.canvas.mapSettings().destinationCrs(),
             color=PATROL_AREA_COLOR,
-            style=PATROL_AREA_STYLE
+            style=PATROL_AREA_STYLE,
         )
         iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
