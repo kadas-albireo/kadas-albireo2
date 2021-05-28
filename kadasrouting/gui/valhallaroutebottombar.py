@@ -208,7 +208,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         except WrongLocationException as e:
             pushWarning(self.tr("Invalid location:") + str(e))
             return
-
         if None in points:
             pushWarning(self.tr("Both origin and destination points are required"))
             return
@@ -267,13 +266,17 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         return layer, points, profile, allAreasToAvoidWGS, costingOptions
 
     def calculate(self):
-        (
-            layer,
-            points,
-            profile,
-            allAreasToAvoidWGS,
-            costingOptions,
-        ) = self.prepareValhalla()
+        try:
+            (
+                layer,
+                points,
+                profile,
+                allAreasToAvoidWGS,
+                costingOptions,
+            ) = self.prepareValhalla()
+        except TypeError:
+            # exit if prepareValhalla raised a warning to the user
+            return
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
@@ -285,10 +288,13 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             raise (e)
 
     def clearPoints(self):
+        # remove pins and points
         self.originSearchBox.clearSearchBox()
         self.destinationSearchBox.clearSearchBox()
         KadasMapCanvasItemManager.removeItem(self.originSearchBox.pin)
         KadasMapCanvasItemManager.removeItem(self.destinationSearchBox.pin)
+        self.originSearchBox.deletePoint()
+        self.destinationSearchBox.deletePoint()
 
     def reverse(self):
         """Reverse route"""
@@ -310,8 +316,11 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         """
         # remove origin pin
         self.originSearchBox.removePin()
-        # remove destination poin
+        # remove destination pin
         self.destinationSearchBox.removePin()
+
+    def deletePoints(self):
+        self.originSearchBox.point
 
     def addPins(self):
         """Add pins for all stored points."""

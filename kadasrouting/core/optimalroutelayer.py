@@ -132,7 +132,9 @@ class OptimalRouteLayer(KadasItemLayer):
         items = self.items()
         for itemId in items.keys():
             self.takeItem(itemId)
+        print(self.pins)
         self.pins = []
+        print(self.pins)
         self.maneuvers = {}
 
     def hasRoute(self):
