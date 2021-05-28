@@ -23,6 +23,7 @@ from qgis.core import (
     QgsWkbTypes,
     QgsVectorLayer,
     QgsProject,
+    QgsSettings,
 )
 from qgis.gui import QgsRubberBand, QgsMapToolPan
 
@@ -86,6 +87,11 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.layout().addWidget(self.destinationSearchBox, 3, 1)
 
         self.comboBoxVehicles.addItems(vehicles.vehicle_names())
+        self.comboBoxVehicles.setCurrentIndex(
+            QgsSettings().value(
+                "/kadasrouting/current_vehicle", self.comboBoxVehicles.currentIndex()
+            )
+        )
 
         self.btnPointsClear.clicked.connect(self.clearPoints)
         self.btnReverse.clicked.connect(self.reverse)
@@ -216,6 +222,9 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         except AttributeError:
             shortest = False
         vehicle = self.comboBoxVehicles.currentIndex()
+        QgsSettings().setValue(
+            "/kadasrouting/current_vehicle", self.comboBoxVehicles.currentIndex()
+        )
         profile, costingOptions = vehicles.options_for_vehicle(vehicle)
 
         if self.radioAreasToAvoidPolygon.isChecked():
