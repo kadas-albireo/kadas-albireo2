@@ -50,11 +50,11 @@ class SuggestCompletion(QObject):
         self._popup.itemClicked.connect(self.done_completion)
         self._timer.timeout.connect(self.auto_suggest)
         self._editor.textEdited.connect(self._timer.start)
+        self._editor.editingFinished.connect(self.done_coordinates_editing)
         self._network_manager.finished.connect(self.handle_network_data)
 
     def eventFilter(self, object, event):
-        print('nope')
-        if object != self._popup or object != self._editor:
+        if object != self._popup:
             return False
 
         if event.type() == QEvent.MouseButtonPress:
@@ -114,13 +114,17 @@ class SuggestCompletion(QObject):
         self._popup.setFocus()
         self._popup.show()
 
+    def done_coordinates_editing(self):
+        selected = self.catch_coordinates(self._editor.text())
+        if selected:
+            self.finished.emit(selected)
+
     def done_completion(self):
         self._timer.stop()
         self._popup.hide()
         self._editor.setFocus()
 
         item = self._popup.currentItem()
-        selected = None
         if item:
             label = strip_tags(item.text(0))
             lon = item.data(0, Qt.UserRole)
@@ -128,17 +132,12 @@ class SuggestCompletion(QObject):
             self._editor.setText(label)
             QMetaObject.invokeMethod(self._editor, "returnPressed")
             selected = {"label": label, "lon": lon, "lat": lat}
-        else:
-            selected = self.catch_coordinates(self._editor.text())
-            print(self._editor.text())
-        if selected:
-            print(selected)
             self.finished.emit(selected)
 
     @staticmethod
     def catch_coordinates(text):
         if text:
-            lon_lat_match = re.match('^(\d+(\.?\d+?)?),(\d+(\.?\d+?)?)$', text)
+            lon_lat_match = re.match(r'^(\d+(\.?\d+?)?),(\d+(\.?\d+?)?)$', text)
             if lon_lat_match:
                 lon = float(lon_lat_match[1])
                 lat = float(lon_lat_match[3])
