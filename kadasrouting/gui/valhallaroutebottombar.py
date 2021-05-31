@@ -328,9 +328,6 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         # remove destination pin
         self.destinationSearchBox.removePin()
 
-    def deletePoints(self):
-        self.originSearchBox.point
-
     def addPins(self):
         """Add pins for all stored points."""
         self.originSearchBox.addPin()
