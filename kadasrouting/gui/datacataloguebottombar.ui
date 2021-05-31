@@ -33,7 +33,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <widget class="QListWidget" name="listWidget"/>
    </item>
    <item row="1" column="0" colspan="2">
@@ -41,7 +41,7 @@
      <item>
       <widget class="QLabel" name="repoUrllabel">
        <property name="text">
-        <string>Repository URL</string>
+        <string>Repository</string>
        </property>
       </widget>
      </item>
@@ -80,24 +80,6 @@
        <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="searchLabel">
-       <property name="text">
-        <string>Search string</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="searchComboBox">
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

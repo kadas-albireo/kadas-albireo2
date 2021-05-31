@@ -17,22 +17,21 @@ from kadasrouting.utilities import appDataDir, waitcursor, pushWarning, tr
 
 LOG = logging.getLogger(__name__)
 
-DEFAULT_REPOSITORY_URLS = [
-    "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest",
-    "https://ch-milgeo.maps.arcgis.com/sharing/rest",
+DEFAULT_REPOSITORIES = [
+    {
+        "name": "MGS Portal",
+        "url": "https://geoinfo-kadas.op.intra2.admin.ch/portal/sharing/rest",
+        "search_str": "tags:%22valhalla_network%22",
+    },
+    {
+        "name": "MILGEO Cloud",
+        "url": "https://ch-milgeo.maps.arcgis.com/sharing/rest",
+        "search_str": "owner:%22geosupport.fsta%22%20tags:%22valhalla%22",
+    }
 ]
-
-DEFAULT_SEARCH_STRINGS = [
-    "tags:%22valhalla_network%22",
-    "owner:%22geosupport.fsta%22%20tags:%22valhalla%22"
-]
-
-DEFAULT_ACTIVE_REPOSITORY_URL = DEFAULT_REPOSITORY_URLS[0]
-DEFAULT_ACTIVE_SEARCH_STRING = DEFAULT_SEARCH_STRINGS[0]
 
 
 class DataCatalogueClient:
-
     # Status of data tiles
     NOT_INSTALLED = 0  # Available on remote repository, but not in local file system
     UPDATABLE = 1  # There is a local copy, but the one in remote repository is newer
@@ -40,10 +39,10 @@ class DataCatalogueClient:
     LOCAL_ONLY = 3  # The data is only available locally
     LOCAL_DELETED = 4  # The local only data is deleted
 
-    def __init__(self, url=None, search_str=None):
+    def __init__(self, repo_id):
         self.iface = KadasPluginInterface.cast(iface)
-        self.url = url or DEFAULT_ACTIVE_REPOSITORY_URL
-        self.search_str = search_str or DEFAULT_ACTIVE_SEARCH_STRING
+        self.url = DEFAULT_REPOSITORIES[repo_id]['url']
+        self.search_str = DEFAULT_REPOSITORIES[repo_id]['search_str']
         self.progress_bar = None
         self.progess_message_bar = None
         self.downloader = None

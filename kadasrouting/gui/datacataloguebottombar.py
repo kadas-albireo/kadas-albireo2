@@ -20,10 +20,7 @@ from kadas.kadasgui import KadasBottomBar
 from kadasrouting.utilities import pushWarning, pushMessage, icon
 from kadasrouting.core.datacatalogueclient import (
     DataCatalogueClient,
-    DEFAULT_REPOSITORY_URLS,
-    DEFAULT_ACTIVE_REPOSITORY_URL,
-    DEFAULT_SEARCH_STRINGS,
-    DEFAULT_ACTIVE_SEARCH_STRING
+    DEFAULT_REPOSITORIES,
 )
 
 LOG = logging.getLogger(__name__)
@@ -192,7 +189,6 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
 
         # Repository URLs combo box
         self.repoUrlComboBox.setEditable(True)
-        self.searchComboBox.setEditable(True)
 
         self.populateListRepositoryURLs()
         self.reloadRepository()
@@ -213,42 +209,26 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
 
     def populateListRepositoryURLs(self):
         self.repoUrlComboBox.clear()
-        self.searchComboBox.clear()
-        active_repository_url = QgsSettings().value(
-            "/kadasrouting/active_repository_url", DEFAULT_ACTIVE_REPOSITORY_URL
+        self.repository_names = [key["name"] for key in DEFAULT_REPOSITORIES]
+        self.repoUrlComboBox.addItems(self.repository_names)
+        active_repository_id = int(
+            QgsSettings().value(
+                "/kadasrouting/active_repository", self.repoUrlComboBox.currentIndex()
+            )
         )
-        active_search_string = QgsSettings().value(
-            "/kadasrouting/active_search_string", DEFAULT_ACTIVE_SEARCH_STRING
+        self.repoUrlComboBox.setCurrentText(
+            DEFAULT_REPOSITORIES[active_repository_id]["name"]
         )
-        self.repository_urls = list(DEFAULT_REPOSITORY_URLS)
-        if active_repository_url not in self.repository_urls:
-            self.repository_urls.append(active_repository_url)
-        self.search_strings = list(DEFAULT_SEARCH_STRINGS)
-        if active_search_string not in self.search_strings:
-            self.search_strings.append(active_search_string)
-
-        self.repoUrlComboBox.addItems(self.repository_urls)
-        self.repoUrlComboBox.setCurrentText(active_repository_url)
-        self.searchComboBox.addItems(self.search_strings)
-        self.searchComboBox.setCurrentText(active_search_string)
+        self.repoUrlComboBox.setCurrentIndex(active_repository_id)
 
     def reloadRepository(self):
         # Update the list
-        active_repository_url = self.repoUrlComboBox.currentText()
-        active_search_string = self.searchComboBox.currentText()
-        self.dataCatalogueClient = DataCatalogueClient(
-            active_repository_url,
-            active_search_string
-        )
+        active_repository_id = self.repoUrlComboBox.currentIndex()
+        self.dataCatalogueClient = DataCatalogueClient(active_repository_id)
         success = self.populateList()
         # Store the active repository URL
         if success:
-            QgsSettings().setValue(
-                "/kadasrouting/active_repository_url", active_repository_url
-            )
-            QgsSettings().setValue(
-                "/kadasrouting/active_search_string", active_search_string
-            )
+            QgsSettings().setValue("/kadasrouting/active_repository", active_repository_id)
 
     def show(self):
         KadasBottomBar.show(self)
