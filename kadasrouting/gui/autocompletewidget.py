@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from PyQt5.QtCore import Qt, pyqtSignal, QUrl, QUrlQuery
 from PyQt5.QtCore import QObject, QTimer, QEvent, QPoint, QMetaObject
 from PyQt5.QtWidgets import QTreeWidget, QLineEdit, QFrame, QTreeWidgetItem
@@ -49,6 +50,7 @@ class SuggestCompletion(QObject):
         self._popup.itemClicked.connect(self.done_completion)
         self._timer.timeout.connect(self.auto_suggest)
         self._editor.textEdited.connect(self._timer.start)
+        self._editor.editingFinished.connect(self.done_coordinates_editing)
         self._network_manager.finished.connect(self.handle_network_data)
 
     def eventFilter(self, object, event):
@@ -112,13 +114,17 @@ class SuggestCompletion(QObject):
         self._popup.setFocus()
         self._popup.show()
 
+    def done_coordinates_editing(self):
+        selected = self.catch_coordinates(self._editor.text())
+        if selected:
+            self.finished.emit(selected)
+
     def done_completion(self):
         self._timer.stop()
         self._popup.hide()
         self._editor.setFocus()
 
         item = self._popup.currentItem()
-
         if item:
             label = strip_tags(item.text(0))
             lon = item.data(0, Qt.UserRole)
@@ -128,10 +134,23 @@ class SuggestCompletion(QObject):
             selected = {"label": label, "lon": lon, "lat": lat}
             self.finished.emit(selected)
 
+    @staticmethod
+    def catch_coordinates(text):
+        if text:
+            lon_lat_match = re.match(r'^(\d+(\.?\d+?)?),(\d+(\.?\d+?)?)$', text)
+            if lon_lat_match:
+                lon = float(lon_lat_match[1])
+                lat = float(lon_lat_match[3])
+                selected = {"label": "{},{}".format(lon, lat), "lon": lon, "lat": lat}
+                return selected
+        return None
+
     def auto_suggest(self):
         text = self._editor.text()
-        if text:
-            is_offline = QgsSettings().value("/kadas/isOffline")
+        if self.catch_coordinates(text):
+            pass
+        elif text:
+            is_offline = False if QgsSettings().value("/kadas/isOffline") == "false" else True
             LOG.debug("is_offline %s" % is_offline)
             if is_offline:
                 url = QgsSettings().value(

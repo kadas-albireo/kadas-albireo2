@@ -187,6 +187,10 @@ class LocationInputWidget(QWidget):
     def clearSearchBox(self):
         self.setText("")
 
+    def deletePoint(self):
+        self.point = None
+        self.removePin()
+
     def setPoint(self, point):
         self.point = point
         LOG.debug("Current point is %s" % self.point.asWkt())

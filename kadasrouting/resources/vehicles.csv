@@ -1,7 +1,7 @@
 ID,type_de,type_fr,type_it,type_en,max_weight_kg,width_m,height_m,length_m,fuel_capacity_l,radius,fuel_consumption_by100km,cost_model,max_speed_kmh
+30,PW,VOITURE,AUTOMOBILE,CAR,2000,2,1.9,4,70,1400,5,auto,120
 28,ZU FUSS,À PIED,A PIEDI,WALK,,,,,,,,pedestrian,5
 29,FAHRRAD,VÉLO,BICICLETTA,BICYCLE,120,0.7,1.2,2,,,,bicycle,25
-30,PW,VOITURE,AUTOMOBILE,CAR,2000,2,1.9,4,70,1400,5,auto,120
 1,Motrd BMW F 700 GS,Moto BMW F 700 GS,Moto BMW F 700 GS,Motorcycle BMW F 700 GS,436,0.93,1.21,2.39,16,350,4.5,motorcycle,120
 2,"LIEFERW KA 0,75T/4PL 4X4 GL MB G 300","VOIT LIVR CA 0,75T/4PL 4X4 TT MB G 300","AUTOFRG CA 0,75T/4PO 4X4 FSTR MB G 300","Deliv van KA 0,75T/4PL 4X4 GL MB G 300",3500,1.77,2.21,4.7,96,650,14,auto,120
 3,Kleinbus 10 Pl 4x4 Sprinter 316,minibus 10 pl 4x4 Sprinter 316,Frg 10 po 4x4 Sprinter 316,Minibus 10s 4x4 Sprinter 316,3500,1.99,2.43,5.91,100,550,12,auto,120
