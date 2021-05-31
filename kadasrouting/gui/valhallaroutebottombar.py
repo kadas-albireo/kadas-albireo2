@@ -88,9 +88,9 @@ class ValhallaRouteBottomBar(KadasBottomBar):
 
         self.comboBoxVehicles.addItems(vehicles.vehicle_names())
         self.comboBoxVehicles.setCurrentIndex(
-            QgsSettings().value(
+            int(QgsSettings().value(
                 "/kadasrouting/current_vehicle", self.comboBoxVehicles.currentIndex()
-            )
+            ))
         )
 
         self.btnPointsClear.clicked.connect(self.clearPoints)
