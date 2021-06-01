@@ -439,6 +439,9 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       KadasPinItem pinItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
       QgsPointXY pos( annotationItemEl.attribute( "geoPosX" ).toDouble(), annotationItemEl.attribute( "geoPosY" ).toDouble() );
       pinItem.setPosition( KadasItemPos::fromPoint( pos ) );
+      pinItem.setEditor( "KadasSymbolAttributesEditor" );
+      pinItem.setName( pinItemEl.attribute( "pinName" ) );
+      pinItem.setRemarks( pinItemEl.firstChildElement( "PinRemarks" ).text() );
 
       QDomElement mapItemEl = doc.createElement( "MapItem" );
       mapItemEl.setAttribute( "name", "KadasPinItem" );
