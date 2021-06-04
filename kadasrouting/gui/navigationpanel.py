@@ -51,6 +51,9 @@ GPS_MIN_SPEED = (
     1.0  # speed above which we start to rotate the map and projecting the point
 )
 REFRESH_RATE_S = 1.0  # navigation panel refresh rate (in seconds)
+SPEED_DIVIDE_BY = (
+    2.0  # variable used to divide the speed vector for the reprojected point
+)
 
 route_html_template = (
     """
@@ -335,11 +338,15 @@ class NavigationPanel(BASE, WIDGET):
             )
             qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
             point = qgsdistance.computeSpheroidProject(
-                point, (gpsinfo.speed / 2.0) * REFRESH_RATE_S, math.radians(gpsinfo.direction)
+                point,
+                (gpsinfo.speed / SPEED_DIVIDE_BY) * REFRESH_RATE_S,
+                math.radians(gpsinfo.direction),
             )
         origCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
-        self.transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
+        self.transform = QgsCoordinateTransform(
+            origCrs, canvasCrs, QgsProject.instance()
+        )
 
         if (
             isinstance(layer, QgsVectorLayer)
@@ -357,7 +364,7 @@ class NavigationPanel(BASE, WIDGET):
         if hasattr(layer, "valhalla") and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
-                self.refreshCanvas(maneuver['closest_point'], gpsinfo)
+                self.refreshCanvas(maneuver["closest_point"], gpsinfo)
                 LOG.debug(maneuver)
             except NotInRouteException:
                 self.refreshCanvas(point, gpsinfo)
