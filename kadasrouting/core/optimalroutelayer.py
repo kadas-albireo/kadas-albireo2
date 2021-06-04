@@ -36,7 +36,7 @@ from kadas.kadascore import KadasPluginLayerType, KadasCoordinateFormat
 
 LOG = logging.getLogger(__name__)
 
-MAX_DISTANCE_FOR_NAVIGATION = 250
+MAX_DISTANCE_FOR_NAVIGATION = 30
 
 _icon_for_maneuver = {
     1: "direction_depart",
@@ -321,7 +321,6 @@ class OptimalRouteLayer(KadasItemLayer):
                     displayed_point = KadasCoordinateFormat.instance().getDisplayString(
                         closest_point, QgsCoordinateReferenceSystem(4326)
                     )
-
                     if ", " not in displayed_point:
                         displayed_point = displayed_point.replace(",", ", ")
 
@@ -344,6 +343,7 @@ class OptimalRouteLayer(KadasItemLayer):
                         raw_distleft=distanceleft,
                         eta=eta_string,
                         displayed_point=displayed_point,
+                        closest_point=closest_point,
                     )
                     return maneuver
 

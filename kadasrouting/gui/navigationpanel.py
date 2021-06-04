@@ -335,21 +335,11 @@ class NavigationPanel(BASE, WIDGET):
             )
             qgsdistance.setEllipsoid(qgsdistance.sourceCrs().ellipsoidAcronym())
             point = qgsdistance.computeSpheroidProject(
-                point, gpsinfo.speed * REFRESH_RATE_S, math.radians(gpsinfo.direction)
+                point, (gpsinfo.speed / 2.0) * REFRESH_RATE_S, math.radians(gpsinfo.direction)
             )
         origCrs = QgsCoordinateReferenceSystem(4326)
         canvasCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
-        transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
-        canvasPoint = transform.transform(point)
-        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
-        self.iface.mapCanvas().setCenter(canvasPoint)
-        # stop rotating the map like a crazy when the user is almost still,
-        # i.e. rotate only if we move faster than 1m/s
-        if gpsinfo.speed > GPS_MIN_SPEED:
-            self.iface.mapCanvas().setRotation(-gpsinfo.direction)
-            self.centerPin.setAngle(0)
-        self.iface.mapCanvas().refresh()
-        self.rubberband.reset(QgsWkbTypes.LineGeometry)
+        self.transform = QgsCoordinateTransform(origCrs, canvasCrs, QgsProject.instance())
 
         if (
             isinstance(layer, QgsVectorLayer)
@@ -361,14 +351,16 @@ class NavigationPanel(BASE, WIDGET):
                 layer = self.getOptimalRouteLayerForGeometry(geom)
                 if layer is not None:
                     rubbergeom = QgsGeometry(layer.geom)
-                    rubbergeom.transform(transform)
+                    rubbergeom.transform(self.transform)
                     self.rubberband.setToGeometry(rubbergeom)
 
         if hasattr(layer, "valhalla") and layer.hasRoute():
             try:
                 maneuver = layer.maneuverForPoint(point, gpsinfo.speed)
+                self.refreshCanvas(maneuver['closest_point'], gpsinfo)
                 LOG.debug(maneuver)
             except NotInRouteException:
+                self.refreshCanvas(point, gpsinfo)
                 self.setMessage(self.tr("You are not on the route"))
                 return
             self.setWidgetsVisibility(False)
@@ -415,6 +407,18 @@ class NavigationPanel(BASE, WIDGET):
             self.setMessage(self.tr("Select a route or waypoint layer for navigation"))
             self.stopNavigation()
             return
+
+    def refreshCanvas(self, point, gpsinfo):
+        canvasPoint = self.transform.transform(point)
+        self.centerPin.setPosition(KadasItemPos(point.x(), point.y()))
+        self.iface.mapCanvas().setCenter(canvasPoint)
+        # stop rotating the map like a crazy when the user is almost still,
+        # i.e. rotate only if we move faster than 1m/s
+        if gpsinfo.speed > GPS_MIN_SPEED:
+            self.iface.mapCanvas().setRotation(-gpsinfo.direction)
+            self.centerPin.setAngle(0)
+        self.iface.mapCanvas().refresh()
+        self.rubberband.reset(QgsWkbTypes.LineGeometry)
 
     def setWarnings(self, dist):
         threshold = QSettings().value(
