@@ -24,7 +24,7 @@ DEFAULT_REPOSITORIES = [
         "search_str": "tags:%22valhalla_network%22",
     },
     {
-        "name": "MILGEO Cloud",
+        "name": "ArcGIS.com Cloud (test only)",
         "url": "https://ch-milgeo.maps.arcgis.com/sharing/rest",
         "search_str": "owner:%22geosupport.fsta%22%20tags:%22valhalla%22",
     }
