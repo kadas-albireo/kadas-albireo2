@@ -356,8 +356,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
 
       newMapLayerEl.appendChild( mapItemEl );
-
-      root.removeChild( svgItemEl );
     }
   }
 
@@ -409,8 +407,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
 
       newMapLayerEl.appendChild( mapItemEl );
-
-      root.removeChild( imageItemEl );
     }
   }
 
@@ -453,8 +449,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
 
       newMapLayerEl.appendChild( mapItemEl );
-
-      root.removeChild( pinItemEl );
     }
   }
 
