@@ -132,8 +132,9 @@ function linkDep {
     test -e "$destdir/$name" && return 0
     test -e "$destdir/qgisplugins/$name" && return 0
     test -e "$QGIS_INSTALL_PREFIX/bin/$name" && return 0
+    [[ "$1" == *api-ms-win* ]] && return 0
     echo "${indent}${1}"
-    [ ! -e "$MINGWROOT/$1" ] && [[ "$1" != *api-ms-win* ]]  && echo "Error: missing $MINGWROOT/$1" && return 1
+    [ ! -e "$MINGWROOT/$1" ] && echo "Error: missing $MINGWROOT/$1" && return 1
     mkdir -p "$destdir" || return 1
     lnk "$MINGWROOT/$1" "$destdir/$name" || return 1
     echo "${2:-bin}/$name: $(rpm -qf "$MINGWROOT/$1")" >> $installprefix/origins.txt
