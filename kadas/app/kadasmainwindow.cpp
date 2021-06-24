@@ -176,6 +176,8 @@ void KadasMainWindow::init()
   addServiceMenu->addAction( tr( "Add WMS layer" ), this, [this] { showSourceSelectDialog( "wms" ); } );
   addServiceMenu->addAction( tr( "Add WFS layer" ), this, [this] { showSourceSelectDialog( "WFS" ); } );
   addServiceMenu->addAction( tr( "Add WCS layer" ), this, [this] { showSourceSelectDialog( "wcs" ); } );
+  addServiceMenu->addAction( tr( "Add vector tile layer" ), this, [this] { showSourceSelectDialog( "vectortile" ); } );
+  addServiceMenu->addAction( tr( "Add XYZ layer" ), this, [this] { showSourceSelectDialog( "xyz" ); } );
   mAddServiceButton->setMenu( addServiceMenu );
 
   mMapCanvas->installEventFilter( this );
@@ -929,6 +931,8 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [ = ]( const QString & uri, const QString & layerName, const QString & providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString & url, const QString & baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, &KadasApplication::addVectorLayers );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, dialog, &QDialog::accept );
 
