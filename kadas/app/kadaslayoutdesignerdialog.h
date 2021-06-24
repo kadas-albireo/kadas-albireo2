@@ -370,10 +370,6 @@ class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
     void activateTool( StandardTool tool ) override;
     void setAtlasFeature( const QgsFeature &feature ) override;
     QgsLayoutDesignerInterface::ExportResults *lastExportResults() const override;
-//    void setCurrentLayout( QgsLayout *layout ) override;
-//    void setSectionTitle( const QString &title ) override { mDesigner->setSectionTitle( title ); }
-//    QgsLayoutGuideWidget *guideWidget() override { return mDesigner->guideWidget(); }
-//    void showGuideDock( bool show ) override { mDesigner->showGuideDock( show ); }
 
   public slots:
 
