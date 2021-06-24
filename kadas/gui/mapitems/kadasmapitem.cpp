@@ -206,7 +206,7 @@ QPair<KadasMapPos, double> KadasMapItem::closestPoint( const KadasMapPos &pos, c
   KadasMapPos mapPos = toMapPos( position(), settings );
   QgsPointXY itemPosScreen = settings.mapToPixel().transform( mapPos );
   QgsPointXY testPosScreen = settings.mapToPixel().transform( pos );
-  double dist = qSqrt( itemPosScreen.sqrDist( testPosScreen ) );
+  double dist = std::sqrt( itemPosScreen.sqrDist( testPosScreen ) );
   return qMakePair( mapPos, dist );
 }
 

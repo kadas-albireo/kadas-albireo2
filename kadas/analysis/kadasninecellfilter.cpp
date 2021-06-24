@@ -316,26 +316,26 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordina
   QgsPointXY pRaster = ct.transform( regionPoints[0] );
   double col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
   double row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
-  colStart = qFloor( col );
-  colEnd = qCeil( col );
-  rowStart = qFloor( row );
-  rowEnd = qCeil( row );
+  colStart = std::floor( col );
+  colEnd = std::ceil( col );
+  rowStart = std::floor( row );
+  rowEnd = std::ceil( row );
 
   for ( int i = 1; i < 4; ++i )
   {
     pRaster = ct.transform( regionPoints[i] );
     col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
     row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
-    colStart  = qMin( colStart, qFloor( col ) );
-    colEnd  = qMax( colEnd, qCeil( col ) );
-    rowStart = qMin( rowStart, qFloor( row ) );
-    rowEnd = qMax( rowEnd, qCeil( row ) );
+    colStart  = std::min( colStart, static_cast <int>( std::floor( col ) ) );
+    colEnd  = std::max( colEnd, static_cast <int>( std::ceil( col ) ) );
+    rowStart = std::min( rowStart, static_cast <int>( std::floor( row ) ) );
+    rowEnd = std::max( rowEnd, static_cast <int>( std::ceil( row ) ) );
   }
 
-  colStart = qMax( colStart, 0 );
-  colEnd = qMin( colEnd + 1, nCellsX );
-  rowStart = qMax( rowStart, 0 );
-  rowEnd = qMin( rowEnd + 1, nCellsY );
+  colStart = std::max( colStart, 0 );
+  colEnd = std::min( colEnd + 1, nCellsX );
+  rowStart = std::max( rowStart, 0 );
+  rowEnd = std::min( rowEnd + 1, nCellsY );
 
   return colEnd > colStart && rowEnd > rowStart;
 }

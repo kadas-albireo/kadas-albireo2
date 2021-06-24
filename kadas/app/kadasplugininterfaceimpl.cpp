@@ -256,6 +256,26 @@ QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const 
   return nullptr;
 }
 
+QgsVectorTileLayer *KadasPluginInterfaceImpl::addVectorTileLayer( const QString &url, const QString &baseName )
+{
+  return kApp->addVectorTileLayer( url, baseName );
+}
+
+QgsVectorTileLayer *KadasPluginInterfaceImpl::addVectorTileLayerQuiet( const QString &url, const QString &baseName )
+{
+  return kApp->addVectorTileLayer( url, baseName, true );
+}
+
+QgsPointCloudLayer *KadasPluginInterfaceImpl::addPointCloudLayer( const QString &url, const QString &baseName, const QString &providerKey )
+{
+  return kApp->addPointCloudLayer( url, baseName, providerKey );
+}
+
+QgsPointCloudLayer *KadasPluginInterfaceImpl::addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey )
+{
+  return kApp->addPointCloudLayer( url, baseName, providerKey, true );
+}
+
 bool KadasPluginInterfaceImpl::addProject( const QString &project )
 {
   return kApp->projectOpen( project );
@@ -352,7 +372,7 @@ QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeIn
   return QgsLayerTreeRegistryBridge::InsertionPoint( nullptr, 0 );
 }
 
-void KadasPluginInterfaceImpl::showLayerProperties( QgsMapLayer *l )
+void KadasPluginInterfaceImpl::showLayerProperties( QgsMapLayer *l, const QString &page )
 {
   // TODO
 }

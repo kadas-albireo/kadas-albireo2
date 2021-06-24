@@ -124,15 +124,15 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   {
     double x = geoToPixelX( gtrans, p.x(), p.y() );
     double y = geoToPixelY( gtrans, p.x(), p.y() );
-    colStart = qMin( colStart, qFloor( x ) );
-    colEnd = qMax( colEnd, qCeil( x ) );
-    rowStart = qMin( rowStart, qFloor( y ) );
-    rowEnd = qMax( rowEnd, qCeil( y ) );
+    colStart = std::min( colStart, static_cast<int>( std::floor( x ) ) );
+    colEnd = std::max( colEnd, static_cast<int>( std::ceil( x ) ) );
+    rowStart = std::min( rowStart, static_cast<int>( std::floor( y ) ) );
+    rowEnd = std::max( rowEnd, static_cast<int>( std::ceil( y ) ) );
   }
-  colStart = qMax( 0, colStart );
-  colEnd = qMin( terWidth - 1, colEnd );
-  rowStart = qMax( 0, rowStart );
-  rowEnd = qMin( terHeight - 1, rowEnd );
+  colStart = std::max( 0, colStart );
+  colEnd = std::min( terWidth - 1, colEnd );
+  rowStart = std::max( 0, rowStart );
+  rowEnd = std::min( terHeight - 1, rowEnd );
   int hmapWidth = colEnd - colStart + 1;
   int hmapHeight = rowEnd - rowStart + 1;
   QPolygon filterPoly;
@@ -301,7 +301,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
 
   // Compute viewshed
-  int roi = .5 * qMin( hmapWidth, hmapHeight );
+  int roi = .5 * std::min( hmapWidth, hmapHeight );
   progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
   progress->setRange( 0, 8 * roi );
 
@@ -366,11 +366,11 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
       if ( i * slope > 0 )
       {
-        p[1 - inciny] = obs[1 - inciny] + int ( qCeil( i * slope - 0.5 ) );
+        p[1 - inciny] = obs[1 - inciny] + int ( std::ceil( i * slope - 0.5 ) );
       }
       else
       {
-        p[1 - inciny] = obs[1 - inciny] + int ( qFloor( i * slope + 0.5 ) );
+        p[1 - inciny] = obs[1 - inciny] + int ( std::floor( i * slope + 0.5 ) );
       }
 
       if ( p[0] < colStart || p[0] > colEnd || p[1] < rowStart || p[1] > rowEnd )
@@ -409,7 +409,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
       // Update the slope if the current slope is greater than the old one
       double s = double ( pElev - observerHeight ) / double ( qAbs( p[inciny] - obs[inciny] ) );
-      horizon_slope = qMax( horizon_slope, s );
+      horizon_slope = std::max( horizon_slope, s );
 
       double horizon_alt =  observerHeight + horizon_slope * qAbs( p[inciny] - obs[inciny] );
       double tHeight = targetHeight;

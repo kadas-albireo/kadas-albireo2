@@ -31,6 +31,7 @@ class QToolButton;
 class QUndoView;
 
 class QgsDockWidget;
+class QgsLayoutGuideWidget;
 class QgsLayoutItemsListView;
 class QgsLayoutPropertiesWidget;
 class QgsLayoutRuler;
@@ -346,7 +347,6 @@ class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
     KadasAppLayoutDesignerInterface( KadasLayoutDesignerDialog *dialog );
     QWidget *window() override { return mDesigner; }
     QgsLayout *layout() override;
-    void setCurrentLayout( QgsLayout *layout ) override;
     QgsMasterLayoutInterface *masterLayout() override;
     QgsLayoutView *view() override { return mDesigner->view(); }
     QgsMessageBar *messageBar() override { return mDesigner->messageBar(); }
@@ -368,9 +368,12 @@ class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
     void addDockWidget( Qt::DockWidgetArea area, QDockWidget *dock ) override { mDesigner->addDockWidget( area, dock ); }
     void removeDockWidget( QDockWidget *dock ) override { mDesigner->removeDockWidget( dock ); }
     void activateTool( StandardTool tool ) override;
-    void setSectionTitle( const QString &title ) override { mDesigner->setSectionTitle( title ); }
-    QgsLayoutGuideWidget *guideWidget() override { return mDesigner->guideWidget(); }
-    void showGuideDock( bool show ) override { mDesigner->showGuideDock( show ); }
+    void setAtlasFeature( const QgsFeature &feature ) override;
+    QgsLayoutDesignerInterface::ExportResults *lastExportResults() const override;
+//    void setCurrentLayout( QgsLayout *layout ) override;
+//    void setSectionTitle( const QString &title ) override { mDesigner->setSectionTitle( title ); }
+//    QgsLayoutGuideWidget *guideWidget() override { return mDesigner->guideWidget(); }
+//    void showGuideDock( bool show ) override { mDesigner->showGuideDock( show ); }
 
   public slots:
 

@@ -57,8 +57,8 @@ KadasMapItem::Margin KadasGpxWaypointItem::margin() const
   Margin m = KadasPointItem::margin();
   if ( !mName.isEmpty() )
   {
-    m.right = qMax( m.right, mLabelSize.width() + mIconSize / 2 + 1 );
-    m.top = qMax( m.top, mLabelSize.height() + mIconSize / 2 + 1 );
+    m.right = std::max( m.right, mLabelSize.width() + mIconSize / 2 + 1 );
+    m.top = std::max( m.top, mLabelSize.height() + mIconSize / 2 + 1 );
   }
   return m;
 }

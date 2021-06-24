@@ -129,7 +129,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
         QSize canvasSize = mCanvas->mapSettings().outputSize();
         double sfx = ( double ) zoomRectSize.width() / canvasSize.width();
         double sfy = ( double ) zoomRectSize.height() / canvasSize.height();
-        double scaleFactor = qMax( sfx, sfy );
+        double scaleFactor = std::max( sfx, sfy );
 
         QgsPointXY c = mCanvas->getCoordinateTransform()->toMapCoordinates( mExtentRect.center() );
         QgsRectangle oe = mCanvas->mapSettings().extent();

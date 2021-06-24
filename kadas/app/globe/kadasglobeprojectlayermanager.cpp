@@ -20,6 +20,7 @@
 #include <qgis/qgspallabeling.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrenderer.h>
+#include <qgis/qgssymbol.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayerlabeling.h>
 

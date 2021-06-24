@@ -22,6 +22,7 @@
 #include <qgis/qgsattributetablefiltermodel.h>
 #include <qgis/qgsattributetablemodel.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsvectorlayercache.h>
 #include <qgis/qgsvectorlayerselectionmanager.h>
 
 #include <kadas/gui/kadasattributetabledialog.h>

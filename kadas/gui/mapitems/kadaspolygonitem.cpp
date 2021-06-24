@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QMenu>
+#include <QJsonArray>
 
 #include <GeographicLib/Geodesic.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
@@ -377,7 +378,7 @@ void KadasPolygonItem::recomputeDerived()
         {
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
           double dist = line.Distance();
-          int nIntervals = qMax( 1, int ( std::ceil( dist / sdist ) ) );
+          int nIntervals = std::max( 1, int ( std::ceil( dist / sdist ) ) );
           for ( int j = 0; j < nIntervals; ++j )
           {
             double lat, lon;

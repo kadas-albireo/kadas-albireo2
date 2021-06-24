@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QJsonArray>
+
 #include <qgis/qgspoint.h>
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmapsettings.h>

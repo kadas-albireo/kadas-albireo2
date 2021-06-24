@@ -211,12 +211,12 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
   mSegmentLengths.clear();
 
   QgsDistanceArea da;
-  da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
+  da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
   da.setSourceCrs( crs, QgsProject::instance()->transformContext() );
 
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
   {
-    mSegmentLengths.append( qSqrt( mPoints[i + 1].sqrDist( mPoints[i] ) ) );
+    mSegmentLengths.append( std::sqrt( mPoints[i + 1].sqrDist( mPoints[i] ) ) );
     mTotLength += mSegmentLengths.back();
     mTotLengthMeters += da.measureLine( mPoints[i], mPoints[i + 1] );
   }
@@ -230,12 +230,12 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
 void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
   QgsPointXY pos = QgsCoordinateTransform( crs, mPointsCrs, QgsProject::instance() ).transform( p );
-  double x = qSqrt( pos.sqrDist( mPoints[segment] ) );
+  double x = std::sqrt( pos.sqrDist( mPoints[segment] ) );
   for ( int i = 0; i < segment; ++i )
   {
     x += mSegmentLengths[i];
   }
-  int idx = qMin( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
+  int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
   QPointF sample = mPlotCurve->data()->sample( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( QString::number( qRound( sample.y() ) ) );
@@ -359,7 +359,7 @@ void KadasHeightProfileDialog::replot()
 
       double pixValues[4] = {};
       if ( CE_None != GDALRasterIO( band, GF_Read,
-                                    qFloor( col ), qFloor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
+                                    std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
       {
         QgsDebugMsg( "Failed to read pixel values" );
         samples.append( QPointF( samples.size(), 0 ) );
@@ -367,8 +367,8 @@ void KadasHeightProfileDialog::replot()
       else
       {
         // Interpolate values
-        double lambdaR = row - qFloor( row );
-        double lambdaC = col - qFloor( col );
+        double lambdaR = row - std::floor( row );
+        double lambdaC = col - std::floor( col );
 
         double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
                        + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
@@ -390,7 +390,7 @@ void KadasHeightProfileDialog::replot()
   int nSamples = samples.size();
   mPlotMarker->setValue( 0, 0 );
   mPlot->setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw( mTotLengthMeters, nSamples ) );
-  double step = qPow( 10, qFloor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
+  double step = qPow( 10, std::floor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
   while ( nSamples / step < 10 ) { step /= 2.; }
   while ( nSamples / step > 10 ) { step *= 2.; }
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
@@ -407,7 +407,7 @@ void KadasHeightProfileDialog::replot()
       QwtPlotMarker *nodeMarker = new QwtPlotMarker();
       nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
       nodeMarker->setLineStyle( QwtPlotMarker::VLine );
-      int idx = qMin( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
+      int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
       QPointF sample = mPlotCurve->data()->sample( idx );
       nodeMarker->setValue( sample );
       nodeMarker->attach( mPlot );

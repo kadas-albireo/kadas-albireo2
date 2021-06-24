@@ -37,7 +37,7 @@ class KadasPythonIntegration : public QObject
     KadasPythonIntegration( QObject *parent = nullptr );
     ~KadasPythonIntegration();
 
-    void initPython( KadasPluginInterface *interface, bool installErrorHook );
+    void initPython( KadasPluginInterface *iface, bool installErrorHook );
     void exitPython();
     bool isEnabled();
 

@@ -73,6 +73,7 @@ dnf install -y \
   mingw64-spatialindex \
   mingw64-sqlite \
   mingw64-svg2svgt \
+  mingw64-zstd \
   bison \
   cmake \
   findutils \

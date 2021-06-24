@@ -45,13 +45,13 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
         items.append( mLayer->mItems[id] );
       }
       std::stable_sort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
-      bool omitSinglePoint = mRendererContext.customRenderFlags().contains( "globe" );
+      bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
       for ( const KadasMapItem *item : items )
       {
         if ( item && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
+          mRendererContext.painter()->setOpacity( mLayer->opacity() );
           mRendererContext.setCoordinateTransform( QgsCoordinateTransform( item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() ) );
           item->render( mRendererContext );
           mRendererContext.painter()->restore();

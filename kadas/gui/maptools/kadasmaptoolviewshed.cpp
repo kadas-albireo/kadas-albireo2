@@ -204,7 +204,7 @@ void KadasMapToolViewshed::drawFinished()
   {
     // Need to compute radius in meters
     QgsDistanceArea da;
-    da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
+    da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
     curRadius = da.measureLine( center, QgsPoint( center.x() + curRadius, center.y() ) );
     curRadius = da.convertLengthMeasurement( curRadius, QgsUnitTypes::DistanceMeters );
   }

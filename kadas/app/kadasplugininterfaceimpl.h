@@ -87,9 +87,13 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QgsVectorLayer *addVectorLayer( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) override;
     virtual QgsRasterLayer *addRasterLayer( const QString &rasterLayerPath, const QString &baseName = QString() ) override;
     virtual QgsRasterLayer *addRasterLayer( const QString &url, const QString &layerName, const QString &providerKey ) override;
+    virtual QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName ) override;
+    virtual QgsPointCloudLayer *addPointCloudLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
 
     virtual QgsVectorLayer *addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) override;
     virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) override;
+    virtual QgsVectorTileLayer *addVectorTileLayerQuiet( const QString &url, const QString &baseName ) override;
+    virtual QgsPointCloudLayer *addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey ) override;
 
     virtual QgsMeshLayer *addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
 
@@ -98,7 +102,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     virtual void reloadConnections( ) override;
     virtual bool setActiveLayer( QgsMapLayer *layer ) override;
-    virtual void showLayerProperties( QgsMapLayer *l ) override;
+    virtual void showLayerProperties( QgsMapLayer *l, const QString &page = QString() ) override;
     virtual QDialog *showAttributeTable( QgsVectorLayer *l, const QString &filterExpression = QString() ) override;
     virtual bool openFeatureForm( QgsVectorLayer *l, QgsFeature &f, bool updateFeatureOnly = false, bool showModal = true ) override;
     virtual QgsAttributeDialog *getFeatureForm( QgsVectorLayer *l, QgsFeature &f ) override;
@@ -143,6 +147,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QToolBar *vectorToolBar() override { return dummyToolbar(); }
     virtual QToolBar *databaseToolBar() override { return dummyToolbar(); }
     virtual QToolBar *webToolBar() override { return dummyToolbar(); }
+    virtual QToolBar *selectionToolBar() override { return dummyToolbar(); }
     QToolBar *dummyToolbar();
 
     virtual int addToolBarIcon( QAction *qAction ) override { return -1; }
@@ -253,6 +258,30 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QAction *actionCheckQgisVersion() override { return nullptr; }
     virtual QAction *actionAbout() override { return nullptr; }
     virtual QgsStatusBar *statusBarIface() override { return nullptr; }
+    virtual QAction *actionZoomToLayers() override { return nullptr; }
+    virtual QAction *actionAddXyzLayer() override { return nullptr; }
+    virtual QAction *actionAddVectorTileLayer() override { return nullptr; }
+    virtual QAction *actionAddPointCloudLayer() override { return nullptr; }
+    virtual QAction *actionToggleSelectedLayers() override { return nullptr; }
+    virtual QAction *actionToggleSelectedLayersIndependently() override { return nullptr; }
+    virtual QAction *actionCircle2Points() override { return nullptr; }
+    virtual QAction *actionCircle3Points() override { return nullptr; }
+    virtual QAction *actionCircle3Tangents() override { return nullptr; }
+    virtual QAction *actionCircle2TangentsPoint() override { return nullptr; }
+    virtual QAction *actionCircleCenterPoint() override { return nullptr; }
+    virtual QAction *actionEllipseCenter2Points()override { return nullptr; }
+    virtual QAction *actionEllipseCenterPoint() override { return nullptr; }
+    virtual QAction *actionEllipseExtent() override { return nullptr; }
+    virtual QAction *actionEllipseFoci() override { return nullptr; }
+    virtual QAction *actionRectangleCenterPoint() override { return nullptr; }
+    virtual QAction *actionRectangleExtent() override { return nullptr; }
+    virtual QAction *actionRectangle3PointsDistance() override { return nullptr; }
+    virtual QAction *actionRectangle3PointsProjected() override { return nullptr; }
+    virtual QAction *actionRegularPolygon2Points() override { return nullptr; }
+    virtual QAction *actionRegularPolygonCenterPoint() override { return nullptr; }
+    virtual QAction *actionRegularPolygonCenterCorner() override { return nullptr; }
+
+    virtual QActionGroup *mapToolActionGroup() override { return nullptr; }
 
     virtual void preloadForm( const QString &uifile ) override { }
     virtual void registerLocatorFilter( QgsLocatorFilter *filter SIP_TRANSFER ) override { }
@@ -277,6 +306,20 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     virtual void locatorSearch( const QString &searchText ) override { }
     virtual QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() override;
+
+    virtual void showProjectPropertiesDialog( const QString &currentPage = QString() ) override {};
+    virtual void addTabifiedDockWidget( Qt::DockWidgetArea area, QDockWidget *dockwidget, const QStringList &tabifyWith = QStringList(), bool raiseTab = false ) override {};
+    virtual void registerProjectPropertiesWidgetFactory( QgsOptionsWidgetFactory *factory ) override {};
+    virtual void unregisterProjectPropertiesWidgetFactory( QgsOptionsWidgetFactory *factory ) override {};
+    virtual void registerDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
+    virtual void unregisterDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
+    virtual void registerApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
+    virtual void unregisterApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
+    virtual void registerMapToolHandler( QgsAbstractMapToolHandler *handler ) override {};
+    virtual void unregisterMapToolHandler( QgsAbstractMapToolHandler *handler ) override {};
+    virtual void registerCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) override {};
+    virtual void unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) override {};
+    virtual void setGpsPanelConnection( QgsGpsConnection *connection ) override {};
 
 
     // KADAS specific interface

@@ -18,6 +18,7 @@
 #define KADASAPPLICATION_H
 
 #include <QDateTime>
+#include <QTimer>
 
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
@@ -31,10 +32,12 @@ class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
 class KadasMessageLogViewer;
 class QgsMessageOutput;
+class QgsPointCloudLayer;
 class QgsPrintLayout;
 class QgsRasterLayer;
 class QStackedWidget;
 class QgsVectorLayer;
+class QgsVectorTileLayer;
 class KadasClipboard;
 class KadasGpxIntegration;
 class KadasMainWindow;
@@ -65,6 +68,8 @@ class KadasApplication : public QgsApplication
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
+    QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false );
+    QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
 

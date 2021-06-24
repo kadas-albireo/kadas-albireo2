@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QJsonArray>
+
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
@@ -100,8 +102,8 @@ QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const Q
   double x = mapPos.x();
   double y = mapPos.y();
   double mup = settings.mapUnitsPerPixel();
-  double cosa = qCos( angle / 180 * M_PI );
-  double sina = qSin( angle / 180 * M_PI );
+  double cosa = std::cos( angle / 180 * M_PI );
+  double sina = std::sin( angle / 180 * M_PI );
   KadasMapPos p1( x + ( cosa * dx1 - sina * dy1 ) * mup, y + ( sina * dx1 + cosa * dy1 ) * mup );
   KadasMapPos p2( x + ( cosa * dx2 - sina * dy1 ) * mup, y + ( sina * dx2 + cosa * dy1 ) * mup );
   KadasMapPos p3( x + ( cosa * dx2 - sina * dy2 ) * mup, y + ( sina * dx2 + cosa * dy2 ) * mup );
@@ -117,17 +119,17 @@ KadasMapItem::Margin KadasAnchoredItem::margin() const
   double right = ( 1. - mAnchorX ) * constState()->size.width() * mSymbolScale;
   double bottom = ( 1. - mAnchorY ) * constState()->size.height() * mSymbolScale;
 
-  double cosa = qCos( constState()->angle / 180 * M_PI );
-  double sina = qSin( constState()->angle / 180 * M_PI );
+  double cosa = std::cos( constState()->angle / 180 * M_PI );
+  double sina = std::sin( constState()->angle / 180 * M_PI );
   QPointF p1( ( cosa * left + sina * top ), ( -sina * left + cosa * top ) );
   QPointF p2( ( cosa * right + sina * top ), ( -sina * right + cosa * top ) );
   QPointF p3( ( cosa * right + sina * bottom ), ( -sina * right + cosa * bottom ) );
   QPointF p4( ( cosa * left + sina * bottom ), ( -sina * left + cosa * bottom ) );
 
-  int iLeft = qFloor( qMin( qMin( p1.x(), p2.x() ), qMin( p3.x(), p4.x() ) ) );
-  int iRight = qCeil( qMax( qMax( p1.x(), p2.x() ), qMax( p3.x(), p4.x() ) ) );
-  int iTop = qFloor( qMin( qMin( p1.y(), p2.y() ), qMin( p3.y(), p4.y() ) ) );
-  int iBottom = qCeil( qMax( qMax( p1.y(), p2.y() ), qMax( p3.y(), p4.y() ) ) );
+  int iLeft = std::floor( std::min( std::min( p1.x(), p2.x() ), std::min( p3.x(), p4.x() ) ) );
+  int iRight = std::ceil( std::max( std::max( p1.x(), p2.x() ), std::max( p3.x(), p4.x() ) ) );
+  int iTop = std::floor( std::min( std::min( p1.y(), p2.y() ), std::min( p3.y(), p4.y() ) ) );
+  int iBottom = std::ceil( std::max( std::max( p1.y(), p2.y() ), std::max( p3.y(), p4.y() ) ) );
   return Margin{ -iLeft, -iTop, iRight, iBottom };
 }
 
@@ -258,8 +260,8 @@ void KadasAnchoredItem::edit( const EditContext &context, const KadasMapPos &new
       double dy = newPoint.y() - mapPos.y();
       // Rotate handle is in the middle of the right edge
       QgsPointXY dir( state()->size.width() - mAnchorX * state()->size.width(), 0.5 * state()->size.height() - mAnchorY * state()->size.height() );
-      double offset = qAtan2( dir.y(), dir.x() );
-      double angle = ( qAtan2( dy, dx ) + offset ) / M_PI * 180.;
+      double offset = std::atan2( dir.y(), dir.x() );
+      double angle = ( std::atan2( dy, dx ) + offset ) / M_PI * 180.;
       // If less than 5 deg from quarter, snap to quarter
       if ( qAbs( angle - qRound( angle / 90. ) * 90. ) < 5 )
       {
@@ -296,11 +298,11 @@ KadasMapItem::AttribValues KadasAnchoredItem::editAttribsFromPosition( const Edi
   if ( context.vidx.vertex == 1 )
   {
     QgsPointXY dir( constState()->size.width() - mAnchorX * constState()->size.width(), 0.5 * constState()->size.height() - mAnchorY * constState()->size.height() );
-    double offset = qAtan2( dir.y(), dir.x() );
+    double offset = std::atan2( dir.y(), dir.x() );
     KadasMapPos mapPos = toMapPos( constState()->pos, mapSettings );
     double dx = pos.x() - mapPos.x();
     double dy = pos.y() - mapPos.y();
-    double angle = ( qAtan2( dy, dx ) + offset ) / M_PI * 180.;
+    double angle = ( std::atan2( dy, dx ) + offset ) / M_PI * 180.;
     while ( angle < 0 )
     {
       angle += 360;

@@ -68,7 +68,7 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
   registerMetaTypes();
 
   mDa.setSourceCrs( crs, QgsProject::instance()->transformContext() );
-  mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", GEO_NONE ) );
+  mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
   connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
 }
 
@@ -158,7 +158,7 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   outStream << "</ExtendedData>\n";
   QgsAbstractGeometry *geom = mGeometry->segmentize();
   geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
-  outStream << geom->asKML( 6 ) << "\n";
+  outStream << geom->asKml( 6 ) << "\n";
   delete geom;
   outStream << "</Placemark>\n";
   outStream.flush();
@@ -227,13 +227,13 @@ KadasMapItem::Margin KadasGeometryItem::margin() const
   {
     for ( const MeasurementLabel &label : mMeasurementLabels )
     {
-      maxMeasureLabelWidth = qMax( maxMeasureLabelWidth, label.width / 2 + 1 );
-      maxMeasureLabelHeight = qMax( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
+      maxMeasureLabelWidth = std::max( maxMeasureLabelWidth, label.width / 2 + 1 );
+      maxMeasureLabelHeight = std::max( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
     }
   }
-  int maxPainterMargin = qCeil( qMax( mIconType != ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
-  int maxW = qMax( maxMeasureLabelWidth, maxPainterMargin );
-  int maxH = qMax( maxMeasureLabelHeight, maxPainterMargin );
+  int maxPainterMargin = std::ceil( std::max( mIconType != ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
+  int maxW = std::max( maxMeasureLabelWidth, maxPainterMargin );
+  int maxH = std::max( maxMeasureLabelHeight, maxPainterMargin );
   return Margin{ maxW, maxH, maxW, maxH };
 }
 
@@ -312,7 +312,7 @@ QPair<KadasMapPos, double> KadasGeometryItem::closestPoint( const KadasMapPos &p
       minPos = mapPos;
     }
   }
-  return qMakePair( minPos, qSqrt( minDistSq ) );
+  return qMakePair( minPos, std::sqrt( minDistSq ) );
 }
 
 void KadasGeometryItem::clear()
@@ -426,7 +426,7 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
   int width = 0;
   for ( const QString &line : measurements )
   {
-    width = qMax( width, metrics.horizontalAdvance( line ) );
+    width = std::max( width, metrics.horizontalAdvance( line ) );
   }
   if ( !measurements.isEmpty() )
   {

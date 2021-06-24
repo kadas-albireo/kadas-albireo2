@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QMenu>
-#include <qmath.h>
+#include <QJsonArray>
 
 #include <GeographicLib/Geodesic.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
@@ -395,7 +395,7 @@ void KadasLineItem::measureGeometry()
           }
           else
           {
-            angle = qAtan2( p2.x() - p1.x(), p2.y() - p1.y() );
+            angle = std::atan2( p2.x() - p1.x(), p2.y() - p1.y() );
           }
           angle = qRound( angle *  1000 ) / 1000.;
           angle = angle < 0 ? angle + 2 * M_PI : angle;
@@ -439,7 +439,7 @@ void KadasLineItem::recomputeDerived()
         {
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
           double dist = line.Distance();
-          int nIntervals = qMax( 1, int ( std::ceil( dist / sdist ) ) );
+          int nIntervals = std::max( 1, int ( std::ceil( dist / sdist ) ) );
           for ( int j = 0; j < nIntervals; ++j )
           {
             double lat, lon;

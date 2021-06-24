@@ -117,7 +117,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
           minIdx = i;
         }
       }
-      if ( qSqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
+      if ( std::sqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
       {
         mPosMarker->clear();
         mPosMarker->addPartFromGeometry( minPos );

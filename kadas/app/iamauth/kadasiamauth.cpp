@@ -68,7 +68,7 @@ class StackedDialog : public QDialog
 class WebWidget : public QAxWidget
 {
   public:
-    WebWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 )
+    WebWidget( QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() )
       : QAxWidget( parent, f )
     {
       setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );

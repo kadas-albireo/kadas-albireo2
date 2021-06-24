@@ -285,7 +285,7 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
   iconImage.fill( Qt::transparent );
   if ( !image.isNull() )
   {
-    double scale = qMin( 1., image.width() > image.height() ? iconImage.width() / double( image.width() ) : iconImage.height() / double( image.height() ) );
+    double scale = std::min( 1., image.width() > image.height() ? iconImage.width() / double( image.width() ) : iconImage.height() / double( image.height() ) );
     QPainter painter( &iconImage );
     painter.setRenderHint( QPainter::SmoothPixmapTransform );
     painter.drawImage(

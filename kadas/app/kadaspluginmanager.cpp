@@ -15,11 +15,13 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QBuffer>
 #include <QDir>
 #include <QDomDocument>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeWidgetItem>
+#include <QVersionNumber>
 #include <quazip5/quazipfile.h>
 
 #include <qgis/qgsmessagebar.h>

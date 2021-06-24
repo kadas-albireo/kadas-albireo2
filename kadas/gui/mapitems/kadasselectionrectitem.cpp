@@ -66,10 +66,10 @@ KadasItemRect KadasSelectionRectItem::boundingBox() const
   for ( int i = 1, n = mItems.size(); i < n; ++i )
   {
     QgsRectangle itemRect = QgsCoordinateTransform( mItems[i]->crs(), crs(), tctx ).transformBoundingBox( mItems[i]->boundingBox() );
-    rect.setXMinimum( qMin( rect.xMinimum(), itemRect.xMinimum() ) );
-    rect.setYMinimum( qMin( rect.yMinimum(), itemRect.yMinimum() ) );
-    rect.setXMaximum( qMax( rect.xMaximum(), itemRect.xMaximum() ) );
-    rect.setYMaximum( qMax( rect.yMaximum(), itemRect.yMaximum() ) );
+    rect.setXMinimum( std::min( rect.xMinimum(), itemRect.xMinimum() ) );
+    rect.setYMinimum( std::min( rect.yMinimum(), itemRect.yMinimum() ) );
+    rect.setXMaximum( std::max( rect.xMaximum(), itemRect.xMaximum() ) );
+    rect.setYMaximum( std::max( rect.yMaximum(), itemRect.yMaximum() ) );
   }
   return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
@@ -84,10 +84,10 @@ KadasMapItem::Margin KadasSelectionRectItem::margin() const
   for ( int i = 1, n = mItems.size(); i < n; ++i )
   {
     Margin im = mItems[i]->margin();
-    m.left = qMax( m.left, im.left );
-    m.right = qMax( m.right, im.right );
-    m.top = qMax( m.top, im.top );
-    m.bottom = qMax( m.bottom, im.bottom );
+    m.left = std::max( m.left, im.left );
+    m.right = std::max( m.right, im.right );
+    m.top = std::max( m.top, im.top );
+    m.bottom = std::max( m.bottom, im.bottom );
   }
   return m;
 }
@@ -110,10 +110,10 @@ KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
       rect = KadasMapRect( itemRect.xMaximum(), itemRect.yMinimum(), itemRect.xMaximum(), itemRect.yMaximum() );
       empty = false;
     }
-    rect.setXMinimum( qMin( rect.xMinimum(), itemRect.xMinimum() - m.left * mup ) );
-    rect.setYMinimum( qMin( rect.yMinimum(), itemRect.yMinimum() - m.bottom * mup ) );
-    rect.setXMaximum( qMax( rect.xMaximum(), itemRect.xMaximum() + m.right * mup ) );
-    rect.setYMaximum( qMax( rect.yMaximum(), itemRect.yMaximum() + m.top * mup ) );
+    rect.setXMinimum( std::min( rect.xMinimum(), itemRect.xMinimum() - m.left * mup ) );
+    rect.setYMinimum( std::min( rect.yMinimum(), itemRect.yMinimum() - m.bottom * mup ) );
+    rect.setXMaximum( std::max( rect.xMaximum(), itemRect.xMaximum() + m.right * mup ) );
+    rect.setYMaximum( std::max( rect.yMaximum(), itemRect.yMaximum() + m.top * mup ) );
   }
   return rect;
 }

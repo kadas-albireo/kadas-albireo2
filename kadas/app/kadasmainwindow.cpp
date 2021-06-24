@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QUrlQuery>
 
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertree.h>
@@ -126,7 +127,7 @@ void KadasMainWindow::init()
   mSearchWidget->init( mMapCanvas );
 
   mLayersWidget->setVisible( false );
-  mLayersWidget->resize( qMax( 10, qMin( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
+  mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
   mGeodataBox->setCollapsed( false );
   mLayersBox->setCollapsed( false );
 
@@ -147,7 +148,7 @@ void KadasMainWindow::init()
   {
     QString userLocale = QgsSettings().value( "/locale/userLocale", "" ).toString();
     int idx = mLanguageCombo->findData( userLocale.left( 2 ).toLower() );
-    mLanguageCombo->setCurrentIndex( qMax( 0, idx ) );
+    mLanguageCombo->setCurrentIndex( std::max( 0, idx ) );
   }
   connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
@@ -204,7 +205,7 @@ void KadasMainWindow::init()
 
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( QgsSnappingConfig::AllLayers );
-  snappingConfig.setType( QgsSnappingConfig::Vertex );
+  snappingConfig.setTypeFlag( QgsSnappingConfig::VertexFlag );
   int snappingRadius = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
   snappingConfig.setUnits( QgsTolerance::Pixels );
@@ -340,7 +341,7 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     if ( e->buttons() == Qt::LeftButton )
     {
       QPoint delta = e->pos() - mResizePressPos;
-      mLayersWidget->resize( qMax( 10, qMin( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
+      mLayersWidget->resize( std::max( 10, std::min( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
       QgsSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
       mLayerTreeViewButton->move( mLayersWidget->width(), mLayerTreeViewButton->y() );
     }
@@ -907,7 +908,7 @@ void KadasMainWindow::zoomPrev()
 
 void KadasMainWindow::zoomToLayerExtent()
 {
-  mLayerTreeView->defaultActions()->zoomToLayer( mMapCanvas );
+  mLayerTreeView->defaultActions()->zoomToLayers( mMapCanvas );
 }
 
 void KadasMainWindow::showSourceSelectDialog( const QString &providerName )

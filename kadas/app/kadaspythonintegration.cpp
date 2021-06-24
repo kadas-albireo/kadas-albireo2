@@ -166,7 +166,7 @@ bool KadasPythonIntegration::checkQgisUser()
   return true;
 }
 
-void KadasPythonIntegration::initPython( KadasPluginInterface *interface, const bool installErrorHook )
+void KadasPythonIntegration::initPython( KadasPluginInterface *iface, const bool installErrorHook )
 {
   init();
   if ( !checkSystemImports() )
@@ -175,10 +175,10 @@ void KadasPythonIntegration::initPython( KadasPluginInterface *interface, const 
     return;
   }
 
-  if ( interface )
+  if ( iface )
   {
     // initialize 'iface' object
-    runString( QStringLiteral( "qgis.utils.initInterface(%1)" ).arg( reinterpret_cast< quint64 >( interface ) ) );
+    runString( QStringLiteral( "qgis.utils.initInterface(%1)" ).arg( reinterpret_cast< quint64 >( iface ) ) );
   }
 
   if ( !checkQgisUser() )
@@ -769,7 +769,7 @@ bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const 
   }
 
   // our qgis version - cut release name after version number
-  QString qgisVersion = Qgis::QGIS_VERSION.section( '-', 0, 0 );
+  QString qgisVersion = QString( _QGIS_VERSION ).section( '-', 0, 0 );
 
   QStringList qgisVersionParts = qgisVersion.split( '.' );
 

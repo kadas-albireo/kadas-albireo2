@@ -108,7 +108,7 @@ QgsMapSettings KadasGlobeTileImage::createSettings( int dpi, const QList<QgsMapL
 {
   QgsMapSettings settings;
   settings.setBackgroundColor( QColor( Qt::transparent ) );
-  settings.setDestinationCrs( QgsCoordinateReferenceSystem::fromOgcWmsCrs( GEO_EPSG_CRS_AUTHID ) );
+  settings.setDestinationCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
   settings.setExtent( mTileExtent );
   settings.setLayers( layers );
   settings.setFlag( QgsMapSettings::DrawEditingInfo, false );
@@ -117,7 +117,7 @@ QgsMapSettings KadasGlobeTileImage::createSettings( int dpi, const QList<QgsMapL
   settings.setOutputSize( QSize( mTileSize, mTileSize ) );
   settings.setOutputImageFormat( QImage::Format_ARGB32_Premultiplied );
   settings.setOutputDpi( dpi );
-  settings.setCustomRenderFlags( "globe" );
+  settings.setCustomRenderingFlag( "globe", true );
   return settings;
 }
 

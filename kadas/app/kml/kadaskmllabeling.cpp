@@ -16,8 +16,10 @@
 
 #include <QTextStream>
 
-#include <qgis/feature.h>
+#include <qgis/qgsfeature.h>
+#include <qgis/qgslabelposition.h>
 #include <qgis/labelposition.h>
+#include <qgis/feature.h>
 
 #include <kadas/app/kml/kadaskmlexport.h>
 #include <kadas/app/kml/kadaskmllabeling.h>

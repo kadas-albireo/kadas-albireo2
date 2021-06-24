@@ -16,6 +16,7 @@
 
 #include <QDesktopServices>
 #include <QImageReader>
+#include <QJsonArray>
 #include <QMenu>
 
 #include <exiv2/exiv2.hpp>
@@ -182,10 +183,10 @@ KadasMapItem::Margin KadasPictureItem::margin() const
   double framePadding = mFrame ? sFramePadding : 0;
   return Margin
   {
-    qCeil( qMax( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) * mSymbolScale ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) * mSymbolScale ),
-    qCeil( qMax( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) * mSymbolScale ),
-    qCeil( qMax( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) * mSymbolScale )
+    std::ceil( std::max( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) * mSymbolScale ),
+    std::ceil( std::max( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) * mSymbolScale ),
+    std::ceil( std::max( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) * mSymbolScale ),
+    std::ceil( std::max( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) * mSymbolScale )
   };
 }
 
@@ -275,17 +276,17 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
       QgsPointXY framePos;
       QgsVector baseDir;
       // Determine triangle quadrant
-      int quadrant = qRound( qAtan2( -offsetY, offsetX ) / M_PI * 180 / 90 );
+      int quadrant = qRound( std::atan2( -offsetY, offsetX ) / M_PI * 180 / 90 );
       if ( quadrant < 0 ) { quadrant += 4; }
       if ( quadrant == 0 || quadrant == 2 )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
       {
         baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
         framePos.setX( quadrant == 0 ? offsetX - 0.5 * framew : offsetX + 0.5 * framew );
-        framePos.setY( qMin( qMax( -offsetY - 0.5 * frameh + sArrowWidth, 0. ), -offsetY + 0.5 * frameh - sArrowWidth ) );
+        framePos.setY( std::min( std::max( -offsetY - 0.5 * frameh + sArrowWidth, 0. ), -offsetY + 0.5 * frameh - sArrowWidth ) );
       }
       else     // Triangle above (quadrant = 1) or below (quadrant = 3)
       {
-        framePos.setX( qMin( qMax( offsetX - 0.5 * framew + sArrowWidth, 0. ), offsetX + 0.5 * framew - sArrowWidth ) );
+        framePos.setX( std::min( std::max( offsetX - 0.5 * framew + sArrowWidth, 0. ), offsetX + 0.5 * framew - sArrowWidth ) );
         framePos.setY( quadrant == 1 ? -offsetY - 0.5 * frameh : -offsetY + 0.5 * frameh );
         baseDir = QgsVector( quadrant == 1 ? 1 : -1, 0 );
       }

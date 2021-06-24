@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QDesktopWidget>
+#include <QJsonArray>
 #include <QMenu>
 #include <QVector2D>
 
@@ -195,10 +196,10 @@ KadasItemRect KadasMilxItem::boundingBox() const
 KadasMapItem::Margin KadasMilxItem::margin() const
 {
   Margin m = mMargin;
-  m.left = qMax( 0, m.left - constState()->userOffset.x() );
-  m.right = qMax( 0, m.right + constState()->userOffset.x() );
-  m.top = qMax( 0, m.top - constState()->userOffset.y() );
-  m.bottom = qMax( 0, m.bottom + constState()->userOffset.y() );
+  m.left = std::max( 0, m.left - constState()->userOffset.x() );
+  m.right = std::max( 0, m.right + constState()->userOffset.x() );
+  m.top = std::max( 0, m.top - constState()->userOffset.y() );
+  m.bottom = std::max( 0, m.bottom + constState()->userOffset.y() );
   return m;
 }
 
@@ -263,7 +264,7 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
       minPos = mapPos;
     }
   }
-  return qMakePair( minPos, qSqrt( minDistSq ) );
+  return qMakePair( minPos, std::sqrt( minDistSq ) );
 }
 
 void KadasMilxItem::render( QgsRenderContext &context ) const
@@ -945,10 +946,10 @@ QRect KadasMilxItem::computeScreenExtent( const QgsRectangle &mapExtent, const Q
   QPoint topRight = mapToPixel.transform( mapExtent.xMaximum(), mapExtent.yMinimum() ).toQPointF().toPoint();
   QPoint bottomLeft = mapToPixel.transform( mapExtent.xMinimum(), mapExtent.yMaximum() ).toQPointF().toPoint();
   QPoint bottomRight = mapToPixel.transform( mapExtent.xMaximum(), mapExtent.yMaximum() ).toQPointF().toPoint();
-  int xMin = qMin( qMin( topLeft.x(), topRight.x() ), qMin( bottomLeft.x(), bottomRight.x() ) );
-  int xMax = qMax( qMax( topLeft.x(), topRight.x() ), qMax( bottomLeft.x(), bottomRight.x() ) );
-  int yMin = qMin( qMin( topLeft.y(), topRight.y() ), qMin( bottomLeft.y(), bottomRight.y() ) );
-  int yMax = qMax( qMax( topLeft.y(), topRight.y() ), qMax( bottomLeft.y(), bottomRight.y() ) );
+  int xMin = std::min( std::min( topLeft.x(), topRight.x() ), std::min( bottomLeft.x(), bottomRight.x() ) );
+  int xMax = std::max( std::max( topLeft.x(), topRight.x() ), std::max( bottomLeft.x(), bottomRight.x() ) );
+  int yMin = std::min( std::min( topLeft.y(), topRight.y() ), std::min( bottomLeft.y(), bottomRight.y() ) );
+  int yMax = std::max( std::max( topLeft.y(), topRight.y() ), std::max( bottomLeft.y(), bottomRight.y() ) );
   return QRect( xMin, yMin, xMax - xMin, yMax - yMin ).normalized();
 }
 
@@ -1010,18 +1011,18 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   for ( int i = 1, n = result.adjustedPoints.size(); i < n; ++i )
   {
     const QPoint &p = result.adjustedPoints[i];
-    pointBounds.setLeft( qMin( pointBounds.left(), p.x() ) );
-    pointBounds.setRight( qMax( pointBounds.right(), p.x() ) );
-    pointBounds.setTop( qMin( pointBounds.top(), p.y() ) );
-    pointBounds.setBottom( qMax( pointBounds.bottom(), p.y() ) );
+    pointBounds.setLeft( std::min( pointBounds.left(), p.x() ) );
+    pointBounds.setRight( std::max( pointBounds.right(), p.x() ) );
+    pointBounds.setTop( std::min( pointBounds.top(), p.y() ) );
+    pointBounds.setBottom( std::max( pointBounds.bottom(), p.y() ) );
   }
 
   QPoint offset = result.adjustedPoints.front() + result.offset;
   QRect symbolBounds( offset.x(), offset.y(), result.graphic.width(), result.graphic.height() );
-  mMargin.left = qMax( 0, pointBounds.left() - symbolBounds.left() );
-  mMargin.top = qMax( 0, pointBounds.top() - symbolBounds.top() );
-  mMargin.right = qMax( 0, symbolBounds.right() - pointBounds.right() );
-  mMargin.bottom = qMax( 0, symbolBounds.bottom() - pointBounds.bottom() );
+  mMargin.left = std::max( 0, pointBounds.left() - symbolBounds.left() );
+  mMargin.top = std::max( 0, pointBounds.top() - symbolBounds.top() );
+  mMargin.right = std::max( 0, symbolBounds.right() - pointBounds.right() );
+  mMargin.bottom = std::max( 0, symbolBounds.bottom() - pointBounds.bottom() );
 
   // Clear cache
   mSymbolGraphic = QImage();

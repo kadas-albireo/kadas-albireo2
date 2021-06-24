@@ -65,13 +65,13 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
 
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
+      mRendererContext.painter()->setOpacity( mLayer->opacity() );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
       mRendererContext.painter()->setBrush( mLayer->mColor );
 
-      const QStringList &flags = mRendererContext.customRenderFlags();
-      bool adaptLabelsToScreen = !( flags.contains( "globe" ) || flags.contains( "kml" ) );
+      const QVariantMap &flags = mRendererContext.customRenderingFlags();
+      bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
 
       QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
 
@@ -105,8 +105,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         path.addPolygon( vLine1 );
         mRendererContext.painter()->drawPath( path );
       }
-      double sy1 = adaptLabelsToScreen ? qMax( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
-      double sy2 = adaptLabelsToScreen ? qMin( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
+      double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
+      double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
       for ( int col = 1; col <= mLayer->mCols; ++col )
       {
         double x2 = gridRect.xMinimum() + col * ix;
@@ -171,8 +171,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         path.addPolygon( hLine1 );
         mRendererContext.painter()->drawPath( path );
       }
-      double sx1 = adaptLabelsToScreen ? qMax( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
-      double sx2 = adaptLabelsToScreen ? qMin( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
+      double sx1 = adaptLabelsToScreen ? std::max( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
+      double sx2 = adaptLabelsToScreen ? std::min( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
       for ( int row = 1; row <= mLayer->mRows; ++row )
       {
         double y = gridRect.yMaximum() - row * iy;
@@ -317,7 +317,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
 {
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
-  mOpacity = 100. - layerEl.attribute( "transparency" ).toInt();
+  mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
   mGridRect.setXMinimum( layerEl.attribute( "xmin" ).toDouble() );
   mGridRect.setYMinimum( layerEl.attribute( "ymin" ).toDouble() );
   mGridRect.setXMaximum( layerEl.attribute( "xmax" ).toDouble() );
@@ -404,7 +404,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "type", "plugin" );
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
-  layerEl.setAttribute( "transparency", 100. - mOpacity );
+  layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
   layerEl.setAttribute( "xmin", mGridRect.xMinimum() );
   layerEl.setAttribute( "ymin", mGridRect.yMinimum() );
   layerEl.setAttribute( "xmax", mGridRect.xMaximum() );

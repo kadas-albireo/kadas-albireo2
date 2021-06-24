@@ -81,7 +81,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
           plt->addLayerTreeMenuActions( menu, pluginLayer );
         }
       }
-      menu->addAction( actions->actionZoomToLayer( kApp->mainWindow()->mapCanvas(), menu ) );
+      menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
@@ -125,7 +125,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    opacity = static_cast<KadasPluginLayer *>( layer )->opacity();
+    opacity = static_cast<KadasPluginLayer *>( layer )->opacity() * 100;
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {
@@ -201,7 +201,7 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    static_cast<KadasPluginLayer *>( layer )->setOpacity( 100 - value );
+    static_cast<KadasPluginLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {

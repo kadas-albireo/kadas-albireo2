@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QJsonArray>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>

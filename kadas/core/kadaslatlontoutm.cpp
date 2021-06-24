@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <qmath.h>
-
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgspoint.h>
 
@@ -39,7 +37,7 @@ QgsPointXY KadasLatLonToUTM::UTM2LL( const UTMCoo &utm, bool &ok )
   const double k0 = 0.9996;
   const double a = 6378137.0; //ellip.radius;
   const double eccSquared = 0.00669438; //ellip.eccsq;
-  double e1 = ( 1 - qSqrt( 1 - eccSquared ) ) / ( 1 + qSqrt( 1 - eccSquared ) );
+  double e1 = ( 1 - std::sqrt( 1 - eccSquared ) ) / ( 1 + std::sqrt( 1 - eccSquared ) );
 
   // remove 500,000 meter offset for longitude
   double x = utm.easting - 500000.0;
@@ -63,19 +61,19 @@ QgsPointXY KadasLatLonToUTM::UTM2LL( const UTMCoo &utm, bool &ok )
   double M = y / k0;
   double mu = M / ( a * ( 1 - eccSquared / 4 - 3 * eccSquared * eccSquared / 64 - 5 * eccSquared * eccSquared * eccSquared / 256 ) );
 
-  double phi1Rad = mu + ( 3 * e1 / 2 - 27 * e1 * e1 * e1 / 32 ) * qSin( 2 * mu ) + ( 21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32 ) * qSin( 4 * mu ) + ( 151 * e1 * e1 * e1 / 96 ) * qSin( 6 * mu );
+  double phi1Rad = mu + ( 3 * e1 / 2 - 27 * e1 * e1 * e1 / 32 ) * std::sin( 2 * mu ) + ( 21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32 ) * std::sin( 4 * mu ) + ( 151 * e1 * e1 * e1 / 96 ) * std::sin( 6 * mu );
   // double phi1 = ProjMath.radToDeg(phi1Rad);
 
-  double N1 = a / qSqrt( 1 - eccSquared * qSin( phi1Rad ) * qSin( phi1Rad ) );
-  double T1 = qTan( phi1Rad ) * qTan( phi1Rad );
-  double C1 = eccPrimeSquared * qCos( phi1Rad ) * qCos( phi1Rad );
-  double R1 = a * ( 1 - eccSquared ) / qPow( 1 - eccSquared * qSin( phi1Rad ) * qSin( phi1Rad ), 1.5 );
+  double N1 = a / std::sqrt( 1 - eccSquared * std::sin( phi1Rad ) * std::sin( phi1Rad ) );
+  double T1 = std::tan( phi1Rad ) * std::tan( phi1Rad );
+  double C1 = eccPrimeSquared * std::cos( phi1Rad ) * std::cos( phi1Rad );
+  double R1 = a * ( 1 - eccSquared ) / std::pow( 1 - eccSquared * std::sin( phi1Rad ) * std::sin( phi1Rad ), 1.5 );
   double D = x / ( N1 * k0 );
 
-  double lat = phi1Rad - ( N1 * qTan( phi1Rad ) / R1 ) * ( D * D / 2 - ( 5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared ) * D * D * D * D / 24 + ( 61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared - 3 * C1 * C1 ) * D * D * D * D * D * D / 720 );
+  double lat = phi1Rad - ( N1 * std::tan( phi1Rad ) / R1 ) * ( D * D / 2 - ( 5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared ) * D * D * D * D / 24 + ( 61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared - 3 * C1 * C1 ) * D * D * D * D * D * D / 720 );
   lat = lat / M_PI * 180.;
 
-  double lon = ( D - ( 1 + 2 * T1 + C1 ) * D * D * D / 6 + ( 5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * eccPrimeSquared + 24 * T1 * T1 ) * D * D * D * D * D / 120 ) / qCos( phi1Rad );
+  double lon = ( D - ( 1 + 2 * T1 + C1 ) * D * D * D / 6 + ( 5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * eccPrimeSquared + 24 * T1 * T1 ) * D * D * D * D * D / 120 ) / std::cos( phi1Rad );
   lon = LongOrigin + lon / M_PI * 180.;
 
   ok = true;
@@ -99,21 +97,21 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::LL2UTM( const QgsPointXY &pLatLong )
 
   double eccPrimeSquared = ( eccSqr ) / ( 1 - eccSqr );
 
-  double N = a / qSqrt( 1 - eccSqr * qSin( LatRad ) * qSin( LatRad ) );
-  double T = qTan( LatRad ) * qTan( LatRad );
-  double C = eccPrimeSquared * qCos( LatRad ) * qCos( LatRad );
-  double A = qCos( LatRad ) * ( LongRad - LongOriginRad );
+  double N = a / std::sqrt( 1 - eccSqr * std::sin( LatRad ) * std::sin( LatRad ) );
+  double T = std::tan( LatRad ) * std::tan( LatRad );
+  double C = eccPrimeSquared * std::cos( LatRad ) * std::cos( LatRad );
+  double A = std::cos( LatRad ) * ( LongRad - LongOriginRad );
   double M = a * (
                ( 1 - eccSqr / 4 - 3 * eccSqr * eccSqr / 64 - 5 * eccSqr * eccSqr * eccSqr / 256 ) * LatRad -
-               ( 3 * eccSqr / 8 + 3 * eccSqr * eccSqr / 32 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * qSin( 2 * LatRad ) +
-               ( 15 * eccSqr * eccSqr / 256 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * qSin( 4 * LatRad ) -
-               ( 35 * eccSqr * eccSqr * eccSqr / 3072 ) * qSin( 6 * LatRad ) );
+               ( 3 * eccSqr / 8 + 3 * eccSqr * eccSqr / 32 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 2 * LatRad ) +
+               ( 15 * eccSqr * eccSqr / 256 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 4 * LatRad ) -
+               ( 35 * eccSqr * eccSqr * eccSqr / 3072 ) * std::sin( 6 * LatRad ) );
 
   UTMCoo coo;
 
   coo.easting = ( k0 * N * ( A + ( 1 - T + C ) * A * A * A / 6.0 + ( 5 - 18 * T + T * T + 72 * C - 58 * eccPrimeSquared ) * A * A * A * A * A / 120.0 ) + 500000.0 );
 
-  coo.northing = ( k0 * ( M + N * qTan( LatRad ) * ( A * A / 2 + ( 5 - T + 9 * C + 4 * C * C ) * A * A * A * A / 24.0 + ( 61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared ) * A * A * A * A * A * A / 720.0 ) ) );
+  coo.northing = ( k0 * ( M + N * std::tan( LatRad ) * ( A * A / 2 + ( 5 - T + 9 * C + 4 * C * C ) * A * A * A * A / 24.0 + ( 61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared ) * A * A * A * A * A * A / 720.0 ) ) );
   if ( Lat < 0.0 )
   {
     coo.northing += 10000000.0; //10000000 meter offset for southern hemisphere
@@ -126,7 +124,7 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::LL2UTM( const QgsPointXY &pLatLong )
 
 int KadasLatLonToUTM::getZoneNumber( double lon, double lat )
 {
-  int zoneNumber = qFloor( ( lon + 180. ) / 6. ) + 1;
+  int zoneNumber = std::floor( ( lon + 180. ) / 6. ) + 1;
 
   //Make sure the longitude 180.00 is in Zone 60
   if ( lon >= 180.0 )
@@ -258,8 +256,8 @@ KadasLatLonToUTM::MGRSCoo KadasLatLonToUTM::UTM2MGRS( const UTMCoo &utmcoo )
     setParm = NUM_100K_SETS;
   }
 
-  int setColumn = qFloor( utmcoo.easting / 100000 );
-  int setRow = int ( qFloor( utmcoo.northing / 100000 ) ) % 20;
+  int setColumn = std::floor( utmcoo.easting / 100000 );
+  int setRow = int ( std::floor( utmcoo.northing / 100000 ) ) % 20;
 
   MGRSCoo mgrscoo;
   mgrscoo.easting = utmcoo.easting % 100000;
@@ -805,10 +803,10 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
         continue;
       }
 
-      double xMin = qMax( x1, bbox.xMinimum() );
-      double xMax = qMin( x2, bbox.xMaximum() );
-      double yMin = qMax( y1, bbox.yMinimum() );
-      double yMax = qMin( y2, bbox.yMaximum() );
+      double xMin = std::max( x1, bbox.xMinimum() );
+      double xMax = std::min( x2, bbox.xMaximum() );
+      double yMin = std::max( y1, bbox.yMinimum() );
+      double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
       zoneLines << polyGridLineX( xMin, yMin, yMax, 1 ) << polyGridLineX( xMax, yMin, yMax, 1. );
@@ -909,7 +907,7 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
       UTMCoo maxCoo = xcoo;
       maxCoo.easting += cellSize;
       QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-      zoneLabels->append( zoneLabelCallback( xLine.last().x(), qMax( yMin, xLine.last().y() ), maxPos.x(), maxPos.y() ) );
+      zoneLabels->append( zoneLabelCallback( xLine.last().x(), std::max( yMin, xLine.last().y() ), maxPos.x(), maxPos.y() ) );
     }
     truncated = false;
     // Draw remaining segments of grid line
@@ -974,7 +972,7 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
       UTMCoo maxCoo = ycoo;
       maxCoo.northing += cellSize;
       QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-      zoneLabels->append( zoneLabelCallback( yLine.last().x(), qMax( xMin, yLine.last().y() ), maxPos.x(), maxPos.y() ) );
+      zoneLabels->append( zoneLabelCallback( yLine.last().x(), std::max( xMin, yLine.last().y() ), maxPos.x(), maxPos.y() ) );
     }
     // Draw remaining segments of grid line
     while ( ( q = UTM2LL( ycoo, ok ) ).x() < xMax && ok )
@@ -986,8 +984,8 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
         maxCoo.easting += cellSize;
         maxCoo.northing += cellSize;
         QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-        maxPos.setX( qMin( maxPos.x(), xMax ) );
-        maxPos.setY( qMin( maxPos.y(), yMax ) );
+        maxPos.setX( std::min( maxPos.x(), xMax ) );
+        maxPos.setY( std::min( maxPos.y(), yMax ) );
         zoneLabels->append( zoneLabelCallback( q.x(), q.y(), maxPos.x(), maxPos.y() ) );
       }
       ycoo.easting += cellSize;
@@ -1001,8 +999,8 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
 KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat )
 {
   UTMCoo utmcoo = LL2UTM( QgsPointXY( posX + 0.01, posY + 0.01 ) );
-  int setColumn = qFloor( utmcoo.easting / 100000 );
-  int setRow = int ( qFloor( utmcoo.northing / 100000 ) ) % 20;
+  int setColumn = std::floor( utmcoo.easting / 100000 );
+  int setRow = int ( std::floor( utmcoo.northing / 100000 ) ) % 20;
   int setParm = utmcoo.zoneNumber % NUM_100K_SETS;
   if ( setParm == 0 )
   {

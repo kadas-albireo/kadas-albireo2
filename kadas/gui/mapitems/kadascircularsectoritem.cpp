@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <qmath.h>
+#include <QJsonArray>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgscircularstring.h>
@@ -186,7 +186,7 @@ bool KadasCircularSectorItem::startPart( const AttribValues &values, const QgsMa
   state()->drawStatus = State::Drawing;
   state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
   state()->centers.append( center );
-  state()->radii.append( qSqrt( center.sqrDist( rPos ) ) );
+  state()->radii.append( std::sqrt( center.sqrDist( rPos ) ) );
   state()->startAngles.append( toRadAngle( values[AttrA1] ) );
   state()->stopAngles.append( toRadAngle( values[AttrA2] ) );
   if ( state()->stopAngles.last() <= state()->startAngles.last() )
@@ -202,8 +202,8 @@ void KadasCircularSectorItem::setCurrentPoint( const KadasMapPos &p, const QgsMa
   if ( state()->sectorStatus == State::HaveCenter )
   {
     KadasItemPos rPos = toItemPos( p, mapSettings );
-    state()->radii.back() = qSqrt( rPos.sqrDist( state()->centers.back() ) );
-    state()->startAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
+    state()->radii.back() = std::sqrt( rPos.sqrDist( state()->centers.back() ) );
+    state()->startAngles.back() = std::atan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
     if ( state()->startAngles.back() < 0 )
     {
       state()->startAngles.back() += 2 * M_PI;
@@ -212,7 +212,7 @@ void KadasCircularSectorItem::setCurrentPoint( const KadasMapPos &p, const QgsMa
   }
   else if ( state()->sectorStatus == State::HaveRadius )
   {
-    state()->stopAngles.back() = qAtan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
+    state()->stopAngles.back() = std::atan2( p.y() - state()->centers.back().y(), p.x() - state()->centers.back().x() );
     while ( state()->stopAngles.back() <= state()->startAngles.back() )
     {
       state()->stopAngles.back() += 2 * M_PI;
@@ -223,10 +223,10 @@ void KadasCircularSectorItem::setCurrentPoint( const KadasMapPos &p, const QgsMa
     const double &radius = state()->radii.back();
     const double &startAngle = state()->startAngles.back();
     const double &stopAngle = state()->stopAngles.back();
-    KadasItemPos pStart( center.x() + radius * qCos( startAngle ),
-                         center.y() + radius * qSin( startAngle ) );
-    KadasItemPos pEnd( center.x() + radius * qCos( stopAngle ),
-                       center.y() + radius * qSin( stopAngle ) );
+    KadasItemPos pStart( center.x() + radius * std::cos( startAngle ),
+                         center.y() + radius * std::sin( startAngle ) );
+    KadasItemPos pEnd( center.x() + radius * std::cos( stopAngle ),
+                       center.y() + radius * std::sin( stopAngle ) );
     KadasMapPos mapPStart = toMapPos( pStart, mapSettings );
     KadasMapPos mapPEnd = toMapPos( pEnd, mapSettings );
     if ( mapPStart.sqrDist( mapPEnd ) < pickTolSqr( mapSettings ) )
@@ -243,7 +243,7 @@ void KadasCircularSectorItem::setCurrentAttributes( const AttribValues &values, 
   KadasItemPos rPos = toItemPos( KadasMapPos( values[AttrX] + values[AttrR], values[AttrY] ), mapSettings );
   state()->sectorStatus = values[AttrR] > 0 ? State::HaveRadius : State::HaveCenter;
   state()->centers.last() = center;
-  state()->radii.last() = qSqrt( center.sqrDist( rPos ) );
+  state()->radii.last() = std::sqrt( center.sqrDist( rPos ) );
   state()->startAngles.last() = toRadAngle( values[AttrA1] );
   state()->stopAngles.last() = toRadAngle( values[AttrA2] );
   if ( state()->stopAngles.last() <= state()->startAngles.last() )
@@ -297,7 +297,7 @@ KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition( con
     KadasMapPos mapRPos = toMapPos( KadasItemPos( center.x() + constState()->radii.last(), center.y() ), mapSettings );
     attributes.insert( AttrX, mapCenter.x() );
     attributes.insert( AttrY, mapCenter.y() );
-    attributes.insert( AttrR, qSqrt( mapCenter.sqrDist( mapRPos ) ) );
+    attributes.insert( AttrR, std::sqrt( mapCenter.sqrDist( mapRPos ) ) );
     if ( constState()->sectorStatus == State::HaveRadius )
     {
       attributes.insert( AttrA1, toGeoAngle( constState()->startAngles.last() ) );
@@ -379,12 +379,12 @@ void KadasCircularSectorItem::recomputeDerived()
     if ( stopAngle - startAngle < 2 * M_PI - std::numeric_limits<float>::epsilon() )
     {
       double alphaMid = 0.5 * ( startAngle + 2 * M_PI + stopAngle );
-      QgsPoint pStart = QgsPoint( center.x() + radius * qCos( startAngle ),
-                                  center.y() + radius * qSin( startAngle ) );
-      QgsPoint pMid = QgsPoint( center.x() + radius * qCos( alphaMid ),
-                                center.y() + radius * qSin( alphaMid ) );
-      QgsPoint pEnd = QgsPoint( center.x() + radius * qCos( stopAngle ),
-                                center.y() + radius * qSin( stopAngle ) );
+      QgsPoint pStart = QgsPoint( center.x() + radius * std::cos( startAngle ),
+                                  center.y() + radius * std::sin( startAngle ) );
+      QgsPoint pMid = QgsPoint( center.x() + radius * std::cos( alphaMid ),
+                                center.y() + radius * std::sin( alphaMid ) );
+      QgsPoint pEnd = QgsPoint( center.x() + radius * std::cos( stopAngle ),
+                                center.y() + radius * std::sin( stopAngle ) );
       exterior->addCurve( new QgsCircularString( pStart, pMid, pEnd ) );
 
       exterior->addCurve( new QgsLineString( QgsPointSequence() << pEnd << QgsPoint( center ) << pStart ) );

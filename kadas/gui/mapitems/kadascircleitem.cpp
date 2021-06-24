@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QJsonArray>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgscircularstring.h>
@@ -392,7 +393,7 @@ void KadasCircleItem::recomputeDerived()
 void KadasCircleItem::computeCircle( const KadasItemPos &center, const KadasItemPos &ringpos, QgsMultiSurface *multiGeom )
 {
   QgsCircularString *string = new QgsCircularString();
-  double radius = qSqrt( ringpos.sqrDist( center ) );
+  double radius = std::sqrt( ringpos.sqrDist( center ) );
   string->setPoints( QgsPointSequence()
                      << QgsPoint( center.x(), center.y() + radius )
                      << QgsPoint( center.x(), center.y() - radius )
@@ -499,7 +500,7 @@ void KadasCircleItem::computeGeoCircle( const KadasItemPos &center, const KadasI
       QgsPointSequence points;
       for ( int k = 0, n = poly[j].size(); k < n; ++k )
       {
-        poly[j][k].setY( qMin( clampLatitude, qMax( -clampLatitude, poly[j][k].y() ) ) );
+        poly[j][k].setY( std::min( clampLatitude, std::max( -clampLatitude, poly[j][k].y() ) ) );
         try
         {
           points.append( QgsPoint( t2.transform( poly[j][k] ) ) );

@@ -42,7 +42,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
     bool render() override
     {
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->opacity() / 100. );
+      mRendererContext.painter()->setOpacity( mLayer->opacity() );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1. ) );
 
@@ -94,13 +94,13 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QList<GridLabel> topLabels;
       QList<GridLabel> bottomLabels;
 
-      double xStart = qFloor( area.xMinimum() / mLayer->intervalX() ) * mLayer->intervalX();
-      double xEnd = qCeil( area.xMaximum() / mLayer->intervalX() ) * mLayer->intervalX();
-      double yStart = qFloor( area.yMinimum() / mLayer->intervalY() ) * mLayer->intervalY();
-      double yEnd = qCeil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
+      double xStart = std::floor( area.xMinimum() / mLayer->intervalX() ) * mLayer->intervalX();
+      double xEnd = std::ceil( area.xMaximum() / mLayer->intervalX() ) * mLayer->intervalX();
+      double yStart = std::floor( area.yMinimum() / mLayer->intervalY() ) * mLayer->intervalY();
+      double yEnd = std::ceil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
 
-      const QStringList &renderFlags = mRendererContext.customRenderFlags();
-      bool drawLabels = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) || mRendererContext.flags() & QgsRenderContext::RenderPreviewJob );
+      const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
+      bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || mRendererContext.flags() & QgsRenderContext::RenderPreviewJob );
 
       // If chosen intervals would result in over 100 grid lines, reduce interval
       double intervalX = mLayer->intervalX();
@@ -119,7 +119,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       // Vertical lines
-      double ySegmentLength = intervalY / qCeil( intervalY / segmentLength );
+      double ySegmentLength = intervalY / std::ceil( intervalY / segmentLength );
       for ( int ix = 0; ix <= numX; ++ix )
       {
         QPolygonF poly;
@@ -166,7 +166,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       // Horizontal lines
-      double xSegmentLength = intervalX / qCeil( intervalX / segmentLength );
+      double xSegmentLength = intervalX / std::ceil( intervalX / segmentLength );
       for ( int iy = numY; iy >= 0; --iy )
       {
         QPolygonF poly;
@@ -310,17 +310,17 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QPoint topRight = mapToPixel.transform( mapExtent.xMaximum(), mapExtent.yMinimum() ).toQPointF().toPoint();
       QPoint bottomLeft = mapToPixel.transform( mapExtent.xMinimum(), mapExtent.yMaximum() ).toQPointF().toPoint();
       QPoint bottomRight = mapToPixel.transform( mapExtent.xMaximum(), mapExtent.yMaximum() ).toQPointF().toPoint();
-      int xMin = qMin( qMin( topLeft.x(), topRight.x() ), qMin( bottomLeft.x(), bottomRight.x() ) );
-      int xMax = qMax( qMax( topLeft.x(), topRight.x() ), qMax( bottomLeft.x(), bottomRight.x() ) );
-      int yMin = qMin( qMin( topLeft.y(), topRight.y() ), qMin( bottomLeft.y(), bottomRight.y() ) );
-      int yMax = qMax( qMax( topLeft.y(), topRight.y() ), qMax( bottomLeft.y(), bottomRight.y() ) );
+      int xMin = std::min( std::min( topLeft.x(), topRight.x() ), std::min( bottomLeft.x(), bottomRight.x() ) );
+      int xMax = std::max( std::max( topLeft.x(), topRight.x() ), std::max( bottomLeft.x(), bottomRight.x() ) );
+      int yMin = std::min( std::min( topLeft.y(), topRight.y() ), std::min( bottomLeft.y(), bottomRight.y() ) );
+      int yMax = std::max( std::max( topLeft.y(), topRight.y() ), std::max( bottomLeft.y(), bottomRight.y() ) );
       return QRect( xMin, yMin, xMax - xMin, yMax - yMin ).normalized();
     }
 
     void drawMgrsGrid()
     {
-      const QStringList &renderFlags = mRendererContext.customRenderFlags();
-      bool adaptToScreen = !( renderFlags.contains( "globe" ) || renderFlags.contains( "kml" ) );
+      const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
+      bool adaptToScreen = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() );
 
       QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
       QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), QgsCoordinateTransform::ReverseTransform );
@@ -547,7 +547,7 @@ bool KadasMapGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext
 {
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
-  mOpacity = 100. - layerEl.attribute( "transparency" ).toInt();
+  mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
   mGridType = static_cast<GridType>( layerEl.attribute( "type" ).toInt() );
   mIntervalX = layerEl.attribute( "intervalX" ).toDouble();
   mIntervalY = layerEl.attribute( "intervalY" ).toDouble();
@@ -563,7 +563,7 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
   layerEl.setAttribute( "type", "plugin" );
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
-  layerEl.setAttribute( "transparency", 100. - mOpacity );
+  layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
   layerEl.setAttribute( "type", mGridType );
   layerEl.setAttribute( "intervalX", mIntervalX );
   layerEl.setAttribute( "intervalY", mIntervalY );

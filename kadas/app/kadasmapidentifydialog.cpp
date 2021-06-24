@@ -16,11 +16,12 @@
 
 #include <QDialogButtonBox>
 #include <QHeaderView>
+#include <QJsonDocument>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTreeWidget>
+#include <QUrlQuery>
 #include <QVBoxLayout>
-#include <QJsonDocument>
 
 #include <qgis/qgsarcgisrestutils.h>
 #include <qgis/qgsgeometryrubberband.h>
@@ -424,7 +425,7 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
     }
     QTreeWidgetItem *resultItem = new QTreeWidgetItem( QStringList() << "" );
     QgsCoordinateReferenceSystem crs;
-    QgsAbstractGeometry *geometryV2 = QgsArcGisRestUtils::parseEsriGeoJSON( result["geometry"].toMap(), result["geometryType"].toString(), false, false, &crs ).release();
+    QgsAbstractGeometry *geometryV2 = QgsArcGisRestUtils::convertGeometry( result["geometry"].toMap(), result["geometryType"].toString(), false, false, &crs );
     mGeometries.append( geometryV2 );
 
     resultItem->setData( 0, sGeometryRole, mGeometries.size() - 1 );

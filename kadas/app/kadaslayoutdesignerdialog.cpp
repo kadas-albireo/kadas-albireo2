@@ -1568,7 +1568,7 @@ void KadasLayoutDesignerDialog::initializeRegistry()
   sInitializedRegistry = true;
   auto createPageWidget = ( []( QgsLayoutItem * item )->QgsLayoutItemBaseWidget *
   {
-    std::unique_ptr< QgsLayoutPagePropertiesWidget > newWidget = qgis::make_unique< QgsLayoutPagePropertiesWidget >( nullptr, item );
+    std::unique_ptr< QgsLayoutPagePropertiesWidget > newWidget = std::make_unique< QgsLayoutPagePropertiesWidget >( nullptr, item );
     return newWidget.release();
   } );
 
@@ -1695,7 +1695,7 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   dialog.setGeometriesSimplified( simplify );
   dialog.setExportGeoPdf( geoPdf );
   dialog.setUseOgcBestPracticeFormat( useOgcBestPracticeFormat );
-  dialog.setExportGeoPdfFeatures( exportGeoPdfFeatures );
+  dialog.setExportGeoPdf( exportGeoPdfFeatures );
   dialog.setExportThemes( exportThemes );
 
   if ( dialog.exec() != QDialog::Accepted )
@@ -1709,7 +1709,7 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   QgsRenderContext::TextRenderFormat textRenderFormat = dialog.textRenderFormat();
   geoPdf = dialog.exportGeoPdf();
   useOgcBestPracticeFormat = dialog.useOgcBestPracticeFormat();
-  exportGeoPdfFeatures = dialog.exportGeoPdfFeatures();
+  exportGeoPdfFeatures = dialog.exportGeoPdf();
   exportThemes = dialog.exportThemes();
 
   if ( mLayout )
@@ -1763,7 +1763,7 @@ QVector<double> KadasLayoutDesignerDialog::predefinedScales() const
   {
     // default to global map tool scales
     QgsSettings settings;
-    QString scalesStr( settings.value( QStringLiteral( "Map/scales" ), PROJECT_SCALES ).toString() );
+    QString scalesStr( settings.value( QStringLiteral( "Map/scales" ), Qgis::defaultProjectScales() ).toString() );
     QStringList scales = scalesStr.split( ',' );
 
     for ( auto scaleIt = scales.constBegin(); scaleIt != scales.constEnd(); ++scaleIt )
@@ -1783,7 +1783,7 @@ QPrinter *KadasLayoutDesignerDialog::printer()
   //only create the printer on demand - creating a printer object can be very slow
   //due to QTBUG-3033
   if ( !mPrinter )
-    mPrinter = qgis::make_unique< QPrinter >();
+    mPrinter = std::make_unique< QPrinter >();
 
   return mPrinter.get();
 }
@@ -1904,11 +1904,6 @@ QgsLayout *KadasAppLayoutDesignerInterface::layout()
   return mDesigner->currentLayout();
 }
 
-void KadasAppLayoutDesignerInterface::setCurrentLayout( QgsLayout *layout )
-{
-  return mDesigner->setCurrentLayout( dynamic_cast<QgsPrintLayout *>( layout ) );
-}
-
 QgsMasterLayoutInterface *KadasAppLayoutDesignerInterface::masterLayout()
 {
   return mDesigner->currentLayout();
@@ -1928,4 +1923,15 @@ void KadasAppLayoutDesignerInterface::activateTool( QgsLayoutDesignerInterface::
         mDesigner->mActionEditNodesItem->trigger();
       break;
   }
+}
+
+void KadasAppLayoutDesignerInterface::setAtlasFeature( const QgsFeature &feature )
+{
+  // TODO ?
+}
+
+QgsLayoutDesignerInterface::ExportResults *KadasAppLayoutDesignerInterface::lastExportResults() const
+{
+  // TODO ?
+  return nullptr;
 }

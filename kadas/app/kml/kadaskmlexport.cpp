@@ -116,7 +116,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setScaleFactor( dpi / 25.4 );
   rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
                                    fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
-  rc.setCustomRenderFlags( QStringList() << "kml" );
+  rc.setCustomRenderingFlag( "kml", true );
 
   // Render layers
   int drawingOrder = 0;
@@ -302,7 +302,7 @@ void KadasKMLExport::writeVectorLayerFeatures( QgsVectorLayer *vl, QTextStream &
       if ( geom )
       {
         geom->transform( ct ); //KML must be WGS84
-        outStream << geom->asKML( 6 );
+        outStream << geom->asKml( 6 );
       }
       delete geom;
     }
@@ -324,7 +324,7 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
 
   // Make extent square
   QgsPointXY center = layerExtent.center();
-  double extension = qMax( layerExtent.width(), layerExtent.height() ) * 0.5;
+  double extension = std::max( layerExtent.width(), layerExtent.height() ) * 0.5;
   QgsRectangle renderExtent = QgsRectangle( center.x() - extension, center.y() - extension, center.x() + extension, center.y() + extension );
 
   // Compute pixels to match extent at scale
@@ -336,7 +336,7 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
   double resolution = renderExtent.width() / totPixels;
 
   // Round up to next <tileSize> multiple
-  totPixels = qCeil( ( totPixels ) / double( tileSize ) ) * tileSize;
+  totPixels = std::ceil( ( totPixels ) / double( tileSize ) ) * tileSize;
   extension = totPixels * resolution * 0.5;
   renderExtent = QgsRectangle( center.x() - extension, center.y() - extension, center.x() + extension, center.y() + extension );
 
@@ -400,7 +400,7 @@ bool KadasKMLExport::renderTile( QImage &img, const QgsRectangle &extent, QgsMap
   QgsMapToPixel mtp( extent.width() / img.width(), centerPoint.x(), centerPoint.y(), img.width(), img.height(), 0.0 );
   context.setMapToPixel( mtp );
   context.setExtent( crst.transformBoundingBox( extent, QgsCoordinateTransform::ReverseTransform ) );
-  context.setCustomRenderFlags( QStringList() << "kml" );
+  context.setCustomRenderingFlag( "kml", true );
   QgsMapLayerRenderer *layerRenderer = mapLayer->createMapRenderer( context );
   bool rendered = false;
   if ( layerRenderer )
@@ -427,7 +427,7 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
   }
 
   outStream << "<Style>";
-  if ( s->type() == QgsSymbol::Line )
+  if ( s->type() == Qgis::SymbolType::Line )
   {
     double width = 1;
     if ( dynamic_cast<QgsLineSymbolLayer *>( s->symbolLayer( 0 ) ) )
@@ -440,7 +440,7 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
 
     outStream << QString( "<LineStyle><color>%1</color><width>%2</width></LineStyle>" ).arg( convertColor( c ) ).arg( QString::number( width ) );
   }
-  else if ( s->type() == QgsSymbol::Fill )
+  else if ( s->type() == Qgis::SymbolType::Fill )
   {
     double width = 1;
 

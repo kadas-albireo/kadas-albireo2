@@ -16,6 +16,7 @@
 
 #include <QClipboard>
 #include <QDesktopServices>
+#include <QJsonArray>
 #include <QFile>
 #include <QFileDialog>
 #include <QIcon>
@@ -23,6 +24,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStatusBar>
+#include <QUrlQuery>
 
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
@@ -32,13 +34,15 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
-#include <qgis/qgslayoutapputils.h>
 #include <qgis/qgslayoutundostack.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgsmessageviewer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgspointcloudlayer.h>
 #include <qgis/qgsprintlayout.h>
+#include <qgis/qgslayeritem.h>
+#include <qgis/qgslayoutguiutils.h>
 #include <qgis/qgslayoutmanager.h>
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
@@ -47,7 +51,9 @@
 #include <qgis/qgsrasterlayerproperties.h>
 #include <qgis/qgssublayersdialog.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsvectortilelayer.h>
 #include <qgis/qgsvectorlayerproperties.h>
+#include <qgis/qgszipitem.h>
 #include <qgis/qgsziputils.h>
 
 #include <kadas/core/kadas.h>
@@ -83,7 +89,7 @@
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
 {
-  return subLayerDef.split( QgsDataProvider::SUBLAYER_SEPARATOR );
+  return subLayerDef.split( QgsDataProvider::sublayerSeparator() );
 }
 
 static void setupVectorLayer( const QString &vectorLayerPath,
@@ -127,7 +133,7 @@ static void setupVectorLayer( const QString &vectorLayerPath,
     QString composedURI( uriParts.value( QStringLiteral( "path" ) ).toString() );
     composedURI += "|layername=" + rawLayerName;
 
-    auto newLayer = qgis::make_unique<QgsVectorLayer> ( composedURI, layer->name(), QStringLiteral( "ogr" ), options );
+    auto newLayer = std::make_unique<QgsVectorLayer> ( composedURI, layer->name(), QStringLiteral( "ogr" ), options );
     if ( newLayer && newLayer->isValid() )
     {
       delete layer;
@@ -349,7 +355,7 @@ void KadasApplication::init()
   processEvents();
 
   // Setup layout item widgets
-  QgsLayoutAppUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
+  QgsLayoutGuiUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
@@ -559,7 +565,7 @@ QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QStr
   if ( rx.indexIn( uri ) != -1 )
   {
     authok = false;
-    if ( !QgsAuthGuiUtils::isDisabled( mMainWindow->messageBar(), mMainWindow->messageTimeout() ) )
+    if ( !QgsAuthGuiUtils::isDisabled( mMainWindow->messageBar() ) )
     {
       authok = kApp->authManager()->setMasterPassword( true );
     }
@@ -699,6 +705,82 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
     }
     addVectorLayer( uri, baseName, QStringLiteral( "ogr" ) );
   }
+}
+
+QgsVectorTileLayer *KadasApplication::addVectorTileLayer( const QString &url, const QString &baseName, bool quiet )
+{
+  QgsSettings settings;
+
+  QString base( baseName );
+
+  if ( settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() )
+  {
+    base = QgsMapLayer::formatLayerName( base );
+  }
+
+  QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
+
+  // create the layer
+  std::unique_ptr<QgsVectorTileLayer> layer( new QgsVectorTileLayer( url, base ) );
+
+  if ( !layer || !layer->isValid() )
+  {
+    if ( !quiet )
+    {
+      QString msg = tr( "%1 is not a valid or recognized data source." ).arg( url );
+      mMainWindow->messageBar()->pushMessage( tr( "Invalid Data Source" ), msg, Qgis::MessageLevel::Critical );
+    }
+
+    // since the layer is bad, stomp on it
+    return nullptr;
+  }
+  bool ok = false;
+  QString error = layer->loadDefaultStyle( ok );
+  if ( !ok )
+    mMainWindow->messageBar()->pushMessage( tr( "Error loading style" ), error, Qgis::MessageLevel::Warning );
+  error = layer->loadDefaultMetadata( ok );
+  if ( !ok )
+    mMainWindow->messageBar()->pushMessage( tr( "Error loading layer metadata" ), error, Qgis::MessageLevel::Warning );
+
+  QgsProject::instance()->addMapLayer( layer.get() );
+
+  return layer.release();
+}
+
+QgsPointCloudLayer *KadasApplication::addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet )
+{
+  QgsSettings settings;
+
+  QString base( baseName );
+
+  if ( settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() )
+  {
+    base = QgsMapLayer::formatLayerName( base );
+  }
+
+  QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
+
+  // create the layer
+  std::unique_ptr<QgsPointCloudLayer> layer( new QgsPointCloudLayer( uri, base, providerKey ) );
+
+  if ( !layer || !layer->isValid() )
+  {
+    if ( !quiet )
+    {
+      QString msg = tr( "%1 is not a valid or recognized data source." ).arg( uri );
+      mMainWindow->messageBar()->pushMessage( tr( "Invalid Data Source" ), msg, Qgis::MessageLevel::Critical );
+    }
+
+    // since the layer is bad, stomp on it
+    return nullptr;
+  }
+  bool ok = false;
+  layer->loadDefaultStyle( ok );
+  layer->loadDefaultMetadata( ok );
+
+  QgsProject::instance()->addMapLayer( layer.get() );
+
+  return layer.release();
 }
 
 QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::addImageItem( const QString &filename ) const
@@ -876,7 +958,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   // Add default print templates if none are loaded
   bool haveLayouts = false;
-  for ( const QString &file : QgsProject::instance()->attachedFiles().keys() )
+  for ( const QString &file : QgsProject::instance()->attachedFiles() )
   {
     if ( file.endsWith( ".qpt" ) )
     {
@@ -1494,7 +1576,7 @@ QList<QgsMapLayer *> KadasApplication::showGDALSublayerSelectionDialog( QgsRaste
     else
     {
       // remove driver name and file name
-      name.remove( name.split( QgsDataProvider::SUBLAYER_SEPARATOR )[0] );
+      name.remove( name.split( QgsDataProvider::sublayerSeparator() )[0] );
       name.remove( path );
     }
     // remove any : or " left over

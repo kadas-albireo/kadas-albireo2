@@ -56,7 +56,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       bool labelRings = mLayer->mLabellingMode == LABEL_RINGS || mLayer->mLabellingMode == LABEL_AXES_RINGS;
 
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->mOpacity / 100. );
+      mRendererContext.painter()->setOpacity( mLayer->mOpacity );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
       QFont font = mRendererContext.painter()->font();
@@ -101,7 +101,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         GeographicLib::GeodesicLine line = mGeod.InverseLine( wgsCenter.y(), wgsCenter.x(), wgsPoint.y(), wgsPoint.x() );
         double dist = line.Distance();
         double sdist = 100000; // ~100km segments
-        int nSegments = qMax( 1, int( std::ceil( dist / sdist ) ) );
+        int nSegments = std::max( 1, int( std::ceil( dist / sdist ) ) );
         QPolygonF poly;
         for ( int iSeg = 0; iSeg < nSegments; ++iSeg )
         {
@@ -211,7 +211,7 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
 {
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
-  mOpacity = 100. - layerEl.attribute( "transparency" ).toInt();
+  mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
   mCenter.setX( layerEl.attribute( "x" ).toDouble() );
   mCenter.setY( layerEl.attribute( "y" ).toDouble() );
   mRings = layerEl.attribute( "rings" ).toInt();
@@ -232,7 +232,7 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
   layerEl.setAttribute( "type", "plugin" );
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
-  layerEl.setAttribute( "transparency", 100. - mOpacity );
+  layerEl.setAttribute( "transparency", 100. - 100. * mOpacity );
   layerEl.setAttribute( "x", mCenter.x() );
   layerEl.setAttribute( "y", mCenter.y() );
   layerEl.setAttribute( "rings", mRings );

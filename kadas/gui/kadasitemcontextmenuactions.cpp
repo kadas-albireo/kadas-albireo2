@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <qmath.h>
 #include <QClipboard>
 #include <QIcon>
 #include <QInputDialog>
@@ -156,12 +155,12 @@ void KadasItemContextMenuActions::createPolygonFromCircle()
   KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
   polygonitem->setEditor( "KadasRedliningItemEditor" );
   KadasItemPos pos = circleItem->constState()->centers.front();
-  double r = qSqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
+  double r = std::sqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
 
   QgsLineString *ring = new QgsLineString();
   for ( int i = 0; i < num; ++i )
   {
-    ring->addVertex( QgsPoint( pos.x() + r * qCos( ( 2. * i ) / num * M_PI ), pos.y() + r * qSin( ( 2. * i ) / num * M_PI ) ) );
+    ring->addVertex( QgsPoint( pos.x() + r * std::cos( ( 2. * i ) / num * M_PI ), pos.y() + r * std::sin( ( 2. * i ) / num * M_PI ) ) );
   }
   ring->addVertex( QgsPoint( pos.x() + r, pos.y() ) );
   QgsPolygon poly;

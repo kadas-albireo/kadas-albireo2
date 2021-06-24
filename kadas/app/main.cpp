@@ -17,6 +17,8 @@
 #include <csignal>
 #include <QDir>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QTextCodec>
 
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>

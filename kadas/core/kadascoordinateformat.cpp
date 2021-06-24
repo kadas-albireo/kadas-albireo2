@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include <gdal.h>
-#include <qmath.h>
 #include <QRegExp>
 
 #include <qgis/qgscoordinateformatter.h>
@@ -201,7 +200,7 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
 
   double pixValues[4] = {};
   if ( CE_None != GDALRasterIO( band, GF_Read,
-                                qFloor( col ), qFloor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
+                                std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
   {
     if ( errMsg )
     {
@@ -214,8 +213,8 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
   GDALClose( raster );
 
   // Interpolate values
-  double lambdaR = row - qFloor( row );
-  double lambdaC = col - qFloor( col );
+  double lambdaR = row - std::floor( row );
+  double lambdaC = col - std::floor( col );
 
   double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
                  + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );

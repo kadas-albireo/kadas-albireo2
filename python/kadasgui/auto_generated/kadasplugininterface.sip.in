@@ -99,6 +99,8 @@ Generic object finder
 
     virtual QgsVectorLayer *addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) = 0;
     virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) = 0;
+    virtual QgsVectorTileLayer *addVectorTileLayerQuiet( const QString &url, const QString &baseName ) = 0;
+    virtual QgsPointCloudLayer *addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey ) = 0;
 
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );

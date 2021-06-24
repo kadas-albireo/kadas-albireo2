@@ -338,9 +338,9 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       int width = annotationItemEl.attribute( "frameWidth" ).toInt();
       int height = annotationItemEl.attribute( "frameHeight" ).toInt();
       double angle = annotationItemEl.attribute( "angle" ).toDouble();
-      double adjWidth = height * qAbs( qSin( angle / 180. * M_PI ) ) + width * qAbs( qCos( angle / 180. * M_PI ) );
-      double adjHeight = height * qAbs( qCos( angle / 180. * M_PI ) ) + width * qAbs( qSin( angle / 180. * M_PI ) );
-      double scale = qMin( width / adjWidth, height / adjHeight );
+      double adjWidth = height * qAbs( std::sin( angle / 180. * M_PI ) ) + width * qAbs( std::cos( angle / 180. * M_PI ) );
+      double adjHeight = height * qAbs( std::cos( angle / 180. * M_PI ) ) + width * qAbs( std::sin( angle / 180. * M_PI ) );
+      double scale = std::min( width / adjWidth, height / adjHeight );
 
       KadasSymbolItem symbolItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
       symbolItem.setup( fileName, 0.5, 0.5, width * scale );

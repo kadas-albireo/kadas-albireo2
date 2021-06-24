@@ -43,6 +43,7 @@
 %Include auto_generated/maptools/kadasmaptooledititemgroup.sip
 %Include auto_generated/catalog/kadasvbscatalogprovider.sip
 %Include auto_generated/catalog/kadasarcgisrestcatalogprovider.sip
+%Include auto_generated/catalog/kadasarcgisportalcatalogprovider.sip
 %Include auto_generated/catalog/kadasgeoadminrestcatalogprovider.sip
 %Include auto_generated/kadascatalogprovider.sip
 %Include auto_generated/kadasbottombar.sip

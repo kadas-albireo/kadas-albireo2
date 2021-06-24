@@ -498,13 +498,13 @@ void KadasSearchBox::resultActivated()
 
     KadasSearchProvider::SearchResult result = item->data( 0, sResultDataRole ).value<KadasSearchProvider::SearchResult>();
     QgsRectangle zoomExtent;
+    QgsCoordinateTransform t( QgsCoordinateReferenceSystem( result.crs ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
     if ( result.bbox.isEmpty() )
     {
-      zoomExtent = mMapCanvas->mapSettings().computeExtentForScale( result.pos, result.zoomScale, QgsCoordinateReferenceSystem( result.crs ) );
+      zoomExtent = mMapCanvas->mapSettings().computeExtentForScale( t.transform( result.pos ), result.zoomScale );
     }
     else
     {
-      QgsCoordinateTransform t( QgsCoordinateReferenceSystem( result.crs ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
       zoomExtent = t.transform( result.bbox );
     }
     mMapCanvas->setExtent( zoomExtent, true );

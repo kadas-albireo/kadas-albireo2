@@ -60,9 +60,9 @@ KadasMapItem::Margin KadasGpxRouteItem::margin() const
   if ( !mName.isEmpty() )
   {
     // See rendering routine below
-    int maxLabelExtent = qMax( mLabelSize.height() / 4 + mLabelSize.width() + 1, mLabelSize.height() );
-    m.right = qMax( m.right, maxLabelExtent );
-    m.top = qMax( m.top, maxLabelExtent );
+    int maxLabelExtent = std::max( mLabelSize.height() / 4 + mLabelSize.width() + 1, mLabelSize.height() );
+    m.right = std::max( m.right, maxLabelExtent );
+    m.top = std::max( m.top, maxLabelExtent );
   }
   return m;
 }
@@ -90,11 +90,11 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
       QPointF p1 = context.mapToPixel().transform( context.coordinateTransform().transform( points[i] ) ).toQPointF();
       QPointF p2 = context.mapToPixel().transform( context.coordinateTransform().transform( points[i + 1] ) ).toQPointF();
 
-      double dist = qSqrt( ( p2.x() - p1.x() ) * ( p2.x() - p1.x() ) + ( p2.y() - p1.y() ) * ( p2.y() - p1.y() ) );
+      double dist = std::sqrt( ( p2.x() - p1.x() ) * ( p2.x() - p1.x() ) + ( p2.y() - p1.y() ) * ( p2.y() - p1.y() ) );
       while ( walkDist < dist )
       {
         QPointF dir( ( p2.x() - p1.x() ) / dist, ( p2.y() - p1.y() ) / dist );
-        double angle = qAtan2( dir.y(), dir.x() )  / M_PI * 180.;
+        double angle = std::atan2( dir.y(), dir.x() )  / M_PI * 180.;
         while ( angle < 0 ) angle += 360.;
         QPointF nor( dir.y(), -dir.x() );
         if ( angle > 90 && angle < 270 )
