@@ -157,7 +157,11 @@ class ConsoleConnector(Connector):
         params = self.prepareRouteParameters(
             points, profile, avoid_polygons, options, patrol_polygon
         )
-        response = self._execute("route", json.dumps(params))
+        # Add handling for chinese_postman if there is a patrol_polygon
+        if patrol_polygon:
+            response = self._execute("chinese_postman", json.dumps(params))
+        else:
+            response = self._execute("route", json.dumps(params))
         return response
 
     def isochrones(self, points, profile, options, intervals, colors):
