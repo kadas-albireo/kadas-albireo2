@@ -121,6 +121,12 @@ MACRO(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES CPP_FILES
     DEPENDS ${SIP_EXTRA_FILES_DEPEND}
     VERBATIM
   )
+  IF (SIP_MODULE_EXECUTABLE)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_sip_output_files} APPEND
+      COMMAND ${SIP_MODULE_EXECUTABLE} --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${_module_path} --sip-h ${PYQT5_SIP_IMPORT}
+    )
+  ENDIF (SIP_MODULE_EXECUTABLE)
 
   ADD_CUSTOM_TARGET(generate_sip_${MODULE_NAME}_cpp_files DEPENDS ${_sip_output_files})
 
@@ -139,9 +145,12 @@ MACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
   SET(_logical_name "python_module_${_logical_name}")
 
   ADD_LIBRARY(${_logical_name} MODULE ${_sip_output_files} ${EXTRA_OBJECTS})
+
+  # require c++14 only -- sip breaks with newer versions due to reliance on throw(...) annotations removed in c++17
+  TARGET_COMPILE_FEATURES(${_logical_name} PRIVATE cxx_std_14)
+
   SET_TARGET_PROPERTIES(${_logical_name} PROPERTIES CXX_VISIBILITY_PRESET default)
   IF (NOT APPLE)
-    TARGET_INCLUDE_DIRECTORIES(${_logical_name} PRIVATE ${PYTHON_INCLUDE_DIR})
     TARGET_LINK_LIBRARIES(${_logical_name} ${PYTHON_LIBRARY})
   ENDIF (NOT APPLE)
   TARGET_LINK_LIBRARIES(${_logical_name} ${EXTRA_LINK_LIBRARIES})
