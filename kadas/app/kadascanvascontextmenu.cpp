@@ -98,15 +98,15 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     QMenu *measureMenu = new QMenu();
     addAction( tr( "Measure" ) )->setMenu( measureMenu );
 
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::LineGeometry ) )
+    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_line" ), tr( "Distance" ), this, &KadasCanvasContextMenu::measureLine );
     }
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::PolygonGeometry ) )
+    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_area" ), tr( "Area" ), this, &KadasCanvasContextMenu::measurePolygon );
     }
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::PolygonGeometry ) )
+    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_circle" ), tr( "Circle" ), this, SLOT( measureCircle() ) );
     }
@@ -114,7 +114,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_angle" ), tr( "Azimuth" ), this, &KadasCanvasContextMenu::measureAzimuth );
     }
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::LineGeometry ) )
+    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
@@ -127,7 +127,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), this, &KadasCanvasContextMenu::terrainViewshed );
     }
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::LineGeometry ) )
+    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
