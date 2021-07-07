@@ -103,6 +103,8 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
+    QgsAbstractGeometry *toGeometry() const;
+
     bool isMultiPoint() const;
 
     void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;

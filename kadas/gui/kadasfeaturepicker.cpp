@@ -25,6 +25,7 @@
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include <kadas/gui/milx/kadasmilxitem.h>
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
 {
@@ -66,6 +67,10 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
     if ( dynamic_cast<KadasGeometryItem *>( item ) )
     {
       pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
+    }
+    else if ( dynamic_cast<KadasMilxItem *>( item ) )
+    {
+      pickResult.geom = static_cast<KadasMilxItem *>( item )->toGeometry();
     }
   }
   return pickResult;

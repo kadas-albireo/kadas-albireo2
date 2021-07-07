@@ -109,6 +109,8 @@ class KadasMilxItem : KadasMapItem
     virtual void setPosition( const KadasItemPos &pos );
 
 
+    QgsAbstractGeometry *toGeometry() const;
+
     bool isMultiPoint() const;
 
     void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;

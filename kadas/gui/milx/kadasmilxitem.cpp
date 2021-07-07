@@ -20,8 +20,10 @@
 #include <QVector2D>
 
 #include <qgis/qgsdistancearea.h>
+#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmaptopixel.h>
+#include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
 #include <quazip5/quazipfile.h>
@@ -174,6 +176,36 @@ void KadasMilxItem::setPosition( const KadasItemPos &pos )
   }
 
   update();
+}
+
+QgsAbstractGeometry *KadasMilxItem::toGeometry() const
+{
+  if ( isMultiPoint() )
+  {
+    QgsLineString *lineString = new QgsLineString();
+    for ( int i = 0, n = constState()->points.size(); i < n; ++i )
+    {
+      if ( !constState()->controlPoints.contains( i ) )
+      {
+        lineString->addVertex( QgsPoint( constState()->points[i] ) );
+      }
+    }
+    if ( mSymbolType == "Polygon" && constState()->points.size() > 2 )
+    {
+      lineString->addVertex( QgsPoint( constState()->points[0] ) );
+      QgsPolygon *poly = new QgsPolygon();
+      poly->setExteriorRing( lineString );
+      return poly;
+    }
+    else
+    {
+      return lineString;
+    }
+  }
+  else
+  {
+    return new QgsPoint( constState()->points.isEmpty() ? QgsPoint() : QgsPoint( constState()->points[0] ) );
+  }
 }
 
 KadasItemRect KadasMilxItem::boundingBox() const
