@@ -52,7 +52,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
   {
     menu->addAction( actions->actionAddGroup( menu ) );
   }
-  else if ( QgsLayerTreeNode *node = mView->layerTreeModel()->index2node( idx ) )
+  else if ( QgsLayerTreeNode *node = mView->index2node( idx ) )
   {
     if ( QgsLayerTree::isGroup( node ) )
     {
