@@ -61,10 +61,11 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
   if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     pickResult.layer = layer;
-    pickResult.crs = layer->items()[pickResult.itemId]->crs();
-    if ( dynamic_cast<KadasGeometryItem *>( layer->items()[pickResult.itemId] ) )
+    KadasMapItem *item = layer->items()[pickResult.itemId];
+    pickResult.crs = item->crs();
+    if ( dynamic_cast<KadasGeometryItem *>( item ) )
     {
-      pickResult.geom = static_cast<KadasGeometryItem *>( layer->items()[pickResult.itemId] )->geometry();
+      pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
     }
   }
   return pickResult;
@@ -120,7 +121,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
     }
     pickResult.layer = vlayer;
     pickResult.feature = feature;
-    pickResult.geom = feature.geometry().constGet();
+    pickResult.geom = feature.geometry().constGet()->clone();
     pickResult.crs = vlayer->crs();
     break;
   }

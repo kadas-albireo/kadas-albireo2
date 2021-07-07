@@ -36,10 +36,29 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
     class PickResult
     {
       public:
+        PickResult() = default;
+        PickResult( const PickResult &other )
+        {
+          layer = other.layer;
+          geom = other.geom ? other.geom->clone() : nullptr;
+          crs = other.crs;
+          feature = other.feature;
+          itemId = other.itemId;
+        }
+        ~PickResult() { delete geom; }
+        const PickResult &operator=( const PickResult &other )
+        {
+          layer = other.layer;
+          geom = other.geom ? other.geom->clone() : nullptr;
+          crs = other.crs;
+          feature = other.feature;
+          itemId = other.itemId;
+          return *this;
+        }
         bool isEmpty() const { return layer == nullptr; }
 
         QgsMapLayer *layer = nullptr;
-        const QgsAbstractGeometry *geom = nullptr;
+        QgsAbstractGeometry *geom = nullptr;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
         KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
