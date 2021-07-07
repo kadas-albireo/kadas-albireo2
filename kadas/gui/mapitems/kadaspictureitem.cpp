@@ -183,10 +183,10 @@ KadasMapItem::Margin KadasPictureItem::margin() const
   double framePadding = mFrame ? sFramePadding : 0;
   return Margin
   {
-    std::ceil( std::max( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) * mSymbolScale ),
-    std::ceil( std::max( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) * mSymbolScale ),
-    std::ceil( std::max( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) * mSymbolScale ),
-    std::ceil( std::max( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) * mSymbolScale )
+    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->size.width() - constState()->offsetX + framePadding ) * mSymbolScale ) ),
+    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->size.height() + constState()->offsetY + framePadding ) * mSymbolScale ) ),
+    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->size.width() + constState()->offsetX + framePadding ) * mSymbolScale ) ),
+    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->size.height() - constState()->offsetY + framePadding ) * mSymbolScale ) )
   };
 }
 
