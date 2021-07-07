@@ -398,7 +398,7 @@ bool KadasMilxClient::getSymbolMetadata( const QString &symbolId, KadasMilxSymbo
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
   QByteArray svgxml;
-  ostream >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints;
+  ostream >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints >> result.symbolType;
   result.icon = renderSvg( svgxml );
   return true;
 }
@@ -429,7 +429,7 @@ bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<Ka
     QByteArray svgxml;
     KadasMilxSymbolDesc desc;
     desc.symbolXml = symbolIds[i];
-    ostream >> desc.name >> desc.militaryName >> svgxml >> desc.hasVariablePoints >> desc.minNumPoints;
+    ostream >> desc.name >> desc.militaryName >> svgxml >> desc.hasVariablePoints >> desc.minNumPoints >> desc.symbolType;
     desc.icon = renderSvg( svgxml );
     result.append( desc );
   }
@@ -593,7 +593,7 @@ bool KadasMilxClient::createSymbol( QString &symbolId, KadasMilxSymbolDesc &resu
   QDataStream ostream( &response, QIODevice::ReadOnly );
   MilXServerReply replycmd = 0; ostream >> replycmd;
   QByteArray svgxml;
-  ostream >> symbolId >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints;
+  ostream >> symbolId >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints >> result.symbolType;
   result.icon = renderSvg( svgxml );
   return true;
 }

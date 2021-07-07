@@ -33,6 +33,7 @@ const int KadasMilxLibrary::SymbolXmlRole = Qt::UserRole + 1;
 const int KadasMilxLibrary::SymbolMilitaryNameRole = Qt::UserRole + 2;
 const int KadasMilxLibrary::SymbolPointCountRole = Qt::UserRole + 3;
 const int KadasMilxLibrary::SymbolVariablePointsRole = Qt::UserRole + 4;
+const int KadasMilxLibrary::SymbolTypeRole = Qt::UserRole + 5;
 
 
 class KadasMilxLibrary::TreeFilterProxyModel : public QSortFilterProxyModel
@@ -191,6 +192,7 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
       symbolDesc.militaryName = item->data( SymbolMilitaryNameRole ).toString();
       symbolDesc.minNumPoints = item->data( SymbolPointCountRole ).toInt();
       symbolDesc.hasVariablePoints = item->data( SymbolVariablePointsRole ).toInt();
+      symbolDesc.symbolType = item->data( SymbolTypeRole ).toString();
       symbolDesc.icon = item->icon().pixmap( item->icon().actualSize( QSize( 32, 32 ) ) ).toImage();
     }
     emit symbolSelected( symbolDesc );
@@ -266,7 +268,7 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
             {
               if ( mLoaderAborted )
                 return model;
-              addItem( subSectionItem, symbolDesc.name, symbolDesc.icon, viewIconSize, true, symbolDesc.symbolXml, symbolDesc.militaryName, symbolDesc.minNumPoints, symbolDesc.hasVariablePoints );
+              addItem( subSectionItem, symbolDesc.name, symbolDesc.icon, viewIconSize, true, symbolDesc.symbolXml, symbolDesc.militaryName, symbolDesc.minNumPoints, symbolDesc.hasVariablePoints, symbolDesc.symbolType );
             }
           }
         }
@@ -277,7 +279,7 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
   return model;
 }
 
-QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &value, const QImage &image, const QSize &viewIconSize, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool symbolHasVariablePoints )
+QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &value, const QImage &image, const QSize &viewIconSize, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool symbolHasVariablePoints, const QString &symbolType )
 {
   QIcon icon;
   QSize iconSize = isLeaf ? viewIconSize : !image.isNull() ? QSize( 32, 32 ) : QSize( 1, 32 );
@@ -327,6 +329,7 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
     item->setData( symbolMilitaryName, SymbolMilitaryNameRole );
     item->setData( symbolPointCount, SymbolPointCountRole );
     item->setData( symbolHasVariablePoints, SymbolVariablePointsRole );
+    item->setData( symbolType, SymbolTypeRole );
     item->setToolTip( item->text() );
     item->setIcon( icon );
     return item;

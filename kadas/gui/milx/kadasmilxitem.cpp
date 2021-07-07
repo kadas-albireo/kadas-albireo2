@@ -130,6 +130,7 @@ void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
   mMilitaryName = symbolDesc.militaryName;
   mHasVariablePoints = symbolDesc.hasVariablePoints;
   mMinNPoints = symbolDesc.minNumPoints;
+  mSymbolType = symbolDesc.symbolType;
 }
 
 void KadasMilxItem::setMssString( const QString &mssString )

@@ -135,6 +135,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     // These are only used when first drawing
     int mMinNPoints = -1;
     bool mHasVariablePoints = false;
+    QString mSymbolType;
 
     // Symbol cache
     mutable QImage mSymbolGraphic;

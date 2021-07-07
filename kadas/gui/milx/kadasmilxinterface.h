@@ -23,7 +23,7 @@
 
 typedef quint8 MilXServerRequest;
 
-quint64 MILX_INTERFACE_VERSION = 201711091512;
+quint64 MILX_INTERFACE_VERSION = 202107071230;
 
 MilXServerRequest MILX_REQUEST_INIT = 1; // {MILX_REQUEST_INIT, Lang:QString, InterfaceVersion:int64}
 MilXServerRequest MILX_REQUEST_SET_SYMBOL_OPTIONS = 2; // {MILX_REQUEST_SYMBOL_OPTIONS, SymbolSize:int, LineWidth:int, WorkMode:int}
@@ -60,8 +60,8 @@ MilXServerReply MILX_REPLY_ERROR = 99; // {MILX_REPLY_ERROR, Message:QString}
 MilXServerReply MILX_REPLY_INIT_OK = 101; // {MILX_REPLY_INIT_OK, Version:QString}
 MilXServerReply MILX_REPLY_SET_SYMBOL_OPTIONS = 102; // {MILX_REPLY_SET_SYMBOL_OPTIONS}
 
-MilXServerReply MILX_REPLY_GET_SYMBOL_METADATA = 110; // {MILX_REPLY_GET_SYMBOL_METADATA, Name:QString, MilitaryName:QString, SvgXML:QByteArray, HasVariablePoints:bool, MinPointCount:int}
-MilXServerReply MILX_REPLY_GET_SYMBOLS_METADATA = 111; // {MILX_REPLY_GET_SYMBOLS_METADATA, count:int, Name1:QString, MilitaryName1:QString, SvgXML1:QByteArray, HasVariablePoints1:bool, MinPointCount1:int, Name2:QString, MilitaryName2:QString, SvgXML2:QByteArray, HasVariablePoints2:bool, MinPointCount2:int, ...}
+MilXServerReply MILX_REPLY_GET_SYMBOL_METADATA = 110; // {MILX_REPLY_GET_SYMBOL_METADATA, Name:QString, MilitaryName:QString, SvgXML:QByteArray, HasVariablePoints:bool, MinPointCount:int, SymbolType:QString}
+MilXServerReply MILX_REPLY_GET_SYMBOLS_METADATA = 111; // {MILX_REPLY_GET_SYMBOLS_METADATA, count:int, Name1:QString, MilitaryName1:QString, SvgXML1:QByteArray, HasVariablePoints1:bool, MinPointCount1:int, SymbolType1:QString, Name2:QString, MilitaryName2:QString, SvgXML2:QByteArray, HasVariablePoints2:bool, MinPointCount2:int, SymbolType2:QString, ...}
 MilXServerReply MILX_REPLY_GET_MILITARY_NAME = 112; // {MILX_REPLY_GET_MILITARY_NAME, MilitaryName:QString}
 MilXServerReply MILX_REPLY_GET_CONTROL_POINT_INDICES = 113; // {MILX_REPLY_GET_CONTROL_POINT_INDICES, ControlPoints:QList<int>}
 MilXServerReply MILX_REPLY_GET_CONTROL_POINTS = 114;  // {MILX_REPLY_GET_CONTROL_POINTS, Points:QList<QPoint>, ControlPoints:QList<int>}
@@ -73,7 +73,7 @@ MilXServerReply MILX_REPLY_MOVE_ATTRIBUTE_POINT = 123; // {MILX_REPLY_MOVE_ATTRI
 MilXServerReply MILX_REPLY_CAN_DELETE_POINT = 124; // {MILX_REPLY_CAN_DELETE_POINT, canDelete:bool}
 MilXServerReply MILX_REPLY_DELETE_POINT = 125; // {MILX_REPLY_DELETE_POINT, SvgString:QByteArray, Offset:QPoint, AdjustedPoints:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>}
 MilXServerReply MILX_REPLY_EDIT_SYMBOL = 126; // {MILX_REPLY_EDIT_SYMBOL, SymbolXml:QString, MilitaryName:QString, SvgString:QByteArray, Offset:QPoint, AdjustedPoints:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>}
-MilXServerReply MILX_REPLY_CREATE_SYMBOL = 127; // {MILX_REPLY_CREATE_SYMBOL, SymbolXml:QString, Name:QString, MilitaryName:QString, SvgXML:QByteArray, HasVariablePoints:bool, MinPointCount:int}
+MilXServerReply MILX_REPLY_CREATE_SYMBOL = 127; // {MILX_REPLY_CREATE_SYMBOL, SymbolXml:QString, Name:QString, MilitaryName:QString, SvgXML:QByteArray, HasVariablePoints:bool, MinPointCount:int, SymbolType:QString}
 
 
 MilXServerReply MILX_REPLY_UPDATE_SYMBOL = 130; // {MILX_REPLY_UPDATE_SYMBOL, SvgXml:QByteArray, Offset:QPoint[, AdjustedPoints:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, AttributePoints:QList<QPair<int,QPoint>>]} // Last four depending on whether returnPoints is true in the request

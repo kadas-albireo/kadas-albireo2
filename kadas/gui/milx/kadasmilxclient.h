@@ -42,6 +42,7 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
   QImage icon;
   bool hasVariablePoints;
   int minNumPoints;
+  QString symbolType;
 };
 
 #ifndef SIP_RUN

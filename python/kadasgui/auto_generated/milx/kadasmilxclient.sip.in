@@ -20,6 +20,7 @@ struct KadasMilxSymbolDesc
   QImage icon;
   bool hasVariablePoints;
   int minNumPoints;
+  QString symbolType;
 };
 
 /************************************************************************

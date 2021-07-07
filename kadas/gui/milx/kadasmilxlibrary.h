@@ -52,6 +52,7 @@ class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
     static const int SymbolMilitaryNameRole;
     static const int SymbolPointCountRole;
     static const int SymbolVariablePointsRole;
+    static const int SymbolTypeRole;
 
     WId mWinId;
     QgsFilterLineEdit *mFilterLineEdit = nullptr;
@@ -69,7 +70,7 @@ class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
 
   private:
     QStandardItemModel *loadLibrary( const QSize &viewIconSize );
-    static QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), const QSize &viewIconSize = QSize(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false );
+    static QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), const QSize &viewIconSize = QSize(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false, const QString &symbolType = QString() );
     void loaderFinished();
 };
 
