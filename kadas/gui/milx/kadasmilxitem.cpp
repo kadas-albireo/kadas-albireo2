@@ -806,7 +806,7 @@ void KadasMilxItem::writeMilx( QDomDocument &doc, QDomElement &itemElement ) con
   QDomElement pointListEl = doc.createElement( "PointList" );
   itemElement.appendChild( pointListEl );
 
-  for ( const QgsPointXY &p : constState()->points )
+  for ( const KadasItemPos &p : constState()->points )
   {
     QDomElement pEl = doc.createElement( "Point" );
     pointListEl.appendChild( pEl );
