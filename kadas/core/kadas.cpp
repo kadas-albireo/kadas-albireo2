@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <gdal.h>
+#include <openssl/bio.h>
+#include <openssl/ssl.h>
 
 #include <QApplication>
 #include <QDir>
@@ -34,6 +36,10 @@
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadas_config.h>
+
+#ifdef Q_OS_WINDOWS
+#include <wincrypt.h>
+#endif
 
 const char *Kadas::KADAS_VERSION = _KADAS_VERSION_;
 const int Kadas::KADAS_VERSION_INT = _KADAS_VERSION_INT_;
@@ -72,6 +78,34 @@ static QString resolveResourcePath()
     return QDir( QString( "%1/../share/kadas/resources" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
   }
 }
+
+static QByteArray X509_to_PEM( X509 *cert )
+{
+
+  BIO *bio = BIO_new( BIO_s_mem() );
+  if ( NULL == bio )
+  {
+    return QByteArray();
+  }
+
+  if ( PEM_write_bio_X509( bio, cert ) != 1 )
+  {
+    BIO_free( bio );
+    return QByteArray();
+  }
+
+  BUF_MEM *mem = NULL;
+  BIO_get_mem_ptr( bio, &mem );
+  if ( !mem || !mem->data || !mem->length )
+  {
+    BIO_free( bio );
+    return QByteArray();
+  }
+  QByteArray pem( mem->data, mem->length );
+  BIO_free( bio );
+  return pem;
+}
+
 
 QString Kadas::configPath()
 {
@@ -246,4 +280,159 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     return dataset;
   }
   return nullptr;
+}
+
+void Kadas::importSslCertificates()
+{
+  // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
+  QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
+  QgsDebugMsg( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ) );
+  for ( const QString &certFilename : certDir.entryList( QStringList() << "*.pem", QDir::Files ) )
+  {
+    QFile certFile( certDir.absoluteFilePath( certFilename ) );
+    if ( certFile.open( QIODevice::ReadOnly ) )
+    {
+      QgsDebugMsg( QString( "Reading certificate file %1" ).arg( certFile.fileName() ) );
+      QByteArray pem = certFile.readAll();
+      QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
+      QgsDebugMsg( QString( "Adding %1 certificates" ).arg( certs.size() ) );
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+      QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
+#else
+      for ( const QSslCertificate &cert : certs )
+      {
+        QSslSocket::addDefaultCaCertificate( cert );
+      }
+#endif
+    }
+  }
+
+#ifdef Q_OS_WINDOWS
+  // Taken from curl-7.77.0/lib/vtls/openssl.c
+  HCERTSTORE hStore = CertOpenSystemStore( 0, TEXT( "ROOT" ) );
+
+  if ( hStore )
+  {
+    PCCERT_CONTEXT pContext = NULL;
+    /* The array of enhanced key usage OIDs will vary per certificate and is
+       declared outside of the loop so that rather than malloc/free each
+       iteration we can grow it with realloc, when necessary. */
+    CERT_ENHKEY_USAGE *enhkey_usage = NULL;
+    DWORD enhkey_usage_size = 0;
+
+    /* This loop makes a best effort to import all valid certificates from
+       the MS root store. If a certificate cannot be imported it is skipped. */
+    for ( ;; )
+    {
+      X509 *x509;
+      FILETIME now;
+      BYTE key_usage[2];
+      DWORD req_size;
+      const unsigned char *encoded_cert;
+
+      pContext = CertEnumCertificatesInStore( hStore, pContext );
+      if ( !pContext )
+        break;
+
+      char cert_name[256];
+      if ( !CertGetNameStringA( pContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0,
+                                NULL, cert_name, sizeof( cert_name ) ) )
+      {
+        strcpy( cert_name, "Unknown" );
+      }
+      QgsDebugMsg( QString( "Checking system certificate %1" ).arg( cert_name ) );
+
+      encoded_cert = ( const unsigned char * )pContext->pbCertEncoded;
+      if ( !encoded_cert )
+        continue;
+
+      GetSystemTimeAsFileTime( &now );
+      if ( CompareFileTime( &pContext->pCertInfo->NotBefore, &now ) > 0 || CompareFileTime( &now, &pContext->pCertInfo->NotAfter ) > 0 )
+        continue;
+
+      /* If key usage exists check for signing attribute */
+      if ( CertGetIntendedKeyUsage( pContext->dwCertEncodingType,
+                                    pContext->pCertInfo,
+                                    key_usage, sizeof( key_usage ) ) )
+      {
+        if ( !( key_usage[0] & CERT_KEY_CERT_SIGN_KEY_USAGE ) )
+          continue;
+      }
+      else if ( GetLastError() )
+        continue;
+
+      /* If enhanced key usage exists check for server auth attribute.
+       *
+       * Note "In a Microsoft environment, a certificate might also have EKU
+       * extended properties that specify valid uses for the certificate."
+       * The call below checks both, and behavior varies depending on what is
+       * found. For more details see CertGetEnhancedKeyUsage doc.
+       */
+      if ( CertGetEnhancedKeyUsage( pContext, 0, NULL, &req_size ) )
+      {
+        if ( req_size && req_size > enhkey_usage_size )
+        {
+          void *tmp = realloc( enhkey_usage, req_size );
+
+          if ( !tmp )
+          {
+            // Out of memory allocating for OID list
+            break;
+          }
+
+          enhkey_usage = ( CERT_ENHKEY_USAGE * )tmp;
+          enhkey_usage_size = req_size;
+        }
+
+        if ( CertGetEnhancedKeyUsage( pContext, 0, enhkey_usage, &req_size ) )
+        {
+          if ( !enhkey_usage->cUsageIdentifier )
+          {
+            /* "If GetLastError returns CRYPT_E_NOT_FOUND, the certificate is
+               good for all uses. If it returns zero, the certificate has no
+               valid uses." */
+            if ( ( HRESULT )GetLastError() != CRYPT_E_NOT_FOUND )
+              continue;
+          }
+          else
+          {
+            DWORD i;
+            bool found = false;
+
+            for ( i = 0; i < enhkey_usage->cUsageIdentifier; ++i )
+            {
+              if ( !strcmp( "1.3.6.1.5.5.7.3.1" /* OID server auth */,
+                            enhkey_usage->rgpszUsageIdentifier[i] ) )
+              {
+                found = true;
+                break;
+              }
+            }
+
+            if ( !found )
+              continue;
+          }
+        }
+        else
+          continue;
+      }
+      else
+        continue;
+
+      x509 = d2i_X509( NULL, &encoded_cert, pContext->cbCertEncoded );
+      if ( !x509 )
+        continue;
+
+      QByteArray pem = X509_to_PEM( x509 );
+      QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
+      QgsDebugMsg( QString( "Importing %1 certificates from system certificate %2" ).arg( certs.size() ).arg( cert_name ) );
+      QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
+      X509_free( x509 );
+    }
+
+    free( enhkey_usage );
+    CertFreeCertificateContext( pContext );
+    CertCloseStore( hStore, 0 );
+  }
+#endif // Q_OS_WINDOWS
 }

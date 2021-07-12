@@ -38,6 +38,8 @@ class Kadas
     static void gdalProxyConfig( const QUrl &url );
 
     static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = 0 );
+
+    static void importSslCertificates();
 };
 
 /************************************************************************

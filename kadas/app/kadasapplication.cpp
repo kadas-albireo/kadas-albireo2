@@ -269,28 +269,8 @@ void KadasApplication::init()
   // Ensure network access manager uses the correct proxy settings
   QgsNetworkAccessManager::instance()->setupDefaultProxyAndCache();
 
-  // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
-  QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
-  QgsDebugMsg( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ) );
-  for ( const QString &certFilename : certDir.entryList( QStringList() << "*.pem", QDir::Files ) )
-  {
-    QFile certFile( certDir.absoluteFilePath( certFilename ) );
-    if ( certFile.open( QIODevice::ReadOnly ) )
-    {
-      QgsDebugMsg( QString( "Reading certificate file %1" ).arg( certFile.fileName() ) );
-      QByteArray pem = certFile.readAll();
-      QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
-      QgsDebugMsg( QString( "Adding %1 certificates" ).arg( certs.size() ) );
-      for ( const QSslCertificate &cert : certs )
-      {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-        QSslConfiguration::defaultConfiguration().addCaCertificate( cert );
-#else
-        QSslSocket::addDefaultCaCertificate( cert );
-#endif
-      }
-    }
-  }
+  Kadas::importSslCertificates();
+
 
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );

@@ -60,6 +60,9 @@ class KADAS_CORE_EXPORT Kadas
 
     // Returns gdal source string for raster layer or null string in case of error
     static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = nullptr );
+
+    // Import SSL certificates from the certificate directory and from the system store (on Windows)
+    static void importSslCertificates();
 };
 
 #endif // KADAS_H
