@@ -23,7 +23,6 @@ dnf install -y \
   mingw64-libgomp \
   mingw64-libzip \
   mingw64-osgearth-qt5 \
-  mingw64-pacparser \
   mingw64-postgresql \
   mingw64-proj \
   mingw64-python3 \

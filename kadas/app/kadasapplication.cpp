@@ -565,10 +565,6 @@ QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QStr
     QApplication::setOverrideCursor( Qt::WaitCursor );
     processEvents();
   }
-  if ( uri.startsWith( "http://", Qt::CaseInsensitive ), uri.startsWith( "https://", Qt::CaseInsensitive ) )
-  {
-    Kadas::gdalProxyConfig( QUrl( uri ) );
-  }
   QgsVectorLayer *layer = new QgsVectorLayer( uri, baseName, providerKey, options );
   if ( isVsiCurl || isRemoteUrl )
   {
