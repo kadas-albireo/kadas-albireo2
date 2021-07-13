@@ -72,6 +72,12 @@ QJsonObject KadasMilxItem::State::serialize() const
   offset.append( userOffset.x() );
   offset.append( userOffset.y() );
 
+  QJsonArray marginArray;
+  marginArray.append( margin.left );
+  marginArray.append( margin.top );
+  marginArray.append( margin.right );
+  marginArray.append( margin.bottom );
+
   QJsonObject json;
   json["status"] = drawStatus;
   json["points"] = pts;
@@ -80,7 +86,8 @@ QJsonObject KadasMilxItem::State::serialize() const
   json["controlPoints"] = ctrlPts;
   json["userOffset"] = offset;
   json["pressedPoints"] = pressedPoints;
-  return json;;
+  json["margin"] = marginArray;
+  return json;
 }
 
 bool KadasMilxItem::State::deserialize( const QJsonObject &json )
@@ -115,6 +122,14 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
   userOffset.setX( offset.at( 0 ).toDouble() );
   userOffset.setY( offset.at( 1 ).toDouble() );
   pressedPoints = json["pressedPoints"].toInt();
+  QJsonArray marginArray = json["margin"].toArray();
+  if ( marginArray.size() == 4 )
+  {
+    margin.left = marginArray[0].toInt();
+    margin.top = marginArray[1].toInt();
+    margin.right = marginArray[2].toInt();
+    margin.bottom = marginArray[3].toInt();
+  }
   return attributes.size() == attributePoints.size();
 }
 
@@ -228,7 +243,7 @@ KadasItemRect KadasMilxItem::boundingBox() const
 
 KadasMapItem::Margin KadasMilxItem::margin() const
 {
-  Margin m = mMargin;
+  Margin m = constState()->margin;
   m.left = std::max( 0, m.left - constState()->userOffset.x() );
   m.right = std::max( 0, m.right + constState()->userOffset.x() );
   m.top = std::max( 0, m.top - constState()->userOffset.y() );
@@ -957,6 +972,15 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
 
   item->state()->drawStatus = State::DrawStatus::Finished;
   item->mIsPointSymbol = !item->isMultiPoint();
+
+  KadasMilxClient::NPointSymbol symbol( item->mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
+  QRect screenExtent( 0, 0, 100, 100 );
+  KadasMilxClient::NPointSymbolGraphic result;
+  int dpi = qApp->desktop()->logicalDpiX();
+  if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+  {
+    item->updateSymbolMargin( result );
+  }
 }
 
 void KadasMilxItem::posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
@@ -1040,6 +1064,16 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
     state()->attributePoints.insert( it.key(), KadasItemPos( itemPos.x(), itemPos.y() ) );
   }
 
+  updateSymbolMargin( result );
+
+  // Clear cache
+  mSymbolGraphic = QImage();
+
+  update();
+}
+
+void KadasMilxItem::updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result )
+{
   QRect pointBounds( result.adjustedPoints.front(), result.adjustedPoints.front() );
   for ( int i = 1, n = result.adjustedPoints.size(); i < n; ++i )
   {
@@ -1052,15 +1086,10 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
 
   QPoint offset = result.adjustedPoints.front() + result.offset;
   QRect symbolBounds( offset.x(), offset.y(), result.graphic.width(), result.graphic.height() );
-  mMargin.left = std::max( 0, pointBounds.left() - symbolBounds.left() );
-  mMargin.top = std::max( 0, pointBounds.top() - symbolBounds.top() );
-  mMargin.right = std::max( 0, symbolBounds.right() - pointBounds.right() );
-  mMargin.bottom = std::max( 0, symbolBounds.bottom() - pointBounds.bottom() );
-
-  // Clear cache
-  mSymbolGraphic = QImage();
-
-  update();
+  state()->margin.left = std::max( 0, pointBounds.left() - symbolBounds.left() );
+  state()->margin.top = std::max( 0, pointBounds.top() - symbolBounds.top() );
+  state()->margin.right = std::max( 0, symbolBounds.right() - pointBounds.right() );
+  state()->margin.bottom = std::max( 0, symbolBounds.bottom() - pointBounds.bottom() );
 }
 
 QImage KadasMilxItem::symbolImage() const
@@ -1071,7 +1100,8 @@ QImage KadasMilxItem::symbolImage() const
     KadasMilxClient::NPointSymbol symbol( mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
     QRect screenExtent( 0, 0, 100, 100 );
     KadasMilxClient::NPointSymbolGraphic result;
-    if ( KadasMilxClient::updateSymbol( screenExtent, 96, symbol, result, false ) )
+    int dpi = qApp->desktop()->logicalDpiX();
+    if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
     {
       mSymbolGraphic = result.graphic;
       mSymbolAnchor = QPointF( double( -result.offset.x() ) / mSymbolGraphic.width(), double( -result.offset.y() ) / mSymbolGraphic.height() );

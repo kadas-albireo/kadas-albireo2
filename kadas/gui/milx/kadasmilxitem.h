@@ -69,6 +69,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
       QList<int> controlPoints;
       QPoint userOffset;
       int pressedPoints = 0;
+      Margin margin;
 
       void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
       State *clone() const override SIP_FACTORY { return new State( *this ); }
@@ -143,8 +144,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     mutable QImage mSymbolGraphic;
     mutable QPointF mSymbolAnchor;
 
-    Margin mMargin;
-
     KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
 
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
@@ -152,6 +151,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
+    void updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result );
 
     static void finalize( KadasMilxItem *item, bool isCorridor );
     static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
