@@ -116,7 +116,10 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
     connect( bbox, &QDialogButtonBox::accepted, &confirmDialog, &QDialog::accept );
     connect( bbox, &QDialogButtonBox::rejected, &confirmDialog, &QDialog::reject );
     confirmDialog.layout()->addWidget( bbox );
-    if ( confirmDialog.exec() == QDialog::Accepted )
+
+    int response = confirmDialog.exec();
+    qDeleteAll( mapCanvasItems );
+    if ( response == QDialog::Accepted )
     {
       for ( auto it = checkboxes.begin(), itEnd = checkboxes.end(); it != itEnd; ++it )
       {
@@ -138,7 +141,6 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
       {
         item->setSelected( false );
       }
-      qDeleteAll( mapCanvasItems );
     }
   }
 }
