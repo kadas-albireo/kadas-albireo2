@@ -71,6 +71,10 @@ KadasHandleBadLayers::KadasHandleBadLayers( const QList<QDomNode> &layers )
     QString datasource = QgsProject::instance()->readPath( node.namedItem( QStringLiteral( "datasource" ) ).toElement().text() );
     QString provider = node.namedItem( QStringLiteral( "provider" ) ).toElement().text();
     bool providerFileBased = ( provider == QStringLiteral( "gdal" ) || provider == QStringLiteral( "ogr" ) || provider == QStringLiteral( "mdal" ) );
+    if ( provider == QStringLiteral( "delimitedtext" ) && datasource.startsWith( "file://" ) )
+    {
+      providerFileBased = true;
+    }
 
     mLayerList->setRowCount( i + 1 );
 
@@ -110,23 +114,33 @@ void KadasHandleBadLayers::itemClicked( QTableWidgetItem *item )
   {
     return;
   }
+  QString filename = mLayerList->item( item->row(), 2 )->text();
+  QString provider = mLayerList->item( item->row(), 1 )->data( ProviderRole ).toString();
+  QUrl url;
+  QVariantMap parts;
 
   QString type = mLayerList->item( item->row(), 1 )->text();
   QString fileFilter;
-  if ( type == QLatin1String( "vector" ) )
+  if ( provider == QStringLiteral( "delimitedtext" ) )
   {
-    fileFilter = QgsProviderRegistry::instance()->fileVectorFilters();
+    url = QUrl( filename );
+    filename = url.path();
+    fileFilter = tr( "Text files" ) + QStringLiteral( " (*.txt *.csv *.dat *.wkt);;" );
   }
   else
   {
-    fileFilter = QgsProviderRegistry::instance()->fileRasterFilters();
+    if ( type == QStringLiteral( "vector" ) )
+    {
+      fileFilter = QgsProviderRegistry::instance()->fileVectorFilters();
+    }
+    else
+    {
+      fileFilter = QgsProviderRegistry::instance()->fileRasterFilters();
+    }
+
+    parts = QgsProviderRegistry::instance()->decodeUri( provider, filename );
+    filename = parts.isEmpty() ? filename : parts.value( "path" ).toString();
   }
-
-  QString filename = mLayerList->item( item->row(), 2 )->text();
-  QString provider = mLayerList->item( item->row(), 1 )->data( ProviderRole ).toString();
-
-  QVariantMap parts = QgsProviderRegistry::instance()->decodeUri( provider, filename );
-  filename = parts.isEmpty() ? filename : parts.value( "path" ).toString();
 
   filename = QFileDialog::getOpenFileName( this, tr( "Select File" ), QFileInfo( filename ).filePath(), fileFilter );
   if ( filename.isEmpty() )
@@ -138,6 +152,11 @@ void KadasHandleBadLayers::itemClicked( QTableWidgetItem *item )
   {
     parts["path"] = filename;
     filename = QgsProviderRegistry::instance()->encodeUri( provider, parts );
+  }
+  if ( !url.isEmpty() )
+  {
+    url.setPath( filename );
+    filename = url.toString();
   }
   mLayerList->item( item->row(), 2 )->setText( filename );
 }
