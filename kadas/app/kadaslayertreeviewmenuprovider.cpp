@@ -47,13 +47,14 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 
   QgsLayerTreeViewDefaultActions *actions = mView->defaultActions();
 
-  QModelIndex idx = mView->currentIndex();
-  if ( !idx.isValid() )
+  QList<QgsLayerTreeNode *> selected = mView->selectedNodes();
+  if ( selected.isEmpty() )
   {
     menu->addAction( actions->actionAddGroup( menu ) );
   }
-  else if ( QgsLayerTreeNode *node = mView->index2node( idx ) )
+  else if ( selected.size() == 1 )
   {
+    QgsLayerTreeNode *node = selected[0];
     if ( QgsLayerTree::isGroup( node ) )
     {
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
@@ -107,6 +108,12 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       }
     }
   }
+  else
+  {
+    menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
+    menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
+  }
+
   return menu;
 }
 
