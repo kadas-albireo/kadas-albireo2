@@ -32,6 +32,8 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
 #include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
 
@@ -83,6 +85,30 @@ class PaddedPlotMarker : public QwtPlotMarker
     }
 };
 
+class PlotMousePicker : public QwtPlotPicker
+{
+  public:
+    typedef std::function<void( const QPoint & )> PickCallback_t;
+    PlotMousePicker( QWidget *canvas, const PickCallback_t &callback )
+      : QwtPlotPicker( QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas )
+      , mCallback( callback )
+    {
+      setStateMachine( new QwtPickerTrackerMachine() );
+    }
+  signals:
+    void plotPicked( const QPoint &pos );
+
+  protected:
+    QwtText trackerText( const QPoint &pos ) const override
+    {
+      mCallback( pos );
+      return QwtText();
+    }
+
+  private:
+    std::function<void( const QPoint & )> mCallback;
+};
+
 KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent, Qt::WindowFlags f )
   : QDialog( parent, f ), mTool( tool )
 {
@@ -127,6 +153,8 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mPlotMarker->setItemAttribute( QwtPlotItem::Margins );
   mPlotMarker->attach( mPlot );
   mPlotMarker->setLabelAlignment( Qt::AlignTop | Qt::AlignHCenter );
+
+  mPlotPicker = new PlotMousePicker( mPlot->canvas(), [this]( const QPoint & pos ) { setMarkerPlotPos( pos ); } );
 
   mNodeMarkersCheckbox = new QCheckBox( tr( "Show vertex lines" ) );
   mNodeMarkersCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_nodemarkers", true ).toBool() );
@@ -242,6 +270,18 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
   mPlot->replot();
 }
 
+void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
+{
+
+  int idx = mPlot->invTransform( QwtPlot::xBottom, pos.x() );
+  QPointF sample = mPlotCurve->data()->sample( idx );
+  mPlotMarker->setValue( sample );
+  mPlotMarker->setLabel( QString::number( qRound( sample.y() ) ) );
+  mPlot->replot();
+  double distance = sample.x() / double( mNSamples ) * mTotLength;
+  mTool->setMarkerPos( distance );
+}
+
 void KadasHeightProfileDialog::clear()
 {
   static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->setSamples( QVector<QPointF>() );
@@ -251,7 +291,7 @@ void KadasHeightProfileDialog::clear()
   qDeleteAll( mLinesOfSightRB );
   mLinesOfSightRB.clear();
   delete mLineOfSightMarker;
-  mLineOfSightMarker = 0;
+  mLineOfSightMarker = nullptr;
   qDeleteAll( mNodeMarkers );
   mNodeMarkers.clear();
   mPlot->replot();
@@ -603,3 +643,5 @@ void KadasHeightProfileDialog::toggleNodeMarkers()
   mNodeMarkers.clear();
   replot();
 }
+
+#include "moc_kadasheightprofiledialog.cpp"

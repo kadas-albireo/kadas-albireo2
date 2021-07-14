@@ -31,6 +31,7 @@ class QProgressBar;
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMarker;
+class QwtPlotPicker;
 class KadasLineItem;
 class KadasMapToolHeightProfile;
 
@@ -53,6 +54,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void updateLineOfSight();
     void copyToClipboard();
     void addToCanvas();
+    void setMarkerPlotPos( const QPoint &pos );
     void toggleNodeMarkers();
 
   private:
@@ -65,6 +67,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QVector<QwtPlotCurve *> mLinesOfSight;
     QVector<KadasLineItem *> mLinesOfSightRB;
     QwtPlotMarker *mPlotMarker = nullptr;
+    QwtPlotPicker *mPlotPicker = nullptr;
     QwtPlotMarker *mLineOfSightMarker = nullptr;
     QList<QwtPlotMarker *> mNodeMarkers;
     QList<QgsPointXY> mPoints;

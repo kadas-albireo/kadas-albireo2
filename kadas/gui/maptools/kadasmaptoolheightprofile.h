@@ -42,6 +42,7 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     void deactivate() override;
 
     void setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
+    void setMarkerPos( double distance );
 
   public slots:
     void pickLine();

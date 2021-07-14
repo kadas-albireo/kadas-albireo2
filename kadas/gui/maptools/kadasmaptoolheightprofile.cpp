@@ -77,6 +77,33 @@ void KadasMapToolHeightProfile::setGeometry( const QgsAbstractGeometry &geom, co
   addPartFromGeometry( geom, crs );
 }
 
+void KadasMapToolHeightProfile::setMarkerPos( double distance )
+{
+  const KadasLineItem *lineItem = dynamic_cast<const KadasLineItem *>( currentItem() );
+  if ( !mPosMarker || lineItem->constState()->points.isEmpty() )
+  {
+    return;
+  }
+  const QList<KadasItemPos> &points = lineItem->constState()->points.front();
+  for ( int i = 0, n = points.size() - 1; i < n; ++i )
+  {
+    double segDist = std::sqrt( points[i + 1].sqrDist( points[i] ) );
+    if ( distance < segDist )
+    {
+      double k = distance / segDist;
+      double x = points[i].x() + ( points[i + 1].x() - points[i].x() ) * k;
+      double y = points[i].y() + ( points[i + 1].y() - points[i].y() ) * k;
+      mPosMarker->setPosition( KadasItemPos( x, y ) );
+      return;
+    }
+    else
+    {
+      distance -= segDist;
+    }
+  }
+  mPosMarker->setPosition( points.last() );
+}
+
 void KadasMapToolHeightProfile::pickLine()
 {
   mPicking = true;
@@ -119,8 +146,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
       }
       if ( std::sqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
       {
-        mPosMarker->clear();
-        mPosMarker->addPartFromGeometry( minPos );
+        mPosMarker->setPosition( KadasItemPos::fromPoint( minPos ) );
         mDialog->setMarkerPos( minIdx, minPos, mCanvas->mapSettings().destinationCrs() );
       }
     }
