@@ -110,6 +110,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
   }
   else
   {
+    menu->addAction( actions->actionGroupSelected( menu ) );
     menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
     menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
   }
