@@ -4,6 +4,8 @@ SOURCES += \
 ../kadas/core/kadaslatlontoutm.h \
 ../kadas/core/kadascoordinateformat.h \
 ../kadas/core/kadasalgorithms.h \
+../kadas/core/kadasfileserver.h \
+../kadas/core/kadasfileserver.cpp \
 ../kadas/core/kadaslatlontoutm.cpp \
 ../kadas/core/kadasstatehistory.cpp \
 ../kadas/core/kadasalgorithms.cpp \
