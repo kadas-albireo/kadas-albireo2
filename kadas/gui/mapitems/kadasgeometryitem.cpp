@@ -410,7 +410,21 @@ QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
-  return QgsUnitTypes::formatArea( value, decimals, unit );
+  if ( unit == QgsUnitTypes::AreaSquareMeters )
+  {
+    if ( value >= 1000000 )
+    {
+      return QString( "%1 km²" ).arg( value / 1000000., 0, 'f', decimals );
+    }
+    else
+    {
+      return QString( "%1 m²" ).arg( value, 0, 'f', decimals );
+    }
+  }
+  else
+  {
+    return QgsUnitTypes::formatArea( value, decimals, unit );
+  }
 }
 
 QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const
