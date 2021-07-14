@@ -30,7 +30,7 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     enum AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
 
-    KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth );
+    KadasMeasureWidget( KadasMapItem *item );
 
     virtual void syncItemToWidget();
     virtual void syncWidgetToItem();
@@ -52,7 +52,7 @@ class KadasMapToolMeasure : KadasMapToolCreateItem
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
-    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle, MeasureAzimuth };
+    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
 
     virtual void activate();

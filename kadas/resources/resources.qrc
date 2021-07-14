@@ -121,6 +121,7 @@
         <file alias="icons/delete_node">icons/delete_node.svg</file>
         <file alias="icons/add_node">icons/add_node.svg</file>
         <file alias="icons/gpsarrow">icons/gpsarrow.svg</file>
+        <file alias="icons/distance_angle">icons/distance_angle.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

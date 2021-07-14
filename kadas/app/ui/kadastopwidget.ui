@@ -901,7 +901,8 @@
              </size>
             </property>
             <property name="text">
-             <string>Distance</string>
+             <string>Distance
+Azimuth</string>
             </property>
             <property name="iconSize">
              <size>
@@ -964,37 +965,6 @@
             </property>
             <property name="text">
              <string>Circle</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="KadasRibbonButton" name="mAzimuthButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Azimuth</string>
             </property>
             <property name="iconSize">
              <size>
@@ -2130,10 +2100,13 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/kadas/icons/distance</normaloff>:/kadas/icons/distance</iconset>
+     <normaloff>:/kadas/icons/distance_angle</normaloff>:/kadas/icons/distance_angle</iconset>
    </property>
    <property name="text">
-    <string>Distance</string>
+    <string>Distance &amp; Azimuth</string>
+   </property>
+   <property name="toolTip">
+    <string>Distance and azimuth</string>
    </property>
   </action>
   <action name="mActionArea">
@@ -2571,6 +2544,7 @@ Sight</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../resources/resources.qrc"/>
   <include location="../../resources/resources.qrc"/>
  </resources>
  <connections/>

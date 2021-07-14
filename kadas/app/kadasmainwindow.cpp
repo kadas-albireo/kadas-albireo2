@@ -626,8 +626,6 @@ void KadasMainWindow::configureButtons()
 
   setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureCircle ); } );
 
-  setActionToButton( mActionAzimuth, mAzimuthButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureAzimuth ); } );
-
   setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return new KadasMapToolHeightProfile( mapCanvas() ); } );
 
   setActionToButton( mActionSlope, mSlopeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_S ), [this] { return new KadasMapToolSlope( mapCanvas() ); } );

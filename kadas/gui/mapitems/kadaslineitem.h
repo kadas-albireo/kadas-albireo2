@@ -67,7 +67,9 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     {
       MeasureLineAndSegments,
       MeasureAzimuthMapNorth,
-      MeasureAzimuthGeoNorth
+      MeasureAzimuthGeoNorth,
+      MeasureLineAndSegmentsAndAzimuthMapNorth,
+      MeasureLineAndSegmentsAndAzimuthGeoNorth
     };
 
     void setMeasurementMode( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees );
@@ -99,6 +101,8 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
 
     QgsMultiLineString *geometry();
     State *state() { return static_cast<State *>( mState ); }
+
+    double computeSegmentAzimut( const KadasItemPos &p1, const KadasItemPos &p2, bool geoNorth ) const;
 };
 
 #endif // KADASLINEITEM_H

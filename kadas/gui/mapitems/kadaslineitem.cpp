@@ -388,26 +388,51 @@ void KadasLineItem::measureGeometry()
         {
           const KadasItemPos &p1 = part[i - 1];
           const KadasItemPos &p2 = part[i];
-          double angle = 0;
-          if ( mMeasurementMode == MeasureAzimuthGeoNorth )
-          {
-            angle = mDa.bearing( p1, p2 );
-          }
-          else
-          {
-            angle = std::atan2( p2.x() - p1.x(), p2.y() - p1.y() );
-          }
-          angle = qRound( angle *  1000 ) / 1000.;
-          angle = angle < 0 ? angle + 2 * M_PI : angle;
-          angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
+          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasureAzimuthGeoNorth );
           QString segmentAngle = formatAngle( angle, mAngleUnit );
           addMeasurements( QStringList() << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
         break;
       }
+      case MeasureLineAndSegmentsAndAzimuthGeoNorth:
+      case MeasureLineAndSegmentsAndAzimuthMapNorth:
+      {
+        double totLength = 0;
+        for ( int i = 1, n = part.size(); i < n; ++i )
+        {
+          const KadasItemPos &p1 = part[i - 1];
+          const KadasItemPos &p2 = part[i];
+          double length = mDa.measureLine( p1, p2 );
+          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasureLineAndSegmentsAndAzimuthGeoNorth );
+          totLength += length;
+          QString segmentAngle = formatAngle( angle, mAngleUnit );
+          addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ) << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
+        }
+        QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
+        addMeasurements( QStringList() << totLengthStr, KadasItemPos::fromPoint( part.last() ), false );
+        totalLength += totLength;
+        break;
+      }
     }
   }
   mTotalMeasurement = formatLength( totalLength, distanceBaseUnit() );
+}
+
+double KadasLineItem::computeSegmentAzimut( const KadasItemPos &p1, const KadasItemPos &p2, bool geoNorth ) const
+{
+  double angle = 0;
+  if ( geoNorth )
+  {
+    angle = mDa.bearing( p1, p2 );
+  }
+  else
+  {
+    angle = std::atan2( p2.x() - p1.x(), p2.y() - p1.y() );
+  }
+  angle = qRound( angle *  1000 ) / 1000.;
+  angle = angle < 0 ? angle + 2 * M_PI : angle;
+  angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
+  return angle;
 }
 
 void KadasLineItem::recomputeDerived()

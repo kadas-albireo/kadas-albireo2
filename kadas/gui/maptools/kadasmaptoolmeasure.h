@@ -24,6 +24,7 @@
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QgsGeometry;
@@ -36,7 +37,7 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
   public:
     enum AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
 
-    KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth );
+    KadasMeasureWidget( KadasMapItem *item );
 
     void syncItemToWidget() override {}
     void syncWidgetToItem() override;
@@ -48,14 +49,16 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     void pickRequested();
 
   private:
-    bool mMeasureAzimuth = false;
     QLabel *mMeasurementLabel = nullptr;
     QComboBox *mUnitComboBox = nullptr;
+    QComboBox *mAngleUnitComboBox = nullptr;
     QComboBox *mNorthComboBox = nullptr;
+    QCheckBox *mAzimuthCheckbox = nullptr;
 
   private slots:
     void setDistanceUnit( int index );
     void setAngleUnit( int index );
+    void setAzimutEnabled( bool enabled );
     void setAzimuthNorth( int index );
     void updateTotal();
 };
@@ -64,7 +67,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
-    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle, MeasureAzimuth };
+    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
 
     void activate() override;
@@ -78,7 +81,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
     MeasureMode mMeasureMode = MeasureLine;
 
     KadasMapToolCreateItem::ItemFactory itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const;
-    KadasGeometryItem *setupItem( KadasGeometryItem *item, bool measureAzimut ) const;
+    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
 
 
   private slots:

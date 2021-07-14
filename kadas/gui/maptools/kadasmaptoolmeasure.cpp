@@ -14,7 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QCheckBox>
 #include <QComboBox>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QToolButton>
@@ -31,54 +33,79 @@
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 
 
-KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item, false ); } )
-KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureAzimuthWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item, true ); } )
+KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item ); } )
 
-KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth )
-  : KadasMapItemEditor( item ), mMeasureAzimuth( measureAzimuth )
+KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
+  : KadasMapItemEditor( item )
 {
   setLayout( new QHBoxLayout() );
   layout()->setMargin( 2 );
   layout()->setSpacing( 2 );
 
+
+  QGridLayout *gridLayout = new QGridLayout();
+  gridLayout->setMargin( 0 );
+  gridLayout->setSpacing( 2 );
+  QWidget *grid = new QWidget();
+  grid->setLayout( gridLayout );
+  layout()->addWidget( grid );
+
+  QString toolLabel;
+  if ( dynamic_cast<KadasLineItem *>( mItem ) )
+  {
+    toolLabel = tr( "Measure line" );
+  }
+  else if ( dynamic_cast<KadasPolygonItem *>( mItem ) )
+  {
+    toolLabel = tr( "Measure polygon" );
+  }
+  else if ( dynamic_cast<KadasCircleItem *>( mItem ) )
+  {
+    toolLabel = tr( "Measure circle" );
+  }
+  gridLayout->addWidget( new QLabel( QString( "<b>%1</b>" ).arg( toolLabel ) ), 0, 0 );
+
   mMeasurementLabel = new QLabel();
   mMeasurementLabel->setTextInteractionFlags( Qt::TextSelectableByMouse );
-
-  static_cast<QHBoxLayout *>( layout() )->addStretch( 1 );
+  mMeasurementLabel->setAlignment( Qt::AlignVCenter | Qt::AlignRight );
+  gridLayout->addWidget( mMeasurementLabel, 0, 1 );
 
   mUnitComboBox = new QComboBox();
-  if ( !measureAzimuth )
-  {
-    layout()->addWidget( mMeasurementLabel );
+  mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
+  mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
+  mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
+  int defUnit = QgsSettings().value( "/kadas/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
+  mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
+  connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
+  gridLayout->addWidget( mUnitComboBox, 0, 2 );
 
-    mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
-    mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
-    mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
-    int defUnit = QgsSettings().value( "/kadas/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
-    mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
-    connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
-  }
-  else
+  if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
-    layout()->addWidget( new QLabel( tr( "North:" ) ) );
+    mAzimuthCheckbox = new QCheckBox( tr( "Azimuth" ) );
+    mAzimuthCheckbox->setChecked( QgsSettings().value( "kadas/last_azimuth_enabled", true ).toBool() );
+    connect( mAzimuthCheckbox, &QCheckBox::toggled, this, &KadasMeasureWidget::setAzimutEnabled );
+    gridLayout->addWidget( mAzimuthCheckbox, 1, 0 );
+
     mNorthComboBox = new QComboBox();
-    mNorthComboBox->addItem( tr( "Geographic" ), static_cast<int>( AzimuthGeoNorth ) );
-    mNorthComboBox->addItem( tr( "Map" ), static_cast<int>( AzimuthMapNorth ) );
+    mNorthComboBox->addItem( tr( "Geographic north" ), static_cast<int>( AzimuthGeoNorth ) );
+    mNorthComboBox->addItem( tr( "Map north" ), static_cast<int>( AzimuthMapNorth ) );
     int defNorth = std::max( 0, QgsSettings().value( "/kadas/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt() );
     mNorthComboBox->setCurrentIndex( defNorth );
+    mNorthComboBox->setEnabled( mAzimuthCheckbox->isChecked() );
     connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
-    layout()->addWidget( mNorthComboBox );
+    gridLayout->addWidget( mNorthComboBox, 1, 1 );
 
-    mUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( QgsUnitTypes::AngleDegrees ) );
-    mUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
-    mUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
-    mUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
+    mAngleUnitComboBox = new QComboBox();
+    mAngleUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( QgsUnitTypes::AngleDegrees ) );
+    mAngleUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
+    mAngleUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
+    mAngleUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
     int defUnit = std::max( 0, QgsSettings().value( "/kadas/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt() );
-    mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
-    connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
+    mAngleUnitComboBox->setCurrentIndex( mAngleUnitComboBox->findData( defUnit ) );
+    mAngleUnitComboBox->setEnabled( mAzimuthCheckbox->isChecked() );
+    connect( mAngleUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
+    gridLayout->addWidget( mAngleUnitComboBox, 1, 2 );
   }
-
-  layout()->addWidget( mUnitComboBox );
 
   QToolButton *pickButton = new QToolButton();
   pickButton->setIcon( QIcon( ":/kadas/icons/select" ) );
@@ -92,34 +119,30 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item, bool measureAzimuth 
   connect( clearButton, &QToolButton::clicked, this, &KadasMeasureWidget::clearRequested );
   layout()->addWidget( clearButton );
 
-  if ( !measureAzimuth )
-  {
-    connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
-  }
+  connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
 
-  setFixedWidth( 300 );
+  setFixedWidth( 350 );
 }
 
 void KadasMeasureWidget::syncWidgetToItem()
 {
-  if ( mMeasureAzimuth )
+  if ( mAzimuthCheckbox && mAzimuthCheckbox->isChecked() )
   {
-    setAngleUnit( mUnitComboBox->currentIndex() );
+    setAngleUnit( mAngleUnitComboBox->currentIndex() );
     setAzimuthNorth( mNorthComboBox->currentIndex() );
   }
-  else
+  else if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
-    setDistanceUnit( mUnitComboBox->currentIndex() );
+    KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
+    lineItem->setMeasurementMode( KadasLineItem::MeasureLineAndSegments, lineItem->angleUnit() );
   }
+  setDistanceUnit( mUnitComboBox->currentIndex() );
 }
 
 void KadasMeasureWidget::setItem( KadasMapItem *item )
 {
   KadasMapItemEditor::setItem( item );
-  if ( !mMeasureAzimuth )
-  {
-    connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
-  }
+  connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
 }
 
 void KadasMeasureWidget::setDistanceUnit( int index )
@@ -134,13 +157,21 @@ void KadasMeasureWidget::setDistanceUnit( int index )
 
 void KadasMeasureWidget::setAngleUnit( int index )
 {
-  QgsUnitTypes::AngleUnit unit = static_cast<QgsUnitTypes::AngleUnit>( mUnitComboBox->itemData( index ).toInt() );
+  QgsUnitTypes::AngleUnit unit = static_cast<QgsUnitTypes::AngleUnit>( mAngleUnitComboBox->itemData( index ).toInt() );
   QgsSettings().setValue( "/kadas/last_azimuth_unit", unit );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
     lineItem->setMeasurementMode( lineItem->measurementMode(), unit );
   }
+}
+
+void KadasMeasureWidget::setAzimutEnabled( bool enabled )
+{
+  QgsSettings().setValue( "/kadas/last_azimuth_enabled", enabled );
+  mNorthComboBox->setEnabled( enabled );
+  mAngleUnitComboBox->setEnabled( enabled );
+  syncWidgetToItem();
 }
 
 void KadasMeasureWidget::setAzimuthNorth( int index )
@@ -150,7 +181,7 @@ void KadasMeasureWidget::setAzimuthNorth( int index )
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
-    lineItem->setMeasurementMode( north == AzimuthGeoNorth ? KadasLineItem::MeasureAzimuthGeoNorth : KadasLineItem::MeasureAzimuthMapNorth, lineItem->angleUnit() );
+    lineItem->setMeasurementMode( north == AzimuthGeoNorth ? KadasLineItem::MeasureLineAndSegmentsAndAzimuthGeoNorth : KadasLineItem::MeasureLineAndSegmentsAndAzimuthMapNorth, lineItem->angleUnit() );
   }
 }
 
@@ -169,19 +200,8 @@ void KadasMeasureWidget::updateTotal()
 KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode )
   : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) ), mMeasureMode( measureMode )
 {
-  setMultipart( measureMode != MeasureAzimuth );
+  setMultipart( true );
   setSnappingEnabled( true );
-  switch ( measureMode )
-  {
-    case MeasureLine:
-      setToolLabel( tr( "Measure line" ) ); break;
-    case MeasurePolygon:
-      setToolLabel( tr( "Measure polygon" ) ); break;
-    case MeasureCircle:
-      setToolLabel( tr( "Measure circle" ) ); break;
-    case MeasureAzimuth:
-      setToolLabel( tr( "Measure azimuth" ) ); break;
-  };
 }
 
 KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const
@@ -189,20 +209,18 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanv
   switch ( measureMode )
   {
     case MeasureLine:
-      return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ), false ); };
+      return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ) ); };
     case MeasurePolygon:
-      return [ = ] { return setupItem( new KadasPolygonItem( canvas->mapSettings().destinationCrs(), true ), false ); };
+      return [ = ] { return setupItem( new KadasPolygonItem( canvas->mapSettings().destinationCrs(), true ) ); };
     case MeasureCircle:
-      return [ = ] { return setupItem( new KadasCircleItem( canvas->mapSettings().destinationCrs(), true ), false ); };
-    case MeasureAzimuth:
-      return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ), true ); };
+      return [ = ] { return setupItem( new KadasCircleItem( canvas->mapSettings().destinationCrs(), true ) ); };
   }
   return nullptr;
 }
 
-KadasGeometryItem *KadasMapToolMeasure::setupItem( KadasGeometryItem *item, bool measureAzimut ) const
+KadasGeometryItem *KadasMapToolMeasure::setupItem( KadasGeometryItem *item ) const
 {
-  item->setEditor( measureAzimut ? "KadasMeasureAzimuthWidget" : "KadasMeasureWidget" );
+  item->setEditor( "KadasMeasureWidget" );
   return item;
 }
 
@@ -250,7 +268,7 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
   }
   else
   {
-    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), ( mMeasureMode == MeasureLine || mMeasureMode == MeasureAzimuth ) ? QgsWkbTypes::LineGeometry : QgsWkbTypes::PolygonGeometry );
+    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), mMeasureMode == MeasureLine ? QgsWkbTypes::LineGeometry : QgsWkbTypes::PolygonGeometry );
     if ( pickResult.geom )
     {
       addPartFromGeometry( *pickResult.geom, pickResult.crs );
