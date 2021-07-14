@@ -122,12 +122,18 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   ui.comboBoxLabels->addItem( tr( "Rings" ), static_cast<int>( KadasBullseyeLayer::LABEL_RINGS ) );
   ui.comboBoxLabels->addItem( tr( "Axes and rings" ), static_cast<int>( KadasBullseyeLayer::LABEL_AXES_RINGS ) );
 
+  ui.comboBoxRingIntevalUnit->addItem( "m", QgsUnitTypes::DistanceMeters );
+  ui.comboBoxRingIntevalUnit->addItem( "ft", QgsUnitTypes::DistanceFeet );
+  ui.comboBoxRingIntevalUnit->addItem( "mi", QgsUnitTypes::DistanceMiles );
+  ui.comboBoxRingIntevalUnit->addItem( "nm", QgsUnitTypes::DistanceNauticalMiles );
+
   connect( ui.inputCenter, &KadasCoordinateInput::coordinateChanged, this, &KadasBullseyeWidget::updateLayer );
   connect( ui.toolButtonPickCenter, &QToolButton::clicked, this, [this] { emit requestPickCenter( true ); } );
   connect( ui.spinBoxRings, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateLayer );
 
   connect( ui.spinBoxRingInterval, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateLayer );
   connect( ui.spinBoxAxesInterval, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateLayer );
+  connect( ui.comboBoxRingIntevalUnit, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasBullseyeWidget::updateLayer );
 
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasBullseyeWidget::updateColor );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateFontSize );
@@ -173,7 +179,8 @@ void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxRings->setValue( mCurrentLayer->rings() );
   ui.spinBoxRings->blockSignals( false );
   ui.spinBoxRingInterval->blockSignals( true );
-  ui.spinBoxRingInterval->setValue( mCurrentLayer->ringInterval() );
+  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntevalUnit->currentData().toInt() );
+  ui.spinBoxRingInterval->setValue( mCurrentLayer->ringInterval() * QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceNauticalMiles, intervalUnit ) );
   ui.spinBoxRingInterval->blockSignals( false );
   ui.spinBoxAxesInterval->blockSignals( true );
   ui.spinBoxAxesInterval->setValue( mCurrentLayer->axesInterval() );
@@ -201,7 +208,9 @@ void KadasBullseyeWidget::updateLayer()
   QgsPointXY center = ui.inputCenter->getCoordinate();
   const QgsCoordinateReferenceSystem &crs = ui.inputCenter->getCrs();
   int rings = ui.spinBoxRings->value();
-  double interval = ui.spinBoxRingInterval->value();
+  // First implementation had interval distance in nm, hence for backwards compat. keep this unit internally
+  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntevalUnit->currentData().toInt() );
+  double interval = ui.spinBoxRingInterval->value() * QgsUnitTypes::fromUnitToUnitFactor( intervalUnit, QgsUnitTypes::DistanceNauticalMiles );
   int axes = ui.spinBoxAxesInterval->value();
   mCurrentLayer->setup( center, crs, rings, interval, axes );
   mCurrentLayer->triggerRepaint();
