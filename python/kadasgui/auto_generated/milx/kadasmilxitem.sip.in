@@ -56,6 +56,7 @@ class KadasMilxItem : KadasMapItem
       QList<int> controlPoints;
       QPoint userOffset;
       int pressedPoints;
+      Margin margin;
 
       virtual void assign( const KadasMapItem::State *other );
       virtual State *clone() const /Factory/;
