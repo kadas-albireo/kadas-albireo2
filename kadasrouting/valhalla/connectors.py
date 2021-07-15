@@ -146,8 +146,9 @@ class ConsoleConnector(Connector):
         commands = [valhallaExecutable, valhallaConfig, action, request]
         LOG.debug("Run %s" % commands)
         result = subprocess.run(
-            commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True
+            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
+        LOG.debug("stderr:", result.stderr.decode(("utf-8")))
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
             raise Exception(response["error"])
@@ -159,8 +160,10 @@ class ConsoleConnector(Connector):
         )
         # Add handling for chinese_postman if there is a patrol_polygon
         if patrol_polygon:
-            response = self._execute("chinese_postman", json.dumps(params))
+            LOG.debug('patrol polygon')
+            response = self._execute("chinese_postman_polygon", json.dumps(params))
         else:
+            LOG.debug('route')
             response = self._execute("route", json.dumps(params))
         return response
 

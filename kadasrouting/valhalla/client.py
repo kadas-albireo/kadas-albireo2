@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 # Code partially adapted from the QGIS - Valhalla plugin by Nils Nolde(nils@gis-ops.com)
-
+import logging
 from kadasrouting.exceptions import ValhallaException, Valhalla400Exception
 from kadasrouting.utilities import encodePolyline6
 
 from .connectors import ConsoleConnector
+
+LOG = logging.getLogger(__name__)
 
 
 class ValhallaClient:
