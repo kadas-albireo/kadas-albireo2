@@ -144,12 +144,15 @@ class ConsoleConnector(Connector):
             {"valhallaTilesDir": valhallaTilesDir}
         )
         commands = [valhallaExecutable, valhallaConfig, action, request]
-        LOG.debug("Run %s" % commands)
+        LOG.info("Run %s" % commands)
         result = subprocess.run(
-            commands, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True
+            commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
+        LOG.info(result.stdout)
+        LOG.error(result.stderr)
         response = json.loads(result.stdout.decode("utf-8"))
         if "error" in response:
+            LOG.error(response["error"])
             raise Exception(response["error"])
         return response
 
@@ -157,7 +160,13 @@ class ConsoleConnector(Connector):
         params = self.prepareRouteParameters(
             points, profile, avoid_polygons, options, patrol_polygon
         )
-        response = self._execute("route", json.dumps(params))
+        # Add handling for chinese_postman if there is a patrol_polygon
+        if patrol_polygon:
+            LOG.debug('patrol polygon')
+            response = self._execute("chinese_postman", json.dumps(params))
+        else:
+            LOG.debug('route')
+            response = self._execute("route", json.dumps(params))
         return response
 
     def isochrones(self, points, profile, options, intervals, colors):
