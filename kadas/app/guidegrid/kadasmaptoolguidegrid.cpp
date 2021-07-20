@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QPushButton>
 
+#include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -194,6 +195,8 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
     ui.widgetLayerSetup->setEnabled( false );
     return;
   }
+  QIcon lockedIcon = QgsApplication::getThemeIcon( "/locked.svg" );
+  QIcon unlockedIcon = QgsApplication::getThemeIcon( "/unlocked.svg" );
 
   mCrs = mCurrentLayer->crs();
   int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
@@ -214,11 +217,11 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxHeight->blockSignals( false );
   ui.toolButtonLockHeight->blockSignals( true );
   ui.toolButtonLockHeight->setChecked( mCurrentLayer->rowSizeLocked() );
-  ui.toolButtonLockHeight->setIcon( QIcon( ui.toolButtonLockHeight->isChecked() ? ":/images/themes/default/locked.svg" : ":/images/themes/default/unlocked.svg" ) );
+  ui.toolButtonLockHeight->setIcon( ui.toolButtonLockHeight->isChecked() ? lockedIcon : unlockedIcon );
   ui.toolButtonLockHeight->blockSignals( false );
   ui.toolButtonLockWidth->blockSignals( true );
   ui.toolButtonLockWidth->setChecked( mCurrentLayer->colSizeLocked() );
-  ui.toolButtonLockWidth->setIcon( QIcon( ui.toolButtonLockWidth->isChecked() ? ":/images/themes/default/locked.svg" : ":/images/themes/default/unlocked.svg" ) );
+  ui.toolButtonLockWidth->setIcon( ui.toolButtonLockWidth->isChecked() ? lockedIcon : unlockedIcon );
   ui.toolButtonLockWidth->blockSignals( false );
   ui.toolButtonColor->setColor( mCurrentLayer->color() );
   ui.spinBoxLineWidth->blockSignals( true );
