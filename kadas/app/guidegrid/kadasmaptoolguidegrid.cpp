@@ -128,6 +128,10 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.comboBoxLabelPos->addItem( tr( "Inside" ), KadasGuideGridLayer::LabelsInside );
   ui.comboBoxLabelPos->addItem( tr( "Outside" ), KadasGuideGridLayer::LabelsOutside );
 
+  ui.comboBoxQuadrants->addItem( tr( "Don't label quadrants" ), KadasGuideGridLayer::DontLabelQuadrants );
+  ui.comboBoxQuadrants->addItem( tr( "Label one quadrant" ), KadasGuideGridLayer::LabelOneQuadrant );
+  ui.comboBoxQuadrants->addItem( tr( "Label all quadrants" ), KadasGuideGridLayer::LabelAllQuadrants );
+
   auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
@@ -161,7 +165,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.comboBoxColLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
   connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
-  connect( ui.checkBoxQuadrants, &QCheckBox::toggled, this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxQuadrants, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
 
   connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::setCurrentLayer );
 
@@ -238,9 +242,9 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.comboBoxLabelPos->blockSignals( true );
   ui.comboBoxLabelPos->setCurrentIndex( ui.comboBoxLabelPos->findData( mCurrentLayer->labelingPos() ) );
   ui.comboBoxLabelPos->blockSignals( false );
-  ui.checkBoxQuadrants->blockSignals( true );
-  ui.checkBoxQuadrants->setChecked( mCurrentLayer->labelQuadrants() );
-  ui.checkBoxQuadrants->blockSignals( false );
+  ui.comboBoxQuadrants->blockSignals( true );
+  ui.comboBoxQuadrants->setCurrentIndex( ui.comboBoxQuadrants->findData( mCurrentLayer->labelQuadrants() ) );
+  ui.comboBoxQuadrants->blockSignals( false );
   updateIntervals();
   ui.widgetLayerSetup->setEnabled( true );
 }
@@ -449,6 +453,6 @@ void KadasGuideGridWidget::updateLabeling()
   }
   mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().front(), ui.comboBoxColLabels->currentText().front() );
   mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
-  mCurrentLayer->setLabelQuadrants( ui.checkBoxQuadrants->isChecked() );
+  mCurrentLayer->setLabelQuadrants( static_cast<KadasGuideGridLayer::QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
   mCurrentLayer->triggerRepaint();
 }

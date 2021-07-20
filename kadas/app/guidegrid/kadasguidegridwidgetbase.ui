@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
+    <width>753</width>
     <height>126</height>
    </rect>
   </property>
@@ -408,11 +408,7 @@
           <widget class="QComboBox" name="comboBoxLabelPos"/>
          </item>
          <item>
-          <widget class="QCheckBox" name="checkBoxQuadrants">
-           <property name="text">
-            <string>Quadrants</string>
-           </property>
-          </widget>
+          <widget class="QComboBox" name="comboBoxQuadrants"/>
          </item>
         </layout>
        </widget>
@@ -447,9 +443,9 @@
   <tabstop>toolButtonSwitchLabels</tabstop>
   <tabstop>comboBoxColLabels</tabstop>
   <tabstop>comboBoxLabelPos</tabstop>
-  <tabstop>checkBoxQuadrants</tabstop>
  </tabstops>
  <resources>
+  <include location="../../resources/resources.qrc"/>
   <include location="../../resources/resources.qrc"/>
  </resources>
  <connections/>

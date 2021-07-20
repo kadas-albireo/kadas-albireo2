@@ -107,6 +107,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
       double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
+      QuadrantLabeling quadrantLabeling = mLayer->mQuadrantLabeling;
       for ( int col = 1; col <= mLayer->mCols; ++col )
       {
         double x2 = gridRect.xMinimum() + col * ix;
@@ -138,7 +139,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           }
         }
 
-        if ( mLayer->mLabelQuadrants )
+        if ( quadrantLabeling != DontLabelQuadrants )
         {
           mRendererContext.painter()->save();
           mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
@@ -153,6 +154,12 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
               drawGridLabel( vLine2.at( i ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i ).y() + 0.5 * smallLabelBoxSize, "B", smallFont, smallFontMetrics, bufferColor );
               drawGridLabel( vLine1.at( i + 1 ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "D", smallFont, smallFontMetrics, bufferColor );
               drawGridLabel( vLine2.at( i + 1 ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "C", smallFont, smallFontMetrics, bufferColor );
+            }
+            if ( quadrantLabeling == LabelOneQuadrant )
+            {
+              vLineMid.append( 0.5 * ( vLine1.at( i + 1 ) + vLine2.at( i + 1 ) ) );
+              quadrantLabeling = DontLabelQuadrants;
+              break;
             }
           }
           QPainterPath path;
@@ -173,6 +180,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       double sx1 = adaptLabelsToScreen ? std::max( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
       double sx2 = adaptLabelsToScreen ? std::min( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
+      quadrantLabeling = mLayer->mQuadrantLabeling;
       for ( int row = 1; row <= mLayer->mRows; ++row )
       {
         double y = gridRect.yMaximum() - row * iy;
@@ -204,14 +212,23 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           }
         }
 
-        if ( mLayer->mLabelQuadrants )
+        if ( quadrantLabeling != DontLabelQuadrants )
         {
           mRendererContext.painter()->save();
           mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
           QPolygonF hLineMid;
-          for ( int i = 0, n = hLine1.size(); i < n; ++i )
+          if ( quadrantLabeling == LabelOneQuadrant )
           {
-            hLineMid.append( 0.5 * ( hLine1.at( i ) + hLine2.at( i ) ) );
+            hLineMid.append( 0.5 * ( hLine1.at( 0 ) + hLine2.at( 0 ) ) );
+            hLineMid.append( 0.5 * ( hLine1.at( 1 ) + hLine2.at( 1 ) ) );
+            quadrantLabeling = DontLabelQuadrants;
+          }
+          else
+          {
+            for ( int i = 0, n = hLine1.size(); i < n; ++i )
+            {
+              hLineMid.append( 0.5 * ( hLine1.at( i ) + hLine2.at( i ) ) );
+            }
           }
           QPainterPath path;
           path.addPolygon( hLineMid );
@@ -304,7 +321,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mRowChar = mRowChar;
   layer->mColChar = mColChar;
   layer->mLabelingPos = mLabelingPos;
-  layer->mLabelQuadrants = mLabelQuadrants;
+  layer->mQuadrantLabeling = mQuadrantLabeling;
   return layer;
 }
 
@@ -332,7 +349,14 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
   mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
   mLabelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
-  mLabelQuadrants = layerEl.attribute( "labelQuadrans" ).toInt();
+  if ( layerEl.hasAttribute( "quadrantLabeling" ) )
+  {
+    mQuadrantLabeling = static_cast<QuadrantLabeling>( layerEl.attribute( "quadrantLabeling" ).toInt() );
+  }
+  else
+  {
+    mQuadrantLabeling = layerEl.attribute( "labelQuadrans" ).toInt() == 1 ? LabelAllQuadrants : DontLabelQuadrants;
+  }
   if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
   {
     // Compatibility
@@ -379,7 +403,7 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
   QMap<QString, QVariant> attrs;
 
   QString text = tr( "Cell %1, %2" ).arg( gridLabel( mRowChar, j ) ).arg( gridLabel( mColChar, i ) );
-  if ( mLabelQuadrants )
+  if ( mQuadrantLabeling != DontLabelQuadrants )
   {
     bool left = pos.x() <= mGridRect.xMinimum() + ( i + 0.5 ) * colWidth;
     bool top = pos.y() >= mGridRect.yMaximum() - ( j + 0.5 ) * rowHeight;
@@ -420,7 +444,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "colChar", QString( mColChar ) );
   layerEl.setAttribute( "rowChar", QString( mRowChar ) );
   layerEl.setAttribute( "labelingPos", mLabelingPos );
-  layerEl.setAttribute( "labelQuadrants", mLabelQuadrants );
+  layerEl.setAttribute( "quadrantLabeling", mQuadrantLabeling );
   return true;
 }
 
