@@ -37,7 +37,7 @@ class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog, protected Ui
   protected slots:
     virtual void apply();
 
-  private:
+  protected:
     QgsMapLayer *mLayer = nullptr;
     QList<QgsMapLayerConfigWidget *> mLayerPropertiesPages;
 };

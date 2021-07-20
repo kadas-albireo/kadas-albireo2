@@ -1154,7 +1154,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   }
   else if ( qobject_cast<KadasItemLayer *>( layer ) && !qobject_cast<KadasMilxLayer *>( layer ) )
   {
-    KadasItemLayerProperties dialog( static_cast<KadasItemLayer *>( layer ), mainWindow() );
+    KadasItemLayerProperties dialog( static_cast<KadasItemLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow() );
     for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
     {
       dialog.addPropertiesPageFactory( factory );

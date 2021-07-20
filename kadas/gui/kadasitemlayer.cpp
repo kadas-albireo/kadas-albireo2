@@ -163,6 +163,21 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
 
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
+
+  bool hasScaleBasedVisibiliy { layerEl.attributes().namedItem( QStringLiteral( "hasScaleBasedVisibilityFlag" ) ).nodeValue() == '1' };
+  setScaleBasedVisibility( hasScaleBasedVisibiliy );
+  bool ok;
+  double maxScale { layerEl.attributes().namedItem( QStringLiteral( "maxScale" ) ).nodeValue().toDouble( &ok ) };
+  if ( ok )
+  {
+    setMaximumScale( maxScale );
+  }
+  double minScale { layerEl.attributes().namedItem( QStringLiteral( "minScale" ) ).nodeValue().toDouble( &ok ) };
+  if ( ok )
+  {
+    setMinimumScale( minScale );
+  }
+
   QDomNodeList itemEls = layerEl.elementsByTagName( "MapItem" );
   for ( int i = 0, n = itemEls.size(); i < n; ++i )
   {
@@ -185,6 +200,9 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   layerEl.setAttribute( "type", "plugin" );
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
+  layerEl.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
+  layerEl.setAttribute( QStringLiteral( "maxScale" ), maximumScale() );
+  layerEl.setAttribute( QStringLiteral( "minScale" ), minimumScale() );
   for ( auto it = mItemOrder.begin(), itEnd = mItemOrder.end(); it != itEnd; ++it )
   {
     layerEl.appendChild( mItems[*it]->writeXml( document ) );

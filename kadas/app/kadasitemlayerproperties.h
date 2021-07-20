@@ -17,16 +17,35 @@
 #ifndef KADASITEMLAYERPROPERTIES_H
 #define KADASITEMLAYERPROPERTIES_H
 
+#include <qgis/qgsmaplayerconfigwidget.h>
+
 #include <kadas/gui/kadaslayerpropertiesdialog.h>
 
+class QGroupBox;
+class QgsScaleRangeWidget;
 class KadasItemLayer;
 
+
+class KadasItemLayerRenderingPropertiesWidget : public QgsMapLayerConfigWidget
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasItemLayerRenderingPropertiesWidget( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+
+  public slots:
+    void apply() override;
+
+  private:
+    QGroupBox *mGroupBox = nullptr;
+    QgsScaleRangeWidget *mScaleRangeWidget = nullptr;
+};
 
 class KadasItemLayerProperties : public KadasLayerPropertiesDialog
 {
     Q_OBJECT
   public:
-    KadasItemLayerProperties( KadasItemLayer *layer, QWidget *parent = nullptr );
+    KadasItemLayerProperties( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 };
 
 #endif // KADASITEMLAYERPROPERTIES_H
