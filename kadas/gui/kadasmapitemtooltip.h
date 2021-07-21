@@ -1,0 +1,53 @@
+/***************************************************************************
+    kadasmapitemtooltip.h
+    ---------------------
+    copyright            : (C) 2021 by Sandro Mani
+    email                : smani at sourcepole dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef KADASMAPITEMTOOLTIP_H
+#define KADASMAPITEMTOOLTIP_H
+
+#include <QTimer>
+#include <QTextBrowser>
+
+#include <kadas/gui/kadas_gui.h>
+
+class QgsMapCanvas;
+class KadasMapItem;
+
+class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
+{
+    Q_OBJECT
+  public:
+    KadasMapItemTooltip( QgsMapCanvas *canvas );
+    void updateForPos( const QPoint &canvasPos );
+
+  protected:
+    void enterEvent( QEvent * ) override;
+
+  private:
+    static constexpr int sWidth = 320;
+    static constexpr int sHeight = 160;
+
+    QTimer mShowTimer;
+    QTimer mHideTimer;
+    QPoint mPos;
+    QgsMapCanvas *mCanvas = nullptr;
+    KadasMapItem *mItem = nullptr;
+
+  private slots:
+    void positionAndShow();
+    void clearAndHide();
+};
+
+#endif // KADASMAPITEMTOOLTIP_H

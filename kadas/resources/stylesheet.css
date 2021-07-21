@@ -513,3 +513,11 @@ QgsAttributeForm QScrollArea > QWidget > QWidget
   border: 1px solid black;
   border-radius: 2px;
 }
+
+#TooltipWidget
+{
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: rgba(22, 23, 27, 0.9);
+  color: white;
+}

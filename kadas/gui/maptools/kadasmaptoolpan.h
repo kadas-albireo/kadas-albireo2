@@ -22,12 +22,13 @@
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 
+class QPinchGesture;
 class QgsFeature;
 class QgsLabelPosition;
 class QgsMapCanvas;
 class QgsRubberBand;
 class QgsVectorLayer;
-class QPinchGesture;
+class KadasMapItemTooltip;
 
 
 /** \ingroup gui
@@ -57,8 +58,6 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
 
     bool gestureEvent( QGestureEvent *event ) override;
 
-    bool canvasToolTipEvent( QHelpEvent *e ) override;
-
   signals:
     void contextMenuRequested( QPoint screenPos, QgsPointXY mapPos );
     void itemPicked( const KadasFeaturePicker::PickResult &result );
@@ -82,6 +81,8 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
 
     //!Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
     bool mPickClick;
+
+    KadasMapItemTooltip *mTooltipWidget = nullptr;
 
     void pinchTriggered( QPinchGesture *gesture );
 

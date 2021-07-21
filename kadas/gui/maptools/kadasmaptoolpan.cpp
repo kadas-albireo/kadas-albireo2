@@ -18,6 +18,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 #include <QPinchGesture>
+#include <QTextBrowser>
 #include <QToolTip>
 
 #include <qgis/qgsmapcanvas.h>
@@ -26,8 +27,10 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasfeaturepicker.h>
+#include <kadas/gui/kadasmapitemtooltip.h>
 #include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
+
 
 KadasMapToolPan::KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteraction )
   : QgsMapTool( canvas )
@@ -39,11 +42,14 @@ KadasMapToolPan::KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteractio
 {
   mToolName = tr( "Pan" );
   setCursor( QCursor( Qt::ArrowCursor ) );
+
+  mTooltipWidget = new KadasMapItemTooltip( canvas );
 }
 
 KadasMapToolPan::~KadasMapToolPan()
 {
   mCanvas->ungrabGesture( Qt::PinchGesture );
+  delete mTooltipWidget;
 }
 
 void KadasMapToolPan::activate()
@@ -113,6 +119,7 @@ void KadasMapToolPan::canvasMoveEvent( QgsMapMouseEvent *e )
   else
   {
     mCanvas->setCursor( mCursor );
+    mTooltipWidget->updateForPos( e->pos() );
   }
 }
 
@@ -177,22 +184,6 @@ bool KadasMapToolPan::gestureEvent( QGestureEvent *event )
     pinchTriggered( static_cast<QPinchGesture *>( gesture ) );
   }
   return true;
-}
-
-bool KadasMapToolPan::canvasToolTipEvent( QHelpEvent *e )
-{
-  QPoint canvasPos = e->pos();
-  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ) );
-  if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
-  {
-    QString tooltip = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId]->tooltip();
-    if ( !tooltip.isEmpty() )
-    {
-      QToolTip::showText( e->globalPos(), tooltip, mCanvas );
-      return true;
-    }
-  }
-  return false;
 }
 
 void KadasMapToolPan::pinchTriggered( QPinchGesture *gesture )
