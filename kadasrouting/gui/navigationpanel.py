@@ -634,12 +634,12 @@ class NavigationPanel(BASE, WIDGET):
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
         self.iface.mapCanvas().setRotation(0)
         self.iface.mapCanvas().refresh()
-    
+
     def removeOriginalGpsMarker(self):
         for item in KadasMapCanvasItemManager.items():
-            if item.itemName() == 'Symbol':
+            if item.itemName() == "Symbol":
                 item.__class__ = KadasSymbolItem
-                if item.filePath() == ':/kadas/icons/gpsarrow':
+                if item.filePath() == ":/kadas/icons/gpsarrow":
                     self.originalGpsMarker = item
                     KadasMapCanvasItemManager.removeItem(self.originalGpsMarker)
 
@@ -651,7 +651,6 @@ class NavigationPanel(BASE, WIDGET):
             pass
         finally:
             self.originalGpsMarker = None
-
 
 
 class WaypointItem(QListWidgetItem):
