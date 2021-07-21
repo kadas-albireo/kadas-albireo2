@@ -38,6 +38,7 @@ from kadas.kadasgui import (
     KadasMapCanvasItemManager,
     KadasPluginInterface,
     KadasGpxWaypointItem,
+    KadasSymbolItem,
 )
 
 from kadasrouting.utilities import formatdist, pushMessage, iconPath
@@ -562,6 +563,7 @@ class NavigationPanel(BASE, WIDGET):
         self.centerPin = None
         self.waypointLayer = None
         self.warningShown = False
+        self.originalGpsMarker = None
 
         self.setMessage(self.tr("Connecting to GPS..."))
         self.gpsConnection = getGpsConnection()
@@ -583,6 +585,7 @@ class NavigationPanel(BASE, WIDGET):
         if self.gpsConnection is None:
             self.setMessage(self.tr("Cannot connect to GPS"))
         else:
+            self.removeOriginalGpsMarker()
             self.centerPin = KadasPinItem(QgsCoordinateReferenceSystem(4326))
             self.centerPin.setup(
                 iconPath("navigationcenter.svg"),
@@ -627,9 +630,27 @@ class NavigationPanel(BASE, WIDGET):
         except TypeError as e:
             LOG.debug(e)
         # Finally, reset everything
+        self.addOriginalGpsMarker()
         self.rubberband.reset(QgsWkbTypes.LineGeometry)
         self.iface.mapCanvas().setRotation(0)
         self.iface.mapCanvas().refresh()
+
+    def removeOriginalGpsMarker(self):
+        for item in KadasMapCanvasItemManager.items():
+            if item.itemName() == "Symbol":
+                item.__class__ = KadasSymbolItem
+                if item.filePath() == ":/kadas/icons/gpsarrow":
+                    self.originalGpsMarker = item
+                    KadasMapCanvasItemManager.removeItem(self.originalGpsMarker)
+
+    def addOriginalGpsMarker(self):
+        try:
+            KadasMapCanvasItemManager.addItem(self.originalGpsMarker)
+        except RuntimeError:
+            # if the GPS connection has been aborted, then just pass
+            pass
+        finally:
+            self.originalGpsMarker = None
 
 
 class WaypointItem(QListWidgetItem):
