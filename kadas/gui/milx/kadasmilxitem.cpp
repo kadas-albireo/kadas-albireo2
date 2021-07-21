@@ -1046,15 +1046,18 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   state()->controlPoints = result.controlPoints;
 
   state()->attributes.clear();
-  double m2p = metersToPixels( state()->points.first(), mapSettings.mapToPixel(), mapCrst );
-  for ( auto it = result.attributes.begin(), itEnd = result.attributes.end(); it != itEnd; ++it )
+  if ( !state()->points.isEmpty() )
   {
-    double value = it.value();
-    if ( it.key() != MilxAttributeAttitude )
+    double m2p = metersToPixels( state()->points.first(), mapSettings.mapToPixel(), mapCrst );
+    for ( auto it = result.attributes.begin(), itEnd = result.attributes.end(); it != itEnd; ++it )
     {
-      value /= m2p;
+      double value = it.value();
+      if ( it.key() != MilxAttributeAttitude )
+      {
+        value /= m2p;
+      }
+      state()->attributes.insert( it.key(), value );
     }
-    state()->attributes.insert( it.key(), value );
   }
 
   state()->attributePoints.clear();

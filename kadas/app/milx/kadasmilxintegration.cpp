@@ -51,18 +51,19 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   connect( mUi.mActionMilx, &QAction::triggered, this, &KadasMilxIntegration::createMilx );
   connect( mUi.mActionSaveMilx, &QAction::triggered, this, &KadasMilxIntegration::saveMilxly );
   connect( mUi.mActionLoadMilx, &QAction::triggered, this, &KadasMilxIntegration::openMilxly );
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMilxIntegration::readProjectSettings );
 
   mUi.mRibbonWidget->setTabEnabled( mUi.mRibbonWidget->indexOf( mUi.mMssTab ), true );
 
-  mUi.mSymbolSizeSlider->setValue( QgsSettings().value( "/milx/milx_symbol_size", "60" ).toInt() );
+  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", 60 ) );
   setMilXSymbolSize( mUi.mSymbolSizeSlider->value() );
   connect( mUi.mSymbolSizeSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXSymbolSize );
 
-  mUi.mLineWidthSlider->setValue( QgsSettings().value( "/milx/milx_line_width", "2" ).toInt() );
+  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", 2 ) );
   setMilXLineWidth( mUi.mLineWidthSlider->value() );
   connect( mUi.mLineWidthSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXLineWidth );
 
-  mUi.mWorkModeCombo->setCurrentIndex( QgsSettings().value( "/milx/milx_work_mode", "1" ).toInt() );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", 1 ) );
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
@@ -132,20 +133,30 @@ void KadasMilxIntegration::createMilx( bool active )
   }
 }
 
+void KadasMilxIntegration::readProjectSettings()
+{
+  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", 60 ) );
+  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", 2 ) );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", 1 ) );
+}
+
 void KadasMilxIntegration::setMilXSymbolSize( int value )
 {
+  QgsProject::instance()->writeEntry( "milx", "symbol_size", value );
   KadasMilxClient::setSymbolSize( value );
   refreshMilxLayers();
 }
 
 void KadasMilxIntegration::setMilXLineWidth( int value )
 {
+  QgsProject::instance()->writeEntry( "milx", "line_width", value );
   KadasMilxClient::setLineWidth( value );
   refreshMilxLayers();
 }
 
 void KadasMilxIntegration::setMilXWorkMode( int idx )
 {
+  QgsProject::instance()->writeEntry( "milx", "work_mode", idx );
   KadasMilxClient::setWorkMode( idx );
   refreshMilxLayers();
 }
@@ -549,4 +560,3 @@ bool KadasMilxDropHandler::handleMimeDataV2( const QMimeData *data )
   }
   return handled > 0;
 }
-

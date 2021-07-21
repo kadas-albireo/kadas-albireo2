@@ -73,6 +73,7 @@ class KadasMilxIntegration : public QObject
     void createMilx( bool active );
     void saveMilxly();
     void openMilxly();
+    void readProjectSettings();
     void setMilXSymbolSize( int value );
     void setMilXLineWidth( int value );
     void setMilXWorkMode( int idx );
