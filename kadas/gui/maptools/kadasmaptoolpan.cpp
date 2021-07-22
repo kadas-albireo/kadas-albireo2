@@ -61,6 +61,7 @@ void KadasMapToolPan::activate()
 void KadasMapToolPan::deactivate()
 {
   mCanvas->ungrabGesture( Qt::PinchGesture );
+  mTooltipWidget->clear();
   QgsMapTool::deactivate();
 }
 

@@ -29,7 +29,7 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   mHideTimer.setSingleShot( true );
   setReadOnly( true );
   connect( &mShowTimer, &QTimer::timeout, this, &KadasMapItemTooltip::positionAndShow );
-  connect( &mHideTimer, &QTimer::timeout, this, &KadasMapItemTooltip::clearAndHide );
+  connect( &mHideTimer, &QTimer::timeout, this, &KadasMapItemTooltip::hide );
   setFixedSize( sWidth, sHeight );
   hide();
 }
@@ -67,6 +67,14 @@ void KadasMapItemTooltip::enterEvent( QEvent * )
   mHideTimer.stop();
 }
 
+void KadasMapItemTooltip::clear()
+{
+  mItem = nullptr;
+  setText( "" );
+  mShowTimer.stop();
+  hide();
+}
+
 void KadasMapItemTooltip::positionAndShow()
 {
   double x = mPos.x() + 5;
@@ -81,11 +89,4 @@ void KadasMapItemTooltip::positionAndShow()
   }
   move( x, y );
   show();
-}
-
-void KadasMapItemTooltip::clearAndHide()
-{
-  hide();
-  mItem = nullptr;
-  setText( "" );
 }

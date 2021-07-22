@@ -32,6 +32,9 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
     KadasMapItemTooltip( QgsMapCanvas *canvas );
     void updateForPos( const QPoint &canvasPos );
 
+  public slots:
+    void clear();
+
   protected:
     void enterEvent( QEvent * ) override;
 
@@ -47,7 +50,6 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
 
   private slots:
     void positionAndShow();
-    void clearAndHide();
 };
 
 #endif // KADASMAPITEMTOOLTIP_H
