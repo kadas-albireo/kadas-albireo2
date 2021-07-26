@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
-    <height>270</height>
+    <width>933</width>
+    <height>285</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,6 +98,12 @@
    </item>
    <item row="5" column="3" colspan="2">
     <widget class="QGroupBox" name="groupBox_avoid">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Areas to avoid</string>
      </property>
@@ -140,15 +146,15 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="1" colspan="3">
+       <widget class="QComboBox" name="comboAreasToAvoidLayers"/>
+      </item>
       <item row="1" column="3">
        <widget class="QToolButton" name="btnAreasToAvoidSave">
         <property name="text">
          <string>Save</string>
         </property>
        </widget>
-      </item>
-      <item row="2" column="1" colspan="3">
-       <widget class="QComboBox" name="comboAreasToAvoidLayers"/>
       </item>
      </layout>
     </widget>
@@ -223,6 +229,12 @@
    </item>
    <item row="5" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_patrol">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Patrol area</string>
      </property>
@@ -258,15 +270,15 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="2" colspan="3">
+       <widget class="QComboBox" name="comboPatrolAreaLayers"/>
+      </item>
       <item row="2" column="4">
        <widget class="QToolButton" name="btnPatrolAreaSave">
         <property name="text">
          <string>Save</string>
         </property>
        </widget>
-      </item>
-      <item row="3" column="2" colspan="3">
-       <widget class="QComboBox" name="comboPatrolAreaLayers"/>
       </item>
      </layout>
     </widget>
