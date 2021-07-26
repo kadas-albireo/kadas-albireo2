@@ -52,8 +52,8 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
       {
         hide();
       }
-      mShowTimer.start( 500 );
     }
+    mShowTimer.start( 500 );
   }
   else if ( isVisible() )
   {
