@@ -23,10 +23,9 @@
 
 typedef quint8 MilXServerRequest;
 
-quint64 MILX_INTERFACE_VERSION = 202107071230;
+quint64 MILX_INTERFACE_VERSION = 202107271520;
 
 MilXServerRequest MILX_REQUEST_INIT = 1; // {MILX_REQUEST_INIT, Lang:QString, InterfaceVersion:int64}
-MilXServerRequest MILX_REQUEST_SET_SYMBOL_OPTIONS = 2; // {MILX_REQUEST_SYMBOL_OPTIONS, SymbolSize:int, LineWidth:int, WorkMode:int}
 
 MilXServerRequest MILX_REQUEST_GET_SYMBOL_METADATA = 10; // {MILX_REQUEST_GET_SYMBOL_METADATA, SymbolXml:QString}
 MilXServerRequest MILX_REQUEST_GET_SYMBOLS_METADATA = 11; // {MILX_REQUEST_GET_SYMBOLS_METADATA, SymbolXmls:QStringList}
@@ -34,17 +33,17 @@ MilXServerRequest MILX_REQUEST_GET_MILITARY_NAME = 12; // {MILX_REQUEST_GET_MILI
 MilXServerRequest MILX_REQUEST_GET_CONTROL_POINT_INDICES = 13; // {MILX_REQUEST_GET_CONTROL_POINT_INDICES, SymbolXml:QString, nPoints:int}
 MilXServerRequest MILX_REQUEST_GET_CONTROL_POINTS = 14;  // {MILX_REQUEST_GET_CONTROL_POINTS, SymbolXml:QString, Points:QList<QPoint>}
 
-MilXServerRequest MILX_REQUEST_APPEND_POINT = 20; // {MILX_REQUEST_APPEND_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, NewPoint:QPoint}
-MilXServerRequest MILX_REQUEST_INSERT_POINT = 21; // {MILX_REQUEST_INSERT_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, NewPoint:QPoint}
-MilXServerRequest MILX_REQUEST_MOVE_POINT = 22; // {MILX_REQUEST_MOVE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int, NewPos:QPoint}
-MilXServerRequest MILX_REQUEST_MOVE_ATTRIBUTE_POINT = 23; // {MILX_REQUEST_MOVE_ATTRIBUTE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int, NewPos:QPoint}
+MilXServerRequest MILX_REQUEST_APPEND_POINT = 20; // {MILX_REQUEST_APPEND_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, NewPoint:QPoint, symbolSize:int, lineWidth:int, workMode: int}
+MilXServerRequest MILX_REQUEST_INSERT_POINT = 21; // {MILX_REQUEST_INSERT_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, NewPoint:QPoint, symbolSize:int, lineWidth:int, workMode: int}
+MilXServerRequest MILX_REQUEST_MOVE_POINT = 22; // {MILX_REQUEST_MOVE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int, NewPos:QPoint, symbolSize:int, lineWidth:int, workMode: int}
+MilXServerRequest MILX_REQUEST_MOVE_ATTRIBUTE_POINT = 23; // {MILX_REQUEST_MOVE_ATTRIBUTE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int, NewPos:QPoint, symbolSize:int, lineWidth:int, workMode: int}
 MilXServerRequest MILX_REQUEST_CAN_DELETE_POINT = 24; // {MILX_REQUEST_CAN_DELETE_POINT, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int}
-MilXServerRequest MILX_REQUEST_DELETE_POINT = 25; // {MILX_REQUEST_DELETE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int}
-MilXServerRequest MILX_REQUEST_EDIT_SYMBOL = 26; // {MILX_REQUEST_EDIT_SYMBOL, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, wid:WId}
+MilXServerRequest MILX_REQUEST_DELETE_POINT = 25; // {MILX_REQUEST_DELETE_POINT, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, index:int, symbolSize:int, lineWidth:int, workMode: int}
+MilXServerRequest MILX_REQUEST_EDIT_SYMBOL = 26; // {MILX_REQUEST_EDIT_SYMBOL, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, symbolSize:int, lineWidth:int, workMode: int, wid:WId}
 MilXServerRequest MILX_REQUEST_CREATE_SYMBOL = 27; // {MILX_REQUEST_CREATE_SYMBOL, wid:WId}
 
-MilXServerRequest MILX_REQUEST_UPDATE_SYMBOL = 30; // {MILX_REQUEST_UPDATE_SYMBOL, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, returnPoints:bool}
-MilXServerRequest MILX_REQUEST_UPDATE_SYMBOLS = 31; // {MILX_REQUEST_UPDATE_SYMBOLS, VisibleExtent:QRect, dpi:int, scaleFactor:double, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}
+MilXServerRequest MILX_REQUEST_UPDATE_SYMBOL = 30; // {MILX_REQUEST_UPDATE_SYMBOL, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, symbolSize:int, lineWidth:int, workMode: int, returnPoints:bool}
+MilXServerRequest MILX_REQUEST_UPDATE_SYMBOLS = 31; // {MILX_REQUEST_UPDATE_SYMBOLS, VisibleExtent:QRect, dpi:int, scaleFactor:double, symbolSize:int, lineWidth:int, workMode: int, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}
 
 MilXServerRequest MILX_REQUEST_HIT_TEST = 40; // {MILX_REQUEST_HIT_TEST, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, clickPos:QPoint}
 MilXServerRequest MILX_REQUEST_PICK_SYMBOL = 41; // {MILX_REQUEST_PICK_SYMBOL, ClickPos:QPoint, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}
@@ -58,7 +57,6 @@ typedef quint8 MilXServerReply;
 
 MilXServerReply MILX_REPLY_ERROR = 99; // {MILX_REPLY_ERROR, Message:QString}
 MilXServerReply MILX_REPLY_INIT_OK = 101; // {MILX_REPLY_INIT_OK, Version:QString}
-MilXServerReply MILX_REPLY_SET_SYMBOL_OPTIONS = 102; // {MILX_REPLY_SET_SYMBOL_OPTIONS}
 
 MilXServerReply MILX_REPLY_GET_SYMBOL_METADATA = 110; // {MILX_REPLY_GET_SYMBOL_METADATA, Name:QString, MilitaryName:QString, SvgXML:QByteArray, HasVariablePoints:bool, MinPointCount:int, SymbolType:QString}
 MilXServerReply MILX_REPLY_GET_SYMBOLS_METADATA = 111; // {MILX_REPLY_GET_SYMBOLS_METADATA, count:int, Name1:QString, MilitaryName1:QString, SvgXML1:QByteArray, HasVariablePoints1:bool, MinPointCount1:int, SymbolType1:QString, Name2:QString, MilitaryName2:QString, SvgXML2:QByteArray, HasVariablePoints2:bool, MinPointCount2:int, SymbolType2:QString, ...}

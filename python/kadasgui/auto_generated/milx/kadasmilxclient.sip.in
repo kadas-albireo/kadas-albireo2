@@ -23,6 +23,28 @@ struct KadasMilxSymbolDesc
   QString symbolType;
 };
 
+struct KadasMilxSymbolSettings
+{
+  static const int MinSymbolSize;
+  static const int MaxSymbolSize;
+  static const int DefaultSymbolSize;
+
+  static const int MinLineWidth;
+  static const int MaxLineWidth;
+  static const int DefaultLineWidth;
+
+  enum WorkMode
+  {
+    WorkModeInternational,
+    WorkModeCH
+  };
+  static const WorkMode DefaultWorkMode;
+
+  int symbolSize;
+  int lineWidth;
+  WorkMode workMode;
+};
+
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *

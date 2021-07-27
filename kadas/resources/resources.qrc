@@ -123,6 +123,7 @@
         <file alias="icons/gpsarrow">icons/gpsarrow.svg</file>
         <file alias="icons/distance_angle">icons/distance_angle.png</file>
         <file alias="icons/vchain">icons/vchain.png</file>
+        <file alias="icons/mss">icons/mss.svg</file>
         <file alias="icons/texteditor/textleft">icons/texteditor/textleft.png</file>
         <file alias="icons/texteditor/textanchor">icons/texteditor/textanchor.png</file>
         <file alias="icons/texteditor/textitalic">icons/texteditor/textitalic.png</file>

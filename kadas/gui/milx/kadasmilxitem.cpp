@@ -29,6 +29,7 @@
 #include <quazip5/quazipfile.h>
 
 #include <kadas/gui/milx/kadasmilxitem.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
 #include <kadas/app/kadasapplication.h>
 
 
@@ -322,7 +323,7 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
 
   int dpi = context.painter()->device()->logicalDpiX();
   QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, false ) )
   {
     return;
   }
@@ -363,7 +364,7 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
 
   int dpi = exportContext.painter()->device()->logicalDpiX();
   QRect screenExtent = computeScreenExtent( exportContext.mapExtent(), exportContext.mapToPixel() );
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true ) )
+  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, true ) )
   {
     return "";
   }
@@ -458,7 +459,7 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   KadasMilxClient::NPointSymbolGraphic result;
   QRect screenExtent = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
   int dpi = mapSettings.outputDpi();
-  KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true );
+  KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, true );
   updateSymbol( mapSettings, result );
 
   return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
@@ -479,7 +480,7 @@ void KadasMilxItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings 
 
   QPoint screenPoint = mapSettings.mapToPixel().transform( p ).toQPointF().toPoint();
   KadasMilxClient::NPointSymbolGraphic result;
-  if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, index, screenPoint, result ) )
+  if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, index, screenPoint, symbolSettings(), result ) )
   {
     updateSymbol( mapSettings, result );
   }
@@ -508,7 +509,7 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
 
     QPoint screenPoint = mapSettings.mapToPixel().transform( crst.transform( constState()->points[index] ) ).toQPointF().toPoint();
     KadasMilxClient::NPointSymbolGraphic result;
-    if ( KadasMilxClient::appendPoint( screenRect, dpi, symbol, screenPoint, result ) )
+    if ( KadasMilxClient::appendPoint( screenRect, dpi, symbol, screenPoint, symbolSettings(), result ) )
     {
       updateSymbol( mapSettings, result );
     }
@@ -604,14 +605,14 @@ void KadasMilxItem::edit( const EditContext &context, const KadasMapPos &newPoin
     KadasMilxClient::NPointSymbolGraphic result;
     if ( context.vidx.ring == 0 ) // Regular point
     {
-      if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, result ) )
+      if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
       {
         updateSymbol( mapSettings, result );
       }
     }
     else if ( context.vidx.ring == 1 )  // Attribute point
     {
-      if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, result ) )
+      if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
       {
         updateSymbol( mapSettings, result );
       }
@@ -657,7 +658,7 @@ void KadasMilxItem::edit( const EditContext &context, const AttribValues &values
     KadasMilxClient::NPointSymbolGraphic result;
     QRect screenExtent = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
     int dpi = mapSettings.outputDpi();
-    KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, true );
+    KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, true );
     updateSymbol( mapSettings, result );
   }
   else
@@ -677,7 +678,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   {
     KadasMilxClient::NPointSymbolGraphic result;
     WId winId = QApplication::topLevelWidgets().front()->winId();
-    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, result, winId ) )
+    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
     {
       updateSymbol( mapSettings, result );
     }
@@ -689,7 +690,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
       QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), [ = ]
       {
         KadasMilxClient::NPointSymbolGraphic result;
-        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, result ) )
+        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
       } );
       bool canDelete = false;
@@ -700,7 +701,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
       menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), [ = ]
       {
         KadasMilxClient::NPointSymbolGraphic result;
-        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, result ) )
+        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
       } );
     }
@@ -723,7 +724,7 @@ void KadasMilxItem::onDoubleClick( const QgsMapSettings &mapSettings )
   KadasMilxClient::NPointSymbolGraphic result;
   WId winId = QApplication::topLevelWidgets().front()->winId();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
-  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, result, winId ) )
+  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
   {
     updateSymbol( mapSettings, result );
   }
@@ -856,11 +857,11 @@ void KadasMilxItem::writeMilx( QDomDocument &doc, QDomElement &itemElement ) con
     itemElement.appendChild( offsetEl );
 
     QDomElement factorXEl = doc.createElement( "FactorX" );
-    factorXEl.appendChild( doc.createTextNode( QString::number( double( constState()->userOffset.x() ) / KadasMilxClient::getSymbolSize() ) ) );
+    factorXEl.appendChild( doc.createTextNode( QString::number( double( constState()->userOffset.x() ) / symbolSettings().symbolSize ) ) );
     offsetEl.appendChild( factorXEl );
 
     QDomElement factorYEl = doc.createElement( "FactorY" );
-    factorYEl.appendChild( doc.createTextNode( QString::number( -double( constState()->userOffset.y() ) / KadasMilxClient::getSymbolSize() ) ) );
+    factorYEl.appendChild( doc.createTextNode( QString::number( -double( constState()->userOffset.y() ) / symbolSettings().symbolSize ) ) );
     offsetEl.appendChild( factorYEl );
   }
 }
@@ -977,7 +978,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
   QRect screenExtent( 0, 0, 100, 100 );
   KadasMilxClient::NPointSymbolGraphic result;
   int dpi = qApp->desktop()->logicalDpiX();
-  if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+  if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, item->symbolSettings(), result, false ) )
   {
     item->updateSymbolMargin( result );
   }
@@ -1095,6 +1096,11 @@ void KadasMilxItem::updateSymbolMargin( const KadasMilxClient::NPointSymbolGraph
   state()->margin.bottom = std::max( 0, symbolBounds.bottom() - pointBounds.bottom() );
 }
 
+const KadasMilxSymbolSettings &KadasMilxItem::symbolSettings() const
+{
+  return mOwnerLayer ? static_cast<KadasMilxLayer *>( mOwnerLayer )->milxSymbolSettings() : KadasMilxClient::globalSymbolSettings();
+}
+
 QImage KadasMilxItem::symbolImage() const
 {
   if ( isPointSymbol() && mSymbolGraphic.isNull() )
@@ -1104,7 +1110,7 @@ QImage KadasMilxItem::symbolImage() const
     QRect screenExtent( 0, 0, 100, 100 );
     KadasMilxClient::NPointSymbolGraphic result;
     int dpi = qApp->desktop()->logicalDpiX();
-    if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, result, false ) )
+    if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, false ) )
     {
       mSymbolGraphic = result.graphic;
       mSymbolAnchor = QPointF( double( -result.offset.x() ) / mSymbolGraphic.width(), double( -result.offset.y() ) / mSymbolGraphic.height() );

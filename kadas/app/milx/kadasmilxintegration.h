@@ -27,6 +27,7 @@ class QSlider;
 class QTabWidget;
 class QgsMapLayer;
 class KadasMilxLayer;
+class KadasMilxLayerPropertiesPageFactory;
 class KadasMilxLibrary;
 
 
@@ -61,7 +62,8 @@ class KadasMilxIntegration : public QObject
 
   private:
     MilxUi mUi;
-    KadasMilxLibrary *mMilxLibrary;
+    KadasMilxLibrary *mMilxLibrary = nullptr;
+    KadasMilxLayerPropertiesPageFactory *mLayerPropertiesFactory = nullptr;
     KadasMilxDropHandler mDropHandler;
     KadasMilxLayer *getLayer();
     KadasMilxLayer *getOrCreateLayer();

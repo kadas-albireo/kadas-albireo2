@@ -33,6 +33,7 @@
 #include <kadas/gui/milx/kadasmilxeditor.h>
 #include <kadas/gui/milx/kadasmilxitem.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
+#include <kadas/gui/milx/kadasmilxlayerpropertiespage.h>
 #include <kadas/gui/milx/kadasmilxlibrary.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasmainwindow.h>
@@ -55,15 +56,19 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   mUi.mRibbonWidget->setTabEnabled( mUi.mRibbonWidget->indexOf( mUi.mMssTab ), true );
 
-  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", 60 ) );
+  mUi.mSymbolSizeSlider->setRange( KadasMilxSymbolSettings::MinSymbolSize, KadasMilxSymbolSettings::MaxSymbolSize );
+  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", KadasMilxSymbolSettings::DefaultSymbolSize ) );
   setMilXSymbolSize( mUi.mSymbolSizeSlider->value() );
   connect( mUi.mSymbolSizeSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXSymbolSize );
 
-  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", 2 ) );
+  mUi.mLineWidthSlider->setRange( KadasMilxSymbolSettings::MinLineWidth, KadasMilxSymbolSettings::MaxLineWidth );
+  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", KadasMilxSymbolSettings::DefaultLineWidth ) );
   setMilXLineWidth( mUi.mLineWidthSlider->value() );
   connect( mUi.mLineWidthSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXLineWidth );
 
-  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", 1 ) );
+  mUi.mWorkModeCombo->addItem( tr( "International" ), KadasMilxSymbolSettings::WorkModeInternational );
+  mUi.mWorkModeCombo->addItem( tr( "CH" ), KadasMilxSymbolSettings::WorkModeCH );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", KadasMilxSymbolSettings::DefaultWorkMode ) );
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
@@ -75,6 +80,9 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   } );
 
   kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
+
+  mLayerPropertiesFactory = new KadasMilxLayerPropertiesPageFactory( this );
+  kApp->registerMapLayerPropertiesFactory( mLayerPropertiesFactory );
 }
 
 KadasMilxIntegration::~KadasMilxIntegration()
@@ -157,7 +165,7 @@ void KadasMilxIntegration::setMilXLineWidth( int value )
 void KadasMilxIntegration::setMilXWorkMode( int idx )
 {
   QgsProject::instance()->writeEntry( "milx", "work_mode", idx );
-  KadasMilxClient::setWorkMode( idx );
+  KadasMilxClient::setWorkMode( static_cast<KadasMilxSymbolSettings::WorkMode>( idx ) );
   refreshMilxLayers();
 }
 

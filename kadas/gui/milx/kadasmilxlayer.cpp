@@ -60,7 +60,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       int dpi = mRendererContext.painter()->device()->logicalDpiX();
       double scaleFactor = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
       QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
-      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, scaleFactor, symbols, result ) )
+      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, scaleFactor, symbols, mLayer->milxSymbolSettings(), result ) )
       {
         return false;
       }
@@ -182,7 +182,7 @@ void KadasMilxLayer::exportToMilxly( QDomElement &milxLayerEl, int dpi )
   milxLayerEl.appendChild( crsEl );
 
   QDomElement symbolSizeEl = doc.createElement( "SymbolSize" );
-  symbolSizeEl.appendChild( doc.createTextNode( QString::number( ( KadasMilxClient::getSymbolSize() * 25.4 ) / dpi ) ) );
+  symbolSizeEl.appendChild( doc.createTextNode( QString::number( ( milxSymbolSettings().symbolSize * 25.4 ) / dpi ) ) );
   milxLayerEl.appendChild( symbolSizeEl );
 
   QDomElement bwEl = doc.createElement( "DisplayBW" );
@@ -231,6 +231,17 @@ bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, 
   return true;
 }
 
+const KadasMilxSymbolSettings &KadasMilxLayer::milxSymbolSettings() const
+{
+  if ( mOverrideMilxSymbolSettings )
+  {
+    return mMilxSymbolSettings;
+  }
+  else
+  {
+    return KadasMilxClient::globalSymbolSettings();
+  }
+}
 
 void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {

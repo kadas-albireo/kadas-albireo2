@@ -152,6 +152,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
     void updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result );
+    const KadasMilxSymbolSettings &symbolSettings() const;
 
     static void finalize( KadasMilxItem *item, bool isCorridor );
     static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );

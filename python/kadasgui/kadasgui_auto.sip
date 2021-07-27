@@ -63,6 +63,7 @@
 %Include auto_generated/kadasitemlayer.sip
 %Include auto_generated/milx/kadasmilxeditor.sip
 %Include auto_generated/milx/kadasmilxlibrary.sip
+%Include auto_generated/milx/kadasmilxlayerpropertiespage.sip
 %Include auto_generated/milx/kadasmilxlayer.sip
 %Include auto_generated/milx/kadasmilxinterface.sip
 %Include auto_generated/milx/kadasmilxclient.sip

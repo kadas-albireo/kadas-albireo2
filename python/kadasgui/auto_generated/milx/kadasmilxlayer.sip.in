@@ -9,6 +9,7 @@
 
 
 
+
 class KadasMilxLayer : KadasItemLayer
 {
 %Docstring
@@ -46,6 +47,20 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     void exportToMilxly( QDomElement &milxLayerEl, int dpi );
     bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
+
+    void setOverrideMilxSymbolSettings( bool overrideSettings );
+    bool overrideMilxSymbolSettings() const;
+
+    void setMilxSymbolSize( int symbolSize );
+    int milxSymbolSize() const;
+
+    void setMilxLineWidth( int lineWidth );
+    int milxLineWidth() const;
+
+    void setMilxWorkMode( KadasMilxSymbolSettings::WorkMode workMode );
+    KadasMilxSymbolSettings::WorkMode milxWorkMode() const;
+
+    const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
   signals:
     void approvedChanged( bool approved );
