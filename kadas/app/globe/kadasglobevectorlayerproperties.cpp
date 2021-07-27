@@ -18,6 +18,7 @@
 #include <qgis/qgsmaplayer.h>
 
 #include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/milx/kadasmilxlayer.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
 
 
@@ -198,7 +199,7 @@ QString KadasGlobeLayerPropertiesFactory::title() const
 
 bool KadasGlobeLayerPropertiesFactory::supportsLayer( QgsMapLayer *layer ) const
 {
-  return layer->type() == QgsMapLayerType::VectorLayer || qobject_cast<KadasItemLayer *>( layer );
+  return layer->type() == QgsMapLayerType::VectorLayer || ( qobject_cast<KadasItemLayer *>( layer ) && !qobject_cast<KadasMilxLayer *>( layer ) );
 }
 
 void KadasGlobeLayerPropertiesFactory::readGlobeVectorLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )
