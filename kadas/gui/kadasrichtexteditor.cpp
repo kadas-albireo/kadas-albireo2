@@ -385,15 +385,15 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   // Bold, italic and underline buttons
 
   m_bold_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textbold" ), tr( "Bold" ), editor, SLOT( setFontBold( bool ) ), this );
-  m_bold_action->setShortcut( tr( "CTRL+B" ) );
+  m_bold_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_B ) );
   addAction( m_bold_action );
 
   m_italic_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textitalic" ), tr( "Italic" ), editor, SLOT( setFontItalic( bool ) ), this );
-  m_italic_action->setShortcut( tr( "CTRL+I" ) );
+  m_italic_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_I ) );
   addAction( m_italic_action );
 
   m_underline_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textunder" ), tr( "Underline" ), editor, SLOT( setFontUnderline( bool ) ), this );
-  m_underline_action->setShortcut( tr( "CTRL+U" ) );
+  m_underline_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_U ) );
   addAction( m_underline_action );
 
   addSeparator();
@@ -415,9 +415,6 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
 
   m_align_justify_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textjustify" ), tr( "Justify" ), editor, nullptr, alignment_group );
   addAction( m_align_justify_action );
-
-  m_layoutDirectionAction = createCheckableAction( QIcon( ":/kadas/icons/texteditor/righttoleft" ), tr( "Right to Left" ), this, SLOT( layoutDirectionChanged() ) );
-  addAction( m_layoutDirectionAction );
 
   addSeparator();
 
@@ -522,22 +519,6 @@ void KadasRichTextEditorToolBar::insertImage()
   KadasAddImageDialog( m_editor, this ).exec();
 }
 
-void KadasRichTextEditorToolBar::layoutDirectionChanged()
-{
-  QTextCursor cursor = m_editor->textCursor();
-  QTextBlock block = cursor.block();
-  if ( block.isValid() )
-  {
-    QTextBlockFormat format = block.blockFormat();
-    const Qt::LayoutDirection newDirection = m_layoutDirectionAction->isChecked() ? Qt::RightToLeft : Qt::LeftToRight;
-    if ( format.layoutDirection() != newDirection )
-    {
-      format.setLayoutDirection( newDirection );
-      cursor.setBlockFormat( format );
-    }
-  }
-}
-
 void KadasRichTextEditorToolBar::updateActions()
 {
   if ( m_editor == nullptr )
@@ -571,7 +552,6 @@ void KadasRichTextEditorToolBar::updateActions()
   {
     m_align_justify_action->setChecked( true );
   }
-  m_layoutDirectionAction->setChecked( cursor.blockFormat().layoutDirection() == Qt::RightToLeft );
 
   m_bold_action->setChecked( font.bold() );
   m_italic_action->setChecked( font.italic() );
