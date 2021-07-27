@@ -79,15 +79,12 @@ class KadasGlobeVectorLayerPropertiesPage : public QgsMapLayerConfigWidget, priv
     explicit KadasGlobeVectorLayerPropertiesPage( QgsMapLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 
   public slots:
-    virtual void apply();
+    void apply() override;
 
   private slots:
     void onAltitudeClampingChanged( int index );
     void onAltituteTechniqueChanged( int index );
     void showRenderingModeWidget( int index );
-
-  signals:
-    void layerSettingsChanged( QgsMapLayer * );
 
   private:
     QgsMapLayer *mLayer = nullptr;
@@ -100,17 +97,10 @@ class KadasGlobeLayerPropertiesFactory : public QObject, public QgsMapLayerConfi
   public:
     explicit KadasGlobeLayerPropertiesFactory( QObject *parent = nullptr );
     QgsMapLayerConfigWidget *createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const override;
-
     QIcon icon() const override;
-
     QString title() const override;
-
     bool supportLayerPropertiesDialog() const override { return true; }
-
     bool supportsLayer( QgsMapLayer *layer ) const override;
-
-  signals:
-    void layerSettingsChanged( QgsMapLayer *layer );
 
   private slots:
     void readGlobeVectorLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem );

@@ -127,8 +127,6 @@ void KadasGlobeVectorLayerPropertiesPage::apply()
 
   layerConfig->labelingEnabled = groupBoxLabelingEnabled->isChecked();
   layerConfig->labelingDeclutter = checkBoxLabelingDeclutter->isChecked();
-
-  emit layerSettingsChanged( mLayer );
 }
 
 void KadasGlobeVectorLayerPropertiesPage::onAltitudeClampingChanged( int index )
@@ -182,9 +180,7 @@ KadasGlobeLayerPropertiesFactory::KadasGlobeLayerPropertiesFactory( QObject *par
 QgsMapLayerConfigWidget *KadasGlobeLayerPropertiesFactory::createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const
 {
   Q_UNUSED( dockWidget )
-  KadasGlobeVectorLayerPropertiesPage *propsPage = new KadasGlobeVectorLayerPropertiesPage( layer, canvas, parent );
-  connect( propsPage, &KadasGlobeVectorLayerPropertiesPage::layerSettingsChanged, this, &KadasGlobeLayerPropertiesFactory::layerSettingsChanged );
-  return propsPage;
+  return new KadasGlobeVectorLayerPropertiesPage( layer, canvas, parent );
 }
 
 QIcon KadasGlobeLayerPropertiesFactory::icon() const
