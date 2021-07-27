@@ -30,10 +30,13 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasMapItemTooltip( QgsMapCanvas *canvas );
     void updateForPos( const QPoint &canvasPos );
+    virtual QVariant loadResource( int type, const QUrl &url );
+
+
+  public slots:
+    void clear();
 
   protected:
-    virtual void leaveEvent( QEvent * );
-
     virtual void enterEvent( QEvent * );
 
 

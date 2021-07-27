@@ -31,6 +31,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
   public:
     KadasMapItemTooltip( QgsMapCanvas *canvas );
     void updateForPos( const QPoint &canvasPos );
+    QVariant loadResource( int type, const QUrl &url ) override;
 
   public slots:
     void clear();
@@ -40,7 +41,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
 
   private:
     static constexpr int sWidth = 320;
-    static constexpr int sHeight = 160;
+    static constexpr int sHeight = 240;
 
     QTimer mShowTimer;
     QTimer mHideTimer;

@@ -1,0 +1,116 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasrichtexteditor.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasRichTextEditor : QTextEdit
+{
+%Docstring
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify  *
+it under the terms of the GNU General Public License as published by  *
+the Free Software Foundation; either version 2 of the License, or     *
+(at your option) any later version.                                   *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtexteditor.h"
+%End
+  public:
+    explicit KadasRichTextEditor( QWidget *parent = 0 );
+    virtual QVariant loadResource( int type, const QUrl &url );
+
+
+  public slots:
+    void setFontBold( bool b );
+    void setFontPointSize( double );
+    void setText( const QString &text );
+    QString text( Qt::TextFormat format ) const;
+
+  signals:
+    void stateChanged();
+
+};
+
+
+class KadasColorAction : QAction
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtexteditor.h"
+%End
+  public:
+    KadasColorAction( QObject *parent );
+    const QColor &color() const;
+    void setColor( const QColor &color );
+
+  signals:
+    void colorChanged( const QColor &color );
+
+};
+
+class KadasAddLinkDialog : QDialog
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtexteditor.h"
+%End
+  public:
+    KadasAddLinkDialog( KadasRichTextEditor *editor, QWidget *parent = 0 );
+    int showDialog();
+
+  public slots:
+    virtual void accept();
+
+
+};
+
+class KadasAddImageDialog : QDialog
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtexteditor.h"
+%End
+  public:
+    KadasAddImageDialog( KadasRichTextEditor *editor, QWidget *parent = 0 );
+
+  public slots:
+    virtual void accept();
+
+
+};
+
+class KadasRichTextEditorToolBar : QToolBar
+{
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtexteditor.h"
+%End
+  public:
+    KadasRichTextEditorToolBar( KadasRichTextEditor *editor,
+                                QWidget *parent = 0 );
+
+  public slots:
+    void updateActions();
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasrichtexteditor.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

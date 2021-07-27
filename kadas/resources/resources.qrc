@@ -122,6 +122,18 @@
         <file alias="icons/add_node">icons/add_node.svg</file>
         <file alias="icons/gpsarrow">icons/gpsarrow.svg</file>
         <file alias="icons/distance_angle">icons/distance_angle.png</file>
+        <file alias="icons/vchain">icons/vchain.png</file>
+        <file alias="icons/texteditor/textleft">icons/texteditor/textleft.png</file>
+        <file alias="icons/texteditor/textanchor">icons/texteditor/textanchor.png</file>
+        <file alias="icons/texteditor/textitalic">icons/texteditor/textitalic.png</file>
+        <file alias="icons/texteditor/textright">icons/texteditor/textright.png</file>
+        <file alias="icons/texteditor/textunder">icons/texteditor/textunder.png</file>
+        <file alias="icons/texteditor/textsubscript">icons/texteditor/textsubscript.png</file>
+        <file alias="icons/texteditor/textjustify">icons/texteditor/textjustify.png</file>
+        <file alias="icons/texteditor/textcenter">icons/texteditor/textcenter.png</file>
+        <file alias="icons/texteditor/textsuperscript">icons/texteditor/textsuperscript.png</file>
+        <file alias="icons/texteditor/insertimage">icons/texteditor/insertimage.png</file>
+        <file alias="icons/texteditor/textbold">icons/texteditor/textbold.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

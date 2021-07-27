@@ -14,6 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+
+#include <kadas/gui/kadasrichtexteditor.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
 
@@ -23,9 +28,20 @@ KADAS_REGISTER_MAP_ITEM_EDITOR( KadasSymbolAttributesEditor, []( KadasMapItem *i
 KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {
-  mUi.setupUi( this );
-  connect( mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
-  connect( mUi.mTextEditRemarks, &QTextBrowser::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
+  mLineEditName = new QLineEdit();
+  mTextEditRemarks = new KadasRichTextEditor();
+  mEditorToolbar = new KadasRichTextEditorToolBar( mTextEditRemarks );
+
+  QGridLayout *layout = new QGridLayout();
+  layout->addWidget( new QLabel( tr( "Name:" ) ), 0, 0, 1, 1 );
+  layout->addWidget( mLineEditName, 0, 1, 1, 1 );
+  layout->addWidget( new QLabel( tr( "Remarks:" ) ), 1, 0, 1, 1 );
+  layout->addWidget( mEditorToolbar, 1, 1, 1, 1 );
+  layout->addWidget( mTextEditRemarks, 2, 1, 1, 1 );
+  setLayout( layout );
+
+  connect( mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
+  connect( mTextEditRemarks, &QTextEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
   connect( item, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   setEnabled( false );
 }
@@ -37,8 +53,8 @@ void KadasSymbolAttributesEditor::adjustVisiblity()
 
 void KadasSymbolAttributesEditor::reset()
 {
-  mUi.mLineEditName->setText( "" );
-  mUi.mTextEditRemarks->setHtml( "" );
+  mLineEditName->setText( "" );
+  mTextEditRemarks->setHtml( "" );
 }
 
 void KadasSymbolAttributesEditor::syncItemToWidget()
@@ -48,12 +64,12 @@ void KadasSymbolAttributesEditor::syncItemToWidget()
   {
     return;
   }
-  mUi.mLineEditName->blockSignals( true );
-  mUi.mLineEditName->setText( symbolItem->name() );
-  mUi.mLineEditName->blockSignals( false );
-  mUi.mTextEditRemarks->blockSignals( true );
-  mUi.mTextEditRemarks->setHtml( symbolItem->remarks() );
-  mUi.mTextEditRemarks->blockSignals( false );
+  mLineEditName->blockSignals( true );
+  mLineEditName->setText( symbolItem->name() );
+  mLineEditName->blockSignals( false );
+  mTextEditRemarks->blockSignals( true );
+  mTextEditRemarks->setHtml( symbolItem->remarks() );
+  mTextEditRemarks->blockSignals( false );
 }
 
 void KadasSymbolAttributesEditor::syncWidgetToItem()
@@ -63,6 +79,6 @@ void KadasSymbolAttributesEditor::syncWidgetToItem()
   {
     return;
   }
-  symbolItem->setName( mUi.mLineEditName->text() );
-  symbolItem->setRemarks( mUi.mTextEditRemarks->toHtml() );
+  symbolItem->setName( mLineEditName->text() );
+  symbolItem->setRemarks( mTextEditRemarks->toHtml() );
 }

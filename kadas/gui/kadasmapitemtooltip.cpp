@@ -14,7 +14,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QUrlQuery>
+
 #include <qgis/qgsmapcanvas.h>
+
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/kadasmapitemtooltip.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
@@ -60,6 +63,26 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
     mHideTimer.start( 500 );
     mShowTimer.stop();
   }
+}
+
+QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )
+{
+  if ( type == QTextDocument::ImageResource )
+  {
+    if ( url.scheme() == "attachment" )
+    {
+      QString path = url.path();
+      int width = QUrlQuery( url.query() ).queryItemValue( "w" ).toInt();
+      int height = QUrlQuery( url.query() ).queryItemValue( "h" ).toInt();
+      QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
+      QString attachmentFile = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
+      if ( !attachmentFile.isEmpty() )
+      {
+        return QImage( attachmentFile ).scaled( width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+      }
+    }
+  }
+  return QTextEdit::loadResource( type, url );
 }
 
 void KadasMapItemTooltip::enterEvent( QEvent * )

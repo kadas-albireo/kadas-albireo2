@@ -3,6 +3,7 @@
 %Include auto_generated/kadassearchbox.sip
 %Include auto_generated/kadasmapwidget.sip
 %Include auto_generated/kadasplugininterface.sip
+%Include auto_generated/kadasrichtexteditor.sip
 %Include auto_generated/kadasmapcanvasitemmanager.sip
 %Include auto_generated/kadasmapitemtooltip.sip
 %Include auto_generated/kadasheightprofiledialog.sip

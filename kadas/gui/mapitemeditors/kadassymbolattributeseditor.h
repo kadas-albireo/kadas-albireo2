@@ -20,7 +20,11 @@
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/ui_kadassymbolattributeseditor.h>
+
+class QLineEdit;
+class KadasRichTextEditor;
+class KadasRichTextEditorToolBar;
+
 
 class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
 {
@@ -34,9 +38,11 @@ class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
     void syncWidgetToItem() override;
 
   private:
-    Ui::KadasSymbolAttributesEditorBase mUi;
-
     void adjustVisiblity();
+
+    QLineEdit *mLineEditName = nullptr;
+    KadasRichTextEditor *mTextEditRemarks = nullptr;
+    KadasRichTextEditorToolBar *mEditorToolbar = nullptr;
 };
 
 #endif // KADASSYMBOLATTRIBUTESEDITOR_H
