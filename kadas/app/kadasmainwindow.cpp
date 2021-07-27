@@ -1248,6 +1248,8 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   {
     return nullptr;
   }
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+
   QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
   mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
   return nullptr;
