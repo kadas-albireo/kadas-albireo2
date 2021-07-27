@@ -34,17 +34,14 @@ class Connector(QObject):
             locations=points,
             directions_options={"language": locale_name},
         )
-        LOG.debug(params)
+
         if options:
             params["costing_options"] = {profile: options}
         if avoid_polygons:
             params["avoid_polygons"] = avoid_polygons
         if patrol_polygon:
             params["chinese_postman_polygon"] = patrol_polygon
-            # hacky to set the origin = destination
-            params['locations'] = [points[0], points[0]]
-            LOG.debug('patrol')
-            LOG.debug(params)
+        LOG.debug(params)
 
         return params
 
