@@ -23,6 +23,7 @@ SOURCES += \
 ../kadas/analysis/kadasviewshedfilter.cpp \
 ../kadas/analysis/kadasslopefilter.h \
 ../kadas/gui/kadasitemcontextmenuactions.h \
+../kadas/gui/kadasbookmarksmenu.h \
 ../kadas/gui/kadasfloatinginputwidget.cpp \
 ../kadas/gui/kadasitemlayer.cpp \
 ../kadas/gui/kadasmapcanvasitem.h \
@@ -34,9 +35,11 @@ SOURCES += \
 ../kadas/gui/kadasmapwidget.h \
 ../kadas/gui/kadasmapcanvasitem.cpp \
 ../kadas/gui/kadasplugininterface.h \
+../kadas/gui/kadasrichtexteditor.h \
 ../kadas/gui/kadaslayerpropertiesdialog.cpp \
 ../kadas/gui/kadastextbrowser.cpp \
 ../kadas/gui/kadasmapcanvasitemmanager.h \
+../kadas/gui/kadasmapitemtooltip.h \
 ../kadas/gui/kadasheightprofiledialog.h \
 ../kadas/gui/mapitems/kadastextitem.cpp \
 ../kadas/gui/mapitems/kadaspolygonitem.cpp \
@@ -86,6 +89,7 @@ SOURCES += \
 ../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp \
 ../kadas/gui/mapitemeditors/kadassymbolattributeseditor.h \
 ../kadas/gui/kadascoordinateinput.h \
+../kadas/gui/kadasmapitemtooltip.cpp \
 ../kadas/gui/maptools/kadasmaptoolpan.h \
 ../kadas/gui/maptools/kadasmaptoolcreateitem.cpp \
 ../kadas/gui/maptools/kadasmaptoolpan.cpp \
@@ -139,6 +143,7 @@ SOURCES += \
 ../kadas/gui/search/kadaslocaldatasearchprovider.h \
 ../kadas/gui/search/kadasremotedatasearchprovider.cpp \
 ../kadas/gui/search/kadascoordinatesearchprovider.h \
+../kadas/gui/kadasbookmarksmenu.cpp \
 ../kadas/gui/kadaslayerpropertiesdialog.h \
 ../kadas/gui/kadascatalogbrowser.h \
 ../kadas/gui/kadasheightprofiledialog.cpp \
@@ -147,10 +152,12 @@ SOURCES += \
 ../kadas/gui/kadassearchprovider.h \
 ../kadas/gui/kadasitemlayer.h \
 ../kadas/gui/milx/kadasmilxeditor.cpp \
+../kadas/gui/milx/kadasmilxlayerpropertiespage.cpp \
 ../kadas/gui/milx/kadasmilxitem.cpp \
 ../kadas/gui/milx/kadasmilxeditor.h \
 ../kadas/gui/milx/kadasmilxlayer.cpp \
 ../kadas/gui/milx/kadasmilxlibrary.h \
+../kadas/gui/milx/kadasmilxlayerpropertiespage.h \
 ../kadas/gui/milx/kadasmilxlayer.h \
 ../kadas/gui/milx/kadasmilxclient.cpp \
 ../kadas/gui/milx/kadasmilxinterface.h \
@@ -167,6 +174,7 @@ SOURCES += \
 ../kadas/gui/kadastextbrowser.h \
 ../kadas/gui/kadasitemcontextmenuactions.cpp \
 ../kadas/gui/kadasribbonbutton.cpp \
+../kadas/gui/kadasrichtexteditor.cpp \
 ../kadas/gui/kadasclipboard.h \
 ../kadas/gui/kadascatalogbrowser.cpp \
 ../kadas/gui/kadasprojecttemplateselectiondialog.h \
