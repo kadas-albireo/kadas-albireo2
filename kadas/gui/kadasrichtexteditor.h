@@ -132,7 +132,6 @@ class KADAS_GUI_EXPORT KadasRichTextEditorToolBar : public QToolBar
     void setVAlignSub( bool sub );
     void insertLink();
     void insertImage();
-    void layoutDirectionChanged();
 
   private:
     QAction *m_bold_action;
@@ -144,7 +143,6 @@ class KADAS_GUI_EXPORT KadasRichTextEditorToolBar : public QToolBar
     QAction *m_align_center_action;
     QAction *m_align_right_action;
     QAction *m_align_justify_action;
-    QAction *m_layoutDirectionAction;
     QAction *m_link_action;
     QAction *m_image_action;
     QAction *m_simplify_richtext_action;
