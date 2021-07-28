@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1430</width>
-    <height>133</height>
+    <height>149</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -734,6 +734,37 @@
             </property>
             <property name="text">
              <string>Next Extent</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="KadasRibbonButton" name="mBookmarksButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Bookmarks</string>
             </property>
             <property name="iconSize">
              <size>
@@ -2496,6 +2527,18 @@ Sight</string>
    </property>
    <property name="text">
     <string>Plugin Manager</string>
+   </property>
+  </action>
+  <action name="mActionBookmarks">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/bookmark</normaloff>:/kadas/icons/bookmark</iconset>
+   </property>
+   <property name="text">
+    <string>Bookmarks</string>
+   </property>
+   <property name="toolTip">
+    <string>Bookmarks</string>
    </property>
   </action>
  </widget>

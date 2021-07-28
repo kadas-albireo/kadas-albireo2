@@ -36,6 +36,7 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 
+#include <kadas/gui/kadasbookmarksmenu.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
 #include <kadas/gui/kadasitemlayer.h>
@@ -596,6 +597,10 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionZoomNext, mZoomNextButton, QKeySequence( Qt::CTRL + Qt::Key_PageDown ) );
   connect( mActionZoomNext, &QAction::triggered, this, &KadasMainWindow::zoomNext );
   connect( mMapCanvas, &QgsMapCanvas::zoomNextStatusChanged, mActionZoomNext, &QAction::setEnabled );
+
+  setActionToButton( mActionBookmarks, mBookmarksButton );
+  mBookmarksButton->setMenu( new KadasBookmarksMenu( mMapCanvas, messageBar(), this ) );
+  mBookmarksButton->setPopupMode( QToolButton::InstantPopup );
 
   setActionToButton( mActionNewMapWindow, mNewMapWindowButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
   connect( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, qOverload<> ( &KadasMapWidgetManager::addMapWidget ) );

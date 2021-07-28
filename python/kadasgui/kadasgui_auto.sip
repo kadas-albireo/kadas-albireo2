@@ -1,4 +1,5 @@
 %Include auto_generated/kadasitemcontextmenuactions.sip
+%Include auto_generated/kadasbookmarksmenu.sip
 %Include auto_generated/kadasmapcanvasitem.sip
 %Include auto_generated/kadassearchbox.sip
 %Include auto_generated/kadasmapwidget.sip
