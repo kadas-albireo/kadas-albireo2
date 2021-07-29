@@ -56,7 +56,7 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
 
   QToolButton *deleteButton = new QToolButton();
   deleteButton->setIcon( QgsApplication::getThemeIcon( "/mIconDelete.svg" ) );
-  deleteButton->setAutoRaise( false );
+  deleteButton->setAutoRaise( true );
 
   QWidget *widget = new QWidget( this );
   widget->setLayout( new QHBoxLayout );
