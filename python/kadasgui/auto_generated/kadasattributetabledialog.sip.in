@@ -12,7 +12,7 @@
 
 
 
-class KadasAttributeTableDialog : QDialog
+class KadasAttributeTableDialog : QDockWidget
 {
 %Docstring
 *************************************************************************
@@ -29,8 +29,14 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/kadasattributetabledialog.h"
 %End
   public:
-    KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QWidget *parent = 0 );
+    KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = 0 );
     ~KadasAttributeTableDialog();
+    QgsMapCanvas *mCanvas;
+    QgsMessageBar *mMessageBar;
+
+  protected:
+    virtual void showEvent( QShowEvent *ev );
+
 
 };
 

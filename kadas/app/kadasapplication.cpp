@@ -1100,8 +1100,8 @@ void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
   QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
   if ( vlayer )
   {
-    ( new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow ) )->show();
     // Deletes on close
+    ( new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow ) )->show();
   }
 }
 

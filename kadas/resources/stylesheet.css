@@ -7,7 +7,9 @@ QWidget {
   background-color: #263B4E;
 }
 
+QDockWidget #dockContentsWidget,
 QDockWidget #mapWidgetTitleWidget,
+QDockWidget #dockTitleWidget,
 QDockWidget #globeTitleWidget {
     background: #BEDCF6;
 }
