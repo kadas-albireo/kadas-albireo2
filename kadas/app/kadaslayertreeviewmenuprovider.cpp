@@ -59,6 +59,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
     {
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
+      menu->addAction( actions->actionZoomToGroup( kApp->mainWindow()->mapCanvas(), menu ) );
       menu->addAction( renameAction );
       menu->addAction( actions->actionMutuallyExclusiveGroup( menu ) );
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
