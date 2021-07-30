@@ -132,6 +132,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void buildStyleSheet( const QMap<QString, QVariant> &opts ) override { }
     virtual void saveStyleSheetOptions( const QMap<QString, QVariant> &opts ) override { }
     virtual QgsAdvancedDigitizingDockWidget *cadDockWidget() override { return nullptr; }
+    virtual QList<QgsMapDecoration *> activeDecorations() override { return QList<QgsMapDecoration *>(); }
 
     virtual QToolBar *fileToolBar() override { return dummyToolbar(); }
     virtual QToolBar *layerToolBar() override { return dummyToolbar(); }

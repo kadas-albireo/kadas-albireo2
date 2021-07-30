@@ -315,7 +315,7 @@ void KadasAddImageDialog::accept()
   {
     attachedFile.write( file.readAll() );
   }
-  QString attachmentId = QgsProject::instance()->getAttachmentIdentifier( attachedFilename );
+  QString attachmentId = QgsProject::instance()->attachmentIdentifier( attachedFilename );
   QString url = QStringLiteral( "%1?w=%2&h=%3" ).arg( attachmentId ).arg( m_widthInput->value() ).arg( m_heightInput->value() );
   m_editor->insertHtml( QStringLiteral( "<img src=\"%1\" />" ).arg( url ) );
   QDialog::accept();
