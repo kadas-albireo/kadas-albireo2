@@ -58,6 +58,7 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewPolygon = nullptr;
     QAction *mActionNewCircle = nullptr;
     QAction *mActionNewText = nullptr;
+    QAction *mActionNewCoordCross = nullptr;
 
     QPointer<KadasItemLayer> mLastLayer;
 

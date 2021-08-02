@@ -17,6 +17,7 @@
 %Include auto_generated/mapitems/kadaspointitem.sip
 %Include auto_generated/mapitems/kadasrectangleitem.sip
 %Include auto_generated/mapitems/kadascircularsectoritem.sip
+%Include auto_generated/mapitems/kadascoordinatecrossitem.sip
 %Include auto_generated/mapitems/kadaslineitem.sip
 %Include auto_generated/mapitems/kadascircleitem.sip
 %Include auto_generated/mapitems/kadasgpxwaypointitem.sip

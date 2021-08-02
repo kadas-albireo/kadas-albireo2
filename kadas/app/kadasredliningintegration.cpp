@@ -24,6 +24,7 @@
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/mapitems/kadascircleitem.h>
+#include <kadas/gui/mapitems/kadascoordinatecrossitem.h>
 #include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/mapitems/kadaspointitem.h>
 #include <kadas/gui/mapitems/kadaspolygonitem.h>
@@ -83,6 +84,11 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
     textItem->setEditor( "KadasRedliningTextEditor" );
     return textItem;
   };
+  KadasMapToolCreateItem::ItemFactory coordCrossFactory = [ = ]
+  {
+    QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
+    return new KadasCoordinateCrossItem( crs );
+  };
 
 
   QAction *actionNewMarker = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Marker" ), this );
@@ -124,6 +130,11 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, textFactory, false ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
+  mActionNewCoordCross = new QAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this );
+  mActionNewCoordCross->setCheckable( true );
+  connect( mActionNewCoordCross, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, coordCrossFactory, false ); } );
+  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
+
   QMenu *menuNewMarker = new QMenu();
   menuNewMarker->addAction( mActionNewPoint );
   menuNewMarker->addAction( mActionNewSquare );
@@ -136,6 +147,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   menuNewObject->addAction( mActionNewPolygon );
   menuNewObject->addAction( mActionNewCircle );
   menuNewObject->addAction( mActionNewText );
+  menuNewObject->addAction( mActionNewCoordCross );
   mButtonNewObject->setMenu( menuNewObject );
   mButtonNewObject->setPopupMode( QToolButton::InstantPopup );
   mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
