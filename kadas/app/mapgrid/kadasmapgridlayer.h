@@ -29,7 +29,7 @@ class KadasMapGridLayer : public KadasPluginLayer
     enum LabelingMode {LabelingDisabled, LabelingEnabled};
 
     KadasMapGridLayer( const QString &name );
-    void setup( GridType type, double intervalX, double intervalY );
+    void setup( GridType type, double intervalX, double intervalY, int cellSize );
 
     QString layerTypeKey() const override { return layerType(); };
     KadasMapGridLayer *clone() const override;
@@ -40,6 +40,7 @@ class KadasMapGridLayer : public KadasPluginLayer
     GridType gridType() const { return mGridType; }
     double intervalX() const { return mIntervalX; }
     double intervalY() const { return mIntervalY; }
+    int cellSize() const { return mCellSize; }
 
     const QColor &color() const { return mColor; }
     int fontSize() const { return mFontSize; }
@@ -60,6 +61,7 @@ class KadasMapGridLayer : public KadasPluginLayer
     GridType mGridType = GridLV95;
     double mIntervalX = 10000;
     double mIntervalY = 10000;
+    int mCellSize = 0;
     int mFontSize = 15;
     QColor mColor = Qt::black;
     LabelingMode mLabelingMode = LabelingEnabled;

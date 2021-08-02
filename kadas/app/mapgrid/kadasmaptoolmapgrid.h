@@ -61,6 +61,8 @@ class KadasMapGridWidget : public KadasBottomBar
     Ui::KadasMapGridWidgetBase ui;
     KadasLayerSelectionWidget *mLayerSelectionWidget = nullptr;
     KadasMapGridLayer *mCurrentLayer = nullptr;
+    QLabel *mCellSizeLabel = nullptr;
+    QComboBox *mCellSizeCombo = nullptr;
 
 
   signals:
@@ -69,7 +71,7 @@ class KadasMapGridWidget : public KadasBottomBar
   private slots:
     void setCurrentLayer( QgsMapLayer *layer );
     void updateGrid();
-    void updateType( int idx );
+    void updateType( int idx, bool updateValues );
     void updateColor( const QColor &color );
     void updateFontSize( int fontSize );
     void updateLabeling( int labelingMode );

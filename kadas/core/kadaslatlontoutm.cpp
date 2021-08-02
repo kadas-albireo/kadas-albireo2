@@ -549,49 +549,6 @@ static inline QPolygonF polyGridLineY( double x1, double x2, double stepX, doubl
   return poly;
 }
 
-static inline void truncateGridLine( double &x1, double &x2, double &y1, double &y2, double xMin, double xMax, double yMin, double yMax )
-{
-  // Truncate at yMin
-  if ( y1 < yMin )
-  {
-    double lambda = ( yMin - y1 ) / ( y2 - y1 );
-    y1 = yMin;
-    x1 += lambda * ( x2 - x1 );
-  }
-  // Truncate at yMax
-  if ( y2 > yMax )
-  {
-    double lambda = ( yMax - y1 ) / ( y2 - y1 );
-    y2 = yMax;
-    x2 = x1 + lambda * ( x2 - x1 );
-  }
-  // Truncate at xMin/xMax
-  if ( x1 < xMin )
-  {
-    double lambda = ( xMin - x1 ) / ( x2 - x1 );
-    x1 = xMin;
-    y1 += lambda * ( y2 - y1 );
-  }
-  else if ( x1 > xMax )
-  {
-    double lambda = ( xMax - x1 ) / ( x2 - x1 );
-    x1 = xMax;
-    y1 += lambda * ( y2 - y1 );
-  }
-  if ( x2 < xMin )
-  {
-    double lambda = ( xMin - x1 ) / ( x2 - x1 );
-    x2 = xMin;
-    y2 = y1 + lambda * ( y2 - y1 );
-  }
-  else if ( x2 > xMax )
-  {
-    double lambda = ( xMax - x1 ) / ( x2 - x1 );
-    x2 = xMax;
-    y2 = y1 + lambda * ( y2 - y1 );
-  }
-}
-
 static inline QPointF truncateGridLineYMax( const QPointF &p, const QPointF &q, double xMin, double xMax, double yMax, bool &truncated )
 {
   QPointF ret = q;
@@ -740,7 +697,7 @@ static inline QPointF truncateGridLineXMax( const QPointF &p, const QPointF &q, 
 
 void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
                                     QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
-                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode )
+                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode, int cellSize )
 {
 
   QgsDistanceArea da;
@@ -823,27 +780,43 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
       {
         continue;
       }
-      int cellSize = 0;
-      if ( mapScale > 500000 )
+      if ( mapScale > 500000 && gridMode == GridMGRS )
       {
-        if ( gridMode == GridMGRS )
+        computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
+        continue;
+      }
+      if ( cellSize == 0 )
+      {
+        if ( mapScale > 500000 )
         {
-          computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
-          continue;
+          cellSize = 100000;
         }
-        cellSize = 100000;
-      }
-      else if ( mapScale > 50000 )
-      {
-        cellSize = 10000;
-      }
-      else if ( mapScale > 5000 )
-      {
-        cellSize = 1000;
+        else if ( mapScale > 50000 )
+        {
+          cellSize = 10000;
+        }
+        else if ( mapScale > 5000 )
+        {
+          cellSize = 1000;
+        }
+        else if ( mapScale > 500 )
+        {
+          cellSize = 100;
+        }
+        else if ( mapScale > 50 )
+        {
+          cellSize = 10;
+        }
+        else
+        {
+          cellSize = 1;
+        }
       }
       else
       {
-        cellSize = 100;
+        // If chosen cellSize would result in over 100 grid lines in any direction, reduce interval
+        double length = da.measureLine( QgsPointXY( xMin, 0.5 * ( yMin + yMax ) ), QgsPointXY( xMax, 0.5 * ( yMin + yMax ) ) );
+        cellSize = std::max( cellSize, int( length / 100. ) );
       }
       if ( gridMode == GridMGRS )
       {

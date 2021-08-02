@@ -106,12 +106,27 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   ui.comboBoxGridType->addItem( "UTM ", KadasMapGridLayer::GridUTM );
   ui.comboBoxGridType->addItem( "MGRS", KadasMapGridLayer::GridMGRS );
 
+  mCellSizeLabel = new QLabel( tr( "Cell size:" ) );
+  mCellSizeLabel->setVisible( false );
+  static_cast<QGridLayout *>( ui.widgetLayerSetup->layout() )->addWidget( mCellSizeLabel, 0, 2, 1, 2 );
+  mCellSizeCombo = new QComboBox( );
+  mCellSizeCombo->addItem( tr( "Dynamic" ), 0 );
+  mCellSizeCombo->addItem( tr( "1 m" ), 1 );
+  mCellSizeCombo->addItem( tr( "10 m" ), 10 );
+  mCellSizeCombo->addItem( tr( "100 m" ), 100 );
+  mCellSizeCombo->addItem( tr( "1 km" ), 1000 );
+  mCellSizeCombo->addItem( tr( "10 km" ), 10000 );
+  mCellSizeCombo->addItem( tr( "100 km" ), 100000 );
+  mCellSizeCombo->setVisible( false );
+  static_cast<QGridLayout *>( ui.widgetLayerSetup->layout() )->addWidget( mCellSizeCombo, 0, 4, 1, 2 );
+
   ui.comboBoxLabeling->addItem( tr( "Disabled" ), KadasMapGridLayer::LabelingDisabled );
   ui.comboBoxLabeling->addItem( tr( "Enabled" ), KadasMapGridLayer::LabelingEnabled );
 
-  connect( ui.comboBoxGridType, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMapGridWidget::updateType );
+  connect( ui.comboBoxGridType, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this]( int idx ) { updateType( idx, true ); } );
   connect( ui.spinBoxIntervalX, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMapGridWidget::updateGrid );
   connect( ui.spinBoxIntervalY, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMapGridWidget::updateGrid );
+  connect( mCellSizeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMapGridWidget::updateGrid );
 
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasMapGridWidget::updateColor );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMapGridWidget::updateFontSize );
@@ -126,7 +141,7 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
 QgsMapLayer *KadasMapGridWidget::createLayer( QString layerName )
 {
   KadasMapGridLayer *guideGridLayer = new KadasMapGridLayer( layerName );
-  guideGridLayer->setup( KadasMapGridLayer::GridLV95, 10000., 10000. );
+  guideGridLayer->setup( KadasMapGridLayer::GridLV95, 10000., 10000., 0 );
   return guideGridLayer;
 }
 
@@ -152,11 +167,14 @@ void KadasMapGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxIntervalY->blockSignals( true );
   ui.spinBoxIntervalY->setValue( mCurrentLayer->intervalY() );
   ui.spinBoxIntervalY->blockSignals( false );
+  mCellSizeCombo->blockSignals( true );
+  mCellSizeCombo->setCurrentIndex( mCellSizeCombo->findData( mCurrentLayer->cellSize() ) );
+  mCellSizeCombo->blockSignals( false );
   ui.toolButtonColor->setColor( mCurrentLayer->color() );
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
   ui.comboBoxLabeling->setCurrentIndex( ui.comboBoxLabeling->findData( mCurrentLayer->labelingMode() ) );
-  updateType( ui.comboBoxGridType->currentIndex() );
   ui.widgetLayerSetup->setEnabled( true );
+  updateType( ui.comboBoxGridType->currentIndex(), false );
 }
 
 void KadasMapGridWidget::updateGrid()
@@ -165,17 +183,17 @@ void KadasMapGridWidget::updateGrid()
   {
     return;
   }
-  mCurrentLayer->setup( static_cast<KadasMapGridLayer::GridType>( ui.comboBoxGridType->currentData().toInt() ), ui.spinBoxIntervalX->value(), ui.spinBoxIntervalY->value() );
+  mCurrentLayer->setup( static_cast<KadasMapGridLayer::GridType>( ui.comboBoxGridType->currentData().toInt() ), ui.spinBoxIntervalX->value(), ui.spinBoxIntervalY->value(), mCellSizeCombo->currentData().toInt() );
   mCurrentLayer->triggerRepaint();
 }
 
-void KadasMapGridWidget::updateType( int idx )
+void KadasMapGridWidget::updateType( int idx, bool updateValues )
 {
   KadasMapGridLayer::GridType type = static_cast<KadasMapGridLayer::GridType>( ui.comboBoxGridType->itemData( idx ).toInt() );
 
   struct IntervalConfig
   {
-    bool enabled = false;
+    bool spinEnabled = false;
     double lower = 0, upper = 0, decimals = 0, value = 0;
     QString suffix;
   } config;
@@ -196,21 +214,31 @@ void KadasMapGridWidget::updateType( int idx )
       break;
   }
 
-  ui.spinBoxIntervalX->blockSignals( true );
-  ui.spinBoxIntervalY->blockSignals( true );
-  ui.spinBoxIntervalX->setEnabled( config.enabled );
-  ui.spinBoxIntervalY->setEnabled( config.enabled );
-  ui.spinBoxIntervalX->setRange( config.lower, config.upper );
-  ui.spinBoxIntervalY->setRange( config.lower, config.upper );
-  ui.spinBoxIntervalX->setDecimals( config.decimals );
-  ui.spinBoxIntervalY->setDecimals( config.decimals );
-  ui.spinBoxIntervalX->setSuffix( config.suffix );
-  ui.spinBoxIntervalY->setSuffix( config.suffix );
-  ui.spinBoxIntervalX->setValue( config.value );
-  ui.spinBoxIntervalY->setValue( config.value );
-  ui.spinBoxIntervalX->blockSignals( false );
-  ui.spinBoxIntervalY->blockSignals( false );
+  ui.spinBoxIntervalX->setVisible( config.spinEnabled );
+  ui.spinBoxIntervalY->setVisible( config.spinEnabled );
+  mCellSizeCombo->setVisible( !config.spinEnabled );
+  ui.labelIntervalX->setVisible( config.spinEnabled );
+  ui.labelIntervalY->setVisible( config.spinEnabled );
+  mCellSizeLabel->setVisible( !config.spinEnabled );
 
+  if ( updateValues )
+  {
+    ui.spinBoxIntervalX->blockSignals( true );
+    ui.spinBoxIntervalY->blockSignals( true );
+    mCellSizeCombo->blockSignals( true );
+    ui.spinBoxIntervalX->setRange( config.lower, config.upper );
+    ui.spinBoxIntervalY->setRange( config.lower, config.upper );
+    ui.spinBoxIntervalX->setDecimals( config.decimals );
+    ui.spinBoxIntervalY->setDecimals( config.decimals );
+    ui.spinBoxIntervalX->setSuffix( config.suffix );
+    ui.spinBoxIntervalY->setSuffix( config.suffix );
+    ui.spinBoxIntervalX->setValue( config.value );
+    ui.spinBoxIntervalY->setValue( config.value );
+    mCellSizeCombo->setCurrentIndex( 0 );
+    ui.spinBoxIntervalX->blockSignals( false );
+    ui.spinBoxIntervalY->blockSignals( false );
+    mCellSizeCombo->blockSignals( false );
+  }
   updateGrid();
 }
 

@@ -337,7 +337,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
       QList<KadasLatLonToUTM::ZoneLabel> zoneSubLabels;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
-      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mLayer->mGridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM );
+      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mLayer->mGridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM, mLayer->mCellSize );
 
       // Draw grid lines
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, 3 ) );
@@ -506,16 +506,17 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasMapGridLayer::KadasMapGridLayer( const QString &name )
-  : KadasPluginLayer( layerTypeKey(), name )
+  : KadasPluginLayer( layerType(), name )
 {
   mValid = true;
 }
 
-void KadasMapGridLayer::setup( GridType type, double intervalX, double intervalY )
+void KadasMapGridLayer::setup( GridType type, double intervalX, double intervalY, int cellSize )
 {
   mGridType = type;
   mIntervalX = intervalX;
   mIntervalY = intervalY;
+  mCellSize = cellSize;
 }
 
 KadasMapGridLayer *KadasMapGridLayer::clone() const
@@ -526,6 +527,7 @@ KadasMapGridLayer *KadasMapGridLayer::clone() const
   layer->mGridType = mGridType;
   layer->mIntervalX = mIntervalX;
   layer->mIntervalY = mIntervalY;
+  layer->mCellSize = mCellSize;
   layer->mFontSize = mFontSize;
   layer->mColor = mColor;
   layer->mLabelingMode = mLabelingMode;
@@ -551,6 +553,7 @@ bool KadasMapGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext
   mGridType = static_cast<GridType>( layerEl.attribute( "gridtype" ).toInt() );
   mIntervalX = layerEl.attribute( "intervalX" ).toDouble();
   mIntervalY = layerEl.attribute( "intervalY" ).toDouble();
+  mCellSize = layerEl.attribute( "cellSize" ).toInt();
   mFontSize = layerEl.attribute( "fontSize" ).toInt();
   mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
   mLabelingMode = static_cast<LabelingMode>( layerEl.attribute( "labelingMode" ).toInt() );
@@ -561,12 +564,13 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
 {
   QDomElement layerEl = layer_node.toElement();
   layerEl.setAttribute( "type", "plugin" );
-  layerEl.setAttribute( "name", layerTypeKey() );
+  layerEl.setAttribute( "name", layerType() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
   layerEl.setAttribute( "gridtype", mGridType );
   layerEl.setAttribute( "intervalX", mIntervalX );
   layerEl.setAttribute( "intervalY", mIntervalY );
+  layerEl.setAttribute( "cellSize", mCellSize );
   layerEl.setAttribute( "fontSize", mFontSize );
   layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
   layerEl.setAttribute( "labelingMode", static_cast<int>( mLabelingMode ) );
