@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
+    <width>524</width>
     <height>156</height>
    </rect>
   </property>
@@ -64,21 +64,42 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="2" column="3">
-       <widget class="QLabel" name="labelLineWidth">
+      <item row="2" column="1">
+       <widget class="QLabel" name="labelColor">
         <property name="text">
-         <string>Line width:</string>
+         <string>Color:</string>
         </property>
        </widget>
       </item>
       <item row="3" column="3">
-       <widget class="QLabel" name="labelFontSize">
+       <widget class="QCheckBox" name="checkBoxLabelRings">
         <property name="text">
-         <string>Font size:</string>
+         <string>Rings</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item row="1" column="5">
+       <widget class="QLabel" name="labelInterval">
+        <property name="text">
+         <string>Interval:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="labelLabels">
+        <property name="text">
+         <string>Labels:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="labelRings">
+        <property name="text">
+         <string>Rings:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="3">
        <widget class="QgsColorButton" name="toolButtonColor">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -88,7 +109,75 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
+      <item row="3" column="4">
+       <widget class="QCheckBox" name="checkBoxLabelQuadrants">
+        <property name="text">
+         <string>Quadrants</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QLabel" name="labelLineWidth">
+        <property name="text">
+         <string>Line width:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLabel" name="labelAxes">
+        <property name="text">
+         <string>Axes:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6" colspan="2">
+       <widget class="QSpinBox" name="spinBoxLineWidth">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7">
+       <widget class="QComboBox" name="comboBoxRingIntevalUnit"/>
+      </item>
+      <item row="3" column="6" colspan="2">
+       <widget class="QSpinBox" name="spinBoxFontSize">
+        <property name="suffix">
+         <string notr="true"> px</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5">
+       <widget class="QLabel" name="labelFontSize">
+        <property name="text">
+         <string>Font size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelCenter">
+        <property name="text">
+         <string>Center:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="checkBoxLabelAxes">
+        <property name="text">
+         <string>Axes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
        <widget class="QDoubleSpinBox" name="spinBoxRingInterval">
         <property name="suffix">
          <string notr="true"/>
@@ -104,14 +193,33 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="labelLabels">
-        <property name="text">
-         <string>Labels:</string>
+      <item row="0" column="6" colspan="2">
+       <widget class="QDoubleSpinBox" name="spinBoxAxesInterval">
+        <property name="suffix">
+         <string notr="true">°</string>
+        </property>
+        <property name="maximum">
+         <double>90.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>45.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="1" column="2" colspan="3">
+       <widget class="QSpinBox" name="spinBoxRings">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="3">
        <widget class="QWidget" name="widgetCenter" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
@@ -150,96 +258,6 @@
         </layout>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QComboBox" name="comboBoxLabels"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="labelColor">
-        <property name="text">
-         <string>Color:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="spinBoxRings">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="labelRings">
-        <property name="text">
-         <string>Rings:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="labelInterval">
-        <property name="text">
-         <string>Interval:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="labelCenter">
-        <property name="text">
-         <string>Center:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="labelAxes">
-        <property name="text">
-         <string>Axes:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="QComboBox" name="comboBoxRingIntevalUnit"/>
-      </item>
-      <item row="0" column="4" colspan="2">
-       <widget class="QDoubleSpinBox" name="spinBoxAxesInterval">
-        <property name="suffix">
-         <string notr="true">°</string>
-        </property>
-        <property name="maximum">
-         <double>90.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>45.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4" colspan="2">
-       <widget class="QSpinBox" name="spinBoxLineWidth">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>20</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4" colspan="2">
-       <widget class="QSpinBox" name="spinBoxFontSize">
-        <property name="suffix">
-         <string notr="true"> px</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -273,11 +291,9 @@
   <tabstop>spinBoxRingInterval</tabstop>
   <tabstop>toolButtonColor</tabstop>
   <tabstop>spinBoxLineWidth</tabstop>
-  <tabstop>comboBoxLabels</tabstop>
   <tabstop>spinBoxFontSize</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/resources.qrc"/>
   <include location="../../resources/resources.qrc"/>
  </resources>
  <connections/>

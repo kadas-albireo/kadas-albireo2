@@ -52,8 +52,6 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       }
 
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      bool labelAxes = mLayer->mLabellingMode == LABEL_AXES || mLayer->mLabellingMode == LABEL_AXES_RINGS;
-      bool labelRings = mLayer->mLabellingMode == LABEL_RINGS || mLayer->mLabellingMode == LABEL_AXES_RINGS;
 
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->mOpacity );
@@ -85,7 +83,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         QPainterPath path;
         path.addPolygon( poly );
         mRendererContext.painter()->drawPath( path );
-        if ( labelRings )
+        if ( mLayer->mLabelRings )
         {
           QString label = QString( "%1 nm" ).arg( ( iRing + 1 ) * mLayer->mInterval, 0, 'f', 2 );
           double x = poly.last().x() - 0.5 * metrics.horizontalAdvance( label );
@@ -117,7 +115,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         QPainterPath path;
         path.addPolygon( poly );
         mRendererContext.painter()->drawPath( path );
-        if ( labelAxes )
+        if ( mLayer->mLabelAxes )
         {
           QString label = QString( "%1°" ).arg( bearing );
           int n = poly.size();
@@ -129,6 +127,37 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
           double x = n < 2 ? poly.last().x() : poly.last().x() + d * dx / l;
           double y = n < 2 ? poly.last().y() : poly.last().y() + d * dy / l;
           drawGridLabel( x - w, y + 0.5 * metrics.ascent(), label, font, bufferColor );
+        }
+      }
+      if ( mLayer->mLabelQuadrants )
+      {
+        const char firstLetter = 'F';
+        QList<char> labelChars = {firstLetter};
+        for ( int iRing = 0; iRing < mLayer->mRings; ++iRing )
+        {
+          double r = mLayer->mInterval * ( 0.5 + iRing ) * nm2meters;
+          for ( int bearing = 0; bearing < 360; bearing += mLayer->mAxesInterval )
+          {
+            double a = bearing + 0.5 * mLayer->mAxesInterval;
+            QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, r, a / 180. * M_PI );
+            QgsPointXY mapPoint = rct.transform( wgsPoint );
+            QPointF screenPoint = mapToPixel.transform( mapPoint ).toQPointF();
+            QString label;
+            for ( char c : labelChars )
+            {
+              label += c;
+            }
+            drawGridLabel( screenPoint.x(), screenPoint.y(), label, font, bufferColor );
+            if ( labelChars.last() == 'Z' )
+            {
+              labelChars.last() = firstLetter;
+              labelChars.append( firstLetter );
+            }
+            else
+            {
+              ++labelChars.last();
+            }
+          }
         }
       }
 
@@ -189,7 +218,9 @@ KadasBullseyeLayer *KadasBullseyeLayer::clone() const
   layer->mAxesInterval = mAxesInterval;
   layer->mColor = mColor;
   layer->mFontSize = mFontSize;
-  layer->mLabellingMode = mLabellingMode;
+  layer->mLabelAxes = mLabelAxes;
+  layer->mLabelQuadrants = mLabelQuadrants;
+  layer->mLabelRings = mLabelRings;
   layer->mLineWidth = mLineWidth;
   return layer;
 }
@@ -220,7 +251,21 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
   mFontSize = layerEl.attribute( "fontSize" ).toInt();
   mLineWidth = layerEl.attribute( "lineWidth" ).toInt();
   mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
-  mLabellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
+  if ( layerEl.hasAttribute( "labellingMode" ) )
+  {
+    // Backwards compatibility with KADAS-2.0
+    enum LabellingMode { NO_LABELS, LABEL_AXES, LABEL_RINGS, LABEL_AXES_RINGS };
+    LabellingMode labellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
+    mLabelAxes = labellingMode == LABEL_AXES || labellingMode == LABEL_AXES_RINGS;
+    mLabelQuadrants = false;
+    mLabelRings = labellingMode == LABEL_RINGS || labellingMode == LABEL_AXES_RINGS;
+  }
+  else
+  {
+    mLabelAxes = layerEl.attribute( "labelAxes" ) == "1";
+    mLabelQuadrants = layerEl.attribute( "labelQuadrants" ) == "1";
+    mLabelRings = layerEl.attribute( "labelRings" ) == "1";
+  }
 
   setCrs( QgsCoordinateReferenceSystem( layerEl.attribute( "crs" ) ) );
   return true;
@@ -242,7 +287,9 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
   layerEl.setAttribute( "fontSize", mFontSize );
   layerEl.setAttribute( "lineWidth", mLineWidth );
   layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
-  layerEl.setAttribute( "labellingMode", static_cast<int>( mLabellingMode ) );
+  layerEl.setAttribute( "labelAxes", mLabelAxes ? "1" : "0" );
+  layerEl.setAttribute( "labelQuadrants", mLabelQuadrants ? "1" : "0" );
+  layerEl.setAttribute( "labelRings", mLabelRings ? "1" : "0" );
   return true;
 }
 

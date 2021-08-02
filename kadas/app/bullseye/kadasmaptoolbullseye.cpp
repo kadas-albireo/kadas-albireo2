@@ -117,11 +117,6 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
-  ui.comboBoxLabels->addItem( tr( "Disabled" ), static_cast<int>( KadasBullseyeLayer::NO_LABELS ) );
-  ui.comboBoxLabels->addItem( tr( "Axes" ), static_cast<int>( KadasBullseyeLayer::LABEL_AXES ) );
-  ui.comboBoxLabels->addItem( tr( "Rings" ), static_cast<int>( KadasBullseyeLayer::LABEL_RINGS ) );
-  ui.comboBoxLabels->addItem( tr( "Axes and rings" ), static_cast<int>( KadasBullseyeLayer::LABEL_AXES_RINGS ) );
-
   ui.comboBoxRingIntevalUnit->addItem( "m", QgsUnitTypes::DistanceMeters );
   ui.comboBoxRingIntevalUnit->addItem( "ft", QgsUnitTypes::DistanceFeet );
   ui.comboBoxRingIntevalUnit->addItem( "mi", QgsUnitTypes::DistanceMiles );
@@ -137,7 +132,9 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
 
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasBullseyeWidget::updateColor );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateFontSize );
-  connect( ui.comboBoxLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasBullseyeWidget::updateLabeling );
+  connect( ui.checkBoxLabelAxes, &QCheckBox::toggled, this, &KadasBullseyeWidget::updateLabeling );
+  connect( ui.checkBoxLabelQuadrants, &QCheckBox::toggled, this, &KadasBullseyeWidget::updateLabeling );
+  connect( ui.checkBoxLabelRings, &QCheckBox::toggled, this, &KadasBullseyeWidget::updateLabeling );
   connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasBullseyeWidget::updateLineWidth );
   connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasBullseyeWidget::setCurrentLayer );
 
@@ -190,7 +187,9 @@ void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxLineWidth->blockSignals( false );
   ui.toolButtonColor->setColor( mCurrentLayer->color() );
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
-  ui.comboBoxLabels->setCurrentIndex( ui.comboBoxLabels->findData( static_cast<int>( mCurrentLayer->labellingMode() ) ) );
+  ui.checkBoxLabelAxes->setChecked( mCurrentLayer->labelAxes() );
+  ui.checkBoxLabelQuadrants->setChecked( mCurrentLayer->labelQuadrants() );
+  ui.checkBoxLabelRings->setChecked( mCurrentLayer->labelRings() );
   ui.widgetLayerSetup->setEnabled( true );
 }
 
@@ -234,11 +233,13 @@ void KadasBullseyeWidget::updateFontSize( int fontSize )
   }
 }
 
-void KadasBullseyeWidget::updateLabeling( int /*index*/ )
+void KadasBullseyeWidget::updateLabeling()
 {
   if ( mCurrentLayer )
   {
-    mCurrentLayer->setLabellingMode( static_cast<KadasBullseyeLayer::LabellingMode>( ui.comboBoxLabels->currentData().toInt() ) );
+    mCurrentLayer->setLabelAxes( ui.checkBoxLabelAxes->isChecked() );
+    mCurrentLayer->setLabelQuadrants( ui.checkBoxLabelQuadrants->isChecked() );
+    mCurrentLayer->setLabelRings( ui.checkBoxLabelRings->isChecked() );
     mCurrentLayer->triggerRepaint();
   }
 }

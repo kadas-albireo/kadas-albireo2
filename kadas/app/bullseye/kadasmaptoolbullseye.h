@@ -74,7 +74,7 @@ class KadasBullseyeWidget : public KadasBottomBar
     void updateLayer();
     void updateColor( const QColor &color );
     void updateFontSize( int fontSize );
-    void updateLabeling( int index );
+    void updateLabeling();
     void updateLineWidth( int width );
 };
 

@@ -30,7 +30,6 @@ class KadasBullseyeLayer : public KadasPluginLayer
     Q_OBJECT
   public:
     static QString layerType() { return "bullseye"; }
-    enum LabellingMode { NO_LABELS, LABEL_AXES, LABEL_RINGS, LABEL_AXES_RINGS };
 
     KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, double axesInterval );
@@ -47,13 +46,17 @@ class KadasBullseyeLayer : public KadasPluginLayer
 
     const QColor &color() const { return mColor; }
     int fontSize() const { return mFontSize; }
-    LabellingMode labellingMode() const { return mLabellingMode; }
+    bool labelAxes() const { return mLabelAxes; }
+    bool labelQuadrants() const { return mLabelQuadrants; }
+    bool labelRings() const { return mLabelRings; }
     int lineWidth() const { return mLineWidth; }
 
   public slots:
     void setColor( const QColor &color ) { mColor = color; }
     void setFontSize( int fontSize ) { mFontSize = fontSize; }
-    void setLabellingMode( LabellingMode labellingMode ) { mLabellingMode = labellingMode; }
+    void setLabelAxes( bool labelAxes ) { mLabelAxes = labelAxes; }
+    void setLabelQuadrants( bool labelQuadrants ) { mLabelQuadrants = labelQuadrants; }
+    void setLabelRings( bool labelRings ) { mLabelRings = labelRings; }
     void setLineWidth( int lineWidth ) { mLineWidth = lineWidth; }
 
   protected:
@@ -69,7 +72,9 @@ class KadasBullseyeLayer : public KadasPluginLayer
     double mAxesInterval;
     QColor mColor = Qt::black;
     int mFontSize = 10;
-    LabellingMode mLabellingMode = NO_LABELS;
+    bool mLabelAxes = false;
+    bool mLabelQuadrants = false;
+    bool mLabelRings = false;
     int mLineWidth = 1;
 };
 
