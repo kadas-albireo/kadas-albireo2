@@ -290,7 +290,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
-  : KadasPluginLayer( layerTypeKey(), name )
+  : KadasPluginLayer( layerType(), name )
 {
   mValid = true;
 }
@@ -426,7 +426,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
 {
   QDomElement layerEl = layer_node.toElement();
   layerEl.setAttribute( "type", "plugin" );
-  layerEl.setAttribute( "name", layerTypeKey() );
+  layerEl.setAttribute( "name", layerType() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
   layerEl.setAttribute( "xmin", mGridRect.xMinimum() );

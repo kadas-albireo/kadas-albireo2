@@ -198,7 +198,7 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
 {
   QDomElement layerEl = layer_node.toElement();
   layerEl.setAttribute( "type", "plugin" );
-  layerEl.setAttribute( "name", layerTypeKey() );
+  layerEl.setAttribute( "name", layerType() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
   layerEl.setAttribute( QStringLiteral( "maxScale" ), maximumScale() );

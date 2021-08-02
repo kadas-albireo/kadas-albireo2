@@ -164,7 +164,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
-  : KadasPluginLayer( layerTypeKey(), name )
+  : KadasPluginLayer( layerType(), name )
 {
   mValid = true;
 }
@@ -230,7 +230,7 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
 {
   QDomElement layerEl = layer_node.toElement();
   layerEl.setAttribute( "type", "plugin" );
-  layerEl.setAttribute( "name", layerTypeKey() );
+  layerEl.setAttribute( "name", layerType() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - 100. * mOpacity );
   layerEl.setAttribute( "x", mCenter.x() );
