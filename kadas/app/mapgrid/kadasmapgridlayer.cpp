@@ -548,7 +548,7 @@ bool KadasMapGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
   mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
-  mGridType = static_cast<GridType>( layerEl.attribute( "type" ).toInt() );
+  mGridType = static_cast<GridType>( layerEl.attribute( "gridtype" ).toInt() );
   mIntervalX = layerEl.attribute( "intervalX" ).toDouble();
   mIntervalY = layerEl.attribute( "intervalY" ).toDouble();
   mFontSize = layerEl.attribute( "fontSize" ).toInt();
@@ -564,7 +564,7 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
-  layerEl.setAttribute( "type", mGridType );
+  layerEl.setAttribute( "gridtype", mGridType );
   layerEl.setAttribute( "intervalX", mIntervalX );
   layerEl.setAttribute( "intervalY", mIntervalY );
   layerEl.setAttribute( "fontSize", mFontSize );
