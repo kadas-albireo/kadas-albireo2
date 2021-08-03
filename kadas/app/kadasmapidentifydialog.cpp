@@ -24,12 +24,14 @@
 #include <QVBoxLayout>
 
 #include <qgis/qgsarcgisrestutils.h>
+#include <qgis/qgsfeaturestore.h>
 #include <qgis/qgsgeometryrubberband.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsrasteridentifyresult.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
@@ -192,8 +194,9 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     }
     else if ( dynamic_cast<QgsRasterLayer *>( layer ) )
     {
-      const QgsRasterLayer *rlayer = static_cast<const QgsRasterLayer *>( layer );
+      QgsRasterLayer *rlayer = static_cast<QgsRasterLayer *>( layer );
 
+#if 0
       // Detect ArcGIS MapServer Layers
       if ( rlayer->providerType() == "arcgismapserver" )
       {
@@ -203,7 +206,6 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
         // Example: https://<...>/services/<group>/<service>/MapServer
         if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
         {
-          QTextStream( stdout ) << "AMS " << ( urlParts[nParts - 3] + ":" + urlParts[nParts - 2] ) << Qt::endl;
           rlayerIds.append( urlParts[nParts - 3] + ":" + urlParts[nParts - 2] );
           rlayerMap.insert( urlParts[nParts - 2], rlayer->id() );
         }
@@ -229,18 +231,22 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
           rlayerIds.append( urlParts[nParts - 6] + ":" + urlParts[nParts - 5] );
           rlayerMap.insert( urlParts[nParts - 5], rlayer->id() );
         }
-        // Detect geo.admin.ch layers
-        else if ( nParts > 1 && urlParts[1].endsWith( "geo.admin.ch" ) )
-        {
-          QStringList sublayerIds = dataSource.params( "layers" );
-          rlayerIds.append( sublayerIds );
-          for ( const QString &id : sublayerIds )
-          {
-            rlayerMap.insert( id, rlayer->id() );
-          }
-        }
       }
+#else
+      int capabilities = rlayer->dataProvider()->capabilities();
+      QgsRaster::IdentifyFormat format = QgsRaster::IdentifyFormatUndefined;
+      if ( capabilities & QgsRasterInterface::IdentifyFeature ) format = QgsRaster::IdentifyFormatFeature;
+      else if ( capabilities & QgsRasterInterface::IdentifyValue ) format = QgsRaster::IdentifyFormatValue;
+      else if ( capabilities & QgsRasterInterface::IdentifyText ) format = QgsRaster::IdentifyFormatText;
+//        else if ( capabilities & QgsRasterInterface::IdentifyHtml ) format = QgsRaster::IdentifyFormatHtml;
 
+      if ( ( capabilities & QgsRasterDataProvider::Identify ) && format != QgsRaster::IdentifyFormatUndefined )
+      {
+        QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), rlayer->crs(), QgsProject::instance()->transformContext() );
+        QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), mCanvas->width(), mCanvas->height(), mCanvas->mapSettings().outputDpi() );
+        addRasterIdentifyResult( rlayer, result );
+      }
+#endif
     }
     else if ( dynamic_cast<QgsVectorLayer *>( layer ) )
     {
@@ -311,13 +317,13 @@ void KadasMapIdentifyDialog::addPluginLayerResults( KadasPluginLayer *pLayer, co
   if ( !mLayerTreeItemMap[pLayer->id()] )
   {
     QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << pLayer->name() );
-    item->setFirstColumnSpanned( true );
     QFont font = item->font( 0 );
     font.setBold( true );
     item->setFont( 0, font );
     mTreeWidget->invisibleRootItem()->addChild( item );
     mLayerTreeItemMap.insert( pLayer->id(), item );
     item->setExpanded( true );
+    item->setFirstColumnSpanned( true );
   }
 
   for ( const KadasPluginLayer::IdentifyResult &result : results )
@@ -343,13 +349,13 @@ void KadasMapIdentifyDialog::addVectorLayerResult( QgsVectorLayer *vLayer, const
   if ( !mLayerTreeItemMap[vLayer->id()] )
   {
     QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << vLayer->name() );
-    item->setFirstColumnSpanned( true );
     QFont font = item->font( 0 );
     font.setBold( true );
     item->setFont( 0, font );
     mTreeWidget->invisibleRootItem()->addChild( item );
     mLayerTreeItemMap.insert( vLayer->id(), item );
     item->setExpanded( true );
+    item->setFirstColumnSpanned( true );
   }
 
   QString label = vLayer->displayField().isEmpty() ? QString::number( feature.id() ) : QString( "%1 [%2]" ).arg( feature.attribute( vLayer->displayField() ).toString() ).arg( feature.id() );
@@ -368,6 +374,92 @@ void KadasMapIdentifyDialog::addVectorLayerResult( QgsVectorLayer *vLayer, const
     item->addChild( new QTreeWidgetItem( pair ) );
   }
   item->setExpanded( true );
+}
+
+void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result )
+{
+  const QMap<int, QVariant> &results = result.results();
+  if ( results.isEmpty() )
+  {
+    return;
+  }
+  if ( result.format() == QgsRaster::IdentifyFormatFeature )
+  {
+    bool nonempty = false;
+    for ( const QVariant &variant : result.results() )
+    {
+      QgsFeatureStoreList stores = variant.value<QgsFeatureStoreList>();
+      if ( !stores.isEmpty() )
+      {
+        nonempty = true;
+        break;
+      }
+    }
+    if ( !nonempty )
+    {
+      return;
+    }
+  }
+  if ( !mLayerTreeItemMap[rLayer->id()] )
+  {
+    QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << rLayer->name() );
+    QFont font = item->font( 0 );
+    font.setBold( true );
+    item->setFont( 0, font );
+    mTreeWidget->invisibleRootItem()->addChild( item );
+    mLayerTreeItemMap.insert( rLayer->id(), item );
+    item->setExpanded( true );
+    item->setFirstColumnSpanned( true );
+  }
+
+  switch ( result.format() )
+  {
+    case QgsRaster::IdentifyFormatUndefined: break;
+    case QgsRaster::IdentifyFormatHtml: break;
+    case QgsRaster::IdentifyFormatValue:
+    {
+      for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
+      {
+        QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << QString::number( resultIt.key() ) << QString::number( resultIt.value().toInt() ) );
+        mLayerTreeItemMap[rLayer->id()]->addChild( item );
+      }
+    }
+    case QgsRaster::IdentifyFormatText:
+    {
+      for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
+      {
+        QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+        QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << sublayerName << resultIt.value().toString() );
+        mLayerTreeItemMap[rLayer->id()]->addChild( item );
+      }
+    }
+    case QgsRaster::IdentifyFormatFeature:
+    {
+      for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
+      {
+        QgsFeatureStoreList stores = resultIt.value().value<QgsFeatureStoreList>();
+
+        for ( const QgsFeatureStore &store : stores )
+        {
+          for ( int i = 0, n = store.count(); i < n; ++i )
+          {
+            QgsFeature feature = store.features().at( i );
+            QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+            QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << sublayerName );
+            mLayerTreeItemMap[rLayer->id()]->addChild( item );
+            for ( int j = 0, m = feature.attributeCount(); j < m; ++j )
+            {
+              const QgsField &field = feature.fields().at( j );
+              QStringList pair = QStringList() << field.displayName() << field.displayString( feature.attribute( j ) );
+              item->addChild( new QTreeWidgetItem( pair ) );
+            }
+            item->setExpanded( true );
+            item->setFirstColumnSpanned( true );
+          }
+        }
+      }
+    }
+  }
 }
 
 void KadasMapIdentifyDialog::rasterIdentifyFinished()
@@ -409,13 +501,13 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
       else
       {
         QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << layer->name() );
-        item->setFirstColumnSpanned( true );
         QFont font = item->font( 0 );
         font.setBold( true );
         item->setFont( 0, font );
         mLayerTreeItemMap.insert( layerId, item );
         mTreeWidget->invisibleRootItem()->addChild( item );
         item->setExpanded( true );
+        item->setFirstColumnSpanned( true );
       }
     }
     QTreeWidgetItem *parent = mLayerTreeItemMap[layerId];
@@ -431,7 +523,6 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
     resultItem->setData( 0, sGeometryRole, mGeometries.size() - 1 );
     resultItem->setData( 0, sGeometryCrsRole, crs.authid() );
 
-    resultItem->setFirstColumnSpanned( true );
     QString displayFieldName = result["displayFieldName"].toString();
     QVariantMap attributes = result["attributes"].toMap();
     for ( const QString &key : attributes.keys() )
@@ -444,6 +535,7 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
     }
     parent->addChild( resultItem );
     resultItem->setExpanded( true );
+    resultItem->setFirstColumnSpanned( true );
   }
 }
 

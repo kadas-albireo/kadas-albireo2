@@ -30,6 +30,8 @@ class QgsFeature;
 class QgsGeometryRubberBand;
 class QgsMapCanvas;
 class QgsPinAnnotationItem;
+class QgsRasterIdentifyResult;
+class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasPinItem;
 
@@ -62,6 +64,7 @@ class KadasMapIdentifyDialog : public QDialog
     void collectInfo( const QgsPointXY &mapPos );
     void addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
     void addVectorLayerResult( QgsVectorLayer *vLayer, const QgsFeature &feature );
+    void addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result );
 
   private slots:
     void clear();
