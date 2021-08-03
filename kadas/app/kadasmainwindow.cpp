@@ -123,6 +123,8 @@ void KadasMainWindow::init()
 
   mLayerTreeCanvasBridge = new QgsLayerTreeMapCanvasBridge( QgsProject::instance()->layerTreeRoot(), mMapCanvas, this );
 
+  mProjectTemplateDialog = new KadasProjectTemplateSelectionDialog( this );
+
   mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS, mActionMoveWithGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
   mSearchWidget->init( mMapCanvas );
@@ -991,10 +993,9 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
 
 void KadasMainWindow::showProjectSelectionWidget()
 {
-  KadasProjectTemplateSelectionDialog dialog( this );
-  if ( dialog.exec() == QDialog::Accepted && !dialog.selectedTemplate().isEmpty() )
+  if ( mProjectTemplateDialog->exec() == QDialog::Accepted && !mProjectTemplateDialog->selectedTemplate().isEmpty() )
   {
-    kApp->projectCreateFromTemplate( dialog.selectedTemplate() );
+    kApp->projectCreateFromTemplate( mProjectTemplateDialog->selectedTemplate() );
   }
 }
 

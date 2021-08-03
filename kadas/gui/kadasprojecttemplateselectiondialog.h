@@ -22,27 +22,33 @@
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/ui_kadasprojecttemplateselectiondialog.h>
 
-class QDialogButtonBox;
-class QFileSystemModel;
-class QModelIndex;
-class QTreeView;
+class QDir;
+class QTemporaryDir;
+class QFileIconProvider;
 
 class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, private Ui::KadasProjectTemplateSelectionDialogBase
 {
     Q_OBJECT
   public:
-    KadasProjectTemplateSelectionDialog( QWidget *parent = 0 );
+    KadasProjectTemplateSelectionDialog( QWidget *parent = nullptr );
+    ~KadasProjectTemplateSelectionDialog();
     const QString &selectedTemplate() const { return mSelectedTemplate; }
 
   private:
-    QFileSystemModel *mModel;
-    QAbstractButton *mCreateButton;
+    QAbstractButton *mCreateButton = nullptr;
     QString mSelectedTemplate;
+    QTemporaryDir *mProjectTempDir = nullptr;
+
+    void populateFileTree( const QDir &dir, QTreeWidgetItem *parent, const QFileIconProvider &iconProvider );
+
+    static constexpr int sItemUrlRole = Qt::UserRole + 1;
+    static constexpr int sFilePathRole = Qt::UserRole + 2;
 
   private slots:
-    void itemClicked( const QModelIndex &index );
-    void itemDoubleClicked( const QModelIndex &index );
+    void itemClicked( QTreeWidgetItem *item, int column );
+    void itemDoubleClicked( QTreeWidgetItem *item, int column );
     void createProject();
+    void parseServiceReply();
 
 };
 

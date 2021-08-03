@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,13 @@
     </widget>
    </item>
    <item>
-    <widget class="QTreeView" name="mTreeView">
+    <widget class="QTreeWidget" name="mTreeWidget">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
      <property name="iconSize">
       <size>
        <width>32</width>
@@ -32,9 +38,11 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>26</number>
-     </attribute>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>

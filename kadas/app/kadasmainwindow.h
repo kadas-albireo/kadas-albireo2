@@ -37,6 +37,7 @@ class KadasKmlIntegration;
 class KadasMilxIntegration;
 class KadasMapItem;
 class KadasMapWidgetManager;
+class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
 class KadasRedliningIntegration;
 
@@ -167,6 +168,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasPluginManager *mPluginManager = nullptr;
     QToolButton *mPluginsToolButton = nullptr;
     QAction *mActionShowPythonConsole = nullptr;
+    KadasProjectTemplateSelectionDialog *mProjectTemplateDialog = nullptr;
 
     QTimer mLoadingTimer;
     QPoint mResizePressPos;
