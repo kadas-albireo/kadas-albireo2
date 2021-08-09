@@ -318,12 +318,16 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
 
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
-  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs() );
+  double dpiScale = outputDpiScale( context );
+  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true, dpiScale );
   KadasMilxClient::NPointSymbolGraphic result;
 
   int dpi = context.painter()->device()->logicalDpiX();
   QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, false ) )
+  KadasMilxSymbolSettings symSettings = symbolSettings();
+  symSettings.lineWidth *= dpiScale;
+  symSettings.symbolSize *= dpiScale;
+  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symSettings, result, false ) )
   {
     return;
   }
@@ -331,7 +335,7 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
-    context.painter()->drawLine( symbol.points.front(), symbol.points.front() - constState()->userOffset );
+    context.painter()->drawLine( symbol.points.front(), symbol.points.front() - constState()->userOffset * dpiScale );
   }
   context.painter()->drawImage( renderPos, result.graphic );
 }
@@ -796,13 +800,13 @@ bool KadasMilxItem::isMultiPoint() const
   return constState()->points.size() > 1 || !constState()->attributes.isEmpty();
 }
 
-KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored ) const
+KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored, double dpiScale ) const
 {
   QgsCoordinateTransform mapCrst( mCrs, mapCrs, QgsProject::instance()->transformContext() );
   QList<QPoint> points = computeScreenPoints( mapToPixel, mapCrst );
   for ( int i = 0, n = points.size(); i < n; ++i )
   {
-    points[i] += constState()->userOffset;
+    points[i] += constState()->userOffset * dpiScale;
   }
   QList< QPair<int, double> > screenAttribs = computeScreenAttributes( mapToPixel, mapCrst );
   bool finalized = constState()->drawStatus == State::DrawStatus::Finished;

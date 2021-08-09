@@ -148,7 +148,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
+    KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true, double dpiScale = 1. ) const;
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
     void updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result );

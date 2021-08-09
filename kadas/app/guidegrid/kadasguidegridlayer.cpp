@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QMenu>
 
 #include <qgis/qgsapplication.h>
@@ -74,13 +76,14 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
 
       QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
       QFont smallFont;
-      smallFont.setPixelSize( 0.5 * mLayer->mFontSize );
+      smallFont.setPixelSize( 0.5 * mLayer->mFontSize * dpiScale );
       QFontMetrics smallFontMetrics( smallFont );
 
       QFont font;
-      font.setPixelSize( mLayer->mFontSize );
+      font.setPixelSize( mLayer->mFontSize * dpiScale );
       QFontMetrics fontMetrics( font );
 
       const int labelBoxSize = fontMetrics.height();

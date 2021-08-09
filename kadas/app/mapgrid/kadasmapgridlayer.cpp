@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QMenu>
 #include <QVector2D>
 
@@ -214,9 +216,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
       {
+        double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
         QFont font = mRendererContext.painter()->font();
         font.setBold( true );
-        font.setPointSizeF( mLayer->mFontSize );
+        font.setPointSizeF( mLayer->mFontSize * dpiScale );
         QFontMetrics fm( font );
         mRendererContext.painter()->setBrush( mLayer->mColor );
 
@@ -407,11 +410,12 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
       mRendererContext.painter()->setBrush( mLayer->mColor );
 
       QFont font = mRendererContext.painter()->font();
       font.setBold( true );
-      font.setPointSizeF( zoneFontSize );
+      font.setPointSizeF( zoneFontSize * dpiScale );
       QFontMetrics fm( font );
       for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : zoneLabels )
       {

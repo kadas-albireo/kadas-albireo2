@@ -14,6 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QDesktopWidget>
+
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
@@ -275,6 +278,11 @@ void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QPointF &screenP
   painter->setPen( QPen( Qt::black, 1 ) );
   painter->setBrush( Qt::red );
   painter->drawEllipse( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
+}
+
+double KadasMapItem::outputDpiScale( const QgsRenderContext &context )
+{
+  return double( context.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 }
 
 KadasMapItem::Registry *KadasMapItem::registry()

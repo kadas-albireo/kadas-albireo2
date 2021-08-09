@@ -251,17 +251,19 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   pos.transform( context.mapToPixel().transform() );
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->scale( mSymbolScale, mSymbolScale );
+  double dpiScale = outputDpiScale( context );
+  double arrowWidth = sArrowWidth * dpiScale;
 
-  double w = constState()->size.width();
-  double h = constState()->size.height();
-  double offsetX = constState()->offsetX;
-  double offsetY = constState()->offsetY;
+  double w = constState()->size.width() * dpiScale;
+  double h = constState()->size.height() * dpiScale;
+  double offsetX = constState()->offsetX * dpiScale;
+  double offsetY = constState()->offsetY * dpiScale;
 
   // Draw frame
   if ( mFrame )
   {
-    double framew = w + 2 * sFramePadding;
-    double frameh = h + 2 * sFramePadding;
+    double framew = w + 2 * sFramePadding * dpiScale;
+    double frameh = h + 2 * sFramePadding * dpiScale;
     context.painter()->setPen( QPen( Qt::black, 1 ) );
     context.painter()->setBrush( Qt::white );
     QPolygonF poly;
@@ -282,25 +284,37 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
       {
         baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
         framePos.setX( quadrant == 0 ? offsetX - 0.5 * framew : offsetX + 0.5 * framew );
-        framePos.setY( std::min( std::max( -offsetY - 0.5 * frameh + sArrowWidth, 0. ), -offsetY + 0.5 * frameh - sArrowWidth ) );
+        framePos.setY( std::min( std::max( -offsetY - 0.5 * frameh + arrowWidth, 0. ), -offsetY + 0.5 * frameh - arrowWidth ) );
       }
       else     // Triangle above (quadrant = 1) or below (quadrant = 3)
       {
-        framePos.setX( std::min( std::max( offsetX - 0.5 * framew + sArrowWidth, 0. ), offsetX + 0.5 * framew - sArrowWidth ) );
+        framePos.setX( std::min( std::max( offsetX - 0.5 * framew + arrowWidth, 0. ), offsetX + 0.5 * framew - arrowWidth ) );
         framePos.setY( quadrant == 1 ? -offsetY - 0.5 * frameh : -offsetY + 0.5 * frameh );
         baseDir = QgsVector( quadrant == 1 ? 1 : -1, 0 );
       }
       int inspos = quadrant + 1;
-      poly.insert( inspos++, QPointF( framePos.x() - sArrowWidth * baseDir.x(), framePos.y() - sArrowWidth * baseDir.y() ) );
+      poly.insert( inspos++, QPointF( framePos.x() - arrowWidth * baseDir.x(), framePos.y() - arrowWidth * baseDir.y() ) );
       poly.insert( inspos++, QPointF( 0, 0 ) );
-      poly.insert( inspos++, QPointF( framePos.x() + sArrowWidth * baseDir.x(), framePos.y() + sArrowWidth * baseDir.y() ) );
+      poly.insert( inspos++, QPointF( framePos.x() + arrowWidth * baseDir.x(), framePos.y() + arrowWidth * baseDir.y() ) );
     }
     QPainterPath path;
     path.addPolygon( poly );
     context.painter()->drawPath( path );
   }
 
-  context.painter()->drawImage( QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 ), mImage );
+  if ( dpiScale != 1. )
+  {
+    QImageReader reader( mFilePath );
+    reader.setBackgroundColor( Qt::white );
+    reader.setScaledSize( constState()->size * dpiScale );
+    QImage image = reader.read().convertToFormat( QImage::Format_ARGB32 );
+    context.painter()->drawImage( QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 ), image );
+  }
+  else
+  {
+    context.painter()->drawImage( QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 ), mImage );
+  }
+
 }
 
 QString KadasPictureItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const

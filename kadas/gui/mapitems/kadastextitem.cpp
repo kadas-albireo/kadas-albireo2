@@ -76,20 +76,23 @@ QImage KadasTextItem::symbolImage() const
 
 void KadasTextItem::render( QgsRenderContext &context ) const
 {
+  QFont font = mFont;
+  font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
+
   QgsPointXY mapPos = context.coordinateTransform().transform( constState()->pos );
   QPointF pos = context.mapToPixel().transform( mapPos ).toQPointF();
-  QFontMetrics metrics( mFont );
+  QFontMetrics metrics( font );
   QRect bbox = metrics.boundingRect( mText );
   int baselineOffset = metrics.ascent() - mAnchorY * metrics.height();
 
   context.painter()->setBrush( QBrush( mFillColor ) );
-  context.painter()->setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
-  context.painter()->setFont( mFont );
+  context.painter()->setPen( QPen( mOutlineColor, font.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
+  context.painter()->setFont( font );
   context.painter()->translate( pos );
   context.painter()->rotate( -constState()->angle );
   context.painter()->scale( mSymbolScale, mSymbolScale );
   QPainterPath path;
-  path.addText( -mAnchorX * bbox.width(), baselineOffset, mFont, mText );
+  path.addText( -mAnchorX * bbox.width(), baselineOffset, font, mText );
   context.painter()->drawPath( path );
   context.painter()->setPen( Qt::transparent );
   context.painter()->drawPath( path );

@@ -102,14 +102,16 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
 
 void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
 {
+  double crossSize = sCrossSize * outputDpiScale( context );
+
   QgsPointXY mapPos = context.coordinateTransform().transform( constState()->pos.x(), constState()->pos.y() );
   QPointF screenPos = context.mapToPixel().transform( mapPos ).toQPointF();
   context.painter()->setPen( QPen( Qt::white, 5 ) );
-  context.painter()->drawLine( screenPos.x() - sCrossSize, screenPos.y(), screenPos.x() + sCrossSize, screenPos.y() );
-  context.painter()->drawLine( screenPos.x(), screenPos.y() - sCrossSize, screenPos.x(), screenPos.y() + sCrossSize );
+  context.painter()->drawLine( screenPos.x() - crossSize, screenPos.y(), screenPos.x() + crossSize, screenPos.y() );
+  context.painter()->drawLine( screenPos.x(), screenPos.y() - crossSize, screenPos.x(), screenPos.y() + crossSize );
   context.painter()->setPen( QPen( Qt::black, 2 ) );
-  context.painter()->drawLine( screenPos.x() - sCrossSize, screenPos.y(), screenPos.x() + sCrossSize, screenPos.y() );
-  context.painter()->drawLine( screenPos.x(), screenPos.y() - sCrossSize, screenPos.x(), screenPos.y() + sCrossSize );
+  context.painter()->drawLine( screenPos.x() - crossSize, screenPos.y(), screenPos.x() + crossSize, screenPos.y() );
+  context.painter()->drawLine( screenPos.x(), screenPos.y() - crossSize, screenPos.x(), screenPos.y() + crossSize );
 
   struct LabelData
   {
@@ -119,12 +121,12 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
   };
   QList<LabelData> labels =
   {
-    {screenPos.x() - sCrossSize, screenPos.y() - 5, constState()->pos.x(), 0},
-    {screenPos.x() - 5, screenPos.y() + sCrossSize, constState()->pos.y(), -90}
+    {screenPos.x() - crossSize, screenPos.y() - 5, constState()->pos.x(), 0},
+    {screenPos.x() - 5, screenPos.y() + crossSize, constState()->pos.y(), -90}
   };
 
   QFont font = context.painter()->font();
-  font.setPixelSize( sFontSize );
+  font.setPixelSize( sFontSize * outputDpiScale( context ) );
 
   for ( const LabelData &label : labels )
   {

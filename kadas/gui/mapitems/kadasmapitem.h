@@ -438,6 +438,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
+    static double outputDpiScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;

@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QMenu>
 
 #include <GeographicLib/Geodesic.hpp>
@@ -52,13 +54,14 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       }
 
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
+      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->mOpacity );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
       mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
       QFont font = mRendererContext.painter()->font();
-      font.setPixelSize( mLayer->mFontSize );
+      font.setPixelSize( mLayer->mFontSize * dpiScale );
       QFontMetrics metrics( mRendererContext.painter()->font() );
       QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
 
