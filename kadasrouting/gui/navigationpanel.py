@@ -639,13 +639,17 @@ class NavigationPanel(BASE, WIDGET):
         for item in KadasMapCanvasItemManager.items():
             if item.itemName() == "Symbol":
                 item.__class__ = KadasSymbolItem
-                if item.filePath() == ":/kadas/icons/gpsarrow":
-                    self.originalGpsMarker = item
-                    KadasMapCanvasItemManager.removeItem(self.originalGpsMarker)
+                try:
+                    if item.filePath() == ":/kadas/icons/gpsarrow":
+                        self.originalGpsMarker = item
+                        KadasMapCanvasItemManager.removeItem(self.originalGpsMarker)
+                except AttributeError:
+                    pass
 
     def addOriginalGpsMarker(self):
         try:
-            KadasMapCanvasItemManager.addItem(self.originalGpsMarker)
+            if self.originalGpsMarker:
+                KadasMapCanvasItemManager.addItem(self.originalGpsMarker)
         except RuntimeError:
             # if the GPS connection has been aborted, then just pass
             pass
