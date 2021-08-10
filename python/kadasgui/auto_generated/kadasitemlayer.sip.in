@@ -118,6 +118,12 @@ class KadasItemLayer : KadasPluginLayer
     typedef unsigned ItemId;
     static const ItemId ITEM_ID_NULL;
 
+    enum PickObjective
+    {
+      PICK_OBJECTIVE_ANY,
+      PICK_OBJECTIVE_TOOLTIP
+    };
+
     static QString layerType();
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
@@ -137,7 +143,7 @@ class KadasItemLayer : KadasPluginLayer
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
 
-    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const;
+    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective = PICK_OBJECTIVE_ANY ) const;
     KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 

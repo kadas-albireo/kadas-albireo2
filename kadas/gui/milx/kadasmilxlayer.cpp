@@ -101,7 +101,7 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
   return new Renderer( this, rendererContext );
 }
 
-KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings ) const
+KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective ) const
 {
   if ( mIsApproved )
   {
@@ -114,15 +114,16 @@ KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, cons
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
   {
     const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( it.value() );
-    if ( milxItem )
+    if ( !milxItem || ( pickObjective == PICK_OBJECTIVE_TOOLTIP && milxItem->tooltip().isEmpty() ) )
     {
-      itemIdMap.insert( symbols.size(), it.key() );
-      symbols.append( milxItem->toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() ) );
+      continue;
     }
+    itemIdMap.insert( symbols.size(), it.key() );
+    symbols.append( milxItem->toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() ) );
   }
   int selectedSymbol = -1;
   QRect bbox;
-  if ( KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0 )
+  if ( !symbols.isEmpty() && KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0 )
   {
     return itemIdMap[selectedSymbol];
   }

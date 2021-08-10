@@ -39,7 +39,7 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
 
 void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
 {
-  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ) );
+  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), QgsWkbTypes::UnknownGeometry, KadasItemLayer::PICK_OBJECTIVE_TOOLTIP );
 
   // If hovering over an item, update/show tooltip
   if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )

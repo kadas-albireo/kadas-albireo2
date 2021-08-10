@@ -28,7 +28,6 @@
 
 class QgsMapLayer;
 class QgsMapCanvas;
-class KadasItemLayer;
 
 class KADAS_GUI_EXPORT KadasFeaturePicker
 {
@@ -64,14 +63,14 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
     };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry );
+    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PICK_OBJECTIVE_ANY );
 #ifndef SIP_RUN
     [[deprecated( "Use variant without canvasPos instead" )]]
 #endif
     static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
 
   private:
-    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos );
+    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective );
     static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
 };
 

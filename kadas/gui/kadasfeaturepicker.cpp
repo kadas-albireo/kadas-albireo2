@@ -27,7 +27,7 @@
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/milx/kadasmilxitem.h>
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
 {
   PickResult pickResult;
 
@@ -35,7 +35,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   {
     if ( qobject_cast<KadasItemLayer *> ( layer ) )
     {
-      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ) );
+      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
     }
     else if ( qobject_cast<QgsVectorLayer *> ( layer ) )
     {
@@ -55,10 +55,10 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pick( canvas, mapPos, geomType );
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective )
 {
   PickResult pickResult;
-  pickResult.itemId = layer->pickItem( mapPos, canvas->mapSettings() );
+  pickResult.itemId = layer->pickItem( mapPos, canvas->mapSettings(), pickObjective );
   if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     pickResult.layer = layer;
