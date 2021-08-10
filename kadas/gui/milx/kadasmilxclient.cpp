@@ -582,7 +582,7 @@ bool KadasMilxClient::createSymbol( QString &symbolId, KadasMilxSymbolDesc &resu
 
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_CREATE_SYMBOL << wid;
+  istream << MILX_REQUEST_CREATE_SYMBOL << wid << instance()->mGlobalSymbolSettings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_CREATE_SYMBOL, true ) )
@@ -783,11 +783,11 @@ bool KadasMilxClient::getCurrentLibraryVersionTag( QString &versionTag )
   return result;
 }
 
-bool KadasMilxClient::getControlPointIndices( const QString &symbolXml, int nPoints, QList<int> &controlPoints )
+bool KadasMilxClient::getControlPointIndices( const QString &symbolXml, int nPoints, const KadasMilxSymbolSettings &settings, QList<int> &controlPoints )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_GET_CONTROL_POINT_INDICES << symbolXml << nPoints;
+  istream << MILX_REQUEST_GET_CONTROL_POINT_INDICES << symbolXml << nPoints << settings.symbolSize << settings.lineWidth << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_GET_CONTROL_POINT_INDICES ) )

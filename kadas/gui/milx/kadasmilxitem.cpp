@@ -966,7 +966,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
     }
     else
     {
-      KadasMilxClient::getControlPointIndices( item->mMssString, item->state()->points.count(), item->state()->controlPoints );
+      KadasMilxClient::getControlPointIndices( item->mMssString, item->state()->points.count(), item->symbolSettings(), item->state()->controlPoints );
     }
   }
 

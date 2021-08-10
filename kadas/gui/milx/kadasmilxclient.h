@@ -140,7 +140,7 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool getSymbolMetadata( const QString &symbolId, KadasMilxSymbolDesc &result );
     static bool getSymbolsMetadata( const QStringList &symbolIds, QList<KadasMilxSymbolDesc> &result );
     static bool getMilitaryName( const QString &symbolXml, QString &militaryName );
-    static bool getControlPointIndices( const QString &symbolXml, int nPoints, QList<int> &controlPoints );
+    static bool getControlPointIndices( const QString &symbolXml, int nPoints, const KadasMilxSymbolSettings &settings, QList<int> &controlPoints );
     static bool getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor );
 
     static bool appendPoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const QPoint &newPoint, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
