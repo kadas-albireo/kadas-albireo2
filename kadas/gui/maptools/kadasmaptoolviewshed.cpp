@@ -58,19 +58,37 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   mSpinBoxObserverHeight->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   heightDialogLayout->addWidget( mSpinBoxObserverHeight, 0, 1, 1, 1 );
 
-  heightDialogLayout->addWidget( new QLabel( tr( "Target height:" ) ), 1, 0, 1, 1 );
+  mComboObserverHeightMode = new QComboBox();
+  mComboObserverHeightMode->addItem( tr( "Ground" ), static_cast<int>( HeightRelToGround ) );
+  mComboObserverHeightMode->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
+  heightDialogLayout->addWidget( mComboObserverHeightMode, 0, 2, 1, 1 );
+
+  heightDialogLayout->addWidget( new QLabel( tr( "Observer angle range:" ) ), 1, 0, 1, 1 );
+  mSpinBoxObserverMinAngle = new QSpinBox();
+  mSpinBoxObserverMinAngle->setRange( -90, 90 );
+  mSpinBoxObserverMinAngle->setValue( -90 );
+  mSpinBoxObserverMinAngle->setSuffix( "°" );
+  mSpinBoxObserverMaxAngle = new QSpinBox();
+  mSpinBoxObserverMaxAngle->setRange( -90, 90 );
+  mSpinBoxObserverMaxAngle->setValue( 90 );
+  mSpinBoxObserverMaxAngle->setSuffix( "°" );
+  heightDialogLayout->addWidget( mSpinBoxObserverMinAngle, 1, 1, 1, 1 );
+  heightDialogLayout->addWidget( mSpinBoxObserverMaxAngle, 1, 2, 1, 1 );
+  connect( mSpinBoxObserverMinAngle, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasViewshedDialog::adjustMaxAngle );
+  connect( mSpinBoxObserverMaxAngle, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasViewshedDialog::adjustMinAngle );
+
+  heightDialogLayout->addWidget( new QLabel( tr( "Target height:" ) ), 2, 0, 1, 1 );
   mSpinBoxTargetHeight = new QDoubleSpinBox();
-  mSpinBoxTargetHeight->setRange( 0, 8000 );
+  mSpinBoxTargetHeight->setRange( 0, 999999999999 );
   mSpinBoxTargetHeight->setDecimals( 1 );
   mSpinBoxTargetHeight->setValue( 2. );
   mSpinBoxTargetHeight->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
-  heightDialogLayout->addWidget( mSpinBoxTargetHeight, 1, 1, 1, 1 );
+  heightDialogLayout->addWidget( mSpinBoxTargetHeight, 2, 1, 1, 1 );
 
-  heightDialogLayout->addWidget( new QLabel( tr( "Heights relative to:" ) ), 2, 0, 1, 1 );
-  mComboHeightMode = new QComboBox();
-  mComboHeightMode->addItem( tr( "Ground" ), static_cast<int>( HeightRelToGround ) );
-  mComboHeightMode->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
-  heightDialogLayout->addWidget( mComboHeightMode, 2, 1, 1, 1 );
+  mComboTargetHeightMode = new QComboBox();
+  mComboTargetHeightMode->addItem( tr( "Ground" ), static_cast<int>( HeightRelToGround ) );
+  mComboTargetHeightMode->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
+  heightDialogLayout->addWidget( mComboTargetHeightMode, 2, 2, 1, 1 );
 
   heightDialogLayout->addWidget( new QLabel( tr( "Radius:" ) ), 3, 0, 1, 1 );
   QDoubleSpinBox *spinRadius = new QDoubleSpinBox();
@@ -80,20 +98,20 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   spinRadius->setSuffix( " m" );
   spinRadius->setKeyboardTracking( false );
   connect( spinRadius, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasViewshedDialog::radiusChanged );
-  heightDialogLayout->addWidget( spinRadius, 3, 1, 1, 1 );
+  heightDialogLayout->addWidget( spinRadius, 3, 1, 1, 2 );
 
   heightDialogLayout->addWidget( new QLabel( tr( "Display:" ) ), 4, 0, 1, 1 );
   mDisplayModeCombo = new QComboBox();
   mDisplayModeCombo->addItem( tr( "Visible area" ) );
   mDisplayModeCombo->addItem( tr( "Invisible area" ) );
-  heightDialogLayout->addWidget( mDisplayModeCombo, 4, 1, 1, 1 );
+  heightDialogLayout->addWidget( mDisplayModeCombo, 4, 1, 1, 2 );
 
   heightDialogLayout->addWidget( new QLabel( tr( "Accuracy:" ) ), 5, 0, 1, 1 );
   mAccuracySlider = new QSlider( Qt::Horizontal );
   mAccuracySlider->setRange( 1, 10 );
   mAccuracySlider->setTickPosition( QSlider::TicksBelow );
   mAccuracySlider->setTickInterval( 1 );
-  heightDialogLayout->addWidget( mAccuracySlider, 5, 1, 1, 1 );
+  heightDialogLayout->addWidget( mAccuracySlider, 5, 1, 1, 2 );
 
   QWidget *labelWidget = new QWidget( this );
   labelWidget->setLayout( new QHBoxLayout );
@@ -101,40 +119,71 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   labelWidget->layout()->addWidget( new QLabel( QString( "<small>%1</small>" ).arg( tr( "Accurate" ) ) ) );
   labelWidget->layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding ) );
   labelWidget->layout()->addWidget( new QLabel( QString( "<small>%1</small>" ).arg( tr( "Fast" ) ) ) );
-  heightDialogLayout->addWidget( labelWidget, 6, 1, 1, 1 );
+  heightDialogLayout->addWidget( labelWidget, 6, 1, 1, 2 );
 
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
-  heightDialogLayout->addWidget( bbox, 7, 0, 1, 2 );
+  heightDialogLayout->addWidget( bbox, 7, 0, 1, 3 );
 
   setLayout( heightDialogLayout );
   setFixedSize( sizeHint() );
 }
 
-double KadasViewshedDialog::getObserverHeight() const
+double KadasViewshedDialog::observerHeight() const
 {
   return mSpinBoxObserverHeight->value();
 }
 
-double KadasViewshedDialog::getTargetHeight() const
+double KadasViewshedDialog::targetHeight() const
 {
   return mSpinBoxTargetHeight->value();
 }
 
-bool KadasViewshedDialog::getHeightRelativeToGround() const
+bool KadasViewshedDialog::observerHeightRelativeToGround() const
 {
-  return static_cast<HeightMode>( mComboHeightMode->itemData( mComboHeightMode->currentIndex() ).toInt() ) == HeightRelToGround;
+  return static_cast<HeightMode>( mComboObserverHeightMode->itemData( mComboObserverHeightMode->currentIndex() ).toInt() ) == HeightRelToGround;
 }
 
-KadasViewshedDialog::DisplayMode KadasViewshedDialog::getDisplayMode() const
+bool KadasViewshedDialog::targetHeightRelativeToGround() const
+{
+  return static_cast<HeightMode>( mComboTargetHeightMode->itemData( mComboTargetHeightMode->currentIndex() ).toInt() ) == HeightRelToGround;
+}
+
+double KadasViewshedDialog::observerMinVertAngle() const
+{
+  return mSpinBoxObserverMinAngle->value();
+}
+
+double KadasViewshedDialog::observerMaxVertAngle() const
+{
+  return mSpinBoxObserverMaxAngle->value();
+}
+
+KadasViewshedDialog::DisplayMode KadasViewshedDialog::displayMode() const
 {
   return static_cast<DisplayMode>( mDisplayModeCombo->currentIndex() );
 }
 
-int KadasViewshedDialog::getAccuracyFactor() const
+int KadasViewshedDialog::accuracyFactor() const
 {
   return mAccuracySlider->value();
+}
+
+void KadasViewshedDialog::adjustMaxAngle()
+{
+  if ( mSpinBoxObserverMinAngle->value() >= mSpinBoxObserverMaxAngle->value() )
+  {
+    mSpinBoxObserverMaxAngle->setValue( std::min( 90, mSpinBoxObserverMinAngle->value() + 1 ) );
+  }
+}
+
+void KadasViewshedDialog::adjustMinAngle()
+{
+  if ( mSpinBoxObserverMaxAngle->value() <= mSpinBoxObserverMinAngle->value() )
+  {
+    mSpinBoxObserverMinAngle->setValue( std::max( -90, mSpinBoxObserverMaxAngle->value() - 1 ) );
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,13 +263,13 @@ void KadasMapToolViewshed::drawFinished()
   QProgressDialog p( tr( "Calculating viewshed..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Viewshed" ) );
   p.setWindowModality( Qt::ApplicationModal );
-  bool displayVisible = viewshedDialog.getDisplayMode() == KadasViewshedDialog::DisplayVisibleArea;
-  int accuracyFactor = viewshedDialog.getAccuracyFactor();
+  bool displayVisible = viewshedDialog.displayMode() == KadasViewshedDialog::DisplayVisibleArea;
+  int accuracyFactor = viewshedDialog.accuracyFactor();
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
 
   QString errMsg;
-  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.getObserverHeight() * heightConv, viewshedDialog.getTargetHeight() * heightConv, viewshedDialog.getHeightRelativeToGround(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, displayVisible, accuracyFactor );
+  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.observerHeight() * heightConv, viewshedDialog.targetHeight() * heightConv, viewshedDialog.observerHeightRelativeToGround(), viewshedDialog.targetHeightRelativeToGround(), viewshedDialog.observerMinVertAngle(), viewshedDialog.observerMaxVertAngle(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, displayVisible, accuracyFactor );
   QApplication::restoreOverrideCursor();
   if ( success )
   {

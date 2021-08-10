@@ -31,11 +31,14 @@ the Free Software Foundation; either version 2 of the License, or     *
     enum DisplayMode { DisplayVisibleArea, DisplayInvisibleArea };
 
     KadasViewshedDialog( double radius, QWidget *parent = 0 );
-    double getObserverHeight() const;
-    double getTargetHeight() const;
-    bool getHeightRelativeToGround() const;
-    DisplayMode getDisplayMode() const;
-    int getAccuracyFactor() const;
+    double observerHeight() const;
+    double targetHeight() const;
+    bool observerHeightRelativeToGround() const;
+    bool targetHeightRelativeToGround() const;
+    double observerMinVertAngle() const;
+    double observerMaxVertAngle() const;
+    DisplayMode displayMode() const;
+    int accuracyFactor() const;
 
   signals:
     void radiusChanged( double radius );

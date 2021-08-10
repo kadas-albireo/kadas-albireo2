@@ -34,7 +34,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     static bool computeViewshed( const QgsRasterLayer *layer,
                                  const QString &outputFile, const QString &outputFormat,
                                  QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
-                                 double observerHeight, double targetHeight, bool heightRelToTerr, double radius,
+                                 double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr,
+                                 double observerMinVertAngle, double observerMaxVertAngle, double radius,
                                  const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
                                  const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), bool displayVisible = true, int accuracyFactor = 1 );
 

@@ -50,7 +50,12 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool heightRelToTerr, double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor )
+bool KadasViewshedFilter::computeViewshed(
+  const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
+  const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
+  bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
+  double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress,
+  QString *errMsg, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor )
 {
   // Open input file
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
@@ -294,7 +299,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   GDALSetRasterNoDataValue( outputBand, 255 * !displayVisible );
 
   // Offset observer elevation by position at point
-  if ( heightRelToTerr )
+  if ( observerHeightRelToTerr )
   {
     observerHeight += heightmap[( obs[1] - rowStart ) * hmapWidth + ( obs[0] - colStart )];
   }
@@ -413,11 +418,19 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
       double horizon_alt =  observerHeight + horizon_slope * qAbs( p[inciny] - obs[inciny] );
       double tHeight = targetHeight;
-      if ( heightRelToTerr )
+      if ( targetHeightRelToTerr )
       {
         tHeight += pElev;
       }
-      if ( tHeight >= horizon_alt )
+
+      // Compute vertical angle from observer to target and ensure it is in range
+      double vx = pGeoX - observerPos.x();
+      double vy = pGeoY - observerPos.y();
+      double vz = tHeight - observerHeight;
+      double n = std::sqrt( vx * vx + vy * vy + vz * vz );
+      double vangle = std::asin( vz / n ) / M_PI * 180.;
+
+      if ( tHeight >= horizon_alt && vangle >= observerMinVertAngle && vangle <= observerMaxVertAngle )
       {
         viewshed[( p[1] - rowStart ) * hmapWidth + ( p[0] - colStart )] = 255;
       }

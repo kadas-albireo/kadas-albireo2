@@ -25,6 +25,7 @@
 class QComboBox;
 class QDoubleSpinBox;
 class QSlider;
+class QSpinBox;
 
 class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
 {
@@ -33,22 +34,32 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     enum DisplayMode { DisplayVisibleArea, DisplayInvisibleArea };
 
     KadasViewshedDialog( double radius, QWidget *parent = 0 );
-    double getObserverHeight() const;
-    double getTargetHeight() const;
-    bool getHeightRelativeToGround() const;
-    DisplayMode getDisplayMode() const;
-    int getAccuracyFactor() const;
+    double observerHeight() const;
+    double targetHeight() const;
+    bool observerHeightRelativeToGround() const;
+    bool targetHeightRelativeToGround() const;
+    double observerMinVertAngle() const;
+    double observerMaxVertAngle() const;
+    DisplayMode displayMode() const;
+    int accuracyFactor() const;
 
   signals:
     void radiusChanged( double radius );
 
   private:
     enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
-    QDoubleSpinBox *mSpinBoxObserverHeight;
-    QDoubleSpinBox *mSpinBoxTargetHeight;
-    QComboBox *mComboHeightMode;
-    QComboBox *mDisplayModeCombo;
-    QSlider *mAccuracySlider;
+    QDoubleSpinBox *mSpinBoxObserverHeight = nullptr;
+    QDoubleSpinBox *mSpinBoxTargetHeight = nullptr;
+    QSpinBox *mSpinBoxObserverMinAngle = nullptr;
+    QSpinBox *mSpinBoxObserverMaxAngle = nullptr;
+    QComboBox *mComboObserverHeightMode = nullptr;
+    QComboBox *mComboTargetHeightMode = nullptr;
+    QComboBox *mDisplayModeCombo = nullptr;
+    QSlider *mAccuracySlider = nullptr;
+
+  private slots:
+    void adjustMaxAngle();
+    void adjustMinAngle();
 };
 
 class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
