@@ -568,7 +568,7 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
 {
   QDomElement layerEl = layer_node.toElement();
   layerEl.setAttribute( "type", "plugin" );
-  layerEl.setAttribute( "name", layerType() );
+  layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
   layerEl.setAttribute( "gridtype", mGridType );
