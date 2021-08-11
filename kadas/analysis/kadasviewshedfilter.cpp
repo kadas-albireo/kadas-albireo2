@@ -50,12 +50,11 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed(
-  const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
-  const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
-  bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
-  double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress,
-  QString *errMsg, const QVector<QgsPointXY> &filterRegion, bool displayVisible, int accuracyFactor )
+bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
+    const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
+    bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
+    double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress,
+    QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
 {
   // Open input file
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
@@ -296,7 +295,7 @@ bool KadasViewshedFilter::computeViewshed(
     *errMsg = QApplication::translate( "KadasViewshedFilter", "Failed to get output dataset band 1" );
     return false;
   }
-  GDALSetRasterNoDataValue( outputBand, 255 * !displayVisible );
+  GDALSetRasterNoDataValue( outputBand, 127 );
 
   // Offset observer elevation by position at point
   if ( observerHeightRelToTerr )
@@ -310,7 +309,7 @@ bool KadasViewshedFilter::computeViewshed(
   progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
   progress->setRange( 0, 8 * roi );
 
-  QVector<unsigned char> viewshed( hmapWidth * hmapHeight, 255 * !displayVisible );
+  QVector<unsigned char> viewshed( hmapWidth * hmapHeight, 127 );
   for ( int radiusNumber = 0; radiusNumber < 8 * roi; ++radiusNumber )
   {
     if ( progress->wasCanceled() )

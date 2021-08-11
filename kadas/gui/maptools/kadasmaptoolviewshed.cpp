@@ -25,12 +25,11 @@
 
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmultisurface.h>
+#include <qgis/qgspalettedrasterrenderer.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
-#include <qgis/qgsrastershader.h>
 #include <qgis/qgssettings.h>
-#include <qgis/qgssinglebandpseudocolorrenderer.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
@@ -100,18 +99,12 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   connect( spinRadius, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasViewshedDialog::radiusChanged );
   heightDialogLayout->addWidget( spinRadius, 3, 1, 1, 2 );
 
-  heightDialogLayout->addWidget( new QLabel( tr( "Display:" ) ), 4, 0, 1, 1 );
-  mDisplayModeCombo = new QComboBox();
-  mDisplayModeCombo->addItem( tr( "Visible area" ) );
-  mDisplayModeCombo->addItem( tr( "Invisible area" ) );
-  heightDialogLayout->addWidget( mDisplayModeCombo, 4, 1, 1, 2 );
-
-  heightDialogLayout->addWidget( new QLabel( tr( "Accuracy:" ) ), 5, 0, 1, 1 );
+  heightDialogLayout->addWidget( new QLabel( tr( "Accuracy:" ) ), 4, 0, 1, 1 );
   mAccuracySlider = new QSlider( Qt::Horizontal );
   mAccuracySlider->setRange( 1, 10 );
   mAccuracySlider->setTickPosition( QSlider::TicksBelow );
   mAccuracySlider->setTickInterval( 1 );
-  heightDialogLayout->addWidget( mAccuracySlider, 5, 1, 1, 2 );
+  heightDialogLayout->addWidget( mAccuracySlider, 4, 1, 1, 2 );
 
   QWidget *labelWidget = new QWidget( this );
   labelWidget->setLayout( new QHBoxLayout );
@@ -119,12 +112,12 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   labelWidget->layout()->addWidget( new QLabel( QString( "<small>%1</small>" ).arg( tr( "Accurate" ) ) ) );
   labelWidget->layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding ) );
   labelWidget->layout()->addWidget( new QLabel( QString( "<small>%1</small>" ).arg( tr( "Fast" ) ) ) );
-  heightDialogLayout->addWidget( labelWidget, 6, 1, 1, 2 );
+  heightDialogLayout->addWidget( labelWidget, 5, 1, 1, 2 );
 
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
-  heightDialogLayout->addWidget( bbox, 7, 0, 1, 3 );
+  heightDialogLayout->addWidget( bbox, 6, 0, 1, 3 );
 
   setLayout( heightDialogLayout );
   setFixedSize( sizeHint() );
@@ -158,11 +151,6 @@ double KadasViewshedDialog::observerMinVertAngle() const
 double KadasViewshedDialog::observerMaxVertAngle() const
 {
   return mSpinBoxObserverMaxAngle->value();
-}
-
-KadasViewshedDialog::DisplayMode KadasViewshedDialog::displayMode() const
-{
-  return static_cast<DisplayMode>( mDisplayModeCombo->currentIndex() );
 }
 
 int KadasViewshedDialog::accuracyFactor() const
@@ -263,39 +251,23 @@ void KadasMapToolViewshed::drawFinished()
   QProgressDialog p( tr( "Calculating viewshed..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Viewshed" ) );
   p.setWindowModality( Qt::ApplicationModal );
-  bool displayVisible = viewshedDialog.displayMode() == KadasViewshedDialog::DisplayVisibleArea;
   int accuracyFactor = viewshedDialog.accuracyFactor();
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
 
   QString errMsg;
-  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.observerHeight() * heightConv, viewshedDialog.targetHeight() * heightConv, viewshedDialog.observerHeightRelativeToGround(), viewshedDialog.targetHeightRelativeToGround(), viewshedDialog.observerMinVertAngle(), viewshedDialog.observerMaxVertAngle(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, displayVisible, accuracyFactor );
+  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.observerHeight() * heightConv, viewshedDialog.targetHeight() * heightConv, viewshedDialog.observerHeightRelativeToGround(), viewshedDialog.targetHeightRelativeToGround(), viewshedDialog.observerMinVertAngle(), viewshedDialog.observerMaxVertAngle(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, accuracyFactor );
   QApplication::restoreOverrideCursor();
   if ( success )
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
-    QgsColorRampShader *rampShader = new QgsColorRampShader();
-    rampShader->setColorRampType( QgsColorRampShader::Exact );
-    if ( displayVisible )
+    QgsPalettedRasterRenderer *renderer = new QgsPalettedRasterRenderer( 0, 1,
     {
-      QList<QgsColorRampShader::ColorRampItem> colorRampItems = QList<QgsColorRampShader::ColorRampItem>()
-          << QgsColorRampShader::ColorRampItem( 255, QColor( 0, 255, 0 ), tr( "Visible" ) );
-      rampShader->setSourceColorRamp( new QgsPresetSchemeColorRamp( {QColor( 0, 255, 0 )} ) );
-      rampShader->setColorRampItemList( colorRampItems );
-    }
-    else
-    {
-      QList<QgsColorRampShader::ColorRampItem> colorRampItems = QList<QgsColorRampShader::ColorRampItem>()
-          << QgsColorRampShader::ColorRampItem( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) );
-      rampShader->setSourceColorRamp( new QgsPresetSchemeColorRamp( {QColor( 255, 0, 0 )} ) );
-      rampShader->setColorRampItemList( colorRampItems );
-    }
-    QgsRasterShader *shader = new QgsRasterShader();
-    shader->setRasterShaderFunction( rampShader );
-    QgsSingleBandPseudoColorRenderer *renderer = new QgsSingleBandPseudoColorRenderer( 0, 1, shader );
-    renderer->setClassificationMin( displayVisible ? 255 : 0 );
-    renderer->setClassificationMax( displayVisible ? 255 : 0 );
+      QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ),
+      QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) )
+    } );
     layer->setRenderer( renderer );
+    layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
 
     KadasPinItem *pin = new KadasPinItem( canvasCrs );

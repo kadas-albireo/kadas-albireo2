@@ -31,8 +31,6 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
 {
     Q_OBJECT
   public:
-    enum DisplayMode { DisplayVisibleArea, DisplayInvisibleArea };
-
     KadasViewshedDialog( double radius, QWidget *parent = 0 );
     double observerHeight() const;
     double targetHeight() const;
@@ -40,7 +38,6 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     bool targetHeightRelativeToGround() const;
     double observerMinVertAngle() const;
     double observerMaxVertAngle() const;
-    DisplayMode displayMode() const;
     int accuracyFactor() const;
 
   signals:
@@ -54,7 +51,6 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     QSpinBox *mSpinBoxObserverMaxAngle = nullptr;
     QComboBox *mComboObserverHeightMode = nullptr;
     QComboBox *mComboTargetHeightMode = nullptr;
-    QComboBox *mDisplayModeCombo = nullptr;
     QSlider *mAccuracySlider = nullptr;
 
   private slots:
