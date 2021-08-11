@@ -423,6 +423,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
         QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << QString::number( resultIt.key() ) << QString::number( resultIt.value().toInt() ) );
         mLayerTreeItemMap[rLayer->id()]->addChild( item );
       }
+      break;
     }
     case QgsRaster::IdentifyFormatText:
     {
@@ -432,6 +433,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
         QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << sublayerName << resultIt.value().toString() );
         mLayerTreeItemMap[rLayer->id()]->addChild( item );
       }
+      break;
     }
     case QgsRaster::IdentifyFormatFeature:
     {
@@ -458,6 +460,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
           }
         }
       }
+      break;
     }
   }
 }
