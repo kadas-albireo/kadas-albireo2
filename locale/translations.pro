@@ -55,9 +55,11 @@ SOURCES += \
 ../kadas/gui/mapitems/kadaspointitem.h \
 ../kadas/gui/mapitems/kadasrectangleitem.h \
 ../kadas/gui/mapitems/kadasgeometryitem.cpp \
+../kadas/gui/mapitems/kadascoordinatecrossitem.cpp \
 ../kadas/gui/mapitems/kadasgpxwaypointitem.cpp \
 ../kadas/gui/mapitems/kadascircularsectoritem.h \
 ../kadas/gui/mapitems/kadasselectionrectitem.cpp \
+../kadas/gui/mapitems/kadascoordinatecrossitem.h \
 ../kadas/gui/mapitems/kadaslineitem.cpp \
 ../kadas/gui/mapitems/kadasmapitem.cpp \
 ../kadas/gui/mapitems/kadascircularsectoritem.cpp \
