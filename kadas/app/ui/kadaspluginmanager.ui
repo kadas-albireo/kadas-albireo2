@@ -36,18 +36,20 @@
    </item>
    <item row="1" column="0" rowspan="2">
     <widget class="QTreeWidget" name="mInstalledTreeWidget">
-     <property name="rootIsDecorated">
-      <bool>true</bool>
-     </property>
      <property name="headerHidden">
       <bool>true</bool>
      </property>
      <property name="columnCount">
-      <number>1</number>
+      <number>2</number>
      </property>
      <column>
       <property name="text">
        <string/>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string notr="true">2</string>
       </property>
      </column>
     </widget>
@@ -56,6 +58,9 @@
     <widget class="QTreeWidget" name="mAvailableTreeWidget">
      <property name="headerHidden">
       <bool>true</bool>
+     </property>
+     <property name="columnCount">
+      <number>3</number>
      </property>
      <column>
       <property name="text">

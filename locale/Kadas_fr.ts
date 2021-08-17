@@ -3469,37 +3469,37 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="39"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="40"/>
         <source>Municipalities</source>
         <translation>Municipalités</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="40"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="41"/>
         <source>Cantons</source>
         <translation>Cantons</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="41"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="42"/>
         <source>Districts</source>
         <translation>Districts</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="42"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="43"/>
         <source>Places</source>
         <translation>Places</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="43"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="44"/>
         <source>Zip Codes</source>
         <translation>Codes Postaux</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="44"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="45"/>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="45"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="46"/>
         <source>General place name directory</source>
         <translation>Répertoire géneral de noms de lieux</translation>
     </message>
@@ -4691,58 +4691,58 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPluginManager</name>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="237"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Remove plugin</source>
         <translation>Désinstaller le plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="237"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Êtes-vous sûr de vouloir désinstaller le plugin &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="256"/>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="270"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="280"/>
         <source>Plugin install failed</source>
         <translation>Échec de l&apos;installation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="256"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>
         <source>Error creating plugin directory</source>
         <translation>Erreur de création du directoire des plugins</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="270"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="280"/>
         <source>Error downloading plugin: %1</source>
         <translation>Erreur de téléchargement du plugin : %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="359"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="370"/>
         <source>Plugin deinstallation failed</source>
         <translation>Échec de la désinstallation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="359"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="370"/>
         <source>The deinstallation of the plugin &apos;%1&apos; failed</source>
         <translation>La désinstallation du plugin &apos;%1&apos; a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="387"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="397"/>
         <source>Install</source>
         <translation>Installer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="392"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="403"/>
         <source>Uninstall</source>
         <translation>Désinstaller</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="426"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="437"/>
         <source>Update</source>
         <translation>Mise à jour</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="438"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="449"/>
         <source>up-to-date</source>
         <translation>À jour</translation>
     </message>
@@ -5055,57 +5055,57 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasSearchBox</name>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="106"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="109"/>
         <source>Search</source>
         <translation>Rechercher</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="113"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="116"/>
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="119"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="122"/>
         <source>Filter for dataset searches:</source>
         <translation>Filtre pour recherche dans géodonnées:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="121"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="124"/>
         <source>No filter</source>
         <translation>Pas de filtre</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="125"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="128"/>
         <source>Filter by radius</source>
         <translation>Filtrer par rayon</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="130"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="133"/>
         <source>Filter by rectangle</source>
         <translation>Filtrer par rectangle</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="135"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="138"/>
         <source>Filter by polygon</source>
         <translation>Filtrer par polygone</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="149"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="152"/>
         <source>Select Filter</source>
         <translation>Sélectionner filtre</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="175"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="178"/>
         <source>Search for Places, Coordinates, Adresses, ...</source>
         <translation>Rechercher places, coordonnées, adresses, ...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="372"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="376"/>
         <source>No search results found</source>
         <translation>Pas de résultat</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="391"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="395"/>
         <source>Close matches</source>
         <translation>Résultats proches</translation>
     </message>
@@ -5856,7 +5856,7 @@ avec géoloc.</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="40"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="41"/>
         <source>World Places</source>
         <translation>Lieux mondiales</translation>
     </message>

@@ -38,6 +38,8 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
 {
   setupUi( this );
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
+  mInstalledTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
+  mInstalledTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
 
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
@@ -63,6 +65,7 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     QTreeWidgetItem *installedItem = new QTreeWidgetItem();
     installedItem->setText( 0, pi.name );
     installedItem->setToolTip( 0, pi.description );
+    installedItem->setText( 1, pi.version );
     installedItem->setData( 0, Qt::UserRole, *installedIt );
     if ( p->isPluginEnabled( *installedIt ) )
     {
@@ -82,11 +85,11 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     availableItem->setText( 0, pluginIt.key() );
     availableItem->setToolTip( 0, pluginIt.value().description );
     mAvailableTreeWidget->addTopLevelItem( availableItem );
+    QString repoVersion = pluginIt.value().version;
     if ( installedPluginInfo.contains( pluginIt.key() ) )
     {
       setItemRemoveable( availableItem );
 
-      QString repoVersion = pluginIt.value().version;
       QString installedVersion = installedPluginInfo.value( pluginIt.key() ).version;
 
       if ( updateAvailable( installedVersion, repoVersion ) )
@@ -100,7 +103,7 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     }
     else
     {
-      setItemInstallable( availableItem );
+      setItemInstallable( availableItem, repoVersion );
     }
   }
 
@@ -195,6 +198,7 @@ void KadasPluginManager::updateButtonClicked()
 
   QString downloadPath = mAvailablePlugins.value( pluginName ).downloadLink;
   QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
+  QString pluginVersion = mAvailablePlugins.value( pluginName ).version;
 
   //get module name
   QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
@@ -203,7 +207,7 @@ void KadasPluginManager::updateButtonClicked()
     return;
   }
   QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
-  updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip );
+  updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip, pluginVersion );
 
   QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( available.size() > 0 )
@@ -214,6 +218,7 @@ void KadasPluginManager::updateButtonClicked()
 
 void KadasPluginManager::installButtonClicked()
 {
+  QPushButton *b = qobject_cast<QPushButton *>( QObject::sender() );
   QString pluginName = sender()->property( "PluginName" ).toString();
   if ( pluginName.isEmpty() )
   {
@@ -226,23 +231,28 @@ void KadasPluginManager::installButtonClicked()
   {
     QString downloadPath = mAvailablePlugins.value( pluginName ).downloadLink;
     QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
-    if ( downloadPath.isEmpty() )
+    QString version = mAvailablePlugins.value( pluginName ).version;
+    if ( !downloadPath.isEmpty() )
     {
-      return;
+      b->setEnabled( false );
+      b->setText( tr( "Installing..." ) );
+      installPlugin( pluginName, downloadPath, pluginTooltip, version );
     }
-    installPlugin( pluginName, downloadPath, pluginTooltip );
   }
   else //plugin installed, remove it
   {
     if ( QMessageBox::question( this, tr( "Remove plugin" ), tr( "Are you sure you want to remove the plugin '%1'?" ).arg( pluginName ) ) == QMessageBox::Yes )
     {
+      b->setEnabled( false );
+      b->setText( tr( "Uninstalling..." ) );
       QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
       uninstallPlugin( pluginName, moduleName );
     }
   }
+  b->setEnabled( true );
 }
 
-void KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip )
+void KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
 {
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
@@ -319,6 +329,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   //insert into mInstalledTreeWidget
   QTreeWidgetItem *installedItem = new QTreeWidgetItem();
   installedItem->setText( 0, pluginName );
+  installedItem->setText( 1, pluginVersion );
   installedItem->setToolTip( 0, pluginTooltip );
   installedItem->setData( 0, Qt::UserRole, moduleName );
 
@@ -369,22 +380,22 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
 
   //set icon to download in mAvailableTreeWidget
   QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
-  if ( availableItem.size() > 0 )
+  if ( mAvailablePlugins.contains( pluginName ) )
   {
-    setItemInstallable( availableItem.at( 0 ) );
-    availableItem.at( 0 )->setText( 2, "" );
+    setItemInstallable( availableItem.at( 0 ), mAvailablePlugins[pluginName].version );
   }
 }
 
-void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip )
+void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
 {
   uninstallPlugin( pluginName, moduleName );
-  installPlugin( pluginName, downloadUrl, pluginTooltip );
+  installPlugin( pluginName, downloadUrl, pluginTooltip, pluginVersion );
 }
 
-void KadasPluginManager::setItemInstallable( QTreeWidgetItem *item )
+void KadasPluginManager::setItemInstallable( QTreeWidgetItem *item, const QString &version )
 {
   changeItemInstallationState( item, tr( "Install" ) );
+  item->setText( 2, version );
 }
 
 void KadasPluginManager::setItemRemoveable( QTreeWidgetItem *item )
