@@ -57,6 +57,7 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
       double zoomScale;
       bool showPin;
       bool fuzzy = false;
+      QString geometry;
     };
     struct SearchRegion
     {

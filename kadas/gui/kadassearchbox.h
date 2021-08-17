@@ -66,6 +66,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 
     QgsMapCanvas *mMapCanvas;
     KadasSymbolItem *mPin = nullptr;
+    KadasGeometryItem *mGeometry = nullptr;
     KadasMapToolCreateItem *mFilterTool = nullptr;
     KadasGeometryItem *mFilterItem = nullptr;
     QList<KadasSearchProvider *> mSearchProviders;
@@ -79,6 +80,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 
     void cancelSearch();
     void clearPin();
+    void clearGeometry();
 
   private slots:
     void textChanged();

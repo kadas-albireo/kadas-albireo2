@@ -28,6 +28,7 @@
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometrycollection.h>
+#include <qgis/qgsjsonutils.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
@@ -36,7 +37,9 @@
 #include <kadas/gui/kadassearchbox.h>
 #include <kadas/gui/kadassearchprovider.h>
 #include <kadas/gui/mapitems/kadascircleitem.h>
+#include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
+#include <kadas/gui/mapitems/kadaspointitem.h>
 #include <kadas/gui/mapitems/kadaspolygonitem.h>
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
@@ -357,6 +360,7 @@ void KadasSearchBox::clearSearch()
   mSearchButton->setVisible( true );
   mClearButton->setVisible( false );
   clearPin();
+  clearGeometry();
   mTreeWidget->close();
   mTreeWidget->blockSignals( true );
   mTreeWidget->clear();
@@ -455,10 +459,48 @@ void KadasSearchBox::resultSelected()
     if ( item->data( 0, sEntryTypeRole ) != EntryTypeResult )
     {
       clearPin();
+      clearGeometry();
       return;
     }
 
     KadasSearchProvider::SearchResult result = item->data( 0, sResultDataRole ).value<KadasSearchProvider::SearchResult>();
+    clearGeometry();
+    if ( !result.geometry.isEmpty() )
+    {
+      QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"feature\", \"geometry\": %1}]}" ).arg( result.geometry );
+      QgsFeatureList features = QgsJsonUtils::stringToFeatureList( feature );
+      if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
+      {
+        switch ( features[0].geometry().type() )
+        {
+          case QgsWkbTypes::PointGeometry:
+          {
+            mGeometry = new KadasPointItem( QgsCoordinateReferenceSystem( result.crs ) );
+            break;
+          }
+          case QgsWkbTypes::LineGeometry:
+          {
+            mGeometry = new KadasLineItem( QgsCoordinateReferenceSystem( result.crs ) );
+            break;
+          }
+          case QgsWkbTypes::PolygonGeometry:
+          {
+            mGeometry = new KadasPolygonItem( QgsCoordinateReferenceSystem( result.crs ) );
+            break;
+          }
+          case QgsWkbTypes::UnknownGeometry:
+          case QgsWkbTypes::NullGeometry:
+            break;
+        }
+        if ( mGeometry )
+        {
+          mGeometry->addPartFromGeometry( *features[0].geometry().get() );
+          mGeometry->setOutline( QPen( Qt::blue, 3 ) );
+          mGeometry->setFill( QBrush( QColor( 127, 127, 255 ), Qt::FDiagPattern ) );
+          KadasMapCanvasItemManager::addItem( mGeometry );
+        }
+      }
+    }
     if ( result.showPin )
     {
       if ( !mPin )
@@ -483,6 +525,7 @@ void KadasSearchBox::resultSelected()
   else
   {
     clearPin();
+    clearGeometry();
   }
 }
 
@@ -529,17 +572,27 @@ void KadasSearchBox::cancelSearch()
   if ( !mClearButton->isVisible() )
   {
     clearPin();
+    clearGeometry();
   }
 }
 
 void KadasSearchBox::clearPin()
 {
-
   if ( mPin )
   {
     KadasMapCanvasItemManager::removeItem( mPin );
     delete mPin;
     mPin = nullptr;
+  }
+}
+
+void KadasSearchBox::clearGeometry()
+{
+  if ( mGeometry )
+  {
+    KadasMapCanvasItemManager::removeItem( mGeometry );
+    delete mGeometry;
+    mGeometry = nullptr;
   }
 }
 

@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
@@ -118,12 +119,12 @@ void KadasLocationSearchProvider::replyFinished()
   {
     QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
   }
-  QVariantMap resultMap = doc.object().toVariantMap();
+  QJsonObject resultMap = doc.object();
   bool fuzzy = resultMap["fuzzy"] == "true";
-  for ( const QVariant &item : resultMap["results"].toList() )
+  for ( const QJsonValueRef &item : resultMap["results"].toArray() )
   {
-    QVariantMap itemMap = item.toMap();
-    QVariantMap itemAttrsMap = itemMap["attrs"].toMap();
+    QJsonObject itemMap = item.toObject();
+    QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
 
     QString origin = itemAttrsMap["origin"].toString();
 
@@ -142,8 +143,12 @@ void KadasLocationSearchProvider::replyFinished()
     searchResult.text = itemAttrsMap["label"].toString();
     searchResult.text.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
     searchResult.crs = "EPSG:4326";
-    searchResult.showPin = true;
+    searchResult.showPin = !itemAttrsMap.contains( "geometryGeoJSON" );
     searchResult.fuzzy = fuzzy;
+    if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
+    {
+      searchResult.geometry = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
+    }
     emit searchResultFound( searchResult );
   }
   mNetReply->deleteLater();
