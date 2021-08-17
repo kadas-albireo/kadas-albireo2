@@ -1,0 +1,27 @@
+[general]
+name=KADAS Ephem
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=KADAS ephem plugin
+about=KADAS ephem plugin.
+version=0.9
+author=Sourcepole
+email=smani@sourcepole.ch
+
+
+changelog=
+ Rev 0.9 (17.08.2021)
+  - Initial test release
+
+ Rev 0.1 (14.07.2021)
+  - Prerelease
+
+# Tags are comma separated with spaces allowed
+tags=about
+
+homepage=https://github.com/kadas-albireo/kadas-ephem-plugin
+tracker=https://github.com/kadas-albireo/kadas-ephem-plugin
+repository=https://github.com/kadas-albireo/kadas-ephem-plugin
+icon=icons/icon.png
+experimental=False
+deprecated=False
