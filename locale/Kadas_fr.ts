@@ -4691,6 +4691,11 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPluginManager</name>
     <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="238"/>
+        <source>Installing...</source>
+        <translation>Installation...</translation>
+    </message>
+    <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Remove plugin</source>
         <translation>Désinstaller le plugin</translation>
@@ -4699,6 +4704,11 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Êtes-vous sûr de vouloir désinstaller le plugin &apos;%1&apos;?</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="247"/>
+        <source>Uninstalling...</source>
+        <translation>Désinstallation...</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>

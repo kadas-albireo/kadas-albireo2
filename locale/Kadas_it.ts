@@ -4688,6 +4688,11 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasPluginManager</name>
     <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="238"/>
+        <source>Installing...</source>
+        <translation>Installazione...</translation>
+    </message>
+    <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Remove plugin</source>
         <translation>Rimuovi plugin</translation>
@@ -4696,6 +4701,11 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Rimuovere il plugin &apos;%1&apos;?</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="247"/>
+        <source>Uninstalling...</source>
+        <translation>Disinstallazione...</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>
