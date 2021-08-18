@@ -137,6 +137,15 @@ void KadasWorldLocationSearchProvider::replyFinished()
     {
       searchResult.geometry = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
     }
+    if ( itemAttrsMap.contains( "boundingBox" ) )
+    {
+      static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)" );
+      QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
+      if ( match.isValid() )
+      {
+        searchResult.bbox = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
+      }
+    }
     emit searchResultFound( searchResult );
   }
   mNetReply->deleteLater();
