@@ -74,8 +74,8 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
 
   private:
     enum AttribIds {AttrX, AttrY};
-    static constexpr int sCrossSize = 60;
-    static constexpr int sFontSize = 16;
+    static constexpr int sCrossSize = 80;
+    static constexpr int sFontSize = 24;
 
     State *state() { return static_cast<State *>( mState ); }
     KadasItemPos roundToKilometre( const KadasItemPos &itemPos ) const;
