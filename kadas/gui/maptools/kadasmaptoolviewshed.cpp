@@ -51,7 +51,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
 
   heightDialogLayout->addWidget( new QLabel( tr( "Observer height:" ) ), 0, 0, 1, 1 );
   mSpinBoxObserverHeight = new QDoubleSpinBox();
-  mSpinBoxObserverHeight->setRange( 0, 8000 );
+  mSpinBoxObserverHeight->setRange( 0, 999999999999 );
   mSpinBoxObserverHeight->setDecimals( 1 );
   mSpinBoxObserverHeight->setValue( 2. );
   mSpinBoxObserverHeight->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
