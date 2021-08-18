@@ -62,7 +62,7 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   toolbar->setIconSize( QSize( 16, 16 ) );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mIconExpressionSelect.svg" ), tr( "Select features using an expression" ), this, &KadasAttributeTableDialog::selectByExpression );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionSelectAll.svg" ), tr( "Select all" ), this, &KadasAttributeTableDialog::selectAll );
-  toolbar->addAction( QgsApplication::getThemeIcon( "/mActionInvertSelection.svg" ), tr( "Deselect all features from the layer" ), this, &KadasAttributeTableDialog::invertSelection );
+  toolbar->addAction( QgsApplication::getThemeIcon( "/mActionInvertSelection.svg" ), tr( "Invert selection" ), this, &KadasAttributeTableDialog::invertSelection );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionDeselectActiveLayer.svg" ), tr( "Deselect all features from the layer" ), this, &KadasAttributeTableDialog::deselectAll );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionPanToSelected.svg" ), tr( "Pan map to the selected rows" ), this, &KadasAttributeTableDialog::panToSelected );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionZoomToSelected.svg" ), tr( "Zoom map to the selected rows" ), this, &KadasAttributeTableDialog::zoomToSelected );

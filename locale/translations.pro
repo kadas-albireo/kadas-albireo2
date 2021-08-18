@@ -18,8 +18,10 @@ SOURCES += \
 ../kadas/analysis/kadasninecellfilter.h \
 ../kadas/analysis/kadasviewshedfilter.h \
 ../kadas/analysis/kadashillshadefilter.cpp \
+../kadas/analysis/kadaslineofsight.h \
 ../kadas/analysis/kadasslopefilter.cpp \
 ../kadas/analysis/kadashillshadefilter.h \
+../kadas/analysis/kadaslineofsight.cpp \
 ../kadas/analysis/kadasviewshedfilter.cpp \
 ../kadas/analysis/kadasslopefilter.h \
 ../kadas/gui/kadasitemcontextmenuactions.h \

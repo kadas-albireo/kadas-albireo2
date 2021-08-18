@@ -281,6 +281,10 @@
     </message>
     <message>
         <location filename="../kadas/gui/kadasattributetabledialog.cpp" line="65"/>
+        <source>Invert selection</source>
+        <translation>Inverti selezione</translation>
+    </message>
+    <message>
         <location filename="../kadas/gui/kadasattributetabledialog.cpp" line="66"/>
         <source>Deselect all features from the layer</source>
         <translation>Deseleziona tutti gli elementi dal layer</translation>
@@ -4688,68 +4692,68 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasPluginManager</name>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="238"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="270"/>
         <source>Installing...</source>
         <translation>Installazione...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="276"/>
         <source>Remove plugin</source>
         <translation>Rimuovi plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="244"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="276"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Rimuovere il plugin &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="247"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="279"/>
         <source>Uninstalling...</source>
         <translation>Disinstallazione...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="280"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="302"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="316"/>
         <source>Plugin install failed</source>
         <translation>Installazione plugin fallita</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="266"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="302"/>
         <source>Error creating plugin directory</source>
         <translation>Impossibile creare la cartella dei plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="280"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="316"/>
         <source>Error downloading plugin: %1</source>
         <translation>Impossibile scaricare il plugin: %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="370"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="407"/>
         <source>Plugin deinstallation failed</source>
         <translation>Rimozione plugin fallita</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="370"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="407"/>
         <source>The deinstallation of the plugin &apos;%1&apos; failed</source>
         <translation>La rimozione del plugin &apos;%1&apos; è fallita</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="397"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="435"/>
         <source>Install</source>
         <translation>Installa</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="403"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="441"/>
         <source>Uninstall</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="437"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="475"/>
         <source>Update</source>
         <translation>Aggiorna</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="449"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="487"/>
         <source>up-to-date</source>
         <translation>aggiornato</translation>
     </message>
