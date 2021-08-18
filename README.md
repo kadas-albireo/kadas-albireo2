@@ -44,7 +44,7 @@ Currently, the installation only available from this repository.
 
    For example (using [Virtual Box](https://www.virtualbox.org/)):
    ```bash
-   mklink /D "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting" "\\VBOXSVR\kadas-routing-plugin\kadasrouting" 
+   mklink /D "C:\Users\fclementi\AppData\Roaming\Kadas\KadasMil\profiles\default\python\plugins\kadasrouting" "\\VBOXSVR\kadas-routing-plugin\kadasrouting"
    ```
 
 **Note**
@@ -62,7 +62,7 @@ This plugin support 4 languages (DE, FR, IT, EN). The translation process is don
 
 1. Updating string to be translated
     ```bash
-    docker-update-translation-strings
+    make docker-update-translation-strings
     ```
 2. Push string to be translated in Transifex
    ```bash
