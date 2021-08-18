@@ -4,12 +4,15 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=KADAS ephem plugin
 about=KADAS ephem plugin.
-version=0.9
+version=1.0
 author=Sourcepole
 email=smani@sourcepole.ch
 
 
 changelog=
+ Rev 1.0 (18.08.2021)
+  - Implement relief handling
+
  Rev 0.9 (17.08.2021)
   - Initial test release
 

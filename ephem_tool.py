@@ -10,6 +10,7 @@ from qgis.PyQt.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
 from kadas.kadasgui import *
+from kadas.kadasanalysis import *
 
 from .ui_EphemToolWidget import Ui_EphemToolWidget
 
@@ -54,8 +55,10 @@ class EphemTool(QgsMapTool):
             self.pinAdded = True
         mapCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
         wgsCrs = QgsCoordinateReferenceSystem("EPSG:4326")
-        crst = QgsCoordinateTransform(mapCrs, wgsCrs, QgsProject.instance())
-        self.widget.setPos(crst.transform(pos))
+        mrcCrs = QgsCoordinateReferenceSystem("EPSG:3857")
+        wgsCrst = QgsCoordinateTransform(mapCrs, wgsCrs, QgsProject.instance())
+        mrcCrst = QgsCoordinateTransform(mapCrs, mrcCrs, QgsProject.instance())
+        self.widget.setPos(wgsCrst.transform(pos), mrcCrst.transform(pos))
         self.widget.recompute()
 
 class EphemToolWidget(KadasBottomBar):
@@ -84,72 +87,121 @@ class EphemToolWidget(KadasBottomBar):
         self.layout().setAlignment(closeButton, Qt.AlignTop)
 
         self.ui.dateTimeEdit.setDateTime(QDateTime.currentDateTime())
-        self.ui.dateTimeEdit.dateTimeChanged.connect(self.recompute)
+        self.ui.dateTimeEdit.editingFinished.connect(self.recompute)
+        self.ui.checkBoxRelief.toggled.connect(self.recompute)
         self.ui.tabWidgetOutput.setEnabled(False)
 
-        self.pos = None
+        self.busyOverlay = QLabel(self.tr("Calculating..."))
+        self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
+        self.busyOverlay.setAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
+        self.busyOverlay.setVisible(False)
+        self.ui.gridLayout.addWidget(self.busyOverlay, 4, 0, 1, 5)
+
+        self.wgsPos = None
+        self.mrcPos = None
 
     def getTimestamp(self):
         return self.ui.dateTimeEdit.dateTime().toSecsSinceEpoch()
 
-    def setPos(self, pos):
-        self.pos = pos
+    def setPos(self, wgsPos, mrcPos):
+        self.wgsPos = wgsPos
+        self.mrcPos = mrcPos
 
     def recompute(self):
-        if not self.pos:
+        if not self.wgsPos:
             return
+
+        if self.ui.checkBoxRelief.isChecked():
+            self.busyOverlay.setVisible(True)
+            QApplication.instance().processEvents(QEventLoop.ExcludeUserInputEvents)
 
         self.ui.tabWidgetOutput.setEnabled(True)
         font = self.ui.labelPositionValue.font()
         font.setItalic(False)
         self.ui.labelPositionValue.setFont(font)
-        x_str = QgsCoordinateFormatter.formatX(self.pos.x(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
-        y_str = QgsCoordinateFormatter.formatY(self.pos.y(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
+        x_str = QgsCoordinateFormatter.formatX(self.wgsPos.x(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
+        y_str = QgsCoordinateFormatter.formatY(self.wgsPos.y(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
         self.ui.labelPositionValue.setText(y_str + " " + x_str)
 
         home = ephem.Observer()
-        home.lat = str(self.pos.y())
-        home.lon = str(self.pos.x())
+        home.lat = str(self.wgsPos.y())
+        home.lon = str(self.wgsPos.x())
         home.date = ephem.Date(datetime.fromtimestamp(self.getTimestamp(), timezone.utc))
+
+        ## Sun ##
 
         sun = ephem.Sun()
         sun.compute(home)
         self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
 
+        # Compute sunrise and sunset taking relief into account
+        sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
+
+        sun.compute(home)
+        suntransit = ephem.to_timezone(home.next_transit(sun), ephem.UTC).timestamp()
+        if suntransit > sunset:
+            suntransit = ephem.to_timezone(home.previous_transit(sun), ephem.UTC).timestamp()
+
+        sun.compute(home)
+        if sun.alt >= 0:
+            sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+        else:
+            sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
+        if self.ui.checkBoxRelief.isChecked():
+            sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, suntransit)
+            sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, suntransit)
+
+        if sunrise < sunset:
+            self.ui.labelSunRiseValue.setText("%s" % self.timestampToHourString(sunrise))
+        else:
+            self.ui.labelSunRiseValue.setText("-")
+        if sunset > sunrise:
+            self.ui.labelSunSetValue.setText("%s" % self.timestampToHourString(sunset))
+        else:
+            self.ui.labelSunSetValue.setText("-")
+        self.ui.labelZenithValue.setText(self.timestampToHourString(suntransit))
+
+        ## Moon ##
+
         moon = ephem.Moon()
         moon.compute(home)
         self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
 
-        if sun.alt >= 0:
-            prev_sunrise = home.previous_rising(sun)
-            self.ui.labelSunRiseValue.setText(self.dateFromEphemDate(prev_sunrise))
-        else:
-            next_sunrise = home.next_rising(sun)
-            self.ui.labelSunRiseValue.setText(self.dateFromEphemDate(next_sunrise))
-        next_sunset = home.next_setting(sun)
-        self.ui.labelSunSetValue.setText(self.dateFromEphemDate(next_sunset))
-        next_transit = home.next_transit(sun)
-        if next_transit < next_sunset:
-            self.ui.labelZenithValue.setText(self.dateFromEphemDate(next_transit))
-        else:
-            self.ui.labelZenithValue.setText(self.dateFromEphemDate(home.previous_transit(sun)))
+        # Compute moonrise and moonset taking relief into account
+        moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
 
+        moon.compute(home)
+        moontransit = ephem.to_timezone(home.next_transit(moon), ephem.UTC).timestamp()
+        if moontransit > moonset:
+            moontransit = ephem.to_timezone(home.previous_transit(moon), ephem.UTC).timestamp()
+
+        moon.compute(home)
         if moon.alt >= 0:
-            prev_moonrise = home.previous_rising(moon)
-            self.ui.labelMoonRiseValue.setText(self.dateFromEphemDate(prev_moonrise))
+            moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
         else:
-            next_moonrise = home.next_rising(moon)
-            self.ui.labelMoonRiseValue.setText(self.dateFromEphemDate(next_moonrise))
-        next_moonset = home.next_setting(moon)
-        self.ui.labelMoonSetValue.setText(self.dateFromEphemDate(next_moonset))
+            moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
+        if self.ui.checkBoxRelief.isChecked():
+            moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, moontransit)
+            moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, moontransit)
 
+        if moonrise < moonset:
+            self.ui.labelMoonRiseValue.setText("%s" % self.timestampToHourString(moonrise))
+        else:
+            self.ui.labelMoonRiseValue.setText("-")
+        if moonset > moonrise:
+            self.ui.labelMoonSetValue.setText("%s" % self.timestampToHourString(moonset))
+        else:
+            self.ui.labelMoonSetValue.setText("-")
+
+        # Moon phase
         moon_image_suffix = math.floor(round(moon.phase/12.5)*12.5)
         self.ui.labelMoonPhaseIcon.setPixmap(QPixmap(":/plugins/Ephem/icons/moon_%d.svg" % moon_image_suffix))
         self.ui.labelMoonPhaseValue.setText("%.2f%%" % moon.phase)
 
-    def dateFromEphemDate(self, val):
-        d = ephem.to_timezone(val, ephem.UTC)
-        return QDateTime.fromSecsSinceEpoch(round(d.timestamp())).toString("hh:mm")
+        self.busyOverlay.setVisible(False)
+
+    def timestampToHourString(self, timestamp):
+        return QDateTime.fromSecsSinceEpoch(round(timestamp)).toString("hh:mm")
 
     def formatDMS(self, val, sign=False):
         strval = str(val)
@@ -160,3 +212,46 @@ class EphemToolWidget(KadasBottomBar):
             return parts[0] + "°" + parts[1] + "'" + parts[2] + "\"";
         else:
             return strval
+
+    def search_body_visible(self, body, start, initialstep, bound):
+        step = math.copysign(min(abs(bound - start), abs(initialstep)), initialstep)
+        value = start
+        sign = math.copysign(1, initialstep)
+        test_visible = False
+
+        while abs(step) >= 60:
+            while self.body_is_visible(self.compute_body_position(value, body)) == test_visible and sign * value <= sign * bound and sign * value >= sign * start:
+                value += step
+            step = -step / 2
+            test_visible = not test_visible
+
+        return value
+
+    def search_body_relief_crossing(self, body, spheretime, zenithtime):
+        # Binary search up to 1min precision
+        mid = 0.5 * (spheretime + zenithtime)
+        if abs(spheretime - zenithtime) < 60:
+            return mid
+        if self.body_is_visible(self.compute_body_position(mid, body)):
+            return self.search_body_relief_crossing(body, spheretime, mid)
+        else:
+            return self.search_body_relief_crossing(body, mid, zenithtime)
+
+    def compute_body_position(self, timestamp, body):
+        home = ephem.Observer()
+        home.lat = str(self.wgsPos.y())
+        home.lon = str(self.wgsPos.x())
+        home.date = ephem.Date(datetime.fromtimestamp(timestamp, timezone.utc))
+        body.compute(home)
+        azimuth_rad = float(body.az)
+        alt_rad = float(body.alt)
+        # Assume body 100km distant
+        r = 100000
+        body_x = self.mrcPos.x() + r * math.sin(azimuth_rad) * math.cos(alt_rad)
+        body_y = self.mrcPos.y() + r * math.cos(azimuth_rad) * math.cos(alt_rad)
+        body_z = r * math.sin(alt_rad)
+        return QgsPoint(body_x, body_y, body_z)
+
+    def body_is_visible(self, body_pos):
+        # 100m resolution
+        return KadasLineOfSight.computeTargetVisibility(QgsPoint(self.mrcPos.x(), self.mrcPos.y(), 0), body_pos, QgsCoordinateReferenceSystem("EPSG:3857"), 10000, False, True)
