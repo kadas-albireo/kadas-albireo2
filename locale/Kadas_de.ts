@@ -3991,7 +3991,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapToolViewshed</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="183"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="189"/>
         <source>Compute viewshed</source>
         <translation>Einsehbarkeit berechnen</translation>
     </message>
@@ -4000,47 +4000,59 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation type="vanished">Kein Geländemodell im Projekt definiert.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="202"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="208"/>
         <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
         <translation>Im Projekt ist kein Höhenprofil definiert. Eine Rasterebene kann via Context-Menu im Layerbaum als Höhenmodell selektiert werden.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="251"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="257"/>
         <source>Calculating viewshed...</source>
         <translation>Berechne Einsehbarkeit...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="251"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="257"/>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="252"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="258"/>
         <source>Viewshed</source>
         <translation>Einsehbarkeit</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="263"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="269"/>
         <source>Viewshed [%1]</source>
         <translation>Einsehbarkeit [%1]</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="267"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="273"/>
         <source>Visible</source>
         <translation>Sichtbar</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="266"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="272"/>
         <source>Invisible</source>
         <translation>Unsichtbar</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="280"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="287"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="294"/>
+        <source>above ground</source>
+        <translation>über Grund</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="287"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="294"/>
+        <source>above sea level</source>
+        <translation>über Meereshöhe</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="300"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="280"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="300"/>
         <source>Failed to compute viewshed: %1</source>
         <translation>Die Einsehbarkeit konnte nicht berechnet werden: %1</translation>
     </message>
@@ -5675,22 +5687,21 @@ bewegen</translation>
 <context>
     <name>KadasViewshedDialog</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="46"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="47"/>
         <source>Viewshed setup</source>
         <translation>Einsehbarkeitsparameter</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="52"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="53"/>
         <source>Observer height:</source>
         <translation>Beobachterhöhe:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="65"/>
         <source>Observer angle range:</source>
-        <translation>Winkelbereich des Beobachters:</translation>
+        <translation type="vanished">Winkelbereich des Beobachters:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="79"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="85"/>
         <source>Target height:</source>
         <translation>Zielhöhe:</translation>
     </message>
@@ -5699,19 +5710,24 @@ bewegen</translation>
         <translation type="vanished">Höhen relativ zu:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="61"/>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="88"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="62"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="94"/>
         <source>Ground</source>
         <translation>Terrain</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="62"/>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="89"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="63"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="95"/>
         <source>Sea level</source>
         <translation>Meereshöhe</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="92"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="66"/>
+        <source>Limit observer angle range:</source>
+        <translation>Winkelbereich des Beobachters eingrenzen:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="98"/>
         <source>Radius:</source>
         <translation>Radius:</translation>
     </message>
@@ -5728,17 +5744,17 @@ bewegen</translation>
         <translation type="vanished">Unsichtbare Fläche</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="102"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="108"/>
         <source>Accuracy:</source>
         <translation>Genauigkeit:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="112"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="118"/>
         <source>Accurate</source>
         <translation>Genau</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="114"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="120"/>
         <source>Fast</source>
         <translation>Schnell</translation>
     </message>
