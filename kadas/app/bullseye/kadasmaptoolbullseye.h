@@ -71,6 +71,7 @@ class KadasBullseyeWidget : public KadasBottomBar
 
   private slots:
     void setCurrentLayer( QgsMapLayer *layer );
+    void ringUnitChanged();
     void updateLayer();
     void updateColor( const QColor &color );
     void updateFontSize( int fontSize );
