@@ -77,7 +77,7 @@ void KadasProjectTemplateSelectionDialog::parseServiceReply()
   if ( reply->error() == QNetworkReply::NoError )
   {
     QString serviceUrl = QgsSettings().value( "kadas/project_template_service" ).toString();
-    QString baseUrl = serviceUrl.replace( QRegularExpression( "/rest/search/\?.*$" ), "/rest/content/items/" );
+    QString baseUrl = serviceUrl.replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
     QByteArray response = reply->readAll();
     QJsonDocument doc = QJsonDocument::fromJson( response );
     QJsonObject root = doc.object();
