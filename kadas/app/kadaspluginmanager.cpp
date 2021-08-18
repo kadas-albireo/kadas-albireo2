@@ -18,6 +18,9 @@
 #include <QBuffer>
 #include <QDir>
 #include <QDomDocument>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeWidgetItem>
@@ -119,33 +122,60 @@ QMap< QString, KadasPluginManager::PluginInfo > KadasPluginManager::availablePlu
 {
   QgsSettings s;
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
-  QgsNetworkContentFetcher nf;
-  QUrl repositoryUrl( repoUrl );
-  QEventLoop e;
-  nf.fetchContent( repositoryUrl );
-  QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
-  e.exec();
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
+  QEventLoop evLoop;
+  connect( reply, &QNetworkReply::finished, &evLoop, &QEventLoop::quit );
+  evLoop.exec( QEventLoop::ExcludeUserInputEvents );
+  reply->deleteLater();
 
-  QString pluginContent = nf.contentAsString();
   QMap< QString, PluginInfo > pluginMap;
 
-  //Dom document
-  QDomDocument xml;
-  if ( !xml.setContent( pluginContent ) )
+  if ( reply->error() != QNetworkReply::NoError )
   {
     return pluginMap;
   }
+  QByteArray response = reply->readAll();
 
-  QDomNodeList pluginNodeList = xml.elementsByTagName( "pyqgis_plugin" );
-  for ( int i = 0; i < pluginNodeList.size(); ++i )
+  QDomDocument xml;
+  QJsonParseError err;
+
+  // Attemp to read as JSON first, then XML
+  QJsonDocument json = QJsonDocument::fromJson( response, &err );
+  if ( !json.isNull() )
   {
-    QDomElement pluginElem  = pluginNodeList.at( i ).toElement();
-    KadasPluginManager::PluginInfo p;
-    p.name = pluginElem.attribute( "name" );
-    p.version = pluginElem.attribute( "version" );
-    p.description = pluginElem.firstChildElement( "description" ).text();
-    p.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
-    pluginMap.insert( p.name, p );
+    QString baseUrl = repoUrl.replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
+
+    for ( const QJsonValueRef &resultRef : json.object()["results"].toArray() )
+    {
+      QJsonObject result = resultRef.toObject();
+      KadasPluginManager::PluginInfo p;
+      p.name = result["title"].toString();
+      for ( const QJsonValueRef &tagRef : result["tags"].toArray() )
+      {
+        QString tag = tagRef.toString();
+        if ( tag.startsWith( "version:" ) )
+        {
+          p.version = tag.mid( 8 );
+        }
+      }
+      p.description = result["description"].toString();
+      p.downloadLink = baseUrl + result["id"].toString() + "/data";
+      pluginMap.insert( p.name, p );
+    }
+  }
+  else if ( xml.setContent( response ) )
+  {
+    QDomNodeList pluginNodeList = xml.elementsByTagName( "pyqgis_plugin" );
+    for ( int i = 0; i < pluginNodeList.size(); ++i )
+    {
+      QDomElement pluginElem  = pluginNodeList.at( i ).toElement();
+      KadasPluginManager::PluginInfo p;
+      p.name = pluginElem.attribute( "name" );
+      p.version = pluginElem.attribute( "version" );
+      p.description = pluginElem.firstChildElement( "description" ).text();
+      p.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
+      pluginMap.insert( p.name, p );
+    }
   }
   return pluginMap;
 }
