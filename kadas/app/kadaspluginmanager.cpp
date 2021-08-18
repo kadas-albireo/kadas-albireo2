@@ -226,6 +226,8 @@ void KadasPluginManager::installButtonClicked()
   }
 
   QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QString prevText = b->text();
+  bool success = false;
 
   if ( installed.size() < 1 ) //not yet installed
   {
@@ -236,7 +238,7 @@ void KadasPluginManager::installButtonClicked()
     {
       b->setEnabled( false );
       b->setText( tr( "Installing..." ) );
-      installPlugin( pluginName, downloadPath, pluginTooltip, version );
+      success = installPlugin( pluginName, downloadPath, pluginTooltip, version );
     }
   }
   else //plugin installed, remove it
@@ -246,25 +248,29 @@ void KadasPluginManager::installButtonClicked()
       b->setEnabled( false );
       b->setText( tr( "Uninstalling..." ) );
       QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
-      uninstallPlugin( pluginName, moduleName );
+      success = uninstallPlugin( pluginName, moduleName );
     }
   }
   b->setEnabled( true );
+  if ( ! success )
+  {
+    b->setText( prevText );
+  }
 }
 
-void KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
+bool KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
 {
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
   {
-    return;
+    return false;
   }
 
   QString pp = p->homePluginsPath();
   if ( !QDir().mkpath( pp ) )
   {
     kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error creating plugin directory" ) );
-    return;
+    return false;
   }
 
   //download and unzip in kadasPluginsPath
@@ -278,7 +284,7 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   if ( nf.reply()->error() != QNetworkReply::NoError )
   {
     kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error downloading plugin: %1" ).arg( nf.reply()->error() ) );
-    return;
+    return false;
   }
 
   QByteArray pluginData = nf.reply()->readAll();
@@ -351,15 +357,16 @@ void KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     setItemRemoveable( availableItem.at( 0 ) );
     setItemNotUpdateable( availableItem.at( 0 ) );
   }
+  return true;
 }
 
-void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QString &moduleName )
+bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QString &moduleName )
 {
   //deactivate first
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
   {
-    return;
+    return false;
   }
   p->unloadPlugin( moduleName );
 
@@ -368,7 +375,7 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   if ( !pluginDir.removeRecursively() )
   {
     QMessageBox::critical( this, tr( "Plugin deinstallation failed" ), tr( "The deinstallation of the plugin '%1' failed" ).arg( pluginName ) );
-    return;
+    return false;
   }
 
   //remove entry from mInstalledTreeWidget
@@ -384,6 +391,7 @@ void KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   {
     setItemInstallable( availableItem.at( 0 ), mAvailablePlugins[pluginName].version );
   }
+  return true;
 }
 
 void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
