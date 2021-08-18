@@ -97,14 +97,16 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
     return;
   }
 
+  double dpiScale = outputDpiScale( context );
+
   QgsPoint pos = QgsPoint( constState()->pos );
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
 
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->rotate( -constState()->angle );
-  context.painter()->scale( mSymbolScale, mSymbolScale );
-  context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
+  context.painter()->scale( mSymbolScale * dpiScale, mSymbolScale * dpiScale );
+  context.painter()->translate( - mAnchorX * constState()->size.width() * dpiScale, - mAnchorY * constState()->size.height() * dpiScale );
   if ( mScalable )
   {
     svg2svgt::Logger logger;
