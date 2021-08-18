@@ -213,20 +213,6 @@ class EphemToolWidget(KadasBottomBar):
         else:
             return strval
 
-    def search_body_visible(self, body, start, initialstep, bound):
-        step = math.copysign(min(abs(bound - start), abs(initialstep)), initialstep)
-        value = start
-        sign = math.copysign(1, initialstep)
-        test_visible = False
-
-        while abs(step) >= 60:
-            while self.body_is_visible(self.compute_body_position(value, body)) == test_visible and sign * value <= sign * bound and sign * value >= sign * start:
-                value += step
-            step = -step / 2
-            test_visible = not test_visible
-
-        return value
-
     def search_body_relief_crossing(self, body, spheretime, zenithtime):
         # Binary search up to 1min precision
         mid = 0.5 * (spheretime + zenithtime)
