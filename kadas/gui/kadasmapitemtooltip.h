@@ -47,7 +47,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
     QTimer mHideTimer;
     QPoint mPos;
     QgsMapCanvas *mCanvas = nullptr;
-    KadasMapItem *mItem = nullptr;
+    const KadasMapItem *mItem = nullptr;
 
   private slots:
     void positionAndShow();

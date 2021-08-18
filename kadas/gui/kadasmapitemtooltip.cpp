@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 
 #include <kadas/gui/kadasfeaturepicker.h>
+#include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/kadasmapitemtooltip.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
@@ -39,12 +40,26 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
 
 void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
 {
-  KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), QgsWkbTypes::UnknownGeometry, KadasItemLayer::PICK_OBJECTIVE_TOOLTIP );
+  const KadasMapItem *item = nullptr;
+
+  QGraphicsItem *canvasItem = mCanvas->itemAt( canvasPos );
+  if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) )
+  {
+    KadasMapCanvasItem *mapCanvasItem = static_cast<KadasMapCanvasItem *>( canvasItem );
+    item = mapCanvasItem->mapItem();
+  }
+  else
+  {
+    KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), QgsWkbTypes::UnknownGeometry, KadasItemLayer::PICK_OBJECTIVE_TOOLTIP );
+    if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
+    {
+      item = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId];
+    }
+  }
 
   // If hovering over an item, update/show tooltip
-  if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
+  if ( item )
   {
-    KadasMapItem *item = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId];
     mHideTimer.stop();
     mPos = canvasPos;
     if ( mItem != item )
