@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
@@ -62,17 +63,22 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   mComboObserverHeightMode->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
   heightDialogLayout->addWidget( mComboObserverHeightMode, 0, 2, 1, 1 );
 
-  heightDialogLayout->addWidget( new QLabel( tr( "Observer angle range:" ) ), 1, 0, 1, 1 );
+  mVertRangeCheckbox = new QCheckBox( tr( "Limit observer angle range:" ) );
+  heightDialogLayout->addWidget( mVertRangeCheckbox, 1, 0, 1, 1 );
   mSpinBoxObserverMinAngle = new QSpinBox();
   mSpinBoxObserverMinAngle->setRange( -90, 90 );
   mSpinBoxObserverMinAngle->setValue( -90 );
   mSpinBoxObserverMinAngle->setSuffix( "°" );
+  mSpinBoxObserverMinAngle->setEnabled( false );
   mSpinBoxObserverMaxAngle = new QSpinBox();
   mSpinBoxObserverMaxAngle->setRange( -90, 90 );
   mSpinBoxObserverMaxAngle->setValue( 90 );
   mSpinBoxObserverMaxAngle->setSuffix( "°" );
+  mSpinBoxObserverMaxAngle->setEnabled( false );
   heightDialogLayout->addWidget( mSpinBoxObserverMinAngle, 1, 1, 1, 1 );
   heightDialogLayout->addWidget( mSpinBoxObserverMaxAngle, 1, 2, 1, 1 );
+  connect( mVertRangeCheckbox, &QCheckBox::toggled, mSpinBoxObserverMinAngle, &QSpinBox::setEnabled );
+  connect( mVertRangeCheckbox, &QCheckBox::toggled, mSpinBoxObserverMaxAngle, &QSpinBox::setEnabled );
   connect( mSpinBoxObserverMinAngle, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasViewshedDialog::adjustMaxAngle );
   connect( mSpinBoxObserverMaxAngle, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasViewshedDialog::adjustMinAngle );
 
@@ -145,12 +151,12 @@ bool KadasViewshedDialog::targetHeightRelativeToGround() const
 
 double KadasViewshedDialog::observerMinVertAngle() const
 {
-  return mSpinBoxObserverMinAngle->value();
+  return mVertRangeCheckbox->isChecked() ? mSpinBoxObserverMinAngle->value() : -90;
 }
 
 double KadasViewshedDialog::observerMaxVertAngle() const
 {
-  return mSpinBoxObserverMaxAngle->value();
+  return mVertRangeCheckbox->isChecked() ? mSpinBoxObserverMaxAngle->value() : 90;
 }
 
 int KadasViewshedDialog::accuracyFactor() const
@@ -270,9 +276,23 @@ void KadasMapToolViewshed::drawFinished()
     layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
 
-    KadasPinItem *pin = new KadasPinItem( canvasCrs );
+    KadasSymbolItem *pin = new KadasSymbolItem( canvasCrs );
+    pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );
+    pin->setTooltip(
+      QString( "<b>Observer height</b>: %1 %2 %3<br />" )
+      .arg( viewshedDialog.observerHeight() )
+      .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+      .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) +
+      QString( "<b>Observer angle range</b>: %1° - %2°<br />" )
+      .arg( viewshedDialog.observerMinVertAngle() )
+      .arg( viewshedDialog.observerMaxVertAngle() ) +
+      QString( "<b>Target height</b>: %1 %2 %3" )
+      .arg( viewshedDialog.targetHeight() )
+      .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+      .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+    );
     KadasMapCanvasItemManager::addItem( pin );
   }
   else if ( !errMsg.isEmpty() )

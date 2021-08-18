@@ -22,6 +22,7 @@
 #include <kadas/gui/kadas_gui.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
+class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QSlider;
@@ -52,6 +53,7 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     QComboBox *mComboObserverHeightMode = nullptr;
     QComboBox *mComboTargetHeightMode = nullptr;
     QSlider *mAccuracySlider = nullptr;
+    QCheckBox *mVertRangeCheckbox = nullptr;
 
   private slots:
     void adjustMaxAngle();
