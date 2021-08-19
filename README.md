@@ -24,8 +24,8 @@ KADAS Albireo is a mapping application based on [QGIS](http://qgis.org/) and tar
 
 ## Manuals
 
-* [User manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/manual/en/SUMMARY.md)
-* [Technical manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/technical/SUMMARY.md)
+* [User manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/manual/src/index.md)
+* [Technical manual](https://github.com/kadas-albireo/kadas-manuals/tree/master/technical/src)
 
 ## Downloads
 
@@ -35,7 +35,7 @@ KADAS Albireo is a mapping application based on [QGIS](http://qgis.org/) and tar
 
 * Download and extract the latest `kadas-portable-win64.zip` portable build from the [releases](https://github.com/kadas-albireo/kadas-albireo2/releases) page.
 * Run `..\kadas\bin\kadas.exe`.
-* Read the [technical manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/technical/SUMMARY.md) to learn how to configure the application.
+* Read the [technical manual](https://github.com/kadas-albireo/kadas-manuals/tree/master/technical/src) to learn how to configure the application.
 * *Note*: To be able to use the terrain analysis functions, a heightmap needs to be defined in the project. The portable build contains a sample project which references a 1km resolution SRTM model. You can use any other model by adding the corresponding layer to the project, and marking it as heightmap from its context menu in the layer tree.
 
 ## Screenshots
