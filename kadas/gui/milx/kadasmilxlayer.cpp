@@ -123,7 +123,7 @@ KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, cons
   }
   int selectedSymbol = -1;
   QRect bbox;
-  if ( !symbols.isEmpty() && KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0 )
+  if ( !symbols.isEmpty() && KadasMilxClient::pickSymbol( symbols, screenPos, milxSymbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0 )
   {
     return itemIdMap[selectedSymbol];
   }

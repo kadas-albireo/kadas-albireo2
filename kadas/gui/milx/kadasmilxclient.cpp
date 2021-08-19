@@ -508,12 +508,12 @@ bool KadasMilxClient::moveAttributePoint( const QRect &visibleExtent, int dpi, c
   return true;
 }
 
-bool KadasMilxClient::canDeletePoint( const NPointSymbol &symbol, int index, bool &canDelete )
+bool KadasMilxClient::canDeletePoint( const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, int index, bool &canDelete )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
   istream << MILX_REQUEST_CAN_DELETE_POINT;
-  istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << index;
+  istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << index << settings.symbolSize << settings.lineWidth << settings.workMode;
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_CAN_DELETE_POINT ) )
   {
@@ -716,12 +716,12 @@ bool KadasMilxClient::validateSymbolXml( const QString &symbolXml, const QString
 }
 
 
-bool KadasMilxClient::hitTest( const NPointSymbol &symbol, const QPoint &clickPos, bool &hitTestResult )
+bool KadasMilxClient::hitTest( const NPointSymbol &symbol, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, bool &hitTestResult )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
   istream << MILX_REQUEST_HIT_TEST;
-  istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << clickPos;
+  istream << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << clickPos << settings.symbolSize << settings.lineWidth << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_HIT_TEST ) )
@@ -735,12 +735,12 @@ bool KadasMilxClient::hitTest( const NPointSymbol &symbol, const QPoint &clickPo
   return true;
 }
 
-bool KadasMilxClient::pickSymbol( const QList<NPointSymbol> &symbols, const QPoint &clickPos, int &selectedSymbol, QRect &boundingBox )
+bool KadasMilxClient::pickSymbol( const QList<NPointSymbol> &symbols, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, int &selectedSymbol, QRect &boundingBox )
 {
   int nSymbols = symbols.length();
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_PICK_SYMBOL << clickPos;
+  istream << MILX_REQUEST_PICK_SYMBOL << clickPos << settings.symbolSize << settings.lineWidth << settings.workMode;
   istream << nSymbols;
   for ( const NPointSymbol &symbol : symbols )
   {
@@ -800,11 +800,11 @@ bool KadasMilxClient::getControlPointIndices( const QString &symbolXml, int nPoi
   return true;
 }
 
-bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList< QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor )
+bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList< QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_GET_CONTROL_POINTS << symbolXml << points << attributes << isCorridor;
+  istream << MILX_REQUEST_GET_CONTROL_POINTS << symbolXml << points << attributes << isCorridor << settings.symbolSize << settings.lineWidth << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_GET_CONTROL_POINTS ) )

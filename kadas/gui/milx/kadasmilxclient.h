@@ -141,13 +141,13 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool getSymbolsMetadata( const QStringList &symbolIds, QList<KadasMilxSymbolDesc> &result );
     static bool getMilitaryName( const QString &symbolXml, QString &militaryName );
     static bool getControlPointIndices( const QString &symbolXml, int nPoints, const KadasMilxSymbolSettings &settings, QList<int> &controlPoints );
-    static bool getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor );
+    static bool getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings );
 
     static bool appendPoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const QPoint &newPoint, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool insertPoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const QPoint &newPoint, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool movePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int index, const QPoint &newPos, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool moveAttributePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int attr, const QPoint &newPos, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
-    static bool canDeletePoint( const NPointSymbol &symbol, int index, bool &canDelete );
+    static bool canDeletePoint( const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, int index, bool &canDelete );
     static bool deletePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int index, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool editSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, WId parentWid );
     static bool createSymbol( QString &symbolId, KadasMilxSymbolDesc &result, WId parentWid );
@@ -155,8 +155,8 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool updateSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, bool returnPoints );
     static bool updateSymbols( const QRect &visibleExtent, int dpi, double scaleFactor, const QList<NPointSymbol> &symbols, const KadasMilxSymbolSettings &settings, QList<NPointSymbolGraphic> &result );
 
-    static bool hitTest( const NPointSymbol &symbol, const QPoint &clickPos, bool &hitTestResult );
-    static bool pickSymbol( const QList<NPointSymbol> &symbols, const QPoint &clickPos, int &selectedSymbol, QRect &boundingBox );
+    static bool hitTest( const NPointSymbol &symbol, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, bool &hitTestResult );
+    static bool pickSymbol( const QList<NPointSymbol> &symbols, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, int &selectedSymbol, QRect &boundingBox );
 
     static bool getCurrentLibraryVersionTag( QString &versionTag );
     static bool getSupportedLibraryVersionTags( QStringList &versionTags, QStringList &versionNames );

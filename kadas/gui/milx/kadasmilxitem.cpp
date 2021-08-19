@@ -292,7 +292,7 @@ bool KadasMilxItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &setti
   QList<KadasMilxClient::NPointSymbol> symbols;
   symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
   QRect bbox;
-  return KadasMilxClient::pickSymbol( symbols, screenPos, selectedSymbol, bbox ) && selectedSymbol >= 0;
+  return KadasMilxClient::pickSymbol( symbols, screenPos, symbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0;
 }
 
 QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const
@@ -698,7 +698,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
           updateSymbol( mapSettings, result );
       } );
       bool canDelete = false;
-      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, context.vidx.vertex, canDelete ) && canDelete );
+      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, symbolSettings(), context.vidx.vertex, canDelete ) && canDelete );
     }
     else
     {
@@ -953,7 +953,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
         }
         item->state()->attributes.clear();
       }
-      if ( KadasMilxClient::getControlPoints( item->mMssString, screenPoints, screenAttributes, item->state()->controlPoints, isCorridor ) )
+      if ( KadasMilxClient::getControlPoints( item->mMssString, screenPoints, screenAttributes, item->state()->controlPoints, isCorridor, item->symbolSettings() ) )
       {
         item->state()->points.clear();
         for ( const QPoint &screenPoint : screenPoints )
