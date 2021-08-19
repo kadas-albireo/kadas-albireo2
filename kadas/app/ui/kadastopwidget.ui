@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1430</width>
-    <height>149</height>
+    <height>133</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1739,49 +1739,31 @@ Sight</string>
           </item>
           <item>
            <layout class="QGridLayout" name="mGridLayoutMssOptions">
-            <item row="2" column="0">
+            <item row="1" column="0">
              <widget class="QLabel" name="mLineWidthLabel">
               <property name="text">
                <string>Line width:</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QSlider" name="mSymbolSizeSlider">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>100</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="tracking">
-               <bool>false</bool>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::TicksBelow</enum>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="mWorkModeCombo"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="mWorkModeLabel">
+              <property name="text">
+               <string>Work mode:</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="0" column="0">
              <widget class="QLabel" name="mSymbolSizeLabel">
               <property name="text">
                <string>Symbol size:</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="1">
-             <widget class="QComboBox" name="mWorkModeCombo"/>
-            </item>
-            <item row="2" column="1">
+            <item row="1" column="1">
              <widget class="QSlider" name="mLineWidthSlider">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -1806,17 +1788,28 @@ Sight</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="mWorkModeLabel">
-              <property name="text">
-               <string>Work mode:</string>
+            <item row="0" column="1">
+             <widget class="QSlider" name="mSymbolSizeSlider">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Global symbol settings:</string>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="tracking">
+               <bool>false</bool>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBelow</enum>
               </property>
              </widget>
             </item>
@@ -2556,7 +2549,6 @@ Sight</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../resources/resources.qrc"/>
   <include location="../../resources/resources.qrc"/>
  </resources>
  <connections/>
