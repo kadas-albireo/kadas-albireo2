@@ -153,7 +153,7 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool createSymbol( QString &symbolId, KadasMilxSymbolDesc &result, WId parentWid );
 
     static bool updateSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, bool returnPoints );
-    static bool updateSymbols( const QRect &visibleExtent, int dpi, double scaleFactor, const QList<NPointSymbol> &symbols, const KadasMilxSymbolSettings &settings, QList<NPointSymbolGraphic> &result );
+    static bool updateSymbols( const QRect &visibleExtent, int dpi, const QList<NPointSymbol> &symbols, const KadasMilxSymbolSettings &settings, QList<NPointSymbolGraphic> &result );
 
     static bool hitTest( const NPointSymbol &symbol, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, bool &hitTestResult );
     static bool pickSymbol( const QList<NPointSymbol> &symbols, const QPoint &clickPos, const KadasMilxSymbolSettings &settings, int &selectedSymbol, QRect &boundingBox );

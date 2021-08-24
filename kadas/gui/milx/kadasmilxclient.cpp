@@ -618,7 +618,7 @@ bool KadasMilxClient::updateSymbol( const QRect &visibleExtent, int dpi, const N
   return true;
 }
 
-bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, double scaleFactor, const QList<NPointSymbol> &symbols, const KadasMilxSymbolSettings &settings, QList<NPointSymbolGraphic> &result )
+bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, const QList<NPointSymbol> &symbols, const KadasMilxSymbolSettings &settings, QList<NPointSymbolGraphic> &result )
 {
   int nSymbols = symbols.length();
   QByteArray request;
@@ -626,7 +626,6 @@ bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, double
   istream << MILX_REQUEST_UPDATE_SYMBOLS;
   istream << visibleExtent;
   istream << dpi;
-  istream << scaleFactor;
   istream << settings.symbolSize << settings.lineWidth << settings.workMode;
   istream << nSymbols;
   for ( const NPointSymbol &symbol : symbols )

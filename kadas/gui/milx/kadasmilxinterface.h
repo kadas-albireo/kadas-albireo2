@@ -23,7 +23,7 @@
 
 typedef quint8 MilXServerRequest;
 
-quint64 MILX_INTERFACE_VERSION = 202108191150;
+quint64 MILX_INTERFACE_VERSION = 202108241750;
 
 MilXServerRequest MILX_REQUEST_INIT = 1; // {MILX_REQUEST_INIT, Lang:QString, InterfaceVersion:int64}
 
@@ -43,7 +43,7 @@ MilXServerRequest MILX_REQUEST_EDIT_SYMBOL = 26; // {MILX_REQUEST_EDIT_SYMBOL, V
 MilXServerRequest MILX_REQUEST_CREATE_SYMBOL = 27; // {MILX_REQUEST_CREATE_SYMBOL, wid:WId, workMode:int}
 
 MilXServerRequest MILX_REQUEST_UPDATE_SYMBOL = 30; // {MILX_REQUEST_UPDATE_SYMBOL, VisibleExtent:QRect, dpi:int, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, symbolSize:int, lineWidth:int, workMode: int, returnPoints:bool}
-MilXServerRequest MILX_REQUEST_UPDATE_SYMBOLS = 31; // {MILX_REQUEST_UPDATE_SYMBOLS, VisibleExtent:QRect, dpi:int, scaleFactor:double, symbolSize:int, lineWidth:int, workMode: int, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}
+MilXServerRequest MILX_REQUEST_UPDATE_SYMBOLS = 31; // {MILX_REQUEST_UPDATE_SYMBOLS, VisibleExtent:QRect, dpi:int, symbolSize:int, lineWidth:int, workMode: int, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}
 
 MilXServerRequest MILX_REQUEST_HIT_TEST = 40; // {MILX_REQUEST_HIT_TEST, SymbolXml:QString, Points:QList<QPoint>, ControlPoints:QList<int>, Attributes:QList<QPair<int,double>>, finalized:bool, colored:bool, clickPos:QPoint, symbolSize:int, lineWidth:int, workMode: int}
 MilXServerRequest MILX_REQUEST_PICK_SYMBOL = 41; // {MILX_REQUEST_PICK_SYMBOL, ClickPos:QPoint, symbolSize:int, lineWidth:int, workMode: int, nSymbols:int, SymbolXml1:QString, Points1:QList<QPoint>, ControlPoints1:QList<int>, Attributes1:QList<QPair<int,double>>, finalized1:bool, colored1:bool, SymbolXml2:QString, Points2:QList<QPoint>, ControlPoints2:QList<int>, Attributes2:QList<QPair<int,double>>, finalized2:bool, colored2:bool, ...}

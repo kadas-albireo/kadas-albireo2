@@ -40,6 +40,8 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasMapItem *> items = mLayer->items().values();
       QList<KadasMilxClient::NPointSymbol> symbols;
       QList<KadasMilxItem *> renderItems;
+      int dpi = mRendererContext.painter()->device()->logicalDpiX();
+      double dpiScale = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
       bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
       for ( int i = 0, n = items.size(); i < n; ++i )
       {
@@ -49,7 +51,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
           // Skip symbols
           continue;
         }
-        symbols.append( item->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !mLayer->mIsApproved ) );
+        symbols.append( item->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !mLayer->mIsApproved, dpiScale ) );
         renderItems.append( item );
       }
       if ( symbols.isEmpty() )
@@ -57,10 +59,11 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
         return true;
       }
       QList<KadasMilxClient::NPointSymbolGraphic> result;
-      int dpi = mRendererContext.painter()->device()->logicalDpiX();
-      double scaleFactor = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
+      KadasMilxSymbolSettings symSettings = mLayer->milxSymbolSettings();
+      symSettings.lineWidth *= dpiScale;
+      symSettings.symbolSize *= dpiScale;
       QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
-      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, scaleFactor, symbols, mLayer->milxSymbolSettings(), result ) )
+      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, symbols, symSettings, result ) )
       {
         return false;
       }
@@ -73,7 +76,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
         if ( !renderItems[i]->isMultiPoint() )
         {
           // Draw line from visual reference point to actual refrence point
-          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset );
+          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset * dpiScale );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
       }
