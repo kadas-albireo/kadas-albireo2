@@ -48,6 +48,10 @@ class EphemTool(QgsMapTool):
         elif event.button() == Qt.RightButton:
             self.iface.mapCanvas().unsetMapTool(self)
 
+    def keyReleaseEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.iface.mapCanvas().unsetMapTool( self )
+
     def positionPicked(self, pos):
         self.pin.setPosition(KadasItemPos.fromPoint(pos))
         if not self.pinAdded:
