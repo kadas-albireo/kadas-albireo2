@@ -159,6 +159,10 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
             else
             {
               ++labelChars.last();
+              if ( labelChars.last() == 'I' || labelChars.last() == 'O' )
+              {
+                ++labelChars.last();
+              }
             }
           }
         }
