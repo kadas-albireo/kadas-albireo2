@@ -81,6 +81,10 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
     mHideTimer.start( 500 );
     mShowTimer.stop();
   }
+  else
+  {
+    clear();
+  }
 }
 
 QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )

@@ -44,6 +44,8 @@ KadasMapToolPan::KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteractio
   setCursor( QCursor( Qt::ArrowCursor ) );
 
   mTooltipWidget = new KadasMapItemTooltip( canvas );
+
+  connect( canvas, &QgsMapCanvas::extentsChanged, mTooltipWidget, &KadasMapItemTooltip::clear );
 }
 
 KadasMapToolPan::~KadasMapToolPan()
