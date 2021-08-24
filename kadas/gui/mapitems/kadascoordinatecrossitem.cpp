@@ -106,7 +106,7 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
 
   QgsPointXY mapPos = context.coordinateTransform().transform( constState()->pos.x(), constState()->pos.y() );
   QPointF screenPos = context.mapToPixel().transform( mapPos ).toQPointF();
-  context.painter()->setPen( QPen( Qt::white, 6 ) );
+  context.painter()->setPen( QPen( Qt::white, 10 ) );
   context.painter()->drawLine( screenPos.x() - crossSize, screenPos.y(), screenPos.x() + crossSize, screenPos.y() );
   context.painter()->drawLine( screenPos.x(), screenPos.y() - crossSize, screenPos.x(), screenPos.y() + crossSize );
   context.painter()->setPen( QPen( Qt::black, 3 ) );
@@ -121,8 +121,8 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
   };
   QList<LabelData> labels =
   {
-    {screenPos.x() - crossSize, screenPos.y() - 5, constState()->pos.x(), 0},
-    {screenPos.x() - 5, screenPos.y() + crossSize, constState()->pos.y(), -90}
+    {screenPos.x() - crossSize, screenPos.y() - 12, constState()->pos.y(), 0},
+    {screenPos.x() - 12, screenPos.y() + crossSize, constState()->pos.x(), -90}
   };
 
   QFont font = context.painter()->font();
@@ -136,7 +136,7 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
     context.painter()->translate( label.x, label.y );
     context.painter()->rotate( label.angle );
     context.painter()->setBrush( Qt::black );
-    context.painter()->setPen( QPen( Qt::white, qRound( sFontSize / 4. ) ) );
+    context.painter()->setPen( QPen( Qt::white, qRound( sFontSize / 3. ) ) );
     context.painter()->drawPath( path );
     context.painter()->setPen( Qt::NoPen );
     context.painter()->drawPath( path );
