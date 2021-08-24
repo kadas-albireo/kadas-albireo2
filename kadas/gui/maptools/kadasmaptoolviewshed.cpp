@@ -281,14 +281,14 @@ void KadasMapToolViewshed::drawFinished()
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );
     pin->setTooltip(
-      QString( "<b>Observer height</b>: %1 %2 %3<br />" )
+      tr( "<b>Observer height</b>: %1 %2 %3<br />" )
       .arg( viewshedDialog.observerHeight() )
       .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
       .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) +
-      QString( "<b>Observer angle range</b>: %1° - %2°<br />" )
+      tr( "<b>Observer angle range</b>: %1° to %2°<br />" )
       .arg( viewshedDialog.observerMinVertAngle() )
       .arg( viewshedDialog.observerMaxVertAngle() ) +
-      QString( "<b>Target height</b>: %1 %2 %3" )
+      tr( "<b>Target height</b>: %1 %2 %3" )
       .arg( viewshedDialog.targetHeight() )
       .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
       .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
