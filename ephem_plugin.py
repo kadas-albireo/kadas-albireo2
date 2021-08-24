@@ -31,7 +31,7 @@ class EphemPlugin:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'kadas_emphem_{}.qm'.format(self.locale))
+            'kadas_ephem_{}.qm'.format(self.locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
