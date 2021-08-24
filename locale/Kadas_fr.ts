@@ -3561,7 +3561,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="183"/>
         <source>Add XYZ layer</source>
-        <translation>XYZ une couche CSV</translation>
+        <translation>Ajouter une couche XYZ</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="1015"/>
