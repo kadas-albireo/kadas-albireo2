@@ -91,8 +91,10 @@ int main( int argc, char *argv[] )
   KadasApplication *app = new KadasApplication( argc, argv );
 
 #ifdef __MINGW32__
-  QString gdalDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
-  qputenv( "GDAL_DATA", gdalDir.toLocal8Bit() );
+  QString gdalDataDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
+  qputenv( "GDAL_DATA", gdalDataDir.toLocal8Bit() );
+  QString gdalDriverDir = QDir( QString( "%1/../lib/gdalplugins" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
+  qputenv( "GDAL_DRIVER_PATH", gdalDriverDir.toLocal8Bit() );
   QString projDir = QDir( QString( "%1/../share/proj" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
   qputenv( "PROJ_LIB", projDir.toLocal8Bit() );
 #endif
