@@ -940,6 +940,8 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, &KadasApplication::addVectorLayers );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, dialog, &QDialog::accept );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, []( const QStringList & layerUris ) { kApp->addRasterLayers( layerUris ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, dialog, &QDialog::accept );
 
   dialog->exec();
 }

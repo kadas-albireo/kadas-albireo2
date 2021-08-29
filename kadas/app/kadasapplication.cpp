@@ -47,6 +47,7 @@
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
+#include <qgis/qgsproviderutils.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasterlayerproperties.h>
 #include <qgis/qgssublayersdialog.h>
@@ -680,6 +681,70 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
       baseName = QFileInfo( uri ).completeBaseName();
     }
     addVectorLayer( uri, baseName, QStringLiteral( "ogr" ) );
+  }
+}
+
+void KadasApplication::addRasterLayers( const QStringList &layerUris, bool quiet )  const
+{
+  if ( layerUris.empty() )
+  {
+    return;
+  }
+
+  // this is messy since some files in the list may be rasters and others may
+  // be ogr layers. We'll set returnValue to false if one or more layers fail
+  // to load.
+  for ( const QString &src : layerUris )
+  {
+    QString errMsg;
+
+    if ( QgsRasterLayer::isValidRasterFileName( src, errMsg ) )
+    {
+      QFileInfo myFileInfo( src );
+
+      // set the layer name to the file base name unless provided explicitly
+      QString layerName;
+      const QVariantMap uriDetails = QgsProviderRegistry::instance()->decodeUri( QStringLiteral( "gdal" ), src );
+      if ( !uriDetails[ QStringLiteral( "layerName" ) ].toString().isEmpty() )
+      {
+        layerName = uriDetails[ QStringLiteral( "layerName" ) ].toString();
+      }
+      else
+      {
+        layerName = QgsProviderUtils::suggestLayerNameFromFilePath( src );
+      }
+
+      // try to create the layer
+      QgsRasterLayer *layer = addRasterLayer( src, layerName, QStringLiteral( "gdal" ), quiet );
+
+      if ( layer && layer->isValid() )
+      {
+        //only allow one copy of a ai grid file to be loaded at a
+        //time to prevent the user selecting all adfs in 1 dir which
+        //actually represent 1 coverage,
+
+        if ( myFileInfo.fileName().endsWith( QLatin1String( ".adf" ), Qt::CaseInsensitive ) )
+        {
+          break;
+        }
+      }
+      // if layer is invalid addLayerPrivate() will show the error
+
+    } // valid raster filename
+    else
+    {
+      // Issue message box warning unless we are loading from cmd line since
+      // non-rasters are passed to this function first and then successfully
+      // loaded afterwards (see main.cpp)
+      if ( !quiet )
+      {
+        QString msg = tr( "%1 is not a supported raster data source" ).arg( src );
+        if ( !errMsg.isEmpty() )
+          msg += '\n' + errMsg;
+
+        mMainWindow->messageBar()->pushMessage( tr( "Unsupported Data Source" ), msg, Qgis::MessageLevel::Critical );
+      }
+    }
   }
 }
 
