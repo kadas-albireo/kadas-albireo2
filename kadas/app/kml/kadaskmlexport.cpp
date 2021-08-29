@@ -19,7 +19,7 @@
 #include <QIODevice>
 #include <QTextStream>
 #include <QUuid>
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsproject.h>

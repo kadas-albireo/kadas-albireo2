@@ -25,7 +25,7 @@
 #include <QPushButton>
 #include <QTreeWidgetItem>
 #include <QVersionNumber>
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>

@@ -27,7 +27,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <kadas/gui/mapitems/kadaspictureitem.h>
 

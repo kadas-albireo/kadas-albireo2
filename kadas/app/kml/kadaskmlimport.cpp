@@ -20,7 +20,7 @@
 #include <QImageReader>
 #include <QUuid>
 
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslogger.h>

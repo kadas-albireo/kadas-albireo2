@@ -17,7 +17,7 @@
 #include <QSvgRenderer>
 #include <QImageReader>
 
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <svg2svgt/processorengine.h>
 #include <svg2svgt/ruleengine.h>

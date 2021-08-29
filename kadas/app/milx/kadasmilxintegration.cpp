@@ -21,7 +21,7 @@
 #include <QPlainTextEdit>
 #include <QSlider>
 #include <QTabWidget>
-#include <quazip5/quazipfile.h>
+#include <quazip/quazipfile.h>
 
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmessagebar.h>
