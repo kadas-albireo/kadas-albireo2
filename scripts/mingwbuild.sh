@@ -139,7 +139,8 @@ function linkDep {
     lnk "$MINGWROOT/$1" "$destdir/$name" || return 1
     echo "${2:-bin}/$name: $(rpm -qf "$MINGWROOT/$1")" >> $installprefix/origins.txt
     autoLinkDeps "$destdir/$name" "${indent}  " || return 1
-    [ -e "$MINGWROOT/$1.debug" ] && lnk "$MINGWROOT/$1.debug" "$destdir/$name.debug" || ($debug && echo "Warning: missing $name.debug" || :)
+    [ -e "/usr/lib/debug${MINGWROOT}/$1.debug" ] && lnk "/usr/lib/debug${MINGWROOT}/$1.debug" "$destdir/$name.debug" || :
+    [ -e "$MINGWROOT/$1.debug" ] && lnk "$MINGWROOT/$1.debug" "$destdir/$name.debug" || :
     return 0
 }
 
