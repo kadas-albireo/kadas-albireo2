@@ -128,11 +128,14 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
   }
   else if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::NoModifier )
   {
-    mMoveRefPos = e->mapPoint();
-    for ( KadasMapItem *item : mItems )
+    if ( mSelectionRect->hitTest( hitPos, mCanvas->mapSettings() ) )
     {
-      QgsCoordinateTransform crst( item->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-      mItemRefPos.append( crst.transform( item->position() ) );
+      mMoveRefPos = e->mapPoint();
+      for ( KadasMapItem *item : mItems )
+      {
+        QgsCoordinateTransform crst( item->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
+        mItemRefPos.append( crst.transform( item->position() ) );
+      }
     }
   }
   else if ( e->button() == Qt::RightButton )
@@ -178,7 +181,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
 
 void KadasMapToolEditItemGroup::canvasMoveEvent( QgsMapMouseEvent *e )
 {
-  if ( e->buttons() == Qt::LeftButton && e->modifiers() == Qt::NoModifier )
+  if ( e->buttons() == Qt::LeftButton && e->modifiers() == Qt::NoModifier && !mItemRefPos.isEmpty() )
   {
     QgsVector delta = e->mapPoint() - mMoveRefPos;
     for ( int i = 0, n = mItems.size(); i < n; ++i )
