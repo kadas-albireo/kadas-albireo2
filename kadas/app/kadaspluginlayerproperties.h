@@ -1,5 +1,5 @@
 /***************************************************************************
-    kadasitemlayerproperties.h
+    kadaspluginlayerproperties.h
     --------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
@@ -14,8 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASITEMLAYERPROPERTIES_H
-#define KADASITEMLAYERPROPERTIES_H
+#ifndef KADASPLUGINLAYERPROPERTIES_H
+#define KADASPLUGINLAYERPROPERTIES_H
 
 #include <qgis/qgsmaplayerconfigwidget.h>
 
@@ -23,15 +23,15 @@
 
 class QGroupBox;
 class QgsScaleRangeWidget;
-class KadasItemLayer;
+class KadasPluginLayer;
 
 
-class KadasItemLayerRenderingPropertiesWidget : public QgsMapLayerConfigWidget
+class KadasPluginLayerRenderingPropertiesWidget : public QgsMapLayerConfigWidget
 {
     Q_OBJECT
 
   public:
-    explicit KadasItemLayerRenderingPropertiesWidget( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    explicit KadasPluginLayerRenderingPropertiesWidget( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 
   public slots:
     void apply() override;
@@ -41,11 +41,11 @@ class KadasItemLayerRenderingPropertiesWidget : public QgsMapLayerConfigWidget
     QgsScaleRangeWidget *mScaleRangeWidget = nullptr;
 };
 
-class KadasItemLayerProperties : public KadasLayerPropertiesDialog
+class KadasPluginLayerProperties : public KadasLayerPropertiesDialog
 {
     Q_OBJECT
   public:
-    KadasItemLayerProperties( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    KadasPluginLayerProperties( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 };
 
-#endif // KADASITEMLAYERPROPERTIES_H
+#endif // KADASPLUGINLAYERPROPERTIES_H

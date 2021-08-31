@@ -76,7 +76,7 @@
 #include <kadas/app/kadascanvascontextmenu.h>
 #include <kadas/app/kadascrashrpt.h>
 #include <kadas/app/kadashandlebadlayers.h>
-#include <kadas/app/kadasitemlayerproperties.h>
+#include <kadas/app/kadaspluginlayerproperties.h>
 #include <kadas/app/kadaslayoutdesignermanager.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
@@ -1217,9 +1217,9 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     }
     dialog.exec();
   }
-  else if ( qobject_cast<KadasItemLayer *>( layer ) )
+  else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    KadasItemLayerProperties dialog( static_cast<KadasItemLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow() );
+    KadasPluginLayerProperties dialog( static_cast<KadasPluginLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow() );
     for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
     {
       dialog.addPropertiesPageFactory( factory );

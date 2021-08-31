@@ -1,5 +1,5 @@
 /***************************************************************************
-    kadasitemlayerproperties.cpp
+    kadaspluginlayerproperties.cpp
     ----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
@@ -20,11 +20,11 @@
 #include <qgis/qgsstyle.h>
 #include <qgis/qgssymbolwidgetcontext.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/app/kadasitemlayerproperties.h>
+#include <kadas/core/kadaspluginlayer.h>
+#include <kadas/app/kadaspluginlayerproperties.h>
 
 
-KadasItemLayerRenderingPropertiesWidget::KadasItemLayerRenderingPropertiesWidget( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
+KadasPluginLayerRenderingPropertiesWidget::KadasPluginLayerRenderingPropertiesWidget( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
   : QgsMapLayerConfigWidget( layer, canvas, parent )
 {
   mScaleRangeWidget = new QgsScaleRangeWidget( this );
@@ -45,14 +45,14 @@ KadasItemLayerRenderingPropertiesWidget::KadasItemLayerRenderingPropertiesWidget
   layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 }
 
-void KadasItemLayerRenderingPropertiesWidget::apply()
+void KadasPluginLayerRenderingPropertiesWidget::apply()
 {
   mLayer->setScaleBasedVisibility( mGroupBox->isChecked() );
   mLayer->setMinimumScale( mScaleRangeWidget->minimumScale() );
   mLayer->setMaximumScale( mScaleRangeWidget->maximumScale() );
 }
 
-KadasItemLayerProperties::KadasItemLayerProperties( KadasItemLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
+KadasPluginLayerProperties::KadasPluginLayerProperties( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent )
   : KadasLayerPropertiesDialog( layer, parent )
 {
   QListWidgetItem *item = new QListWidgetItem();
@@ -62,7 +62,7 @@ KadasItemLayerProperties::KadasItemLayerProperties( KadasItemLayer *layer, QgsMa
 
   mOptionsListWidget->addItem( item );
 
-  QgsMapLayerConfigWidget *itemLayerRenderingWidget = new KadasItemLayerRenderingPropertiesWidget( layer, canvas, this );
+  QgsMapLayerConfigWidget *itemLayerRenderingWidget = new KadasPluginLayerRenderingPropertiesWidget( layer, canvas, this );
   mLayerPropertiesPages << itemLayerRenderingWidget;
   mOptionsStackedWidget->addWidget( itemLayerRenderingWidget );
 }

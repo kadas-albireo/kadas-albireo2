@@ -212,7 +212,7 @@ SOURCES += \
 ../kadas/app/kadasmainwindow.cpp \
 ../kadas/app/kadaslayertreeviewmenuprovider.cpp \
 ../kadas/app/kadaspythonintegration.h \
-../kadas/app/kadasitemlayerproperties.cpp \
+../kadas/app/kadaspluginlayerproperties.cpp \
 ../kadas/app/kadasgpxintegration.h \
 ../kadas/app/kadaspluginmanager.cpp \
 ../kadas/app/kadasgpxintegration.cpp \
@@ -278,7 +278,7 @@ SOURCES += \
 ../kadas/app/kadasgpsintegration.cpp \
 ../kadas/app/kadasmainwindow.h \
 ../kadas/app/kadaspythonintegration.cpp \
-../kadas/app/kadasitemlayerproperties.h \
+../kadas/app/kadaspluginlayerproperties.h \
 ../kadas/app/kadasmapwidgetmanager.h \
 ../kadas/app/kadasapplication.cpp \
 ../kadas/app/kadasmapidentifydialog.h \

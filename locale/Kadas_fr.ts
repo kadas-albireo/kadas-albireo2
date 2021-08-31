@@ -1825,10 +1825,10 @@
     </message>
 </context>
 <context>
-    <name>KadasItemLayerProperties</name>
+    <name>kadaspluginlayerproperties</name>
     <message>
-        <location filename="../kadas/app/kadasitemlayerproperties.cpp" line="60"/>
-        <location filename="../kadas/app/kadasitemlayerproperties.cpp" line="61"/>
+        <location filename="../kadas/app/kadaspluginlayerproperties.cpp" line="60"/>
+        <location filename="../kadas/app/kadaspluginlayerproperties.cpp" line="61"/>
         <source>Rendering</source>
         <translation>Rendu</translation>
     </message>
@@ -1864,7 +1864,7 @@
 <context>
     <name>KadasItemLayerRenderingPropertiesWidget</name>
     <message>
-        <location filename="../kadas/app/kadasitemlayerproperties.cpp" line="36"/>
+        <location filename="../kadas/app/kadaspluginlayerproperties.cpp" line="36"/>
         <source>Scale Dependent Visibility</source>
         <translation>Visibilité en fonction de l&apos;échelle</translation>
     </message>
