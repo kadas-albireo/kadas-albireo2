@@ -148,6 +148,7 @@ QString simplifyRichTextFilter( const QString &in, bool *isPlainTextPtr = nullpt
 
 static QAction *createCheckableAction( const QIcon &icon, const QString &text,
                                        QObject *receiver, const char *slot,
+                                       KadasRichTextEditor *editor,
                                        QObject *parent = nullptr )
 {
   QAction *result = new QAction( parent );
@@ -156,7 +157,10 @@ static QAction *createCheckableAction( const QIcon &icon, const QString &text,
   result->setCheckable( true );
   result->setChecked( false );
   if ( slot )
+  {
     QObject::connect( result, SIGNAL( triggered( bool ) ), receiver, slot );
+    QObject::connect( result, &QAction::triggered, editor, [editor] { editor->setFocus(); } );
+  }
   return result;
 }
 
@@ -402,15 +406,15 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
 
   // Bold, italic and underline buttons
 
-  m_bold_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textbold" ), tr( "Bold" ), editor, SLOT( setFontBold( bool ) ), this );
+  m_bold_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textbold" ), tr( "Bold" ), editor, SLOT( setFontBold( bool ) ), editor, this );
   m_bold_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_B ) );
   addAction( m_bold_action );
 
-  m_italic_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textitalic" ), tr( "Italic" ), editor, SLOT( setFontItalic( bool ) ), this );
+  m_italic_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textitalic" ), tr( "Italic" ), editor, SLOT( setFontItalic( bool ) ), editor, this );
   m_italic_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_I ) );
   addAction( m_italic_action );
 
-  m_underline_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textunder" ), tr( "Underline" ), editor, SLOT( setFontUnderline( bool ) ), this );
+  m_underline_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textunder" ), tr( "Underline" ), editor, SLOT( setFontUnderline( bool ) ), editor, this );
   m_underline_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_U ) );
   addAction( m_underline_action );
 
@@ -422,26 +426,26 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   connect( alignment_group, &QActionGroup::triggered,
            this, &KadasRichTextEditorToolBar::alignmentActionTriggered );
 
-  m_align_left_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textleft" ), tr( "Left Align" ), editor, nullptr, alignment_group );
+  m_align_left_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textleft" ), tr( "Left Align" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_left_action );
 
-  m_align_center_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textcenter" ), tr( "Center" ), editor, nullptr, alignment_group );
+  m_align_center_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textcenter" ), tr( "Center" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_center_action );
 
-  m_align_right_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textright" ), tr( "Right Align" ), editor, nullptr, alignment_group );
+  m_align_right_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textright" ), tr( "Right Align" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_right_action );
 
-  m_align_justify_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textjustify" ), tr( "Justify" ), editor, nullptr, alignment_group );
+  m_align_justify_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textjustify" ), tr( "Justify" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_justify_action );
 
   addSeparator();
 
   // Superscript and subscript buttons
 
-  m_valign_sup_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textsuperscript" ), tr( "Superscript" ), this, SLOT( setVAlignSuper( bool ) ), this );
+  m_valign_sup_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textsuperscript" ), tr( "Superscript" ), this, SLOT( setVAlignSuper( bool ) ), editor, this );
   addAction( m_valign_sup_action );
 
-  m_valign_sub_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textsubscript" ), tr( "Subscript" ), this, SLOT( setVAlignSub( bool ) ), this );
+  m_valign_sub_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textsubscript" ), tr( "Subscript" ), this, SLOT( setVAlignSub( bool ) ), editor, this );
   addAction( m_valign_sub_action );
 
   addSeparator();
