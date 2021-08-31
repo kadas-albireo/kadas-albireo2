@@ -110,6 +110,7 @@ QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )
 void KadasMapItemTooltip::enterEvent( QEvent * )
 {
   mHideTimer.stop();
+  mShowTimer.stop();
 }
 
 void KadasMapItemTooltip::clear()
