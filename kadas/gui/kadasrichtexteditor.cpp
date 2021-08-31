@@ -17,9 +17,11 @@
 
 // Based on qttools-everywhere-src-5.15.2/src/designer/src/lib/shared/richtexteditor.cpp
 
+#include <QAbstractTextDocumentLayout>
 #include <QAction>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDomDocument>
 #include <QFileDialog>
@@ -206,17 +208,22 @@ void KadasAddLinkDialog::accept()
 
   if ( !title.isEmpty() )
   {
-    const QTextCursor cursor = m_editor->textCursor();
+    QTextCharFormat origCharFormat = m_editor->currentCharFormat();
+    QTextCharFormat charFormat = m_editor->currentCharFormat();
+    charFormat.setAnchor( true );
+    charFormat.setAnchorHref( url );
+    charFormat.setUnderlineStyle( QTextCharFormat::SingleUnderline );
+    charFormat.setForeground( qApp->palette().color( QPalette::Link ) );
+    charFormat.setToolTip( tr( "%1 (Ctrl+click to open)" ).arg( url ) );
+    QTextCursor cursor = m_editor->textCursor();
     if ( cursor.hasSelection() )
     {
-      QTextCharFormat charFormat = m_editor->currentCharFormat();
-      charFormat.setAnchor( true );
-      charFormat.setAnchorHref( url );
       m_editor->setCurrentCharFormat( charFormat );
     }
     else
     {
-      m_editor->insertHtml( QStringLiteral( "<a href=\"%1\">%2</a> " ).arg( url ).arg( title ) );
+      cursor.insertText( title, charFormat );
+      m_editor->setCurrentCharFormat( origCharFormat );
     }
   }
 
@@ -636,6 +643,22 @@ void KadasRichTextEditor::checkImageRemoved( int position, int charsRemoved, int
       }
     }
     redo();
+  }
+}
+
+void KadasRichTextEditor::mouseReleaseEvent( QMouseEvent *e )
+{
+  if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
+  {
+    QString anchor = document()->documentLayout()->anchorAt( e->pos() );
+    if ( !anchor.isEmpty() )
+    {
+      QDesktopServices::openUrl( QUrl( anchor ) );
+    }
+  }
+  else
+  {
+    QTextEdit::mouseReleaseEvent( e );
   }
 }
 
