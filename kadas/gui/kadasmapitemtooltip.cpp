@@ -33,7 +33,7 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   mHideTimer.setSingleShot( true );
   setReadOnly( true );
   connect( &mShowTimer, &QTimer::timeout, this, &KadasMapItemTooltip::positionAndShow );
-  connect( &mHideTimer, &QTimer::timeout, this, &KadasMapItemTooltip::hide );
+  connect( &mHideTimer, &QTimer::timeout, this, &KadasMapItemTooltip::clear );
   setFixedSize( sWidth, sHeight );
   hide();
 }
