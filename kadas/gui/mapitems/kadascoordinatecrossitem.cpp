@@ -68,23 +68,8 @@ QList<KadasMapItem::Node> KadasCoordinateCrossItem::nodes( const QgsMapSettings 
 
 bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
 {
-  if ( contains )
-  {
-    return false;
-  }
   double mapCrossSize = sCrossSize * settings.mapUnitsPerPixel();
   KadasMapPos itemMapPos = toMapPos( constState()->pos, settings );
-  QgsLineString hLine( QVector<QgsPointXY>
-  {
-    QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ),
-    QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() )
-  } );
-  QgsLineString vLine( QVector<QgsPointXY>
-  {
-    QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ),
-    QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize )
-  } );
-
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
   exterior->setPoints( QgsPointSequence()
@@ -95,9 +80,37 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
                        << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
-  bool inter = geomEngine->intersects( &hLine ) || geomEngine->intersects( &vLine );
+  bool result = false;
+  if ( contains )
+  {
+    QgsPolygon crossRect;
+    QgsLineString *exterior = new QgsLineString();
+    exterior->setPoints( QgsPointSequence()
+                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize )
+                         << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() - mapCrossSize )
+                         << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() + mapCrossSize )
+                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() + mapCrossSize )
+                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize ) );
+    crossRect.setExteriorRing( exterior );
+    result = geomEngine->contains( &crossRect );
+  }
+  else
+  {
+    QgsLineString hLine( QVector<QgsPointXY>
+    {
+      QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ),
+      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() )
+    } );
+    QgsLineString vLine( QVector<QgsPointXY>
+    {
+      QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ),
+      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize )
+    } );
+
+    result = geomEngine->intersects( &hLine ) || geomEngine->intersects( &vLine );
+  }
   delete geomEngine;
-  return inter;
+  return result;
 }
 
 void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
