@@ -38,6 +38,8 @@ class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasI
     const KadasMapItem *mItem = nullptr;
     static constexpr double sHandleSize = 8;
 
+    bool layerVisible( QgsMapLayer *layer ) const;
+
   private slots:
     void updateRect();
 };

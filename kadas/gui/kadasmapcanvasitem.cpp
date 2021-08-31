@@ -34,8 +34,8 @@ void KadasMapCanvasItem::paint( QPainter *painter )
   if ( mItem )
   {
     if (
-      ( mItem->associatedLayer() && !mMapCanvas->layers().contains( mItem->associatedLayer() ) ) ||
-      ( mItem->ownerLayer() && !mMapCanvas->layers().contains( mItem->ownerLayer() ) )
+      ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) ||
+      ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
     )
     {
       return;
@@ -68,6 +68,12 @@ void KadasMapCanvasItem::paint( QPainter *painter )
     }
     rc.painter()->restore();
   }
+}
+
+bool KadasMapCanvasItem::layerVisible( QgsMapLayer *layer ) const
+{
+  double scale = mMapCanvas->mapSettings().scale();
+  return mMapCanvas->layers().contains( layer ) && ( !layer->hasScaleBasedVisibility() || ( layer->minimumScale() > scale && layer->maximumScale() <= scale ) );
 }
 
 void KadasMapCanvasItem::updateRect()
