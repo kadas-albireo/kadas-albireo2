@@ -98,6 +98,17 @@ void KadasBookmarksMenu::restoreBookmark( const Bookmark *bookmark )
 {
   mCanvas->setDestinationCrs( QgsCoordinateReferenceSystem( bookmark->crs ) );
   mCanvas->setExtent( bookmark->extent );
+  mCanvas->freeze( true );
+  // Disable all entries first, then re-enable the ones stored in the bookmark
+  for ( QgsLayerTreeLayer *layer : QgsProject::instance()->layerTreeRoot()->findLayers() )
+  {
+    layer->setItemVisibilityChecked( false );
+  }
+  for ( QgsLayerTreeGroup *group : QgsProject::instance()->layerTreeRoot()->findGroups() )
+  {
+    group->setItemVisibilityChecked( false );
+  }
+
   bool missing = false;
   for ( auto it = bookmark->layerVisibilities.begin(), itEnd = bookmark->layerVisibilities.end(); it != itEnd; ++it )
   {
@@ -123,6 +134,7 @@ void KadasBookmarksMenu::restoreBookmark( const Bookmark *bookmark )
       missing = true;
     }
   }
+  mCanvas->freeze( false );
   if ( missing )
   {
     int timeout = QgsSettings().value( QStringLiteral( "qgis/messageTimeout" ), 5 ).toInt();
