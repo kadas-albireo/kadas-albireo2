@@ -206,7 +206,18 @@ void KadasAddLinkDialog::accept()
 
   if ( !title.isEmpty() )
   {
-    m_editor->insertHtml( QStringLiteral( "<a href=\"%1\">%2</a> " ).arg( url ).arg( title ) );
+    const QTextCursor cursor = m_editor->textCursor();
+    if ( cursor.hasSelection() )
+    {
+      QTextCharFormat charFormat = m_editor->currentCharFormat();
+      charFormat.setAnchor( true );
+      charFormat.setAnchorHref( url );
+      m_editor->setCurrentCharFormat( charFormat );
+    }
+    else
+    {
+      m_editor->insertHtml( QStringLiteral( "<a href=\"%1\">%2</a> " ).arg( url ).arg( title ) );
+    }
   }
 
   m_titleInput->clear();
