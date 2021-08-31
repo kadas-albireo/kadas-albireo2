@@ -186,6 +186,7 @@ SOURCES += \
 ../kadas/app/kadascanvascontextmenu.h \
 ../kadas/app/kadaslayoutdesignermanager.cpp \
 ../kadas/app/kadasmessagelogviewer.h \
+../kadas/app/kadaspluginlayerproperties.cpp \
 ../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp \
 ../kadas/app/mapgrid/kadasmapgridlayer.cpp \
 ../kadas/app/mapgrid/kadasmaptoolmapgrid.h \
@@ -212,7 +213,6 @@ SOURCES += \
 ../kadas/app/kadasmainwindow.cpp \
 ../kadas/app/kadaslayertreeviewmenuprovider.cpp \
 ../kadas/app/kadaspythonintegration.h \
-../kadas/app/kadaspluginlayerproperties.cpp \
 ../kadas/app/kadasgpxintegration.h \
 ../kadas/app/kadaspluginmanager.cpp \
 ../kadas/app/kadasgpxintegration.cpp \
@@ -243,6 +243,7 @@ SOURCES += \
 ../kadas/app/bullseye/kadasmaptoolbullseye.h \
 ../kadas/app/bullseye/kadasbullseyelayer.h \
 ../kadas/app/bullseye/kadasbullseyewidgetbase.ui \
+../kadas/app/kadaspluginlayerproperties.h \
 ../kadas/app/milx/kadasmilxintegration.cpp \
 ../kadas/app/milx/kadasmilxintegration.h \
 ../kadas/app/kadasredliningintegration.h \
@@ -278,7 +279,6 @@ SOURCES += \
 ../kadas/app/kadasgpsintegration.cpp \
 ../kadas/app/kadasmainwindow.h \
 ../kadas/app/kadaspythonintegration.cpp \
-../kadas/app/kadaspluginlayerproperties.h \
 ../kadas/app/kadasmapwidgetmanager.h \
 ../kadas/app/kadasapplication.cpp \
 ../kadas/app/kadasmapidentifydialog.h \
