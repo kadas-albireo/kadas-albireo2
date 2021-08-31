@@ -206,7 +206,7 @@ void KadasAddLinkDialog::accept()
 
   if ( !title.isEmpty() )
   {
-    m_editor->insertHtml( QStringLiteral( "<a href=\"%1\">%2</a>" ).arg( url ).arg( title ) );
+    m_editor->insertHtml( QStringLiteral( "<a href=\"%1\">%2</a> " ).arg( url ).arg( title ) );
   }
 
   m_titleInput->clear();
