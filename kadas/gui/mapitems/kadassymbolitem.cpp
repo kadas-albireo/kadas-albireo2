@@ -245,7 +245,7 @@ void KadasPinItem::updateTooltip()
   {
     posStr = QString( "%1 (%2)" ).arg( QgsPointXY( position() ).toString() ).arg( crs().authid() );
   }
-  QString toolTipText = QString( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
+  QString toolTipText = tr( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
                         .arg( posStr )
                         .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
                         .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == QgsUnitTypes::DistanceFeet ? "ft" : "m" )
