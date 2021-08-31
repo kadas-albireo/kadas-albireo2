@@ -11,7 +11,7 @@
 
 
 
-class KadasMapItemTooltip : QTextBrowser
+class KadasMapItemTooltip : QTextEdit
 {
 %Docstring
 *************************************************************************
@@ -38,6 +38,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
   protected:
     virtual void enterEvent( QEvent * );
+
+    virtual void mousePressEvent( QMouseEvent *ev );
+
+    virtual void mouseMoveEvent( QMouseEvent *ev );
+
+    virtual void mouseReleaseEvent( QMouseEvent *ev );
 
 
 };

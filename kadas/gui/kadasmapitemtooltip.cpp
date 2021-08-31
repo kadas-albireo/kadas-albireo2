@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAbstractTextDocumentLayout>
+#include <QDesktopServices>
 #include <QUrlQuery>
 
 #include <qgis/qgsmapcanvas.h>
@@ -24,11 +26,10 @@
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
 KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
-  : QTextBrowser( canvas )
+  : QTextEdit( canvas )
   , mCanvas( canvas )
 {
   setObjectName( "TooltipWidget" );
-  setOpenExternalLinks( true );
   mShowTimer.setSingleShot( true );
   mHideTimer.setSingleShot( true );
   setReadOnly( true );
@@ -111,6 +112,43 @@ void KadasMapItemTooltip::enterEvent( QEvent * )
 {
   mHideTimer.stop();
   mShowTimer.stop();
+}
+
+void KadasMapItemTooltip::mousePressEvent( QMouseEvent *ev )
+{
+  mMouseMoved = false;
+  QTextEdit::mousePressEvent( ev );
+}
+
+void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
+{
+  mMouseMoved = true;
+  QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
+  if ( ev->button() == Qt::NoButton && !anchor.isEmpty() )
+  {
+    viewport()->setCursor( Qt::PointingHandCursor );
+  }
+  else
+  {
+    viewport()->setCursor( Qt::IBeamCursor );
+  }
+  QTextEdit::mouseMoveEvent( ev );
+}
+
+void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
+{
+  if ( ev->button() == Qt::LeftButton && !mMouseMoved )
+  {
+    QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
+    if ( !anchor.isEmpty() )
+    {
+      QDesktopServices::openUrl( QUrl( anchor ) );
+    }
+  }
+  else
+  {
+    QTextEdit::mouseReleaseEvent( ev );
+  }
 }
 
 void KadasMapItemTooltip::clear()

@@ -25,7 +25,7 @@
 class QgsMapCanvas;
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
+class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
 {
     Q_OBJECT
   public:
@@ -38,6 +38,9 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
 
   protected:
     void enterEvent( QEvent * ) override;
+    void mousePressEvent( QMouseEvent *ev ) override;
+    void mouseMoveEvent( QMouseEvent *ev ) override;
+    void mouseReleaseEvent( QMouseEvent *ev ) override;
 
   private:
     static constexpr int sWidth = 320;
@@ -47,6 +50,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextBrowser
     QTimer mHideTimer;
     QPoint mPos;
     QgsMapCanvas *mCanvas = nullptr;
+    bool mMouseMoved = false;
     const KadasMapItem *mItem = nullptr;
 
   private slots:
