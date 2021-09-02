@@ -444,6 +444,7 @@ void KadasSearchBox::searchResultFound( KadasSearchProvider::SearchResult result
   resultItem->setData( 0, sEntryTypeRole, EntryTypeResult );
   resultItem->setData( 0, sResultDataRole, QVariant::fromValue( result ) );
   resultItem->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+  resultItem->setToolTip( 0, result.text );
 
   categoryItem->addChild( resultItem );
   int categoryCount = categoryItem->data( 0, sCatCountRole ).toInt() + 1;
