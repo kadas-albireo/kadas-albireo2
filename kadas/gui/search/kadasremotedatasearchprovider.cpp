@@ -20,6 +20,7 @@
 #include <QNetworkReply>
 #include <QUrlQuery>
 
+#include <qgis/qgsarcgisrestutils.h>
 #include <qgis/qgsdatasourceuri.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslinestring.h>
@@ -52,8 +53,8 @@ KadasRemoteDataSearchProvider::KadasRemoteDataSearchProvider( QgsMapCanvas *mapC
 void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, const SearchRegion &searchRegion )
 {
   // List queryable rasters
-  typedef QPair<QString, QString> LayerIdName; // <layerid, layername>
-  QList< LayerIdName > queryableLayers;
+  typedef QPair<QString, QString> LayerUrlName; // <layerid, layername>
+  QList< LayerUrlName > queryableLayers;
   for ( const QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
   {
     const QgsRasterLayer *rlayer = qobject_cast<const QgsRasterLayer *> ( layer );
@@ -71,10 +72,11 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
       // Example: https://<...>/services/<group>/<service>/MapServer
       if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
       {
-        queryableLayers.append( qMakePair( urlParts[nParts - 3] + ":" + urlParts[nParts - 2], rlayer->name() ) );
+        queryableLayers.append( qMakePair( dataSource.param( "url" ), rlayer->name() ) );
       }
     }
 
+    // Detect WMS served by ArcGIS MapServer
     if ( rlayer->providerType() == "wms" )
     {
       QgsDataSourceUri dataSource;
@@ -85,21 +87,13 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
       // Example: https://<...>/services/<group>/<service>/MapServer/WMSServer
       if ( nParts > 5 && urlParts[nParts - 1] == "WMSServer" && urlParts[nParts - 2] == "MapServer" && urlParts[nParts - 5] == "services" )
       {
-        queryableLayers.append( qMakePair( urlParts[nParts - 4] + ":" + urlParts[nParts - 3], rlayer->name() ) );
+        queryableLayers.append( qMakePair( urlParts.mid( 0, urlParts.length() - 1 ).join( "/" ), rlayer->name() ) );
       }
       // Detect MapServer WMTS Layers
       // Example: https://<...>/rest/services/<group>/<service>/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
       else if ( nParts > 8 && urlParts[nParts - 1] == "WMTSCapabilities.xml" && urlParts[nParts - 4] == "MapServer" && urlParts[nParts - 7] == "services" )
       {
-        queryableLayers.append( qMakePair( urlParts[nParts - 6] + ":" + urlParts[nParts - 5], rlayer->name() ) );
-      }
-      // Detect geo.admin.ch layers
-      else if ( nParts > 1 && urlParts[1].endsWith( "geo.admin.ch" ) )
-      {
-        for ( const QString &id : dataSource.params( "layers" ) )
-        {
-          queryableLayers.append( qMakePair( id, rlayer->name() ) );
-        }
+        queryableLayers.append( qMakePair( urlParts.mid( 0, urlParts.length() - 3 ).join( "/" ), rlayer->name() ) );
       }
     }
   }
@@ -108,36 +102,39 @@ void KadasRemoteDataSearchProvider::startSearch( const QString &searchtext, cons
     return;
   }
 
-  for ( const LayerIdName &ql : queryableLayers )
+  QString spatialFilter;
+  if ( !searchRegion.polygon.isEmpty() )
   {
-    QUrl url( QgsSettings().value( "search/remotedatasearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString() );
-    QUrlQuery query( url );
-    query.addQueryItem( "type", "featuresearch" );
-    query.addQueryItem( "searchText", searchtext );
-    query.addQueryItem( "features", ql.first );
-    if ( !searchRegion.polygon.isEmpty() )
+    QgsRectangle rect;
+    rect.setMinimal();
+    QgsLineString *exterior = new QgsLineString();
+    QgsCoordinateTransform ct = QgsCoordinateTransform( QgsCoordinateReferenceSystem( searchRegion.crs ), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
+    for ( const QgsPointXY &p : searchRegion.polygon )
     {
-      QgsRectangle rect;
-      rect.setMinimal();
-      QgsLineString *exterior = new QgsLineString();
-      QgsCoordinateTransform ct = QgsCoordinateTransform( QgsCoordinateReferenceSystem( searchRegion.crs ), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
-      for ( const QgsPointXY &p : searchRegion.polygon )
-      {
-        QgsPointXY pt = ct.transform( p );
-        rect.include( pt );
-        exterior->addVertex( QgsPoint( pt ) );
-      }
-      query.addQueryItem( "bbox", QString( "%1,%2,%3,%4" ).arg( rect.xMinimum(), 0, 'f', 4 ).arg( rect.yMinimum(), 0, 'f', 4 ).arg( rect.xMaximum(), 0, 'f', 4 ).arg( rect.yMaximum(), 0, 'f', 4 ) );
-      QgsPolygon *poly = new QgsPolygon();
-      poly->setExteriorRing( exterior );
-      mReplyFilter = new QgsGeometry( poly );
+      QgsPointXY pt = ct.transform( p );
+      rect.include( pt );
+      exterior->addVertex( QgsPoint( pt ) );
     }
+    QgsPolygon *poly = new QgsPolygon();
+    poly->setExteriorRing( exterior );
+    mReplyFilter = new QgsGeometry( poly );
+    spatialFilter = QString( "{\"spatialRel\": \"esriSpatialRelIntersects\", \"geometryType\": \"esriGeometryEnvelope\", \"geometry\": { \"xmin\": %1, \"ymin\": %2, \"xmax\": %3, \"ymax\": %4, \"spatialReference\": {\"wkid\": 4326}}}" )
+                    .arg( rect.xMinimum(), 0, 'f', 4 ).arg( rect.yMinimum(), 0, 'f', 4 ).arg( rect.xMaximum(), 0, 'f', 4 ).arg( rect.yMaximum(), 0, 'f', 4 );
+  }
+
+  for ( const LayerUrlName &ql : queryableLayers )
+  {
+    QUrl url( ql.first + "/find" );
+    QUrlQuery query( url );
+    query.addQueryItem( "f", "json" );
+    query.addQueryItem( "searchText", searchtext );
+    query.addQueryItem( "layers", ql.second );
+    query.addQueryItem( "spatialFilter", spatialFilter );
 
     url.setQuery( query );
     QNetworkRequest req( url );
     req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-    reply->setProperty( "layerName", ql.second );
     connect( reply, &QNetworkReply::finished, this, &KadasRemoteDataSearchProvider::replyFinished );
     mNetReplies.append( reply );
   }
@@ -169,17 +166,6 @@ void KadasRemoteDataSearchProvider::replyFinished()
 
   if ( reply->error() == QNetworkReply::NoError )
   {
-    QString layerName = reply->property( "layerName" ).toString();
-    QStringList bboxStr = QUrlQuery( reply->request().url().query() ).queryItemValue( "bbox" ).split( "," );
-    QgsRectangle bbox;
-    if ( bboxStr.size() == 4 )
-    {
-      bbox.setXMinimum( bboxStr[0].toDouble() );
-      bbox.setYMinimum( bboxStr[1].toDouble() );
-      bbox.setXMaximum( bboxStr[2].toDouble() );
-      bbox.setYMaximum( bboxStr[3].toDouble() );
-    }
-
     QByteArray replyText = reply->readAll();
     QJsonParseError err;
     QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
@@ -191,37 +177,24 @@ void KadasRemoteDataSearchProvider::replyFinished()
     for ( const QVariant &item : resultMap["results"].toList() )
     {
       QVariantMap itemMap = item.toMap();
-      QVariantMap itemAttrsMap = itemMap["attrs"].toMap();
-
-      if ( !mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
-      {
-        QgsDebugMsg( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString() );
-        continue;
-      }
+      QVariantMap itemAttrsMap = itemMap["attributes"].toMap();
+      QString authid = QString( "EPSG:%1" ).arg( itemAttrsMap["spatialReference"].toMap()["wkid"].toString() );
+      QgsCoordinateReferenceSystem crs( authid );
+      QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
+      QgsAbstractGeometry *geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, &crs );
+      geom->transform( QgsCoordinateTransform( crs, crsWgs84, QgsProject::instance() ) );
 
       SearchResult searchResult;
-      searchResult.crs = itemAttrsMap["sr"].toString();
-      searchResult.bbox = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                        mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
-      // When bbox is empty, fallback to pos + zoomScale is used
-      searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
-      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsCoordinateReferenceSystem( searchResult.crs ), QgsProject::instance() );
-      if ( !bbox.isEmpty() && !bbox.contains( searchResult.pos ) )
-      {
-        continue;
-      }
-      if ( mReplyFilter && !mReplyFilter->contains( &searchResult.pos ) )
-      {
-        continue;
-      }
-
-      searchResult.pos = ct.transform( searchResult.pos );
+      searchResult.crs = crsWgs84.authid();
+      searchResult.geometry = geom->asJson( 5 );
+      searchResult.bbox = geom->boundingBox();
+      searchResult.pos = geom->centroid();
       searchResult.zoomScale = 1000;
-      searchResult.category = tr( "Layer %1" ).arg( layerName );
+      searchResult.category = tr( "Layer %1" ).arg( itemMap["layerName"].toString() );
       searchResult.categoryPrecedence = 11;
-      searchResult.text = itemAttrsMap["label"].toString() + " (" + itemAttrsMap["detail"].toString() + ")";
-      searchResult.text.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
-      searchResult.showPin = true;
+      searchResult.text = QString( "%1: %2" ).arg( itemMap["foundFieldName"].toString() ).arg( itemMap["value"].toString() );
+      searchResult.showPin = false;
+      delete geom;
       emit searchResultFound( searchResult );
     }
   }
