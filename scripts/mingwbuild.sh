@@ -215,8 +215,8 @@ osgPlugins=$(basename $MINGWROOT/bin/osgPlugins-*)
 lnk $MINGWROOT/bin/$osgPlugins $installprefix/bin/$osgPlugins
 
 mkdir -p $installprefix/share/qt5/translations/
-cp -a $MINGWROOT/share/qt5/translations/qt_*.qm  $installprefix/share/qt5/translations
-cp -a $MINGWROOT/share/qt5/translations/qtbase_*.qm  $installprefix/share/qt5/translations
+#cp -a $MINGWROOT/share/qt5/translations/qt_*.qm  $installprefix/share/qt5/translations
+#cp -a $MINGWROOT/share/qt5/translations/qtbase_*.qm  $installprefix/share/qt5/translations
 
 # Sort origins file
 cat $installprefix/origins.txt | sort | uniq > $installprefix/origins.new && mv $installprefix/origins.new $installprefix/origins.txt
