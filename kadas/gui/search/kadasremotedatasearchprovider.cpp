@@ -34,7 +34,7 @@
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 
 
-const int KadasRemoteDataSearchProvider::sSearchTimeout = 2000;
+const int KadasRemoteDataSearchProvider::sSearchTimeout = 10000;
 const int KadasRemoteDataSearchProvider::sResultCountLimit = 100;
 
 

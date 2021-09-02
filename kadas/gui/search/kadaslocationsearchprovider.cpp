@@ -28,7 +28,7 @@
 
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
 
-const int KadasLocationSearchProvider::sSearchTimeout = 2000;
+const int KadasLocationSearchProvider::sSearchTimeout = 10000;
 const int KadasLocationSearchProvider::sResultCountLimit = 50;
 
 
