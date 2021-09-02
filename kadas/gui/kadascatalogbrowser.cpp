@@ -239,8 +239,8 @@ void KadasCatalogBrowser::providerFinished()
   {
     if ( mCatalogModel->rowCount() > 0 )
     {
-      mCatalogModel->invisibleRootItem()->sortChildren( 0 );
       mFilterProxyModel->setSourceModel( mCatalogModel );
+      mFilterProxyModel->sort( 0 );
       mTreeView->setModel( mFilterProxyModel );
     }
     else
