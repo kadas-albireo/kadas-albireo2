@@ -181,6 +181,7 @@ void KadasMainWindow::init()
   addServiceMenu->addAction( tr( "Add WCS layer" ), this, [this] { showSourceSelectDialog( "wcs" ); } );
   addServiceMenu->addAction( tr( "Add vector tile layer" ), this, [this] { showSourceSelectDialog( "vectortile" ); } );
   addServiceMenu->addAction( tr( "Add XYZ layer" ), this, [this] { showSourceSelectDialog( "xyz" ); } );
+//  addServiceMenu->addAction( tr( "Add MapServer layer" ), this, [this] { showSourceSelectDialog( "arcgisfeatureserver" ); } );
   mAddServiceButton->setMenu( addServiceMenu );
 
   mMapCanvas->installEventFilter( this );
