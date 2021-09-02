@@ -114,9 +114,14 @@ void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinate
         << QgsColorRampShader::ColorRampItem( 40, QColor( 231, 91, 58 ), QString::fromUtf8( "40°" ) )
         << QgsColorRampShader::ColorRampItem( 45, QColor( 215, 25, 28 ), QString::fromUtf8( "45°" ) );
     rampShader->setColorRampItemList( colorRampItems );
+    QgsColorRampLegendNodeSettings *legendSettings = new QgsColorRampLegendNodeSettings( *rampShader->legendSettings() );
+    legendSettings->setUseContinuousLegend( false );
+    rampShader->setLegendSettings( legendSettings );
     QgsRasterShader *shader = new QgsRasterShader();
     shader->setRasterShaderFunction( rampShader );
     QgsSingleBandPseudoColorRenderer *renderer = new QgsSingleBandPseudoColorRenderer( 0, 1, shader );
+    renderer->setClassificationMin( 0 );
+    renderer->setClassificationMin( 255 );
     layer->setRenderer( renderer );
     QgsProject::instance()->addMapLayer( layer );
   }
