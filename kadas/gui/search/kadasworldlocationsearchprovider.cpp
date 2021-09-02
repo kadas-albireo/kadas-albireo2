@@ -139,7 +139,7 @@ void KadasWorldLocationSearchProvider::replyFinished()
     }
     if ( itemAttrsMap.contains( "boundingBox" ) )
     {
-      static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)" );
+      static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
       QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
       if ( match.isValid() )
       {
