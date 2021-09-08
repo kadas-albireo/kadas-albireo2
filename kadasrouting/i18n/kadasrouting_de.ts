@@ -69,17 +69,17 @@
     <message>
         <location filename="navigationpanel.py" line="59"/>
         <source>Then</source>
-        <translation type="unfinished"/>
+        <translation>Dann</translation>
     </message>
     <message>
         <location filename="datacatalogueclient.py" line="153"/>
         <source>Download is canceled!</source>
-        <translation type="unfinished"/>
+        <translation>Download wird abgebrochen!</translation>
     </message>
     <message>
         <location filename="datacatalogueclient.py" line="166"/>
         <source>Downloading...</source>
-        <translation type="unfinished"/>
+        <translation>Datei wird heruntergeladen...</translation>
     </message>
 </context>
 <context>
@@ -87,27 +87,27 @@
     <message>
         <location filename="cpbottombar.py" line="119"/>
         <source>Custom polygon button is checked, but no polygon is drawn</source>
-        <translation type="unfinished"/>
+        <translation>Custom Polygon wurde ausgewählt, aber kein Polygon gezeichnet</translation>
     </message>
     <message>
         <location filename="cpbottombar.py" line="130"/>
         <source>The polygon layer for Patrol must contain exactly only one polygon.</source>
-        <translation type="unfinished"/>
+        <translation>Für die zu befahrende Fläche darf nur ein einziges Polygon verwendet werden</translation>
     </message>
     <message>
         <location filename="cpbottombar.py" line="140"/>
         <source>Polygon layer button is checked for Patrol, but no layer polygon is selected</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde noch kein Polygon ausgewählt</translation>
     </message>
     <message>
         <location filename="cpbottombar.py" line="172"/>
         <source>Could not compute patrol: no polygon selected</source>
-        <translation type="unfinished"/>
+        <translation>Patrouillenfahrt konnte nicht berechnet werden: es wurde kein Polygon ausgewählt</translation>
     </message>
     <message>
         <location filename="cpbottombar.py" line="182"/>
         <source>Could not compute route</source>
-        <translation type="unfinished"/>
+        <translation>Route konnte nicht berechnet werden</translation>
     </message>
 </context>
 <context>
@@ -128,7 +128,7 @@
     <message>
         <location filename="connectors.py" line="126"/>
         <source>No map package selected. Please open data catalogue, and select a map package.</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde kein Datenpaket ausgewählt. Bitte ein Kartenpaket aus dem Datenkatalog auswählen</translation>
     </message>
 </context>
 <context>
@@ -141,7 +141,7 @@
     <message>
         <location filename="datacataloguebottombar.py" line="182"/>
         <source>Reload data catalogue with the selected repository</source>
-        <translation type="unfinished"/>
+        <translation>Datenkatalog neu laden</translation>
     </message>
 </context>
 <context>
@@ -194,12 +194,12 @@
     <message>
         <location filename="datacataloguebottombar.py" line="68"/>
         <source>N/A</source>
-        <translation type="unfinished"/>
+        <translation>nicht verfügbar</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
         <source>This map package is local only, if you delete it you can not download it from the selected URL</source>
-        <translation type="unfinished"/>
+        <translation>Dieses Kartenpaket ist nur lokal gespeichert und kann nicht heruntergeladen werden</translation>
     </message>
 </context>
 <context>
@@ -368,22 +368,22 @@
     <message>
         <location filename="datacataloguebottombar.ui" line="44"/>
         <source>Repository</source>
-        <translation type="unfinished"/>
+        <translation>Datenablage</translation>
     </message>
     <message>
         <location filename="cpbottombar.ui" line="395"/>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="cpbottombar.ui" line="251"/>
         <source>Start navigation</source>
-        <translation type="unfinished"/>
+        <translation>Start der Navigation</translation>
     </message>
     <message>
         <location filename="cpbottombar.ui" line="306"/>
         <source>Patrol area</source>
-        <translation type="unfinished"/>
+        <translation>Zu patrouillierendes Gebiet</translation>
     </message>
 </context>
 <context>
@@ -449,17 +449,17 @@
     <message>
         <location filename="navigationpanel.py" line="411"/>
         <source>The &apos;Routes&apos; layer has no waypoints.</source>
-        <translation type="unfinished"/>
+        <translation>Die Ebene &quot;Routen&quot; enthält keine Wegpunkte</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="576"/>
         <source>You must save your project to use waypoint layers for navigation</source>
-        <translation type="unfinished"/>
+        <translation>Das Projekt muss gespeichert werden um eine Wegpunkt-Ebene für die Navigation zu verwenden</translation>
     </message>
     <message>
         <location filename="navigationpanel.py" line="583"/>
         <source>There are no waypoints in the &apos;Routes&apos; layer</source>
-        <translation type="unfinished"/>
+        <translation>Die Ebene &quot;Routen&quot; enthält keine Wegpunkte</translation>
     </message>
 </context>
 <context>
@@ -606,12 +606,12 @@
     <message>
         <location filename="plugin.py" line="69"/>
         <source>Patrol</source>
-        <translation type="unfinished"/>
+        <translation>Patrouillieren</translation>
     </message>
     <message>
         <location filename="plugin.py" line="93"/>
         <source>Routing Data</source>
-        <translation type="unfinished"/>
+        <translation>Navigationsdatensätze</translation>
     </message>
 </context>
 <context>
@@ -619,37 +619,37 @@
     <message>
         <location filename="valhallaroutebottombar.py" line="60"/>
         <source>Close routing dialog</source>
-        <translation type="unfinished"/>
+        <translation>Dialogfenster für die Navigation schließen</translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="207"/>
         <source>Please, select a valid destination layer</source>
-        <translation type="unfinished"/>
+        <translation>Bitte eine gültige Ziel-Ebene auswählen </translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="215"/>
         <source>Invalid location:</source>
-        <translation type="unfinished"/>
+        <translation>Ungültige Ortsangabe</translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="218"/>
         <source>Both origin and destination points are required</source>
-        <translation type="unfinished"/>
+        <translation>Ziel und Endpunkt müssen angegeben werden</translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="236"/>
         <source>Custom polygon button is checked, but no polygon is drawn</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde noch kein Polygon gezeichnet</translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="248"/>
         <source>Polygon layer button is checked, but no layer polygon is selected</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde noch kein Polygon ausgewählt</translation>
     </message>
     <message>
         <location filename="valhallaroutebottombar.py" line="295"/>
         <source>Could not compute route</source>
-        <translation type="unfinished"/>
+        <translation>Route konnte nicht berechnet werden</translation>
     </message>
 </context>
 </TS>

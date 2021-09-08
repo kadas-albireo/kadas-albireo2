@@ -194,7 +194,7 @@
     <message>
         <location filename="datacataloguebottombar.py" line="68"/>
         <source>N/A</source>
-        <translation type="unfinished"/>
+        <translation>Non disponibile</translation>
     </message>
     <message>
         <location filename="datacataloguebottombar.py" line="80"/>
