@@ -17,7 +17,35 @@
 #include "ui_kadaspluginmanager.h"
 #include <kadas/gui/kadasbottombar.h>
 
+class QProgressBar;
 class KadasRibbonButton;
+
+
+class KadasPluginManagerInstallButton : public QWidget
+{
+    Q_OBJECT
+  public:
+    enum Status
+    {
+      Install,
+      Installing,
+      Uninstall,
+      Uninstalling,
+      Update
+    };
+    KadasPluginManagerInstallButton( Status status, QWidget *parent = nullptr );
+    void setStatus( Status status, int progress = 0 );
+    Status status() const { return mStatus; }
+
+  signals:
+    void clicked();
+
+  private:
+    Status mStatus = Status::Install;
+    QPushButton *mButton = nullptr;
+    QProgressBar *mProgressbar = nullptr;
+};
+
 
 class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerBase
 {
@@ -47,14 +75,14 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     QMap< QString, PluginInfo > mAvailablePlugins;
 
     QMap< QString, PluginInfo > availablePlugins();
-    bool installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion );
-    bool uninstallPlugin( const QString &pluginName, const QString &moduleName );
-    void updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion );
+    bool installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b );
+    bool uninstallPlugin( const QString &pluginName, const QString &moduleName, KadasPluginManagerInstallButton *b );
+    void updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b );
 
     //tree widget state
     void setItemInstallable( QTreeWidgetItem *item, const QString &version );
     void setItemRemoveable( QTreeWidgetItem *item );
-    void changeItemInstallationState( QTreeWidgetItem *item, const QString &buttonText );
+    void changeItemInstallationState( QTreeWidgetItem *item, KadasPluginManagerInstallButton::Status buttonStatus );
     void setItemActivatable( QTreeWidgetItem *item );
     void setItemDeactivatable( QTreeWidgetItem *item );
     void setItemUpdateable( QTreeWidgetItem *item );

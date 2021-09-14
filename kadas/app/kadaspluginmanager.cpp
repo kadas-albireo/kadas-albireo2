@@ -22,6 +22,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QTreeWidgetItem>
 #include <QVersionNumber>
@@ -36,6 +37,60 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
+
+
+KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )
+  : QWidget( parent )
+{
+  setLayout( new QHBoxLayout );
+  mButton = new QPushButton( this );
+  mProgressbar = new QProgressBar( this );
+  mProgressbar->setRange( 0, 100 );
+  layout()->addWidget( mButton );
+  layout()->addWidget( mProgressbar );
+  layout()->setContentsMargins( 0, 0, 0, 0 );
+  layout()->setSpacing( 0 );
+  setStatus( status );
+
+  connect( mButton, &QPushButton::clicked, this, &KadasPluginManagerInstallButton::clicked );
+}
+
+void KadasPluginManagerInstallButton::setStatus( Status status, int progress )
+{
+  mStatus = status;
+  if ( progress == 0 )
+  {
+    mButton->setVisible( true );
+    mProgressbar->setVisible( false );
+  }
+  else
+  {
+    mButton->setVisible( false );
+    mProgressbar->setVisible( true );
+    mProgressbar->setValue( progress );
+  }
+  mButton->setEnabled( status != Installing && status != Uninstalling );
+  switch ( status )
+  {
+    case Install:
+      mButton->setText( tr( "Install" ) );
+      break;
+    case Installing:
+      mButton->setText( tr( "Installing..." ) );
+      mProgressbar->setFormat( tr( "Installing..." ) );
+      break;
+    case Uninstall:
+      mButton->setText( tr( "Uninstall" ) );
+      break;
+    case Uninstalling:
+      mButton->setText( tr( "Uninstalling..." ) );
+      mProgressbar->setFormat( tr( "Uninstalling..." ) );
+      break;
+    case Update:
+      mButton->setText( tr( "Update" ) );
+  }
+}
+
 
 KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ): KadasBottomBar( canvas ), mAction( action )
 {
@@ -226,6 +281,7 @@ void KadasPluginManager::updateButtonClicked()
     return;
   }
 
+  KadasPluginManagerInstallButton *b = qobject_cast<KadasPluginManagerInstallButton *>( QObject::sender() );
   QString downloadPath = mAvailablePlugins.value( pluginName ).downloadLink;
   QString pluginTooltip = mAvailablePlugins.value( pluginName ).description;
   QString pluginVersion = mAvailablePlugins.value( pluginName ).version;
@@ -237,7 +293,7 @@ void KadasPluginManager::updateButtonClicked()
     return;
   }
   QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
-  updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip, pluginVersion );
+  updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip, pluginVersion, b );
 
   QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
   if ( available.size() > 0 )
@@ -248,7 +304,7 @@ void KadasPluginManager::updateButtonClicked()
 
 void KadasPluginManager::installButtonClicked()
 {
-  QPushButton *b = qobject_cast<QPushButton *>( QObject::sender() );
+  KadasPluginManagerInstallButton *b = qobject_cast<KadasPluginManagerInstallButton *>( QObject::sender() );
   QString pluginName = sender()->property( "PluginName" ).toString();
   if ( pluginName.isEmpty() )
   {
@@ -256,7 +312,7 @@ void KadasPluginManager::installButtonClicked()
   }
 
   QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
-  QString prevText = b->text();
+  KadasPluginManagerInstallButton::Status prevStatus = b->status();
   bool success = false;
 
   if ( installed.size() < 1 ) //not yet installed
@@ -266,30 +322,27 @@ void KadasPluginManager::installButtonClicked()
     QString version = mAvailablePlugins.value( pluginName ).version;
     if ( !downloadPath.isEmpty() )
     {
-      b->setEnabled( false );
-      b->setText( tr( "Installing..." ) );
-      success = installPlugin( pluginName, downloadPath, pluginTooltip, version );
+      success = installPlugin( pluginName, downloadPath, pluginTooltip, version, b );
     }
   }
   else //plugin installed, remove it
   {
     if ( QMessageBox::question( this, tr( "Remove plugin" ), tr( "Are you sure you want to remove the plugin '%1'?" ).arg( pluginName ) ) == QMessageBox::Yes )
     {
-      b->setEnabled( false );
-      b->setText( tr( "Uninstalling..." ) );
       QString moduleName = installed.at( 0 )->data( 0, Qt::UserRole ).toString();
-      success = uninstallPlugin( pluginName, moduleName );
+      success = uninstallPlugin( pluginName, moduleName, b );
     }
   }
-  b->setEnabled( true );
   if ( ! success )
   {
-    b->setText( prevText );
+    b->setStatus( prevStatus );
   }
 }
 
-bool KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
+bool KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b )
 {
+  b->setStatus( KadasPluginManagerInstallButton::Installing );
+
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
   {
@@ -305,15 +358,20 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
 
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
+  QTextStream( stdout ) << downloadUrl << Qt::endl;
   QUrl repositoryUrl( downloadUrl );
   QEventLoop e;
   nf.fetchContent( repositoryUrl );
+  connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot )
+  {
+    b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 );
+  } );
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
   e.exec();
 
   if ( nf.reply()->error() != QNetworkReply::NoError )
   {
-    kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error downloading plugin: %1" ).arg( nf.reply()->error() ) );
+    kApp->mainWindow()->messageBar()->pushCritical( tr( "Plugin install failed" ), tr( "Error downloading plugin: %1" ).arg( nf.reply()->errorString() ) );
     return false;
   }
 
@@ -390,8 +448,10 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   return true;
 }
 
-bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QString &moduleName )
+bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QString &moduleName, KadasPluginManagerInstallButton *b )
 {
+  b->setStatus( KadasPluginManagerInstallButton::Uninstalling );
+
   //deactivate first
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
@@ -424,30 +484,30 @@ bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   return true;
 }
 
-void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion )
+void KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b )
 {
-  uninstallPlugin( pluginName, moduleName );
-  installPlugin( pluginName, downloadUrl, pluginTooltip, pluginVersion );
+  uninstallPlugin( pluginName, moduleName, b );
+  installPlugin( pluginName, downloadUrl, pluginTooltip, pluginVersion, b );
 }
 
 void KadasPluginManager::setItemInstallable( QTreeWidgetItem *item, const QString &version )
 {
-  changeItemInstallationState( item, tr( "Install" ) );
+  changeItemInstallationState( item, KadasPluginManagerInstallButton::Install );
   item->setText( 2, version );
 }
 
 void KadasPluginManager::setItemRemoveable( QTreeWidgetItem *item )
 {
-  changeItemInstallationState( item, tr( "Uninstall" ) );
+  changeItemInstallationState( item, KadasPluginManagerInstallButton::Uninstall );
 }
 
-void KadasPluginManager::changeItemInstallationState( QTreeWidgetItem *item, const QString &buttonText )
+void KadasPluginManager::changeItemInstallationState( QTreeWidgetItem *item, KadasPluginManagerInstallButton::Status buttonStatus )
 {
   if ( item )
   {
-    QPushButton *b = new QPushButton( buttonText );
+    KadasPluginManagerInstallButton *b = new KadasPluginManagerInstallButton( buttonStatus );
     b->setProperty( "PluginName", item->text( 0 ) );
-    QObject::connect( b, &QPushButton::clicked, this, &KadasPluginManager::installButtonClicked );
+    QObject::connect( b, &KadasPluginManagerInstallButton::clicked, this, &KadasPluginManager::installButtonClicked );
     mAvailableTreeWidget->setItemWidget( item, 1, b );
   }
 }
@@ -472,9 +532,9 @@ void KadasPluginManager::setItemUpdateable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    QPushButton *b = new QPushButton( tr( "Update" ) );
+    KadasPluginManagerInstallButton *b = new KadasPluginManagerInstallButton( KadasPluginManagerInstallButton::Update );
     b->setProperty( "PluginName", item->text( 0 ) );
-    QObject::connect( b, &QPushButton::clicked, this, &KadasPluginManager::updateButtonClicked );
+    QObject::connect( b, &KadasPluginManagerInstallButton::clicked, this, &KadasPluginManager::updateButtonClicked );
     mAvailableTreeWidget->setItemWidget( item, 2, b );
   }
 }
