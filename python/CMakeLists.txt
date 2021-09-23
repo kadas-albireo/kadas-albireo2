@@ -33,6 +33,9 @@ SET(SIP_INCLUDES ${PYQT5_SIP_DIR} ${QGIS_SIP_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 if((${PYQT5_VERSION_STR} VERSION_EQUAL 5.15) OR (${PYQT5_VERSION_STR} VERSION_GREATER 5.15))
   set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} VECTOR_MAPPED_TYPE)
 endif()
+if(NOT ANDROID)
+  set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} ANDROID)
+endif()
 
 # Macro to byte-compile a target's staged Python resource(s)
 macro(PY_COMPILE TARGET_NAME RESOURCE_PATHS)
@@ -48,10 +51,16 @@ endmacro(PY_COMPILE)
 
 separate_arguments(PYQT5_SIP_FLAGS_args UNIX_COMMAND "${PYQT5_SIP_FLAGS}")
 
+if(UNIX)
+  add_definitions(-Dprotected=public)
+endif()
+
 # core module
 FILE(GLOB_RECURSE sip_files_core kadascore/*.sip kadascore/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_core})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS_args} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadascore.api -n ${PYQT5_SIP_IMPORT} -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadascore.pyi)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadascore/project.py.in ${CMAKE_CURRENT_BINARY_DIR}/kadascore/project.py @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/kadascore/pyproject.toml @ONLY)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadascore kadascore/kadascore.sip "${sip_files_core}" cpp_files)
 BUILD_SIP_PYTHON_MODULE(kadas._kadascore kadascore/kadascore.sip ${cpp_files} "" kadas_core ${QGIS_CORE_LIBRARY})
 
@@ -59,6 +68,8 @@ BUILD_SIP_PYTHON_MODULE(kadas._kadascore kadascore/kadascore.sip ${cpp_files} ""
 FILE(GLOB_RECURSE sip_files_analysis kadasanalysis/*.sip kadasanalysis/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_analysis})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS_args} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadasanalysis.api -n ${PYQT5_SIP_IMPORT} -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasanalysis.pyi)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/project.py.in ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/project.py @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/pyproject.toml @ONLY)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip "${sip_files_analysis}" cpp_files)
 BUILD_SIP_PYTHON_MODULE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip ${cpp_files} "" kadas_core kadas_analysis ${QGIS_CORE_LIBRARY} ${QGIS_ANALYSIS_LIBRARY})
 
@@ -66,6 +77,8 @@ BUILD_SIP_PYTHON_MODULE(kadas._kadasanalysis kadasanalysis/kadasanalysis.sip ${c
 FILE(GLOB_RECURSE sip_files_gui kadasgui/*.sip kadasgui/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_gui})
 SET(SIP_EXTRA_OPTIONS ${PYQT5_SIP_FLAGS_args} -g -o -a ${CMAKE_BINARY_DIR}/python/kadas.kadasgui.api -n ${PYQT5_SIP_IMPORT} -y ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasgui.pyi)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/project.py.in ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/project.py @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/pyproject.toml @ONLY)
 GENERATE_SIP_PYTHON_MODULE_CODE(kadas._kadasgui kadasgui/kadasgui.sip "${sip_files_gui}" cpp_files)
 BUILD_SIP_PYTHON_MODULE(kadas._kadasgui kadasgui/kadasgui.sip ${cpp_files} "" kadas_core kadas_gui ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY})
 
