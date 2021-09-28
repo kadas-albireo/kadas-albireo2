@@ -54,11 +54,7 @@ KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QStrin
 
 void KadasArcGisPortalCatalogProvider::load()
 {
-  mAmsLayers.clear();
-  mWmtsLayers.clear();
-  mWmsLayers.clear();
-  mAmsLayerIds.clear();
-  mWmsLayerIds.clear();
+  mLayers.clear();
 
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
@@ -110,20 +106,10 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
 
       QString metadataUrl = QgsSettings().value( "kadas/metadataBaseUrl" ).toString().arg( resultMap["id"].toString() );
       bool flatten = false;
-      if ( resultMap["type"].toString() == "Map Service" )
-      {
-        mAmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
-        mAmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
-      }
-      else if ( resultMap["type"].toString() == "WMS" )
-      {
-        mWmsLayerIds.insert( categoryId + ":" + resultMap["title"].toString(), qMakePair( resultMap["url"].toString(), resultMap["id"].toString() ) );
-        mWmsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
-      }
-//      else if( resultMap["type"].toString() == "WMTS" )
-//      {
-//        wmtsLayers[resultMap["url"].toString()].insert( resultMap["id"].toString(), ResultEntry( category, resultMap["title"].toString(), position, metadataUrl, flatten ) );
-//      }
+      ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, metadataUrl, flatten );
+      QString id = categoryId + ":" + resultMap["title"].toString();
+      mLayers[id] = mLayers.value( id );
+      mLayers[id][resultMap["type"].toString()] = entry;
     }
 
     if ( rootMap["nextStart"].toInt() >= 0 )
@@ -136,54 +122,26 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    // Prevent adding same layer (as identified by the milcatalog tag + title) twice in different service variants (WMS or MapServer). Preference according to config.
-    if ( mServicePreference == "wms" )
+    QList<QString> typeOrder = {"WMTS", "WMS", "Map Service"};
+    QMap<QString, std::function<void( const ResultEntry & )>> typeHandlers;
+    typeHandlers.insert( "Map Service", [this]( const ResultEntry & entry ) { readAMSCapabilities( entry ); } );
+    typeHandlers.insert( "WMTS", [this]( const ResultEntry & entry ) { readWMTSCapabilities( entry ); } );
+    typeHandlers.insert( "WMS", [this]( const ResultEntry & entry ) { readWMSCapabilities( entry ); } );
+
+    for ( const auto &layerTypeMap : mLayers )
     {
-      for ( auto it = mAmsLayerIds.begin(), itEnd = mAmsLayerIds.end(); it != itEnd; ++it )
+      for ( const QString &type : typeOrder )
       {
-        if ( mWmsLayerIds.contains( it.key() ) )
+        if ( layerTypeMap.contains( type ) )
         {
-          mAmsLayers[it.value().first].remove( it.value().second );
-          if ( mAmsLayers[it.value().first].isEmpty() )
-          {
-            mAmsLayers.remove( it.value().first );
-          }
-        }
-      }
-    }
-    else if ( mServicePreference == "arcgismapserver" )
-    {
-      for ( auto it = mWmsLayerIds.begin(), itEnd = mWmsLayerIds.end(); it != itEnd; ++it )
-      {
-        if ( mAmsLayerIds.contains( it.key() ) )
-        {
-          mWmsLayers[it.value().first].remove( it.value().second );
-          if ( mWmsLayers[it.value().first].isEmpty() )
-          {
-            mWmsLayers.remove( it.value().first );
-          }
+          const ResultEntry &entry = layerTypeMap[type];
+          typeHandlers[type]( entry );
+          break;
         }
       }
     }
 
-    for ( const QString &amsUrl : mAmsLayers.keys() )
-    {
-      readAMSCapabilities( amsUrl, mAmsLayers[amsUrl] );
-    }
-    for ( const QString &wmsUrl : mWmsLayers.keys() )
-    {
-      readWMSCapabilities( wmsUrl, mWmsLayers[wmsUrl] );
-    }
-    //    for ( const QString &wmtsUrl : wmtsLayers.keys() )
-    //    {
-    //      readWMTSCapabilities( wmtsUrl, wmtsLayers[wmtsUrl] );
-    //    }
-
-    mAmsLayers.clear();
-    mWmtsLayers.clear();
-    mWmsLayers.clear();
-    mAmsLayerIds.clear();
-    mWmsLayerIds.clear();
+    mLayers.clear();
 
     endTask();
   }
@@ -211,12 +169,12 @@ void KadasArcGisPortalCatalogProvider::endTask()
   }
 }
 
-void KadasArcGisPortalCatalogProvider::readWMTSCapabilities( const QString &wmtsUrl, const EntryMap &entries )
+void KadasArcGisPortalCatalogProvider::readWMTSCapabilities( const ResultEntry &entry )
 {
   mPendingTasks += 1;
-  QNetworkRequest req( ( QUrl( wmtsUrl ) ) );
+  QNetworkRequest req( ( QUrl( entry.url ) ) );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
 }
 
@@ -224,7 +182,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
-  EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
+  ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
   if ( reply->error() == QNetworkReply::NoError )
@@ -234,33 +192,25 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
     if ( !doc.isNull() )
     {
       QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
-      for ( const QDomNode &layerItem : childrenByTagName( doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ), "Layer" ) )
-      {
-        QString layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
-        if ( entries->contains( layerid ) )
-        {
-          QString title;
-          QMimeData *mimeData;
-          const ResultEntry &entry = ( *entries ) [layerid];
-          parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry.metadataUrl, QString( "&referer=%1" ).arg( referer ), title, layerid, mimeData );
-          QStringList sortIndices = entry.sortIndices.split( "/" );
-          mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
-        }
-      }
+      QDomNode layerItem = doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ).firstChildElement( "Layer" );
+      QString layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
+      QMimeData *mimeData = nullptr;
+      parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry->metadataUrl, QString( "&referer=%1" ).arg( referer ), entry->title, layerid, mimeData );
+      QStringList sortIndices = entry->sortIndices.split( "/" );
+      mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }
   }
 
-  delete entries;
+  delete entry;
   endTask();
 }
 
-void KadasArcGisPortalCatalogProvider::readWMSCapabilities( const QString &wmsUrl, const EntryMap &entries )
+void KadasArcGisPortalCatalogProvider::readWMSCapabilities( const ResultEntry &entry )
 {
   mPendingTasks += 1;
-  QNetworkRequest req( QUrl( wmsUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
+  QNetworkRequest req( QUrl( entry.url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  reply->setProperty( "url", wmsUrl );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
 }
 
@@ -268,8 +218,8 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
-  EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
-  QString url = reply->property( "url" ).toString();
+  ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QString url = entry->url;
 
   if ( reply->error() == QNetworkReply::NoError )
   {
@@ -281,24 +231,19 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     QDomElement layerItem = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" );
     QString layerName = layerItem.firstChildElement( "Name" ).text();
 
-    QString title;
-    QMimeData *mimeData;
-    // Assume entries contains just one entry (every WMS service just referenced by one item in the portal)
-    const ResultEntry &entry = entries->first();
-
-    if ( parseWMSLayerCapabilities( layerItem, entry.title, imgFormats, parentCrs, url, entry.metadataUrl, mimeData ) )
+    QMimeData *mimeData = nullptr;
+    if ( parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, entry->metadataUrl, mimeData ) )
     {
-
       // Parse sublayers
       QVariantList sublayers;
       readWMSSublayers( layerItem, "-1", sublayers );
       mimeData->setProperty( "sublayers", sublayers );
-      QStringList sortIndices = entry.sortIndices.split( "/" );
-      mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
+      QStringList sortIndices = entry->sortIndices.split( "/" );
+      mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }
   }
 
-  delete entries;
+  delete entry;
   endTask();
 }
 
@@ -316,16 +261,15 @@ void KadasArcGisPortalCatalogProvider::readWMSSublayers( const QDomElement &laye
   }
 }
 
-void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const QString &amsUrl, const EntryMap &entries )
+void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const ResultEntry &entry )
 {
   mPendingTasks += 1;
   QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
-  QUrl url( amsUrl + "?f=json" );
+  QUrl url( entry.url + "?f=json" );
 
   QNetworkRequest req( url );
   QNetworkReply *reply = nam->get( req );
-  reply->setProperty( "url", amsUrl );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo );
 }
 
@@ -333,8 +277,8 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
-  EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
-  QString url = reply->property( "url" ).toString();
+  ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QString url = entry->url;
 
   if ( reply->error() == QNetworkReply::NoError )
   {
@@ -343,7 +287,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     if ( !serviceInfoMap["error"].isNull() )
     {
       // Something went wrong
-      delete entries;
+      delete entry;
       endTask();
       return;
     }
@@ -396,34 +340,30 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
       sublayers.append( sublayer );
     }
 
-    for ( const QString &layerName : entries->keys() )
+    QgsMimeDataUtils::Uri mimeDataUri;
+    mimeDataUri.layerType = "raster";
+    mimeDataUri.providerKey = "arcgismapserver";
+    mimeDataUri.name = entry->title;
+    QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
+    mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( entry->id );
+    QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
+    mimeData->setProperty( "metadataUrl", entry->metadataUrl );
+    if ( !entry->flatten )
     {
-      QgsMimeDataUtils::Uri mimeDataUri;
-      mimeDataUri.layerType = "raster";
-      mimeDataUri.providerKey = "arcgismapserver";
-      const ResultEntry &entry = ( *entries ) [layerName];
-      mimeDataUri.name = entry.title;
-      QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
-      QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
-      mimeData->setProperty( "metadataUrl", entry.metadataUrl );
-      if ( !entry.flatten )
+      QVariantList entrySublayers;
+      for ( const QVariantMap &sublayer : sublayers )
       {
-        QVariantList entrySublayers;
-        for ( const QVariantMap &sublayer : sublayers )
+        if ( sublayer["id"].toInt() >= ( entry->id.isEmpty() ? -1 : entry->id.toInt() ) )
         {
-          if ( sublayer["id"].toInt() >= ( layerName.isEmpty() ? -1 : layerName.toInt() ) )
-          {
-            entrySublayers.append( sublayer );
-          }
+          entrySublayers.append( sublayer );
         }
-        mimeData->setProperty( "sublayers", entrySublayers );
       }
-      QStringList sortIndices = entry.sortIndices.split( "/" );
-      mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), mimeDataUri.name, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
+      mimeData->setProperty( "sublayers", entrySublayers );
     }
+    QStringList sortIndices = entry->sortIndices.split( "/" );
+    mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), mimeDataUri.name, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
   }
 
-  delete entries;
+  delete entry;
   endTask();
 }
