@@ -216,8 +216,6 @@ void KadasBullseyeWidget::updateLayer()
   QgsPointXY center = ui.inputCenter->getCoordinate();
   const QgsCoordinateReferenceSystem &crs = ui.inputCenter->getCrs();
   int rings = ui.spinBoxRings->value();
-  // First implementation had interval distance in nm, hence for backwards compat. keep this unit internally
-  double interval = ui.spinBoxRingInterval->value();
   QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
   int axes = ui.spinBoxAxesInterval->value();
   mCurrentLayer->setup( center, crs, rings, ui.spinBoxRingInterval->value(), intervalUnit, axes );
