@@ -155,7 +155,7 @@ void KadasCircleItem::setCurrentAttributes( const AttribValues &values, const Qg
   KadasItemPos center = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
   QgsPointXY rPosWgs = mDa.computeSpheroidProject( crst.transform( center ), values[AttrR] );
   state()->centers.last() = center;
-  state()->ringpos.last() = KadasItemPos::fromPoint( crst.transform( rPosWgs, QgsCoordinateTransform::ReverseTransform ) );
+  state()->ringpos.last() = KadasItemPos::fromPoint( crst.transform( rPosWgs, Qgis::TransformDirection::Reverse ) );
   recomputeDerived();
 }
 
@@ -204,7 +204,7 @@ KadasMapPos KadasCircleItem::positionFromDrawAttribs( const AttribValues &values
   QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
   KadasItemPos pos = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
   QgsPointXY rposWgs = mDa.computeSpheroidProject( crst.transform( pos ), values[AttrR] );
-  return toMapPos( KadasItemPos::fromPoint( crst.transform( rposWgs, QgsCoordinateTransform::ReverseTransform ) ), mapSettings );
+  return toMapPos( KadasItemPos::fromPoint( crst.transform( rposWgs, Qgis::TransformDirection::Reverse ) ), mapSettings );
 }
 
 KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
@@ -291,7 +291,7 @@ void KadasCircleItem::edit( const EditContext &context, const AttribValues &valu
     {
       QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
       QgsPointXY rPosWgs = mDa.computeSpheroidProject( crst.transform( constState()->centers[context.vidx.part] ), values[AttrR] );
-      state()->ringpos[context.vidx.part] = KadasItemPos::fromPoint( crst.transform( rPosWgs, QgsCoordinateTransform::ReverseTransform ) );
+      state()->ringpos[context.vidx.part] = KadasItemPos::fromPoint( crst.transform( rPosWgs, Qgis::TransformDirection::Reverse ) );
     }
     recomputeDerived();
   }
@@ -327,7 +327,7 @@ KadasMapPos KadasCircleItem::positionFromEditAttribs( const EditContext &context
     {
       QgsCoordinateTransform crst( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
       QgsPointXY wgsrpos = mDa.computeSpheroidProject( crst.transform( constState()->centers[context.vidx.part] ), values[AttrR] );
-      return toMapPos( KadasItemPos::fromPoint( crst.transform( wgsrpos, QgsCoordinateTransform::ReverseTransform ) ), mapSettings );
+      return toMapPos( KadasItemPos::fromPoint( crst.transform( wgsrpos, Qgis::TransformDirection::Reverse ) ), mapSettings );
     }
   }
   return KadasMapPos();

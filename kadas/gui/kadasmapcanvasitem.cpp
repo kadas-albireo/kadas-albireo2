@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/kadasmapcanvasitem.h>
 #include <kadas/gui/kadasitemlayer.h>
@@ -45,7 +46,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
     rc.setExtent( mMapCanvas->mapSettings().extent() );
     rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
     rc.setTransformContext( mMapCanvas->mapSettings().transformContext() );
-    rc.setFlag( QgsRenderContext::Antialiasing, true );
+    rc.setFlag( Qgis::RenderContextFlag::Antialiasing, true );
     rc.setCoordinateTransform( QgsCoordinateTransform( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() ) );
 
     rc.painter()->save();

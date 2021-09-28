@@ -25,6 +25,7 @@
 #include <qgis/qgsmaptopixel.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <quazip/quazipfile.h>
 
@@ -1044,7 +1045,7 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   state()->points.clear();
   for ( const QPoint &screenPoint : result.adjustedPoints )
   {
-    QgsPointXY pos = mapCrst.transform( mapSettings.mapToPixel().toMapCoordinates( screenPoint ), QgsCoordinateTransform::ReverseTransform );
+    QgsPointXY pos = mapCrst.transform( mapSettings.mapToPixel().toMapCoordinates( screenPoint ), Qgis::TransformDirection::Reverse );
     state()->points.append( KadasItemPos( pos.x(), pos.y() ) );
   }
 
@@ -1068,7 +1069,7 @@ void KadasMilxItem::updateSymbol( const QgsMapSettings &mapSettings, const Kadas
   state()->attributePoints.clear();
   for ( auto it = result.attributePoints.begin(), itEnd = result.attributePoints.end(); it != itEnd; ++it )
   {
-    QgsPointXY itemPos = mapCrst.transform( mapSettings.mapToPixel().toMapCoordinates( it.value() ), QgsCoordinateTransform::ReverseTransform );
+    QgsPointXY itemPos = mapCrst.transform( mapSettings.mapToPixel().toMapCoordinates( it.value() ), Qgis::TransformDirection::Reverse );
     state()->attributePoints.insert( it.key(), KadasItemPos( itemPos.x(), itemPos.y() ) );
   }
 

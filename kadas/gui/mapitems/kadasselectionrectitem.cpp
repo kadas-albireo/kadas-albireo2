@@ -23,6 +23,7 @@
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/mapitems/kadasselectionrectitem.h>
 

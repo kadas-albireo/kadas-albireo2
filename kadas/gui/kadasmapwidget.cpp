@@ -26,6 +26,7 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreelayer.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
@@ -91,7 +92,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   mMapCanvas = new QgsMapCanvas( this );
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() ) ;
-  mMapCanvas->enableMapTileRendering( mMasterCanvas->mapSettings().flags() & QgsMapSettings::RenderMapTile );
+  mMapCanvas->enableMapTileRendering( mMasterCanvas->mapSettings().flags() & Qgis::MapSettingsFlag::RenderMapTile );
   mMapCanvas->setMapUpdateInterval( mMasterCanvas->mapUpdateInterval() );
   mMapCanvas->setCachingEnabled( mMasterCanvas->isCachingEnabled() );
   mMapCanvas->setParallelRenderingEnabled( mMasterCanvas->isParallelRenderingEnabled() );

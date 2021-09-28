@@ -88,7 +88,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
     void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags )
     {
       QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( crs ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
-      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), QgsCoordinateTransform::ReverseTransform );
+      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), Qgis::TransformDirection::Reverse );
       QRectF screenRect = computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
 
       QList<GridLabel> leftLabels;
@@ -102,7 +102,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       double yEnd = std::ceil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
 
       const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
-      bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || mRendererContext.flags() & QgsRenderContext::RenderPreviewJob );
+      bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob );
 
       // If chosen intervals would result in over 100 grid lines, reduce interval
       double intervalX = mLayer->intervalX();
@@ -326,7 +326,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       bool adaptToScreen = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() );
 
       QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
-      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), QgsCoordinateTransform::ReverseTransform );
+      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), Qgis::TransformDirection::Reverse );
       QRectF screenExtent = computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
       double mapScale = mRendererContext.rendererScale();
       if ( !adaptToScreen )
@@ -377,7 +377,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       // Draw labels
-      bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
+      bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
       if ( previewJob || mLayer->mLabelingMode != LabelingEnabled )
       {
         return;

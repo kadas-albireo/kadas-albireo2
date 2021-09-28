@@ -111,9 +111,9 @@ QgsMapSettings KadasGlobeTileImage::createSettings( int dpi, const QList<QgsMapL
   settings.setDestinationCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
   settings.setExtent( mTileExtent );
   settings.setLayers( layers );
-  settings.setFlag( QgsMapSettings::DrawEditingInfo, false );
-  settings.setFlag( QgsMapSettings::DrawLabeling, false );
-  settings.setFlag( QgsMapSettings::DrawSelection, false );
+  settings.setFlag( Qgis::MapSettingsFlag::DrawEditingInfo, false );
+  settings.setFlag( Qgis::MapSettingsFlag::DrawLabeling, false );
+  settings.setFlag( Qgis::MapSettingsFlag::DrawSelection, false );
   settings.setOutputSize( QSize( mTileSize, mTileSize ) );
   settings.setOutputImageFormat( QImage::Format_ARGB32_Premultiplied );
   settings.setOutputDpi( dpi );

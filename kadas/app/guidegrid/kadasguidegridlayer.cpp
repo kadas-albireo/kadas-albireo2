@@ -64,7 +64,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       {
         return true;
       }
-      bool previewJob = mRendererContext.flags() & QgsRenderContext::RenderPreviewJob;
+      bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
 
       mRendererContext.painter()->save();
       mRendererContext.painter()->setOpacity( mLayer->opacity() );

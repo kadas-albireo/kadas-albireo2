@@ -29,6 +29,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasteridentifyresult.h>

@@ -1651,7 +1651,7 @@ bool KadasLayoutDesignerDialog::getRasterExportSettings( QgsLayoutExporter::Imag
 
 bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExportSettings &settings )
 {
-  QgsRenderContext::TextRenderFormat prevTextRenderFormat = mLayout->layoutProject()->labelingEngineSettings().defaultTextRenderFormat();
+  Qgis::TextRenderFormat prevTextRenderFormat = mLayout->layoutProject()->labelingEngineSettings().defaultTextRenderFormat();
   bool forceVector = false;
   bool appendGeoreference = true;
   bool includeMetadata = true;
@@ -1679,7 +1679,7 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
     if ( prevLayoutSettingLabelsAsOutlines >= 0 )
     {
       // previous layout setting takes default over project setting
-      prevTextRenderFormat = static_cast< QgsRenderContext::TextRenderFormat >( prevLayoutSettingLabelsAsOutlines );
+      prevTextRenderFormat = static_cast< Qgis::TextRenderFormat >( prevLayoutSettingLabelsAsOutlines );
     }
   }
 
@@ -1706,7 +1706,7 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   forceVector = dialog.forceVector();
   disableRasterTiles = dialog.rasterTilingDisabled();
   simplify = dialog.geometriesSimplified();
-  QgsRenderContext::TextRenderFormat textRenderFormat = dialog.textRenderFormat();
+  Qgis::TextRenderFormat textRenderFormat = dialog.textRenderFormat();
   geoPdf = dialog.exportGeoPdf();
   useOgcBestPracticeFormat = dialog.useOgcBestPracticeFormat();
   exportGeoPdfFeatures = dialog.exportGeoPdf();

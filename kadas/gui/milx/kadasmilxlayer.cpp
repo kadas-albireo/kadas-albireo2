@@ -21,6 +21,7 @@
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/milx/kadasmilxclient.h>
 #include <kadas/gui/milx/kadasmilxitem.h>

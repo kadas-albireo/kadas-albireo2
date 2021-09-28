@@ -18,6 +18,7 @@
 
 #include <gdal.h>
 
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 

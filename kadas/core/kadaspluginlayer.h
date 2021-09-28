@@ -19,6 +19,7 @@
 
 #include <QObject>
 
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 

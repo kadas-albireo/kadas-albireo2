@@ -399,7 +399,7 @@ bool KadasKMLExport::renderTile( QImage &img, const QgsRectangle &extent, QgsMap
   QgsPointXY centerPoint = extent.center();
   QgsMapToPixel mtp( extent.width() / img.width(), centerPoint.x(), centerPoint.y(), img.width(), img.height(), 0.0 );
   context.setMapToPixel( mtp );
-  context.setExtent( crst.transformBoundingBox( extent, QgsCoordinateTransform::ReverseTransform ) );
+  context.setExtent( crst.transformBoundingBox( extent, Qgis::TransformDirection::Reverse ) );
   context.setCustomRenderingFlag( "kml", true );
   QgsMapLayerRenderer *layerRenderer = mapLayer->createMapRenderer( context );
   bool rendered = false;

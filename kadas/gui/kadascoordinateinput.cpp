@@ -19,6 +19,7 @@
 #include <QLineEdit>
 #include <QRegExp>
 
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
 #include <kadas/core/kadascoordinateformat.h>

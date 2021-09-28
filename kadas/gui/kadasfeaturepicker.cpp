@@ -19,6 +19,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspallabeling.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 

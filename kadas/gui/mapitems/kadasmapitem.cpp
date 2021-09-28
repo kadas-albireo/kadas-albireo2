@@ -17,10 +17,12 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>

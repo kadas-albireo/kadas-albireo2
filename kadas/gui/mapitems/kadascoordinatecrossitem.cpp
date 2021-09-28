@@ -18,9 +18,10 @@
 
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
-#include <qgis/qgsmapsettings.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/mapitems/kadascoordinatecrossitem.h>
 

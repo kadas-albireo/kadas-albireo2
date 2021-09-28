@@ -23,6 +23,7 @@
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 
 #include <kadas/gui/kadasitemlayer.h>
