@@ -27,6 +27,7 @@ KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *
   setZValue( mItem->zIndex() );
   connect( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
   connect( item, &QObject::destroyed, this, &QObject::deleteLater );
+  connect( canvas, &QgsMapCanvas::scaleChanged, this, &KadasMapCanvasItem::updateRect );
   updateRect();
 }
 
@@ -95,9 +96,10 @@ void KadasMapCanvasItem::updateRect()
   QgsRectangle bbox = t.transformBoundingBox( mItem->boundingBox() );
   double mup = mMapCanvas->mapUnitsPerPixel();
   KadasMapItem::Margin margin = mItem->margin();
-  bbox.setXMinimum( bbox.xMinimum() - ( margin.left + sHandleSize ) * mup );
-  bbox.setXMaximum( bbox.xMaximum() + ( margin.right + sHandleSize ) * mup );
-  bbox.setYMinimum( bbox.yMinimum() - ( margin.bottom + sHandleSize ) * mup );
-  bbox.setYMaximum( bbox.yMaximum() + ( margin.top + sHandleSize ) * mup );
+  double handleSize = mItem->selected() ? 0.5 * sHandleSize : 0.;
+  bbox.setXMinimum( bbox.xMinimum() - ( margin.left + handleSize ) * mup );
+  bbox.setXMaximum( bbox.xMaximum() + ( margin.right + handleSize ) * mup );
+  bbox.setYMinimum( bbox.yMinimum() - ( margin.bottom + handleSize ) * mup );
+  bbox.setYMaximum( bbox.yMaximum() + ( margin.top + handleSize ) * mup );
   setRect( bbox );
 }
