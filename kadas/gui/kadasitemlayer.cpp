@@ -236,7 +236,6 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, c
 QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
 {
   QgsCoordinateTransform crst( crs(), settings.destinationCrs(), mTransformContext );
-  QgsPointXY layerPos = crst.transform( mapPos, QgsCoordinateTransform::ReverseTransform );
   double minDist = std::numeric_limits<double>::max();
   QgsPointXY minPos;
   for ( auto it = mItemBounds.begin(), itEnd = mItemBounds.end(); it != itEnd; ++it )
