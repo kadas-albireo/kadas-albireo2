@@ -3569,47 +3569,47 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Ajouter une couche XYZ</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1017"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1018"/>
         <source>Language Changed</source>
         <translation>La langue a changé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1017"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1018"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La langue sera modifiée au prochain démarrage du programme.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1039"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1040"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1043"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1044"/>
         <source>Favorite</source>
         <translation>Favori</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1203"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1204"/>
         <source>Manually set projection</source>
         <translation>Sélectionner manuellement la projection</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1206"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1207"/>
         <source>Unknown layer projection</source>
         <translation>Projection de la couche inconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1207"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1208"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1254"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1255"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1294"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1295"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
@@ -3731,12 +3731,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapIdentifyDialog</name>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="64"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="65"/>
         <source>Identify results</source>
         <translation>Résultats identification</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="423"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="424"/>
         <source>Band %1</source>
         <translation>Bande %1</translation>
     </message>
@@ -4036,44 +4036,53 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Visible</translation>
     </message>
     <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="291"/>
+        <source>&lt;b&gt;Observer vertical angle range&lt;/b&gt;: %1° to %2°&lt;br /&gt;</source>
+        <translation>&lt;b&gt;Champ de vision vertical de l&apos;observateur&lt;/b&gt;: %1° à %2°&lt;br /&gt;</translation>
+    </message>
+    <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="272"/>
         <source>Invisible</source>
         <translation>Invisible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="284"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="285"/>
+        <source>&lt;b&gt;Observer position&lt;/b&gt;: %1&lt;br /&gt;</source>
+        <translation>&lt;b&gt;Position de l&apos;observateur:&lt;/b&gt;: %1&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="287"/>
         <source>&lt;b&gt;Observer height&lt;/b&gt;: %1 %2 %3&lt;br /&gt;</source>
         <translation>&lt;b&gt;Altitude de l&apos;observateur:&lt;/b&gt;: %1 %2 %3&lt;br /&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="287"/>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="294"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="290"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="297"/>
         <source>above ground</source>
         <translation>au-dessus du sol</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="287"/>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="294"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="290"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="297"/>
         <source>above sea level</source>
         <translation>au-dessus du niveau de la mer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="288"/>
         <source>&lt;b&gt;Observer angle range&lt;/b&gt;: %1° to %2°&lt;br /&gt;</source>
-        <translation>&lt;b&gt;Plage d&apos;angle de l&apos;observateur&lt;/b&gt;: %1° à %2°&lt;br /&gt;</translation>
+        <translation type="vanished">&lt;b&gt;Plage d&apos;angle de l&apos;observateur&lt;/b&gt;: %1° à %2°&lt;br /&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="291"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="294"/>
         <source>&lt;b&gt;Target height&lt;/b&gt;: %1 %2 %3</source>
         <translation>&lt;b&gt;Altitude de l&apos;objectif&lt;/b&gt;: %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="300"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="303"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="300"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="303"/>
         <source>Failed to compute viewshed: %1</source>
         <translation>Impossible de calculer le bassin visuel: %1</translation>
     </message>
@@ -4085,22 +4094,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapWidget</name>
     <message>
-        <location filename="../kadas/gui/kadasmapwidget.cpp" line="45"/>
+        <location filename="../kadas/gui/kadasmapwidget.cpp" line="46"/>
         <source>Layers</source>
         <translation>Couches</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasmapwidget.cpp" line="52"/>
+        <location filename="../kadas/gui/kadasmapwidget.cpp" line="53"/>
         <source>Lock with main view</source>
         <translation>Synchroniser avec vue principale</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasmapwidget.cpp" line="74"/>
+        <location filename="../kadas/gui/kadasmapwidget.cpp" line="75"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasmapwidget.cpp" line="218"/>
+        <location filename="../kadas/gui/kadasmapwidget.cpp" line="219"/>
         <source>Sync with main view</source>
         <translation>Sync avec la vue principale</translation>
     </message>
@@ -4476,22 +4485,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="681"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="682"/>
         <source>Symbol editor...</source>
         <translation>Editeur de symbole...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="694"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="695"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="705"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="706"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="715"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="716"/>
         <source>Reset offset</source>
         <translation>Supprimer offset</translation>
     </message>
@@ -4499,7 +4508,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxLayer</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="205"/>
+        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="206"/>
         <source>The file is corrupt</source>
         <translation>Le fichier est corrompu</translation>
     </message>
@@ -4548,7 +4557,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxLayerType</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="255"/>
+        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="256"/>
         <source>Approved layer</source>
         <translation>Couche approuvée</translation>
     </message>
@@ -4628,12 +4637,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPictureItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="506"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="507"/>
         <source>Frame visible</source>
         <translation>Encadrement visible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="510"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="511"/>
         <source>Position locked</source>
         <translation>Position bloquée</translation>
     </message>
@@ -4646,7 +4655,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPinItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadassymbolitem.cpp" line="248"/>
+        <location filename="../kadas/gui/mapitems/kadassymbolitem.cpp" line="249"/>
         <source>&lt;b&gt;Position:&lt;/b&gt; %1&lt;br /&gt;&lt;b&gt;Height:&lt;/b&gt; %2 %3&lt;br /&gt;&lt;b&gt;Name:&lt;/b&gt; %4&lt;br /&gt;&lt;b&gt;Remarks:&lt;/b&gt;&lt;br /&gt;%5</source>
         <translation>&lt;b&gt;Position:&lt;/b&gt; %1&lt;br /&gt;&lt;b&gt;Altitude:&lt;/b&gt; %2 %3&lt;br /&gt;&lt;b&gt;Nom:&lt;/b&gt; %4&lt;br /&gt;&lt;b&gt;Remarques:&lt;/b&gt;&lt;br /&gt;%5</translation>
     </message>
@@ -4752,68 +4761,63 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPluginManager</name>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="270"/>
         <source>Installing...</source>
-        <translation>Installation...</translation>
+        <translation type="vanished">Installation...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="276"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="330"/>
         <source>Remove plugin</source>
         <translation>Désinstaller le plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="276"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="330"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Êtes-vous sûr de vouloir désinstaller le plugin &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="279"/>
         <source>Uninstalling...</source>
-        <translation>Désinstallation...</translation>
+        <translation type="vanished">Désinstallation...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="302"/>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="316"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="355"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="374"/>
         <source>Plugin install failed</source>
         <translation>Échec de l&apos;installation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="302"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="355"/>
         <source>Error creating plugin directory</source>
         <translation>Erreur de création du directoire des plugins</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="316"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="374"/>
         <source>Error downloading plugin: %1</source>
         <translation>Erreur de téléchargement du plugin : %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="407"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="467"/>
         <source>Plugin deinstallation failed</source>
         <translation>Échec de la désinstallation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="407"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="467"/>
         <source>The deinstallation of the plugin &apos;%1&apos; failed</source>
         <translation>La désinstallation du plugin &apos;%1&apos; a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="435"/>
         <source>Install</source>
-        <translation>Installer</translation>
+        <translation type="vanished">Installer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="441"/>
         <source>Uninstall</source>
-        <translation>Désinstaller</translation>
+        <translation type="vanished">Désinstaller</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="475"/>
         <source>Update</source>
-        <translation>Mise à jour</translation>
+        <translation type="vanished">Mise à jour</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="487"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="547"/>
         <source>up-to-date</source>
         <translation>À jour</translation>
     </message>
@@ -4834,6 +4838,36 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/ui/kadaspluginmanager.ui" line="33"/>
         <source>Available</source>
         <translation>Disponibles</translation>
+    </message>
+</context>
+<context>
+    <name>KadasPluginManagerInstallButton</name>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="76"/>
+        <source>Install</source>
+        <translation>Installer</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="79"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="80"/>
+        <source>Installing...</source>
+        <translation>Installation...</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="83"/>
+        <source>Uninstall</source>
+        <translation>Désinstaller</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="86"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="87"/>
+        <source>Uninstalling...</source>
+        <translation>Désinstallation...</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="90"/>
+        <source>Update</source>
+        <translation>Mise à jour</translation>
     </message>
 </context>
 <context>
@@ -5060,7 +5094,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="220"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="193"/>
         <source>Layer %1</source>
         <translation>Couche %1</translation>
     </message>
@@ -5767,9 +5801,8 @@ avec géoloc.</translation>
         <translation>Niveau de la mer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="66"/>
         <source>Limit observer angle range:</source>
-        <translation>Limiter la plage d&apos;angle de l&apos;observateur:</translation>
+        <translation type="vanished">Limiter la plage d&apos;angle de l&apos;observateur:</translation>
     </message>
     <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="98"/>
@@ -5787,6 +5820,11 @@ avec géoloc.</translation>
     <message>
         <source>Invisible area</source>
         <translation type="vanished">Zone invisible</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="66"/>
+        <source>Limit observer vertical angle range:</source>
+        <translation>Limiter le champ de vision vertical de l&apos;observateur:</translation>
     </message>
     <message>
         <location filename="../kadas/gui/maptools/kadasmaptoolviewshed.cpp" line="108"/>
