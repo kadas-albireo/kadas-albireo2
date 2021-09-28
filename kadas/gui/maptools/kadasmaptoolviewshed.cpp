@@ -63,7 +63,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   mComboObserverHeightMode->addItem( tr( "Sea level" ), static_cast<int>( HeightRelToSeaLevel ) );
   heightDialogLayout->addWidget( mComboObserverHeightMode, 0, 2, 1, 1 );
 
-  mVertRangeCheckbox = new QCheckBox( tr( "Limit observer angle range:" ) );
+  mVertRangeCheckbox = new QCheckBox( tr( "Limit observer vertical angle range:" ) );
   heightDialogLayout->addWidget( mVertRangeCheckbox, 1, 0, 1, 1 );
   mSpinBoxObserverMinAngle = new QSpinBox();
   mSpinBoxObserverMinAngle->setRange( -90, 90 );
@@ -280,12 +280,15 @@ void KadasMapToolViewshed::drawFinished()
     pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );
+
     pin->setTooltip(
+      tr( "<b>Observer position</b>: %1<br />" )
+      .arg( KadasCoordinateFormat::instance()->getDisplayString( pin->position(), pin->crs() ) ) +
       tr( "<b>Observer height</b>: %1 %2 %3<br />" )
       .arg( viewshedDialog.observerHeight() )
       .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
       .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) +
-      tr( "<b>Observer angle range</b>: %1° to %2°<br />" )
+      tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" )
       .arg( viewshedDialog.observerMinVertAngle() )
       .arg( viewshedDialog.observerMaxVertAngle() ) +
       tr( "<b>Target height</b>: %1 %2 %3" )
