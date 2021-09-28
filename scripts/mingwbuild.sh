@@ -77,7 +77,7 @@ mkdir -p $builddir
     -DQGIS_INCLUDE_DIR=$QGIS_INSTALL_PREFIX/include \
     -DQGIS_UI_INCLUDE_DIR=$QGIS_INSTALL_PREFIX/include \
     -DQGIS_PLUGIN_DIR=$QGIS_INSTALL_PREFIX/lib/qgis/plugins \
-    -DQGIS_SIP_DIR=$QGIS_INSTALL_PREFIX/share/sip/qgis \
+    -DQGIS_SIP_DIR=$(readlink -f $QGIS_INSTALL_PREFIX/lib/python*/site-packages/qgis) \
     -DQUAZIP_INCLUDE_DIR=$MINGWROOT/include/quazip5 \
     -DQUAZIP_LIBRARIES=$MINGWROOT/bin/libquazip5.dll \
     -DQWT_INCLUDE_DIRS=$MINGWROOT/include/qt5/qwt \
