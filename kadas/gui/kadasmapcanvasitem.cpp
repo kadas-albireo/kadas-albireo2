@@ -30,6 +30,18 @@ KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *
   updateRect();
 }
 
+bool KadasMapCanvasItem::isVisible() const
+{
+  if (
+    ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) ||
+    ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
+  )
+  {
+    return false;
+  }
+  return true;
+}
+
 void KadasMapCanvasItem::paint( QPainter *painter )
 {
   if ( mItem )

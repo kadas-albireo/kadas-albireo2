@@ -44,7 +44,7 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
   const KadasMapItem *item = nullptr;
 
   QGraphicsItem *canvasItem = mCanvas->itemAt( canvasPos );
-  if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) )
+  if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->isVisible() )
   {
     KadasMapCanvasItem *mapCanvasItem = static_cast<KadasMapCanvasItem *>( canvasItem );
     item = mapCanvasItem->mapItem();

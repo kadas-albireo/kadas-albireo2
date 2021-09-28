@@ -31,6 +31,7 @@ class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasI
   public:
     KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas );
     const KadasMapItem *mapItem() const { return mItem; }
+    bool isVisible() const;
 
     void paint( QPainter *painter ) override;
 
