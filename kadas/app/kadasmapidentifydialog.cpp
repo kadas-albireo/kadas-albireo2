@@ -447,9 +447,18 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
           for ( int i = 0, n = store.count(); i < n; ++i )
           {
             QgsFeature feature = store.features().at( i );
-            QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
-            QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << sublayerName );
-            mLayerTreeItemMap[rLayer->id()]->addChild( item );
+            QString sublayerName;
+            QTreeWidgetItem *item = nullptr;
+            if ( resultIt.key() < rLayer->dataProvider()->subLayers().length() )
+            {
+              QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+              item = new QTreeWidgetItem( QStringList() << sublayerName );
+              mLayerTreeItemMap[rLayer->id()]->addChild( item );
+            }
+            else
+            {
+              item = mLayerTreeItemMap[rLayer->id()];
+            }
             for ( int j = 0, m = feature.attributeCount(); j < m; ++j )
             {
               const QgsField &field = feature.fields().at( j );
