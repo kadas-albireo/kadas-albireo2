@@ -4,27 +4,31 @@
 <context>
     <name>KadasAddImageDialog</name>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="246"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="267"/>
         <source>Add Image</source>
         <translation>Bild hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="271"/>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation type="vanished">URL:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="274"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="292"/>
+        <source>Image:</source>
+        <translation>Bild:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="295"/>
         <source>Width:</source>
         <translation>Breite:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="276"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="297"/>
         <source>Height:</source>
         <translation>Höhe:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="293"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="314"/>
         <source>Select Image</source>
         <translation>Bild auswählen</translation>
     </message>
@@ -32,24 +36,29 @@
 <context>
     <name>KadasAddLinkDialog</name>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="173"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="174"/>
         <source>Add Link</source>
         <translation>Link hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="183"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="188"/>
         <source>Title:</source>
         <translation>Titel:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="185"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="190"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="221"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="228"/>
         <source>%1 (Ctrl+click to open)</source>
         <translation>%1 (Ctrl+click zum öffnen)</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="249"/>
+        <source>Select file</source>
+        <translation>Datei auswählen</translation>
     </message>
 </context>
 <context>
@@ -657,7 +666,7 @@
 <context>
     <name>KadasColorAction</name>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="351"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="372"/>
         <source>Text Color</source>
         <translation>Textfarbe</translation>
     </message>
@@ -3568,6 +3577,11 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>XYZ Ebene hinzufügen</translation>
     </message>
     <message>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="184"/>
+        <source>Add MapServer layer</source>
+        <translation>MapServer Ebene hinzufügen</translation>
+    </message>
+    <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="1018"/>
         <source>Language Changed</source>
         <translation>Sprache geändert</translation>
@@ -5100,57 +5114,57 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasRichTextEditorToolBar</name>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="409"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="430"/>
         <source>Bold</source>
         <translation>Fett</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="413"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="434"/>
         <source>Italic</source>
         <translation>Kursiv</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="417"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="438"/>
         <source>Underline</source>
         <translation>Unterstreichen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="429"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="450"/>
         <source>Left Align</source>
         <translation>Links ausrichten</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="432"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="453"/>
         <source>Center</source>
         <translation>Mittig ausrichten</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="435"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="456"/>
         <source>Right Align</source>
         <translation>Rechts ausrichten</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="438"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="459"/>
         <source>Justify</source>
         <translation>Zeile füllen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="445"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="466"/>
         <source>Superscript</source>
         <translation>Hochgestellt</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="448"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="469"/>
         <source>Subscript</source>
         <translation>Tiefgestellt</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="456"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="477"/>
         <source>Insert &amp;Link</source>
         <translation>&amp;Link einfügen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="461"/>
+        <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="482"/>
         <source>Insert &amp;Image</source>
         <translation>&amp;Bild einfügen</translation>
     </message>
