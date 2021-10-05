@@ -124,7 +124,8 @@ void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
 {
   mMouseMoved = true;
   QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
-  if ( ev->button() == Qt::NoButton && !anchor.isEmpty() )
+  QString image = document()->documentLayout()->imageAt( ev->pos() );
+  if ( ev->button() == Qt::NoButton && ( !anchor.isEmpty() || !image.isEmpty() ) )
   {
     viewport()->setCursor( Qt::PointingHandCursor );
   }
@@ -140,9 +141,24 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
   if ( ev->button() == Qt::LeftButton && !mMouseMoved )
   {
     QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
+    QString image = document()->documentLayout()->imageAt( ev->pos() );
     if ( !anchor.isEmpty() )
     {
       QDesktopServices::openUrl( QUrl( anchor ) );
+    }
+    else if ( !image.isEmpty() )
+    {
+      QUrl url( image );
+      if ( url.scheme() == "attachment" )
+      {
+        QString path = url.path();
+        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
+        image = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
+      }
+      if ( QFile::exists( image ) )
+      {
+        QDesktopServices::openUrl( QString( "file://%1" ).arg( image ) );
+      }
     }
   }
   else

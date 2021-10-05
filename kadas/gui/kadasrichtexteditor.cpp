@@ -655,9 +655,24 @@ void KadasRichTextEditor::mouseReleaseEvent( QMouseEvent *e )
   if ( e->button() == Qt::LeftButton && e->modifiers() == Qt::ControlModifier )
   {
     QString anchor = document()->documentLayout()->anchorAt( e->pos() );
+    QString image = document()->documentLayout()->imageAt( e->pos() );
     if ( !anchor.isEmpty() )
     {
       QDesktopServices::openUrl( QUrl( anchor ) );
+    }
+    else if ( !image.isEmpty() )
+    {
+      QUrl url( image );
+      if ( url.scheme() == "attachment" )
+      {
+        QString path = url.path();
+        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
+        image = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
+      }
+      if ( QFile::exists( image ) )
+      {
+        QDesktopServices::openUrl( QString( "file://%1" ).arg( image ) );
+      }
     }
   }
   else
