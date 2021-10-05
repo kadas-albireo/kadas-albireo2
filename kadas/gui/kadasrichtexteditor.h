@@ -90,6 +90,9 @@ class KADAS_GUI_EXPORT KadasAddLinkDialog : public QDialog
     KadasRichTextEditor *m_editor = nullptr;
     QLineEdit *m_titleInput = nullptr;
     QLineEdit *m_urlInput = nullptr;
+
+  private slots:
+    void selectFile();
 };
 
 class KADAS_GUI_EXPORT KadasAddImageDialog : public QDialog

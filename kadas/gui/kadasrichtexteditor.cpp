@@ -179,12 +179,18 @@ KadasAddLinkDialog::KadasAddLinkDialog( KadasRichTextEditor *editor, QWidget *pa
   connect( bbox, &QDialogButtonBox::accepted, this, &KadasAddLinkDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &KadasAddLinkDialog::reject );
 
+  QToolButton *button = new QToolButton();
+  button->setIcon( QgsApplication::getThemeIcon( "/mActionFileOpen.svg" ) );
+  connect( button, &QToolButton::clicked, this, &KadasAddLinkDialog::selectFile );
+
   QGridLayout *layout = new QGridLayout();
   layout->addWidget( new QLabel( tr( "Title:" ) ), 0, 0 );
-  layout->addWidget( m_titleInput, 0, 1 );
+  layout->addWidget( m_titleInput, 0, 1, 1, 2 );
   layout->addWidget( new QLabel( tr( "URL:" ) ), 1, 0 );
   layout->addWidget( m_urlInput, 1, 1 );
-  layout->addWidget( bbox, 2, 0, 1, 2 );
+  layout->addWidget( button, 1, 2 );
+
+  layout->addWidget( bbox, 2, 0, 1, 3 );
   setLayout( layout );
 }
 
@@ -235,6 +241,20 @@ void KadasAddLinkDialog::accept()
   m_urlInput->clear();
 
   QDialog::accept();
+}
+
+void KadasAddLinkDialog::selectFile()
+{
+  QString path = QFileDialog::getOpenFileName( this, tr( "Select file" ), QDir::homePath() );
+  if ( !path.isEmpty() )
+  {
+    path = path.replace( "\\", "/" );
+    if ( !path.startsWith( "/" ) )
+    {
+      path.prepend( "/" );
+    }
+    m_urlInput->setText( QString( "file://%1" ).arg( path ) );
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
