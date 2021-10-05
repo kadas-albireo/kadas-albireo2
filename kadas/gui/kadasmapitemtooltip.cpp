@@ -157,7 +157,12 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
       }
       if ( QFile::exists( image ) )
       {
-        QDesktopServices::openUrl( QString( "file://%1" ).arg( image ) );
+        QString path = QString( image ).replace( QStringLiteral( "\\" ), QStringLiteral( "/" ) );
+        if ( !path.startsWith( QStringLiteral( "/" ) ) )
+        {
+          path.prepend( QStringLiteral( "/" ) );
+        }
+        QDesktopServices::openUrl( QUrl( QStringLiteral( "file://%1" ).arg( path ) ) );
       }
     }
   }
