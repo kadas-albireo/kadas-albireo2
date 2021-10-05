@@ -288,7 +288,7 @@ KadasAddImageDialog::KadasAddImageDialog( KadasRichTextEditor *editor, QWidget *
   connect( m_bbox, &QDialogButtonBox::rejected, this, &KadasAddImageDialog::reject );
 
   QGridLayout *layout = new QGridLayout();
-  layout->addWidget( new QLabel( tr( "URL:" ) ), 0, 0 );
+  layout->addWidget( new QLabel( tr( "Image:" ) ), 0, 0 );
   layout->addWidget( m_urlInput, 0, 1 );
   layout->addWidget( browseButton, 0, 2 );
   layout->addWidget( new QLabel( tr( "Width:" ) ), 1, 0 );
