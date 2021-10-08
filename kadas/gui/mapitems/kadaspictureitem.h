@@ -78,6 +78,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
       KadasItemPos pos;
+      QList<KadasItemPos> footprint;
+      KadasItemPos cameraTarget;
       double angle = 0.;
       double offsetX = 0.;
       double offsetY = 0.;
@@ -107,7 +109,9 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasMapItem
     State *state() { return static_cast<State *>( mState ); }
 
     QList<KadasMapPos> cornerPoints( const QgsMapSettings &settings ) const;
-    static bool readGeoPos( const QString &filePath, QgsPointXY &wgsPos );
+    static bool readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget );
+    static double parseExifRational( const QString &rational );
+    static QgsPoint findTerrainIntersection( const QgsPoint &cameraPos, QgsPoint nearPos, QgsPoint farPos, const QgsCoordinateReferenceSystem &crs );
 };
 
 #endif // KADASPICTUREITEM_H

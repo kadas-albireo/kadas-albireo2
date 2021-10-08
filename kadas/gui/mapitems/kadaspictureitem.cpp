@@ -15,10 +15,12 @@
  ***************************************************************************/
 
 #include <QDesktopServices>
+#include <QGenericMatrix>
 #include <QImageReader>
 #include <QJsonArray>
 #include <QMenu>
 
+#include <array>
 #include <exiv2/exiv2.hpp>
 
 #include <qgis/qgsgeometryengine.h>
@@ -30,6 +32,8 @@
 
 #include <quazip/quazipfile.h>
 
+#include <kadas/core/kadascoordinateformat.h>
+#include <kadas/analysis/kadaslineofsight.h>
 #include <kadas/gui/mapitems/kadaspictureitem.h>
 
 
@@ -43,6 +47,17 @@ QJsonObject KadasPictureItem::State::serialize() const
   QJsonArray s;
   s.append( size.width() );
   s.append( size.height() );
+  QJsonArray f;
+  for ( const KadasItemPos &footprintPos : footprint )
+  {
+    QJsonArray fp;
+    fp.append( footprintPos.x() );
+    fp.append( footprintPos.y() );
+    f.append( fp );
+  }
+  QJsonArray t;
+  t.append( cameraTarget.x() );
+  t.append( cameraTarget.y() );
 
   QJsonObject json;
   json["status"] = drawStatus;
@@ -51,6 +66,8 @@ QJsonObject KadasPictureItem::State::serialize() const
   json["offsetX"] = offsetX;
   json["offsetY"] = offsetY;
   json["size"] = s;
+  json["footprint"] = f;
+  json["cameraTarget"] = t;
   return json;
 }
 
@@ -64,6 +81,15 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
   offsetY = json["offsetY"].toDouble();
   QJsonArray s = json["size"].toArray();
   size = QSize( s.at( 0 ).toDouble(), s.at( 1 ).toDouble() );
+  QJsonArray f = json["footprint"].toArray();
+  footprint.clear();
+  for ( const QJsonValue &v : f )
+  {
+    QJsonArray fp = v.toArray();
+    footprint.append( KadasItemPos( fp.at( 0 ).toDouble(), fp.at( 1 ).toDouble() ) );
+  }
+  QJsonArray t = json["cameraTarget"].toArray();
+  cameraTarget = KadasItemPos( t.at( 0 ).toDouble(), t.at( 1 ).toDouble() );
   return true;
 }
 
@@ -110,11 +136,14 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   }
 
   state()->pos = fallbackPos;
-  QgsPointXY wgsPos;
-  if ( !ignoreExiv && readGeoPos( path, wgsPos ) )
+  KadasItemPos cameraPos;
+  QList<KadasItemPos> footprint;
+  KadasItemPos cameraTarget;
+  if ( !ignoreExiv && readGeoPos( path, mCrs, cameraPos, footprint, cameraTarget ) )
   {
-    QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( "EPSG:4326" ), mCrs, QgsProject::instance()->transformContext() ).transform( wgsPos );
-    state()->pos = KadasItemPos( itemPos.x(), itemPos.y() );
+    state()->pos = cameraPos;
+    state()->footprint = footprint;
+    state()->cameraTarget = cameraTarget;
     mPosLocked = true;
   }
 
@@ -176,7 +205,16 @@ void KadasPictureItem::setState( const KadasMapItem::State *state )
 
 KadasItemRect KadasPictureItem::boundingBox() const
 {
-  return KadasItemRect( constState()->pos, constState()->pos );
+  double xmin = constState()->pos.x(), xmax = constState()->pos.x();
+  double ymin = constState()->pos.y(), ymax = constState()->pos.y();
+  for ( const KadasItemPos &p : constState()->footprint )
+  {
+    xmin = std::min( xmin, p.x() );
+    xmax = std::max( xmax, p.x() );
+    ymin = std::min( ymin, p.y() );
+    ymax = std::max( ymax, p.y() );
+  }
+  return KadasItemRect( xmin, ymin, xmax, ymax );
 }
 
 KadasMapItem::Margin KadasPictureItem::margin() const
@@ -250,6 +288,42 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   QgsPoint pos( constState()->pos );
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
+
+  // Draw footprint
+  QPolygonF poly;
+  if ( constState()->footprint.size() == 4 )
+  {
+    QgsPoint target( constState()->cameraTarget );
+    target.transform( context.coordinateTransform() );
+    target.transform( context.mapToPixel().transform() );
+
+    for ( const KadasItemPos &fp : constState()->footprint )
+    {
+      QgsPointXY p = fp;
+      p = context.coordinateTransform().transform( p );
+      poly.append( context.mapToPixel().transform( p ).toQPointF() );
+    }
+    poly.append( poly.front() );
+    QPainterPath path;
+    path.addPolygon( poly );
+
+    QLinearGradient strokeGradient( pos.toQPointF(), target.toQPointF() );
+    strokeGradient.setColorAt( 0, QColor( 255, 0, 0 ) );
+    strokeGradient.setColorAt( 0.75, QColor( 255, 0, 0 ) );
+    strokeGradient.setColorAt( 1., QColor( 255, 0, 0, 12 ) );
+    context.painter()->setPen( QPen( strokeGradient, 2, Qt::SolidLine ) );
+
+    QLinearGradient fillGradient( pos.toQPointF(), target.toQPointF() );
+    fillGradient.setColorAt( 0, QColor( 255, 0, 0, 127 ) );
+    fillGradient.setColorAt( 0.75, QColor( 255, 0, 0, 127 ) );
+    fillGradient.setColorAt( 1., QColor( 255, 0, 0, 12 ) );
+    context.painter()->setBrush( fillGradient );
+    context.painter()->drawPath( path );
+    context.painter()->setPen( QPen( Qt::blue, 2, Qt::SolidLine ) );
+    context.painter()->drawLine( pos.x(), pos.y(), poly.at( 0 ).x(), poly.at( 0 ).y() );
+    context.painter()->drawLine( pos.x(), pos.y(), poly.at( 1 ).x(), poly.at( 1 ).y() );
+  }
+
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->scale( mSymbolScale, mSymbolScale );
   double dpiScale = outputDpiScale( context );
@@ -466,6 +540,7 @@ void KadasPictureItem::edit( const EditContext &context, const KadasMapPos &newP
   if ( context.vidx.vertex == 0 )
   {
     state()->pos = toItemPos( newPoint, mapSettings );
+    state()->footprint.clear();
     update();
   }
   else if ( context.vidx.vertex >= 1 && context.vidx.vertex <= 4 )
@@ -528,7 +603,42 @@ KadasMapPos KadasPictureItem::positionFromEditAttribs( const EditContext &contex
   return positionFromDrawAttribs( values, mapSettings );
 }
 
-bool KadasPictureItem::readGeoPos( const QString &filePath, QgsPointXY &wgsPos )
+class QVector3 : public QGenericMatrix<1, 3, float>
+{
+  public:
+    QVector3( const std::array<float, 3> &data )
+      : QGenericMatrix<1, 3, float>( data.data() )
+    {}
+    QVector3( const QGenericMatrix<1, 3, float> &other )
+      : QGenericMatrix<1, 3, float>( other )
+    {}
+    const QVector3 &operator=( const QGenericMatrix<1, 3, float> &other )
+    {
+      static_cast<QGenericMatrix<1, 3, float>>( *this ) = other;
+      return *this;
+    }
+    float operator[]( int idx ) const { return ( *this )( idx, 0 ); }
+    operator std::array<float, 3>() const
+    {
+      return {( *this )[0], ( *this )[1], ( *this )[2]};
+    }
+};
+
+static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
+{
+  float sina = std::sin( angle );
+  float cosa = std::cos( angle );
+  return QMatrix3x3(
+           std::array<float, 9>
+  {
+    cosa + u[0] * u[0] * ( 1 - cosa ),         u[0] * u[1] * ( 1 - cosa ) - u[2] * sina,  u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
+    u[0] * u[1] * ( 1 - cosa ) + u[2] * sina,  cosa + u[1] * u[1] * ( 1 - cosa ),         u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
+    u[0] * u[2] * ( 1 - cosa ) - u[1] * sina,  u[1] * u[2] * ( 1 - cosa ) + u[0] * sina,  cosa + u[2] * u[2] * ( 1 - cosa )
+  }.data()
+         );
+}
+
+bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget )
 {
   // Read EXIF position
   Exiv2::Image::AutoPtr image;
@@ -564,34 +674,10 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, QgsPointXY &wgsPos )
     return false;
   }
   QString latRef = QString::fromStdString( itLatRef->value().toString() );
-  QStringList latVals = QString::fromStdString( itLatVal->value().toString() ).split( QRegExp( "\\s+" ) );
   QString lonRef = QString::fromStdString( itLonRef->value().toString() );
-  QStringList lonVals = QString::fromStdString( itLonVal->value().toString() ).split( QRegExp( "\\s+" ) );
 
-  double lat = 0, lon = 0;
-  double div = 1;
-  for ( const QString &rational : latVals )
-  {
-    QStringList pair = rational.split( "/" );
-    if ( pair.size() != 2 )
-    {
-      break;
-    }
-    lat += ( pair[0].toDouble() / pair[1].toDouble() ) / div;
-    div *= 60;
-  }
-
-  div = 1;
-  for ( const QString &rational : lonVals )
-  {
-    QStringList pair = rational.split( "/" );
-    if ( pair.size() != 2 )
-    {
-      break;
-    }
-    lon += ( pair[0].toDouble() / pair[1].toDouble() ) / div;
-    div *= 60;
-  }
+  double lat = parseExifRational( QString::fromStdString( itLatVal->value().toString() ) );
+  double lon = parseExifRational( QString::fromStdString( itLonVal->value().toString() ) );
 
   if ( latRef.compare( "S", Qt::CaseInsensitive ) == 0 )
   {
@@ -601,6 +687,119 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, QgsPointXY &wgsPos )
   {
     lon *= -1;
   }
-  wgsPos = QgsPointXY( lon, lat );
+  QgsCoordinateReferenceSystem crs4326( "EPSG:4326" );
+  cameraPos = KadasItemPos::fromPoint( QgsCoordinateTransform( crs4326, destCrs, QgsProject::instance() ).transform( QgsPointXY( lon, lat ) ) );
+
+  // Footprint
+  Exiv2::ExifData::iterator itUserComment = exifData.findKey( Exiv2::ExifKey( "Exif.Photo.UserComment" ) );
+  Exiv2::ExifData::iterator itAltitude = exifData.findKey( Exiv2::ExifKey( "Exif.GPSInfo.GPSAltitude" ) );
+  Exiv2::ExifData::iterator itDirection = exifData.findKey( Exiv2::ExifKey( "Exif.GPSInfo.GPSImgDirection" ) );
+  if ( itUserComment != exifData.end() && itAltitude != exifData.end() && itDirection != exifData.end() )
+  {
+    // I.e. {"ImgPitch":-6.84,"ImgRoll":1.26,"HorizontalFOV":65.83,"VerticalFOV":51.79,"Inclination":62.6,"Address":"Schlossgasse 4, 3752 Wimmis, Switzerland"}
+    QVariantMap data = QJsonDocument::fromJson( QByteArray::fromStdString( itUserComment->value().toString() ) ).object().toVariantMap();
+
+    if ( !data.isEmpty() && data.contains( "ImgRoll" ) && data.contains( "ImgPitch" ) && data.contains( "HorizontalFOV" ) && data.contains( "VerticalFOV" ) )
+    {
+      double alt = parseExifRational( QString::fromStdString( itAltitude->value().toString() ) );
+      double direction = parseExifRational( QString::fromStdString( itDirection->value().toString( ) ) );
+
+      QVector3 ey( {0, 1, 0} );
+
+      // Camera rotation matrix
+      float yaw = -direction / 180. * M_PI;
+      float roll = data["ImgRoll"].toDouble() / 180. * M_PI;
+      float pitch = data["ImgPitch"].toDouble() / 180. * M_PI;
+
+      QMatrix3x3 Rcz = rotAngleAxis( {0, 0, 1}, yaw );
+      QMatrix3x3 Rcy = rotAngleAxis( QVector3( Rcz * QVector3( {0, 1, 0} ) ), roll );
+      QMatrix3x3 Rcx = rotAngleAxis( QVector3( Rcy * Rcz * QVector3( {1, 0, 0} ) ), pitch );
+
+      QMatrix3x3 R = Rcx * Rcy * Rcz;
+
+      // Aperture boundary direction vectors wrt unrotated camera
+      float halfHFov = 0.5 * data["HorizontalFOV"].toDouble() / 180. * M_PI;
+      float halfVFov = 0.5 * data["VerticalFOV"].toDouble() / 180. * M_PI;
+      QMatrix3x3 Rz = rotAngleAxis( {0, 0, 1}, halfHFov );
+      QMatrix3x3 Rx = rotAngleAxis( QVector3( Rz * QVector3( {1, 0, 0} ) ), -halfVFov );
+
+      QVector3 bottomleft = Rx * Rz * ey;
+      QVector3 bottomright( {-bottomleft[0], bottomleft[1], bottomleft[2]} );
+      QVector3 topleft( {bottomleft[0], bottomleft[1], -bottomleft[2]} );
+      QVector3 topright( {-topleft[0], topleft[1], topleft[2]} );
+
+      // Aperture boundary direction vectors wrt camera
+      QVector3 rbottomleft = R * bottomleft;
+      QVector3 rbottomright = R * bottomright;
+      QVector3 rtopleft = R * topleft;
+      QVector3 rtopright = R * topright;
+
+      // Terrain intersection: up to max 25km, binary search for terrain point from which camera becomes visible
+      QgsCoordinateReferenceSystem crs3857( "EPSG:3857" );
+      QgsPointXY mrcPosXY = QgsCoordinateTransform( destCrs, crs3857, QgsProject::instance() ).transform( cameraPos );
+      QgsPoint mrcPos( mrcPosXY.x(), mrcPosXY.y(), alt );
+      double d = 25000;
+      QgsPoint pTerrBottomLeft = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rbottomleft[0] * d, mrcPos.y() + rbottomleft[1] * d, mrcPos.z() + rbottomleft[2] * d ), crs3857 );
+      QgsPoint pTerrBottomRight = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rbottomright[0] * d, mrcPos.y() + rbottomright[1] * d, mrcPos.z() + rbottomright[2] * d ), crs3857 );
+      QgsPoint pTerrTopLeft = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rtopleft[0] * d, mrcPos.y() + rtopleft[1] * d, mrcPos.z() + rtopleft[2] * d ), crs3857 );
+      QgsPoint pTerrTopRight = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rtopright[0] * d, mrcPos.y() + rtopright[1] * d, mrcPos.z() + rtopright[2] * d ), crs3857 );
+
+      QVector3 reye = R * ey;
+      // Point in camera direction 25km away to compute the camera direction
+      QgsPoint target( mrcPos.x() + reye[0] * .75 * d, mrcPos.y() + reye[1] * .75 * d, mrcPos.z() + reye[2] * .75 * d );
+
+      QgsCoordinateTransform crst( crs3857, destCrs, QgsProject::instance() );
+      footprint =
+      {
+        KadasItemPos::fromPoint( crst.transform( pTerrBottomLeft ) ),
+        KadasItemPos::fromPoint( crst.transform( pTerrBottomRight ) ),
+        KadasItemPos::fromPoint( crst.transform( pTerrTopRight ) ),
+        KadasItemPos::fromPoint( crst.transform( pTerrTopLeft ) )
+      };
+      cameraTarget = KadasItemPos::fromPoint( crst.transform( target ) );
+    }
+
+  }
+
   return true;
+}
+
+double KadasPictureItem::parseExifRational( const QString &entry )
+{
+  QStringList parts = entry.split( QRegExp( "\\s+" ) );
+
+  double value = 0;
+  double div = 1;
+  for ( const QString &rational : parts )
+  {
+    QStringList pair = rational.split( "/" );
+    if ( pair.size() != 2 )
+    {
+      break;
+    }
+    value += ( pair[0].toDouble() / pair[1].toDouble() ) / div;
+    div *= 60;
+  }
+  return value;
+}
+
+QgsPoint KadasPictureItem::findTerrainIntersection( const QgsPoint &cameraPos, QgsPoint nearPos, QgsPoint farPos, const QgsCoordinateReferenceSystem &crs )
+{
+  // Binary search between cameraPos and farPos until farPos sees camera, up to 2m resolution, 2m terrain resolution
+  double resolution = 2;
+  while ( nearPos.distanceSquared( farPos ) > resolution * resolution )
+  {
+    QgsPoint midPos( 0.5 * ( nearPos.x() + farPos.x() ), 0.5 * ( nearPos.y() + farPos.y() ), 0.5 * ( nearPos.z() + farPos.z() ) );
+    double len = cameraPos.distance( midPos );
+    int samples = std::round( len / resolution );
+    if ( KadasLineOfSight::computeTargetVisibility( cameraPos, midPos, crs, samples, true, true ) )
+    {
+      nearPos = midPos;
+    }
+    else
+    {
+      farPos = midPos;
+    }
+  }
+  return QgsPoint( 0.5 * ( nearPos.x() + farPos.x() ), 0.5 * ( nearPos.y() + farPos.y() ), 0.5 * ( nearPos.z() + farPos.z() ) );
 }
