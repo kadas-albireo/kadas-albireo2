@@ -23,6 +23,7 @@
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgsvertexid.h>
 
 #include <kadas/core/kadasstatehistory.h>
 #include <kadas/gui/kadas_gui.h>
@@ -31,7 +32,6 @@
 class QMenu;
 class QuaZip;
 class QgsRenderContext;
-struct QgsVertexId;
 class KadasItemLayer;
 class KadasMapItem;
 
