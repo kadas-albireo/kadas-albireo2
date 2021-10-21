@@ -100,7 +100,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
 
     if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
-      measureMenu->addAction( QIcon( ":/kadas/icons/measure_line" ), tr( "Distance" ), this, &KadasCanvasContextMenu::measureLine );
+      measureMenu->addAction( QIcon( ":/kadas/icons/measure_line" ), tr( "Distance / Azimuth" ), this, &KadasCanvasContextMenu::measureLine );
     }
     if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
     {
@@ -109,10 +109,6 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_circle" ), tr( "Circle" ), this, SLOT( measureCircle() ) );
-    }
-    if ( mPickResult.isEmpty() )
-    {
-      measureMenu->addAction( QIcon( ":/kadas/icons/measure_angle" ), tr( "Azimuth" ), this, &KadasCanvasContextMenu::measureAzimuth );
     }
     if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
@@ -261,16 +257,6 @@ void KadasCanvasContextMenu::measurePolygon()
 void KadasCanvasContextMenu::measureCircle()
 {
   kApp->mainWindow()->actionMeasureCircle()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
-  {
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
-  }
-}
-
-void KadasCanvasContextMenu::measureAzimuth()
-{
-  kApp->mainWindow()->actionMeasureAzimuth()->trigger();
   QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
   if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
   {
