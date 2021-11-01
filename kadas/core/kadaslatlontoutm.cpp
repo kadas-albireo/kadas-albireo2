@@ -697,7 +697,7 @@ static inline QPointF truncateGridLineXMax( const QPointF &p, const QPointF &q, 
 
 void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
                                     QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
-                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode, int cellSize )
+                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode, int minCellSize )
 {
 
   QgsDistanceArea da;
@@ -785,39 +785,36 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
         computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
         continue;
       }
-      if ( cellSize == 0 )
+      int cellSize;
+      if ( mapScale > 500000 )
       {
-        if ( mapScale > 500000 )
-        {
-          cellSize = 100000;
-        }
-        else if ( mapScale > 50000 )
-        {
-          cellSize = 10000;
-        }
-        else if ( mapScale > 5000 )
-        {
-          cellSize = 1000;
-        }
-        else if ( mapScale > 500 )
-        {
-          cellSize = 100;
-        }
-        else if ( mapScale > 50 )
-        {
-          cellSize = 10;
-        }
-        else
-        {
-          cellSize = 1;
-        }
+        cellSize = 100000;
+      }
+      else if ( mapScale > 50000 )
+      {
+        cellSize = 10000;
+      }
+      else if ( mapScale > 5000 )
+      {
+        cellSize = 1000;
+      }
+      else if ( mapScale > 500 )
+      {
+        cellSize = 100;
+      }
+      else if ( mapScale > 50 )
+      {
+        cellSize = 10;
       }
       else
       {
-        // If chosen cellSize would result in over 100 grid lines in any direction, reduce interval
-        double length = da.measureLine( QgsPointXY( xMin, 0.5 * ( yMin + yMax ) ), QgsPointXY( xMax, 0.5 * ( yMin + yMax ) ) );
-        cellSize = std::max( cellSize, int( length / 100. ) );
+        cellSize = 1;
       }
+      if ( minCellSize != 0 )
+      {
+        cellSize = std::max( cellSize, minCellSize );
+      }
+
       if ( gridMode == GridMGRS )
       {
         computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );

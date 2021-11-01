@@ -3646,9 +3646,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
         <source>Cell size:</source>
-        <translation>Taille des cellules:</translation>
+        <translation type="vanished">Taille des cellules:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
+        <source>Min. cell size:</source>
+        <translation>Taille min. des cellules:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="113"/>
