@@ -205,6 +205,7 @@ void KadasMapToolHeightProfile::drawFinished()
       }
       mDialog->setPoints( points, lineItem->crs() );
       QgsPoint markerPos( points[0] );
+      mPosMarker->clear();
       mPosMarker->addPartFromGeometry( markerPos );
     }
   }
