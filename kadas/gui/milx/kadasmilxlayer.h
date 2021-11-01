@@ -66,7 +66,7 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     class Renderer;
 
     bool mIsApproved = false;
-    bool mOverrideMilxSymbolSettings;
+    bool mOverrideMilxSymbolSettings = false;
     KadasMilxSymbolSettings mMilxSymbolSettings;
 };
 
