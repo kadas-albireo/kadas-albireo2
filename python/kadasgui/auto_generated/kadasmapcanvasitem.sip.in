@@ -31,6 +31,7 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas );
     const KadasMapItem *mapItem() const;
+    bool isVisible() const;
 
     virtual void paint( QPainter *painter );
 
