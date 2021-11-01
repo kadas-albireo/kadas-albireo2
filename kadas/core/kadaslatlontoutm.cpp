@@ -868,7 +868,8 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
     {
       xLine.append( truncateGridLineYMax( QPointF( r.x(), r.y() ), QPointF( q.x(), q.y() ), xMin, xMax, yMax, truncated ) );
     }
-    if ( lineLabelCallback )
+    // No grid labels below 1km grid
+    if ( lineLabelCallback && ( coo.easting % 1000 ) == 0 )
     {
       lineLabelCallback( xLine.last().x(), xLine.last().y(), cellSize, false, gridLines.size(), *gridLabels );
     }
@@ -933,7 +934,8 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
     ycoo.easting += cellSize;
     r = UTM2LL( ycoo, ok );
     yLine.append( truncateGridLineXMin( QPointF( r.x(), r.y() ), QPointF( q.x(), q.y() ), xMin ) );
-    if ( lineLabelCallback )
+    // No grid labels below 1km grid
+    if ( lineLabelCallback && ( coo.northing % 1000 ) == 0 )
     {
       lineLabelCallback( yLine.last().x(), yLine.last().y(), cellSize, true, gridLines.size(), *gridLabels );
     }
@@ -983,7 +985,7 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
   return label;
 }
 
-void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, double cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
+void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.01, lat + 0.01 ) );
   GridLabel label;
@@ -1000,19 +1002,19 @@ void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, double cell
   gridLabels.append( label );
 }
 
-void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, double cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
+void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.0001, lat + 0.0001 ) );
   GridLabel label;
   if ( horiz )
   {
-    label.label = QString::number( int ( ( utmcoo.northing % 100000 ) / cellSize ) );
+    label.label = QString::number( int ( ( utmcoo.northing % 100000 ) / cellSize ) ).rightJustified( 2, '0' );
   }
   else
   {
-    label.label = QString::number( int ( ( utmcoo.easting % 100000 ) / cellSize ) );
+    label.label = QString::number( int ( ( utmcoo.easting % 100000 ) / cellSize ) ).rightJustified( 2, '0' );
   }
-  if ( label.label == "0" )
+  if ( label.label == "00" )
   {
     return;    // 0 always overlaps with a 100kID zone label, so omit it
   }

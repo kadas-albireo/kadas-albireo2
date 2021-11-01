@@ -72,7 +72,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static void computeGrid( const QgsRectangle &bbox, double mapScale,
                              QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
                              QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,
-                             KadasLatLonToUTM::GridMode gridMode, int cellSize );
+                             KadasLatLonToUTM::GridMode gridMode, int minCellSize );
 
   private:
     static const int NUM_100K_SETS;
@@ -82,11 +82,11 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static QString getLetter100kID( int column, int row, int parm );
     static double getMinNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
-    typedef void ( gridLabelCallback_t )( double, double, double, bool, int, QList<GridLabel> & );
+    typedef void ( gridLabelCallback_t )( double, double, int, bool, int, QList<GridLabel> & );
     static void computeSubGrid( int cellSize, double xMin, double xMax, double yMin, double yMax, QList<QPolygonF> &gridLines, QList<ZoneLabel> *zoneLabels = 0, QList<GridLabel> *gridLabels = 0, zoneLabelCallback_t *zoneLabelCallback = 0, gridLabelCallback_t *lineLabelCallback = 0 );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
-    static void utmGridLabelCallback( double lon, double lat, double cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
-    static void mgrsGridLabelCallback( double lon, double lat, double cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
+    static void utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
+    static void mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
 };
 
 #endif // KADASLATLONTOUTM_H
