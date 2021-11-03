@@ -37,6 +37,7 @@ class KadasAnalysis(PyQtBindings):
         super().__init__(project, 'kadasanalysis')
         self.sip_file = 'kadasanalysis.sip'
         self.exceptions = True
+        self.release_gil = True
         self.disabled_features = "@SIP_DISABLE_FEATURES@".split(";")
 
     def apply_user_defaults(self, tool):
