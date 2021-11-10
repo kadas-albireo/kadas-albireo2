@@ -198,7 +198,7 @@ QMap< QString, KadasPluginManager::PluginInfo > KadasPluginManager::availablePlu
   QJsonDocument json = QJsonDocument::fromJson( response, &err );
   if ( !json.isNull() )
   {
-    QString baseUrl = repoUrl.replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
+    QString baseUrl = QString( repoUrl ).replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
 
     for ( const QJsonValueRef &resultRef : json.object()["results"].toArray() )
     {
