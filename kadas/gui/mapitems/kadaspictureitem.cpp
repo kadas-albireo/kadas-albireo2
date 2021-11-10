@@ -737,7 +737,10 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
       // Terrain intersection: up to max 25km, binary search for terrain point from which camera becomes visible
       QgsCoordinateReferenceSystem crs3857( "EPSG:3857" );
       QgsPointXY mrcPosXY = QgsCoordinateTransform( destCrs, crs3857, QgsProject::instance() ).transform( cameraPos );
-      QgsPoint mrcPos( mrcPosXY.x(), mrcPosXY.y(), alt );
+      // Ensure altitude is at least 1m above terrain
+      double terrHeigth = KadasCoordinateFormat::instance()->getHeightAtPos( mrcPosXY, crs3857, QgsUnitTypes::DistanceMeters );
+      QgsPoint mrcPos( mrcPosXY.x(), mrcPosXY.y(), std::max( alt, terrHeigth + 1 ) );
+
       double d = 25000;
       QgsPoint pTerrBottomLeft = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rbottomleft[0] * d, mrcPos.y() + rbottomleft[1] * d, mrcPos.z() + rbottomleft[2] * d ), crs3857 );
       QgsPoint pTerrBottomRight = findTerrainIntersection( mrcPos, mrcPos, QgsPoint( mrcPos.x() + rbottomright[0] * d, mrcPos.y() + rbottomright[1] * d, mrcPos.z() + rbottomright[2] * d ), crs3857 );
