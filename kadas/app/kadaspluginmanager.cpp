@@ -386,11 +386,11 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   for ( bool f = zip.goToFirstFile(); f; f = zip.goToNextFile() )
   {
     QString fileName = zip.getCurrentFileName();
-    QString absoluteFilePath = pp + "/" + fileName;
+    QString absoluteFilePath = QDir( pp ).absoluteFilePath( fileName );
 
     if ( moduleName.isEmpty() )
     {
-      moduleName = QFileInfo( fileName ).path();;
+      moduleName = QFileInfo( fileName ).path();
     }
 
     if ( fileName.endsWith( "/" ) )
@@ -398,26 +398,19 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
       continue;
     }
 
-    QString zipName = zip.getZipName();
-    QuaZipFile zFile( zipName, fileName );
-    zFile.setZip( &zip );
-    if ( !zFile.open( QIODevice::ReadOnly ) )
+    if ( file.open( QIODevice::ReadOnly ) )
     {
-//      int errorCode = zFile.getZipError();
-      continue;
-    }
+      QByteArray ba = file.readAll();
+      file.close();
 
-    QByteArray ba = zFile.readAll();
-    zFile.close();
-    QDir().mkpath( QFileInfo( absoluteFilePath ).absolutePath() );
-    QFile dstFile( absoluteFilePath );
-    if ( !dstFile.open( QIODevice::WriteOnly ) )
-    {
-      continue;
+      QDir().mkpath( QFileInfo( absoluteFilePath ).absolutePath() );
+      QFile dstFile( absoluteFilePath );
+      if ( dstFile.open( QIODevice::WriteOnly ) )
+      {
+        dstFile.write( ba );
+        dstFile.close();
+      }
     }
-
-    dstFile.write( ba.data() );
-    dstFile.close();
   }
 
   //insert into mInstalledTreeWidget
