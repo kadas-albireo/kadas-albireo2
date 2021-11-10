@@ -104,6 +104,7 @@ void KadasItemLayer::addItem( KadasMapItem *item )
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
   item->setSymbolScale( mSymbolScale );
   emit itemAdded( id );
+  emit repaintRequested();
 }
 
 KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
@@ -116,6 +117,7 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
     mItemBounds.remove( itemId );
     mItemOrder.removeOne( itemId );
     emit itemRemoved( itemId );
+    emit repaintRequested();
   }
   return item;
 }
