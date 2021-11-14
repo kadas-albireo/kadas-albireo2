@@ -29,6 +29,7 @@ class KadasGlobeBillboardManager;
 class KadasGlobeLayerPropertiesFactory;
 class KadasGlobeProjectLayerManager;
 class KadasGlobeWidget;
+class osgQtViewerWidget;
 
 namespace osg { class Group; }
 namespace osgViewer { class Viewer; }
@@ -37,7 +38,6 @@ namespace osgEarth
 {
   class ImageLayer;
   class MapNode;
-  namespace QtGui { class ViewerWidget; }
   namespace Util
   {
     class SkyNode;
@@ -72,7 +72,7 @@ class KadasGlobeIntegration : public QObject
 
   private:
     QAction *mAction3D = nullptr;
-    osgEarth::QtGui::ViewerWidget *mViewerWidget = nullptr;
+    osgQtViewerWidget *mViewerWidget = nullptr;
     KadasGlobeWidget *mDockWidget = nullptr;
     KadasGlobeDialog *mSettingsDialog = nullptr;
     KadasGlobeLayerPropertiesFactory *mLayerPropertiesFactory = nullptr;

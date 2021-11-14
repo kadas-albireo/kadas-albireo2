@@ -15,14 +15,12 @@ IF(WITH_GLOBE)
     ${OSGGA_LIBRARY}
     ${OSGUTIL_LIBRARY}
     ${OSG_LIBRARY}
-    ${OSGQT_LIBRARY}
     ${OSGVIEWER_LIBRARY}
     ${OSGEARTH_LIBRARY}
     ${OSGEARTHANNOTATION_LIBRARY}
     ${OSGEARTHFEATURES_LIBRARY}
     ${OSGEARTHUTIL_LIBRARY}
     ${OSGEARTHSYMBOLOGY_LIBRARY}
-    ${OSGEARTHQT_LIBRARY}
     ${OPENTHREADS_LIBRARY}
     )
 ENDIF(WITH_GLOBE)
@@ -36,7 +34,7 @@ FILE(GLOB kadas_SRC
   iamauth/*.cpp
   mapgrid/*.cpp)
 IF(WITH_GLOBE)
-    FILE(GLOB globe_SRC globe/*.cpp)
+    FILE(GLOB globe_SRC globe/*.cpp globe/osg/*.cpp)
     SET(kadas_SRC ${kadas_SRC} ${globe_SRC})
 ENDIF(WITH_GLOBE)
 LIST(SORT kadas_SRC)
@@ -50,7 +48,7 @@ FILE(GLOB kadas_HDR
   iamauth/*.h
   mapgrid/*.h)
 IF(WITH_GLOBE)
-    FILE(GLOB globe_HDR globe/*.h)
+    FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
     SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
 ENDIF(WITH_GLOBE)
 LIST(SORT kadas_HDR)

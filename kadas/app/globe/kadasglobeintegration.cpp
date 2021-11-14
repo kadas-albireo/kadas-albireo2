@@ -42,7 +42,6 @@
 #include <osgEarthDrivers/sky_simple/SimpleSkyOptions>
 #include <osgEarthDrivers/tms/TMSOptions>
 #include <osgEarthDrivers/wms/WMSOptions>
-#include <osgEarthQt/ViewerWidget>
 #include <osgEarthUtil/AutoClipPlaneHandler>
 #include <osgEarthUtil/EarthManipulator>
 #include <osgEarthUtil/Sky>
@@ -60,6 +59,8 @@
 #include <kadas/app/globe/kadasglobeprojectlayermanager.h>
 #include <kadas/app/globe/kadasglobevectorlayerproperties.h>
 #include <kadas/app/globe/kadasglobewidget.h>
+
+#include "osg/osgQtViewerWidget.h"
 
 
 KadasGlobeIntegration::KadasGlobeIntegration( QAction *action3D, QObject *parent )
@@ -197,7 +198,7 @@ void KadasGlobeIntegration::run()
   // OSG, this activates OSG's IncrementalCompileOpeartion in order to avoid frame breaks.
   mOsgViewer->getDatabasePager()->setDoPreCompile( true );
 
-  mViewerWidget = new osgEarth::QtGui::ViewerWidget( mOsgViewer );
+  mViewerWidget = new osgQtViewerWidget( mOsgViewer );
 #if OSGEARTH_VERSION_LESS_THAN(2, 10, 0)
   QGLFormat glf = QGLFormat::defaultFormat();
   glf.setVersion( 3, 3 );
