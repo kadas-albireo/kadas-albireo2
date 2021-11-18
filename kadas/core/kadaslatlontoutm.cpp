@@ -1006,15 +1006,16 @@ void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSi
 {
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.0001, lat + 0.0001 ) );
   GridLabel label;
+  int pad = std::log10( 100000 / cellSize );
   if ( horiz )
   {
-    label.label = QString::number( int ( ( utmcoo.northing % 100000 ) / cellSize ) ).rightJustified( 2, '0' );
+    label.label = QString::number( int ( ( utmcoo.northing % 100000 ) / cellSize ) ).rightJustified( pad, '0' );
   }
   else
   {
-    label.label = QString::number( int ( ( utmcoo.easting % 100000 ) / cellSize ) ).rightJustified( 2, '0' );
+    label.label = QString::number( int ( ( utmcoo.easting % 100000 ) / cellSize ) ).rightJustified( pad, '0' );
   }
-  if ( label.label == "00" )
+  if ( label.label == QString( "0" ).rightJustified( pad, '0' ) )
   {
     return;    // 0 always overlaps with a 100kID zone label, so omit it
   }
