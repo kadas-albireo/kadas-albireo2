@@ -685,22 +685,22 @@
 <context>
     <name>KadasCoordinateDisplayer</name>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="67"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="68"/>
         <source>Meters</source>
         <translation>Meter</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="68"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="69"/>
         <source>Feet</source>
         <translation>Fuss</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="155"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="161"/>
         <source>ft AMSL</source>
         <translation>ft ü.M.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="155"/>
+        <location filename="../kadas/gui/kadascoordinatedisplayer.cpp" line="161"/>
         <source>m AMSL</source>
         <translation>m ü.M.</translation>
     </message>
@@ -809,46 +809,46 @@
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="294"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="282"/>
         <source>Timeout</source>
         <translation>Zeitüberschreitung</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="332"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="338"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="320"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="326"/>
         <source>Add TMS Imagery</source>
         <translation>TMS-Bilder hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="332"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="393"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="320"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="381"/>
         <source>TMS URL:</source>
         <translation>TMS URL:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="349"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="355"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="337"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="343"/>
         <source>Add WMS Imagery</source>
         <translation>WMS-Bilder hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="349"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="337"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="371"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="359"/>
         <source>Add Raster Imagery</source>
         <translation>Rasterbilder hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="393"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="399"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="381"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="387"/>
         <source>Add TMS Elevation</source>
         <translation>TMS-Höhen hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="410"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.cpp" line="398"/>
         <source>Add Raster Elevation</source>
         <translation>Rasterhöhen hinzufügen</translation>
     </message>
@@ -866,39 +866,39 @@
         <translation>Karte</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="56"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="150"/>
         <source>Sk&amp;y</source>
         <translation>Him&amp;mel</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="71"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="165"/>
         <source>Override Date / Time (UTC)</source>
         <translation>Datum/Zeit übersteuern (UTC)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="84"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="178"/>
         <source>dd.MM.yyyy HH:mm</source>
         <translation>dd.MM.yyyy HH:mm</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="94"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="188"/>
         <source>Ambient lighting</source>
         <translation>Beleuchtung</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="126"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="69"/>
         <source>Imagery</source>
         <translation>Bildmaterial</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="185"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="311"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="128"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="241"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="195"/>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="321"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="138"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="251"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
@@ -908,107 +908,106 @@
         <translation>Geländehöhe</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="232"/>
         <source>Vertical scale</source>
-        <translation>Vertikaler Massstab</translation>
+        <translation type="vanished">Vertikaler Massstab</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="334"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="305"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="346"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="317"/>
         <source>Anti Aliasing</source>
         <translation>Anti-Aliasing</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="361"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="332"/>
         <source>Samples</source>
         <translation>Stichproben</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="368"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="339"/>
         <source>[Leave empty for maximum]</source>
         <translation>[Für Maximum leer lassen]</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="375"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="346"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Change requires a restart of the 3D view&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Änderung erfordert einen Neustart der 3D Ansicht&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="398"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="369"/>
         <source>Stereo</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="404"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="375"/>
         <source>Stereo Mode</source>
         <translation>Stereomodus</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="414"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="385"/>
         <source>Eye separation (m)</source>
         <translation>Augenabstand (m)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="443"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="414"/>
         <source>Screen distance (m)</source>
         <translation>Bildschirmabstand (m)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="466"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="437"/>
         <source>Screen width (m)</source>
         <translation>Bildschirmbreite (m)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="486"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="457"/>
         <source>Screen height (m)</source>
         <translation>Bildschirmhöhe (m)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="506"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="477"/>
         <source>Split stereo horizontal separation (px)</source>
         <translation>Horizontalstaffelung (px)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="523"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="494"/>
         <source>Split stereo horizontal eye mapping</source>
         <translation>Horizontale Stereo-Augenabbildung teilen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="544"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="515"/>
         <source>Split stereo vertical separation (px)</source>
         <translation>Vertikalstaffelung (px)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="558"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="529"/>
         <source>Split stereo vertical eye mapping</source>
         <translation>Vertikale Stereo-Augenabbildung teilen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="582"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="553"/>
         <source>Reset to defaults</source>
         <translation>Auf Voreinstellungen zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="593"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="564"/>
         <source>Advanced</source>
         <translation>Erweitert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="599"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="570"/>
         <source>Scrolling</source>
         <translation>Scrollverhalten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="605"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="576"/>
         <source>Sensitivity</source>
         <translation>Empfindlichkeit</translation>
     </message>
     <message>
-        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="631"/>
+        <location filename="../kadas/app/globe/kadasglobedialog.ui" line="602"/>
         <source>Invert scroll wheel</source>
         <translation>Mausrad umkehren</translation>
     </message>
@@ -1853,27 +1852,27 @@
 <context>
     <name>KadasItemLayerRegistry</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="360"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="362"/>
         <source>Redlining</source>
         <translation>Redlining</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="361"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="363"/>
         <source>Symbols</source>
         <translation>Symbole</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="362"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="364"/>
         <source>Pictures</source>
         <translation>Bilder</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="363"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="365"/>
         <source>Pins</source>
         <translation>Stecknadeln</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="364"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="366"/>
         <source>Routes</source>
         <translation>Routen</translation>
     </message>
@@ -1888,7 +1887,7 @@
 <context>
     <name>KadasItemLayerType</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="384"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="386"/>
         <source>Symbol scale:</source>
         <translation>Symbolmassstab:</translation>
     </message>
@@ -4813,12 +4812,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Download des Plugins fehlgeschlagen: %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="467"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="460"/>
         <source>Plugin deinstallation failed</source>
         <translation>Entfernung des Plugins fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="467"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="460"/>
         <source>The deinstallation of the plugin &apos;%1&apos; failed</source>
         <translation>Entfernung des Plugins &apos;%1&apos; fehlgeschlagen</translation>
     </message>
@@ -4835,7 +4834,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation type="vanished">Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="547"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="540"/>
         <source>up-to-date</source>
         <translation>Aktuell</translation>
     </message>
