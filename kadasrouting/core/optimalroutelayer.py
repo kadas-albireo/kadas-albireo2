@@ -15,6 +15,7 @@ from kadasrouting.utilities import (
     pushWarning,
     decodePolyline6,
     formatdist,
+    write_response
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
@@ -186,6 +187,8 @@ class OptimalRouteLayer(KadasItemLayer):
     def computeFromResponse(self, response):
         if response is None:
             return
+        # Write response to file
+        write_response(response)
         epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
         self.clear()
         self.response = response

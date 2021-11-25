@@ -3,6 +3,9 @@ import os
 import itertools
 import io
 import math
+import json
+import logging
+from datetime import datetime
 
 
 from io import StringIO
@@ -19,6 +22,8 @@ from qgis.core import (
     QgsProject,
     Qgis,
 )
+
+LOG = logging.getLogger(__name__)
 
 
 def tr(x):
@@ -204,3 +209,22 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
+
+
+def write_response(response):
+    kadas_dir = os.path.join(os.path.expanduser("~"), ".kadas")
+    try:
+        os.mkdir(kadas_dir)
+    except FileExistsError:
+        pass
+    response_dir = os.path.join(kadas_dir, "valhalla-response")
+    try:
+        os.mkdir(response_dir)
+    except FileExistsError:
+        pass
+    response_filename = datetime.now().strftime("%Y%m%d_%H%M%S") + ".json"
+    response_path = os.path.join(response_dir, response_filename)
+
+    with open(response_path, 'w', encoding='utf-8') as f:
+        json.dump(response, f, ensure_ascii=False, indent=2)
+        LOG.info("Response from Valhalla is written to %s" % response_path)
