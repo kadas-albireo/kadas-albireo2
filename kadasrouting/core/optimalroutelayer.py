@@ -181,8 +181,11 @@ class OptimalRouteLayer(KadasItemLayer):
             self.computeFromResponse(response)
             self.triggerRepaint()
         except ValhallaException as e:
-            pushWarning(str(e))
             LOG.error(e)
+            if "Failed to find a route between two locations for Chinese Postman route" in str(e):
+                raise(e)
+            else:
+                pushWarning(str(e))
 
     def computeFromResponse(self, response):
         if response is None:

@@ -4,6 +4,7 @@ import json
 
 from PyQt5 import uic
 from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QMessageBox
 
 from qgis.core import QgsWkbTypes, QgsProject, QgsVectorLayer
 from qgis.utils import iface
@@ -177,11 +178,16 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             )
             self.btnNavigate.setEnabled(True)
         except Exception as e:
+            if "Failed to find a route between two locations for Chinese Postman route" in str(e):
+                self.show_chinese_postman_warning(str(e))
+            else:
+                pushWarning(str(e))
             LOG.error(e, exc_info=True)
-            # TODO more fine-grained error control
-            pushWarning(self.tr("Could not compute route"))
             LOG.error("Could not compute route")
-            raise (e)
+
+    def show_chinese_postman_warning(self, error_message):
+        LOG.debug("show on the right time again")
+        QMessageBox.warning(None, "Patrol Warning", "Test", QMessageBox.Ok)
 
     def actionToggled(self, toggled):
         super().actionToggled(toggled)
