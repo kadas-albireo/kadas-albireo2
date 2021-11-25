@@ -4,12 +4,12 @@ import json
 
 from PyQt5 import uic
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMessageBox
 
 from qgis.core import QgsWkbTypes, QgsProject, QgsVectorLayer
 from qgis.utils import iface
 from qgis.gui import QgsMapToolPan
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
+from kadasrouting.gui.patrolwarning import PatrolWarning
 from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 from kadasrouting.utilities import pushWarning, transformToWGS
 from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
@@ -186,8 +186,10 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             LOG.error("Could not compute route")
 
     def show_chinese_postman_warning(self, error_message):
-        LOG.debug("show on the right time again")
-        QMessageBox.warning(None, "Patrol Warning", "Test", QMessageBox.Ok)
+        # Add location parser here
+        # set the text somehow
+        dialog = PatrolWarning(self)
+        dialog.exec_()
 
     def actionToggled(self, toggled):
         super().actionToggled(toggled)
