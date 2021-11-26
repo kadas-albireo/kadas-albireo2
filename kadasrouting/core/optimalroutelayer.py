@@ -175,6 +175,8 @@ class OptimalRouteLayer(KadasItemLayer):
             response = self.valhalla.route(
                 points, profile, avoid_polygons, costingOptions, patrol_polygons
             )
+            # Write response to file
+            write_response(response)
             self.costingOptions = costingOptions
             self.profile = profile
             self.points = points
@@ -190,8 +192,6 @@ class OptimalRouteLayer(KadasItemLayer):
     def computeFromResponse(self, response):
         if response is None:
             return
-        # Write response to file
-        write_response(response)
         epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
         self.clear()
         self.response = response
