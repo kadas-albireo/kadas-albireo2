@@ -86,9 +86,9 @@ class RoutingPlugin(QObject):
         # Day and Night
         self.dayNightAction = QAction(icon("day-and-night.png"), self.tr("Day / Night"))
         # Removed until we have one
-        # self.iface.addAction(
-        #     self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
-        # )
+        self.iface.addAction(
+            self.dayNightAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
+        )
 
         self.dataCatalogueAction = QAction(
             icon("data-catalogue.png"), self.tr("Routing Data")
@@ -243,7 +243,11 @@ class RoutingPlugin(QObject):
             dialog.exec_()
 
     def toggleDayNight(self, day=True):
-        if day:
-            pushWarning("Show day map")
-        else:
-            pushWarning("show night map")
+        from kadasrouting.gui.patrolwarning import PatrolWarning
+        dialog = PatrolWarning(iface.mainWindow())
+        dialog.setWarningMessage("1,2", "3,4")
+        dialog.exec_()
+        # if day:
+        #     pushWarning("Show day map")
+        # else:
+        #     pushWarning("show night map")
