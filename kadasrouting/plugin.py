@@ -66,7 +66,7 @@ class RoutingPlugin(QObject):
         )
 
         # Chinese Postaman menu
-        self.cpAction = QAction(icon("chinesepostman.png"), self.tr("Patrol"))
+        self.cpAction = QAction(icon("chinesepostman.png"), self.tr("Patrol") + "\n(Beta)")
         self.iface.addAction(self.cpAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB)
 
         # Reachability menu

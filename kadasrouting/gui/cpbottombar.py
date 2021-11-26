@@ -9,6 +9,7 @@ from qgis.core import QgsWkbTypes, QgsProject, QgsVectorLayer
 from qgis.utils import iface
 from qgis.gui import QgsMapToolPan
 from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
+from kadasrouting.gui.patrolwarning import PatrolWarning
 from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
 from kadasrouting.utilities import pushWarning, transformToWGS
 from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
@@ -177,11 +178,21 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             )
             self.btnNavigate.setEnabled(True)
         except Exception as e:
+            if "Failed to find a route between two locations for Chinese Postman route" in str(e):
+                self.show_chinese_postman_warning(str(e))
+            else:
+                pushWarning(str(e))
             LOG.error(e, exc_info=True)
-            # TODO more fine-grained error control
-            pushWarning(self.tr("Could not compute route"))
             LOG.error("Could not compute route")
-            raise (e)
+
+    def show_chinese_postman_warning(self, error_message):
+        # Parse location for
+        # Failed to find a route between two locations for Chinese Postman route.:
+        # No route from 7.456342, 46.959747 to 7.454752, 46.959480
+        start, end = error_message.split("from ")[1].split(" to ")
+        dialog = PatrolWarning(self)
+        dialog.setWarningMessage(start, end)
+        dialog.exec_()
 
     def actionToggled(self, toggled):
         super().actionToggled(toggled)

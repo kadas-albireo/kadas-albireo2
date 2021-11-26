@@ -15,6 +15,7 @@ from kadasrouting.utilities import (
     pushWarning,
     decodePolyline6,
     formatdist,
+    write_response
 )
 
 from kadasrouting.valhalla.client import ValhallaClient
@@ -174,14 +175,19 @@ class OptimalRouteLayer(KadasItemLayer):
             response = self.valhalla.route(
                 points, profile, avoid_polygons, costingOptions, patrol_polygons
             )
+            # Write response to file
+            write_response(response)
             self.costingOptions = costingOptions
             self.profile = profile
             self.points = points
             self.computeFromResponse(response)
             self.triggerRepaint()
         except ValhallaException as e:
-            pushWarning(str(e))
             LOG.error(e)
+            if "Failed to find a route between two locations for Chinese Postman route" in str(e):
+                raise(e)
+            else:
+                pushWarning(str(e))
 
     def computeFromResponse(self, response):
         if response is None:
