@@ -187,7 +187,8 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
 
     def show_chinese_postman_warning(self, error_message):
         # Parse location for
-        # Failed to find a route between two locations for Chinese Postman route.: No route from 7.456342, 46.959747 to 7.454752, 46.959480
+        # Failed to find a route between two locations for Chinese Postman route.:
+        # No route from 7.456342, 46.959747 to 7.454752, 46.959480
         start, end = error_message.split("from ")[1].split(" to ")
         dialog = PatrolWarning(self)
         dialog.setWarningMessage(start, end)
