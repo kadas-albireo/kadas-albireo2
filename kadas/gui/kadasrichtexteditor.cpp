@@ -618,7 +618,7 @@ KadasRichTextEditor::KadasRichTextEditor( QWidget *parent )
            this, &KadasRichTextEditor::stateChanged );
   connect( this, &KadasRichTextEditor::cursorPositionChanged,
            this, &KadasRichTextEditor::stateChanged );
-  connect( this->document(), &QTextDocument::contentsChange, this, &KadasRichTextEditor::checkImageRemoved );
+  connect( this->document(), &QTextDocument::contentsChange, this, &KadasRichTextEditor::contentsChange );
 }
 
 QVariant KadasRichTextEditor::loadResource( int type, const QUrl &url )
@@ -641,8 +641,26 @@ QVariant KadasRichTextEditor::loadResource( int type, const QUrl &url )
   return QTextEdit::loadResource( type, url );
 }
 
-void KadasRichTextEditor::checkImageRemoved( int position, int charsRemoved, int /*charsAdded*/ )
+void KadasRichTextEditor::contentsChange( int position, int charsRemoved, int charsAdded )
 {
+  // If inserted text is whitespace, reset anchor char format
+  if ( charsAdded > 0 )
+  {
+    QTextCursor c( textCursor() );
+    c.setPosition( position );
+    c.setPosition( position + charsAdded, QTextCursor::KeepAnchor );
+    QString text = c.selectedText();
+    QTextCharFormat fmt = c.charFormat();
+    if ( fmt.isAnchor() && text.trimmed().isEmpty() )
+    {
+      fmt.setAnchor( false );
+      fmt.setUnderlineStyle( QTextCharFormat::NoUnderline );
+      fmt.setForeground( qApp->palette().color( QPalette::Text ) );
+      fmt.setBackground( Qt::transparent );
+      c.setCharFormat( fmt );
+    }
+  }
+  // Check if an image was removed
   if ( charsRemoved > 0 )
   {
     document()->undo();

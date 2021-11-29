@@ -52,7 +52,7 @@ class KADAS_GUI_EXPORT KadasRichTextEditor : public QTextEdit
     void mouseReleaseEvent( QMouseEvent *e ) override;
 
   private slots:
-    void checkImageRemoved( int position, int charsRemoved, int charsAdded );
+    void contentsChange( int position, int charsRemoved, int charsAdded );
 };
 
 
