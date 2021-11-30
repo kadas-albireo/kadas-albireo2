@@ -2,6 +2,7 @@
 
 dnf install -y 'dnf-command(config-manager)' && \
 dnf config-manager --add-repo https://copr.fedorainfracloud.org/coprs/smani/mingw-extras/repo/fedora-rawhide/smani-mingw-extras-fedora-rawhide.repo && \
+dnf config-manager --add-repo https://copr.fedorainfracloud.org/coprs/smani/osgearth-2.10/repo/fedora-rawhide/smani-osgearth-2.10-fedora-rawhide.repo && \
 dnf install -y --disablerepo=*modular* \
   mingw64-dlfcn \
   mingw64-exiv2 \
@@ -15,7 +16,7 @@ dnf install -y --disablerepo=*modular* \
   mingw64-gsl \
   mingw64-libgomp \
   mingw64-libzip \
-  mingw64-osgearth-qt5 \
+  mingw64-osgearth \
   mingw64-postgresql \
   mingw64-proj \
   mingw64-python3 \
