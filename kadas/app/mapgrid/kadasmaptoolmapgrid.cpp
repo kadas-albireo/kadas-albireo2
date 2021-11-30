@@ -106,7 +106,7 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   ui.comboBoxGridType->addItem( "UTM ", KadasMapGridLayer::GridUTM );
   ui.comboBoxGridType->addItem( "MGRS", KadasMapGridLayer::GridMGRS );
 
-  mCellSizeLabel = new QLabel( tr( "Min. cell size:" ) );
+  mCellSizeLabel = new QLabel( tr( "Cell size:" ) );
   mCellSizeLabel->setVisible( false );
   static_cast<QGridLayout *>( ui.widgetLayerSetup->layout() )->addWidget( mCellSizeLabel, 0, 2, 1, 2 );
   mCellSizeCombo = new QComboBox( );

@@ -3643,13 +3643,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Chiudi</translation>
     </message>
     <message>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
         <source>Cell size:</source>
-        <translation type="vanished">Dimensione delle celle:</translation>
+        <translation>Dimensione delle celle:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
         <source>Min. cell size:</source>
-        <translation>Dimensione min. celle:</translation>
+        <translation type="vanished">Dimensione min. celle:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="113"/>

@@ -697,7 +697,7 @@ static inline QPointF truncateGridLineXMax( const QPointF &p, const QPointF &q, 
 
 void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
                                     QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
-                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode, int minCellSize )
+                                    QList<ZoneLabel> &zoneLabels, QList<ZoneLabel> &subZoneLabels, QList<GridLabel> &gridLabels, GridMode gridMode, int cellSize )
 {
 
   QgsDistanceArea da;
@@ -785,34 +785,32 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
         computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
         continue;
       }
-      int cellSize;
-      if ( mapScale > 500000 )
+      if ( cellSize == 0 )
       {
-        cellSize = 100000;
-      }
-      else if ( mapScale > 50000 )
-      {
-        cellSize = 10000;
-      }
-      else if ( mapScale > 5000 )
-      {
-        cellSize = 1000;
-      }
-      else if ( mapScale > 500 )
-      {
-        cellSize = 100;
-      }
-      else if ( mapScale > 50 )
-      {
-        cellSize = 10;
-      }
-      else
-      {
-        cellSize = 1;
-      }
-      if ( minCellSize != 0 )
-      {
-        cellSize = std::max( cellSize, minCellSize );
+        if ( mapScale > 500000 )
+        {
+          cellSize = 100000;
+        }
+        else if ( mapScale > 50000 )
+        {
+          cellSize = 10000;
+        }
+        else if ( mapScale > 5000 )
+        {
+          cellSize = 1000;
+        }
+        else if ( mapScale > 500 )
+        {
+          cellSize = 100;
+        }
+        else if ( mapScale > 50 )
+        {
+          cellSize = 10;
+        }
+        else
+        {
+          cellSize = 1;
+        }
       }
 
       if ( gridMode == GridMGRS )
@@ -851,7 +849,9 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
     QgsPointXY maxPos = UTM2LL( maxCoo, ok );
     zoneLabels->append( zoneLabelCallback( xMin, yMin, maxPos.x(), maxPos.y() ) );
   }
-  while ( ( p = UTM2LL( coo, ok ) ).x() <= xMax && ok )
+  int count = 0;
+  const int maxLines = 200;
+  while ( ( p = UTM2LL( coo, ok ) ).x() <= xMax && ok && count++ < maxLines )
   {
     QPolygonF xLine;
     // Draw segment from border of zone to next 100k position
@@ -916,7 +916,8 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
   restn = coo.northing % cellSize;
   coo.northing += restn != 0 ? cellSize - restn : 0;
 
-  while ( ( p = UTM2LL( coo, ok ) ).y() <= yMax && ok )
+  count = 0;
+  while ( ( p = UTM2LL( coo, ok ) ).y() <= yMax && ok && count++ < maxLines )
   {
     QPolygonF yLine;
     // Draw segment from border of zone to next 100k position

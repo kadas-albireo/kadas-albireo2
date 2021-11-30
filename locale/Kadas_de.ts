@@ -3644,13 +3644,13 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Schliessen</translation>
     </message>
     <message>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
         <source>Cell size:</source>
-        <translation type="vanished">Zellengrösse:</translation>
+        <translation>Zellengrösse:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="109"/>
         <source>Min. cell size:</source>
-        <translation>Min. Zellengrösse:</translation>
+        <translation type="vanished">Min. Zellengrösse:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="113"/>

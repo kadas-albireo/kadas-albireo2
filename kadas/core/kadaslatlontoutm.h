@@ -72,7 +72,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static void computeGrid( const QgsRectangle &bbox, double mapScale,
                              QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
                              QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,
-                             KadasLatLonToUTM::GridMode gridMode, int minCellSize );
+                             KadasLatLonToUTM::GridMode gridMode, int cellSize );
 
   private:
     static const int NUM_100K_SETS;
