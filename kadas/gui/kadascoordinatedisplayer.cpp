@@ -193,7 +193,7 @@ void KadasCoordinateDisplayer::heightUnitChanged( int idx )
 
 void KadasCoordinateDisplayer::readProjectSettings()
 {
-  int displayCrs = QgsProject::instance()->readNumEntry( "coodisplay", "crs" );
+  int displayCrs = QgsProject::instance()->readNumEntry( "crsdisplay", "format" );
   if ( displayCrs < 0 || displayCrs >= mCRSSelectionButton->menu()->actions().size() )
   {
     displayCrs = 0;
