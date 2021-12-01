@@ -329,7 +329,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     }
 
     // Parse sublayers
-    QList<QVariantMap> sublayers;
+    QVariantList sublayers;
     for ( QVariant variant : serviceInfoMap["layers"].toList() )
     {
       QVariantMap entry = variant.toMap();
@@ -345,20 +345,12 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     mimeDataUri.providerKey = "arcgismapserver";
     mimeDataUri.name = entry->title;
     QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
-    mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( entry->id );
+    mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0'" ).arg( crs.authid() ).arg( format ).arg( url );
     QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
     mimeData->setProperty( "metadataUrl", entry->metadataUrl );
     if ( !entry->flatten )
     {
-      QVariantList entrySublayers;
-      for ( const QVariantMap &sublayer : sublayers )
-      {
-        if ( sublayer["id"].toInt() >= ( entry->id.isEmpty() ? -1 : entry->id.toInt() ) )
-        {
-          entrySublayers.append( sublayer );
-        }
-      }
-      mimeData->setProperty( "sublayers", entrySublayers );
+      mimeData->setProperty( "sublayers", sublayers );
     }
     QStringList sortIndices = entry->sortIndices.split( "/" );
     mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), mimeDataUri.name, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
