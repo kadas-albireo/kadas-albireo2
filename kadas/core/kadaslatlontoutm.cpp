@@ -988,7 +988,7 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
 
 void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
-  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.01, lat + 0.01 ) );
+  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.000001, lat + 0.000001 ) );
   GridLabel label;
   if ( horiz )
   {
@@ -1005,7 +1005,7 @@ void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSiz
 
 void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
-  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.0001, lat + 0.0001 ) );
+  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.000001, lat + 0.000001 ) );
   GridLabel label;
   int pad = std::log10( 100000 / cellSize );
   if ( horiz )
