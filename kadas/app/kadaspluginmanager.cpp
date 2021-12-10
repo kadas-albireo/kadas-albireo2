@@ -390,7 +390,11 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
 
     if ( moduleName.isEmpty() )
     {
-      moduleName = QFileInfo( fileName ).path();
+      QStringList parts = QDir::cleanPath( QFileInfo( fileName ).path() ).split( "/", Qt::SkipEmptyParts );
+      if ( !parts.isEmpty() )
+      {
+        moduleName = parts[0];
+      }
     }
 
     if ( fileName.endsWith( "/" ) )
