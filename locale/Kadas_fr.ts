@@ -201,7 +201,7 @@
     <message>
         <location filename="../kadas/app/kadasapplication.cpp" line="1119"/>
         <source>Project saved</source>
-        <translation>Projet enregistrée</translation>
+        <translation>Projet sauvegardé</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasapplication.cpp" line="1125"/>
@@ -221,7 +221,7 @@
     <message>
         <location filename="../kadas/app/kadasapplication.cpp" line="1160"/>
         <source>Map image saved to clipboard</source>
-        <translation>Carte enregistrée dans le presse-papier</translation>
+        <translation>Carte sauvegardé dans le presse-papier</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasapplication.cpp" line="1322"/>
