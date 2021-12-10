@@ -850,7 +850,7 @@ void KadasLatLonToUTM::computeSubGrid( int cellSize, double xMin, double xMax, d
     zoneLabels->append( zoneLabelCallback( xMin, yMin, maxPos.x(), maxPos.y() ) );
   }
   int count = 0;
-  const int maxLines = 200;
+  const int maxLines = 500;
   while ( ( p = UTM2LL( coo, ok ) ).x() <= xMax && ok && count++ < maxLines )
   {
     QPolygonF xLine;
