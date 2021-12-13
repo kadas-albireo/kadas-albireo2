@@ -71,7 +71,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     static void computeGrid( const QgsRectangle &bbox, double mapScale,
                              QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
                              QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,
-                             KadasLatLonToUTM::GridMode gridMode, int minCellSize );
+                             KadasLatLonToUTM::GridMode gridMode, int cellSize );
 
 };
 
