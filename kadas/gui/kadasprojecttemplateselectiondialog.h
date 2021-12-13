@@ -23,7 +23,6 @@
 #include <kadas/gui/ui_kadasprojecttemplateselectiondialog.h>
 
 class QDir;
-class QTemporaryDir;
 class QFileIconProvider;
 
 class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, private Ui::KadasProjectTemplateSelectionDialogBase
@@ -31,13 +30,12 @@ class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, pri
     Q_OBJECT
   public:
     KadasProjectTemplateSelectionDialog( QWidget *parent = nullptr );
-    ~KadasProjectTemplateSelectionDialog();
-    const QString &selectedTemplate() const { return mSelectedTemplate; }
+
+  signals:
+    void templateSelected( const QString &templateFile, const QUrl &templateUrl );
 
   private:
     QAbstractButton *mCreateButton = nullptr;
-    QString mSelectedTemplate;
-    QTemporaryDir *mProjectTempDir = nullptr;
 
     void populateFileTree( const QDir &dir, QTreeWidgetItem *parent, const QFileIconProvider &iconProvider );
 

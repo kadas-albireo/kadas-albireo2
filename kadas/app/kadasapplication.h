@@ -25,6 +25,7 @@
 
 #include <kadas/gui/kadasfeaturepicker.h>
 
+class QTemporaryDir;
 class QgsLayerTreeGroup;
 class QNetworkRequest;
 class QgsMapLayer;
@@ -75,7 +76,7 @@ class KadasApplication : public QgsApplication
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
 
     bool projectNew( bool askToSave );
-    bool projectCreateFromTemplate( const QString &templateFile );
+    bool projectCreateFromTemplate( const QString &templateFile, const QUrl &templateUrl );
     bool projectOpen( const QString &projectFile = QString() );
     void projectClose();
     bool projectSave( const QString &fileName = QString(), bool promptFileName = false );
@@ -136,6 +137,7 @@ class KadasApplication : public QgsApplication
     QTimer mAutosaveTimer;
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
+    QTemporaryDir *mProjectTempDir = nullptr;
 
     QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
     QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;

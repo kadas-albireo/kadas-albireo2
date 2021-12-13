@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QBuffer>
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QJsonArray>
@@ -25,6 +26,7 @@
 #include <QSplashScreen>
 #include <QStatusBar>
 #include <QUrlQuery>
+#include <quazip/quazipfile.h>
 
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
@@ -161,6 +163,7 @@ KadasApplication::KadasApplication( int &argc, char **argv )
 KadasApplication::~KadasApplication()
 {
   delete mMainWindow;
+  delete mProjectTempDir;
 
   for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )
   {
@@ -171,6 +174,9 @@ KadasApplication::~KadasApplication()
 void KadasApplication::init()
 {
   QgsApplication::init();
+
+  mProjectTempDir = new QTemporaryDir();
+  mProjectTempDir->setAutoRemove( true );
 
   // Translations
   QString translationsPath;
@@ -421,7 +427,6 @@ void KadasApplication::loadStartupProject()
   {
     // Perform online/offline check to select default template
     QString onlineTestUrl = settings.value( "/kadas/onlineTestUrl" ).toString();
-    QString projectTemplate;
     if ( !onlineTestUrl.isEmpty() )
     {
       QEventLoop eventLoop;
@@ -434,22 +439,56 @@ void KadasApplication::loadStartupProject()
 
       if ( reply->error() == QNetworkReply::NoError && timeout.isActive() && reply->isFinished() )
       {
-        projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
         settings.setValue( "/kadas/isOffline", false );
+
+        QString projectTemplate = settings.value( "/kadas/onlineDefaultProject" ).toString();
+        QString projectTemplateUrl = settings.value( "/kadas/onlineDefaultProjectUrl" ).toString();
+        if ( !projectTemplate.isEmpty() )
+        {
+          projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
+          projectCreateFromTemplate( projectTemplate, QString() );
+        }
+        else if ( !projectTemplateUrl.isEmpty() )
+        {
+          QEventLoop eventLoop;
+          QTimer timeout;
+          QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( projectTemplateUrl ) );
+          QObject::connect( reply, &QNetworkReply::finished, &eventLoop, &QEventLoop::quit );
+          QObject::connect( &timeout, &QTimer::timeout, &eventLoop, &QEventLoop::quit );
+          timeout.start( 10000 );
+          eventLoop.exec();
+          QByteArray response = reply->readAll();
+          QJsonDocument doc = QJsonDocument::fromJson( response );
+          if ( doc.isObject() )
+          {
+            QJsonArray results = doc.object().value( "results" ).toArray();
+            if ( !results.isEmpty() )
+            {
+              QJsonObject result = results[0].toObject();
+              QString baseUrl = projectTemplateUrl.replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
+              QUrl url( baseUrl + result["id"].toString() + "/data" );
+              url.setFragment( result["title"].toString() + ".qgz" );
+              projectCreateFromTemplate( QString(), url );
+            }
+          }
+
+        }
       }
       else
       {
-        projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
         settings.setValue( "/kadas/isOffline", true );
+
+        QString projectTemplate = settings.value( "/kadas/offlineDefaultProject" ).toString();
+        if ( !projectTemplate.isEmpty() )
+        {
+          projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
+          projectCreateFromTemplate( projectTemplate, QString() );
+        }
       }
       delete reply;
     }
 
-    if ( !projectTemplate.isEmpty() )
-    {
-      projectTemplate = QDir( Kadas::projectTemplatesPath() ).absoluteFilePath( projectTemplate );
-      projectCreateFromTemplate( projectTemplate );
-    }
+
   }
 
   updateWindowTitle();
@@ -896,9 +935,54 @@ bool KadasApplication::projectNew( bool askToSave )
   return true;
 }
 
-bool KadasApplication::projectCreateFromTemplate( const QString &templateFile )
+bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, const QUrl &templateUrl )
 {
-  if ( projectOpen( templateFile ) )
+  if ( !templateUrl.isEmpty() )
+  {
+    QNetworkRequest request = QNetworkRequest( templateUrl );
+    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( request );
+    QEventLoop loop;
+    connect( reply, &QNetworkReply::finished, &loop, &QEventLoop::quit );
+    loop.exec( QEventLoop::ExcludeUserInputEvents );
+    QTextStream( stdout ) << "xxx " << reply->request().url().toString() << " " << reply->error() << Qt::endl;
+    if ( reply->error() != QNetworkReply::NoError )
+    {
+      QgsDebugMsg( QString( "Could not read %1" ).arg( templateUrl.toString() ) );
+      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      return false;
+    }
+    QString projectFileName = templateUrl.fragment();
+
+    QByteArray data = reply->readAll();
+    QBuffer buf( &data );
+    QuaZip zip( &buf );
+    zip.open( QuaZip::mdUnzip );
+    if ( !zip.setCurrentFile( projectFileName, QuaZip::csInsensitive ) )
+    {
+      QgsDebugMsg( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ) );
+      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      return false;
+    }
+    QuaZipFile zipFile( &zip );
+
+    QFile unzipFile( mProjectTempDir->filePath( projectFileName ) );
+    if ( zipFile.open( QIODevice::ReadOnly ) && unzipFile.open( QIODevice::WriteOnly ) )
+    {
+      unzipFile.write( zipFile.readAll() );
+    }
+    else
+    {
+      QgsDebugMsg( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ) );
+      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      return false;
+    }
+    if ( projectOpen( unzipFile.fileName() ) )
+    {
+      QgsProject::instance()->setFileName( QString() );
+      return true;
+    }
+  }
+  else if ( !templateFile.isEmpty() && projectOpen( templateFile ) )
   {
     QgsProject::instance()->setFileName( QString() );
     return true;

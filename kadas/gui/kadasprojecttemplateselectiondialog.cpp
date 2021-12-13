@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QBuffer>
 #include <QDialogButtonBox>
 #include <QDirIterator>
 #include <QFileIconProvider>
@@ -26,7 +25,6 @@
 #include <QPushButton>
 #include <QTemporaryDir>
 #include <QVBoxLayout>
-#include <quazip/quazipfile.h>
 
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
@@ -39,9 +37,6 @@ KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidge
   : QDialog( parent )
 {
   setupUi( this );
-
-  mProjectTempDir = new QTemporaryDir();
-  mProjectTempDir->setAutoRemove( true );
 
   QString serviceUrl = QgsSettings().value( "kadas/project_template_service" ).toString();
   bool offline = QgsSettings().value( "/kadas/isOffline" ).toBool();
@@ -64,11 +59,6 @@ KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidge
   mCreateButton = mButtonBox->addButton( tr( "Create" ), QDialogButtonBox::AcceptRole );
   mCreateButton->setEnabled( false );
   connect( mCreateButton, &QAbstractButton::clicked, this, &KadasProjectTemplateSelectionDialog::createProject );
-}
-
-KadasProjectTemplateSelectionDialog::~KadasProjectTemplateSelectionDialog()
-{
-  delete mProjectTempDir;
 }
 
 void KadasProjectTemplateSelectionDialog::parseServiceReply()
@@ -152,49 +142,13 @@ void KadasProjectTemplateSelectionDialog::createProject()
   QString filePath = item->data( 0, sFilePathRole ).toString();
   if ( !filePath.isEmpty() )
   {
-    mSelectedTemplate = filePath;
+    emit templateSelected( filePath, QUrl() );
   }
   else if ( !itemUrl.isEmpty() )
   {
-
-    QNetworkRequest request = QNetworkRequest( QUrl( itemUrl ) );
-    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( request );
-    QEventLoop loop;
-    connect( reply, &QNetworkReply::finished, &loop, &QEventLoop::quit );
-    loop.exec( QEventLoop::ExcludeUserInputEvents );
-    if ( reply->error() != QNetworkReply::NoError )
-    {
-      QgsDebugMsg( QString( "Could not read %1" ).arg( itemUrl ) );
-      QMessageBox::critical( this, tr( "Error" ),  tr( "Failed to read the project template." ) );
-      return;
-    }
-    QString projectFileName = item->text( 0 ) + ".qgz";
-
-    QByteArray data = reply->readAll();
-    QBuffer buf( &data );
-    QuaZip zip( &buf );
-    zip.open( QuaZip::mdUnzip );
-    if ( !zip.setCurrentFile( projectFileName, QuaZip::csInsensitive ) )
-    {
-      QgsDebugMsg( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, itemUrl ) );
-      QMessageBox::critical( this, tr( "Error" ),  tr( "Failed to read the project template." ) );
-      return;
-    }
-    QuaZipFile zipFile( &zip );
-
-    QFile unzipFile( mProjectTempDir->filePath( projectFileName ) );
-    if ( zipFile.open( QIODevice::ReadOnly ) && unzipFile.open( QIODevice::WriteOnly ) )
-    {
-      unzipFile.write( zipFile.readAll() );
-    }
-    else
-    {
-      QgsDebugMsg( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, itemUrl, mProjectTempDir->path() ) );
-      QMessageBox::critical( this, tr( "Error" ),  tr( "Failed to read the project template." ) );
-      return;
-    }
-    item->setData( 0, sFilePathRole, unzipFile.fileName() );
-    mSelectedTemplate = unzipFile.fileName();
+    QUrl url( itemUrl );
+    url.setFragment( item->text( 0 ) + ".qgz" );
+    emit templateSelected( QString(), url );
   }
   accept();
 }
