@@ -268,6 +268,14 @@ double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
   return 5 * settings.mapUnitsPerPixel();
 }
 
+void KadasMapItem::cleanupAttachment( const QString &filePath ) const
+{
+  if ( !filePath.isEmpty() && QgsProject::instance()->pathResolver().writePath( filePath ).startsWith( "attachment:" ) )
+  {
+    QgsProject::instance()->removeAttachedFile( filePath );
+  }
+}
+
 void KadasMapItem::defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
 {
   painter->setPen( QPen( Qt::red, 2 ) );

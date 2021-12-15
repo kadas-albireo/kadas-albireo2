@@ -43,8 +43,15 @@ KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs )
   clear();
 }
 
+KadasSymbolItem::~KadasSymbolItem()
+{
+  cleanupAttachment( mFilePath );
+}
+
 void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY, int width, int height )
 {
+  cleanupAttachment( mFilePath );
+
   mAnchorX = anchorX;
   mAnchorY = anchorY;
 

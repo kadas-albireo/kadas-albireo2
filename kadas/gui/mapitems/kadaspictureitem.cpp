@@ -101,8 +101,15 @@ KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs )
   clear();
 }
 
+KadasPictureItem::~KadasPictureItem()
+{
+  cleanupAttachment( mFilePath );
+}
+
 void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv, double offsetX, double offsetY, int width, int height )
 {
+  cleanupAttachment( mFilePath );
+
   mFilePath = path;
   QImageReader reader( path );
 

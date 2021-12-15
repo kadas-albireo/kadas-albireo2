@@ -412,6 +412,7 @@ Trigger a redraw */
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
+    void cleanupAttachment( const QString &filePath ) const;
 
 };
 
