@@ -15,6 +15,7 @@ dnf install -y --disablerepo=*modular* \
   mingw64-geos \
   mingw64-gsl \
   mingw64-libgomp \
+  mingw64-librsvg2 \
   mingw64-libzip \
   mingw64-osgearth \
   mingw64-postgresql \
@@ -85,6 +86,3 @@ dnf install -y --disablerepo=*modular* \
   wget \
   xorg-x11-server-Xvfb \
   zip
-
-wget https://pkg.sourcepole.ch/kadas/mingw64-librsvg2-2.40.11-1.fc28.noarch.rpm
-dnf install -y mingw64-librsvg2-2.40.11-1.fc28.noarch.rpm
