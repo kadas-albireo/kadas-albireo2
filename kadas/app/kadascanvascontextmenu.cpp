@@ -90,6 +90,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this, &KadasCanvasContextMenu::drawPolygon );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this, &KadasCanvasContextMenu::drawCircle );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
+    drawMenu->addAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this, &KadasCanvasContextMenu::drawCoordinateCross );
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
   }
   addSeparator();
@@ -233,6 +234,12 @@ void KadasCanvasContextMenu::drawText()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewText()->trigger();
 }
+
+void KadasCanvasContextMenu::drawCoordinateCross()
+{
+  kApp->mainWindow()->redliningIntegration()->actionNewCoordinateCross()->trigger();
+}
+
 
 void KadasCanvasContextMenu::measureLine()
 {

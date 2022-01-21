@@ -46,6 +46,7 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewPolygon() const { return mActionNewPolygon; }
     QAction *actionNewCircle() const { return mActionNewCircle; }
     QAction *actionNewText() const { return mActionNewText; }
+    QAction *actionNewCoordinateCross() const { return mActionNewCoordCross; }
 
   private:
     QToolButton *mButtonNewObject = nullptr;

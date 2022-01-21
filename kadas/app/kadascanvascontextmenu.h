@@ -53,6 +53,7 @@ class KadasCanvasContextMenu : public QMenu
     void drawPolygon();
     void drawCircle();
     void drawText();
+    void drawCoordinateCross();
 
     void identify();
 
