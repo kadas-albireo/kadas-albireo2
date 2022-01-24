@@ -114,7 +114,7 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->rotate( -constState()->angle );
   context.painter()->scale( mSymbolScale * dpiScale, mSymbolScale * dpiScale );
-  context.painter()->translate( - mAnchorX * constState()->size.width() * dpiScale, - mAnchorY * constState()->size.height() * dpiScale );
+  context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
   if ( mScalable )
   {
     svg2svgt::Logger logger;
