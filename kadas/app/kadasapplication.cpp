@@ -273,6 +273,12 @@ void KadasApplication::init()
     settings.sync();
   }
 
+  // Set help path
+  // See qgis/CMakeLists.txt QGIS_VERSION_INT
+  int QGIS_VERSION_MAJOR = Qgis::versionInt() / 10000;
+  int QGIS_VERSION_MINOR = ( Qgis::versionInt() - QGIS_VERSION_MAJOR * 10000 ) / 100;
+  settings.setValue( QStringLiteral( "help/helpSearchPath" ), QString( "https://docs.qgis.org/%1.%2/en/docs/user_manual" ).arg( QGIS_VERSION_MAJOR ).arg( QGIS_VERSION_MINOR ) );
+
   // Ensure network access manager uses the correct proxy settings
   QgsNetworkAccessManager::instance()->setupDefaultProxyAndCache();
 
