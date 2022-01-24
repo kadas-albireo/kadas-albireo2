@@ -273,7 +273,8 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
                        << QgsPoint( r.xMinimum(), r.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
-  QgsGeometryEngine *geomEngine = nullptr;
+  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
+  bool intersects = false;
   if ( ( mBrush.color().alpha() == 0 || mBrush.style() == Qt::NoBrush ) && dynamic_cast<QgsMultiSurface *>( mGeometry ) )
   {
     QgsMultiSurface *multiSurface = static_cast<QgsMultiSurface *>( mGeometry );
@@ -283,13 +284,12 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
       QgsCurvePolygon *surface = dynamic_cast<QgsCurvePolygon *>( multiSurface->geometryN( i ) );
       multiCurve.addGeometry( surface->exteriorRing()->clone() );
     }
-    geomEngine = QgsGeometry::createGeometryEngine( &multiCurve );
+    intersects = contains ? geomEngine->contains( mGeometry ) : geomEngine->intersects( &multiCurve );
   }
   else
   {
-    geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
+    intersects = contains ? geomEngine->contains( mGeometry ) : geomEngine->intersects( mGeometry );
   }
-  bool intersects = contains ? geomEngine->contains( mGeometry ) : geomEngine->intersects( mGeometry );
   delete geomEngine;
   return intersects;
 }
