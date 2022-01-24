@@ -209,7 +209,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
     mIgnoreNextMoveEvent = false;
     return;
   }
-  KadasMapPos pos = transformMousePoint( e->mapPoint() );
+  KadasMapPos pos = transformMousePoint( e->mapPoint(), mEditContext.isValid() && mEditContext.vidx.isValid() && mSnapping );
 
   if ( e->buttons() == Qt::LeftButton )
   {
@@ -405,14 +405,14 @@ void KadasMapToolEditItem::checkHiddenLayer()
   }
 }
 
-KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos ) const
+KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos, bool snapping ) const
 {
-  if ( mSnapping )
+  if ( snapping )
   {
     QgsPointLocator::Match m = mCanvas->snappingUtils()->snapToMap( mapPos );
     if ( m.isValid() )
     {
-      mapPos = m.point();
+      mapPos = QgsPointXY( m.point().x() + mMoveOffset.x(), m.point().y() + mMoveOffset.y() );
     }
     else
     {
@@ -435,7 +435,7 @@ KadasMapPos KadasMapToolEditItem::transformMousePoint( QgsPointXY mapPos ) const
       }
       if ( minDist < snapTol )
       {
-        mapPos = minPos;
+        mapPos = QgsPointXY( minPos.x() + mMoveOffset.x(), minPos.y() + mMoveOffset.y() );
       }
     }
   }

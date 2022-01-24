@@ -62,7 +62,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     KadasMapItem::AttribValues collectAttributeValues() const;
     void setupNumericInput();
     void clearNumericInput();
-    KadasMapPos transformMousePoint( QgsPointXY mapPos ) const;
+    KadasMapPos transformMousePoint( QgsPointXY mapPos, bool snapping ) const;
 
   private slots:
     void itemDestroyed();
