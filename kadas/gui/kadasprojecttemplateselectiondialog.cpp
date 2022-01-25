@@ -64,6 +64,8 @@ KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidge
 void KadasProjectTemplateSelectionDialog::parseServiceReply()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
+  QFileIconProvider iconProvider;
+
   if ( reply->error() == QNetworkReply::NoError )
   {
     QString serviceUrl = QgsSettings().value( "kadas/project_template_service" ).toString();
@@ -72,7 +74,6 @@ void KadasProjectTemplateSelectionDialog::parseServiceReply()
     QJsonDocument doc = QJsonDocument::fromJson( response );
     QJsonObject root = doc.object();
     QJsonArray results = root.value( "results" ).toArray();
-    QFileIconProvider iconProvider;
 
     QTreeWidgetItem *remoteItem = new QTreeWidgetItem( QStringList() << tr( "Remote templates" ) );
     remoteItem->setIcon( 0, iconProvider.icon( QFileIconProvider::Network ) );
@@ -86,14 +87,14 @@ void KadasProjectTemplateSelectionDialog::parseServiceReply()
       item->setData( 0, sItemUrlRole, baseUrl + result["id"].toString() + "/data" );
       remoteItem->addChild( item );
     }
-
-    QTreeWidgetItem *localItem = new QTreeWidgetItem( QStringList() << tr( "Local templates" ) );
-    localItem->setIcon( 0, iconProvider.icon( QFileIconProvider::Folder ) );
-    mTreeWidget->invisibleRootItem()->addChild( localItem );
-    localItem->setExpanded( true );
-    QDir projectTemplatesDir( Kadas::projectTemplatesPath() );
-    populateFileTree( projectTemplatesDir, localItem, iconProvider );
   }
+
+  QTreeWidgetItem *localItem = new QTreeWidgetItem( QStringList() << tr( "Local templates" ) );
+  localItem->setIcon( 0, iconProvider.icon( QFileIconProvider::Folder ) );
+  mTreeWidget->invisibleRootItem()->addChild( localItem );
+  localItem->setExpanded( true );
+  QDir projectTemplatesDir( Kadas::projectTemplatesPath() );
+  populateFileTree( projectTemplatesDir, localItem, iconProvider );
   reply->deleteLater();
 }
 
