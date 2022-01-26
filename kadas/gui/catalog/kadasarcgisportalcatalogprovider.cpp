@@ -112,7 +112,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       mLayers[id][resultMap["type"].toString()] = entry;
     }
 
-    if ( rootMap["nextStart"].toInt() >= 0 )
+    if ( rootMap["nextStart"].toInt() >= 0 && rootMap["num"].toInt() >= 0 )
     {
       lastRequest = false;
       nextStart = rootMap["nextStart"].toString();
