@@ -124,7 +124,7 @@ void KadasHandleBadLayers::itemClicked( QTableWidgetItem *item )
   if ( provider == QStringLiteral( "delimitedtext" ) )
   {
     url = QUrl( filename );
-    filename = url.path();
+    filename = url.host() + "/" + url.path();
     fileFilter = tr( "Text files" ) + QStringLiteral( " (*.txt *.csv *.dat *.wkt);;" );
   }
   else
@@ -155,7 +155,9 @@ void KadasHandleBadLayers::itemClicked( QTableWidgetItem *item )
   }
   if ( !url.isEmpty() )
   {
-    url.setPath( filename );
+    QUrl fileNameUrl( QString( "file:%1" ).arg( filename ) );
+    url.setHost( fileNameUrl.host() );
+    url.setPath( fileNameUrl.path() );
     filename = url.toString();
   }
   mLayerList->item( item->row(), 2 )->setText( filename );
