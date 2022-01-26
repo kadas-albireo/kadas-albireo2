@@ -16,6 +16,7 @@
 
 #include <QDesktopWidget>
 #include <QJsonArray>
+#include <QMainWindow>
 #include <QMenu>
 #include <QVector2D>
 
@@ -682,7 +683,15 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   menu->addAction( QIcon( ":/kadas/icons/editor" ), tr( "Symbol editor..." ), [ = ]
   {
     KadasMilxClient::NPointSymbolGraphic result;
-    WId winId = QApplication::topLevelWidgets().front()->winId();
+    WId winId = 0;
+    for ( QWidget *widget : QApplication::topLevelWidgets() )
+    {
+      if ( qobject_cast<QMainWindow *>( widget ) )
+      {
+        winId = widget->effectiveWinId();
+        break;
+      }
+    }
     if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
     {
       updateSymbol( mapSettings, result );
@@ -727,7 +736,15 @@ void KadasMilxItem::onDoubleClick( const QgsMapSettings &mapSettings )
   QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbolGraphic result;
-  WId winId = QApplication::topLevelWidgets().front()->winId();
+  WId winId = 0;
+  for ( QWidget *widget : QApplication::topLevelWidgets() )
+  {
+    if ( qobject_cast<QMainWindow *>( widget ) )
+    {
+      winId = widget->effectiveWinId();
+      break;
+    }
+  }
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
   if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
   {
