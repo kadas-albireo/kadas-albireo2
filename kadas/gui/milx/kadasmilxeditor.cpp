@@ -75,7 +75,7 @@ void KadasMilxEditor::toggleLibrary( bool enabled )
 {
   if ( enabled )
   {
-    double width = 240;
+    double width = 320;
     double height = 320;
     QPoint anchor = mSymbolButton->mapToGlobal( QPoint( 0.5 * mSymbolButton->width(), 0 ) );
     mLibrary->resize( width, height );
