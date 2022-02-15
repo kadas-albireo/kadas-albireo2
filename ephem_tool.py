@@ -139,27 +139,36 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
 
         # Compute sunrise and sunset taking relief into account
-        sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
+        try:
+            sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
+        except:
+            sunset = None
 
         sun.compute(home)
         suntransit = ephem.to_timezone(home.next_transit(sun), ephem.UTC).timestamp()
-        if suntransit > sunset:
+        if sunset and suntransit > sunset:
             suntransit = ephem.to_timezone(home.previous_transit(sun), ephem.UTC).timestamp()
 
         sun.compute(home)
         if sun.alt >= 0:
-            sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+            try:
+                sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+            except:
+                sunrise = None
         else:
-            sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
+            try:
+                sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
+            except:
+                sunrise = None
         if self.ui.checkBoxRelief.isChecked():
-            sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, suntransit)
-            sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, suntransit)
+            sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, suntransit) if sunset else None
+            sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, suntransit) if sunrise else None
 
-        if sunrise < sunset:
+        if sunrise and (not sunset or sunrise < sunset):
             self.ui.labelSunRiseValue.setText("%s" % self.timestampToHourString(sunrise))
         else:
             self.ui.labelSunRiseValue.setText("-")
-        if sunset > sunrise:
+        if sunset and (not sunrise or sunset > sunrise):
             self.ui.labelSunSetValue.setText("%s" % self.timestampToHourString(sunset))
         else:
             self.ui.labelSunSetValue.setText("-")
@@ -172,27 +181,36 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
 
         # Compute moonrise and moonset taking relief into account
-        moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
+        try:
+            moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
+        except:
+            moonset = None
 
         moon.compute(home)
         moontransit = ephem.to_timezone(home.next_transit(moon), ephem.UTC).timestamp()
-        if moontransit > moonset:
+        if moonset and moontransit > moonset:
             moontransit = ephem.to_timezone(home.previous_transit(moon), ephem.UTC).timestamp()
 
         moon.compute(home)
         if moon.alt >= 0:
-            moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
+            try:
+                moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
+            except:
+                moonrise = None
         else:
-            moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
+            try:
+                moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
+            except:
+                moonrise = None
         if self.ui.checkBoxRelief.isChecked():
-            moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, moontransit)
-            moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, moontransit)
+            moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, moontransit) if moonset else None
+            moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, moontransit) if moonrise else None
 
-        if moonrise < moonset:
+        if moonrise and (not moonset or moonrise < moonset):
             self.ui.labelMoonRiseValue.setText("%s" % self.timestampToHourString(moonrise))
         else:
             self.ui.labelMoonRiseValue.setText("-")
-        if moonset > moonrise:
+        if moonset and (not moonrise or moonset > moonrise):
             self.ui.labelMoonSetValue.setText("%s" % self.timestampToHourString(moonset))
         else:
             self.ui.labelMoonSetValue.setText("-")
