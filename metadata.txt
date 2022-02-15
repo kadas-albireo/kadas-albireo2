@@ -4,12 +4,15 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=KADAS ephem plugin
 about=KADAS ephem plugin.
-version=1.0.1
+version=1.0.2
 author=Sourcepole
 email=smani@sourcepole.ch
 
 
 changelog=
+ Rev 1.0.2 (15.02.2022)
+ - Fix ephemeris computation in polar circle
+
  Rev 1.0.1 (24.08.2021)
   - Fix typo in translation path
   - Exit tool if ESC is pressed
