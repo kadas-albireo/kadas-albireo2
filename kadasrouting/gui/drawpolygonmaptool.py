@@ -3,7 +3,7 @@ import logging
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
-from qgis.core import QgsWkbTypes
+from qgis.core import QgsWkbTypes, QgsGeometry
 from qgis.gui import QgsMapTool, QgsRubberBand
 
 RB_STROKE = QColor(204, 235, 239, 255)
@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 
 class DrawPolygonMapTool(QgsMapTool):
 
-    polygonSelected = pyqtSignal(object)
+    polygonSelected = pyqtSignal(QgsGeometry)
 
     def __init__(self, canvas):
         QgsMapTool.__init__(self, canvas)

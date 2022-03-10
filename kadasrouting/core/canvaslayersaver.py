@@ -73,7 +73,7 @@ class CanvasLayerSaver:
         if geomType == QgsWkbTypes.LineGeometry:
             geomList = geom.asPolyline()
         elif geomType == QgsWkbTypes.PolygonGeometry:
-            geomList = geom.asPolygon()
+            geomList = list(geom.asMultiPolygon())[0]
         newGeom = []
         for j in range(len(geomList)):
             if geomType == QgsWkbTypes.LineGeometry:

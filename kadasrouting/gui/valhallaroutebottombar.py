@@ -1,9 +1,10 @@
 import os
 import logging
 import json
-
+import time
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QDesktopWidget
+from pprint import pprint
 
 from kadas.kadasgui import (
     KadasBottomBar,
@@ -24,6 +25,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsProject,
     QgsSettings,
+    QgsMultiPolygon
 )
 from qgis.gui import QgsRubberBand, QgsMapToolPan
 
@@ -55,7 +57,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.waypoints = []
         self.waypointPins = []
         self.areasToAvoid = []
-
+        
         self.btnClose.setIcon(QIcon(":/kadas/icons/close"))
         self.btnClose.setToolTip(self.tr("Close routing dialog"))
 
@@ -63,19 +65,7 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.btnClose.clicked.connect(self.action.toggle)
 
         self.btnCalculate.clicked.connect(self.calculate)
-
-        self.layerSelector = KadasLayerSelectionWidget(
-            canvas,
-            iface.layerTreeView(),
-            lambda x: isinstance(x, OptimalRouteLayer),
-            self.createLayer,
-        )
-        self.layerSelector.createLayerIfEmpty(self.tr(self.default_layer_name))
-        self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
-        self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
-        layer = self.layerSelector.getSelectedLayer()
-        self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
-
+        
         self.originSearchBox = LocationInputWidget(
             canvas, locationSymbolPath=iconPath("pin_origin.svg")
         )
@@ -92,7 +82,16 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                 "/kadasrouting/current_vehicle", self.comboBoxVehicles.currentIndex()
             ))
         )
-
+        
+        self.layerSelector = KadasLayerSelectionWidget(
+                canvas,
+                iface.layerTreeView(),
+                lambda x: isinstance(x, OptimalRouteLayer),
+                self.createLayer,
+            )
+        
+        QgsProject.instance().layerRemoved.connect(self.layerRemoved)
+                
         self.btnPointsClear.clicked.connect(self.clearPoints)
         self.btnReverse.clicked.connect(self.reverse)
         self.btnNavigate.clicked.connect(self.navigate)
@@ -115,13 +114,40 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         if size.width() >= 3200 or size.height() >= 1800:
             self.setFixedSize(self.size() * 1.5)
 
+    
     @staticmethod
     def createFootprintArea(color=AVOID_AREA_COLOR):
         footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
         footprint.setStrokeColor(color)
         footprint.setWidth(2)
-        return footprint
-
+        return footprint      
+    
+    def resetCombo(self, show):
+        LOG.debug("reset combo")
+        if show:
+            layer = self.layerSelector.getSelectedLayer()
+            if layer is not None:
+                QgsProject.instance().removeMapLayer(layer.id())
+            
+            
+     
+            self.layerSelector.createLayerIfEmpty(self.tr(self.default_layer_name))
+            self.layerSelector.selectedLayerChanged.connect(self.selectedLayerChanged)
+            self.layout().addWidget(self.layerSelector, 0, 0, 1, 2)
+            layer = self.layerSelector.getSelectedLayer()
+            self.btnNavigate.setEnabled(layer is not None and layer.hasRoute())
+   
+    def layerRemoved(self, ele):
+        if ele.startswith('avoid_areas'):
+            self.radioAreasToAvoidPolygon.setChecked(True)
+            index = self.comboAreasToAvoidLayers.findText("avoid_areas")
+            self.comboAreasToAvoidLayers.removeItem(index)
+        elif ele.startswith('patrol_area') and hasattr(self, 'radioPatrolAreaPolygon'):
+            self.radioPatrolAreaPolygon.setChecked(True)
+            index = self.comboPatrolAreaLayers.findText("patrol_area")
+            self.comboPatrolAreaLayers.removeItem(index) 
+           
+    
     def populateLayerSelector(self):
         self.comboAreasToAvoidLayers.clear()
         for layer in QgsProject.instance().mapLayers().values():
@@ -193,6 +219,9 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             style=AVOID_AREA_STYLE,
         )
         iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
+        self.radioAreasToAvoidLayer.setChecked(True)
+        index = self.comboAreasToAvoidLayers.findText("avoid_areas")
+        self.comboAreasToAvoidLayers.setCurrentIndex(index)
 
     def createLayer(self, name):
         layer = OptimalRouteLayer(name)
@@ -203,17 +232,31 @@ class ValhallaRouteBottomBar(KadasBottomBar):
 
     def prepareValhalla(self):
         layer = self.layerSelector.getSelectedLayer()
+        
         if layer is None:
-            pushWarning(self.tr("Please, select a valid destination layer"))
-            return
+            self.layerSelector.createLayerIfEmpty(self.tr(self.default_layer_name))
+            layer = self.layerSelector.getSelectedLayer()
+        
+            if layer is None:
+                pushWarning(self.tr("Please, select a valid destination layer"))
+                return
+                
         try:
             points = [self.originSearchBox.point]
+            
+            if self.plugin.optimalRouteBar is not None:
+                if self.plugin.optimalRouteBar.waypointsSearchBox.text() != "":
+                    self.plugin.optimalRouteBar.addWaypoints()
+            
             if len(self.waypoints) > 0:
                 points.extend(self.waypoints)
             points.append(self.destinationSearchBox.point)
         except WrongLocationException as e:
             pushWarning(self.tr("Invalid location:") + str(e))
             return
+        #except Exception as e:
+        #    pushWarning(self.tr("An exception occured:") + str(e))
+        #    return
         if None in points:
             pushWarning(self.tr("Both origin and destination points are required"))
             return
@@ -231,18 +274,21 @@ class ValhallaRouteBottomBar(KadasBottomBar):
             areasToAvoid = self.areasToAvoid
             canvasCrs = self.canvas.mapSettings().destinationCrs()
             transformer = transformToWGS(canvasCrs)
+            
             if areasToAvoid is None:
                 # if the custom polygon button is checked, but no polygon has been drawn
                 pushWarning(
                     self.tr("Custom polygon button is checked, but no polygon is drawn")
                 )
                 return
+  
         elif self.radioAreasToAvoidLayer.isChecked():
             avoidLayer = self.comboAreasToAvoidLayers.currentData()
             if avoidLayer is not None:
                 layerCrs = avoidLayer.crs()
                 transformer = transformToWGS(layerCrs)
                 areasToAvoid = [f.geometry() for f in avoidLayer.getFeatures()]
+                #LOG.debug("Took polygon from polygon, areasToAvoid %s" % ''.join([f.asWkt() for f in areasToAvoid]))
             else:
                 # If polygon layer button is checked, but no layer polygon is selected
                 pushWarning(
@@ -263,18 +309,25 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         # transform to WGS84 (Valhalla's requirement)
         allAreasToAvoidWGS = []
         if areasToAvoid:
+            #every drawn polygon
             for areasToAvoidGeom in areasToAvoid:
                 areasToAvoidJson = json.loads(areasToAvoidGeom.asJson())
+                
+                if areasToAvoidJson["type"] == 'MultiPolygon':
+                    areasToAvoidJson["coordinates"] = areasToAvoidJson["coordinates"][0]
+                    areasToAvoidJson["type"] = 'Polygon'
+                               
                 areasToAvoidWGS = []
                 for i, polygon in enumerate(areasToAvoidJson["coordinates"]):
                     areasToAvoidWGS.append([])
                     for point in polygon:
-                        pointWGS = transformer.transform(point[0], point[1])
+                        pointWGS = transformer.transform(point[0], point[1])                        
                         areasToAvoidWGS[i].append([pointWGS.x(), pointWGS.y()])
                 allAreasToAvoidWGS.extend(areasToAvoidWGS)
         return layer, points, profile, allAreasToAvoidWGS, costingOptions
 
     def calculate(self):
+        
         try:
             (
                 layer,
@@ -283,9 +336,16 @@ class ValhallaRouteBottomBar(KadasBottomBar):
                 allAreasToAvoidWGS,
                 costingOptions,
             ) = self.prepareValhalla()
-        except TypeError:
+        except TypeError as t:
+            LOG.error(t, exc_info=True)
             # exit if prepareValhalla raised a warning to the user
             return
+        except Exception as e:
+            LOG.error(e, exc_info=True)
+            pushWarning(self.tr("An Exception occured:"+str(e)))
+            # exit if prepareValhalla raised a warning to the user
+            return
+            
         try:
             layer.updateRoute(points, profile, allAreasToAvoidWGS, costingOptions)
             self.btnNavigate.setEnabled(True)
@@ -334,6 +394,8 @@ class ValhallaRouteBottomBar(KadasBottomBar):
         self.destinationSearchBox.addPin()
 
     def navigate(self):
+        
+        
         self.action.toggle()
         iface.setActiveLayer(self.layerSelector.getSelectedLayer())
         self.plugin.navigationAction.toggle()

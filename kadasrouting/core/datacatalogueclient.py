@@ -5,7 +5,7 @@ import logging
 from pyplugin_installer import unzip
 
 from functools import partial
-from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop, Qt
+from PyQt5.QtCore import QUrl, QFile, QDir, QUrlQuery, QEventLoop, Qt, pyqtSignal, QObject
 from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply
 from PyQt5.QtWidgets import QProgressBar
 
@@ -31,15 +31,18 @@ DEFAULT_REPOSITORIES = [
 ]
 
 
-class DataCatalogueClient:
+class DataCatalogueClient(QObject):
     # Status of data tiles
     NOT_INSTALLED = 0  # Available on remote repository, but not in local file system
     UPDATABLE = 1  # There is a local copy, but the one in remote repository is newer
     UP_TO_DATE = 2  # There is a local copy and is up to date compared to the one in remote repository
     LOCAL_ONLY = 3  # The data is only available locally
     LOCAL_DELETED = 4  # The local only data is deleted
-
+    
+    data_changed = pyqtSignal()
+    
     def __init__(self, repo_id):
+        super(DataCatalogueClient, self).__init__()
         self.iface = KadasPluginInterface.cast(iface)
         self.url = DEFAULT_REPOSITORIES[repo_id]['url']
         self.search_str = DEFAULT_REPOSITORIES[repo_id]['search_str']
@@ -133,6 +136,7 @@ class DataCatalogueClient:
             LOG.debug("install data on %s" % filename)
             with open(filename, "w") as f:
                 json.dump(data, f)
+            self.data_changed.emit()
             return True
         else:
             return False
@@ -196,12 +200,13 @@ class DataCatalogueClient:
         self.downloader.downloadCanceled.connect(self.download_canceled)
         self.downloader.downloadExited.connect(loop.quit)
         loop.exec_()
-
-    @staticmethod
-    def uninstall(itemid):
+    
+    def uninstall(self, itemid):
         path = DataCatalogueClient.folderForDataItem(itemid)
         LOG.debug("uninstall/remove from %s" % path)
-        return QDir(DataCatalogueClient.folderForDataItem(itemid)).removeRecursively()
+        res = QDir(DataCatalogueClient.folderForDataItem(itemid)).removeRecursively()
+        self.data_changed.emit()
+        return res
 
     @staticmethod
     def folderForDataItem(itemid):

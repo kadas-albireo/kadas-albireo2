@@ -31,7 +31,6 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.patrolArea = None
         self.patrolFootprint = self.createFootprintArea(color=PATROL_AREA_COLOR)
         super().__init__(canvas, action, plugin)
-
         self.btnPatrolAreaClear.clicked.connect(self.clearPatrol)
         self.btnPatrolAreaSave.clicked.connect(self.savePatrolAreaLayer)
         self.btnPatrolAreaCanvas.toggled.connect(
@@ -40,7 +39,7 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
 
         self.radioPatrolAreaPolygon.toggled.connect(self._radioButtonsPatrolChanged)
         self.radioPatrolAreaLayer.toggled.connect(self._radioButtonsPatrolChanged)
-        self.radioPatrolAreaPolygon.setChecked(True)
+        self.radioPatrolAreaPolygon.setChecked(True)        
 
     def populatePatrolLayerSelector(self):
         self.comboPatrolAreaLayers.clear()
@@ -102,6 +101,11 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
         )
         iface.mapCanvas().setMapTool(QgsMapToolPan(iface.mapCanvas()))
 
+        self.radioPatrolAreaLayer.setChecked(True)
+        index = self.comboPatrolAreaLayers.findText("patrol_area")
+        self.comboPatrolAreaLayers.setCurrentIndex(index)
+
+
     def prepareValhalla(self):
         (
             layer,
@@ -111,6 +115,8 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
             costingOptions,
         ) = super().prepareValhalla()
         if self.radioPatrolAreaPolygon.isChecked():
+            #asMultiPolygon() returns empty coordinates.... 
+            #pushWarning(self.tr("Treating Patrol area:" + str(self.patrolArea.asMultiPolygon())))                                                
             # Currently only single polygon is accepted
             patrolArea = self.patrolArea
             canvasCrs = self.canvas.mapSettings().destinationCrs()
@@ -151,7 +157,9 @@ class CPBottomBar(ValhallaRouteBottomBar, WIDGET):
 
         # transform to WGS84 (Valhalla's requirement)
         if patrolArea:
-            patrolAreaJson = json.loads(patrolArea.asJson())
+            #Workaround to get sinngle multipolygon as polygon                                                                                 
+            patrolAreaTxt = patrolArea.asJson().replace("]]]]", "]]]").replace("[[[[", "[[[")
+            patrolAreaJson = json.loads(patrolAreaTxt)
             patrolAreaWGS = []
             polygon = patrolAreaJson["coordinates"][0]
             for point in polygon:

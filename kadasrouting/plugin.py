@@ -24,6 +24,9 @@ from kadasrouting.valhalla.client import ValhallaClient
 
 from kadasrouting.core.memorylayersaver import MemoryLayerSaver
 
+from kadasrouting.core.datacatalogueclient import DataCatalogueClient
+
+
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")
 try:
     os.mkdir(os.path.dirname(logfile))
@@ -79,6 +82,7 @@ class RoutingPlugin(QObject):
 
         # Navigation menu
         self.navigationAction = QAction(icon("navigate.png"), self.tr("Navigate"))
+        
         self.iface.addAction(
             self.navigationAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
         )
@@ -120,15 +124,38 @@ class RoutingPlugin(QObject):
         # auto saver for memory layers
         self._saver.attachToProject()
 
-        try:
-            self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
-        except Exception as e:
-            LOG.debug(
-                "Can not connect to ribbon widget currentChange signal because %s" % e
-            )
-            message = "Changing tab will not close a routing plugin panel because your Kadas does not support it yet."
-            pushWarning(message)
+        self.iface.getRibbonWidget().currentChanged.connect(self._hidePanels)
 
+        self.dataCatalogueBar = DataCatalogueBottomBar(
+                    self.iface.mapCanvas(), self.dataCatalogueAction
+                )
+        
+        self.dataCatalogueBar.dataCatalogueClient.data_changed.connect(self.catalogDataChanged)
+        
+        self.catalogDataChanged()
+        
+        self.dataCatalogueBar.hide()
+    
+    def catalogDataChanged(self):
+        if self.dataCatalogueBar.radioButtonGroup.checkedButton() == None:
+            #pushWarning("checkedButton: None")
+            self.enableRoutingMenus(False)
+        else:
+            btn = self.dataCatalogueBar.radioButtonGroup.button(self.dataCatalogueBar.radioButtonGroup.checkedId())
+
+            if not btn.isChecked():
+                #pushWarning("Button not enabled")
+                self.enableRoutingMenus(False)
+            else:
+                #pushWarning("Button enabled")
+                self.enableRoutingMenus(True)
+    
+    def enableRoutingMenus(self, val):
+        self.optimalRouteAction.setEnabled(val)
+        self.cpAction.setEnabled(val)
+        self.reachabilityAction.setEnabled(val)
+        self.navigationAction.setEnabled(val)
+    
     def unload(self):
         self.iface.removeAction(
             self.optimalRouteAction, self.iface.PLUGIN_MENU, self.iface.GPS_TAB
@@ -160,7 +187,7 @@ class RoutingPlugin(QObject):
         for action in self.actionsToggled:
             if action != keep:
                 action.setChecked(False)
-
+    
     @testclientavailability
     def showOptimalRoute(self, show=True):
         if show:
@@ -173,6 +200,9 @@ class RoutingPlugin(QObject):
         else:
             if self.optimalRouteBar is not None:
                 self.optimalRouteBar.hide()
+                
+        if self.optimalRouteBar is not None:
+            self.optimalRouteBar.resetCombo(show)
 
     @testclientavailability
     def showCP(self, show=True):
@@ -184,7 +214,10 @@ class RoutingPlugin(QObject):
         else:
             if self.cpBar is not None:
                 self.cpBar.hide()
-
+        
+        if self.cpBar is not None:        
+            self.cpBar.resetCombo(show)
+                
     @testclientavailability
     def showReachability(self, show=True):
         if show:
@@ -205,14 +238,14 @@ class RoutingPlugin(QObject):
                 self.navigationPanel = NavigationPanel()
 
                 def _resize():
-                    x = (
+                    x = int(
                         self.iface.mapCanvas().width()
                         - self.navigationPanel.FIXED_WIDTH
                     )
-                    y = self.iface.mapCanvas().height() / 3
-                    height = 2 * self.iface.mapCanvas().height() / 3
+                    y = int(self.iface.mapCanvas().height() / 3)
+                    height = int(2 * self.iface.mapCanvas().height() / 3)
                     self.navigationPanel.setGeometry(
-                        x, y, self.navigationPanel.FIXED_WIDTH, height
+                        x, y, int(self.navigationPanel.FIXED_WIDTH), height
                     )
 
                 self.iface.mapCanvas().extentsChanged.connect(_resize)

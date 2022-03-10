@@ -3,7 +3,7 @@ import logging
 
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
-
+from PyQt5.QtWidgets import QWidget
 from kadas.kadasgui import (
     KadasPinItem,
     KadasItemPos,
@@ -35,7 +35,7 @@ class OptimalRouteBottomBar(ValhallaRouteBottomBar, WIDGET):
         self.groupBox.layout().addWidget(self.waypointsSearchBox, 0, 0)
         self.btnAddWaypoints.clicked.connect(self.addWaypoints)
         self.btnAreasToAvoidFromCanvas.toggled.connect(self.setPolygonDrawingMapTool)
-
+            
     def clearPoints(self):
         self.waypointsSearchBox.clearSearchBox()
         self.waypoints = []

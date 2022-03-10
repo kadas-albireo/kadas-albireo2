@@ -37,10 +37,11 @@ class DataItem(QListWidgetItem):
 
 
 class DataItemWidget(QFrame):
-    def __init__(self, data, data_catalogue_client):
+    def __init__(self, data, data_catalogue_client, parent):
         QFrame.__init__(self)
         self.data = data
         self.dataCatalogueClient = data_catalogue_client
+        self.bbar = parent
         layout = QHBoxLayout()
         layout.setMargin(0)
         self.radioButton = QRadioButton()
@@ -53,6 +54,7 @@ class DataItemWidget(QFrame):
         layout.addWidget(self.button)
         self.setLayout(layout)
         self.setStyleSheet("QFrame { background-color: white; }")
+        
         if (
             QgsSettings().value("/kadasrouting/activeValhallaTilesID", "default")
             == self.data["id"]
@@ -100,10 +102,13 @@ class DataItemWidget(QFrame):
         else:
             self.radioButton.setDisabled(False)
             self.radioButton.setToolTip("")
-
+    
+    
     def buttonClicked(self):
         status = self.data["status"]
         if status == DataCatalogueClient.UP_TO_DATE:
+            if self.radioButton.isChecked():
+                self.resetRadioGroup()
             ret = self.dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
                 pushWarning(
@@ -119,6 +124,8 @@ class DataItemWidget(QFrame):
                 )
                 self.data["status"] = DataCatalogueClient.NOT_INSTALLED
         elif status == DataCatalogueClient.LOCAL_ONLY:
+            if self.radioButton.isChecked():
+                self.resetRadioGroup()
             ret = self.dataCatalogueClient.uninstall(self.data["id"])
             if not ret:
                 pushWarning(
@@ -134,6 +141,7 @@ class DataItemWidget(QFrame):
                 )
                 self.data["status"] = DataCatalogueClient.LOCAL_DELETED
         else:
+            self.radioButton.setChecked(True)
             ret = self.dataCatalogueClient.install(self.data)
             if not ret:
                 pushWarning(
@@ -148,7 +156,6 @@ class DataItemWidget(QFrame):
                     ).format(name=self.data["title"])
                 )
                 self.data["status"] = DataCatalogueClient.UP_TO_DATE
-
         if ret:
             self.updateContent()
 
@@ -158,14 +165,18 @@ class DataItemWidget(QFrame):
             QgsSettings().setValue(
                 "/kadasrouting/activeValhallaTilesID", self.data["id"]
             )
-            pushMessage(
-                self.tr("Active map package is set to {tile}").format(
-                    tile=self.data["title"]
-                )
-            )
+            
+            self.bbar.dataCatalogueClient.data_changed.emit()
+            
+    def resetRadioGroup(self):
+        self.bbar.radioButtonGroup.setExclusive(False)       
+        for ele in self.bbar.radioButtonGroup.buttons():
+            ele.setChecked(False)
+        self.bbar.radioButtonGroup.setExclusive(True)
+    
 
 
-class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
+class DataCatalogueBottomBar(KadasBottomBar, WIDGET):   
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
@@ -192,7 +203,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
 
         self.populateListRepositoryURLs()
         self.reloadRepository()
-
+    
     def populateList(self):
         dataItems = self.dataCatalogueClient.getTiles()
 
@@ -200,7 +211,7 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
         self.listWidget.clear()
         for data in dataItems:
             item = DataItem(data)
-            widget = DataItemWidget(data, self.dataCatalogueClient)
+            widget = DataItemWidget(data, self.dataCatalogueClient, self)
             item.setSizeHint(widget.sizeHint())
             self.listWidget.addItem(item)
             self.listWidget.setItemWidget(item, widget)
