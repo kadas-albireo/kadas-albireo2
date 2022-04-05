@@ -64,6 +64,7 @@
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
+#include <kadas/gui/search/kadasmapserverfindsearchprovider.h>
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
@@ -317,7 +318,15 @@ void KadasMainWindow::init()
   mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasLocalDataSearchProvider( mMapCanvas ) );
   mSearchWidget->addSearchProvider( new KadasPinSearchProvider( mMapCanvas ) );
-  mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( mMapCanvas ) );
+  QString remoteDataSearchUrl = QgsSettings().value( "search/remotedatasearchurl", "" ).toString();
+  if ( remoteDataSearchUrl.isEmpty() )
+  {
+    mSearchWidget->addSearchProvider( new KadasMapServerFindSearchProvider( mMapCanvas ) );
+  }
+  else
+  {
+    mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( remoteDataSearchUrl, mMapCanvas ) );
+  }
   mSearchWidget->addSearchProvider( new KadasWorldLocationSearchProvider( mMapCanvas ) );
 
   mActionShowPythonConsole = new QAction( this );

@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/search/kadasremotedatasearchprovider.h                     *
+ * kadas/gui/search/kadasmapserverfindsearchprovider.h                  *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -12,7 +12,7 @@
 
 
 
-class KadasRemoteDataSearchProvider : KadasSearchProvider
+class KadasMapServerFindSearchProvider : KadasSearchProvider
 {
 %Docstring
 *************************************************************************
@@ -26,10 +26,10 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/search/kadasremotedatasearchprovider.h"
+#include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
 %End
   public:
-    KadasRemoteDataSearchProvider( const QString &remoteDataSearchUrl, QgsMapCanvas *mapCanvas );
+    KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );
     virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion );
 
     virtual void cancelSearch();
@@ -40,7 +40,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/search/kadasremotedatasearchprovider.h                     *
+ * kadas/gui/search/kadasmapserverfindsearchprovider.h                  *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

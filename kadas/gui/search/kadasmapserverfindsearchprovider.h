@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasremotedatasearchprovider.h
-    -------------------------------
+    kadasmapserverfindsearchprovider.h
+    ----------------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -15,8 +15,8 @@
  ***************************************************************************/
 
 
-#ifndef KADASREMOTEDATASEARCHPROVIDER_H
-#define KADASREMOTEDATASEARCHPROVIDER_H
+#ifndef KADASMAPSERVERFINDSEARCHPROVIDER_H
+#define KADASMAPSERVERFINDSEARCHPROVIDER_H
 
 #include <QMap>
 #include <QRegExp>
@@ -27,11 +27,11 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public KadasSearchProvider
+class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider : public KadasSearchProvider
 {
     Q_OBJECT
   public:
-    KadasRemoteDataSearchProvider( const QString &remoteDataSearchUrl, QgsMapCanvas *mapCanvas );
+    KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );
     void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
     void cancelSearch() override;
 
@@ -42,7 +42,6 @@ class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public KadasSearchProvide
 
     QList<QNetworkReply *> mNetReplies;
     QgsGeometry *mReplyFilter;
-    QString mRemoteDataSearchUrl;
     QRegExp mPatBox;
     QTimer mTimeoutTimer;
 
@@ -51,4 +50,4 @@ class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public KadasSearchProvide
     void searchTimeout() { cancelSearch(); }
 };
 
-#endif // KADASREMOTEDATASEARCHPROVIDER_H
+#endif // KADASMAPSERVERFINDSEARCHPROVIDER_H

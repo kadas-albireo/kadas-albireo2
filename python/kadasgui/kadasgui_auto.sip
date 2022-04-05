@@ -53,6 +53,7 @@
 %Include auto_generated/kadasbottombar.sip
 %Include auto_generated/kadasfeaturepicker.sip
 %Include auto_generated/kadascoordinatedisplayer.sip
+%Include auto_generated/search/kadasmapserverfindsearchprovider.sip
 %Include auto_generated/search/kadaslocationsearchprovider.sip
 %Include auto_generated/search/kadaspinsearchprovider.sip
 %Include auto_generated/search/kadasworldlocationsearchprovider.sip
