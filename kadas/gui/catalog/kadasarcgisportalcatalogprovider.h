@@ -36,16 +36,17 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     struct ResultEntry
     {
       ResultEntry() {}
-      ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, bool _flatten = false )
-        : url( _url ), id( _id ), category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), flatten( _flatten ) {}
+      ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false )
+        : url( _url ), id( _id ), category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), detailUrl( _detailUrl ), flatten( _flatten ) {}
       ResultEntry( const ResultEntry &entry )
-        : url( entry.url ), id( entry.id ), category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ), flatten( entry.flatten ) {}
+        : url( entry.url ), id( entry.id ), category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ), detailUrl( entry.detailUrl ), flatten( entry.flatten ) {}
       QString url;
       QString id;
       QString category;
       QString title;
       QString sortIndices;
       QString metadataUrl;
+      QString detailUrl;
       bool flatten;
     };
 
@@ -58,14 +59,17 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 
     QString mBaseUrl;
     QString mServicePreference;
+    QString mCatalogTag;
     int mPendingTasks;
 
     QMap<QString, QMap<QString, ResultEntry>> mLayers;
 
     void endTask();
 
-    void readWMTSCapabilities( const ResultEntry &entry );
-    void readWMSCapabilities( const ResultEntry &entry );
+    void readWMTSDetail( const ResultEntry &entry );
+    void readWMSDetail( const ResultEntry &entry );
+    void readWMTSCapabilities();
+    void readWMSCapabilities();
     void readAMSCapabilities( const ResultEntry &entry );
 
     void readWMSSublayers( const QDomElement &layerItem, const QString &parentName, QVariantList &sublayers );

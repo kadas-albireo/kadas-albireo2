@@ -34,7 +34,7 @@
 #include <kadas/gui/catalog/kadasarcgisportalcatalogprovider.h>
 
 KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params )
-  : KadasCatalogProvider( browser ), mBaseUrl( baseUrl ), mServicePreference( params.value( "preferred", "wms" ) )
+  : KadasCatalogProvider( browser ), mBaseUrl( baseUrl ), mServicePreference( params.value( "preferred", "wms" ) ), mCatalogTag( params.value( "tag", "milcatalog" ) )
 {
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QFile isoTopics( QDir( Kadas::pkgDataPath() ).absoluteFilePath( QString( "catalog/isoTopics_%1.csv" ).arg( lang ) ) );
@@ -73,7 +73,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   QUrl reqUrl = reply->request().url();
-  QString portalBaseUrl = reqUrl.scheme() + "://" + reqUrl.authority();
+  QString detailBaseUrl = reqUrl.toString().replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
   bool lastRequest = true;
   QString nextStart;
   QString num;
@@ -91,10 +91,10 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       for ( const QVariant &tagv : resultMap["tags"].toList() )
       {
         QString tag = tagv.toString();
-        if ( tag.startsWith( "milcatalog:", Qt::CaseInsensitive ) )
+        if ( tag.startsWith( mCatalogTag + ":", Qt::CaseInsensitive ) )
         {
           categoryId = tag;
-          auto it = mIsoTopics.find( tag.mid( 11 ).toUpper() );
+          auto it = mIsoTopics.find( tag.mid( mCatalogTag.length() + 1 ).toUpper() );
           if ( it != mIsoTopics.end() )
           {
             category = it.value().category;
@@ -106,7 +106,8 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
 
       QString metadataUrl = QgsSettings().value( "kadas/metadataBaseUrl" ).toString().arg( resultMap["id"].toString() );
       bool flatten = false;
-      ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, metadataUrl, flatten );
+      QString detailUrl = QString( "%1%2/data?f=json" ).arg( detailBaseUrl, resultMap["id"].toString() );
+      ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, metadataUrl, detailUrl, flatten );
       QString id = categoryId + ":" + resultMap["title"].toString();
       mLayers[id] = mLayers.value( id );
       mLayers[id][resultMap["type"].toString()] = entry;
@@ -125,8 +126,8 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
     QList<QString> typeOrder = {"WMTS", "WMS", "Map Service"};
     QMap<QString, std::function<void( const ResultEntry & )>> typeHandlers;
     typeHandlers.insert( "Map Service", [this]( const ResultEntry & entry ) { readAMSCapabilities( entry ); } );
-    typeHandlers.insert( "WMTS", [this]( const ResultEntry & entry ) { readWMTSCapabilities( entry ); } );
-    typeHandlers.insert( "WMS", [this]( const ResultEntry & entry ) { readWMSCapabilities( entry ); } );
+    typeHandlers.insert( "WMTS", [this]( const ResultEntry & entry ) { readWMTSDetail( entry ); } );
+    typeHandlers.insert( "WMS", [this]( const ResultEntry & entry ) { readWMSDetail( entry ); } );
 
     for ( const auto &layerTypeMap : mLayers )
     {
@@ -169,13 +170,28 @@ void KadasArcGisPortalCatalogProvider::endTask()
   }
 }
 
-void KadasArcGisPortalCatalogProvider::readWMTSCapabilities( const ResultEntry &entry )
+void KadasArcGisPortalCatalogProvider::readWMTSDetail( const ResultEntry &entry )
 {
   mPendingTasks += 1;
-  QNetworkRequest req( ( QUrl( entry.url ) ) );
+  QNetworkRequest req( entry.detailUrl );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
-  connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
+  connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilities );
+}
+
+void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  QString layerIdentifier = rootMap["wmtsInfo"].toMap()["layerIdentifier"].toString();
+
+  QString WMTSCapUrl = QString( entry->url ).replace( QRegularExpression( "/WMTS/.*$" ), "/WMTS/WMTSCapabilities.xml" );
+  QNetworkRequest req( ( QUrl( WMTSCapUrl ) ) );
+  QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
+  capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
+  capReply->setProperty( "layeridentifier", layerIdentifier );
+  connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
@@ -183,6 +199,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QString layerIdentifier = reply->property( "layeridentifier" ).toString();
   QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
   if ( reply->error() == QNetworkReply::NoError )
@@ -191,13 +208,23 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
     doc.setContent( reply->readAll() );
     if ( !doc.isNull() )
     {
-      QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
-      QDomNode layerItem = doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ).firstChildElement( "Layer" );
-      QString layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
-      QMimeData *mimeData = nullptr;
-      parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry->metadataUrl, QString( "&referer=%1" ).arg( referer ), entry->title, layerid, mimeData );
-      QStringList sortIndices = entry->sortIndices.split( "/" );
-      mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
+      QDomNodeList layerItems = doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ).elementsByTagName( "Layer" );
+      QDomElement layerItem;
+      for ( int i = 0, n = layerItems.size(); i < n; ++i )
+      {
+        if ( layerItems.at( i ).firstChildElement( "ows:Identifier" ).text() == layerIdentifier )
+        {
+          layerItem = layerItems.at( i ).toElement();
+        }
+      }
+      if ( !layerItem.isNull() )
+      {
+        QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
+        QMimeData *mimeData = nullptr;
+        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry->metadataUrl, QString( "&referer=%1" ).arg( referer ), entry->title, layerIdentifier, mimeData );
+        QStringList sortIndices = entry->sortIndices.split( "/" );
+        mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
+      }
     }
   }
 
@@ -205,13 +232,33 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
   endTask();
 }
 
-void KadasArcGisPortalCatalogProvider::readWMSCapabilities( const ResultEntry &entry )
+void KadasArcGisPortalCatalogProvider::readWMSDetail( const ResultEntry &entry )
 {
   mPendingTasks += 1;
-  QNetworkRequest req( QUrl( entry.url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
+  QNetworkRequest req( entry.detailUrl );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
-  connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
+  connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilities );
+}
+
+void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
+{
+  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  QVariantList layers = rootMap["layers"].toList();
+  if ( layers.isEmpty() )
+  {
+    endTask();
+    return;
+  }
+  QString layerName = layers[0].toMap()["name"].toString();
+
+  QNetworkRequest req( QUrl( entry->url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
+  QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
+  capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
+  capReply->setProperty( "layername", layerName );
+  connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
@@ -219,6 +266,7 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
   QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
   reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
+  QString layerName = reply->property( "layername" ).toString();
   QString url = entry->url;
 
   if ( reply->error() == QNetworkReply::NoError )
@@ -228,11 +276,18 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     QStringList imgFormats = parseWMSFormats( doc );
     QStringList parentCrs;
 
-    QDomElement layerItem = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" );
-    QString layerName = layerItem.firstChildElement( "Name" ).text();
+    QDomNodeList layerItems = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).elementsByTagName( "Layer" );
+    QDomElement layerItem;
+    for ( int i = 0, n = layerItems.size(); i < n; ++i )
+    {
+      if ( layerItems.at( i ).firstChildElement( "Name" ).text() == layerName )
+      {
+        layerItem = layerItems.at( i ).toElement();
+      }
+    }
 
     QMimeData *mimeData = nullptr;
-    if ( parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, entry->metadataUrl, mimeData ) )
+    if ( !layerItem.isNull() && parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, entry->metadataUrl, mimeData ) )
     {
       // Parse sublayers
       QVariantList sublayers;
