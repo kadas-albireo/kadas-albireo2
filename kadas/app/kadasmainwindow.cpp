@@ -249,6 +249,8 @@ void KadasMainWindow::init()
   // Globe
   KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
   Q_UNUSED( globe );
+#else
+  m3DButton->hide();
 #endif
 
   configureButtons();
