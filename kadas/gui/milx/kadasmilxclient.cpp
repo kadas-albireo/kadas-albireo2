@@ -197,6 +197,7 @@ bool KadasMilxClientWorker::initialize()
   istream << MILX_REQUEST_INIT;
   istream << lang;
   istream << MILX_INTERFACE_VERSION;
+  istream << QStringLiteral( MILX_LICENSE_KEY );
   QByteArray response;
   if ( !processRequest( request, response, MILX_REPLY_INIT_OK ) )
   {

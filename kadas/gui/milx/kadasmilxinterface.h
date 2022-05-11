@@ -23,9 +23,9 @@
 
 typedef quint8 MilXServerRequest;
 
-quint64 MILX_INTERFACE_VERSION = 202108241750;
+quint64 MILX_INTERFACE_VERSION = 202205101200;
 
-MilXServerRequest MILX_REQUEST_INIT = 1; // {MILX_REQUEST_INIT, Lang:QString, InterfaceVersion:int64}
+MilXServerRequest MILX_REQUEST_INIT = 1; // {MILX_REQUEST_INIT, Lang:QString, InterfaceVersion:int64, LicenseKey:QString}
 
 MilXServerRequest MILX_REQUEST_GET_SYMBOL_METADATA = 10; // {MILX_REQUEST_GET_SYMBOL_METADATA, SymbolXml:QString}
 MilXServerRequest MILX_REQUEST_GET_SYMBOLS_METADATA = 11; // {MILX_REQUEST_GET_SYMBOLS_METADATA, SymbolXmls:QStringList}
