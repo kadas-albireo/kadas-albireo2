@@ -43,6 +43,34 @@
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   : QObject( parent ), mUi( ui ), mMilxLibrary( nullptr )
 {
+  QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
+  if ( licenseKey.isEmpty() )
+  {
+    QgsDebugMsg( "MilX license key is empty, disabling MilX integration." );
+    return;
+  }
+
+  // Read expiration time from key and show message if expired or about to expire
+  // CH_XXXYYYZZZ.2021.12.31_51C4AC96574DBD5355C5B55648BF8933FF41A434
+  QRegularExpressionMatch match = QRegularExpression( "CH_[^\\.]+\\.(\\d\\d\\d\\d)\\.(\\d\\d)\\.(\\d\\d)_.*" ).match( licenseKey );
+  if ( match.hasMatch() )
+  {
+    int year = match.captured( 1 ).toInt();
+    int month = match.captured( 2 ).toInt();
+    int day = match.captured( 3 ).toInt();
+    QDate licenseExpiryDate( year, month, day );
+    licenseExpiryDate = licenseExpiryDate.addDays( -1 ); // The license expires at YYYY-MM-DD 00:00, so subtract one day
+    QDate today = QDate::currentDate();
+    if ( licenseExpiryDate.isValid() && today > licenseExpiryDate )
+    {
+      QMessageBox::warning( kApp->mainWindow(), tr( "MSS license expired" ), tr( "The MSS license has expired. Please download a fresh copy of KADAS." ) );
+    }
+    else if ( licenseExpiryDate.isValid() && today.addDays( 10 ) > licenseExpiryDate )
+    {
+      QMessageBox::information( kApp->mainWindow(), tr( "MSS license about to expire" ), tr( "The MSS license will expire on %1. Please download a fresh copy of KADAS." ).arg( licenseExpiryDate.toString() ) );
+    }
+  }
+
   if ( !KadasMilxClient::init() )
   {
     QgsDebugMsg( "Failed to initialize the MilX library." );
