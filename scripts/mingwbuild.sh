@@ -87,6 +87,7 @@ mkdir -p $builddir
     -DKADAS_NAME="${KADAS_NAME:-Kadas}" \
     -DKADAS_FULL_NAME="${KADAS_FULL_NAME:-Kadas Albireo}" \
     -DMILX_LICENSE_KEY="${MILX_LICENSE_KEY}" \
+    ${CMAKE_OPTS} \
     ..
 )
 
