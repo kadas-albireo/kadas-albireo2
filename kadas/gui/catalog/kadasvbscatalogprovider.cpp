@@ -38,9 +38,11 @@ KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasC
 
 void KadasVBSCatalogProvider::load()
 {
-  mPendingTasks = 1;
-  QUrl url( mBaseUrl );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+  mPendingTasks = 1;
+  QString baseUrl = mBaseUrl;
+  baseUrl.replace( "{lang}", lang );
+  QUrl url( mBaseUrl );
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   query.addQueryItem( "timestamp", QString::number( QDateTime::currentSecsSinceEpoch() ) );
