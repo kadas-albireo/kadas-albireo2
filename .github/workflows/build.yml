@@ -15,7 +15,15 @@ jobs:
         run: dnf -y update
 
       - name: Install core dependencies
-        run: dnf -y install jq wget unzip
+        run: dnf -y install jq wget unzip 'dnf-command(download)' cpio
+
+      - name: Install build dependencies
+        run: ./scripts/mingwdeps.sh
+
+      - name: Manually install qt5-qttranslations (FIXME?)
+        run: |
+          dnf download --downloaddir=/tmp mingw64-qt5-qttranslations
+          rpm2cpio /tmp/mingw64-qt5-qttranslations*.rpm | cpio -idmv -D /
 
       - name: Version number
         id: version_number
@@ -23,26 +31,22 @@ jobs:
           if [ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]; then
             VERSION=$(basename ${{ github.ref }})
           else
-            VERSION=ci-latest-$(basename ${{ github.ref }})
-            PREV_RELEASE=$(curl -s https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$VERSION | jq -r .url)
+            VERSION=ci-$(git rev-parse --short HEAD)
           fi
           echo "##[set-output name=version;]$VERSION"
-          echo "##[set-output name=prev_release;]${PREV_RELEASE/null/}"
 
       - name: Download QGIS build
         run: |
-          asset_url=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/actions/artifacts | jq -r '[.artifacts[] | select(.name == "QGIS for Windows 64bit")][0].archive_download_url')
-          asset_debug_url=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/actions/artifacts | jq -r '[.artifacts[] | select(.name == "QGIS for Windows 64bit Debug Symbols")][0].archive_download_url')
-          curl -L -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} -o qgis-portable-win64_zip.zip ${asset_url}
-          curl -L -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} -o qgis-portable-win64-debugsym_zip.zip ${asset_debug_url}
-          unzip qgis-portable-win64_zip.zip
-          unzip qgis-portable-win64-debugsym_zip.zip
+          tag=$(jq -r '.qgis_tag' ci-config.json)
+          asset_url=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases | jq -r '.[0]["assets"] | map(select(.browser_download_url | match("'$tag'.zip"))) | map(.browser_download_url)[0]')
+          asset_debug_url=$(curl -s https://api.github.com/repos/kadas-albireo/QGIS/releases | jq -r '.[0]["assets"] | map(select(.browser_download_url | match("'$tag'-debugsym.zip"))) | map(.browser_download_url)[0]')
+          echo "Downloading ${asset_url}"
+          curl -L -o qgis-portable-win64.zip ${asset_url}
+          echo "Downloading ${asset_debug_url}"
+          curl -L -o qgis-portable-win64-debugsym.zip ${asset_debug_url}
           unzip qgis-portable-win64.zip
           unzip qgis-portable-win64-debugsym.zip
           mv QGIS-Portable dist
-
-      - name: Install build dependencies
-        run: ./scripts/mingwdeps.sh
 
       - name: Build application
         run: QGIS_INSTALL_PREFIX=$PWD/dist ./scripts/mingwbuild.sh x86_64 nodebug 4
@@ -51,25 +55,10 @@ jobs:
         run: ./packaging/kadas_release.sh
 
       - name: Create portable zip
-        run: mv kadas k && mv dist kadas && zip -r kadas-portable-win64.zip kadas
+        run: mv kadas k && mv dist kadas && zip -r kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip kadas
 
       - name: Create debugsym zip
-        run: (cd dist_debug && zip -r - *) > kadas-portable-win64-debugsym.zip
-
-      - name: Reset ci-latest tag
-        run: |
-          VERSION=${{ steps.version_number.outputs.version }}
-          git config --global user.email "ci@github.com"
-          git config --global user.name "Github CI"
-          # Workaround for "could not read Username for 'https://github.com': No such device or address"
-          git remote set-url origin https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
-          git tag -d $VERSION || true
-          git push origin :$VERSION || true
-          git tag -m $VERSION $VERSION
-          git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(steps.version_number.outputs.version, 'ci-latest-')
+        run: (cd dist_debug && zip -r - *) > kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
 
       - name: Create release
         id: create_release
@@ -78,9 +67,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.version_number.outputs.version }}
-          release_name: CI Build
+          release_name: KADAS ${{ steps.version_number.outputs.version }}
           draft: false
-          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1.0.1
@@ -88,9 +77,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kadas-portable-win64.zip
-          asset_name: kadas-portable-win64.zip
+          asset_path: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
+          asset_name: kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
           asset_content_type: application/zip
+        if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
       - name: Upload debugsym release asset
         uses: actions/upload-release-asset@v1.0.1
@@ -98,12 +88,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kadas-portable-win64-debugsym.zip
-          asset_name: kadas-portable-win64-debugsym.zip
+          asset_path: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
+          asset_name: kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
           asset_content_type: application/zip
+        if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
-      - name: Delete previous release
-        run: |
-          curl -s -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-               -X DELETE ${{ steps.version_number.outputs.prev_release }}
-        if: steps.version_number.outputs.prev_release != ''
+      - name: Upload CI build artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: KADAS for Windows 64bit
+          path: kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
+        if: ${{ startsWith(steps.version_number.outputs.version, 'ci-') }}
+
+      - name: Upload CI debug symbols artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: KADAS for Windows 64bit Debug Symbols
+          path: kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
+        if: ${{ startsWith(steps.version_number.outputs.version, 'ci-') }}
