@@ -213,11 +213,13 @@ linkDep lib/qt5/plugins/crypto/libqca-gnupg.dll bin/crypto
 linkDep lib/qt5/plugins/crypto/libqca-ossl.dll bin/crypto
 
 # Osg plugins
-osgPlugins=$(basename $MINGWROOT/bin/osgPlugins-*)
-lnk $MINGWROOT/bin/$osgPlugins $installprefix/bin/$osgPlugins
+if [ "$(grep WITH_GLOBE $builddir/CMakeCache.txt | awk -F '=' '{print $2}')" != "OFF" ]; then
+    osgPlugins=$(basename $MINGWROOT/bin/osgPlugins-*)
+    lnk $MINGWROOT/bin/$osgPlugins $installprefix/bin/$osgPlugins
+fi
 
 mkdir -p $installprefix/share/qt5/translations/
-find $MINGWROOT/share/qt5/translations/ \( -name 'qt_*.qm' -or -name 'qtbase_*.qm' \) -exec cp -a {} $installprefix/share/qt5/translations \;
+cp -a $MINGWROOT/share/qt5/translations/qt{,base}_{de,en,fr,it}.qm $installprefix/share/qt5/translations
 
 # Sort origins file
 cat $installprefix/origins.txt | sort | uniq > $installprefix/origins.new && mv $installprefix/origins.new $installprefix/origins.txt
