@@ -14,8 +14,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDir>
 #include <QDomDocument>
 #include <QDomNode>
+#include <QFileInfo>
 #include <QImageReader>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -28,6 +30,7 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgssettings.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/gui/kadascatalogbrowser.h>
 #include <kadas/gui/catalog/kadasvbscatalogprovider.h>
 
@@ -38,11 +41,15 @@ KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasC
 
 void KadasVBSCatalogProvider::load()
 {
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   mPendingTasks = 1;
   QString baseUrl = mBaseUrl;
   baseUrl.replace( "{lang}", lang );
-  QUrl url( mBaseUrl );
+  QUrl url( baseUrl );
+  if ( QFileInfo( url.path() ).isRelative() )
+  {
+    url.setPath( QDir( Kadas::pkgDataPath() ).filePath( url.path() ) );
+  }
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   query.addQueryItem( "timestamp", QString::number( QDateTime::currentSecsSinceEpoch() ) );
