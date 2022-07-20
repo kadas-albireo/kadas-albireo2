@@ -3,4 +3,5 @@ build_mingw64
 dist
 dist_debug
 CMakeLists.txt.user
+kadas/resources/resources.qrc
 .cmake

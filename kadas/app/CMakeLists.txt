@@ -65,7 +65,9 @@ IF(WITH_GLOBE)
 ENDIF(WITH_GLOBE)
 LIST(SORT kadas_UI)
 
-SET(kadas_RCC_SRC ../resources/resources.qrc)
+SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY)
+SET(kadas_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
 
 FILE(GLOB kadas_TS ${CMAKE_SOURCE_DIR}/locale/*.ts)
 LIST(SORT kadas_TS)
