@@ -1102,6 +1102,9 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     addDefaultPrintTemplates();
   }
 
+  // Ensure WGS84 ellipsoid
+  QgsProject::instance()->setEllipsoid( "WGS84" );
+
   return success;
 }
 
