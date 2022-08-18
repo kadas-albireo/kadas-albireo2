@@ -212,8 +212,8 @@ void KadasMainWindow::init()
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem );
 
   QgsSnappingConfig snappingConfig;
-  snappingConfig.setMode( QgsSnappingConfig::AllLayers );
-  snappingConfig.setTypeFlag( QgsSnappingConfig::VertexFlag );
+  snappingConfig.setMode( Qgis::SnappingMode::AllLayers );
+  snappingConfig.setTypeFlag( Qgis::SnappingType::Vertex );
   int snappingRadius = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
   snappingConfig.setUnits( QgsTolerance::Pixels );

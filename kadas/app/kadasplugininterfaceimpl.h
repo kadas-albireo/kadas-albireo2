@@ -96,6 +96,8 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QgsPointCloudLayer *addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey ) override;
 
     virtual QgsMeshLayer *addMeshLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
+    virtual void addPluginToMeshMenu( const QString &, QAction * ) override;
+    virtual void removePluginMeshMenu( const QString &, QAction * ) override;
 
     virtual bool addProject( const QString &project ) override;
     virtual bool newProject( bool promptToSaveFlag = false ) override;

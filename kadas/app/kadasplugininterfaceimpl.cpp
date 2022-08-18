@@ -256,6 +256,16 @@ QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const 
   return nullptr;
 }
 
+void KadasPluginInterfaceImpl::addPluginToMeshMenu( const QString &, QAction * )
+{
+
+}
+
+void KadasPluginInterfaceImpl::removePluginMeshMenu( const QString &, QAction * )
+{
+
+}
+
 QgsVectorTileLayer *KadasPluginInterfaceImpl::addVectorTileLayer( const QString &url, const QString &baseName )
 {
   return kApp->addVectorTileLayer( url, baseName );
