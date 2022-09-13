@@ -137,6 +137,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void endFullscreen();
     void checkOnTheFlyProjection();
     void showPluginManager( bool show );
+    void addLocalPicture();
+    void addRemotePicture();
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
@@ -147,7 +149,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void showEvent( QShowEvent * /*event*/ ) override;
     void closeEvent( QCloseEvent * /*event*/ ) override;
 
-    QgsMapTool *addPictureTool();
     QgsMapTool *addPinTool();
     KadasRibbonButton *addRibbonButton( QWidget *tabWidget );
     void configureButtons();

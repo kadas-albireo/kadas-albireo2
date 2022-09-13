@@ -30,6 +30,7 @@
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmimedatautils.h>
+#include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssnappingutils.h>
@@ -636,7 +637,12 @@ void KadasMainWindow::configureButtons()
   // Draw tab
   setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this] { return addPinTool(); } );
 
-  setActionToButton( mActionAddImage, mAddImageButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ), [this] { return addPictureTool(); } );
+  QMenu *addImageMenu = new QMenu( mAddImageButton );
+  addImageMenu->addAction( tr( "Choose file..." ), this, &KadasMainWindow::addLocalPicture, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_I ) );
+  addImageMenu->addAction( tr( "Enter URL..." ), this, &KadasMainWindow::addRemotePicture, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_U ) );
+  mAddImageButton->setMenu( addImageMenu );
+  mAddImageButton->setPopupMode( QToolButton::InstantPopup );
+  mAddImageButton->setIcon( QIcon( ":/kadas/icons/picture" ) );
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), [this] { return new KadasMapToolGuideGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
 
@@ -1272,7 +1278,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
   return new KadasMapToolCreateItem( mapCanvas(), factory, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer ) );
 }
 
-QgsMapTool *KadasMainWindow::addPictureTool()
+void KadasMainWindow::addLocalPicture()
 {
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QSet<QString> formats;
@@ -1286,13 +1292,68 @@ QgsMapTool *KadasMainWindow::addPictureTool()
   QString filename = QFileDialog::getOpenFileName( this, tr( "Select Image" ), lastDir, filter );
   if ( filename.isEmpty() )
   {
-    return nullptr;
+    return;
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
   QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
   mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
-  return nullptr;
+}
+
+void KadasMainWindow::addRemotePicture()
+{
+  QDialog dialog;
+  QGridLayout *layout = new QGridLayout();
+  dialog.setLayout( layout );
+
+  QLineEdit *urlLineEdit = new QLineEdit();
+  QLabel *statusLabel = new QLabel();
+  QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
+  connect( bbox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept );
+  connect( bbox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject );
+
+  layout->addWidget( new QLabel( "Image URL:" ), 0, 0, 1, 1 );
+  layout->addWidget( urlLineEdit, 0, 1, 1, 1 );
+  layout->addWidget( statusLabel, 1, 0, 1, 2 );
+  layout->addWidget( bbox, 2, 0, 1, 2 );
+
+  while ( dialog.exec() == QDialog::Accepted )
+  {
+    QString url = urlLineEdit->text();
+    if ( url.isEmpty() )
+    {
+      continue;
+    }
+    statusLabel->setText( tr( "Downloading..." ) );
+    dialog.setEnabled( false );
+
+    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( url ) ) );
+    QEventLoop evloop;
+    connect( reply, &QNetworkReply::finished, &evloop, &QEventLoop::quit );
+    evloop.exec();
+
+    if ( reply->error() != QNetworkReply::NoError )
+    {
+      statusLabel->setText( tr( "Unable to download image" ) );
+      dialog.setEnabled( true );
+      continue;
+    }
+
+    QTemporaryFile tempfile( QFileInfo( url ).fileName() );
+    tempfile.setAutoRemove( true );
+    if ( !tempfile.open() )
+    {
+      statusLabel->setText( tr( "Unable to save downloaded image" ) );
+      dialog.setEnabled( true );
+      continue;
+    }
+
+    tempfile.write( reply->readAll() );
+
+    QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( tempfile.fileName() );
+    mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+    break;
+  }
 }
 
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
