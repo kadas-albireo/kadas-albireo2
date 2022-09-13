@@ -40,11 +40,6 @@ QMenu, QComboBox QAbstractItemView  {
     border: 1px solid #959697;
 }
 
-QMenu::item, QAbstractItemView::item {
-    background-color: transparent;
-    color: #31363b;
-}
-
 QMenu::item::disabled,
 QMenu::item:selected::disabled,
 QAbstractItemView::item::disabled,

@@ -305,6 +305,7 @@ void KadasApplication::init()
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::layersChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::updateWmtsZoomResolutions );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::destinationCrsChanged, this, &KadasApplication::unsetMapTool );
+  connect( mMainWindow->mapCanvas(), &QgsMapCanvas::extentsChanged, this, &KadasApplication::extentChanged );
   connect( QgsProject::instance(), &QgsProject::dirtySet, this, &KadasApplication::projectDirtySet );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
@@ -1622,6 +1623,16 @@ void KadasApplication::unsetMapTool()
   {
     mMainWindow->mapCanvas()->unsetMapTool( mMainWindow->mapCanvas()->mapTool() );
   }
+}
+
+void KadasApplication::extentChanged()
+{
+  // allow symbols in the legend update their preview if they use map units
+  const QgsMapCanvas *mapCanvas = mMainWindow->mapCanvas();
+  mMainWindow->layerTreeView()->layerTreeModel()->setLegendMapViewData(
+    mapCanvas->mapUnitsPerPixel(),
+    static_cast< int >( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale()
+  );
 }
 
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &result )

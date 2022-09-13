@@ -165,6 +165,7 @@ class KadasApplication : public QgsApplication
     void cleanup();
     void updateWmtsZoomResolutions() const;
     void unsetMapToolOnSave();
+    void extentChanged();
 };
 
 #endif // KADASAPPLICATION_H
