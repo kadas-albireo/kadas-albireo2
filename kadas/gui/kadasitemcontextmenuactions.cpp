@@ -54,7 +54,7 @@ KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, 
   }
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasItemContextMenuActions::cutItem );
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasItemContextMenuActions::copyItem );
-  menu->addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasItemContextMenuActions::deleteItem );
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, [this] { deleteItem(); } );
 }
 
 void KadasItemContextMenuActions::copyItem()
@@ -65,17 +65,26 @@ void KadasItemContextMenuActions::copyItem()
 void KadasItemContextMenuActions::cutItem()
 {
   copyItem();
-  deleteItem();
+  deleteItem( true );
 }
 
-void KadasItemContextMenuActions::deleteItem()
+void KadasItemContextMenuActions::deleteItem( bool preventAttachmentCleanup )
 {
   if ( mLayerItemId != KadasItemLayer::ITEM_ID_NULL )
   {
-    delete mLayer->takeItem( mLayerItemId );
+    KadasMapItem *item = mLayer->takeItem( mLayerItemId );
+    if ( preventAttachmentCleanup )
+    {
+      item->preventAttachmentCleanup();
+    }
+    delete item;
   }
   else
   {
+    if ( preventAttachmentCleanup )
+    {
+      mItem->preventAttachmentCleanup();
+    }
     delete mItem;
   }
   mItem = nullptr;

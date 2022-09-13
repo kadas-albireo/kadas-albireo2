@@ -394,6 +394,8 @@ Trigger a redraw */
     QDomElement writeXml( QDomDocument &document ) const;
     static KadasMapItem *fromXml( const QDomElement &element );
 
+    void preventAttachmentCleanup();
+
   signals:
     void aboutToBeDestroyed();
     void changed();

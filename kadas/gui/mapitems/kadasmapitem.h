@@ -419,6 +419,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QDomElement writeXml( QDomDocument &document ) const;
     static KadasMapItem *fromXml( const QDomElement &element );
 
+    void preventAttachmentCleanup()
+    {
+      mDontCleanupAttachment = true;
+    }
+
   signals:
     void aboutToBeDestroyed();
     void changed();
@@ -450,6 +455,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
   private:
     QString mEditor;
+    bool mDontCleanupAttachment = false;
 
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };

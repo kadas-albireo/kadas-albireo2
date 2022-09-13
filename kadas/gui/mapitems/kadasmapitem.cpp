@@ -270,7 +270,7 @@ double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
 
 void KadasMapItem::cleanupAttachment( const QString &filePath ) const
 {
-  if ( !filePath.isEmpty() && QgsProject::instance()->pathResolver().writePath( filePath ).startsWith( "attachment:" ) )
+  if ( !mDontCleanupAttachment && !filePath.isEmpty() && QgsProject::instance()->pathResolver().writePath( filePath ).startsWith( "attachment:" ) )
   {
     QgsProject::instance()->removeAttachedFile( filePath );
   }
