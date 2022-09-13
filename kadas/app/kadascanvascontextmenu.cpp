@@ -49,8 +49,11 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     geomType = QgsWkbTypes::geometryType( mPickResult.geom->wkbType() );
   }
 
-  addAction( QgsApplication::getThemeIcon( "/mActionIdentify.svg" ), tr( "Identify" ), this, SLOT( identify() ) );
-  addSeparator();
+  if ( !pickedItem )
+  {
+    addAction( QgsApplication::getThemeIcon( "/mActionIdentify.svg" ), tr( "Identify" ), this, SLOT( identify() ) );
+    addSeparator();
+  }
 
   if ( pickedItem )
   {
