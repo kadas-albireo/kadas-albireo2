@@ -421,7 +421,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
       {
-        QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << tr( "Band %1" ).arg( resultIt.key() ) << QString::number( resultIt.value().toInt() ) );
+        QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << tr( "Band %1" ).arg( resultIt.key() ) << resultIt.value().toString() );
         mLayerTreeItemMap[rLayer->id()]->addChild( item );
       }
       break;
