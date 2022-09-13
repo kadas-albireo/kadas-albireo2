@@ -55,6 +55,7 @@
 #include <qgis/qgssublayersdialog.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectortilelayer.h>
+#include <qgis/qgsvectortilelayerproperties.h>
 #include <qgis/qgsvectorlayerproperties.h>
 #include <qgis/qgszipitem.h>
 #include <qgis/qgsziputils.h>
@@ -1309,6 +1310,11 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     {
       dialog.addPropertiesPageFactory( factory );
     }
+    dialog.exec();
+  }
+  else if ( layer->type() == QgsMapLayerType::VectorTileLayer )
+  {
+    QgsVectorTileLayerProperties dialog( static_cast<QgsVectorTileLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow()->messageBar(), mMainWindow );
     dialog.exec();
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )

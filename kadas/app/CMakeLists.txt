@@ -121,6 +121,7 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Sql
   Qt5::OpenGL
   Qt5::PrintSupport
+  Qt5::WebKitWidgets
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
   ${QGIS_CORE_LIBRARY}

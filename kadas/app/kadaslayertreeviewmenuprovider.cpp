@@ -103,7 +103,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       {
         menu->addAction( QIcon( ":/kadas/icons/info" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }
-      if ( qobject_cast<KadasPluginLayer *>( layer ) || layer->type() == QgsMapLayerType::RasterLayer || layer->type() == QgsMapLayerType::VectorLayer )
+      if ( qobject_cast<KadasPluginLayer *>( layer ) || layer->type() == QgsMapLayerType::RasterLayer || layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::VectorTileLayer )
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
       }
