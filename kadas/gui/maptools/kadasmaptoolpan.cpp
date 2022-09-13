@@ -50,7 +50,6 @@ KadasMapToolPan::KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteractio
 
 KadasMapToolPan::~KadasMapToolPan()
 {
-  mCanvas->ungrabGesture( Qt::PinchGesture );
   delete mTooltipWidget;
 }
 
