@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>725</width>
+    <width>783</width>
     <height>45</height>
    </rect>
   </property>
@@ -186,6 +186,49 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="mScaleLockButton">
+       <property name="toolTip">
+        <string>Lock scale and zoom via magnification</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/resources.qrc">
+         <normaloff>:/kadas/icons/unlocked</normaloff>:/kadas/icons/unlocked</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Magnifier:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="mMagnifierSpinBox">
+       <property name="suffix">
+        <string>%</string>
+       </property>
+       <property name="prefix">
+        <string/>
+       </property>
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>1600</number>
+       </property>
+       <property name="singleStep">
+        <number>50</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -229,6 +272,8 @@
    <header location="global">kadas/gui/kadascrsselection.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

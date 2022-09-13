@@ -193,6 +193,14 @@ void KadasMainWindow::init()
   mCRSSelectionButton->setMapCanvas( mMapCanvas );
 
   connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
+  connect( mScaleLockButton, &QToolButton::toggled, this, &KadasMainWindow::toggleScaleLock );
+  connect( mMagnifierSpinBox, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
+  connect( mMapCanvas, &QgsMapCanvas::magnificationChanged, [this]( double value )
+  {
+    mMagnifierSpinBox->blockSignals( true );
+    mMagnifierSpinBox->setValue( value * 100 );
+    mMagnifierSpinBox->blockSignals( false );
+  } );
 
   mNumericInputCheckbox->setChecked( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() );
   connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
@@ -962,6 +970,20 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
 void KadasMainWindow::setMapScale()
 {
   mMapCanvas->zoomScale( mScaleComboBox->scale() );
+}
+
+void KadasMainWindow::toggleScaleLock( bool active )
+{
+  mScaleLockButton->setIcon( active ? QgsApplication::getThemeIcon( "/locked.svg" ) : QgsApplication::getThemeIcon( "/unlocked.svg" ) );
+  mMapCanvas->setScaleLocked( mScaleLockButton->isChecked() );
+  mScaleComboBox->setEnabled( !mScaleLockButton->isChecked() );
+}
+
+void KadasMainWindow::setMapMagnifier( int value )
+{
+  mMapCanvas->blockSignals( true );
+  mMapCanvas->setMagnificationFactor( value / 100 );
+  mMapCanvas->blockSignals( false );
 }
 
 void KadasMainWindow::showScale( double scale )

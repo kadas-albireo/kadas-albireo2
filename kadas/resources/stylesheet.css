@@ -344,7 +344,9 @@ QPushButton#mRibbonbarButton:pressed
 #mStatusWidget #mDisplayCRSButton,
 #mStatusWidget #mScaleComboBox,
 #mStatusWidget #mCRSSelectionButton,
-#mStatusWidget #mGpsToolButton
+#mStatusWidget #mGpsToolButton,
+#mStatusWidget #mScaleLockButton,
+#mStatusWidget #mMagnifierSpinBox
 {
   background-color: #16171B;
   color: #FFFFFF;
