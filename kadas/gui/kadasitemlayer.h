@@ -147,6 +147,8 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
     void addItem( KadasMapItem *item SIP_TRANSFER );
+    void lowerItem( const ItemId &itemId );
+    void raiseItem( const ItemId &itemId );
     KadasMapItem *takeItem( const ItemId &itemId ) SIP_TRANSFER;
     const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const { return mItems; }
 

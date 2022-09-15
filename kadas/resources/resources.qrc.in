@@ -137,6 +137,8 @@
         <file alias="icons/texteditor/insertimage">icons/texteditor/insertimage.png</file>
         <file alias="icons/texteditor/textbold">icons/texteditor/textbold.png</file>
         <file alias="/icons/bookmark">icons/bookmark.png</file>
+        <file alias="/icons/raise">icons/raise.svg</file>
+        <file alias="/icons/lower">icons/lower.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

@@ -58,6 +58,9 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
   if ( pickedItem )
   {
     addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
+    addSeparator();
+    addAction( QIcon( ":/kadas/icons/lower" ), tr( "Lower" ), this, &KadasCanvasContextMenu::lowerItem );
+    addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
     KadasItemLayer *itemLayer = static_cast< KadasItemLayer * >( mPickResult.layer );
     mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
     mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
@@ -186,6 +189,16 @@ void KadasCanvasContextMenu::deleteItems()
 void KadasCanvasContextMenu::editItem()
 {
   mCanvas->setMapTool( new KadasMapToolEditItem( mCanvas, mPickResult.itemId, static_cast<KadasItemLayer *>( mPickResult.layer ) ) );
+}
+
+void KadasCanvasContextMenu::raiseItem()
+{
+  static_cast< KadasItemLayer * >( mPickResult.layer )->raiseItem( mPickResult.itemId );
+}
+
+void KadasCanvasContextMenu::lowerItem()
+{
+  static_cast< KadasItemLayer * >( mPickResult.layer )->lowerItem( mPickResult.itemId );
 }
 
 void KadasCanvasContextMenu::paste()

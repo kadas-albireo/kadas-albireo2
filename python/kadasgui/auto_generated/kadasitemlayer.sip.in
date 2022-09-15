@@ -130,6 +130,8 @@ class KadasItemLayer : KadasPluginLayer
     virtual QString layerTypeKey() const;
 
     void addItem( KadasMapItem *item /Transfer/ );
+    void lowerItem( const ItemId &itemId );
+    void raiseItem( const ItemId &itemId );
     KadasMapItem *takeItem( const ItemId &itemId ) /Transfer/;
     const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const;
 
