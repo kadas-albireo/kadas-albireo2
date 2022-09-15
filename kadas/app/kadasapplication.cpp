@@ -952,7 +952,6 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     QEventLoop loop;
     connect( reply, &QNetworkReply::finished, &loop, &QEventLoop::quit );
     loop.exec( QEventLoop::ExcludeUserInputEvents );
-    QTextStream( stdout ) << "xxx " << reply->request().url().toString() << " " << reply->error() << Qt::endl;
     if ( reply->error() != QNetworkReply::NoError )
     {
       QgsDebugMsg( QString( "Could not read %1" ).arg( templateUrl.toString() ) );
