@@ -983,6 +983,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
       QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
       return false;
     }
+    unzipFile.close();
     if ( projectOpen( unzipFile.fileName() ) )
     {
       QgsProject::instance()->setFileName( QString() );
