@@ -137,17 +137,6 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   grid->setMajorPen( QPen( Qt::gray ) );
   grid->attach( mPlot );
 
-  mPlotCurve = new QwtPlotCurve( tr( "Height profile" ) );
-  mPlotCurve->setRenderHint( QwtPlotItem::RenderAntialiased );
-  QPen curvePen;
-  curvePen.setColor( Qt::red );
-  curvePen.setJoinStyle( Qt::RoundJoin );
-  mPlotCurve->setPen( curvePen );
-  mPlotCurve->setBaseline( 0 );
-  mPlotCurve->setBrush( QColor( 255, 127, 127 ) );
-  mPlotCurve->attach( mPlot );
-  mPlotCurve->setData( new QwtPointSeriesData() );
-
   mPlotMarker = new PaddedPlotMarker();
   mPlotMarker->setSymbol( new QwtSymbol( QwtSymbol::Ellipse, QBrush( Qt::blue ), QPen( Qt::blue ), QSize( 5, 5 ) ) );
   mPlotMarker->setItemAttribute( QwtPlotItem::Margins );
@@ -264,9 +253,9 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
     x += mSegmentLengths[i];
   }
   int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
-  QPointF sample = mPlotCurve->data()->sample( idx );
+  QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
-  mPlotMarker->setLabel( QString::number( qRound( sample.y() ) ) );
+  mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
   mPlot->replot();
 }
 
@@ -274,9 +263,9 @@ void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 {
 
   int idx = mPlot->invTransform( QwtPlot::xBottom, pos.x() );
-  QPointF sample = mPlotCurve->data()->sample( idx );
+  QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
-  mPlotMarker->setLabel( QString::number( qRound( sample.y() ) ) );
+  mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
   mPlot->replot();
   double distance = sample.x() / double( mNSamples ) * mTotLength;
   mTool->setMarkerPos( distance );
@@ -284,8 +273,10 @@ void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 
 void KadasHeightProfileDialog::clear()
 {
-  static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->setSamples( QVector<QPointF>() );
+  mPlotSamples.clear();
   mPlotMarker->setValue( 0, 0 );
+  qDeleteAll( mPlotCurves );
+  mPlotCurves.clear();
   qDeleteAll( mLinesOfSight );
   mLinesOfSight.clear();
   qDeleteAll( mLinesOfSightRB );
@@ -361,6 +352,7 @@ void KadasHeightProfileDialog::replot()
   // Get vertical unit
   QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
   double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, vertDisplayUnit );
+  mNoDataValue = GDALGetRasterNoDataValue( band, NULL );
   mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
@@ -369,8 +361,8 @@ void KadasHeightProfileDialog::replot()
   mProgressBar->setRange( 0, mNSamples );
   mProgressBar->show();
   mCancelButton->show();
+  mPlotSamples.clear();
 
-  QVector<QPointF> samples;
   double x = 0;
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
   {
@@ -402,17 +394,32 @@ void KadasHeightProfileDialog::replot()
                                     std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
       {
         QgsDebugMsg( "Failed to read pixel values" );
-        samples.append( QPointF( samples.size(), 0 ) );
+        mPlotSamples.append( QPointF( mPlotSamples.size(), 0 ) );
       }
       else
       {
-        // Interpolate values
-        double lambdaR = row - std::floor( row );
-        double lambdaC = col - std::floor( col );
+        bool nodata = false;
+        for ( int j = 0; j < 4; ++j )
+        {
+          if ( pixValues[j] == mNoDataValue )
+          {
+            nodata = true;
+          }
+        }
+        if ( nodata )
+        {
+          mPlotSamples.append( QPointF( mPlotSamples.size(), mNoDataValue ) );
+        }
+        else
+        {
+          // Interpolate values
+          double lambdaR = row - std::floor( row );
+          double lambdaC = col - std::floor( col );
 
-        double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
-                       + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
-        samples.append( QPointF( samples.size(), value * heightConversion ) );
+          double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
+                         + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
+          mPlotSamples.append( QPointF( mPlotSamples.size(), value * heightConversion ) );
+        }
       }
       x += mTotLength / mNSamples;
     }
@@ -426,8 +433,50 @@ void KadasHeightProfileDialog::replot()
   mCancelButton->hide();
   mProgressBar->hide();
 
-  static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->setSamples( samples );
-  int nSamples = samples.size();
+  // Add separate plot curves for each contiguous set of samples without NODATA values
+  QVector<QPointF> sampleSet;
+  for ( const QPointF &p : mPlotSamples )
+  {
+    if ( p.y() == mNoDataValue )
+    {
+      if ( !sampleSet.isEmpty() )
+      {
+        QwtPlotCurve *plotCurve = new QwtPlotCurve( tr( "Height profile" ) );
+        plotCurve->setRenderHint( QwtPlotItem::RenderAntialiased );
+        QPen curvePen;
+        curvePen.setColor( Qt::red );
+        curvePen.setJoinStyle( Qt::RoundJoin );
+        plotCurve->setPen( curvePen );
+        plotCurve->setBaseline( 0 );
+        plotCurve->setBrush( QColor( 255, 127, 127 ) );
+        plotCurve->attach( mPlot );
+        plotCurve->setData( new QwtPointSeriesData( sampleSet ) );
+        mPlotCurves.append( plotCurve );
+        sampleSet.clear();
+      }
+    }
+    else
+    {
+      sampleSet.append( p );
+    }
+  }
+  if ( !sampleSet.isEmpty() )
+  {
+    QwtPlotCurve *plotCurve = new QwtPlotCurve( tr( "Height profile" ) );
+    plotCurve->setRenderHint( QwtPlotItem::RenderAntialiased );
+    QPen curvePen;
+    curvePen.setColor( Qt::red );
+    curvePen.setJoinStyle( Qt::RoundJoin );
+    plotCurve->setPen( curvePen );
+    plotCurve->setBaseline( 0 );
+    plotCurve->setBrush( QColor( 255, 127, 127 ) );
+    plotCurve->attach( mPlot );
+    plotCurve->setData( new QwtPointSeriesData( sampleSet ) );
+    mPlotCurves.append( plotCurve );
+    sampleSet.clear();
+  }
+
+  int nSamples = mPlotSamples.size();
   mPlotMarker->setValue( 0, 0 );
   mPlot->setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw( mTotLengthMeters, nSamples ) );
   double step = qPow( 10, std::floor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
@@ -448,7 +497,7 @@ void KadasHeightProfileDialog::replot()
       nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
       nodeMarker->setLineStyle( QwtPlotMarker::VLine );
       int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
-      QPointF sample = mPlotCurve->data()->sample( idx );
+      QPointF sample = mPlotSamples.at( idx );
       nodeMarker->setValue( sample );
       nodeMarker->attach( mPlot );
       mNodeMarkers.append( nodeMarker );
@@ -476,14 +525,19 @@ void KadasHeightProfileDialog::updateLineOfSight( )
     return;
   }
 
-  int nSamples = mPlotCurve->dataSize();
+  int nSamples = mPlotSamples.size();
   if ( nSamples < 2 )
   {
     mPlot->replot();
     return;
   }
 
-  QVector<QPointF> samples = static_cast<QwtPointSeriesData *>( mPlotCurve->data() )->samples();
+  // If first point is noData, don't compute any line of sight
+  if ( mPlotSamples.first().y() == mNoDataValue )
+  {
+    mPlot->replot();
+    return;
+  }
 
   QVector< QVector<QPointF> > losSampleSet;
   losSampleSet.append( QVector<QPointF>() );
@@ -496,7 +550,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   pY.reserve( nSamples );
   double earthRadius = 6370000;
   double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
-  for ( const QPointF &p : samples )
+  for ( const QPointF &p : mPlotSamples )
   {
     pX.append( p.x() / mNSamples * mTotLengthMeters );
     double hCorr = 0.87 * pX.last() * pX.last() / ( 2 * earthRadius ) * meterToDisplayUnit;
@@ -504,10 +558,13 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   }
 
   // Visibility of first point
-  double y = pY.front() + targetHeight - ( heightRelToGround ? 0 : samples.front().y() );
+  double y = pY.front() + targetHeight - ( heightRelToGround ? 0 : mPlotSamples.front().y() );
   if ( y > pY.front() )
   {
-    losSampleSet.back().append( samples.front() );
+    if ( mPlotSamples.front().y() != mNoDataValue )
+    {
+      losSampleSet.back().append( mPlotSamples.front() );
+    }
   }
   else
   {
@@ -520,7 +577,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
     QPointF p2( pX[i], pY[i] + targetHeight );
     if ( !heightRelToGround )
     {
-      p2.ry() -= samples[i].y();
+      p2.ry() -= mPlotSamples[i].y();
     }
     // For each sample position along line [p1, p2], check if y is below terrain
     // X = p1.x() + d * (p2.x() - p1.x())
@@ -541,7 +598,10 @@ void KadasHeightProfileDialog::updateLineOfSight( )
     {
       losSampleSet.append( QVector<QPointF>() );
     }
-    losSampleSet.back().append( samples[i] );
+    if ( mPlotSamples[i].y() != mNoDataValue )
+    {
+      losSampleSet.back().append( mPlotSamples[i] );
+    }
   }
 
   Qt::GlobalColor colors[] = {Qt::green, Qt::red};
@@ -581,14 +641,14 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   double observerHeight = mObserverHeightSpinBox->value();
   if ( heightRelToGround )
   {
-    observerHeight += samples.front().y();
+    observerHeight += mPlotSamples.front().y();
   }
   mLineOfSightMarker = new QwtPlotMarker();
   QwtSymbol *observerMarkerSymbol = new QwtSymbol( QwtSymbol::Pixmap );
   observerMarkerSymbol->setPixmap( QPixmap( ":/kadas/icons/observer" ) );
   observerMarkerSymbol->setPinPoint( QPointF( 0, 4 ) );
   mLineOfSightMarker->setSymbol( observerMarkerSymbol );
-  mLineOfSightMarker->setValue( QPointF( samples.front().x(), observerHeight ) );
+  mLineOfSightMarker->setValue( QPointF( mPlotSamples.front().x(), observerHeight ) );
   mLineOfSightMarker->attach( mPlot );
 
   mPlot->replot();

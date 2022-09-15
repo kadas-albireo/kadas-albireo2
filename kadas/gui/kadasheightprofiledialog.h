@@ -63,7 +63,9 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
 
     KadasMapToolHeightProfile *mTool = nullptr;
     QwtPlot *mPlot = nullptr;
-    QwtPlotCurve *mPlotCurve = nullptr;
+    QVector<QPointF> mPlotSamples;
+    double mNoDataValue = 0.;
+    QVector<QwtPlotCurve *> mPlotCurves;
     QVector<QwtPlotCurve *> mLinesOfSight;
     QVector<KadasLineItem *> mLinesOfSightRB;
     QwtPlotMarker *mPlotMarker = nullptr;
