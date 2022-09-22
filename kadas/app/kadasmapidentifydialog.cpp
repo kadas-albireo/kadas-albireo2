@@ -244,7 +244,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       if ( ( capabilities & QgsRasterDataProvider::Identify ) && format != QgsRaster::IdentifyFormatUndefined )
       {
         QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), rlayer->crs(), QgsProject::instance()->transformContext() );
-        QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), mCanvas->width(), mCanvas->height(), mCanvas->mapSettings().outputDpi() );
+        QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), 0.25 * mCanvas->width(), 0.25 * mCanvas->height(), mCanvas->mapSettings().outputDpi() );
         addRasterIdentifyResult( rlayer, result );
       }
 #endif
