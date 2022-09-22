@@ -1107,6 +1107,34 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   // Ensure WGS84 ellipsoid
   QgsProject::instance()->setEllipsoid( "WGS84" );
 
+  // Adjust current zoom to an optimal zoom resolution
+  if ( !mMainWindow->mapCanvas()->zoomResolutions().isEmpty() )
+  {
+    double mapRes = mMainWindow->mapCanvas()->mapSettings().mapUnitsPerPixel();
+    const QList<double> zoomResolutions = mMainWindow->mapCanvas()->zoomResolutions();
+    for ( int i = 0, n = zoomResolutions.size() - 1; i < n; ++i )
+    {
+      if ( qgsDoubleNear( zoomResolutions[i], mapRes, 0.0001 ) )
+      {
+        // Already at optimal resolution
+        break;
+      }
+      if ( mapRes >= zoomResolutions[i] && mapRes < zoomResolutions[i + 1] )
+      {
+        // Zoom in or out, whichever is closer
+        if ( mapRes - zoomResolutions[i] < zoomResolutions[i + 1] - mapRes )
+        {
+          mMainWindow->mapCanvas()->zoomIn();
+        }
+        else
+        {
+          mMainWindow->mapCanvas()->zoomOut();
+        }
+        break;
+      }
+    }
+  }
+
   return success;
 }
 
