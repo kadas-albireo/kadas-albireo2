@@ -110,7 +110,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, metadataUrl, detailUrl, flatten );
       QString id = categoryId + ":" + resultMap["title"].toString();
       mLayers[id] = mLayers.value( id );
-      mLayers[id][resultMap["type"].toString()] = entry;
+      mLayers[id][resultMap["type"].toString().toLower()] = entry;
     }
 
     if ( rootMap["nextStart"].toInt() >= 0 && rootMap["num"].toInt() >= 0 )
@@ -123,11 +123,22 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    QList<QString> typeOrder = {"WMTS", "WMS", "Map Service"};
+    QStringList typeOrder = {"wmts", "map service", "wms"};
+    int pos = 0;
+    for ( const QString &entry : mServicePreference.split( "," ) )
+    {
+      int index = typeOrder.indexOf( entry.toLower() );
+      if ( index != -1 )
+      {
+        typeOrder.removeAt( index );
+        typeOrder.insert( pos, entry.toLower() );
+      }
+      ++pos;
+    }
     QMap<QString, std::function<void( const ResultEntry & )>> typeHandlers;
-    typeHandlers.insert( "Map Service", [this]( const ResultEntry & entry ) { readAMSCapabilities( entry ); } );
-    typeHandlers.insert( "WMTS", [this]( const ResultEntry & entry ) { readWMTSDetail( entry ); } );
-    typeHandlers.insert( "WMS", [this]( const ResultEntry & entry ) { readWMSDetail( entry ); } );
+    typeHandlers.insert( "map service", [this]( const ResultEntry & entry ) { readAMSCapabilities( entry ); } );
+    typeHandlers.insert( "wmts", [this]( const ResultEntry & entry ) { readWMTSDetail( entry ); } );
+    typeHandlers.insert( "wms", [this]( const ResultEntry & entry ) { readWMSDetail( entry ); } );
 
     for ( const auto &layerTypeMap : mLayers )
     {
