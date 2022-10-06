@@ -258,12 +258,11 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
   QVariantList layers = rootMap["layers"].toList();
-  if ( layers.isEmpty() )
+  QString layerName;
+  if ( !layers.isEmpty() )
   {
-    endTask();
-    return;
+    layerName = layers[0].toMap()["name"].toString();
   }
-  QString layerName = layers[0].toMap()["name"].toString();
 
   QNetworkRequest req( QUrl( entry->url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
@@ -287,13 +286,21 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     QStringList imgFormats = parseWMSFormats( doc );
     QStringList parentCrs;
 
-    QDomNodeList layerItems = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).elementsByTagName( "Layer" );
     QDomElement layerItem;
-    for ( int i = 0, n = layerItems.size(); i < n; ++i )
+    if ( layerName.isEmpty() )
     {
-      if ( layerItems.at( i ).firstChildElement( "Name" ).text() == layerName )
+      layerItem = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" );
+      layerName = layerItem.firstChildElement( "Name" ).text();
+    }
+    else
+    {
+      QDomNodeList layerItems = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).elementsByTagName( "Layer" );
+      for ( int i = 0, n = layerItems.size(); i < n; ++i )
       {
-        layerItem = layerItems.at( i ).toElement();
+        if ( layerItems.at( i ).firstChildElement( "Name" ).text() == layerName )
+        {
+          layerItem = layerItems.at( i ).toElement();
+        }
       }
     }
 
