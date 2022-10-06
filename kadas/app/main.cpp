@@ -105,6 +105,5 @@ int main( int argc, char *argv[] )
   app->init();
   int status = app->exec();
   delete app;
-  delete QgsProject::instance();
   return status;
 }
