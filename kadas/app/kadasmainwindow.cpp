@@ -39,6 +39,7 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/gui/kadasbookmarksmenu.h>
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/kadascoordinatedisplayer.h>
@@ -1454,21 +1455,18 @@ void KadasMainWindow::updateBgLayerZoomResolutions() const
     }
     else if ( currentProvider->name().compare( "gdal", Qt::CaseInsensitive ) == 0 )
     {
-      QList<QgsRasterPyramid> pyramids = currentProvider->buildPyramidList();
       QgsRectangle extent = currentProvider->extent();
-      QSize size( rasterLayer->width(), rasterLayer->height() );
-      double resolution = extent.width() / size.width();
-      resolutions.append( resolution );
 
-      for ( const QgsRasterPyramid &pyramid : pyramids )
+      GDALDatasetH ds = Kadas::gdalOpenForLayer( rasterLayer );
+      GDALRasterBandH band = GDALGetRasterBand( ds, 1 );
+      int count = GDALGetOverviewCount( band );
+      for ( int i = 0; i < count; ++i )
       {
-        if ( pyramid.getExists() )
-        {
-
-          // Compute pyramid resolution
-          resolutions.append( extent.width() / pyramid.getXDim() );
-        }
+        GDALRasterBandH overview = GDALGetOverview( band, i );
+        int xDim = GDALGetRasterBandXSize( overview );
+        resolutions.append( extent.width() / xDim );
       }
+      GDALClose( ds );
     }
     if ( !resolutions.isEmpty() )
     {
