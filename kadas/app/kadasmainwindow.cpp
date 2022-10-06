@@ -282,6 +282,8 @@ void KadasMainWindow::init()
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( mMapCanvas, &QgsMapCanvas::currentLayerChanged, mLayerTreeView, &QgsLayerTreeView::setCurrentLayer );
+  connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
+  connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
   connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mMapCanvas->unsetMapTool( mMapCanvas->mapTool() ); } );   // Clear tool when changing active kadas tab
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
@@ -1391,3 +1393,77 @@ void KadasMainWindow::showAuthenticatedUser( const QString &user )
 {
   mLabelUsername->setText( user.isEmpty() ? "" : QString( "<small>%1<br />%2</small>" ).arg( tr( "Authenticated as:" ), user ) );
 }
+
+void KadasMainWindow::updateBgLayerZoomResolutions() const
+{
+  QList<double> resolutions;
+  const QList<QgsMapLayer *> layers = mMapCanvas->layers();
+  for ( auto it = layers.rbegin(), itEnd = layers.rend(); it != itEnd; ++it )
+  {
+    QgsMapLayer *layer = *it;
+
+    QgsRasterLayer *rasterLayer = dynamic_cast<QgsRasterLayer *>( layer );
+    if ( !rasterLayer )
+    {
+      continue;
+    }
+
+    QgsRasterDataProvider *currentProvider = rasterLayer->dataProvider();
+    if ( !currentProvider )
+    {
+      continue;
+    }
+
+    // layer must not be reprojected
+    if ( currentProvider->crs() != mMapCanvas->mapSettings().destinationCrs() )
+    {
+      continue;
+    }
+
+    if ( currentProvider->name().compare( "wms", Qt::CaseInsensitive ) == 0 )
+    {
+      //property 'resolutions' for wmts layers
+      resolutions = rasterLayer->dataProvider()->nativeResolutions();
+    }
+    else if ( currentProvider->name().compare( "gdal", Qt::CaseInsensitive ) == 0 )
+    {
+      QList<QgsRasterPyramid> pyramids = currentProvider->buildPyramidList();
+      QgsRectangle extent = currentProvider->extent();
+      QSize size( rasterLayer->width(), rasterLayer->height() );
+      double resolution = extent.width() / size.width();
+      resolutions.append( resolution );
+
+      for ( const QgsRasterPyramid &pyramid : pyramids )
+      {
+        if ( pyramid.getExists() )
+        {
+
+          // Compute pyramid resolution
+          resolutions.append( extent.width() / pyramid.getXDim() );
+        }
+      }
+    }
+    if ( !resolutions.isEmpty() )
+    {
+      break;
+    }
+  }
+  if ( !resolutions.isEmpty() )
+  {
+    mMapCanvas->setZoomResolutions( resolutions );
+
+    QStringList scales;
+    double refRes = 0.0254 / mMapCanvas->mapSettings().outputDpi();
+    for ( double resolution : resolutions )
+    {
+      double scale = resolution / refRes;
+      scales.append( QgsScaleComboBox::toString( scale ) );
+    }
+    mScaleComboBox->updateScales( scales );
+  }
+  else
+  {
+    mScaleComboBox->updateScales( QStringList() ); // default scales
+  }
+}
+

@@ -163,7 +163,6 @@ class KadasApplication : public QgsApplication
     void showCanvasContextMenu( const QPoint &screenPos, const QgsPointXY &mapPos );
     void updateWindowTitle();
     void cleanup();
-    void updateBgLayerZoomResolutions() const;
     void unsetMapToolOnSave();
     void extentChanged();
 };
