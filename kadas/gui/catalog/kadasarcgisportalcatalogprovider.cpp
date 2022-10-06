@@ -311,7 +311,7 @@ void KadasArcGisPortalCatalogProvider::readWMSSublayers( const QDomElement &laye
     sublayer["id"] = layerId;
     sublayer["parentLayerId"] = parentName;
     sublayer["name"] = subLayerItem.firstChildElement( "Title" ).text();
-    sublayers.append( sublayer );
+    sublayers.prepend( sublayer );
     readWMSSublayers( subLayerItem.toElement(), layerId, sublayers );
   }
 }
