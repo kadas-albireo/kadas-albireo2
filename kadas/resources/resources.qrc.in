@@ -2,6 +2,7 @@
     <qresource prefix="/kadas">
         <file alias="icons/layertree">icons/layertree.png</file>
         <file alias="icons/new">icons/new.png</file>
+        <file alias="icons/letter">icons/letter.png</file>
         <file alias="icons/gps_sync">icons/gps_sync.png</file>
         <file alias="icons/open">icons/open.png</file>
         <file alias="icons/grid">icons/grid.png</file>

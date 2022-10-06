@@ -83,6 +83,7 @@
 #include <kadas/app/kadaslayoutdesignermanager.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmessagelogviewer.h>
+#include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
 #include <kadas/app/kadasprojectmigration.h>
 #include <kadas/app/kadaspythonintegration.h>
@@ -365,6 +366,9 @@ void KadasApplication::init()
   {
     loadStartupProject();
   }
+
+  // Show news popup
+  KadasNewsPopup::showIfNewsAvailable();
 }
 
 void KadasApplication::extractPortalToken()

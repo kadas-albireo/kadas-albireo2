@@ -2022,6 +2022,31 @@ Sight</string>
            </widget>
           </item>
           <item>
+           <widget class="KadasRibbonButton" name="mNewsletterButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Newsletter</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -2532,6 +2557,18 @@ Sight</string>
    </property>
    <property name="toolTip">
     <string>Bookmarks</string>
+   </property>
+  </action>
+  <action name="mActionNewsletter">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/letter</normaloff>:/kadas/icons/letter</iconset>
+   </property>
+   <property name="text">
+    <string>Newsletter</string>
+   </property>
+   <property name="toolTip">
+    <string>Newsletter</string>
    </property>
   </action>
  </widget>

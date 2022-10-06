@@ -79,6 +79,7 @@
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
+#include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
@@ -708,6 +709,15 @@ void KadasMainWindow::configureButtons()
   //help tab
   setActionToButton( mActionHelp, mHelpButton );
   setActionToButton( mActionAbout, mAboutButton );
+  if ( KadasNewsPopup::isConfigured() )
+  {
+    setActionToButton( mActionNewsletter, mNewsletterButton );
+    connect( mActionNewsletter, &QAction::triggered, this, &KadasMainWindow::showNewsletter );
+  }
+  else
+  {
+    mNewsletterButton->hide();
+  }
 }
 
 void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut, const std::function<QgsMapTool*() > &toolFactory )
@@ -1482,5 +1492,10 @@ void KadasMainWindow::updateBgLayerZoomResolutions() const
   {
     mScaleComboBox->updateScales( QStringList() ); // default scales
   }
+}
+
+void KadasMainWindow::showNewsletter()
+{
+  KadasNewsPopup::showIfNewsAvailable( true );
 }
 
