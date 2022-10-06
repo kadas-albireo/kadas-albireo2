@@ -22,6 +22,8 @@
 #include <QShortcut>
 #include <QUrlQuery>
 
+#include <gdal.h>
+
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
@@ -520,6 +522,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       {"jp2", "j2w"},
       {"png", "pgw"},
       {"tif", "tfw"},
+      {"tiff", "tfw"}
     };
 
     for ( const QUrl &url : event->mimeData()->urls() )
@@ -541,6 +544,18 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
         {
           addAsMapItem = false;
         }
+      }
+      // Don't add as map item if file is a geotiff with georeferencing
+      if ( suffix.startsWith( "tif" ) )
+      {
+        GDALDatasetH ds = GDALOpen( fileName.toUtf8().data(), GA_ReadOnly );
+        double gtrans[6] = {};
+        CPLErr err = GDALGetGeoTransform( ds, gtrans );
+        if ( err == CE_None )
+        {
+          addAsMapItem = false;
+        }
+        GDALClose( ds );
       }
       if ( addAsMapItem )
       {
