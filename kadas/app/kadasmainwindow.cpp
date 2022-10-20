@@ -1374,7 +1374,7 @@ void KadasMainWindow::addRemotePicture()
       continue;
     }
 
-    QTemporaryFile tempfile( QFileInfo( url ).fileName() );
+    QTemporaryFile tempfile( QDir::temp().absoluteFilePath( QFileInfo( url ).fileName() ) );
     tempfile.setAutoRemove( true );
     if ( !tempfile.open() )
     {
@@ -1384,6 +1384,7 @@ void KadasMainWindow::addRemotePicture()
     }
 
     tempfile.write( reply->readAll() );
+    tempfile.flush();
 
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( tempfile.fileName() );
     mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
