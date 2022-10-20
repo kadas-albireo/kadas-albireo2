@@ -879,7 +879,6 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
   QFile( attachedPath ).remove();
   QFile( filename ).copy( attachedPath );
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-  QString errMsg;
   QgsCoordinateReferenceSystem crs( "EPSG:3857" );
   QgsCoordinateTransform crst( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );
   if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
