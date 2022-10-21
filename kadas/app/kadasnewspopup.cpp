@@ -17,6 +17,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QCheckBox>
 #include <QFrame>
@@ -29,6 +30,33 @@
 #include <kadas/app/kadasnewspopup.h>
 
 KadasNewsPopup *KadasNewsPopup::sInstance = nullptr;
+
+
+class ExternalLinkDelegateWebView : public QWebView
+{
+  public:
+    ExternalLinkDelegateWebView( QWidget *parent = nullptr ) : QWebView( parent )
+    {
+      connect( this, &QWebView::urlChanged, this, &ExternalLinkDelegateWebView::openUrlInExternalBrowserAndDestory );
+    }
+  private:
+    void openUrlInExternalBrowserAndDestory( const QUrl &url )
+    {
+      QDesktopServices::openUrl( url );
+      deleteLater();
+    }
+};
+
+class KadasNewsWebView : public QWebView
+{
+    using QWebView::QWebView;
+
+  protected:
+    QWebView *createWindow( QWebPage::WebWindowType type ) override
+    {
+      return new ExternalLinkDelegateWebView( this );
+    }
+};
 
 bool KadasNewsPopup::isConfigured()
 {
@@ -116,7 +144,7 @@ KadasNewsPopup::KadasNewsPopup( const QString &url, const QString &version )
   frame->layout()->setContentsMargins( 0, 0, 0, 0 );
   layout()->addWidget( frame );
 
-  QWebView *webView = new QWebView();
+  KadasNewsWebView *webView = new KadasNewsWebView();
   webView->load( QUrl( url ) );
   webView->settings()->setAttribute( QWebSettings::JavascriptCanOpenWindows, true );
   webView->settings()->setAttribute( QWebSettings::JavascriptCanAccessClipboard, true );
