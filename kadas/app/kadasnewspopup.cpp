@@ -53,9 +53,31 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
     QVariantList results = rootMap["results"].toList();
     if ( !results.isEmpty() )
     {
-      QVariantMap result = results[0].toMap();
-      QVariantList tags = result["tags"].toList();
-      QString url = result["url"].toString();
+      QVariantMap chosenResult = results[0].toMap();
+      QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+      QString langTag = "lang:" + lang;
+      // Search result matching the current lang
+      for ( const QVariant &result : results )
+      {
+        bool found = false;
+        for ( const QVariant &tag : result.toMap()["tags"].toList() )
+        {
+          if ( tag.toString() == langTag )
+          {
+            chosenResult = result.toMap();
+            found = true;
+            break;
+          }
+          if ( found )
+          {
+            break;
+          }
+        }
+      }
+
+      // Read version and URL for chosen result
+      QVariantList tags = chosenResult["tags"].toList();
+      QString url = chosenResult["url"].toString();
       QString version;
       for ( const QVariant &tag : tags )
       {
