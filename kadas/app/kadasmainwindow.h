@@ -56,6 +56,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QgsLayerTreeView *layerTreeView() const { return mLayerTreeView; }
     QgsLayerTreeMapCanvasBridge *layerTreeMapCanvasBridge() const { return mLayerTreeCanvasBridge; }
     KadasMapWidgetManager *mapWidgetManager() const { return mMapWidgetManager; }
+    void resetMagnification() { mMagnifierSpinBox->clear(); }
     int messageTimeout() const;
 
     QWidget *addRibbonTab( const QString &name );

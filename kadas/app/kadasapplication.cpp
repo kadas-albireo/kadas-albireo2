@@ -1163,6 +1163,7 @@ void KadasApplication::projectClose()
   onActiveLayerChanged( currentLayer() );
 
   mMainWindow->mapWidgetManager()->clearMapWidgets();
+  mMainWindow->resetMagnification();
 
   KadasMapCanvasItemManager::clear();
 
