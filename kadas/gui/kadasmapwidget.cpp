@@ -126,6 +126,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
 KadasMapWidget::~KadasMapWidget()
 {
+  mMapCanvas->cancelJobs();
   emit aboutToBeDestroyed();
 }
 

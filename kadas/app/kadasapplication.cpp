@@ -82,6 +82,7 @@
 #include <kadas/app/kadaspluginlayerproperties.h>
 #include <kadas/app/kadaslayoutdesignermanager.h>
 #include <kadas/app/kadasmainwindow.h>
+#include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
@@ -1149,24 +1150,23 @@ void KadasApplication::projectClose()
 
   unsetMapTool();
 
-  // Avoid unnecessary layer changed handling for each layer removed - instead,
-  // defer the handling until we've removed all layers
-  mBlockActiveLayerChanged = true;
-  QgsProject::instance()->clear();
-  mBlockActiveLayerChanged = false;
 
   KadasLayoutDesignerManager::instance()->closeAllDesigners();
 
-  mMainWindow->mapCanvas()->clearExtentHistory();
-
-  KadasMapCanvasItemManager::clear();
-
   // clear out any stuff from project
+  mMainWindow->mapCanvas()->cancelJobs();
   mMainWindow->mapCanvas()->setLayers( QList<QgsMapLayer *>() );
   mMainWindow->mapCanvas()->clearCache();
+  mMainWindow->mapCanvas()->clearExtentHistory();
   mMainWindow->mapCanvas()->freeze( false );
 
   onActiveLayerChanged( currentLayer() );
+
+  mMainWindow->mapWidgetManager()->clearMapWidgets();
+
+  KadasMapCanvasItemManager::clear();
+
+  QgsProject::instance()->clear();
 }
 
 bool KadasApplication::projectSaveDirty()
