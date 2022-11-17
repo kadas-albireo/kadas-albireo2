@@ -34,7 +34,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
     Renderer( KadasItemLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id() )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mLayer( layer )
       , mRendererContext( rendererContext )
     {}
