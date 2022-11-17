@@ -139,8 +139,12 @@ void KadasMapWidgetManager::removeMapWidget( const QString &id )
 
 void KadasMapWidgetManager::clearMapWidgets()
 {
-  qDeleteAll( mMapWidgets );
-  mMapWidgets.clear();
+  while ( !mMapWidgets.isEmpty() )
+  {
+    KadasMapWidget *mapWidget = mMapWidgets.takeAt( 0 );
+    disconnect( mapWidget, &KadasMapWidget::aboutToBeDestroyed, this, &KadasMapWidgetManager::mapWidgetDestroyed );
+    delete mapWidget;
+  }
 }
 
 void KadasMapWidgetManager::mapWidgetDestroyed()
