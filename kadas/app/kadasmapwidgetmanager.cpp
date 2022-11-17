@@ -99,11 +99,11 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
   }
   if ( addArea == Qt::RightDockWidgetArea )
   {
-    mapWidget->setFixedHeight( initialSize.height() ); // fixed size unfixed in KadasMapWidget::showEvent
+    mapWidget->widget()->resize( mapWidget->widget()->width(), initialSize.height() );
   }
   else
   {
-    mapWidget->setFixedWidth( initialSize.width() ); // fixed size unfixed in KadasMapWidget::showEvent
+    mapWidget->widget()->resize( initialSize.width(), mapWidget->widget()->width() );
   }
   mMainWindow->addDockWidget( addArea, mapWidget );
   if ( addArea == Qt::RightDockWidgetArea )
@@ -168,8 +168,8 @@ void KadasMapWidgetManager::writeProjectSettings( QDomDocument &doc )
     QDataStream ds( &ba, QIODevice::WriteOnly );
 
     QDomElement mapWidgetItemElem = doc.createElement( "MapView" );
-    mapWidgetItemElem.setAttribute( "width", mapWidget->width() );
-    mapWidgetItemElem.setAttribute( "height", mapWidget->height() );
+    mapWidgetItemElem.setAttribute( "width", mapWidget->widget()->width() );
+    mapWidgetItemElem.setAttribute( "height", mapWidget->widget()->height() );
     mapWidgetItemElem.setAttribute( "floating", mapWidget->isFloating() );
     mapWidgetItemElem.setAttribute( "islocked", mapWidget->getLocked() );
     mapWidgetItemElem.setAttribute( "area", mMainWindow->dockWidgetArea( mapWidget ) );
@@ -221,8 +221,12 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
       bool islocked = attributes.namedItem( "islocked" ).nodeValue().toInt();
       mapWidget->setLocked( islocked );
       mapWidget->setFloating( attributes.namedItem( "floating" ).nodeValue().toInt() );
-      mapWidget->setFixedWidth( attributes.namedItem( "width" ).nodeValue().toInt() );
-      mapWidget->setFixedHeight( attributes.namedItem( "height" ).nodeValue().toInt() );
+      mapWidget->widget()->setFixedSize(
+        QSize(
+          attributes.namedItem( "width" ).nodeValue().toInt(),
+          attributes.namedItem( "height" ).nodeValue().toInt()
+        )
+      );
       ba = QByteArray::fromBase64( attributes.namedItem( "extent" ).nodeValue().toLocal8Bit() );
       QRectF extent;
       ds >> extent;

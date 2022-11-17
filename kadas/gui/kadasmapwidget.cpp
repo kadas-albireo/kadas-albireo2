@@ -39,8 +39,6 @@
 KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
   : QDockWidget( parent ), mNumber( number ), mId( id ), mMasterCanvas( masterCanvas )
 {
-  QgsSettings settings;
-
   mLayerSelectionButton = new QToolButton( this );
   mLayerSelectionButton->setAutoRaise( true );
   mLayerSelectionButton->setText( tr( "Layers" ) );
@@ -285,8 +283,8 @@ void KadasMapWidget::showEvent( QShowEvent * )
   {
     // Clear previously set fixed size - which was just used to enforce the initial dimensions...
     mUnsetFixedSize = false;
-    setMinimumSize( 100, 100 );
-    setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
+    widget()->setMinimumSize( 0, 0 );
+    widget()->setMaximumSize( QWIDGETSIZE_MAX, QWIDGETSIZE_MAX );
   }
 }
 
