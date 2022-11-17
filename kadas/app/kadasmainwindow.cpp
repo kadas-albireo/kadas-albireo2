@@ -196,10 +196,18 @@ void KadasMainWindow::init()
 
   mCoordinateDisplayer = new KadasCoordinateDisplayer( mDisplayCRSButton, mCoordinateLineEdit, mHeightLineEdit, mHeightUnitCombo, mMapCanvas, this );
   mCRSSelectionButton->setMapCanvas( mMapCanvas );
+  mMagnifierSpinBox->setDecimals( 0 );
+  mMagnifierSpinBox->setRange( 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MIN, 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MAX );
+  mMagnifierSpinBox->setValue( 100 );
+  mMagnifierSpinBox->setWrapping( false );
+  mMagnifierSpinBox->setSingleStep( 10 );
+  mMagnifierSpinBox->setToolTip( tr( "Magnifier level" ) );
+  mMagnifierSpinBox->setClearValueMode( QgsDoubleSpinBox::CustomValue );
+  mMagnifierSpinBox->setClearValue( 100 * QgsSettings().value( QStringLiteral( "qgis/magnifier_factor_default" ), 1.0 ).toDouble() );
 
   connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
   connect( mScaleLockButton, &QToolButton::toggled, this, &KadasMainWindow::toggleScaleLock );
-  connect( mMagnifierSpinBox, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
+  connect( mMagnifierSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
   connect( mMapCanvas, &QgsMapCanvas::magnificationChanged, [this]( double value )
   {
     mMagnifierSpinBox->blockSignals( true );
@@ -1014,10 +1022,10 @@ void KadasMainWindow::toggleScaleLock( bool active )
   mScaleComboBox->setEnabled( !mScaleLockButton->isChecked() );
 }
 
-void KadasMainWindow::setMapMagnifier( int value )
+void KadasMainWindow::setMapMagnifier( double value )
 {
   mMapCanvas->blockSignals( true );
-  mMapCanvas->setMagnificationFactor( value / 100 );
+  mMapCanvas->setMagnificationFactor( value / 100. );
   mMapCanvas->blockSignals( false );
 }
 

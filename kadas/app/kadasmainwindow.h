@@ -126,7 +126,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void onNumericInputCheckboxToggled( bool checked );
     void onSnappingChanged( bool enabled );
     void setMapScale();
-    void setMapMagnifier( int val );
+    void setMapMagnifier( double val );
     void toggleScaleLock( bool active );
     void showFavoriteContextMenu( const QPoint &p );
     void showProjectSelectionWidget();

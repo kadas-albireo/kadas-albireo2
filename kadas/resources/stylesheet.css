@@ -349,6 +349,16 @@ QPushButton#mRibbonbarButton:pressed
   border-radius: 2px;
 }
 
+#mStatusWidget #mMagnifierSpinBox:up-button
+{
+  image: url(:/kadas/icons/uparrow);
+}
+
+#mStatusWidget #mMagnifierSpinBox:down-button
+{
+  image: url(:/kadas/icons/downarrow);
+}
+
 #mStatusWidget #mGpsToolButton:checked
 {
     background: black;
