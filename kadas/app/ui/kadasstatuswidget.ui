@@ -184,6 +184,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumContentsLength">
+        <number>14</number>
+       </property>
       </widget>
      </item>
      <item>
