@@ -78,7 +78,6 @@ void KadasSearchBox::init( QgsMapCanvas *canvas )
 {
   mMapCanvas = canvas;
   mNumRunningProviders = 0;
-  mPin = nullptr;
   mFilterTool = nullptr;
 
   mSearchBox = new LineEdit( this );
@@ -582,8 +581,7 @@ void KadasSearchBox::clearPin()
   if ( mPin )
   {
     KadasMapCanvasItemManager::removeItem( mPin );
-    delete mPin;
-    mPin = nullptr;
+    delete mPin.data();
   }
 }
 

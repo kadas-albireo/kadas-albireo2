@@ -65,7 +65,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
     static const int sResultDataRole;
 
     QgsMapCanvas *mMapCanvas;
-    KadasSymbolItem *mPin = nullptr;
+    QPointer<KadasSymbolItem> mPin;
     KadasGeometryItem *mGeometry = nullptr;
     KadasMapToolCreateItem *mFilterTool = nullptr;
     KadasGeometryItem *mFilterItem = nullptr;
