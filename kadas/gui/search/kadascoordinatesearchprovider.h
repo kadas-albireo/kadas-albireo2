@@ -37,6 +37,7 @@ class KADAS_GUI_EXPORT KadasCoordinateSearchProvider : public KadasSearchProvide
     QRegExp mPatMGRS;
 
     static const QString sCategoryName;
+    double parseNumber( const QString &string ) const;
 };
 
 #endif // KADASCOORDINATESEARCHPROVIDER_H
