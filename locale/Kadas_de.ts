@@ -506,12 +506,12 @@
     <message>
         <location filename="../kadas/app/kadascanvascontextmenu.cpp" line="62"/>
         <source>Lower</source>
-        <translation>Nach hinten versetzten</translation>
+        <translation>Nach hinten versetzen</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadascanvascontextmenu.cpp" line="63"/>
         <source>Raise</source>
-        <translation>Nach vorne versetzten</translation>
+        <translation>Nach vorne versetzen</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadascanvascontextmenu.cpp" line="86"/>
