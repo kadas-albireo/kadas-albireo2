@@ -253,8 +253,8 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     {
       QgsVectorLayer *vlayer = static_cast<QgsVectorLayer *>( layer );
       if ( vlayer->hasScaleBasedVisibility() &&
-           ( vlayer->minimumScale() > mCanvas->mapSettings().scale() ||
-             vlayer->maximumScale() <= mCanvas->mapSettings().scale() ) )
+           ( vlayer->maximumScale() > mCanvas->mapSettings().scale() ||
+             vlayer->minimumScale() <= mCanvas->mapSettings().scale() ) )
       {
         continue;
       }
