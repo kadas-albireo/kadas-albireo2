@@ -19,6 +19,7 @@
 
 #include <QObject>
 #include <osg/ref_ptr>
+#include <osg/Camera>
 #include <osgEarth/Version>
 
 #include <kadas/app/globe/kadasglobedialog.h>
@@ -66,6 +67,7 @@ class KadasGlobeIntegration : public QObject
 
   public slots:
     void syncExtent();
+    void takeScreenshot();
 
   signals:
     void xyCoordinates( const QgsPointXY &p );
@@ -89,6 +91,7 @@ class KadasGlobeIntegration : public QObject
     osg::ref_ptr<osgEarth::ImageLayer> mBaseLayer;
     osg::ref_ptr<osgEarth::Util::VerticalScale> mVerticalScale;
     osg::ref_ptr<osgEarth::Util::Controls::LabelControl> mStatsLabel;
+    QList<osg::ref_ptr<osgEarth::Util::Controls::Control>> mImageControls;
 
     void addControl( osgEarth::Util::Controls::Control *control, int x, int y, int w, int h, osgEarth::Util::Controls::ControlEventHandler *handler );
     void addImageControl( const std::string &imgPath, int x, int y, osgEarth::Util::Controls::ControlEventHandler *handler = 0 );
@@ -104,6 +107,22 @@ class KadasGlobeIntegration : public QObject
     void setGlobeEnabled( bool enabled );
     void showSettings();
     void updateTileStats( int queued, int tot );
+};
+
+class FinalDrawCallback : public QObject, public osg::Camera::DrawCallback
+{
+    Q_OBJECT
+  public:
+    void operator()( osg::RenderInfo &renderInfo ) const override
+    {
+      const_cast<FinalDrawCallback *>( this )->emitDone();
+    }
+    void emitDone()
+    {
+      emit done();
+    }
+  signals:
+    void done();
 };
 
 #endif // KADASGLOBEINTEGRATION_H

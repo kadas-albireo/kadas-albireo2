@@ -18,6 +18,7 @@
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmessagebar.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
@@ -109,6 +110,7 @@ void KadasGlobeIntegration::reset()
     mDockWidget = nullptr;
     mImagerySources.clear();
     mElevationSources.clear();
+    mImageControls.clear();
 #ifdef GLOBE_SHOW_TILE_STATS
     disconnect( KadasGlobeTileStatistics::instance(), &KadasGlobeTileStatistics::changed, this, &KadasGlobeIntegration::updateTileStats );
     delete KadasGlobeTileStatistics::instance();
@@ -151,6 +153,7 @@ void KadasGlobeIntegration::run()
   connect( mDockWidget, &KadasGlobeWidget::showSettings, this, &KadasGlobeIntegration::showSettings );
   connect( mDockWidget, &KadasGlobeWidget::refresh, mProjectLayerManager, [this] { mMapNode->getTerrainEngine()->dirtyTerrain(); } );
   connect( mDockWidget, &KadasGlobeWidget::syncExtent, this, &KadasGlobeIntegration::syncExtent );
+  connect( mDockWidget, &KadasGlobeWidget::takeScreenshot, this, &KadasGlobeIntegration::takeScreenshot );
 
   QString cacheDirectory = settings.value( "cache/directory" ).toString();
   if ( cacheDirectory.isEmpty() )
@@ -256,6 +259,7 @@ void KadasGlobeIntegration::addImageControl( const std::string &imgPath, int x, 
   if ( handler )
     control->addEventHandler( handler );
   osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control );
+  mImageControls.append( osg::ref_ptr<osgEarth::Util::Controls::Control>( control ) );
 }
 
 void KadasGlobeIntegration::applySettings()
@@ -477,6 +481,33 @@ void KadasGlobeIntegration::syncExtent()
   manip->setRotation( osg::Quat() );
   manip->setViewpoint( viewpoint, 4.0 );
   mOsgViewer->requestRedraw();
+}
+
+void KadasGlobeIntegration::takeScreenshot()
+{
+  QPair< QString, QString> fileAndFilter = QgsGuiUtils::getSaveAsImageName( kApp->mainWindow(), tr( "Choose an Image File" ) );
+  if ( fileAndFilter.first.isEmpty() )
+  {
+    return;
+  }
+  for ( auto control : mImageControls )
+  {
+    osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->removeControl( control );
+  }
+  osg::ref_ptr<FinalDrawCallback> callback = new FinalDrawCallback();
+  mOsgViewer->getCamera()->addFinalDrawCallback( callback );
+  QEventLoop loop;
+  connect( callback, &FinalDrawCallback::done, &loop, &QEventLoop::quit );
+  mOsgViewer->frame();
+  loop.exec( QEventLoop::ExcludeUserInputEvents );
+  mOsgViewer->getCamera()->removeFinalDrawCallback( callback );
+  mViewerWidget->grabFrameBuffer().save( fileAndFilter.first );
+  for ( auto control : mImageControls )
+  {
+    osgEarth::Util::Controls::ControlCanvas::get( mOsgViewer )->addControl( control.get() );
+  }
+  mOsgViewer->frame();
+  kApp->mainWindow()->messageBar()->pushMessage( tr( "Image saved to %1" ).arg( QFileInfo( fileAndFilter.first ).fileName() ), QString(), Qgis::Info, kApp->mainWindow()->messageTimeout() );
 }
 
 void KadasGlobeIntegration::setupControls()

@@ -58,6 +58,13 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   refreshButton->setIconSize( QSize( 16, 16 ) );
   connect( refreshButton, &QToolButton::clicked, this, &KadasGlobeWidget::refresh );
 
+  QToolButton *screenshotButton = new QToolButton( this );
+  screenshotButton->setAutoRaise( true );
+  screenshotButton->setToolTip( tr( "Screenshot" ) );
+  screenshotButton->setIcon( QIcon( ":/kadas/icons/camera" ) );
+  screenshotButton->setIconSize( QSize( 16, 16 ) );
+  connect( screenshotButton, &QToolButton::clicked, this, &KadasGlobeWidget::takeScreenshot );
+
   QToolButton *settingsButton = new QToolButton( this );
   settingsButton->setAutoRaise( true );
   settingsButton->setToolTip( tr( "Globe settings" ) );
@@ -78,6 +85,7 @@ KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )
   titleWidget->layout()->addWidget( layerSelectionButton );
   titleWidget->layout()->addWidget( syncButton );
   titleWidget->layout()->addWidget( refreshButton );
+  titleWidget->layout()->addWidget( screenshotButton );
   titleWidget->layout()->addWidget( settingsButton );
   static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 ); // spacer
   titleWidget->layout()->addWidget( new QLabel( tr( "Globe" ) ) );

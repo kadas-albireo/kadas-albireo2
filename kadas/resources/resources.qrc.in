@@ -140,6 +140,7 @@
         <file alias="/icons/bookmark">icons/bookmark.png</file>
         <file alias="/icons/raise">icons/raise.svg</file>
         <file alias="/icons/lower">icons/lower.svg</file>
+        <file alias="/icons/camera">icons/camera.png</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

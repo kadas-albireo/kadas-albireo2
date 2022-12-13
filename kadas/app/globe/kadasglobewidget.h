@@ -32,6 +32,7 @@ class KadasGlobeWidget : public QDockWidget
     void layersChanged();
     void showSettings();
     void refresh();
+    void takeScreenshot();
     void syncExtent();
 
   private:
