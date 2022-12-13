@@ -44,6 +44,10 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kml/kadaskmlimport.h>
 
+#ifdef WITH_GLOBE
+#include <kadas/app/globe/kadasglobevectorlayerproperties.h>
+#endif
+
 
 bool KadasKMLImport::importFile( const QString &filename, QString &errMsg )
 {
@@ -205,6 +209,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           KadasGeometryItem::IconType iconType = static_cast<KadasGeometryItem::IconType>( attributes.value( "icon_type" ).toInt() );
           Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
           Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
+          bool hasZ = false;
 
           if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
           {
@@ -229,6 +234,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->setIconOutline( QPen( style.outlineColor, style.outlineSize / 4, outlineStyle ) );
             item->setIconFill( QBrush( style.fillColor, fillStyle ) );
             itemLayer->addItem( item );
+            hasZ = geom->wkbType() == QgsWkbTypes::PointZ;
           }
           else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
           {
@@ -237,6 +243,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->addPartFromGeometry( *geom );
             item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
             itemLayer->addItem( item );
+            hasZ = geom->wkbType() == QgsWkbTypes::LineStringZ;
           }
           else if ( dynamic_cast<QgsPolygon *>( geom ) || dynamic_cast<QgsMultiPolygon *>( geom ) )
           {
@@ -246,7 +253,17 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
             item->setFill( QBrush( style.fillColor, fillStyle ) );
             itemLayer->addItem( item );
+            hasZ = geom->wkbType() == QgsWkbTypes::PolygonZ;
           }
+
+#ifdef WITH_GLOBE
+          if ( hasZ )
+          {
+            KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( itemLayer );
+            config->renderingMode = KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced;
+            config->altitudeTechnique = osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_GPU;
+          }
+#endif
         }
         qDeleteAll( geoms );
       }
