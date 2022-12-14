@@ -52,7 +52,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
           // Skip symbols
           continue;
         }
-        symbols.append( item->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !mLayer->mIsApproved, dpiScale ) );
+        symbols.append( item->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !mLayer->mIsApproved ) );
         renderItems.append( item );
       }
       if ( symbols.isEmpty() )
@@ -73,11 +73,11 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       for ( int i = 0, n = result.size(); i < n; ++i )
       {
         QPoint itemOrigin = symbols[i].points.front();
-        QPoint renderPos = itemOrigin + result[i].offset;
+        QPoint renderPos = itemOrigin + result[i].offset + renderItems[i]->constState()->userOffset * dpiScale;
         if ( !renderItems[i]->isMultiPoint() )
         {
           // Draw line from visual reference point to actual refrence point
-          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin - renderItems[i]->constState()->userOffset * dpiScale );
+          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + renderItems[i]->constState()->userOffset * dpiScale );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
       }
@@ -124,6 +124,10 @@ KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, cons
     }
     itemIdMap.insert( symbols.size(), it.key() );
     symbols.append( milxItem->toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() ) );
+    for ( int i = 0, n = symbols.last().points.size(); i < n; ++i )
+    {
+      symbols.last().points[i] += milxItem->constState()->userOffset;
+    }
   }
   int selectedSymbol = -1;
   QRect bbox;

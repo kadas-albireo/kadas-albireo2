@@ -293,6 +293,11 @@ bool KadasMilxItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &setti
   int selectedSymbol = -1;
   QList<KadasMilxClient::NPointSymbol> symbols;
   symbols.append( toSymbol( settings.mapToPixel(), settings.destinationCrs() ) );
+  for ( int i = 0, n = symbols[0].points.size(); i < n; ++i )
+  {
+    symbols[0].points[i] += constState()->userOffset;
+  }
+
   QRect bbox;
   return KadasMilxClient::pickSymbol( symbols, screenPos, symbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0;
 }
@@ -321,7 +326,7 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
   double dpiScale = outputDpiScale( context );
-  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true, dpiScale );
+  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true );
   KadasMilxClient::NPointSymbolGraphic result;
 
   int dpi = context.painter()->device()->logicalDpiX();
@@ -333,11 +338,11 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
   {
     return;
   }
-  QPoint renderPos = symbol.points.front() + result.offset;
+  QPoint renderPos = symbol.points.front() + result.offset + constState()->userOffset * dpiScale;
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
-    context.painter()->drawLine( symbol.points.front(), symbol.points.front() - constState()->userOffset * dpiScale );
+    context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset * dpiScale );
   }
   context.painter()->drawImage( renderPos, result.graphic );
 }
@@ -818,14 +823,10 @@ bool KadasMilxItem::isMultiPoint() const
   return constState()->points.size() > 1 || !constState()->attributes.isEmpty();
 }
 
-KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored, double dpiScale ) const
+KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored ) const
 {
   QgsCoordinateTransform mapCrst( mCrs, mapCrs, QgsProject::instance()->transformContext() );
   QList<QPoint> points = computeScreenPoints( mapToPixel, mapCrst );
-  for ( int i = 0, n = points.size(); i < n; ++i )
-  {
-    points[i] += constState()->userOffset * dpiScale;
-  }
   QList< QPair<int, double> > screenAttribs = computeScreenAttributes( mapToPixel, mapCrst );
   bool finalized = constState()->drawStatus == State::DrawStatus::Finished;
   return KadasMilxClient::NPointSymbol( mMssString, points, constState()->controlPoints, screenAttribs, finalized, colored );
