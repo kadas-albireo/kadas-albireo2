@@ -289,6 +289,22 @@ void KadasHeightProfileDialog::clear()
   mLineOfSightGroupBoxgroupBox->setEnabled( false );
 }
 
+void KadasHeightProfileDialog::accept()
+{
+  if ( !mCancelButton->isVisible() )
+  {
+    QDialog::accept();
+  }
+}
+
+void KadasHeightProfileDialog::reject()
+{
+  if ( !mCancelButton->isVisible() )
+  {
+    QDialog::reject();
+  }
+}
+
 void KadasHeightProfileDialog::finish()
 {
   QgsSettings().setValue( "/Windows/MeasureHeightProfile/geometry", saveGeometry() );
