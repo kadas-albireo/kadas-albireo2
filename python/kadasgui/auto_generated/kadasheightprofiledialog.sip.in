@@ -35,6 +35,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     void setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
     void clear();
 
+  public slots:
+    virtual void accept();
+
+    virtual void reject();
+
+
   protected:
     virtual void keyPressEvent( QKeyEvent *ev );
 

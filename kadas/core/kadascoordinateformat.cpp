@@ -14,19 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <gdal.h>
 #include <QRegExp>
 
 #include <qgis/qgscoordinateformatter.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
-#include <qgis/qgslogger.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrasterlayer.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/core/kadascoordinateformat.h>
+#include <kadas/core/kadascoordinateutils.h>
 #include <kadas/core/kadaslatlontoutm.h>
 
 static QRegExp gPatDflt = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)?$" ) );
@@ -76,7 +74,7 @@ const QString &KadasCoordinateFormat::getCoordinateDisplayCrs() const
 
 QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const
 {
-  return getDisplayString( p, sSrs, mFormat, mEpsg );
+  return KadasCoordinateFormat::getDisplayString( p, sSrs, mFormat, mEpsg );
 }
 
 QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg )
@@ -132,97 +130,12 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
 
 double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg )
 {
-  return getHeightAtPos( p, crs, mHeightUnit, errMsg );
+  return KadasCoordinateUtils::getHeightAtPos( p, crs, mHeightUnit, errMsg );
 }
 
 double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg )
 {
-  QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
-  QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
-  {
-    if ( errMsg )
-    {
-      *errMsg = tr( "No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap." );
-    }
-    return 0;
-  }
-
-  GDALDatasetH raster = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ), errMsg );
-  if ( !raster )
-  {
-    return 0;
-  }
-
-  double gtrans[6] = {};
-  if ( GDALGetGeoTransform( raster, &gtrans[0] ) != CE_None )
-  {
-    if ( errMsg )
-    {
-      *errMsg = tr( "Failed to get raster geotransform" );
-    }
-    GDALClose( raster );
-    return 0;
-  }
-
-  QString proj( GDALGetProjectionRef( raster ) );
-  QgsCoordinateReferenceSystem rasterCrs = QgsCoordinateReferenceSystem::fromWkt( proj );
-  if ( !rasterCrs.isValid() )
-  {
-    if ( errMsg )
-    {
-      *errMsg = tr( "Failed to get raster CRS" );
-    }
-    GDALClose( raster );
-    return 0;
-  }
-
-  GDALRasterBandH band = GDALGetRasterBand( raster, 1 );
-  if ( !raster )
-  {
-    if ( errMsg )
-    {
-      *errMsg = tr( "Failed to open raster band 0" );
-    }
-    GDALClose( raster );
-    return 0;
-  }
-
-  // Get vertical unit
-  QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-
-  // Transform geo position to raster CRS
-  QgsPointXY pRaster = QgsCoordinateTransform( crs, rasterCrs, QgsProject::instance() ).transform( p );
-
-  // Transform raster geo position to pixel coordinates
-  double row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
-  double col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
-
-  double pixValues[4] = {};
-  if ( CE_None != GDALRasterIO( band, GF_Read,
-                                std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
-  {
-    if ( errMsg )
-    {
-      *errMsg = tr( "Failed to read pixel values" );
-    }
-    GDALClose( raster );
-    return 0;
-  }
-
-  GDALClose( raster );
-
-  // Interpolate values
-  double lambdaR = row - std::floor( row );
-  double lambdaC = col - std::floor( col );
-
-  double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
-                 + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
-  if ( rasterCrs.mapUnits() != unit )
-  {
-    value *= QgsUnitTypes::fromUnitToUnitFactor( vertUnit, unit );
-  }
-  return value;
+  return KadasCoordinateUtils::getHeightAtPos( p, crs, unit, errMsg );
 }
 
 QgsPointXY KadasCoordinateFormat::parseCoordinate( const QString &text, Format format, bool &valid ) const

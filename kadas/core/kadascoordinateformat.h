@@ -49,6 +49,9 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
     static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
 
     double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
+#ifndef SIP_RUN
+    [[deprecated( "Use KadasCoordinateUtils::getHeightAtPos." )]]
+#endif
     static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
 
     QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
