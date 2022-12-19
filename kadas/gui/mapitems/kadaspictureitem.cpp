@@ -32,7 +32,7 @@
 
 #include <quazip/quazipfile.h>
 
-#include <kadas/core/kadascoordinateformat.h>
+#include <kadas/core/kadascoordinateutils.h>
 #include <kadas/analysis/kadaslineofsight.h>
 #include <kadas/gui/mapitems/kadaspictureitem.h>
 
@@ -745,7 +745,7 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
       QgsCoordinateReferenceSystem crs3857( "EPSG:3857" );
       QgsPointXY mrcPosXY = QgsCoordinateTransform( destCrs, crs3857, QgsProject::instance() ).transform( cameraPos );
       // Ensure altitude is at least 1m above terrain
-      double terrHeigth = KadasCoordinateFormat::instance()->getHeightAtPos( mrcPosXY, crs3857, QgsUnitTypes::DistanceMeters );
+      double terrHeigth = KadasCoordinateUtils::getHeightAtPos( mrcPosXY, crs3857, QgsUnitTypes::DistanceMeters );
       QgsPoint mrcPos( mrcPosXY.x(), mrcPosXY.y(), std::max( alt, terrHeigth + 1 ) );
 
       double d = 25000;
