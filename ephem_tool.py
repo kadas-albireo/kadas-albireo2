@@ -22,21 +22,24 @@ class EphemTool(QgsMapTool):
 
         self.iface = iface
         self.setCursor(Qt.ArrowCursor)
-        self.widget = EphemToolWidget(self.iface)
-        self.widget.close.connect(self.close)
+        self.widget = None
 
     def activate(self):
+        self.widget = EphemToolWidget(self.iface)
+        self.widget.close.connect(self.close)
         self.widget.setVisible(True)
         self.pin = KadasSymbolItem(self.iface.mapCanvas().mapSettings().destinationCrs())
         self.pin.setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
-        self.pinAdded = False
+        self.pin.setVisible(False)
+        KadasMapCanvasItemManager.addItem(self.pin)
+
         QgsMapTool.activate(self)
 
     def deactivate(self):
-        self.widget.setVisible(False)
-        if self.pinAdded:
-            KadasMapCanvasItemManager.removeItem(self.pin)
-            self.pinAdded = False
+        if self.widget:
+            self.widget.cleanup()
+            self.widget = None
+        KadasMapCanvasItemManager.removeItem(self.pin)
         self.pin = None
         QgsMapTool.deactivate(self)
 
@@ -55,9 +58,7 @@ class EphemTool(QgsMapTool):
 
     def positionPicked(self, pos):
         self.pin.setPosition(KadasItemPos.fromPoint(pos))
-        if not self.pinAdded:
-            KadasMapCanvasItemManager.addItem(self.pin)
-            self.pinAdded = True
+        self.pin.setVisible(True)
         mapCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
         wgsCrs = QgsCoordinateReferenceSystem("EPSG:4326")
         mrcCrs = QgsCoordinateReferenceSystem("EPSG:3857")
@@ -103,6 +104,7 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.timezoneCombo.currentIndexChanged.connect(self.recompute)
         self.ui.checkBoxRelief.toggled.connect(self.recompute)
         self.ui.tabWidgetOutput.setEnabled(False)
+        self.ui.tabWidgetOutput.currentChanged.connect(self.setIconVisibilities)
 
         self.busyOverlay = QLabel(self.tr("Calculating..."))
         self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
@@ -113,6 +115,17 @@ class EphemToolWidget(KadasBottomBar):
 
         self.wgsPos = None
         self.mrcPos = None
+
+        self.sunAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
+        self.sunAzIcon.setup( ":/plugins/Ephem/icons/az_sun.svg", 0.5, 1.0 );
+        self.sunAzIcon.setVisible(False)
+        KadasMapCanvasItemManager.addItem(self.sunAzIcon)
+
+        self.moonAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
+        self.moonAzIcon.setup( ":/plugins/Ephem/icons/az_moon.svg", 0.5, 1.0 );
+        KadasMapCanvasItemManager.addItem(self.moonAzIcon)
+        self.moonAzIcon.setVisible(False)
+
 
     def getTimestamp(self):
         datetime = self.ui.dateTimeEdit.dateTime()
@@ -128,7 +141,16 @@ class EphemToolWidget(KadasBottomBar):
         self.wgsPos = wgsPos
         self.mrcPos = mrcPos
 
+    def cleanup(self):
+        KadasMapCanvasItemManager.removeItem(self.sunAzIcon)
+        self.sunAzIcon = None
+        KadasMapCanvasItemManager.removeItem(self.moonAzIcon)
+        self.moonAzIcon = None
+
     def recompute(self):
+        self.sunAzIcon.setVisible(False)
+        self.moonAzIcon.setVisible(False)
+
         if not self.wgsPos:
             return
 
@@ -157,6 +179,9 @@ class EphemToolWidget(KadasBottomBar):
         sun = ephem.Sun()
         sun.compute(home)
         self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
+        self.sunAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
+        self.sunAzIcon.setAngle(-self.azDec(sun.az))
+        self.sunAzIcon.setVisible(self.ui.tabWidgetOutput.currentIndex() == 0)
 
         # Compute sunrise and sunset taking relief into account
         try:
@@ -199,6 +224,9 @@ class EphemToolWidget(KadasBottomBar):
         moon = ephem.Moon()
         moon.compute(home)
         self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
+        self.moonAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
+        self.moonAzIcon.setAngle(-self.azDec(moon.az))
+        self.moonAzIcon.setVisible(self.ui.tabWidgetOutput.currentIndex() == 1)
 
         # Compute moonrise and moonset taking relief into account
         try:
@@ -243,6 +271,14 @@ class EphemToolWidget(KadasBottomBar):
         self.busyOverlay.setVisible(False)
         self.ui.tabWidgetOutput.setVisible(True)
 
+    def setIconVisibilities(self, index):
+        if index == 0:
+            self.sunAzIcon.setVisible(True)
+            self.moonAzIcon.setVisible(False)
+        else:
+            self.sunAzIcon.setVisible(False)
+            self.moonAzIcon.setVisible(True)
+
     def timestampToHourString(self, timestamp):
         if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
             return QDateTime.fromSecsSinceEpoch(round(timestamp), QTimeZone.utc()).toString("hh:mm")
@@ -258,9 +294,17 @@ class EphemToolWidget(KadasBottomBar):
             strval = "+" + strval
         parts = strval.split(":")
         if len(parts) == 3:
-            return parts[0] + "°" + parts[1] + "'" + parts[2] + "\"";
+            return parts[0] + "°" + parts[1] + "'" + parts[2] + "\""
         else:
             return strval
+
+    def azDec(self, val):
+        strval = str(val)
+        parts = strval.split(":")
+        if len(parts) == 3:
+            return float(parts[0]) + float(parts[1]) / 60 + float(parts[2]) / 3600
+        else:
+            return 0
 
     def search_body_relief_crossing(self, body, spheretime, zenithtime):
         # Binary search up to 1min precision

@@ -19,5 +19,7 @@
         <file>icons/moon_62.svg</file>
         <file>icons/moon_75.svg</file>
         <file>icons/moon_87.svg</file>
+        <file>icons/az_moon.svg</file>
+        <file>icons/az_sun.svg</file>
     </qresource>
 </RCC>
