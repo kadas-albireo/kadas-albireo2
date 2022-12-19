@@ -187,6 +187,12 @@ void KadasMapItem::setTooltip( const QString &tooltip )
   update();
 }
 
+void KadasMapItem::setVisible( bool visible )
+{
+  mVisible = visible;
+  update();
+}
+
 void KadasMapItem::setSymbolScale( double scale )
 {
   mSymbolScale = scale;

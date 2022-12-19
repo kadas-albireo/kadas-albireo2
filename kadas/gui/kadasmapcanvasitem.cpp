@@ -45,7 +45,7 @@ bool KadasMapCanvasItem::isVisible() const
 
 void KadasMapCanvasItem::paint( QPainter *painter )
 {
-  if ( mItem )
+  if ( mItem && mItem->isVisible() )
   {
     if (
       ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) ||

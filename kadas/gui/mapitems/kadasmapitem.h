@@ -318,6 +318,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setTooltip( const QString &tooltip );
     const QString &tooltip() const { return mTooltip; }
 
+    /* visibility */
+    void setVisible( bool visible );
+    bool isVisible() const { return mVisible; }
+
     bool isPointSymbol() const { return mIsPointSymbol; }
     virtual QImage symbolImage() const { return QImage(); }
     virtual QPointF symbolAnchor() const { return QPointF( 0.5, 0.5 ); }
@@ -434,6 +438,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool mSelected = false;
     int mZIndex = 0;
     QString mTooltip;
+    bool mVisible = true;
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
     KadasItemLayer *mOwnerLayer = nullptr;

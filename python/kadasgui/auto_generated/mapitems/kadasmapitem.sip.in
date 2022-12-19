@@ -309,6 +309,12 @@ tooltip */
 %End
     const QString &tooltip() const;
 
+    void setVisible( bool visible );
+%Docstring
+visibility */
+%End
+    bool isVisible() const;
+
     bool isPointSymbol() const;
     virtual QImage symbolImage() const;
     virtual QPointF symbolAnchor() const;

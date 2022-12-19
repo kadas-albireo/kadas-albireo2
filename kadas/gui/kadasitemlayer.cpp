@@ -49,7 +49,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
       bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
       for ( const KadasMapItem *item : items )
       {
-        if ( item && ( !omitSinglePoint || !item->isPointSymbol() ) )
+        if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
           mRendererContext.painter()->save();
           mRendererContext.painter()->setOpacity( mLayer->opacity() );
