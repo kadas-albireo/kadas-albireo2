@@ -9,6 +9,7 @@ from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
+from kadas.kadascore import *
 from kadas.kadasgui import *
 from kadas.kadasanalysis import *
 
@@ -69,6 +70,10 @@ class EphemToolWidget(KadasBottomBar):
 
     close = pyqtSignal()
 
+    TIMEZONE_SYSTEM = 0
+    TIMEZONE_UTC = 1
+    TIMEZONE_LOCAL = 2
+
     def __init__(self, iface):
         KadasBottomBar.__init__(self, iface.mapCanvas())
 
@@ -92,6 +97,10 @@ class EphemToolWidget(KadasBottomBar):
 
         self.ui.dateTimeEdit.setDateTime(QDateTime.currentDateTime())
         self.ui.dateTimeEdit.editingFinished.connect(self.recompute)
+        self.ui.timezoneCombo.addItem(self.tr("System time"), EphemToolWidget.TIMEZONE_SYSTEM)
+        self.ui.timezoneCombo.addItem(self.tr("UTC"), EphemToolWidget.TIMEZONE_UTC)
+        self.ui.timezoneCombo.addItem(self.tr("Local time at position"), EphemToolWidget.TIMEZONE_LOCAL)
+        self.ui.timezoneCombo.currentIndexChanged.connect(self.recompute)
         self.ui.checkBoxRelief.toggled.connect(self.recompute)
         self.ui.tabWidgetOutput.setEnabled(False)
 
@@ -99,13 +108,21 @@ class EphemToolWidget(KadasBottomBar):
         self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
         self.busyOverlay.setAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
         self.busyOverlay.setVisible(False)
-        self.ui.gridLayout.addWidget(self.busyOverlay, 4, 0, 1, 5)
+        self.busyOverlay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.verticalLayout.addWidget(self.busyOverlay)
 
         self.wgsPos = None
         self.mrcPos = None
 
     def getTimestamp(self):
-        return self.ui.dateTimeEdit.dateTime().toSecsSinceEpoch()
+        datetime = self.ui.dateTimeEdit.dateTime()
+        if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
+            datetime = QDateTime(datetime.date(), datetime.time(), QTimeZone.utc())
+        elif self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_LOCAL:
+            tz = QTimeZone(KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")))
+            datetime = QDateTime(datetime.date(), datetime.time(), QTimeZone(tz))
+        return datetime.toSecsSinceEpoch()
+
 
     def setPos(self, wgsPos, mrcPos):
         self.wgsPos = wgsPos
@@ -117,6 +134,7 @@ class EphemToolWidget(KadasBottomBar):
 
         if self.ui.checkBoxRelief.isChecked():
             self.busyOverlay.setVisible(True)
+            self.ui.tabWidgetOutput.setVisible(False)
             QApplication.instance().processEvents(QEventLoop.ExcludeUserInputEvents)
 
         self.ui.tabWidgetOutput.setEnabled(True)
@@ -126,6 +144,8 @@ class EphemToolWidget(KadasBottomBar):
         x_str = QgsCoordinateFormatter.formatX(self.wgsPos.x(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
         y_str = QgsCoordinateFormatter.formatY(self.wgsPos.y(), QgsCoordinateFormatter.FormatDegreesMinutesSeconds, 1)
         self.ui.labelPositionValue.setText(y_str + " " + x_str)
+        tz = KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326"))
+        self.ui.labelTimezone.setText(tz.data().decode('utf-8'))
 
         home = ephem.Observer()
         home.lat = str(self.wgsPos.y())
@@ -221,9 +241,16 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.labelMoonPhaseValue.setText("%.2f%%" % moon.phase)
 
         self.busyOverlay.setVisible(False)
+        self.ui.tabWidgetOutput.setVisible(True)
 
     def timestampToHourString(self, timestamp):
-        return QDateTime.fromSecsSinceEpoch(round(timestamp)).toString("hh:mm")
+        if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
+            return QDateTime.fromSecsSinceEpoch(round(timestamp), QTimeZone.utc()).toString("hh:mm")
+        elif self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_LOCAL:
+            tz = QTimeZone(KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")))
+            return QDateTime.fromSecsSinceEpoch(round(timestamp), tz).toString("hh:mm")
+        else:
+            return QDateTime.fromSecsSinceEpoch(round(timestamp)).toString("hh:mm")
 
     def formatDMS(self, val, sign=False):
         strval = str(val)
