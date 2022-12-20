@@ -11,7 +11,9 @@ SOURCES += \
 ../kadas/core/kadasalgorithms.cpp \
 ../kadas/core/kadas.cpp \
 ../kadas/core/kadascoordinateformat.cpp \
+../kadas/core/kadascoordinateutils.h \
 ../kadas/core/kadas.h \
+../kadas/core/kadascoordinateutils.cpp \
 ../kadas/core/kadaspluginlayer.h \
 ../kadas/core/kadasstatehistory.h \
 ../kadas/analysis/kadasninecellfilter.cpp \
@@ -184,6 +186,7 @@ SOURCES += \
 ../kadas/gui/kadasclipboard.h \
 ../kadas/gui/kadascatalogbrowser.cpp \
 ../kadas/gui/kadasprojecttemplateselectiondialog.h \
+../kadas/app/kadaslayerrefreshmanager.h \
 ../kadas/app/kadascrashrpt.cpp \
 ../kadas/app/kadascanvascontextmenu.h \
 ../kadas/app/kadaslayoutdesignermanager.cpp \
@@ -221,6 +224,7 @@ SOURCES += \
 ../kadas/app/kadaslayertreemodel.h \
 ../kadas/app/kadaslayertreemodel.cpp \
 ../kadas/app/kadaslayoutdesignerdialog.cpp \
+../kadas/app/kadasnewspopup.cpp \
 ../kadas/app/kadashandlebadlayers.h \
 ../kadas/app/kadasplugininterfaceimpl.cpp \
 ../kadas/app/kadasmapwidgetmanager.cpp \
@@ -239,12 +243,15 @@ SOURCES += \
 ../kadas/app/iamauth/kadasiamauth.cpp \
 ../kadas/app/kadasmapidentifydialog.cpp \
 ../kadas/app/kadascrashrpt.h \
+../kadas/app/kadasapplayerhandling.cpp \
 ../kadas/app/kadasapplication.h \
+../kadas/app/kadaslayerrefreshmanager.cpp \
 ../kadas/app/bullseye/kadasmaptoolbullseye.cpp \
 ../kadas/app/bullseye/kadasbullseyelayer.cpp \
 ../kadas/app/bullseye/kadasmaptoolbullseye.h \
 ../kadas/app/bullseye/kadasbullseyelayer.h \
 ../kadas/app/bullseye/kadasbullseyewidgetbase.ui \
+../kadas/app/kadasnewspopup.h \
 ../kadas/app/kadaspluginlayerproperties.h \
 ../kadas/app/milx/kadasmilxintegration.cpp \
 ../kadas/app/milx/kadasmilxintegration.h \
@@ -256,6 +263,7 @@ SOURCES += \
 ../kadas/app/guidegrid/kadasmaptoolguidegrid.cpp \
 ../kadas/app/kadasplugininterfaceimpl.h \
 ../kadas/app/kadaslayertreeviewmenuprovider.h \
+../kadas/app/kadasapplayerhandling.h \
 ../kadas/app/globe/kadasglobevectorlayerproperties.h \
 ../kadas/app/globe/kadasglobeinteractionhandlers.h \
 ../kadas/app/globe/kadasglobebillboardmanager.cpp \
