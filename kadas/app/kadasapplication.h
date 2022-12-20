@@ -68,12 +68,14 @@ class KadasApplication : public QgsApplication
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
-    void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType )  const;
+    void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType, bool quiet = false )  const;
     void addRasterLayers( const QStringList &layerUris, bool quiet = false )  const;
     QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
+    bool askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer );
+    bool checkTasksDependOnProject();
 
     bool projectNew( bool askToSave );
     bool projectCreateFromTemplate( const QString &templateFile, const QUrl &templateUrl );
@@ -139,10 +141,7 @@ class KadasApplication : public QgsApplication
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
 
-    QList<QgsMapLayer *> showGDALSublayerSelectionDialog( QgsRasterLayer *layer ) const;
-    QList<QgsMapLayer *> showOGRSublayerSelectionDialog( QgsVectorLayer *layer ) const;
     void loadPythonSupport();
-    bool showZipSublayerSelectionDialog( const QString &path ) const;
     QString migrateDatasource( const QString &path ) const;
     DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();

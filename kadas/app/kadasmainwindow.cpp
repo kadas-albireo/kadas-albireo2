@@ -73,6 +73,7 @@
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
 
+#include <kadas/app/kadasapplayerhandling.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
@@ -572,13 +573,10 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
         QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( fileName );
         KadasItemLayerRegistry::getOrCreateItemLayer( pair.second )->addItem( pair.first );
       }
-      else if ( QgsRasterLayer::isValidRasterFileName( fileName ) )
-      {
-        kApp->addRasterLayer( fileName, QFileInfo( fileName ).completeBaseName(), QString() );
-      }
       else
       {
-        kApp->addVectorLayer( fileName, QFileInfo( fileName ).completeBaseName(), "ogr" );
+        bool ok = false;
+        KadasAppLayerHandling::openLayer( fileName, ok, true, true );
       }
     }
   }
@@ -1002,7 +1000,7 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString & url, const QString & baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, &KadasApplication::addVectorLayers );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList & layerUris, const QString & enc, const QString & dataSourceType ) { kApp->addVectorLayers( layerUris, enc, dataSourceType ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, []( const QStringList & layerUris ) { kApp->addRasterLayers( layerUris ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, dialog, &QDialog::accept );
