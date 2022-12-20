@@ -46,6 +46,7 @@ class KadasMapToolPan;
 class KadasPythonIntegration;
 class KadasPluginInterface;
 class KadasRedliningIntegration;
+class KadasLayerRefreshManager;
 
 #define kApp KadasApplication::instance()
 
@@ -65,6 +66,7 @@ class KadasApplication : public QgsApplication
 
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
+    KadasLayerRefreshManager *layerRefreshManager() { return mLayerRefreshManager; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
@@ -132,6 +134,7 @@ class KadasApplication : public QgsApplication
     KadasPluginInterface *mPythonInterface = nullptr;
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
+    KadasLayerRefreshManager *mLayerRefreshManager = nullptr;
     KadasMessageLogViewer *mMessageLogViewer = nullptr;
     bool mBlockActiveLayerChanged = false;
     KadasMapToolPan *mMapToolPan = nullptr;

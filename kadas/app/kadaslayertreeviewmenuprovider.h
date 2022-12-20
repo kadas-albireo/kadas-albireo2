@@ -28,6 +28,7 @@ class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMen
 
   private:
     QAction *actionLayerTransparency( QMenu *parent );
+    QAction *actionLayerRefreshRate( QMenu *parent );
     QAction *actionLayerUseAsHeightmap( QMenu *parent );
 
     QgsLayerTreeView *mView = nullptr;
@@ -35,6 +36,7 @@ class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMen
   private slots:
     void removeLayerTreeItems();
     void setLayerTransparency( int value );
+    void setLayerRefreshRate( int value );
     void setLayerUseAsHeightmap( bool enabled );
     void showLayerAttributeTable();
     void showLayerInfo();

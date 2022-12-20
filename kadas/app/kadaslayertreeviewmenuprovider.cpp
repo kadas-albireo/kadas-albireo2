@@ -29,6 +29,7 @@
 #include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadaslayerrefreshmanager.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 
@@ -72,6 +73,10 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) || qobject_cast<KadasPluginLayer *>( layer ) )
       {
         menu->addAction( actionLayerTransparency( menu ) );
+      }
+      if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) )
+      {
+        menu->addAction( actionLayerRefreshRate( menu ) );
       }
 
       if ( layer->type() == QgsMapLayerType::PluginLayer )
@@ -161,6 +166,28 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent 
   return transpAction;
 }
 
+QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
+{
+  QWidget *refreshRateWidget = new QWidget();
+  QHBoxLayout *refreshRateLayout = new QHBoxLayout( refreshRateWidget );
+
+  QLabel *refreshRateLabel = new QLabel( tr( "Data refresh rate:" ) );
+  refreshRateLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+  refreshRateLayout->addWidget( refreshRateLabel );
+
+  QSpinBox *refreshRateSpin = new QSpinBox( );
+  refreshRateSpin->setRange( 0, 1000000 );
+  refreshRateSpin->setSuffix( " s" );
+  refreshRateSpin->setValue( kApp->layerRefreshManager()->layerRefreshInterval( mView->currentLayer()->id() ) );
+  refreshRateSpin->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+  connect( refreshRateSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasLayerTreeViewMenuProvider::setLayerRefreshRate );
+  refreshRateLayout->addWidget( refreshRateSpin );
+
+  QWidgetAction *transpAction = new QWidgetAction( parent );
+  transpAction->setDefaultWidget( refreshRateWidget );
+  return transpAction;
+}
+
 QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *parent )
 {
   QgsMapLayer *layer = mView->currentLayer();
@@ -218,6 +245,11 @@ void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
   }
   mView->refreshLayerSymbology( layer->id() );
   layer->triggerRepaint();
+}
+
+void KadasLayerTreeViewMenuProvider::setLayerRefreshRate( int value )
+{
+  kApp->layerRefreshManager()->setLayerRefreshInterval( mView->currentLayer()->id(), value );
 }
 
 void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )

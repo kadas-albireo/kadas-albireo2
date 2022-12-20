@@ -84,6 +84,7 @@
 #include <kadas/app/kadashandlebadlayers.h>
 #include <kadas/app/kadaspluginlayerproperties.h>
 #include <kadas/app/kadaslayoutdesignermanager.h>
+#include <kadas/app/kadaslayerrefreshmanager.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasmessagelogviewer.h>
@@ -347,6 +348,9 @@ void KadasApplication::init()
   // Load python support
   mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
+
+  // Layer refresh manager
+  mLayerRefreshManager = new KadasLayerRefreshManager( this );
 
   mMainWindow->show();
   splash.finish( mMainWindow );
