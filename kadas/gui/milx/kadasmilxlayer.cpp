@@ -77,6 +77,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
         if ( !renderItems[i]->isMultiPoint() )
         {
           // Draw line from visual reference point to actual refrence point
+          mRendererContext.painter()->setPen( QPen( Qt::black, dpiScale ) );
           mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + renderItems[i]->constState()->userOffset * dpiScale );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );

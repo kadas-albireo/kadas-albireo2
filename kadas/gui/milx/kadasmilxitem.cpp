@@ -342,6 +342,7 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
   if ( !isMultiPoint() )
   {
     // Draw line from visual reference point to actual refrence point
+    context.painter()->setPen( QPen( Qt::black, dpiScale ) );
     context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset * dpiScale );
   }
   context.painter()->drawImage( renderPos, result.graphic );
