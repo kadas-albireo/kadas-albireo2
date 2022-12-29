@@ -17,6 +17,7 @@ dnf install -y --disablerepo=*modular* \
   mingw64-libgomp \
   mingw64-librsvg2 \
   mingw64-libzip \
+  mingw64-libzonedetect \
   mingw64-osgearth \
   mingw64-postgresql \
   mingw64-proj \
