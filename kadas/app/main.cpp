@@ -74,6 +74,7 @@ int main( int argc, char *argv[] )
   if ( clearsettings )
   {
     QDir( QString( "%1/%2" ).arg( rootProfileFolder, profileName ) ).removeRecursively();
+    QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).removeRecursively();
   }
   else
   {
