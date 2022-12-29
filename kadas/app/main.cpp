@@ -90,6 +90,9 @@ int main( int argc, char *argv[] )
   }
   KadasApplication::setTranslation( locale );
 
+  // Delete any leftover wcs cache
+  QDir( QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).absoluteFilePath( "wcs_cache" ) ).removeRecursively();
+
   KadasApplication *app = new KadasApplication( argc, argv );
 
 #ifdef __MINGW32__
