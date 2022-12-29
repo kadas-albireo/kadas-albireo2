@@ -24,7 +24,9 @@
 class QAction;
 class QComboBox;
 class QSlider;
+class QSpinBox;
 class QTabWidget;
+class QgsColorButton;
 class QgsMapLayer;
 class KadasMilxLayer;
 class KadasMilxLayerPropertiesPageFactory;
@@ -54,6 +56,8 @@ class KadasMilxIntegration : public QObject
       QSlider *mSymbolSizeSlider;
       QSlider *mLineWidthSlider;
       QComboBox *mWorkModeCombo;
+      QSpinBox *mLeaderLineWidthSpin;
+      QgsColorButton *mLeaderLineColorButton;
     };
     KadasMilxIntegration( const MilxUi &ui, QObject *parent = nullptr );
     ~KadasMilxIntegration();
@@ -79,6 +83,8 @@ class KadasMilxIntegration : public QObject
     void setMilXSymbolSize( int value );
     void setMilXLineWidth( int value );
     void setMilXWorkMode( int idx );
+    void setMilxLeaderLineWidth( int width );
+    void setMilxLeaderLineColor( QColor color );
 };
 
 #endif // KADASMILXINTEGRATION_H

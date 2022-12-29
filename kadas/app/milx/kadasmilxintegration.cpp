@@ -100,6 +100,14 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
+  mUi.mLeaderLineWidthSpin->setValue( QgsProject::instance()->readNumEntry( "milx", "leader_line_width", KadasMilxSymbolSettings::DefaultLeaderLineWidth ) );
+  setMilxLeaderLineWidth( mUi.mLeaderLineWidthSpin->value() );
+  connect( mUi.mLeaderLineWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMilxIntegration::setMilxLeaderLineWidth );
+
+  mUi.mLeaderLineColorButton->setColor( QgsProject::instance()->readEntry( "milx", "leader_line_color", QColor( KadasMilxSymbolSettings::DefaultLeaderLineColor ).name() ) );
+  setMilxLeaderLineColor( mUi.mLeaderLineColorButton->color() );
+  connect( mUi.mLeaderLineColorButton, &QgsColorButton::colorChanged, this, &KadasMilxIntegration::setMilxLeaderLineColor );
+
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
   KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
@@ -171,9 +179,11 @@ void KadasMilxIntegration::createMilx( bool active )
 
 void KadasMilxIntegration::readProjectSettings()
 {
-  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", 60 ) );
-  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", 2 ) );
-  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", 1 ) );
+  mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", KadasMilxSymbolSettings::DefaultSymbolSize ) );
+  mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", KadasMilxSymbolSettings::DefaultLineWidth ) );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", KadasMilxSymbolSettings::DefaultWorkMode ) );
+  mUi.mLeaderLineWidthSpin->setValue( QgsProject::instance()->readNumEntry( "milx", "leader_line_width", KadasMilxSymbolSettings::DefaultLeaderLineWidth ) );
+  mUi.mLeaderLineColorButton->setColor( QgsProject::instance()->readEntry( "milx", "leader_line_color", QColor( KadasMilxSymbolSettings::DefaultLeaderLineColor ).name() ) );
 }
 
 void KadasMilxIntegration::setMilXSymbolSize( int value )
@@ -194,6 +204,20 @@ void KadasMilxIntegration::setMilXWorkMode( int idx )
 {
   QgsProject::instance()->writeEntry( "milx", "work_mode", idx );
   KadasMilxClient::setWorkMode( static_cast<KadasMilxSymbolSettings::WorkMode>( idx ) );
+  refreshMilxLayers();
+}
+
+void KadasMilxIntegration::setMilxLeaderLineWidth( int width )
+{
+  QgsProject::instance()->writeEntry( "milx", "leader_line_width", width );
+  KadasMilxClient::setLeaderLineWidth( width );
+  refreshMilxLayers();
+}
+
+void KadasMilxIntegration::setMilxLeaderLineColor( QColor color )
+{
+  QgsProject::instance()->writeEntry( "milx", "leader_line_color", color.name() );
+  KadasMilxClient::setLeaderLineColor( color );
   refreshMilxLayers();
 }
 

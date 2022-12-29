@@ -262,6 +262,8 @@ void KadasMainWindow::init()
   milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
   milxUi.mLineWidthSlider = mLineWidthSlider;
   milxUi.mWorkModeCombo = mWorkModeCombo;
+  milxUi.mLeaderLineWidthSpin = mLeaderLineWidthSpin;
+  milxUi.mLeaderLineColorButton = mLeaderLineColorButton;
   mMilxIntegration = new KadasMilxIntegration( milxUi, this );
 
   // IAM Auth

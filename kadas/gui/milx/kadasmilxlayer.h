@@ -57,6 +57,12 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     void setMilxWorkMode( KadasMilxSymbolSettings::WorkMode workMode ) { mMilxSymbolSettings.workMode = workMode; }
     KadasMilxSymbolSettings::WorkMode milxWorkMode() const { return mMilxSymbolSettings.workMode; }
 
+    void setMilxLeaderLineWidth( int width ) { mMilxSymbolSettings.leaderLineWidth = width; }
+    int milxLeaderLineWidth() const { return mMilxSymbolSettings.leaderLineWidth; }
+
+    void setMilxLeaderLineColor( const QColor &color ) { mMilxSymbolSettings.leaderLineColor = color; }
+    QColor milxLeaderLineColor() const { return mMilxSymbolSettings.leaderLineColor; }
+
     const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
   signals:

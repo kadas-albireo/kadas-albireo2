@@ -55,6 +55,9 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
   static constexpr int MaxLineWidth = 5;
   static constexpr int DefaultLineWidth = 2;
 
+  static constexpr int DefaultLeaderLineWidth = 1;
+  static constexpr Qt::GlobalColor DefaultLeaderLineColor = Qt::black;
+
   enum WorkMode
   {
     WorkModeInternational = 0,
@@ -65,6 +68,8 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
   int symbolSize = DefaultSymbolSize;
   int lineWidth = DefaultLineWidth;
   WorkMode workMode = DefaultWorkMode;
+  int leaderLineWidth = DefaultLeaderLineWidth;
+  QColor leaderLineColor = DefaultLeaderLineColor;
 };
 
 #ifndef SIP_RUN
@@ -134,6 +139,8 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static void setSymbolSize( int value ) { instance()->mGlobalSymbolSettings.symbolSize = value; }
     static void setLineWidth( int value ) { instance()->mGlobalSymbolSettings.lineWidth = value; }
     static void setWorkMode( KadasMilxSymbolSettings::WorkMode workMode ) { instance()->mGlobalSymbolSettings.workMode = workMode; }
+    static void setLeaderLineWidth( int width ) { instance()->mGlobalSymbolSettings.leaderLineWidth = width; }
+    static void setLeaderLineColor( const QColor &color ) { instance()->mGlobalSymbolSettings.leaderLineColor = color; }
     static const KadasMilxSymbolSettings &globalSymbolSettings() { return instance()->mGlobalSymbolSettings; }
 
     static bool init();

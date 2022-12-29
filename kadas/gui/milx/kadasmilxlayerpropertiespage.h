@@ -29,6 +29,8 @@ class QDomElement;
 class QComboBox;
 class QGroupBox;
 class QSlider;
+class QSpinBox;
+class QgsColorButton;
 class QgsMapLayer;
 class KadasMilxLayer;
 
@@ -48,6 +50,8 @@ class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPage : public QgsMapLayerConfigWi
     QSlider *mSymbolSizeSlider = nullptr;
     QSlider *mLineWidthSlider = nullptr;
     QComboBox *mWorkModeCombo = nullptr;
+    QSpinBox *mLeaderLineWidthSpin = nullptr;
+    QgsColorButton *mLeaderLineColorButton = nullptr;
 };
 
 

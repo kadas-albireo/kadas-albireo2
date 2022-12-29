@@ -1739,10 +1739,16 @@ Sight</string>
           </item>
           <item>
            <layout class="QGridLayout" name="mGridLayoutMssOptions">
-            <item row="1" column="0">
-             <widget class="QLabel" name="mLineWidthLabel">
-              <property name="text">
-               <string>Line width:</string>
+            <item row="0" column="3">
+             <widget class="QSpinBox" name="mLeaderLineWidthSpin">
+              <property name="suffix">
+               <string notr="true">px</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
               </property>
              </widget>
             </item>
@@ -1756,10 +1762,28 @@ Sight</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="mSymbolSizeLabel">
-              <property name="text">
-               <string>Symbol size:</string>
+            <item row="0" column="1">
+             <widget class="QSlider" name="mSymbolSizeSlider">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="tracking">
+               <bool>false</bool>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBelow</enum>
               </property>
              </widget>
             </item>
@@ -1788,28 +1812,43 @@ Sight</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QSlider" name="mSymbolSizeSlider">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Leader lines:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="mSymbolSizeLabel">
+              <property name="text">
+               <string>Symbol size:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="mLineWidthLabel">
+              <property name="text">
+               <string>Line width:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QgsColorButton" name="mLeaderLineColorButton">
+              <property name="minimumSize">
+               <size>
+                <width>32</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
+                <width>48</width>
                 <height>16777215</height>
                </size>
               </property>
-              <property name="tracking">
-               <bool>false</bool>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::TicksBelow</enum>
+              <property name="text">
+               <string>...</string>
               </property>
              </widget>
             </item>
@@ -2582,6 +2621,12 @@ Sight</string>
    <class>KadasSearchBox</class>
    <extends>QWidget</extends>
    <header location="global">kadas/gui/kadassearchbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsColorButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">qgis/qgscolorbutton.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
