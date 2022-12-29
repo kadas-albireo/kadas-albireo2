@@ -36,6 +36,7 @@
 #include <qwt_picker_machine.h>
 #include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
+#include <qwt_text.h>
 
 #include <gdal.h>
 
@@ -495,7 +496,7 @@ void KadasHeightProfileDialog::replot()
   int nSamples = mPlotSamples.size();
   mPlotMarker->setValue( 0, 0 );
   mPlot->setAxisScaleDraw( QwtPlot::xBottom, new ScaleDraw( mTotLengthMeters, nSamples ) );
-  double step = qPow( 10, std::floor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
+  double step = std::pow( 10, std::floor( log10( mTotLengthMeters ) ) ) / ( mTotLengthMeters ) * nSamples;
   while ( nSamples / step < 10 ) { step /= 2.; }
   while ( nSamples / step > 10 ) { step *= 2.; }
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
