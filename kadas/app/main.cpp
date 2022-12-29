@@ -106,6 +106,9 @@ int main( int argc, char *argv[] )
 
   app->init();
   int status = app->exec();
+
+  // Delete wcs cache on close
+  QDir( QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).absoluteFilePath( "wcs_cache" ) ).removeRecursively();
   delete app;
   return status;
 }

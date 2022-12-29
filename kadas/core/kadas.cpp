@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <gdal.h>
+#include <cpl_string.h>
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 
@@ -220,7 +221,10 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     {
       gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
     }
-    GDALDatasetH dataset = GDALOpen( gdalSource.toUtf8().data(), GA_ReadOnly );
+    QString cacheDir = QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).absoluteFilePath( "wcs_cache" );
+    char **papszOptions = nullptr;
+    papszOptions = CSLSetNameValue( papszOptions, "CACHE", cacheDir.toLocal8Bit().data() );
+    GDALDatasetH dataset = GDALOpenEx( gdalSource.toUtf8().data(), GA_ReadOnly, nullptr, papszOptions, nullptr );
     if ( !dataset && errMsg )
     {
       *errMsg = QApplication::tr( "Failed to open raster file: %1" ).arg( layerSource );
