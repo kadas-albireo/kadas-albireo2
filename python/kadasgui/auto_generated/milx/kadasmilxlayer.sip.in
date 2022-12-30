@@ -60,6 +60,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     void setMilxWorkMode( KadasMilxSymbolSettings::WorkMode workMode );
     KadasMilxSymbolSettings::WorkMode milxWorkMode() const;
 
+    void setMilxLeaderLineWidth( int width );
+    int milxLeaderLineWidth() const;
+
+    void setMilxLeaderLineColor( const QColor &color );
+    QColor milxLeaderLineColor() const;
+
     const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
   signals:

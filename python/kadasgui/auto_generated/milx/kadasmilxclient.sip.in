@@ -33,6 +33,9 @@ struct KadasMilxSymbolSettings
   static const int MaxLineWidth;
   static const int DefaultLineWidth;
 
+  static const int DefaultLeaderLineWidth;
+  static const Qt::GlobalColor DefaultLeaderLineColor;
+
   enum WorkMode
   {
     WorkModeInternational,
@@ -43,6 +46,8 @@ struct KadasMilxSymbolSettings
   int symbolSize;
   int lineWidth;
   WorkMode workMode;
+  int leaderLineWidth;
+  QColor leaderLineColor;
 };
 
 /************************************************************************
