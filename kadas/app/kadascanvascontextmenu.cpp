@@ -18,6 +18,7 @@
 #include <QInputDialog>
 
 #include <qgis/qgsgeometryrubberband.h>
+#include <qgis/qgsgeometrycollection.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
@@ -31,6 +32,7 @@
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 #include <kadas/gui/maptools/kadasmaptooledititem.h>
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
+#include <kadas/gui/maptools/kadasmaptoolminmax.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadascanvascontextmenu.h>
@@ -133,6 +135,10 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), this, &KadasCanvasContextMenu::measureHeightProfile );
+    }
+    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::PolygonGeometry && mPickResult.geom->partCount() == 1 ) )
+    {
+      analysisMenu->addAction( QIcon( ":/kadas/icons/measure_min_max" ), tr( "Min/max" ), this, &KadasCanvasContextMenu::measureMinMax );
     }
   }
 
@@ -294,6 +300,25 @@ void KadasCanvasContextMenu::measureHeightProfile()
   if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
   {
     static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
+}
+
+void KadasCanvasContextMenu::measureMinMax()
+{
+  kApp->mainWindow()->actionMeasureMinMax()->trigger();
+  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
+  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+  {
+    QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( mPickResult.geom ) ? static_cast<QgsGeometryCollection *>( mPickResult.geom )->geometryN( 0 ) : mPickResult.geom;
+    if ( QgsWkbTypes::flatType( geom->wkbType() ) == QgsWkbTypes::CurvePolygon )
+    {
+      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterCircle );
+    }
+    else
+    {
+      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterPoly );
+    }
+    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *geom, mPickResult.crs );
   }
 }
 

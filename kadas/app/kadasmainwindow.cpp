@@ -64,6 +64,7 @@
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
+#include <kadas/gui/maptools/kadasmaptoolminmax.h>
 
 #include <kadas/gui/search/kadascoordinatesearchprovider.h>
 #include <kadas/gui/search/kadaslocationsearchprovider.h>
@@ -695,6 +696,7 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionHillshade, mHillshadeButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_H ), [this] { return new KadasMapToolHillshade( mapCanvas() ); } );
 
   setActionToButton( mActionViewshed, mViewshedButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_V ), [this] { return new KadasMapToolViewshed( mapCanvas() ); } );
+  setActionToButton( mActionMinMax, mMinMaxButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_M ), [this] { return new KadasMapToolMinMax( mapCanvas() ); } );
 
   // GPS tab
   setActionToButton( mActionEnableGPS, mEnableGPSButton, QKeySequence( Qt::CTRL + Qt::Key_G, Qt::CTRL + Qt::Key_T ) );

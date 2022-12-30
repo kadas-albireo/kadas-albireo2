@@ -44,6 +44,7 @@
 %Include auto_generated/maptools/kadasmaptoolviewshed.sip
 %Include auto_generated/maptools/kadasmaptoolcreateitem.sip
 %Include auto_generated/maptools/kadasmaptoolmeasure.sip
+%Include auto_generated/maptools/kadasmaptoolminmax.sip
 %Include auto_generated/maptools/kadasmaptooledititemgroup.sip
 %Include auto_generated/catalog/kadasvbscatalogprovider.sip
 %Include auto_generated/catalog/kadasarcgisrestcatalogprovider.sip

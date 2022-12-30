@@ -63,6 +63,7 @@ class KadasCanvasContextMenu : public QMenu
     void measurePolygon();
     void measureCircle();
     void measureHeightProfile();
+    void measureMinMax();
     void terrainSlope();
     void terrainHillshade();
     void terrainViewshed();

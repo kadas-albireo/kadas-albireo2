@@ -1131,6 +1131,25 @@ Sight</string>
            </widget>
           </item>
           <item>
+           <widget class="KadasRibbonButton" name="mMinMaxButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>80</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Min/Max</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -2608,6 +2627,21 @@ Sight</string>
    </property>
    <property name="toolTip">
     <string>Newsletter</string>
+   </property>
+  </action>
+  <action name="mActionMinMax">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/minmax</normaloff>:/kadas/icons/minmax</iconset>
+   </property>
+   <property name="text">
+    <string>Min/Max</string>
+   </property>
+   <property name="toolTip">
+    <string>Compute terrain min/max</string>
    </property>
   </action>
  </widget>

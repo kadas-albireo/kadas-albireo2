@@ -89,6 +89,10 @@ void KadasMapToolCreateItem::activate()
     label->setFont( font );
     mBottomBar->layout()->addWidget( label );
   }
+  if ( mBottomBarExtra )
+  {
+    mBottomBar->layout()->addWidget( mBottomBarExtra );
+  }
   if ( mShowLayerSelection )
   {
     KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerTreeView, mLayerSelectionFilter, mLayerCreator );
@@ -147,6 +151,17 @@ void KadasMapToolCreateItem::deactivate()
   mStateHistory = nullptr;
   delete mInputWidget;
   mInputWidget = nullptr;
+}
+
+void KadasMapToolCreateItem::setExtraBottomBarContents( QWidget *widget )
+{
+  mBottomBarExtra = widget;
+}
+
+void KadasMapToolCreateItem::setItemFactory( ItemFactory itemFactory )
+{
+  mItemFactory = itemFactory;
+  clear();
 }
 
 void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )

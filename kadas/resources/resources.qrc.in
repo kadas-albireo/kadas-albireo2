@@ -7,6 +7,7 @@
         <file alias="icons/open">icons/open.png</file>
         <file alias="icons/grid">icons/grid.png</file>
         <file alias="icons/viewshed">icons/viewshed.png</file>
+        <file alias="icons/minmax">icons/minmax.png</file>
         <file alias="icons/favorite">icons/favorite.png</file>
         <file alias="icons/gpx_import">icons/gpx_import.png</file>
         <file alias="icons/login">icons/login.svg</file>
@@ -93,6 +94,8 @@
         <file alias="icons/clear">icons/clear.png</file>
         <file alias="icons/pin_blue">icons/pin_blue.svg</file>
         <file alias="icons/pin_red">icons/pin_red.svg</file>
+        <file alias="icons/tri_up">icons/tri_up.svg</file>
+        <file alias="icons/tri_down">icons/tri_down.svg</file>
         <file alias="icons/observer">icons/observer.svg</file>
         <file alias="icons/plugin_b">icons/plugin_b.png</file>
         <file alias="icons/plugin_w">icons/plugin_w.png</file>
@@ -105,6 +108,7 @@
         <file alias="icons/measure_area">icons/measure_area.svg</file>
         <file alias="icons/measure_circle">icons/measure_circle.svg</file>
         <file alias="icons/measure_height_profile">icons/measure_height_profile.svg</file>
+        <file alias="icons/measure_min_max">icons/measure_min_max.svg</file>
         <file alias="icons/measure_line">icons/measure_line.svg</file>
         <file alias="icons/hillshade_color">icons/hillshade.svg</file>
         <file alias="icons/slope_color">icons/slope.svg</file>

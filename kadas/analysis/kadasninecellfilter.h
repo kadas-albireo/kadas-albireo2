@@ -59,6 +59,9 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
                                          float *x12, float *x22, float *x32,
                                          float *x13, float *x23, float *x33 ) = 0;
 
+    /**Computes the window of the raster which contains the specified region of the raster*/
+    static bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
+
   private:
 
     /**Opens the input file and returns the dataset handle and the number of pixels in x-/y- direction*/
@@ -69,8 +72,6 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     /**Opens the output file and sets the same geotransform and CRS as the input data
       @return the output dataset or NULL in case of error*/
     GDALDatasetH openOutputFile( GDALDatasetH inputDataset, const QgsCoordinateReferenceSystem &inputCrs, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize );
-    /**Computes the window of the raster which contains the specified region of the raster*/
-    bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
 
   protected:
 

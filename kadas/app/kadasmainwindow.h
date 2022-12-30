@@ -90,6 +90,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QAction *actionMeasureCircle() const { return mActionCircle; }
     QAction *actionMeasureAzimuth() const { return mActionAzimuth; }
     QAction *actionMeasureHeightProfile() const { return mActionProfile; }
+    QAction *actionMeasureMinMax() const { return mActionMinMax; }
     QAction *actionTerrainSlope() const { return mActionSlope; }
     QAction *actionTerrainHillshade() const { return mActionHillshade; }
     QAction *actionTerrainViewshed() const { return mActionViewshed; }
