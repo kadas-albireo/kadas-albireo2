@@ -170,6 +170,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     % End
 #endif
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
+    void addPoint( const KadasMapPos &mapPos );
 
   public slots:
     void clear();
@@ -181,7 +182,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
   protected:
     void createItem();
-    void addPoint( const KadasMapPos &mapPos );
     void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();

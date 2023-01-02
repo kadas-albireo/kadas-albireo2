@@ -159,6 +159,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 %End
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
+    void addPoint( const KadasMapPos &mapPos );
 
   public slots:
     void clear();
@@ -170,7 +171,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
   protected:
     void createItem();
-    void addPoint( const KadasMapPos &mapPos );
     void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &attributes );
     void finishPart();

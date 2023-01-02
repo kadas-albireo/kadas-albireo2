@@ -16,8 +16,11 @@
 
 #include <gdal.h>
 
+#include <QApplication>
+#include <QClipboard>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QMenu>
 #include <QToolButton>
 
 #include <qgis/qgsgeometry.h>
@@ -28,6 +31,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadas.h>
+#include <kadas/core/kadascoordinateformat.h>
 #include <kadas/analysis/kadasninecellfilter.h>
 #include <kadas/gui/mapitems/kadascircleitem.h>
 #include <kadas/gui/mapitems/kadaspolygonitem.h>
@@ -38,8 +42,10 @@
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 
 
-KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas )
+KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile )
   : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas, FilterRect ) )
+  , mActionViewshed( actionViewshed )
+  , mActionProfile( actionProfile )
 {
   setCursor( Qt::ArrowCursor );
   setToolLabel( tr( "Compute min/max" ) );
@@ -146,6 +152,11 @@ void KadasMapToolMinMax::drawFinished()
   }
   geom->transform( crst, Qgis::TransformDirection::Reverse );
   QgsRectangle bbox = geom->boundingBox();
+  if ( bbox.isEmpty() )
+  {
+    clear();
+    return;
+  }
   QPolygonF filterGeom = QgsGeometry( geom ).asQPolygonF();
 
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ) );
@@ -263,10 +274,61 @@ void KadasMapToolMinMax::requestPick()
 
 void KadasMapToolMinMax::canvasPressEvent( QgsMapMouseEvent *e )
 {
-  if ( !mPickFeature )
+  if ( mPickFeature )
   {
-    KadasMapToolCreateItem::canvasPressEvent( e );
+    return;
   }
+  if ( currentItem() && currentItem()->constState()->drawStatus != KadasMapItem::State::Drawing && mPinMin && mPinMax )
+  {
+    QgsPointXY mapPos = toMapCoordinates( e->pos() );
+    if ( mPinMax->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
+    {
+      showContextMenu( mPinMax );
+      return;
+    }
+    else if ( mPinMin->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
+    {
+      showContextMenu( mPinMin );
+      return;
+    }
+  }
+  KadasMapToolCreateItem::canvasPressEvent( e );
+}
+
+void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
+{
+  QgsPointXY mapPos = item->position();
+  QMenu menu;
+  menu.addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), [this, mapPos]
+  {
+    const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
+    QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mapPos, mapCrs );
+    QString text = QString( "%1\n%2" )
+    .arg( posStr )
+    .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
+    QApplication::clipboard()->setText( text );
+  } );
+  menu.addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), [this, mapPos]
+  {
+    mActionViewshed->trigger();
+    QgsMapTool *tool = mCanvas->mapTool();
+    if ( dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+    {
+      static_cast<KadasMapToolCreateItem *>( tool )->addPoint( KadasMapPos::fromPoint( mapPos ) );
+    }
+  } );
+  menu.addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), [this, mapPos]
+  {
+    mActionProfile->trigger();
+    QgsMapTool *tool = mCanvas->mapTool();
+    if ( dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+    {
+      static_cast<KadasMapToolCreateItem *>( tool )->addPoint( KadasMapPos::fromPoint( mapPos ) );
+    }
+  } );
+  item->setSelected( true );
+  menu.exec( mCanvas->mapToGlobal( toCanvasCoordinates( mapPos ) ) );
+  item->setSelected( false );
 }
 
 void KadasMapToolMinMax::canvasMoveEvent( QgsMapMouseEvent *e )
