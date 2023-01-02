@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="64"
-   height="64"
-   viewBox="0 0 64.000001 64.000001"
+   width="55.486534"
+   height="43.279499"
+   viewBox="0 0 55.486535 43.2795"
    id="svg2"
    version="1.1"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="-24.553571"
+     inkscape:cx="21.785714"
      inkscape:cy="52.767857"
      inkscape:document-units="px"
      inkscape:current-layer="g4200"
@@ -35,9 +35,9 @@
      inkscape:object-paths="true"
      inkscape:snap-intersection-paths="true"
      inkscape:object-nodes="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1171"
-     inkscape:window-x="1600"
+     inkscape:window-width="1600"
+     inkscape:window-height="829"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:showpageshadow="2"
@@ -45,7 +45,9 @@
      inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        type="xygrid"
-       id="grid4776" />
+       id="grid4776"
+       originx="-4.2567342"
+       originy="-1.3318044e-06" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -62,14 +64,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-988.36216)">
+     transform="translate(-4.2567341,-988.36216)">
     <g
        id="g4200"
        transform="matrix(0.03543036,0,0,0.03543036,6.1025327,985.18341)">
       <title
          id="title4202">Layer 1</title>
       <path
-         style="fill:#ff0000;fill-opacity:0.99635035;stroke:#fffff7;stroke-width:84.6731;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#ff0000;fill-opacity:0.99635;stroke:#fffff7;stroke-width:84.6731;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
          d="M 730.94,168.16782 25.330447,1268.9188 H 1436.5496 Z"
          id="path348"
          sodipodi:nodetypes="cccc" />
