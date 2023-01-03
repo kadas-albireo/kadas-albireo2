@@ -447,7 +447,6 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
           for ( int i = 0, n = store.count(); i < n; ++i )
           {
             QgsFeature feature = store.features().at( i );
-            QString sublayerName;
             QTreeWidgetItem *item = nullptr;
             if ( resultIt.key() < rLayer->dataProvider()->subLayers().length() )
             {
