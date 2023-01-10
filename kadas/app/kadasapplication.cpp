@@ -1575,6 +1575,11 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
 
   QUrl url = request->url();
+  QUrlQuery query( url );
+  if ( query.hasQueryItem( "token" ) )
+  {
+    return;
+  }
   QgsDebugMsg( QString( "injectAuthToken: got url %1" ).arg( url.url() ) );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
   QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
@@ -1587,11 +1592,6 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
       QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
       if ( tokenRe.indexIn( QString( data ) ) != -1 )
       {
-        QUrlQuery query( url );
-        if ( query.hasQueryItem( "token" ) )
-        {
-          continue;
-        }
         query.addQueryItem( "token", tokenRe.cap( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
