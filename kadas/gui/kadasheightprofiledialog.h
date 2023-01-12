@@ -44,6 +44,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void setPoints( const QList<QgsPointXY> &points, const QgsCoordinateReferenceSystem &crs );
     void setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
     void clear();
+    bool isBusy() const;
 
   public slots:
     void accept() override;

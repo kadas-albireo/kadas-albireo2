@@ -247,6 +247,11 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
 
 void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
+  if ( isBusy() )
+  {
+    return;
+  }
+
   QgsPointXY pos = QgsCoordinateTransform( crs, mPointsCrs, QgsProject::instance() ).transform( p );
   double x = std::sqrt( pos.sqrDist( mPoints[segment] ) );
   for ( int i = 0; i < segment; ++i )
@@ -262,6 +267,10 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
 
 void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 {
+  if ( isBusy() )
+  {
+    return;
+  }
 
   int idx = mPlot->invTransform( QwtPlot::xBottom, pos.x() );
   QPointF sample = mPlotSamples.at( idx );
@@ -290,9 +299,14 @@ void KadasHeightProfileDialog::clear()
   mLineOfSightGroupBoxgroupBox->setEnabled( false );
 }
 
+bool KadasHeightProfileDialog::isBusy() const
+{
+  return mCancelButton->isVisible();
+}
+
 void KadasHeightProfileDialog::accept()
 {
-  if ( !mCancelButton->isVisible() )
+  if ( !isBusy() )
   {
     QDialog::accept();
   }
@@ -300,7 +314,7 @@ void KadasHeightProfileDialog::accept()
 
 void KadasHeightProfileDialog::reject()
 {
-  if ( !mCancelButton->isVisible() )
+  if ( !isBusy() )
   {
     QDialog::reject();
   }
