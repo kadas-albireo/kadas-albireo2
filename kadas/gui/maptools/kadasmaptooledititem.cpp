@@ -322,7 +322,7 @@ void KadasMapToolEditItem::clearNumericInput()
   mInputWidget = nullptr;
 }
 
-void KadasMapToolEditItem::stateChanged( KadasStateHistory::State *state )
+void KadasMapToolEditItem::stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State */*prevState*/ )
 {
   mItem->setState( static_cast<const KadasMapItem::State *>( state ) );
 }

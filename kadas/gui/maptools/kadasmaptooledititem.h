@@ -69,7 +69,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     void checkRemovedLayer( QgsMapLayer *layer );
     void checkHiddenLayer();
     void inputChanged();
-    void stateChanged( KadasStateHistory::State *state );
+    void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State * );
     void copyItem();
     void cutItem();
     void deleteItem();

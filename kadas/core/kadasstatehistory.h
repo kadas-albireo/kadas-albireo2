@@ -32,6 +32,7 @@ class KADAS_CORE_EXPORT KadasStateHistory : public QObject
     {
       virtual ~State() {}
     };
+    enum class ChangeType {Undo, Redo};
 
     KadasStateHistory( QObject *parent = 0 );
     ~KadasStateHistory();
@@ -45,7 +46,7 @@ class KADAS_CORE_EXPORT KadasStateHistory : public QObject
   signals:
     void canUndoChanged( bool );
     void canRedoChanged( bool );
-    void stateChanged( State *state );
+    void stateChanged( ChangeType changeType, State *state, State *prevState );
 
   private:
     QVector<State *> mStates;

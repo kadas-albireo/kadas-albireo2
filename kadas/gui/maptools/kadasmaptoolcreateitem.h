@@ -21,6 +21,7 @@
 
 #include <kadas/core/kadasstatehistory.h>
 #include <kadas/gui/kadas_gui.h>
+#include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>
 
@@ -196,7 +197,16 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
 
+    struct ToolState : KadasStateHistory::State
+    {
+      ToolState( State *_itemState, QSharedPointer<KadasItemLayer::ItemId> _itemId ) : itemState( _itemState ), itemId( _itemId ) {}
+      ~ToolState() { delete itemState; }
+      State *itemState = nullptr;
+      QSharedPointer<KadasItemLayer::ItemId> itemId;
+    };
     KadasStateHistory *mStateHistory = nullptr;
+    QSharedPointer<KadasItemLayer::ItemId> mCurrentItemId;
+
     KadasFloatingInputWidget *mInputWidget = nullptr;
     KadasMapItem::AttribDefs mDrawAttribs;
     bool mIgnoreNextMoveEvent = false;
@@ -218,7 +228,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
   private slots:
     void inputChanged();
     void acceptInput();
-    void stateChanged( KadasStateHistory::State *state );
+    void stateChanged( KadasStateHistory::ChangeType changeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
     void setTargetLayer( QgsMapLayer *layer );
 
 };

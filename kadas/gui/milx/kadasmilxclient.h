@@ -40,6 +40,7 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
   QString name;
   QString militaryName;
   QImage icon;
+  // These are only used when first drawing
   bool hasVariablePoints;
   int minNumPoints;
   QString symbolType;

@@ -86,7 +86,7 @@ KadasItemLayer::~KadasItemLayer()
   qDeleteAll( mItems );
 }
 
-void KadasItemLayer::addItem( KadasMapItem *item )
+KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
 {
   ItemId id = ITEM_ID_NULL;
   if ( !mFreeIds.isEmpty() )
@@ -105,6 +105,7 @@ void KadasItemLayer::addItem( KadasMapItem *item )
   item->setSymbolScale( mSymbolScale );
   emit itemAdded( id );
   emit repaintRequested();
+  return id;
 }
 
 void KadasItemLayer::lowerItem( const ItemId &itemId )

@@ -40,7 +40,8 @@ void KadasStateHistory::undo()
 {
   if ( canUndo() )
   {
-    emit stateChanged( mStates[--mCurrent] );
+    --mCurrent;
+    emit stateChanged( ChangeType::Undo, mStates[mCurrent], mStates[mCurrent + 1] );
   }
   emit canUndoChanged( canUndo() );
   emit canRedoChanged( canRedo() );
@@ -50,7 +51,8 @@ void KadasStateHistory::redo()
 {
   if ( canRedo() )
   {
-    emit stateChanged( mStates[++mCurrent] );
+    ++mCurrent;
+    emit stateChanged( ChangeType::Redo, mStates[mCurrent], mStates[mCurrent - 1] );
   }
   emit canUndoChanged( canUndo() );
   emit canRedoChanged( canRedo() );

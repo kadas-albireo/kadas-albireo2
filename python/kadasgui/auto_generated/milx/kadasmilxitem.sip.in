@@ -50,6 +50,7 @@ class KadasMilxItem : KadasMapItem
 
     struct State : KadasMapItem::State
     {
+      KadasMilxSymbolDesc symbolDesc;
       QList<KadasItemPos> points;
       QMap<int, double> attributes;
       QMap<int, KadasItemPos> attributePoints;
