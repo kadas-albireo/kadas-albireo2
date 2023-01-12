@@ -332,36 +332,42 @@ void KadasGeometryItem::setOutline( const QPen &pen )
 {
   mPen = pen;
   update();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setFill( const QBrush &brush )
 {
   mBrush = brush;
   update();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconSize( int iconSize )
 {
   mIconSize = iconSize;
   update();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconType( IconType iconType )
 {
   mIconType = iconType;
   update();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconOutline( const QPen &iconPen )
 {
   mIconPen = iconPen;
   update();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
 {
   mIconBrush = iconBrush;
   update();
+  emit propertyChanged();
 }
 
 KadasItemRect KadasGeometryItem::boundingBox() const

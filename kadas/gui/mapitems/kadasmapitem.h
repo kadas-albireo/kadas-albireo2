@@ -428,9 +428,14 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       mDontCleanupAttachment = true;
     }
 
+    // Props
+    QMap<QString, QVariant> getProps() const;
+    void setProps( const QMap<QString, QVariant> &props );
+
   signals:
     void aboutToBeDestroyed();
     void changed();
+    void propertyChanged();
 
   protected:
     State *mState = nullptr;

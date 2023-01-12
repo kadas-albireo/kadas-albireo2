@@ -146,19 +146,48 @@ KadasMilxItem::KadasMilxItem()
 
 void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
 {
-  state()->symbolDesc = symbolDesc;
+  mMssString = symbolDesc.symbolXml;
+  mMilitaryName = symbolDesc.militaryName;
+  mHasVariablePoints = symbolDesc.hasVariablePoints;
+  mMinNPoints = symbolDesc.minNumPoints;
+  mSymbolType = symbolDesc.symbolType;
+  update();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setMssString( const QString &mssString )
 {
-  state()->symbolDesc.symbolXml = mssString;
+  mMssString = mssString;
   update();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setMilitaryName( const QString &militaryName )
 {
-  state()->symbolDesc.militaryName = militaryName;
+  mMilitaryName = militaryName;
   update();
+  emit propertyChanged();
+}
+
+void KadasMilxItem::setMinNPoints( int minNPoints )
+{
+  mMinNPoints = minNPoints;
+  update();
+  emit propertyChanged();
+}
+
+void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
+{
+  mHasVariablePoints = hasVariablePoints;
+  update();
+  emit propertyChanged();
+}
+
+void KadasMilxItem::setSymbolType( const QString &symbolType )
+{
+  mSymbolType = symbolType;
+  update();
+  emit propertyChanged();
 }
 
 KadasItemPos KadasMilxItem::position() const
@@ -204,7 +233,7 @@ QgsAbstractGeometry *KadasMilxItem::toGeometry() const
         lineString->addVertex( QgsPoint( constState()->points[i] ) );
       }
     }
-    if ( constState()->symbolDesc.symbolType == "Polygon" && constState()->points.size() > 2 )
+    if ( mSymbolType == "Polygon" && constState()->points.size() > 2 )
     {
       lineString->addVertex( QgsPoint( constState()->points[0] ) );
       QgsPolygon *poly = new QgsPolygon();
@@ -455,7 +484,7 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
 
 bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  if ( state()->symbolDesc.symbolXml.isEmpty() )
+  if ( mMssString.isEmpty() )
   {
     return false;
   }
@@ -470,7 +499,7 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, true );
   updateSymbol( mapSettings, result );
 
-  return state()->pressedPoints < state()->symbolDesc.minNumPoints || state()->symbolDesc.hasVariablePoints;
+  return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
 }
 
 bool KadasMilxItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
@@ -505,7 +534,7 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
   // The server automatically adds points up to the minimum number
   ++state()->pressedPoints;
 
-  if ( state()->pressedPoints >= state()->symbolDesc.minNumPoints && state()->symbolDesc.hasVariablePoints )
+  if ( state()->pressedPoints >= mMinNPoints && mHasVariablePoints )
   {
     QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
     int dpi = mapSettings.outputDpi();
@@ -522,12 +551,12 @@ bool KadasMilxItem::continuePart( const QgsMapSettings &mapSettings )
       updateSymbol( mapSettings, result );
     }
   }
-  return state()->pressedPoints < state()->symbolDesc.minNumPoints || state()->symbolDesc.hasVariablePoints;
+  return state()->pressedPoints < mMinNPoints || mHasVariablePoints;
 }
 
 void KadasMilxItem::endPart()
 {
-  if ( !state()->symbolDesc.symbolXml.isEmpty() )
+  if ( !mMssString.isEmpty() )
   {
     state()->drawStatus = State::Finished;
     mIsPointSymbol = !isMultiPoint();
@@ -694,7 +723,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
         break;
       }
     }
-    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, state()->symbolDesc.symbolXml, state()->symbolDesc.militaryName, symbolSettings(), result, winId ) )
+    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
     {
       updateSymbol( mapSettings, result );
     }
@@ -748,7 +777,7 @@ void KadasMilxItem::onDoubleClick( const QgsMapSettings &mapSettings )
     }
   }
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
-  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, state()->symbolDesc.symbolXml, state()->symbolDesc.militaryName, symbolSettings(), result, winId ) )
+  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, mMssString, mMilitaryName, symbolSettings(), result, winId ) )
   {
     updateSymbol( mapSettings, result );
   }
@@ -826,17 +855,17 @@ KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapT
   QList<QPoint> points = computeScreenPoints( mapToPixel, mapCrst );
   QList< QPair<int, double> > screenAttribs = computeScreenAttributes( mapToPixel, mapCrst );
   bool finalized = constState()->drawStatus == State::DrawStatus::Finished;
-  return KadasMilxClient::NPointSymbol( constState()->symbolDesc.symbolXml, points, constState()->controlPoints, screenAttribs, finalized, colored );
+  return KadasMilxClient::NPointSymbol( mMssString, points, constState()->controlPoints, screenAttribs, finalized, colored );
 }
 
 void KadasMilxItem::writeMilx( QDomDocument &doc, QDomElement &itemElement ) const
 {
   QDomElement stringXmlEl = doc.createElement( "MssStringXML" );
-  stringXmlEl.appendChild( doc.createTextNode( constState()->symbolDesc.symbolXml ) );
+  stringXmlEl.appendChild( doc.createTextNode( mMssString ) );
   itemElement.appendChild( stringXmlEl );
 
   QDomElement nameEl = doc.createElement( "Name" );
-  nameEl.appendChild( doc.createTextNode( constState()->symbolDesc.militaryName ) );
+  nameEl.appendChild( doc.createTextNode( mMilitaryName ) );
   itemElement.appendChild( nameEl );
 
   QDomElement pointListEl = doc.createElement( "PointList" );
@@ -890,8 +919,8 @@ KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const Qg
 {
   KadasMilxItem *item = new KadasMilxItem();
 
-  item->setMilitaryName( itemElement.firstChildElement( "Name" ).text() );
-  item->setMssString( itemElement.firstChildElement( "MssStringXML" ).text() );
+  item->mMilitaryName = itemElement.firstChildElement( "Name" ).text();
+  item->mMssString = itemElement.firstChildElement( "MssStringXML" ).text();
 
   bool isCorridor = itemElement.firstChildElement( "IsMIPCorridorPointList" ).text().toInt();
 
@@ -924,7 +953,7 @@ KadasMilxItem *KadasMilxItem::fromMssStringAndPoints( const QString &mssString, 
 {
   KadasMilxItem *item = new KadasMilxItem();
 
-  item->state()->symbolDesc.symbolXml = mssString;
+  item->mMssString = mssString;
   item->state()->points = points;
 
   finalize( item, false );
@@ -969,7 +998,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
         }
         item->state()->attributes.clear();
       }
-      if ( KadasMilxClient::getControlPoints( item->state()->symbolDesc.symbolXml, screenPoints, screenAttributes, item->state()->controlPoints, isCorridor, item->symbolSettings() ) )
+      if ( KadasMilxClient::getControlPoints( item->mMssString, screenPoints, screenAttributes, item->state()->controlPoints, isCorridor, item->symbolSettings() ) )
       {
         item->state()->points.clear();
         for ( const QPoint &screenPoint : screenPoints )
@@ -982,19 +1011,19 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
     }
     else
     {
-      KadasMilxClient::getControlPointIndices( item->state()->symbolDesc.symbolXml, item->state()->points.count(), item->symbolSettings(), item->state()->controlPoints );
+      KadasMilxClient::getControlPointIndices( item->mMssString, item->state()->points.count(), item->symbolSettings(), item->state()->controlPoints );
     }
   }
 
-  if ( item->state()->symbolDesc.militaryName.isEmpty() )
+  if ( item->mMilitaryName.isEmpty() )
   {
-    KadasMilxClient::getMilitaryName( item->state()->symbolDesc.symbolXml, item->state()->symbolDesc.militaryName );
+    KadasMilxClient::getMilitaryName( item->mMssString, item->mMilitaryName );
   }
 
   item->state()->drawStatus = State::DrawStatus::Finished;
   item->mIsPointSymbol = !item->isMultiPoint();
 
-  KadasMilxClient::NPointSymbol symbol( item->state()->symbolDesc.symbolXml, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
+  KadasMilxClient::NPointSymbol symbol( item->mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
   QRect screenExtent( 0, 0, 100, 100 );
   KadasMilxClient::NPointSymbolGraphic result;
   int dpi = qApp->desktop()->logicalDpiX();
@@ -1126,7 +1155,7 @@ QImage KadasMilxItem::symbolImage() const
   if ( isPointSymbol() && mSymbolGraphic.isNull() )
   {
     // Update symbol
-    KadasMilxClient::NPointSymbol symbol( constState()->symbolDesc.symbolXml, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
+    KadasMilxClient::NPointSymbol symbol( mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList< QPair<int, double> >(), true, true );
     QRect screenExtent( 0, 0, 100, 100 );
     KadasMilxClient::NPointSymbolGraphic result;
     int dpi = qApp->desktop()->logicalDpiX();

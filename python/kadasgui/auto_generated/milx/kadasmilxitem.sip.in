@@ -23,6 +23,13 @@ class KadasMilxItem : KadasMapItem
     void setMssString( const QString &mssString );
     const QString &militaryName() const;
     void setMilitaryName( const QString &militaryName );
+    int minNPoints() const;
+    void setMinNPoints( int minNPoints );
+    bool hasVariablePoints() const;
+    void setHasVariablePoints( bool hasVariablePoints );
+    QString symbolType() const;
+    void setSymbolType( const QString &symbolType );
+
 
     virtual QString itemName() const;
 
@@ -50,7 +57,6 @@ class KadasMilxItem : KadasMapItem
 
     struct State : KadasMapItem::State
     {
-      KadasMilxSymbolDesc symbolDesc;
       QList<KadasItemPos> points;
       QMap<int, double> attributes;
       QMap<int, KadasItemPos> attributePoints;

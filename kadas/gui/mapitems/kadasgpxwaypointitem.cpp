@@ -50,6 +50,7 @@ void KadasGpxWaypointItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
+  emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxWaypointItem::margin() const

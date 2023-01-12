@@ -85,6 +85,7 @@ void KadasCircleItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
+  emit propertyChanged();
 }
 
 KadasItemPos KadasCircleItem::position() const

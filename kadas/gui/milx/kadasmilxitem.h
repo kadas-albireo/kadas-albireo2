@@ -26,15 +26,25 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     Q_OBJECT
     Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
     Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
+    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
+    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
+    Q_PROPERTY( QString symbolType READ symbolType WRITE setSymbolType )
 
   public:
     KadasMilxItem();
     void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
 
-    const QString &mssString() const { return constState()->symbolDesc.symbolXml; }
+    const QString &mssString() const { return mMssString; }
     void setMssString( const QString &mssString );
-    const QString &militaryName() const { return constState()->symbolDesc.militaryName; }
+    const QString &militaryName() const { return mMilitaryName; }
     void setMilitaryName( const QString &militaryName );
+    int minNPoints() const { return mMinNPoints; }
+    void setMinNPoints( int minNPoints );
+    bool hasVariablePoints() const { return mHasVariablePoints; }
+    void setHasVariablePoints( bool hasVariablePoints );
+    QString symbolType() const { return mSymbolType; }
+    void setSymbolType( const QString &symbolType );
+
 
     QString itemName() const override { return mMilitaryName; }
 
@@ -58,7 +68,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     // State interface
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      KadasMilxSymbolDesc symbolDesc;
       QList<KadasItemPos> points;
 #ifndef SIP_RUN
       QMap<KadasMilxAttrType, double> attributes;
@@ -136,6 +145,10 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     QString mMssString;
     QString mMilitaryName;
+    // These are only used when first drawing
+    int mMinNPoints = -1;
+    bool mHasVariablePoints = false;
+    QString mSymbolType;
 
     // Symbol cache
     mutable QImage mSymbolGraphic;

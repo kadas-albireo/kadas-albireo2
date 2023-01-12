@@ -84,6 +84,7 @@ void KadasLineItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
+  emit propertyChanged();
 }
 
 KadasItemPos KadasLineItem::position() const

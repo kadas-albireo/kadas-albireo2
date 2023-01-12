@@ -402,9 +402,13 @@ Trigger a redraw */
 
     void preventAttachmentCleanup();
 
+    QMap<QString, QVariant> getProps() const;
+    void setProps( const QMap<QString, QVariant> &props );
+
   signals:
     void aboutToBeDestroyed();
     void changed();
+    void propertyChanged();
 
   protected:
 

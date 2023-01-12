@@ -65,12 +65,14 @@ void KadasAnchoredItem::setAnchorX( double anchorX )
 {
   mAnchorX = anchorX;
   update();
+  emit propertyChanged();
 }
 
 void KadasAnchoredItem::setAnchorY( double anchorY )
 {
   mAnchorY = anchorY;
   update();
+  emit propertyChanged();
 }
 
 void KadasAnchoredItem::setPosition( const KadasItemPos &pos )

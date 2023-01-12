@@ -168,6 +168,7 @@ void KadasPictureItem::setFilePath( const QString &filePath )
 {
   setup( filePath, constState()->pos, true, state()->offsetX, state()->offsetY );
   update();
+  emit propertyChanged();
 }
 
 void KadasPictureItem::setFrameVisible( bool frame )
@@ -179,12 +180,14 @@ void KadasPictureItem::setFrameVisible( bool frame )
     state()->offsetY = 0;
   }
   update();
+  emit propertyChanged();
 }
 
 void KadasPictureItem::setPositionLocked( bool locked )
 {
   mPosLocked = locked;
   update();
+  emit propertyChanged();
 }
 
 void KadasPictureItem::setPosition( const KadasItemPos &pos )

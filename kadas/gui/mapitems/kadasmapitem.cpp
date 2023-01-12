@@ -173,18 +173,21 @@ void KadasMapItem::setAuthId( const QString &authId )
 {
   mCrs = QgsCoordinateReferenceSystem( authId );
   update();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
   update();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setTooltip( const QString &tooltip )
 {
   mTooltip = tooltip;
   update();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setVisible( bool visible )
@@ -197,6 +200,7 @@ void KadasMapItem::setSymbolScale( double scale )
 {
   mSymbolScale = scale;
   update();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setState( const State *state )
@@ -384,4 +388,32 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     QgsDebugMsg( QString( "Unknown item: %1" ).arg( name ) );
   }
   return nullptr;
+}
+
+QMap<QString, QVariant> KadasMapItem::getProps() const
+{
+  QMap<QString, QVariant> result;
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    result[prop.name()] = prop.read( this );
+  }
+  return result;
+}
+
+void KadasMapItem::setProps( const QMap<QString, QVariant> &props )
+{
+  blockSignals( true );
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    auto it = props.find( prop.name() );
+    if ( it != props.end() )
+    {
+      prop.write( this, it.value() );
+    }
+  }
+  blockSignals( false );
+  emit changed();
+  emit propertyChanged();
 }

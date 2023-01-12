@@ -36,9 +36,9 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
     void setFilePath( const QString &path );
     const QString &filePath() const { return mFilePath; }
-    void setName( const QString &name ) { mName = name; }
+    void setName( const QString &name );
     const QString &name() const { return mName; }
-    void setRemarks( const QString &remarks ) { mRemarks = remarks; }
+    void setRemarks( const QString &remarks );
     const QString &remarks() const { return mRemarks; }
 
     QImage symbolImage() const override { return mImage; }

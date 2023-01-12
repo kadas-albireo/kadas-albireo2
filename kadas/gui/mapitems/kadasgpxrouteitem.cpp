@@ -46,12 +46,14 @@ void KadasGpxRouteItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
+  emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setNumber( const QString &number )
 {
   mNumber = number;
   update();
+  emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxRouteItem::margin() const

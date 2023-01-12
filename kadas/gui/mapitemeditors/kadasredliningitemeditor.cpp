@@ -134,12 +134,16 @@ void KadasRedliningItemEditor::syncWidgetToItem()
   Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
   Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
 
+  geometryItem->blockSignals( true );
   geometryItem->setOutline( QPen( outlineColor, outlineWidth, lineStyle ) );
   geometryItem->setFill( QBrush( fillColor, brushStyle ) );
 
   geometryItem->setIconSize( 10 + 2 * outlineWidth );
   geometryItem->setIconOutline( QPen( outlineColor, outlineWidth / 4, lineStyle ) );
   geometryItem->setIconFill( QBrush( fillColor, brushStyle ) );
+  geometryItem->blockSignals( false );
+  emit geometryItem->changed();
+  emit geometryItem->propertyChanged();
 }
 
 KadasRedliningItemEditor::~KadasRedliningItemEditor()

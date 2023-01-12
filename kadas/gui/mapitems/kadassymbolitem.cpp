@@ -83,6 +83,19 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
 void KadasSymbolItem::setFilePath( const QString &path )
 {
   setup( path, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
+  emit propertyChanged();
+}
+
+void KadasSymbolItem::setName( const QString &name )
+{
+  mName = name;
+  emit propertyChanged();
+}
+
+void KadasSymbolItem::setRemarks( const QString &remarks )
+{
+  mRemarks = remarks;
+  emit propertyChanged();
 }
 
 void KadasSymbolItem::setState( const KadasMapItem::State *state )
