@@ -30,31 +30,31 @@ class KadasGuideGridLayer : public KadasPluginLayer
     KadasGuideGridLayer( const QString &name );
     void setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked );
 
-    QString layerTypeKey() const override { return layerType(); };
+    QString layerTypeKey() const override { return layerType(); }
     KadasGuideGridLayer *clone() const override;
     QList<IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    QgsRectangle extent() const override  { return mGridRect; }
+    QgsRectangle extent() const override  { return mGridConfig.gridRect; }
 
-    int cols() const { return mCols; }
-    int rows() const { return mRows; }
-    bool colSizeLocked() const { return mColSizeLocked; }
-    bool rowSizeLocked() const { return mRowSizeLocked; }
+    int cols() const { return mGridConfig.cols; }
+    int rows() const { return mGridConfig.rows; }
+    bool colSizeLocked() const { return mGridConfig.colSizeLocked; }
+    bool rowSizeLocked() const { return mGridConfig.rowSizeLocked; }
 
-    const QColor &color() const { return mColor; }
-    int lineWidth() const { return mLineWidth; }
-    int fontSize() const { return mFontSize; }
-    QPair<QChar, QChar> labelingMode() const { return qMakePair( mRowChar, mColChar ); }
-    LabelingPos labelingPos() const { return mLabelingPos; }
-    QuadrantLabeling labelQuadrants() const { return mQuadrantLabeling; }
+    const QColor &color() const { return mGridConfig.color; }
+    int lineWidth() const { return mGridConfig.lineWidth; }
+    int fontSize() const { return mGridConfig.fontSize; }
+    QPair<QChar, QChar> labelingMode() const { return qMakePair( mGridConfig.rowChar, mGridConfig.colChar ); }
+    LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
+    QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
 
   public slots:
-    void setColor( const QColor &color ) { mColor = color; }
-    void setLineWidth( int lineWidth ) { mLineWidth = lineWidth; }
-    void setFontSize( int fontSize ) { mFontSize = fontSize; }
-    void setLabelingMode( QChar rowChar, QChar colChar ) { mRowChar = rowChar; mColChar = colChar; }
-    void setLabelingPos( LabelingPos pos ) { mLabelingPos = pos; }
-    void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mQuadrantLabeling = labelQuadrants; }
+    void setColor( const QColor &color ) { mGridConfig.color = color; }
+    void setLineWidth( int lineWidth ) { mGridConfig.lineWidth = lineWidth; }
+    void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
+    void setLabelingMode( QChar rowChar, QChar colChar ) { mGridConfig.rowChar = rowChar; mGridConfig.colChar = colChar; }
+    void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
+    void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -63,18 +63,21 @@ class KadasGuideGridLayer : public KadasPluginLayer
   private:
     class Renderer;
 
-    QgsRectangle mGridRect;
-    int mCols = 0;
-    int mRows = 0;
-    bool mColSizeLocked = false;
-    bool mRowSizeLocked = false;
-    int mFontSize = 30;
-    QColor mColor = Qt::red;
-    int mLineWidth = 1;
-    QChar mRowChar = 'A';
-    QChar mColChar = '1';
-    LabelingPos mLabelingPos = LabelsInside;
-    QuadrantLabeling mQuadrantLabeling = DontLabelQuadrants;
+    struct GridConfig
+    {
+      QgsRectangle gridRect;
+      int cols = 0;
+      int rows = 0;
+      bool colSizeLocked = false;
+      bool rowSizeLocked = false;
+      int fontSize = 30;
+      QColor color = Qt::red;
+      int lineWidth = 1;
+      QChar rowChar = 'A';
+      QChar colChar = '1';
+      LabelingPos labelingPos = LabelsInside;
+      QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
+    } mGridConfig;
 };
 
 

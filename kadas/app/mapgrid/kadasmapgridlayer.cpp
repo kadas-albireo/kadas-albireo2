@@ -37,18 +37,19 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
   public:
     Renderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id() )
-      , mLayer( layer )
+      , mRenderGridConfig( layer->mGridConfig )
+      , mRenderOpacity( layer->opacity() )
       , mRendererContext( rendererContext )
     {}
 
     bool render() override
     {
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->opacity() );
+      mRendererContext.painter()->setOpacity( mRenderOpacity );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1. ) );
+      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1. ) );
 
-      switch ( mLayer->mGridType )
+      switch ( mRenderGridConfig.gridType )
       {
         case GridLV03:
           drawCrsGrid( "EPSG:21781", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
@@ -76,7 +77,8 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    KadasMapGridLayer *mLayer;
+    KadasMapGridLayer::GridConfig mRenderGridConfig;
+    double mRenderOpacity = 1.;
     QgsRenderContext &mRendererContext;
 
     struct GridLabel
@@ -96,23 +98,23 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QList<GridLabel> topLabels;
       QList<GridLabel> bottomLabels;
 
-      double xStart = std::floor( area.xMinimum() / mLayer->intervalX() ) * mLayer->intervalX();
-      double xEnd = std::ceil( area.xMaximum() / mLayer->intervalX() ) * mLayer->intervalX();
-      double yStart = std::floor( area.yMinimum() / mLayer->intervalY() ) * mLayer->intervalY();
-      double yEnd = std::ceil( area.yMaximum() / mLayer->intervalY() ) * mLayer->intervalY();
+      double xStart = std::floor( area.xMinimum() / mRenderGridConfig.intervalX ) * mRenderGridConfig.intervalX;
+      double xEnd = std::ceil( area.xMaximum() / mRenderGridConfig.intervalX ) * mRenderGridConfig.intervalX;
+      double yStart = std::floor( area.yMinimum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
+      double yEnd = std::ceil( area.yMaximum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
 
       const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
       bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob );
 
       // If chosen intervals would result in over 100 grid lines, reduce interval
-      double intervalX = mLayer->intervalX();
+      double intervalX = mRenderGridConfig.intervalX;
       int numX = qRound( ( xEnd - xStart ) / intervalX ) + 1;
       while ( numX > 100 )
       {
         intervalX *= 2;
         numX = qRound( ( xEnd - xStart ) / intervalX ) + 1;
       }
-      double intervalY = mLayer->intervalY();
+      double intervalY = mRenderGridConfig.intervalY;
       int numY = qRound( ( yEnd - yStart ) / intervalY ) + 1;
       while ( numY > 100 )
       {
@@ -135,7 +137,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
         mRendererContext.painter()->drawPolyline( poly );
 
-        if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
+        if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
         {
           int iSegment = 0, nSegments = poly.size() - 1;
           // Bottom edge label pos
@@ -182,7 +184,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
         mRendererContext.painter()->drawPolyline( poly );
 
-        if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
+        if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
         {
           int iSegment = 0, nSegments = poly.size() - 1;
           // Left edge label pos
@@ -214,16 +216,16 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         }
       }
 
-      if ( drawLabels && mLayer->mLabelingMode == LabelingEnabled )
+      if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
       {
         double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
         QFont font = mRendererContext.painter()->font();
         font.setBold( true );
-        font.setPointSizeF( mLayer->mFontSize * dpiScale );
+        font.setPointSizeF( mRenderGridConfig.fontSize * dpiScale );
         QFontMetrics fm( font );
-        mRendererContext.painter()->setBrush( mLayer->mColor );
+        mRendererContext.painter()->setBrush( mRenderGridConfig.color );
 
-        QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+        QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
         double screenMargin = 5;
         double labelMargin = 10;
         double lastDrawY = std::numeric_limits<double>::lowest();
@@ -340,10 +342,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
       QList<KadasLatLonToUTM::ZoneLabel> zoneSubLabels;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
-      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mLayer->mGridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM, mLayer->mCellSize );
+      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM, mRenderGridConfig.cellSize );
 
       // Draw grid lines
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, 3 ) );
+      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
       for ( const QPolygonF &zoneLine : zoneLines )
       {
         QPolygonF itemLine;
@@ -354,7 +356,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         mRendererContext.painter()->drawPolyline( itemLine );
       }
 
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1.5 ) );
+      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
       for ( const QPolygonF &subZoneLine : subZoneLines )
       {
         QPolygonF itemLine;
@@ -365,7 +367,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         mRendererContext.painter()->drawPolyline( itemLine );
       }
 
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, 1 ) );
+      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
       for ( const QPolygonF &gridLine : gridLines )
       {
         QPolygonF itemLine;
@@ -378,40 +380,40 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       // Draw labels
       bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
-      if ( previewJob || mLayer->mLabelingMode != LabelingEnabled )
+      if ( previewJob || mRenderGridConfig.labelingMode != LabelingEnabled )
       {
         return;
       }
 
       double zoneFontSize = 0;
       double subZoneFontSize = 0;
-      double gridLabelSize = mLayer->mFontSize;
+      double gridLabelSize = mRenderGridConfig.fontSize;
       if ( mapScale > 20000000 )
       {
-        zoneFontSize = 0.66 * mLayer->mFontSize;
+        zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
       }
       else if ( mapScale > 10000000 )
       {
-        zoneFontSize = mLayer->mFontSize;
+        zoneFontSize = mRenderGridConfig.fontSize;
       }
       else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
       {
-        zoneFontSize = 1.33 * mLayer->mFontSize;
+        zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
       }
       else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
       {
-        zoneFontSize = 1.8 * mLayer->mFontSize;
-        subZoneFontSize = mLayer->mFontSize;
+        zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
+        subZoneFontSize = mRenderGridConfig.fontSize;
       }
       else
       {
-        zoneFontSize = 2 * mLayer->mFontSize;
-        subZoneFontSize = 1.33 * mLayer->mFontSize;
+        zoneFontSize = 2 * mRenderGridConfig.fontSize;
+        subZoneFontSize = 1.33 * mRenderGridConfig.fontSize;
       }
 
-      QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+      QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
       double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
-      mRendererContext.painter()->setBrush( mLayer->mColor );
+      mRendererContext.painter()->setBrush( mRenderGridConfig.color );
 
       QFont font = mRendererContext.painter()->font();
       font.setBold( true );
@@ -502,7 +504,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
     {
       QPainterPath path;
       path.addText( pos, font, text );
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
+      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
       mRendererContext.painter()->drawPath( path );
       mRendererContext.painter()->setPen( Qt::NoPen );
       mRendererContext.painter()->drawPath( path );
@@ -517,10 +519,10 @@ KadasMapGridLayer::KadasMapGridLayer( const QString &name )
 
 void KadasMapGridLayer::setup( GridType type, double intervalX, double intervalY, int cellSize )
 {
-  mGridType = type;
-  mIntervalX = intervalX;
-  mIntervalY = intervalY;
-  mCellSize = cellSize;
+  mGridConfig.gridType = type;
+  mGridConfig.intervalX = intervalX;
+  mGridConfig.intervalY = intervalY;
+  mGridConfig.cellSize = cellSize;
 }
 
 KadasMapGridLayer *KadasMapGridLayer::clone() const
@@ -528,13 +530,7 @@ KadasMapGridLayer *KadasMapGridLayer::clone() const
   KadasMapGridLayer *layer = new KadasMapGridLayer( name() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
-  layer->mGridType = mGridType;
-  layer->mIntervalX = mIntervalX;
-  layer->mIntervalY = mIntervalY;
-  layer->mCellSize = mCellSize;
-  layer->mFontSize = mFontSize;
-  layer->mColor = mColor;
-  layer->mLabelingMode = mLabelingMode;
+  layer->mGridConfig = mGridConfig;
   return layer;
 }
 
@@ -554,13 +550,13 @@ bool KadasMapGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
   mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
-  mGridType = static_cast<GridType>( layerEl.attribute( "gridtype" ).toInt() );
-  mIntervalX = layerEl.attribute( "intervalX" ).toDouble();
-  mIntervalY = layerEl.attribute( "intervalY" ).toDouble();
-  mCellSize = layerEl.attribute( "cellSize" ).toInt();
-  mFontSize = layerEl.attribute( "fontSize" ).toInt();
-  mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
-  mLabelingMode = static_cast<LabelingMode>( layerEl.attribute( "labelingMode" ).toInt() );
+  mGridConfig.gridType = static_cast<GridType>( layerEl.attribute( "gridtype" ).toInt() );
+  mGridConfig.intervalX = layerEl.attribute( "intervalX" ).toDouble();
+  mGridConfig.intervalY = layerEl.attribute( "intervalY" ).toDouble();
+  mGridConfig.cellSize = layerEl.attribute( "cellSize" ).toInt();
+  mGridConfig.fontSize = layerEl.attribute( "fontSize" ).toInt();
+  mGridConfig.color = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
+  mGridConfig.labelingMode = static_cast<LabelingMode>( layerEl.attribute( "labelingMode" ).toInt() );
   return true;
 }
 
@@ -571,13 +567,13 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
-  layerEl.setAttribute( "gridtype", mGridType );
-  layerEl.setAttribute( "intervalX", mIntervalX );
-  layerEl.setAttribute( "intervalY", mIntervalY );
-  layerEl.setAttribute( "cellSize", mCellSize );
-  layerEl.setAttribute( "fontSize", mFontSize );
-  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
-  layerEl.setAttribute( "labelingMode", static_cast<int>( mLabelingMode ) );
+  layerEl.setAttribute( "gridtype", mGridConfig.gridType );
+  layerEl.setAttribute( "intervalX", mGridConfig.intervalX );
+  layerEl.setAttribute( "intervalY", mGridConfig.intervalY );
+  layerEl.setAttribute( "cellSize", mGridConfig.cellSize );
+  layerEl.setAttribute( "fontSize", mGridConfig.fontSize );
+  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
+  layerEl.setAttribute( "labelingMode", static_cast<int>( mGridConfig.labelingMode ) );
   return true;
 }
 

@@ -35,24 +35,24 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
   public:
     Renderer( KadasItemLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id(), &rendererContext )
-      , mLayer( layer )
       , mRendererContext( rendererContext )
-    {}
+    {
+      for ( ItemId id : layer->mItemOrder )
+      {
+        mRenderItems.append( layer->mItems[id]->clone() );
+      }
+      std::stable_sort( mRenderItems.begin(), mRenderItems.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
+      mRenderOpacity = layer->opacity();
+    }
     bool render() override
     {
-      QList<KadasMapItem *> items;
-      for ( ItemId id : mLayer->mItemOrder )
-      {
-        items.append( mLayer->mItems[id] );
-      }
-      std::stable_sort( items.begin(), items.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
       bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
-      for ( const KadasMapItem *item : items )
+      for ( const KadasMapItem *item : mRenderItems )
       {
         if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setOpacity( mLayer->opacity() );
+          mRendererContext.painter()->setOpacity( mRenderOpacity );
           mRendererContext.setCoordinateTransform( QgsCoordinateTransform( item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() ) );
           item->render( mRendererContext );
           mRendererContext.painter()->restore();
@@ -62,7 +62,8 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    KadasItemLayer *mLayer;
+    QList<KadasMapItem *> mRenderItems;
+    double mRenderOpacity = 1.;
     QgsRenderContext &mRendererContext;
 };
 

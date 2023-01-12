@@ -34,31 +34,31 @@ class KadasBullseyeLayer : public KadasPluginLayer
     KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, QgsUnitTypes::DistanceUnit intervalUnit, double axesInterval );
 
-    QString layerTypeKey() const override { return layerType(); };
+    QString layerTypeKey() const override { return layerType(); }
     KadasBullseyeLayer *clone() const override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
 
-    QgsPointXY center() const { return mCenter; }
-    int rings() const { return mRings; }
-    double ringInterval() const { return mInterval; }
-    QgsUnitTypes::DistanceUnit ringIntervalUnit() const { return mIntervalUnit; }
-    double axesInterval() const { return mAxesInterval; }
+    QgsPointXY center() const { return mBullseyeConfig.center; }
+    int rings() const { return mBullseyeConfig.rings; }
+    double ringInterval() const { return mBullseyeConfig.interval; }
+    QgsUnitTypes::DistanceUnit ringIntervalUnit() const { return mBullseyeConfig.intervalUnit; }
+    double axesInterval() const { return mBullseyeConfig.axesInterval; }
 
-    const QColor &color() const { return mColor; }
-    int fontSize() const { return mFontSize; }
-    bool labelAxes() const { return mLabelAxes; }
-    bool labelQuadrants() const { return mLabelQuadrants; }
-    bool labelRings() const { return mLabelRings; }
-    int lineWidth() const { return mLineWidth; }
+    const QColor &color() const { return mBullseyeConfig.color; }
+    int fontSize() const { return mBullseyeConfig.fontSize; }
+    bool labelAxes() const { return mBullseyeConfig.labelAxes; }
+    bool labelQuadrants() const { return mBullseyeConfig.labelQuadrants; }
+    bool labelRings() const { return mBullseyeConfig.labelRings; }
+    int lineWidth() const { return mBullseyeConfig.lineWidth; }
 
   public slots:
-    void setColor( const QColor &color ) { mColor = color; }
-    void setFontSize( int fontSize ) { mFontSize = fontSize; }
-    void setLabelAxes( bool labelAxes ) { mLabelAxes = labelAxes; }
-    void setLabelQuadrants( bool labelQuadrants ) { mLabelQuadrants = labelQuadrants; }
-    void setLabelRings( bool labelRings ) { mLabelRings = labelRings; }
-    void setLineWidth( int lineWidth ) { mLineWidth = lineWidth; }
+    void setColor( const QColor &color ) { mBullseyeConfig.color = color; }
+    void setFontSize( int fontSize ) { mBullseyeConfig.fontSize = fontSize; }
+    void setLabelAxes( bool labelAxes ) { mBullseyeConfig.labelAxes = labelAxes; }
+    void setLabelQuadrants( bool labelQuadrants ) { mBullseyeConfig.labelQuadrants = labelQuadrants; }
+    void setLabelRings( bool labelRings ) { mBullseyeConfig.labelRings = labelRings; }
+    void setLineWidth( int lineWidth ) { mBullseyeConfig.lineWidth = lineWidth; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -67,17 +67,20 @@ class KadasBullseyeLayer : public KadasPluginLayer
   private:
     class Renderer;
 
-    QgsPointXY mCenter;
-    int mRings;
-    double mInterval;
-    QgsUnitTypes::DistanceUnit mIntervalUnit = QgsUnitTypes::DistanceNauticalMiles;
-    double mAxesInterval;
-    QColor mColor = Qt::black;
-    int mFontSize = 20;
-    bool mLabelAxes = false;
-    bool mLabelQuadrants = false;
-    bool mLabelRings = false;
-    int mLineWidth = 1;
+    struct BullseyeConfig
+    {
+      QgsPointXY center;
+      int rings;
+      double interval;
+      QgsUnitTypes::DistanceUnit intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
+      double axesInterval;
+      QColor color = Qt::black;
+      int fontSize = 20;
+      bool labelAxes = false;
+      bool labelQuadrants = false;
+      bool labelRings = false;
+      int lineWidth = 1;
+    } mBullseyeConfig;
 };
 
 class KadasBullseyeLayerType : public KadasPluginLayerType

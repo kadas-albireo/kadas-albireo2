@@ -54,36 +54,37 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
   public:
     Renderer( KadasGuideGridLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id() )
-      , mLayer( layer )
+      , mRenderGridConfig( layer->mGridConfig )
+      , mRenderOpacity( layer->opacity() )
       , mRendererContext( rendererContext )
     {}
 
     bool render() override
     {
-      if ( mLayer->mRows == 0 || mLayer->mCols == 0 )
+      if ( mRenderGridConfig.rows == 0 || mRenderGridConfig.cols == 0 )
       {
         return true;
       }
       bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
 
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->opacity() );
+      mRendererContext.painter()->setOpacity( mRenderOpacity );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
-      mRendererContext.painter()->setBrush( mLayer->mColor );
+      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth ) );
+      mRendererContext.painter()->setBrush( mRenderGridConfig.color );
 
       const QVariantMap &flags = mRendererContext.customRenderingFlags();
       bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
 
-      QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+      QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
       double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
       QFont smallFont;
-      smallFont.setPixelSize( 0.5 * mLayer->mFontSize * dpiScale );
+      smallFont.setPixelSize( 0.5 * mRenderGridConfig.fontSize * dpiScale );
       QFontMetrics smallFontMetrics( smallFont );
 
       QFont font;
-      font.setPixelSize( mLayer->mFontSize * dpiScale );
+      font.setPixelSize( mRenderGridConfig.fontSize * dpiScale );
       QFontMetrics fontMetrics( font );
 
       const int labelBoxSize = fontMetrics.height();
@@ -91,15 +92,15 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      const QgsRectangle &gridRect = mLayer->mGridRect;
+      const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
       QgsPoint pTL = QgsPoint( mRendererContext.mapExtent().xMinimum(), mRendererContext.mapExtent().yMaximum() );
       QgsPoint pBR = QgsPoint( mRendererContext.mapExtent().xMaximum(), mRendererContext.mapExtent().yMinimum() );
       QPointF screenTL = mapToPixel.transform( crst.transform( pTL ) ).toQPointF();
       QPointF screenBR = mapToPixel.transform( crst.transform( pBR ) ).toQPointF();
       QRectF screenRect( screenTL, screenBR );
 
-      double ix = gridRect.width() / mLayer->mCols;
-      double iy = gridRect.height() / mLayer->mRows;
+      double ix = gridRect.width() / mRenderGridConfig.cols;
+      double iy = gridRect.height() / mRenderGridConfig.rows;
 
       // Draw vertical lines
       QPolygonF vLine1 = vScreenLine( gridRect.xMinimum(), iy );
@@ -110,8 +111,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
       double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
-      QuadrantLabeling quadrantLabeling = mLayer->mQuadrantLabeling;
-      for ( int col = 1; col <= mLayer->mCols; ++col )
+      QuadrantLabeling quadrantLabeling = mRenderGridConfig.quadrantLabeling;
+      for ( int col = 1; col <= mRenderGridConfig.cols; ++col )
       {
         double x2 = gridRect.xMinimum() + col * ix;
         QPolygonF vLine2 = vScreenLine( x2, iy );
@@ -123,8 +124,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         {
           double sx1 = vLine1.first().x();
           double sx2 = vLine2.first().x();
-          QString label = gridLabel( mLayer->mColChar, col - 1 );
-          if ( mLayer->mLabelingPos == LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
+          QString label = gridLabel( mRenderGridConfig.colChar, col - 1 );
+          if ( mRenderGridConfig.labelingPos == LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
           {
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           }
@@ -132,7 +133,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           {
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           }
-          if ( mLayer->mLabelingPos == LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
+          if ( mRenderGridConfig.labelingPos == LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
           {
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           }
@@ -145,7 +146,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         if ( quadrantLabeling != DontLabelQuadrants )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
+          mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
           QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
           QPolygonF vLineMid;
           for ( int i = 0, n = vLine1.size(); i < n; ++i )
@@ -183,8 +184,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       }
       double sx1 = adaptLabelsToScreen ? std::max( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
       double sx2 = adaptLabelsToScreen ? std::min( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
-      quadrantLabeling = mLayer->mQuadrantLabeling;
-      for ( int row = 1; row <= mLayer->mRows; ++row )
+      quadrantLabeling = mRenderGridConfig.quadrantLabeling;
+      for ( int row = 1; row <= mRenderGridConfig.rows; ++row )
       {
         double y = gridRect.yMaximum() - row * iy;
         QPolygonF hLine2 = hScreenLine( y, ix );
@@ -196,8 +197,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         {
           double sy1 = hLine1.first().y();
           double sy2 = hLine2.first().y();
-          QString label = gridLabel( mLayer->mRowChar, row - 1 );
-          if ( mLayer->mLabelingPos == LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
+          QString label = gridLabel( mRenderGridConfig.rowChar, row - 1 );
+          if ( mRenderGridConfig.labelingPos == LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
           {
             drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
           }
@@ -205,7 +206,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           {
             drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
           }
-          if ( mLayer->mLabelingPos == LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
+          if ( mRenderGridConfig.labelingPos == LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
           {
             drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1 + sy2 ), label, font, fontMetrics, bufferColor );
           }
@@ -218,7 +219,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         if ( quadrantLabeling != DontLabelQuadrants )
         {
           mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth, Qt::DashLine ) );
+          mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
           QPolygonF hLineMid;
           if ( quadrantLabeling == LabelOneQuadrant )
           {
@@ -251,7 +252,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       y =  y - metrics.descent() + 0.5 * metrics.height();
       path.addText( x, y, font, text );
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
+      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
       mRendererContext.painter()->drawPath( path );
       mRendererContext.painter()->setPen( Qt::NoPen );
       mRendererContext.painter()->drawPath( path );
@@ -259,16 +260,17 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    KadasGuideGridLayer *mLayer;
+    KadasGuideGridLayer::GridConfig mRenderGridConfig;
+    double mRenderOpacity = 1.0;
     QgsRenderContext &mRendererContext;
 
     QPolygonF vScreenLine( double x, double iy ) const
     {
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      const QgsRectangle &gridRect = mLayer->mGridRect;
+      const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
       QPolygonF screenPoints;
-      for ( int row = 0; row <= mLayer->mRows; ++row )
+      for ( int row = 0; row <= mRenderGridConfig.rows; ++row )
       {
         QgsPoint p( x, gridRect.yMaximum() - row * iy );
         QPointF screenPoint = mapToPixel.transform( crst.transform( p ) ).toQPointF();
@@ -280,9 +282,9 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
     {
       QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
       const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      const QgsRectangle &gridRect = mLayer->mGridRect;
+      const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
       QPolygonF screenPoints;
-      for ( int col = 0; col <= mLayer->mCols; ++col )
+      for ( int col = 0; col <= mRenderGridConfig.cols; ++col )
       {
         QgsPoint p( gridRect.xMinimum() + col * ix, y );
         QPointF screenPoint = mapToPixel.transform( crst.transform( p ) ).toQPointF();
@@ -300,11 +302,11 @@ KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
 
 void KadasGuideGridLayer::setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked )
 {
-  mGridRect = gridRect;
-  mCols = cols;
-  mRows = rows;
-  mColSizeLocked = colSizeLocked;
-  mRowSizeLocked = rowSizeLocked;
+  mGridConfig.gridRect = gridRect;
+  mGridConfig.cols = cols;
+  mGridConfig.rows = rows;
+  mGridConfig.colSizeLocked = colSizeLocked;
+  mGridConfig.rowSizeLocked = rowSizeLocked;
   setCrs( crs, false );
 }
 
@@ -313,18 +315,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   KadasGuideGridLayer *layer = new KadasGuideGridLayer( name() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
-  layer->mGridRect = mGridRect;
-  layer->mCols = mCols;
-  layer->mRows = mRows;
-  layer->mColSizeLocked = mColSizeLocked;
-  layer->mRowSizeLocked = mRowSizeLocked;
-  layer->mFontSize = mFontSize;
-  layer->mColor = mColor;
-  layer->mLineWidth = mLineWidth;
-  layer->mRowChar = mRowChar;
-  layer->mColChar = mColChar;
-  layer->mLabelingPos = mLabelingPos;
-  layer->mQuadrantLabeling = mQuadrantLabeling;
+  layer->mGridConfig = mGridConfig;
   return layer;
 }
 
@@ -338,27 +329,27 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
   mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
-  mGridRect.setXMinimum( layerEl.attribute( "xmin" ).toDouble() );
-  mGridRect.setYMinimum( layerEl.attribute( "ymin" ).toDouble() );
-  mGridRect.setXMaximum( layerEl.attribute( "xmax" ).toDouble() );
-  mGridRect.setYMaximum( layerEl.attribute( "ymax" ).toDouble() );
-  mCols = layerEl.attribute( "cols" ).toInt();
-  mRows = layerEl.attribute( "rows" ).toInt();
-  mColSizeLocked = layerEl.attribute( "colSizeLocked", "0" ).toInt();
-  mRowSizeLocked = layerEl.attribute( "rowSizeLocked", "0" ).toInt();
-  mFontSize = layerEl.attribute( "fontSize" ).toInt();
-  mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
-  mLineWidth = layerEl.attribute( "lineWidth", "1" ).toInt();
-  mRowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
-  mColChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
-  mLabelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
+  mGridConfig.gridRect.setXMinimum( layerEl.attribute( "xmin" ).toDouble() );
+  mGridConfig.gridRect.setYMinimum( layerEl.attribute( "ymin" ).toDouble() );
+  mGridConfig.gridRect.setXMaximum( layerEl.attribute( "xmax" ).toDouble() );
+  mGridConfig.gridRect.setYMaximum( layerEl.attribute( "ymax" ).toDouble() );
+  mGridConfig.cols = layerEl.attribute( "cols" ).toInt();
+  mGridConfig.rows = layerEl.attribute( "rows" ).toInt();
+  mGridConfig.colSizeLocked = layerEl.attribute( "colSizeLocked", "0" ).toInt();
+  mGridConfig.rowSizeLocked = layerEl.attribute( "rowSizeLocked", "0" ).toInt();
+  mGridConfig.fontSize = layerEl.attribute( "fontSize" ).toInt();
+  mGridConfig.color = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
+  mGridConfig.lineWidth = layerEl.attribute( "lineWidth", "1" ).toInt();
+  mGridConfig.rowChar = layerEl.attribute( "rowChar" ).size() > 0 ? layerEl.attribute( "rowChar" ).at( 0 ) : 'A';
+  mGridConfig.colChar = layerEl.attribute( "colChar" ).size() > 0 ? layerEl.attribute( "colChar" ).at( 0 ) : '1';
+  mGridConfig.labelingPos = static_cast<LabelingPos>( layerEl.attribute( "labelingPos" ).toInt() );
   if ( layerEl.hasAttribute( "quadrantLabeling" ) )
   {
-    mQuadrantLabeling = static_cast<QuadrantLabeling>( layerEl.attribute( "quadrantLabeling" ).toInt() );
+    mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( layerEl.attribute( "quadrantLabeling" ).toInt() );
   }
   else
   {
-    mQuadrantLabeling = layerEl.attribute( "labelQuadrans" ).toInt() == 1 ? LabelAllQuadrants : DontLabelQuadrants;
+    mGridConfig.quadrantLabeling = layerEl.attribute( "labelQuadrans" ).toInt() == 1 ? LabelAllQuadrants : DontLabelQuadrants;
   }
   if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
   {
@@ -367,13 +358,13 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
     int labellingMode =  static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
     if ( labellingMode == LABEL_A_1 )
     {
-      mRowChar = 'A';
-      mColChar = '1';
+      mGridConfig.rowChar = 'A';
+      mGridConfig.colChar = '1';
     }
     else
     {
-      mRowChar = '1';
-      mColChar = 'A';
+      mGridConfig.rowChar = '1';
+      mGridConfig.colChar = 'A';
     }
   }
 
@@ -386,30 +377,30 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
   QgsCoordinateTransform crst( mapSettings.destinationCrs(), crs(), mTransformContext );
   QgsPointXY pos = crst.transform( mapPos );
 
-  double colWidth = ( mGridRect.xMaximum() - mGridRect.xMinimum() ) / mCols;
-  double rowHeight = ( mGridRect.yMaximum() - mGridRect.yMinimum() ) / mRows;
+  double colWidth = ( mGridConfig.gridRect.xMaximum() - mGridConfig.gridRect.xMinimum() ) / mGridConfig.cols;
+  double rowHeight = ( mGridConfig.gridRect.yMaximum() - mGridConfig.gridRect.yMinimum() ) / mGridConfig.rows;
 
-  int i = std::floor( ( pos.x() - mGridRect.xMinimum() ) / colWidth );
-  int j = std::floor( ( mGridRect.yMaximum() - pos.y() ) / rowHeight );
+  int i = std::floor( ( pos.x() - mGridConfig.gridRect.xMinimum() ) / colWidth );
+  int j = std::floor( ( mGridConfig.gridRect.yMaximum() - pos.y() ) / rowHeight );
 
   QgsPolygon *bbox = new QgsPolygon();
   QgsLineString *ring = new QgsLineString();
   ring->setPoints(
     QgsPointSequence()
-    << QgsPoint( mGridRect.xMinimum() + i * colWidth,     mGridRect.yMaximum() - j * rowHeight )
-    << QgsPoint( mGridRect.xMinimum() + ( i + 1 ) * colWidth, mGridRect.yMaximum() - j * rowHeight )
-    << QgsPoint( mGridRect.xMinimum() + ( i + 1 ) * colWidth, mGridRect.yMaximum() - ( j + 1 ) * rowHeight )
-    << QgsPoint( mGridRect.xMinimum() + i * colWidth,     mGridRect.yMaximum() - ( j + 1 ) * rowHeight )
-    << QgsPoint( mGridRect.xMinimum() + i * colWidth,     mGridRect.yMaximum() - j * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - j * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - j * rowHeight )
   );
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mRowChar, j ) ).arg( gridLabel( mColChar, i ) );
-  if ( mQuadrantLabeling != DontLabelQuadrants )
+  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowChar, j ) ).arg( gridLabel( mGridConfig.colChar, i ) );
+  if ( mGridConfig.quadrantLabeling != DontLabelQuadrants )
   {
-    bool left = pos.x() <= mGridRect.xMinimum() + ( i + 0.5 ) * colWidth;
-    bool top = pos.y() >= mGridRect.yMaximum() - ( j + 0.5 ) * rowHeight;
+    bool left = pos.x() <= mGridConfig.gridRect.xMinimum() + ( i + 0.5 ) * colWidth;
+    bool top = pos.y() >= mGridConfig.gridRect.yMaximum() - ( j + 0.5 ) * rowHeight;
     QString quadrantLabel;
     if ( left )
     {
@@ -432,22 +423,22 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - mOpacity * 100. );
-  layerEl.setAttribute( "xmin", mGridRect.xMinimum() );
-  layerEl.setAttribute( "ymin", mGridRect.yMinimum() );
-  layerEl.setAttribute( "xmax", mGridRect.xMaximum() );
-  layerEl.setAttribute( "ymax", mGridRect.yMaximum() );
-  layerEl.setAttribute( "cols", mCols );
-  layerEl.setAttribute( "rows", mRows );
-  layerEl.setAttribute( "colSizeLocked", mColSizeLocked ? 1 : 0 );
-  layerEl.setAttribute( "rowSizeLocked", mRowSizeLocked ? 1 : 0 );
+  layerEl.setAttribute( "xmin", mGridConfig.gridRect.xMinimum() );
+  layerEl.setAttribute( "ymin", mGridConfig.gridRect.yMinimum() );
+  layerEl.setAttribute( "xmax", mGridConfig.gridRect.xMaximum() );
+  layerEl.setAttribute( "ymax", mGridConfig.gridRect.yMaximum() );
+  layerEl.setAttribute( "cols", mGridConfig.cols );
+  layerEl.setAttribute( "rows", mGridConfig.rows );
+  layerEl.setAttribute( "colSizeLocked", mGridConfig.colSizeLocked ? 1 : 0 );
+  layerEl.setAttribute( "rowSizeLocked", mGridConfig.rowSizeLocked ? 1 : 0 );
   layerEl.setAttribute( "crs", crs().authid() );
-  layerEl.setAttribute( "fontSize", mFontSize );
-  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
-  layerEl.setAttribute( "lineWidth", mLineWidth );
-  layerEl.setAttribute( "colChar", QString( mColChar ) );
-  layerEl.setAttribute( "rowChar", QString( mRowChar ) );
-  layerEl.setAttribute( "labelingPos", mLabelingPos );
-  layerEl.setAttribute( "quadrantLabeling", mQuadrantLabeling );
+  layerEl.setAttribute( "fontSize", mGridConfig.fontSize );
+  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
+  layerEl.setAttribute( "lineWidth", mGridConfig.lineWidth );
+  layerEl.setAttribute( "colChar", QString( mGridConfig.colChar ) );
+  layerEl.setAttribute( "rowChar", QString( mGridConfig.rowChar ) );
+  layerEl.setAttribute( "labelingPos", mGridConfig.labelingPos );
+  layerEl.setAttribute( "quadrantLabeling", mGridConfig.quadrantLabeling );
   return true;
 }
 

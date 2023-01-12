@@ -31,25 +31,25 @@ class KadasMapGridLayer : public KadasPluginLayer
     KadasMapGridLayer( const QString &name );
     void setup( GridType type, double intervalX, double intervalY, int cellSize );
 
-    QString layerTypeKey() const override { return layerType(); };
+    QString layerTypeKey() const override { return layerType(); }
     KadasMapGridLayer *clone() const override;
     QList<IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override  { return QgsRectangle(); }
 
-    GridType gridType() const { return mGridType; }
-    double intervalX() const { return mIntervalX; }
-    double intervalY() const { return mIntervalY; }
-    int cellSize() const { return mCellSize; }
+    GridType gridType() const { return mGridConfig.gridType; }
+    double intervalX() const { return mGridConfig.intervalX; }
+    double intervalY() const { return mGridConfig.intervalY; }
+    int cellSize() const { return mGridConfig.cellSize; }
 
-    const QColor &color() const { return mColor; }
-    int fontSize() const { return mFontSize; }
-    LabelingMode labelingMode() const { return mLabelingMode; }
+    const QColor &color() const { return mGridConfig.color; }
+    int fontSize() const { return mGridConfig.fontSize; }
+    LabelingMode labelingMode() const { return mGridConfig.labelingMode; }
 
   public slots:
-    void setColor( const QColor &color ) { mColor = color; }
-    void setFontSize( int fontSize ) { mFontSize = fontSize; }
-    void setLabelingMode( LabelingMode labelingMode ) { mLabelingMode = labelingMode; }
+    void setColor( const QColor &color ) { mGridConfig.color = color; }
+    void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
+    void setLabelingMode( LabelingMode labelingMode ) { mGridConfig.labelingMode = labelingMode; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -58,13 +58,16 @@ class KadasMapGridLayer : public KadasPluginLayer
   private:
     class Renderer;
 
-    GridType mGridType = GridLV95;
-    double mIntervalX = 10000;
-    double mIntervalY = 10000;
-    int mCellSize = 0;
-    int mFontSize = 15;
-    QColor mColor = Qt::black;
-    LabelingMode mLabelingMode = LabelingEnabled;
+    struct GridConfig
+    {
+      GridType gridType = GridLV95;
+      double intervalX = 10000;
+      double intervalY = 10000;
+      int cellSize = 0;
+      int fontSize = 15;
+      QColor color = Qt::black;
+      LabelingMode labelingMode = LabelingEnabled;
+    } mGridConfig;
 };
 
 

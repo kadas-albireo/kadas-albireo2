@@ -38,7 +38,9 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
   public:
     Renderer( KadasBullseyeLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id() )
-      , mLayer( layer )
+      , mRenderBullseyeConfig( layer->mBullseyeConfig )
+      , mRenderOpacity( layer->opacity() )
+      , mLayerCrs( layer->crs() )
       , mRendererContext( rendererContext )
       , mGeod( GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f() )
     {
@@ -48,7 +50,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 
     bool render() override
     {
-      if ( mLayer->mRings <= 0 || mLayer->mInterval <= 0 )
+      if ( mRenderBullseyeConfig.rings <= 0 || mRenderBullseyeConfig.interval <= 0 )
       {
         return true;
       }
@@ -57,24 +59,24 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->mOpacity );
+      mRendererContext.painter()->setOpacity( mRenderOpacity );
       mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mLayer->mColor, mLayer->mLineWidth ) );
+      mRendererContext.painter()->setPen( QPen( mRenderBullseyeConfig.color, mRenderBullseyeConfig.lineWidth ) );
       QFont font = mRendererContext.painter()->font();
-      font.setPixelSize( mLayer->mFontSize * dpiScale );
+      font.setPixelSize( mRenderBullseyeConfig.fontSize * dpiScale );
       QFontMetrics metrics( mRendererContext.painter()->font() );
-      QColor bufferColor = ( 0.2126 * mLayer->mColor.red() + 0.7152 * mLayer->mColor.green() + 0.0722 * mLayer->mColor.blue() ) > 128 ? Qt::black : Qt::white;
+      QColor bufferColor = ( 0.2126 * mRenderBullseyeConfig.color.red() + 0.7152 * mRenderBullseyeConfig.color.green() + 0.0722 * mRenderBullseyeConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
 
       QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-      QgsCoordinateTransform ct( mLayer->crs(), crsWgs84, mRendererContext.transformContext() );
+      QgsCoordinateTransform ct( mLayerCrs, crsWgs84, mRendererContext.transformContext() );
       QgsCoordinateTransform rct( crsWgs84, mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
 
       // Draw rings
-      QgsPointXY wgsCenter = ct.transform( mLayer->mCenter );
-      double intervalUnit2meters = QgsUnitTypes::fromUnitToUnitFactor( mLayer->mIntervalUnit, QgsUnitTypes::DistanceMeters );
-      for ( int iRing = 0; iRing < mLayer->mRings; ++iRing )
+      QgsPointXY wgsCenter = ct.transform( mRenderBullseyeConfig.center );
+      double intervalUnit2meters = QgsUnitTypes::fromUnitToUnitFactor( mRenderBullseyeConfig.intervalUnit, QgsUnitTypes::DistanceMeters );
+      for ( int iRing = 0; iRing < mRenderBullseyeConfig.rings; ++iRing )
       {
-        double radMeters = mLayer->mInterval * ( 1 + iRing ) * intervalUnit2meters;
+        double radMeters = mRenderBullseyeConfig.interval * ( 1 + iRing ) * intervalUnit2meters;
 
         QPolygonF poly;
         for ( int a = 0; a <= 360; ++a )
@@ -86,17 +88,17 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         QPainterPath path;
         path.addPolygon( poly );
         mRendererContext.painter()->drawPath( path );
-        if ( mLayer->mLabelRings )
+        if ( mRenderBullseyeConfig.labelRings )
         {
-          QString label = QString( "%1 %2" ).arg( ( iRing + 1 ) * mLayer->mInterval, 0, 'f', 2 ).arg( QgsUnitTypes::toAbbreviatedString( mLayer->mIntervalUnit ) );
+          QString label = QString( "%1 %2" ).arg( ( iRing + 1 ) * mRenderBullseyeConfig.interval, 0, 'f', 2 ).arg( QgsUnitTypes::toAbbreviatedString( mRenderBullseyeConfig.intervalUnit ) );
           double x = poly.last().x() - 0.5 * metrics.horizontalAdvance( label );
           drawGridLabel( x, poly.last().y() - 0.25 * metrics.height(), label, font, bufferColor );
         }
       }
 
       // Draw axes
-      double axisRadiusMeters = mLayer->mInterval * ( mLayer->mRings + 1 ) * intervalUnit2meters;
-      for ( int bearing = 0; bearing < 360; bearing += mLayer->mAxesInterval )
+      double axisRadiusMeters = mRenderBullseyeConfig.interval * ( mRenderBullseyeConfig.rings + 1 ) * intervalUnit2meters;
+      for ( int bearing = 0; bearing < 360; bearing += mRenderBullseyeConfig.axesInterval )
       {
         QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, axisRadiusMeters, bearing / 180. * M_PI );
         GeographicLib::GeodesicLine line = mGeod.InverseLine( wgsCenter.y(), wgsCenter.x(), wgsPoint.y(), wgsPoint.x() );
@@ -118,30 +120,30 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         QPainterPath path;
         path.addPolygon( poly );
         mRendererContext.painter()->drawPath( path );
-        if ( mLayer->mLabelAxes )
+        if ( mRenderBullseyeConfig.labelAxes )
         {
           QString label = QString( "%1°" ).arg( bearing );
           int n = poly.size();
           double dx = n > 1 ? poly[n - 1].x() - poly[n - 2].x() : 0;
           double dy = n > 1 ? poly[n - 1].y() - poly[n - 2].y() : 0;
           double l = std::sqrt( dx * dx + dy * dy );
-          double d = mLayer->mFontSize;
+          double d = mRenderBullseyeConfig.fontSize;
           double w = metrics.horizontalAdvance( label );
           double x = n < 2 ? poly.last().x() : poly.last().x() + d * dx / l;
           double y = n < 2 ? poly.last().y() : poly.last().y() + d * dy / l;
           drawGridLabel( x - w, y + 0.5 * metrics.ascent(), label, font, bufferColor );
         }
       }
-      if ( mLayer->mLabelQuadrants )
+      if ( mRenderBullseyeConfig.labelQuadrants )
       {
         const char firstLetter = 'F';
         QList<char> labelChars = {firstLetter};
-        for ( int iRing = 0; iRing < mLayer->mRings; ++iRing )
+        for ( int iRing = 0; iRing < mRenderBullseyeConfig.rings; ++iRing )
         {
-          double r = mLayer->mInterval * ( 0.5 + iRing ) * intervalUnit2meters;
-          for ( int bearing = 0; bearing < 360; bearing += mLayer->mAxesInterval )
+          double r = mRenderBullseyeConfig.interval * ( 0.5 + iRing ) * intervalUnit2meters;
+          for ( int bearing = 0; bearing < 360; bearing += mRenderBullseyeConfig.axesInterval )
           {
-            double a = bearing + 0.5 * mLayer->mAxesInterval;
+            double a = bearing + 0.5 * mRenderBullseyeConfig.axesInterval;
             QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, r, a / 180. * M_PI );
             QgsPointXY mapPoint = rct.transform( wgsPoint );
             QPointF screenPoint = mapToPixel.transform( mapPoint ).toQPointF();
@@ -173,7 +175,9 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    KadasBullseyeLayer *mLayer;
+    KadasBullseyeLayer::BullseyeConfig mRenderBullseyeConfig;
+    double mRenderOpacity = 1.;
+    QgsCoordinateReferenceSystem mLayerCrs;
     QgsRenderContext &mRendererContext;
     QgsDistanceArea mDa;
     GeographicLib::Geodesic mGeod;
@@ -190,8 +194,8 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       QPainterPath path;
       path.addText( x, y, font, text );
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setBrush( mLayer->mColor );
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mLayer->mFontSize / 8. ) ) );
+      mRendererContext.painter()->setBrush( mRenderBullseyeConfig.color );
+      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderBullseyeConfig.fontSize / 8. ) ) );
       mRendererContext.painter()->drawPath( path );
       mRendererContext.painter()->setPen( Qt::NoPen );
       mRendererContext.painter()->drawPath( path );
@@ -207,11 +211,11 @@ KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
 
 void KadasBullseyeLayer::setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, QgsUnitTypes::DistanceUnit intervalUnit, double axesInterval )
 {
-  mCenter = center;
-  mRings = rings;
-  mInterval = interval;
-  mIntervalUnit = intervalUnit;
-  mAxesInterval = axesInterval;
+  mBullseyeConfig.center = center;
+  mBullseyeConfig.rings = rings;
+  mBullseyeConfig.interval = interval;
+  mBullseyeConfig.intervalUnit = intervalUnit;
+  mBullseyeConfig.axesInterval = axesInterval;
   setCrs( crs, false );
 }
 
@@ -220,17 +224,7 @@ KadasBullseyeLayer *KadasBullseyeLayer::clone() const
   KadasBullseyeLayer *layer = new KadasBullseyeLayer( name() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
-  layer->mCenter = mCenter;
-  layer->mRings = mRings;
-  layer->mInterval = mInterval;
-  layer->mIntervalUnit = mIntervalUnit;
-  layer->mAxesInterval = mAxesInterval;
-  layer->mColor = mColor;
-  layer->mFontSize = mFontSize;
-  layer->mLabelAxes = mLabelAxes;
-  layer->mLabelQuadrants = mLabelQuadrants;
-  layer->mLabelRings = mLabelRings;
-  layer->mLineWidth = mLineWidth;
+  layer->mBullseyeConfig = mBullseyeConfig;
   return layer;
 }
 
@@ -241,10 +235,9 @@ QgsMapLayerRenderer *KadasBullseyeLayer::createMapRenderer( QgsRenderContext &re
 
 QgsRectangle KadasBullseyeLayer::extent() const
 {
-  QgsDistanceArea da;
-  double radius = mRings * mInterval * QgsUnitTypes::fromUnitToUnitFactor( mIntervalUnit, QgsUnitTypes::DistanceMeters );
+  double radius = mBullseyeConfig.rings * mBullseyeConfig.interval * QgsUnitTypes::fromUnitToUnitFactor( mBullseyeConfig.intervalUnit, QgsUnitTypes::DistanceMeters );
   radius *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, crs().mapUnits() );
-  return QgsRectangle( mCenter.x() - radius, mCenter.y() - radius, mCenter.x() + radius, mCenter.y() + radius );
+  return QgsRectangle( mBullseyeConfig.center.x() - radius, mBullseyeConfig.center.y() - radius, mBullseyeConfig.center.x() + radius, mBullseyeConfig.center.y() + radius );
 }
 
 bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
@@ -252,36 +245,36 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
   QDomElement layerEl = layer_node.toElement();
   mLayerName = layerEl.attribute( "title" );
   mOpacity = ( 100. - layerEl.attribute( "transparency" ).toInt() ) / 100.;
-  mCenter.setX( layerEl.attribute( "x" ).toDouble() );
-  mCenter.setY( layerEl.attribute( "y" ).toDouble() );
-  mRings = layerEl.attribute( "rings" ).toInt();
-  mAxesInterval = layerEl.attribute( "axes" ).toDouble();
-  mInterval = layerEl.attribute( "interval" ).toDouble();
+  mBullseyeConfig.center.setX( layerEl.attribute( "x" ).toDouble() );
+  mBullseyeConfig.center.setY( layerEl.attribute( "y" ).toDouble() );
+  mBullseyeConfig.rings = layerEl.attribute( "rings" ).toInt();
+  mBullseyeConfig.axesInterval = layerEl.attribute( "axes" ).toDouble();
+  mBullseyeConfig.interval = layerEl.attribute( "interval" ).toDouble();
   if ( layerEl.hasAttribute( "intervalUnit" ) )
   {
-    mIntervalUnit = QgsUnitTypes::decodeDistanceUnit( layerEl.attribute( "intervalUnit" ) );
+    mBullseyeConfig.intervalUnit = QgsUnitTypes::decodeDistanceUnit( layerEl.attribute( "intervalUnit" ) );
   }
   else
   {
-    mIntervalUnit = QgsUnitTypes::DistanceNauticalMiles;
+    mBullseyeConfig.intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
   }
-  mFontSize = layerEl.attribute( "fontSize" ).toInt();
-  mLineWidth = layerEl.attribute( "lineWidth" ).toInt();
-  mColor = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
+  mBullseyeConfig.fontSize = layerEl.attribute( "fontSize" ).toInt();
+  mBullseyeConfig.lineWidth = layerEl.attribute( "lineWidth" ).toInt();
+  mBullseyeConfig.color = QgsSymbolLayerUtils::decodeColor( layerEl.attribute( "color" ) );
   if ( layerEl.hasAttribute( "labellingMode" ) )
   {
     // Backwards compatibility with KADAS-2.0
     enum LabellingMode { NO_LABELS, LABEL_AXES, LABEL_RINGS, LABEL_AXES_RINGS };
     LabellingMode labellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
-    mLabelAxes = labellingMode == LABEL_AXES || labellingMode == LABEL_AXES_RINGS;
-    mLabelQuadrants = false;
-    mLabelRings = labellingMode == LABEL_RINGS || labellingMode == LABEL_AXES_RINGS;
+    mBullseyeConfig.labelAxes = labellingMode == LABEL_AXES || labellingMode == LABEL_AXES_RINGS;
+    mBullseyeConfig.labelQuadrants = false;
+    mBullseyeConfig.labelRings = labellingMode == LABEL_RINGS || labellingMode == LABEL_AXES_RINGS;
   }
   else
   {
-    mLabelAxes = layerEl.attribute( "labelAxes" ) == "1";
-    mLabelQuadrants = layerEl.attribute( "labelQuadrants" ) == "1";
-    mLabelRings = layerEl.attribute( "labelRings" ) == "1";
+    mBullseyeConfig.labelAxes = layerEl.attribute( "labelAxes" ) == "1";
+    mBullseyeConfig.labelQuadrants = layerEl.attribute( "labelQuadrants" ) == "1";
+    mBullseyeConfig.labelRings = layerEl.attribute( "labelRings" ) == "1";
   }
 
   setCrs( QgsCoordinateReferenceSystem( layerEl.attribute( "crs" ) ) );
@@ -295,19 +288,19 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
   layerEl.setAttribute( "name", layerTypeKey() );
   layerEl.setAttribute( "title", name() );
   layerEl.setAttribute( "transparency", 100. - 100. * mOpacity );
-  layerEl.setAttribute( "x", mCenter.x() );
-  layerEl.setAttribute( "y", mCenter.y() );
-  layerEl.setAttribute( "rings", mRings );
-  layerEl.setAttribute( "axes", mAxesInterval );
-  layerEl.setAttribute( "interval", mInterval );
-  layerEl.setAttribute( "intervalUnit", QgsUnitTypes::encodeUnit( mIntervalUnit ) );
+  layerEl.setAttribute( "x", mBullseyeConfig.center.x() );
+  layerEl.setAttribute( "y", mBullseyeConfig.center.y() );
+  layerEl.setAttribute( "rings", mBullseyeConfig.rings );
+  layerEl.setAttribute( "axes", mBullseyeConfig.axesInterval );
+  layerEl.setAttribute( "interval", mBullseyeConfig.interval );
+  layerEl.setAttribute( "intervalUnit", QgsUnitTypes::encodeUnit( mBullseyeConfig.intervalUnit ) );
   layerEl.setAttribute( "crs", crs().authid() );
-  layerEl.setAttribute( "fontSize", mFontSize );
-  layerEl.setAttribute( "lineWidth", mLineWidth );
-  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mColor ) );
-  layerEl.setAttribute( "labelAxes", mLabelAxes ? "1" : "0" );
-  layerEl.setAttribute( "labelQuadrants", mLabelQuadrants ? "1" : "0" );
-  layerEl.setAttribute( "labelRings", mLabelRings ? "1" : "0" );
+  layerEl.setAttribute( "fontSize", mBullseyeConfig.fontSize );
+  layerEl.setAttribute( "lineWidth", mBullseyeConfig.lineWidth );
+  layerEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mBullseyeConfig.color ) );
+  layerEl.setAttribute( "labelAxes", mBullseyeConfig.labelAxes ? "1" : "0" );
+  layerEl.setAttribute( "labelQuadrants", mBullseyeConfig.labelQuadrants ? "1" : "0" );
+  layerEl.setAttribute( "labelRings", mBullseyeConfig.labelRings ? "1" : "0" );
   return true;
 }
 

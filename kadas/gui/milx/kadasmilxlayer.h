@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     static QString layerType() { return "KadasMilxLayer"; }
 
     KadasMilxLayer( const QString &name = "MilX" );
-    QString layerTypeKey() const override { return layerType(); };
+    QString layerTypeKey() const override { return layerType(); }
     bool acceptsItem( const KadasMapItem *item ) const override;
 
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;

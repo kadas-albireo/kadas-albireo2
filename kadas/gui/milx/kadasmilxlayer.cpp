@@ -33,52 +33,50 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
   public:
     Renderer( KadasMilxLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id() )
-      , mLayer( layer )
       , mRendererContext( rendererContext )
-    {}
-    bool render() override
     {
-      QList<KadasMapItem *> items = mLayer->items().values();
-      QList<KadasMilxClient::NPointSymbol> symbols;
-      QList<KadasMilxItem *> renderItems;
-      int dpi = mRendererContext.painter()->device()->logicalDpiX();
-      double dpiScale = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
-      bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
-      for ( int i = 0, n = items.size(); i < n; ++i )
+      bool omitSinglePoint = rendererContext.customRenderingFlags().contains( "globe" );
+      for ( const KadasMapItem *item : layer->items().values() )
       {
-        KadasMilxItem *item = dynamic_cast<KadasMilxItem *>( items[i] );
-        if ( !item || item->constState()->points.isEmpty() || ( omitSinglePoint && !item->isMultiPoint() ) )
+        const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( item );
+        if ( !milxItem || milxItem->constState()->points.isEmpty() || ( omitSinglePoint && !milxItem->isMultiPoint() ) )
         {
           // Skip symbols
           continue;
         }
-        symbols.append( item->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !mLayer->mIsApproved ) );
-        renderItems.append( item );
+        mRenderSymbols.append( milxItem->toSymbol( mRendererContext.mapToPixel(), mRendererContext.coordinateTransform().destinationCrs(), !layer->mIsApproved ) );
+        mRenderItemData.append( {milxItem->constState()->userOffset, milxItem->isMultiPoint()} );
+        mSymSettings = layer->milxSymbolSettings();
+        mRenderOpacity = layer->opacity();
       }
-      if ( symbols.isEmpty() )
+    }
+    bool render() override
+    {
+      if ( mRenderSymbols.isEmpty() )
       {
         return true;
       }
+      int dpi = mRendererContext.painter()->device()->logicalDpiX();
+      double dpiScale = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
       QList<KadasMilxClient::NPointSymbolGraphic> result;
-      KadasMilxSymbolSettings symSettings = mLayer->milxSymbolSettings();
-      symSettings.lineWidth *= dpiScale;
-      symSettings.symbolSize *= dpiScale;
+      mSymSettings.lineWidth *= dpiScale;
+      mSymSettings.symbolSize *= dpiScale;
       QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
-      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, symbols, symSettings, result ) )
+      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, mRenderSymbols, mSymSettings, result ) )
       {
         return false;
       }
       mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mLayer->opacity() );
+      mRendererContext.painter()->setOpacity( mRenderOpacity );
       for ( int i = 0, n = result.size(); i < n; ++i )
       {
-        QPoint itemOrigin = symbols[i].points.front();
-        QPoint renderPos = itemOrigin + result[i].offset + renderItems[i]->constState()->userOffset * dpiScale;
-        if ( !renderItems[i]->isMultiPoint() )
+        QPoint itemOrigin = mRenderSymbols[i].points.front();
+        QPoint renderPos = itemOrigin + result[i].offset + mRenderItemData[i].userOffset * dpiScale;
+        if ( !mRenderItemData[i].isMultiPoint )
         {
           // Draw line from visual reference point to actual refrence point
-          mRendererContext.painter()->setPen( QPen( symSettings.leaderLineColor, symSettings.leaderLineWidth * dpiScale ) );
-          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + renderItems[i]->constState()->userOffset * dpiScale );
+          mRendererContext.painter()->setPen( QPen( mSymSettings.leaderLineColor, mSymSettings.leaderLineWidth * dpiScale ) );
+          mRendererContext.painter()->drawLine( itemOrigin, itemOrigin + mRenderItemData[i].userOffset * dpiScale );
         }
         mRendererContext.painter()->drawImage( renderPos, result[i].graphic );
       }
@@ -87,7 +85,15 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    KadasMilxLayer *mLayer;
+    struct RenderItemData
+    {
+      QPoint userOffset;
+      bool isMultiPoint;
+    };
+    QList<KadasMilxClient::NPointSymbol> mRenderSymbols;
+    QList<RenderItemData> mRenderItemData;
+    KadasMilxSymbolSettings mSymSettings;
+    double mRenderOpacity = 1.;
     QgsRenderContext &mRendererContext;
 };
 
