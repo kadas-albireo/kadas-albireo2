@@ -108,6 +108,7 @@ SOURCES += \
 ../kadas/gui/maptools/kadasmaptoolhillshade.cpp \
 ../kadas/gui/maptools/kadasmaptoolslope.h \
 ../kadas/gui/maptools/kadasmaptoolselectrect.h \
+../kadas/gui/maptools/kadasmaptoolminmax.cpp \
 ../kadas/gui/maptools/kadasmaptoolhillshade.h \
 ../kadas/gui/maptools/kadasmaptoolviewshed.h \
 ../kadas/gui/maptools/kadasmaptooldeleteitems.cpp \
@@ -117,6 +118,7 @@ SOURCES += \
 ../kadas/gui/maptools/kadasmaptoolslope.cpp \
 ../kadas/gui/maptools/kadasmaptooledititemgroup.cpp \
 ../kadas/gui/maptools/kadasmaptooledititem.cpp \
+../kadas/gui/maptools/kadasmaptoolminmax.h \
 ../kadas/gui/maptools/kadasmaptooledititemgroup.h \
 ../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp \
 ../kadas/gui/catalog/kadasvbscatalogprovider.h \
