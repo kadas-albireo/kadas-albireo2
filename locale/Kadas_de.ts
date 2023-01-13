@@ -3851,7 +3851,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Abfrageergebnisse</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="424"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="425"/>
         <source>Band %1</source>
         <translation>Band %1</translation>
     </message>
@@ -4684,22 +4684,22 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="691"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="714"/>
         <source>Symbol editor...</source>
         <translation>Symboleditor...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="712"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="735"/>
         <source>Delete node</source>
         <translation>Knoten löschen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="723"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="746"/>
         <source>Add node</source>
         <translation>Knoten hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="733"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="756"/>
         <source>Reset offset</source>
         <translation>Offset zurücksetzten</translation>
     </message>
@@ -4799,9 +4799,8 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>KADAS Newsletter</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="190"/>
         <source>Don&apos;t show this newsletter again</source>
-        <translation>Diese Newsletter nicht mehr anzeigen</translation>
+        <translation type="vanished">Diese Newsletter nicht mehr anzeigen</translation>
     </message>
 </context>
 <context>

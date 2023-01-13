@@ -187,28 +187,14 @@ KadasNewsPopup::KadasNewsPopup( const QString &url, const QString &version )
   webView->load( QUrl( url ) );
   frame->layout()->addWidget( webView );
 
-  QCheckBox *checkBox = new QCheckBox( tr( "Don't show this newsletter again" ) );
-  checkBox->setChecked( version == QgsSettings().value( "kadas/lastPortalNewsVer" ).toString() );
-  layout()->addWidget( checkBox );
-
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Close );
-
-  QPushButton *closeButton = bbox->button( QDialogButtonBox::Close );
-  connect( closeButton, &QPushButton::pressed, this, [checkBox, version]
-  {
-    if ( checkBox->isChecked() )
-    {
-      QgsSettings().setValue( "kadas/lastPortalNewsVer", version );
-    }
-    else
-    {
-      QgsSettings().setValue( "kadas/lastPortalNewsVer", "" );
-    }
-  } );
 
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
   layout()->addWidget( bbox );
+
+  // Set news version to current version to not show it again
+  QgsSettings().setValue( "kadas/lastPortalNewsVer", version );
 }
 
 KadasNewsPopup::~KadasNewsPopup()

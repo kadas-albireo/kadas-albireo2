@@ -3850,7 +3850,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Risultati identificazione</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="424"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="425"/>
         <source>Band %1</source>
         <translation>Banda %1</translation>
     </message>
@@ -4679,22 +4679,22 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="691"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="714"/>
         <source>Symbol editor...</source>
         <translation>Editor del simbolo...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="712"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="735"/>
         <source>Delete node</source>
         <translation>Elimina vertice</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="723"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="746"/>
         <source>Add node</source>
         <translation>Aggiungi vertice</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="733"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="756"/>
         <source>Reset offset</source>
         <translation>Azzera offset</translation>
     </message>
@@ -4794,9 +4794,8 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Newsletter KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="190"/>
         <source>Don&apos;t show this newsletter again</source>
-        <translation>Non mostrare più questa newsletter</translation>
+        <translation type="vanished">Non mostrare più questa newsletter</translation>
     </message>
 </context>
 <context>
