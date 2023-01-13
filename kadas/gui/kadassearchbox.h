@@ -66,7 +66,7 @@ class KADAS_GUI_EXPORT KadasSearchBox : public QWidget
 
     QgsMapCanvas *mMapCanvas;
     QPointer<KadasSymbolItem> mPin;
-    KadasGeometryItem *mGeometry = nullptr;
+    QPointer<KadasGeometryItem> mGeometry;
     KadasMapToolCreateItem *mFilterTool = nullptr;
     KadasGeometryItem *mFilterItem = nullptr;
     QList<KadasSearchProvider *> mSearchProviders;

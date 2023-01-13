@@ -590,8 +590,7 @@ void KadasSearchBox::clearGeometry()
   if ( mGeometry )
   {
     KadasMapCanvasItemManager::removeItem( mGeometry );
-    delete mGeometry;
-    mGeometry = nullptr;
+    delete mGeometry.data();
   }
 }
 
