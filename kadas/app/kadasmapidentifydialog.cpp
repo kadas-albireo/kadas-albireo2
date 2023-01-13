@@ -23,6 +23,7 @@
 #include <QUrlQuery>
 #include <QVBoxLayout>
 
+#include <qgis/qgsarcgisrestquery.h>
 #include <qgis/qgsarcgisrestutils.h>
 #include <qgis/qgsfeaturestore.h>
 #include <qgis/qgsgeometryrubberband.h>
@@ -379,6 +380,20 @@ void KadasMapIdentifyDialog::addVectorLayerResult( QgsVectorLayer *vLayer, const
 
 void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result )
 {
+  QMap<QString, QString> sublayerNames;
+  if ( rLayer->dataProvider()->name() == "arcgismapserver" )
+  {
+    QgsDataSourceUri dataSource( rLayer->dataProvider()->dataSourceUri() );
+    QString serviceUrl = dataSource.param( QStringLiteral( "url" ) );
+    QString authcfg = dataSource.authConfigId();
+    QString trash;
+    QVariantMap serviceInfo = QgsArcGisRestQueryUtils::getServiceInfo( serviceUrl, authcfg, trash, trash, dataSource.httpHeaders() );
+    for ( const QVariant &entry : serviceInfo["layers"].toList() )
+    {
+      QVariantMap entryMap = entry.toMap();
+      sublayerNames.insert( entryMap["id"].toString(), entryMap["name"].toString() );
+    }
+  }
   const QMap<int, QVariant> &results = result.results();
   if ( results.isEmpty() )
   {
@@ -451,6 +466,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
             if ( resultIt.key() < rLayer->dataProvider()->subLayers().length() )
             {
               QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+              sublayerName = sublayerNames.value( sublayerName, sublayerName );
               item = new QTreeWidgetItem( QStringList() << sublayerName );
               mLayerTreeItemMap[rLayer->id()]->addChild( item );
             }
