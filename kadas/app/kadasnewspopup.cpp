@@ -27,10 +27,43 @@
 #include <QVBoxLayout>
 #include <QWebView>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+
+#include <QAxObject>
+#include <QAxWidget>
+#endif
+
 #include <kadas/app/kadasnewspopup.h>
 
 KadasNewsPopup *KadasNewsPopup::sInstance = nullptr;
 
+#ifdef Q_OS_WIN
+
+class KadasNewsWebView : public QAxWidget
+{
+  public:
+    KadasNewsWebView( QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() )
+      : QAxWidget( parent, f )
+    {
+      setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
+    }
+
+    void load( const QUrl &url )
+    {
+      dynamicCall( "Navigate(const QString&)", url.toString() );
+    }
+  protected:
+    virtual bool translateKeyEvent( int message, int keycode ) const
+    {
+      if ( message >= WM_KEYFIRST && message <= WM_KEYLAST )
+        return true;
+      else
+        return QAxWidget::translateKeyEvent( message, keycode );
+    }
+};
+
+#else
 
 class ExternalLinkDelegateWebView : public QWebView
 {
@@ -49,7 +82,12 @@ class ExternalLinkDelegateWebView : public QWebView
 
 class KadasNewsWebView : public QWebView
 {
-    using QWebView::QWebView;
+  public:
+    KadasNewsWebView( QWidget *parent = nullptr ) : QWebView( parent )
+    {
+      settings()->setAttribute( QWebSettings::JavascriptCanOpenWindows, true );
+      settings()->setAttribute( QWebSettings::JavascriptCanAccessClipboard, true );
+    }
 
   protected:
     QWebView *createWindow( QWebPage::WebWindowType type ) override
@@ -57,6 +95,7 @@ class KadasNewsWebView : public QWebView
       return new ExternalLinkDelegateWebView( this );
     }
 };
+#endif
 
 bool KadasNewsPopup::isConfigured()
 {
@@ -146,8 +185,6 @@ KadasNewsPopup::KadasNewsPopup( const QString &url, const QString &version )
 
   KadasNewsWebView *webView = new KadasNewsWebView();
   webView->load( QUrl( url ) );
-  webView->settings()->setAttribute( QWebSettings::JavascriptCanOpenWindows, true );
-  webView->settings()->setAttribute( QWebSettings::JavascriptCanAccessClipboard, true );
   frame->layout()->addWidget( webView );
 
   QCheckBox *checkBox = new QCheckBox( tr( "Don't show this newsletter again" ) );
