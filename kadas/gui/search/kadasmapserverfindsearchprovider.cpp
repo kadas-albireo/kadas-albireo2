@@ -53,7 +53,7 @@ KadasMapServerFindSearchProvider::KadasMapServerFindSearchProvider( QgsMapCanvas
 void KadasMapServerFindSearchProvider::startSearch( const QString &searchtext, const SearchRegion &searchRegion )
 {
   // List queryable rasters
-  typedef QPair<QString, QString> LayerUrlName; // <layerid, layername>
+  typedef QPair<QString, QString> LayerUrlName; // <layerurl, layername>
   QList< LayerUrlName > queryableLayers;
   for ( const QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
   {
@@ -72,7 +72,10 @@ void KadasMapServerFindSearchProvider::startSearch( const QString &searchtext, c
       // Example: https://<...>/services/<group>/<service>/MapServer
       if ( nParts > 4 && urlParts[nParts - 1] == "MapServer" && urlParts[nParts - 4] == "services" )
       {
-        queryableLayers.append( qMakePair( dataSource.param( "url" ), rlayer->name() ) );
+        QStringList layerList;
+        layerList.append( dataSource.param( "layer" ) );
+        layerList.append( rlayer->dataProvider()->subLayers() );
+        queryableLayers.append( qMakePair( dataSource.param( "url" ), layerList.join( "," ) ) );
       }
     }
 
