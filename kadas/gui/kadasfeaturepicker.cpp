@@ -97,8 +97,8 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
     return pickResult;
   }
   if ( vlayer->hasScaleBasedVisibility() &&
-       ( vlayer->minimumScale() > canvas->mapSettings().scale() ||
-         vlayer->maximumScale() <= canvas->mapSettings().scale() ) )
+       ( vlayer->maximumScale() > canvas->mapSettings().scale() ||
+         vlayer->minimumScale() <= canvas->mapSettings().scale() ) )
   {
     return pickResult;
   }
