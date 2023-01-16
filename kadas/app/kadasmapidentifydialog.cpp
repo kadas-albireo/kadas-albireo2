@@ -394,7 +394,6 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
       sublayerNames.insert( entryMap["id"].toString(), entryMap["name"].toString() );
     }
   }
-  mTreeWidget->setUpdatesEnabled( false );
   const QMap<int, QVariant> &results = result.results();
   if ( results.isEmpty() )
   {
@@ -489,7 +488,6 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
       break;
     }
   }
-  mTreeWidget->setUpdatesEnabled( true );
 }
 
 void KadasMapIdentifyDialog::rasterIdentifyFinished()
