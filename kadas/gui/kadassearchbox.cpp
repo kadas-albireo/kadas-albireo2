@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QCheckBox>
+#include <QContextMenuEvent>
 #include <QHeaderView>
 #include <QImageReader>
 #include <QKeyEvent>
@@ -221,7 +222,16 @@ bool KadasSearchBox::eventFilter( QObject *obj, QEvent *ev )
     }
     return true;
   }
-  else if ( obj == mTreeWidget && ( ev->type() == QEvent::MouseMove || ev->type() == QEvent::MouseButtonRelease ) )
+  else if ( obj == mTreeWidget && ev->type() == QEvent::ContextMenu )
+  {
+    QContextMenuEvent *mev = static_cast<QContextMenuEvent *>( ev );
+    if ( mSearchBox->rect().contains( mSearchBox->mapFromGlobal( mev->globalPos() ) ) )
+    {
+      mSearchBox->event( ev );
+      return true;
+    }
+  }
+  else if ( obj == mTreeWidget && ( ev->type() == QEvent::MouseMove || ev->type() == QEvent::MouseButtonRelease || ev->type() == QEvent::ContextMenu ) )
   {
     QMouseEvent *mev = static_cast<QMouseEvent *>( ev );
     if ( mSearchBox->rect().contains( mSearchBox->mapFromGlobal( mev->globalPos() ) ) )
