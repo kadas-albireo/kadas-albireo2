@@ -56,7 +56,7 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
   static constexpr int MaxLineWidth = 5;
   static constexpr int DefaultLineWidth = 2;
 
-  static constexpr int DefaultLeaderLineWidth = 1;
+  static constexpr int DefaultLeaderLineWidth = 3;
   static constexpr Qt::GlobalColor DefaultLeaderLineColor = Qt::black;
 
   enum WorkMode
