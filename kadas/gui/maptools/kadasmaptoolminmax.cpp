@@ -326,6 +326,12 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
       static_cast<KadasMapToolCreateItem *>( tool )->addPoint( KadasMapPos::fromPoint( mapPos ) );
     }
   } );
+  menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Add pin" ), [this, mapPos]
+  {
+    KadasPinItem *pin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+    pin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
+    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
+  } );
   item->setSelected( true );
   menu.exec( mCanvas->mapToGlobal( toCanvasCoordinates( mapPos ) ) );
   item->setSelected( false );
