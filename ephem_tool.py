@@ -181,7 +181,6 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
         self.sunAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
         self.sunAzIcon.setAngle(-self.azDec(sun.az))
-        self.sunAzIcon.setVisible(self.ui.tabWidgetOutput.currentIndex() == 0)
 
         # Compute sunrise and sunset taking relief into account
         try:
@@ -226,7 +225,6 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
         self.moonAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
         self.moonAzIcon.setAngle(-self.azDec(moon.az))
-        self.moonAzIcon.setVisible(self.ui.tabWidgetOutput.currentIndex() == 1)
 
         # Compute moonrise and moonset taking relief into account
         try:
@@ -271,13 +269,20 @@ class EphemToolWidget(KadasBottomBar):
         self.busyOverlay.setVisible(False)
         self.ui.tabWidgetOutput.setVisible(True)
 
+        self.sunrise = sunrise
+        self.sunset = sunset
+        self.moonrise = moonrise
+        self.moonset = moonset
+        self.setIconVisibilities(self.ui.tabWidgetOutput.currentIndex())
+
     def setIconVisibilities(self, index):
+        ts = self.getTimestamp()
         if index == 0:
-            self.sunAzIcon.setVisible(True)
+            self.sunAzIcon.setVisible(ts >= self.sunrise and ts <= self.sunset)
             self.moonAzIcon.setVisible(False)
         else:
             self.sunAzIcon.setVisible(False)
-            self.moonAzIcon.setVisible(True)
+            self.moonAzIcon.setVisible(ts >= self.moonrise and ts <= self.moonset)
 
     def timestampToHourString(self, timestamp):
         if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
