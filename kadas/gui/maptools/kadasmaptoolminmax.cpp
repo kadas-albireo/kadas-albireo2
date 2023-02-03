@@ -329,6 +329,7 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
   menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Add pin" ), [this, mapPos]
   {
     KadasPinItem *pin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+    pin->setEditor( "KadasSymbolAttributesEditor" );
     pin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
     KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
   } );
