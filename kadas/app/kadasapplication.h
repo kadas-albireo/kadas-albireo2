@@ -149,6 +149,7 @@ class KadasApplication : public QgsApplication
     DataSourceMigrations dataSourceMigrationMap() const;
     void cleanupAutosave();
     int dialogPanelIndex( const QString &name, QStackedWidget *stackedWidget );
+    void mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings );
 
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );

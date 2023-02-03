@@ -265,17 +265,7 @@ void KadasApplication::init()
     {
       settings.setValue( "timestamp", newtimestamp );
       // Merge new settings to old settings
-      for ( const QString &group : newSettings.childGroups() )
-      {
-        newSettings.beginGroup( group );
-        settings.beginGroup( group );
-        for ( const QString &key : newSettings.childKeys() )
-        {
-          settings.setValue( key, newSettings.value( key ) );
-        }
-        newSettings.endGroup();
-        settings.endGroup();
-      }
+      mergeChildSettingsGroups( settings, newSettings );
     }
     settings.sync();
   }
@@ -377,6 +367,22 @@ void KadasApplication::init()
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
+}
+
+void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
+{
+  for ( const QString &group : newSettings.childGroups() )
+  {
+    newSettings.beginGroup( group );
+    settings.beginGroup( group );
+    for ( const QString &key : newSettings.childKeys() )
+    {
+      settings.setValue( key, newSettings.value( key ) );
+    }
+    mergeChildSettingsGroups( settings, newSettings );
+    newSettings.endGroup();
+    settings.endGroup();
+  }
 }
 
 void KadasApplication::extractPortalToken()
