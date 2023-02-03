@@ -357,8 +357,11 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
   int dpi = context.painter()->device()->logicalDpiX();
   QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
   KadasMilxSymbolSettings symSettings = symbolSettings();
+#ifndef Q_OS_WIN
+  // FIXME: Why only on non-windows?
   symSettings.lineWidth *= dpiScale;
   symSettings.symbolSize *= dpiScale;
+#endif
   if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symSettings, result, false ) )
   {
     return;

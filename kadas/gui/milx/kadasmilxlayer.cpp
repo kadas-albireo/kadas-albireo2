@@ -59,8 +59,11 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
       int dpi = mRendererContext.painter()->device()->logicalDpiX();
       double dpiScale = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
       QList<KadasMilxClient::NPointSymbolGraphic> result;
+#ifndef Q_OS_WIN
+      // FIXME: Why only on non-windows?
       mSymSettings.lineWidth *= dpiScale;
       mSymSettings.symbolSize *= dpiScale;
+#endif
       QRect screenExtent = KadasMilxItem::computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
       if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, mRenderSymbols, mSymSettings, result ) )
       {
