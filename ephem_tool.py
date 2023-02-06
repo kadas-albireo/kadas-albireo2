@@ -104,7 +104,7 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.timezoneCombo.currentIndexChanged.connect(self.recompute)
         self.ui.checkBoxRelief.toggled.connect(self.recompute)
         self.ui.tabWidgetOutput.setEnabled(False)
-        self.ui.tabWidgetOutput.currentChanged.connect(self.setIconVisibilities)
+        self.ui.tabWidgetOutput.currentChanged.connect(self.recompute)
 
         self.busyOverlay = QLabel(self.tr("Calculating..."))
         self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
@@ -156,7 +156,7 @@ class EphemToolWidget(KadasBottomBar):
 
         if self.ui.checkBoxRelief.isChecked():
             self.busyOverlay.setVisible(True)
-            self.ui.tabWidgetOutput.setVisible(False)
+            self.ui.tabWidgetOutput.setEnabled(False)
             QApplication.instance().processEvents(QEventLoop.ExcludeUserInputEvents)
 
         self.ui.tabWidgetOutput.setEnabled(True)
@@ -169,120 +169,125 @@ class EphemToolWidget(KadasBottomBar):
         tz = KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326"))
         self.ui.labelTimezone.setText(tz.data().decode('utf-8'))
 
+        ts = self.getTimestamp()
+
         home = ephem.Observer()
         home.lat = str(self.wgsPos.y())
         home.lon = str(self.wgsPos.x())
-        home.date = ephem.Date(datetime.fromtimestamp(self.getTimestamp(), timezone.utc))
+        home.date = ephem.Date(datetime.fromtimestamp(ts, timezone.utc))
 
-        ## Sun ##
+        if self.ui.tabWidgetOutput.currentIndex() == 0:
+            ## Sun ##
 
-        sun = ephem.Sun()
-        sun.compute(home)
-        self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
-        self.sunAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
-        self.sunAzIcon.setAngle(-self.azDec(sun.az))
+            sun = ephem.Sun()
+            sun.compute(home)
+            self.ui.labelAzimuthElevationValue.setText("%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True)))
+            self.sunAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
+            self.sunAzIcon.setAngle(-self.azDec(sun.az))
 
-        # Compute sunrise and sunset taking relief into account
-        try:
-            sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
-        except:
-            sunset = None
-
-        sun.compute(home)
-        suntransit = ephem.to_timezone(home.next_transit(sun), ephem.UTC).timestamp()
-        if sunset and suntransit > sunset:
-            suntransit = ephem.to_timezone(home.previous_transit(sun), ephem.UTC).timestamp()
-
-        sun.compute(home)
-        if sun.alt >= 0:
+            # Compute sunrise and sunset taking relief into account
             try:
-                sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+                sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
             except:
-                sunrise = None
+                sunset = None
+
+            sun.compute(home)
+            suntransit = ephem.to_timezone(home.next_transit(sun), ephem.UTC).timestamp()
+            if sunset and suntransit > sunset:
+                suntransit = ephem.to_timezone(home.previous_transit(sun), ephem.UTC).timestamp()
+
+            sun.compute(home)
+            if sun.alt >= 0:
+                try:
+                    sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+                except:
+                    sunrise = None
+            else:
+                try:
+                    sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
+                except:
+                    sunrise = None
+            if self.ui.checkBoxRelief.isChecked():
+                tvisible = self.search_body_visible(ephem.Sun(), sunrise, sunset)
+                if tvisible:
+                    sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, tvisible) if sunset else None
+                    sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, tvisible) if sunrise else None
+                else:
+                    sunset = None
+                    sunrise = None
+
+            if sunrise and (not sunset or sunrise < sunset):
+                self.ui.labelSunRiseValue.setText("%s" % self.timestampToHourString(sunrise))
+            else:
+                self.ui.labelSunRiseValue.setText("-")
+            if sunset and (not sunrise or sunset > sunrise):
+                self.ui.labelSunSetValue.setText("%s" % self.timestampToHourString(sunset))
+            else:
+                self.ui.labelSunSetValue.setText("-")
+            self.ui.labelZenithValue.setText(self.timestampToHourString(suntransit))
+
+            self.sunAzIcon.setVisible(sunrise is not None and sunset is not None and ts >= sunrise and ts <= sunset)
+            self.moonAzIcon.setVisible(False)
+
         else:
+            ## Moon ##
+
+            moon = ephem.Moon()
+            moon.compute(home)
+            self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
+            self.moonAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
+            self.moonAzIcon.setAngle(-self.azDec(moon.az))
+
+            # Compute moonrise and moonset taking relief into account
             try:
-                sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
+                moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
             except:
-                sunrise = None
-        if self.ui.checkBoxRelief.isChecked():
-            sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, suntransit) if sunset else None
-            sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, suntransit) if sunrise else None
+                moonset = None
 
-        if sunrise and (not sunset or sunrise < sunset):
-            self.ui.labelSunRiseValue.setText("%s" % self.timestampToHourString(sunrise))
-        else:
-            self.ui.labelSunRiseValue.setText("-")
-        if sunset and (not sunrise or sunset > sunrise):
-            self.ui.labelSunSetValue.setText("%s" % self.timestampToHourString(sunset))
-        else:
-            self.ui.labelSunSetValue.setText("-")
-        self.ui.labelZenithValue.setText(self.timestampToHourString(suntransit))
+            moon.compute(home)
+            moontransit = ephem.to_timezone(home.next_transit(moon), ephem.UTC).timestamp()
+            if moonset and moontransit > moonset:
+                moontransit = ephem.to_timezone(home.previous_transit(moon), ephem.UTC).timestamp()
 
-        ## Moon ##
+            moon.compute(home)
+            if moon.alt >= 0:
+                try:
+                    moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
+                except:
+                    moonrise = None
+            else:
+                try:
+                    moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
+                except:
+                    moonrise = None
+            if self.ui.checkBoxRelief.isChecked():
+                tvisible = self.search_body_visible(ephem.Moon(), moonrise, moonset)
+                if tvisible:
+                    moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, tvisible) if moonset else None
+                    moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, tvisible) if moonrise else None
+                else:
+                    moonset = None
+                    moonrise = None
 
-        moon = ephem.Moon()
-        moon.compute(home)
-        self.ui.labelMoonAzimuthElevationValue.setText("%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True)))
-        self.moonAzIcon.setPosition(KadasItemPos.fromPoint(self.wgsPos))
-        self.moonAzIcon.setAngle(-self.azDec(moon.az))
+            if moonrise and (not moonset or moonrise < moonset):
+                self.ui.labelMoonRiseValue.setText("%s" % self.timestampToHourString(moonrise))
+            else:
+                self.ui.labelMoonRiseValue.setText("-")
+            if moonset and (not moonrise or moonset > moonrise):
+                self.ui.labelMoonSetValue.setText("%s" % self.timestampToHourString(moonset))
+            else:
+                self.ui.labelMoonSetValue.setText("-")
 
-        # Compute moonrise and moonset taking relief into account
-        try:
-            moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
-        except:
-            moonset = None
+            # Moon phase
+            moon_image_suffix = math.floor(round(moon.phase/12.5)*12.5)
+            self.ui.labelMoonPhaseIcon.setPixmap(QPixmap(":/plugins/Ephem/icons/moon_%d.svg" % moon_image_suffix))
+            self.ui.labelMoonPhaseValue.setText("%.2f%%" % moon.phase)
 
-        moon.compute(home)
-        moontransit = ephem.to_timezone(home.next_transit(moon), ephem.UTC).timestamp()
-        if moonset and moontransit > moonset:
-            moontransit = ephem.to_timezone(home.previous_transit(moon), ephem.UTC).timestamp()
-
-        moon.compute(home)
-        if moon.alt >= 0:
-            try:
-                moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
-            except:
-                moonrise = None
-        else:
-            try:
-                moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
-            except:
-                moonrise = None
-        if self.ui.checkBoxRelief.isChecked():
-            moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, moontransit) if moonset else None
-            moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, moontransit) if moonrise else None
-
-        if moonrise and (not moonset or moonrise < moonset):
-            self.ui.labelMoonRiseValue.setText("%s" % self.timestampToHourString(moonrise))
-        else:
-            self.ui.labelMoonRiseValue.setText("-")
-        if moonset and (not moonrise or moonset > moonrise):
-            self.ui.labelMoonSetValue.setText("%s" % self.timestampToHourString(moonset))
-        else:
-            self.ui.labelMoonSetValue.setText("-")
-
-        # Moon phase
-        moon_image_suffix = math.floor(round(moon.phase/12.5)*12.5)
-        self.ui.labelMoonPhaseIcon.setPixmap(QPixmap(":/plugins/Ephem/icons/moon_%d.svg" % moon_image_suffix))
-        self.ui.labelMoonPhaseValue.setText("%.2f%%" % moon.phase)
+            self.sunAzIcon.setVisible(False)
+            self.moonAzIcon.setVisible(moonrise is not None and moonset is not None and ts >= moonrise and ts <= moonset)
 
         self.busyOverlay.setVisible(False)
-        self.ui.tabWidgetOutput.setVisible(True)
-
-        self.sunrise = sunrise
-        self.sunset = sunset
-        self.moonrise = moonrise
-        self.moonset = moonset
-        self.setIconVisibilities(self.ui.tabWidgetOutput.currentIndex())
-
-    def setIconVisibilities(self, index):
-        ts = self.getTimestamp()
-        if index == 0:
-            self.sunAzIcon.setVisible(ts >= self.sunrise and ts <= self.sunset)
-            self.moonAzIcon.setVisible(False)
-        else:
-            self.sunAzIcon.setVisible(False)
-            self.moonAzIcon.setVisible(ts >= self.moonrise and ts <= self.moonset)
+        self.ui.tabWidgetOutput.setEnabled(True)
 
     def timestampToHourString(self, timestamp):
         if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
@@ -310,6 +315,23 @@ class EphemToolWidget(KadasBottomBar):
             return float(parts[0]) + float(parts[1]) / 60 + float(parts[2]) / 3600
         else:
             return 0
+
+    def search_body_visible(self, body, tmin, tmax):
+        # Tree like search to find one any time when body is visible
+        ranges = [(tmin, tmax)]
+        # Search up to 10min precision
+        maxsteps = math.ceil(1 + math.log2(round((tmax - tmin) / 600)))
+        for i in range(0, maxsteps):
+            newranges = []
+            for entry in ranges:
+                mid = 0.5 * (entry[0] + entry[1])
+                if self.body_is_visible(self.compute_body_position(mid, body)):
+                    return mid
+                else:
+                    newranges.append((entry[0], mid))
+                    newranges.append((mid, entry[1]))
+            ranges = newranges
+        return None
 
     def search_body_relief_crossing(self, body, spheretime, zenithtime):
         # Binary search up to 1min precision
