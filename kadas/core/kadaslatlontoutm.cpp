@@ -988,15 +988,17 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
 
 void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
-  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.000001, lat + 0.000001 ) );
+  int cellSizeClamp = std::max( 1000, cellSize ); // No labeling below 1km grid
+  int rest = std::max( 1, 1000 / cellSize );
+  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon, lat ) );
   GridLabel label;
   if ( horiz )
   {
-    label.label = QString::number( int ( utmcoo.northing / cellSize ) );
+    label.label = QString::number( std::round( double( utmcoo.northing ) / cellSizeClamp ) * rest, 'f', 0 );
   }
   else
   {
-    label.label = QString::number( int ( utmcoo.easting / cellSize ) );
+    label.label = QString::number( std::round( double( utmcoo.easting ) / cellSizeClamp ) * rest, 'f', 0 );
   }
   label.horiz = horiz;
   label.lineIdx = lineIdx;
@@ -1005,19 +1007,16 @@ void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSiz
 
 void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
-  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon + 0.000001, lat + 0.000001 ) );
+  cellSize = std::max( 1000, cellSize ); // No labeling below 1km grid
+  UTMCoo utmcoo = LL2UTM( QgsPointXY( lon, lat ) );
   GridLabel label;
   if ( horiz )
   {
-    label.label = QString::number( std::round( utmcoo.northing % 100000 ) ).rightJustified( 5, '0' );
+    label.label = QString::number( std::round( double( utmcoo.northing % 100000 ) / cellSize ) * cellSize, 'f', 0 ).rightJustified( 5, '0' );
   }
   else
   {
-    label.label = QString::number( std::round( utmcoo.easting % 100000 ) ).rightJustified( 5, '0' );
-  }
-  if ( label.label == QString( "0" ).rightJustified( 5, '0' ) )
-  {
-    return;    // 0 always overlaps with a 100kID zone label, so omit it
+    label.label = QString::number( std::round( double( utmcoo.easting % 100000 ) / cellSize ) * cellSize, 'f', 0 ).rightJustified( 5, '0' );
   }
   label.horiz = horiz;
   label.lineIdx = lineIdx;
