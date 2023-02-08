@@ -417,43 +417,6 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       QFont font = mRendererContext.painter()->font();
       font.setBold( true );
-      font.setPointSizeF( zoneFontSize * dpiScale );
-      QFontMetrics fm( font );
-      for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : zoneLabels )
-      {
-        const QPointF &pos = zoneLabel.pos;
-        const QPointF &maxPos = zoneLabel.maxPos;
-        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-        if ( adaptToScreen )
-        {
-          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-        }
-        labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
-        labelPos.ry() += fm.height();
-        if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
-        {
-          drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
-        }
-      }
-
-      font.setPointSizeF( subZoneFontSize );
-      fm = QFontMetrics( font );
-      for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : zoneSubLabels )
-      {
-        const QPointF &pos = subZoneLabel.pos;
-        const QPointF &maxPos = subZoneLabel.maxPos;
-        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-        if ( adaptToScreen )
-        {
-          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-        }
-        if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-        {
-          drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
-        }
-      }
 
       if ( adaptToScreen )
       {
@@ -497,6 +460,44 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
           {
             drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
           }
+        }
+      }
+
+      font.setPointSizeF( zoneFontSize * dpiScale );
+      QFontMetrics fm( font );
+      for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : zoneLabels )
+      {
+        const QPointF &pos = zoneLabel.pos;
+        const QPointF &maxPos = zoneLabel.maxPos;
+        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+        if ( adaptToScreen )
+        {
+          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        }
+        labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
+        labelPos.ry() += fm.height();
+        if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
+        {
+          drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
+        }
+      }
+
+      font.setPointSizeF( subZoneFontSize );
+      fm = QFontMetrics( font );
+      for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : zoneSubLabels )
+      {
+        const QPointF &pos = subZoneLabel.pos;
+        const QPointF &maxPos = subZoneLabel.maxPos;
+        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+        if ( adaptToScreen )
+        {
+          adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+        }
+        if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
+        {
+          drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
         }
       }
     }
