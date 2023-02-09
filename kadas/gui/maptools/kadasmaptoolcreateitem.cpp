@@ -60,24 +60,7 @@ void KadasMapToolCreateItem::activate()
   mCurrentItemData = QSharedPointer<ItemData>( new ItemData );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged );
   createItem();
-  if ( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
-  {
-    mInputWidget = new KadasFloatingInputWidget( canvas() );
-
-    mDrawAttribs = mItem->drawAttribs();
-    for ( auto it = mDrawAttribs.begin(), itEnd = mDrawAttribs.end(); it != itEnd; ++it )
-    {
-      const KadasMapItem::NumericAttribute &attribute = it.value();
-      KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
-      connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged );
-      connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput );
-      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
-    }
-    if ( !mDrawAttribs.isEmpty() )
-    {
-      mInputWidget->setFocusedInputField( mInputWidget->inputField( mDrawAttribs.begin().key() ) );
-    }
-  }
+  setupNumericInputWidget();
   mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
   mBottomBar = new KadasBottomBar( canvas() );
   mBottomBar->setLayout( new QHBoxLayout() );
@@ -163,6 +146,7 @@ void KadasMapToolCreateItem::setItemFactory( ItemFactory itemFactory )
 {
   mItemFactory = itemFactory;
   clear();
+  setupNumericInputWidget();
 }
 
 void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
@@ -544,4 +528,28 @@ void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )
 void KadasMapToolCreateItem::storeItemProps()
 {
   mCurrentItemData->props = mItem->getProps();
+}
+
+void KadasMapToolCreateItem::setupNumericInputWidget()
+{
+  delete mInputWidget;
+  mInputWidget = nullptr;
+  if ( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+  {
+    mInputWidget = new KadasFloatingInputWidget( canvas() );
+
+    mDrawAttribs = mItem->drawAttribs();
+    for ( auto it = mDrawAttribs.begin(), itEnd = mDrawAttribs.end(); it != itEnd; ++it )
+    {
+      const KadasMapItem::NumericAttribute &attribute = it.value();
+      KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
+      connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateItem::inputChanged );
+      connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateItem::acceptInput );
+      mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
+    }
+    if ( !mDrawAttribs.isEmpty() )
+    {
+      mInputWidget->setFocusedInputField( mInputWidget->inputField( mDrawAttribs.begin().key() ) );
+    }
+  }
 }

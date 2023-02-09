@@ -230,6 +230,8 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     bool mSelectItems = true;
     bool mUndoRedoVisible = true;
 
+    void setupNumericInputWidget();
+
   private slots:
     void inputChanged();
     void acceptInput();
