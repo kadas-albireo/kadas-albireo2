@@ -150,14 +150,14 @@ void KadasMapToolMinMax::drawFinished()
   {
     geom = item->geometry()->clone();
   }
-  geom->transform( crst, Qgis::TransformDirection::Reverse );
-  QgsRectangle bbox = geom->boundingBox();
+  QgsRectangle bbox = crst.transformBoundingBox( geom->boundingBox(), Qgis::TransformDirection::Reverse );
+  QPolygonF filterGeom = QgsGeometry( geom ).asQPolygonF();
+
   if ( bbox.isEmpty() )
   {
     clear();
     return;
   }
-  QPolygonF filterGeom = QgsGeometry( geom ).asQPolygonF();
 
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ) );
   double gtrans[6] = {};
@@ -202,9 +202,11 @@ void KadasMapToolMinMax::drawFinished()
 
           for ( int by = 0; by < maxy; ++by )
           {
-            double px = pixelToGeoX( gtrans, x + bx, y + by );
-            double py = pixelToGeoY( gtrans, x + bx, y + by );
-            if ( mFilterType != FilterRect && !filterGeom.containsPoint( QPointF( px, py ), Qt::WindingFill ) )
+            QgsPointXY p( crst.transform(
+                            pixelToGeoX( gtrans, x + bx, y + by ),
+                            pixelToGeoY( gtrans, x + bx, y + by )
+                          ) );
+            if ( mFilterType != FilterRect && !filterGeom.containsPoint( p.toQPointF(), Qt::WindingFill ) )
             {
               continue;
             }
@@ -213,14 +215,14 @@ void KadasMapToolMinMax::drawFinished()
             if ( val < localValMin )
             {
               localValMin = val;
-              localxMin = px;
-              localyMin = py;
+              localxMin = p.x();
+              localyMin = p.y();
             }
             if ( val > localValMax )
             {
               localValMax = val;
-              localxMax = px;
-              localyMax = py;
+              localxMax = p.x();
+              localyMax = p.y();
             }
           }
 
@@ -244,8 +246,8 @@ void KadasMapToolMinMax::drawFinished()
     }
   }
 
-  QgsPointXY pMin = crst.transform( xMin, yMin );
-  QgsPointXY pMax = crst.transform( xMax, yMax );
+  QgsPointXY pMin( xMin, yMin );
+  QgsPointXY pMax( xMax, yMax );
 
   if ( !mPinMin )
   {
