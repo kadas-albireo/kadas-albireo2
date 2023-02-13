@@ -637,25 +637,37 @@ void KadasMilxItem::edit( const EditContext &context, const KadasMapPos &newPoin
   if ( context.vidx.isValid() )
   {
     // Move node
-    QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
-    int dpi = mapSettings.outputDpi();
-    KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
-
-    QPoint screenPoint = mapSettings.mapToPixel().transform( newPoint ).toQPointF().toPoint();
-    KadasMilxClient::NPointSymbolGraphic result;
-    if ( context.vidx.ring == 0 ) // Regular point
+    if ( isMultiPoint() )
     {
-      if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
+      QRect screenRect = computeScreenExtent( mapSettings.visibleExtent(), mapSettings.mapToPixel() );
+      int dpi = mapSettings.outputDpi();
+      KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
+
+      QPoint screenPoint = mapSettings.mapToPixel().transform( newPoint ).toQPointF().toPoint();
+      KadasMilxClient::NPointSymbolGraphic result;
+      if ( context.vidx.ring == 0 ) // Regular point
       {
-        updateSymbol( mapSettings, result );
+        if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
+        {
+          updateSymbol( mapSettings, result );
+        }
+      }
+      else if ( context.vidx.ring == 1 )  // Attribute point
+      {
+        if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
+        {
+          updateSymbol( mapSettings, result );
+        }
       }
     }
-    else if ( context.vidx.ring == 1 )  // Attribute point
+    else
     {
-      if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, context.vidx.vertex, screenPoint, symbolSettings(), result ) )
-      {
-        updateSymbol( mapSettings, result );
-      }
+      // Move single point symbols directly without calling KadasMilxClient::movePoint
+      state()->points.clear();
+      QgsCoordinateTransform mapCrst( crs(), mapSettings.destinationCrs(), QgsProject::instance()->transformContext() );
+      QgsPointXY pos = mapCrst.transform( newPoint, Qgis::TransformDirection::Reverse );
+      state()->points.append( KadasItemPos( pos.x(), pos.y() ) );
+      update();
     }
   }
   else if ( isMultiPoint() )
