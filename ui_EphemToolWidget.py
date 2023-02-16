@@ -224,4 +224,3 @@ class Ui_EphemToolWidget(object):
         self.labelMoonAzimuthElevation.setText(_translate("EphemToolWidget", "Azimuth / Elevation:"))
         self.tabWidgetOutput.setTabText(self.tabWidgetOutput.indexOf(self.tabMoon), _translate("EphemToolWidget", "Moon"))
         self.label_3.setText(_translate("EphemToolWidget", "<html><head/><body><p>Note: In locations with steep relief and/or large height differences over a short distance, several rises and sets are possible, but only one result will be displayed.</p></body></html>"))
-import resources_rc
