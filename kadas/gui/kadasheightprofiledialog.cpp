@@ -247,7 +247,7 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
 
 void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
-  if ( isBusy() )
+  if ( isBusy() || mSegmentLengths.isEmpty() )
   {
     return;
   }
