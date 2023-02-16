@@ -461,9 +461,16 @@ void KadasHeightProfileDialog::replot()
       break;
     }
   }
+  bool cancelled = mCancelButton->isChecked();
   mCancelButton->setChecked( false );
   mCancelButton->hide();
   mProgressBar->hide();
+  GDALClose( raster );
+  if ( cancelled )
+  {
+    clear();
+    return;
+  }
 
   // Add separate plot curves for each contiguous set of samples without NODATA values
   QVector<QPointF> sampleSet;
@@ -516,7 +523,6 @@ void KadasHeightProfileDialog::replot()
   while ( nSamples / step > 10 ) { step *= 2.; }
   mPlot->setAxisScale( QwtPlot::xBottom, 0, nSamples, step );
 
-  GDALClose( raster );
 
   // Node markers
   if ( mNodeMarkersCheckbox->isChecked() )
