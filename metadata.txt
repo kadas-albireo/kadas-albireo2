@@ -4,12 +4,15 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=KADAS ephem plugin
 about=KADAS ephem plugin.
-version=1.1
+version=1.2
 author=Sourcepole
 email=smani@sourcepole.ch
 
 
 changelog=
+ Rev 1.2 (16.02.2023)
+ - Improve rise/set computation with relief
+
  Rev 1.1 (19.12.2022)
  - Add timezone support
  - Display sun and moon azimuth on map
