@@ -528,10 +528,13 @@ void KadasHeightProfileDialog::replot()
       nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
       nodeMarker->setLineStyle( QwtPlotMarker::VLine );
       int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
-      QPointF sample = mPlotSamples.at( idx );
-      nodeMarker->setValue( sample );
-      nodeMarker->attach( mPlot );
-      mNodeMarkers.append( nodeMarker );
+      if ( idx < mPlotSamples.length() )
+      {
+        QPointF sample = mPlotSamples.at( idx );
+        nodeMarker->setValue( sample );
+        nodeMarker->attach( mPlot );
+        mNodeMarkers.append( nodeMarker );
+      }
     }
   }
 
