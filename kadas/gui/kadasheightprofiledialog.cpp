@@ -267,7 +267,7 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
 
 void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 {
-  if ( isBusy() )
+  if ( isBusy() || mSegmentLengths.isEmpty() )
   {
     return;
   }
@@ -283,6 +283,7 @@ void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 
 void KadasHeightProfileDialog::clear()
 {
+  mSegmentLengths.clear();
   mPlotSamples.clear();
   mPlotMarker->setValue( 0, 0 );
   qDeleteAll( mPlotCurves );
