@@ -165,7 +165,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
 
       // Geometry
       int types = 0;
-      QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl, types );
+      bool extrude = false;
+      QList<QgsAbstractGeometry *> geoms = parseGeometries( placemarkEl, types, &extrude );
 
       if ( geoms.isEmpty() )
       {
@@ -210,7 +211,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
           Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
           bool hasZ = false;
-          double extrusionHeight = 0;
 
           if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
           {
@@ -227,7 +227,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsPoint *>( geom ) || dynamic_cast<QgsMultiPoint *>( geom ) )
           {
-            hasZ = geom->wkbType() == QgsWkbTypes::PointZ;
             KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
@@ -239,7 +238,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
           {
-            hasZ = geom->wkbType() == QgsWkbTypes::LineStringZ;
             KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
@@ -248,9 +246,22 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsPolygon *>( geom ) || dynamic_cast<QgsMultiPolygon *>( geom ) )
           {
-            hasZ = geom->wkbType() == QgsWkbTypes::PolygonZ;
+            KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
+            item->setEditor( "KadasRedliningItemEditor" );
+            item->addPartFromGeometry( *geom );
+            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
+            item->setFill( QBrush( style.fillColor, fillStyle ) );
+            itemLayer->addItem( item );
+          }
+          hasZ = QgsWkbTypes::hasZ( geom->wkbType() );
+
 #ifdef WITH_GLOBE
-            if ( hasZ )
+          if ( hasZ )
+          {
+            KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( itemLayer );
+            config->renderingMode = KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced;
+            config->altitudeClamping = osgEarth::Symbology::AltitudeSymbol::CLAMP_NONE;
+            if ( extrude )
             {
               double maxHeight = 0;
               for ( auto it = geom->vertices_begin(), itEnd = geom->vertices_end(); it != itEnd; ++it )
@@ -264,22 +275,9 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
               KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( itemLayer );
               config->extrusionEnabled = true;
               config->extrusionHeight = QString::number( maxHeight );
+              config->altitudeClamping = osgEarth::Symbology::AltitudeSymbol::CLAMP_TO_TERRAIN;
+              config->altitudeTechnique = osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_GPU;
             }
-#endif
-            KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
-            item->setEditor( "KadasRedliningItemEditor" );
-            item->addPartFromGeometry( *geom );
-            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
-            item->setFill( QBrush( style.fillColor, fillStyle ) );
-            itemLayer->addItem( item );
-          }
-
-#ifdef WITH_GLOBE
-          if ( hasZ )
-          {
-            KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( itemLayer );
-            config->renderingMode = KadasGlobeVectorLayerConfig::RenderingModeModelAdvanced;
-            config->altitudeTechnique = osgEarth::Symbology::AltitudeSymbol::TECHNIQUE_GPU;
           }
 #endif
         }
@@ -575,7 +573,7 @@ KadasKMLImport::StyleData KadasKMLImport::parseStyle( const QDomElement &styleEl
   return style;
 }
 
-QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement &containerEl, int &types )
+QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement &containerEl, int &types, bool *extrude )
 {
   QList<QgsAbstractGeometry *> geoms;
   QDomNodeList children = containerEl.childNodes();
@@ -651,6 +649,10 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
         }
         geoms.append( collection );
       }
+    }
+    if ( extrude )
+    {
+      *extrude = el.firstChildElement( "extrude" ).text() == "1";
     }
   }
 
