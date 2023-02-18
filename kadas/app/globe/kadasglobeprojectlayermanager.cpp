@@ -241,6 +241,7 @@ void KadasGlobeProjectLayerManager::addModelLayer( const QString &layerId )
   osgEarth::RenderSymbol *renderSymbol = style.getOrCreateSymbol<osgEarth::RenderSymbol>();
   renderSymbol->lighting() = layerConfig->lightingEnabled;
   renderSymbol->backfaceCulling() = false;
+  renderSymbol->renderBin() = "featurebin";
   style.addSymbol( renderSymbol );
 
   KadasGlobeFeatureOptions featureOpt;
