@@ -22,6 +22,7 @@
 
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgspoint.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsvertexid.h>
 
@@ -82,16 +83,25 @@ class KADAS_GUI_EXPORT KadasItemPos
   public:
     static KadasItemPos fromPoint( const QgsPointXY &pos ) { return KadasItemPos( pos.x(), pos.y() ); }
 
-    KadasItemPos( double x = 0., double y = 0. ) : mX( x ), mY( y ) {}
+#ifndef SIP_RUN
+    KadasItemPos( double x = 0., double y = 0, double z = std::numeric_limits<double>::quiet_NaN() ) : mX( x ), mY( y ), mZ( z ) {}
+#else
+    KadasItemPos( double x = 0., double y = 0 ) : mX( x ), mY( y ) {}
+#endif
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
     void setY( double y ) { mY = y; }
+    double z() const { return mZ; }
+    void setZ( double z ) { mZ = z; }
+    bool hasZ() const { return !std::isnan( mZ ); }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
+    operator QgsPoint() const { return QgsPoint( mX, mY, mZ ); }
     double sqrDist( const KadasItemPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
   private:
     double mX = 0.;
     double mY = 0.;
+    double mZ = 0.;
 };
 
 class KADAS_GUI_EXPORT KadasItemRect

@@ -211,7 +211,7 @@ void KadasPointItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
   }
   for ( const QgsPoint *point : geoms )
   {
-    state()->points.append( KadasItemPos( point->x(), point->y() ) );
+    state()->points.append( KadasItemPos( point->x(), point->y(), point->z() ) );
     endPart();
   }
   recomputeDerived();

@@ -327,7 +327,7 @@ void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
     QgsPoint p;
     while ( line->nextVertex( vidx, p ) )
     {
-      points.append( KadasItemPos( p.x(), p.y() ) );
+      points.append( KadasItemPos( p.x(), p.y(), p.z() ) );
     }
     state()->points.append( points );
     endPart();

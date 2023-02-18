@@ -71,12 +71,16 @@ class KadasItemPos
   public:
     static KadasItemPos fromPoint( const QgsPointXY &pos );
 
-    KadasItemPos( double x = 0., double y = 0. );
+    KadasItemPos( double x = 0., double y = 0 );
     double x() const;
     void setX( double x );
     double y() const;
     void setY( double y );
+    double z() const;
+    void setZ( double z );
+    bool hasZ() const;
     operator QgsPointXY() const;
+    operator QgsPoint() const;
     double sqrDist( const KadasItemPos &p ) const;
 };
 

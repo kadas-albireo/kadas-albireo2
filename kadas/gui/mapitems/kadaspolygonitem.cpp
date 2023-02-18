@@ -317,7 +317,7 @@ void KadasPolygonItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
     const QgsCurve *ring = poly->exteriorRing();
     while ( ring->nextVertex( vidx, p ) )
     {
-      points.append( KadasItemPos( p.x(), p.y() ) );
+      points.append( KadasItemPos( p.x(), p.y(), p.z() ) );
     }
     state()->points.append( points );
     endPart();
