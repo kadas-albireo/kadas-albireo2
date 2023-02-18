@@ -144,15 +144,17 @@ void KadasGlobeWidget::buildLayerSelectionMenu( bool syncMainLayers )
     bool wasUnchecked = prevDisabledLayerIds.contains( layer->id() );
     bool isNew = !prevLayers.contains( layer->id() );
     bool isRemote = layer->source().contains( "url=http" );
+    QgsLayerTreeNode *parentGroup = QgsProject::instance()->layerTreeRoot()->findLayer( layer )->parent();
+    bool isBasemap = parentGroup && parentGroup->name() == "Basemaps";
     bool isHeightmap = layer->id() == heightmap;
     bool isVisibleInMainCanvas = mainCanvas->layers().contains( layer );
     if ( syncMainLayers )
     {
-      layerAction->setChecked( isVisibleInMainCanvas );
+      layerAction->setChecked( isVisibleInMainCanvas && !isBasemap );
     }
     else
     {
-      layerAction->setChecked( !wasUnchecked && !( isNew && ( isRemote || isHeightmap ) ) );
+      layerAction->setChecked( !wasUnchecked && !( isNew && ( isRemote || isHeightmap || isBasemap ) ) );
     }
     connect( layerAction, &QAction::toggled, this, &KadasGlobeWidget::layersChanged );
     mLayerSelectionMenu->addAction( layerAction );
