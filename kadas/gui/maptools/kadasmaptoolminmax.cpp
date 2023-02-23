@@ -181,8 +181,8 @@ void KadasMapToolMinMax::drawFinished()
   double pixValues[256 * 256] = {};
   double valMin = std::numeric_limits<double>::max();
   double valMax = 0;
-  int xMin = -1, xMax = -1;
-  int yMin = -1, yMax = -1;
+  double xMin = 0, xMax = 0;
+  double yMin = 0, yMax = 0;
   // Read in 256x256 chunks
   for ( int x = colStart; x <= colEnd; x += 256 )
   {
@@ -197,8 +197,8 @@ void KadasMapToolMinMax::drawFinished()
         {
           double localValMin = std::numeric_limits<double>::max();
           double localValMax = 0;
-          int localxMin = -1, localxMax = -1;
-          int localyMin = -1, localyMax = -1;
+          double localxMin = 0, localxMax = 0;
+          double localyMin = 0, localyMax = 0;
 
           for ( int by = 0; by < maxy; ++by )
           {
