@@ -1578,6 +1578,10 @@ QgsMessageOutput *KadasApplication::messageOutputViewer()
 
 void KadasApplication::injectAuthToken( QNetworkRequest *request )
 {
+  if ( QgsSettings().value( "/kadas/injectAuthToken", false ).toBool() == false )
+  {
+    return;
+  }
   QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
 
   QUrl url = request->url();
