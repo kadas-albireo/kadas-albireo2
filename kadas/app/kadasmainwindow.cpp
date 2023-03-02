@@ -1222,6 +1222,10 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     for ( Entry *entry : sortedEntries )
     {
       QgsLayerTreeGroup *parent = entries.contains( entry->parentId ) ? entries[entry->parentId]->group : rootGroup;
+      if ( !parent )
+      {
+        parent = rootGroup;
+      }
       if ( entry->leaf )
       {
         if ( uri.providerKey == "arcgismapserver" )
