@@ -202,6 +202,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layeridentifier", layerIdentifier );
+  QgsDebugMsg( QString( "Reading WMTS capabilities %1 for layer %2" ).arg( WMTSCapUrl ).arg( layerIdentifier ) );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
 }
 
@@ -268,6 +269,7 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layername", layerName );
+  QgsDebugMsg( QString( "Reading WMS capabilities %1 for layer %2" ).arg( req.url().toString() ).arg( layerName ) );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
 }
 
