@@ -1072,10 +1072,46 @@ int KadasApplication::dialogPanelIndex( const QString &name, QStackedWidget *sta
 
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 {
-  if ( layer && !layer->metadataUrl().isEmpty() )
+  QString layerUrl;
+  if ( layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )
   {
-    QDesktopServices::openUrl( layer->metadataUrl() );
+    layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
   }
+  else if ( layer->providerType() == "wms" )
+  {
+    layerUrl = QUrlQuery( layer->source() ).queryItemValue( "url" );
+  }
+  QgsDebugMsg( QString( "GDI layer url is %1" ).arg( layerUrl ) );
+  if ( layerUrl.isEmpty() )
+  {
+    return;
+  }
+  QString gdiBaseUrl = QgsSettings().value( "kadas/gdiBaseUrl" ).toString();
+  if ( !gdiBaseUrl.endsWith( "/" ) )
+  {
+    gdiBaseUrl += "/";
+  }
+  QUrl searchUrl( gdiBaseUrl + "portal/sharing/rest/search?f=pjson&q=" +  QUrl::toPercentEncoding( "url:" + layerUrl ) );
+  QgsDebugMsg( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ) );
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( searchUrl ) );
+  connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply]
+  {
+    QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+    QVariantList results = rootMap["results"].toList();
+    if ( results.length() == 1 )
+    {
+      QVariantMap result = results.at( 0 ).toMap();
+      QString id = result["id"].toString();
+      QString metadataUrl = gdiBaseUrl + "portal/home/item.html?id=" + id;
+      QgsDebugMsg( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ) );
+      QDesktopServices::openUrl( metadataUrl );
+    }
+    else
+    {
+      QMessageBox::information( mMainWindow, tr( "No layer info" ), tr( "No info available for this layer" ) );
+    }
+    reply->deleteLater();
+  } );
 }
 
 void KadasApplication::showMessageLog()

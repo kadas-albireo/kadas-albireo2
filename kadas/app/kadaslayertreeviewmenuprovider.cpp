@@ -104,7 +104,8 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ),
                          this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
       }
-      if ( !layer->metadataUrl().isEmpty() )
+      // For gdi layers, also add info icon
+      if ( layer->providerType() == "wms" || layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )
       {
         menu->addAction( QIcon( ":/kadas/icons/info" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }

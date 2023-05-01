@@ -104,10 +104,9 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
         }
       }
 
-      QString metadataUrl = QgsSettings().value( "kadas/metadataBaseUrl" ).toString().arg( resultMap["id"].toString() );
       bool flatten = false;
       QString detailUrl = QString( "%1%2/data?f=json" ).arg( detailBaseUrl, resultMap["id"].toString() );
-      ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, metadataUrl, detailUrl, flatten );
+      ResultEntry entry( resultMap["url"].toString(), resultMap["id"].toString(), category, resultMap["title"].toString(), position, "", detailUrl, flatten );
       QString id = categoryId + ":" + resultMap["title"].toString();
       mLayers[id] = mLayers.value( id );
       mLayers[id][resultMap["type"].toString().toLower()] = entry;
@@ -233,7 +232,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
       {
         QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
         QMimeData *mimeData = nullptr;
-        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry->metadataUrl, QString( "&referer=%1" ).arg( referer ), entry->title, layerIdentifier, mimeData );
+        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), "", QString( "&referer=%1" ).arg( referer ), entry->title, layerIdentifier, mimeData );
         QStringList sortIndices = entry->sortIndices.split( "/" );
         mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
       }
@@ -307,7 +306,7 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     }
 
     QMimeData *mimeData = nullptr;
-    if ( !layerItem.isNull() && parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, entry->metadataUrl, mimeData ) )
+    if ( !layerItem.isNull() && parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, "", mimeData ) )
     {
       // Parse sublayers
       QVariantList sublayers;
@@ -422,7 +421,6 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
     mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0'" ).arg( crs.authid() ).arg( format ).arg( url );
     QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
-    mimeData->setProperty( "metadataUrl", entry->metadataUrl );
     if ( !entry->flatten )
     {
       mimeData->setProperty( "sublayers", sublayers );
