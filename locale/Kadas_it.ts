@@ -128,147 +128,157 @@
         <translation type="vanished">Errure durante il caricamento dei metadati del layer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="603"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="609"/>
         <source>Select layer</source>
         <translation>Seleziona un layer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="606"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="612"/>
         <source>Select layer to paste items to:</source>
         <translation>Seleziona un layer nel quale incollare gli elementi:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="660"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="672"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="685"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="666"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="678"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="691"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="660"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="672"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="685"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="666"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="678"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="691"/>
         <source>Failed to read the project template.</source>
         <translation>Impossibile leggere il modello del progetto.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="715"/>
-        <location filename="../kadas/app/kadasapplication.cpp" line="904"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="721"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="910"/>
         <source>Choose a KADAS Project</source>
         <translation>Seleziona un progetto KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="715"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="721"/>
         <source>KADAS project files</source>
         <translation>Progetti KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="731"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="737"/>
         <source>Project recovery</source>
         <translation>Recupero progetto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="731"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="737"/>
         <source>A more recent automatic backup of the project exists. Open the backup instead?</source>
         <translation>Esiste un backup automatico più recente del progetto. Aprire questo al suo posto?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="768"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="774"/>
         <source>Project migrated</source>
         <translation>Progetto convertito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="768"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="774"/>
         <source>The project was created with an older version of KADAS and automatically migrated.</source>
         <translation>Il progetto è stato creato con una versione di KADAS più vecchia ed è stato automaticamente convertito.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="791"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="797"/>
         <source>Unable to open project</source>
         <translation>Impossibile aprire il progetto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="878"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="884"/>
         <source>Save Project</source>
         <translation>Salva progetto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="878"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="884"/>
         <source>Do you want to save the current project?</source>
         <translation>Salvare il progetto corrente?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="904"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="910"/>
         <source>Kadas project files</source>
         <translation>Progetti Kadas</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="944"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="950"/>
         <source>Project saved</source>
         <translation>Progetto salvato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="950"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="956"/>
         <source>Unable to save project %1</source>
         <translation>Impossibile salvare il progetto %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="969"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="975"/>
         <source>Choose an Image File</source>
         <translation>Scegliere un&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="975"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="981"/>
         <source>Map image saved to %1</source>
         <translation>Cartina salvata a %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="985"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="991"/>
         <source>Map image saved to clipboard</source>
         <translation>Cartina salvata negli appunti</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1152"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1111"/>
+        <source>No layer info</source>
+        <translation>Nessuna info layer</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1111"/>
+        <source>No info available for this layer</source>
+        <translation>Nessuna informazione disponibile per questo livello</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1194"/>
         <source>Autosaving project...</source>
         <translation>Salvataggio automatico...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1166"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1208"/>
         <source>Unsaved project from template, autosave disabled</source>
         <translation>Progetto non salvato da modello, autosave disabilitato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1394"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1436"/>
         <source>&lt;New Project&gt;</source>
         <translation>&lt;Nuovo progetto&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1401"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1443"/>
         <source>Offline</source>
         <translation>Disconnesso</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1401"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1443"/>
         <source>Online</source>
         <translation>Connesso</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1658"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1704"/>
         <source>Select Transformation for %1</source>
         <translation>Seleziona trasformazione per %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1678"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1724"/>
         <source> • %1</source>
         <translation> • %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1685"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1731"/>
         <source>Active Tasks</source>
         <translation>Attività attive</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1686"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1732"/>
         <source>The following tasks are currently running which depend on layers in this project:
 
 %1
@@ -297,12 +307,12 @@ Annullare queste attività e riprovare.</translation>
         <translation type="vanished">Vettore</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1546"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1588"/>
         <source>Python unavailable</source>
         <translation>Python non disponibile</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1546"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1588"/>
         <source>Failed to load python support</source>
         <translation>Impossibile caricare il supporto Python</translation>
     </message>
@@ -1069,7 +1079,7 @@ Annullare queste attività e riprovare.</translation>
 <context>
     <name>KadasGlobeLayerPropertiesFactory</name>
     <message>
-        <location filename="../kadas/app/globe/kadasglobevectorlayerproperties.cpp" line="193"/>
+        <location filename="../kadas/app/globe/kadasglobevectorlayerproperties.cpp" line="192"/>
         <source>Globe</source>
         <translation>Globo</translation>
     </message>
@@ -1741,8 +1751,8 @@ Annullare queste attività e riprovare.</translation>
     <name>KadasHeightProfileDialog</name>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="116"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="475"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="496"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="483"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="504"/>
         <source>Height profile</source>
         <translation>Profilo di elevazione</translation>
     </message>
@@ -1753,15 +1763,15 @@ Annullare queste attività e riprovare.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="131"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="333"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="387"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="334"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="388"/>
         <source>Height [ft AMSL]</source>
         <translation>Altezza [ft s.l.m.]</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="131"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="333"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="387"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="334"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="388"/>
         <source>Height [m AMSL]</source>
         <translation>Altezza [m s.l.m.]</translation>
     </message>
@@ -1777,7 +1787,7 @@ Annullare queste attività e riprovare.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="155"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="646"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="656"/>
         <source>Line of sight</source>
         <translation>Linea di vista</translation>
     </message>
@@ -1817,12 +1827,12 @@ Annullare queste attività e riprovare.</translation>
         <translation>Aggiungi alla mappa</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="346"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="347"/>
         <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
         <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="354"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="355"/>
         <source>Error: Unable to open heightmap.</source>
         <translation>Errore: impossibile aprire il modello d&apos;elevazione.</translation>
     </message>
@@ -2185,7 +2195,7 @@ Annullare queste attività e riprovare.</translation>
     <message>
         <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="66"/>
         <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="95"/>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="121"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="122"/>
         <source>&amp;Remove</source>
         <translation>&amp;Rimuovi</translation>
     </message>
@@ -2195,27 +2205,27 @@ Annullare queste attività e riprovare.</translation>
         <translation>&amp;Apri tabella attributi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="109"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="110"/>
         <source>Show layer info</source>
         <translation>Informazioni layer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="113"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="114"/>
         <source>&amp;Properties</source>
         <translation>&amp;Proprietà</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="152"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="153"/>
         <source>Transparency:</source>
         <translation>Trasparenza:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="174"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="175"/>
         <source>Data refresh rate:</source>
         <translation>Frequenza aggiornamento dati:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="199"/>
+        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="200"/>
         <source>Use as heightmap</source>
         <translation>Utilizza come modello di elevazione</translation>
     </message>
@@ -3684,42 +3694,42 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Preferito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1286"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1290"/>
         <source>Manually set projection</source>
         <translation>Seleziona la proiezione manualmente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1289"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1293"/>
         <source>Unknown layer projection</source>
         <translation>Proiezione del layer sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1290"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1294"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1337"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1341"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1372"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1376"/>
         <source>Downloading...</source>
         <translation>Scaricando...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1382"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1386"/>
         <source>Unable to download image</source>
         <translation>Impossibile scaricare l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1391"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1395"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible salvare l&apos;immagine scaricata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1433"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1437"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
     </message>
@@ -3727,7 +3737,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapGridLayerType</name>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="582"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="583"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
@@ -3845,12 +3855,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapIdentifyDialog</name>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="65"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="66"/>
         <source>Identify results</source>
         <translation>Risultati identificazione</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="425"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="439"/>
         <source>Band %1</source>
         <translation>Banda %1</translation>
     </message>
@@ -3858,7 +3868,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="193"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="196"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -3866,17 +3876,17 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapToolCreateItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="116"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="99"/>
         <source>Undo</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="124"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="107"/>
         <source>Redo</source>
         <translation>Ripeti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="133"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="116"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
@@ -4104,19 +4114,24 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="302"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="304"/>
         <source>Copy coordinates</source>
         <translation>Copia coordinate</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="311"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="313"/>
         <source>Viewshed</source>
         <translation>Bacino visuale</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="320"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="322"/>
         <source>Line of sight</source>
         <translation>Linea di vista</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="331"/>
+        <source>Add pin</source>
+        <translation>Aggiungi spillo</translation>
     </message>
 </context>
 <context>
@@ -4679,22 +4694,22 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="714"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="729"/>
         <source>Symbol editor...</source>
         <translation>Editor del simbolo...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="735"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="750"/>
         <source>Delete node</source>
         <translation>Elimina vertice</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="746"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="761"/>
         <source>Add node</source>
         <translation>Aggiungi vertice</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="756"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="771"/>
         <source>Reset offset</source>
         <translation>Azzera offset</translation>
     </message>
@@ -4702,7 +4717,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMilxLayer</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="217"/>
+        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="220"/>
         <source>The file is corrupt</source>
         <translation>Il file è corrotto</translation>
     </message>
@@ -4756,7 +4771,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMilxLayerType</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="267"/>
+        <location filename="../kadas/gui/milx/kadasmilxlayer.cpp" line="270"/>
         <source>Approved layer</source>
         <translation>Layer approvato</translation>
     </message>
@@ -5365,57 +5380,57 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasSearchBox</name>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="108"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="109"/>
         <source>Search</source>
         <translation>Cerca</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="115"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="116"/>
         <source>Clear</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="121"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="122"/>
         <source>Filter for dataset searches:</source>
         <translation>Filtro per ricerca nei geodati:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="123"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="124"/>
         <source>No filter</source>
         <translation>Nessun filtro</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="127"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="128"/>
         <source>Filter by radius</source>
         <translation>Filtra con un cerchio</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="132"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="133"/>
         <source>Filter by rectangle</source>
         <translation>Filtra con un rettangolo</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="137"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="138"/>
         <source>Filter by polygon</source>
         <translation>Filtra con un poligono</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="151"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="152"/>
         <source>Select Filter</source>
         <translation>Seleziona filtro</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="177"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="178"/>
         <source>Search for Places, Coordinates, Adresses, ...</source>
         <translation>Trova luoghi, coordinate, indirizzi, ...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="375"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="385"/>
         <source>No search results found</source>
         <translation>Nessun risultato</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadassearchbox.cpp" line="394"/>
+        <location filename="../kadas/gui/kadassearchbox.cpp" line="404"/>
         <source>Close matches</source>
         <translation>Risultati simili</translation>
     </message>
