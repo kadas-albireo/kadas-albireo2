@@ -32,6 +32,8 @@ class KadasPluginInterface;
 
 class KadasPythonIntegration : public QObject
 {
+    Q_OBJECT
+
   public:
 
     KadasPythonIntegration( QObject *parent = nullptr );

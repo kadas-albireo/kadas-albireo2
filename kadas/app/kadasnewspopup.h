@@ -21,6 +21,8 @@
 
 class KadasNewsPopup : public QDialog
 {
+    Q_OBJECT
+
   public:
     static bool isConfigured();
     static void showIfNewsAvailable( bool force = false );
