@@ -365,7 +365,6 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
     <message>
         <location filename="../kadas/gui/kadasbookmarksmenu.cpp" line="49"/>
         <source>Create bookmark...</source>
-        <translatorcomment>Créer un signet...</translatorcomment>
         <translation>Lesezeichen erstellen...</translation>
     </message>
     <message>

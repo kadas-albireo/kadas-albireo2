@@ -365,7 +365,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/gui/kadasbookmarksmenu.cpp" line="49"/>
         <source>Create bookmark...</source>
-        <translation></translation>
+        <translation>Créer un signet...</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasbookmarksmenu.cpp" line="75"/>
