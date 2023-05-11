@@ -17,7 +17,7 @@
 #ifndef KADASCOORDINATESEARCHPROVIDER_H
 #define KADASCOORDINATESEARCHPROVIDER_H
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <kadas/gui/kadassearchprovider.h>
 
@@ -29,15 +29,20 @@ class KADAS_GUI_EXPORT KadasCoordinateSearchProvider : public KadasSearchProvide
     void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
 
   private:
-    QRegExp mPatLVDD;
-    QRegExp mPatDM;
-    QRegExp mPatDMS;
-    QRegExp mPatUTM;
-    QRegExp mPatUTM2;
-    QRegExp mPatMGRS;
+    QRegularExpression mPatLVDD;
+    QRegularExpression mPatLVDDalt;
+    QRegularExpression mPatDM;
+    QRegularExpression mPatDMalt;
+    QRegularExpression mPatDMS;
+    QRegularExpression mPatDMSalt;
+    QRegularExpression mPatUTM;
+    QRegularExpression mPatUTMalt;
+    QRegularExpression mPatUTM2;
+    QRegularExpression mPatMGRS;
 
     static const QString sCategoryName;
     double parseNumber( const QString &string ) const;
+    bool matchOneOf( const QString &str, const QVector<QRegularExpression> &patterns, QRegularExpressionMatch &match ) const;
 };
 
 #endif // KADASCOORDINATESEARCHPROVIDER_H
