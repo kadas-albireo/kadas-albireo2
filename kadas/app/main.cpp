@@ -75,6 +75,8 @@ int main( int argc, char *argv[] )
   {
     QDir( QString( "%1/%2" ).arg( rootProfileFolder, profileName ) ).removeRecursively();
     QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).removeRecursively();
+    QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/Kadas/%2.ini" ).arg( profileName, Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
+    settings.setValue( "/locale/userLocale", locale );
   }
   else
   {
