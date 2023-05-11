@@ -102,6 +102,7 @@ int main( int argc, char *argv[] )
   qputenv( "GDAL_DATA", gdalDataDir.toLocal8Bit() );
   QString gdalDriverDir = QDir( QString( "%1/../lib/gdalplugins" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
   qputenv( "GDAL_DRIVER_PATH", gdalDriverDir.toLocal8Bit() );
+  qputenv( "GDAL_HTTP_USE_CAPI_STORE", "YES" );
   QString projDir = QDir( QString( "%1/../share/proj" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
   qputenv( "PROJ_LIB", projDir.toLocal8Bit() );
 #endif
