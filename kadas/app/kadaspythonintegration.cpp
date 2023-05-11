@@ -536,12 +536,18 @@ QString KadasPythonIntegration::homePluginsPath() const
 
 void KadasPythonIntegration::restorePlugins()
 {
-  QgsSettings mySettings;
+  QgsSettings settings;
+
+  // Always load core plugins regardless of whether they were disabled
+  QgsSettings defaultSettings( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_full.ini" ), QSettings::IniFormat );
 
   for ( const QString &packageName : pluginList() )
   {
     // check if the plugin was active on last session
-    if ( mySettings.value( "/PythonPlugins/" + packageName ).toBool() )
+    if (
+      settings.value( "/PythonPlugins/" + packageName ).toBool() ||
+      defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()
+    )
     {
       loadPlugin( packageName );
     }
