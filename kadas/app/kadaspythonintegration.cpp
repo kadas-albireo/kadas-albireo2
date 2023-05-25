@@ -62,6 +62,20 @@ bool KadasPythonIntegration::checkSystemImports()
   runString( "os.environ['HOME']=os.environ['USERPROFILE']\n" );
 #endif
 
+  QByteArray prefixPath = qgetenv( "QGIS_PREFIX_PATH" );
+  if ( !prefixPath.isEmpty() )
+  {
+    // Inject additional python site dir
+    QString result;
+    if ( runString( QStringLiteral( "import site" ) ) && evalString( QStringLiteral( "'\\n'.join(map(lambda path: os.path.relpath(path, sys.prefix), site.getsitepackages()))" ), result ) )
+    {
+      for ( const QString &path : result.split( "\n" ) )
+      {
+        runString( QStringLiteral( "sys.path.insert(0, '%1')" ).arg( prefixPath + '/' + path ) );
+      }
+    }
+  }
+
   // construct a list of plugin paths
   // locally installed plugins have priority over the system plugins
   QStringList pluginpaths;
