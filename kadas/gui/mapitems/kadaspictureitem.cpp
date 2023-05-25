@@ -697,6 +697,13 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
   {
     lon *= -1;
   }
+
+  if ( lon == 0 && lat == 0 )
+  {
+    // Assume 0, 0 is an invalid coordinate as it is pretty unlikely the image was captured at that position
+    return false;
+  }
+
   QgsCoordinateReferenceSystem crs4326( "EPSG:4326" );
   cameraPos = KadasItemPos::fromPoint( QgsCoordinateTransform( crs4326, destCrs, QgsProject::instance() ).transform( QgsPointXY( lon, lat ) ) );
 
