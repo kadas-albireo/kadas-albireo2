@@ -25,6 +25,11 @@ jobs:
       - name: Install build dependencies
         run: ./scripts/mingwdeps.sh
 
+      - name: Manually install qt5-qttranslations (FIXME?)
+        run: |
+          dnf download mingw64-qt5-qttranslations
+          rpm2cpio mingw64-qt5-qttranslations*.rpm | cpio -idmv -D /
+
       - name: Version number
         id: version_number
         run: |
