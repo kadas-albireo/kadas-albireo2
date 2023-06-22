@@ -1,8 +1,7 @@
 #!/bin/sh
 
-dnf install -y 'dnf-command(config-manager)' && \
-dnf config-manager --add-repo https://copr.fedorainfracloud.org/coprs/smani/mingw-extras/repo/fedora-rawhide/smani-mingw-extras-fedora-rawhide.repo && \
-dnf config-manager --add-repo https://copr.fedorainfracloud.org/coprs/smani/osgearth-2.10/repo/fedora-rawhide/smani-osgearth-2.10-fedora-rawhide.repo && \
+wget -O /etc/yum.repos.d/smani-mingw-extras-fedora-rawhide.repo https://copr.fedorainfracloud.org/coprs/smani/mingw-extras/repo/fedora-rawhide/smani-mingw-extras-fedora-rawhide.repo && \
+wget -O /etc/yum.repos.d/smani-osgearth-2.10-fedora-rawhide.repo https://copr.fedorainfracloud.org/coprs/smani/osgearth-2.10/repo/fedora-rawhide/smani-osgearth-2.10-fedora-rawhide.repo && \
 dnf install -y --disablerepo=*modular* \
   mingw64-dlfcn \
   mingw64-exiv2 \
