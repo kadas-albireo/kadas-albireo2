@@ -24,7 +24,7 @@ KADAS Albireo is a mapping application based on [QGIS](http://qgis.org/) and tar
 
 ## Manuals
 
-* [User manual](https://github.com/kadas-albireo/kadas-manuals/blob/master/manual/src/index.md)
+* [User manual](https://kadas-albireo.github.io/)
 * [Technical manual](https://github.com/kadas-albireo/kadas-manuals/tree/master/technical/src)
 
 ## Downloads
