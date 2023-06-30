@@ -4,12 +4,15 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=KADAS ephem plugin
 about=KADAS ephem plugin.
-version=1.2
+version=1.3
 author=Sourcepole
 email=smani@sourcepole.ch
 
 
 changelog=
+ Rev 1.3 (30.06.2023)
+  - Catch cases where sun/moon never rises/sets
+
  Rev 1.2 (16.02.2023)
  - Improve rise/set computation with relief
 
