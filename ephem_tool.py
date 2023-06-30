@@ -208,7 +208,7 @@ class EphemToolWidget(KadasBottomBar):
                 except:
                     sunrise = None
             if self.ui.checkBoxRelief.isChecked():
-                tvisible = self.search_body_visible(ephem.Sun(), sunrise, sunset)
+                tvisible = self.search_body_visible(ephem.Sun(), sunrise, sunset) if sunrise and sunset else None
                 if tvisible:
                     sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, tvisible) if sunset else None
                     sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, tvisible) if sunrise else None
@@ -261,7 +261,7 @@ class EphemToolWidget(KadasBottomBar):
                 except:
                     moonrise = None
             if self.ui.checkBoxRelief.isChecked():
-                tvisible = self.search_body_visible(ephem.Moon(), moonrise, moonset)
+                tvisible = self.search_body_visible(ephem.Moon(), moonrise, moonset) if moonrise and moonset else None
                 if tvisible:
                     moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, tvisible) if moonset else None
                     moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, tvisible) if moonrise else None
