@@ -50,6 +50,7 @@
 %Include auto_generated/catalog/kadasarcgisrestcatalogprovider.sip
 %Include auto_generated/catalog/kadasarcgisportalcatalogprovider.sip
 %Include auto_generated/catalog/kadasgeoadminrestcatalogprovider.sip
+%Include auto_generated/kadasprojectmigration.sip
 %Include auto_generated/kadascatalogprovider.sip
 %Include auto_generated/kadasbottombar.sip
 %Include auto_generated/kadasfeaturepicker.sip

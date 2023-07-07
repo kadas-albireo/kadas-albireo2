@@ -17,15 +17,17 @@
 #ifndef KADASPROJECTMIGRATION_H
 #define KADASPROJECTMIGRATION_H
 
+#include <kadas/gui/kadas_gui.h>
 #include <QString>
 
 class QDomDocument;
 class QDomElement;
 
-class KadasProjectMigration
+class KADAS_GUI_EXPORT KadasProjectMigration
 {
   public:
     static QString migrateProject( const QString &fileName, QStringList &filesToAttach );
+    static bool migrateProjectXml( const QString &basedir, QDomDocument &doc, QStringList &filesToAttach );
 
   private:
     static void migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach );

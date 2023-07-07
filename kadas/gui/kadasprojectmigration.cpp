@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QDir>
 #include <QDomDocument>
 #include <QFile>
@@ -32,6 +34,7 @@
 
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasitemlayer.h>
+#include <kadas/gui/kadasprojectmigration.h>
 #include <kadas/gui/mapitems/kadascircleitem.h>
 #include <kadas/gui/mapitems/kadasgpxrouteitem.h>
 #include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
@@ -43,9 +46,6 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/mapitems/kadastextitem.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasprojectmigration.h>
 
 
 QString KadasProjectMigration::migrateProject( const QString &fileName, QStringList &filesToAttach )
@@ -64,16 +64,8 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   }
   QString basedir = QFileInfo( fileName ).path();
 
-  QDomElement root = doc.documentElement();
-  if ( root.tagName() != "qgis" )
+  if ( migrateProjectXml( basedir, doc, filesToAttach ) )
   {
-    QgsDebugMsg( "Invalid project (incorrect root tag name)" );
-  }
-
-
-  if ( root.attribute( "version" ) == "2.15.2-KADAS" )
-  {
-    migrateKadas1xTo2x( doc, root, basedir, filesToAttach );
     QTemporaryFile tempFile;
     tempFile.setAutoRemove( false );
     if ( tempFile.open() )
@@ -85,6 +77,23 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   }
 
   return fileName;
+}
+
+bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocument &doc, QStringList &filesToAttach )
+{
+  QDomElement root = doc.documentElement();
+  if ( root.tagName() != "qgis" )
+  {
+    QgsDebugMsg( "Invalid project (incorrect root tag name)" );
+    return false;
+  }
+
+  if ( root.attribute( "version" ) == "2.15.2-KADAS" )
+  {
+    migrateKadas1xTo2x( doc, root, basedir, filesToAttach );
+    return true;
+  }
+  return false;
 }
 
 void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach )
@@ -461,7 +470,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       continue;
     }
     KadasMilxLayer layer( mapLayerEl.firstChildElement( "layername" ).text() );
-    int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
+    int dpi = qApp->desktop()->logicalDpiX();
     QString err;
     layer.importFromMilxly( mapLayerEl.firstChildElement( "MilXLayer" ), dpi, err );
 

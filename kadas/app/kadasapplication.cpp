@@ -68,6 +68,7 @@
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include <kadas/gui/kadasprojectmigration.h>
 #include <kadas/gui/mapitems/kadaspointitem.h>
 #include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/mapitems/kadaspictureitem.h>
@@ -90,7 +91,6 @@
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
-#include <kadas/app/kadasprojectmigration.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
