@@ -33,6 +33,7 @@ class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
   public:
     KadasSymbolAttributesEditor( KadasMapItem *item );
 
+    void setItem( KadasMapItem *item ) override;
     void reset() override;
     void syncItemToWidget() override;
     void syncWidgetToItem() override;

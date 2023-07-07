@@ -42,13 +42,26 @@ KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
 
   connect( mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
   connect( mTextEditRemarks, &QTextEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
-  connect( item, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+  connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   setEnabled( false );
 }
 
 void KadasSymbolAttributesEditor::adjustVisiblity()
 {
-  setEnabled( mItem->constState()->drawStatus != KadasMapItem::State::Empty );
+  setEnabled( mItem && mItem->constState()->drawStatus != KadasMapItem::State::Empty );
+}
+
+void KadasSymbolAttributesEditor::setItem( KadasMapItem *item )
+{
+  if ( mItem )
+  {
+    disconnect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+  }
+  KadasMapItemEditor::setItem( item );
+  if ( mItem )
+  {
+    connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+  }
 }
 
 void KadasSymbolAttributesEditor::reset()
