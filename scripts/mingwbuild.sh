@@ -180,6 +180,7 @@ linkDep bin/gdb.exe
 linkDep bin/python3.exe
 linkDep bin/python3w.exe
 linkDep bin/gdalinfo.exe
+linkDep bin/ogrinfo.exe
 
 linkDep $(ls $MINGWROOT/bin/libssl-*.dll | sed "s|$MINGWROOT/||")
 linkDep $(ls $MINGWROOT/bin/libcrypto-*.dll | sed "s|$MINGWROOT/||")
