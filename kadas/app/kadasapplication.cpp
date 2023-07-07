@@ -1091,7 +1091,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   {
     gdiBaseUrl += "/";
   }
-  QUrl searchUrl( gdiBaseUrl + "portal/sharing/rest/search?f=pjson&q=" +  QUrl::toPercentEncoding( "url:" + layerUrl ) );
+  QUrl searchUrl( gdiBaseUrl + "sharing/rest/search?f=pjson&q=" +  QUrl::toPercentEncoding( "url:" + layerUrl ) );
   QgsDebugMsg( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ) );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( searchUrl ) );
   connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply]
