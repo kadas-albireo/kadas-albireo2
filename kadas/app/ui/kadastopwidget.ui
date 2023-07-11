@@ -1958,6 +1958,13 @@ Sight</string>
               </property>
              </widget>
             </item>
+            <item row="2" column="5">
+             <widget class="QCheckBox" name="mCheckboxIgnoreSystemScaling">
+              <property name="text">
+               <string>Ignore system font scaling</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>

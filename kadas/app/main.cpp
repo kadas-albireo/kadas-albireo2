@@ -55,7 +55,6 @@ int main( int argc, char *argv[] )
 
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
   QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
-  QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
   QString rootProfileFolder = QgsUserProfileManager::resolveProfilesFolder( configLocalStorageLocation );
@@ -71,12 +70,14 @@ int main( int argc, char *argv[] )
   }
 
   QString locale = QLocale::system().name();
+  bool ignoreDpiScale = false;
   if ( clearsettings )
   {
     QDir( QString( "%1/%2" ).arg( rootProfileFolder, profileName ) ).removeRecursively();
     QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).removeRecursively();
     QSettings settings( QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/Kadas/%2.ini" ).arg( profileName, Kadas::KADAS_RELEASE_NAME ) ), QSettings::IniFormat );
     settings.setValue( "/locale/userLocale", locale );
+    ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
   }
   else
   {
@@ -89,8 +90,14 @@ int main( int argc, char *argv[] )
     {
       settings.setValue( "/locale/userLocale", locale );
     }
+    ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
   }
   KadasApplication::setTranslation( locale );
+
+  if ( !ignoreDpiScale )
+  {
+    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+  }
 
   // Delete any leftover wcs cache
   QDir( QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).absoluteFilePath( "wcs_cache" ) ).removeRecursively();

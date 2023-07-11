@@ -803,8 +803,8 @@ Annullare queste attività e riprovare.</translation>
         <translation>Coordinate</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadascoordinatesearchprovider.cpp" line="168"/>
-        <location filename="../kadas/gui/search/kadascoordinatesearchprovider.cpp" line="185"/>
+        <location filename="../kadas/gui/search/kadascoordinatesearchprovider.cpp" line="222"/>
+        <location filename="../kadas/gui/search/kadascoordinatesearchprovider.cpp" line="239"/>
         <source>zone</source>
         <translation>zona</translation>
     </message>
@@ -3606,32 +3606,32 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Lingua del sistema</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="182"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="185"/>
         <source>Add vector layer</source>
         <translation>Aggiungi layer vettoriale</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="183"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="186"/>
         <source>Add raster layer</source>
         <translation>Aggiungi layer raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="184"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="187"/>
         <source>Add CSV layer</source>
         <translation>Aggiungi layer CSV</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="188"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="191"/>
         <source>Add WMS layer</source>
         <translation>Aggiungi layer WMS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="189"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="192"/>
         <source>Add WFS layer</source>
         <translation>Aggiungi layer WFS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="190"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="193"/>
         <source>Add WCS layer</source>
         <translation>Aggiungi layer WCS</translation>
     </message>
@@ -3644,94 +3644,104 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation type="vanished">I seguenti layer sono reprojettati al SR selezionato: %1. La prestazione potrebbe essere ridotta.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="191"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="194"/>
         <source>Add vector tile layer</source>
         <translation>Aggiungi layer tassello vettoriale</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="192"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="195"/>
         <source>Add XYZ layer</source>
         <translation>Aggiungi layer XYZ</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="193"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="196"/>
         <source>Add MapServer layer</source>
         <translation>Aggiungi layer MapServer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="206"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="209"/>
         <source>Magnifier level</source>
         <translation>Livello di ingrandimento</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="670"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="673"/>
         <source>Choose file...</source>
         <translation>Scegli file...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="671"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="674"/>
         <source>Enter URL...</source>
         <translation>Inserire URL...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1094"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1097"/>
         <source>Language Changed</source>
         <translation>Lingua modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1094"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1097"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La nuova lingua verrà utilizzata al prossimo avvio dell&apos;applicazione.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1116"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1119"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1120"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1123"/>
         <source>Favorite</source>
         <translation>Preferito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1290"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1293"/>
         <source>Manually set projection</source>
         <translation>Seleziona la proiezione manualmente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1293"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1296"/>
         <source>Unknown layer projection</source>
         <translation>Proiezione del layer sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1294"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1297"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1341"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1344"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1376"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1379"/>
         <source>Downloading...</source>
         <translation>Scaricando...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1386"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1389"/>
         <source>Unable to download image</source>
         <translation>Impossibile scaricare l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1395"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1398"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible salvare l&apos;immagine scaricata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1437"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1440"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1520"/>
+        <source>Font scaling setting changed</source>
+        <translation>Configurazione scala carattere modificata</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1520"/>
+        <source>The font scaling change will be applied at the next program launch.</source>
+        <translation>La modifica della scala dei caratteri verrà applicata al successivo avvio del programma.</translation>
     </message>
 </context>
 <context>
@@ -4114,22 +4124,22 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Nessun modello di elevazione è specificato nel progetto. Seleziona un layer raster da usare come modello di elevazione dal menu contestuale del layer.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="304"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="305"/>
         <source>Copy coordinates</source>
         <translation>Copia coordinate</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="313"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="314"/>
         <source>Viewshed</source>
         <translation>Bacino visuale</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="322"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="323"/>
         <source>Line of sight</source>
         <translation>Linea di vista</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="331"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolminmax.cpp" line="332"/>
         <source>Add pin</source>
         <translation>Aggiungi spillo</translation>
     </message>
@@ -4804,7 +4814,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="173"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="175"/>
         <source>KADAS Newsletter</source>
         <translation>Newsletter KADAS</translation>
     </message>
@@ -5579,44 +5589,44 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="413"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2167"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2174"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="444"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2134"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2141"/>
         <source>Open</source>
         <translation>Apri</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="475"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2146"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2153"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="506"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2533"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2536"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2540"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2543"/>
         <source>Save As</source>
         <translation>Salva con nome</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="531"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2290"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2297"/>
         <source>Print</source>
         <translation>Stampa</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="562"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2278"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2285"/>
         <source>Copy Map</source>
         <translation>Copia cartina</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="593"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2299"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2306"/>
         <source>Save Map</source>
         <translation>Salva cartina</translation>
     </message>
@@ -5632,31 +5642,31 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="705"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2311"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2318"/>
         <source>Previous Extent</source>
         <translation>Estesione precedente</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="736"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2323"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2330"/>
         <source>Next Extent</source>
         <translation>Estensione successiva</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="798"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2335"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2342"/>
         <source>New map window</source>
         <translation>Nuova vista</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="832"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2347"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2354"/>
         <source>3D</source>
         <translation>3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="863"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2359"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2366"/>
         <source>Grid</source>
         <translation>Griglia</translation>
     </message>
@@ -5671,13 +5681,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="967"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2194"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2201"/>
         <source>Area</source>
         <translation>Area</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="998"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2269"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2276"/>
         <source>Circle</source>
         <translation>Cerchio</translation>
     </message>
@@ -5686,7 +5696,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation type="vanished">Impostazioni simbolo globali</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2221"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2228"/>
         <source>Azimuth</source>
         <translation>Azimuth</translation>
     </message>
@@ -5698,8 +5708,8 @@ Sight</source>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="767"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2611"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2614"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2618"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2621"/>
         <source>Bookmarks</source>
         <translation>Segnalibri</translation>
     </message>
@@ -5712,25 +5722,25 @@ Azimuth</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1061"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2233"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2240"/>
         <source>Slope</source>
         <translation>Pendenza</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1092"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2245"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2252"/>
         <source>Hillshade</source>
         <translation>Ombreggiatura</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1123"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2257"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2264"/>
         <source>Viewshed</source>
         <translation>Bacino visuale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1148"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2638"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2645"/>
         <source>Min/Max</source>
         <translation>Min/Max</translation>
     </message>
@@ -5746,7 +5756,7 @@ Azimuth</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1242"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2158"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2165"/>
         <source>Pin</source>
         <translation>Spillo</translation>
     </message>
@@ -5757,28 +5767,28 @@ Azimuth</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1304"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2557"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2560"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2564"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2567"/>
         <source>Paste</source>
         <translation>Incolla</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1335"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2575"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2582"/>
         <source>Guide grid</source>
         <translation>Griglia di condotta</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1366"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2587"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2590"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2594"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2597"/>
         <source>Bullseye</source>
         <translation>Bullseye</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1391"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2509"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2512"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2516"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2519"/>
         <source>Delete Items</source>
         <translation>Elimina oggetti</translation>
     </message>
@@ -5789,42 +5799,42 @@ Azimuth</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1463"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2401"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2408"/>
         <source>Toggle Geolocation</source>
         <translation>Geolocazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1494"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2416"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2423"/>
         <source>Move with Geolocation</source>
         <translation>Sposta con
 geolocazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1525"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2386"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2389"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2393"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2396"/>
         <source>Draw Waypoints</source>
         <translation>Disegna waypoint</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1556"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2371"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2374"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2378"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2381"/>
         <source>Draw Routes</source>
         <translation>Disegna rotte</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1587"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2440"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2443"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2447"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2450"/>
         <source>Export GPX</source>
         <translation>Esporta GPX</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1618"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2428"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2431"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2435"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2438"/>
         <source>Import GPX</source>
         <translation>Importa GPX</translation>
     </message>
@@ -5835,21 +5845,21 @@ geolocazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1696"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2470"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2477"/>
         <source>Add MSS Symbol</source>
         <translation>Aggiungi simbolo MSS</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1730"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2482"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2485"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2489"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2492"/>
         <source>Export MILXLY</source>
         <translation>Esporta MILXLY</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1755"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2494"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2497"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2501"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2504"/>
         <source>Import MILXLY</source>
         <translation>Importa MILXLY</translation>
     </message>
@@ -5869,7 +5879,12 @@ geolocazione</translation>
         <translation>Spessore linea:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2641"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="1964"/>
+        <source>Ignore system font scaling</source>
+        <translation>Ignora la scala dei caratteri del sistema</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2648"/>
         <source>Compute terrain min/max</source>
         <translation>Calcola min/max del terreno</translation>
     </message>
@@ -5917,105 +5932,105 @@ geolocazione</translation>
         <translation>Aggancia ai vertici in prossimità durante il disegno</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="1984"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2602"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="1991"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2609"/>
         <source>Plugin Manager</source>
         <translation>Gestione plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2011"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2018"/>
         <source>&amp;Help</source>
         <translation>&amp;Guida</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2050"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2521"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2524"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2057"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2528"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2531"/>
         <source>Help</source>
         <translation>Guida</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2075"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2545"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2548"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2082"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2552"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2555"/>
         <source>About</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2100"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2623"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2626"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2107"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2630"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2633"/>
         <source>Newsletter</source>
         <translation>Newsletter</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2137"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2144"/>
         <source>Open project</source>
         <translation>Apri progetto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2179"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2186"/>
         <source>Distance &amp; Azimuth</source>
         <translation>Distanza &amp; Azimuth</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2182"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2189"/>
         <source>Distance and azimuth</source>
         <translation>Distanza e azimuth</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2206"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2213"/>
         <source>Profile &amp; Sight</source>
         <translation>Profilo &amp; vista</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2209"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2216"/>
         <source>Profile and Line of Sight</source>
         <translation>Profilo e linea di vista</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2281"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2288"/>
         <source>Copy Map to Clipboard</source>
         <translation>Copia cartina negli appunti</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2302"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2309"/>
         <source>Save Map to Image</source>
         <translation>Salva cartina come immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2314"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2321"/>
         <source>Zoom to previous Extent</source>
         <translation>Zoom al riquadro precedente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2326"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2333"/>
         <source>Zoom to next Extent</source>
         <translation>Zoom al riquadro successivo</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2404"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2411"/>
         <source>Toggle GPS</source>
         <translation>Attiva GPS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2419"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2426"/>
         <source>Move with GPS</source>
         <translation>Muovi con GPS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2455"/>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2458"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2462"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2465"/>
         <source>Add Image</source>
         <translation>Aggiungi immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2473"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2480"/>
         <source>Add MilX Symbol</source>
         <translation>Aggiungi simbolo MilX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2572"/>
+        <location filename="../kadas/app/ui/kadastopwidget.ui" line="2579"/>
         <source>Guide Grid</source>
         <translation>Griglia di condotta</translation>
     </message>
@@ -6241,77 +6256,77 @@ geolocazione</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="571"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="591"/>
         <source>Plugins</source>
         <translation>Plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="571"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="591"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Errore durante la lettura dei metadati del plugin %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="85"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="99"/>
         <source>Couldn&apos;t load SIP module.</source>
         <translation>Impossibile caricare il modulo SIP.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="85"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="96"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="103"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="109"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="116"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="158"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="99"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="110"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="117"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="123"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="130"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="172"/>
         <source>Python support will be disabled.</source>
         <translation>Il supporto Python verrà disabilitato.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="96"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="110"/>
         <source>Couldn&apos;t set SIP API versions.</source>
         <translation>Impossibile impostare le versioni SIP API.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="103"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="117"/>
         <source>Couldn&apos;t load PyQt.</source>
         <translation>Impossibile caricare PyQt.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="109"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="123"/>
         <source>Couldn&apos;t load PyQGIS.</source>
         <translation>Impossibile caricare PyQGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="116"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="130"/>
         <source>Couldn&apos;t load QGIS utils.</source>
         <translation>Impossibile caricare gli strumenti QGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="254"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="268"/>
         <source>An error occurred during execution of following code:</source>
         <translation>Si è verificato un errore durante l&apos;esecuzione delle istruzioni seguenti:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="265"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="279"/>
         <source>Python version:</source>
         <translation>Versione Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="266"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="280"/>
         <source>KADAS version:</source>
         <translation>Versione KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="267"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="281"/>
         <source>Python path:</source>
         <translation>Percorso Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="272"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="286"/>
         <source>Python error</source>
         <translation>Errore python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="158"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="172"/>
         <source>Couldn&apos;t load qgis.user.</source>
         <translation>Impossibile caricare qgis.user.</translation>
     </message>

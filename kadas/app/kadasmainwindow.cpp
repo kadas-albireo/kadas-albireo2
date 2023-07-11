@@ -164,6 +164,9 @@ void KadasMainWindow::init()
   }
   connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
+  mCheckboxIgnoreSystemScaling->setChecked( QgsSettings().value( "/kadas/ignore_dpi_scale", false ).toBool() );
+  connect( mCheckboxIgnoreSystemScaling, &QCheckBox::toggled, this, &KadasMainWindow::toggleIgnoreDpiScale );
+
   mSpinBoxDecimalPlaces->setValue( QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
   connect( mSpinBoxDecimalPlaces, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
 
@@ -1510,5 +1513,11 @@ void KadasMainWindow::updateBgLayerZoomResolutions() const
 void KadasMainWindow::showNewsletter()
 {
   KadasNewsPopup::showIfNewsAvailable( true );
+}
+
+void KadasMainWindow::toggleIgnoreDpiScale()
+{
+  QMessageBox::information( this, tr( "Font scaling setting changed" ), tr( "The font scaling change will be applied at the next program launch." ) );
+  QgsSettings().setValue( "/kadas/ignore_dpi_scale", mCheckboxIgnoreSystemScaling->isChecked() );
 }
 

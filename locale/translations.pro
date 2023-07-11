@@ -128,6 +128,7 @@ SOURCES += \
 ../kadas/gui/catalog/kadasarcgisportalcatalogprovider.cpp \
 ../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h \
 ../kadas/gui/catalog/kadasvbscatalogprovider.cpp \
+../kadas/gui/kadasprojectmigration.h \
 ../kadas/gui/ui/kadasgpxrouteeditor.ui \
 ../kadas/gui/ui/kadasprojecttemplateselectiondialog.ui \
 ../kadas/gui/ui/kadasgpxwaypointeditor.ui \
@@ -139,6 +140,7 @@ SOURCES += \
 ../kadas/gui/kadasbottombar.h \
 ../kadas/gui/kadasfeaturepicker.h \
 ../kadas/gui/kadascoordinatedisplayer.h \
+../kadas/gui/kadasprojectmigration.cpp \
 ../kadas/gui/search/kadasmapserverfindsearchprovider.h \
 ../kadas/gui/search/kadaspinsearchprovider.cpp \
 ../kadas/gui/search/kadaslocationsearchprovider.cpp \
@@ -232,14 +234,12 @@ SOURCES += \
 ../kadas/app/kadasmapwidgetmanager.cpp \
 ../kadas/app/main.cpp \
 ../kadas/app/kadaspluginmanager.h \
-../kadas/app/kadasprojectmigration.h \
 ../kadas/app/ui/kadaspluginmanager.ui \
 ../kadas/app/ui/KadasMilxExportDialog.ui \
 ../kadas/app/ui/kadastopwidget.ui \
 ../kadas/app/ui/kadaslayoutdesignerbase.ui \
 ../kadas/app/ui/kadaswindowbase.ui \
 ../kadas/app/ui/kadasstatuswidget.ui \
-../kadas/app/kadasprojectmigration.cpp \
 ../kadas/app/kadasredliningintegration.cpp \
 ../kadas/app/iamauth/kadasiamauth.h \
 ../kadas/app/iamauth/kadasiamauth.cpp \

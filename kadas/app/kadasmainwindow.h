@@ -143,6 +143,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void addRemotePicture();
     void updateBgLayerZoomResolutions() const;
     void showNewsletter();
+    void toggleIgnoreDpiScale();
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
