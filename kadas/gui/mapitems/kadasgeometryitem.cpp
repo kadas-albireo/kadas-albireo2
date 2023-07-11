@@ -92,7 +92,8 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   {
     context.painter()->setBrush( Qt::NoBrush );
   }
-  context.painter()->setPen( mPen );
+  double dpiScale = outputDpiScale( context );
+  context.painter()->setPen( QPen( mPen.brush(), mPen.widthF() * dpiScale ) );
 
   QgsAbstractGeometry *paintGeom = mGeometry->clone();
   paintGeom->transform( context.coordinateTransform() );
@@ -107,7 +108,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   QgsPoint vertex;
   while ( paintGeom->nextVertex( vertexId, vertex ) )
   {
-    drawVertex( context.painter(), vertex.x(), vertex.y() );
+    drawVertex( context, vertex.x(), vertex.y() );
   }
 
   // Draw measurement labels
@@ -165,12 +166,14 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   return outString;
 }
 
-void KadasGeometryItem::drawVertex( QPainter *p, double x, double y ) const
+void KadasGeometryItem::drawVertex( QgsRenderContext &context, double x, double y ) const
 {
-  qreal iconSize = mIconSize * mSymbolScale;
+  QPainter *p = context.painter();
+  double dpiScale = outputDpiScale( context );
+  qreal iconSize = mIconSize * mSymbolScale * dpiScale;
   qreal s = ( iconSize - 1 ) / 2;
   p->save();
-  p->setPen( mIconPen );
+  p->setPen( QPen( mIconPen.brush(), mIconPen.widthF() * dpiScale ) );
   p->setBrush( mIconBrush );
 
   switch ( mIconType )

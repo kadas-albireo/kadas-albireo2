@@ -94,7 +94,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     void setInternalGeometry( QgsAbstractGeometry *geom );
 
-    void drawVertex( QPainter *p, double x, double y ) const;
+    void drawVertex( QgsRenderContext &context, double x, double y ) const;
     QgsUnitTypes::DistanceUnit distanceBaseUnit() const;
     QgsUnitTypes::AreaUnit areaBaseUnit() const;
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;

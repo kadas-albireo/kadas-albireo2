@@ -135,7 +135,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 
     void setInternalGeometry( QgsAbstractGeometry *geom );
 
-    void drawVertex( QPainter *p, double x, double y ) const;
+    void drawVertex( QgsRenderContext &context, double x, double y ) const;
     QgsUnitTypes::DistanceUnit distanceBaseUnit() const;
     QgsUnitTypes::AreaUnit areaBaseUnit() const;
     QString formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const;
