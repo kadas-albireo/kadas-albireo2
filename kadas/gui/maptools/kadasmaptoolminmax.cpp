@@ -138,7 +138,18 @@ void KadasMapToolMinMax::drawFinished()
     return;
   }
 
-  QgsCoordinateTransform crst( layer->crs(), mCanvas->mapSettings().destinationCrs(), layer->transformContext() );
+  GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ) );
+  double gtrans[6] = {};
+  if ( inputDataset == NULL || GDALGetRasterCount( inputDataset ) < 1 || GDALGetGeoTransform( inputDataset, &gtrans[0] ) != CE_None )
+  {
+    GDALClose( inputDataset );
+    clear();
+    return;
+  }
+  GDALRasterBandH band = GDALGetRasterBand( inputDataset, 1 );
+  QgsCoordinateReferenceSystem inputCrs( QString( GDALGetProjectionRef( inputDataset ) ) );
+
+  QgsCoordinateTransform crst( inputCrs, mCanvas->mapSettings().destinationCrs(), layer->transformContext() );
 
   const KadasGeometryItem *item = static_cast<const KadasGeometryItem *>( currentItem() );
   QgsAbstractGeometry *geom = nullptr;
@@ -159,19 +170,9 @@ void KadasMapToolMinMax::drawFinished()
     return;
   }
 
-  GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( static_cast<QgsRasterLayer *>( layer ) );
-  double gtrans[6] = {};
-  if ( inputDataset == NULL || GDALGetRasterCount( inputDataset ) < 1 || GDALGetGeoTransform( inputDataset, &gtrans[0] ) != CE_None )
-  {
-    GDALClose( inputDataset );
-    clear();
-    return;
-  }
-  GDALRasterBandH band = GDALGetRasterBand( inputDataset, 1 );
-
   //determine the window
   int rowStart, rowEnd, colStart, colEnd;
-  if ( !KadasNineCellFilter::computeWindow( inputDataset, layer->crs(), bbox, layer->crs(), rowStart, rowEnd, colStart, colEnd ) )
+  if ( !KadasNineCellFilter::computeWindow( inputDataset, inputCrs, bbox, inputCrs, rowStart, rowEnd, colStart, colEnd ) )
   {
     GDALClose( inputDataset );
     clear();
