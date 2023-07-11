@@ -158,16 +158,18 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
       {
         if ( sInstance == nullptr )
         {
-          sInstance = new KadasNewsPopup( url, version );
-          sInstance->show();
+          QDesktopServices::openUrl( url );
+          QgsSettings().setValue( "kadas/lastPortalNewsVer", version );
+//          sInstance = new KadasNewsPopup( url );
+//          sInstance->show();
         }
-        sInstance->raise();
+//        sInstance->raise();
       }
     }
   } );
 }
 
-KadasNewsPopup::KadasNewsPopup( const QString &url, const QString &version )
+KadasNewsPopup::KadasNewsPopup( const QString &url )
 {
   setAttribute( Qt::WA_DeleteOnClose );
   setWindowTitle( tr( "KADAS Newsletter" ) );
@@ -192,9 +194,6 @@ KadasNewsPopup::KadasNewsPopup( const QString &url, const QString &version )
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
   layout()->addWidget( bbox );
-
-  // Set news version to current version to not show it again
-  QgsSettings().setValue( "kadas/lastPortalNewsVer", version );
 }
 
 KadasNewsPopup::~KadasNewsPopup()

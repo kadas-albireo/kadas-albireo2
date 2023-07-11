@@ -28,7 +28,7 @@ class KadasNewsPopup : public QDialog
     static void showIfNewsAvailable( bool force = false );
 
   private:
-    KadasNewsPopup( const QString &url, const QString &version );
+    KadasNewsPopup( const QString &url );
     ~KadasNewsPopup();
     static KadasNewsPopup *sInstance;
 };
