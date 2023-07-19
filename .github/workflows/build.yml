@@ -77,25 +77,21 @@ jobs:
         if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: svenstaro/upload-release-action@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          file: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
           asset_name: kadas-portable-win64-${{ steps.version_number.outputs.version }}.zip
-          asset_content_type: application/zip
         if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
       - name: Upload debugsym release asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: svenstaro/upload-release-action@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          file: ./kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
           asset_name: kadas-portable-win64-${{ steps.version_number.outputs.version }}-debugsym.zip
-          asset_content_type: application/zip
         if: ${{ !startsWith(steps.version_number.outputs.version, 'ci-') }}
 
       - name: Upload CI build artifact
