@@ -1102,7 +1102,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
     {
       QVariantMap result = results.at( 0 ).toMap();
       QString id = result["id"].toString();
-      QString metadataUrl = gdiBaseUrl + "portal/home/item.html?id=" + id;
+      QString metadataUrl = gdiBaseUrl + "home/item.html?id=" + id;
       QgsDebugMsg( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ) );
       QDesktopServices::openUrl( metadataUrl );
     }
