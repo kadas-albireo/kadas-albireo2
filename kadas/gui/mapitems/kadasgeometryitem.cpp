@@ -93,7 +93,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     context.painter()->setBrush( Qt::NoBrush );
   }
   double dpiScale = outputDpiScale( context );
-  context.painter()->setPen( QPen( mPen.brush(), mPen.widthF() * dpiScale ) );
+  context.painter()->setPen( QPen( mPen.brush(), mPen.widthF() * dpiScale, mPen.style() ) );
 
   QgsAbstractGeometry *paintGeom = mGeometry->clone();
   paintGeom->transform( context.coordinateTransform() );
