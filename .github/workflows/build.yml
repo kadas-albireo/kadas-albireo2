@@ -20,14 +20,14 @@ jobs:
         run: dnf -y update
 
       - name: Install core dependencies
-        run: dnf5 -y install jq wget unzip 'dnf-command(download)' cpio
+        run: dnf -y install jq wget unzip 'dnf-command(download)' cpio
 
       - name: Install build dependencies
         run: ./scripts/mingwdeps.sh
 
       - name: Manually install qt5-qttranslations (FIXME?)
         run: |
-          dnf5 download mingw64-qt5-qttranslations
+          dnf download mingw64-qt5-qttranslations
           rpm2cpio mingw64-qt5-qttranslations*.rpm | cpio -idmv -D /
 
       - name: Version number
