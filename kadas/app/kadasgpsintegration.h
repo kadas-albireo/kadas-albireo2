@@ -46,7 +46,7 @@ class KadasGpsIntegration : public QObject
     QAction *mActionMoveWithGps = nullptr;
     QgsGpsConnection *mConnection = nullptr;
     KadasSymbolItem *mMarker = nullptr;
-    QgsGpsInformation::FixStatus mCurFixStatus = QgsGpsInformation::NoFix;
+    Qgis::GpsFixStatus mCurFixStatus = Qgis::GpsFixStatus::NoFix;
 
   private slots:
     void enableGPS( bool enabled );

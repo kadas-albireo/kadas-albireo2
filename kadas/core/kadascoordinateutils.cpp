@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <gdal.h>
-#include <zonedetect.h>
+#include <zonedetect/zonedetect.h>
 
 #include <qgis/qgscoordinateformatter.h>
 #include <qgis/qgscoordinatetransform.h>
@@ -26,11 +26,11 @@
 #include <kadas/core/kadascoordinateutils.h>
 #include <kadas/core/kadaslatlontoutm.h>
 
-double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg )
+double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg )
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     if ( errMsg )
     {
@@ -80,7 +80,7 @@ double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoord
   }
 
   // Get vertical unit
-  QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
 
   // Transform geo position to raster CRS
   QgsPointXY pRaster = QgsCoordinateTransform( crs, rasterCrs, QgsProject::instance() ).transform( p );

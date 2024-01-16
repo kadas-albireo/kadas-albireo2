@@ -203,7 +203,7 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   QIcon unlockedIcon = QgsApplication::getThemeIcon( "/unlocked.svg" );
 
   mCrs = mCurrentLayer->crs();
-  int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+  int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   mCurRect = mCurrentLayer->extent();
   ui.lineEditTopLeft->setText( QString( "%1, %2" ).arg( mCurRect.xMinimum(), 0, 'f', prec ).arg( mCurRect.yMaximum(), 0, 'f', prec ) );
   ui.lineEditBottomRight->setText( QString( "%1, %2" ).arg( mCurRect.xMaximum(), 0, 'f', prec ).arg( mCurRect.yMinimum(), 0, 'f', prec ) );
@@ -251,7 +251,7 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
 
 void KadasGuideGridWidget::pointPicked( KadasMapToolGuideGrid::PickMode pickMode, const QgsPointXY &pos )
 {
-  int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+  int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   if ( pickMode == KadasMapToolGuideGrid::PICK_TOP_LEFT )
   {
     ui.lineEditTopLeft->setText( QString( "%1, %2" ).arg( pos.x(), 0, 'f', prec ).arg( pos.y(), 0, 'f', prec ) );
@@ -295,7 +295,7 @@ void KadasGuideGridWidget::topLeftEdited()
   }
   else
   {
-    int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+    int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
     ui.lineEditTopLeft->setText( QString( "%1, %2" ).arg( mCurRect.xMinimum(), 0, 'f', prec ).arg( mCurRect.yMaximum(), 0, 'f', prec ) );
   }
 }
@@ -331,7 +331,7 @@ void KadasGuideGridWidget::bottomRightEdited()
   }
   else
   {
-    int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+    int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
     ui.lineEditBottomRight->setText( QString( "%1, %2" ).arg( mCurRect.xMaximum(), 0, 'f', prec ).arg( mCurRect.yMinimum(), 0, 'f', prec ) );
   }
 }
@@ -367,7 +367,7 @@ void KadasGuideGridWidget::updateIntervals()
 
 void KadasGuideGridWidget::updateBottomRight()
 {
-  int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+  int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   mCurRect.setXMaximum( mCurRect.xMinimum() + ui.spinBoxCols->value() * ui.spinBoxWidth->value() );
   mCurRect.setYMinimum( mCurRect.yMaximum() - ui.spinBoxRows->value() * ui.spinBoxHeight->value() );
   ui.lineEditBottomRight->setText( QString( "%1, %2" ).arg( mCurRect.xMaximum(), 0, 'f', prec ).arg( mCurRect.yMinimum(), 0, 'f', prec ) );
@@ -387,7 +387,7 @@ void KadasGuideGridWidget::updateGrid()
   {
     return;
   }
-  int prec = mCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+  int prec = mCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   mCurRect.normalize();
   ui.lineEditTopLeft->setText( QString( "%1, %2" ).arg( mCurRect.xMinimum(), 0, 'f', prec ).arg( mCurRect.yMaximum(), 0, 'f', prec ) );
   ui.lineEditBottomRight->setText( QString( "%1, %2" ).arg( mCurRect.xMaximum(), 0, 'f', prec ).arg( mCurRect.yMinimum(), 0, 'f', prec ) );

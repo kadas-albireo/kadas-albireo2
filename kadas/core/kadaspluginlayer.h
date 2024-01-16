@@ -20,6 +20,7 @@
 #include <QObject>
 
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
@@ -40,8 +41,8 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
     bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const override { return true; }
     bool readSymbology( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) override { return true; }
 
-    void setOpacity( double opacity ) { mOpacity = opacity; }
-    double opacity() const { return mOpacity; }
+    void setOpacity( double opacity ) override { mOpacity = opacity; }
+    double opacity() const override { return mOpacity; }
 
     class IdentifyResult
     {

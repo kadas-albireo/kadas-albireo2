@@ -22,6 +22,8 @@
 #include <qgis/qgsfeaturestore.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsmapsettings.h>
+
 
 #include <kadas/gui/kadasclipboard.h>
 #include <kadas/gui/mapitems/kadasmapitem.h>

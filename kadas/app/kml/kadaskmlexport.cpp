@@ -27,6 +27,7 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayerlabeling.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/kml/kadaskmlexport.h>
@@ -93,7 +94,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
       fullExtent.combineExtentWith( layerExtent );
   }
   int dpi = 96;
-  double factor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceDegrees, QgsUnitTypes::DistanceMeters ) * dpi / 25.4 * 1000 / exportScale;
+  double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * dpi / 25.4 * 1000 / exportScale;
   QgsMapSettings settings;
   settings.setDestinationCrs( crsWgs84 );
   settings.setExtent( fullExtent );

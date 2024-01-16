@@ -1,250 +1,131 @@
-## Once run this will define:
-##
-## QGIS_FOUND            = system has QGIS lib
-##
-## QGIS_CORE_LIBRARY     = full path to the CORE library
-## QGIS_GUI_LIBRARY      = full path to the GUI library
-## QGIS_ANALYSIS_LIBRARY = full path to the ANALYSIS library
-## QGIS_PLUGIN_DIR       = full path to where QGIS plugins are installed
-## QGIS_INCLUDE_DIR      = where to find headers
-## QGIS_UI_INCLUDE_DIR   = where to find ui_* generated headers
-##
-## QGIS_VERSION          = version as defined in qgsconfig.h, as major.minor.patch
-##
-## Definitions or ENV variables affecting search locations
-##
-## OSGEO4W_ROOT          = [A-Z]:/path/to/OSGeo4W/install/root
-##                               (^ use forward slashes!)
-## OSGEO4W_QGIS_SUBDIR   = qgis[-rel|-ltr][-dev], in OSGEO4W_ROOT/apps/
-## QGIS_MAC_PATH         = /path/to/any/QGIS.app/Contents
-## QGIS_BUILD_PATH       = [A-Z:]/path/to/QGIS/build/directory
-##
-## Tim Sutton
-## Larry Shaffer (2017-01-31)
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file COPYING-CMAKE-SCRIPTS or https://cmake.org/licensing for details.
 
-#MESSAGE("Searching for QGIS")
-IF(WIN32)
-  # OSGEO4W_QGIS_SUBDIR relative install: qgis[-rel|-ltr][-dev], etc.
-  IF (NOT OSGEO4W_QGIS_SUBDIR OR "${OSGEO4W_QGIS_SUBDIR}" STREQUAL "")
-    IF (NOT "$ENV{OSGEO4W_QGIS_SUBDIR}" STREQUAL "")
-      SET (OSGEO4W_QGIS_SUBDIR $ENV{OSGEO4W_QGIS_SUBDIR})
-    ELSE ()
-      SET (OSGEO4W_QGIS_SUBDIR qgis)
-    ENDIF ()
-  ENDIF ()
+#[=======================================================================[.rst:
+FindQGIS
+---------
 
-  #MESSAGE("Searching for QGIS in $ENV{PROGRAMFILES}/QGIS")
-  IF (MINGW)
-    FIND_PATH(QGIS_PLUGIN_DIR
-      NAMES libofflineeditingplugin.dll
-      PATHS
-        "$ENV{PROGRAMFILES}/QGIS/plugins"
-    )
-    FIND_PATH(QGIS_INCLUDE_DIR
-      NAMES qgsapplication.h
-      PATHS
-        "$ENV{PROGRAMFILES}/QGIS/include"
-    )
-    FIND_LIBRARY(QGIS_CORE_LIBRARY
-      NAMES qgis_core
-      PATHS
-        "$ENV{PROGRAMFILES}/QGIS/"
-    )
-    FIND_LIBRARY(QGIS_GUI_LIBRARY
-      NAMES qgis_gui
-      PATHS
-        "$ENV{PROGRAMFILES}/QGIS/"
-    )
-  ENDIF (MINGW)
+CMake module to search for QGIS library
 
-  IF (MSVC)
-    FIND_PATH(QGIS_PLUGIN_DIR
-      NAMES offlineeditingplugin.dll
-      PATHS
-        "$ENV{OSGEO4W_ROOT}/apps/${OSGEO4W_QGIS_SUBDIR}/plugins"
-        "$ENV{PROGRAMFILES}/QGIS/plugins"
-    )
-    FIND_PATH(QGIS_INCLUDE_DIR
-      NAMES qgsapplication.h
-      PATHS
-        "$ENV{INCLUDE}"
-        "$ENV{LIB_DIR}/include/qgis"
-        "$ENV{OSGEO4W_ROOT}/include"
-        "$ENV{OSGEO4W_ROOT}/apps/${OSGEO4W_QGIS_SUBDIR}/include"
-        "$ENV{PROGRAMFILES}/QGIS/include"
-    )
-    FIND_LIBRARY(QGIS_CORE_LIBRARY
-      NAMES qgis_core
-      PATHS
-        "$ENV{LIB_DIR}/lib/"
-        "$ENV{LIB}"
-        "$ENV{OSGEO4W_ROOT}/lib"
-        "$ENV{OSGEO4W_ROOT}/apps/${OSGEO4W_QGIS_SUBDIR}/lib"
-        "$ENV{PROGRAMFILES}/QGIS/lib"
-    )
-    FIND_LIBRARY(QGIS_GUI_LIBRARY
-      NAMES qgis_gui
-      PATHS
-        "$ENV{LIB_DIR}"
-        "$ENV{LIB}"
-        "$ENV{OSGEO4W_ROOT}/lib"
-        "$ENV{OSGEO4W_ROOT}/apps/${OSGEO4W_QGIS_SUBDIR}/lib"
-        "$ENV{PROGRAMFILES}/QGIS/lib"
-    )
-    FIND_LIBRARY(QGIS_ANALYSIS_LIBRARY
-      NAMES qgis_analysis
-      PATHS
-        "$ENV{LIB_DIR}"
-        "$ENV{LIB}"
-        "$ENV{OSGEO4W_ROOT}/lib"
-        "$ENV{OSGEO4W_ROOT}/apps/${OSGEO4W_QGIS_SUBDIR}/lib"
-        "$ENV{PROGRAMFILES}/QGIS/lib"
-    )
-  ENDIF (MSVC)
-ELSE(WIN32)
-  IF(UNIX)
-    #MESSAGE("Searching for QGIS in /usr/bin; /usr/local/bin")
-    FIND_PATH(QGIS_PLUGIN_DIR
-      NAMES libofflineeditingplugin.so
-      PATHS
-        ${QGIS_BUILD_PATH}/PlugIns/qgis
-        ${QGIS_MAC_PATH}/PlugIns/qgis
-        ${QGIS_PREFIX_PATH}/lib/qgis/plugins/
-        /usr/lib64/qgis/plugins
-        /usr/lib/qgis
-        /usr/lib/qgis/plugins
-        /usr/local/lib/qgis/plugins
-        "$ENV{LIB_DIR}/lib/qgis/plugins"
-        "$ENV{LIB_DIR}/lib/qgis"
-    )
-    FIND_PATH(QGIS_INCLUDE_DIR
-      NAMES qgis.h
-      PATHS
-        ${QGIS_BUILD_PATH}/output/lib/qgis_core.framework/Headers
-        ${QGIS_MAC_PATH}/Frameworks/qgis_core.framework/Headers
-        ${QGIS_PREFIX_PATH}/include/qgis
-        /usr/include/qgis
-        /usr/local/include/qgis
-        /Library/Frameworks/qgis_core.framework/Headers
-        "$ENV{LIB_DIR}/include/qgis"
-    )
-    FIND_PATH(QGIS_UI_INCLUDE_DIR
-      NAMES ui_qgscredentialdialog.h
-      PATHS
-        ${QGIS_BUILD_PATH}/src/ui
-        ${QGIS_MAC_PATH}/Frameworks/qgis_gui.framework/Headers
-        ${QGIS_PREFIX_PATH}/include/qgis
-        /usr/include/qgis
-        /usr/local/include/qgis
-        /Library/Frameworks/qgis_gui.framework/Headers
-        "$ENV{LIB_DIR}/include/qgis"
-    )
-    # also get other frameworks' headers folders on OS X
-    IF (APPLE)
-      FIND_PATH(QGIS_GUI_INCLUDE_DIR
-        NAMES qgsguiutils.h
-        PATHS
-          ${QGIS_BUILD_PATH}/output/lib
-          ${QGIS_MAC_PATH}/Frameworks
-          /Library/Frameworks
-          PATH_SUFFIXES qgis_gui.framework/Headers
-      )
-      FIND_PATH(QGIS_ANALYSIS_INCLUDE_DIR
-        NAMES qgsinterpolator.h
-        PATHS
-          ${QGIS_BUILD_PATH}/output/lib
-          ${QGIS_MAC_PATH}/Frameworks
-          /Library/Frameworks
-          PATH_SUFFIXES qgis_analysis.framework/Headers
-      )
-      SET(QGIS_INCLUDE_DIR
-        ${QGIS_INCLUDE_DIR}
-        ${QGIS_GUI_INCLUDE_DIR}
-        ${QGIS_ANALYSIS_INCLUDE_DIR}
-        ${QGIS_UI_INCLUDE_DIR}
-      )
-    ENDIF (APPLE)
+IMPORTED targets
+^^^^^^^^^^^^^^^^
+This module defines the following :prop_tgt:`IMPORTED` target:
 
-    FIND_LIBRARY(QGIS_CORE_LIBRARY
-      NAMES qgis_core
-      PATHS
-        ${QGIS_BUILD_PATH}/output/lib
-        ${QGIS_MAC_PATH}/Frameworks
-        ${QGIS_MAC_PATH}/lib
-        ${QGIS_PREFIX_PATH}/lib/
-        /usr/lib64
-        /usr/lib
-        /usr/local/lib
-        /Library/Frameworks
-        "$ENV{LIB_DIR}/lib/"
-    )
-    FIND_LIBRARY(QGIS_GUI_LIBRARY
-      NAMES qgis_gui
-      PATHS
-        ${QGIS_BUILD_PATH}/output/lib
-        ${QGIS_MAC_PATH}/Frameworks
-        ${QGIS_MAC_PATH}/lib
-        ${QGIS_PREFIX_PATH}/lib/
-        /usr/lib64
-        /usr/lib
-        /usr/local/lib
-        /Library/Frameworks
-        "$ENV{LIB_DIR}/lib/"
-    )
-    FIND_LIBRARY(QGIS_ANALYSIS_LIBRARY
-      NAMES qgis_analysis
-      PATHS
-        ${QGIS_BUILD_PATH}/output/lib
-        ${QGIS_MAC_PATH}/Frameworks
-        ${QGIS_MAC_PATH}/lib
-        ${QGIS_PREFIX_PATH}/lib/
-        /usr/lib64
-        /usr/lib
-        /usr/local/lib
-        /Library/Frameworks
-        "$ENV{LIB_DIR}/lib/"
-    )
-  ENDIF(UNIX)
-ENDIF(WIN32)
+ - ``QGIS::Core``
+ - ``QGIS::Gui``
+ - ``QGIS::Analysis``
 
-IF (QGIS_INCLUDE_DIR)
-  SET(QGIS_VERSION QGIS_VERSION-NOTFOUND)
-  FIND_FILE(_qgsconfig_h qgsconfig.h PATHS ${QGIS_INCLUDE_DIR})
-  IF (_qgsconfig_h)
-    FILE(READ ${_qgsconfig_h} _qgsconfig)
-    IF (_qgsconfig)
-      # version defined like #define VERSION "2.14.8-Essen"
-      FILE(STRINGS "${_qgsconfig_h}" _qgsversion_str REGEX "^#define VERSION .*$")
-      STRING(REGEX REPLACE "^#define VERSION +\"([0-9]+\\.[0-9]+\\.[0-9]+).*$" "\\1" _qgsversion "${_qgsversion_str}")
-      IF (_qgsversion)
-        SET(QGIS_VERSION ${_qgsversion})
-      ELSE ()
-        MESSAGE(WARNING "No QGIS version determined: failed to parse qgsconfig.h")
-      ENDIF ()
-    ELSE()
-      MESSAGE(WARNING "No QGIS version determined: failed to read qgsconfig.h")
-    ENDIF ()
-  ELSE ()
-    MESSAGE(WARNING "No QGIS version determined: failed to find qgsconfig.h")
-  ENDIF ()
-ENDIF ()
+Variables
+^^^^^^^^^
+This module defines the following variables:
 
-IF (QGIS_INCLUDE_DIR AND QGIS_CORE_LIBRARY AND QGIS_GUI_LIBRARY AND QGIS_ANALYSIS_LIBRARY)
-   SET(QGIS_FOUND TRUE)
-ENDIF ()
+``QGIS_FOUND``
+  if the library is found
 
-FIND_PATH(QGIS_SIP_DIR NAMES qgis_core/core.sip PATHS /usr/share/sip)
+``QGIS_LIBRARIES``
+  full path to the libraries
 
-IF (QGIS_FOUND)
-   IF (NOT QGIS_FIND_QUIETLY)
-     MESSAGE(STATUS "Found QGIS: ${QGIS_VERSION}")
-     MESSAGE(STATUS "Found QGIS core: ${QGIS_CORE_LIBRARY}")
-     MESSAGE(STATUS "Found QGIS gui: ${QGIS_GUI_LIBRARY}")
-     MESSAGE(STATUS "Found QGIS analysis: ${QGIS_ANALYSIS_LIBRARY}")
-     MESSAGE(STATUS "Found QGIS plugins directory: ${QGIS_PLUGIN_DIR}")
-   ENDIF (NOT QGIS_FIND_QUIETLY)
-ELSE (QGIS_FOUND)
-   IF (QGIS_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find QGIS")
-   ENDIF (QGIS_FIND_REQUIRED)
-ENDIF (QGIS_FOUND)
+``QGIS_INCLUDE_DIRS``
+  where to find the library headers
+
+``QGIS_PREFIX_PATH``
+  the base path of the qgis installation
+
+``QGIS_VERSION_STRING``
+  version string of QGIS
+
+#]=======================================================================]
+
+find_path(QGIS_INCLUDE_DIR qgis.h
+          PATHS
+            ${QGIS_ROOT}/include/
+          PATH_SUFFIXES
+            qgis
+          DOC "Path to QGIS include directory")
+
+include(SelectLibraryConfigurations)
+macro(_find_qgis_library _lib_name _component)
+  if(NOT QGIS_${_component}_LIBRARY)
+    find_library(QGIS_${_component}_LIBRARY_RELEASE NAMES qgis_${_lib_name})
+    find_library(QGIS_${_component}_LIBRARY_DEBUG NAMES qgis_${_lib_name})
+    select_library_configurations(QGIS_${_component})
+    mark_as_advanced(QGIS_${_component}_LIBRARY_RELEASE QGIS_${_component}_LIBRARY_DEBUG)
+  endif()
+
+  if(QGIS_${_component}_LIBRARY)
+    list(APPEND QGIS_LIBRARIES QGIS_${_component}_LIBRARY)
+    if(NOT TARGET QGIS::${_component})
+      add_library(QGIS::${_component} UNKNOWN IMPORTED)
+      set_target_properties(QGIS::${_component} PROPERTIES
+                            INTERFACE_INCLUDE_DIRECTORIES ${QGIS_INCLUDE_DIR}
+                            IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
+      if(EXISTS "${QGIS_${_component}_LIBRARY}")
+        set_target_properties(QGIS::${_component} PROPERTIES
+          IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+          IMPORTED_LOCATION "${QGIS_${_component}_LIBRARY}")
+      endif()
+                          #      if(EXISTS "${QGIS_${_component}_LIBRARY_RELEASE}")
+                          #        set_property(TARGET QGIS::${_component} APPEND PROPERTY
+                          #          IMPORTED_CONFIGURATIONS RELEASE)
+                          #        set_target_properties(QGIS::${_component} PROPERTIES
+                          #          IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+                          #          IMPORTED_LOCATION_RELEASE "${QGIS_${_component}_LIBRARY_RELEASE}")
+                          #      endif()
+                          #      if(EXISTS "${QGIS_${_component}_LIBRARY_DEBUG}")
+                          #        set_property(TARGET QGIS::${_component} APPEND PROPERTY
+                          #          IMPORTED_CONFIGURATIONS DEBUG)
+                          #        set_target_properties(QGIS::${_component} PROPERTIES
+                          #          IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "CXX"
+                          #          IMPORTED_LOCATION_DEBUG "${QGIS_${_component}_LIBRARY_DEBUG}")
+                          #      endif()
+    endif()
+  endif()
+  mark_as_advanced(QGIS_${_component}_LIBRARY)
+endmacro()
+
+if(Core IN_LIST QGIS_FIND_COMPONENTS)
+  _find_qgis_library(core Core)
+endif()
+if(Analysis IN_LIST QGIS_FIND_COMPONENTS)
+  _find_qgis_library(analysis Analysis)
+endif()
+if(Gui IN_LIST QGIS_FIND_COMPONENTS)
+  _find_qgis_library(gui Gui)
+  if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+      _find_qgis_library(native Native)
+      target_link_libraries(QGIS::Core INTERFACE QGIS::Native)
+  endif()
+endif()
+
+
+if(QGIS_INCLUDE_DIR)
+  set(_qgsconfig_h "${QGIS_INCLUDE_DIR}/qgsconfig.h")
+  file(STRINGS "${_qgsconfig_h}" _qgsversion_str REGEX "^#define VERSION .*$")
+  string(REGEX REPLACE "^#define VERSION +\"([0-9]+\\.[0-9]+\\.[0-9]+).*$" "\\1" QGIS_VERSION_STRING "${_qgsversion_str}")
+endif ()
+
+foreach(_component ${QGIS_FIND_COMPONENTS})
+  if(QGIS_FIND_REQUIRED_${_component})
+    list(APPEND _required_libs "QGIS_${_component}_LIBRARY")
+  endif()
+endforeach()
+unset(_component)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(QGIS
+                                  REQUIRED_VARS ${_required_libs} QGIS_INCLUDE_DIR
+                                  VERSION_VAR QGIS_VERSION_STRING)
+mark_as_advanced(QGIS_INCLUDE_DIR)
+get_filename_component(_qgis_lib_path "${QGIS_Core_LIBRARY}" DIRECTORY)
+get_filename_component(QGIS_PREFIX_PATH "${_qgis_lib_path}/.." ABSOLUTE)
+unset(_qgis_lib_path)
+
+if(QGIS_FOUND)
+  set(QGIS_INCLUDE_DIRS ${QGIS_INCLUDE_DIR})
+endif()
+
+if(WITH_VCPKG)
+  include("cmake/qgis-cmake-wrapper.cmake")
+else()
+  target_include_directories(QGIS::Core INTERFACE ${GDAL_INCLUDE_DIR})
+endif()

@@ -27,7 +27,7 @@ class QgsCoordinateReferenceSystem;
 class KADAS_CORE_EXPORT KadasCoordinateUtils
 {
   public:
-    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
     static QByteArray getTimezoneAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
 };
 

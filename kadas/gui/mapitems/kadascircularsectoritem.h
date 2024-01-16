@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
-    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
+    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Polygon; }
 
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;

@@ -5,3 +5,5 @@ dist_debug
 CMakeLists.txt.user
 kadas/resources/resources.qrc
 .cmake
+.idea
+*.orig

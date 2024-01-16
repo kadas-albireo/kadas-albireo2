@@ -42,23 +42,23 @@ the Free Software Foundation; either version 2 of the License, or     *
     static KadasCoordinateFormat *instance();
     Format getCoordinateDisplayFormat() const;
     const QString &getCoordinateDisplayCrs() const;
-    QgsUnitTypes::DistanceUnit getHeightDisplayUnit() const;
+    Qgis::DistanceUnit getHeightDisplayUnit() const;
 
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
     static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
 
     double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
-    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
 
     QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
 
   public slots:
     void setCoordinateDisplayFormat( Format format, const QString &epsg );
-    void setHeightDisplayUnit( QgsUnitTypes::DistanceUnit heightUnit );
+    void setHeightDisplayUnit( Qgis::DistanceUnit heightUnit );
 
   signals:
     void coordinateDisplayFormatChanged( Format format, const QString &epsg );
-    void heightDisplayUnitChanged( QgsUnitTypes::DistanceUnit heightUnit );
+    void heightDisplayUnitChanged( Qgis::DistanceUnit heightUnit );
 
   private:
     KadasCoordinateFormat();

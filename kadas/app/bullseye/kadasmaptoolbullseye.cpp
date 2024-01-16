@@ -21,6 +21,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/kadaslayerselectionwidget.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
@@ -117,10 +118,10 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
-  ui.comboBoxRingIntervalUnit->addItem( "m", QgsUnitTypes::DistanceMeters );
-  ui.comboBoxRingIntervalUnit->addItem( "ft", QgsUnitTypes::DistanceFeet );
-  ui.comboBoxRingIntervalUnit->addItem( "mi", QgsUnitTypes::DistanceMiles );
-  ui.comboBoxRingIntervalUnit->addItem( "nm", QgsUnitTypes::DistanceNauticalMiles );
+  ui.comboBoxRingIntervalUnit->addItem( "m", QVariant::fromValue( Qgis::DistanceUnit::Meters ) );
+  ui.comboBoxRingIntervalUnit->addItem( "ft", QVariant::fromValue( Qgis::DistanceUnit::Feet ) );
+  ui.comboBoxRingIntervalUnit->addItem( "mi", QVariant::fromValue( Qgis::DistanceUnit::Miles ) );
+  ui.comboBoxRingIntervalUnit->addItem( "nm", QVariant::fromValue( Qgis::DistanceUnit::NauticalMiles ) );
 
   connect( ui.inputCenter, &KadasCoordinateInput::coordinateChanged, this, &KadasBullseyeWidget::updateLayer );
   connect( ui.toolButtonPickCenter, &QToolButton::clicked, this, [this] { emit requestPickCenter( true ); } );
@@ -149,9 +150,9 @@ KadasBullseyeLayer *KadasBullseyeWidget::createLayer( QString layerName )
   da.setSourceCrs( mCanvas->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
   QgsRectangle extent = mCanvas->extent();
   double extentHeight = da.measureLine( QgsPoint( extent.center().x(), extent.yMinimum() ), QgsPoint( extent.center().x(), extent.yMaximum() ) );
-  double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceNauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
+  double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, Qgis::DistanceUnit::NauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
   KadasBullseyeLayer *bullseyeLayer = new KadasBullseyeLayer( layerName );
-  bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval,  QgsUnitTypes::DistanceNauticalMiles, 45 );
+  bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval,  Qgis::DistanceUnit::NauticalMiles, 45 );
   return bullseyeLayer;
 }
 
@@ -182,7 +183,7 @@ void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxAxesInterval->setValue( mCurrentLayer->axesInterval() );
   ui.spinBoxAxesInterval->blockSignals( false );
   ui.comboBoxRingIntervalUnit->blockSignals( true );
-  ui.comboBoxRingIntervalUnit->setCurrentIndex( ui.comboBoxRingIntervalUnit->findData( mCurrentLayer->ringIntervalUnit() ) ) ;
+  ui.comboBoxRingIntervalUnit->setCurrentIndex( ui.comboBoxRingIntervalUnit->findData( QVariant::fromValue( mCurrentLayer->ringIntervalUnit() ) ) ) ;
   ui.comboBoxRingIntervalUnit->blockSignals( false );
   ui.spinBoxLineWidth->blockSignals( true );
   ui.spinBoxLineWidth->setValue( mCurrentLayer->lineWidth() );
@@ -202,7 +203,7 @@ void KadasBullseyeWidget::centerPicked( const QgsPointXY &pos )
 
 void KadasBullseyeWidget::ringUnitChanged()
 {
-  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
+  Qgis::DistanceUnit intervalUnit = static_cast<Qgis::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
   double conv = QgsUnitTypes::fromUnitToUnitFactor( mCurrentLayer->ringIntervalUnit(), intervalUnit );
   ui.spinBoxRingInterval->setValue( ui.spinBoxRingInterval->value() * conv ); // invokes updateLayer()
 }
@@ -216,7 +217,7 @@ void KadasBullseyeWidget::updateLayer()
   QgsPointXY center = ui.inputCenter->getCoordinate();
   const QgsCoordinateReferenceSystem &crs = ui.inputCenter->getCrs();
   int rings = ui.spinBoxRings->value();
-  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
+  Qgis::DistanceUnit intervalUnit = static_cast<Qgis::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
   int axes = ui.spinBoxAxesInterval->value();
   mCurrentLayer->setup( center, crs, rings, ui.spinBoxRingInterval->value(), intervalUnit, axes );
   mCurrentLayer->triggerRepaint();

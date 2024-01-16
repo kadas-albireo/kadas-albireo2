@@ -28,7 +28,7 @@
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 #include <kadas/gui/milx/kadasmilxitem.h>
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
 {
   PickResult pickResult;
 
@@ -50,7 +50,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType )
 {
   Q_UNUSED( canvasPos );
   return pick( canvas, mapPos, geomType );
@@ -77,7 +77,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType )
 {
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
@@ -92,7 +92,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   PickResult pickResult;
 
   QgsFeatureList features;
-  if ( geomType != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != QgsWkbTypes::UnknownGeometry && vlayer->geometryType() != geomType )
+  if ( geomType != Qgis::GeometryType::Unknown && vlayer->geometryType() != Qgis::GeometryType::Unknown && vlayer->geometryType() != geomType )
   {
     return pickResult;
   }
@@ -113,7 +113,11 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   }
 
   QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
+#if QGIS_VERSION_INT >= 33500
+  QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( Qgis::FeatureRequestFlag::ExactIntersect ) );
+#else
   QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+#endif
   QgsFeature feature;
   while ( fit.nextFeature( feature ) )
   {
@@ -121,7 +125,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
     {
       continue;
     }
-    if ( geomType != QgsWkbTypes::UnknownGeometry && feature.geometry().type() != geomType )
+    if ( geomType != Qgis::GeometryType::Unknown && feature.geometry().type() != geomType )
     {
       continue;
     }

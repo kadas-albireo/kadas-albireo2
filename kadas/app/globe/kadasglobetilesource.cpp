@@ -125,7 +125,7 @@ void KadasGlobeTileImage::update( osg::NodeVisitor * )
 {
   if ( !mUpdatedImage.isNull() )
   {
-    QgsDebugMsg( QString( "Updating earth tile image: %1" ).arg( mTileExtent.toString( 5 ) ) );
+    QgsDebugMsgLevel( QString( "Updating earth tile image: %1" ).arg( mTileExtent.toString( 5 ) ) , 2 );
     std::memcpy( mTileData, mUpdatedImage.bits(), mTileSize * mTileSize * 4 );
     setImage( mTileSize, mTileSize, 1, 4, // width, height, depth, internal_format
               GL_BGRA, GL_UNSIGNED_BYTE,
@@ -268,7 +268,7 @@ osg::Image *KadasGlobeTileSource::createImage( const osgEarth::TileKey &key, osg
   key.getExtent().getBounds( xmin, ymin, xmax, ymax );
   QgsRectangle tileExtent( xmin, ymin, xmax, ymax );
 
-  QgsDebugMsg( QString( "Create earth tile image: %1" ).arg( tileExtent.toString( 5 ) ) );
+  QgsDebugMsgLevel( QString( "Create earth tile image: %1" ).arg( tileExtent.toString( 5 ) ) , 2 );
   return new KadasGlobeTileImage( this, tileExtent, getPixelsPerTile(), key.getLOD() );
 }
 

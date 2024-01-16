@@ -1,4 +1,3 @@
-FIND_PACKAGE(OpenMP)
 SET(CMAKE_AUTOMOC ON)
 
 FILE(GLOB kadas_analysis_SRC *.cpp)
@@ -10,7 +9,7 @@ LIST(SORT kadas_analysis_HDR)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIR})
 
-ADD_LIBRARY(kadas_analysis SHARED
+ADD_LIBRARY(kadas_analysis
     ${kadas_analysis_SRC}
     ${kadas_analysis_HDR}
 )
@@ -22,7 +21,6 @@ TARGET_LINK_LIBRARIES(kadas_analysis
   ${QGIS_CORE_LIBRARY}
   ${QGIS_ANALYSIS_LIBRARY}
   ${GDAL_LIBRARIES}
-  OpenMP::OpenMP_CXX
   kadas_core
 )
 

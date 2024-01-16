@@ -46,7 +46,7 @@ bool KadasCoordinateCrossItem::State::deserialize( const QJsonObject &json )
 }
 
 KadasCoordinateCrossItem::KadasCoordinateCrossItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasMapItem( crs.mapUnits() == QgsUnitTypes::DistanceMeters ? crs : QgsCoordinateReferenceSystem( "EPSG:3857" ) )
+  : KadasMapItem( crs.mapUnits() == Qgis::DistanceUnit::Meters ? crs : QgsCoordinateReferenceSystem( "EPSG:3857" ) )
 {
   clear();
 }

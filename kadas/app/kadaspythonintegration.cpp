@@ -82,7 +82,7 @@ bool KadasPythonIntegration::checkSystemImports()
   pluginpaths << '"' + homePluginsPath() + '"';
   pluginpaths << '"' + kadasPluginsPath() + '"';
   pluginpaths << '"' + qgisPluginsPath() + '"';
-  QgsDebugMsg( "Plugin paths: " + pluginpaths.join( "; " ) );
+  QgsDebugMsgLevel( "Plugin paths: " + pluginpaths.join( "; " ) , 2 );
 
   // expect that bindings are installed locally, so add the path to modules
   // also add path to plugins
@@ -90,7 +90,7 @@ bool KadasPythonIntegration::checkSystemImports()
   newpaths << '"' + qgisPythonPath() + '"';
   newpaths << '"' + kadasPythonPath() + '"';
   newpaths << '"' + homePythonPath() + '"';
-  QgsDebugMsg( "Python paths: " + pluginpaths.join( "; " ) );
+  QgsDebugMsgLevel( "Python paths: " + pluginpaths.join( "; " ) , 2 );
   newpaths << pluginpaths;
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
@@ -393,12 +393,12 @@ QString KadasPythonIntegration::getTypeAsString( PyObject *obj )
 
   if ( PyType_Check( obj ) )
   {
-    QgsDebugMsg( QStringLiteral( "got type" ) );
+    QgsDebugMsgLevel( QStringLiteral( "got type" ) , 2 );
     return QString( ( ( PyTypeObject * ) obj )->tp_name );
   }
   else
   {
-    QgsDebugMsg( QStringLiteral( "got object" ) );
+    QgsDebugMsgLevel( QStringLiteral( "got object" ) , 2 );
     return PyObjectToQString( obj );
   }
 }
@@ -474,7 +474,7 @@ QString KadasPythonIntegration::PyObjectToQString( PyObject *obj ) const
   }
 
   // some problem with conversion to Unicode string
-  QgsDebugMsg( QStringLiteral( "unable to convert PyObject to a QString!" ) );
+  QgsDebugMsgLevel( QStringLiteral( "unable to convert PyObject to a QString!" ) , 2 );
   return QStringLiteral( "(qgis error)" );
 }
 
@@ -627,7 +627,7 @@ QString KadasPythonIntegration::getPluginMetadata( const QString &pluginName, co
   QString res;
   QString str = QStringLiteral( "qgis.utils.pluginMetadata('%1', '%2')" ).arg( pluginName, function );
   evalString( str, res );
-  //QgsDebugMsg("metadata "+pluginName+" - '"+function+"' = "+res);
+  //QgsDebugMsgLevel("metadata "+pluginName+" - '"+function+"' = "+res, 2 );
   return res;
 }
 

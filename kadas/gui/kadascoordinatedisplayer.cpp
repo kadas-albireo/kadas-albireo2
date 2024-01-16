@@ -64,8 +64,8 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLin
   mHeightLineEdit->setAlignment( Qt::AlignCenter );
   mHeightLineEdit->setFixedWidth( 100 );
 
-  mHeightSelectionCombo->addItem( tr( "Meters" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
-  mHeightSelectionCombo->addItem( tr( "Feet" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
+  mHeightSelectionCombo->addItem( tr( "Meters" ), static_cast<int>( Qgis::DistanceUnit::Meters ) );
+  mHeightSelectionCombo->addItem( tr( "Feet" ), static_cast<int>( Qgis::DistanceUnit::Feet ) );
   mHeightSelectionCombo->setCurrentIndex( -1 );  // to ensure currentIndexChanged is triggered below
 
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, this, &KadasCoordinateDisplayer::displayCoordinates );
@@ -152,7 +152,7 @@ void KadasCoordinateDisplayer::displayCoordinates( const QgsPointXY &p )
 void KadasCoordinateDisplayer::updateHeight()
 {
   double height = KadasCoordinateFormat::instance()->getHeightAtPos( mLastPos, mMapCanvas->mapSettings().destinationCrs() );
-  QString unit = KadasCoordinateFormat::instance()->getHeightDisplayUnit() == QgsUnitTypes::DistanceFeet ? tr( "ft AMSL" ) : tr( "m AMSL" );
+  QString unit = KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? tr( "ft AMSL" ) : tr( "m AMSL" );
   mHeightLineEdit->setText( QString::number( height, 'f', 1 ) + " " + unit );
 }
 
@@ -187,7 +187,7 @@ void KadasCoordinateDisplayer::displayFormatChanged( QAction *action )
 void KadasCoordinateDisplayer::heightUnitChanged( int idx )
 {
   QgsSettings().setValue( "/Qgis/heightUnit", idx );
-  KadasCoordinateFormat::instance()->setHeightDisplayUnit( static_cast<QgsUnitTypes::DistanceUnit>( mHeightSelectionCombo->itemData( idx ).toInt() ) );
+  KadasCoordinateFormat::instance()->setHeightDisplayUnit( static_cast<Qgis::DistanceUnit>( mHeightSelectionCombo->itemData( idx ).toInt() ) );
   updateHeight();
 }
 

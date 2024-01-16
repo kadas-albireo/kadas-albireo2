@@ -43,7 +43,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
     static KadasCoordinateFormat *instance();
     Format getCoordinateDisplayFormat() const;
     const QString &getCoordinateDisplayCrs() const;
-    QgsUnitTypes::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
+    Qgis::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
 
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
     static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
@@ -52,24 +52,24 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 #ifndef SIP_RUN
     [[deprecated( "Use KadasCoordinateUtils::getHeightAtPos." )]]
 #endif
-    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
 
     QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
 
   public slots:
     void setCoordinateDisplayFormat( Format format, const QString &epsg );
-    void setHeightDisplayUnit( QgsUnitTypes::DistanceUnit heightUnit );
+    void setHeightDisplayUnit( Qgis::DistanceUnit heightUnit );
 
   signals:
     void coordinateDisplayFormatChanged( Format format, const QString &epsg );
-    void heightDisplayUnitChanged( QgsUnitTypes::DistanceUnit heightUnit );
+    void heightDisplayUnitChanged( Qgis::DistanceUnit heightUnit );
 
   private:
     KadasCoordinateFormat() SIP_FORCE;
 
     Format mFormat;
     QString mEpsg;
-    QgsUnitTypes::DistanceUnit mHeightUnit;
+    Qgis::DistanceUnit mHeightUnit;
 };
 
 #endif // KADASCOORDINATEFORMAT_H

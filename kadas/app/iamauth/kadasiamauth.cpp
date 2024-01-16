@@ -18,6 +18,7 @@
 
 #ifdef Q_OS_WIN
 #include <windows.h>
+#include <ocidl.h>
 
 #include <QAxObject>
 #include <QAxWidget>

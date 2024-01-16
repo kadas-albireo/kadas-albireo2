@@ -651,7 +651,7 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
 bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget )
 {
   // Read EXIF position
-  Exiv2::Image::AutoPtr image;
+  Exiv2::Image::UniquePtr image;
   try
   {
     image = Exiv2::ImageFactory::open( filePath.toLocal8Bit().data() );
@@ -755,7 +755,7 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
       QgsCoordinateReferenceSystem crs3857( "EPSG:3857" );
       QgsPointXY mrcPosXY = QgsCoordinateTransform( destCrs, crs3857, QgsProject::instance() ).transform( cameraPos );
       // Ensure altitude is at least 1m above terrain
-      double terrHeigth = KadasCoordinateUtils::getHeightAtPos( mrcPosXY, crs3857, QgsUnitTypes::DistanceMeters );
+      double terrHeigth = KadasCoordinateUtils::getHeightAtPos( mrcPosXY, crs3857, Qgis::DistanceUnit::Meters );
       QgsPoint mrcPos( mrcPosXY.x(), mrcPosXY.y(), std::max( alt, terrHeigth + 1 ) );
 
       double d = 25000;

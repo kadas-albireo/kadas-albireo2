@@ -236,13 +236,13 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       }
 #else
       int capabilities = rlayer->dataProvider()->capabilities();
-      QgsRaster::IdentifyFormat format = QgsRaster::IdentifyFormatUndefined;
-      if ( capabilities & QgsRasterInterface::IdentifyFeature ) format = QgsRaster::IdentifyFormatFeature;
-      else if ( capabilities & QgsRasterInterface::IdentifyValue ) format = QgsRaster::IdentifyFormatValue;
-      else if ( capabilities & QgsRasterInterface::IdentifyText ) format = QgsRaster::IdentifyFormatText;
-//        else if ( capabilities & QgsRasterInterface::IdentifyHtml ) format = QgsRaster::IdentifyFormatHtml;
+      Qgis::RasterIdentifyFormat format = Qgis::RasterIdentifyFormat::Undefined;
+      if ( capabilities & QgsRasterInterface::IdentifyFeature ) format = Qgis::RasterIdentifyFormat::Feature;
+      else if ( capabilities & QgsRasterInterface::IdentifyValue ) format = Qgis::RasterIdentifyFormat::Value;
+      else if ( capabilities & QgsRasterInterface::IdentifyText ) format = Qgis::RasterIdentifyFormat::Text;
+//        else if ( capabilities & QgsRasterInterface::IdentifyHtml ) format = Qgis::RasterIdentifyFormat::Html;
 
-      if ( ( capabilities & QgsRasterDataProvider::Identify ) && format != QgsRaster::IdentifyFormatUndefined )
+      if ( ( capabilities & QgsRasterDataProvider::Identify ) && format != Qgis::RasterIdentifyFormat::Undefined )
       {
         QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), rlayer->crs(), QgsProject::instance()->transformContext() );
         QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), 0.25 * mCanvas->width(), 0.25 * mCanvas->height(), mCanvas->mapSettings().outputDpi() );
@@ -270,7 +270,11 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       }
 
       QgsRectangle layerFilterRect = mCanvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
+#if QGIS_VERSION_INT >= 33500
+      QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( Qgis::FeatureRequestFlag::ExactIntersect ) );
+#else
       QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+#endif
       QgsFeature feature;
       while ( fit.nextFeature( feature ) )
       {
@@ -399,7 +403,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
   {
     return;
   }
-  if ( result.format() == QgsRaster::IdentifyFormatFeature )
+  if ( result.format() == Qgis::RasterIdentifyFormat::Feature )
   {
     bool nonempty = false;
     for ( const QVariant &variant : result.results() )
@@ -430,9 +434,9 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
 
   switch ( result.format() )
   {
-    case QgsRaster::IdentifyFormatUndefined: break;
-    case QgsRaster::IdentifyFormatHtml: break;
-    case QgsRaster::IdentifyFormatValue:
+    case Qgis::RasterIdentifyFormat::Undefined: break;
+    case Qgis::RasterIdentifyFormat::Html: break;
+    case Qgis::RasterIdentifyFormat::Value:
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
       {
@@ -441,7 +445,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
       }
       break;
     }
-    case QgsRaster::IdentifyFormatText:
+    case Qgis::RasterIdentifyFormat::Text:
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
       {
@@ -451,7 +455,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
       }
       break;
     }
-    case QgsRaster::IdentifyFormatFeature:
+    case Qgis::RasterIdentifyFormat::Feature:
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
       {

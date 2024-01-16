@@ -33,6 +33,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 
@@ -84,7 +85,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     return;
   }
 
-  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) == QgsWkbTypes::PolygonGeometry )
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) == Qgis::GeometryType::Polygon )
   {
     context.painter()->setBrush( mBrush );
   }
@@ -98,7 +99,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   QgsAbstractGeometry *paintGeom = mGeometry->clone();
   paintGeom->transform( context.coordinateTransform() );
   paintGeom->transform( context.mapToPixel().transform() );
-  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != QgsWkbTypes::PointGeometry )
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != Qgis::GeometryType::Point )
   {
     paintGeom->draw( *context.painter() );
   }
@@ -391,35 +392,35 @@ QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settin
   return points;
 }
 
-void KadasGeometryItem::setMeasurementsEnabled( bool enabled, QgsUnitTypes::DistanceUnit baseUnit )
+void KadasGeometryItem::setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit baseUnit )
 {
   mMeasureGeometry = enabled;
   mBaseUnit = baseUnit;
   emit geometryChanged(); // Trigger re-measurement
 }
 
-QgsUnitTypes::DistanceUnit KadasGeometryItem::distanceBaseUnit() const
+Qgis::DistanceUnit KadasGeometryItem::distanceBaseUnit() const
 {
   return mBaseUnit;
 }
 
-QgsUnitTypes::AreaUnit KadasGeometryItem::areaBaseUnit() const
+Qgis::AreaUnit KadasGeometryItem::areaBaseUnit() const
 {
   return QgsUnitTypes::distanceToAreaUnit( mBaseUnit );
 }
 
-QString KadasGeometryItem::formatLength( double value, QgsUnitTypes::DistanceUnit unit ) const
+QString KadasGeometryItem::formatLength( double value, Qgis::DistanceUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertLengthMeasurement( value, unit );
   return QgsUnitTypes::formatDistance( value, decimals, unit );
 }
 
-QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit ) const
+QString KadasGeometryItem::formatArea( double value, Qgis::AreaUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
-  if ( unit == QgsUnitTypes::AreaSquareMeters )
+  if ( unit == Qgis::AreaUnit::SquareMeters )
   {
     if ( value >= 1000000 )
     {
@@ -436,10 +437,10 @@ QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit
   }
 }
 
-QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const
+QString KadasGeometryItem::formatAngle( double value, Qgis::AngleUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
-  value *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, unit );
+  value *= QgsUnitTypes::fromUnitToUnitFactor( Qgis::AngleUnit::Radians, unit );
   return QgsUnitTypes::formatAngle( value, decimals, unit );
 }
 

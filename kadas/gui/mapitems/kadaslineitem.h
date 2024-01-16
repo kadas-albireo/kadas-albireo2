@@ -58,7 +58,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::LineGeometry; }
+    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Line; }
 
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;
@@ -72,9 +72,9 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
       MeasureLineAndSegmentsAndAzimuthGeoNorth
     };
 
-    void setMeasurementMode( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees );
+    void setMeasurementMode( MeasurementMode measurementMode, Qgis::AngleUnit angleUnit = Qgis::AngleUnit::Degrees );
     MeasurementMode measurementMode() const { return mMeasurementMode; }
-    QgsUnitTypes::AngleUnit angleUnit() const { return mAngleUnit; }
+    Qgis::AngleUnit angleUnit() const { return mAngleUnit; }
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
@@ -97,7 +97,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
 
     bool mGeodesic = false;
     MeasurementMode mMeasurementMode = MeasureLineAndSegments;
-    QgsUnitTypes::AngleUnit mAngleUnit = QgsUnitTypes::AngleDegrees;
+    Qgis::AngleUnit mAngleUnit = Qgis::AngleUnit::Degrees;
 
     QgsMultiLineString *geometry();
     State *state() { return static_cast<State *>( mState ); }

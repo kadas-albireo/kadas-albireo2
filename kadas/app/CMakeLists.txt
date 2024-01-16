@@ -2,42 +2,76 @@ SET(CMAKE_AUTOMOC ON)
 
 FIND_PACKAGE(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
 
-OPTION(WITH_GLOBE "Enable globe" ON)
-IF(WITH_GLOBE)
+IF(WITH_GLOBE)    
     FIND_PACKAGE(OSG REQUIRED)
-    FIND_PACKAGE(OSGEARTH REQUIRED)
+    FIND_PACKAGE(osgEarth REQUIRED)
     ADD_DEFINITIONS(-DWITH_GLOBE)
-    INCLUDE_DIRECTORIES(${OSGEARTH_INCLUDE_DIR})
     INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
-
+    
     SET(GLOBE_LIBS 
     ${OSGDB_LIBRARY}
     ${OSGGA_LIBRARY}
     ${OSGUTIL_LIBRARY}
     ${OSG_LIBRARY}
     ${OSGVIEWER_LIBRARY}
-    ${OSGEARTH_LIBRARY}
-    ${OSGEARTHANNOTATION_LIBRARY}
-    ${OSGEARTHFEATURES_LIBRARY}
-    ${OSGEARTHUTIL_LIBRARY}
-    ${OSGEARTHSYMBOLOGY_LIBRARY}
     ${OPENTHREADS_LIBRARY}
     )
-ENDIF(WITH_GLOBE)
+ENDIF()
 
-FILE(GLOB kadas_SRC
-  *.cpp
-  milx/*.cpp
-  kml/*.cpp
-  bullseye/*.cpp
-  guidegrid/*.cpp
-  iamauth/*.cpp
-  mapgrid/*.cpp)
-IF(WITH_GLOBE)
-    FILE(GLOB globe_SRC globe/*.cpp globe/osg/*.cpp)
-    SET(kadas_SRC ${kadas_SRC} ${globe_SRC})
-ENDIF(WITH_GLOBE)
-LIST(SORT kadas_SRC)
+set(kadas_SRC
+  kadasapplayerhandling.cpp
+  kadasapplication.cpp
+  kadascanvascontextmenu.cpp
+  #  kadascrashrpt.cpp
+  kadasgpsintegration.cpp
+  kadasgpxintegration.cpp
+  kadashandlebadlayers.cpp
+  kadaslayerrefreshmanager.cpp
+  kadaslayertreemodel.cpp
+  kadaslayertreeviewmenuprovider.cpp
+  kadaslayoutappmenuprovider.cpp
+  kadaslayoutdesignerdialog.cpp
+  kadaslayoutdesignermanager.cpp
+  kadasmainwindow.cpp
+  kadasmapidentifydialog.cpp
+  kadasmapwidgetmanager.cpp
+  kadasmessagelogviewer.cpp
+  kadasnewspopup.cpp
+  kadasplugininterfaceimpl.cpp
+  kadaspluginlayerproperties.cpp
+  kadaspluginmanager.cpp
+  kadaspythonintegration.cpp
+  kadasredliningintegration.cpp
+  main.cpp
+  bullseye/kadasbullseyelayer.cpp
+  bullseye/kadasmaptoolbullseye.cpp
+  guidegrid/kadasguidegridlayer.cpp
+  guidegrid/kadasmaptoolguidegrid.cpp
+  iamauth/kadasiamauth.cpp
+  kml/kadaskmlexport.cpp
+  kml/kadaskmlexportdialog.cpp
+  kml/kadaskmlimport.cpp
+  kml/kadaskmlintegration.cpp
+  kml/kadaskmllabeling.cpp
+  mapgrid/kadasmapgridlayer.cpp
+  mapgrid/kadasmaptoolmapgrid.cpp
+  milx/kadasmilxintegration.cpp
+)
+
+if(WITH_GLOBE)
+  set(kadas_SRC ${kadas_SRC}
+    globe/kadasglobebillboardmanager.cpp
+    globe/kadasglobedialog.cpp
+    globe/kadasglobeintegration.cpp
+    globe/kadasglobeinteractionhandlers.cpp
+    globe/kadasglobeprojectlayermanager.cpp
+    globe/kadasglobetilesource.cpp
+    globe/kadasglobevectorlayerproperties.cpp
+    globe/kadasglobewidget.cpp
+    globe/osg/osgQtGraphicsWindow.cpp
+    globe/osg/osgQtViewerWidget.cpp
+  )
+endif(WITH_GLOBE)
 
 FILE(GLOB kadas_HDR
   *.h
@@ -93,8 +127,6 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${QCA_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${QTKEYCHAIN_INCLUDE_DIRS}/qt5keychain)
 INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${CAIRO_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${LIBRSVG_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${GEOS_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIR})
 
@@ -121,30 +153,39 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Sql
   Qt5::OpenGL
   Qt5::PrintSupport
-  Qt5::WebKitWidgets
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
-  ${QGIS_CORE_LIBRARY}
-  ${QGIS_GUI_LIBRARY}
-  ${CRASHRPT_LIBRARY}
+  QGIS::Core
+  QGIS::Gui
+  # ${CRASHRPT_LIBRARY}
   ${QCA_LDFLAGS}
   ${QTKEYCHAIN_LIBRARIES}
   ${Python_LIBRARIES}
-  ${CAIRO_LIBRARIES}
-  ${LIBRSVG_LIBRARIES}
   ${kadas_RC_LIBS}
-  ${GLOBE_LIBS}
 
   kadas_core
   kadas_analysis
   kadas_gui
 )
 
-FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
+if (WITH_QTWEBKIT)
+  TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)
+endif()
 
-IF(WITH_GLOBE)
-ADD_SUBDIRECTORY(globe/featuresource)
-ENDIF(WITH_GLOBE)
+if (WITH_GLOBE)
+  TARGET_LINK_LIBRARIES(kadas osgEarth)
+  ADD_SUBDIRECTORY(globe/featuresource)
+endif()
+
+if (WITH_BINDINGS)
+ add_definitions(-DWITH_BINDINGS)
+endif()
+
+if (WITH_QTWEBKIT)
+ add_definitions(-DWITH_QTWEBKIT)
+endif()
+
+FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
 
 INSTALL(TARGETS kadas DESTINATION bin)
 INSTALL(FILES ${kadas_QM} DESTINATION share/kadas/locale)

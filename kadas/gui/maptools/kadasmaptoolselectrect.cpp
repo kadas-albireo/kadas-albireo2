@@ -31,7 +31,7 @@ void KadasMapToolSelectRect::setRect( const QgsRectangle &rect )
 {
   clear();
   mRect = rect;
-  mRubberband = new QgsRubberBand( canvas(), QgsWkbTypes::PolygonGeometry );
+  mRubberband = new QgsRubberBand( canvas(), Qgis::GeometryType::Polygon );
   mRubberband->setToCanvasRectangle( canvasRect( mRect ) );
   mRubberband->setColor( QColor( 127, 127, 255, 127 ) );
   emit rectChanged( mRect );
@@ -208,7 +208,7 @@ void KadasMapToolSelectRect::canvasPressEvent( QgsMapMouseEvent *e )
       if ( mShowReferenceWhenMoving )
       {
         mOldRect = mRect;
-        mOldRubberband = new QgsRubberBand( canvas(), QgsWkbTypes::PolygonGeometry );
+        mOldRubberband = new QgsRubberBand( canvas(), Qgis::GeometryType::Polygon );
         mOldRubberband->setToCanvasRectangle( canvasRect( mOldRect ) );
         mOldRubberband->setColor( QColor( 127, 127, 255, 31 ) );
       }

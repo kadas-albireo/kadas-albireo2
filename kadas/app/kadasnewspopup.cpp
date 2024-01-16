@@ -25,7 +25,10 @@
 #include <QJsonObject>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#ifdef WITH_QTWEBKIT
 #include <QWebView>
+#endif
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -63,8 +66,7 @@ class KadasNewsWebView : public QAxWidget
     }
 };
 
-#else
-
+#elif defined(WITH_QTWEBKIT)
 class ExternalLinkDelegateWebView : public QWebView
 {
   public:
@@ -95,7 +97,22 @@ class KadasNewsWebView : public QWebView
       return new ExternalLinkDelegateWebView( this );
     }
 };
+#else
+ class KadasNewsWebView : public QWidget
+ {
+ public:
+   KadasNewsWebView( QWidget *parent = nullptr )
+     : QWidget( parent )
+   {}
+
+   void load( const QUrl &url)
+   {
+     QDesktopServices::openUrl( url );
+   }
+ };
+
 #endif
+
 
 bool KadasNewsPopup::isConfigured()
 {

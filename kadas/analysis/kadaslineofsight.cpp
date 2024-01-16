@@ -21,6 +21,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/analysis/kadaslineofsight.h>
 #include <kadas/core/kadas.h>
@@ -31,7 +32,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
 
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     // Assume visible if no terrain model available
     return true;
@@ -47,7 +48,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( raster, &gtrans[0] ) != CE_None )
   {
-    QgsDebugMsg( "Failed to get raster geotransform" );
+    QgsDebugMsgLevel( "Failed to get raster geotransform" , 2 );
     GDALClose( raster );
     return true;
   }
@@ -56,7 +57,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   QgsCoordinateReferenceSystem rasterCrs( proj );
   if ( !rasterCrs.isValid() )
   {
-    QgsDebugMsg( "Failed to get raster CRS" );
+    QgsDebugMsgLevel( "Failed to get raster CRS" , 2 );
     GDALClose( raster );
     return true;
   }
@@ -64,14 +65,14 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   GDALRasterBandH band = GDALGetRasterBand( raster, 1 );
   if ( !band )
   {
-    QgsDebugMsg( "Failed to open raster band 0" );
+    QgsDebugMsgLevel( "Failed to open raster band 0" , 2 );
     GDALClose( raster );
     return true;
   }
 
   // Get vertical unit
-  QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-  double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, QgsUnitTypes::DistanceMeters );
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
+  double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, Qgis::DistanceUnit::Meters );
 
   // Sample terrain under line from observer to target
   QgsCoordinateTransform crst( crs, rasterCrs, QgsProject::instance() );
@@ -96,7 +97,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
     if ( CE_None != GDALRasterIO( band, GF_Read,
                                   std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
     {
-      QgsDebugMsg( "Failed to read pixel values" );
+      QgsDebugMsgLevel( "Failed to read pixel values" , 2 );
       samples.append( QPointF( samples.size(), 0 ) );
     }
     else
@@ -112,7 +113,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
     }
   }
 
-  double zConv = QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), QgsUnitTypes::DistanceMeters );
+  double zConv = QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), Qgis::DistanceUnit::Meters );
 
   QPointF p1( samples.front().x(), ( observerPosAbsolute ? 0 : samples.front().y() ) + observerPos.z() * zConv );
   QPointF p2( samples.back().x(), ( targetPosAbsolute ? 0 : samples.back().y() ) + targetPos.z() * zConv );

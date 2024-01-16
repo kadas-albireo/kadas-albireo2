@@ -1,0 +1,66 @@
+---
+name: 🪟 Windows
+on:
+  push:
+    branches:
+      - vcpkg
+  pull_request:
+  release:
+    types: ['published']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build (windows)
+    runs-on: windows-2022
+
+    steps:
+      - name: 🐣 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐩 Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - name: 🧽 Developer Command Prompt for Microsoft Visual C++
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 🌱 Install dependencies and generate project files
+        shell: bash
+        run: |
+          cmake -S . \
+                -G Ninja \
+                -B build \
+                -D CMAKE_BUILD_TYPE=Release \
+                -D CMAKE_INSTALL_PREFIX="C:\kadas" \
+                -D WITH_BINDINGS=OFF \
+                -D WITH_GLOBE=OFF \
+                -D VCPKG_TARGET_TRIPLET="x64-windows" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D NUGET_USERNAME=kadas-albireo \
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📑 Upload vcpkg build logs
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: build-logs-x64-windows
+          path: |
+            C:/src/**/*.log
+
+      - name: 🌋 Build
+        run: |
+          cmake --build build
+
+      - name: 📦 Package
+        run: |
+          cmake --install build
+
+      - name: 📤 Upload package
+        uses: actions/upload-artifact@v3
+        with:
+          name: kadas-albireo2
+          path: |
+            C:/kadas

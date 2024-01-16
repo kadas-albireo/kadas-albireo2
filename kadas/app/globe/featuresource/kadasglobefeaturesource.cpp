@@ -69,11 +69,11 @@ KadasGlobeVectorFeatureSource::KadasGlobeVectorFeatureSource( const KadasGlobeFe
 
   switch ( layer->geometryType() )
   {
-    case  QgsWkbTypes::PointGeometry:
+    case  Qgis::GeometryType::Point:
       mGeomType = osgEarth::Features::Geometry::TYPE_POINTSET; break;
-    case QgsWkbTypes::LineGeometry:
+    case Qgis::GeometryType::Line:
       mGeomType = osgEarth::Features::Geometry::TYPE_LINESTRING; break;
-    case QgsWkbTypes::PolygonGeometry:
+    case Qgis::GeometryType::Polygon:
       mGeomType = osgEarth::Features::Geometry::TYPE_POLYGON; break;
     default:
       mGeomType = osgEarth::Features::Geometry::TYPE_UNKNOWN; break;

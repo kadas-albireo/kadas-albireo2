@@ -1,0 +1,38 @@
+{
+  "name": "svg2svgt-qt5",
+  "version": "0.9.6",
+  "description": "Library and tools to convert SVG to SVG Tiny",
+  "homepage": "https://github.com/manisandro/svg2svgt",
+  "license": "LGPL-2.1-or-later",
+  "dependencies": [
+    {
+      "name": "qt5-base",
+      "default-features": false
+    },
+    {
+      "name": "qt5-svg",
+      "default-features": false
+    },
+    {
+      "name": "qt5-xmlpatterns",
+      "default-features": false
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    },
+    "zlib"
+  ],
+  "features": {
+    "bzip2": {
+      "description": "BZIP2 compression",
+      "dependencies": [
+        "bzip2"
+      ]
+    }
+  }
+}

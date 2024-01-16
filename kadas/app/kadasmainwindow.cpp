@@ -243,7 +243,7 @@ void KadasMainWindow::init()
   snappingConfig.setTypeFlag( Qgis::SnappingType::Vertex );
   int snappingRadius = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
-  snappingConfig.setUnits( QgsTolerance::Pixels );
+  snappingConfig.setUnits( Qgis::MapToolUnit::Pixels );
   snappingConfig.setEnabled( true );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 
@@ -930,7 +930,7 @@ void KadasMainWindow::checkOnTheFlyProjection()
   // the user can actually see
   for ( QgsMapLayer *layer : mMapCanvas->layers() )
   {
-    if ( layer->type() != QgsMapLayerType::PluginLayer && !layer->crs().authid().startsWith( "USER:" ) && layer->crs().authid() != destAuthId )
+    if ( layer->type() != Qgis::LayerType::Plugin && !layer->crs().authid().startsWith( "USER:" ) && layer->crs().authid() != destAuthId )
     {
       reprojLayers.append( layer->name() );
     }
@@ -1140,7 +1140,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
     {
       adjustedUri.replace( QRegExp( "crs=[^&]+" ), "crs=" + c );
-      QgsDebugMsg( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ) );
+      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ) , 2 );
       break;
     }
   }
@@ -1152,7 +1152,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( fmt == lastImageEncoding )
     {
       adjustedUri.replace( QRegExp( "format=[^&]+" ), "format=" + fmt );
-      QgsDebugMsg( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ) );
+      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ) , 2 );
       break;
     }
   }
