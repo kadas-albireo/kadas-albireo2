@@ -1,0 +1,13 @@
+{
+  "name": "kadas-albireo2",
+  "version-string": "current",
+  "description": "KADAS Albireo is a mapping application based on QGIS and targeted at non-specialized users, providing enhanced functionalities in areas such as drawing, measuring, terrain analysis, etc.",
+  "homepage": "https://github.com/kadas-albireo/kadas-albireo2",
+  "dependencies": [
+     "qgis-kadas"
+  ],
+  "vcpkg-configuration": {
+    "overlay-ports": ["vcpkg/ports"],
+    "overlay-triplets": ["vcpkg/triplets"]
+  }
+}
