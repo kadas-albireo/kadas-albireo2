@@ -1,0 +1,37 @@
+---
+name: 🪟 Windows
+on:
+  push:
+    branches:
+      - vcpkg
+  pull_request:
+  release:
+    types: ['published']
+
+
+jobs:
+  build:
+    name: build (windows)
+    runs-on: windows-2022
+
+    steps:
+      - name: 🐣 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐩 Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+
+      - name: 🧽 Developer Command Prompt for Microsoft Visual C++
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: 🌱 Install dependencies and generate project files
+        shell: bash
+        run: |
+          cmake -S . \
+                -G Ninja \
+                -B build \
+                -D VCPKG_TARGET_TRIPLET="x64-windows"
+
+      - name: 🌋 Build
+        run: |
+          cmake --build build
