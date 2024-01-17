@@ -1,4 +1,4 @@
-set(QGIS_REF 3_28_8-kadas)
+set(QGIS_REF final-3_28_8-kadas)
 set(QGIS_SHA512 689d6b17166fe5c91f91c801b93f384e9539f56708cf90aa8dda93bc3b69005ccc279e1a82b4a850116c34851989afe71f17acdbe468dbc0814c7e3003538180)
 
 vcpkg_from_github(
