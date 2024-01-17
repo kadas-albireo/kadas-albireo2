@@ -31,7 +31,7 @@ jobs:
                 -G Ninja \
                 -B build \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src --debug" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src;--debug" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
