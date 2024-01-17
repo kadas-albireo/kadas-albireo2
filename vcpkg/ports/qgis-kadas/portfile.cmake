@@ -1,29 +1,22 @@
-set(QGIS_REF final-3_28_8-kadas)
-set(QGIS_SHA512 c25c903634b6cce9d64c2dbd3163cd067888d992c67e1983b5b3ad8dd9a43c68f65a0db0d7ea43ee5ea63b75568825c8f7594f4d140fdf88755e4ce4d2d448e3)
+set(QGIS_REF final-3_34_1)
+set(QGIS_SHA512 1c14d16bef06c533b119f6e97c56bd216d9376533ef1a727e553964a5c3dacdd6e813adeebbf3a7850a2f4fa526b733fe39bf3951a87791b460cd748f3002420)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO kadas-albireo/QGIS
+    REPO qgis/QGIS
     REF ${QGIS_REF}
     SHA512   ${QGIS_SHA512}
     HEAD_REF master
     PATCHES
         # Make qgis support python's debug library
         qgspython.patch
-        gdal.patch
         keychain.patch
         libxml2.patch
         exiv2.patch
-        androidextras.patch
         crssync.patch
         bigobj.patch
         poly2tri.patch
         mesh.patch
-        sharedmem_ios.patch
-        vectortilelabels.patch # Remove when updating to QGIS 3.34
-        version.patch # Remove when updating to QGIS 3.34
-        snapping_properties.patch # Remove when updating to QGIS 3.34
-        profiler.patch # Remove when updating to QGIS 3.34
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindQtKeychain.cmake)
