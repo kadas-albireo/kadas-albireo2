@@ -46,3 +46,6 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build
+
+      - if: always()
+        uses: m-kuhn/action-tmate@patch-1
