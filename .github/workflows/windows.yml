@@ -31,7 +31,9 @@ jobs:
                 -G Ninja \
                 -B build \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src"
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D NUGET_USERNAME=kadas-albireo \
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3
