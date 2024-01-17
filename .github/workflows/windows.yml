@@ -30,7 +30,16 @@ jobs:
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D VCPKG_TARGET_TRIPLET="x64-windows"
+                -D VCPKG_TARGET_TRIPLET="x64-windows" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src"
+
+      - name: 📑 Upload vcpkg build logs
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: build-logs-x64-windows
+          path: |
+            C:/src/**/*.log
 
       - name: 🌋 Build
         run: |
