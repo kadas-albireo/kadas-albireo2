@@ -160,13 +160,6 @@ if(VCPKG_TARGET_IS_WINDOWS)
     endif()
     FIND_LIB_OPTIONS(SPATIALINDEX ${SPATIALINDEX_LIB_NAME} ${SPATIALINDEX_LIB_NAME}d LIBRARY ${VCPKG_TARGET_IMPORT_LIBRARY_SUFFIX})
     list(APPEND QGIS_OPTIONS -DWITH_INTERNAL_POLY2TRI=OFF)
-    if(VCPKG_LIBRARY_LINKAGE STREQUAL "static" AND EXISTS "${CURRENT_INSTALLED_DIR}/lib/qt_poly2tri.lib")
-        list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
-        list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${CURRENT_INSTALLED_DIR}/debug/lib/qt_poly2tri_debug.lib) # static qt only
-        list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${CURRENT_INSTALLED_DIR}/lib/qt_poly2tri.lib) # static qt only
-    else()
-        list(APPEND -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
-    endif()
 else() # Build in UNIX
     list(APPEND QGIS_OPTIONS -DCMAKE_FIND_ROOT_PATH=$ENV{Qt5_DIR}) # for building with system Qt. Should find a nicer solution.
     list(APPEND QGIS_OPTIONS -DGSL_CONFIG=" ")
@@ -183,20 +176,6 @@ else() # Build in UNIX
     endif()
     find_package(Qt5 QUIET)
     list(APPEND QGIS_OPTIONS -DWITH_INTERNAL_POLY2TRI=OFF)
-    if(EXISTS "${CURRENT_INSTALLED_DIR}/lib/libqt_poly2tri.a")
-        set(QT_POLY2TRI_DIR_RELEASE "${CURRENT_INSTALLED_DIR}/lib")
-        set(QT_POLY2TRI_DIR_DEBUG "${CURRENT_INSTALLED_DIR}/debug/lib")
-    elseif(EXISTS "${Qt5_DIR}/../../libqt_poly2tri.a")
-        set(QT_POLY2TRI_DIR_RELEASE "${Qt5_DIR}/../..")
-        set(QT_POLY2TRI_DIR_DEBUG "${Qt5_DIR}/../..")
-    else()
-        list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
-    endif()
-    if(DEFINED QT_POLY2TRI_DIR_RELEASE)
-        list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
-        list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_DEBUG}/debug/lib/libqt_poly2tri_debug.a) # static qt only
-        list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_RELEASE}/lib/libqt_poly2tri.a) # static qt only
-    endif()
 endif()
 
 if(VCPKG_TARGET_IS_IOS)
