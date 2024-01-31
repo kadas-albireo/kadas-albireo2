@@ -51,7 +51,8 @@ vcpkg_install_msbuild(
 )
 
 get_filename_component(SOURCE_PATH_SUFFIX "${SOURCE_PATH}" NAME)
-file(COPY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/${SOURCE_PATH_SUFFIX}/msvc/include" DESTINATION "${CURRENT_PACKAGES_DIR}/include")
+file(GLOB_RECURSE INCLUDE_FILES "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/${SOURCE_PATH_SUFFIX}/msvc/include" *)
+file(COPY ${INCLUDE_FILES} DESTINATION "${CURRENT_PACKAGES_DIR}/include")
 
 set(exec_prefix "\${prefix}")
 set(libdir "\${prefix}/lib")
