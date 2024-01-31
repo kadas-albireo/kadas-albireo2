@@ -1,0 +1,39 @@
+{
+  "name": "qt5-webkit",
+  "version": "2023-08-11",
+  "description": "Qt5 port of webkit.",
+  "homepage": "https://github.com/movableink/webkit",
+  "dependencies": [
+    {
+      "name": "qt5-base",
+      "default-features": false
+    },
+    {
+      "name": "qt5-location",
+      "default-features": false
+    },
+    {
+      "name": "qt5-sensors",
+      "default-features": false
+    },
+    {
+      "name": "harfbuzz",
+      "default-features": false,
+      "features":
+      [
+        "icu"
+      ]
+    },
+    "libxml2",
+    "shiftmedia-libgcrypt",
+    "gperf",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "pkgconf",
+      "host": true
+    }
+  ]
+}

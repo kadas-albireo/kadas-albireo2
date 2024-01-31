@@ -88,8 +88,9 @@
             "description": "Determines whether the QGIS gui should be built",
             "dependencies":
             [
-                "qwt",
-                "qscintilla"
+                "qwt-qt5",
+                "qscintilla-qt5",
+                "qt5-webkit"
             ]
         },
             "desktop":
