@@ -36,6 +36,7 @@
       "qt5-svg",
       "qt5-location",
       "qt5-tools",
+      "qt5-multimedia",
       {
         "name": "qt5-macextras",
         "platform": "osx"
