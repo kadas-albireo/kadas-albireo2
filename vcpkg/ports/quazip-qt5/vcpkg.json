@@ -8,11 +8,7 @@
   "supports": "!xbox",
   "dependencies": [
     {
-      "name": "qt5compat",
-      "default-features": false
-    },
-    {
-      "name": "qtbase",
+      "name": "qt5-base",
       "default-features": false
     },
     {
