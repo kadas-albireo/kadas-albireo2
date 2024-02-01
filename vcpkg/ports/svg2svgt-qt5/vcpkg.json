@@ -1,5 +1,5 @@
 {
-  "name": "svg2svgt",
+  "name": "svg2svgt-qt5",
   "version": "0.9.6",
   "description": "Library and tools to convert SVG to SVG Tiny",
   "homepage": "https://github.com/manisandro/svg2svgt",
