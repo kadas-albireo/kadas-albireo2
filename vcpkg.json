@@ -12,7 +12,8 @@
      },
      "geographiclib",
      "quazip-qt5",
-     "cairo"
+     "cairo",
+     "librsvg"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
