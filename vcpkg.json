@@ -9,7 +9,8 @@
        "features": [
          "gui"
        ]
-     }
+     },
+     "geographiclib"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
