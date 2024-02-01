@@ -14,6 +14,10 @@
       "default-features": false
     },
     {
+      "name": "qt5-xmlpatterns",
+      "default-features": false
+    },
+    {
       "name": "vcpkg-cmake",
       "host": true
     },

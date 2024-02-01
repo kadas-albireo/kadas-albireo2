@@ -1,29 +1,20 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO stachenov/quazip
-    REF v1.4
-    SHA512 38ce3aa77df1fd92229454e56b7290c066d1e319afa36a9f8ec8477004ae94df682e8f454f13cdaf586a1d0b0e033fe698081033a19536ecd53dd1e4b0204af9
-)
-
-vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-    FEATURES
-        bzip2 QUAZIP_BZIP2
+    REPO manisandro/svg2svgt
+    REF v${VERSION}
+    SHA512 9def961080df12725e2f8914d42527926cb9bf791515919b25b6d34ce20373993eed60fa526f3fa778b5cd61f21174914430c0f3aa9fe87513a242d7138ef0dc
+    PATCHES
+        win.patch
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
-        ${FEATURE_OPTIONS}
-        -DQUAZIP_QT_MAJOR_VERSION=5
-        -DQUAZIP_FETCH_LIBS=OFF
+        "-DWITH_GUI=OFF"
 )
 
 vcpkg_cmake_install()
-vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/QuaZip-Qt5-1.4 PACKAGE_NAME quazip-qt5)
 vcpkg_copy_pdbs()
-# Qt6 pkg-config files not installed https://github.com/microsoft/vcpkg/issues/25988
-# vcpkg_fixup_pkgconfig()
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/lib/pkgconfig" "${CURRENT_PACKAGES_DIR}/debug/lib/pkgconfig")
 
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
-file(INSTALL "${SOURCE_PATH}/COPYING" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}/" RENAME copyright)
+#file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+file(INSTALL "${SOURCE_PATH}/LICENSE.LGPL" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}/" RENAME copyright)
