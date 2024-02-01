@@ -10,7 +10,8 @@
          "gui"
        ]
      },
-     "geographiclib"
+     "geographiclib",
+     "quazip-qt5"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
