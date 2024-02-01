@@ -14,7 +14,7 @@
      "quazip-qt5",
      "cairo",
      "librsvg",
-     "svg2svgt"
+     "svg2svgt-qt5"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
