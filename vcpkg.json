@@ -15,7 +15,8 @@
      "cairo",
      "librsvg",
      "svg2svgt-qt5",
-     "python3"
+     "python3",
+     "osgearth"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
