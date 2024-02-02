@@ -16,7 +16,8 @@
      "librsvg",
      "svg2svgt-qt5",
      "python3",
-     "osgearth"
+     "osgearth",
+     "qt5-activeqt"
   ],
   "vcpkg-configuration": {
     "overlay-ports": ["vcpkg/ports"],
