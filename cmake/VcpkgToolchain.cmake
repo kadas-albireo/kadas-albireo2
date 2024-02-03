@@ -2,71 +2,29 @@ set(NUGET_SOURCE "https://nuget.pkg.github.com/kadas-albireo/index.json")
 set(NUGET_TOKEN "" CACHE STRING "Nuget token")
 
 string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_NAME}" "Windows" _HOST_IS_WINDOWS)
-set(WITH_VCPKG TRUE CACHE BOOL "Use the vcpkg submodule for dependency management.")
+set(WITH_VCPKG TRUE CACHE BOOL "Use vcpkg for dependency management.")
 
 if(NOT WITH_VCPKG)
   message(STATUS "Building with system libraries --")
   return()
 endif()
 
-if(NOT VCPKG_TAG STREQUAL VCPKG_INSTALLED_VERSION)
-  message(STATUS "Updating vcpkg")
-  include(FetchContent)
-  FetchContent_Declare(vcpkg
-      GIT_REPOSITORY https://github.com/microsoft/vcpkg.git
-      GIT_TAG ${VCPKG_TAG}
-  )
-  FetchContent_MakeAvailable(vcpkg)
-else()
-  message(STATUS "Using cached vcpkg")
-endif()
-set(VCPKG_ROOT "${FETCHCONTENT_BASE_DIR}/vcpkg-src" CACHE STRING "")
-set(CMAKE_TOOLCHAIN_FILE "${FETCHCONTENT_BASE_DIR}/vcpkg-src/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
+find_program(VCPKG_EXECUTABLE vcpkg
+  HINTS ENV VCPKG_ROOT
+)
 
-find_package(Git REQUIRED)
-if(WIN32)
-  execute_process(COMMAND cmd /C "${GIT_EXECUTABLE} -C ${VCPKG_ROOT} rev-parse HEAD" OUTPUT_VARIABLE VCPKG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-else()
-  execute_process(COMMAND bash -c "${GIT_EXECUTABLE} -C ${VCPKG_ROOT} rev-parse HEAD" OUTPUT_VARIABLE VCPKG_VERSION ERROR_VARIABLE ERR OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT VCPKG_EXECUTABLE)
+  message(FATAL_ERROR "WITH_VCPKG is enabled but VCPKG_EXECUTABLE was not found. Make sure vcpkg is installed https://github.com/microsoft/vcpkg-tool/blob/main/README.md#installuseremove and the VCPKG_ROOT environment variable is set.")
 endif()
 
-set(VCPKG_INSTALLED_VERSION ${VCPKG_VERSION} CACHE STRING "" FORCE)
-
-message(STATUS "Building with vcpkg libraries version ${VCPKG_INSTALLED_VERSION}")
+cmake_path(GET VCPKG_EXECUTABLE PARENT_PATH VCPKG_ROOT)
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
 
 # Binarycache can only be used on Windows or if mono is available.
 find_program(_VCPKG_MONO mono)
 if(NOT "${NUGET_TOKEN}" STREQUAL "" AND (_HOST_IS_WINDOWS OR EXISTS "${_VCPKG_MONO}"))
-  # Early bootstrap, copied from the vcpkg toolchain, we need this to fetch nuget
-  if(_HOST_IS_WINDOWS)
-    set(_VCPKG_EXECUTABLE "${VCPKG_ROOT}/vcpkg.exe")
-    set(_VCPKG_BOOTSTRAP_SCRIPT "${VCPKG_ROOT}/bootstrap-vcpkg.bat")
-  else()
-    set(_VCPKG_EXECUTABLE "${VCPKG_ROOT}/vcpkg")
-    set(_VCPKG_BOOTSTRAP_SCRIPT "${VCPKG_ROOT}/bootstrap-vcpkg.sh")
-  endif()
-
-  if(NOT EXISTS "${_VCPKG_EXECUTABLE}")
-    message(STATUS "Bootstrapping vcpkg before install")
-
-    file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/vcpkg-bootstrap.log" _VCPKG_BOOTSTRAP_LOG)
-    execute_process(
-      COMMAND "${_VCPKG_BOOTSTRAP_SCRIPT}" ${VCPKG_BOOTSTRAP_OPTIONS}
-      OUTPUT_FILE "${_VCPKG_BOOTSTRAP_LOG}"
-      ERROR_FILE "${_VCPKG_BOOTSTRAP_LOG}"
-      RESULT_VARIABLE _VCPKG_BOOTSTRAP_RESULT)
-
-    if(_VCPKG_BOOTSTRAP_RESULT EQUAL 0)
-      message(STATUS "Bootstrapping vcpkg before install - done")
-    else()
-      message(STATUS "Bootstrapping vcpkg before install - failed")
-      file(READ ${_VCPKG_BOOTSTRAP_LOG} MSG)
-      message(FATAL_ERROR "vcpkg install failed. See logs for more information: ${MSG}")
-    endif()
-  endif()
-
   execute_process(
-    COMMAND ${_VCPKG_EXECUTABLE} fetch nuget
+    COMMAND ${VCPKG_EXECUTABLE} fetch nuget
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE _FETCH_NUGET_OUTPUT)
 

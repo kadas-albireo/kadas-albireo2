@@ -18,6 +18,11 @@ jobs:
       - name: 🐣 Checkout
         uses: actions/checkout@v4
 
+      - name: Init vcpkg
+        uses: ./.github/actions/init-vcpkg
+        with:
+          vcpkg-version: 2024-01-11
+
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
