@@ -31,7 +31,7 @@
     "registries": [
       {
         "kind": "git",
-        "baseline": "c288fd01cbc95c56a122747c3c39cbab2710ee17",
+        "baseline": "79fb4d4c519ef170e7f7217e71734fd17dadc251",
         "repository": "https://github.com/open-vcpkg/vcpkg-qt5",
         "packages": [
           "qscintilla-qt5",
