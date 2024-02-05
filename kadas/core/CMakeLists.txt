@@ -21,6 +21,8 @@ IF(MINGW)
 SET(CRYPT_LIBRARIES crypt32 crypto)
 ENDIF(MINGW)
 
+FIND_PACKAGE(unofficial-zonedetect CONFIG REQUIRED)
+
 TARGET_LINK_LIBRARIES(kadas_core
   Qt5::Widgets
   Qt5::Network
@@ -29,7 +31,7 @@ TARGET_LINK_LIBRARIES(kadas_core
   ${QGIS_CORE_LIBRARY}
   ${GDAL_LIBRARIES}
   ${CRYPT_LIBRARIES}
-  zonedetect
+  unofficial::zonedetect::ZoneDetect)
 )
 
 GENERATE_EXPORT_HEADER(

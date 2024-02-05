@@ -17,6 +17,7 @@
     "svg2svgt-qt5",
     "python3",
     "osgearth",
+    "zonedetect",
     {
       "name": "qt5-activeqt",
       "platform": "windows"
