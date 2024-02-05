@@ -70,8 +70,8 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   }
 
   // Get vertical unit
-  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-  double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, QgsUnitTypes::DistanceMeters );
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
+  double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, Qgis::DistanceUnit::Meters );
 
   // Sample terrain under line from observer to target
   QgsCoordinateTransform crst( crs, rasterCrs, QgsProject::instance() );
@@ -112,7 +112,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
     }
   }
 
-  double zConv = QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), QgsUnitTypes::DistanceMeters );
+  double zConv = QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), Qgis::DistanceUnit::Meters );
 
   QPointF p1( samples.front().x(), ( observerPosAbsolute ? 0 : samples.front().y() ) + observerPos.z() * zConv );
   QPointF p2( samples.back().x(), ( targetPosAbsolute ? 0 : samples.back().y() ) + targetPos.z() * zConv );

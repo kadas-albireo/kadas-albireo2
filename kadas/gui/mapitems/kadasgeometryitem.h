@@ -107,7 +107,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QBrush iconFill() const { return mIconBrush; }
     void setIconFill( const QBrush &iconBrush );
 
-    void setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit baseUnit = QgsUnitTypes::DistanceMeters );
+    void setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit baseUnit = Qgis::DistanceUnit::Meters );
     QString getTotalMeasurement() const { return mTotalMeasurement; }
 
     // Geometry in item CRS
@@ -128,7 +128,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 
     QgsDistanceArea mDa;
     bool mMeasureGeometry = false;
-    Qgis::DistanceUnit mBaseUnit = QgsUnitTypes::DistanceMeters;
+    Qgis::DistanceUnit mBaseUnit = Qgis::DistanceUnit::Meters;
 
     QString mTotalMeasurement;
 
@@ -137,10 +137,10 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 
     void drawVertex( QgsRenderContext &context, double x, double y ) const;
     Qgis::DistanceUnit distanceBaseUnit() const;
-    QgsUnitTypes::AreaUnit areaBaseUnit() const;
+    Qgis::AreaUnit areaBaseUnit() const;
     QString formatLength( double value, Qgis::DistanceUnit unit ) const;
-    QString formatArea( double value, QgsUnitTypes::AreaUnit unit ) const;
-    QString formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const;
+    QString formatArea( double value, Qgis::AreaUnit unit ) const;
+    QString formatAngle( double value, Qgis::AngleUnit unit ) const;
     void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
 
     QgsVertexId insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const;

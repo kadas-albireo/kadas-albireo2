@@ -403,7 +403,7 @@ Qgis::DistanceUnit KadasGeometryItem::distanceBaseUnit() const
   return mBaseUnit;
 }
 
-QgsUnitTypes::AreaUnit KadasGeometryItem::areaBaseUnit() const
+Qgis::AreaUnit KadasGeometryItem::areaBaseUnit() const
 {
   return QgsUnitTypes::distanceToAreaUnit( mBaseUnit );
 }
@@ -415,7 +415,7 @@ QString KadasGeometryItem::formatLength( double value, Qgis::DistanceUnit unit )
   return QgsUnitTypes::formatDistance( value, decimals, unit );
 }
 
-QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit ) const
+QString KadasGeometryItem::formatArea( double value, Qgis::AreaUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
@@ -436,10 +436,10 @@ QString KadasGeometryItem::formatArea( double value, QgsUnitTypes::AreaUnit unit
   }
 }
 
-QString KadasGeometryItem::formatAngle( double value, QgsUnitTypes::AngleUnit unit ) const
+QString KadasGeometryItem::formatAngle( double value, Qgis::AngleUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
-  value *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::AngleRadians, unit );
+  value *= QgsUnitTypes::fromUnitToUnitFactor( Qgis::AngleUnit::Radians, unit );
   return QgsUnitTypes::formatAngle( value, decimals, unit );
 }
 

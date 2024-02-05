@@ -128,7 +128,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mPlot->setCanvasBackground( Qt::white );
   mPlot->enableAxis( QwtPlot::yLeft );
   mPlot->enableAxis( QwtPlot::xBottom );
-  mPlot->setAxisTitle( QwtPlot::yLeft, heightDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
+  mPlot->setAxisTitle( QwtPlot::yLeft, heightDisplayUnit == Qgis::DistanceUnit::Feet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
   mPlot->setAxisTitle( QwtPlot::xBottom, tr( "Distance [m]" ) );
   mPlot->setMinimumHeight( 200 );
   mPlot->setSizePolicy( mPlot->sizePolicy().horizontalPolicy(), QSizePolicy::MinimumExpanding );
@@ -164,7 +164,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mObserverHeightSpinBox = new QDoubleSpinBox();
   mObserverHeightSpinBox->setRange( 0, 8000 );
   mObserverHeightSpinBox->setDecimals( 1 );
-  mObserverHeightSpinBox->setSuffix( heightDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mObserverHeightSpinBox->setSuffix( heightDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
   mObserverHeightSpinBox->setValue( QgsSettings().value( "/kadas/heightprofile_observerheight", 2.0 ).toDouble() );
   mObserverHeightSpinBox->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
   connect( mObserverHeightSpinBox, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasHeightProfileDialog::updateLineOfSight );
@@ -175,7 +175,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   mTargetHeightSpinBox = new QDoubleSpinBox();
   mTargetHeightSpinBox->setRange( 0, 8000 );
   mTargetHeightSpinBox->setDecimals( 1 );
-  mTargetHeightSpinBox->setSuffix( heightDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mTargetHeightSpinBox->setSuffix( heightDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
   mTargetHeightSpinBox->setValue( QgsSettings().value( "/kadas/heightprofile_targetheight", 2.0 ).toDouble() );
   mTargetHeightSpinBox->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
   connect( mTargetHeightSpinBox, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasHeightProfileDialog::updateLineOfSight );
@@ -331,9 +331,9 @@ void KadasHeightProfileDialog::finish()
 void KadasHeightProfileDialog::replot()
 {
   Qgis::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
-  mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
-  mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
-  mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == Qgis::DistanceUnit::Feet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
+  mObserverHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
+  mTargetHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
 
   if ( mPoints.isEmpty() )
   {
@@ -382,12 +382,12 @@ void KadasHeightProfileDialog::replot()
   }
 
   // Get vertical unit
-  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
   double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, vertDisplayUnit );
   mNoDataValue = GDALGetRasterNoDataValue( band, NULL );
-  mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
-  mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
-  mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == Qgis::DistanceUnit::Feet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
+  mObserverHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
+  mTargetHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
 
   mProgressBar->setValue( 0 );
   mProgressBar->setRange( 0, mNSamples );
@@ -590,7 +590,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   QVector<double> pY;
   pY.reserve( nSamples );
   double earthRadius = 6370000;
-  double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
+  double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
   for ( const QPointF &p : mPlotSamples )
   {
     pX.append( p.x() / mNSamples * mTotLengthMeters );

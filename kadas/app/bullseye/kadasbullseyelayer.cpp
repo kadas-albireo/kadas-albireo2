@@ -73,7 +73,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 
       // Draw rings
       QgsPointXY wgsCenter = ct.transform( mRenderBullseyeConfig.center );
-      double intervalUnit2meters = QgsUnitTypes::fromUnitToUnitFactor( mRenderBullseyeConfig.intervalUnit, QgsUnitTypes::DistanceMeters );
+      double intervalUnit2meters = QgsUnitTypes::fromUnitToUnitFactor( mRenderBullseyeConfig.intervalUnit, Qgis::DistanceUnit::Meters );
       for ( int iRing = 0; iRing < mRenderBullseyeConfig.rings; ++iRing )
       {
         double radMeters = mRenderBullseyeConfig.interval * ( 1 + iRing ) * intervalUnit2meters;
@@ -235,8 +235,8 @@ QgsMapLayerRenderer *KadasBullseyeLayer::createMapRenderer( QgsRenderContext &re
 
 QgsRectangle KadasBullseyeLayer::extent() const
 {
-  double radius = mBullseyeConfig.rings * mBullseyeConfig.interval * QgsUnitTypes::fromUnitToUnitFactor( mBullseyeConfig.intervalUnit, QgsUnitTypes::DistanceMeters );
-  radius *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, crs().mapUnits() );
+  double radius = mBullseyeConfig.rings * mBullseyeConfig.interval * QgsUnitTypes::fromUnitToUnitFactor( mBullseyeConfig.intervalUnit, Qgis::DistanceUnit::Meters );
+  radius *= QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, crs().mapUnits() );
   return QgsRectangle( mBullseyeConfig.center.x() - radius, mBullseyeConfig.center.y() - radius, mBullseyeConfig.center.x() + radius, mBullseyeConfig.center.y() + radius );
 }
 

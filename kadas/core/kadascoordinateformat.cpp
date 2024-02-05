@@ -40,7 +40,7 @@ KadasCoordinateFormat::KadasCoordinateFormat()
 {
   mFormat = KadasCoordinateFormat::Default;
   mEpsg = "EPSG:4326";
-  mHeightUnit = QgsUnitTypes::DistanceMeters;
+  mHeightUnit = Qgis::DistanceUnit::Meters;
 }
 
 KadasCoordinateFormat *KadasCoordinateFormat::instance()
@@ -93,7 +93,7 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
   {
     case Default:
     {
-      int prec = destCrs.mapUnits() == QgsUnitTypes::DistanceDegrees ? 4 : 0;
+      int prec = destCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 4 : 0;
       return QString( "%1, %2" ).arg( pTrans.x(), 0, 'f', prec ).arg( pTrans.y(), 0, 'f', prec );
     }
     case DegMinSec:

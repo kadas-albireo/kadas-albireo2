@@ -117,8 +117,8 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
-  ui.comboBoxRingIntervalUnit->addItem( "m", QgsUnitTypes::DistanceMeters );
-  ui.comboBoxRingIntervalUnit->addItem( "ft", QgsUnitTypes::DistanceFeet );
+  ui.comboBoxRingIntervalUnit->addItem( "m", Qgis::DistanceUnit::Meters );
+  ui.comboBoxRingIntervalUnit->addItem( "ft", Qgis::DistanceUnit::Feet );
   ui.comboBoxRingIntervalUnit->addItem( "mi", QgsUnitTypes::DistanceMiles );
   ui.comboBoxRingIntervalUnit->addItem( "nm", QgsUnitTypes::DistanceNauticalMiles );
 
@@ -149,7 +149,7 @@ KadasBullseyeLayer *KadasBullseyeWidget::createLayer( QString layerName )
   da.setSourceCrs( mCanvas->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
   QgsRectangle extent = mCanvas->extent();
   double extentHeight = da.measureLine( QgsPoint( extent.center().x(), extent.yMinimum() ), QgsPoint( extent.center().x(), extent.yMaximum() ) );
-  double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceNauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
+  double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, QgsUnitTypes::DistanceNauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
   KadasBullseyeLayer *bullseyeLayer = new KadasBullseyeLayer( layerName );
   bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval,  QgsUnitTypes::DistanceNauticalMiles, 45 );
   return bullseyeLayer;

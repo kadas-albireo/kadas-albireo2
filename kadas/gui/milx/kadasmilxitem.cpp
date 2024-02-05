@@ -395,7 +395,7 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   QgsRenderContext exportContext = context;
   exportContext.setExtent( worldExtent );
   exportContext.setMapExtent( worldExtent );
-  double factor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceDegrees, QgsUnitTypes::DistanceMeters ) * context.scaleFactor() * 1000 / context.rendererScale();
+  double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * context.scaleFactor() * 1000 / context.rendererScale();
   exportContext.setMapToPixel( QgsMapToPixel( 1.0 / factor, worldExtent.center().x(), worldExtent.center().y(),
                                worldExtent.width() * factor, worldExtent.height() * factor, 0 ) );
 
@@ -1000,7 +1000,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
         da.setEllipsoid( "WGS84" );
         QgsPointXY otherPoint( points[0].x() + 0.001, points[0].y() );
         QPointF otherScreenPoint = QPointF( otherPoint.x() * scale, otherPoint.y() * scale ) - origin;
-        double ellipsoidDist = da.measureLine( points[0], otherPoint ) * QgsUnitTypes::fromUnitToUnitFactor( da.lengthUnits(), QgsUnitTypes::DistanceMeters );
+        double ellipsoidDist = da.measureLine( points[0], otherPoint ) * QgsUnitTypes::fromUnitToUnitFactor( da.lengthUnits(), Qgis::DistanceUnit::Meters );
         double screenDist = QVector2D( screenPoints[0] - otherScreenPoint ).length();
         for ( auto it = item->constState()->attributes.begin(), itEnd = item->constState()->attributes.end(); it != itEnd; ++it )
         {
@@ -1093,7 +1093,7 @@ double KadasMilxItem::metersToPixels( const QgsPointXY &refPoint, const QgsMapTo
   QPointF screenPoint = mapToPixel.transform( mapCrst.transform( point ) ).toQPointF();
   QgsPointXY otherPoint( point.x() + 0.001, point.y() );
   QPointF otherScreenPoint = mapToPixel.transform( mapCrst.transform( otherPoint ) ).toQPointF();
-  double ellipsoidDist = da.measureLine( point, otherPoint ) * QgsUnitTypes::fromUnitToUnitFactor( da.lengthUnits(), QgsUnitTypes::DistanceMeters );
+  double ellipsoidDist = da.measureLine( point, otherPoint ) * QgsUnitTypes::fromUnitToUnitFactor( da.lengthUnits(), Qgis::DistanceUnit::Meters );
   double screenDist = QVector2D( screenPoint - otherScreenPoint ).length();
   return screenDist / ellipsoidDist;
 }

@@ -319,7 +319,7 @@ int KadasMapItem::NumericAttribute::precision( const QgsMapSettings &mapSettings
   }
   if ( type == TypeCoordinate )
   {
-    return mapSettings.destinationCrs().mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+    return mapSettings.destinationCrs().mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   }
   return 0;
 }

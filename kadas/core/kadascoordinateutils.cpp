@@ -80,7 +80,7 @@ double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoord
   }
 
   // Get vertical unit
-  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
 
   // Transform geo position to raster CRS
   QgsPointXY pRaster = QgsCoordinateTransform( crs, rasterCrs, QgsProject::instance() ).transform( p );

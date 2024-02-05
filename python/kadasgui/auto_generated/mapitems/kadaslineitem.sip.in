@@ -91,9 +91,9 @@ the Free Software Foundation; either version 2 of the License, or     *
       MeasureLineAndSegmentsAndAzimuthGeoNorth
     };
 
-    void setMeasurementMode( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit = QgsUnitTypes::AngleDegrees );
+    void setMeasurementMode( MeasurementMode measurementMode, Qgis::AngleUnit angleUnit = Qgis::AngleUnit::Degrees );
     MeasurementMode measurementMode() const;
-    QgsUnitTypes::AngleUnit angleUnit() const;
+    Qgis::AngleUnit angleUnit() const;
 
     struct State : KadasMapItem::State
     {

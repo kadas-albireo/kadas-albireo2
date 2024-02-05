@@ -110,9 +110,9 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
     qRound( geoToPixelY( gtrans, observerPos.x(), observerPos.y() ) )
   };
   double earthRadius = 6370000;
-  if ( datasetCrs.mapUnits() != QgsUnitTypes::DistanceMeters )
+  if ( datasetCrs.mapUnits() != Qgis::DistanceUnit::Meters )
   {
-    earthRadius *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, datasetCrs.mapUnits() );
+    earthRadius *= QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, datasetCrs.mapUnits() );
   }
 
   QList<QgsPointXY> cornerPoints = QList<QgsPointXY>()
