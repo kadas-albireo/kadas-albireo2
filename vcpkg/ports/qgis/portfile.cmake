@@ -62,12 +62,16 @@ endif()
 
 if("gui" IN_LIST FEATURES)
     list(APPEND QGIS_OPTIONS -DWITH_GUI:BOOL=ON)
-    list(APPEND QGIS_OPTIONS -DWITH_QTWEBKIT:BOOL=ON)
 else()
     if("desktop" IN_LIST FEATURES OR "customwidgets" IN_LIST FEATURES)
         message(FATAL_ERROR "If QGIS is built without gui, desktop and customwidgets cannot be built. Enable gui or disable customwidgets and desktop.")
     endif()
     list(APPEND QGIS_OPTIONS -DWITH_GUI:BOOL=OFF)
+endif()
+
+if ("webkit" IN_LIST FEATURES)
+    list(APPEND QGIS_OPTIONS -DWITH_QTWEBKIT:BOOL=ON)
+else()
     list(APPEND QGIS_OPTIONS -DWITH_QTWEBKIT:BOOL=OFF)
 endif()
 
