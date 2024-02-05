@@ -48,5 +48,5 @@ jobs:
         run: |
           cmake --build build
 
-          #      - if: always()
-          #        uses: m-kuhn/action-tmate@patch-1
+      - if: always()
+        uses: m-kuhn/action-tmate@patch-1
