@@ -6,6 +6,11 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 # TODO: Is that actually used?
 INCLUDE(GenerateExportHeader)
 
+SET(WITH_GLOBE ON CACHE BOOL "Enable globe")
+if (WITH_GLOBE)
+  list(APPEND VCPKG_MANIFEST_FEATURES "globe")
+endif()
+
 include(VcpkgToolchain)
 
 PROJECT(kadas)

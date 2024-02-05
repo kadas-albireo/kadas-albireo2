@@ -16,13 +16,18 @@
     "librsvg",
     "svg2svgt-qt5",
     "python3",
-    "osgearth",
     "zonedetect",
     {
       "name": "qt5-activeqt",
       "platform": "windows"
     }
   ],
+  "features": {
+    "globe": {
+      "description": "Globe",
+      "dependencies": ["osgearth"]
+    }
+  },
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
