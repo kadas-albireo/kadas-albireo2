@@ -27,7 +27,7 @@ Q_DECLARE_METATYPE( KadasGlobeVectorLayerConfig * )
 KadasGlobeVectorLayerConfig *KadasGlobeVectorLayerConfig::getConfig( QgsMapLayer *layer )
 {
   KadasGlobeVectorLayerConfig *layerConfig = layer->property( "globe-config" ).value<KadasGlobeVectorLayerConfig *>();
-  if ( !layerConfig && ( layer->type() == QgsMapLayerType::VectorLayer || qobject_cast<KadasItemLayer *>( layer ) ) )
+  if ( !layerConfig && ( layer->type() == Qgis::LayerType::Vector || qobject_cast<KadasItemLayer *>( layer ) ) )
   {
     layerConfig = new KadasGlobeVectorLayerConfig( layer );
     layer->setProperty( "globe-config", QVariant::fromValue<KadasGlobeVectorLayerConfig *>( layerConfig ) );
@@ -194,7 +194,7 @@ QString KadasGlobeLayerPropertiesFactory::title() const
 
 bool KadasGlobeLayerPropertiesFactory::supportsLayer( QgsMapLayer *layer ) const
 {
-  return layer->type() == QgsMapLayerType::VectorLayer || ( qobject_cast<KadasItemLayer *>( layer ) && !qobject_cast<KadasMilxLayer *>( layer ) );
+  return layer->type() == Qgis::LayerType::Vector || ( qobject_cast<KadasItemLayer *>( layer ) && !qobject_cast<KadasMilxLayer *>( layer ) );
 }
 
 void KadasGlobeLayerPropertiesFactory::readGlobeVectorLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )

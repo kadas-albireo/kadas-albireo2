@@ -131,7 +131,7 @@ void KadasMapToolMinMax::drawFinished()
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     emit messageEmitted( tr( "No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap." ), Qgis::Warning );
     clear();

@@ -31,7 +31,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
 
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     // Assume visible if no terrain model available
     return true;

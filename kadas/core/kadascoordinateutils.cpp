@@ -30,7 +30,7 @@ double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoord
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     if ( errMsg )
     {

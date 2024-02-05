@@ -97,8 +97,8 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 {
   switch ( layer->type() )
   {
-    case QgsMapLayerType::VectorLayer:
-    case QgsMapLayerType::RasterLayer:
+    case Qgis::LayerType::Vector:
+    case Qgis::LayerType::Raster:
     {
       bool ok = false;
       layer->loadDefaultStyle( ok );
@@ -106,10 +106,10 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       break;
     }
 
-    case QgsMapLayerType::PluginLayer:
+    case Qgis::LayerType::Plugin:
       break;
 
-    case QgsMapLayerType::MeshLayer:
+    case Qgis::LayerType::Mesh:
     {
       QgsMeshLayer *meshLayer = qobject_cast< QgsMeshLayer *>( layer );
       QDateTime referenceTime = QgsProject::instance()->timeSettings()->temporalRange().begin();
@@ -125,7 +125,7 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       break;
     }
 
-    case QgsMapLayerType::VectorTileLayer:
+    case Qgis::LayerType::VectorTile:
     {
       bool ok = false;
       QString error = layer->loadDefaultStyle( ok );
@@ -138,11 +138,11 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       break;
     }
 
-    case QgsMapLayerType::AnnotationLayer:
-    case QgsMapLayerType::GroupLayer:
+    case Qgis::LayerType::Annotation:
+    case Qgis::LayerType::Group:
       break;
 
-    case QgsMapLayerType::PointCloudLayer:
+    case Qgis::LayerType::PointCloud:
     {
       bool ok = false;
       layer->loadDefaultStyle( ok );
@@ -159,7 +159,7 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
   {
     switch ( layer->type() )
     {
-      case QgsMapLayerType::VectorLayer:
+      case Qgis::LayerType::Vector:
       {
         QgsVectorLayer *vl = qobject_cast< QgsVectorLayer * >( layer );
 
@@ -186,13 +186,13 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
         }
         break;
       }
-      case QgsMapLayerType::RasterLayer:
-      case QgsMapLayerType::PluginLayer:
-      case QgsMapLayerType::MeshLayer:
-      case QgsMapLayerType::VectorTileLayer:
-      case QgsMapLayerType::AnnotationLayer:
-      case QgsMapLayerType::PointCloudLayer:
-      case QgsMapLayerType::GroupLayer:
+      case Qgis::LayerType::Raster:
+      case Qgis::LayerType::Plugin:
+      case Qgis::LayerType::Mesh:
+      case Qgis::LayerType::VectorTile:
+      case Qgis::LayerType::Annotation:
+      case Qgis::LayerType::PointCloud:
+      case Qgis::LayerType::Group:
         break;
     }
   }
@@ -227,7 +227,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
       if ( ! uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) &&
            ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
       {
-        if ( askUserForZipItemLayers( uri, { QgsMapLayerType::VectorLayer } ) )
+        if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Vector } ) )
           continue;
       }
     }
@@ -268,7 +268,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
     // filter out non-vector sublayers
     sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
     {
-      return sublayer.type() != QgsMapLayerType::VectorLayer;
+      return sublayer.type() != Qgis::LayerType::Vector;
     } ), sublayers.end() );
 
     cursorOverride.reset();
@@ -292,7 +292,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
           case SublayerHandling::AskUser:
           {
             // prompt user for sublayers
-            QgsProviderSublayersDialog dlg( uri, path, sublayers, {QgsMapLayerType::VectorLayer}, kApp->mainWindow() );
+            QgsProviderSublayersDialog dlg( uri, path, sublayers, {Qgis::LayerType::Vector}, kApp->mainWindow() );
 
             if ( dlg.exec() )
               sublayers = dlg.selectedLayers();
@@ -311,7 +311,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
               // filter out non-vector sublayers
               sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
               {
-                return sublayer.type() != QgsMapLayerType::VectorLayer;
+                return sublayer.type() != Qgis::LayerType::Vector;
               } ), sublayers.end() );
             }
             break;
@@ -329,7 +329,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
         // filter out non-vector sublayers
         sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
         {
-          return sublayer.type() != QgsMapLayerType::VectorLayer;
+          return sublayer.type() != Qgis::LayerType::Vector;
         } ), sublayers.end() );
       }
 
@@ -476,7 +476,7 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
   return layer.release();
 }
 
-bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const QList<QgsMapLayerType> &acceptableTypes )
+bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const QList<Qgis::LayerType> &acceptableTypes )
 {
   // query sublayers
   QList< QgsProviderSublayerDetails > sublayers = QgsProviderRegistry::instance()->querySublayers( path, Qgis::SublayerQueryFlag::IncludeSystemTables );
@@ -578,7 +578,7 @@ KadasAppLayerHandling::SublayerHandling KadasAppLayerHandling::shouldAskUserForS
       // if any non-raster layers are found, we ask the user. Otherwise we load all
       for ( const QgsProviderSublayerDetails &sublayer : layers )
       {
-        if ( sublayer.type() != QgsMapLayerType::RasterLayer )
+        if ( sublayer.type() != Qgis::LayerType::Raster )
           return SublayerHandling::AskUser;
       }
       return SublayerHandling::LoadAll;
@@ -754,17 +754,17 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
     // one good candidate provider and possible layer type -- that makes things nice and easy!
     switch ( candidateProviders.at( 0 ).layerTypes().at( 0 ) )
     {
-      case QgsMapLayerType::VectorLayer:
-      case QgsMapLayerType::RasterLayer:
-      case QgsMapLayerType::MeshLayer:
-      case QgsMapLayerType::AnnotationLayer:
-      case QgsMapLayerType::PluginLayer:
-      case QgsMapLayerType::VectorTileLayer:
-      case QgsMapLayerType::GroupLayer:
+      case Qgis::LayerType::Vector:
+      case Qgis::LayerType::Raster:
+      case Qgis::LayerType::Mesh:
+      case Qgis::LayerType::Annotation:
+      case Qgis::LayerType::Plugin:
+      case Qgis::LayerType::VectorTile:
+      case Qgis::LayerType::Group:
         // not supported here yet!
         break;
 
-      case QgsMapLayerType::PointCloudLayer:
+      case Qgis::LayerType::PointCloud:
       {
         if ( QgsPointCloudLayer *layer = addPointCloudLayer( fileName, fileInfo.completeBaseName(), candidateProviders.at( 0 ).metadata()->key(), true ) )
         {
@@ -997,17 +997,17 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
 
 QgsVectorLayer *KadasAppLayerHandling::addVectorLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid )
 {
-  return addLayerPrivate< QgsVectorLayer >( QgsMapLayerType::VectorLayer, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "ogr" ), showWarningOnInvalid );
+  return addLayerPrivate< QgsVectorLayer >( Qgis::LayerType::Vector, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "ogr" ), showWarningOnInvalid );
 }
 
 QgsRasterLayer *KadasAppLayerHandling::addRasterLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid )
 {
-  return addLayerPrivate< QgsRasterLayer >( QgsMapLayerType::RasterLayer, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "gdal" ), showWarningOnInvalid );
+  return addLayerPrivate< QgsRasterLayer >( Qgis::LayerType::Raster, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "gdal" ), showWarningOnInvalid );
 }
 
 QgsMeshLayer *KadasAppLayerHandling::addMeshLayer( const QString &uri, const QString &baseName, const QString &provider )
 {
-  return addLayerPrivate< QgsMeshLayer >( QgsMapLayerType::MeshLayer, uri, baseName, provider, true );
+  return addLayerPrivate< QgsMeshLayer >( Qgis::LayerType::Mesh, uri, baseName, provider, true );
 }
 
 QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringList &uris, bool &ok, bool showWarningOnInvalid )
@@ -1035,7 +1035,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
     if ( ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) ) &&
          ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
     {
-      if ( askUserForZipItemLayers( uri, { QgsMapLayerType::RasterLayer } ) )
+      if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Raster } ) )
         continue;
     }
 
@@ -1068,7 +1068,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
 
       // try to create the layer
       cursorOverride.reset();
-      QgsRasterLayer *layer = addLayerPrivate< QgsRasterLayer >( QgsMapLayerType::RasterLayer, uri, layerName, QStringLiteral( "gdal" ), showWarningOnInvalid );
+      QgsRasterLayer *layer = addLayerPrivate< QgsRasterLayer >( Qgis::LayerType::Raster, uri, layerName, QStringLiteral( "gdal" ), showWarningOnInvalid );
       res << layer;
 
       if ( layer && layer->isValid() )
@@ -1263,7 +1263,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addDatabaseLayers( const QStringLi
 }
 
 template<typename T>
-T *KadasAppLayerHandling::addLayerPrivate( QgsMapLayerType type, const QString &uri, const QString &name, const QString &providerKey, bool guiWarnings )
+T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &uri, const QString &name, const QString &providerKey, bool guiWarnings )
 {
   QgsSettings settings;
 

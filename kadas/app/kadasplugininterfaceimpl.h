@@ -32,7 +32,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     // Supported QGIS interface
     virtual QgsPluginManagerInterface *pluginManagerInterface() override;
     virtual QgsLayerTreeView *layerTreeView() override;
-    virtual void addCustomActionForLayerType( QAction *action, QString menu, QgsMapLayerType type, bool allLayers ) override;
+    virtual void addCustomActionForLayerType( QAction *action, QString menu, Qgis::LayerType type, bool allLayers ) override;
     virtual void addCustomActionForLayer( QAction *action, QgsMapLayer *layer ) override;
     virtual bool removeCustomActionForLayerType( QAction *action ) override;
     virtual QList< QgsMapCanvas * > mapCanvases() override;

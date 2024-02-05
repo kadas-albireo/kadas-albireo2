@@ -41,7 +41,7 @@ void KadasLocalDataSearchProvider::startSearch( const QString &searchtext, const
   QList<QgsMapLayer *> visibleLayers;
   for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
   {
-    if ( layer->type() == QgsMapLayerType::VectorLayer && mMapCanvas->layers().contains( layer ) )
+    if ( layer->type() == Qgis::LayerType::Vector && mMapCanvas->layers().contains( layer ) )
     {
       visibleLayers.append( layer );
     }

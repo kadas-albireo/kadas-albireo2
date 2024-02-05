@@ -1006,7 +1006,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   if ( !layer )
     return;
 
-  if ( layer->type() == QgsMapLayerType::RasterLayer )
+  if ( layer->type() == Qgis::LayerType::Raster )
   {
     QgsRasterLayerProperties dialog( layer, mainWindow()->mapCanvas(), mMainWindow );
     // Omit some panels
@@ -1023,7 +1023,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 
     dialog.exec();
   }
-  else if ( layer->type() == QgsMapLayerType::VectorLayer )
+  else if ( layer->type() == Qgis::LayerType::Vector )
   {
     QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
     // Omit some panels
@@ -1048,7 +1048,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     }
     dialog.exec();
   }
-  else if ( layer->type() == QgsMapLayerType::VectorTileLayer )
+  else if ( layer->type() == Qgis::LayerType::VectorTile )
   {
     QgsVectorTileLayerProperties dialog( static_cast<QgsVectorTileLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow()->messageBar(), mMainWindow );
     dialog.exec();
@@ -1658,7 +1658,7 @@ int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group
     if ( node->nodeType() == QgsLayerTreeNode::NodeLayer )
     {
       QgsLayerTreeLayer *layerNode = static_cast<QgsLayerTreeLayer *>( node );
-      if ( layerNode->layer()->type() == QgsMapLayerType::RasterLayer || layerNode->layer()->type() == QgsMapLayerType::VectorLayer )
+      if ( layerNode->layer()->type() == Qgis::LayerType::Raster || layerNode->layer()->type() == Qgis::LayerType::Vector )
       {
         pos = i;
         break;

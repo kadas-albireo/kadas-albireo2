@@ -930,7 +930,7 @@ void KadasMainWindow::checkOnTheFlyProjection()
   // the user can actually see
   for ( QgsMapLayer *layer : mMapCanvas->layers() )
   {
-    if ( layer->type() != QgsMapLayerType::PluginLayer && !layer->crs().authid().startsWith( "USER:" ) && layer->crs().authid() != destAuthId )
+    if ( layer->type() != Qgis::LayerType::Plugin && !layer->crs().authid().startsWith( "USER:" ) && layer->crs().authid() != destAuthId )
     {
       reprojLayers.append( layer->name() );
     }

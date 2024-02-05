@@ -216,7 +216,7 @@ class KadasAppLayerHandling
 
   private:
 
-    template<typename T> static T *addLayerPrivate( QgsMapLayerType type, const QString &uri, const QString &baseName, const QString &providerKey, bool guiWarnings = true );
+    template<typename T> static T *addLayerPrivate( Qgis::LayerType type, const QString &uri, const QString &baseName, const QString &providerKey, bool guiWarnings = true );
 
     /**
      * Post processes a single added \a layer, applying any default behavior which should
@@ -232,7 +232,7 @@ class KadasAppLayerHandling
      * This method will open a dialog so the user can select GDAL sublayers to load
      * \returns TRUE if any items were loaded
      */
-    static bool askUserForZipItemLayers( const QString &path, const QList< QgsMapLayerType > &acceptableTypes );
+    static bool askUserForZipItemLayers( const QString &path, const QList< Qgis::LayerType > &acceptableTypes );
 
     static SublayerHandling shouldAskUserForSublayers( const QList< QgsProviderSublayerDetails > &layers, bool hasNonLayerItems = false );
 
