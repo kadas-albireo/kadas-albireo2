@@ -121,7 +121,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   connect( pickButton, &QPushButton::clicked, mTool, &KadasMapToolHeightProfile::pickLine );
   vboxLayout->addWidget( pickButton );
 
-  QgsUnitTypes::DistanceUnit heightDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
+  Qgis::DistanceUnit heightDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
 
   mPlot = new QwtPlot( this );
   mPlot->canvas()->setCursor( Qt::ArrowCursor );
@@ -330,7 +330,7 @@ void KadasHeightProfileDialog::finish()
 
 void KadasHeightProfileDialog::replot()
 {
-  QgsUnitTypes::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
+  Qgis::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
   mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
@@ -382,7 +382,7 @@ void KadasHeightProfileDialog::replot()
   }
 
   // Get vertical unit
-  QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
   double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, vertDisplayUnit );
   mNoDataValue = GDALGetRasterNoDataValue( band, NULL );
   mPlot->setAxisTitle( QwtPlot::yLeft, vertDisplayUnit == QgsUnitTypes::DistanceFeet ? tr( "Height [ft AMSL]" ) : tr( "Height [m AMSL]" ) );

@@ -209,7 +209,7 @@ KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
   mValid = true;
 }
 
-void KadasBullseyeLayer::setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, QgsUnitTypes::DistanceUnit intervalUnit, double axesInterval )
+void KadasBullseyeLayer::setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval )
 {
   mBullseyeConfig.center = center;
   mBullseyeConfig.rings = rings;

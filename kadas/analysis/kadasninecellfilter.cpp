@@ -121,7 +121,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
   // Autocompute the zFactor if it is -1
   if ( mZFactor == -1 )
   {
-    QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+    Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
     if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
     {
       mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceFeet );

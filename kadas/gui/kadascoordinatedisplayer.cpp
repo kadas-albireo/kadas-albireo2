@@ -187,7 +187,7 @@ void KadasCoordinateDisplayer::displayFormatChanged( QAction *action )
 void KadasCoordinateDisplayer::heightUnitChanged( int idx )
 {
   QgsSettings().setValue( "/Qgis/heightUnit", idx );
-  KadasCoordinateFormat::instance()->setHeightDisplayUnit( static_cast<QgsUnitTypes::DistanceUnit>( mHeightSelectionCombo->itemData( idx ).toInt() ) );
+  KadasCoordinateFormat::instance()->setHeightDisplayUnit( static_cast<Qgis::DistanceUnit>( mHeightSelectionCombo->itemData( idx ).toInt() ) );
   updateHeight();
 }
 

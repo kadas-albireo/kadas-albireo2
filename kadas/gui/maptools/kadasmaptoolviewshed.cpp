@@ -46,7 +46,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
 {
   setWindowTitle( tr( "Viewshed setup" ) );
 
-  QgsUnitTypes::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
+  Qgis::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
 
   QGridLayout *heightDialogLayout = new QGridLayout();
 
@@ -307,8 +307,8 @@ void KadasMapToolViewshed::drawFinished()
 
 void KadasMapToolViewshed::adjustRadius( double newRadius )
 {
-  QgsUnitTypes::DistanceUnit measureUnit = QgsUnitTypes::DistanceMeters;
-  QgsUnitTypes::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
+  Qgis::DistanceUnit measureUnit = QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
   newRadius *= QgsUnitTypes::fromUnitToUnitFactor( measureUnit, targetUnit );
 
   KadasCircularSectorItem *item = dynamic_cast<KadasCircularSectorItem *>( mutableItem() );

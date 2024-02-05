@@ -28,7 +28,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/core/kadascoordinateutils.h"
 %End
   public:
-    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg = 0 );
+    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
     static QByteArray getTimezoneAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
 };
 

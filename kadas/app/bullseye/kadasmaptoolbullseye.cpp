@@ -202,7 +202,7 @@ void KadasBullseyeWidget::centerPicked( const QgsPointXY &pos )
 
 void KadasBullseyeWidget::ringUnitChanged()
 {
-  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
+  Qgis::DistanceUnit intervalUnit = static_cast<Qgis::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
   double conv = QgsUnitTypes::fromUnitToUnitFactor( mCurrentLayer->ringIntervalUnit(), intervalUnit );
   ui.spinBoxRingInterval->setValue( ui.spinBoxRingInterval->value() * conv ); // invokes updateLayer()
 }
@@ -216,7 +216,7 @@ void KadasBullseyeWidget::updateLayer()
   QgsPointXY center = ui.inputCenter->getCoordinate();
   const QgsCoordinateReferenceSystem &crs = ui.inputCenter->getCrs();
   int rings = ui.spinBoxRings->value();
-  QgsUnitTypes::DistanceUnit intervalUnit = static_cast<QgsUnitTypes::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
+  Qgis::DistanceUnit intervalUnit = static_cast<Qgis::DistanceUnit>( ui.comboBoxRingIntervalUnit->currentData().toInt() );
   int axes = ui.spinBoxAxesInterval->value();
   mCurrentLayer->setup( center, crs, rings, ui.spinBoxRingInterval->value(), intervalUnit, axes );
   mCurrentLayer->triggerRepaint();

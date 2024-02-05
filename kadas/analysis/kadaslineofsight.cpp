@@ -70,7 +70,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   }
 
   // Get vertical unit
-  QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
+  Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( band ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
   double heightConversion = QgsUnitTypes::fromUnitToUnitFactor( vertUnit, QgsUnitTypes::DistanceMeters );
 
   // Sample terrain under line from observer to target

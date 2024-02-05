@@ -56,7 +56,7 @@ void KadasCoordinateFormat::setCoordinateDisplayFormat( Format format, const QSt
   emit coordinateDisplayFormatChanged( format, epsg );
 }
 
-void KadasCoordinateFormat::setHeightDisplayUnit( QgsUnitTypes::DistanceUnit heightUnit )
+void KadasCoordinateFormat::setHeightDisplayUnit( Qgis::DistanceUnit heightUnit )
 {
   mHeightUnit = heightUnit;
   emit heightDisplayUnitChanged( heightUnit );
@@ -133,7 +133,7 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
   return KadasCoordinateUtils::getHeightAtPos( p, crs, mHeightUnit, errMsg );
 }
 
-double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QgsUnitTypes::DistanceUnit unit, QString *errMsg )
+double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg )
 {
   return KadasCoordinateUtils::getHeightAtPos( p, crs, unit, errMsg );
 }

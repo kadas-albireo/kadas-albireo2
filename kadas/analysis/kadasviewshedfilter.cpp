@@ -53,7 +53,7 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
 bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
     const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
     bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
-    double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress,
+    double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress,
     QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
 {
   // Open input file

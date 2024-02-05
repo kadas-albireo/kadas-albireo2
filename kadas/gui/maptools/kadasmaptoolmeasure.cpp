@@ -147,7 +147,7 @@ void KadasMeasureWidget::setItem( KadasMapItem *item )
 
 void KadasMeasureWidget::setDistanceUnit( int index )
 {
-  QgsUnitTypes::DistanceUnit unit = static_cast<QgsUnitTypes::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
+  Qgis::DistanceUnit unit = static_cast<Qgis::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
   QgsSettings().setValue( "/kadas/last_measure_unit", unit );
   if ( dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
