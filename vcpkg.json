@@ -26,6 +26,13 @@
     "globe": {
       "description": "Globe",
       "dependencies": ["osgearth"]
+    },
+    "webkit": {
+      "description": "Build with Qt Webkit",
+      "dependencies": [{
+        "name": "qgis",
+        "features": ["webkit"]
+      }]
     }
   },
   "vcpkg-configuration": {

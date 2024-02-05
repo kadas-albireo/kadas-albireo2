@@ -114,11 +114,10 @@ TARGET_LINK_LIBRARIES(kadas
   Qt5::Sql
   Qt5::OpenGL
   Qt5::PrintSupport
-  Qt5::WebKitWidgets
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
-  ${QGIS_CORE_LIBRARY}
-  ${QGIS_GUI_LIBRARY}
+  QGIS::Core
+  QGIS::Gui
   ${CRASHRPT_LIBRARY}
   ${QCA_LDFLAGS}
   ${QTKEYCHAIN_LIBRARIES}
@@ -126,20 +125,30 @@ TARGET_LINK_LIBRARIES(kadas
   ${CAIRO_LIBRARIES}
   ${LIBRSVG_LIBRARIES}
   ${kadas_RC_LIBS}
+
   kadas_core
   kadas_analysis
   kadas_gui
 )
 
-IF(WITH_GLOBE)
-TARGET_LINK_LIBRARIES(osgEarth)
-ENDIF(WITH_GLOBE)
+if (WITH_QTWEBKIT)
+  TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)
+endif()
+
+if (WITH_GLOBE)
+  TARGET_LINK_LIBRARIES(kadas osgEarth)
+  ADD_SUBDIRECTORY(globe/featuresource)
+endif()
+
+if (WITH_BINDINGS)
+ add_definitions(-DWITH_BINDINGS)
+endif()
+
+if (WITH_QTWEBKIT)
+ add_definitions(-DWITH_QTWEBKIT)
+endif()
 
 FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
-
-IF(WITH_GLOBE)
-ADD_SUBDIRECTORY(globe/featuresource)
-ENDIF(WITH_GLOBE)
 
 INSTALL(TARGETS kadas DESTINATION bin)
 INSTALL(FILES ${kadas_QM} DESTINATION share/kadas/locale)

@@ -42,6 +42,10 @@
         "platform": "osx"
       },
       {
+        "name": "libtasn1",
+        "platform": "osx"
+      },
+      {
         "name": "qt5-winextras",
         "platform": "windows"
       },
@@ -90,8 +94,7 @@
             "dependencies":
             [
                 "qwt-qt5",
-                "qscintilla-qt5",
-                "qt5-webkit"
+                "qscintilla-qt5"
             ]
         },
             "desktop":
@@ -110,7 +113,12 @@
                 "qt5-quickcontrols2",
                 "qt5-declarative"
             ]
-        }
+        },
+            "webkit":
+            {
+              "description": "webkit",
+              "dependencies": ["qt5-webkit"]
+            }
   }
     
   }

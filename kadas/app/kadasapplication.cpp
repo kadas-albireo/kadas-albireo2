@@ -336,8 +336,10 @@ void KadasApplication::init()
   }
 
   // Load python support
+#ifdef WITH_BINDINGS
   mPythonInterface = new KadasPluginInterfaceImpl( this );
   loadPythonSupport();
+#endif
 
   // Layer refresh manager
   mLayerRefreshManager = new KadasLayerRefreshManager( this );

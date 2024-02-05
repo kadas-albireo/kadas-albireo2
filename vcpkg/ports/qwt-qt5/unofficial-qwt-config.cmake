@@ -45,3 +45,4 @@ if(NOT TARGET unofficial::qwt::qwt)
         Qt::OpenGL
     )
 endif()
+
