@@ -85,7 +85,7 @@ void KadasKMLExportDialog::extentChanged( const QgsRectangle &extent )
 {
   if ( !extent.isNull() )
   {
-    int decs = kApp->mainWindow()->mapCanvas()->mapSettings().mapUnits() == QgsUnitTypes::DistanceDegrees ? 3 : 0;
+    int decs = kApp->mainWindow()->mapCanvas()->mapSettings().mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
     mLineEditXMin->setText( QString::number( extent.xMinimum(), 'f', decs ) );
     mLineEditYMin->setText( QString::number( extent.yMinimum(), 'f', decs ) );
     mLineEditXMax->setText( QString::number( extent.xMaximum(), 'f', decs ) );

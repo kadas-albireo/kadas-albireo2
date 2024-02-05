@@ -71,10 +71,10 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
   gridLayout->addWidget( mMeasurementLabel, 0, 1 );
 
   mUnitComboBox = new QComboBox();
-  mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( QgsUnitTypes::DistanceMeters ) );
-  mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( QgsUnitTypes::DistanceFeet ) );
+  mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( Qgis::DistanceUnit::Meters ) );
+  mUnitComboBox->addItem( tr( "Imperial" ), static_cast<int>( Qgis::DistanceUnit::Feet ) );
   mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( QgsUnitTypes::DistanceNauticalMiles ) );
-  int defUnit = QgsSettings().value( "/kadas/last_measure_unit", QgsUnitTypes::DistanceMeters ).toInt();
+  int defUnit = QgsSettings().value( "/kadas/last_measure_unit", Qgis::DistanceUnit::Meters ).toInt();
   mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
   connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
   gridLayout->addWidget( mUnitComboBox, 0, 2 );
@@ -96,8 +96,8 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
     gridLayout->addWidget( mNorthComboBox, 1, 1 );
 
     mAngleUnitComboBox = new QComboBox();
-    mAngleUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( QgsUnitTypes::AngleDegrees ) );
-    mAngleUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( QgsUnitTypes::AngleRadians ) );
+    mAngleUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( Qgis::AngleUnit::Degrees ) );
+    mAngleUnitComboBox->addItem( tr( "Radians" ), static_cast<int>( Qgis::AngleUnit::Radians ) );
     mAngleUnitComboBox->addItem( tr( "Gradians" ), static_cast<int>( QgsUnitTypes::AngleGon ) );
     mAngleUnitComboBox->addItem( tr( "Angular Mil" ), static_cast<int>( QgsUnitTypes::AngleMilNATO ) );
     int defUnit = std::max( 0, QgsSettings().value( "/kadas/last_azimuth_unit", static_cast<int>( QgsUnitTypes::AngleMilNATO ) ).toInt() );
@@ -147,7 +147,7 @@ void KadasMeasureWidget::setItem( KadasMapItem *item )
 
 void KadasMeasureWidget::setDistanceUnit( int index )
 {
-  QgsUnitTypes::DistanceUnit unit = static_cast<QgsUnitTypes::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
+  Qgis::DistanceUnit unit = static_cast<Qgis::DistanceUnit>( mUnitComboBox->itemData( index ).toInt() );
   QgsSettings().setValue( "/kadas/last_measure_unit", unit );
   if ( dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
@@ -157,7 +157,7 @@ void KadasMeasureWidget::setDistanceUnit( int index )
 
 void KadasMeasureWidget::setAngleUnit( int index )
 {
-  QgsUnitTypes::AngleUnit unit = static_cast<QgsUnitTypes::AngleUnit>( mAngleUnitComboBox->itemData( index ).toInt() );
+  Qgis::AngleUnit unit = static_cast<Qgis::AngleUnit>( mAngleUnitComboBox->itemData( index ).toInt() );
   QgsSettings().setValue( "/kadas/last_azimuth_unit", unit );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {

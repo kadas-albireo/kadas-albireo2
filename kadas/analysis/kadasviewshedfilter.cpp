@@ -53,7 +53,7 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
 bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
     const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
     bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
-    double radius, const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress,
+    double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress,
     QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
 {
   // Open input file
@@ -110,9 +110,9 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
     qRound( geoToPixelY( gtrans, observerPos.x(), observerPos.y() ) )
   };
   double earthRadius = 6370000;
-  if ( datasetCrs.mapUnits() != QgsUnitTypes::DistanceMeters )
+  if ( datasetCrs.mapUnits() != Qgis::DistanceUnit::Meters )
   {
-    earthRadius *= QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, datasetCrs.mapUnits() );
+    earthRadius *= QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, datasetCrs.mapUnits() );
   }
 
   QList<QgsPointXY> cornerPoints = QList<QgsPointXY>()

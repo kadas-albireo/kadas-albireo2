@@ -247,12 +247,12 @@ void KadasApplication::init()
   bool settingsEmpty = false;
   if ( settings.value( "timestamp", 0 ).toInt() > 0 )
   {
-    QgsDebugMsg( "Patching settings" );
+    QgsDebugMsgLevel( "Patching settings" , 2 );
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_patch.ini" ) );
   }
   else
   {
-    QgsDebugMsg( "Copying full settings" );
+    QgsDebugMsgLevel( "Copying full settings" , 2 );
     settingsEmpty = true;
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_full.ini" ) );
   }
@@ -288,7 +288,7 @@ void KadasApplication::init()
   // Add network request logger
   QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest * req )
   {
-    QgsDebugMsg( QString( "Network request: %1" ).arg( req->url().toString() ) );
+    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ) , 2 );
   } );
 
   // Create main window
@@ -391,16 +391,16 @@ void KadasApplication::extractPortalToken()
   if ( reply->error() == QNetworkReply::NoError )
   {
     QList<QByteArray> setCookieFields = reply->rawHeader( "Set-Cookie" ).split( ';' );
-    QgsDebugMsg( QString( "Set-Cookie header: %1" ).arg( QString::fromUtf8( reply->rawHeader( "Set-Cookie" ) ) ) );
+    QgsDebugMsgLevel( QString( "Set-Cookie header: %1" ).arg( QString::fromUtf8( reply->rawHeader( "Set-Cookie" ) ) ) , 2 );
     if ( setCookieFields.length() > 0 && setCookieFields[0].startsWith( "esri_auth=" ) )
     {
       QJsonDocument esriAuth = QJsonDocument::fromJson( QUrl::fromPercentEncoding( setCookieFields[0] ).toUtf8().mid( 10 ) );
       QString username = esriAuth.object()["email"].toString().replace( QRegExp( "@.*$" ), "" );
-      QgsDebugMsg( QString( "Extracted username from Set-Cookie: %1" ).arg( username ) );
+      QgsDebugMsgLevel( QString( "Extracted username from Set-Cookie: %1" ).arg( username ) , 2 );
       mMainWindow->showAuthenticatedUser( username );
 
       QString token = esriAuth.object()["token"].toString();
-      QgsDebugMsg( QString( "Extracted token from Set-Cookie: %1" ).arg( token ) );
+      QgsDebugMsgLevel( QString( "Extracted token from Set-Cookie: %1" ).arg( token ) , 2 );
       if ( !token.isEmpty() )
       {
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
@@ -408,7 +408,7 @@ void KadasApplication::extractPortalToken()
         QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
         for ( const QString &url : cookieUrls )
         {
-          QgsDebugMsg( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) );
+          QgsDebugMsgLevel( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) , 2 );
           jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
         }
       }
@@ -417,11 +417,11 @@ void KadasApplication::extractPortalToken()
     {
       QVariantMap listData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
       mMainWindow->showAuthenticatedUser( listData["user"].toString() );
-      QgsDebugMsg( QString( "Extracted username: %1" ).arg( listData["user"].toString() ) );
+      QgsDebugMsgLevel( QString( "Extracted username: %1" ).arg( listData["user"].toString() ) , 2 );
       QString cookie = listData["esri_auth"].toString();
       if ( !cookie.isEmpty() )
       {
-        QgsDebugMsg( QString( "Extracted cookie: %1" ).arg( cookie ) );
+        QgsDebugMsgLevel( QString( "Extracted cookie: %1" ).arg( cookie ) , 2 );
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
         QStringList cookieUrls = QgsSettings().value( "/iamauth/cookieurls", "" ).toString().split( ";" );
         for ( const QString &url : cookieUrls )
@@ -662,7 +662,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     loop.exec( QEventLoop::ExcludeUserInputEvents );
     if ( reply->error() != QNetworkReply::NoError )
     {
-      QgsDebugMsg( QString( "Could not read %1" ).arg( templateUrl.toString() ) );
+      QgsDebugMsgLevel( QString( "Could not read %1" ).arg( templateUrl.toString() ) , 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
       return false;
     }
@@ -674,7 +674,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     zip.open( QuaZip::mdUnzip );
     if ( !zip.setCurrentFile( projectFileName, QuaZip::csInsensitive ) )
     {
-      QgsDebugMsg( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ) );
+      QgsDebugMsgLevel( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ) , 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
       return false;
     }
@@ -687,7 +687,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     }
     else
     {
-      QgsDebugMsg( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ) );
+      QgsDebugMsgLevel( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ) , 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
       return false;
     }
@@ -1006,7 +1006,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   if ( !layer )
     return;
 
-  if ( layer->type() == QgsMapLayerType::RasterLayer )
+  if ( layer->type() == Qgis::LayerType::Raster )
   {
     QgsRasterLayerProperties dialog( layer, mainWindow()->mapCanvas(), mMainWindow );
     // Omit some panels
@@ -1023,7 +1023,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
 
     dialog.exec();
   }
-  else if ( layer->type() == QgsMapLayerType::VectorLayer )
+  else if ( layer->type() == Qgis::LayerType::Vector )
   {
     QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
     // Omit some panels
@@ -1048,7 +1048,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     }
     dialog.exec();
   }
-  else if ( layer->type() == QgsMapLayerType::VectorTileLayer )
+  else if ( layer->type() == Qgis::LayerType::VectorTile )
   {
     QgsVectorTileLayerProperties dialog( static_cast<QgsVectorTileLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow()->messageBar(), mMainWindow );
     dialog.exec();
@@ -1081,7 +1081,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   {
     layerUrl = QUrlQuery( layer->source() ).queryItemValue( "url" );
   }
-  QgsDebugMsg( QString( "GDI layer url is %1" ).arg( layerUrl ) );
+  QgsDebugMsgLevel( QString( "GDI layer url is %1" ).arg( layerUrl ) , 2 );
   if ( layerUrl.isEmpty() )
   {
     return;
@@ -1092,7 +1092,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
     gdiBaseUrl += "/";
   }
   QUrl searchUrl( gdiBaseUrl + "sharing/rest/search?f=pjson&q=" +  QUrl::toPercentEncoding( "url:" + layerUrl ) );
-  QgsDebugMsg( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ) );
+  QgsDebugMsgLevel( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ) , 2 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( searchUrl ) );
   connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply]
   {
@@ -1103,7 +1103,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
       QVariantMap result = results.at( 0 ).toMap();
       QString id = result["id"].toString();
       QString metadataUrl = gdiBaseUrl + "home/item.html?id=" + id;
-      QgsDebugMsg( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ) );
+      QgsDebugMsgLevel( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ) , 2 );
       QDesktopServices::openUrl( metadataUrl );
     }
     else
@@ -1580,7 +1580,7 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
 
 void KadasApplication::loadPythonSupport()
 {
-  //QgsDebugMsg("Python support library's instance() symbol resolved.");
+  //QgsDebugMsgLevel("Python support library's instance() symbol resolved.", 2 );
   mPythonIntegration = new KadasPythonIntegration( this );
   mPythonIntegration->initPython( mPythonInterface, true );
   if ( !mPythonIntegration->isEnabled() )
@@ -1626,12 +1626,12 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   {
     return;
   }
-  QgsDebugMsg( QString( "injectAuthToken: got url %1" ).arg( url.url() ) );
+  QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ) , 2 );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
   QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
   for ( const QNetworkCookie &cookie : cookies )
   {
-    QgsDebugMsg( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ) );
+    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ) , 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "esri_auth=" ) )
     {
@@ -1641,7 +1641,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
         query.addQueryItem( "token", tokenRe.cap( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
-        QgsDebugMsg( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) );
+        QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) , 2 );
         break;
       }
     }
@@ -1658,7 +1658,7 @@ int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group
     if ( node->nodeType() == QgsLayerTreeNode::NodeLayer )
     {
       QgsLayerTreeLayer *layerNode = static_cast<QgsLayerTreeLayer *>( node );
-      if ( layerNode->layer()->type() == QgsMapLayerType::RasterLayer || layerNode->layer()->type() == QgsMapLayerType::VectorLayer )
+      if ( layerNode->layer()->type() == Qgis::LayerType::Raster || layerNode->layer()->type() == Qgis::LayerType::Vector )
       {
         pos = i;
         break;

@@ -46,7 +46,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
 {
   setWindowTitle( tr( "Viewshed setup" ) );
 
-  QgsUnitTypes::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
+  Qgis::DistanceUnit vertDisplayUnit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
 
   QGridLayout *heightDialogLayout = new QGridLayout();
 
@@ -55,7 +55,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   mSpinBoxObserverHeight->setRange( 0, 999999999999 );
   mSpinBoxObserverHeight->setDecimals( 1 );
   mSpinBoxObserverHeight->setValue( 2. );
-  mSpinBoxObserverHeight->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mSpinBoxObserverHeight->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
   heightDialogLayout->addWidget( mSpinBoxObserverHeight, 0, 1, 1, 1 );
 
   mComboObserverHeightMode = new QComboBox();
@@ -87,7 +87,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   mSpinBoxTargetHeight->setRange( 0, 999999999999 );
   mSpinBoxTargetHeight->setDecimals( 1 );
   mSpinBoxTargetHeight->setValue( 2. );
-  mSpinBoxTargetHeight->setSuffix( vertDisplayUnit == QgsUnitTypes::DistanceFeet ? " ft" : " m" );
+  mSpinBoxTargetHeight->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
   heightDialogLayout->addWidget( mSpinBoxTargetHeight, 2, 1, 1, 1 );
 
   mComboTargetHeightMode = new QComboBox();
@@ -203,7 +203,7 @@ void KadasMapToolViewshed::drawFinished()
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
-  if ( !layer || layer->type() != QgsMapLayerType::RasterLayer )
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     emit messageEmitted( tr( "No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap." ), Qgis::Warning );
     clear();
@@ -221,7 +221,7 @@ void KadasMapToolViewshed::drawFinished()
   double curRadius = item->constState()->radii.last();
 
   QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
-  curRadius *= QgsUnitTypes::fromUnitToUnitFactor( canvasCrs.mapUnits(), QgsUnitTypes::DistanceMeters );
+  curRadius *= QgsUnitTypes::fromUnitToUnitFactor( canvasCrs.mapUnits(), Qgis::DistanceUnit::Meters );
 
   KadasViewshedDialog viewshedDialog( curRadius );
   connect( &viewshedDialog, &KadasViewshedDialog::radiusChanged, this, &KadasMapToolViewshed::adjustRadius );
@@ -243,16 +243,16 @@ void KadasMapToolViewshed::drawFinished()
   center = item->constState()->centers.last();
   curRadius = item->constState()->radii.last();
 
-  if ( mCanvas->mapSettings().mapUnits() == QgsUnitTypes::DistanceDegrees )
+  if ( mCanvas->mapSettings().mapUnits() == Qgis::DistanceUnit::Degrees )
   {
     // Need to compute radius in meters
     QgsDistanceArea da;
     da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
     curRadius = da.measureLine( center, QgsPoint( center.x() + curRadius, center.y() ) );
-    curRadius = da.convertLengthMeasurement( curRadius, QgsUnitTypes::DistanceMeters );
+    curRadius = da.convertLengthMeasurement( curRadius, Qgis::DistanceUnit::Meters );
   }
 
-  double heightConv = QgsUnitTypes::fromUnitToUnitFactor( KadasCoordinateFormat::instance()->getHeightDisplayUnit(), QgsUnitTypes::DistanceMeters );
+  double heightConv = QgsUnitTypes::fromUnitToUnitFactor( KadasCoordinateFormat::instance()->getHeightDisplayUnit(), Qgis::DistanceUnit::Meters );
 
   QProgressDialog p( tr( "Calculating viewshed..." ), tr( "Abort" ), 0, 0 );
   p.setWindowTitle( tr( "Viewshed" ) );
@@ -262,7 +262,7 @@ void KadasMapToolViewshed::drawFinished()
 
 
   QString errMsg;
-  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.observerHeight() * heightConv, viewshedDialog.targetHeight() * heightConv, viewshedDialog.observerHeightRelativeToGround(), viewshedDialog.targetHeightRelativeToGround(), viewshedDialog.observerMinVertAngle(), viewshedDialog.observerMaxVertAngle(), curRadius, QgsUnitTypes::DistanceMeters, &p, &errMsg, filterRegion, accuracyFactor );
+  bool success = KadasViewshedFilter::computeViewshed( static_cast<QgsRasterLayer *>( layer ), outputFile, "GTiff", center, canvasCrs, viewshedDialog.observerHeight() * heightConv, viewshedDialog.targetHeight() * heightConv, viewshedDialog.observerHeightRelativeToGround(), viewshedDialog.targetHeightRelativeToGround(), viewshedDialog.observerMinVertAngle(), viewshedDialog.observerMaxVertAngle(), curRadius, Qgis::DistanceUnit::Meters, &p, &errMsg, filterRegion, accuracyFactor );
   QApplication::restoreOverrideCursor();
   if ( success )
   {
@@ -307,8 +307,8 @@ void KadasMapToolViewshed::drawFinished()
 
 void KadasMapToolViewshed::adjustRadius( double newRadius )
 {
-  QgsUnitTypes::DistanceUnit measureUnit = QgsUnitTypes::DistanceMeters;
-  QgsUnitTypes::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
+  Qgis::DistanceUnit measureUnit = Qgis::DistanceUnit::Meters;
+  Qgis::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
   newRadius *= QgsUnitTypes::fromUnitToUnitFactor( measureUnit, targetUnit );
 
   KadasCircularSectorItem *item = dynamic_cast<KadasCircularSectorItem *>( mutableItem() );

@@ -56,7 +56,7 @@ QgsLayerTreeView *KadasPluginInterfaceImpl::layerTreeView()
   return kApp->mainWindow()->layerTreeView();
 }
 
-void KadasPluginInterfaceImpl::addCustomActionForLayerType( QAction *action, QString menu, QgsMapLayerType type, bool allLayers )
+void KadasPluginInterfaceImpl::addCustomActionForLayerType( QAction *action, QString menu, Qgis::LayerType type, bool allLayers )
 {
   // TODO
 }

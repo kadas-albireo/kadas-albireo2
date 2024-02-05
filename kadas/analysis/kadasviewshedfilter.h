@@ -36,7 +36,7 @@ class KADAS_ANALYSIS_EXPORT KadasViewshedFilter
                                  QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
                                  double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr,
                                  double observerMinVertAngle, double observerMaxVertAngle, double radius,
-                                 const QgsUnitTypes::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
+                                 const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
                                  const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
 
 };

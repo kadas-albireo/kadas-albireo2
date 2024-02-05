@@ -32,7 +32,7 @@ class KadasBullseyeLayer : public KadasPluginLayer
     static QString layerType() { return "bullseye"; }
 
     KadasBullseyeLayer( const QString &name );
-    void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, QgsUnitTypes::DistanceUnit intervalUnit, double axesInterval );
+    void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval );
 
     QString layerTypeKey() const override { return layerType(); }
     KadasBullseyeLayer *clone() const override;
@@ -42,7 +42,7 @@ class KadasBullseyeLayer : public KadasPluginLayer
     QgsPointXY center() const { return mBullseyeConfig.center; }
     int rings() const { return mBullseyeConfig.rings; }
     double ringInterval() const { return mBullseyeConfig.interval; }
-    QgsUnitTypes::DistanceUnit ringIntervalUnit() const { return mBullseyeConfig.intervalUnit; }
+    Qgis::DistanceUnit ringIntervalUnit() const { return mBullseyeConfig.intervalUnit; }
     double axesInterval() const { return mBullseyeConfig.axesInterval; }
 
     const QColor &color() const { return mBullseyeConfig.color; }
@@ -72,7 +72,7 @@ class KadasBullseyeLayer : public KadasPluginLayer
       QgsPointXY center;
       int rings;
       double interval;
-      QgsUnitTypes::DistanceUnit intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
+      Qgis::DistanceUnit intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
       double axesInterval;
       QColor color = Qt::black;
       int fontSize = 20;

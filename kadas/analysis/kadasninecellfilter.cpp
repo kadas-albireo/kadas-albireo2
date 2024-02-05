@@ -121,16 +121,16 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
   // Autocompute the zFactor if it is -1
   if ( mZFactor == -1 )
   {
-    QgsUnitTypes::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? QgsUnitTypes::DistanceFeet : QgsUnitTypes::DistanceMeters;
-    if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceMeters && vertUnit == QgsUnitTypes::DistanceFeet )
+    Qgis::DistanceUnit vertUnit = strcmp( GDALGetRasterUnitType( rasterBand ), "ft" ) == 0 ? Qgis::DistanceUnit::Feet : Qgis::DistanceUnit::Meters;
+    if ( inputCrs.mapUnits() == Qgis::DistanceUnit::Meters && vertUnit == Qgis::DistanceUnit::Feet )
     {
-      mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceFeet );
+      mZFactor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, Qgis::DistanceUnit::Feet );
     }
-    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceFeet && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( inputCrs.mapUnits() == Qgis::DistanceUnit::Feet && vertUnit == Qgis::DistanceUnit::Meters )
     {
-      mZFactor = QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceFeet, QgsUnitTypes::DistanceMeters );
+      mZFactor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Feet, Qgis::DistanceUnit::Meters );
     }
-    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceMeters )
+    else if ( inputCrs.mapUnits() == Qgis::DistanceUnit::Degrees && vertUnit == Qgis::DistanceUnit::Meters )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
@@ -138,17 +138,17 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
       double latitude = gtrans[3] + px * gtrans[4] + py * gtrans[5];
       mZFactor = ( 111320 * std::cos( latitude * M_PI / 180. ) );
     }
-    else if ( inputCrs.mapUnits() == QgsUnitTypes::DistanceDegrees && vertUnit == QgsUnitTypes::DistanceFeet )
+    else if ( inputCrs.mapUnits() == Qgis::DistanceUnit::Degrees && vertUnit == Qgis::DistanceUnit::Feet )
     {
       // Take latitude in the middle of the window
       double px = 0.5 * ( colStart + colEnd );
       double py = 0.5 * ( rowStart + rowEnd );
       double latitude = gtrans[3] + px * gtrans[4] + py * gtrans[5];
-      mZFactor = ( ( 111320 * std::cos( latitude * M_PI / 180. ) ) ) * QgsUnitTypes::fromUnitToUnitFactor( QgsUnitTypes::DistanceMeters, QgsUnitTypes::DistanceFeet );
+      mZFactor = ( ( 111320 * std::cos( latitude * M_PI / 180. ) ) ) * QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, Qgis::DistanceUnit::Feet );
     }
     else
     {
-      QgsDebugMsg( "Warning: Failed to automatically compute zFactor, defaulting to 1" );
+      QgsDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1" , 2 );
       mZFactor = 1;
     }
   }

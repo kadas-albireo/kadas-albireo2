@@ -269,7 +269,7 @@ void KadasPinItem::updateTooltip()
   QString toolTipText = tr( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
                         .arg( posStr )
                         .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
-                        .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == QgsUnitTypes::DistanceFeet ? "ft" : "m" )
+                        .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? "ft" : "m" )
                         .arg( name() )
                         .arg( remarks() );
   blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again

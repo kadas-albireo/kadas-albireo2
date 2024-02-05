@@ -79,7 +79,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         menu->addAction( actionLayerRefreshRate( menu ) );
       }
 
-      if ( layer->type() == QgsMapLayerType::PluginLayer )
+      if ( layer->type() == Qgis::LayerType::Plugin )
       {
         QgsPluginLayer *pluginLayer = static_cast<QgsPluginLayer *>( layer );
         KadasPluginLayerType *plt = dynamic_cast<KadasPluginLayerType *>( QgsApplication::pluginLayerRegistry()->pluginLayerType( pluginLayer->pluginLayerType() ) );
@@ -95,11 +95,11 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
 
 
-      if ( layer->type() == QgsMapLayerType::RasterLayer && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
+      if ( layer->type() == Qgis::LayerType::Raster && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
       {
         menu->addAction( actionLayerUseAsHeightmap( menu ) );
       }
-      else if ( layer->type() == QgsMapLayerType::VectorLayer )
+      else if ( layer->type() == Qgis::LayerType::Vector )
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ),
                          this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
@@ -109,7 +109,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       {
         menu->addAction( QIcon( ":/kadas/icons/info" ), tr( "Show layer info" ), this, &KadasLayerTreeViewMenuProvider::showLayerInfo );
       }
-      if ( qobject_cast<KadasPluginLayer *>( layer ) || layer->type() == QgsMapLayerType::RasterLayer || layer->type() == QgsMapLayerType::VectorLayer || layer->type() == QgsMapLayerType::VectorTileLayer )
+      if ( qobject_cast<KadasPluginLayer *>( layer ) || layer->type() == Qgis::LayerType::Raster || layer->type() == Qgis::LayerType::Vector || layer->type() == Qgis::LayerType::VectorTile )
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mIconProperties.svg" ), tr( "&Properties" ), this, &KadasLayerTreeViewMenuProvider::showLayerProperties );
       }

@@ -345,7 +345,7 @@ QgsMultiLineString *KadasLineItem::geometry()
   return static_cast<QgsMultiLineString *>( mGeometry );
 }
 
-void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, QgsUnitTypes::AngleUnit angleUnit )
+void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::AngleUnit angleUnit )
 {
   setMeasurementsEnabled( true );
   mMeasurementMode = measurementMode;
