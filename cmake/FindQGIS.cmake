@@ -235,6 +235,10 @@ ENDIF ()
 
 FIND_PATH(QGIS_SIP_DIR NAMES qgis_core/core.sip PATHS /usr/share/sip)
 
+IF(MSVC)
+  add_definitions(-D_USE_MATH_DEFINES)
+ENDIF()
+
 IF (QGIS_FOUND)
    IF (NOT QGIS_FIND_QUIETLY)
      MESSAGE(STATUS "Found QGIS: ${QGIS_VERSION}")
