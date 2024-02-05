@@ -237,6 +237,7 @@ FIND_PATH(QGIS_SIP_DIR NAMES qgis_core/core.sip PATHS /usr/share/sip)
 
 IF(MSVC)
   add_definitions(-D_USE_MATH_DEFINES)
+  add_definitions(-DNOMINMAX)
 ENDIF()
 
 IF (QGIS_FOUND)
