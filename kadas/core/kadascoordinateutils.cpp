@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <gdal.h>
-#include <zonedetect.h>
+#include <zonedetect/zonedetect.h>
 
 #include <qgis/qgscoordinateformatter.h>
 #include <qgis/qgscoordinatetransform.h>
