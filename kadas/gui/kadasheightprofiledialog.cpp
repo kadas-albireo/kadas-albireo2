@@ -359,7 +359,7 @@ void KadasHeightProfileDialog::replot()
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( raster, &gtrans[0] ) != CE_None )
   {
-    QgsDebugMsg( "Failed to get raster geotransform" );
+    QgsDebugMsgLevel( "Failed to get raster geotransform" , 2 );
     GDALClose( raster );
     return;
   }
@@ -368,7 +368,7 @@ void KadasHeightProfileDialog::replot()
   QgsCoordinateReferenceSystem rasterCrs( proj );
   if ( !rasterCrs.isValid() )
   {
-    QgsDebugMsg( "Failed to get raster CRS" );
+    QgsDebugMsgLevel( "Failed to get raster CRS" , 2 );
     GDALClose( raster );
     return;
   }
@@ -376,7 +376,7 @@ void KadasHeightProfileDialog::replot()
   GDALRasterBandH band = GDALGetRasterBand( raster, 1 );
   if ( !band )
   {
-    QgsDebugMsg( "Failed to open raster band 0" );
+    QgsDebugMsgLevel( "Failed to open raster band 0" , 2 );
     GDALClose( raster );
     return;
   }
@@ -425,7 +425,7 @@ void KadasHeightProfileDialog::replot()
       if ( CE_None != GDALRasterIO( band, GF_Read,
                                     std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
       {
-        QgsDebugMsg( "Failed to read pixel values" );
+        QgsDebugMsgLevel( "Failed to read pixel values" , 2 );
         mPlotSamples.append( QPointF( mPlotSamples.size(), 0 ) );
       }
       else

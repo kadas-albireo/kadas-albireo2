@@ -62,7 +62,7 @@ void KadasLocationSearchProvider::startSearch( const QString &searchtext, const 
   {
     serviceUrl = QgsSettings().value( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
   }
-  QgsDebugMsg( serviceUrl );
+  QgsDebugMsgLevel( serviceUrl , 2 );
 
   QUrl url( serviceUrl );
   QUrlQuery query( url );
@@ -117,7 +117,7 @@ void KadasLocationSearchProvider::replyFinished()
   QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
+    QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ) , 2 );
   }
   QJsonObject resultMap = doc.object();
   bool fuzzy = resultMap["fuzzy"] == "true";

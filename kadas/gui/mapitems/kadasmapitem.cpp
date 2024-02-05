@@ -95,7 +95,7 @@ QJsonObject KadasMapItem::serialize() const
       }
       else
       {
-        QgsDebugMsg( QString( "Skipping unserializable property: %1" ).arg( prop.name() ) );
+        QgsDebugMsgLevel( QString( "Skipping unserializable property: %1" ).arg( prop.name() ) , 2 );
       }
     }
     props[prop.name()] = value;
@@ -380,12 +380,12 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     else
     {
       delete item;
-      QgsDebugMsg( QString( "Item deserialization failed: %1" ).arg( name ) );
+      QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ) , 2 );
     }
   }
   else
   {
-    QgsDebugMsg( QString( "Unknown item: %1" ).arg( name ) );
+    QgsDebugMsgLevel( QString( "Unknown item: %1" ).arg( name ) , 2 );
   }
   return nullptr;
 }

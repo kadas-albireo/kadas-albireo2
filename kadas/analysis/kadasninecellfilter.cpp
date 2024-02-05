@@ -148,7 +148,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     }
     else
     {
-      QgsDebugMsg( "Warning: Failed to automatically compute zFactor, defaulting to 1" );
+      QgsDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1" , 2 );
       mZFactor = 1;
     }
   }

@@ -145,7 +145,7 @@ void KadasLocalDataSearchCrawler::run()
     }
     if ( resultCount >= sResultCountLimit )
     {
-      QgsDebugMsg( "Stopping search due to result count limit hit" );
+      QgsDebugMsgLevel( "Stopping search due to result count limit hit" , 2 );
       break;
     }
   }

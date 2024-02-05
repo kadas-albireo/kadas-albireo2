@@ -171,7 +171,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       if ( geoms.isEmpty() )
       {
         // Placemark without geometry
-        QgsDebugMsg( "Could not parse placemark geometry" );
+        QgsDebugMsgLevel( "Could not parse placemark geometry" , 2 );
         continue;
       }
 

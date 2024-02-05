@@ -185,7 +185,7 @@ void KadasRemoteDataSearchProvider::replyFinished()
     QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
     if ( doc.isNull() )
     {
-      QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
+      QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ) , 2 );
     }
     QVariantMap resultMap = doc.object().toVariantMap();
     for ( const QVariant &item : resultMap["results"].toList() )
@@ -195,7 +195,7 @@ void KadasRemoteDataSearchProvider::replyFinished()
 
       if ( !mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
       {
-        QgsDebugMsg( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString() );
+        QgsDebugMsgLevel( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString() , 2 );
         continue;
       }
 

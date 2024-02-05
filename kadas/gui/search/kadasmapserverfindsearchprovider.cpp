@@ -174,7 +174,7 @@ void KadasMapServerFindSearchProvider::replyFinished()
     QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
     if ( doc.isNull() )
     {
-      QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
+      QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ) , 2 );
     }
     QVariantMap resultMap = doc.object().toVariantMap();
     for ( const QVariant &item : resultMap["results"].toList() )

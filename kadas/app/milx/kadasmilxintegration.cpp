@@ -46,7 +46,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
   if ( licenseKey.isEmpty() )
   {
-    QgsDebugMsg( "MilX license key is empty, disabling MilX integration." );
+    QgsDebugMsgLevel( "MilX license key is empty, disabling MilX integration." , 2 );
     return;
   }
 
@@ -73,7 +73,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   if ( !KadasMilxClient::init() )
   {
-    QgsDebugMsg( "Failed to initialize the MilX library." );
+    QgsDebugMsgLevel( "Failed to initialize the MilX library." , 2 );
     return;
   }
 

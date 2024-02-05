@@ -111,7 +111,7 @@ void KadasWorldLocationSearchProvider::replyFinished()
   QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsg( QString( "Parsing error:" ).arg( err.errorString() ) );
+    QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ) , 2 );
   }
   QJsonObject resultMap = doc.object();
   for ( const QJsonValueRef &item : resultMap["results"].toArray() )

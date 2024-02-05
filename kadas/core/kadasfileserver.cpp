@@ -29,7 +29,7 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
   mHost = serverAddress().toString();
   mPort = serverPort();
   connect( this, &QTcpServer::newConnection, this, &KadasFileServer::handleConnection );
-  QgsDebugMsg( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ) );
+  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ) , 2 );
 }
 
 QByteArray KadasFileServer::genHeaders( int code )

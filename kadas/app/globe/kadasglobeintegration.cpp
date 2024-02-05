@@ -295,7 +295,7 @@ void KadasGlobeIntegration::applyProjectSettings()
     if ( imageryDataSources != mImagerySources )
     {
       mImagerySources = imageryDataSources;
-      QgsDebugMsg( "imageryLayersChanged: Globe Running, executing" );
+      QgsDebugMsgLevel( "imageryLayersChanged: Globe Running, executing" , 2 );
       osg::ref_ptr<osgEarth::Map> map = mMapNode->getMap();
 
       // Remove image layers
@@ -354,7 +354,7 @@ void KadasGlobeIntegration::applyProjectSettings()
     if ( elevationDataSources != mElevationSources )
     {
       mElevationSources = elevationDataSources;
-      QgsDebugMsg( "elevationLayersChanged: Globe Running, executing" );
+      QgsDebugMsgLevel( "elevationLayersChanged: Globe Running, executing" , 2 );
       osg::ref_ptr<osgEarth::Map> map = mMapNode->getMap();
 
       // Remove elevation layers

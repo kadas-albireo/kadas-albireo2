@@ -1511,12 +1511,12 @@ void KadasLayoutDesignerDialog::restoreWindowState()
 
   if ( !restoreState( settings.value( QStringLiteral( "LayoutDesigner/state" ), QByteArray() ).toByteArray() ) )
   {
-    QgsDebugMsg( QStringLiteral( "restore of layout UI state failed" ) );
+    QgsDebugMsgLevel( QStringLiteral( "restore of layout UI state failed" ) , 2 );
   }
   // restore window geometry
   if ( !restoreGeometry( settings.value( QStringLiteral( "LayoutDesigner/geometry" ), QgsSettings::App ).toByteArray() ) )
   {
-    QgsDebugMsg( QStringLiteral( "restore of layout UI geometry failed" ) );
+    QgsDebugMsgLevel( QStringLiteral( "restore of layout UI geometry failed" ) , 2 );
     // default to 80% of screen size, at 10% from top left corner
     resize( QDesktopWidget().availableGeometry( this ).size() * 0.8 );
     QSize pos = QDesktopWidget().availableGeometry( this ).size() * 0.1;

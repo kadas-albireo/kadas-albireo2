@@ -59,7 +59,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   QDomDocument doc;
   if ( !doc.setContent( &file ) )
   {
-    QgsDebugMsg( "Failed to parse project" );
+    QgsDebugMsgLevel( "Failed to parse project" , 2 );
     return fileName;
   }
   QString basedir = QFileInfo( fileName ).path();
@@ -84,7 +84,7 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   QDomElement root = doc.documentElement();
   if ( root.tagName() != "qgis" )
   {
-    QgsDebugMsg( "Invalid project (incorrect root tag name)" );
+    QgsDebugMsgLevel( "Invalid project (incorrect root tag name)" , 2 );
     return false;
   }
 
