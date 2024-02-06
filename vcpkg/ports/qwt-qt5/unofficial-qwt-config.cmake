@@ -43,6 +43,5 @@ if(NOT TARGET unofficial::qwt::qwt)
         Qt::Concurrent
         Qt::PrintSupport
         Qt::OpenGL
-        Qt::OpenGLWidgets
     )
 endif()
