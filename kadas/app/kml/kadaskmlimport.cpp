@@ -588,7 +588,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       if ( !points.isEmpty() )
       {
         geoms.append( points[0].clone() );
-        types |= Qgis::GeometryType::Point;
+        types |= static_cast<int>( Qgis::GeometryType::Point );
       }
     }
 
@@ -597,7 +597,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       QgsLineString *line = new QgsLineString();
       line->setPoints( parseCoordinates( el ) );
       geoms.append( line );
-      types |= Qgis::GeometryType::Line;
+      types |= static_cast<int>( Qgis::GeometryType::Line );
     }
 
     if ( el.tagName() == "Polygon" )
@@ -617,7 +617,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
         poly->addInteriorRing( interior );
       }
       geoms.append( poly );
-      types |= Qgis::GeometryType::Polygon;
+      types |= static_cast<int>( Qgis::GeometryType::Polygon );
     }
 
     if ( el.tagName() == "MultiGeometry" )
@@ -625,15 +625,15 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       int childTypes = 0;
       QList<QgsAbstractGeometry *> multiGeoms = parseGeometries( el, childTypes );
       QgsGeometryCollection *collection = nullptr;
-      if ( childTypes == Qgis::GeometryType::Point )
+      if ( childTypes == static_cast<int>( Qgis::GeometryType::Point ) )
       {
         collection = new QgsMultiPoint();
       }
-      else if ( childTypes == Qgis::GeometryType::Line )
+      else if ( childTypes == static_cast<int>( Qgis::GeometryType::Line ) )
       {
         collection = new QgsMultiLineString();
       }
-      else if ( childTypes == Qgis::GeometryType::Polygon )
+      else if ( childTypes == static_cast<int>( Qgis::GeometryType::Polygon ) )
       {
         collection = new QgsMultiPolygon();
       }

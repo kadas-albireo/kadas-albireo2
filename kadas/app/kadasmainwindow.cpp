@@ -243,7 +243,7 @@ void KadasMainWindow::init()
   snappingConfig.setTypeFlag( Qgis::SnappingType::Vertex );
   int snappingRadius = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   snappingConfig.setTolerance( snappingRadius );
-  snappingConfig.setUnits( QgsTolerance::Pixels );
+  snappingConfig.setUnits( Qgis::MapToolUnit::Pixels );
   snappingConfig.setEnabled( true );
   mMapCanvas->snappingUtils()->setConfig( snappingConfig );
 

@@ -27,6 +27,7 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayerlabeling.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/app/kml/kadaskmlexport.h>

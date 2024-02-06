@@ -105,14 +105,14 @@ void KadasGpsIntegration::disconnectGPS()
     mMainWindow->messageBar()->pushMessage( tr( "GPS connection closed" ), QString(), Qgis::Info, mMainWindow->messageTimeout() );
   }
   setGPSIcon( Qt::black );
-  mCurFixStatus = QgsGpsInformation::NoFix;
+  mCurFixStatus = Qgis::GpsFixStatus::NoFix;
   delete mMarker;
   mMarker = nullptr;
 }
 
 void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
 {
-  QgsGpsInformation::FixStatus fixStatus = info.fixStatus();
+  Qgis::GpsFixStatus fixStatus = info.fixStatus();
 
   if ( fixStatus != mCurFixStatus )
   {
@@ -165,16 +165,16 @@ void KadasGpsIntegration::updateGpsFixIcon()
 {
   switch ( mCurFixStatus )
   {
-    case QgsGpsInformation::NoData:
+    case Qgis::GpsFixStatus::NoData:
       setGPSIcon( Qt::white );
       break;
-    case QgsGpsInformation::NoFix:
+    case Qgis::GpsFixStatus::NoFix:
       setGPSIcon( Qt::red );
       break;
-    case QgsGpsInformation::Fix2D:
+    case Qgis::GpsFixStatus::Fix2D:
       setGPSIcon( Qt::yellow );
       break;
-    case QgsGpsInformation::Fix3D:
+    case Qgis::GpsFixStatus::Fix3D:
       setGPSIcon( QColor( 87, 175, 87 ) );
       break;
   }

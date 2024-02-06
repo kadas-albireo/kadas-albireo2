@@ -28,6 +28,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
@@ -256,7 +257,7 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
   }
   else
   {
-    mBullseyeConfig.intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
+    mBullseyeConfig.intervalUnit = Qgis::DistanceUnit::NauticalMiles;
   }
   mBullseyeConfig.fontSize = layerEl.attribute( "fontSize" ).toInt();
   mBullseyeConfig.lineWidth = layerEl.attribute( "lineWidth" ).toInt();
