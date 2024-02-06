@@ -72,7 +72,7 @@ void KadasMapToolPan::canvasPressEvent( QgsMapMouseEvent *e )
   {
     if ( e->modifiers() == Qt::ShiftModifier || e->modifiers() == Qt::ControlModifier )
     {
-      mExtentRubberBand = new QgsRubberBand( mCanvas, QgsWkbTypes::PolygonGeometry );
+      mExtentRubberBand = new QgsRubberBand( mCanvas, Qgis::GeometryType::Polygon );
       if ( e->modifiers() == Qt::ShiftModifier )
       {
         mExtentRubberBand->setColor( QColor( 0, 0, 255, 63 ) );
@@ -168,7 +168,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
     }
     else if ( mAllowItemInteraction && mPickClick )
     {
-      KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), QgsWkbTypes::UnknownGeometry );
+      KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), Qgis::GeometryType::Unknown );
       if ( !result.isEmpty() )
       {
         emit itemPicked( result );

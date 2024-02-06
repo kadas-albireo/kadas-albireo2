@@ -27,6 +27,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgsunittypes.h>
 
 #include <quazip/quazipfile.h>
 

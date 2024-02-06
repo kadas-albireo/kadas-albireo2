@@ -490,7 +490,7 @@ QVector<QgsPoint> KadasKMLImport::parseCoordinates( const QDomElement &geomEl ) 
     QStringList coordinate = coordinates[i].split( "," );
     if ( coordinate.size() >= 3 )
     {
-      QgsPoint p( QgsWkbTypes::PointZ );
+      QgsPoint p( Qgis::WkbType::PointZ );
       p.setX( coordinate[0].toDouble() );
       p.setY( coordinate[1].toDouble() );
       p.setZ( coordinate[2].toDouble() );
@@ -498,7 +498,7 @@ QVector<QgsPoint> KadasKMLImport::parseCoordinates( const QDomElement &geomEl ) 
     }
     else if ( coordinate.size() == 2 )
     {
-      QgsPoint p( QgsWkbTypes::Point );
+      QgsPoint p( Qgis::WkbType::Point );
       p.setX( coordinate[0].toDouble() );
       p.setY( coordinate[1].toDouble() );
       points.append( p );
@@ -588,7 +588,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       if ( !points.isEmpty() )
       {
         geoms.append( points[0].clone() );
-        types |= QgsWkbTypes::PointGeometry;
+        types |= Qgis::GeometryType::Point;
       }
     }
 
@@ -597,7 +597,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       QgsLineString *line = new QgsLineString();
       line->setPoints( parseCoordinates( el ) );
       geoms.append( line );
-      types |= QgsWkbTypes::LineGeometry;
+      types |= Qgis::GeometryType::Line;
     }
 
     if ( el.tagName() == "Polygon" )
@@ -617,7 +617,7 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
         poly->addInteriorRing( interior );
       }
       geoms.append( poly );
-      types |= QgsWkbTypes::PolygonGeometry;
+      types |= Qgis::GeometryType::Polygon;
     }
 
     if ( el.tagName() == "MultiGeometry" )
@@ -625,15 +625,15 @@ QList<QgsAbstractGeometry *> KadasKMLImport::parseGeometries( const QDomElement 
       int childTypes = 0;
       QList<QgsAbstractGeometry *> multiGeoms = parseGeometries( el, childTypes );
       QgsGeometryCollection *collection = nullptr;
-      if ( childTypes == QgsWkbTypes::PointGeometry )
+      if ( childTypes == Qgis::GeometryType::Point )
       {
         collection = new QgsMultiPoint();
       }
-      else if ( childTypes == QgsWkbTypes::LineGeometry )
+      else if ( childTypes == Qgis::GeometryType::Line )
       {
         collection = new QgsMultiLineString();
       }
-      else if ( childTypes == QgsWkbTypes::PolygonGeometry )
+      else if ( childTypes == Qgis::GeometryType::Polygon )
       {
         collection = new QgsMultiPolygon();
       }

@@ -39,7 +39,7 @@ class KadasGlobeFeatureUtils
   public:
     static inline QgsPoint qgsPointFromPoint( const osg::Vec3d &pt )
     {
-      return QgsPoint( QgsWkbTypes::PointZ, pt.x(), pt.y(), pt.z() );
+      return QgsPoint( Qgis::WkbType::PointZ, pt.x(), pt.y(), pt.z() );
     }
 
     static inline osg::Vec3d pointFromQgsPoint( const QgsPoint &pt )
@@ -100,14 +100,14 @@ class KadasGlobeFeatureUtils
 
       switch ( QgsWkbTypes::flatType( geom->wkbType() ) )
       {
-        case QgsWkbTypes::Point:
+        case Qgis::WkbType::Point:
         {
           osgEarth::Features::PointSet *pointSet = new osgEarth::Features::PointSet();
           pointSet->push_back( pointFromQgsPoint( *static_cast<const QgsPoint *>( geom ) ) );
           return pointSet;
         }
 
-        case QgsWkbTypes::MultiPoint:
+        case Qgis::WkbType::MultiPoint:
         {
           osgEarth::Features::PointSet *pointSet = new osgEarth::Features::PointSet();
           const QgsMultiPoint *multiPoint = static_cast<const QgsMultiPoint *>( geom );
@@ -118,14 +118,14 @@ class KadasGlobeFeatureUtils
           return pointSet;
         }
 
-        case QgsWkbTypes::LineString:
+        case Qgis::WkbType::LineString:
         case QgsWkbTypes::CircularString:
-        case QgsWkbTypes::CompoundCurve:
+        case Qgis::WkbType::CompoundCurve:
         {
           return lineStringFromQgsLineString( static_cast<const QgsLineString *>( geom ) );
         }
 
-        case QgsWkbTypes::MultiLineString:
+        case Qgis::WkbType::MultiLineString:
         {
           osgEarth::Features::MultiGeometry *multiGeometry = new osgEarth::Features::MultiGeometry();
           const QgsMultiLineString *multiLineString = static_cast<const QgsMultiLineString *>( geom );
@@ -136,14 +136,14 @@ class KadasGlobeFeatureUtils
           return multiGeometry;
         }
 
-        case QgsWkbTypes::Polygon:
-        case QgsWkbTypes::CurvePolygon:
+        case Qgis::WkbType::Polygon:
+        case Qgis::WkbType::CurvePolygon:
         {
           return polygonFromQgsPolygon( static_cast<const QgsPolygon *>( geom ) );
         }
 
-        case QgsWkbTypes::MultiPolygon:
-        case QgsWkbTypes::MultiSurface:
+        case Qgis::WkbType::MultiPolygon:
+        case Qgis::WkbType::MultiSurface:
         {
           osgEarth::Features::MultiGeometry *multiGeometry = new osgEarth::Features::MultiGeometry();
           const QgsMultiPolygon *multiPolygon = static_cast<const QgsMultiPolygon *>( geom );
@@ -185,7 +185,7 @@ class KadasGlobeFeatureUtils
     {
       osgEarth::Style style = baseStyle;
       osgEarth::PolygonSymbol *poly = style.getOrCreateSymbol<osgEarth::PolygonSymbol>();
-      QColor color = item->geometryType() == QgsWkbTypes::LineGeometry ? item->outline().color() : item->fill().color();
+      QColor color = item->geometryType() == Qgis::GeometryType::Line ? item->outline().color() : item->fill().color();
       poly->fill()->color() = osg::Vec4f( color.redF(), color.greenF(), color.blueF(), color.alphaF() );
 
       QgsAbstractGeometry *wgsGeom = item->geometry()->clone();

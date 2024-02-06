@@ -24,6 +24,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
 

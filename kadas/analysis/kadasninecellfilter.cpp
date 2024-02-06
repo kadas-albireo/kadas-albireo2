@@ -23,6 +23,7 @@
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/analysis/kadasninecellfilter.h>

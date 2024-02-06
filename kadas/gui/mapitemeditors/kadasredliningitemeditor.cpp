@@ -31,7 +31,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );
   if ( geometryItem )
   {
-    mUi.mLabelSize->setText( geometryItem->geometryType() == QgsWkbTypes::PointGeometry ? tr( "Size:" ) : tr( "Line width:" ) );
+    mUi.mLabelSize->setText( geometryItem->geometryType() == Qgis::GeometryType::Point ? tr( "Size:" ) : tr( "Line width:" ) );
   }
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( QgsSettings().value( "/Redlining/size", 1 ).toInt() );
@@ -72,7 +72,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   mUi.mComboBoxFillStyle->setCurrentIndex( QgsSettings().value( "/Redlining/fill_style", "1" ).toInt() );
   connect( mUi.mComboBoxFillStyle, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
-  if ( geometryItem && geometryItem->geometryType() == QgsWkbTypes::LineGeometry )
+  if ( geometryItem && geometryItem->geometryType() == Qgis::GeometryType::Line )
   {
     mUi.mLabelFillColor->setVisible( false );
     mUi.mToolButtonFillColor->setVisible( false );

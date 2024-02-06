@@ -1328,19 +1328,19 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
     for ( const QgsFeature &feature : featureStore.features() )
     {
-      if ( feature.geometry().type() == QgsWkbTypes::PointGeometry )
+      if ( feature.geometry().type() == Qgis::GeometryType::Point )
       {
         KadasPointItem *item = new KadasPointItem( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
         items.append( item );
       }
-      else if ( feature.geometry().type() == QgsWkbTypes::LineGeometry )
+      else if ( feature.geometry().type() == Qgis::GeometryType::Line )
       {
         KadasLineItem *item = new KadasLineItem( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
         items.append( item );
       }
-      else if ( feature.geometry().type() == QgsWkbTypes::PolygonGeometry )
+      else if ( feature.geometry().type() == Qgis::GeometryType::Polygon )
       {
         KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
