@@ -24,15 +24,22 @@ ENDIF(MINGW)
 FIND_PACKAGE(unofficial-zonedetect CONFIG REQUIRED)
 
 TARGET_LINK_LIBRARIES(kadas_core
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Svg
-  Qt5::Xml
   ${QGIS_CORE_LIBRARY}
   ${GDAL_LIBRARIES}
   ${CRYPT_LIBRARIES}
   unofficial::zonedetect::ZoneDetect
+  Qt5::Widgets
+  Qt5::Network
+  Qt5::Svg
+  Qt5::Xml
+  OpenSSL::SSL
+  OpenSSL::Crypto
 )
+
+if(MSVC)
+  # OpenSSL should do that since https://github.com/microsoft/vcpkg/pull/18475 already
+  target_link_libraries(kadas_core Crypt32.lib ws2_32.lib)
+endif()
 
 GENERATE_EXPORT_HEADER(
   kadas_core
