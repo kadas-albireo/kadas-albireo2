@@ -292,7 +292,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
           case SublayerHandling::AskUser:
           {
             // prompt user for sublayers
-            QgsProviderSublayersDialog dlg( uri, path, sublayers, {Qgis::LayerType::Vector}, kApp->mainWindow() );
+            QgsProviderSublayersDialog dlg( uri, QStringLiteral( "ogr" ), path, sublayers, {Qgis::LayerType::Vector}, kApp->mainWindow() );
 
             if ( dlg.exec() )
               sublayers = dlg.selectedLayers();
@@ -502,7 +502,7 @@ bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const 
       case SublayerHandling::AskUser:
       {
         // prompt user for sublayers
-        QgsProviderSublayersDialog dlg( path, path, sublayers, acceptableTypes, kApp->mainWindow() );
+        QgsProviderSublayersDialog dlg( path, QString(), path, sublayers, acceptableTypes, kApp->mainWindow() );
 
         if ( dlg.exec() )
           sublayers = dlg.selectedLayers();
@@ -890,7 +890,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
         case SublayerHandling::AskUser:
         {
           // prompt user for sublayers
-          QgsProviderSublayersDialog dlg( fileName, fileName, sublayers, {}, kApp->mainWindow() );
+          QgsProviderSublayersDialog dlg( fileName, QString(), fileName, sublayers, {}, kApp->mainWindow() );
           dlg.setNonLayerItems( nonLayerItems );
 
           if ( dlg.exec() )
@@ -1327,7 +1327,7 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
       {
         case SublayerHandling::AskUser:
         {
-          QgsProviderSublayersDialog dlg( updatedUri, path, sublayers, {type}, kApp->mainWindow() );
+          QgsProviderSublayersDialog dlg( updatedUri, QString(), path, sublayers, {type}, kApp->mainWindow() );
           if ( dlg.exec() )
           {
             const QList< QgsProviderSublayerDetails > selectedLayers = dlg.selectedLayers();
