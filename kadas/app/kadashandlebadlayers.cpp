@@ -194,9 +194,10 @@ void KadasHandleBadLayers::accept()
         context.setProjectTranslator( QgsProject::instance() );
         if ( !layer->readSymbology( node, errorMsg, context ) )
         {
-          QgsDebugMsgLevel( QStringLiteral( "Failed to restore original layer style from node XML for layer %1: %2" , 2 )
+          QgsDebugMsgLevel( QStringLiteral( "Failed to restore original layer style from node XML for layer %1: %2" )
                        .arg( layer->name( ) )
-                       .arg( errorMsg ) );
+                       .arg( errorMsg ),
+                       2 );
         }
         mLayerList->removeRow( i-- );
       }

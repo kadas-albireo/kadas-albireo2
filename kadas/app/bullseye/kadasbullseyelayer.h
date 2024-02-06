@@ -72,7 +72,7 @@ class KadasBullseyeLayer : public KadasPluginLayer
       QgsPointXY center;
       int rings;
       double interval;
-      Qgis::DistanceUnit intervalUnit = QgsUnitTypes::DistanceNauticalMiles;
+      Qgis::DistanceUnit intervalUnit = Qgis::DistanceUnit::NauticalMiles;
       double axesInterval;
       QColor color = Qt::black;
       int fontSize = 20;
