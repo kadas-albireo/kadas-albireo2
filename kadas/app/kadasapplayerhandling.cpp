@@ -1447,7 +1447,7 @@ const QList<QgsVectorLayerRef> KadasAppLayerHandling::findBrokenLayerDependencie
         {
           if ( !weakRelation.mappingTable().resolveWeakly( QgsProject::instance(), matchType ) )
             dependencies << weakRelation.mappingTable();
-          FALLTHROUGH;
+          [[fallthrough]];
         }
 
         case Qgis::RelationshipCardinality::OneToOne:
