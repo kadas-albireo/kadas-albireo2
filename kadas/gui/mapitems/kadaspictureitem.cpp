@@ -651,7 +651,7 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
 bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget )
 {
   // Read EXIF position
-  Exiv2::Image::AutoPtr image;
+  Exiv2::Image::UniquePtr image;
   try
   {
     image = Exiv2::ImageFactory::open( filePath.toLocal8Bit().data() );
