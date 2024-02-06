@@ -33,6 +33,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/mapitems/kadasgeometryitem.h>
 
@@ -84,7 +85,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     return;
   }
 
-  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) == QgsWkbTypes::PolygonGeometry )
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) == Qgis::GeometryType::Polygon )
   {
     context.painter()->setBrush( mBrush );
   }
@@ -98,7 +99,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   QgsAbstractGeometry *paintGeom = mGeometry->clone();
   paintGeom->transform( context.coordinateTransform() );
   paintGeom->transform( context.mapToPixel().transform() );
-  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != QgsWkbTypes::PointGeometry )
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != Qgis::GeometryType::Point )
   {
     paintGeom->draw( *context.painter() );
   }
@@ -419,7 +420,7 @@ QString KadasGeometryItem::formatArea( double value, Qgis::AreaUnit unit ) const
 {
   int decimals = QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt();
   value = mDa.convertAreaMeasurement( value, unit );
-  if ( unit == QgsUnitTypes::AreaSquareMeters )
+  if ( unit == Qgis::AreaUnit::SquareMeters )
   {
     if ( value >= 1000000 )
     {

@@ -49,7 +49,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PointGeometry; }
+    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
 
     const QgsMultiPoint *geometry() const;

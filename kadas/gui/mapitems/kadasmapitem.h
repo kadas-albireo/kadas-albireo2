@@ -32,9 +32,12 @@
 
 class QMenu;
 class QuaZip;
-class QgsRenderContext;
 class KadasItemLayer;
 class KadasMapItem;
+
+class QgsRenderContext;
+class QgsMapSettings;
+
 
 class KADAS_GUI_EXPORT KadasMapPos
 {

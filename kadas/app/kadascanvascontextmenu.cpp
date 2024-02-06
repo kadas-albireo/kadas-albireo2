@@ -45,7 +45,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
 {
   mPickResult = KadasFeaturePicker::pick( mCanvas, mapPos );
   KadasMapItem *pickedItem = mPickResult.itemId != KadasItemLayer::ITEM_ID_NULL ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
-  QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry;
+  Qgis::GeometryType geomType = Qgis::GeometryType::Unknown;
   if ( mPickResult.geom )
   {
     geomType = QgsWkbTypes::geometryType( mPickResult.geom->wkbType() );
@@ -102,24 +102,24 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
   }
   addSeparator();
-  if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry || geomType == QgsWkbTypes::PolygonGeometry )
+  if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line || geomType == Qgis::GeometryType::Polygon )
   {
     QMenu *measureMenu = new QMenu();
     addAction( tr( "Measure" ) )->setMenu( measureMenu );
 
-    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
+    if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_line" ), tr( "Distance / Azimuth" ), this, &KadasCanvasContextMenu::measureLine );
     }
-    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
+    if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Polygon )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_area" ), tr( "Area" ), this, &KadasCanvasContextMenu::measurePolygon );
     }
-    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::PolygonGeometry )
+    if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Polygon )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_circle" ), tr( "Circle" ), this, SLOT( measureCircle() ) );
     }
-    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
+    if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line )
     {
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
@@ -132,11 +132,11 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), this, &KadasCanvasContextMenu::terrainViewshed );
     }
-    if ( mPickResult.isEmpty() || geomType == QgsWkbTypes::LineGeometry )
+    if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line )
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
-    if ( mPickResult.isEmpty() || ( geomType == QgsWkbTypes::PolygonGeometry && mPickResult.geom->partCount() == 1 ) )
+    if ( mPickResult.isEmpty() || ( geomType == Qgis::GeometryType::Polygon && mPickResult.geom->partCount() == 1 ) )
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_min_max" ), tr( "Min/max" ), this, &KadasCanvasContextMenu::measureMinMax );
     }
@@ -310,7 +310,7 @@ void KadasCanvasContextMenu::measureMinMax()
   if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
   {
     QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( mPickResult.geom ) ? static_cast<QgsGeometryCollection *>( mPickResult.geom )->geometryN( 0 ) : mPickResult.geom;
-    if ( QgsWkbTypes::flatType( geom->wkbType() ) == QgsWkbTypes::CurvePolygon )
+    if ( QgsWkbTypes::flatType( geom->wkbType() ) == Qgis::WkbType::CurvePolygon )
     {
       static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterCircle );
     }

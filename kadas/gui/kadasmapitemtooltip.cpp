@@ -51,7 +51,7 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
   }
   else
   {
-    KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), QgsWkbTypes::UnknownGeometry, KadasItemLayer::PICK_OBJECTIVE_TOOLTIP );
+    KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasItemLayer::PICK_OBJECTIVE_TOOLTIP );
     if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       item = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId];

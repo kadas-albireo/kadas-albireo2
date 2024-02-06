@@ -58,7 +58,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::LineGeometry; }
+    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Line; }
 
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;

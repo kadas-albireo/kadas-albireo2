@@ -483,23 +483,23 @@ void KadasSearchBox::resultSelected()
       {
         switch ( features[0].geometry().type() )
         {
-          case QgsWkbTypes::PointGeometry:
+          case Qgis::GeometryType::Point:
           {
             mGeometry = new KadasPointItem( QgsCoordinateReferenceSystem( result.crs ) );
             break;
           }
-          case QgsWkbTypes::LineGeometry:
+          case Qgis::GeometryType::Line:
           {
             mGeometry = new KadasLineItem( QgsCoordinateReferenceSystem( result.crs ) );
             break;
           }
-          case QgsWkbTypes::PolygonGeometry:
+          case Qgis::GeometryType::Polygon:
           {
             mGeometry = new KadasPolygonItem( QgsCoordinateReferenceSystem( result.crs ) );
             break;
           }
-          case QgsWkbTypes::UnknownGeometry:
-          case QgsWkbTypes::NullGeometry:
+          case Qgis::GeometryType::Unknown:
+          case Qgis::GeometryType::Null:
             break;
         }
         if ( mGeometry )

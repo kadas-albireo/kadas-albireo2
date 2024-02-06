@@ -90,7 +90,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     void clear() override;
     void setState( const State *state ) override;
 
-    virtual QgsWkbTypes::GeometryType geometryType() const = 0;
+    virtual Qgis::GeometryType geometryType() const = 0;
     // Geometry in item CRS
     virtual void addPartFromGeometry( const QgsAbstractGeometry &geom ) = 0;
 

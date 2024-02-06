@@ -58,7 +58,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    QgsWkbTypes::GeometryType geometryType() const override { return QgsWkbTypes::PolygonGeometry; }
+    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Polygon; }
 
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiPolygon *geometry() const;

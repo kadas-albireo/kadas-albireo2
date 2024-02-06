@@ -200,7 +200,7 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
       : KadasPluginLayerType( KadasItemLayer::layerType() ) {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
+    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject

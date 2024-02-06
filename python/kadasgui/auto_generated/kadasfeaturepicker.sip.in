@@ -48,8 +48,8 @@ the Free Software Foundation; either version 2 of the License, or     *
         KadasItemLayer::ItemId itemId;
     };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType = QgsWkbTypes::UnknownGeometry, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PICK_OBJECTIVE_ANY );
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, QgsWkbTypes::GeometryType geomType );
+    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType = Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PICK_OBJECTIVE_ANY );
+    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 
 };
 

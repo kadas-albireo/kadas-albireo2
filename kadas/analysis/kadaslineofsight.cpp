@@ -21,6 +21,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsunittypes.h>
 
 #include <kadas/analysis/kadaslineofsight.h>
 #include <kadas/core/kadas.h>
