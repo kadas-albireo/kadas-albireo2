@@ -29,7 +29,7 @@ QT5_WRAP_UI(kadas_gui_UI_HDR ${kadas_gui_UI})
 
 SET_PROPERTY(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
-FIND_PACKAGE(unofficial-qwt CONFIG REQUIRED)
+FIND_PACKAGE(Qwt REQUIRED)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${GeographicLib_INCLUDE_DIR})
@@ -62,7 +62,7 @@ TARGET_LINK_LIBRARIES(kadas_gui
   ${CAIRO_LIBRARIES}
   ${LIBRSVG_LIBRARIES}
   ${SVG2SVGT_LIBRARIES}
-  unofficial::qwt::qwt
+  Qwt::Qwt
   kadas_core
   kadas_analysis
 )

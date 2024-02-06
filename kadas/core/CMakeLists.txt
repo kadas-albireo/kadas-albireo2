@@ -17,17 +17,20 @@ ADD_LIBRARY(kadas_core SHARED
     ${kadas_core_HDR}
 )
 
-IF(MINGW)
-SET(CRYPT_LIBRARIES crypt32 crypto)
-ENDIF(MINGW)
+find_package(zonedetect REQUIRED)
 
-FIND_PACKAGE(unofficial-zonedetect CONFIG REQUIRED)
+if(MINGW)
+  set(CRYPT_LIBRARIES crypt32 crypto)
+elseif(MSVC)
+  # OpenSSL should do that since https://github.com/microsoft/vcpkg/pull/18475 already
+  set(CRYPT_LIBRARIES Crypt32.lib ws2_32.lib)
+endif()
 
 TARGET_LINK_LIBRARIES(kadas_core
   ${QGIS_CORE_LIBRARY}
   GDAL::GDAL
   ${CRYPT_LIBRARIES}
-  unofficial::zonedetect::ZoneDetect
+  zonedetect::ZoneDetect
   Qt5::Widgets
   Qt5::Network
   Qt5::Svg
@@ -36,10 +39,6 @@ TARGET_LINK_LIBRARIES(kadas_core
   OpenSSL::Crypto
 )
 
-if(MSVC)
-  # OpenSSL should do that since https://github.com/microsoft/vcpkg/pull/18475 already
-  target_link_libraries(kadas_core Crypt32.lib ws2_32.lib)
-endif()
 
 GENERATE_EXPORT_HEADER(
   kadas_core
