@@ -25,7 +25,7 @@ FIND_PACKAGE(unofficial-zonedetect CONFIG REQUIRED)
 
 TARGET_LINK_LIBRARIES(kadas_core
   ${QGIS_CORE_LIBRARY}
-  ${GDAL_LIBRARIES}
+  GDAL::GDAL
   ${CRYPT_LIBRARIES}
   unofficial::zonedetect::ZoneDetect
   Qt5::Widgets
