@@ -28,15 +28,15 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-#include <qwt_scale_draw.h>
-#include <qwt_symbol.h>
-#include <qwt_text.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_grid.h>
+#include <qwt/qwt_plot_marker.h>
+#include <qwt/qwt_plot_picker.h>
+#include <qwt/qwt_picker_machine.h>
+#include <qwt/qwt_scale_draw.h>
+#include <qwt/qwt_symbol.h>
+#include <qwt/qwt_text.h>
 
 #include <gdal.h>
 
