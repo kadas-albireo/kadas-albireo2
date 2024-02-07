@@ -1,0 +1,17 @@
+{
+  "name": "libomp",
+  "version-date": "17.0.6",
+  "description": "LLVM's OpenMP runtime library",
+  "homepage": "https://github.com/llvm/llvm-project",
+  "license": "BSD-3-Clause",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
