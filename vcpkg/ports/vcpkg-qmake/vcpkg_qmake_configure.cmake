@@ -135,7 +135,7 @@ function(vcpkg_qmake_configure)
             if(${QT_VERSION} VERSION_GREATER_EQUAL 6)
                 set(VCPKG_QT_CONF_${buildtype} "${CURRENT_INSTALLED_DIR}/tools/Qt6/qt_${lowerbuildtype}.conf")
             else()
-                set(VCPKG_QT_CONF_${buildtype} "${CURRENT_INSTALLED_DIR}/tools/Qt5/qt_${lowerbuildtype}.conf")
+                set(VCPKG_QT_CONF_${buildtype} "${CURRENT_INSTALLED_DIR}/tools/qt5/qt_${lowerbuildtype}.conf")
 	    endif()
         else()
             # Let a supplied qt.conf override everything.

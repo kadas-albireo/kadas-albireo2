@@ -91,7 +91,12 @@ if(Analysis IN_LIST QGIS_FIND_COMPONENTS)
 endif()
 if(Gui IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(gui Gui)
+  if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+      _find_qgis_library(native Native)
+      target_link_libraries(QGIS::Core INTERFACE QGIS::Native)
+  endif()
 endif()
+
 
 if(QGIS_INCLUDE_DIR)
   set(_qgsconfig_h "${QGIS_INCLUDE_DIR}/qgsconfig.h")

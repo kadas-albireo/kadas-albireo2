@@ -19,7 +19,6 @@ TARGET_LINK_LIBRARIES(kadas_analysis
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
-  ${GDAL_LIBRARIES}
   kadas_core
 )
 

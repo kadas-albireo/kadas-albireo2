@@ -80,12 +80,15 @@ if(TRUE) # Should possibly have a "static only" check
   _find_and_link_library(provider_postgresraster_a QGIS::Core)
   _find_and_link_library(provider_wms_a QGIS::Core)
   _find_and_link_library(provider_delimitedtext_a QGIS::Core)
-  _find_and_link_library(provider_arcgisfeatureserver_a QGIS::Core)
   _find_and_link_library(provider_arcgismapserver_a QGIS::Core)
+  _find_and_link_library(provider_arcgisfeatureserver_a QGIS::Core)
   _find_and_link_library(provider_spatialite_a QGIS::Core)
   _find_and_link_library(provider_wfs_a QGIS::Core)
   _find_and_link_library(provider_wcs_a QGIS::Core)
   _find_and_link_library(provider_virtuallayer_a QGIS::Core)
+
+  pkg_check_modules(PC_SPATIALITE REQUIRED IMPORTED_TARGET spatialite)
+  target_link_libraries(QGIS::Core INTERFACE PkgConfig::PC_SPATIALITE)
 
   _qgis_core_add_dependency(PostgreSQL::PostgreSQL PostgreSQL)
 
@@ -99,6 +102,18 @@ if(TRUE) # Should possibly have a "static only" check
   #    pkg_check_modules(spatialite REQUIRED IMPORTED_TARGET spatialite)
   #    target_link_libraries(qgis_core INTERFACE PkgConfig::spatialite)
   #  endif()
+
+  _find_and_link_library(qscintilla2_qt5 QGIS::Gui)
+  find_package(Qt5 REQUIRED COMPONENTS UiTools)
+  target_link_libraries(QGIS::Gui INTERFACE Qt::UiTools)
+  _find_and_link_library(provider_postgres_gui_a QGIS::Gui)
+  _find_and_link_library(provider_wms_gui_a QGIS::Gui)
+  _find_and_link_library(provider_delimitedtext_gui_a QGIS::Core)
+  _find_and_link_library(provider_arcgisfeatureserver_gui_a QGIS::Gui)
+  _find_and_link_library(provider_spatialite_gui_a QGIS::Gui)
+  _find_and_link_library(provider_wfs_gui_a QGIS::Gui)
+  _find_and_link_library(provider_wcs_gui_a QGIS::Gui)
+  _find_and_link_library(provider_virtuallayer_gui_a QGIS::Gui)
 
   _qgis_core_add_dependency(qca Qca CONFIG)
   _qgis_core_add_dependency(Protobuf Protobuf)
@@ -140,23 +155,27 @@ if(TRUE) # Should possibly have a "static only" check
 
   pkg_check_modules(freexl REQUIRED IMPORTED_TARGET freexl)
   target_link_libraries(QGIS::Core INTERFACE PkgConfig::freexl)
+
   if(BUILD_WITH_QT6)
     _find_and_link_library(qt6keychain QGIS::Core)
   else()
     _find_and_link_library(qt5keychain QGIS::Core)
   endif()
 
-  find_package(${QT_PKG} COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL)
+  find_package(${QT_PKG} COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL Qml Multimedia QuickWidgets)
   target_link_libraries(QGIS::Core INTERFACE
-      ${QT_PKG}::Gui
-      ${QT_PKG}::Core
-      ${QT_PKG}::Network
-      ${QT_PKG}::Xml
-      ${QT_PKG}::Svg
-      ${QT_PKG}::Concurrent
-      ${QT_PKG}::Sql
-      ${QT_PKG}::Positioning
-      ${QT_PKG}::OpenGL
+      Qt::Gui
+      Qt::Core
+      Qt::Network
+      Qt::Xml
+      Qt::Svg
+      Qt::Concurrent
+      Qt::Sql
+      Qt::Positioning
+      Qt::OpenGL
+      Qt::Qml
+      Qt::Multimedia
+      Qt::QuickWidgets
     )
   if(BUILD_WITH_QT6)
     find_package(${QT_PKG} COMPONENTS Core5Compat)
