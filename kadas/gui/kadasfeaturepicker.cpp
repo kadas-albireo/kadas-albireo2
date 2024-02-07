@@ -113,7 +113,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   }
 
   QgsRectangle layerFilterRect = canvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
-  QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+  QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( Qgis::FeatureRequestFlag::ExactIntersect ) );
   QgsFeature feature;
   while ( fit.nextFeature( feature ) )
   {
