@@ -126,12 +126,14 @@ TARGET_LINK_LIBRARIES(kadas
   ${CAIRO_LIBRARIES}
   ${LIBRSVG_LIBRARIES}
   ${kadas_RC_LIBS}
-  osgEarth
-
   kadas_core
   kadas_analysis
   kadas_gui
 )
+
+IF(WITH_GLOBE)
+TARGET_LINK_LIBRARIES(osgEarth)
+ENDIF(WITH_GLOBE)
 
 FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
 
