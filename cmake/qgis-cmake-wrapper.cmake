@@ -150,9 +150,12 @@ if(TRUE) # Should possibly have a "static only" check
   else()
     _find_and_link_library(spatialindex QGIS::Core)
   endif()
-  find_package(poly2tri CONFIG)
-  target_link_libraries(QGIS::Core INTERFACE poly2tri::poly2tri)
 
+  get_target_property(QT_LINKAGE Qt5::Core TYPE)
+  if(NOT QT_LINKAGE STREQUAL STATIC_LIBRARY)
+    find_package(poly2tri CONFIG)
+    target_link_libraries(QGIS::Core INTERFACE poly2tri::poly2tri)
+  endif()
   pkg_check_modules(freexl REQUIRED IMPORTED_TARGET freexl)
   target_link_libraries(QGIS::Core INTERFACE PkgConfig::freexl)
 
