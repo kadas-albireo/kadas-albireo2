@@ -270,7 +270,11 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       }
 
       QgsRectangle layerFilterRect = mCanvas->mapSettings().mapToLayerCoordinates( vlayer, filterRect );
+#if QGIS_VERSION_INT >= 33500
       QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( Qgis::FeatureRequestFlag::ExactIntersect ) );
+#else
+      QgsFeatureIterator fit = vlayer->getFeatures( QgsFeatureRequest( layerFilterRect ).setFlags( QgsFeatureRequest::ExactIntersect ) );
+#endif
       QgsFeature feature;
       while ( fit.nextFeature( feature ) )
       {
