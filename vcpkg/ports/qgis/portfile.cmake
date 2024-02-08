@@ -26,7 +26,6 @@ file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindEXIV2.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindExpat.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindIconv.cmake)
-file(REMOVE ${SOURCE_PATH}/cmake/FindPoly2Tri.cmake)
 
 vcpkg_find_acquire_program(FLEX)
 vcpkg_find_acquire_program(BISON)
@@ -38,6 +37,20 @@ list(APPEND QGIS_OPTIONS "-DWITH_SPATIALITE:BOOL=ON")
 list(APPEND QGIS_OPTIONS "-DWITH_QSPATIALITE:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_PDAL:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_POLY2TRI:BOOL=OFF")
+list(APPEND QGIS_OPTIONS "-DPoly2Tri_LIBRARY=poly2tri::poly2tri")
+
+if(EXISTS "${CURRENT_INSTALLED_DIR}/lib/libqt_poly2tri.a")
+    set(QT_POLY2TRI_DIR_RELEASE "${CURRENT_INSTALLED_DIR}/lib")
+    set(QT_POLY2TRI_DIR_DEBUG "${CURRENT_INSTALLED_DIR}/debug/lib")
+else()
+    list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
+endif()
+if(DEFINED QT_POLY2TRI_DIR_RELEASE)
+    list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
+    list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_DEBUG}/debug/lib/libqt_poly2tri_debug.a) # static qt only
+    list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_RELEASE}/lib/libqt_poly2tri.a) # static qt only
+endif()
+
 
 list(APPEND QGIS_OPTIONS "-DBISON_EXECUTABLE=${BISON}")
 list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
