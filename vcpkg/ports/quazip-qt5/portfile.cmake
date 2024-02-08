@@ -1,3 +1,5 @@
+set(VCPKG_LIBRARY_LINKAGE dynamic)  # Avoid symbol conflicts with minizip at link time
+
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO stachenov/quazip
