@@ -34,6 +34,7 @@ jobs:
                 -G Ninja \
                 -B build \
                 -D WITH_BINDINGS=OFF \
+                -D WITH_GLOBE=OFF \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
                 -D NUGET_USERNAME=kadas-albireo \
