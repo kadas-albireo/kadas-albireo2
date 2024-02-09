@@ -23,7 +23,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadas.h>
-##endif
+#endif
 
 #include <kadas/app/kadascrashrpt.h>
 
