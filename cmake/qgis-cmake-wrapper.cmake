@@ -170,7 +170,7 @@ else()
   _find_and_link_library(qt5keychain QGIS::Core)
 endif()
 
-find_package(Qt5 COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL Qml Multimedia QuickWidgets)
+find_package(${QT_PKG} COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL Qml Multimedia QuickWidgets)
 target_link_libraries(QGIS::Core INTERFACE
     Qt::Gui
     Qt::Core
@@ -186,16 +186,16 @@ target_link_libraries(QGIS::Core INTERFACE
     Qt::QuickWidgets
   )
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  find_package(Qt5 COMPONENTS SerialPort)
+  find_package(${QT_PKG} COMPONENTS SerialPort)
   target_link_libraries(QGIS::Core INTERFACE
-    Qt5::SerialPort
+    Qt::SerialPort
   )
 endif()
 if(APPLE)
   if(NOT BUILD_WITH_QT6)
-    find_package(Qt5 COMPONENTS MacExtras)
+    find_package(${QT_PKG} COMPONENTS MacExtras)
     target_link_libraries(QGIS::Core INTERFACE
-      Qt5::MacExtras
+      Qt::MacExtras
     )
   endif()
   pkg_check_modules(libtasn1 REQUIRED IMPORTED_TARGET libtasn1)

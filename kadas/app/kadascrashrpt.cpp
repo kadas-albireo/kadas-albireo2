@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <GdbCrashHandler/GdbCrashHandler.hpp>
+//#include <GdbCrashHandler/GdbCrashHandler.hpp>
 
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>
@@ -27,6 +27,7 @@
 
 bool KadasCrashRpt::install()
 {
+  /*
   GdbCrashHandler::Configuration config;
   config.applicationName = QString( "%1" ).arg( Kadas::KADAS_FULL_RELEASE_NAME );
   config.applicationVersion = QString( "%1 (%2/%3)" ).arg( Kadas::KADAS_VERSION ).arg( Kadas::KADAS_BUILD_DATE ).arg( Kadas::KADAS_DEV_VERSION );
@@ -37,5 +38,6 @@ bool KadasCrashRpt::install()
   {
     GdbCrashHandler::init( config );
   }
+  */
   return true;
 }
