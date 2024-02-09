@@ -1,5 +1,4 @@
-build
-build_mingw64
+build*
 dist
 dist_debug
 CMakeLists.txt.user
@@ -7,3 +6,5 @@ kadas/resources/resources.qrc
 .cmake
 .idea
 *.orig
+.DS_Store
+.vscode

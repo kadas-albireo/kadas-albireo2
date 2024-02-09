@@ -12,6 +12,7 @@ set(WITH_GLOBE ON CACHE BOOL "Enable globe")
 if (WITH_GLOBE)
   list(APPEND VCPKG_MANIFEST_FEATURES "globe")
 endif()
+
 set(WITH_QTWEBKIT ON CACHE BOOL "Use Qt Webkit")
 if (WITH_QTWEBKIT)
   list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
