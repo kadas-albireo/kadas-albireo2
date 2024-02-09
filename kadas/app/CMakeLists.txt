@@ -153,15 +153,13 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
-  ${Python_LIBRARIES}
+  Python::Interpreter
   ${kadas_RC_LIBS}
 
   kadas_core
   kadas_analysis
   kadas_gui
 )
-
-INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
 
 target_include_directories(kadas ${CMAKE_CURRENT_BINARY_DIR})
 
