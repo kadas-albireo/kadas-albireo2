@@ -59,7 +59,6 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${Qt5OpenGL_INCLUDE_DIRS}
   ${OSG_INCLUDE_DIR}
-  ${GEOS_INCLUDE_DIR}
   ${SIP_INCLUDE_DIR}
   ../../core
   ../../core/expression
