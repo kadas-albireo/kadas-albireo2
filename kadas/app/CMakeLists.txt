@@ -22,7 +22,6 @@ set(kadas_SRC
   kadasapplayerhandling.cpp
   kadasapplication.cpp
   kadascanvascontextmenu.cpp
-  #  kadascrashrpt.cpp
   kadasgpsintegration.cpp
   kadasgpxintegration.cpp
   kadashandlebadlayers.cpp
@@ -57,6 +56,10 @@ set(kadas_SRC
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
 )
+
+if(WITH_CRASHREPORT)
+  set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
+endif()
 
 if(WITH_GLOBE)
   set(kadas_SRC ${kadas_SRC}
@@ -157,7 +160,6 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
-  # ${CRASHRPT_LIBRARY}
   ${QCA_LDFLAGS}
   ${QTKEYCHAIN_LIBRARIES}
   ${Python_LIBRARIES}
@@ -167,6 +169,12 @@ TARGET_LINK_LIBRARIES(kadas
   kadas_analysis
   kadas_gui
 )
+
+if(WITH_CRASHREPORT)
+  TARGET_LINK_LIBRARIES(kadas ${CRASHRPT_LIBRARY})
+endif()
+
+target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
 
 if (WITH_QTWEBKIT)
   TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)
