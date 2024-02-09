@@ -161,7 +161,7 @@ TARGET_LINK_LIBRARIES(kadas
   kadas_gui
 )
 
-target_include_directories(kadas ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(kadas PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 if(WITH_CRASHREPORT)
   target_link_libraries(kadas ${CRASHRPT_LIBRARY})

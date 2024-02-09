@@ -16,7 +16,7 @@ TARGET_LINK_LIBRARIES(kadas_analysis
   kadas_core
 )
 
-target_include_directories(kadas_analysis ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(kadas_analysis PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 GENERATE_EXPORT_HEADER(
   kadas_analysis

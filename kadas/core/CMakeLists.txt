@@ -34,7 +34,7 @@ TARGET_LINK_LIBRARIES(kadas_core
   OpenSSL::Crypto
 )
 
-target_include_directories(kadas_core ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(kadas_core PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 GENERATE_EXPORT_HEADER(
   kadas_core
