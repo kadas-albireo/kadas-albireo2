@@ -19,6 +19,8 @@
 
 #include <QFont>
 
+#include <qgis/qgsconfig.h>
+
 #include <kadas/gui/kadasplugininterface.h>
 
 class KadasApplication;
@@ -38,6 +40,11 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QList< QgsMapCanvas * > mapCanvases() override;
     virtual QgsMapCanvas *createNewMapCanvas( const QString &name ) override;
     virtual void closeMapCanvas( const QString &name ) override;
+#if _QGIS_VERSION_INT >= 33500
+    virtual QList< Qgs3DMapCanvas * > mapCanvases3D() override;
+    virtual Qgs3DMapCanvas *createNewMapCanvas3D( const QString &name ) override;
+    virtual void closeMapCanvas3D( const QString &name ) override;
+#endif
     virtual QSize iconSize( bool dockedToolbar = false ) const override;
     virtual QList<QgsMapLayer *> editableLayers( bool modified = false ) const override;
     virtual QgsMapLayer *activeLayer() override;
@@ -60,6 +67,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QMenu *databaseMenu() override { return getClassicMenu( DATABASE_MENU ); }
     virtual QMenu *vectorMenu() override { return getClassicMenu( VECTOR_MENU ); }
     virtual QMenu *webMenu() override { return getClassicMenu( WEB_MENU ); }
+#if _QGIS_VERSION_INT >= 33440
+    virtual QMenu *meshMenu() override;
+#endif
     virtual QMenu *firstRightStandardMenu() override { return helpMenu(); }
     virtual QMenu *windowMenu() override { return getClassicMenu( WINDOW_MENU ); }
     virtual QMenu *helpMenu() override { return getClassicMenu( HELP_MENU ); }
@@ -78,6 +88,16 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void addPluginToWebMenu( const QString &name, QAction *action ) override;
     virtual void removePluginWebMenu( const QString &name, QAction *action ) override;
 
+#if _QGIS_VERSION_INT >= 33000
+    virtual QMenu *projectImportExportMenu() override;
+    virtual void addProjectImportAction( QAction *action ) override;
+    virtual void removeProjectImportAction( QAction *action ) override;
+    virtual void addProjectExportAction( QAction *action ) override;
+    virtual void removeProjectExportAction( QAction *action ) override;
+    virtual void openDataSourceManagerPage( const QString &pageName ) override;
+    virtual QgsUserProfileManager *userProfileManager() override;
+#endif
+
     virtual int messageTimeout() override;
     virtual void zoomFull() override;
     virtual void zoomToPrevious() override;
@@ -89,6 +109,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QgsRasterLayer *addRasterLayer( const QString &url, const QString &layerName, const QString &providerKey ) override;
     virtual QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName ) override;
     virtual QgsPointCloudLayer *addPointCloudLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
+#if _QGIS_VERSION_INT >= 33400
+    virtual QgsTiledSceneLayer *addTiledSceneLayer( const QString &url, const QString &baseName, const QString &providerKey ) override;
+#endif
 
     virtual QgsVectorLayer *addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) override;
     virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) override;
@@ -323,7 +346,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void registerCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) override {};
     virtual void unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) override {};
     virtual void setGpsPanelConnection( QgsGpsConnection *connection ) override {};
-
+#if _QGIS_VERSION_INT >= 33500
+    virtual void blockActiveLayerChanges( bool blocked ) override {};
+#endif
 
     // KADAS specific interface
     QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) override;

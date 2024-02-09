@@ -31,6 +31,7 @@
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
+#include "kadasplugininterfaceimpl.h"
 
 KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )
 {
@@ -93,7 +94,29 @@ void KadasPluginInterfaceImpl::closeMapCanvas( const QString &name )
   return kApp->mainWindow()->mapWidgetManager()->removeMapWidget( name );
 }
 
-QSize KadasPluginInterfaceImpl::iconSize( bool dockedToolbar ) const
+#if _QGIS_VERSION_INT >= 33500
+
+QList<Qgs3DMapCanvas *> KadasPluginInterfaceImpl::mapCanvases3D()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return QList<Qgs3DMapCanvas *>();
+}
+
+Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D(const QString &name)
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return nullptr;
+}
+
+void KadasPluginInterfaceImpl::closeMapCanvas3D(const QString &name)
+{
+  Q_UNUSED(name)
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+#endif
+
+QSize KadasPluginInterfaceImpl::iconSize(bool dockedToolbar) const
 {
   return QSize();
 }
@@ -130,18 +153,25 @@ QgsMessageBar *KadasPluginInterfaceImpl::messageBar()
 
 QList<QgsLayoutDesignerInterface *> KadasPluginInterfaceImpl::openLayoutDesigners()
 {
-  // TODO
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
   return QList<QgsLayoutDesignerInterface *>();
-
 }
 
 QgsVectorLayerTools *KadasPluginInterfaceImpl::vectorLayerTools()
 {
-  // TODO
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
   return nullptr;
 }
 
-void KadasPluginInterfaceImpl::addPluginToMenu( const QString &name, QAction *action )
+#if _QGIS_VERSION_INT >= 33440
+QMenu *KadasPluginInterfaceImpl::meshMenu()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return nullptr;
+}
+#endif
+
+void KadasPluginInterfaceImpl::addPluginToMenu(const QString &name, QAction *action)
 {
   getSubMenu( getClassicMenu( PLUGIN_MENU ), name )->addAction( action );
 }
@@ -200,6 +230,50 @@ void KadasPluginInterfaceImpl::removePluginWebMenu( const QString &name, QAction
 {
   getSubMenu( getClassicMenu( WEB_MENU ), name )->removeAction( action );
 }
+
+#if _QGIS_VERSION_INT >= 33000
+QMenu *KadasPluginInterfaceImpl::projectImportExportMenu()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return nullptr;
+}
+
+void KadasPluginInterfaceImpl::addProjectImportAction(QAction *action)
+{
+  Q_UNUSED( action )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+void KadasPluginInterfaceImpl::removeProjectImportAction(QAction *action)
+{
+  Q_UNUSED( action )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+void KadasPluginInterfaceImpl::addProjectExportAction(QAction *action)
+{
+  Q_UNUSED( action )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+void KadasPluginInterfaceImpl::removeProjectExportAction(QAction *action)
+{
+  Q_UNUSED( action )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+void KadasPluginInterfaceImpl::openDataSourceManagerPage(const QString &pageName)
+{
+  Q_UNUSED( pageName )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+}
+
+QgsUserProfileManager *KadasPluginInterfaceImpl::userProfileManager()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return nullptr;
+}
+#endif
 
 int KadasPluginInterfaceImpl::messageTimeout()
 {
@@ -280,6 +354,17 @@ QgsPointCloudLayer *KadasPluginInterfaceImpl::addPointCloudLayer( const QString 
 {
   return kApp->addPointCloudLayer( url, baseName, providerKey );
 }
+
+#if _QGIS_VERSION_INT >= 33400
+QgsTiledSceneLayer *KadasPluginInterfaceImpl::addTiledSceneLayer(const QString &url, const QString &baseName, const QString &providerKey)
+{
+  Q_UNUSED( url )
+  Q_UNUSED( baseName )
+  Q_UNUSED( providerKey )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  return nullptr;
+}
+#endif
 
 QgsPointCloudLayer *KadasPluginInterfaceImpl::addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey )
 {
@@ -656,3 +741,4 @@ void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
 {
   kApp->showLayoutDesigner( layout );
 }
+
