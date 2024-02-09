@@ -153,7 +153,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
-  Python3::Interpreter
+  Python3::Python
   ${kadas_RC_LIBS}
 
   kadas_core
