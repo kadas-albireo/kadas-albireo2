@@ -1,5 +1,3 @@
-SET(CMAKE_AUTOMOC ON)
-
 FILE(GLOB kadas_core_SRC *.cpp)
 LIST(SORT kadas_core_SRC)
 

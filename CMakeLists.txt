@@ -53,6 +53,7 @@ if (WITH_QTWEBKIT)
   ADD_DEFINITIONS(-DWITH_QTWEBKIT)
 endif()
 
+set(CMAKE_AUTOMOC ON)
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 

@@ -1,5 +1,3 @@
-SET(CMAKE_AUTOMOC ON)
-
 FIND_PACKAGE(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
 
 IF(WITH_GLOBE)    
