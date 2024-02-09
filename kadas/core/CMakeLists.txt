@@ -7,8 +7,6 @@ LIST(SORT kadas_core_HDR)
 CONFIGURE_FILE(kadas_config.h.in kadas_config.h @ONLY)
 SET(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_config.h)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-
 ADD_LIBRARY(kadas_core
     ${kadas_core_SRC}
     ${kadas_core_HDR}
@@ -36,6 +34,7 @@ TARGET_LINK_LIBRARIES(kadas_core
   OpenSSL::Crypto
 )
 
+target_include_directories(kadas_core ${CMAKE_CURRENT_BINARY_DIR})
 
 GENERATE_EXPORT_HEADER(
   kadas_core

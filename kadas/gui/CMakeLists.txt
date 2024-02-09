@@ -27,8 +27,6 @@ QT5_WRAP_UI(kadas_gui_UI_HDR ${kadas_gui_UI})
 
 SET_PROPERTY(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-
 ADD_LIBRARY(kadas_gui
     ${kadas_gui_SRC}
     ${kadas_gui_HDR}
@@ -59,6 +57,8 @@ TARGET_LINK_LIBRARIES(kadas_gui
   kadas_core
   kadas_analysis
 )
+
+target_include_directories(kadas_gui ${CMAKE_CURRENT_BINARY_DIR})
 
 GENERATE_EXPORT_HEADER(
   kadas_gui
