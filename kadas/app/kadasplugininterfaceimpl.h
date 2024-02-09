@@ -67,7 +67,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QMenu *databaseMenu() override { return getClassicMenu( DATABASE_MENU ); }
     virtual QMenu *vectorMenu() override { return getClassicMenu( VECTOR_MENU ); }
     virtual QMenu *webMenu() override { return getClassicMenu( WEB_MENU ); }
-#if _QGIS_VERSION_INT >= 33400
+#if _QGIS_VERSION_INT >= 33440
     virtual QMenu *meshMenu() override;
 #endif
     virtual QMenu *firstRightStandardMenu() override { return helpMenu(); }
@@ -347,7 +347,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) override {};
     virtual void setGpsPanelConnection( QgsGpsConnection *connection ) override {};
 #if _QGIS_VERSION_INT >= 33500
-    virtual void blockActiveLayerChanges( bool blocked ) override;
+    virtual void blockActiveLayerChanges( bool blocked ) override {};
 #endif
 
     // KADAS specific interface

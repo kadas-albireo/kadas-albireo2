@@ -163,7 +163,7 @@ QgsVectorLayerTools *KadasPluginInterfaceImpl::vectorLayerTools()
   return nullptr;
 }
 
-#if _QGIS_VERSION_INT >= 33400
+#if _QGIS_VERSION_INT >= 33440
 QMenu *KadasPluginInterfaceImpl::meshMenu()
 {
   QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
@@ -742,8 +742,3 @@ void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
   kApp->showLayoutDesigner( layout );
 }
 
-void blockActiveLayerChanges(bool blocked)
-{
-  Q_UNUSED( blocked );
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
-}
