@@ -81,7 +81,7 @@
 #include <kadas/app/kadasapplication.h>
 #include <kadas/app/kadasapplayerhandling.h>
 #include <kadas/app/kadascanvascontextmenu.h>
-#ifdef(WITH_CRASHREPORT)
+#ifdef WITH_CRASHREPORT
 #include <kadas/app/kadascrashrpt.h>
 #endif
 #include <kadas/app/kadashandlebadlayers.h>
@@ -201,7 +201,7 @@ void KadasApplication::init()
   translator->load( QString( "Kadas_%1" ).arg( translation() ), translationsPath );
   QApplication::instance()->installTranslator( translator );
 
-#ifdef(WITH_CRASHREPORT)
+#ifdef WITH_CRASHREPORT
   // Install crash reporter
   KadasCrashRpt::install();
 #endif

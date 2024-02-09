@@ -57,6 +57,8 @@ set(kadas_SRC
   milx/kadasmilxintegration.cpp
 )
 
+set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
+
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
 endif()
@@ -171,10 +173,9 @@ TARGET_LINK_LIBRARIES(kadas
 )
 
 if(WITH_CRASHREPORT)
-  TARGET_LINK_LIBRARIES(kadas ${CRASHRPT_LIBRARY})
+  target_link_libraries(kadas ${CRASHRPT_LIBRARY})
+  target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
 endif()
-
-target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
 
 if (WITH_QTWEBKIT)
   TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)

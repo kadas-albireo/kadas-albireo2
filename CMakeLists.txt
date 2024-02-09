@@ -18,11 +18,6 @@ if (WITH_QTWEBKIT)
   list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
 endif()
 
-set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
-if (WITH_CRASHREPORT)
-  ADD_DEFINITIONS(-DWITH_CRASHREPORT)
-endif()
-
 include(VcpkgToolchain)
 
 PROJECT(kadas)
