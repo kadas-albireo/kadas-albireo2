@@ -1,4 +1,4 @@
-FIND_PACKAGE(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
+FIND_PACKAGE(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
 
 IF(WITH_GLOBE)    
     FIND_PACKAGE(OSG REQUIRED)
@@ -153,7 +153,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
-  Python::Interpreter
+  Python3::Interpreter
   ${kadas_RC_LIBS}
 
   kadas_core
