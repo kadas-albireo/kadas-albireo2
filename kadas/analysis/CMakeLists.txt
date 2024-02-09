@@ -5,7 +5,6 @@ FILE(GLOB kadas_analysis_HDR *.h)
 LIST(SORT kadas_analysis_HDR)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIR})
 
 ADD_LIBRARY(kadas_analysis
     ${kadas_analysis_SRC}
@@ -16,7 +15,6 @@ TARGET_LINK_LIBRARIES(kadas_analysis
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
-  ${GDAL_LIBRARIES}
   kadas_core
 )
 

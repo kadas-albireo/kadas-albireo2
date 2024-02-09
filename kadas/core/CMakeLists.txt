@@ -8,7 +8,6 @@ CONFIGURE_FILE(kadas_config.h.in kadas_config.h @ONLY)
 SET(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_config.h)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIR})
 
 ADD_LIBRARY(kadas_core
     ${kadas_core_SRC}
