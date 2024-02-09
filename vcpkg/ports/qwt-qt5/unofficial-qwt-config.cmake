@@ -34,7 +34,7 @@ if(NOT TARGET unofficial::qwt::qwt)
     endif()
 
     set_target_properties(unofficial::qwt::qwt PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include"
+        INTERFACE_INCLUDE_DIRECTORIES "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include/qwt"
     )
     target_link_libraries(unofficial::qwt::qwt
         INTERFACE

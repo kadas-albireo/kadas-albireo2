@@ -36,11 +36,9 @@ This module defines the following variables:
 
 #]=======================================================================]
 
-find_path(QGIS_INCLUDE_DIR qgis.h
+find_path(QGIS_INCLUDE_DIR qgis/qgis.h
           PATHS
             ${QGIS_ROOT}/include/
-          PATH_SUFFIXES
-            qgis
           DOC "Path to QGIS include directory")
 
 include(SelectLibraryConfigurations)
@@ -99,7 +97,7 @@ endif()
 
 
 if(QGIS_INCLUDE_DIR)
-  set(_qgsconfig_h "${QGIS_INCLUDE_DIR}/qgsconfig.h")
+  set(_qgsconfig_h "${QGIS_INCLUDE_DIR}/qgis/qgsconfig.h")
   file(STRINGS "${_qgsconfig_h}" _qgsversion_str REGEX "^#define VERSION .*$")
   string(REGEX REPLACE "^#define VERSION +\"([0-9]+\\.[0-9]+\\.[0-9]+).*$" "\\1" QGIS_VERSION_STRING "${_qgsversion_str}")
 endif ()
