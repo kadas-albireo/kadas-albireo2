@@ -18,8 +18,6 @@ TARGET_LINK_LIBRARIES(kadas_analysis
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
-  ${QGIS_CORE_LIBRARY}
-  ${QGIS_ANALYSIS_LIBRARY}
   ${GDAL_LIBRARIES}
   kadas_core
 )
