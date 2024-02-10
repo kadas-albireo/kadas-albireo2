@@ -165,9 +165,9 @@ pkg_check_modules(freexl REQUIRED IMPORTED_TARGET freexl)
 target_link_libraries(QGIS::Core INTERFACE PkgConfig::freexl)
 
 if(BUILD_WITH_QT6)
-  _find_and_link_library(qt6keychain QGIS::Core)
+  _qgis_core_add_dependency(Qt6Keychain::Qt6Keychain Qt6Keychain)
 else()
-  _find_and_link_library(qt5keychain QGIS::Core)
+  _qgis_core_add_dependency(Qt5Keychain::Qt5Keychain Qt5Keychain)
 endif()
 
 find_package(Qt5 COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL Qml Multimedia QuickWidgets)
