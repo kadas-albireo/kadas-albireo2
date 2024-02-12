@@ -45,7 +45,7 @@
       {
         "kind": "git",
         "baseline": "c288fd01cbc95c56a122747c3c39cbab2710ee17",
-        "repository": "https://github.com/open-vcpkg/vcpkg-qt5",
+        "repository": "https://github.com/open-vcpkg/qt5-registry",
         "packages": [
           "qscintilla-qt5",
           "qt5-webkit"
