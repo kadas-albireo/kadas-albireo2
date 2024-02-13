@@ -1,5 +1,3 @@
-SET(CMAKE_AUTOMOC ON)
-
 FILE(GLOB kadas_gui_SRC
   *.cpp
   catalog/*.cpp
@@ -29,9 +27,6 @@ QT5_WRAP_UI(kadas_gui_UI_HDR ${kadas_gui_UI})
 
 SET_PROPERTY(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-INCLUDE_DIRECTORIES(${GDAL_INCLUDE_DIRS})
-
 ADD_LIBRARY(kadas_gui
     ${kadas_gui_SRC}
     ${kadas_gui_HDR}
@@ -54,7 +49,6 @@ TARGET_LINK_LIBRARIES(kadas_gui
   QuaZip::QuaZip
   QGIS::Gui
   ${GeographicLib_LIBRARIES}
-  ${GDAL_LDFLAGS}
   PkgConfig::LIBRSVG
   PkgConfig::SVG2SVGT
   PkgConfig::CAIRO
@@ -63,6 +57,8 @@ TARGET_LINK_LIBRARIES(kadas_gui
   kadas_core
   kadas_analysis
 )
+
+target_include_directories(kadas_gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 GENERATE_EXPORT_HEADER(
   kadas_gui
