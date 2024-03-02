@@ -122,6 +122,11 @@ if(QGIS_FOUND)
   set(QGIS_INCLUDE_DIRS ${QGIS_INCLUDE_DIR})
 endif()
 
+find_package(Qca REQUIRED)
+target_link_libraries(QGIS::Core INTERFACE qca)
+find_package(Qt5Keychain REQUIRED)
+target_link_libraries(QGIS::Core INTERFACE Qt5Keychain::Qt5Keychain)
+
 if(WITH_VCPKG)
   include("cmake/qgis-cmake-wrapper.cmake")
 else()
