@@ -18,6 +18,11 @@ if (WITH_QTWEBKIT)
   list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
 endif()
 
+set(WITH_BINDINGS ON CACHE BOOL "Build with python bindings")
+if (WITH_BINDINGS)
+  list(APPEND VCPKG_MANIFEST_FEATURES "bindings")
+endif()
+
 include(VcpkgToolchain)
 
 PROJECT(kadas)
@@ -77,7 +82,6 @@ ADD_DEFINITIONS(-DMILX_LICENSE_KEY="${MILX_LICENSE_KEY}")
 
 ADD_SUBDIRECTORY(kadas)
 
-set(WITH_BINDINGS ON CACHE BOOL "Build with python bindings")
 if(WITH_BINDINGS)
   ADD_SUBDIRECTORY(python)
 endif()
