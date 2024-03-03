@@ -35,10 +35,11 @@ jobs:
                 -B build \
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
-                -D WITH_BINDINGS=OFF \
+                -D WITH_BINDINGS=ON \
                 -D WITH_GLOBE=OFF \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.exe" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
