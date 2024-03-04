@@ -63,7 +63,7 @@ jobs:
         with:
           name: kadas-albireo2-sdk-x64-windows
           path: |
-            sdk
+            sdk/vcpkg-export-*.zip
       # TODO: end
     
       - name: 🌋 Build
