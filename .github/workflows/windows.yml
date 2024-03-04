@@ -52,7 +52,20 @@ jobs:
           name: build-logs-x64-windows
           path: |
             C:/src/**/*.log
-
+      
+      # TODO: only on release or workflow dispatch
+      - name: 📦 Create SDK
+        run: |
+          ./build/_deps/vcpkg-src/vcpkg.exe export --zip --output-dir=./sdk --x-install-root=build/vcpkg_installed
+        
+      - name: 📤 Upload sdk
+        uses: actions/upload-artifacts@v3
+        with:
+          name: kadas-albireo2-sdk-x64-windows
+          path: |
+            sdk
+      # TODO: end
+    
       - name: 🌋 Build
         run: |
           cmake --build build
