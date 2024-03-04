@@ -18,6 +18,7 @@ vcpkg_from_github(
         mesh.patch
         delimitedtext.patch
         qtkeychain-56284.patch
+        bindings-install.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -40,6 +41,7 @@ if("bindings" IN_LIST FEATURES)
     # TODO: linux etc
     list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5.bat")
     list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5.bat")
+    list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${PYTHON3_SITEPACKAGES}/qgis")
 else()
     vcpkg_find_acquire_program(PYTHON3)
     list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
