@@ -26,6 +26,7 @@ endif()
 include(VcpkgToolchain)
 
 PROJECT(kadas)
+
 set(CMAKE_CXX_STANDARD 17)
 
 SET(KADAS_NAME "Kadas" CACHE STRING "Kadas application name")
