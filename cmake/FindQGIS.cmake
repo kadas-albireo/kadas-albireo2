@@ -55,8 +55,11 @@ macro(_find_qgis_library _lib_name _component)
     if(NOT TARGET QGIS::${_component})
       add_library(QGIS::${_component} UNKNOWN IMPORTED)
       set_target_properties(QGIS::${_component} PROPERTIES
-                            INTERFACE_INCLUDE_DIRECTORIES ${QGIS_INCLUDE_DIR}
                             IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
+      target_include_directories(QGIS::${_component} INTERFACE
+                                "${QGIS_INCLUDE_DIR}"
+                                "${QGIS_INCLUDE_DIR}/qgis" # Required for includes in qgis .sip files
+                                )
       if(EXISTS "${QGIS_${_component}_LIBRARY}")
         set_target_properties(QGIS::${_component} PROPERTIES
           IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
@@ -86,6 +89,7 @@ if(Core IN_LIST QGIS_FIND_COMPONENTS)
 endif()
 if(Analysis IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(analysis Analysis)
+  target_link_libraries(QGIS::Analysis INTERFACE QGIS::Core)
 endif()
 if(Gui IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(gui Gui)
@@ -103,8 +107,16 @@ if(QGIS_INCLUDE_DIR)
 endif ()
 
 foreach(_component ${QGIS_FIND_COMPONENTS})
-  if(QGIS_FIND_REQUIRED_${_component})
-    list(APPEND _required_libs "QGIS_${_component}_LIBRARY")
+  if(${_component} STREQUAL "Python")
+    execute_process(COMMAND ${Python_EXECUTABLE} -c "import os;import qgis;print(os.path.dirname(qgis.__file__))" OUTPUT_VARIABLE QGIS_PYTHON_MODULE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings)
+    add_library(QGIS::Python UNKNOWN IMPORTED)
+    set_target_properties(QGIS::Python PROPERTIES PYTHON_MODULE_DIR ${QGIS_PYTHON_MODULE_DIR})
+    message(STATUS "QGIS Python module found at ${QGIS_PYTHON_MODULE_PATH}")
+  else()
+    if(QGIS_FIND_REQUIRED_${_component})
+      list(APPEND _required_libs "QGIS_${_component}_LIBRARY")
+    endif()
   endif()
 endforeach()
 unset(_component)

@@ -24,3 +24,13 @@ index 0a4b489b908..70cae84a9e7 100644
 +  install(FILES ${sip_files} DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
 +  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
  endforeach(module)
+diff --git a/python/PyQt/CMakeLists.txt b/python/PyQt/CMakeLists.txt
+index 09807ef474e..0a2488e47ab 100644
+--- a/python/PyQt/CMakeLists.txt
++++ b/python/PyQt/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-set (QGIS_PYQT_DIR ${Python_SITEARCH}/qgis/PyQt)
++set (QGIS_PYQT_DIR ${QGIS_PYTHON_DIR}/PyQt)
+ 
+ set(PYQT_COMPAT_FILES
+   __init__.py
