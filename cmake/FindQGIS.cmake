@@ -108,7 +108,7 @@ endif ()
 
 foreach(_component ${QGIS_FIND_COMPONENTS})
   if(${_component} STREQUAL "Python")
-    execute_process(COMMAND ${Python_EXECUTABLE} -c "import os;import qgis;print(os.path.dirname(qgis.__file__))" OUTPUT_VARIABLE QGIS_PYTHON_MODULE_DIR COMMAND_ERROR_IS_FATAL ANY ECHO_ERROR_VARIABLE _DEV_NULL OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${Python_EXECUTABLE} -c "import os;import qgis;print(os.path.dirname(qgis.__file__))" OUTPUT_VARIABLE QGIS_PYTHON_MODULE_DIR COMMAND_ERROR_IS_FATAL ANY ECHO_ERROR_VARIABLE OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings)
     add_library(QGIS::Python UNKNOWN IMPORTED)
     set_target_properties(QGIS::Python PROPERTIES PYTHON_MODULE_DIR ${QGIS_PYTHON_MODULE_DIR})
