@@ -76,6 +76,9 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build --config Release
+          # TODO move to cpack
+          cp build/vcpkg_installed/x64-windows C:/kadas/deps
+
 
       - name: 📦 Package
         run: |
@@ -87,3 +90,4 @@ jobs:
           name: kadas-albireo2
           path: |
             C:/kadas
+            
