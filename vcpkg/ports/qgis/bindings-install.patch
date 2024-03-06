@@ -1,5 +1,16 @@
-﻿diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
-index 0a4b489b908..70cae84a9e7 100644
+diff --git a/cmake/SIPMacros.cmake b/cmake/SIPMacros.cmake
+index a0bfb1e6e22..26a33343780 100644
+--- a/cmake/SIPMacros.cmake
++++ b/cmake/SIPMacros.cmake
+@@ -199,5 +199,5 @@ MACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
+       )
+   ENDIF(WIN32)
+ 
+-  INSTALL(TARGETS ${_logical_name} DESTINATION "${Python_SITEARCH}/${_parent_module_path}")
++  INSTALL(TARGETS ${_logical_name} DESTINATION "${QGIS_PYTHON_DIR}/${_parent_module_path}")
+ ENDMACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
+diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
+index 0a4b489b908..60561ea8757 100644
 --- a/python/CMakeLists.txt
 +++ b/python/CMakeLists.txt
 @@ -140,7 +140,7 @@ ELSE()
@@ -34,3 +45,15 @@ index 09807ef474e..0a2488e47ab 100644
  
  set(PYQT_COMPAT_FILES
    __init__.py
+diff --git a/python/processing/CMakeLists.txt b/python/processing/CMakeLists.txt
+index 167a7be08a1..9cca052d840 100644
+--- a/python/processing/CMakeLists.txt
++++ b/python/processing/CMakeLists.txt
+@@ -1,7 +1,5 @@
+ # See ../CMakeLists.txt for info on staged-plugins* and clean-staged-plugins targets
+ 
+-set(QGIS_PYTHON_DIR ${Python_SITEARCH}/qgis)
+-
+ set(PY_FILES
+   __init__.py
+   algfactory.py
