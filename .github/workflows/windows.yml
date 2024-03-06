@@ -74,11 +74,11 @@ jobs:
     
       - name: 🌋 Build
         run: |
-          cmake --build build
+          cmake --build build --config Release
 
       - name: 📦 Package
         run: |
-          cmake --install build
+          cmake --install build --config Release
 
       - name: 📤 Upload package
         uses: actions/upload-artifact@v3
