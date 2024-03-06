@@ -42,6 +42,7 @@ jobs:
                 -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.exe" \
                 -D PYUIC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyuic5.bat" \
                 -D PYRCC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyrcc5.bat" \
+                -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
