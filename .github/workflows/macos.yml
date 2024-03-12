@@ -51,7 +51,6 @@ jobs:
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D WITH_BINDINGS=OFF \
                 -D WITH_GLOBE=OFF \
                 -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
