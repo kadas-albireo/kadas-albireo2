@@ -1,5 +1,5 @@
 if(NOT WITH_VCPKG)
-  return()
+    return()
 endif()
 
 # Copy files from the install dir to where it
@@ -8,23 +8,23 @@ add_custom_target(deploy)
 
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/bin/kadas.app/Contents/share")
+    set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/bin/kadas.app/Contents/share")
 else()
-  set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/share")
+    set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/share")
 endif()
 file(MAKE_DIRECTORY "${SHARE_DIR}")
 
 function(copy_resource source target)
-add_custom_command(TARGET deploy
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/${target}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${source}" "${SHARE_DIR}/${target}"
-)
+    add_custom_command(TARGET deploy
+                       POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/${target}"
+                       COMMAND ${CMAKE_COMMAND} -E copy_directory "${source}" "${SHARE_DIR}/${target}"
+    )
 endfunction()
 
 set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 if(MSVC)
-    set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/tools/qgis/plugins")
+    set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/plugins")
     file(GLOB PROVIDER_LIBS
         "${QGIS_PLUGIN_DIR}/*provider*.dll"
     )
@@ -45,21 +45,22 @@ else()
     set(QGIS_PLUGIN_INSTALL_PREFIX "lib${LIB_SUFFIX}/qgis/plugins")
 endif()
 add_custom_command(TARGET deploy
-POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
 )
 foreach(LIB ${PROVIDER_LIBS})
-add_custom_command(TARGET deploy
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}" "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
-)
-install(FILES "${LIB}" DESTINATION "${QGIS_PLUGIN_INSTALL_PREFIX}")
+    add_custom_command(TARGET deploy
+                       POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}" "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+    )
+    install(FILES "${LIB}" DESTINATION "${QGIS_PLUGIN_INSTALL_PREFIX}")
 endforeach()
 foreach(LIB ${AUTHMETHODS_LIBS})
-add_custom_command(TARGET deploy
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}" "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
-)
+    add_custom_command(TARGET deploy
+                       POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}" "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+    )
+    install(FILES "${LIB}" DESTINATION "${QGIS_PLUGIN_INSTALL_PREFIX}")
 endforeach()
 
 # This is needed for gdal to successfully access remote datasets through encrypted connections
@@ -67,18 +68,18 @@ file(DOWNLOAD https://curl.se/ca/cacert.pem "${CMAKE_BINARY_DIR}/cacert.pem" TLS
 list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
 list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
 if(NOT ${STATUS_CODE} EQUAL 0)
-    message(FATAL_ERROR "Error occurred during download: ${ERROR_MESSAGE}")
+    message(FATAL_ERROR "Error occurred during cacert.pem download: ${ERROR_MESSAGE}")
 endif()
 
 add_custom_command(TARGET deploy
-POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/cacert.pem" "${SHARE_DIR}/cacert.pem"
-COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/resources"
-COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
-COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/share/qgis/resources" "${SHARE_DIR}/qgis/resources"
-COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/share/qgis/svg" "${SHARE_DIR}/qgis/svg"
-COMMAND ${CMAKE_COMMAND} -E rm -- "${SHARE_DIR}/qgis/resources/data/world_map.gpkg"
-COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/cacert.pem" "${SHARE_DIR}/cacert.pem"
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/resources"
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/resources" "${SHARE_DIR}/qgis/resources"
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E rm -- "${SHARE_DIR}/resources/data/world_map.gpkg"
+                   COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/resources/cpt-city-qgis-min"
 )
 set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
 
@@ -89,8 +90,8 @@ endif()
 copy_resource("${PROJ_DATA_PATH}" "proj")
 copy_resource("${VCPKG_BASE_DIR}/share/gdal" "gdal")
 copy_resource("${CMAKE_SOURCE_DIR}/packaging/files" "kadas")
-install(DIRECTORY "${VCPKG_BASE_DIR}/share/qgis/resources/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
-install(DIRECTORY "${VCPKG_BASE_DIR}/share/qgis/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
+install(DIRECTORY "${VCPKG_BASE_DIR}/resources/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
+install(DIRECTORY "${VCPKG_BASE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
 install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj/")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
 
