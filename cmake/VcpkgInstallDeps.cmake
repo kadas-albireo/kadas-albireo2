@@ -6,6 +6,14 @@ endif()
 # will be bundled
 add_custom_target(deploy)
 
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/bin/kadas.app/Contents/share")
+else()
+  set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/share")
+endif()
+file(MAKE_DIRECTORY "${SHARE_DIR}")
+
 function(copy_resource source target)
 add_custom_command(TARGET deploy
     POST_BUILD
