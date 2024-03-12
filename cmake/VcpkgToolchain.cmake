@@ -15,6 +15,7 @@ if(NOT VCPKG_TAG STREQUAL VCPKG_INSTALLED_VERSION)
   FetchContent_Declare(vcpkg
       GIT_REPOSITORY https://github.com/microsoft/vcpkg.git
       GIT_TAG ${VCPKG_TAG}
+      PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/patches/36556.patch
   )
   FetchContent_MakeAvailable(vcpkg)
 else()

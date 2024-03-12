@@ -19,6 +19,7 @@ vcpkg_from_github(
         delimitedtext.patch
         qtkeychain-56284.patch
         bindings-install.patch
+        sip-cxx-14.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -38,9 +39,11 @@ if("bindings" IN_LIST FEATURES)
     vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
     list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
 
-    # TODO: linux etc
-    list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5.bat")
-    list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5.bat")
+    if(VCPKG_TARGET_IS_WINDOWS)
+        set(PYQT_TOOLS_SUFFIX ".bat")
+    endif()
+    list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5${PYQT_TOOLS_SUFFIX}")
+    list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5${PYQT_TOOLS_SUFFIX}")
     list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${PYTHON3_SITEPACKAGES}/qgis")
 else()
     vcpkg_find_acquire_program(PYTHON3)
@@ -162,11 +165,7 @@ if (VCPKG_LIBRARY_LINKAGE STREQUAL "static")
   list(APPEND QGIS_OPTIONS -DQGIS_PLUGIN_SUBDIR=lib)
 endif()
 
-if(VCPKG_TARGET_IS_WINDOWS)
-    list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe)
-else()
-    list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe)
-endif()
+list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease${VCPKG_HOST_EXECUTABLE_SUFFIX})
 
 vcpkg_backup_env_variables(VARS PATH)
 

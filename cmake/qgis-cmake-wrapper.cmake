@@ -79,7 +79,7 @@ endif()
 
 _qgis_core_add_dependency(qca Qca CONFIG)
 
-if(APPLE) # Should be "if qgis is built statically" -- leaving this cleanup as an exercise for later
+if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as an exercise for later
   _find_and_link_library(authmethod_basic_a QGIS::Core)
   _find_and_link_library(authmethod_esritoken_a QGIS::Core)
   _find_and_link_library(authmethod_identcert_a QGIS::Core)
