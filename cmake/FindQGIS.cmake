@@ -55,8 +55,11 @@ macro(_find_qgis_library _lib_name _component)
     if(NOT TARGET QGIS::${_component})
       add_library(QGIS::${_component} UNKNOWN IMPORTED)
       set_target_properties(QGIS::${_component} PROPERTIES
-                            INTERFACE_INCLUDE_DIRECTORIES ${QGIS_INCLUDE_DIR}
                             IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
+      target_include_directories(QGIS::${_component} INTERFACE
+                                "${QGIS_INCLUDE_DIR}"
+                                "${QGIS_INCLUDE_DIR}/qgis" # Required for includes in qgis .sip files
+                                )
       if(EXISTS "${QGIS_${_component}_LIBRARY}")
         set_target_properties(QGIS::${_component} PROPERTIES
           IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
@@ -86,6 +89,7 @@ if(Core IN_LIST QGIS_FIND_COMPONENTS)
 endif()
 if(Analysis IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(analysis Analysis)
+  target_link_libraries(QGIS::Analysis INTERFACE QGIS::Core)
 endif()
 if(Gui IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(gui Gui)
@@ -103,8 +107,22 @@ if(QGIS_INCLUDE_DIR)
 endif ()
 
 foreach(_component ${QGIS_FIND_COMPONENTS})
-  if(QGIS_FIND_REQUIRED_${_component})
-    list(APPEND _required_libs "QGIS_${_component}_LIBRARY")
+  if(${_component} STREQUAL "Python")
+    set(QGIS_PYTHON_MODULE_DIR "" CACHE PATH "Path to QGIS Python Modules")
+    if(QGIS_PYTHON_MODULE_DIR STREQUAL "")
+      set(CMD ${Python_EXECUTABLE} -c "import os;import qgis;print(os.path.dirname(qgis.__file__))")
+      execute_process(COMMAND ${CMD} OUTPUT_VARIABLE QGIS_PYTHON_MODULE_DIR COMMAND_ERROR_IS_FATAL ANY ECHO_ERROR_VARIABLE OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
+    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings)
+    message(STATUS "QGIS Python Module Dir: ${QGIS_PYTHON_MODULE_DIR}")
+
+    # Add a cmake target: PYTHON_MODULE_DIR is not cmake native
+    add_library(QGIS::Python UNKNOWN IMPORTED)
+    set_target_properties(QGIS::Python PROPERTIES PYTHON_MODULE_DIR ${QGIS_PYTHON_MODULE_DIR})
+  else()
+    if(QGIS_FIND_REQUIRED_${_component})
+      list(APPEND _required_libs "QGIS_${_component}_LIBRARY")
+    endif()
   endif()
 endforeach()
 unset(_component)

@@ -35,10 +35,14 @@ jobs:
                 -B build \
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
-                -D WITH_BINDINGS=OFF \
+                -D WITH_BINDINGS=ON \
                 -D WITH_GLOBE=OFF \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.exe" \
+                -D PYUIC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyuic5.bat" \
+                -D PYRCC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyrcc5.bat" \
+                -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
@@ -50,13 +54,35 @@ jobs:
           path: |
             C:/src/**/*.log
 
+      - name: 📑 Upload vcpkg build logs
+        if: failure()
+        run: |
+          D:/a/kadas-albireo2/kadas-albireo2/build/vcpkg_installed/x64-windows/tools/python3/python.exe -c "print('test')"
+          D:/a/kadas-albireo2/kadas-albireo2/build/vcpkg_installed/x64-windows/tools/python3/python.exe -c "import os;import qgis;print(os.path.dirname(qgis.__file__))"
+      
+      # TODO: only on release or workflow dispatch
+      - name: 📦 Create SDK
+        run: |
+          ./build/_deps/vcpkg-src/vcpkg.exe export --zip --output-dir=./sdk --x-install-root=build/vcpkg_installed
+        
+      - name: 📤 Upload sdk
+        uses: actions/upload-artifact@v3
+        with:
+          name: kadas-albireo2-sdk-x64-windows
+          path: |
+            sdk/vcpkg-export-*.zip
+      # TODO: end
+    
       - name: 🌋 Build
         run: |
-          cmake --build build
+          cmake --build build --config Release
+          # TODO move to cpack
+          cp build/vcpkg_installed/x64-windows C:/kadas/deps
+
 
       - name: 📦 Package
         run: |
-          cmake --install build
+          cmake --install build --config Release
 
       - name: 📤 Upload package
         uses: actions/upload-artifact@v3
@@ -64,3 +90,4 @@ jobs:
           name: kadas-albireo2
           path: |
             C:/kadas
+            
