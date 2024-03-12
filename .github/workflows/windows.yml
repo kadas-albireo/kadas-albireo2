@@ -54,12 +54,6 @@ jobs:
           path: |
             C:/src/**/*.log
 
-      - name: 📑 Upload vcpkg build logs
-        if: failure()
-        run: |
-          D:/a/kadas-albireo2/kadas-albireo2/build/vcpkg_installed/x64-windows/tools/python3/python.exe -c "print('test')"
-          D:/a/kadas-albireo2/kadas-albireo2/build/vcpkg_installed/x64-windows/tools/python3/python.exe -c "import os;import qgis;print(os.path.dirname(qgis.__file__))"
-      
       # TODO: only on release or workflow dispatch
       - name: 📦 Create SDK
         run: |
@@ -76,9 +70,6 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build --config Release
-          # TODO move to cpack
-          cp build/vcpkg_installed/x64-windows C:/kadas/deps
-
 
       - name: 📦 Package
         run: |
