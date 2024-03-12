@@ -1,5 +1,5 @@
-set(QGIS_REF final-3_34_3)
-set(QGIS_SHA512 42f579ab04b91dcfa8c710d01dfbb5318f7ae9a27e77935dde3099c1dadfa9a8c4a3a2a7cacb220c5fec31a4b9da004ff39e38674f1c8d866e468cff64a1a8bd)
+set(QGIS_REF final-3_34_4)
+set(QGIS_SHA512 d8075b98efe8ebea1ee53273b9427e0a7329ba8f1a96258d962dee52b0c5c08be2bea10b2130fee4c0acbc3f4a94b94da0033e8b6c92857e0c679c051545d3d8)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -18,6 +18,8 @@ vcpkg_from_github(
         mesh.patch
         delimitedtext.patch
         qtkeychain-56284.patch
+        bindings-install.patch
+        sip-cxx-14.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -29,7 +31,25 @@ file(REMOVE ${SOURCE_PATH}/cmake/FindPoly2Tri.cmake)
 
 vcpkg_find_acquire_program(FLEX)
 vcpkg_find_acquire_program(BISON)
-vcpkg_find_acquire_program(PYTHON3)
+
+vcpkg_backup_env_variables(VARS PATH)
+
+if("bindings" IN_LIST FEATURES)
+    # TODO ... we want this to be extracted via python command ?
+    vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
+    list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
+
+    if(VCPKG_TARGET_IS_WINDOWS)
+        set(PYQT_TOOLS_SUFFIX ".bat")
+    endif()
+    list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5${PYQT_TOOLS_SUFFIX}")
+    list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5${PYQT_TOOLS_SUFFIX}")
+    list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${PYTHON3_SITEPACKAGES}/qgis")
+else()
+    vcpkg_find_acquire_program(PYTHON3)
+    list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
+    list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=OFF)
+endif()
 
 list(APPEND QGIS_OPTIONS "-DENABLE_TESTS:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_GRASS7:BOOL=OFF")
@@ -59,7 +79,6 @@ list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
 list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 list(APPEND QGIS_OPTIONS "-DQGIS_MACAPP_FRAMEWORK=FALSE")
-list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 
@@ -67,12 +86,6 @@ if("opencl" IN_LIST FEATURES)
     list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)
 else()
     list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=OFF)
-endif()
-
-if("bindings" IN_LIST FEATURES)
-    list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
-else()
-    list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=OFF)
 endif()
 
 if("gui" IN_LIST FEATURES)
@@ -152,11 +165,9 @@ if (VCPKG_LIBRARY_LINKAGE STREQUAL "static")
   list(APPEND QGIS_OPTIONS -DQGIS_PLUGIN_SUBDIR=lib)
 endif()
 
-if(VCPKG_TARGET_IS_WINDOWS)
-    list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe)
-else()
-    list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe)
-endif()
+list(APPEND QGIS_OPTIONS -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease${VCPKG_HOST_EXECUTABLE_SUFFIX})
+
+vcpkg_backup_env_variables(VARS PATH)
 
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
@@ -164,6 +175,8 @@ vcpkg_configure_cmake(
     OPTIONS_DEBUG ${QGIS_OPTIONS_DEBUG}
     OPTIONS_RELEASE ${QGIS_OPTIONS_RELEASE}
 )
+
+vcpkg_restore_env_variables(VARS PATH)
 
 vcpkg_install_cmake()
 
@@ -248,6 +261,8 @@ vcpkg_install_cmake()
 #         endif()
 #     endif()
 # endif()
+
+vcpkg_restore_env_variables(VARS PATH)
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 
