@@ -88,6 +88,8 @@ IF(INSTALL_DEMO_DATA)
     install(DIRECTORY packaging/files/print_templates packaging/files/project_templates DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
 ENDIF()
 
+include(VcpkgInstallDeps)
+
 IF(UNIX)
     install(FILES com.sourcepole.kadas.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)
     install(FILES com.sourcepole.kadas.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo/)
