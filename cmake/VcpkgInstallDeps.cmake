@@ -78,8 +78,6 @@ add_custom_command(TARGET deploy
                    COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/resources" "${SHARE_DIR}/qgis/resources"
                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
-                   COMMAND ${CMAKE_COMMAND} -E rm -- "${SHARE_DIR}/resources/data/world_map.gpkg"
-                   COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/resources/cpt-city-qgis-min"
 )
 set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
 
@@ -94,5 +92,6 @@ install(DIRECTORY "${VCPKG_BASE_DIR}/resources/" DESTINATION "${CMAKE_INSTALL_DA
 install(DIRECTORY "${VCPKG_BASE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
 install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj/")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
+install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/" DESTINATION "bin/")
 
 add_dependencies(kadas deploy)
