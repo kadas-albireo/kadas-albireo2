@@ -20,6 +20,9 @@ endif()
 
 include(VcpkgToolchain)
 
+# The default installation paths
+include(GNUInstallDirs)
+
 PROJECT(kadas)
 set(CMAKE_CXX_STANDARD 17)
 
