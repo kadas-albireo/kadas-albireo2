@@ -71,13 +71,21 @@ if(NOT ${STATUS_CODE} EQUAL 0)
     message(FATAL_ERROR "Error occurred during cacert.pem download: ${ERROR_MESSAGE}")
 endif()
 
+#TODO on windows the qgis share dir is not prefixed: probably something to solve in the qgis port
+if(MSVC)
+    set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR})
+else()
+    set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR}/share/qgis)
+endif()
+
 add_custom_command(TARGET deploy
                    POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/cacert.pem" "${SHARE_DIR}/cacert.pem"
                    COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/resources"
-                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/resources" "${SHARE_DIR}/qgis/resources"
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_BASE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
+#                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/resources" "${SHARE_DIR}/qgis/resources"
+#                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
 )
 set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
 
@@ -88,10 +96,10 @@ endif()
 copy_resource("${PROJ_DATA_PATH}" "proj")
 copy_resource("${VCPKG_BASE_DIR}/share/gdal" "gdal")
 copy_resource("${CMAKE_SOURCE_DIR}/packaging/files" "kadas")
-install(DIRECTORY "${VCPKG_BASE_DIR}/resources/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
-install(DIRECTORY "${VCPKG_BASE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
-install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj/")
+#install(DIRECTORY "${SHARE_DIR}/qgis/resources/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
+#install(DIRECTORY "${QGIS_SHARE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
+install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
-install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/" DESTINATION "bin/")
+install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/" DESTINATION "bin")
 
 add_dependencies(kadas deploy)
