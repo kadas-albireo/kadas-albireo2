@@ -25,6 +25,9 @@ endif()
 
 include(VcpkgToolchain)
 
+# The default installation paths
+include(GNUInstallDirs)
+
 PROJECT(kadas)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -97,6 +100,8 @@ IF(INSTALL_DEMO_DATA)
     install(FILES packaging/files/settings_full.ini packaging/files/settings_patch.ini DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
     install(DIRECTORY packaging/files/print_templates packaging/files/project_templates DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
 ENDIF()
+
+include(VcpkgInstallDeps)
 
 IF(UNIX)
     install(FILES com.sourcepole.kadas.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)
