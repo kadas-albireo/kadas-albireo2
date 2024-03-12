@@ -1,4 +1,6 @@
-set(QGIS_REF final-3_34_3)
+string(REPLACE "." "_" TAG ${VERSION})
+
+set(QGIS_REF "final-${TAG}")
 set(QGIS_SHA512 42f579ab04b91dcfa8c710d01dfbb5318f7ae9a27e77935dde3099c1dadfa9a8c4a3a2a7cacb220c5fec31a4b9da004ff39e38674f1c8d866e468cff64a1a8bd)
 
 vcpkg_from_github(
