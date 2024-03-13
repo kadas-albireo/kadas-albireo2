@@ -5,9 +5,6 @@ set(VCPKG_TAG c3801cf53c614ffc54c94051d124eba097b057b1)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-# TODO: Is that actually used?
-INCLUDE(GenerateExportHeader)
-
 set(WITH_GLOBE ON CACHE BOOL "Enable globe")
 if (WITH_GLOBE)
   list(APPEND VCPKG_MANIFEST_FEATURES "globe")
@@ -25,10 +22,10 @@ endif()
 
 include(VcpkgToolchain)
 
+PROJECT(kadas LANGUAGES CXX)
+
 # The default installation paths
 include(GNUInstallDirs)
-
-PROJECT(kadas)
 
 set(CMAKE_CXX_STANDARD 17)
 
