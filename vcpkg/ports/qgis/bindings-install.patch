@@ -7,7 +7,7 @@ index a0bfb1e6e22..26a33343780 100644
    ENDIF(WIN32)
  
 -  INSTALL(TARGETS ${_logical_name} DESTINATION "${Python_SITEARCH}/${_parent_module_path}")
-+  INSTALL(TARGETS ${_logical_name} DESTINATION "${QGIS_PYTHON_DIR}/${_parent_module_path}")
++  INSTALL(TARGETS ${_logical_name} DESTINATION "${QGIS_PYTHON_DIR}")
  ENDMACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
 diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
 index 0a4b489b908..60561ea8757 100644

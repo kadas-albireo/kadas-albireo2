@@ -33,6 +33,8 @@ if(MSVC)
     )
     # From QGIS CMakeLists.txt
     set(QGIS_PLUGIN_INSTALL_PREFIX "plugins")
+
+    install(FILES "${VCPKG_BASE_DIR}/bin/postgres3.dll" DESTINATION "bin")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
     file(GLOB PROVIDER_LIBS
