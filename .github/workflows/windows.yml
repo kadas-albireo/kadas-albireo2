@@ -57,18 +57,17 @@ jobs:
 
       # TODO: only on release or workflow dispatch
       - name: 📦 Create SDK
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         run: |
           ./build/_deps/vcpkg-src/vcpkg.exe export --zip --output-dir=./sdk --x-install-root=build/vcpkg_installed
         
       - name: 📤 Upload sdk
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v3
         with:
           name: kadas-albireo2-sdk-x64-windows
           path: |
             sdk/vcpkg-export-*.zip
-      # TODO: end
     
       - name: 🌋 Build
         run: |
