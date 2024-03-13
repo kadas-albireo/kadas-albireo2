@@ -25,6 +25,7 @@ endfunction()
 set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 if(MSVC)
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/plugins")
+    set(QGIS_PYTHON_DIR "${VCPKG_BASE_DIR}/python")
     file(GLOB PROVIDER_LIBS
         "${QGIS_PLUGIN_DIR}/*provider*.dll"
     )
@@ -34,7 +35,14 @@ if(MSVC)
     # From QGIS CMakeLists.txt
     set(QGIS_PLUGIN_INSTALL_PREFIX "plugins")
 
-    install(FILES "${VCPKG_BASE_DIR}/bin/python3.dll" DESTINATION "bin")
+    # At least python3.dll, qgis_analysis.dll and gsl.dll are missing
+    # Copy everything
+    file(GLOB ALL_LIBS
+        "${VCPKG_BASE_DIR}/bin/*.dll"
+    )
+    install(FILES ${ALL_LIBS} DESTINATION "bin")
+    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas/python")
+    
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
     file(GLOB PROVIDER_LIBS
