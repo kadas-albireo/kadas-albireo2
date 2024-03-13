@@ -24,8 +24,8 @@ include(VcpkgToolchain)
 
 PROJECT(kadas LANGUAGES CXX)
 
-# The default installation paths
 include(GNUInstallDirs)
+include(GenerateExportHeader)
 
 set(CMAKE_CXX_STANDARD 17)
 
