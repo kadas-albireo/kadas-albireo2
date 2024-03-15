@@ -71,6 +71,12 @@
           "features": [
             "bindings"
           ]
+        },
+        {
+          "name": "gdal",
+          "features": [
+            "python"
+          ]
         }
       ]
     },
