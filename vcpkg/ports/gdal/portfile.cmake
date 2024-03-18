@@ -168,15 +168,16 @@ if(NOT bin_files)
     )
 endif()
 
-if("bindings" IN_LIST FEATURES)
+if("python" IN_LIST FEATURES)
   file(REMOVE_RECURSE
     "${CURRENT_PACKAGES_DIR}/debug/Lib"
     "${CURRENT_PACKAGES_DIR}/debug/Scripts"
   )
-  file(COPY "${CURRENT_PACKAGES_DIR}/Lib" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
-  file(COPY "${CURRENT_PACKAGES_DIR}/Scripts" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
+  file(COPY "${CURRENT_PACKAGES_DIR}/Lib/site-packages/" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
+  # TODO: Generalize for non windows
+  file(COPY "${CURRENT_PACKAGES_DIR}/Scripts" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../Scripts")
   file(REMOVE_RECURSE
-    "${CURRENT_PACKAGES_DIR}/Lib"
+    "${CURRENT_PACKAGES_DIR}/Lib/site-packages"
     "${CURRENT_PACKAGES_DIR}/Scripts"
     )
 endif()
