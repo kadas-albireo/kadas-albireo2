@@ -99,6 +99,8 @@ IF(INSTALL_DEMO_DATA)
 ENDIF()
 
 include(VcpkgInstallDeps)
+include(Package)
+
 
 IF(UNIX)
     install(FILES com.sourcepole.kadas.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)

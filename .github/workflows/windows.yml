@@ -75,12 +75,12 @@ jobs:
 
       - name: 📦 Package
         run: |
-          cmake --install build --config Release
+          cmake --build build --target bundle --config Release
 
       - name: 📤 Upload package
         uses: actions/upload-artifact@v4
         with:
           name: kadas-albireo2
           path: |
-            C:/kadas
+            build/kadas-*-win64.zip
             
