@@ -1,0 +1,16 @@
+{
+  "name": "py-kadas-requirements",
+  "version-date": "2024-03-25",
+  "description": "pip installed python requirements",
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    {
+      "name": "py-pip",
+      "host": true
+    },
+    "python3"
+  ]
+}

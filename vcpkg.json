@@ -65,7 +65,7 @@
       "description": "Build with python bindings",
       "dependencies": [
         "py-pip",
-        "py-pyqt5",
+        "py-kadas-requirements",
         {
           "name": "qgis",
           "features": [
