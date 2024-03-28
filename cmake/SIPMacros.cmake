@@ -19,9 +19,6 @@
 # The behavior of the ADD_SIP_PYTHON_MODULE macro can be controlled by a
 # number of variables:
 #
-# SIP_INCLUDES - List of directories which SIP will scan through when looking
-#     for included .sip files. (Corresponds to the -I option for SIP.)
-#
 # SIP_TAGS - List of tags to define when running SIP. (Corresponds to the -t
 #     option for SIP.)
 #
@@ -35,7 +32,6 @@
 # SIP_EXTRA_OPTIONS - Extra command line options which should be passed on to
 #     SIP.
 
-SET(SIP_INCLUDES)
 SET(SIP_TAGS)
 SET(SIP_CONCAT_PARTS 16)
 SET(SIP_DISABLE_FEATURES)
@@ -111,42 +107,7 @@ MACRO(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES CPP_FILES
     )
 
   ELSE (SIP_BUILD_EXECUTABLE)
-
-    FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_module_path})    # Output goes in this dir.
-
-    SET(_sip_includes)
-    FOREACH (_inc ${SIP_INCLUDES})
-      GET_FILENAME_COMPONENT(_abs_inc ${_inc} ABSOLUTE)
-      LIST(APPEND _sip_includes -I ${_abs_inc})
-    ENDFOREACH (_inc )
-
-    SET(_sip_tags)
-    FOREACH (_tag ${SIP_TAGS})
-      LIST(APPEND _sip_tags -t ${_tag})
-    ENDFOREACH (_tag)
-
-    SET(_sip_x)
-    FOREACH (_x ${SIP_DISABLE_FEATURES})
-      LIST(APPEND _sip_x -x ${_x})
-    ENDFOREACH (_x ${SIP_DISABLE_FEATURES})
-
-    FOREACH(CONCAT_NUM RANGE 0 ${SIP_CONCAT_PARTS} )
-      IF( ${CONCAT_NUM} LESS ${SIP_CONCAT_PARTS} )
-        SET(_sip_output_files ${_sip_output_files} ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/sip${_child_module_name}part${CONCAT_NUM}.cpp )
-      ENDIF( ${CONCAT_NUM} LESS ${SIP_CONCAT_PARTS} )
-    ENDFOREACH(CONCAT_NUM RANGE 0 ${SIP_CONCAT_PARTS} )
-
-    SET(SIPCMD ${SIP_BINARY_PATH} ${_sip_tags} -w -e ${_sip_x} ${SIP_EXTRA_OPTIONS} -j ${SIP_CONCAT_PARTS} -c ${CMAKE_CURRENT_BINARY_DIR}/${_module_path} -I ${CMAKE_CURRENT_BINARY_DIR}/${_module_path} ${_sip_includes} ${_configured_module_sip})
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_sip_output_files}
-      COMMAND ${CMAKE_COMMAND} -E echo ${message}
-      COMMAND ${CMAKE_COMMAND} -E touch ${_sip_output_files}
-      COMMAND ${SIPCMD}
-      MAIN_DEPENDENCY ${_configured_module_sip}
-      DEPENDS ${SIP_EXTRA_FILES_DEPEND}
-      VERBATIM
-    )
-
+    message(FATAL_ERROR "sip-build (SIP_BUILD_EXECUTABLE) not found")
   ENDIF (SIP_BUILD_EXECUTABLE)
 
   ADD_CUSTOM_TARGET(generate_sip_${MODULE_NAME}_cpp_files DEPENDS ${_sip_output_files})
@@ -180,10 +141,14 @@ MACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
     TARGET_LINK_LIBRARIES(${_logical_name} ${Python_LIBRARIES})
   ENDIF (NOT APPLE)
   TARGET_LINK_LIBRARIES(${_logical_name} ${EXTRA_LINK_LIBRARIES})
+
+  message(STATUS "${_logical_name} ${EXTRA_LINK_LIBRARIES}")
   IF (APPLE)
     SET_TARGET_PROPERTIES(${_logical_name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   ENDIF (APPLE)
   SET_TARGET_PROPERTIES(${_logical_name} PROPERTIES PREFIX "" OUTPUT_NAME ${_child_module_name})
+
+  target_link_libraries(${_logical_name} Python::Python)
 
   IF (WIN32)
     SET_TARGET_PROPERTIES(${_logical_name} PROPERTIES SUFFIX ".pyd")

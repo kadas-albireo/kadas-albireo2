@@ -1,3 +1,8 @@
+if(qgis_cmake_wrapper_included)
+  return()
+endif()
+set(qgis_cmake_wrapper_included TRUE)
+
 function(find_and_link_library TARGET LIBRARY)
   find_library(${LIBRARY}-LIBRARY ${LIBRARY} ${ADDITIONAL_ARGS})
   if(${LIBRARY}-LIBRARY)

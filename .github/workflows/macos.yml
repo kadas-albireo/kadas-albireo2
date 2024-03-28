@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: build-logs-x64-windows
+          name: build-logs-${{ matrix.triplet }}
           path: |
             build/_deps/vcpkg-src/buildtrees/**/*.log
 
