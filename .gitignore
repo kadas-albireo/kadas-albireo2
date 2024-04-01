@@ -1,4 +1,4 @@
-build*
+/build*
 dist
 dist_debug
 CMakeLists.txt.user
