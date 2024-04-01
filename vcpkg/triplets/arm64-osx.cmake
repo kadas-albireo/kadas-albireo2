@@ -6,7 +6,7 @@ set(VCPKG_LIBRARY_LINKAGE static)
 set(VCPKG_BUILD_TYPE release)
 
 # qt5-location ships a very old boost version with incompatibilities with clang 16
-if(PORT MATCHES "qt5-location")
+if(PORT STREQUAL "qt5-location")
   set(VCPKG_CXX_FLAGS "-Wno-enum-constexpr-conversion")
   set(VCPKG_C_FLAGS "-Wno-enum-constexpr-conversion")
 endif()
