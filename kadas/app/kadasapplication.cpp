@@ -61,6 +61,7 @@
 #include <qgis/qgsvectorlayerproperties.h>
 #include <qgis/qgszipitem.h>
 #include <qgis/qgsziputils.h>
+#include <qgis/qgsdockablewidgethelper.h>
 
 #include <kadas/core/kadas.h>
 #include <kadas/gui/kadasattributetabledialog.h>
@@ -326,6 +327,18 @@ void KadasApplication::init()
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
+
+  QgsDockableWidgetHelper::sAddTabifiedDockWidgetFunction = [](Qt::DockWidgetArea dockArea, QDockWidget* dock, const QStringList& tabSiblings, bool raiseTab)
+  {
+    // If we want to add tabified dock widgets as QGIS does, we need to implement this
+    // KadasApplication::instance()->addTabifiedDockWidget(dockArea, dock, tabSiblings, raiseTab);
+  };
+  QgsDockableWidgetHelper::sAppStylesheetFunction = []()->QString
+  {
+    return KadasApplication::instance()->styleSheet();
+  };
+  QgsDockableWidgetHelper::sOwnerWindow = mMainWindow;
+
 
   // Register plugin layers
   mKadasPluginLayerTypes.append( new KadasItemLayerType() );

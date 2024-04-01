@@ -1,54 +1,32 @@
 {
-  "name": "kadas-albireo2",
-  "version-string": "current",
-  "description": "KADAS Albireo is a mapping application based on QGIS and targeted at non-specialized users, providing enhanced functionalities in areas such as drawing, measuring, terrain analysis, etc.",
-  "homepage": "https://github.com/kadas-albireo/kadas-albireo2",
-  "dependencies": [
-    {
-      "name": "qgis",
-      "features": [
-        "gui"
-      ]
-    },
-    "geographiclib",
-    "quazip-qt5",
-    "cairo",
-    "librsvg",
-    "svg2svgt-qt5",
-    "python3",
-    "zonedetect",
-    {
-      "name": "qt5-activeqt",
-      "platform": "windows"
-    }
-  ],
-  "features": {
-    "globe": {
-      "description": "Globe",
-      "dependencies": ["osgearth"]
-    },
-    "webkit": {
-      "description": "Build with Qt Webkit",
-      "dependencies": [{
-        "name": "qgis",
-        "features": ["webkit"]
-      }]
-    }
-  },
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "fecdd89f28ed883b26a48c2b30085f6384070bb8",
+      "baseline": "ce1916404fc6f2b645f419a6d47b7ebafe686582",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
       {
         "kind": "git",
-        "baseline": "c288fd01cbc95c56a122747c3c39cbab2710ee17",
+        "baseline": "ff79a0956d18156e493b3c1f6342fd01fe563283",
         "repository": "https://github.com/open-vcpkg/qt5-registry",
         "packages": [
+          "py-pyqt5",
+          "py-pyqt5-sip",
+          "py-qscintilla-qt5",
           "qscintilla-qt5",
-          "qt5-webkit"
+          "qt5-webkit",
+          "vcpkg-qmake-qt5"
+        ]
+      },
+      {
+        "kind": "git",
+        "baseline": "719f4a42d3bb6b573503adf50c9216a620cd579f",
+        "repository": "https://github.com/open-vcpkg/python-registry",
+        "packages": [
+          "python3",
+          "py-*",
+          "vcpkg-python-scripts"
         ]
       }
     ],
@@ -58,5 +36,66 @@
     "overlay-triplets": [
       "vcpkg/triplets"
     ]
+  },
+  "name": "kadas-albireo2",
+  "version-string": "current",
+  "description": "KADAS Albireo is a mapping application based on QGIS and targeted at non-specialized users, providing enhanced functionalities in areas such as drawing, measuring, terrain analysis, etc.",
+  "homepage": "https://github.com/kadas-albireo/kadas-albireo2",
+  "dependencies": [
+    "cairo",
+    "geographiclib",
+    "librsvg",
+    "python3",
+    {
+      "name": "qgis",
+      "features": [
+        "gui"
+      ]
+    },
+    {
+      "name": "qt5-activeqt",
+      "platform": "windows"
+    },
+    "quazip-qt5",
+    "svg2svgt-qt5",
+    "zonedetect"
+  ],
+  "features": {
+    "bindings": {
+      "description": "Build with python bindings",
+      "dependencies": [
+        "py-pip",
+        "py-kadas-requirements",
+        {
+          "name": "qgis",
+          "features": [
+            "bindings"
+          ]
+        },
+        {
+          "name": "gdal",
+          "features": [
+            "python"
+          ]
+        }
+      ]
+    },
+    "globe": {
+      "description": "Globe",
+      "dependencies": [
+        "osgearth"
+      ]
+    },
+    "webkit": {
+      "description": "Build with Qt Webkit",
+      "dependencies": [
+        {
+          "name": "qgis",
+          "features": [
+            "webkit"
+          ]
+        }
+      ]
+    }
   }
 }

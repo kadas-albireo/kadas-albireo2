@@ -1,12 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.27.0)
 CMAKE_POLICY(SET CMP0094 NEW)
 
-set(VCPKG_TAG c3801cf53c614ffc54c94051d124eba097b057b1)
+set(VCPKG_TAG ce1916404fc6f2b645f419a6d47b7ebafe686582)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-
-# TODO: Is that actually used?
-INCLUDE(GenerateExportHeader)
 
 set(WITH_GLOBE ON CACHE BOOL "Enable globe")
 if (WITH_GLOBE)
@@ -18,9 +15,18 @@ if (WITH_QTWEBKIT)
   list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
 endif()
 
+set(WITH_BINDINGS ON CACHE BOOL "Build with python bindings")
+if (WITH_BINDINGS)
+  list(APPEND VCPKG_MANIFEST_FEATURES "bindings")
+endif()
+
 include(VcpkgToolchain)
 
-PROJECT(kadas)
+PROJECT(kadas LANGUAGES CXX)
+
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+
 set(CMAKE_CXX_STANDARD 17)
 
 SET(KADAS_NAME "Kadas" CACHE STRING "Kadas application name")
@@ -43,9 +49,14 @@ FIND_PACKAGE(Qt5Svg REQUIRED)
 FIND_PACKAGE(Qt5Xml REQUIRED)
 FIND_PACKAGE(Qt5Concurrent REQUIRED)
 FIND_PACKAGE(QGIS REQUIRED COMPONENTS Core Analysis Gui)
+
 FIND_PACKAGE(GDAL CONFIG REQUIRED)
 FIND_PACKAGE(QuaZip-Qt5 REQUIRED)
 find_package(OpenSSL REQUIRED)
+if(WITH_BINDINGS)
+  find_package(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
+  find_package(QGIS REQUIRED COMPONENTS Python)
+endif()
 
 if (WITH_QTWEBKIT)
   FIND_PACKAGE(Qt5WebKitWidgets REQUIRED)
@@ -77,7 +88,6 @@ ADD_DEFINITIONS(-DMILX_LICENSE_KEY="${MILX_LICENSE_KEY}")
 
 ADD_SUBDIRECTORY(kadas)
 
-set(WITH_BINDINGS ON CACHE BOOL "Build with python bindings")
 if(WITH_BINDINGS)
   ADD_SUBDIRECTORY(python)
 endif()
@@ -87,6 +97,10 @@ IF(INSTALL_DEMO_DATA)
     install(FILES packaging/files/settings_full.ini packaging/files/settings_patch.ini DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
     install(DIRECTORY packaging/files/print_templates packaging/files/project_templates DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
 ENDIF()
+
+include(VcpkgInstallDeps)
+include(Package)
+
 
 IF(UNIX)
     install(FILES com.sourcepole.kadas.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)
