@@ -92,9 +92,9 @@ add_custom_command(TARGET deploy
                    POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/cacert.pem" "${SHARE_DIR}/cacert.pem"
                    COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/resources"
-#                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/resources" "${SHARE_DIR}/qgis/resources"
-#                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
                    COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
 )
 set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
