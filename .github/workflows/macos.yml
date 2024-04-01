@@ -62,6 +62,9 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
+      - uses: m-kuhn/action-tmate@patch-1
+        if: always()
+
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3
         if: failure()
