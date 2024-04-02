@@ -24,6 +24,8 @@ include(VcpkgToolchain)
 
 PROJECT(kadas LANGUAGES CXX)
 
+set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 
@@ -56,6 +58,12 @@ find_package(OpenSSL REQUIRED)
 if(WITH_BINDINGS)
   find_package(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
   find_package(QGIS REQUIRED COMPONENTS Python)
+
+  if(WIN32)
+    set(SITEARCH_INSTALL_DIR "bin/Lib/site-packages")
+  else()
+    set(SITEARCH_INSTALL_DIR "${Python_SITEARCH}")
+  endif()
 endif()
 
 if (WITH_QTWEBKIT)
