@@ -102,8 +102,8 @@ endif()
 
 option(INSTALL_DEMO_DATA "Installs settings and templates" OFF)
 IF(INSTALL_DEMO_DATA)
-    install(FILES packaging/files/settings_full.ini packaging/files/settings_patch.ini DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
-    install(DIRECTORY packaging/files/print_templates packaging/files/project_templates DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kadas/)
+    install(FILES "packaging/files/settings_full.ini" "packaging/files/settings_patch.ini" DESTINATION "share/kadas/")
+    install(DIRECTORY "packaging/files/print_templates" "packaging/files/project_templates" DESTINATION "share/kadas/")
 ENDIF()
 
 include(VcpkgInstallDeps)
