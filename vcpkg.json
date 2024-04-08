@@ -69,7 +69,8 @@
         {
           "name": "qgis",
           "features": [
-            "bindings"
+            "bindings",
+            "desktop"
           ]
         },
         {

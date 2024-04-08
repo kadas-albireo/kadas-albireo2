@@ -2,10 +2,7 @@ if(NOT WITH_VCPKG)
     return()
 endif()
 
-# Copy files from the install dir to where it
-# will be bundled
 add_custom_target(deploy)
-
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/bin/kadas.app/Contents/share")
@@ -42,7 +39,7 @@ if(MSVC)
     )
     install(FILES ${ALL_LIBS} DESTINATION "bin")
     install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas/python")
-    
+    install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
     file(GLOB PROVIDER_LIBS
