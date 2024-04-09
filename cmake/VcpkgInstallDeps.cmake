@@ -108,6 +108,8 @@ install(DIRECTORY "${SHARE_DIR}/qgis/resources/" DESTINATION "${CMAKE_INSTALL_DA
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
 install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
-install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/" DESTINATION "bin")
+install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
+        DESTINATION "bin"
+        PATTERN "*.sip" EXCLUDE)
 
 add_dependencies(kadas deploy)
