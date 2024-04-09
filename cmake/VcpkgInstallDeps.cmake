@@ -19,7 +19,8 @@ function(copy_resource source target)
     )
 endfunction()
 
-set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+file(TO_CMAKE_PATH "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}" VCPKG_BASE_DIR)
+
 if(MSVC)
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/plugins")
     set(QGIS_PYTHON_DIR "${VCPKG_BASE_DIR}/python")
@@ -38,7 +39,7 @@ if(MSVC)
         "${VCPKG_BASE_DIR}/bin/*.dll"
     )
     install(FILES ${ALL_LIBS} DESTINATION "bin")
-    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas/python")
+    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "python/")
     install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
