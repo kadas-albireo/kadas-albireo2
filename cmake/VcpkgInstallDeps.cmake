@@ -19,8 +19,6 @@ function(copy_resource source target)
     )
 endfunction()
 
-file(TO_CMAKE_PATH "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}" VCPKG_BASE_DIR)
-
 if(MSVC)
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/plugins")
     set(QGIS_PYTHON_DIR "${VCPKG_BASE_DIR}/python")
