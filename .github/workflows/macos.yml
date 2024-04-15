@@ -32,6 +32,10 @@ jobs:
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
+        with:
+          # Pin to specific version to avoid rebuilding too often
+          # Also helps to avoid spurious build failures like https://github.com/qgis/QGIS/pull/47098
+          cmakeVersion: 3.29.0
 
       - name: 🔨 Prepare build env
         run: |

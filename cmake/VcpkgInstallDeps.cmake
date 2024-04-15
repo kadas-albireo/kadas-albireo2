@@ -2,10 +2,7 @@ if(NOT WITH_VCPKG)
     return()
 endif()
 
-# Copy files from the install dir to where it
-# will be bundled
 add_custom_target(deploy)
-
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(SHARE_DIR "${CMAKE_BINARY_DIR}/output/bin/kadas.app/Contents/share")
@@ -40,8 +37,8 @@ if(MSVC)
         "${VCPKG_BASE_DIR}/bin/*.dll"
     )
     install(FILES ${ALL_LIBS} DESTINATION "bin")
-    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas/python")
-    
+    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "python/")
+    install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
     file(GLOB PROVIDER_LIBS
@@ -109,6 +106,9 @@ install(DIRECTORY "${SHARE_DIR}/qgis/resources/" DESTINATION "${CMAKE_INSTALL_DA
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
 install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
-install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/" DESTINATION "bin")
+install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/" DESTINATION "bin/Qca") # QCA plugins
+install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
+        DESTINATION "bin"
+        PATTERN "*.sip" EXCLUDE)
 
 add_dependencies(kadas deploy)
