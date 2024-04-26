@@ -93,18 +93,17 @@ add_custom_command(TARGET deploy
                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg" "${SHARE_DIR}/qgis/svg"
                    COMMAND ${CMAKE_COMMAND} -E rm -R -- "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
 )
-set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
 
-if(NOT EXISTS "${PROJ_DATA_PATH}/proj.db")
-    message(FATAL_ERROR "proj.db not found at ${PROJ_DATA_PATH}/proj.db")
+if(NOT EXISTS "${VCPKG_BASE_DIR}/share/proj/proj.db")
+    message(FATAL_ERROR "proj.db not found at ${VCPKG_BASE_DIR}/share/proj/proj.db")
 endif()
 
-copy_resource("${PROJ_DATA_PATH}" "proj")
-copy_resource("${VCPKG_BASE_DIR}/share/gdal" "gdal")
-copy_resource("${CMAKE_SOURCE_DIR}/packaging/files" "kadas")
+install(DIRECTORY "${VCPKG_BASE_DIR}/share/proj/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
+install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/packaging/files/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas")
+install(DIRECTORY "${VCPKG_BASE_DIR}/share/kadas/" DESTINATION "${CMAKE_INSTALL_DATADIR}/kadas")
 install(DIRECTORY "${SHARE_DIR}/qgis/resources/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/" DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
-install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
 install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
         DESTINATION "bin"
