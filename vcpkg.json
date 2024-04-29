@@ -8,7 +8,7 @@
     "registries": [
       {
         "kind": "git",
-        "baseline": "ff79a0956d18156e493b3c1f6342fd01fe563283",
+        "baseline": "6ede4a1108756899e55fe4d308aaa25410e8e12f",
         "repository": "https://github.com/open-vcpkg/qt5-registry",
         "packages": [
           "py-pyqt5",
