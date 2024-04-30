@@ -1,16 +1,21 @@
 diff --git a/cmake/FindQScintilla.cmake b/cmake/FindQScintilla.cmake
-index bab6c631720..a26ac13f21b 100644
+index bab6c631720..e32e6248f1b 100644
 --- a/cmake/FindQScintilla.cmake
 +++ b/cmake/FindQScintilla.cmake
-@@ -87,6 +87,11 @@ ELSE(QSCINTILLA_VERSION_STR)
+@@ -87,6 +87,16 @@ ELSE(QSCINTILLA_VERSION_STR)
    ENDIF(QSCINTILLA_INCLUDE_DIR AND NOT EXISTS QSCINTILLA_VERSION_STR)
  
    IF(QSCINTILLA_FOUND)
-+  if(NOT BUILD_WITH_QT6 AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
-+  find_package(Qt5 COMPONENTS MacExtras REQUIRED)
-+    target_link_libraries(QSCINTILLA_LIBRARY INTERFACE Qt5::MacExtras)
-+  endif()
-+
++    if(NOT BUILD_WITH_QT6 AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
++      find_package(Qt5 COMPONENTS MacExtras REQUIRED)
++      add_library(qsci::qsci-unofficial UNKNOWN IMPORTED)
++      set_target_properties(qsci::qsci-unofficial
++        PROPERTIES
++          IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
++	  IMPORTED_LOCATION "${QSCINTILLA_LIBRARY}")
++      target_link_libraries(qsci::qsci-unofficial INTERFACE Qt5::MacExtras)
++      set(QSCINTILLA_LIBRARY "qsci::qsci-unofficial")
++    endif()
      IF(NOT QSCINTILLA_FIND_QUIETLY)
        MESSAGE(STATUS "Found QScintilla2: ${QSCINTILLA_LIBRARY} (${QSCINTILLA_VERSION_STR})")
      ENDIF(NOT QSCINTILLA_FIND_QUIETLY)

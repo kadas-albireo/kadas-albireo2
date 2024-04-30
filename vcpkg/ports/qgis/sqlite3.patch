@@ -10,7 +10,7 @@ index 36fd3f2c6bc..1785081a0dc 100644
 -  if (NOT SQLITE3_FOUND)
 -    message (SEND_ERROR "sqlite3 dependency was not found!")
 -  endif()
-+  find_package(SQlite3 REQUIRED)
++  find_package(SQLite3 REQUIRED)
  
    find_package(Protobuf CONFIG)
    find_package(Protobuf REQUIRED)
