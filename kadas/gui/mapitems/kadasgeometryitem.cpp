@@ -174,7 +174,7 @@ void KadasGeometryItem::drawVertex( QgsRenderContext &context, double x, double 
   qreal iconSize = mIconSize * mSymbolScale * dpiScale;
   qreal s = ( iconSize - 1 ) / 2;
   p->save();
-  p->setPen( QPen( mIconPen.brush(), mIconPen.widthF() * dpiScale ) );
+  p->setPen( QPen( mIconPen.brush(), mIconPen.widthF() * dpiScale, mPen.style() ) );
   p->setBrush( mIconBrush );
 
   switch ( mIconType )
