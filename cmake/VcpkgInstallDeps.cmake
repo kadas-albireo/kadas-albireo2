@@ -109,5 +109,8 @@ install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_D
 install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
         DESTINATION "bin"
         PATTERN "*.sip" EXCLUDE)
+# This should normally be done by qtdeploy but it seems some opengl things are missing
+install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/"
+        DESTINATION "bin/plugins")
 
 add_dependencies(kadas deploy)
