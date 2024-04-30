@@ -21,6 +21,7 @@ vcpkg_from_github(
         delimitedtext.patch
         qtkeychain-56284.patch
         bindings-install.patch
+        qscintilla_link_macextras.diff
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
