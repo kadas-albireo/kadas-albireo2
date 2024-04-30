@@ -87,9 +87,6 @@
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
-#ifdef WITH_GLOBE
-#include <kadas/app/globe/kadasglobeintegration.h>
-#endif
 #include "kadas/app/3d/kadas3dintegration.h"
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
 #include <kadas/app/iamauth/kadasiamauth.h>
@@ -277,13 +274,7 @@ void KadasMainWindow::init()
 
 
 
-#ifdef WITH_GLOBE
-  // Globe
-  KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
-  Q_UNUSED( globe );
-#else
   Kadas3DIntegration *my3Dintegration = new Kadas3DIntegration( mAction3D, mMapCanvas, this );
-#endif
 
   configureButtons();
 

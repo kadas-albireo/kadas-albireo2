@@ -9,8 +9,7 @@ QWidget {
 
 QDockWidget #dockContentsWidget,
 QDockWidget #mapWidgetTitleWidget,
-QDockWidget #dockTitleWidget,
-QDockWidget #globeTitleWidget {
+QDockWidget #dockTitleWidget {
     background: #BEDCF6;
 }
 
