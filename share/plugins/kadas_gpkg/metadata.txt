@@ -1,0 +1,17 @@
+[general]
+name=KADAS GPKG
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=KADAS GPKG plugin
+about=KADAS GPKG plugin.
+version=2.4
+author=Sourcepole
+email=smani@sourcepole.ch
+tags=
+
+homepage=https://github.com/kadas-albireo/kadas-albireo2
+tracker=https://github.com/kadas-albireo/kadas-albireo2
+repository=https://github.com/kadas-albireo/kadas-albireo2
+icon=icon.png
+experimental=False
+deprecated=False

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>MSS - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "MSS";
+        var mkdocs_page_input_path = "fr/mss.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">MSS</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dessiner-des-symboles-mss">Dessiner des symboles MSS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#editer-des-symboles-mss">Editer des symboles MSS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gestion-des-couches">Gestion des couches</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#importation-et-exportation-milx">Importation et exportation MilX</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dimension-des-symboles-largeur-des-lignes-standard-largeur-et-couleur-de-la-ligne-de-repere">Dimension des symboles, largeur des lignes, standard, largeur et couleur de la ligne de repère</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Fonctionnalités avancées</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Couche vecteur</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>MSS</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mss">MSS</h1>
+<p>La fonctionnalité de la représentation de la situation se trouve dans l’onglet MSS. Cet onglet est inactif si l’interface KADAS MSS-MilX n’est pas installée. La fonctionnalité de représentation de la situation comprend le dessin et l’édition de symboles MSS et la gestion de niveaux MilX.</p>
+<h2 id="dessiner-des-symboles-mss"><a name="sec0"></a>Dessiner des symboles MSS</h2>
+<p>Le bouton <strong><em>Ajouter un symbole</em></strong> ouvre une galerie de symboles MSS où l’on peut effectuer des recherches. Après avoir sélectionné un symbole dans la galerie, on peut le placer sur la carte.</p>
+<p>Les symboles sont placés au niveau MilX. Ils sont visibles dans le répertoire de la carte. On peut créer de nouveaux niveaux MilX et on peut également choisir à quel niveau les symboles que l’on vient de dessiner doivent être ajoutés.</p>
+<p><img src="../../../media/image10.png" /></p>
+<h2 id="editer-des-symboles-mss"><a name="sec1"></a>Editer des symboles MSS</h2>
+<p>On peut éditer les symboles déjà dessinés a posteriori en les sélectionnant sur la carte. Les <strong><em>objets sélectionnés</em></strong> peuvent être déplacés et, selon le type de symbole, les nœuds peuvent être déplacés individuellement, créés ou supprimés via le menu contextuel. L’éditeur de symbole MilX peut être ouvert par double clic ou par Editer dans le menu contextuel.</p>
+<p>Pour les <strong><em>symboles à un point</em></strong>, il est également possible de choisir entre point d’ancrage symbole ou graphique symbole pour un offset. Dans le mode d’édition, le point d’ancrage est caractérisé par un point rouge, par défaut au milieu du symbole. Si le symbole est déplacé vers le point d’ancrage, le point est déplacé en même temps que le graphique. Si le symbole est vers le graphique, seul le graphique est déplacé et une ligne noire apparaît entre le point d’ancrage et le centre du graphique. On peut supprimer l’offset en faisant un clic droit sur le symbole.</p>
+<p>Pour les <strong><em>symboles à plusieurs points</em></strong>, il est possible d’éditer des nœuds et des points de contrôle éventuels, tant que les spécifications du symbole le permettent. Dans le mode édition, les nœuds sont représentés par des points jaunes et les points de contrôle par des points rouges. Ces derniers peuvent contrôler la largeur des flèches ou les paramètres d’évaluation des courbes Bézier. En plus de déplacer les points, on peut ajouter de nouveaux noeuds ou en supprimer ou faisant clic droit.</p>
+<p>De la même manière que pour les objets redlining, les symboles MSS peuvent être déplacés, copiés, coupés et collés individuellement ou en groupe. En plus des entrées du menu contextuel et des raccourcis clavier habituels, il y a aussi les boutons <strong><em>Copier vers...</em></strong> et <strong><em>Déplacer vers...</em></strong> en bas de la carte. Ces derniers permettent explicitement de spécifier une couche cible, par défaut la couche MilX actuellement sélectionnée est prise comme cible. Si aucune couche MilX n'est sélectionnée, la couche de destination sera demandée.</p>
+<p><img src="../../../media/image11.png" /></p>
+<h2 id="gestion-des-couches"><a name="sec2"></a>Gestion des couches</h2>
+<p>Les symboles MSS sont classés dans un <strong><em>niveau MilX</em></strong> dédié dans l’arborescence. On peut créer plusieurs niveaux MilX indépendants. Dans la galerie des symboles MSS, on peut choisir à quel niveau un symbole doit être ajouté. Comme d’habitude, les niveaux individuels peuvent être activés ou désactivés dans l’arborescence.</p>
+<p>Les niveaux MilX présentent la caractéristique particulière de pouvoir être marqués comme <strong><em>Approuvé</em></strong>. Les niveaux approuvés ne peuvent pas être édités et les symboles tactiques apparaissent en noir. On peut marquer un niveau comme approuvé (ou enlever cet attribut) dans le menu contextuel du niveau MilX correspondant.</p>
+<h2 id="importation-et-exportation-milx"><a name="sec3"></a>Importation et exportation MilX</h2>
+<p>Les niveaux MilX peuvent être exportés dans un fichier MILXLY ou MILXLYZ, et les fichiers MILXLY et MILXLYZ peuvent être importés en tant que niveaux MilX. </p>
+<p>MILXLY (et la variante comprimée MILXLYZ) est un format d’échange de représentations de situation. Il comprend uniquement des symboles MSS de représentation de situation, et aucun autre objet tel que les redlinings, punaises ou images.</p>
+<p>Lors de <strong><em>l'exportation</em></strong> vers MILXLY (Z), vous pouvez choisir les couches MilX à exporter et dans quelle version le fichier doit être créé. De plus, vous pouvez choisir d'exporter le cartouche de carte défini dans la boîte de dialogue d'impression.</p>
+<p><strong><em>L'importation</em></strong> d'un fichier MILXLY (Z) parcourt toutes les couches qu'il contient. Si le fichier MSS contient des définitions de symboles conformes à un ancien standard, ceux-ci sont automatiquement convertis. Les pertes de conversion possibles ou les erreurs sont communiquées à l'utilisateur. Si l'une des couches importées contient un cartouche, l'utilisateur sera invité à l'importer dans KADAS.</p>
+<h2 id="dimension-des-symboles-largeur-des-lignes-standard-largeur-et-couleur-de-la-ligne-de-repere"><a name="sec5"></a>Dimension des symboles, largeur des lignes, standard, largeur et couleur de la ligne de repère</h2>
+<p>Ces réglages influencent l'affichage de tous les symboles MSS dans carte. Elles peuvent être remplacées individuellement pour chaque couche dans l'onglet MSS de dialogue des propriétés de la couche.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../gps/" class="btn btn-neutral float-left" title="Navigation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../settings/" class="btn btn-neutral float-right" title="Réglages">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../gps/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../settings/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

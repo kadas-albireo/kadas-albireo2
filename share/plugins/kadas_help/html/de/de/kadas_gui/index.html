@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Benutzeroberfläche - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Benutzeroberfl\u00e4che";
+        var mkdocs_page_input_path = "de/kadas_gui.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Benutzeroberfläche</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#funktionsmenu">Funktionsmenü</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#favoriten-und-suche">Favoriten und Suche</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#favoriten">Favoriten</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#suche">Suche</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#kartenfenster">Kartenfenster</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ebenen-und-geodatenkatalog">Ebenen und Geodatenkatalog</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ebenen">Ebenen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#geodatenkatalog">Geodatenkatalog</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#statusbar">Statusbar</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Erweiterte Funktionalitäten</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vektorebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Ausdrücke</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Feldrechner</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rasterebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Eigenschaftendialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Druckzusammenstellung</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Benutzeroberfläche</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="kadas-benutzeroberflache">KADAS Benutzeroberfläche</h1>
+<p><img src="../../../media/image1.png" /></p>
+<p>Die KADAS Benutzeroberfläche ist in fünf Bereiche unterteilt:</p>
+<ul>
+<li>Funktionsmenü</li>
+<li>Favoriten und Suche</li>
+<li>Kartenfenster</li>
+<li>Ebenen und Geodatenkatalog</li>
+<li>Status Bar</li>
+</ul>
+<h2 id="funktionsmenu"><a name="sec0"></a>Funktionsmenü</h2>
+<p>Im Funkionsmenü kann über eine Menüleiste zwischen verschiedenen Symbolleisten umgeschaltet werden. Die Symbolleisten enthalten Knöpfe für die verschiedenen Funktionen. Diese sind in separaten Kapiteln dokumentiert:</p>
+<ul>
+<li><a href="/map">Karte</a></li>
+<li><a href="/view">Ansicht</a></li>
+<li><a href="/analysis">Analyse</a></li>
+<li><a href="/draw">Zeichnen</a></li>
+<li><a href="/gps">Navigation</a></li>
+<li><a href="/mss">MSS</a></li>
+<li><a href="/settings">Einstellungen</a></li>
+</ul>
+<h2 id="favoriten-und-suche"><a name="sec1"></a>Favoriten und Suche</h2>
+<h3 id="favoriten">Favoriten</h3>
+<p>Auf den vier Platzhaltern können favorisierte Funktionen aus dem Funktionsmenü platziert werden. Dies geschieht durch Ziehen der Maus bei gedrückter Maustaste. Der Favorit kann durch Drücken der rechten Mausstaste wieder entfernt werden. Die Favoriten werden als Benutzereinstellungen gespeichert.</p>
+<h3 id="suche">Suche</h3>
+<p>Das Suchfeld bietet eine einheitliche Schnittstelle für verschiedene Suchdienste:</p>
+<ul>
+<li>Koordinaten (LV03, LV95, DD, DM, DMS, UTM, MGRS)</li>
+<li>Ortschaften und Adressen schweizweit</li>
+<li>Ortschaften weltweit</li>
+<li>Attribute in lokale Datensätze</li>
+<li>Attribute in remote Datensätze (Web-Dienste)</li>
+<li>Attribute in Stecknadeln</li>
+</ul>
+<p>Nach der Eingabe von mindestens drei Buchstaben startet die Suche und es werden erste Resultate angezeigt.</p>
+<p>Die Resultate werden in entsprechend bezeichnete Kategorien aufgelistet. Die Resultatliste kann mit Maus oder Tastatur-Pfeile durchsucht werden. Beim Auswählen eines Resultats mit den Pfeilen wird eine blaue Stecknadel an den entsprechenden Ort gesetzt. Beim aktivieren eines Resultats mit der Maus wird der Kartenausschnitt auf den entsprechenden Ort zentriert.</p>
+<p><img src="../../../media/image2.png" /></p>
+<p>Rechts vom Suchfeld gibt es die Möglichkeit, einen Filter für die lokale und remote Datensatz-Suche zu definieren. Dieser Filter greift <em>nicht</em> für Koordinaten, Ortschaft oder Stecknadelsuchen.</p>
+<h2 id="kartenfenster"><a name="sec2"></a>Kartenfenster</h2>
+<p>Dieser zentrale Bereich von KADAS zeigt die geladenen Layer an und ermöglicht verschiedene Operationen auf der Karte.</p>
+<p>Das Navigieren in der Karte erfolgt mit der linken oder mittleren Maustaste, das Zoomen mit dem Scrollrad oder mit den Zoomtasten in der oberen rechten Ecke des Kartenfensters. Mit der rechten Maustaste wird das Kontextmenü geöffnet. Navigations- und Drehbewegungen werden auf berührungsempfindlichen Geräten erkannt. Darüber hinaus kann auf eine bestimmte Region gezoomt werden, indem man bei gedrückter SHIFT-Taste  ein Rechteck aufzieht. </p>
+<p>Unabhängig vom aktiven Kartenwerkzeug werden die mittlere Maustaste und das Scrollrad immer für die Kartennavigation verwendet. Die Funktion der linken und rechten Maustasten ist abhängig vom aktiven Werkzeug.</p>
+<p>Der Inhalt der Karte wird durch die im nächsten Abschnitt beschriebene Kartenlegende gesteuert.</p>
+<p>In der Registerkarte Ansicht können zusätzliche Kartenansichten hinzugefügt werden. Diese zusätzlichen Ansichten sind passiv, d.h. es ist keine weitere Interaktion außer dem Navigieren und Zoomen möglich.</p>
+<h2 id="ebenen-und-geodatenkatalog"><a name="sec3"></a>Ebenen und Geodatenkatalog</h2>
+<p>Am linken Rand des Programmfensters befindet sich ein aufklappbarer Bereich, welche Verwaltungsfunktionen für Kartenebenen enthält. Im oberen Teil ist die Kartenlegende und im unteren Teil der Geodatenkatalog angeordnet.</p>
+<h3 id="ebenen">Ebenen</h3>
+<p>Der Bereich der Kartenlegende verzeichnet alle <strong><em>Ebenen</em></strong> des Projekts. Das Kontrollkästchen für jedes Element der Legende kann benutzt werden, um die Ebene ein- oder auszublenden.</p>
+<p>Die Z-Anordnung der Kartenlayer kann mit der ‘drag and drop’ Funktion der Maus festgelegt werden. Z-Anordnung bedeutet, dass ein weiter oben in der Legende angeordneter Layer über einem weiter unten angeordneten Layer im Kartenfenster angezeigt wird.</p>
+<p>Die Ebenen im Legendenfenster können als Gruppen organisiert werden.</p>
+<p>Das Kontrollkästchen für eine Gruppe zeigt oder verbirgt alle Layer einer Gruppe mit einem Klick.</p>
+<p>Bei einem Rechtsklick auf einen Eintrag können, abhängig vom Typ der ausgewählten Ebene, verschiedene Operationen ausgeführt werden, wie:</p>
+<ul>
+<li>Auf Ebene zoomen</li>
+<li>Entfernen</li>
+<li>Unbenennen</li>
+<li>Ebeneneigentschaften aufrufen</li>
+</ul>
+<p>Es ist möglich mehr als einen Layer oder Gruppe zur gleichen Zeit auszuwählen indem man die Strg Taste gedrückt hält und die Layer mit der linken Maustaste auswählt.</p>
+<h3 id="geodatenkatalog">Geodatenkatalog</h3>
+<p>Im Geodatenkatalog können weitere Kartenebenen zur Karte hinzugefügt werden. Ist die Liste leer, besteht keine Netzwerkverbindung zum Katalogdienst. </p>
+<p>Beim Programmstart werden nur öffentliche Daten angezeigt. Abhängig vom Benutzer können nach erfolgter Authentifizierung weitere Daten zur Verfügung stehen, siehe <em>SAML Authentifizierung</em> unten.</p>
+<p>Durch Eingabe von Suchbegriffen im Textfeld werden die verfügbaren Ebenen entsprechend eingeschränkt. Eine Ebene kann mittels Kontextmenü (rechte Maustaste auf dem Ebeneneintrag) oder via “Drag and Drop” der Karte hinzugefügt werden.</p>
+<p>Oberhalb der Katalogliste stehen folgende Funktionen zur Verfügung:</p>
+<ul>
+<li><strong><em>Lokaler Datensatz hinzufügen</em></strong>: Es können Vektor-, Raster- und CSV-Daten hinzugefügt werden.</li>
+<li><strong><em>Ebene eines Webdienstes hinzufügen</em></strong>: Es können WMS, WFS, WCS, MapServer und Vektorkachel Ebenen hinzugefügt werden.</li>
+<li><strong><em>Katalog neu laden</em></strong>: Lädt die Liste der verfügbaren Kartenebenen neu.</li>
+<li><strong><em>SAML Authentifizierung</em></strong>: Es wird ein Fenster geöffnet, in dem ein webbasiertes Login auf dem Server durchgeführt werden kann. Nach erfolgreichem Login wird der Geodatenkatalog neu geladen und es stehen entsprechend den Berechtigungen zusätzliche Kartenebenen zur Verfügung.</li>
+</ul>
+<h2 id="statusbar"><a name="sec4"></a>Statusbar</h2>
+<p>In der Statuszeile sind folgende Anzeigen und Bedienelemente angeordnet:</p>
+<ul>
+<li><strong><em>GPS</em></strong>: Die Verwendung der GPS Schaltfläche ist im Kapitel <a href="/gps">Kapitel <em>Navigation</em></a> beschrieben.</li>
+<li>Mausposition_**: Die aktuelle Mausposition auf der Karte kann in Bezug auf mehrere Referenzsysteme angezeigt werden. Das gewünschte System kann im Menü links neben der Positionsanzeige ausgewählt werden. Die Einheit für die Höhe kann in der Einstellungen-Registerkarte geändert werden.</li>
+<li><strong><em>Massstab</em></strong>: Der aktuelle Massstab der Kartenansicht wird neben dem Koordinatenfeld angezeigt. Der Menü ermöglicht die Auswahl zwischen vordefinierten Skalen zwischen 1:500 und 1:100000000. Mit dem Schloss-Symbol kann der aktuelle Kartenmassstab fixiert werden, das Zoomen wirkt sich dann nur noch auf den Vergrößerungsfaktor aus.</li>
+<li>Koordinatenbezugssystem_**: In dieser Auswahlschaltfläche ausgewählt werden, welche Projektion für die Karte verwendet werden soll. Weicht die gewählte Projektion von der nativen Projektion eines Datensatzes ab, wird dieser neu projiziert, was je nach Datenmenge zu Leistungseinbussen führen kann.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Allgemeines"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../map/" class="btn btn-neutral float-right" title="Karte">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../map/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/plugins/KADASGpkg" >
+        <file>icons/icon.png</file>
+        <file>icons/gpkg.png</file>
+        <file>icons/gpkg_import.png</file>
+        <file>icons/gpkg_export.png</file>
+    </qresource>
+</RCC>

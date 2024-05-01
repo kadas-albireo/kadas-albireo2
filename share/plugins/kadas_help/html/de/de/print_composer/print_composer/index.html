@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Druckzusammenstellung - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Druckzusammenstellung";
+        var mkdocs_page_input_path = "de/print_composer/print_composer.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Benutzeroberfläche</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Erweiterte Funktionalitäten</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Vektorebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/expression/">Ausdrücke</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/field_calculator/">Feldrechner</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rasterebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Eigenschaftendialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Druckzusammenstellung</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#uberblick-uber-die-druckzusammenstellung">Überblick über die Druckzusammenstellung</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#in-der-druckzusammenstellung-navigieren">In der Druckzusammenstellung navigieren</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#beispielsitzung">Beispielsitzung</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#druckzusammenstellungsoptionen">Druckzusammenstellungsoptionen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#reiter-zusammenstellung-allgemeines-zusammenstellung-setup">Reiter Zusammenstellung - Allgemeines Zusammenstellung Setup</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#gemeinsame-eigenschaften-von-zusammenstellunselementen">Gemeinsame Eigenschaften von Zusammenstellunselementen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-kartenelement">Das Kartenelement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#haupteigenschaften">Haupteigenschaften</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#ausdehnung">Ausdehnung</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#gitter">Gitter</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#ubersichten">Übersichten</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-beschriftungselement">Das Beschriftungselement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#haupteigenschaften_1">Haupteigenschaften</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#darstellung">Darstellung</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-bildelement">Das Bildelement</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-legendenelement">Das Legendenelement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#haupteigenschaften_2">Haupteigenschaften</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#legendenelemente">Legendenelemente</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#schriftarten-spalten-symbol">Schriftarten, Spalten, Symbol</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#wms-legendgraphic-und-abstand">WMS LegendGraphic und Abstand</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-mastabselement">Das Maßstabselement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#haupteigenschaften_3">Haupteigenschaften</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#einheiten-und-segmente">Einheiten und Segmente</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#anzeigen">Anzeigen</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#schriftarten-und-farben">Schriftarten und Farben</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#die-grundformelemente">Die Grundformelemente</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-pfeilelement">Das Pfeilelement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#elementeigenschaften">Elementeigenschaften</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-attributtabellenelement">Das Attributtabellenelement</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#haupteigenschaften_4">Haupteigenschaften</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#objektfiltrierung">Objektfiltrierung</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#darstellung_1">Darstellung</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#gitter-anzeigen">Gitter anzeigen</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#schrift-und-textgestaltung">Schrift- und Textgestaltung</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rahmen">Rahmen</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#das-html-rahmen-element">Das HTML-Rahmen Element</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#html-quelle">HTML-Quelle</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rahmen_1">Rahmen</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#intelligente-seitenumbruche-und-benutzer-stylesheet-nutzen">Intelligente Seitenumbrüche und Benutzer Stylesheet nutzen</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#groe-und-position">Größe und Position</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ausrichtung">Ausrichtung</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#elemente-kopierenausschneiden-und-einfugen">Elemente Kopieren/Ausschneiden und Einfügen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#beschriftungen">Beschriftungen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#datendefinierte-ubersteuerung-knopfe">Datendefinierte Übersteuerung Knöpfe</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vorschau">Vorschau</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#erstellung">Erstellung</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Erweiterte Funktionalitäten &raquo;</li>
+      <li>Druckzusammenstellung</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="druckzusammenstellung">Druckzusammenstellung</h1>
+<p>Mit der Druckzusammenstellung können Sie ansprechende Karten und Atlanten erstellen die als PDF-Datei, als Bild oder als SVG-Datei geduckt oder gespeichert werden können. Dies ist eine leistungsstarke Methode geografische Informationen, die von QGIS erstellt werden in Berichten zu teilen oder zu veröffentlichen.</p>
+<p>Die Druckzusammenstellung bietet wachsende Layout- und Druckfunktionen. Sie können Elemente wie die KADAS-Kartenleinwand, Textbeschriftungen, Bilder, Legenden, Maßstäbe, Grundformen, Pfeile, Attributtabellen und HTML-Rahmen hinzufügen. Sie können jedes Element vergrößern, gruppieren, ausrichten, positionieren und drehen und die Eigenschaften anpassen, um Ihr Layout zu erstellen. Das Layout kann gedruckt oder in Bildformate, PostScript, PDF oder SVG exportiert werden. Sie können das Layout als Vorlage speichern und in einem anderen Modus erneut laden. Schließlich kann die Generierung mehrerer Karten auf Basis einer Vorlage über den Atlasgenerator erfolgen. Eine Übersicht der verfügbaren Funktionalitäten ist in der folgenden Liste zusammengestellt:</p>
+<ul>
+<li><img src="../../../../images/mActionFileSave.png" /> <em>Projekt speichern</em></li>
+<li><img src="../../../../images/mActionNewComposer.png" /> <em>Neue Zusammenstellung</em></li>
+<li><img src="../../../../images/mActionDuplicateComposer.png" /> <em>Zusammenstellungsduplizierung</em></li>
+<li><img src="../../../../images/mActionComposerManager.png" /> <em>Druckzusammenstellung verwalten</em></li>
+<li><img src="../../../../images/mActionFileOpen.png" /> <em>Aus Vorlage laden</em></li>
+<li><img src="../../../../images/mActionFileSaveAs.png" /> <em>Als Vorlage speichern</em></li>
+<li><img src="../../../../images/mActionFilePrint.png" /> <em>Drucken oder Exportieren als PostScript</em></li>
+<li><img src="../../../../images/mActionSaveMapAsImage.png" /> <em>Speichern als Rasterbild</em></li>
+<li><img src="../../../../images/mActionSaveAsSVG.png" /> <em>Speichern als SVG</em></li>
+<li><img src="../../../../images/mActionSaveAsPDF.png" /> <em>Als PDF exportieren</em></li>
+<li><img src="../../../../images/mActionUndo.png" /> <em>Letzte Änderung zurücknehmen</em></li>
+<li><img src="../../../../images/mActionRedo.png" /> <em>Letzte Änderung wiederherstellen</em></li>
+<li><img src="../../../../images/mActionZoomFullExtent.png" /> <em>Volle Ausdehnung</em></li>
+<li><img src="../../../../images/mActionZoomActual.png" /> <em>Zoom auf 100%</em></li>
+<li><img src="../../../../images/mActionZoomIn.png" /> <em>Hineinzoomen</em></li>
+<li><img src="../../../../images/mActionZoomIn.png" /> <em>Hinauszoomen</em></li>
+<li><img src="../../../../images/mActionDraw.png" /> <em>Aktualisiere Ansicht</em></li>
+<li><img src="../../../../images/mActionPan.png" /> <em>Druckzusammenstellung verschieben</em></li>
+<li><img src="../../../../images/mActionZoomToSelected.png" /> <em>Auf bestimmte Region zoomen</em></li>
+<li><img src="../../../../images/mActionSelect.png" /> <em>Eintrag wählen/verschieben</em></li>
+<li><img src="../../../../images/mActionMoveItemContent.png" /> <em>Den Elementinhalt verschieben</em></li>
+<li><img src="../../../../images/mActionAddMap.png" /> <em>Neue Karte aus KADAS Kartenansicht hinzufügen</em></li>
+<li><img src="../../../../images/mActionAddImage.png" /> <em>Bild hinzufügen</em></li>
+<li><img src="../../../../images/mActionLabel.png" /> <em>Neue Beschriftung hinzufügen</em></li>
+<li><img src="../../../../images/mActionAddLegend.png" /> <em>Neue Legende hinzufügen</em></li>
+<li><img src="../../../../images/mActionScaleBar.png" /> <em>Einen Maßstab zu Druckzusammenstellung hinzufügen</em></li>
+<li><img src="../../../../images/mActionAddBasicShape.png" /> <em>Einfaches Objekt hinzufügen</em></li>
+<li><img src="../../../../images/mActionAddArrow.png" /> <em>Pfeil hinzufügen</em></li>
+<li><img src="../../../../images/mActionOpenTable.png" /> <em>Fügt Attributtabelle hinzu</em></li>
+<li><img src="../../../../images/mActionAddHtml.png" /> <em>Einen HTML-Rahmen hinzufügen</em></li>
+<li><img src="../../../../images/mActionGroupItems.png" /> <em>Elemente gruppieren</em></li>
+<li><img src="../../../../images/mActionUngroupItems.png" /> <em>Gruppe auflösen</em></li>
+<li><img src="../../../../images/locked.png" /> <em>Gewählte Element fixieren</em></li>
+<li><img src="../../../../images/unlocked.png" /> <em>Alle Elemente entsichern</em></li>
+<li><img src="../../../../images/mActionRaiseItems.png" /> <em>Hervorholen</em></li>
+<li><img src="../../../../images/mActionLowerItems.png" /> <em>Versenken</em></li>
+<li><img src="../../../../images/mActionMoveItemsToTop.png" /> <em>In den Vordergrund holen</em></li>
+<li><img src="../../../../images/mActionMoveItemsToBottom.png" /> <em>In den Hintergrund schicken</em></li>
+<li><img src="../../../../images/mActionAlignLeft.png" /> <em>Linksbündig</em></li>
+<li><img src="../../../../images/mActionAlignRight.png" /> <em>Rechtsbündig</em></li>
+<li><img src="../../../../images/mActionAlignHCenter.png" /> <em>Zentrieren</em></li>
+<li><img src="../../../../images/mActionAlignVCenter.png" /> <em>Vertikal zentrieren</em></li>
+<li><img src="../../../../images/mActionAlignTop.png" /> <em>Oben bündig</em></li>
+<li><img src="../../../../images/mActionAlignBottom.png" /> <em>Unten bündig</em></li>
+<li><img src="../../../../images/mIconAtlas.png" /> <em>Atlasvorschau</em></li>
+<li><img src="../../../../images/mActionAtlasFirst.png" /> <em>Erstes Objekt</em></li>
+<li><img src="../../../../images/mActionAtlasPrev.png" /> <em>Vorheriges Objekt</em></li>
+<li><img src="../../../../images/mActionAtlasNext.png" /> <em>Nächstes Objekt</em></li>
+<li><img src="../../../../images/mActionAtlasLast.png" /> <em>Letztes Objekt</em></li>
+<li><img src="../../../../images/mActionFilePrint.png" /> <em>Atlas drucken</em></li>
+<li><img src="../../../../images/mActionSaveMapAsImage.png" /> <em>Atlas als Bilder exportieren</em></li>
+<li><img src="../../../../images/mActionAtlasSettings.png" /> <em>Atlas-Einstellungen</em></li>
+</ul>
+<p>Alle Werkzeuge der Druckzusammenstellung stehen in Menüs und als Icons in der Werkzeugleiste zur Verfügung. Die Werkzeugleiste kann aus und angeschaltet werden, indem Sie rechte Maustaste in der Werkzeugleiste verwenden.</p>
+<h2 id="uberblick-uber-die-druckzusammenstellung">Überblick über die Druckzusammenstellung</h2>
+<p>Das Öffnen der Druckzusammenstellung bietet Ihnen eine leere Seite, die die Blattoberfläche beim Benutzen der Druckoption darstellt. Zunächst finden Sie Knöpfe auf der linken Seite der Seite um Druckzusammenstellungselemente hinzuzufügen; die aktuelle KADAS Kartenansicht, Beschriftungen, Bilder, Legenden, Maßstäbe, einfache Formen, Pfeile, Attributtabellen und HTML-Rahmen. In dieser Werkzeugleiste finden Sie auch Werkzeugleistenknöpfe zum Navigieren, Zoomen in einen Bereich und zum Verschieben der Ansicht in der Zusammenstellung und Werkzeugleistenknöpfe um ein Druckzusammenstellunselement auszuwählen und den Inhalt des Kartenelements zu verschieben.</p>
+<p>Folgendes Bild zeigt die anfängliche Ansicht der Druckzusammenstellung bevor Elemente hinzugefügt sind.</p>
+<p><img alt="" src="../../../../images/print_composer_blank.png" /></p>
+<p>Rechts von der Seite finden Sie zwei Bedienfelder. Das obere Bedienfeld enthält die Reiter <em>Elemente</em> und <em>Befehlsprotokoll</em> und das untere Bedienfeld enthält die Reiter <em>Zusammenstellung</em>, <em>Elementeigenschaften</em> und <em>Atlas-Erzeugung</em>.</p>
+<ul>
+<li>
+<p>Der <em>Elementeigenschaften</em> Reiter stellt eine Liste aller Kartenzusammenstellungselemente die der Seite hinzugefügt wurden.</p>
+</li>
+<li>
+<p>Der <em>Befehlprotokoll</em> Reiter stellt einen Verlauf aller Änderungen, die am Druckzusammenstellungslayout durchgeführt wurden dar. Mit einem Mausklick ist es möglich Layoutschritte vorwärts oder rückwärts zu einem bestimmten Status rückgängig zu machen oder wiederherzustellen.</p>
+</li>
+<li>
+<p>Der Reiter <em>Zusammenstellung</em> ermöglicht Ihnen die Papiergröße, Orientierung, den Seitenhintergrund, Anzahl der Seiten und die Druckqualität der Ausgabedatei in dpi einzustellen. Darüberhinaus können Sie auch das <img src="../../../../images/checkbox.png" /> <em>Als Raster drucken</em> Kontrollkästchen aktivieren. Das heisst, dass alle Elemente vor dem Drucken oder Speichern als PostScript oder PDF gerastert werden. In diesem Reiter können Sie auch benutzerdefinierte Einstellungen für Gitter und Ausrichtungen vornehmen.</p>
+</li>
+<li>
+<p>The <em>Item Properties</em> tab displays the properties for the selected item. Click the <img src="../../../../images/mActionSelect.png" /> <em>Select/Move item</em> icon to select an item (e.g., legend, scale bar or label) on the canvas. Then click the <em>Item Properties</em> tab and customize the settings for the selected item.</p>
+</li>
+<li>
+<p>Der <em>Atlas-Erzeugung</em> Reiter ermöglicht es Ihnen die Erstellung eines Atlas für die aktuelle Zusammenstellung zu bewirken und bietet Zugang zu seinen Parametern.</p>
+</li>
+<li>
+<p>Schließlich können Sie Ihre Druckzusammenstellung mit dem <img src="../../../../images/mActionFileSave.png" /> <em>Projekt speichern</em> Knopf speichern.</p>
+</li>
+</ul>
+<p>Im unteren Teil des Druckzusammenstellungsfensters können Sie eine Statusleiste mit der Mausposition, aktuellen Seitenanzahl und einer Kombobox zum Einstellen der Zoomstufe finden.</p>
+<p>Sie können der Zusammenstellung mehrere Element hinzufügen. Es ist auch möglich, dass die Druckzusammenstellungsansicht mehr als eine Karte, Legende oder Maßstab enthält, dies auf einer oder mehreren Seiten. Jedes Element hat seine eigenen Eigenschaften und, im Fall der Karte, seine eigenen Ausmaße. Wenn Sie ein Element aus der Zusammenstellungsansicht entfernen wollen können Sie das mit <code>Entf</code> oder <code>Rücktaste</code> tun.</p>
+<h3 id="in-der-druckzusammenstellung-navigieren">In der Druckzusammenstellung navigieren</h3>
+<p>Um im Layout navigieren zu können bietet die Druckzusammenstellung einige grundlegende Tools:</p>
+<ul>
+<li>
+<p><img src="../../../../images/mActionZoomIn.png" /> <em>Hineinzoomen</em></p>
+</li>
+<li>
+<p><img src="../../../../images/mActionZoomOut.png" /> <em>Hinauszoomen</em></p>
+</li>
+<li>
+<p><img src="../../../../images/mActionZoomFullExtent.png" /> <em>Zoom full</em></p>
+</li>
+<li>
+<p><img src="../../../../images/mActionZoomActual.png" /> <em>Zoom auf 100%</em></p>
+</li>
+<li>
+<p><img src="../../../../images/mActionDraw.png" /> <em>Refresh view</em> (if you find the view in an inconsistent state)</p>
+</li>
+<li>
+<p><img src="../../../../images/mActionPan.png" /> <em>Druckzusammenstellung verschieben</em></p>
+</li>
+<li>
+<p><img src="../../../../images/mActionZoomToSelected.png" /> <em>Zoom</em> (zoom to a specific region of the Composer)</p>
+</li>
+</ul>
+<p>Sie können die Zoomstufe auch mit dem Mausrad oder der Combobox in der Statusleiste ändern. Wenn Sie während der Arbeit im Composer-Bereich in den Pan-Modus wechseln müssen, können Sie die Leertaste oder das Mausrad gedrückt halten. Mit <code>Strg+Spacebar</code> können Sie vorübergehend in den Zoom-Modus und mit <code>Strg+Shift+Spacebar</code> in den Zoom-Modus wechseln.</p>
+<h2 id="beispielsitzung">Beispielsitzung</h2>
+<p>Um zu zeigen wie man eine Karte erstellt folgen Sie den nächsten Anweisungen.</p>
+<ol>
+<li>
+<p>Wählen Sie den <img src="../../../../images/mActionAddMap.png" /> <em>Neue Karte hinzufügen</em> Werkzugleistenknopf aus und zeichnen Sie ein Rechteck auf die Seite indem Sie die linke Maustaste gedrückt halten. Innerhalb des gezeichneten Rechteckes erscheint die KADAS Kartenansicht auf der Seite.</p>
+</li>
+<li>
+<p>Wählen Sie den <img src="../../../../images/mActionScaleBar.png" /> <em>Neuen Maßstab hinzufügen</em> Werkzeugleistenknopf und plazieren Sie das Kartenelement mit der linken Maustaste auf der Druckzusammenstellungsseite. Es wird ein Maßstab der Seite hinzugefügt.</p>
+</li>
+<li>
+<p>Wähllen Sie den <img src="../../../../images/mActionAddLegend.png" /> <em>Neue Legende hinzufügen</em> Werkzeugleistenknopf und zeichnen Sie ein Rechteck auf die Seite indem sie die linke Maustaste gedrückt halten. Innerhalb des Rechtecks wird die Legende gezeichnet.</p>
+</li>
+<li>
+<p>Wählen Sie das <img src="../../../../images/mActionSelect.png" /> <em>Den Elementinhalt verschieben</em> Icon um die Karte auszuwählen und verschieben Sie es ein bisschen.</p>
+</li>
+<li>
+<p>Während das Kartenelement noch ausgewählt ist, können Sie auch die Größe des Kartenelements ändern. Klicken Sie bei gedrückter linker Maustaste in einem weißen kleinen Rechteck in einer der Ecken des Kartenelements und ziehen Sie es an eine neue Position, um seine Größe zu ändern.</p>
+</li>
+<li>Klicken Sie auf die Registerkarte <em>Element-Eigenschaften</em> im linken unteren Bereich und finden Sie die Einstellung für die Ausrichtung. Ändern Sie den Wert der Einstellung <em>Kartenausrichtung</em> auf '15.00° '. Sie sollten sehen, wie sich die Ausrichtung des Kartenelements ändert.</li>
+<li>Schließlich können Sie Ihre Druckzusammenstellung mit dem <img src="../../../../images/mActionFileSave.png" /> <em>Projekt speichern</em> Knopf speichern.</li>
+</ol>
+<h2 id="druckzusammenstellungsoptionen">Druckzusammenstellungsoptionen</h2>
+<p>Unter <em>Einstellungen ‣ Zusammenstellungseinstellungen ...</em> können Sie einige Optionen, die als voreingestellt während Ihrer Arbeit benutzt werden, einstellen.</p>
+<ul>
+<li>
+<p>Mit <em>Zusammenstellungsvoreinstellungen</em> können Sie die Standardschriftart, die verwendet werden soll, benutzen.</p>
+</li>
+<li>
+<p>Mit <em>Gitterdarstellung</em> können Sie den Gitterstil und seine Farbe festlegen. Es gibt drei Arten von Gittern: <strong>Punkte</strong>, <strong>Solide</strong> Linien und <strong>Kreuze</strong>.</p>
+</li>
+<li><em>Gitter- und Hilfslinien</em> vorgaben definieren Abstand, Versatz und Toleranz des Gitters.</li>
+</ul>
+<h2 id="reiter-zusammenstellung-allgemeines-zusammenstellung-setup">Reiter Zusammenstellung - Allgemeines Zusammenstellung Setup</h2>
+<p>Im Reiter <em>Zusammenstellung</em> können Sie die globalen Einstellungen Ihrer Zusammenstellung definieren.</p>
+<ul>
+<li>
+<p>Sie können eine der <em>Voreinstellungen</em> für Ihre Seite auswählen oder Ihre benutzerdefinierte <em>Breite</em> und <em>Höhe</em> eingeben.</p>
+</li>
+<li>
+<p>Die Zusammenstellung kann nun in mehrere Seiten aufgeteilt werden. Beispielsweise kann die erste Seite eine Kartenansicht zeigen und eine zweite Seite kann die zum Layer gehörende Attributtabelle zeigen während die dritte einen HTML-Rahmen, der zu der Webseite Ihrer Organisation zeigt, zeigt. Stellen Sie die <em>Seitenzahl</em> auf den gewünschten Wert ein. Sie können die Seiten <em>Orientierung</em> und Ihre exportierte Auflösung wählen. Wenn es aktiviert ist mit <img src="../../../../images/checkbox.png" /> <em>Als Raster drucken</em> gemeint, dass alle Elemente vor dem Drucken oder Speichern als PostScript oder PDF gerastert werden.</p>
+</li>
+<li>
+<p>Mit <em>Gitter und Hilfslinien</em> können Sie Rastereinstellungen wie <em>Abstände</em>, <em>Offsets</em> und <em>Toleranz</em> an Ihre Bedürfnisse anpassen. Die Toleranz ist die maximale Entfernung, unterhalb derer ein Artikel an Smart Guides befestigt wird.</p>
+</li>
+</ul>
+<p>Das Snappen auf das Gitter und/oder auf die Ausrichtungen kann im <em>Ansicht</em> Menü aktiviert werden. In diesem Menü können Sie auch das Gitter und die Führungen verstecken oder anzeigen.</p>
+<h2 id="gemeinsame-eigenschaften-von-zusammenstellunselementen">Gemeinsame Eigenschaften von Zusammenstellunselementen</h2>
+<p>Zusammenstellungselemente besitzen eine Reihe von allgemeinen Eigenschaften die Sie am unteren Ende des <em>Elementeigenschaften</em> Reiters finden: Position und Größe, Rahmen, Hintergrund, Elementkennung und Darstellung.</p>
+<p><img alt="" src="../../../../images/print_composer_common_properties.png" /></p>
+<ul>
+<li>
+<p>Der <em>Position und Größe</em> Dialog erlaubt es Ihnen die Größe und Position des Rahmens, der das Element beinhaltet, zu definieren. Sie können auch auswählen welcher Referenzpunkt an den vorher definierten <strong>X</strong> und <strong>Y</strong> Koordinaten gesetzt wird.</p>
+</li>
+<li>
+<p>Die <em>Drehung</em> stellt die Drehung des Elements (in Grad) ein.</p>
+</li>
+<li>
+<p>The <img src="../../../../images/checkbox.png" /> <em>Frame</em> shows or hides the frame around the label. Use the <em>Frame color</em> and <em>Thickness</em> menus to adjust those properties.</p>
+</li>
+<li>Verwenden Sie das Menü <em>Hintergrundfarbe</em>, um eine Hintergrundfarbe festzulegen. Mit dem Dialog können Sie eine Farbe auswählen.</li>
+<li>
+<p>Verwenden Sie die <em>Elementkennung</em> um eine Beziehung zu anderen Elementen der Druckzusammenstellung herzustellen. Dies wird beim KADAS Server und anderen potentiellen Webclients benutzt. Sie können eine ID an ein Element vergeben (z.B. eine Karte und eine Beschriftung) und dann kann der Webclient Daten zum Einstellen einer Eigenschaft (z.B. Beschriftung) für das bestimmte Element senden. Der GetProjectSettings Befehl führt auf welche Elemente und welche IDs in einem Layout zur Verfügung stehen.</p>
+</li>
+<li>
+<p><em>Darstellung</em> kann im Optionen Feld ausgewählt werden.</p>
+</li>
+<li>
+<p>Das <img src="../../../../images/mIconDataDefine.png" /> <em>Datendefinierte Übersteuerung</em> Icon neben einem Feld bedeutet dass Sie einem Feld Daten im Kartenelement zuweisen können oder dass Sie Ausdrücke verwenden können. Diese sind besonders hilfreich bei der Atlaserstellung.</p>
+</li>
+</ul>
+<p>KADAS ermöglicht eine erweiterte Darstellung für Zusammenstellungselement wie Vektor- und Rasterlayer.</p>
+<p><img alt="" src="../../../../images/rendering_mode.png" /></p>
+<ul>
+<li>
+<p><em>Transparenz</em> <img alt="slider" src="../../../../images/slider.png" />: Mit diesem Tool können Sie das zugrunde liegende Element im Composer sichtbar machen. Verwenden Sie den Schieberegler, um die Sichtbarkeit Ihres Artikels an Ihre Bedürfnisse anzupassen. Sie können den Prozentsatz der Sichtbarkeit auch im Menü neben dem Schieberegler genau definieren.</p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Element aus Export ausnehmen</em>: Sie können sich entschließen ein Element in allen Exporten nicht sichtbar zu machen. Nach dem Aktivieren dieses Kontrollkästchens wird das Element nicht in PDF’s, Drucken etc. enthalten sein</p>
+</li>
+<li>
+<p><em>Mischmodus</em>: Sie können spezielle Darstellungseffekte mit diesen Tools, die Sie vorher vielleicht nur von Grafikprogrammen kannten, erzielen. Die Pixel Ihrer oben liegenden und darunterliegenden Elemente werden durch die unten beschriebenen Einstellungen gemischt.</p>
+<blockquote>
+<ul>
+<li>
+<p>Normal: Dies ist der Standardmischmodus, der den Alphakanal des oben liegenden Pixels mit dem darunter liegenden Pixel vermischt. Die Farben werden nicht vermischt.</p>
+</li>
+<li>
+<p>Heller: Dies wählt das Maximum jeder Komponente der Vordergrund- und Hintergrundpixel. Seien Sie sich bewusst dass die Ergebnisse zackig und hart aussehen können.</p>
+</li>
+<li>
+<p>Bildschirm: Helle Pixel der Quelle werden über die des Ziels gezeichnet, wohingegen dunkle Pixel nicht verwendet werden. Dieser Modus ist am nützlichsten für das Mischen der Textur eines Layers mit einem anderen Layer (z.B. kann man eine Schummerung dazu verwenden einen anderen Layer mit einer Textur zu versehen).</p>
+</li>
+<li>
+<p>Abwedeln: das Abwedeln erhellt und sättigt unten liegende Pixel auf Basis der Helligkeit des oben liegenden Pixels. Demzufolge erhöhen hellere oben liegende Pixel die Sättigung und Helligkeit des unten liegenden Pixels. Dies funktioniert am Besten wenn die oben liegenden Pixel nicht zu hell sind; andernfalls ist der Effekt zu extrem.</p>
+</li>
+<li>
+<p>Addition: Dieser Mischmodus fügt einfach die Pixelwerte eines Layers denen eines anderen Layers hinzu. Im Falle von Werten größer 1 (im Fall von RGB) wird weiß dargestellt. Dieser Modus ist dafür geeignet Objekte hervorzuheben.</p>
+</li>
+<li>
+<p>Dunkler: Dies erstellt ein Ergebnispixel das die kleinste Komponente der Vordergrund und Hintergrundpixel erhält. Wie das Aufhellen neigen die Ergebnisse dazu zackig und hart zu sein.</p>
+</li>
+<li>
+<p>Multiplizieren: Hier werden die Nummern für jedes Pixel des oben liegenden Layers mit den entsprechenden Pixeln des unteren Layers multipliziert. Das Ergebnis sind dunklere Bilder.</p>
+</li>
+<li>
+<p>Einbrennen: Dunklere Farben im oben liegenden Layer bewirken ein Verdunkeln des unten liegenden Layers. Einbrennen kann dazu benutzt werden um unten liegende Layer zu optimieren und zu colorieren.</p>
+</li>
+<li>
+<p>Überlagern: Dieser Modus kombiniert die Multiplizieren und Bildschirm Mischmodi. Im Ergebnispixel werden helle Bereiche heller und dunkle Bereiche dunkler.</p>
+</li>
+<li>
+<p>Weiches Licht: Dieses ist dem Überlagern sehr ähnlich nur dass anstelle Multiplizieren/Bildschirm Einbrennen/Abwedeln verwendet wird. Hier soll das Leuchten eines weichen Lichtes auf ein Bild nachgeahmt werden.</p>
+</li>
+<li>
+<p>Hartes Licht: Hartes Licht ist dem Überlagern Modus sehr ähnlich. Es soll die Projektion eines sehr intensiven Lichts auf das Bild nachahmen.</p>
+</li>
+<li>
+<p>Unterschied: Unterschied subtrahiert das oben liegende Pixel von dem unten liegenden Pixel oder andersherum um immer einen positiven Wert zu bekommen. Das Mischen mit Schwarz produziert keinen Unterschied, da die Differenz mit allen Farben Null ist.</p>
+</li>
+<li>
+<p>Abziehen: Dieser Mischmodus zieht einfach die Pixelwerte eines Layers von dem anderen ab. Im Fall von negativen Werten wird Schwarz dargestellt.
+</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="das-kartenelement">Das Kartenelement</h2>
+</li>
+</ul>
+<p>Klicken Sie auf den <img src="../../../../images/mActionAddMap.png" /> <em>Neue Karte hinzufügen</em> Werkzeugleistenknopf in der Druckzusammenstellung um die KADAS Kartenansicht hinzuzufügen. Ziehen Sie jetzt ein Rechteck mit der linken Maustaste über die Zusammenstellungsansicht um die Karte hinzuzufügen. Um die aktuelle Karte anzuzeigen können Sie zwischen drei verschiedenen Modi im <em>Elementeigenschaften</em> Reiter wählen:</p>
+<ul>
+<li>
+<p><strong>Rechteck</strong> ist die Standardeinstellung. Es wird eine leeres Kästchen mit der Meldung <em>Karte wird hier gedruckt</em> angezeigt.</p>
+</li>
+<li>
+<p><strong>Cache</strong> zeichnet die Karte in der aktuellen Bildschirmauflösung. Wenn Sie in das Zusammenstellungsfenster hinein- oder hinauszoomen, wird die Karte nicht wieder gerendert aber das Bild wird skaliert.</p>
+</li>
+<li>
+<p><strong>Zeichnen</strong> meint dass wenn Sie in das Zusammenstellungsfenster hineinzoomen oder nicht, die Karte wieder gerendert wird, aber aus Platzgründen nur bis zu einer maximalen Auflösung.</p>
+</li>
+</ul>
+<p><strong>Cache</strong> ist der voreingestellte Vorschaumodus für neu hinzugefügte Druckzusammenstellungskarten.</p>
+<p>Sie können die Größe des Kartenelements durch Klicken auf den <img src="../../../../images/mActionSelect.png" /> <em>Eintrag wählen/verschieben</em> Knopf verändern indem Sie das Element auswählen und eins der blauen Kästchen an der Ecke der Karte verschieben. Mit der ausgewählten Karte können Sie jetzt mehr Eigenschaften im <em>Elementeigenschaften</em> Reiter anpassen.</p>
+<p>Um Layer innerhalb des Kartenelements zu verschieben wählen sie das Kartenelement aus, klicken Sie das <img src="../../../../images/mActionMoveItemContent.png" /> <em>Den Elementinhalt verschieben</em> Icon und verschieben Sie die Layer innerhalb des Karteninhaltsrahmen mit der linken Maustaste. Nachdem Sie den richtigen Platz für das Element gefunden haben, können Sie die Elementposition innerhalb der Druckzusammenstellungsseite sichern. Wählen Sie das Kartenelement und verwenden Sie aus der Werkzeugleiste <img src="../../../../images/locked.png" /> <em>Lock Selected Items</em> oder das <em>Elemente</em> Bedienfeld. Einmal ausgewählt können Sie das <em>Elemente</em> Bedienfeld verwenden um individuelle Elemente zu entsichern.</p>
+<h3 id="haupteigenschaften">Haupteigenschaften</h3>
+<p>Der <em>Haupteigenschaften</em> Dialog des Karten <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten bereit:</p>
+<p><img alt="" src="../../../../images/print_composer_map1.png" /></p>
+<ul>
+<li>
+<p>Der <strong>Vorschau</strong> Bereich ermöglicht es Ihnen die Vorschaumodi <em>Rechteck</em>, <em>Cache</em> und <em>Zeichnen</em> wie oben beschrieben zu definieren. Wenn Sie die Ansicht im KADAS Kartenfenster verändern indem Sie Vektor- oder Rastereigenschaften verändern, können Sie die Druckzusammenstellung aktualisieren, indem Sie das Kartenelement in der Druckzusammenstellung auswählen und den <strong>[Vorschau aktualisieren]</strong> Knopf klicken.</p>
+</li>
+<li>
+<p>Das Feld <em>Maßstab</em> <img src="../../../../images/selectnumber.png" /> stellt einen Maßstab manuell ein.</p>
+</li>
+<li>
+<p>Das Field <em>Kartenrotation</em> <img src="../../../../images/selectnumber.png" /> ermöglicht es Ihnen, den Inhalt des Kartenelements im Uhrzeigersinn in Grad zu drehen. Die Rotation der Kartenansicht kann hier imitiert werden. Beachten Sie, dass ein korrekter Koordinatenrahmen nur mit dem Standardwert 0 hinzugefügt werden kann und dass er nach der Definition einer <em>Kartenrotation</em> derzeit nicht mehr geändert werden kann.</p>
+</li>
+<li>
+<p>Mit <img src="../../../../images/checkbox.png" /> <em>Kartenelemente zeichnen</em> können Sie Beschriftungen zeigen, die in der Kartenanzeige im KADAS Hauptfenster platziert worden sind.</p>
+</li>
+<li>
+<p>Sie können die auf einem Kartenelement angezeigten Ebenen sperren. Überprüfen Sie <img src="../../../../images/checkbox.png" /> <em>Ebenen für Kartenelement festhalten</em>. Nachdem diese Option aktiviert wurde, wird jede Ebene, die im KADAS-Hauptfenster angezeigt oder ausgeblendet wird, nicht im Kartenelement des Komponisten angezeigt oder ausgeblendet. Aber Stil und Beschriftungen einer gesperrten Ebene werden immer noch entsprechend der KADAS-Hauptschnittstelle aktualisiert. Sie können dies verhindern, indem Sie <em>Ebenendarstellung für Kartenelement festhalten</em> verwenden.</p>
+</li>
+<li>Der <img src="../../../../images/mActionShowPresets.png" /> Knopf ermöglicht es Ihnen schnell alle Voreinstellungen, die Sie in KADAS vorbereitet haben, hinzuzufügen. Wenn Sie auf den <img src="../../../../images/mActionShowPresets.png" /> Knopf drücken werden Sie die Liste aller Voreinstellungen sehen: wählen Sie einfach die Voreinstellung aus, die sie darstellen wollen. Die Kartenansicht wird automatisch die voreingestellten Layer sichern indem <img src="../../../../images/checkbox.png" /> <em>Layer des Kartenelements festhalten</em> aktiviert wird: wenn sie die Voreinstellung abwählen wollen, deaktivieren Sie die <img src="../../../../images/checkbox.png" /> und drücken Sie auf den <img src="../../../../images/mActionDraw.png" /> Knopf. Siehe <a href="../introduction/qgis_gui.html#label-legend"><em>Legende</em></a> um herauszufinden wie man Voreinstellungen erstellt.</li>
+</ul>
+<h3 id="ausdehnung">Ausdehnung</h3>
+<p>Der <em>Ausdehung</em> Dialog der Karten Elementeigenschaften stellt die folgenden Funktionalitäten bereit:</p>
+<p><img alt="" src="../../../../images/print_composer_map2.png" /></p>
+<ul>
+<li>Der <strong>Kartenausdehnung</strong> Bereich ermöglicht es Ihnen die Kartenausdehnung anhand von X und Y min/max Werten anzugeben indem Sie den <strong>[Anzeigegrenzen übernehmen]</strong> Knopf klicken. Dieser Knopf setzt die Kartenausdehnung der Zusammenstellunskarte auf die Ausmaße der aktuellen Kartenansicht in der KADAS Hauptansicht. Der Knopf <strong>[Ausmaße in der Karte anzeigen]</strong> macht genau das Gegenteil, es aktualisiert die Ausmaße der Kartenansicht in der KADAS Anwendung auf die Ausdehnung der Zusammenstellungskarte.</li>
+</ul>
+<p>Wenn Sie die Ansicht in der KADAS Kartenanzeige ändern indem Sie Vektorlayer- oder Rasterlayereigenschaften ändern können Sie die Druckzusammenstellungsansicht aktualisieren indem Sie das Kartenelement in der Druckzusammenstellung auswählen und den <strong>[Vorschau aktualisieren]</strong> Knopf im <em>Elementeigenschaften</em> Reiter der Karte klicken.</p>
+<h3 id="gitter">Gitter</h3>
+<p>Der Dialog <em>Gitter</em> der Registerkarte Map <em>Elementeigenschaften</em> bietet die Möglichkeit, mehrere Raster zu einem Kartenelement hinzuzufügen.</p>
+<ul>
+<li>
+<p>Mit dem Plus- und Minusknopf könne Sie ein ausgewähltes Gitter hinzufügen oder auswählen.</p>
+</li>
+<li>
+<p>Mit den Hoch und Runterknöpfen können Sie ein Gitter aus der Liste verschieben und die Zeichenpriorität festlegen.</p>
+</li>
+</ul>
+<p>Wenn Sie auf das hinzugefügte Gitter doppelklicken können Sie ihm einen anderen Namen geben.</p>
+<p><img alt="" src="../../../../images/map_grids.png" /></p>
+<p>Nachdem Sie ein Gitter hinzugefügt haben, können Sie das Kontrollkästchen <img src="../../../../images/checkbox.png" /> <em>Gitter anzeigen</em> aktivieren, um ein Gitter auf das Kartenelement zu legen. Erweitern Sie diese Option, um eine Vielzahl von Konfigurationsoptionen bereitzustellen.</p>
+<p><img alt="" src="../../../../images/draw_grid.png" /></p>
+<p>Als Gittertyp können Sie zwischen <em>Durchgezogen</em>, <em>Kreuze</em>, <em>Markierungen</em> oder <em>Rahmen und Annotationen</em> wählen. Letzteres ist besonders nützlich, wenn Sie mit gedrehten Karten oder reprofierten Gittern arbeiten. Im unten genannten Abschnitt Divisionen des Rasterrahmendialogs haben Sie dann eine entsprechende Einstellung. Die Symbologie des Gitters kann gewählt werden. Darüber hinaus können Sie ein Intervall in X- und Y-Richtung, einen X- und Y-Versatz und die Breite für den Kreuz- oder Linienrastertyp definieren.</p>
+<p><img alt="" src="../../../../images/grid_frame.png" /></p>
+<ul>
+<li>
+<p>Es gibt verschiedene Optionen um den Rahmen der die Karte hält zu gestalten. Folgende Optionen sind erhältlich: Kein Rahmen, Zebra, Markierungen innen, Markierungen außen, Innere und äußere Markierungen und Liniengrenze.</p>
+</li>
+<li>
+<p>Mit den Einstellungen 'Nur Breitengrad/Y' und 'nur Längengrad/X' im Bereich Divisionen haben Sie die Möglichkeit, eine Mischung aus Breitengrad/y und Längengrad/x-Koordinaten zu verhindern, die bei der Arbeit mit gedrehten Karten oder reprojizierten Rastern auf einer Seite angezeigt werden.</p>
+</li>
+<li>
+<p>Der erweiterte Darstellungsmodus steht auch für Gitter zur Verfügung.</p>
+</li>
+<li>
+<p>Mit dem <img src="../../../../images/checkbox.png" /> Kontrollkästchen <em>Koordinaten zeichnen</em> können Sie dem Kartenrahmen Koordinaten hinzufügen. Sie können das numerische Annotationsformat wählen, die Optionen reichen von Dezimal bis Grad, Minute und Sekunden, mit oder ohne Suffix, und ausgerichtet oder nicht. Sie können wählen, welche Annotation angezeigt werden soll. Die Optionen sind: alle anzeigen, nur Breitengrad, nur Längengrad oder deaktivieren (keine). Dies ist nützlich, wenn die Karte gedreht wird. Die Annotation kann innerhalb oder außerhalb des Kartenrahmens gezeichnet werden. Die Annotierungsrichtung kann als horizontal, vertikal aufsteigend oder vertikal absteigend definiert werden. Im Falle einer Kartenrotation können Sie schließlich die Annotationsschriftart, die Farbe der Annotationsschrift, den Annotationsabstand vom Kartenrahmen und die Genauigkeit der gezeichneten Koordinaten definieren.</p>
+</li>
+</ul>
+<p><img alt="" src="../../../../images/grid_draw_coordinates.png" /></p>
+<h3 id="ubersichten">Übersichten</h3>
+<p>Der <em>Übersichten</em> Dialog des <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_map4.png" /></p>
+<p>Sie können sich entschließen eine Übersichtskarte zu erstellen welche die Ausmaße anderer Karten, die in der Zusammenstellung zut Verfügung stehen, zeigen. Als erstes müssen Sie die Karte(n), die sie in die Übersichtskarte einfügen wollen, erstellen. Als nächstes erstellen Sie die Karte die Sie wollen, um sie als Übersichtskarte zu benutzen, genau iwe eine normale Karte.</p>
+<ul>
+<li>
+<p>Mit dem Plus- und Minusknopf können Sie Übersichten hinzufügen oder entfernen.</p>
+</li>
+<li>
+<p>Mit dem Rauf- und Runterknopf können Sie eine Übersicht in der Liste verschieben und die Zeichenpriorität setzen.</p>
+</li>
+</ul>
+<p>Öffnen Sie <em>Übersichten</em> und drücken Sie den grünen Plusknopf um eine Übersicht hinzuzufügen. Zunächst wird diese Übersicht <em>Übersicht 1</em> genannt. Sie können den Namen verändern wenn Sie auf das Übersichtelement in der Liste genannt <em>Überblick 1</em> doppelklicken und ihm einen anderen Namen geben.</p>
+<p>Wenn Sie da Übersichtselement in der Liste auswählen können Sie es anpassen.</p>
+<ul>
+<li>
+<p><img src="../../../../images/checkbox.png" /> Übersicht muss aktiviert sein um die Ausmaße des gewählten Kartenrahmens zu zeichnen.</p>
+</li>
+<li>
+<p>Die <em>Übersichtsrahmen</em> Auswahlliste verweist auf das Kartenelement, dessen Ausmaße auf das aktuelle Kartenelement gezeichnet werden.</p>
+</li>
+<li>
+<p>Der <em>Rahmenstil</em> ermöglicht es Ihnen die Übersichtsrahmenfarbe zu ändern.</p>
+</li>
+<li>
+<p>Der <em>Mischmodus</em> ermöglicht verschiedene Transparenzmischmodi einzustellen.</p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Übersicht invertieren</em> erstellt eine Maske um die Ausmaße wenn es aktiviert ist: die referenzierte Kartenausmaße werden deutlich angezeigt, währenddessen alles andere mit einer Rahmenkarte ausgeblendet wird.</p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Auf Übersicht zentrieren</em> setzt die Ausmaße des Übersichtsrahmens in die Mitte der Übersichtskarte. Sie können nur eine Übersicht zum Zentrieren aktivieren wenn Sie mehrere Übersichten hinzugefügt haben.</p>
+</li>
+</ul>
+<h2 id="das-beschriftungselement">Das Beschriftungselement</h2>
+<p>Um eine Beschriftung hinzuzufügen klicken Sie das <img src="../../../../images/mActionLabel.png" /> <em>Neue Beschriftung hinzufügen</em> Icon, platzieren Sie das Element mit der linken Maustaste auf der Druckzusammenstellungsansicht und positionieren und passen Sie sein Aussehen im Beschriftung <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Der <em>Elementeigenschaften</em> Reiter eines Beschriftungselements stellt die folgenden Funktionalitäten für das Beschriftungselement zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_label1.png" /></p>
+<h3 id="haupteigenschaften_1">Haupteigenschaften</h3>
+<ul>
+<li>
+<p>Im Haupteigenschaften Dialog wird der Text (HTML oder nicht) oder der Ausdruck, der benötigt wird um die Beschriftung auszufüllen, zur Zusammenstellungsansicht hinzugefügt.</p>
+</li>
+<li>
+<p>Beschriftungen können als HTML-Code interpretiert werden: aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Als HTML darstellen</em>. Sie können jetzt eine URL, ein klickbares Bild, das zu einer Webseite führt oder etwas komplexeres eingeben.</p>
+</li>
+<li>
+<p>Sie können auch einen Ausdruck eingeben. Klicken Sie auf <strong>[Einen Ausdruck einfügen]</strong> um einen neuen Dialog zu öffnen. Erstellen Sie einen Ausdruck, indem Sie auf die auf der linken Seite zur Verfügung stehenden Funktionen klicken. Zwei spezielle Kategorien können nützlich sein, insbesondere im Zusammenhang mit der Atlasfunktionalität: Geometriefunktionen und Datensatzfunktionen. Unten wird eine Vorschau des Ausdrucks gezeigt.</p>
+</li>
+</ul>
+<h3 id="darstellung">Darstellung</h3>
+<ul>
+<li>
+<p>Definieren Sie <em>Schrift</em> indem Sie auf den <a href="#id1"><span id="id2">**</span></a>[Schriftart ...] Knopf klicken oder eine <em>Schriftfarbe</em> indem Sie eine Farbe mit Hilfe des Farbauswahlwerkzeuges auswählen.</p>
+</li>
+<li>
+<p>Sie können verschiedene horizontale und vertikale Ränder in mm angeben. Dies ist der Rand vom Rand des Komponistenelements. Das Etikett kann außerhalb der Grenzen des Etiketts positioniert werden, z.B. um Etikettenelemente mit anderen Elementen auszurichten. In diesem Fall müssen Sie für die Marge negative Werte verwenden.</p>
+</li>
+<li>Die Verwendung der <em>Ausrichtung</em> ist eine weitere Möglichkeit, Ihr Etikett zu positionieren. Beachten Sie, dass z.B. bei Verwendung der <em>Horizontalen Ausrichtung</em> in <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Mitte</em>, die Positionierung der <em>Horizontale Randfunktion</em> deaktiviert ist.</li>
+</ul>
+<h2 id="das-bildelement">Das Bildelement</h2>
+<p>Um ein Bild hinzuzufügen klicken Sie das <img src="../../../../images/mActionAddImage.png" /> <em>Bild hinzufügen</em> Icon, platzieren Sie das Element mit der linken Maustaste in der Druckzusammenstellungsanzeige und positionieren und passen Sie sein Aussehen im Bild <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Die Registerkarte <em>Elementeigenschaften</em> des Bildes bietet die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_image1.png" /></p>
+<p>Sie müssen zuerst das Bild, das Sie anzeigen wollen auswählen. Es gibt mehere Wege die <em>Bildquelle</em> in den <strong>Haupteigenschaften</strong> festzulegen.</p>
+<ol>
+<li>
+<p>Verwenden Sie den Suchknopf <img src="../../../../images/browsebutton.png" /> von <em>Bildquelle</em> um eine Datei auf Ihrem Computer anhand des Suchen-Dialogs auszuwählen. Der Browser starten in den SVG-Bibliotheken die mit KADAS zur Verfügung gestellt werden. Neben <code>SVG</code> können Sie auch noch andere Bildformate auswählen Sie <code>.png</code> oder <code>.jpg</code>.</p>
+</li>
+<li>
+<p>Sie können die Quelle direkt in das <em>Bildquelle</em> Textfeld eingeben. Sie können für ein Bild sogar eine Remote URL-Adresse vergeben.</p>
+</li>
+<li>
+<p>Im Bereich <strong>Suchverzeichnisse</strong> können Sie auch ein Bild aus <em>Vorschau am Laden...</em> auswählen, um die Bildquelle einzustellen.</p>
+</li>
+<li>Verwenden Sie den datendefinierten Knopf <img src="../../../../images/mIconDataDefine.png" /> um die Bildquelle aus einer Aufnahme festzulegen oder anhand eines regulären Ausdrucks festzulegen.</li>
+</ol>
+<p>Mit der <em>Größenanpassungsmodus</em> Option können Sie festlegen wie das Bild dargestellt wird wenn der Rahmen verändert wird oder sich entschließen den Rahmen des Bildelementes in der Größe zu verändern so dass er auf die Originalgröße des Bildes passt.</p>
+<p>Sie können einen der folgenden Modi auswählen:</p>
+<ul>
+<li>
+<p>Zoom: Vergrößert das Bild im Rahmen wobei das Seitenverhältnis des Bildes beibehalten wird.</p>
+</li>
+<li>
+<p>Strecken: Streckt das Bild damit es in den Rahmen passt, ignoriert das Seitenverhältnis.</p>
+</li>
+<li>
+<p>Zuschneiden: Verwenden Sie diesen Modus nur für Rasterbilder, es setzt die Größe des Bildes auf die Original-Bildgröße ohne zu skalieren und der Rahmen wird verwendet das Bild ausschneiden, so dass nur der Teil des Bildes, der sich innerhalb des Rahmens befindet sichtbar ist.</p>
+</li>
+<li>
+<p>Rahmen zoomen und Größe anpassen: Vergrößert das Bild damit es in den Rahmen passt und verändert dann die Größe des Rahmens damit er zum Ergebnisbild passt.</p>
+</li>
+<li>
+<p>Rahmen auf Bildgröße setzen: Setzt die Größe des Rahmens damit der zur Originalgröße des Bildes passt ohen dass skaliert wird.</p>
+</li>
+</ul>
+<p>Der ausgewählte Größenanpassungsmodus kann die Elementoptionen <em>Platzierung</em> und <em>Bilddrehung</em> deaktivieren. <em>Bilddrehung</em> ist aktiv für die Größenanpassungsmodi <em>Zoom</em> und <em>Zuschneiden</em>.</p>
+<p>Mit <em>Platzierung</em> können Sie die Position des Bildes innerhalb seines Rahmens auswählen. Der <strong>Verzeichnisse durchsuchen</strong> Bereich ermöglicht es ihnen Verzeichnisse mit Bildern im SVG-Format der Bilddatenbank hinzuzufügen und sie zu entfernen. Eine Vorschau der Bilder, die in den ausgewählten Verzeichnissen gefunden werden wird in einem Fenster gezeigt und kann dazu verwendet werden um die Bildquelle auszuwählen und zu setzen.</p>
+<p>Bilder können mit dem <em>Bilddrehung</em> Feld gedreht werden. Das Aktivieren des <img src="../../../../images/checkbox.png" /> <em>Mit Karte abgleichen</em> Kontrollkästchens synchronisiert die Drehung eines Bildes in der KADAS Kartenansicht (z.B. ein gedrehter Nordpfeil) mit dem entsprechenden Druckzusammenstellungsbild.</p>
+<p>Es ist auch möglich, einen Nordpfeil direkt auszuwählen. Wenn Sie zuerst ein Nordpfeilbild aus <strong>Suchverzeichnissen</strong> auswählen und dann die Schaltfläche <img src="../../../../images/browsebutton.png" /> des Feldes <em>Bildquelle</em> verwenden, können Sie nun einen der Nordpfeils aus der Liste auswählen.</p>
+<p>Vielen Nordpfeilen ist keine <em>N</em> zugefügt, dieses ist mit Absicht so gehalten für Sprachen die kein <em>N</em> für Norden verwenden, so dass sie einen anderen Buchstaben verwenden können.</p>
+<p><img alt="" src="../../../../images/north_arrows.png" /></p>
+<h2 id="das-legendenelement">Das Legendenelement</h2>
+<p>Um ein Kartenelement hinzuzufügen, klicken Sie das <img src="../../../../images/mActionAddLegend.png" /> <em>Neue Legende hinzufügen</em> Icon, platzieren Sie das Element mit der linken Maustaste auf der Druckzusammenstellungsansicht und positionieren und passen Sie das Aussehen der Legende im <em>Elementeigenschaften</em> Reiter.</p>
+<p>Die <em>Elementeigenschaften</em> eines Legendenelement-Reiters stellen die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_legend1.png" /></p>
+<h3 id="haupteigenschaften_2">Haupteigenschaften</h3>
+<p>Der <em>Haupteigenschaften</em> Dialog des Legenden <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_legend2.png" /></p>
+<p>In den Haupteigenschaften können Sie:</p>
+<ul>
+<li>
+<p>Den Titel der Legende.</p>
+</li>
+<li>
+<p>Die Titelausrichtung auf Links, Zentriert oder Rechts setzen.</p>
+</li>
+<li>
+<p>Sie können in der Liste auswählen auf welches <em>Karte</em> Element sich die aktuelle Legende bezieht.</p>
+</li>
+<li>
+<p>Sie können den Text des Legendentitels an einem vorgegebenen Zeichen umbrechen.</p>
+</li>
+</ul>
+<h3 id="legendenelemente">Legendenelemente</h3>
+<p>Der Dialog des Legenden <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_legend3.png" /></p>
+<ul>
+<li>
+<p>Die Legende wird automatisch geupdatet wenn <img src="../../../../images/checkbox.png" /> <em>Automatisch aktualisieren</em> aktiviert ist. Wenn <em>Automatisch aktualisieren</em> deaktiviert ist gibt dieses mehr Kontrolle über die Legendenelemente. Die Icons unter den Legendenelementenliste werden aktiviert.</p>
+</li>
+<li>
+<p>Das Legendenelementfenster führt alle Legendenelement auf und Sie können die Elementreihenfolge ändern, Layer gruppieren und Elemente in der Liste wiederherstellen, Namen bearbeiten und einen Filter hinzufügen.</p>
+<ul>
+<li>
+<p>Die Elementreihenfolge kann verändert werden mit <strong>[Hoch]</strong> und <strong>[Runter]</strong> Knöpfen oder mit der <em>Drag-und-Drop</em> Funktionalität. Bei WMS Legendengrafiken kann die Reihenfolge nicht verändert werden.</p>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[Gruppe hinzufügen]</strong> Knopf um einen Legendengruppe hinzuzufügen.</p>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[plus]</strong> und <strong>[minus]</strong> Knopf um Layer hinzuzufügen oder zu entfernen.</p>
+</li>
+<li>
+<p>Der <strong>[Bearbeiten]</strong> Knopf wird verwendet um den Layer, Gruppen- oder Titelnamen zu bearbeiten, zuerst müssen Sie das Legendenelement auswählen.</p>
+</li>
+<li>
+<p>Der <strong>[Sigma]</strong> Knopf fügt eine Objektanzahl für jeden Vektorlayer hinzu.</p>
+</li>
+<li>
+<p>Verwenden Sie die Schaltfläche <strong>[Filter]</strong>, um die Legende nach Karteninhalt zu filtern, nur die in der Karte sichtbaren Legendenelemente werden in der Legende aufgeführt.</p>
+</li>
+</ul>
+<p>Nachdem Sie die Symbologie im KADAS-Hauptfenster geändert haben, können Sie auf <strong>[Alle aktualisieren]</strong> klicken, um die Änderungen im Legendenelement des Print Composers anzupassen.</p>
+</li>
+</ul>
+<h3 id="schriftarten-spalten-symbol">Schriftarten, Spalten, Symbol</h3>
+<p>Die <em>Schriftarten</em>, <em>Spalten</em> und <em>Symbol</em> Dialoge des Legenden <em>Elementeigenschaften</em> Reiters stellen die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_legend4.png" /></p>
+<ul>
+<li>
+<p>Sie können die Schriftart des Legendentitels, der Gruppe, der Untergruppe und des Elements (Layers) ändern. Klicken Sie auf einen Kategorieknopf um einen <strong>Schriftart auswählen</strong> Dialog zu öffnen.</p>
+</li>
+<li>
+<p>Sie stellen den Labels mit der erweiterten Farbauswahl eine <strong>Farbe</strong> zur Verfügung, die ausgewählte Farbe wird jedoch allen Schriftartenelementen in der Legende zugewiesen.</p>
+</li>
+<li>
+<p>Legendenelemente können in mehrere Spalten angeordnet werden. Setzen Sie die Anzahl von Spalten im <em>Anzahl</em> <img src="../../../../images/selectnumber.png" /> Feld.</p>
+<ul>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Gleiche Spaltenbreite</em> stellt ein, wie Legendenspalten angepasst werden sollen.</p>
+</li>
+<li>
+<p>Die <img src="../../../../images/checkbox.png" /> <em>Layer aufteilen</em> Option ermöglicht es eine kategorisierte oder abgestufte Layerlegende in Spalten aufzuteilen.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Sie können die Breite und Höhe des Legendensymbols in diesem Dialog ändern.</p>
+</li>
+</ul>
+<h3 id="wms-legendgraphic-und-abstand">WMS LegendGraphic und Abstand</h3>
+<p>Die Dialoge <em>WMS LegendGraphic</em> und <em>Abstand</em> der Registerkarte <em>Elementeigenschaften</em> der Legende bieten die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_legend5.png" /></p>
+<p>Wenn Sie eine WMS-Schicht hinzugefügt haben und ein Legenden-Komponistenelement einfügen, wird eine Anfrage an den WMS-Server gesendet, um eine WMS-Legende bereitzustellen. Diese Legende wird nur angezeigt, wenn der WMS-Server die GetLegendGraphic-Funktionalität bereitstellt. Der Inhalt der WMS-Legende wird als Rasterbild bereitgestellt.</p>
+<p><em>WMS LegendGraphic</em> wird verwendet, um die <em>Legendenbreite</em> und die <em>Legendenhöhe</em> des WMS Legendenrasterbildes anpassen zu können.</p>
+<p>Die Zwischenräume um Titel, Gruppe, Untergruppe, Symbol, Iconbeschriftung, Rahmenabstand oder Spaltenabstand können über diesen Dialog angepasst werden.</p>
+<h2 id="das-mastabselement">Das Maßstabselement</h2>
+<p>Um einen Maßstab hinzuzufügen klicken Sie das <img src="../../../../images/mActionScaleBar.png" /> <em>Neuen Maßstab hinzufügen</em> Icon, platzieren Sie das Element mit der linken Maustaste auf der Druckzusammenstellungsansicht und positionieren und passen Sie das Aussehen im Maßstab <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Die <em>Elementeigenschaften</em> eines Maßstabselementes bieten die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_scalebar1.png" /></p>
+<h3 id="haupteigenschaften_3">Haupteigenschaften</h3>
+<p>Der <em>Haupteigenschaften</em> Dialog des Maßstab <em>Elementeigenschaften</em> Reiters stellte die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_scalebar2.png" /></p>
+<ul>
+<li>
+<p>Wählen Sie zuerst die Karte aus, an der der Maßstab befestigt werden soll.</p>
+</li>
+<li>
+<p>Wählen Sie dann den Stil des Maßstabs. Sechs Stile stehen zur Verfügung:</p>
+<ul>
+<li>
+<p><strong>Einfacher Rahmen</strong> und <strong>Doppelter Rahmen</strong> Stile, die eine oder zwei Linien von Rahmen mit abwechselnden Farben enthalten.</p>
+</li>
+<li>
+<p><strong>Mittige</strong>, <strong>Oben</strong> oder <strong>Unten</strong> Linieneinteilung.</p>
+</li>
+<li>
+<p><strong>Numerisch</strong>, wobei das Maßstabsverhältnis gedruckt wird (z.B. 1:50000).</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="einheiten-und-segmente">Einheiten und Segmente</h3>
+<p>Der <em>Einheiten</em> und <em>Segmente</em> Dialog des Maßstab <em>Elementeigenschaften</em> Reiters stellen die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_scalebar3.png" /></p>
+<p>In diesen beiden Dialogen können Sie einstellen, wie der Maßstab dargestellt wird.</p>
+<ul>
+<li>
+<p>Wählen Sie die verwendeten Karteneinheiten aus. Es gibt vier Möglichkeiten: <strong>Karteneinheiten</strong> ist die automatische Einheitenauswahl; <strong>Meter</strong>, <strong>Fuß</strong> oder <strong>Seemeilen</strong> erzwingen Einheitumwandlungen.</p>
+</li>
+<li>
+<p>Das <em>Beschriftung</em> Feld definiert den Text, der verwendet wird, um die Einheiten des Maßstabs zu beschreiben.</p>
+</li>
+<li>
+<p><em>Karteneinheit pro Maßstabseinheit</em> ermöglicht Ihnen das Verhältnis zwischen einer Karteneinheit und seiner Darstellung im Maßstab festzulegen.</p>
+</li>
+<li>
+<p>Sie können definieren wie viele <em>Segmente</em> links und rechts vom Maßstab gezeichnet werden und wie lang jedes Segment sein wird (<em>Größe</em> Feld). <em>Höhe</em> kann ebenfalls definiert werden.</p>
+</li>
+</ul>
+<h3 id="anzeigen">Anzeigen</h3>
+<p>Der <em>Anzeigen</em> Dialog des Maßstab <em>Elementeigenschaften</em> Reiters bietet die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_scalebar4.png" /></p>
+<p>Sie können festlegen wie der Maßstab in seinem Rahmen darsgestell wird.</p>
+<ul>
+<li>
+<p><em>Rahmenrand</em>: Zwischenraum zwischen Text- und Rahmengrenzen</p>
+</li>
+<li>
+<p><em>Beschriftungsrand</em>: Zwischenraum zwischen Text und Maßstabdarstellung</p>
+</li>
+<li>
+<p><em>Linienbreite</em>: Linienbreite der Maßstabsdarstellung</p>
+</li>
+<li>
+<p><em>Verbindungsstil</em>: Ecken am Ende des Maßstabs im Stil Rund, Abgerundet oder Eckig (nur für die Maßstabsstile Einfacher Rahmen &amp; Doppelter Rahmen)</p>
+</li>
+<li>
+<p><em>Endenstil</em>: Das Ende aller Linien im Stil Quadratisch, Rund Flach (nur erhältlich für die Maßstabsstile Linieneinteilung Oben, Unten und Mittig)</p>
+</li>
+<li>
+<p><em>Ausrichtung</em>: Setzt Text auf auf die linke, mittlere oder rechte Seite des Rahmens (funktioniert nur für den Maßsstabsstil Numerisch)</p>
+</li>
+</ul>
+<h3 id="schriftarten-und-farben">Schriftarten und Farben</h3>
+<p>Der <em>Schriftarten und Farben</em> Dialog des Maßstab <em>Elementeigenschaften</em> Reiters bieten die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_scalebar5.png" /></p>
+<p>Sie können die Schriftarten und Farben, die für den Maßstab verwendet werden definieren.</p>
+<ul>
+<li>
+<p>Verwenden Sie den <strong>[Schriftart ...]</strong> Knopf um die Schriftart festzulegen.</p>
+</li>
+<li>
+<p><em>Schriftfarbe</em>: setzen Sie die Schriftfarbe</p>
+</li>
+<li>
+<p><em>Füllfarbe</em>: setzen Sie die erste Füllfarbe</p>
+</li>
+<li>
+<p><em>Zweite Füllfarbe</em>: setzen Sie die zweite Füllfarbe</p>
+</li>
+<li>
+<p><em>Stroke color</em>: set the color of the lines of the Scale Bar</p>
+</li>
+</ul>
+<p>Füllfarben werden nur für Maßstabsstile Einfacher Rahmen und Doppelter Rahmen verwendet. Um eine Farbe auszuwählen können Sie die Listenoption mit Hilfe des Dop-down-Pfeiles zum Öffnen einer einfachen Farbauswahloption oder der erweiterten Farbauswahloption verwenden, die gestartet wird wenn Sie in die farbige Box im Dialog klicken.</p>
+<h2 id="die-grundformelemente">Die Grundformelemente</h2>
+<p>Um eine Grundform (Ellipse, Rechteck, Dreieck) hinzuzufügen, klicken Sie das <img src="../../../../images/mActionAddBasicShape.png" /> <em>Ellipse hinzufügen</em> Icon oder das <img src="../../../../images/mActionAddArrow.png" /> <em>Pfeil hinzufügen</em> Icon, platzieren Sie das Element mit dem Halten der linken Maustaste. Passen Sie das Aussehen im <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Wenn Sie auch die <code>Umschalt</code> Taste während des Platzierens der Grundform gerückt halten können Sie auch ein(en) perfektes Rechteck, Kreis oder Rechteck erstellen.</p>
+<p><img alt="" src="../../../../images/print_composer_shape.png" /></p>
+<p>Der <em>Form</em> Elementeigenschaften Reiter ermöglicht es Ihnen auszuwählen wenn Sie eine Ellipse, Rechteck oder Dreieck innerhalb des vorgegebenen Rahmen zeichnen wollen.</p>
+<p>Sie können den Stil der Form setzen indem Sie den erweiterten Symbolauswahldialog verwenden mit dem Sie seinen Randstil, Füllstil, Füllmuster und die Verwendung von Markierungen etc. definieren können.</p>
+<p>Für die Rechteckform können Sie den Wert des Eckradius setzen um die Ecken abzurunden.</p>
+<p>Im Gegensatz zu anderen Elemente können Sie die Rahmen- oder die Hintergrundfarbe des Rahmens nicht setzen.</p>
+<h2 id="das-pfeilelement">Das Pfeilelement</h2>
+<p>Um einen Pfeil hinzuzufügen klicken Sie das <img src="../../../../images/mActionAddArrow.png" /> <em>Pfeil hinzufügen</em> Icon, platzieren Sie das Element indem Sie die linke Maustaste drücken und zeichnen Sie einen Pfeil auf die Druckzusammenstellungsseite positionieren Sie ihn und passen Sie das Aussehen in den Pfeil <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Wenn Sie beim Platzieren des Pfeils auch die Taste "Shift" gedrückt halten, wird sie in einem Winkel von genau 45° platziert.</p>
+<p>Das Pfeilelement kann dazu verwendet werden eine Linie oder einen einfache Pfeil hinzuzufügen, der z.B. dafür verwendet werden kann um eine Beziehung zu anderen Druckzusammenstellungselementen herzustellen. Um einen Nordpfeil zu erstellen sollte man zuerst ein Bildelement in Betracht ziehen. KADAS besitzt einen Satz von Nordpfeilen im SVG Format. Des weiteren können Sie ein Bildelement mit einer Karte verbinden so dass es sich automatisch mit der Karte drehen kann.</p>
+<p><img alt="" src="../../../../images/print_composer_arrow.png" /></p>
+<h3 id="elementeigenschaften">Elementeigenschaften</h3>
+<p>Der <em>Pfeil</em> Elementeigenschaften Reiter ermöglicht es Ihnen ein Pfeilelement zu konfigurieren.</p>
+<p>Der <strong>[Linienstil ...]</strong> Knopf kann dazu verwendet werden den Linienstil anhand einer Symbolauswahl festzulegen.</p>
+<p>In <em>Pfeile</em> können Sie einen von drei Radiobuttons auswählen.</p>
+<ul>
+<li>
+<p><em>Voreinstellung</em>: zeichnet einen einfach Pfeil, vergibt eine Option um den Anfangsstil zu definieren</p>
+</li>
+<li>
+<p><em>Keine</em>: Um eine Linie ohne Pfeilspitze zu zeichnen</p>
+</li>
+<li>
+<p><em>SVG</em> : Um eine Linie mit einem SVG <em>Anfang</em> und/oder <em>Ende</em> zu zeichnen</p>
+</li>
+</ul>
+<p>Beim <em>Voreinstellung</em> Pfeilmarker können Sie die folgenden Optionen zum Gestalten der Pfeilspitze verwenden.</p>
+<ul>
+<li>
+<p><em>Pfeilumrissfarbe</em>: Setzt die Umrissfarbe des Pfeilkopfes</p>
+</li>
+<li>
+<p><em>Pfeilfüllfarbe</em>: Setzt die Füllfarbe des Pfeilkopfes</p>
+</li>
+<li>
+<p><em>Pfeilumrissbreite</em>: Setzt die Umrissbreite des Pfeilkopfes</p>
+</li>
+<li>
+<p><em>Pfeilspitzenbreite</em>: Setzt die Größe der Pfeilspitze fest</p>
+</li>
+</ul>
+<p>Bei <em>SVG</em> können Sie die folgenden Optionen verwenden.</p>
+<ul>
+<li>
+<p><em>Anfang</em>: Suchen Sie ein SVG Bild aus das am Anfang der Linie gezeichnet wird</p>
+</li>
+<li>
+<p><em>Ende</em>: Suchen Sie ein SVG Bild aus das am Ende der Linie gezeichnet wird</p>
+</li>
+<li>
+<p><em>Arrow head width</em>: Sets the size of Start and/or End marker</p>
+</li>
+</ul>
+<p>SVG Bilder werden automatisch mit der Linie gedreht. Die Farbe des SVG Bildes kann nicht geändert werden.</p>
+<h2 id="das-attributtabellenelement">Das Attributtabellenelement</h2>
+<p>Es ist möglich Teile einer Vektorattributtabelle der Druckzusammenstellungsansicht hinzuzufügen: Klicken Sie das <img src="../../../../images/mActionOpenTable.png" /> <em>Fügt Attributtabelle hinzu</em> Icon, platzieren Sie das Element mit der linken Maustaste auf der Druckzusammenstellungsansicht und positionieren und passen Sie das Aussehen im <em>Elementeigenschaften</em> Reiter an.</p>
+<p>Die <em>Elementeigenschaften</em> eines Attributtabellenelement Reiters bieten die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute1.png" /></p>
+<h3 id="haupteigenschaften_4">Haupteigenschaften</h3>
+<p>Die Dialoge <em>Haupteigenschaften</em> der Registerkarte <em>Elementeigenschaften</em> der Attributtabelle bieten die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute2.png" /></p>
+<ul>
+<li>
+<p>Unter <em>Quelle</em> können Sie normalerweise nur <em>Layerobjekte</em> auswählen</p>
+</li>
+<li>
+<p>Mit <em>Layer</em> können Sie aus Vektorlayern, die ins Projekt geladen sind, auswählen.</p>
+</li>
+<li>
+<p>Der Knopf <strong>[Tabellendaten aktualisieren]</strong> kann dazu verwendet werden die Tabelle zu aktualisieren wenn der tatsächliche Inhalt der Tabelle sich geändert hat.</p>
+</li>
+<li>
+<p>Falls Sie die Option <img src="../../../../images/checkbox.png" /><em>Erzeugung eines Atlas</em> auf der Registerkarte <em>Atlasgenerierung</em> aktiviert haben, sind zwei zusätzliche <em>Quellen</em> möglich: 'Aktuelle Atlasfunktion' und 'Beziehungskinder'. Wenn Sie die Option'Aktuelles Atlas-Feature' wählen, sehen Sie keine Option zur Auswahl der Ebene, und das Tabellenelement zeigt nur eine Zeile mit den Attributen aus dem aktuellen Feature der Atlasdeckungsschicht. Wenn Sie 'Beziehungskinder' wählen, erscheint eine Option mit dem Beziehungsnamen. Die Option'Beziehungskinder' kann nur verwendet werden, wenn Sie eine Beziehung mit Ihrer Atlasdeckungsschicht als übergeordnetes Element definiert haben, und sie zeigt die untergeordneten Zeilen der aktuellen Funktion der Atlasdeckungsschicht an.</p>
+</li>
+</ul>
+<p><img alt="" src="../../../../images/print_composer_attribute2b.png" /></p>
+<p><img alt="" src="../../../../images/print_composer_attribute2c.png" /></p>
+<ul>
+<li>
+<p>Der Knopf <strong>[Attribute ...]</strong> startet das <em>Attribute wählen</em> Menü der dazu verwendet werden kann den sichtbaren Inhalt der Tabelle zu ändern. Nachdem die Änderungen vorgenommen wurden benutzen Sie den <strong>[OK]</strong> Knopf um die Änderungen auf die Tabelle anzuwenden.</p>
+<p>Im <em>Spalten</em> Abschnitt können Sie:</p>
+<ul>
+<li>
+<p>Ein Attribut entfernen, wählen Sie einfach eine Attributreihe indem Sie irgendwo in der Reihe klicken aus und drücken Sie den Minusknopf um das ausgewählte Atribut zu entfernen.</p>
+</li>
+<li>
+<p>Fügen Sie ein neues Attribut über die Plus-Taste hinzu. Am Ende erscheint eine neue leere Zeile und Sie können eine leere Zelle der Spalte <em>Attribut</em> auswählen. Sie können ein Feldattribut aus der Liste auswählen oder ein neues Attribut mit einem regulären Ausdruck erstellen (<img src="../../../../images/mIconExpression.png" /> Button). Natürlich können Sie jedes bereits vorhandene Attribut mit Hilfe eines regulären Ausdrucks ändern.</p>
+</li>
+<li>
+<p>Benutzen Sie die Auf- und Ab-Pfeile um die Reihenfolge der Attribute in der Tabelle zu ändern.</p>
+</li>
+<li>
+<p>Wählen Sie eine Zelle in der Spalte Überschriften, um die Überschrift zu ändern, geben Sie einfach einen neuen Namen ein.</p>
+</li>
+<li>
+<p>Wählen Sie eine Zelle in der Ausrichtungspalte und Sie können zwischen Links, Zentriert oder Rechts wählen.</p>
+</li>
+<li>
+<p>Wählen Sie eine Zelle in der Breitespalte und Sie können von Automatisch zu einer Breite in mm wecheln, geben Sie einfach eine Nummer ein. Wenn Sie zurück zu automatisch wechseln wolllen, verwenden Sie das Kreuz.</p>
+</li>
+<li>
+<p>Die <strong>[Reset]</strong> Schaltfläche kann immer verwendet werden um die originalen Einstellungen wiederherzustellen.</p>
+</li>
+</ul>
+<p>Im <em>Sortierung</em> Abschnitt können Sie:</p>
+<ul>
+<li>
+<p>Ein Attribut, mit dem die Tabelle sortiert werden soll, hinzufügen. Wählen Sie ein Attribut aus und legen Sie die Sortierreihenfolge auf <em>Aufsteigend</em> oder Absteigend’ fest und drücken Sie den Plusknopf. Es wird eine neue Linie der Sortierungsreihenfolgenliste hinzugefügt.</p>
+</li>
+<li>
+<p>Wählen Sie eine Reihe in der Liste und verwenden Sie die Auf- und Abknöpfe um den Sortierungsprioritätslevel auf Attributniveau zu ändern.</p>
+</li>
+<li>
+<p>Verwenden Sie den Minusknopf um ein Attribut von der Sortierungsreihenfolgeliste zu entfernen</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img alt="" src="../../../../images/print_composer_attribute3.png" /></p>
+<h3 id="objektfiltrierung">Objektfiltrierung</h3>
+<p>Der <em>Objektfiltrierung</em> Dialog des Attributtabelle <em>Elementeigenschaften</em> Reiters bietet die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute4.png" /></p>
+<p>Sie können:</p>
+<ul>
+<li>
+<p>Die <em>Maximalen Zeilen</em> , die dargestellt werden sollen, definieren.</p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Doppelte Zeilen aus der Tabelle entfernen</em> aktivieren um nur eindeutige Datensätze zu zeigen.</p>
+</li>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Nur auf der Karte sichtbare Objekte zeigen</em> und wählen Sie die entprechende <em>Druckkarte</em> aus um die nur die Attribute von in der ausgewählten Karte sichtbaren Objekten anzuzeigen.</p>
+</li>
+<li>
+<p>Das Aktivieren des <img src="../../../../images/checkbox.png" /> <em>Nur Objekte zeigen, die das Atlasobjekt schneiden</em> ist nur möglich wenn <img src="../../../../images/checkbox.png" /> <em>Einen Atlas erzeugen</em> aktiviert ist. Wenn es aktiviert ist zeigt es eine Tabelle nur mit den Objekten, die auf der Karte der bestimmten Seite des Atlas gezeigt werden.</p>
+</li>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Filter mit</em> und stellen Sie einen Filter durch Eingabe in die Eingabezeile zur Verfügung oder fügen Sie einen regulären Ausdruck mit der jeweiligen <img src="../../../../images/mIconExpression.png" /> Schaltfläche <em>Ausdruck</em>. Einige Beispiele für Filteranweisungen, die Sie verwenden können, wenn Sie die Ebene Flughäfen aus dem Dataset Sample geladen haben:</p>
+<ul>
+<li><code>ELEV &gt; 500</code></li>
+<li><code>NAME = 'ANIAK'</code></li>
+<li><code>NAME NOT LIKE 'AN%</code></li>
+<li><code>regexp_match( attribute( $currentfeature, 'USE' ) , '[i]')</code></li>
+</ul>
+<p>Der letzte reguläre Ausdruck wird nur die Flughäfen einfügen die einen Buchstaben <em>i</em> in der Attributspalte <em>USE</em> haben.</p>
+</li>
+</ul>
+<h3 id="darstellung_1">Darstellung</h3>
+<p>Die <em>Darstellung</em> Dialoge des Attributtabelle <em>Elementeigenschaften</em> Reiter stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute5.png" /></p>
+<ul>
+<li>Click <img src="../../../../images/checkbox.png" /> <em>Show empty rows</em> to make empty entries in the attribute table visible.</li>
+<li>
+<p>Mit <em>Zellenränder</em> können Sie die Ränder um den Text in jeder Zelle der Tabelle definieren.</p>
+</li>
+<li>
+<p>Mit <em>Kopf anzeigen</em> können Sie von einer Liste eine der voreingestellten Optionen <em>Im ersten Rahmen</em>, <em>In allen Rahmen</em> oder <em>Kein Kopf</em> auswählen.</p>
+</li>
+<li>
+<p>Die Option <em>Leere Tabellen</em> kontrolliert was dargestellt wird wenn die Ergebnisauswahl leer ist.</p>
+<ul>
+<li>
+<p><strong>Nur Kopf zeichnen</strong> zeichnet nur den Kopf ausser Sie haben <em>Kein Kopf</em> bei <em>Kopf anzeigen</em> ausgewählt.</p>
+</li>
+<li>
+<p><strong>Ganze Tabelle ausblenden</strong> zeichent nur den Hintergrund der Tabelle. Sie können <img src="../../../../images/checkbox.png" /> <em>Hintergrund nicht anzeigen wenn Rahmen leer ist</em> in <em>Rahmen</em> aktivieren um die Tabelle komplett auszublenden.</p>
+</li>
+<li>
+<p><strong>Zeige leere Zeilen</strong> füllt die Attributtabelle mit leeren Zellen, diese Optione kann auch verwendet werden um zusätzliche leere Zellen zu schaffen wenn Sie ein Ergebnis anzeigen wollen!</p>
+</li>
+<li>
+<p><strong>Eingestellet Nachricht anzeigen</strong> zeichent den Kopf und fügt eine Zelle ein, die sich über alle Spalten erstreckt und eine Nachricht wie <em>Kein Ergebnis</em> kann in der Option <em>Anzuzeigende Nachricht</em> bereitgestellt werden</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Die Option <em>Anzuzeigende Nachricht</em> ist nur aktiviert wenn Sie <strong>Eingestellte Nachricht anzeigen</strong> bei <em>Leere Tabelle</em> gewählt haben. Die angegebene Nachricht wird in der Tabelle in der ersten Zeile gezeigt wenn das Ergebnis eine leere Tabelle ist.</p>
+</li>
+<li>
+<p>Mit <em>Hintergrundfarbe</em> können Sie die Hintergrundfarbe der Tabelle festlegen.</p>
+</li>
+</ul>
+<h3 id="gitter-anzeigen">Gitter anzeigen</h3>
+<p>Der <em>Gitter anzeigen</em> Dialog des Attributtabelle <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute6.png" /></p>
+<ul>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Gitter anzeigen</em> wenn Sie das Gitter, die Umrandungen der Tabellenzellen anzeigen wollen.</p>
+</li>
+<li>
+<p>Mit <em>Strichbreite</em> können Sie die Dicke der Linien, die im Gitter verwendet werden, festlegen.</p>
+</li>
+<li>
+<p>Die <em>Farbe</em> des Gitters kann anhand des Farbauswahldialogs eingestellt werden.</p>
+</li>
+</ul>
+<h3 id="schrift-und-textgestaltung">Schrift- und Textgestaltung</h3>
+<p>Der <em>Schrift- und Textgestaltung</em> dialog des Attributtabelle <em>Elementeigenschaften</em> Reiter stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute7.png" /></p>
+<ul>
+<li>
+<p>Sie können <em>Schriftart</em> und <em>Farbe</em> für <em>Tabellenkopf</em> und <em>Tabelleninhalt</em> definieren.</p>
+</li>
+<li>
+<p>Für den <em>Tabellenkopf</em> können Sie zusätzlich die Ausrichtung` einstellen und zwischen Spaltenausrichtung folgen, Links, Zentriert und Rechts wählen. Die Spaltenausrichtung wird anhand des <em>Attribute wählen</em> Dialogs eingestellt.</p>
+</li>
+</ul>
+<h3 id="rahmen">Rahmen</h3>
+<p>Der <em>Rahmen</em> Dialog des Attributtabelle <em>Elementeigenschafte</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_attribute8.png" /></p>
+<ul>
+<li>
+<p>Mit dem <em>Größenmodus</em> können Sie auswählen wie der Inhalt der Attributtabelle gerendert wird:</p>
+<ul>
+<li>
+<p>Vorhandene Rahmen benutzen stellt das Ergebnis nur im ersten Rahmen und hinzugefügten Rahmen dar.</p>
+</li>
+<li>
+<p>Auf nächste Seite erweitern erstellt so viele Rahmen (und entsprechende Seiten) wie nötig um die vollständige Auswahl der Attributtabelle darstellen zu können. Jeder Rahmen can im Layout bewegt werden. Wenn Sie die Größe eines Rahmens verändern wird die resultierende Tabelle auf andere Rahmen aufgeteilt. Der letzte Rahmen wird so zu geschnitten dass die Tabelle hineinpasst.</p>
+</li>
+<li>
+<p>Bis zum Ende wiederholen erstellt so viele Rahmen wie die Auf nächste Seite erweitern Option, nur dass alle Rahmen die gleiche Größe haben.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[Rahmen hinzufügen]</strong> Knopf um einen weiteren Rahmen mit der Größe wie der ausgewählte Rahmen hinzuzufügen. Das Ergebnis der Tabelle das nicht in den ersten Rahmen passt wird im nächsten Rahmen wiederholt wenn Sie den Größenmodus Vorhandene Rahmen benutzen verwenden.</p>
+</li>
+<li>
+<p>Das Aktivieren von <img src="../../../../images/checkbox.png" /> <em>Seite nicht exportieren wenn der Rahmen leer ist</em> verhindert dass die Seite exportiert wird wenn der Rahmen keinen Inhalt hat. Das heißt dass alle anderen Zusammenstellungselemente wie Elemente, Karten, Maßstäbe, Legenden etc. im Ergbnis nicht sichtbar sind.</p>
+</li>
+<li>
+<p>Das Aktivieren von <img src="../../../../images/checkbox.png" /> <em>Hintergrund nicht anzeigen wenn Rahmen leer ist</em> verhindert dass der Hintergrund gezeichnet wird wenn der Rahmen keinen Inhalt hat.</p>
+</li>
+</ul>
+<h2 id="das-html-rahmen-element">Das HTML-Rahmen Element</h2>
+<p>Es ist möglich einen Rahmen der den Inhalt einer Webseite anzeigt einzufügen oder sogar Ihre eigene HTML-Seite zu erstellen und sie anzuzeigen!</p>
+<p>Klicken Sie das <img src="../../../../images/mActionAddHtml.png" /> <em>HTML-Rahmen hinzufügen</em> Icon, platzieren Sie das Element indem Sie das Rechteck mit gedrückter linker Maustaste auf der Druckzusammenstellungsseite aufziehen und positionieren und gestalten Sie die Erscheinung im <em>Elementeigenschaften</em> Reiter.</p>
+<p><img alt="" src="../../../../images/print_composer_html1.png" /></p>
+<h3 id="html-quelle">HTML-Quelle</h3>
+<p>Als HTML-Quelle können Sie entweder eine URL setzen und den URL-Radiobutton aktivieren oder die HTML-Quelle direkt in die Textbox, die zur Verfügung gestellt wird, eingeben und den Quelle-Radiobutton aktivieren.</p>
+<p>Der <em>HTML-Quelle</em> Dialog der HTML-Rahmen <em>Elementeigenschaften</em> Reiter stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_html2.png" /></p>
+<ul>
+<li>
+<p>In <em>URL</em> können Sie die URL einer Webseite, die Sie aus Ihrem Internetbrowser kopiert haben eingeben oder eine HTML-Datei auswählen indem Sie den Suchknopf <img src="../../../../images/browsebutton.png" /> verwenden. Es gibt zusätzlich die Option den datendefinierte Übersteuerung Knopf zu verwenden um eine URL von den Inhalten eines Attributfeldes einer Tabelle zu benutzen oder einen regulären Ausdruck zu verwenden.</p>
+</li>
+<li>
+<p>Unter <em>Quelle</em> können Sie Text mit einigen HTML-Tags ins Textfenster eingeben oder eine ganze HTML-Seite zur Verfügung zu stellen.</p>
+</li>
+<li>
+<p>Der <strong>[Einen Ausdruck einfügen]</strong> Knopf kann dazu verwendet werden einen Ausdruck wie <code>[%Year($now)%]</code> die das Quelle Textfenster einzugeben um das aktuelle Jahr darzustellen. Dieser Knopf ist nur aktive wenn der Radiobutton <em>Quelle</em> ausgewählt ist. Klicken Sie nach dem Eingeben des Ausdrucks irgendwo in das Textfenster bevor Sie den HTML-Rahmen auffrischen, sonst geht der Ausdruck verloren.</p>
+</li>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>QGIS-Ausdrücke in HTML-Quelle auswerten</em> um das Ergebnis des Ausdrucks, den Sie eingefügt haben, zu sehen, andernfalls sehen Sie den Ausdruck.</p>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[HTML aktualisieren]</strong> Knopf um den HTML-Rahmen zu aktualisieren und das Ergebnis der Änderung zu sehen.</p>
+</li>
+</ul>
+<h3 id="rahmen_1">Rahmen</h3>
+<p>Der <em>Rahmen</em> Dialog des HTML-Rahmen <em>Elementeigenschaften</em> Reiters stellt die folgenden Funktionalitäten zur Verfügung:</p>
+<p><img alt="" src="../../../../images/print_composer_html3.png" /></p>
+<ul>
+<li>
+<p>Mit dem <em>Resize-Modus</em> können Sie auswählen wie der HTMl Inhalt gerendert wird:</p>
+<ul>
+<li>
+<p>Vorhandene Rahmen benutzen stellt das Ergebnis nur im ersten Rahmen und hinzugefügten Rahmen dar.</p>
+</li>
+<li>
+<p>Auf nächste Seite erweitern erstellt so viele Rahmen (und entsprechende Seiten) wie nötig um die Höhe der Webseite zu rendern. Jeder Rahmen kann im Layout verschoben werden. Wenn Sie die Größe eines Rahmens ändern, wird die Webseite auf die anderen Rahmen aufgeteilt. Der letzte Rahmen wird auf die Webseite zugeschnitten.</p>
+</li>
+<li>
+<p>Auf jeder Seite wiederholen wiederholt den oberen linken Abschnitt der Webseite auf jeder Seite in Rahmen der gleichen Größe.</p>
+</li>
+<li>
+<p>Bis zum Ende wiederholen erstellt so viele Rahmen wie die Auf nächste Seite erweitern Option, nur dass alle Rahmen die gleiche Größe haben.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[Rahmen hinzufügen]</strong> Knopf um einen weiteren Rahmen mit der gleichen Größe wie der ausgewählte Rahmen einzufügen. Wenn die HTML-Seite nicht in den ersten Rahmen passt wird sie im nächsten Rahmen weitergehen wenn Sie <em>Resize-Modus</em> oder <em>Vorhandene Rahmen benutzen</em> verwenden.</p>
+</li>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Seite nicht exportieren, wenn Rahmen leer ist</em> verhindert dass das Kartenlayout exportiert wird wenn der Rahmen keinen HTML-Inhalt hat. Das heißt, dass alle Zusammenstellungselemente, Karten, Maßstäbe, Legenden etc. im Ergebnis nicht sichtbar sind.</p>
+</li>
+<li>
+<p>Das Aktivieren von <img src="../../../../images/checkbox.png" /> <em>Hintergrund nicht anzeigen, wenn Rahmen leer ist</em> verhindert, dass der HTML-Rahmen gezeichnet wird wenn der Rahmen leer ist.</p>
+</li>
+</ul>
+<h3 id="intelligente-seitenumbruche-und-benutzer-stylesheet-nutzen">Intelligente Seitenumbrüche und Benutzer Stylesheet nutzen</h3>
+<p>Der <em>Intelligente Seitenumbrüche</em> Dialog und <em>Benutzer Stylesheet</em> Dialog des HTML-Rahmen <em>Elementeigenschaften</em> Reiter bietet die folgenden Funktionalitäten:</p>
+<p><img alt="" src="../../../../images/print_composer_html4.png" /></p>
+<ul>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Intelligente Seitenumbrüche</em> um zu verhindern, dass der HTML-Rahmen inmitten einer Textzeile umbricht so dass er weiter schön und glatt im nächsten Rahmen weitergeht.</p>
+</li>
+<li>
+<p>Setzen Sie den erlaubten <em>Maximalabstand</em> wenn ausgerechnet werden soll wo die Seitenumbrüche im HTML platziert werden sollen. Dieser Abstand ist der maximale Größe des leeren Raums am Fuß eines Rahmens nachdem der optimale Platz für den Seitenumbruch berechnet wurde. Das Setzen eines größeren Wertes resultiert in einer besseren Auswahl des Platzes für den Seitenumbruch, es resultiert aber auch in mehr nichtgenutzem Platz am Fuß des Rahmens. Dies wird nur genutzt wenn <em>Intelligenter Seitenumbrüche nutzen</em> aktiviert ist.</p>
+</li>
+<li>
+<p>Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>Benutzer Stylesheet</em> um HTML-Styles, die oft in Cascading Style Sheets bereitgestellt werden, anzuwenden. Ein Beispiel von Stylecode um die Farbe des <code>&lt;h1&gt;</code> Header Tags in grün zu setzen und die Schrift und Schriftgröße von Text, der in Paragraph Tags <code>&lt;p&gt;</code> enthalten ist, zu setzen.</p>
+<pre><code>h1 {color: #00ff00;
+}
+p {font-family: "Times New Roman", Times, serif;
+   font-size: 20px;
+}
+</code></pre>
+</li>
+<li>
+<p>Verwenden Sie den <strong>[HTML aktualisieren]</strong> Knopf um das Ergebnis der Stylesheeteinstellungen zu sehen.</p>
+</li>
+</ul>
+<h4 id="elemente-verwalten">Elemente verwalten</h4>
+<h2 id="groe-und-position">Größe und Position</h2>
+<p>Jedes Element in der Zusammenstellung kann verschoben/in der Größe verändert werden um ein perfektes Layout zu erstellen. Bei beiden Operationen ist der erste Schritt das <img src="../../../../images/mActionSelect.png" /> <em>Eintrag wählen/verschieben</em> Werkzeug zu aktivieren und auf das Element zu klicken; Sie können es dann verschieben, indem Sie die linke Maustaste gedrückt halten. Wenn Sie die Bewegungen auf die horizontale oder vertikale Achse einschränken wollen, halten Sie einfach <code>Umschalt</code> während Sie die Maus bewegen. Wenn Sie eine höhere Genauigkeit brauchen können Sie das ausgewählte Element mit den <code>Pfeiltasten</code> auf der Tastatur verschieben; wenn die Bewegung zu langsam ist können Sie dies mit Halten von <code>Umschalt</code> verbessern.</p>
+<p>Ein ausgewähltes Element zeigt Quadrate an seinen Grenzen; das Verschieben mit der Maus ändert die Größe des Elements in der entsprechenden Richtung. Beim Ändern der Größe behält man mit dem Halten von <code>Umschalt</code> das Seitenverhältnis. Das Halten von <code>Alt</code> ändert die Größe von der Elementmitte aus.</p>
+<p>Die richtige Position für einen Gegenstand kann durch Einrasten am Gitter oder durch intelligente Führungen ermittelt werden. Die Hilfslinien werden durch Klicken und Ziehen in den Linealen festgelegt. Hilfslinien werden verschoben, indem Sie auf das Lineal klicken, auf gleicher Höhe mit der Hilfslinie stehen und an einen neuen Ort ziehen. Um eine Anleitung zu löschen, verschieben Sie sie von der Leinwand. Wenn Sie den Snap on the fly deaktivieren möchten, halten Sie einfach <code>Ctrl</code> gedrückt, während Sie die Maus bewegen.</p>
+<p>Sie können mehrere Element auf einmal mit dem <img src="../../../../images/mActionSelect.png" /> <em>Eintrag wählen/verschieben</em> Knopf wählen. Halten Sie einfach den <code>Umschalt</code> Knopf und klicken Sie auf alle Elemente, die Sie brauchen. Sie können bei dieser Gruppe dann die Größe verändern oder Sie wie ein einziges Element verschieben.</p>
+<p>Wenn Sie einmal die richtige Position für ein Element gefunden haben können Sie es sichern indem Sie die Elemente in der Werkzeugleiste verwenden oder die Box neben dem Element im <em>Elemente</em> Bedienfeld ticken. Gesicherte Elemente können auf der Seite <strong>nicht</strong> ausgewählt werden.</p>
+<p>Gesicherte Elemente können entsichert weren indem man das Element im <em>Elemente</em> Bedienfeld auswählt und die Tickbox deaktiviert oder indem Sie die Icons in der Werkzeugleiste verwenden.</p>
+<p>Um ein Element zu deselektieren klicken Sie einfach darauf während Sie die <code>Umschalt</code> Taste halten.</p>
+<p>Innerhalb des <em>Bearbeiten</em> Menüs können Sie Aktionen um alle Elemente auszuwählen, um eine Auswahl aufzuheben und um die aktuelle Auswahl zu invertieren finden.</p>
+<h2 id="ausrichtung">Ausrichtung</h2>
+<p>Anheben oder Absenkenfunktionalitäten für Elemente befinden sich innerhalb des <img src="../../../../images/mActionRaiseItems.png" /> <em>Ausgewählte Elemente in den Vordergrund bringen</em> Pull-down-Menü. Suchen Sie ein Element auf der Druckzusammenstellungsseite und wählen sie die zutreffende Funktionalität um das ausgewählte Element verglichen mit anderen Elementen anzuheben oder abzusenken. Diese Reihenfolge wird im <em>Elemente</em> Bedienfeld gezeigt. Sie können ein Objekt auch anheben oder absenken im <em>Elemente</em> Bedienfeld indem Sie auf eine Objektbeschriftung klicken und diese in der Liste verschieben.</p>
+<p><img alt="" src="../../../../images/alignment_lines.png" /></p>
+<p>Es gibt mehrere Ausrichtungsfunktionalitäten im <img src="../../../../images/mActionAlignLeft.png" /> <em>Alle gewählten Elemente linksbündig ausrichten</em> Pulldownmenü. Um eine Ausrichtungsfunktionalität zu verwenden suchen Sie zuerst einige Elemente aus und klicken Sie dann auf das zutreffende Ausrichtungsicon. Alle ausgewählten Elemente werden dann an Ihrem gemeinsamen Begrenzungsrahmen ausgerichtet.</p>
+<h2 id="elemente-kopierenausschneiden-und-einfugen">Elemente Kopieren/Ausschneiden und Einfügen</h2>
+<p>Die Druckzusammenstellung enthält Aktionen um die gemeinsame Kopieren/Ausschneiden/Einfügen Funktionalität für die Elemente im Layout zu verwenden. Wie gewöhnlich müssen Sie erst die Elemente anhand einer der oben zu sehenden Optionen auswählen; an dieser Stelle können die Aktionen im <em>Bearbeiten</em> Menü gefunden werden. Wenn Sie die Einfügen Aktion verwenden werden die Elemente gemäß der aktuellen Mausposition eingefügt.</p>
+<p>HTML-Elemente können auf diese Weise nicht kopiert werden. Um dies zu umgehen benutzen Sie den <strong>[Rahmen hinzufügen]</strong> Knopf im <em>Elementeigenschaften</em> Reiter.</p>
+<p>Während des Layoutens ist es möglich Änderungen zurückzunehmen und wiederherzustellen. Dies kann mit den Zurücknehmen und Wiederherstellen Werkzeugen getan werden:</p>
+<ul>
+<li><img src="../../../../images/mActionUndo.png" /> <em>Revert last change</em></li>
+<li><img src="../../../../images/mActionRedo.png" /> <em>Restore last change</em></li>
+</ul>
+<p>Dies kann auch durch einen Mausklick innerhalb des <em>Befehlsprotokoll</em> Bedienfeldes durchgeführt werden.</p>
+<p><img alt="" src="../../../../images/command_hist.png" /></p>
+<p>Die Druckzusammenstellung enthält Erstellungsfunktionen, die es Ihnen möglich machen ein Kartenbuch auf automatisierte Weise zu erstellen. Das Konzept ist es einen Abdeckungslayer zu verwenden, der Geometrien und Felder enthält. Für jede Geometrie im Abdeckungslayer wird eine neue Ausgabe erstellt in der der Inhalt einer Karte verschoben wird um die aktuelle Geometrie hervorzuheben. Felder die mit diesen Geometrien in Zusammenhang stehen können innerhalb von Beschriftungen verwendet werden.</p>
+<p>Jede Seite wird mit jedem Objekt erzeugt. Um die Erstellung eines Atlas zu aktivieren und die Erstellungsparameter zu erreichen wechseln Sie zum <em>Atlas-Erzeugung</em> Reiter. Dieser Reiter enthält die folgenden Widgets:</p>
+<p><img alt="" src="../../../../images/print_composer_atlas.png" /></p>
+<ul>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Einen Atlas erzeugen</em>, was die Atlaserstellung aktiviert oder deaktiviert.</p>
+</li>
+<li>
+<p>Ein <em>Abdeckungslayer</em> <img src="../../../../images/selectstring.png" /> Kombobox mit der Sie einen (Vektor)Layer, der die Geometrien, über denen eine Iteration durchgeführt werden soll, enthält.</p>
+</li>
+<li>
+<p>Ein optionaler <img src="../../../../images/checkbox.png" /> <em>Abdeckungslayer verstecken</em> das, wenn es aktiviert ist, den Abdeckungslayer (aber nicht die anderen) während der Erstellung versteckt.</p>
+</li>
+<li>
+<p>Ein optionales <em>Filtern nach</em> Textfeld das es Ihnen möglich macht einen Ausdruck zum Filtern von Objekten aus dem Abdeckungslayer anzugeben. Wenn der Ausdruck nicht leer ist werden nur Objekte auf die <code>True</code> zutrifft ausgewählt. Mit dem Knopf auf der rechten Seite können Sie den Ausdrucksbasierten Filter aufrufen.</p>
+</li>
+<li>
+<p>Ein <em>Ausgabedateiausdruck</em> Textfeld, das dazu benutzt wird einen Dateinamen für jede Geometrie, falls benötigt, zu erzeugen. Es beruht auf Ausdrücken. Dieses Feld ist nur von Bedeutung wenn mehrere Dateien gerendert werden sollen.</p>
+</li>
+<li>
+<p>Ein <img src="../../../../images/checkbox.png" /> <em>Einzeldatei wenn möglich</em> ermöglicht die Erstellung einer einzelnen Datei wenn dies möglich ist mit dem ausgewählten Ausgabeformat (PDF beispielsweise). Wenn dieses Feld aktiviert ist, wird der Wert des <em>Ausgabedateiausdruck</em> nicht berücksichtigt.</p>
+</li>
+<li>
+<p>Ein optionales <img src="../../../../images/checkbox.png" /> <em>Sortieren nach</em> ermöglicht es Ihnen, falls aktiviert, Objekte des Abdeckungslayers zu sortieren. Die entsprechende Kombobox ermöglicht es Ihnen auszuwählen welche Spalte als Sortierschlüssel verwendet wird. Die Sortierreihenfolge (entweder aufsteigend oder absteigend) wird durch einen Zweizustandsknopf, der einen nach oben Pfeil oder nach unten Pfeil darstellt, festgelegt.</p>
+</li>
+</ul>
+<p>Sie können mehrere Kartenelemente mit der Atlaserzeugung verwenden; jede Karte wird gemäß den Abdeckungsobjekten dargestellt. Um die Atlaserstellung für ein bestimmtes Kartenelement einzustellen müssen Sie <img src="../../../../images/checkbox.png" /><em>Gesteuert durch Atlas</em> in den Elementeigenschaften des Kartenelements aktivieren. Nach dem Aktivieren können Sie einstellen:</p>
+<ul>
+<li>Ein Radiobutton <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Rand um Objekt</em>, mit dem Sie die Menge an Platz um jede Geometrie herum innerhalb der zugewiesenen Karte auswählen können. Sein Wert ist nur im Auto-Skalierungsmodus sinnvoll.</li>
+<li>Ein Radiobutton <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Vordefinierter Massstab</em> (beste Anpassung). Es wird die am besten geeignete Option aus der Liste der vordefinierten Skalen in Ihren Projekteigenschaften-Einstellungen verwendet (siehe <em>Projekt &rarr; Projekteigenschaften &rarr; Allgemein &rarr; Projektskalen</em> zur Konfiguration dieser vordefinierten Skalen).</li>
+<li>Ein Radiobutton <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Fixer Massstab</em>, mit der Sie zwischen Auto-Skalierung und Fix-Skalierung wechseln können. Im Modus mit fester Skalierung wird die Karte nur für jede zu zentrierende Geometrie übersetzt. Im Auto-Skalierungsmodus werden die Extents der Karte so berechnet, dass jede Geometrie vollständig erscheint.</li>
+</ul>
+<h2 id="beschriftungen">Beschriftungen</h2>
+<p>Um die Beschriftungen an das Objekt, über das das Plugi iteriert, anzupassen können Sie Ausdrücke einfügen. Zum Beispiel können Sie für einen city Layer mit den Feldern CITY_NAME und ZIPCODE folgendes einfügen:</p>
+<pre><code>The area of [% upper(CITY_NAME) || ',' || ZIPCODE || ' is ' format_number($area/1000000,2) %] km2
+</code></pre>
+<p>Die Information [% upper(CITY_NAME) || ‘,’ || ZIPCODE || ‘ is ‘ format_number($area/1000000,2) %] ist ein Ausdruck, der innerhalb der Beschriftung verwendet wird. Dies würde in einem erzeugten Atlas wie folgt resultieren:</p>
+<pre><code>The area of PARIS,75001 is 1.94 km2
+</code></pre>
+<h2 id="datendefinierte-ubersteuerung-knopfe">Datendefinierte Übersteuerung Knöpfe</h2>
+<p>Es gibt mehrere Plätze wo Sie einen <img src="../../../../images/mIconDataDefine.png" /> <em>Datendefinierte Übersteuerung</em> Knopf zum Überschreiben von ausgewählten Einstellungen verwenden können. Diese Optionen sind besonders nützlich bei der Atlas-Erzeugung.</p>
+<p>Für die folgenden Beispiele wird die Schicht Regionen des KADAS-Musterdatensatzes verwendet und für die Atlasgenerierung ausgewählt. Wir gehen auch davon aus, dass das Papierformat A4 (210X297) in der Registerkarte <em>Zusammensetzung</em> für das Feld <em>Presets</em> ausgewählt ist.</p>
+<p>Mit einem Datendefinierte Übersteuerung Knopf können Sie die Seitenorientierung dynamisch einstellen. Wenn die Höhe (Nord-Süd) des Ausmaßes einer region größer als seine Breite (Ost-West) ist wollen sie wohl lieber Hochformat als Querformat wählen um den Nutzen des Papiers zu optimieren.</p>
+<p>In <em>Zusammenstellung</em> können Sie das Feld <em>Orientierung</em> einstellen und Querformat oder Hochformat auswählen. Wir wollen die Orientierung dynamisch anhand eines Ausdrucks, der von der Region geometry abhängt, einstellen. Drücken Sie den <img src="../../../../images/mIconDataDefine.png" /> Knopf des Feldes <em>Orientierung</em>, wählen Sie <em>Bearbeiten ...</em> so dass der <em>Ausdruckseditor</em> Dialog sich öffnet. Geben Sie den folgenden Ausdruck ein:</p>
+<pre><code>CASE WHEN bounds_width($atlasgeometry) &gt; bounds_height($atlasgeometry) THEN 'Landscape' ELSE 'Portrait' END
+</code></pre>
+<p>Jetzt orientiert sich das Papier automatisch für jede Region für die Sie die Position des Zusammenstellungsitems ebenfalls neu bestimmen müsssen. Für das Kartenelement können Sie den <img src="../../../../images/mIconDataDefine.png" /> Knopf des Feldes <em>Breite</em> verwenden um sie dynamisch einzustellen indem Sie folgenden Ausdruck verwenden:</p>
+<pre><code>(CASE WHEN bounds_width($atlasgeometry) &gt; bounds_height($atlasgeometry) THEN 297 ELSE 210 END) - 20
+</code></pre>
+<p>Verwenden Sie den <img src="../../../../images/mIconDataDefine.png" /> Knopf des <em>Höhe</em> Feldes um folgenden Ausdruck zu bereitzustellen:</p>
+<pre><code>(CASE WHEN bounds_width($atlasgeometry) &gt; bounds_height($atlasgeometry) THEN 210 ELSE 297 END) - 20
+</code></pre>
+<p>Wenn Sie eine Beschriftung über der Karte in der Mitte der Seite vergeben wollen fügen Sie ein Beschriftungselement über der Karte ein. Verwenden Sie erst die Elementeigenschaften des Beschriftungselementes um die horizontale Ausrichtung auf <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Zentriert</em> einzustellen. Aktivieren Sie als nächstes unter <em>Referenzpunkt</em> das obere mittlere Kontrollkästchen. Sie können den folgenden Ausdruck für das Feld <em>X</em> eingeben:</p>
+<pre><code>(CASE WHEN bounds_width($atlasgeometry) &gt; bounds_height($atlasgeometry) THEN 297 ELSE 210 END) / 2
+</code></pre>
+<p>Für alle anderen Zusammenstellungselemente können Sie die Position auf eine ähnliche Art und Weise einstellen so dass Sie korrekt positioniert sind wenn die Seite automatisch nach Hochformat oder Querformat gedreht wird.</p>
+<p>Die zur Verfügung gestellten Informationen sind von dem hervorragenden Blog (in Englisch und Portugiesisch) über die Datendefinierte Übersteuerungsoptionen <a href="#id8"><span id="id9">Multiple_format_map_series_using_QGIS_2.6_</span></a> abgeleitet.</p>
+<p>Dieses ist nur ein Beispiel wie Sie Datendefinierte Übersteuerungen anwenden können.</p>
+<h2 id="vorschau">Vorschau</h2>
+<p>Wenn Sie die Atlaseinstellungen konfiguriert haben und die Kartenelemente ausgewählt, können Sie eine Vorschau von allen Seiten machen indem Sie auf <em>Atlas ‣ Atlasvorschau anzeigen</em> klicken und die Pfeile im gleichen Menü zum Navigieren durch alle Objekte verwenden.</p>
+<h2 id="erstellung">Erstellung</h2>
+<p>Die Atlaserstellung kann auf verschiedene Arten durchgeführt werden. Zum Beispiel können sie ihn mit <em>Atlas ‣ Atlas drucken ...</em> direkt drucken. Sie können auch ein PDF erstellen indem Sie <em>Atlas ‣ Atlas als PDF exportieren</em> verwenden: Der Benutzer wird nach einem Verzeichnis gefragt, in das alle erstellten PDF-Dateien gespeichert werden sollen (außer Sie haben <img src="../../../../images/checkbox.png" /> <em>Einzeldatei, wenn möglich</em> ausgewählt). Wenn Sie nur eine Seite des Atlas drucken müssen, starten Sie einfach die Vorschaufunktion, wählen Sie die Seite, die Sie brauchen, aus und klicken Sie <em>Zusammenstellung ‣ Drucken...</em> (oder PDF erstellen).</p>
+<p>Um den verfügbaren Platz für die Interaktion mit einer Komposition zu maximieren, können Sie <em>Ansicht &rarr;</em> <img src="../../../../images/checkbox.png" /> <em>Panels ausblenden</em> auswählen oder <code>F10</code> drücken.</p>
+<p>Hinweis: Es ist auch möglich, via <code>F11</code> oder mit <em>Ansicht &rarr; Vollbildmodus</em> in den Vollbildmodus zu wechseln, um mehr Platz für die Interaktion zu haben.</p>
+<p>Folgendes Bild zeigt die Druckzusammenstellung mit einem Beispieldrucklayout, das jeden Typ von Kartenelement wie in den vorangegangen Abschnitten beschrieben enthält.</p>
+<p><img alt="" src="../../../../images/print_composer_complete.png" /></p>
+<p>Vor dem Drucken eines Layouts haben Sie die Möglichkeit, Ihre Komposition ohne Rahmen zu betrachten. Dies kann durch Deaktivieren von <em>View &rarr;</em> <img src="../../../../images/checkbox.png" /> <em>Begrenzungsrahmen</em> anzeigen oder durch Drücken der Tastenkombination <code>Ctrl+Shift+B</code> aktiviert werden.</p>
+<p>Die Druckzusammenstellung ermöglicht es Ihnen mehere Ausgabeformate zu erstellen, und es ist möglich die Auflösung (Druckqualität) und Seitengröße zu definieren:</p>
+<ul>
+<li>
+<p>Das <img src="../../../../images/mActionFilePrint.png" /> <em>Drucken</em> Icon ermöglicht es Ihnen das Layout in einen angeschlossenen Drucker oder in eine PostScipt Datei zu drucken, je nach installierten Druckertreibern.</p>
+</li>
+<li>
+<p>Das <img src="../../../../images/mActionSaveMapAsImage.png" /> <em>Speichern als Rasterbild</em> Icon exportiert die Zusammenstellungsansicht in diverse Bildformate wie PNG, BPM, TIF, JPG, ...</p>
+</li>
+<li>
+<p><img src="../../../../images/mActionSaveAsPDF.png" /> <em>Als PDF exportieren</em> speichert die definierte Druckzusammenstellungsansicht direkt als PDF.</p>
+</li>
+<li>
+<p>Das <img src="../../../../images/mActionSaveAsSVG.png" /> <em>Speichern als SVG</em> Icon speichet die Druckzusammenstellungsansicht als SVG (Scalable Vector Graphic).</p>
+</li>
+</ul>
+<p>Wenn Sie Ihre Layouts als <strong>georeferenziertes Bild</strong> exportieren müssen (z.B. um es zurück in KADAS zu laden), müssen Sie dies im Zusammenstellung Reiter ermöglichen. Aktivieren Sie <img src="../../../../images/checkbox.png" /> <em>World-Datei ein</em> und wählen Sie das zu benutzende Kartenelement. Mit dieser Option erstellt die <em>Als Bild exportieren</em> Aktion ebenfalls eine World-Datei.</p>
+<p>Bemerkung</p>
+<ul>
+<li>
+<p>Zur Zeit ist die SVG Ausgabe sehr einfach gehalten. Dies ist kein KADAS Probelm sondern ein Problem mit der darunterliegenden Qt Bibliothek. Dies wird hoffentlich in zukünftigen Versionen behoben.</p>
+</li>
+<li>
+<p>Das Exportieren von großen Rastern kann manchmal fehlschlagen, auch wenn es genug Speicher zu geben scheint. Dies ist ebenfalls ein Problem mit dem zugrundeliegenden Qt Management von Rastern.</p>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../working_with_projections/working_with_projections/" class="btn btn-neutral float-left" title="Arbeiten mit Projektionen"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../gpsgate/gpsgate/" class="btn btn-neutral float-right" title="GPS Gate">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../working_with_projections/working_with_projections/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../gpsgate/gpsgate/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

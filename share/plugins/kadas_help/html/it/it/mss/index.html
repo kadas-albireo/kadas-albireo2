@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>MSS - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "MSS";
+        var mkdocs_page_input_path = "it/mss.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Generalità</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interfaccia</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Mappa</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Vista</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analisi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Disegnare</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigazione</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">MSS</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#disegnare-i-simboli-mss">Disegnare i simboli MSS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#modificare-i-simboli-mss">Modificare i simboli MSS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gestione-dei-layer">Gestione dei layer</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#importazione-e-esportazione-milx">Importazione e esportazione MilX</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dimensione-simbolo-spessore-linea-modalita-di-lavoro-colore-e-spessore-della-linea-di-guida">Dimensione simbolo, spessore linea, modalita di lavoro, colore e spessore della linea di guida</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Impostazioni</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Funzionalita avanzate</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer vettoriali</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Dati vettoriali</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Dialogo delle proprietà</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Espressioni</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Campi per digitazioni numeriche</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer raster</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Dati raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Dialogo delle proprietà</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Lavorare con le proiezioni</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Compositore di stampe</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendice</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tasti di scelta rapida</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Licenza</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>MSS</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mss">MSS</h1>
+<p>Nella scheda MSS si trova la funzionalità di rappresentazione della posizione. Questa scheda non è attiva se l'interfaccia KADAS MSS-MilX non è stata installata. La funzionalità di rappresentazione della posizione comprende il disegno e la modifica dei simboli MSS e la gestione dei layer MilX.</p>
+<h2 id="disegnare-i-simboli-mss"><a name="sec0"></a>Disegnare i simboli MSS</h2>
+<p>Il pulsante <strong><em>Aggiungi simbolo</em></strong> apre una galleria sfogliabile di simboli MSS. Dopo aver scelto un simbolo dalla galleria, è possibile posizionarlo sulla mappa.</p>
+<p>I simboli vengono raggruppati nei layer MilX, visualizzabili nella legenda della mappa. Nella galleria dei simboli, è possibile creare nuovi layer e scegliere a quale layer aggiungere i simboli disegnati.</p>
+<p><img src="../../../media/image10.png" /></p>
+<h2 id="modificare-i-simboli-mss"><a name="sec1"></a>Modificare i simboli MSS</h2>
+<p>I simboli disegnati possono essere modificati successivamente selezionandole sulla mappa. Gli <strong><em>oggetti selezionati</em></strong> possono essere spostati e, a seconda del tipo di simbolo, è possi­bile spostare i singoli punti di controllo, nonché aggiungerne e rimuoverne tramite menu contestuale. Effet­tuando le modifiche tramite doppio clic o menu contestuale, è possibile aprire l'editor dei simboli MilX.</p>
+<p>Un’ulteriore possibilità di modifica per i <strong><em>simboli mono-punto</em></strong> è quella di definire un offset tra punto di ancoraggio del simbolo e grafica del simbolo. Il punto di ancoraggio è disegnato nella modalità di modifica quale punto rosso, quale standard al centro del simbolo. Se il simbolo viene spostato sul punto di ancoraggio, il punto viene spostato contestualmente alla grafica. Se il simbolo viene spostato dalla grafica, si sposta solo la grafica e compare una linea nera tra il punto di ancoraggio e il punto centrale della grafica. L’offset può essere rimosso con un clic del tasto destro sul simbolo.</p>
+<p>Nei <strong><em>simboli multi-punto</em></strong>, se permesso dalla specifica del simbolo, è possibile modificare i punti nodali e gli eventuali punti di controllo. Nella modalità di modifica, i punti nodali vengono disegnati quali punti gialli, i punti di controllo quali punti rossi. Questi ultimi possono ad esempio comandare la larghezza della freccia o i parametri di ponderazione delle curve di Bézier. Oltre allo spostamento dei punti, con il clic del tasto destro è possibile aggiungere nuovi punti nodali o cancellare quelli esistenti.</p>
+<p>Analogamente alle figure redlining, è possibile spostare, copiare, tagliare ed incollare simboli MSS singolarmente o in gruppi. Oltre ai tasti di scelta rapida e le apposite voci nel menu contestuale, vi è la possibilità di usare le funzioni <strong><em>Copia a...</em></strong> e <strong><em>Sposta a...</em></strong> situate nella parte inferiore della mappa. Queste ultime permettono di specificare esplicitamente il layer di destinazione, altrimenti il layer MilX attuale viene usato come destinazione. Se nessun layer MilX è selezionato, viene richiesto di specificare il layer di destinazione.</p>
+<p><img src="../../../media/image11.png" /></p>
+<h2 id="gestione-dei-layer"><a name="sec2"></a>Gestione dei layer</h2>
+<p>I simboli MSS vengono salvati in un <strong><em>layer MilX</em></strong> dedicato nell’albero dei layer. È possibile creare più layer MilX indipendenti. Nella galleria di simboli MSS viene scelto a quale layer debba essere aggiunto un simbolo. Nell’albero dei layer è possibile attivare o disattivare i singoli layer come di consueto.</p>
+<p>Una caratteristica speciale dei layer MilX è rappresentata dalla possibilità di marcarli come <strong><em>Approvati</em></strong>. I layer approvati non possono essere modificati; i simboli tattici vengono disegnati in nero. Se un layer sia approvato è impostabile nel menù contestuale del rispettivo layer MilX nell’albero dei layer.</p>
+<h2 id="importazione-e-esportazione-milx"><a name="sec3"></a>Importazione e esportazione MilX</h2>
+<p>I layer MilX possono essere esportati in un file MILXLY o MILXLYZ; i file MILXLY o MILXLYZ esistenti possono essere importati quali layer MilX.</p>
+<p>MILXLY (e la variante compres­sa MILXLYZ) è un formato per lo scambio delle rappresentazioni della posizione. Contiene sola­mente i simboli MSS della rappresentazione della posizione e nessun altro oggetto come figure redlining, spilli o immagini della fotocamera.</p>
+<p><strong><em>Nell'esportazione</em></strong> in formato MILXLY(Z) è possibile scegliere quali layer MilX esportare e in quale versione il file debba essere creato. Inoltre può venir specificato se esportare il cartiglio della mappa definito nel dialogo di stampa.</p>
+<p><strong><em>Nell'importazione</em></strong> di un file MILXLY(Z) vengono importati tutti i layer in esso contenuti. Qualora il file MSS contenga definizioni di simboli basate su un vecchio standard, queste verranno convertite automaticamente. Eventuali errori o perdite in fase di conversione vengono comunicati all'utente. Se uno dei layer importati contiene un cartiglio, l'utente viene chiesto se utilizzare questo cartiglio per la stampa.</p>
+<h2 id="dimensione-simbolo-spessore-linea-modalita-di-lavoro-colore-e-spessore-della-linea-di-guida"><a name="sec5"></a>Dimensione simbolo, spessore linea, modalita di lavoro, colore e spessore della linea di guida</h2>
+<p>Queste impostazioni influenzano la visualizzazione di tutti i simboli MSS nella mappa. Possono essere sovrascritte individualmente per ogni livello nella scheda MSS del dialogo delle proprietà del livello.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../gps/" class="btn btn-neutral float-left" title="Navigazione"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../settings/" class="btn btn-neutral float-right" title="Impostazioni">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../gps/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../settings/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

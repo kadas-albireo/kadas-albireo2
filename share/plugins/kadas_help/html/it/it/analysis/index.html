@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Analisi - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Analisi";
+        var mkdocs_page_input_path = "it/analysis.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Generalità</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interfaccia</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Mappa</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Vista</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Analisi</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#rilevamento-di-lunghezza-superfici-e-azimut">Rilevamento di lunghezza, superfici e azimut</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#profilo-altimetrico-e-visibilita">Profilo altimetrico e visibilità</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pendenza-e-tonalita-del-rilievo">Pendenza e tonalità del rilievo</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bacino-visuale">Bacino visuale</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#minmax">Min/Max</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#efemeridi">Efemeridi</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Disegnare</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigazione</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Impostazioni</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Funzionalita avanzate</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer vettoriali</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Dati vettoriali</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Dialogo delle proprietà</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Espressioni</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Campi per digitazioni numeriche</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer raster</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Dati raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Dialogo delle proprietà</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Lavorare con le proiezioni</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Compositore di stampe</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendice</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tasti di scelta rapida</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Licenza</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Analisi</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="analisi">Analisi</h1>
+<p>Nella scheda <strong><em>Analisi</em></strong> sono disponibili gli strumenti per la misura di distanze, aree, cerchi e angoli, nonché diverse funzionalità di analisi dei terreni.</p>
+<p>Per poter utilizzare le funzionalità di analisi del terreno è necessario definire un modello elevazione nel progetto corrente. Nel menu contestuale di un layer raster nella legenda della mappa, è possibile impostarlo come modello di elevazione.</p>
+<h2 id="rilevamento-di-lunghezza-superfici-e-azimut"><a name="sec0"></a>Rilevamento di lunghezza, superfici e azimut</h2>
+<p>Sono disponibili quattro funzioni di misurazione:</p>
+<ul>
+<li>Linea (distanza)</li>
+<li>Superficie</li>
+<li>Circonferenza</li>
+<li>Azimut</li>
+</ul>
+<p>Tutte le funzioni di rilevamento operano su un ellissoide WGS84.</p>
+<p>Dopo l’attivazione di una funzione di rilevamento, l’utente può disegnare una figura geometrica di rilevamento corrispondente nella finestra delle mappe. I rilevamenti rilevanti vengono visualizzati direttamente accanto alla figura geometrica corrispondente.</p>
+<p>Per il rilevamento di distanza e superficie è possibile disegnare più figure geometriche le une accanto alle altre. Il rilevamento complessivo viene visualizzato nell’area inferiore della finestra delle mappe, dove è possibile modificare anche l’unità di misura. Inoltre, con il pulsante del dispositivo di individuazione è possibile rilevare una figura geometrica esistente.</p>
+<p><img src="../../../media/image3.png" /></p>
+<h2 id="profilo-altimetrico-e-visibilita"><a name="sec1"></a>Profilo altimetrico e visibilità</h2>
+<p>Con la funzione della <strong><em>Profilo vista</em></strong> è possibile analizzare il profilo altimetrico e la visibilità. Per poter utilizzare questa funzione, è necessario definire un modello altimetrico nel progetto. Nel menu contestuale di un layer raster nella legenda della mappa, è possibile impostarlo come modello di elevazione.</p>
+<p>Per creare un profilo altimetrico, l’utente può disegnare sulla mappa una figura geometrica lineare lungo la quale verrà misurato il profilo. Il risultato viene riportato in una finestra di dialogo a parte. In alternativa, per mezzo del pulsante del dispositivo di individuazione, è possibile effettuare rilevamenti anche lungo una figura geometrica lineare esistente.</p>
+<p>Se la figura geometrica lineare è costituita da un solo segmento, lungo questa linea è possibile eseguire un’analisi della visibilità. A tal fine, la casella di controllo Visibilità dev’essere attiva nella schermata del profilo altimetrico. Le aree visibili o invisibili vengono contrassegnate rispettivamente in verde o in rosso. Muovendo il mouse sulla mappa lungo la linea di rilevamento, viene visualizzata la posizione corris­pondente sul grafico con un punto blu. L'analisi della visibilità tiene conto della curvatura terrestre. Le possibilità di configurazione dell’analisi di visibilità sono rappresentate dall’altezza di osservazione, dall’altezza di arrivo e dal fatto che queste altezze debbano essere interpretate relativamente al terreno o al livello del mare.</p>
+<p>Il grafico del profilo altimetrico può inoltre essere copiato negli appunti o inserito nella mappa quale immagine.</p>
+<p><img src="../../../media/image4.png" /></p>
+<h2 id="pendenza-e-tonalita-del-rilievo"><a name="sec2"></a>Pendenza e tonalità del rilievo</h2>
+<p>La funzione <strong><em>Pendenza</em></strong> calcola il profilo di inclinazione del terreno quale griglia codificata cromaticamente.</p>
+<p>La funzione <strong><em>Hillshade</em></strong> (tonalità del rilievo) calcola l’ombreggiatura del terreno, sovrapposta alla mappa in modo semitrasparente.</p>
+<p>Per poter utilizzare queste funzioni di analisi del terreno, deve essere definito un modello altimetrico nel progetto.</p>
+<p>Entrambe queste analisi vengono calcolate in un riquadro rettangolare della mappa. La tonalità del rilievo richiede inoltre l’immissione dell’angolo orizzontale e verticale della sorgente luminosa.</p>
+<p>I risultati delle analisi di pendenza e rilievo vengono inseriti come layer raster alla mappa e compaiono, di conseguenza, nella legenda. Salvando il progetto, questi layer vengono allegati al progetto nel file <em><nome progetto>.qgz</em>.</p>
+<p><img src="../../../media/image5.png" /></p>
+<h2 id="bacino-visuale"><a name="sec3"></a>Bacino visuale</h2>
+<p>Lo strumento <strong><em>Bacino visuale</em></strong> calcola l'area del terreno visibile e invisibile in un settore circolare centrato in un punto di osservazione. L'analisi della visibilità tiene conto della curvatura terrestre.</p>
+<p>Per poter utilizzare queste funzioni di analisi del terreno, deve essere definito un modello altimetrico nel progetto.</p>
+<p>L’analisi della visibilità viene calcolata all’interno di un settore circolare o di un cerchio completo. Al primo clic del mouse sulla mappa viene definito il luogo d’osservazione; il secondo clic definisce il raggio; il terzo clic definisce l’apertura angolare del settore. Questi parametri possono essere immessi anche numericamente se l’immissione numerica è attiva. Dopo il rilevamento della superficie di analisi, possono essere adeguati i parametri di calcolo – ovvero l’altezza d’osservazione, l’altezza di arrivo, se queste altezze debbano essere interpretate relativamente al terreno o al livello del mare e se debba essere visualizzata l’area visibile o quella non visibile.</p>
+<p>Il risultato viene aggiunto come layer raster alla mappa. Al salvataggio del progetto, esso viene allegato al progetto nel file <em><nome progetto>.qgz</em>.</p>
+<h2 id="minmax"><a name="sec4"></a>Min/Max</h2>
+<p>Lo strumento <strong><em>Min/Max</em></strong> consente di calcolare il punto più basso e più alto del terreno all'interno di un'area selezionata (rettangolo/poligono/circolo). I rispettivi punti saranno contrassegnati da icone triangolari rivolte verso l'alto e verso il basso sulla mappa. Facendo clic sulle icone a triangolo è possibile copiare le coordinate, aggiungere un pin e avviare un'ulteriore funzione di analisi (ad es. bacino visuale) da quel punto.</p>
+<h2 id="efemeridi"><a name="sec4"></a>Efemeridi</h2>
+<p>Lo strumento <strong><em>Efemeridi</em></strong> calcola le effemeridi del sole e della luna (posizione, tempi di alba e tramonto, fasi lunari) in una posizione del terreno e in un momento nel tempo selezionati. La casella di controllo permette di configurare se il rilievo è considerato per il calcolo.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../view/" class="btn btn-neutral float-left" title="Vista"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../draw/" class="btn btn-neutral float-right" title="Disegnare">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../view/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../draw/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Mappa - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Mappa";
+        var mkdocs_page_input_path = "it/map.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Generalità</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interfaccia</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Mappa</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#progetti">Progetti</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creazione-e-salvataggio-di-mappe">Creazione e salvataggio di mappe</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#apri-progetti">Apri progetti</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#stampa">Stampa</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#finestra-di-dialogo-della-stampante">Finestra di dialogo della stampante</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#modelli-di-stampa">Modelli di stampa</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cartuccia-mappa">Cartuccia mappa</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#output-di-stampa">Output di stampa</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#copia-mappa-salva-mappa">Copia mappa / Salva mappa</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#esportazione-e-importazione-kmlkmz">Esportazione e importazione KML/KMZ</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gpkg-esportazione-e-importazione">GPKG Esportazione e importazione</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Vista</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analisi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Disegnare</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigazione</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Impostazioni</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Funzionalita avanzate</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer vettoriali</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Dati vettoriali</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Dialogo delle proprietà</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Espressioni</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Campi per digitazioni numeriche</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer raster</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Dati raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Dialogo delle proprietà</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Lavorare con le proiezioni</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Compositore di stampe</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendice</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tasti di scelta rapida</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Licenza</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Mappa</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mappa">Mappa</h1>
+<h2 id="progetti"><a name="sec0"></a>Progetti</h2>
+<p>Le mappe possono essere caricate e salvate come progetti. Viene utilizzato il formato dei pro­getti QGIS, con estensione <em>*.qgz</em>. I progetti vengono creati sulla base di modelli. All'avvio dell'appli­cazione, viene automaticamente creato un progetto sulla base di un modello online od offline, a seconda che il computer sia collegato alla rete o meno.</p>
+<h2 id="creazione-e-salvataggio-di-mappe"><a name="sec1"></a>Creazione e salvataggio di mappe</h2>
+<p>Con le funzioni <strong><em>Nuovo</em></strong>, <strong><em>Apri</em></strong>, <strong><em>Salva</em></strong> e <strong><em>Salva con nome</em></strong>, è possibile creare dei nuovi progetti (sulla base di un modello), aprire progetti esistenti e salvare i progetti.</p>
+<h2 id="apri-progetti"><a name="sec2"></a>Apri progetti</h2>
+<p>Le mappe salvate (progetti) possono essere caricate con la funzione <strong><em>Apri</em></strong>.</p>
+<h2 id="stampa"><a name="sec3"></a>Stampa</h2>
+<p>La mappa attuale può essere inviata alla stampante tramite la funzione <strong><em>Stampa</em></strong> o salvata in un file.</p>
+<p>La stampa si basa su dei modelli. Come impostazione standard, vengono forniti i modelli A0-A6, in formato sia orizzontale che verticale, e un modello Custom.</p>
+<p>Una volta scelto il modello, nella finestra della mappa principale viene visualizzato un rettangolo blu semitrasparente che corrisponde all'riquadro da stampare. Nel caso di modelli con formato di pagina fisso, il rettangolo presente nella mappa principale può essere spostato per adattare l'area di stampa. La dimensione del riquadro viene calcolato dal formato della pagina e dalla scala scelta nel dialogo di stampa. Nel caso del modello <em>Custom</em>, il riquadro viene definito numericamente nel dialogo di stampa, e il formato della pagina risultante in base a queste indicazioni.</p>
+<p>Durante la stampa, è possibile inserire o rimuovere secondo preferenza degli elementi aggiuntivi come la griglia delle coordinate, il cartiglio della mappa, legenda e il righello della scala. La posi­zione di questi elementi è definita nel modello.</p>
+<p><img src="../../../media/image12.png" /></p>
+<h3 id="finestra-di-dialogo-della-stampante">Finestra di dialogo della stampante</h3>
+<ul>
+<li><strong>Modello</strong>: scelta del modello di stampa. Viene visualizzata un’anteprima dell’output di stampa.</li>
+<li><strong>Titolo</strong>: titolo visualizzato sull’output di stampa.</li>
+<li><strong>Scala</strong>: scala di stampa</li>
+<li><strong>Reticolo</strong>: se la sezione Griglia è aperta, nello stampato viene posizionato un reticolo.</li>
+<li><strong>Sistema di coordinate</strong>: scelta del sistema di coordinate della griglia</li>
+<li><strong>Intervallo X</strong>: distanza delle linee del reticolo in direzione X</li>
+<li><strong>Intervallo Y</strong>: distanza delle linee del reticolo in direzione Y</li>
+<li><strong>Mostra coordinate</strong>: attivazione/disattivazione delle diciture del reticolo</li>
+<li><strong>Cartiglio</strong>: attivazione/disattivazione della cartuccia</li>
+<li><strong>Modifica Cartiglio</strong>: configurazione della cartuccia</li>
+<li><strong>Barra della scala</strong>: attivazione/disattivazione della visualizzazione della scala</li>
+<li><strong>Legenda</strong>: attivazione/disattivazione della legenda, tramite il pulsante <em>Configura</em> è inoltre possibile scegliere separatamente quali layer appaiono nella legenda</li>
+<li><strong>Formato</strong>: scelta del formato per la funzione di esportazione del file</li>
+</ul>
+<h3 id="modelli-di-stampa">Modelli di stampa</h3>
+<p>I modelli contenuti nel progetto possono venir gestiti tramite il <em>Gestore modelli</em>, attivabile con il pulsante situato a destra del campo di selezione del modello. Nel gestore i modelli possono venir importati, esportati e rimossi dal progetto.</p>
+<p><img src="../../../media/image12.1.png" /></p>
+<h3 id="cartuccia-mappa">Cartuccia mappa</h3>
+<p>In questa finestra è possibile definire il contenuto della <strong><em>cartuccia</em></strong>. Nei campi di immissione è depositata la funzione del testo. Se è attivata la casella di controllo checkbox <strong>Esercizio</strong>, vengono visualizzate le indicazioni per l’esercizio nella cartuccia.</p>
+<p>Inoltre è possibile esportare e importare il contenuto del cartiglio come file XML a sé stanti dal dialogo di modifica del cartiglio.</p>
+<h3 id="output-di-stampa">Output di stampa</h3>
+<ul>
+<li><strong>Esporta</strong>: viene creato un file nel formato scelto.</li>
+<li><strong>Stampa</strong>: tramite la schermata di stampa è possibile scegliere una stampante configurata e avviare l’output.</li>
+<li><strong>Chiudi</strong>: la finestra di dialogo di stampa viene chiusa.</li>
+<li><strong>Avanzato</strong>: richiamo della funzionalità di layout avanzata</li>
+</ul>
+<h2 id="copia-mappa-salva-mappa"><a name="sec4"></a>Copia mappa / Salva mappa</h2>
+<p>Queste funzioni consentono di salvare il riquadro della mappa visibile della mappa negli appunti o in un'immagine. Viene sempre salvato il contenuto identico a quanto è mostrato nella finestra della mappa.</p>
+<p>La funzione <strong><em>Salva mappa</em></strong> apre un dialogo che permette di selezionare il percorso e il tipo di file (PNG, JPG, etc.) di uscita. Un file "world" (con estensione PNGW, JPGW, etc.) salvato nella stessa cartella georeferenzia l’immagine.</p>
+<h2 id="esportazione-e-importazione-kmlkmz"><a name="sec5"></a>Esportazione e importazione KML/KMZ</h2>
+<p>Il contenuto della mappa può essere esportato come KML o KMZ. Immagini, layer raster e simboli MSS possono solamente venir esportati nel formato KMZ.</p>
+<p>I file KML/KMZ possono anche essere importati in KADAS.</p>
+<p><em>Nota</em>: KMZ e KML sono formati di esportazione che possono comportare delle per­dite e, pertanto, non sono adatti allo scambio tra utenti di KADAS. A questo scopo è necessario utiliz­zare il formato nativo <em>*.qgs</em>.</p>
+<h2 id="gpkg-esportazione-e-importazione"><a name="sec6"></a>GPKG Esportazione e importazione</h2>
+<p>Il GeoPackage (GPKG) KADAS è un formato di file basato su SQLite, che raggruppa in un unico file sia i geodati locali contenuti in un progetto che il progetto stesso, offrendo così la possibilità di comodamente scambiare progetti e dati.</p>
+<p>Durante l'esportazione del progetto a GPKG, è possibile scegliere quali geodati devono essere scritti nel GeoPackage, il progetto salvato nel GPKG caricherà i dati direttamente dal GPKG. Si può anche decidere se un GPKG esistente debba essere aggiornato o completamente sostituito. Nel primo caso, i dati esistenti rimangono nel GPKG, anche se non sono referenzati dal progetto.</p>
+<p>Durante l'importazione, un progetto KADAS viene cercato e aperto nel GPKG, e dati georeferenziati dal GPKG vengono caricati direttamente dallo stesso.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../kadas_gui/" class="btn btn-neutral float-left" title="Interfaccia"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../view/" class="btn btn-neutral float-right" title="Vista">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../kadas_gui/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../view/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

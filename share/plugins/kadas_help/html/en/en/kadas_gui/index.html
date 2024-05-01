@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>The Interface - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "The Interface";
+        var mkdocs_page_input_path = "en/kadas_gui.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">General</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">The Interface</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#functionality-menu">Functionality menu</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#favorites-and-search">Favorites and search</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#favorites">Favorites</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#search">Search</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#map-view">Map View</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#layers-and-geodata-catalog">Layers and geodata catalog</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#layers">Layers</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#geodata-catalog">Geodata catalog</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#status-bar">Status bar</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Advanced functionalities</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>The Interface</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="kadas-interface">KADAS Interface</h1>
+<p><img src="../../../media/image1.png" /></p>
+<p>The KADAS GUI is divided into five areas:</p>
+<ul>
+<li>Functionality menu</li>
+<li>Favorites and search</li>
+<li>Map View</li>
+<li>Layers and geodata catalog</li>
+<li>Status bar</li>
+</ul>
+<h2 id="functionality-menu"><a name="sec0"></a>Functionality menu</h2>
+<p>Functionalities are grouped by topic in tabs, which can be activated from the menu bar. The tabs contain buttons for the various functionalities. The functionalities of each tab are documented in the respective chapters:</p>
+<ul>
+<li><a href="/map">Map</a></li>
+<li><a href="/view">View</a></li>
+<li><a href="/analysis">Analysis</a></li>
+<li><a href="/draw">Draw</a></li>
+<li><a href="/gps">Navigation</a></li>
+<li><a href="/mss">MSS</a></li>
+<li><a href="/settings">Settings</a></li>
+</ul>
+<h2 id="favorites-and-search"><a name="sec1"></a>Favorites and search</h2>
+<h3 id="favorites">Favorites</h3>
+<p>Favorite functionalities can be dragged from the respective tab to one of the four placeholders. They can be removed again via context menu on the favorite button. The favorites are stored in the personal user settings.</p>
+<h3 id="search">Search</h3>
+<p>The search field provides a unified interface for various search services:</p>
+<ul>
+<li>Coordinates (LV03, LV95, DD, DM, DMS, UTM, MGRS)</li>
+<li>Locations and addresses throughout Switzerland</li>
+<li>Locations worldwide</li>
+<li>Attributes in local layers</li>
+<li>Attributes in remote layers (web services)</li>
+<li>Attributes in pins</li>
+</ul>
+<p>As soon as at least three characters are typed, the search starts and results are displayed.</p>
+<p>The results are listed in correspondingly designated categories. The result list can be searched with mouse or keyboard arrows. When selecting a result with the arrows, a blue pin is placed in the appropriate location. When activating a result with the mouse, the map extent is centered on the corresponding location.</p>
+<p><img src="../../../media/image2.png" /></p>
+<p>To the right of the search field, it is possible to define a filter geometry for local and remote data set search. This filter is <em>NOT</em> applied to coordinate, location or pin searches.</p>
+<h2 id="map-view"><a name="sec2"></a>Map View</h2>
+<p>This central area of KADAS displays the loaded layers and allows performing various operations on the map.</p>
+<p>Panning in the map is done with the left or middle mouse button, zooming with the scroll wheel or with the zoom buttons in the upper right corner of the map window. The right mouse button opens the context menu. Pan and rotation gestures are recognized on touch-enabled devices. In addition, you can zoom to a specific extent by holding down the SHIFT key and dragging a rectangle. </p>
+<p>Regardless of the active map tool, the middle mouse button and the scroll wheel are always used for map navigation. The function of the left and right mouse buttons depend on the active tool.</p>
+<p>The contents of the map is controlled by the map legend, described in the next section.</p>
+<p>In the View tab, additional map views can be added. These additional views are passive, meaning no other interaction besides panning and zooming is possible.</p>
+<h2 id="layers-and-geodata-catalog"><a name="sec3"></a>Layers and geodata catalog</h2>
+<p>The functions to manage the map layers are contained in the collapsible area anchored at the left border of the application window. The upper part contains the table of contents of the map, the lower part contains the geodata catalog.</p>
+<h3 id="layers">Layers</h3>
+<p>The map legend area lists all the <strong><em>layers</em></strong> in the project. The checkbox in each legend entry can be used to show or hide the layer.</p>
+<p>A layer can be selected and dragged up or down in the legend to change the Z-ordering. Z-ordering means that layers listed nearer the top of the legend are drawn over layers listed lower down in the legend.</p>
+<p>Layers in the legend window can be organised into groups.</p>
+<p>The checkbox for a group will show or hide all the layers in the group with one click.</p>
+<p>Via right click on an entry it is possible to perform various operations, depending on the type of the selected layer, such as:</p>
+<ul>
+<li>Zoom to layer</li>
+<li>Remove</li>
+<li>Rename</li>
+<li>Open layer properties</li>
+</ul>
+<p>It is possible to select more than one layer or group at the same time by holding down the Ctrl key while selecting the layers with the left mouse button.</p>
+<h3 id="geodata-catalog">Geodata catalog</h3>
+<p>The geodata catalog allows adding additional layers to the map. The catalog is empty if no network connection to the catalog service could be established</p>
+<p>When starting the program, only public data is displayed. Depending on the user, further data may be available after authentication, see <em>SAML authentication</em> below.</p>
+<p>The contents of the catalog can by filtered by entering an appropriate text in the input field above the catalog. A layer in the catalog can be added to the map by drag and drop or double click.</p>
+<p>The toolbar above the catalog contains the following functionalities:</p>
+<ul>
+<li><strong><em>Add local layer</em></strong>: Add local vector, raster or CSV layer to the map.</li>
+<li><strong><em>Add service layer</em></strong>: Add remote WMS, WFS, WCS, MapServer and vector tile layer to the map.</li>
+<li><strong><em>Reload catalog</em></strong>: Reloads the catalog from the catalog service.</li>
+<li><strong><em>SAML authentication</em></strong>: A window for performing a web-based login will be shown. Upon successful authentication, the geodata catalog will be refreshed and additional layers will be listed, according to the privileges of the authenticated user.</li>
+</ul>
+<h2 id="status-bar"><a name="sec4"></a>Status bar</h2>
+<p>The status bar contains following labels and control widgets:</p>
+<ul>
+<li><strong><em>GPS</em></strong>: Usage of the GPS button is described in the <a href="/gps"><em>Navigation</em> chapter</a>.</li>
+<li><strong><em>Mouse position</em></strong>: The current mouse position on the map can be displayed with respect to multiple reference systems. The desired format can be selected from the menu left of the display label. The unit for the height can be changed in the Settings tab.</li>
+<li><strong><em>Scale</em></strong>: The current scale of the map view is displayed next to the coordinate field. The scale selector allows to choose between predefined scales ranging from 1:500 to 1:1000000. The lock icon allows locking the current map scale, zooming will then only affect the magnification factor.</li>
+<li><strong><em>Coordinate reference system</em></strong>: The coordinate reference system selection button allows to choose which projection to use for the map. If the selected projection differs from the native projection of a dataset, the latter will be reprojected, which may result in reduced performance depending on the amount of data.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="General"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../map/" class="btn btn-neutral float-right" title="Map">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../map/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

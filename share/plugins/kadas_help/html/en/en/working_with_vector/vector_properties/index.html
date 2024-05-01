@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Properties dialog - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Properties dialog";
+        var mkdocs_page_input_path = "en/working_with_vector/vector_properties.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Advanced functionalities</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Vector layers</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Properties dialog</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#style-menu">Style Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#labels-menu">Labels Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields-menu">Fields Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#general-menu">General Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rendering-menu">Rendering Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#display-menu">Display Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#actions-menu">Actions Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#joins-menu">Joins Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#diagrams-menu">Diagrams Menu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#metadata-menu">Metadata Menu </a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Advanced functionalities &raquo;</li>
+          <li>Vector layers &raquo;</li>
+      <li>Properties dialog</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="the-vector-properties-dialog">The Vector Properties Dialog <a name="#the-vector-properties-dialog"></a></h1>
+<p>The <em>Layer Properties</em> dialog for a vector layer provides information about the layer, symbology settings and labeling options. If your vector layer has been loaded from a PostgreSQL/PostGIS datastore, you can also alter the underlying SQL for the layer by invoking the <em>Query Builder</em> dialog on the <em>General</em> tab. To access the <em>Layer Properties</em> dialog, double-click on a layer in the legend or right-click on the layer and select <em>Properties</em> from the pop-up menu.</p>
+<p><img alt="" src="../../../../images/vector_general_menu.png" /></p>
+<h2 id="style-menu">Style Menu <a name="#style-menu"></a></h2>
+<p>The Style menu provides you with a comprehensive tool for rendering and symbolizing your vector data. You can use <em>Layer rendering ‣</em> tools that are common to all vector data, as well as special symbolizing tools that were designed for the different kinds of vector data.</p>
+<h3 id="renderers">Renderers <a name="#renderers"></a></h3>
+<p>The renderer is responsible for drawing a feature together with the correct symbol. There are four types of renderers: single symbol, categorized, graduated and rule-based. There is no continuous color renderer, because it is in fact only a special case of the graduated renderer. The categorized and graduated renderers can be created by specifying a symbol and a color ramp - they will set the colors for symbols appropriately. For point layers, there is a point displacement renderer available. For each data type (points, lines and polygons), vector symbol layer types are available. Depending on the chosen renderer, the <em>Style</em> menu provides different additional sections. On the bottom right of the symbology dialog, there is a <strong>[Symbol]</strong> button, which gives access to the Style Manager (see <em>vector_style_manager</em>). The Style Manager allows you to edit and remove existing symbols and add new ones.</p>
+<p>After having made any needed changes, the symbol can be added to the list of current style symbols (using <strong>[Symbol]</strong> <img src="../../../../images/selectstring.png" /> <em>Save in symbol library</em>), and then it can easily be used in the future. Furthermore, you can use the <strong>[Save Style]</strong> <img src="../../../../images/selectstring.png" /> button to save the symbol as a KADAS layer style file (.qml) or SLD file (.sld). SLDs can be exported from any type of renderer – single symbol, categorized, graduated or rule-based – but when importing an SLD, either a single symbol or rule-based renderer is created. That means that categorized or graduated styles are converted to rule-based. If you want to preserve those renderers, you have to stick to the QML format. On the other hand, it can be very handy sometimes to have this easy way of converting styles to rule-based.</p>
+<p>If you change the renderer type when setting the style of a vector layer the settings you made for the symbol will be maintained. Be aware that this procedure only works for one change. If you repeat changing the renderer type the settings for the symbol will get lost.</p>
+<p>If the datasource of the layer is a database (PostGIS or Spatialite for example), you can save your layer style inside a table of the database. Just click on <em>Save Style</em> comboxbox and choose <strong>Save in database</strong> item then fill in the dialog to define a style name, add a description, an ui file and if the style is a default style. When loading a layer from the database, if a style already exists for this layer, KADAS will load the layer and its style. You can add several style in the database. Only one will be the default style anyway.</p>
+<p><img alt="" src="../../../../images/save_style_database.png" /></p>
+<p><strong>Select and change multiple symbols</strong></p>
+<p>The Symbology allows you to select multiple symbols and right click to change color, transparency, size, or width of selected entries.</p>
+<p><strong>Single Symbol Renderer</strong></p>
+<p>The Single Symbol Renderer is used to render all features of the layer using a single user-defined symbol. The properties, which can be adjusted in the <em>Style</em> menu, depend partially on the type of layer, but all types share the following dialog structure. In the top-left part of the menu, there is a preview of the current symbol to be rendered. On the right part of the menu, there is a list of symbols already defined for the current style, prepared to be used by selecting them from the list. The current symbol can be modified using the menu on the right side.</p>
+<p>If you click on the first level in the <em>Symbol layers</em> dialog on the left side, it's possible to define basic parameters like <em>Size</em>, <em>Transparency</em>, <em>color</em> and <em>Rotation</em>. Here, the layers are joined together.</p>
+<p><img alt="" src="../../../../images/singlesymbol_ng_line.png" /></p>
+<p>In any spinbox in this dialog you can enter expressions. E.g. you can calculate simple math like multiplying the existing size of a point by 3 without resorting to a calculator.</p>
+<p><img alt="" src="../../../../images/expression_symbol_size_spinbox.png" /></p>
+<p>If you click on the second level in the <em>Symbol layers</em> dialog a <em>Data-defined override</em> for nearly all settings is possible. When using a data-defined color one may want to link the color to a field <em>budged</em>. Here a comment functionality is inserted.</p>
+<pre><code>/* This expression will return a color code depending on the field value.
+ * Negative value: red
+ * 0 value: yellow
+ * Positive value: green
+ */
+CASE
+  WHEN value &lt; 0 THEN '#DC143C' -- Negative value: red
+  WHEN value = 0 THEN '#CCCC00' -- Value 0: yellow
+  ELSE '#228B22'                -- Positive value: green
+END
+</code></pre>
+<p><strong>Categorized Renderer</strong></p>
+<p>The Categorized Renderer is used to render all features from a layer, using a single user-defined symbol whose color reflects the value of a selected feature's attribute. The <em>Style</em> menu allows you to select:</p>
+<ul>
+<li>The attribute (using the Column listbox or the <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Set column expression</em> function, see <a href="expression.html#vector-expressions"><em>Expressions</em></a>)</li>
+<li>The symbol (using the Symbol dialog)</li>
+<li>The colors (using the color Ramp listbox)</li>
+</ul>
+<p>Then click on <strong>Classify</strong> button to create classes from the distinct value of the attribute column. Each classes can be disabled unchecking the checkbox at the left of the class name.</p>
+<p>You can change symbol, value and/or label of the class, just double click on the item you want to change.</p>
+<p>Right-click shows a contextual menu to <strong>Copy/Paste</strong>, <strong>Change color</strong>, <strong>Change transparency</strong>, <strong>Change output unit</strong>, <strong>Change symbol width</strong>.</p>
+<p>The <strong>[Advanced]</strong> button in the lower-right corner of the dialog allows you to set the fields containing rotation and size scale information. For convenience, the center of the menu lists the values of all currently selected attributes together, including the symbols that will be rendered.</p>
+<p><img alt="" src="../../../../images/categorysymbol_ng_line.png" /></p>
+<p><strong>Graduated Renderer</strong></p>
+<p>The Graduated Renderer is used to render all the features from a layer, using a single user-defined symbol whose color reflects the assignment of a selected feature's attribute to a class.</p>
+<p><img alt="" src="../../../../images/graduatesymbol_ng_line.png" /></p>
+<p>Like the Categorized Renderer, the Graduated Renderer allows you to define rotation and size scale from specified columns.</p>
+<p>Also, analogous to the Categorized Renderer, the <em>Style</em> tab allows you to select:</p>
+<ul>
+<li>The attribute (using the Column listbox or the <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Set column expression</em> function, see <a href="expression.html#vector-expressions"><em>Expressions</em></a> chapter)</li>
+<li>The symbol (using the Symbol Properties button)</li>
+<li>The colors (using the color Ramp list)</li>
+</ul>
+<p>Additionally, you can specify the number of classes and also the mode for classifying features within the classes (using the Mode list). The available modes are:</p>
+<ul>
+<li>Equal Interval: each class has the same size (e.g. values from 0 to 16 and 4 classes, each class has a size of 4);</li>
+<li>Quantile: each class will have the same number of element inside (the idea of a boxplot);</li>
+<li>Natural Breaks (Jenks): the variance within each class is minimal while the variance between classes is maximal;</li>
+<li>Standard Deviation: classes are built depending on the standard deviation of the values;</li>
+<li>Pretty Breaks: the same of natural breaks but the extremes number of each class are integers.</li>
+</ul>
+<p>The listbox in the center part of the <em>Style</em> menu lists the classes together with their ranges, labels and symbols that will be rendered.</p>
+<p>Click on <strong>Classify</strong> button to create classes using the choosen mode. Each classes can be disabled unchecking the checkbox at the left of the class name.</p>
+<p>You can change symbol, value and/or label of the clic, just double clicking on the item you want to change.</p>
+<p>Right-click shows a contextual menu to <strong>Copy/Paste</strong>, <strong>Change color</strong>, <strong>Change transparency</strong>, <strong>Change output unit</strong>, <strong>Change symbol width</strong>.</p>
+<p><strong>Thematic maps using an expression</strong></p>
+<p>Categorized and graduated thematic maps can now be created using the result of an expression. In the properties dialog for vector layers, the attribute chooser has been augmented with a <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Set column expression</em> function. So now you no longer need to write the classification attribute to a new column in your attribute table if you want the classification attribute to be a composite of multiple fields, or a formula of some sort.</p>
+<p><strong>Rule-based rendering</strong></p>
+<p>The Rule-based Renderer is used to render all the features from a layer, using rule based symbols whose color reflects the assignment of a selected feature's attribute to a class. The rules are based on SQL statements. The dialog allows rule grouping by filter or scale, and you can decide if you want to enable symbol levels or use only the first-matched rule.</p>
+<p>To create a rule, activate an existing row by double-clicking on it, or click on <em>+</em> and click on the new rule. In the <em>Rule properties</em> dialog, you can define a label for the rule. Press the <img src="../../../../images/browsebutton.png" /> button to open the expression string builder. In the <strong>Function List</strong>, click on <em>Fields and Values</em> to view all attributes of the attribute table to be searched. To add an attribute to the field calculator <strong>Expression</strong> field, double click its name in the <em>Fields and Values</em> list. Generally, you can use the various fields, values and functions to construct the calculation expression, or you can just type it into the box. You can create a new rule by copying and pasting an existing rule with the right mouse button. You can also use the <em>ELSE</em> rule that will be run if none of the other rules on that level match. The rules appear in a tree hierarchy in the map legend. Just double-klick the rules in the map legend and the Style menu of the layer properties appears showing the rule that is the background for the symbol in the tree.</p>
+<p><img alt="" src="../../../../images/rulesymbol_ng_line.png" /></p>
+<p><strong>Point displacement</strong></p>
+<p>The Point Displacement Renderer works to visualize all features of a point layer, even if they have the same location. To do this, the symbols of the points are placed on a displacement circle around a center symbol.</p>
+<p><img alt="" src="../../../../images/poi_displacement.png" /></p>
+<p><strong>Export vector symbology</strong></p>
+<p>You have the option to export vector symbology from KADAS into Google *.kml, *.dxf and MapInfo *.tab files. Just open the right mouse menu of the layer and click on <em>Save selection as ‣</em> to specify the name of the output file and its format. In the dialog, use the <em>Symbology export</em> menu to save the symbology either as <em>Feature symbology ‣</em> or as <em>Symbol layer symbology ‣</em>. If you have used symbol layers, it is recommended to use the second setting.</p>
+<p><strong>Inverted Polygon</strong></p>
+<p>Inverted polygon renderer allows user to define a symbol to fill in outside of the layer's polygons. As before you can select subrenderers. These subrenderers are the same as for the main renderers.</p>
+<p><img alt="" src="../../../../images/inverted_polygon_symbol.png" /></p>
+<p><strong>Switch quickly between styles</strong></p>
+<p>Once you created one of the above mentioned styles you can right-klick on the layer and choose <em>Styles ‣ Add</em> to save your style. Now you can easily switch between styles you created using the <em>Styles ‣</em> menu again.</p>
+<p><strong>Heatmap</strong></p>
+<p>With the Heatmap renderer you can create live dynamic heatmaps for (multi)point layers. You can specify the heatmap radius in pixels, mm or map units, choose a color ramp for the heatmap style and use a slider for selecting a tradeoff between render speed and quality. When adding or removing a feature the heatmap renderer updates the heatmap style automatically.</p>
+<h3 id="color-picker">Color Picker <a name="#color-picker"></a></h3>
+<p>Regardless the type of style to be used, the <em>select color</em> dialog will show when you click to choose a color - either border or fill color. This dialog has four different tabs which allow you to select colors by <img src="../../../../images/mIconColorBox.png" /> <em>color ramp</em>, <img src="../../../../images/mIconColorWheel.png" /> <em>color wheel</em>, <img src="../../../../images/mIconColorSwatches.png" /> <em>color swatches</em> or <img src="../../../../images/mIconColorPicker.png" /> <em>color picker</em>.</p>
+<p>Whatever method you use, the selected color is always described through color sliders for HSV (Hue, Saturation, Value) and RGB (Red, Green, Blue) values. There is also an <em>opacity</em> slider to set transparency level. On the lower left part of the dialog you can see a comparison between the <em>current</em> and the <em>new</em> color you are presently selecting and on the lower right part you have the option to add the color you just tweaked into a color slot button.</p>
+<p><img alt="" src="../../../../images/color_picker_ramp.png" /></p>
+<p>With <img src="../../../../images/mIconColorBox.png" /> <em>color ramp</em> or with <img src="../../../../images/mIconColorWheel.png" /> <em>color wheel</em>, you can browse to all possible color combinations. There are other possibilities though. By using color swatches <img src="../../../../images/mIconColorSwatches.png" /> you can choose from a preselected list. This selected list is populated with one of three methods: <em>Recent colors</em>, <em>Standard colors</em> or <em>Project colors</em></p>
+<p><img alt="" src="../../../../images/color_picker_recent_colors.png" /></p>
+<p>Another option is to use the <img src="../../../../images/mIconColorPicker.png" /> <em>color picker</em> which allows you to sample a color from under your mouse pointer at any part of QGIS or even from another application by pressing the space bar. Please note that the color picker is OS dependent and is currently not supported by OSX.</p>
+<p>Tip</p>
+<p><strong>quick color picker + copy/paste colors</strong></p>
+<p>You can quickly choose from <em>Recent colors</em>, from <em>Standard colors</em> or simply <em>copy</em> or <em>paste</em> a color by clicking the drop-down arrow that follows a current color box.</p>
+<p><img alt="" src="../../../../images/quick_color_picker.png" /></p>
+<h3 id="layer-rendering">Layer rendering <a name="#layer-rendering"></a></h3>
+<ul>
+<li><em>Layer transparency</em> <img alt="slider" src="../../../../images/slider.png" />: You can make the underlying layer in the map canvas visible with this tool. Use the slider to adapt the visibility of your vector layer to your needs. You can also make a precise definition of the percentage of visibility in the the menu beside the slider.</li>
+</ul>
+<!-- -->
+
+<ul>
+<li><em>Layer blending mode</em> and <em>Feature blending mode</em>: You can achieve special rendering effects with these tools that you may previously only know from graphics programs. The pixels of your overlaying and underlaying layers are mixed through the settings described below.<ul>
+<li>Normal: This is the standard blend mode, which uses the alpha channel of the top pixel to blend with the pixel beneath it. The colors aren't mixed.</li>
+<li>Lighten: This selects the maximum of each component from the foreground and background pixels. Be aware that the results tend to be jagged and harsh.</li>
+<li>Screen: Light pixels from the source are painted over the destination, while dark pixels are not. This mode is most useful for mixing the texture of one layer with another layer (e.g., you can use a hillshade to texture another layer).</li>
+<li>Dodge: Dodge will brighten and saturate underlying pixels based on the lightness of the top pixel. So, brighter top pixels cause the saturation and brightness of the underlying pixels to increase. This works best if the top pixels aren't too bright; otherwise the effect is too extreme.</li>
+<li>Addition: This blend mode simply adds pixel values of one layer with the other. In case of values above one (in the case of RGB), white is displayed. This mode is suitable for highlighting features.</li>
+<li>Darken: This creates a resultant pixel that retains the smallest components of the foreground and background pixels. Like lighten, the results tend to be jagged and harsh.</li>
+<li>Multiply: Here, the numbers for each pixel of the top layer are multiplied with the corresponding pixels for the bottom layer. The results are darker pictures.</li>
+<li>Burn: Darker colors in the top layer cause the underlying layers to darken. Burn can be used to tweak and colorise underlying layers.</li>
+<li>Overlay: This mode combines the multiply and screen blending modes. In the resulting picture, light parts become lighter and dark parts become darker.</li>
+<li>Soft light: This is very similar to overlay, but instead of using multiply/screen it uses color burn/dodge. This is supposed to emulate shining a soft light onto an image.</li>
+<li>Hard light: Hard light is also very similar to the overlay mode. It's supposed to emulate projecting a very intense light onto an image.</li>
+<li>Difference: Difference subtracts the top pixel from the bottom pixel, or the other way around, to always get a positive value. Blending with black produces no change, as the difference with all colors is zero.</li>
+<li>Subtract: This blend mode simply subtracts pixel values of one layer from the other. In case of negative values, black is displayed.</li>
+</ul>
+</li>
+</ul>
+<h2 id="labels-menu">Labels Menu <a name="#labels-menu"></a></h2>
+<p>The <img src="../../../../images/mActionLabeling.png" /> <em>Labels</em> core application provides smart labeling for vector point, line and polygon layers, and it only requires a few parameters. This new application also supports on-the-fly transformed layers. The core functions of the application have been redesigned. In KADAS, there are a number of other features that improve the labeling. The following menus have been created for labeling the vector layers:</p>
+<ul>
+<li>Text</li>
+<li>Formatting</li>
+<li>Buffer</li>
+<li>Background</li>
+<li>Shadow</li>
+<li>Placement</li>
+<li>Rendering</li>
+</ul>
+<p>Let us see how the new menus can be used for various vector layers.</p>
+<p><strong>Labeling point layers</strong><a name="labeling-point-layers"></a></p>
+<p>Start KADAS and load a vector point layer. Activate the layer in the legend and click on the <img src="../../../../images/mActionLabeling.png" /> <em>Layer Labeling Options</em> icon in the KADAS toolbar menu.</p>
+<p>The first step is to activate the <img src="../../../../images/checkbox.png" /> <em>Label this layer with</em> checkbox and select an attribute column to use for labeling. Click <img src="../../../../images/mIconExpressionEditorOpen.png" /> if you want to define labels based on expressions.</p>
+<p>The following steps describe a simple labeling without using the <em>Data defined override</em> functions, which are situated next to the drop-down menus.</p>
+<p>You can define the text style in the <em>Text</em> menu. Use the <em>Type case</em> option to influence the text rendering. You have the possibility to render the text <em>All uppercase</em>, <em>All lowercase</em> or <em>Capitalize first letter</em>. Use the blend modes to create effects known from graphics programs.</p>
+<p>In the <em>Formatting</em> menu, you can define a character for a line break in the labels with the <em>Wrap on character</em> function. Use the <img src="../../../../images/checkbox.png" /> <em>Formatted numbers</em> option to format the numbers in an attribute table. Here, decimal places may be inserted. If you enable this option, three decimal places are initially set by default.</p>
+<p>To create a buffer, just activate the <img src="../../../../images/checkbox.png" /> <em>Draw text buffer</em> checkbox in the <em>Buffer</em> menu. The buffer color is variable. Here, you can also use blend modes.</p>
+<p>If the <img src="../../../../images/checkbox.png" /> <em>color buffer's fill</em> checkbox is activated, it will interact with partially transparent text and give mixed color transparency results. Turning off the buffer fill fixes that issue (except where the interior aspect of the buffer's stroke intersects with the text's fill) and also allows you to make outlined text.</p>
+<p>In the <em>Background</em> menu, you can define with <em>Size X</em> and <em>Size Y</em> the shape of your background. Use <em>Size type</em> to insert an additional <em>Buffer</em> into your background. The buffer size is set by default here. The background then consists of the buffer plus the background in <em>Size X</em> and <em>Size Y</em>. You can set a <em>Rotation</em> where you can choose between <em>Sync with label</em>, <em>Offset of label</em> and <em>Fixed</em>. Using <em>Offset of label</em> and <em>Fixed</em>, you can rotate the background. Define an <em>Offset X,Y</em> with X and Y values, and the background will be shifted. When applying <em>Radius X,Y</em>, the background gets rounded corners. Again, it is possible to mix the background with the underlying layers in the map canvas using the <em>Blend mode</em>.</p>
+<p>Use the <em>Shadow</em> menu for a user-defined <em>Drop shadow</em>. The drawing of the background is very variable. Choose between <em>Lowest label component</em>, <em>Text</em>, <em>Buffer</em> and <em>Background</em>. The <em>Offset</em> angle depends on the orientation of the label. If you choose the <img src="../../../../images/checkbox.png" /> <em>Use global shadow</em> checkbox, then the zero point of the angle is always oriented to the north and doesn't depend on the orientation of the label. You can influence the appearance of the shadow with the <em>Blur radius</em>. The higher the number, the softer the shadows. The appearance of the drop shadow can also be altered by choosing a blend mode.</p>
+<p>Choose the <em>Placement</em> menu for the label placement and the labeling priority. Using the <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Offset from point</em> setting, you now have the option to use <em>Quadrants</em> to place your label. Additionally, you can alter the angle of the label placement with the <em>Rotation</em> setting. Thus, a placement in a certain quadrant with a certain rotation is possible. In the <em>priority</em> section you can define with which priority the labels are rendered. It interacts with labels of the other vector layers in the map canvas. If there are labels from different layers in the same location then the label with the higher priority will be displayed and the other will be left out.</p>
+<p>In the <em>Rendering</em> menu, you can define label and feature options. Under <em>Label options</em>, you find the scale-based visibility setting now. You can prevent KADAS from rendering only selected labels with the <img src="../../../../images/checkbox.png" /> <em>Show all labels for this layer (including colliding labels)</em> checkbox. Under <em>Feature options</em>, you can define whether every part of a multipart feature is to be labeled. It's possible to define whether the number of features to be labeled is limited and to <img src="../../../../images/checkbox.png" /> <em>Discourage labels from covering features</em>.</p>
+<p><img alt="" src="../../../../images/label_points.png" /></p>
+<p><strong>Labeling line layers</strong></p>
+<p>The first step is to activate the <img src="../../../../images/checkbox.png" /> <em>Label this layer</em> checkbox in the <em>Label settings</em> tab and select an attribute column to use for labeling. Click <img src="../../../../images/mIconExpressionEditorOpen.png" /> if you want to define labels based on expressions.</p>
+<p>After that, you can define the text style in the <em>Text</em> menu. Here, you can use the same settings as for point layers.</p>
+<p>Also, in the <em>Formatting</em> menu, the same settings as for point layers are possible.</p>
+<p>The <em>Buffer</em> menu has the same functions as described in section <a href="#labeling-point-layers">labeling point layers</a>.</p>
+<p>The <em>Background</em> menu has the same entries as described in section <a href="#labeling-point-layers">labeling point layers</a>.</p>
+<p>Also, the <em>Shadow</em> menu has the same entries as described in section <a href="#labeling-point-layers">labeling point layers</a>.</p>
+<p>In the <em>Placement</em> menu, you find special settings for line layers. The label can be placed <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Parallel</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Curved</em> or <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Horizontal</em>. With the <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Parallel</em> and <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Curved</em> option, you can define the position <img src="../../../../images/checkbox.png" /> <em>Above line</em>, <img src="../../../../images/checkbox.png" /> <em>On line</em> and <img src="../../../../images/checkbox.png" /> <em>Below line</em>. It's possible to select several options at once. In that case, KADAS will look for the optimal position of the label. Remember that here you can also use the line orientation for the position of the label. Additionally, you can define a <em>Maximum angle between curved characters</em> when selecting the <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Curved</em> option.</p>
+<p>You can set up a minimum distance for repeating labels. Distance can be in mm or in map units.</p>
+<p>Some Placement setup will display more options, for example, <em>Curved</em> and <em>Parallel</em> Placements will allow the user to set up the position of the label (above, below or on the line), <em>distance</em> from the line and for <em>Curved</em>, the user can also setup inside/outside max angle between curved label. As for point vector layers you have the possibility to define a <em>Priority</em> for the labels.</p>
+<p>The <em>Rendering</em> menu has nearly the same entries as for point layers. In the <em>Feature options</em>, you can now <em>Suppress labeling of features smaller than</em>.</p>
+<p><img alt="" src="../../../../images/label_line.png" /></p>
+<p><strong>Labeling polygon layers</strong></p>
+<p>The first step is to activate the <img src="../../../../images/checkbox.png" /> <em>Label this layer</em> checkbox and select an attribute column to use for labeling. Click <img src="../../../../images/mIconExpressionEditorOpen.png" /> if you want to define labels based on expressions.</p>
+<p>In the <em>Text</em> menu, define the text style. The entries are the same as for point and line layers.</p>
+<p>The <em>Formatting</em> menu allows you to format multiple lines, also similar to the cases of point and line layers.</p>
+<p>As with point and line layers, you can create a text buffer in the <em>Buffer</em> menu.</p>
+<p>Use the <em>Background</em> menu to create a complex user-defined background for the polygon layer. You can use the menu also as with the point and line layers.</p>
+<p>The entries in the <em>Shadow</em> menu are the same as for point and line layers.</p>
+<p>In the <em>Placement</em> menu, you find special settings for polygon layers. <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Offset from centroid</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Horizontal (slow)</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Around centroid</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Free</em> and <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Using perimeter</em> are possible.</p>
+<p>In the <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Offset from centroid</em> settings, you can specify if the centroid is of the <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>visible polygon</em> or <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>whole polygon</em>. That means that either the centroid is used for the polygon you can see on the map or the centroid is determined for the whole polygon, no matter if you can see the whole feature on the map. You can place your label with the quadrants here, and define offset and rotation. The <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Around centroid</em> setting makes it possible to place the label around the centroid with a certain distance. Again, you can define <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>visible polygon</em> or <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>whole polygon</em> for the centroid. With the <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Using perimeter</em> settings, you can define a position and a distance for the label. For the position, <img src="../../../../images/checkbox.png" /> <em>Above line</em>, <img src="../../../../images/checkbox.png" /> <em>On line</em>, <img src="../../../../images/checkbox.png" /> <em>Below line</em> and <img src="../../../../images/checkbox.png" /> <em>Line orientation dependent position</em> are possible.</p>
+<p>Related to the choice of Label Placement, several options will appear. As for Point Placement you can choose the distance for the polygon outline, repeat the label around the polygon perimeter.</p>
+<p>As for point and line vector layers you have the possibility to define a <em>Priority</em> for the polygon vector layer.</p>
+<p>The entries in the <em>Rendering</em> menu are the same as for line layers. You can also use <em>Suppress labeling of features smaller than</em> in the <em>Feature options</em>.</p>
+<p><img alt="" src="../../../../images/label_area.png" /></p>
+<p><strong>Define labels based on expressions</strong></p>
+<p>QGIS allows to use expressions to label features. Just click the <img src="../../../../images/mIconExpressionEditorOpen.png" /> icon in the <img src="../../../../images/mActionLabeling.png" /> <em>Labels</em> menu of the properties dialog.</p>
+<p><img src="../../../../images/label_expression.png" /></p>
+<p>Expression based labeling is easy to work with. All you have to take care of is, that you need to combine all elements (strings, fields and functions) with a string concatenation sign <code>||</code> and that fields a written in “double quotes” and strings in ‘single quotes'. Let's have a look at some examples:</p>
+<pre><code> # label based on two fields 'name' and 'place' with a comma as separater
+ "name" || ', ' || "place"
+
+ -&gt; John Smith, Paris
+
+ # label based on two fields 'name' and 'place' separated by comma
+ 'My name is ' || "name" || 'and I live in ' || "place"
+
+ -&gt; My name is John Smith and I live in Paris
+
+ # label based on two fields 'name' and 'place' with a descriptive text
+ # and a line break (\n)
+ 'My name is ' || "name" || '\nI live in ' || "place"
+
+ -&gt; My name is John Smith
+    I live in Paris
+
+ # create a multi-line label based on a field and the $area function
+ # to show the place name and its area size based on unit meter.
+ 'The area of ' || "place" || 'has a size of ' || $area || 'm²'
+
+ -&gt; The area of Paris has a size of 105000000 m²
+
+ # create a CASE ELSE condition. If the population value in field
+ # population is &lt;= 50000 it is a town, otherwise a city.
+ 'This place is a ' || CASE WHEN "population &lt;= 50000" THEN 'town' ELSE 'city' END
+
+-&gt; This place is a town
+</code></pre>
+<p>As you can see in the expression builder, you have hundreds of functions available to create simple and very complex expressions to label your data in QGIS. See <a href="expression.html#vector-expressions"><em>Expressions</em></a> chapter for more information and examples on expressions.</p>
+<p><strong>Using data-defined override for labeling</strong></p>
+<p>With the data-defined override functions, the settings for the labeling are overridden by entries in the attribute table. You can activate and deactivate the function with the right-mouse button. Hover over the symbol and you see the information about the data-defined override, including the current definition field. We now describe an example using the data-defined override function for the <img src="../../../../images/mActionMoveLabel.png" /><em>Move label</em> function.</p>
+<ol>
+<li>Import <code>lakes.shp</code> from the KADAS sample dataset.</li>
+<li>Double-click the layer to open the Layer Properties. Click on <em>Labels</em> and <em>Placement</em>. Select <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Offset from centroid</em>.</li>
+<li>Look for the <em>Data defined</em> entries. Click the <img src="../../../../images/mIconDataDefine.png" /> icon to define the field type for the <em>Coordinate</em>. Choose <em>xlabel</em> for X and <em>ylabel</em> for Y. The icons are now highlighted in yellow.</li>
+<li>Zoom into a lake.</li>
+<li>Go to the Label toolbar and click the <img src="../../../../images/mActionMoveLabel.png" /> icon. Now you can shift the label manually to another position. The new position of the label is saved in the <em>xlabel</em> and <em>ylabel</em> columns of the attribute table.</li>
+</ol>
+<p><img alt="" src="../../../../images/label_data_defined.png" /></p>
+<p><img alt="" src="../../../../images/move_label.png" /></p>
+<h2 id="fields-menu">Fields Menu <a name="#fields-menu"></a></h2>
+<p><img src="../../../../images/attributes.png" /> Within the <em>Fields</em> menu, the field attributes of the selected dataset can be manipulated. The buttons <img src="../../../../images/mActionNewAttribute.png" /> <em>New Column</em> and <img src="../../../../images/mActionDeleteAttribute.png" /> <em>Delete Column</em> can be used when the dataset is in <img src="../../../../images/mActionToggleEditing.png" /> <em>Editing mode</em>.</p>
+<p><strong>Edit Widget</strong></p>
+<p><img alt="" src="../../../../images/editwidgetsdialog.png" /></p>
+<p>Within the <em>Fields</em> menu, you also find an <strong>edit widget</strong> column. This column can be used to define values or a range of values that are allowed to be added to the specific attribute table column. If you click on the <strong>[edit widget]</strong> button, a dialog opens, where you can define different widgets. These widgets are:</p>
+<ul>
+<li><strong>Checkbox</strong>: Displays a checkbox, and you can define what attribute is added to the column when the checkbox is activated or not.</li>
+<li><strong>Classification</strong>: Displays a combo box with the values used for classification, if you have chosen <em>unique value</em> as legend type in the <em>Style</em> menu of the properties dialog.</li>
+<li><strong>Color</strong>: Displays a color button allowing user to choose a color from the color dialog window.</li>
+<li><strong>Date/Time</strong>: Displays a line field which can open a calendar widget to enter a date, a time or both. Column type must be text. You can select a custom format, pop-up a calendar, etc.</li>
+<li><strong>Enumeration</strong>: Opens a combo box with values that can be used within the columns type. This is currently only supported by the PostgreSQL provider.</li>
+<li><strong>File name</strong>: Simplifies the selection by adding a file chooser dialog.</li>
+<li><strong>Hidden</strong>: A hidden attribute column is invisible. The user is not able to see its contents.</li>
+<li><strong>Photo</strong>: Field contains a filename for a picture. The width and height of the field can be defined.</li>
+<li><strong>Range</strong>: Allows you to set numeric values from a specific range. The edit widget can be either a slider or a spin box.</li>
+<li><strong>Relation Reference</strong>: This widged lets you embed the feature form of the referenced layer on the feature form of the actual layer. See <em>vector_relations</em>.</li>
+<li><strong>Text edit</strong> (default): This opens a text edit field that allows simple text or multiple lines to be used. If you choose multiple lines you can also choose html content.</li>
+<li><strong>Unique values</strong>: You can select one of the values already used in the attribute table. If <em>Editable</em> is activated, a line edit is shown with autocompletion support, otherwise a combo box is used.</li>
+<li><strong>UUID Generator</strong>: Generates a read-only UUID (Universally Unique Identifiers) field, if empty.</li>
+<li><strong>Value map</strong>: A combo box with predefined items. The value is stored in the attribute, the description is shown in the combo box. You can define values manually or load them from a layer or a CSV file.</li>
+<li><strong>Value Relation</strong>: Offers values from a related table in a combobox. You can select layer, key column and value column.</li>
+<li><strong>Webview</strong>: Field contains a URL. The width and height of the field is variable.</li>
+</ul>
+<p>Note</p>
+<p>KADAS has an advanced <em>hidden</em> option to define your own field widget using python and add it to this impressive list of widgets. It is tricky but it is very well explained in following excellent blog that explains how to create a real time validation widget that can be used like described widgets. See <a href="http://blog.vitu.ch/10142013-1847/write-your-own-qgis-form-elements">http://blog.vitu.ch/10142013-1847/write-your-own-qgis-form-elements</a></p>
+<p>With the <strong>Attribute editor layout</strong>, you can now define built-in forms. This is usefull for data entry jobs or to identify objects using the option auto open form when you have objects with many attributes. You can create an editor with several tabs and named groups to present the attribute fields.</p>
+<p>Choose <em>Drag and drop designer</em> and an attribute column. Use the <img src="../../../../images/mActionSignPlus.png" /> icon to create a category to insert a tab or a named group. When creating a new category, KADAS will insert a new tab or named group for the category in the built-in form. The next step will be to assign the relevant fields to a selected category with the <img src="../../../../images/mActionArrowRight.png" /> icon. You can create more categories and use the same fields again.</p>
+<p>Other options in the dialog are <em>Autogenerate</em> and <em>Provide ui-file</em>.</p>
+<ul>
+<li><em>Autogenerate</em> just creates editors for all fields and tabulates them.</li>
+<li>The <em>Provide ui-file</em> option allows you to use complex dialogs made with the Qt-Designer. Using a UI-file allows a great deal of freedom in creating a dialog. For detailed information, see <a href="http://nathanw.net/2011/09/05/qgis-tips-custom-feature-forms-with-python-logic/">http://nathanw.net/2011/09/05/qgis-tips-custom-feature-forms-with-python-logic/</a>.</li>
+</ul>
+<p>KADAS dialogs can have a Python function that is called when the dialog is opened. Use this function to add extra logic to your dialogs. An example is (in module MyForms.py):</p>
+<pre><code>def open(dialog,layer,feature):
+geom = feature.geometry()
+control = dialog.findChild(QWidged,"My line edit")
+</code></pre>
+<p>Reference in Python Init Function like so: MyForms.open</p>
+<p>MyForms.py must live on PYTHONPATH, in .qgis2/python, or inside the project folder.</p>
+<p><img alt="" src="../../../../images/attribute_editor_layout.png" /></p>
+<p><img alt="" src="../../../../images/resulting_feature_form.png" /></p>
+<h2 id="general-menu">General Menu <a name="#general-menu"></a></h2>
+<p><img src="../../../../images/general.png" /> Use this menu to make general settings for the vector layer. There are several options available:</p>
+<p>Layer Info</p>
+<ul>
+<li>Change the display name of the layer in <em>displayed as</em></li>
+<li>Define the <em>Layer source</em> of the vector layer</li>
+<li>Define the <em>Data source encoding</em> to define provider-specific options and to be able to read the file</li>
+</ul>
+<p>Coordinate Reference System</p>
+<ul>
+<li><em>Specify</em> the coordinate reference system. Here, you can view or change the projection of the specific vector layer.</li>
+<li>Create a <em>Spatial Index</em> (only for OGR-supported formats)</li>
+<li><em>Update Extents</em> information for a layer</li>
+<li>View or change the projection of the specific vector layer, clicking on <em>Specify ...</em></li>
+</ul>
+<p><img src="../../../../images/checkbox.png" /> <em>Scale dependent visibility</em></p>
+<ul>
+<li>You can set the <em>Maximum (inclusive)</em> and <em>Minimum (exclusive)</em> scale. The scale can also be set by the <strong>[Current]</strong> buttons.</li>
+</ul>
+<p>Feature subset</p>
+<ul>
+<li>With the <strong>[Query Builder]</strong> button, you can create a subset of the features in the layer that will be visualized (also refer to section <em>vector_query_builder</em>).</li>
+</ul>
+<p><img alt="" src="../../../../images/vector_general_menu.png" /></p>
+<h2 id="rendering-menu">Rendering Menu <a name="#rendering-menu"></a></h2>
+<p>KADAS supports for on-the-fly feature generalisation. This can improve rendering times when drawing many complex features at small scales. This feature can be enabled or disabled in the layer settings using the <img src="../../../../images/checkbox.png" /> <em>Simplify geometry</em> option. There is also a new global setting that enables generalisation by default for newly added layers (see section <a href="../introduction/qgis_configuration.html#gui-options"><em>Options</em></a>). <strong>Note</strong>: Feature generalisation may introduce artefacts into your rendered output in some cases. These may include slivers between polygons and inaccurate rendering when using offset-based symbol layers.</p>
+<h2 id="display-menu">Display Menu <a name="#display-menu"></a></h2>
+<p><img src="../../../../images/mActionMapTips.png" /> This menu is specifically created for Map Tips. It includes a new feature: Map Tip display text in HTML. While you can still choose a <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Field</em> to be displayed when hovering over a feature on the map, it is now possible to insert HTML code that creates a complex display when hovering over a feature. To activate Map Tips, select the menu option <em>View ‣ MapTips</em>. Figure Display 1 shows an example of HTML code.</p>
+<p><img alt="" src="../../../../images/display_html.png" /></p>
+<p><img alt="" src="../../../../images/map_tip.png" /></p>
+<h2 id="actions-menu">Actions Menu <a name="#actions-menu"></a></h2>
+<p><img src="../../../../images/action.png" /> KADAS provides the ability to perform an action based on the attributes of a feature. This can be used to perform any number of actions, for example, running a program with arguments built from the attributes of a feature or passing parameters to a web reporting tool.</p>
+<p><img alt="" src="../../../../images/action_dialog.png" /></p>
+<p>Actions are useful when you frequently want to run an external application or view a web page based on one or more values in your vector layer. They are divided into six types and can be used like this:</p>
+<ul>
+<li>Generic, Mac, Windows and Unix actions start an external process.</li>
+<li>Python actions execute a Python expression.</li>
+<li>Generic and Python actions are visible everywhere.</li>
+<li>Mac, Windows and Unix actions are visible only on the respective platform (i.e., you can define three <em>Edit</em> actions to open an editor and the users can only see and execute the one <em>Edit</em> action for their platform to run the editor).</li>
+</ul>
+<p>There are several examples included in the dialog. You can load them by clicking on <strong>[Add default actions]</strong>. One example is performing a search based on an attribute value. This concept is used in the following discussion.</p>
+<p><strong>Defining Actions</strong></p>
+<p>Attribute actions are defined from the vector <em>Layer Properties</em> dialog. To <span id="index-12"></span>define an action, open the vector <em>Layer Properties</em> dialog and click on the <em>Actions</em> menu. Go to the <em>Action properties</em>. Select <em>Generic</em> as type and provide a descriptive name for the action. The action itself must contain the name of the application that will be executed when the action is invoked. You can add one or more attribute field values as arguments to the application. When the action is invoked, any set of characters that start with a <code>%</code> followed by the name of a field will be replaced by the value of that field. The special characters <span id="index-13"></span>%% will be replaced by the value of the field that was selected from the identify results or attribute table. Double quote marks can be used to group text into a single argument to the program, script or command. Double quotes will be ignored if preceded by a backslash.</p>
+<p>If you have field names that are substrings of other field names (e.g., <code>col1</code> and <code>col10</code>), you should indicate that by surrounding the field name (and the % character) with square brackets (e.g., <code>[%col10]</code>). This will prevent the <code>%col10</code> field name from being mistaken for the <code>%col1</code> field name with a <code>0</code> on the end. The brackets will be removed by KADAS when it substitutes in the value of the field. If you want the substituted field to be surrounded by square brackets, use a second set like this: <code>[[%col10]]</code>.</p>
+<p>Using the <em>Identify Features</em> tool, you can open the <em>Identify Results</em> dialog. It includes a <em>(Derived)</em> item that contains information relevant to the layer type. The values in this item can be accessed in a similar way to the other fields by preceeding the derived field name with <code>(Derived).</code>. For example, a point layer has an <code>X</code> and <code>Y</code> field, and the values of these fields can be used in the action with <code>%(Derived).X</code> and <code>%(Derived).Y</code>. The derived attributes are only available from the <em>Identify Results</em> dialog box, not the <em>Attribute Table</em> dialog box.</p>
+<p>Two <span id="index-14"></span>example actions are shown below:</p>
+<ul>
+<li><code>konqueror http://www.google.com/search?q=%nam</code></li>
+<li><code>konqueror http://www.google.com/search?q=%%</code></li>
+</ul>
+<p>In the first example, the web browser konqueror is invoked and passed a URL to open. The URL performs a Google search on the value of the <code>nam</code> field from our vector layer. Note that the application or script called by the action must be in the path, or you must provide the full path. To be certain, we could rewrite the first example as: <code>/opt/kde3/bin/konqueror http://www.google.com/search?q=%nam</code>. This will ensure that the konqueror application will be executed when the action is invoked.</p>
+<p>The second example uses the %% notation, which does not rely on a particular field for its value. When the action is invoked, the %% will be replaced by the value of the selected field in the identify results or attribute table.</p>
+<p><strong>Using Actions</strong></p>
+<p>Actions can be invoked from either the <em>Identify Results</em> dialog, an <em>Attribute Table</em> dialog or from <em>Run Feature Action</em> (recall that these dialogs can be opened by clicking <img src="../../../../images/mActionIdentify.png" /> <em>Identify Features</em> or <img src="../../../../images/mActionOpenTable.png" /> <em>Open Attribute Table</em> or <img src="../../../../images/mAction.png" /> <em>Run Feature Action</em>). To invoke an action, right click on the record and choose the action from the pop-up menu. Actions are listed in the popup menu by the name you assigned when defining the action. Click on the action you wish to invoke.</p>
+<p>If you are invoking an action that uses the <code>%%</code> notation, right-click on the field value in the <em>Identify Results</em> dialog or the <em>Attribute Table</em> dialog that you wish to pass to the application or script.</p>
+<p>Here is another example that pulls data out of a vector layer and inserts it into a file using bash and the <code>echo</code> command (so it will only work on  or perhaps <img src="../../../../images/osx.png" />). The layer in question has fields for a species name <code>taxon_name</code>, latitude <code>lat</code> and longitude <code>long</code>. We would like to be able to make a spatial selection of localities and export these field values to a text file for the selected record (shown in yellow in the KADAS map area). Here is the action to achieve this:</p>
+<pre><code>bash -c "echo \"%taxon_name %lat %long\" &gt;&gt; /tmp/species_localities.txt"
+</code></pre>
+<p>After selecting a few localities and running the action on each one, opening the output file will show something like this:</p>
+<pre><code>Acacia mearnsii -34.0800000000 150.0800000000
+Acacia mearnsii -34.9000000000 150.1200000000
+Acacia mearnsii -35.2200000000 149.9300000000
+Acacia mearnsii -32.2700000000 150.4100000000
+</code></pre>
+<p>As an exercise, we can create an action that does a Google search on the <code>lakes</code> layer. First, we need to determine the URL required to perform a search on a keyword. This is easily done by just going to Google and doing a simple search, then grabbing the URL from the address bar in your browser. From this little effort, we see that the format is <a href="http://google.com/search?q=qgis">http://google.com/search?q=qgis</a>, where <code>QGIS</code> is the search term. Armed with this information, we can proceed:</p>
+<ol>
+<li>
+<p>Make sure the <code>lakes</code> layer is loaded.</p>
+</li>
+<li>
+<p>Open the <em>Layer Properties</em> dialog by double-clicking on the layer in the legend, or right-click and choose <em>Properties</em> from the pop-up menu.</p>
+</li>
+<li>
+<p>Click on the <em>Actions</em> menu.</p>
+</li>
+<li>
+<p>Enter a name for the action, for example <code>Google Search</code>.</p>
+</li>
+<li>
+<p>For the action, we need to provide the name of the external program to run. In this case, we can use Firefox. If the program is not in your path, you need to provide the full path.</p>
+</li>
+<li>
+<p>Following the name of the external application, add the URL used for doing a Google search, up to but not including the search term: <code>http://google.com/search?q=</code></p>
+</li>
+<li>
+<p>The text in the <em>Action</em> field should now look like this: <code>firefox http://google.com/search?q=</code></p>
+</li>
+<li>
+<p>Click on the drop-down box containing the field names for the <code>lakes</code> layer. It's located just to the left of the <strong>[Insert Field]</strong> button.</p>
+</li>
+<li>
+<p>From the drop-down box, select <em>NAMES</em> and click <strong>[Insert Field]</strong>.</p>
+</li>
+<li>
+<p>Your action text now looks like this:</p>
+<p><code>firefox http://google.com/search?q=%NAMES</code></p>
+</li>
+<li>
+<p>To finalize the action, click the <strong>[Add to action list]</strong> button.</p>
+</li>
+</ol>
+<p>This completes the action, and it is ready to use. The final text of the action should look like this:</p>
+<pre><code>firefox http://google.com/search?q=%NAMES
+</code></pre>
+<p>We can now use the action. Close the <em>Layer Properties</em> dialog and zoom in to an area of interest. Make sure the <code>lakes</code> layer is active and identify a lake. In the result box you'll now see that our action is visible:</p>
+<p><img alt="" src="../../../../images/action_identifyaction.png" /></p>
+<p>When we click on the action, it brings up Firefox and navigates to the URL <a href="http://www.google.com/search?q=Tustumena">http://www.google.com/search?q=Tustumena</a>. It is also possible to add further attribute fields to the action. Therefore, you can add a <code>+</code> to the end of the action text, select another field and click on <strong>[Insert Field]</strong>. In this example, there is just no other field available that would make sense to search for.</p>
+<p>You can define multiple actions for a layer, and each will show up in the <em>Identify Results</em> dialog.</p>
+<p>There are all kinds of uses for actions. For example, if you have a point layer containing locations of images or photos along with a file name, you could create an action to launch a viewer to display the image. You could also use actions to launch web-based reports for an attribute field or combination of fields, specifying them in the same way we did in our Google search example.</p>
+<p>We can also make more complex examples, for instance, using <strong>Python</strong> actions.</p>
+<p>Usually, when we create an action to open a file with an external application, we can use absolute paths, or eventually relative paths. In the second case, the path is relative to the location of the external program executable file. But what about if we need to use relative paths, relative to the selected layer (a file-based one, like a shapefile or SpatiaLite)? The following code will do the trick:</p>
+<pre><code>command = "firefox";
+imagerelpath = "images_test/test_image.jpg";
+layer = qgis.utils.iface.activeLayer();
+import os.path;
+layerpath = layer.source() if layer.providerType() == 'ogr'
+  else (qgis.core.QgsDataSourceURI(layer.source()).database()
+  if layer.providerType() == 'spatialite' else None);
+path = os.path.dirname(str(layerpath));
+image = os.path.join(path,imagerelpath);
+import subprocess;
+subprocess.Popen( [command, image ] );
+</code></pre>
+<p>We just have to remember that the action is one of type <em>Python</em> and the <em>command</em> and <em>imagerelpath</em> variables must be changed to fit our needs.</p>
+<p>But what about if the relative path needs to be relative to the (saved) project file? The code of the Python action would be:</p>
+<pre><code>command="firefox";
+imagerelpath="images/test_image.jpg";
+projectpath=qgis.core.QgsProject.instance().fileName();
+import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
+image=os.path.join(path, imagerelpath);
+import subprocess;
+subprocess.Popen( [command, image ] );
+</code></pre>
+<p>Another Python action example is the one that allows us to add new layers to the project. For instance, the following examples will add to the project respectively a vector and a raster. The names of the files to be added to the project and the names to be given to the layers are data driven (<em>filename</em> and <em>layername</em> are column names of the table of attributes of the vector where the action was created):</p>
+<pre><code>qgis.utils.iface.addVectorLayer('/yourpath/[% "filename" %].shp','[% "layername" %]',
+  'ogr')
+</code></pre>
+<p>To add a raster (a TIF image in this example), it becomes:</p>
+<pre><code>qgis.utils.iface.addRasterLayer('/yourpath/[% "filename" %].tif','[% "layername" %]
+')
+</code></pre>
+<h2 id="joins-menu">Joins Menu <a name="#joins-menu"></a></h2>
+<p><img src="../../../../images/join.png" /> The <em>Joins</em> menu allows you to <span id="index-15"></span>join a loaded attribute table to a loaded vector layer. After clicking <img src="../../../../images/mActionSignPlus.png" />, the <em>Add vector join</em> dialog appears. As key columns, you have to define a <span id="index-16"></span>join layer you want to connect with the target vector layer. Then, you have to specify the join field that is common to both the join layer and the target layer. Now you can also specify a subset of fields from the joined layer based on the checkbox <img src="../../../../images/checkbox.png" /> <em>Choose which fields are joined</em>. As a result of the join, all information from the join layer and the target layer are displayed in the attribute table of the target layer as joined information. If you specified a subset of fields only these fields are displayed in the attribute table of the target layer.</p>
+<p>KADAS currently has support for joining non-spatial table formats supported by OGR (e.g., CSV, DBF and Excel), delimited text and the PostgreSQL provider.</p>
+<p><img alt="" src="../../../../images/join_attributes.png" /></p>
+<p>Additionally, the add vector join dialog allows you to:</p>
+<ul>
+<li><img src="../../../../images/checkbox.png" /> <em>Cache join layer in virtual memory</em></li>
+<li><img src="../../../../images/checkbox.png" /> <em>Create attribute index on the join field</em></li>
+<li><img src="../../../../images/checkbox.png" /> <em>Choose which fields are joined</em></li>
+<li>Create a <img src="../../../../images/checkbox.png" /> <em>Custom field name prefix</em></li>
+</ul>
+<h2 id="diagrams-menu">Diagrams Menu <a name="#diagrams-menu"></a></h2>
+<p><img src="../../../../images/diagram.png" /> The <em>Diagrams</em> menu allows you to add a graphic overlay to a vector layer.</p>
+<p>The current core implementation of diagrams provides support for pie charts, text diagrams and histograms.</p>
+<p>The menu is divided into four tabs: <em>Appearance</em>, <em>Size</em>, <em>Postion</em> and <em>Options</em>.</p>
+<p>In the cases of the text diagram and pie chart, text values of different data columns are displayed one below the other with a circle or a box and dividers. In the <em>Size</em> tab, diagram size is based on a fixed size or on linear scaling according to a classification attribute. The placement of the diagrams, which is done in the <em>Position</em> tab, interacts with the new labeling, so position conflicts between diagrams and labels are detected and solved. In addition, chart positions can be fixed manually.</p>
+<p><img alt="" src="../../../../images/diagram_tab.png" /></p>
+<p>We will demonstrate an example and overlay on the Alaska boundary layer a text diagram showing temperature data from a climate vector layer. Both vector layers are part of the KADAS sample dataset (see section <a href="../introduction/getting_started.html#label-sampledata"><em>Sample Data</em></a>).</p>
+<ol>
+<li>First, click on the <img src="../../../../images/mActionAddOgrLayer.png" /> <em>Load Vector</em> icon, browse to the KADAS sample dataset folder, and load the two vector shape layers <code>alaska.shp</code> and <code>climate.shp</code>.</li>
+<li>Double click the <code>climate</code> layer in the map legend to open the <em>Layer Properties</em> dialog.</li>
+<li>Click on the <em>Diagrams</em> menu, activate <img src="../../../../images/checkbox.png" /><em>Display diagrams</em>, and from the <em>Diagram type</em> <img src="../../../../images/selectstring.png" /> combo box, select <em>Text diagram</em>.</li>
+<li>In the <em>Appearance</em> tab, we choose a light blue as background color, and in the <em>Size</em> tab, we set a fixed size to 18 mm.</li>
+<li>In the <em>Position</em> tab, placement could be set to <em>Around Point</em>.</li>
+<li>In the diagram, we want to display the values of the three columns <code>T_F_JAN</code>, <code>T_F_JUL</code> and <code>T_F_MEAN</code>. First select <code>T_F_JAN</code> as <em>Attributes</em> and click the <img src="../../../../images/mActionSignPlus.png" /> button, then <code>T_F_JUL</code>, and finally <code>T_F_MEAN</code>.</li>
+<li>Now click <strong>[Apply]</strong> to display the diagram in the KADAS main window.</li>
+<li>You can adapt the chart size in the <em>Size</em> tab. Deactivate the <img src="../../../../images/checkbox.png" /> <em>Fixed size</em> and set the size of the diagrams on the basis of an attribute with the <strong>[Find maximum value]</strong> button and the <em>Size</em> menu. If the diagrams appear too small on the screen, you can activate the <img src="../../../../images/checkbox.png" /> <em>Increase size of small diagrams</em> checkbox and define the minimum size of the diagrams.</li>
+<li>Change the attribute colors by double clicking on the color values in the <em>Assigned attributes</em> field.</li>
+<li>Finally, click <strong>[Ok]</strong>.</li>
+</ol>
+<p><img src="../../../../images/climate_diagram.png" /></p>
+<p>Remember that in the <em>Position</em> tab, a <img src="../../../../images/checkbox.png" /> <em>Data defined position</em> of the diagrams is possible. Here, you can use attributes to define the position of the diagram. You can also set a scale-dependent visibility in the <em>Appearance</em> tab.</p>
+<p>The size and the attributes can also be an expression. Use the <img src="../../../../images/mIconExpressionEditorOpen.png" /> button to add an expression. See <a href="expression.html#vector-expressions"><em>Expressions</em></a> chapter for more information and example.</p>
+<h2 id="metadata-menu">Metadata Menu <a name="#metadata-menu"></a></h2>
+<p><img src="../../../../images/metadata.png" /> The <em>Metadata</em> menu consists of <em>Description</em>, <em>Attribution</em>, <em>MetadataURL</em> and <em>Properties</em> sections.</p>
+<p>In the <em>Properties</em> section, you get general information about the layer, including specifics about the type and location, number of features, feature type, and editing capabilities. The <em>Extents</em> table provides you with layer extent information and the <em>Layer Spatial Reference System</em>, which is information about the CRS of the layer. This is a quick way to get information about the layer.</p>
+<p>Additionally, you can add or edit a title and abstract for the layer in the <em>Description</em> section. It's also possible to define a <em>Keyword list</em> here. These keyword lists can be used in a metadata catalogue. If you want to use a title from an XML metadata file, you have to fill in a link in the <em>DataUrl</em> field. Use <em>Attribution</em> to get attribute data from an XML metadata catalogue. In <em>MetadataUrl</em>, you can define the general path to the XML metadata catalogue. This information will be saved in the KADAS project file for subsequent sessions and will be used for KADAS server.</p>
+<p><img alt="" src="../../../../images/vector_metadata_tab.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../supported_data/" class="btn btn-neutral float-left" title="Supported formats"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../expression/" class="btn btn-neutral float-right" title="Expressions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../supported_data/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../expression/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Vue - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Vue";
+        var mkdocs_page_input_path = "fr/view.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Vue</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#etendue-precedentesuivant">Étendue précédente/suivant</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#signets"> Signets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nouvelle-vue">Nouvelle vue</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3d">3D</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#reglages">Réglages</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#navigation-dans-la-vue-3d">Navigation dans la vue 3D</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#grille">Grille</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Fonctionnalités avancées</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Couche vecteur</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Vue</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="vue">Vue</h1>
+<h2 id="etendue-precedentesuivant"><a name="sec0"></a>Étendue précédente/suivant</h2>
+<p>En se déplaçant dans la carte, on peut retourner à l’étendue de carte affiché auparavant par la fonction <strong><em>Étendue précédent</em></strong>. On peut ensuite aller sur l’extrait de carte choisi postérieurement par la fonction <strong><em>Étendue suivant</em></strong>.</p>
+<h2 id="signets"><a name="sec1"></a> Signets</h2>
+<p>Les signets permettent de stocker et de restaurer l'état actuel de la carte, plus précisément l'étendue de la carte et la configuration des couches. Notez que la restauration d'un signet ne restaurera pas les couches qui ont depuis été supprimées du projet.</p>
+<h2 id="nouvelle-vue"><a name="sec2"></a>Nouvelle vue</h2>
+<p>Des vues secondaires de la carte peuvent être ouvertes par la fonction <strong><em>Nouvelle vue</em></strong>. On peut les placer à volonté à l’intérieur de la fenêtre principale en les tirant depuis la barre de titre, ou les découpler.</p>
+<p>Dans les vues de sous-fenêtres, on peut activer et désactiver les niveaux indépendamment de la vue principale. On peut gérer l’extrait indépendamment de la vue principale ou l’y coupler en activant l’icône serrure dans la barre de titre de la sous-fenêtre.</p>
+<p>Seul l’outil de navigation est disponible dans les vues secondaires de carte, tous les autres outils peuvent uniquement être utilisés dans la vue principale.</p>
+<p>Le titre de la sous-fenêtre peut être modifié si nécessaire.</p>
+<p><img src="../../../media/image13.png" /></p>
+<h2 id="3d"><a name="sec3"></a>3D</h2>
+<p>La fonction <strong><em>3D</em></strong> ouvre une autre fenêtre avec une vue du globe. Cette fenêtre est disposée automatiquement, mais peut aussi être déplacée à un autre endroit à l’intérieur ou à l’extérieur de la fenêtre de programme au moyen de la souris.</p>
+<p><img src="../../../media/image14.png" /></p>
+<h3 id="reglages">Réglages</h3>
+<p>Les niveaux affichés peuvent être choisis indépendamment de la fenêtre principale dans le menu <strong><em>Fenêtre</em></strong>.</p>
+<ul>
+<li><strong>Synchroniser l’extrait</strong> : Le symbole <strong><em>Synchroniser l’extrait</em></strong> permet de naviguer sur le globe vers l’extrait de carte de la fenêtre principale.</li>
+<li><strong>Recharger la scène</strong> : Le symbole <strong><em>Recharger la scène</em></strong> recharge le niveau sur le globe.</li>
+<li><strong>Réglages du globe</strong> : Le symbole <strong><em>Réglages globe</em></strong> ouvre un dialogue avec d’autres possibilités de réglages. On y configure entre autres le modèle de terrain pour la vue 3D, et on peut aussi ajouter des niveaux de photos. Les éléments de la vue 2D à représenter peuvent être sélectionnés dans le menu à gauche de la barre de titre. Par souci de performance, seuls les niveaux locaux de la vue 2D sont activés par défaut; en fonction des possibilités, les niveaux de photos de fond doivent être ajoutés directement comme niveaux d’image dans la boîte de dialogue de réglage du globe.</li>
+</ul>
+<p>Les couches 2D sont dessinées par défaut en tant que texture sur le globe. Les couches vectorielles (y compris redlining) peuvent également être représentées soit comme modèles extrudés ou 2.5D, soit comme des modèles 3D. Le style de la vue 2D est dans la mesure du possible transféré dans la vue 3D. Les géométries planaires doivent être pourvues d'une information de hauteur (coordonnée Z) pour l'affichage en modèle 3D, et elle doit être exprimée soit par rapport au niveau du sol ou de la mer. Les options d'affichage pour les niveaux vectoriels peuvent être définies dans les propriétés de couche correspondantes.</p>
+<blockquote>
+<p>Les info-bulles des champs de saisie dans les paramètres de la couche du globe décrivent les différentes options en détail.</p>
+<p>L'ombrage des modèles 3D dépend de la position du soleil. La position du soleil peut être contrôlée par une heure / date définie par l'utilisateur dans les paramètres du globe.</p>
+</blockquote>
+<p><img src="../../../media/image15.png" /></p>
+<p>Les punaises, photos et symboles MSS ponctuels sont indiqués comme billboards.</p>
+<h3 id="navigation-dans-la-vue-3d">Navigation dans la vue 3D</h3>
+<ul>
+<li>*<em>Angle de vue</em> : La commande de navigation supérieure permet à l'utilisateur de modifier les angles de vue horizontal et vertical de la caméra.</li>
+<li><strong>Position de la caméra</strong>: La commande de navigation inférieure permet de changer la position de la caméra autour du globe. La même chose peut être accomplie avec les touches fléchées du clavier.</li>
+<li><strong>+</strong>: Réduit la hauteur de la caméra.</li>
+<li><strong>-</strong>: Augmente la hauteur de la caméra.</li>
+</ul>
+<h2 id="grille"><a name="sec4"></a>Grille</h2>
+<p>On peut activer la <strong><em>grille</em></strong> de la carte dans l’onglet Vue.</p>
+<p>Dans le panneau des propriétés de la grille, il est possible de personnaliser le type de grille, ses intervalles ainsi que son apparence.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../map/" class="btn btn-neutral float-left" title="Carte"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../analysis/" class="btn btn-neutral float-right" title="Analyse">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../map/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../analysis/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
