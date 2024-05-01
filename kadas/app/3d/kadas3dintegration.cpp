@@ -40,12 +40,19 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
     if ( !m3DMapCanvasWidget )
     {
       m3DMapCanvasWidget = createNewMapCanvas3D( "3D Map" );
-      connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]()
+      if ( m3DMapCanvasWidget )
       {
-        m3DMapCanvasWidget->deleteLater();
-        m3DMapCanvasWidget = nullptr;
+        connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]()
+        {
+          m3DMapCanvasWidget->deleteLater();
+          m3DMapCanvasWidget = nullptr;
+          mAction3D->setChecked( false );
+        } );
+      }
+      else
+      {
         mAction3D->setChecked( false );
-      } );
+      }
     }
     else
     {
