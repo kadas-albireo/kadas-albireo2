@@ -105,7 +105,7 @@ IF(INSTALL_DEMO_DATA)
     install(DIRECTORY "packaging/files/print_templates" "packaging/files/project_templates" DESTINATION "share/kadas/")
 ENDIF()
 
-install(DIRECTORY "share" DESTINATION "share/kadas/")
+install(DIRECTORY "share/" DESTINATION "share/kadas/")
 
 include(VcpkgInstallDeps)
 include(Package)
