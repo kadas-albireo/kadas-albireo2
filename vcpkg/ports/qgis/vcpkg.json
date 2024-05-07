@@ -76,7 +76,7 @@
         {
             "description": "Determines whether the command line QGIS process tool should be built"
         },
-            "3d":
+        "3d":
         {
             "description": "Determines whether QGIS 3D library should be built",
             "dependencies":
@@ -89,7 +89,10 @@
             "description": "Determines whether Python bindings should be built",
             "dependencies":
             [
-                "py-pyqt5",
+              {
+                "name": "py-pyqt5",
+                "features": ["3d"]
+              },
                 "py-qscintilla-qt5",
                 {
                   "name": "vcpkg-python-scripts",

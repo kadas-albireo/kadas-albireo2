@@ -53,6 +53,17 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
+  3d/kadas3dmapcanvaswidget.cpp
+  3d/kadas3dmapcanvas.cpp
+  3d/kadas3dmapconfigwidget.cpp
+  3d/kadas3dnavigationwidget.cpp
+  3d/kadasambientocclusionsettingswidget.cpp
+  3d/kadaslightswidget.cpp
+  3d/kadasphongmaterialwidget.cpp
+  3d/kadasshadowrenderingsettingswidget.cpp
+  3d/kadasskyboxrenderingsettingswidget.cpp
+  3d/kadas3dintegration.cpp
+  3d/kadas3dmaptool.cpp
 )
 
 set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
@@ -60,21 +71,6 @@ set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
 endif()
-
-if(WITH_GLOBE)
-  set(kadas_SRC ${kadas_SRC}
-    globe/kadasglobebillboardmanager.cpp
-    globe/kadasglobedialog.cpp
-    globe/kadasglobeintegration.cpp
-    globe/kadasglobeinteractionhandlers.cpp
-    globe/kadasglobeprojectlayermanager.cpp
-    globe/kadasglobetilesource.cpp
-    globe/kadasglobevectorlayerproperties.cpp
-    globe/kadasglobewidget.cpp
-    globe/osg/osgQtGraphicsWindow.cpp
-    globe/osg/osgQtViewerWidget.cpp
-  )
-endif(WITH_GLOBE)
 
 FILE(GLOB kadas_HDR
   *.h
@@ -84,10 +80,7 @@ FILE(GLOB kadas_HDR
   guidegrid/*.h
   iamauth/*.h
   mapgrid/*.h)
-IF(WITH_GLOBE)
-    FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
-    SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
-ENDIF(WITH_GLOBE)
+
 LIST(SORT kadas_HDR)
 
 FILE(GLOB kadas_UI
@@ -95,11 +88,8 @@ FILE(GLOB kadas_UI
   kml/*.ui
   bullseye/*.ui
   guidegrid/*.ui
-  mapgrid/*.ui)
-IF(WITH_GLOBE)
-    FILE(GLOB globe_UI globe/*.ui)
-    SET(kadas_UI ${kadas_UI} ${globe_UI})
-ENDIF(WITH_GLOBE)
+  mapgrid/*.ui
+  3d/*.ui)
 LIST(SORT kadas_UI)
 
 SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")
@@ -155,6 +145,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
+  QGIS::3D
   Python3::Python
   ${kadas_RC_LIBS}
 

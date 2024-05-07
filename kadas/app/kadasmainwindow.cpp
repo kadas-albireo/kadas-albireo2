@@ -87,9 +87,7 @@
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
 #include <kadas/app/bullseye/kadasmaptoolbullseye.h>
-#ifdef WITH_GLOBE
-#include <kadas/app/globe/kadasglobeintegration.h>
-#endif
+#include "kadas/app/3d/kadas3dintegration.h"
 #include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
 #include <kadas/app/iamauth/kadasiamauth.h>
 #include <kadas/app/kml/kadaskmlintegration.h>
@@ -274,13 +272,9 @@ void KadasMainWindow::init()
   KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mRefreshCatalogButton, this );
   Q_UNUSED( iamAuth );
 
-#ifdef WITH_GLOBE
-  // Globe
-  KadasGlobeIntegration *globe = new KadasGlobeIntegration( mAction3D, this );
-  Q_UNUSED( globe );
-#else
-  m3DButton->hide();
-#endif
+
+
+  Kadas3DIntegration *my3Dintegration = new Kadas3DIntegration( mAction3D, mMapCanvas, this );
 
   configureButtons();
 
@@ -1140,7 +1134,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
     {
       adjustedUri.replace( QRegExp( "crs=[^&]+" ), "crs=" + c );
-      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ) , 2 );
+      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
       break;
     }
   }
@@ -1152,7 +1146,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( fmt == lastImageEncoding )
     {
       adjustedUri.replace( QRegExp( "format=[^&]+" ), "format=" + fmt );
-      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ) , 2 );
+      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
       break;
     }
   }
