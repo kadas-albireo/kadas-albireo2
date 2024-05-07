@@ -90,6 +90,7 @@
             "dependencies":
             [
                 "py-pyqt5",
+                "numpy",
                 "py-qscintilla-qt5",
                 {
                   "name": "vcpkg-python-scripts",
