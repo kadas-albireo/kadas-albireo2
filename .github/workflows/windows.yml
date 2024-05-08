@@ -55,6 +55,7 @@ jobs:
                 -D PYUIC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyuic5.bat" \
                 -D PYRCC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyrcc5.bat" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
+                -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
                 ${CREATE_MSI_CMAKE_VAR}
@@ -93,7 +94,7 @@ jobs:
         with:
           name: kadas-albireo2-portable
           path: |
-            build/kadas-*-win64.zip
+            build/kadas-*.zip
 
       - name: 📤 Upload msi
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
