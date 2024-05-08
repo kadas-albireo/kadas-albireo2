@@ -46,6 +46,7 @@
     "geographiclib",
     "librsvg",
     "python3",
+    "proj-chenyx06a",
     {
       "name": "qgis",
       "features": [
