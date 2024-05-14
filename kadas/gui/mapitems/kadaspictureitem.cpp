@@ -347,25 +347,61 @@ void KadasPictureItem::render( QgsRenderContext &context ) const
   // Draw frame
   if ( mFrame )
   {
-    double framew = w + 2 * sFramePadding * dpiScale;
-    double frameh = h + 2 * sFramePadding * dpiScale;
     context.painter()->setPen( QPen( Qt::black, 1 ) );
     context.painter()->setBrush( Qt::white );
+
+    double framew = w + 2 * sFramePadding * dpiScale;
+    double frameh = h + 2 * sFramePadding * dpiScale;
+    QRectF frameRectangle(offsetX - 0.5 * framew,
+                          -offsetY - 0.5 * frameh,
+                          framew,
+                          frameh);
+
     QPolygonF poly;
-    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY + 0.5 * frameh ) );
-    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY - 0.5 * frameh ) );
-    poly.append( QPointF( offsetX + 0.5 * framew, -offsetY - 0.5 * frameh ) );
-    poly.append( QPointF( offsetX + 0.5 * framew, -offsetY + 0.5 * frameh ) );
-    poly.append( QPointF( offsetX - 0.5 * framew, -offsetY + 0.5 * frameh ) );
+    poly.append( frameRectangle.bottomLeft() );
+    poly.append( frameRectangle.topLeft() );
+    poly.append( frameRectangle.topRight() );
+    poly.append( frameRectangle.bottomRight() );
+    poly.append( frameRectangle.bottomLeft() );
+
     // Draw frame triangle
     if ( qAbs( offsetX ) > qAbs( 0.5 * framew ) || qAbs( offsetY ) > qAbs( 0.5 * frameh ) )
     {
+      static const int QUADRANT_LEFT = 0;
+      static const int QUADRANT_TOP = 1;
+      static const int QUADRANT_RIGHT = 2;
+      static const int QUADRANT_BOTTOM = 3;
+
+      // Determine nearest corner
+      QPointF nearestCorner = frameRectangle.bottomRight();
+      if ( offsetX > 0 && offsetY > 0 )
+        nearestCorner = frameRectangle.bottomLeft();
+
+      else if ( offsetX > 0 && offsetY <= 0)
+        nearestCorner = frameRectangle.topLeft();
+
+      else if ( offsetX <= 0 && offsetY <= 0)
+        nearestCorner = frameRectangle.topRight();
+
+      // Determine triangle quadrant
+      int quadrant = qRound( std::atan2( nearestCorner.y(), nearestCorner.x() ) / M_PI * 180 / 90 );
+
+      if ( quadrant < 0 )
+        quadrant += 4;
+
+      // Well defined cases (not by the corner)
+      if ( offsetX > 0.5 * framew && qAbs( offsetY ) < 0.5 * frameh )
+        quadrant = QUADRANT_LEFT;
+      else if ( offsetX < -0.5 * framew && qAbs( offsetY ) < 0.5 * frameh )
+        quadrant = QUADRANT_RIGHT;
+      else if ( offsetY > 0.5 * frameh && qAbs( offsetX ) < 0.5 * framew )
+        quadrant = QUADRANT_BOTTOM;
+      else if ( offsetY < -0.5 * frameh && qAbs( offsetX ) < 0.5 * framew )
+        quadrant = QUADRANT_TOP;
+
       QgsPointXY framePos;
       QgsVector baseDir;
-      // Determine triangle quadrant
-      int quadrant = qRound( std::atan2( -offsetY, offsetX ) / M_PI * 180 / 90 );
-      if ( quadrant < 0 ) { quadrant += 4; }
-      if ( quadrant == 0 || quadrant == 2 )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
+      if ( quadrant == QUADRANT_LEFT || quadrant == QUADRANT_RIGHT )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
       {
         baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
         framePos.setX( quadrant == 0 ? offsetX - 0.5 * framew : offsetX + 0.5 * framew );
