@@ -1,17 +1,17 @@
 diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
-index 0a4b489b908..60561ea8757 100644
+index d32dcf52af7..6c52aff5b95 100644
 --- a/python/CMakeLists.txt
 +++ b/python/CMakeLists.txt
-@@ -140,7 +140,7 @@ ELSE()
-   SET(QSCI_SIP_MOD_NAME Qsci/qscimod5.sip)
+@@ -143,7 +143,7 @@ ELSE()
+   SET(BINDING_FILES_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
  ENDIF()
  
 -set(QGIS_PYTHON_DIR ${Python_SITEARCH}/qgis)
 +set(QGIS_PYTHON_DIR "${Python_SITEARCH}/qgis" CACHE PATH "Installation directory for Python bindings")
  
  # core module
- file(GLOB_RECURSE sip_files_core core/*.sip core/*.sip.in)
-@@ -424,9 +424,7 @@ foreach(module ${PY_MODULES})
+ file(GLOB_RECURSE sip_files_core ${BINDING_FILES_ROOT_DIR}/core/*.sip ${BINDING_FILES_ROOT_DIR}/core/*.sip.in)
+@@ -443,9 +443,7 @@ foreach(module ${PY_MODULES})
    PY_COMPILE(py${module} "${QGIS_PYTHON_OUTPUT_DIRECTORY}/${module}")
  
    # install source sip files
@@ -25,7 +25,7 @@ index 0a4b489b908..60561ea8757 100644
 +  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
  endforeach(module)
 diff --git a/python/PyQt/CMakeLists.txt b/python/PyQt/CMakeLists.txt
-index 09807ef474e..0a2488e47ab 100644
+index 8b062819d1a..f8352370bbb 100644
 --- a/python/PyQt/CMakeLists.txt
 +++ b/python/PyQt/CMakeLists.txt
 @@ -1,4 +1,4 @@
