@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Analysis - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Analysis";
+        var mkdocs_page_input_path = "en/analysis.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">View</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Analysis</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#measuring-lengths-areas-and-azimuth-angles">Measuring lengths, areas and azimuth angles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#height-profile-and-line-of-sight">Height profile and line of sight</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#slope-and-hillshade">Slope and hillshade</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#viewshed">Viewshed</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#minmax">Min/Max</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ephemeris">Ephemeris</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Advanced functionalities</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Analysis</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="analysis">Analysis</h1>
+<p>The <strong><em>Analysis</em></strong> tab contains tools for measuring distances, areas, circles, and angles, as well as various terrain analysis functions.</p>
+<p>To use the terrain analysis functions, a height model must be defined in the current project. A raster layer can be selected as height model in its context menu in the map layer tree.</p>
+<h2 id="measuring-lengths-areas-and-azimuth-angles"><a name="sec0"></a>Measuring lengths, areas and azimuth angles</h2>
+<p>Four measurement functions are available: </p>
+<ul>
+<li>Line (distance)</li>
+<li>Area</li>
+<li>Circle area</li>
+<li>Azimuth angles</li>
+</ul>
+<p>All measurement functions work on the WGS84 ellipsoid.</p>
+<p>Upon activating a measurement function, the desired measurement geometry can be drawn in the map canvas. Relevant measurements are displayed directly next to the geometry.</p>
+<p>Multiple geometries can be drawn for distance and area measurements, in which case the total is displayed in measurement bar in the lower area of the application window. Here the user can also select the measurement unit, and a picker button allows to measure existing geometries.</p>
+<p><img src="../../../media/image3.png" /></p>
+<h2 id="height-profile-and-line-of-sight"><a name="sec1"></a>Height profile and line of sight</h2>
+<p>The <strong><em>Profile sight</em></strong> function allows the user to perform a height profile as well as a line of sight analysis of the terrain. To utilize this function, a heightmap must be defined in the project. A raster layer can be selected as height model in its context menu in the map layer tree.</p>
+<p>To create a height profile, the user can draw a line geometry on the map along which the profile should be measured. The result is displayed in a separate dialog. Alternatively, the user can use the picker button to measure along an existing line geometry.</p>
+<p>If the line geometry consists of one segment only, then a line of sight analysis can be computed along this line by checking the corresponding checkbox in the height profile dialog. Visible or invisible areas are then drawn accordingly green or red. If you move the mouse along the measurement line, the corresponding position in the height profile is displayed with a blue dot. The visibility analysis takes into account the curvature of the earth. Configuration parameters for the analysis include the observer height, the target height as well as if these heights are expressed with respect to the ground or the sea level. </p>
+<p>From the height profile dialog, the user can also choose to copy the height profile graphic to the clipboard, or to add it to the map as an annotation.</p>
+<p><img src="../../../media/image4.png" /></p>
+<h2 id="slope-and-hillshade"><a name="sec2"></a>Slope and hillshade</h2>
+<p>The <strong><em>Slope</em></strong> function computes a slope profile of the terrain as a color coded raster layer.</p>
+<p>The <strong><em>Hillshade</em></strong> function computes the shading of the terrain, which is added as a semi-opaque raster layer to the map.</p>
+<p>To utilize these functions, a heightmap must be defined in the project.</p>
+<p>In both cases the analysis is performed within a rectangular region of the map as specified by the user. For hillshade, the user is also asked to specify the horizontal and vertical angles of the light source.</p>
+<p>The results of the slope and hillshade analyzes are added to the map as raster layers, and appear accordingly in the map layer tree. When saving the project, these datasets are stored as project attachments in the <em><project name>.qgz</em> project file.</p>
+<p><img src="../../../media/image5.png" /></p>
+<h2 id="viewshed"><a name="sec3"></a>Viewshed</h2>
+<p>The <strong><em>Viewshed</em></strong> tool calculates the visible or invisible terrain area in a circular sector, starting from the center of the circle - the observer's location. The visibility analysis takes into account the curvature of the earth.</p>
+<p>To utilize these functions, a heightmap must be defined in the project.</p>
+<p>The viewhsed analysis is computed within a circular sector or a full circle as specified by the user. The first click sets the observer position, the second one the radius and the third click the the aperture angle. These parameters can also be entered numerically if numeric input is enabled in the settings tab. After drawing the analysis area geometry, the user is required to specify the computation parameters, which include the observer height, the target height, whether these heights are relative to the ground or the sea level, and whether the visible or invisible area should be shown in the result.</p>
+<p>The analysis output is added as a raster layer to the map. When the project is saved, the raster is saved as a project attachment in the <em><project name>.qgz</em> project file.</p>
+<h2 id="minmax"><a name="sec4"></a>Min/Max</h2>
+<p>The <strong><em>Min/Max</em></strong> tool allows computing the lowest and highest terrain point within a selected area (rectangle/polygon/circle). The respective points will be marked with up- and down-facing triangle icons on the map. Clicking on the triangle icons allows copying the coordinates, adding a pin and initiating a further analysis function (i.e. viewshed) from that point.</p>
+<h2 id="ephemeris"><a name="sec4"></a>Ephemeris</h2>
+<p>The <strong><em>Ephemeris</em></strong> tool calculates sun and moon ephemeris (position, rise and set times, moon phase) at a selected terrain position and moment in time. The checkbox allows configuring whether the relief is considered for the computation.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../view/" class="btn btn-neutral float-left" title="View"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../draw/" class="btn btn-neutral float-right" title="Draw">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../view/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../draw/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

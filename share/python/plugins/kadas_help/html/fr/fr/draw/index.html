@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Dessiner - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Dessiner";
+        var mkdocs_page_input_path = "fr/draw.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Dessiner</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#geometries-et-textes-redlining">Géométries et textes (Redlining)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#epingle">Épingle</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ajouter-image">Ajouter image</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#images-raster">Images raster</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#graphiques-vectoriels">Graphiques vectoriels</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#coller">Coller</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#symboles-symtaz">Symboles SymTaZ</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#grille-de-conduite">Grille de conduite</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bullseye">Bullseye</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#effacer-des-objets">Effacer des objets</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Fonctionnalités avancées</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Couche vecteur</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Dessiner</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="dessiner">Dessiner</h1>
+<h2 id="geometries-et-textes-redlining"><a name="sec0"></a>Géométries et textes (Redlining)</h2>
+<p>On peut dessiner les géométries des types suivants:</p>
+<ul>
+<li>Points</li>
+<li>Lignes</li>
+<li>Polygones</li>
+<li>Rectangles</li>
+<li>Cercles</li>
+<li>Croix de coordonnées</li>
+</ul>
+<p>Selon le type de géométrie, les couleurs et le motif du contour et du remplissage peuvent être adaptés, ainsi que l’épaisseur des lignes ou la taille des points.</p>
+<p>Pour les <strong><em>textes</em></strong>, les caractères et leur taille ainsi que la couleur de remplissage peuvent être adaptés.</p>
+<p>Les géométries dessinées et les textes sont placés sous le niveau <strong><em>Redlining</em></strong> du répertoire de la carte.</p>
+<p>On peut éditer a posteriori les géométries déjà dessinées ou les textes en les sélectionnant sur la carte. Les objets sélectionnés peuvent être déplacés et, en fonction du type de géométrie, les nœuds peuvent être déplacés individuellement, créées ou éliminés via le menu contextuel. L'ordre z d'une géométrie peut être modifié via le menu contextuel.</p>
+<p>Les géométries de lignes et de polygones existantes peuvent être continuées via le menu contextuel sur un nœud.</p>
+<p><img src="../../../media/image6.png" /></p>
+<p>Les opérations d'édition sur une couche de Redlining peuvent se faire par CTRL+Z et CTRL+Y ou avec les touches correspondantes du bord inférieur de la carte.</p>
+<p>Lors de la création et de l'édition de géométries, les valeurs mesurées pertinentes sont affichées en même temps.</p>
+<p>Les dessins de Redlining peuvent être copiés / coupé et collé via le menu contextuel ou les raccourcis habituels CTRL+C, CTRL+X et CTRL+V. Plusieurs objets de Redlining peuvent être sélectionnés avec la touche CTRL et déplacés, copiés, coupés et collés en tant que groupe.</p>
+<h2 id="epingle"><a name="sec1"></a>Épingle</h2>
+<p>Les punaises sont des <strong><em>marqueurs de positions</em></strong> géoréférencés qui peuvent également être nommés ou dotés de commentaires.</p>
+<p>L’infobulle d’une punaise placée indique la position et l’altitude. Un double clic sur la punaise ouvre sa boîte de dialogue. Un clic droit sur la punaise permet de copier sa position dans le presse-papier.</p>
+<p>On peut rechercher des punaises par nom ou par commentaire dans la recherche standard.</p>
+<h2 id="ajouter-image"><a name="sec2"></a>Ajouter image</h2>
+<h3 id="images-raster">Images raster</h3>
+<p>Les images raster dans les formats habituels (JPG, PNG, BMP) peuvent être ajoutées en tant qu' <strong><em>annotations</em></strong> à la carte. Ceux-ci sont affichés dans une bulle de dialogue. Si l'image est géoréférencée (balises EXIF), l'ancre est placée à l'emplacement approprié et l'emplacement est bloqué. Le verrouillage de position peut être activé ou désactivé via le menu contextuel. Un double-clic sur l'ancre ouvre l'image avec la visionneuse d'images par défaut du système d'exploitation. La taille de la bulle peut être modifiée à ses sommets.</p>
+<p>Les images raster sont stockées dans la couche Images.</p>
+<h3 id="graphiques-vectoriels">Graphiques vectoriels</h3>
+<p>Avec la fonction <strong><em>Ajouter image</em></strong> il est possible d'ajouter des graphiques SVG à la carte. Ceux-ci peuvent être augmentés ou réduits avec la souris en faisant glisser les points de contrôle correspondants et en les faisant pivoter.</p>
+<p>Les graphiques vectoriels sont stockés dans la couche <strong><em>SVG graphics</em></strong>.</p>
+<p><img src="../../../media/image7.png" /></p>
+<h2 id="coller"><a name="sec3"></a>Coller</h2>
+<p>La fonction <strong><em>Coller</em></strong>** permet d'insérer divers objets du presse-papiers dans la carte:</p>
+<ul>
+<li>Géométries: Ces objets sont insérés comme des objets redlining</li>
+<li>Symboles MSS: Ceux-ci sont insérés dans la couche MilX sélectionné</li>
+<li>Graphiques SVG: Ceux-ci sont insérés dans la couche <strong><em>SVG graphics</em></strong></li>
+</ul>
+<h2 id="symboles-symtaz"><a name="sec4"></a>Symboles SymTaZ</h2>
+<p>SymTaZ est un programme externe qui peut être utilisé pour créer des symboles, des signes tactiques et des signatures civiles pour des documents militaires conformément au règlement 52.002.03 de l'armée suisse. Ces icônes peuvent être importées dans KADAS, soit par la fonction <strong><em>Copier dans le Presse-papiers (Formulaire Texte)</em></strong> dans SymTaZ suivie de <strong><em>Coller</em></strong> dans KADAS, ou en enregistrant en format SVG dans SymTaZ puis en ouvrant via <strong><em>Ajouter image</em></strong> dans KADAS.</p>
+<h2 id="grille-de-conduite"><a name="sec5"></a>Grille de conduite</h2>
+<p>La grille de conduite est une grille dans laquelle les lignes et les colonnes sont identifiées par des chiffres ou des lettres. La grille de conduite est stockée à son propre couche et apparaît dans la légende de la carte. Toutes les propriétés de la grille ainsi que l'affichage des légendes peuvent être ajustées. Par défaut, la grille est créée en fonction de l'étendue actuelle de la carte. Il est possible de créer autant de niveaux de grille de conduite que vous le souhaitez.</p>
+<h2 id="bullseye"><a name="sec6"></a>Bullseye</h2>
+<p>Un Bullseye est dessiné sous la forme d'un nombre de cercles concentriques autour d'un point sélectionné et d'axes correspondants, séparés à intervalles réguliers. Comme la grille de conduite, elle est stockée dans sa propre couche et différentes propriétés peuvent être configurées librement.</p>
+<h2 id="effacer-des-objets"><a name="sec7"></a>Effacer des objets</h2>
+<p>Les objets individuels peuvent être supprimés via le menu contextuel ou la touche SUPPR. L'outil <strong><em>Supprimer les objets</em></strong> vous permet de supprimer plusieurs objets à la fois dans une section sélectionnée. Cette fonction peut également être appelée via CTRL+Rectangle en mode de navigation.</p>
+<p><img src="../../../media/image8.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../analysis/" class="btn btn-neutral float-left" title="Analyse"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../gps/" class="btn btn-neutral float-right" title="Navigation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../analysis/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../gps/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

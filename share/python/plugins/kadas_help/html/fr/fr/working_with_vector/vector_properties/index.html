@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Fenêtre Propriétés - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Fen\u00eatre Propri\u00e9t\u00e9s";
+        var mkdocs_page_input_path = "fr/working_with_vector/vector_properties.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Fonctionnalités avancées</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Couche vecteur</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Fenêtre Propriétés</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-style">Onglet Style </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-etiquettes">Onglet Étiquettes </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-champs">Onglet Champs </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-general">Onglet Général </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-rendu">Onglet Rendu </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-infobulles">Onglet Infobulles </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-actions">Onglet Actions </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-jointures">Onglet Jointures </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-diagrammes">Onglet Diagrammes </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-metadonnees">Onglet Métadonnées </a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Fonctionnalités avancées &raquo;</li>
+          <li>Couche vecteur &raquo;</li>
+      <li>Fenêtre Propriétés</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="fenetre-proprietes-dune-couche-vecteur">Fenêtre Propriétés d'une couche vecteur <a name="#the-vector-properties-dialog"></a></h1>
+<p>La fenêtre <em>Propriétés de la couche</em> pour une couche vectorielle fournit des informations sur la couche, les paramètres de représentation et les options d'étiquetage. Si votre couche a été chargée depuis une base PostgreSQL/PostGIS, vous pouvez également modifier la requête SQL d'appel de la couche, en l'éditant dans la fenêtre <em>Constructeur de requête</em> de l'onglet <em>Général</em>. Pour accéder à la fenêtre <em>Propriétés de la couche</em>, double-cliquez sur la couche dans la légende ou faites un clic droit sur la couche et sélectionnez <em>Propriétés</em> dans le menu qui apparait.</p>
+<p><img alt="" src="../../../../images/vector_general_menu.png" /></p>
+<h2 id="onglet-style">Onglet Style <a name="#style-menu"></a></h2>
+<p>Le menu Style vous offre un outil complet pour rendre et symboliser vos données vectorielles. Vous pouvez utiliser les outils de rendu <em>Rendering des couches ‣</em> qui sont communs à toutes les données vectorielles, ainsi que les outils de symbolisation spéciaux qui ont été conçus pour les différents types de données vectorielles.</p>
+<h3 id="modes-de-rendu">Modes de rendu <a name="#renderers"></a></h3>
+<p>Le moteur de rendu est chargé de dessiner une entité avec son symbole correct. Il existe quatre types de moteurs de rendu: symbole unique, catégorisé, gradué et basé sur des règles. Il n'y a pas de rendu de couleur continue, car il s'agit en fait d'un cas particulier du rendu gradué. Les moteurs de rendu classés et gradués peuvent être créés en spécifiant un symbole et une rampe de couleur - ils définissent les couleurs pour les symboles de manière appropriée. Pour les couches de points, il y a un moteur de rendu par déplacement de point disponible. Pour chaque type de données (points, lignes et polygones), des types de couches de symboles vectoriels sont disponibles. Selon le moteur de rendu choisi, l'onglet <em>Style</em> fournit différentes sections supplémentaires. Dans la fenêtre de symbologie, il y a un bouton <strong>[Ouvrir la bibliothèque]</strong> qui donne accès au Gestionnaire de Symboles (voir <em>vector_style_manager</em>). Le Gestionnaire de Symboles vous permet de modifier et de supprimer des symboles existants et d'en ajouter de nouveaux.</p>
+<p>Après toutes modifications, le symbole peut-être ajouté à la liste courante des symboles disponibles (via le bouton <strong>[Enregistrer]</strong>), et pourra donc être facilement réutilisé. De plus, vous pouvez utiliser le bouton <strong>[Style &rarr; Enregistrer le style]</strong> pour sauvegarder le style en .qml (fichier de style de couche QGIS) ou au format SLD (.sld). Les SLD peuvent être exportés depuis n'importe quel style de rendu – symbole simple, catégories, gradués, basés sur des règles – mais lors de l'import d'un SLD, un rendu du type symbole simple ou basé sur des règles est créé. Cela signifie que les catégories ou symboles gradués sont convertis en ensemble de règles. Si vous voulez préserver ce type de rendu, vous devez utiliser le format QML. D'un autre coté, cela peut être parfois très pratique d'avoir la possibilité de simplement convertir des styles en ensemble de règles.</p>
+<p>Si, en travaillant sur le style d'une couche vectorielle, vous changez de mode de rendu, les changements effectués sur le symbole sont mémorisés. Notez que cela ne fonctionne qu'une seule fois. Si vous changez à nouveau de mode de rendu, les paramètres seront perdus.</p>
+<p>Si la source d'une couche est une base de données (PostGIS ou Spatialite par exemple), vous pouvez sauvegarder le style de la couche dans une table de la base de données. Cliquez simplement sur la liste déroulante <em>Enregistrer le style</em> et choisissez <strong>Enregistrer dans la base de données</strong>. Renseignez ensuite dans la fenêtre le nom du style, sa description, un fichier ui et s'il s'agit du style par défaut. En ouvrant une couche issue d'une base de données, si un style a été défini pour cette couche, KADAS le chargera automatiquement. Vous pouvez ajouter plusieurs styles dans la base de données. Un seul pourra être le style par défaut.</p>
+<p><img alt="" src="../../../../images/save_style_database.png" /></p>
+<p><strong>Sélectionner et modifier plusieurs symboles</strong></p>
+<p>Il est possible de sélectionner plusieurs symboles, de faire un clic-droit dessus et de changer en une seule opération leur couleur, leur transparence, leur taille ou leur épaisseur.</p>
+<p><strong>Symboles uniques</strong></p>
+<p>Le mode de rendu en symbole unique est utilisé pour représenter toutes les entités de la couche de la même façon, définie par l'utilisateur. Les propriétés, qui peuvent être ajustées dans l'onglet <em>Style</em>, dépendent du type de géométrie de la couche, mais partagent une structure similaire. En haut à gauche figure un aperçu du symbole tel qu'il apparaîtra. A droite est affichée la liste des symboles déjà existants pour le style courant, prêts à être sélectionnés d'un simple clic. Le symbole courant peut être modifié en utilisant les outils à droite de l'aperçu.</p>
+<p>Si vous cliquez sur le premier niveau de la liste des <em>Couches de symbole</em>, sur la gauche, il est possible de choisir un certain nombre de paramètres basiques comme la <em>Taille</em>, la <em>Transparence</em>, la <em>Couleur</em> ou l'angle de <em>Rotation</em>. Ces paramètres s'appliquent à toutes les couches de symboles.</p>
+<p><img alt="" src="../../../../images/singlesymbol_ng_line.png" /></p>
+<p>Dans chaque zone de sélection numérique de cette boîte de dialogue vous pouvez taper des expressions. Par exemple, vous pouvez faire des calculs mathématiques simples comme multiplier la taille actuelle d'un point pas 3 sans avoir recours à une calculette.</p>
+<p><img alt="" src="../../../../images/expression_symbol_size_spinbox.png" /></p>
+<p>Si vous cliquez sur le deuxième niveau dans la boîte de dialogue <em>Symbol layers</em> il est possible d'avoir presque tous les paramètres <em>Définis par les données</em>. Lorsqu'une couleur est définie par les données on peut lier la couleur à un champ <em>calculé</em>. Une fonctionnalité de commentaires est insérée ci-dessous.</p>
+<pre><code>/* This expression will return a color code depending on the field value.
+ * Negative value: red
+ * 0 value: yellow
+ * Positive value: green
+ */
+CASE
+  WHEN value &lt; 0 THEN '#DC143C' -- Negative value: red
+  WHEN value = 0 THEN '#CCCC00' -- Value 0: yellow
+  ELSE '#228B22'                -- Positive value: green
+END
+</code></pre>
+<p><strong>Symboles catégorisés</strong></p>
+<p>Le rendu Catégorisé est utilisé pour représenter toutes les entités d'une couche classées par catégorie qui dépend d'un des attributs de l'entité. L'onglet <em>Style</em> permet de sélectionner:</p>
+<ul>
+<li>
+<p>L'attribut (en utilisant la liste déroulante de Colonne ou la fonction <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Définir une expression de colonne</em></p>
+</li>
+<li>
+<p>le symbole (en utilisant la fenêtre de Sélection de symbole)</p>
+</li>
+<li>
+<p>Les couleurs (en utilisant la liste de palettes de couleur)</p>
+</li>
+</ul>
+<p>Cliquez ensuite sur le bouton <strong>Classer</strong> pour générer les classes pour toutes les valeurs différentes trouvées dans le champ de la table attributaire. Chaque classe peut être désactivée en décochant la case située à gauche du symbole de classe.</p>
+<p>Vous pouvez changer le symbole, la valeur et / ou la légende en double-cliquant sur l'élément à modifier.</p>
+<p>Un clic-droit vous propose de <strong>Copier / Coller</strong>, <strong>Modifier la couleur</strong>, <strong>Modifier la transparence</strong>, <strong>Modifier l'unité de sortie</strong> ou <strong>Modifier la taille</strong>.</p>
+<p>Le bouton <strong>[Avancé]</strong> dans le coin inférieur droit de la fenêtre vous permet de choisir un champ pour faire varier l'angle de rotation et la taille des symboles. Tous les champs de la couche sont alors disponibles, même s'ils ne sont pas utilisés pour le rendu par catégorie.</p>
+<p><img alt="" src="../../../../images/categorysymbol_ng_line.png" /></p>
+<p><strong>Symboles gradués</strong></p>
+<p>Le rendu gradué est utilisé pour afficher toutes les entités d'une couche, en utilisant un symbole de couche défini par l'utilisateur dont la couleur reflètera la plage d'appartenance d'une valeur d'un attribut.</p>
+<p><img alt="" src="../../../../images/graduatesymbol_ng_line.png" /></p>
+<p>De la même manière que le rendu catégorisé, le rendu Gradué permet de faire varier l'angle de rotation et la taille des symboles selon les valeurs des champs spécifiés.</p>
+<p>De la même façon que le rendu Catégorisé, l'onglet <em>Style</em> vous permet de modifier les points suivants:</p>
+<ul>
+<li>
+<p>L'attribut (en utilisant la liste déroulante de Colonne ou la fonction <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Définir une expression de colonne</em></p>
+</li>
+<li>
+<p>Le symbole (en utilisant le bouton Changer)</p>
+</li>
+<li>
+<p>Les couleurs (en utilisant la liste des palettes de couleur)</p>
+</li>
+</ul>
+<p>De plus, vous pouvez choisir le nombre de classes et la méthode de classification (depuis la liste déroulante Mode). Les modes disponibles sont:</p>
+<ul>
+<li>
+<p>Intervalles égaux: toutes les classes sont de même taille (par exemple, avec des valeurs allant de 0 à 16 et 4 classes, chaque classe aura une taille de 4);</p>
+</li>
+<li>
+<p>Quantile: toutes les classes auront le même effectif (même principe que pour les boîtes à moustache);</p>
+</li>
+<li>
+<p>Ruptures naturelles (Jenks): la variance de chaque classe est minimale tandis que la variance entre les différentes classes est maximale;</p>
+</li>
+<li>
+<p>Écart-type: les classes sont construites en fonction le l'écart-type calculé sur l'ensemble des valeurs;</p>
+</li>
+<li>
+<p>Jolies ruptures: même principe que pour les intervalles égaux mais les limites de classe sont des entiers.</p>
+</li>
+</ul>
+<p>La zone de liste dans la partie centrale du menu <em>Style</em> répertorie les classes ainsi que leurs étendues, étiquettes et symboles de rendu.</p>
+<p>Cliquez sur le bouton <strong>Classer</strong> pour générer les classes selon le mode choisi. Chaque classe peut être désactivée en décochant la case située à gauche du symbole de classe.</p>
+<p>Vous pouvez changer le symbole, la valeur et / ou la légende en double-cliquant sur l'élément à modifier.</p>
+<p>Un clic-droit vous propose de <strong>Copier / Coller</strong>, <strong>Modifier la couleur</strong>, <strong>Modifier la transparence</strong>, <strong>Modifier l'unité de sortie</strong> ou <strong>Modifier la taille</strong>.</p>
+<p><strong>Cartes thématiques utilisant une expression</strong></p>
+<p>Les cartes thématiques faites avec le rendu Catégorisé ou Gradué peuvent désormais être créées en utilisant le résultat d'une expression. Dans la fenêtre Propriétés des couches vectorielles, le sélecteur de colonne accueille une fonction <img src="../../../../images/mIconExpressionEditorOpen.png" /> <em>Définir une expression</em> de colonne. Alors maintenant, vous n'avez plus besoin d'écrire l'attribut de la classification dans une nouvelle colonne de votre table si vous souhaitez que l'attribut de classification soit un composite de plusieurs champs, ou une formule quelconque.</p>
+<p><strong>Rendu basé sur un ensemble de règles</strong></p>
+<p>Ce moteur de rendu est utilisé pour afficher toutes les entités d'une couche en utilisant un ensemble de règles prédéfinies dont la couleur reflète la manière dont une entité a été classée en fonction de ses attributs. Les règles sont définies par des expressions SQL. La fenêtre permet de regrouper les règles par type de filtre ou échelle de validité. Vous pouvez activer le rendu selon les niveaux de symboles ou arrêter le rendu à la première règle validée pour chaque entité.</p>
+<p>Pour créer une règle, activez une ligne existante en double-cliquant dessus ou cliquez sur <em>+</em> et cliquez sur la nouvelle règle. Dans la boîte de dialogue Propriétés de la règle, vous pouvez définir une étiquette pour la règle. Appuyez sur le bouton <img src="../../../../images/browsebutton.png" /> pour ouvrir le constructeur de chaînes d'expression. Dans la <strong>Liste des fonctions</strong>, cliquez sur <em>Champs et valeurs</em> pour afficher tous les attributs de la table d'attributs à rechercher. Pour ajouter un attribut au champ Calculatrice de champs <strong>Expression</strong>, double-cliquez sur son nom dans la liste <em>Champs et valeurs</em>. En général, vous pouvez utiliser les différents champs, valeurs et fonctions pour construire l'expression de calcul, ou vous pouvez simplement la saisir dans la case. Vous pouvez créer une nouvelle règle en copiant et collant une règle existante avec le bouton droit de la souris. Vous pouvez également utiliser la règle <em>ELSE</em> qui sera exécutée si aucune des autres règles de ce niveau ne correspond. Les règles apparaissent dans une hiérarchie arborescente dans la légende de la carte. Il suffit de double-cliquer sur les règles dans la légende de la carte et le menu Style des propriétés du calque apparaît, montrant la règle qui est l'arrière-plan du symbole dans l'arbre.</p>
+<p><img alt="" src="../../../../images/rulesymbol_ng_line.png" /></p>
+<p><strong>Déplacement de point</strong></p>
+<p>Le rendu de Déplacement de point permet une visualisation de tous les points d'une couche, même si ceux-ci se superposent. Pour se faire, les symboles des points sont répartis en cercle autour d'un symbole central.</p>
+<p><img alt="" src="../../../../images/poi_displacement.png" /></p>
+<p><strong>Exporter le style d'une couche vecteur</strong></p>
+<p>You have the option to export vector symbology from KADAS into Google *.kml, *.dxf and MapInfo *.tab files. Just open the right mouse menu of the layer and click on <em>Save selection as ‣</em> to specify the name of the output file and its format. In the dialog, use the <em>Symbology export</em> menu to save the symbology either as <em>Feature symbology ‣</em> or as <em>Symbol layer symbology ‣</em>. If you have used symbol layers, it is recommended to use the second setting.</p>
+<p><strong>Polygones inversés</strong></p>
+<p>Le rendu en polygones inversés permet de définir un symbole à appliquer à l'extérieur des polygones de la couche. Vous pouvez alors choisir parmi des sous-mode de rendu. Il s'agit des mêmes que les principaux modes.</p>
+<p><img alt="" src="../../../../images/inverted_polygon_symbol.png" /></p>
+<p><strong>Basculer rapidement entre styles</strong></p>
+<p>Lorsque vous avez créé un des styles mentionnés ci-dessus vous pouvez faire un clic droit sur la couche et sélectionner <em>Styles ‣ Ajouter</em> pour sauver votre style. Vous pouvez maintenant basculer rapidement entre les styles que vous avez créés en utilisant de nouveau le menu <em>Styles ‣</em>.</p>
+<p><strong>Carte de chaleur</strong></p>
+<p>Avec le rendu de Carte de chaleur vous pouvez créer des cartes de chaleur en temps réel et dynamiques pour des couches (multi-)points. Vous pouvez définir le rayon de la carte de chaleur en pixels, mm ou unités cartographiques, choisir une rampe de couleur pour le style de carte de chaleur et utiliser une jauge pour choisir entre la vitesse du rendu et la qualité. Lorsque une entité est ajoutée ou retirée le rendu de carte de chaleur met automatiquement à jour le style de carte de chaleur.</p>
+<h3 id="selecteur-de-couleur">Sélecteur de Couleur <a name="#color-picker"></a></h3>
+<p>Indépendamment du type de style utilisé, la fenêtre <em>Sélectionner la couleur</em> s'affiche dès que vous cliquez pour modifier une couleur - de bordure ou de remplissage. Quatre onglets vous permettent de sélectionner une couleur via une <img src="../../../../images/mIconColorBox.png" /> <em>Palette de couleur</em>, une <img src="../../../../images/mIconColorWheel.png" /> <em>Roue chromatique</em>, des <img src="../../../../images/mIconColorSwatches.png" /> <em>Aplats de couleur</em> ou un <img src="../../../../images/mIconColorPicker.png" /> <em>Sélecteur de couleur</em>.</p>
+<p>Quelle que soit la méthode de sélection, la couleur est toujours décrite en valeurs TSV (Teinte, Saturation, Valeur) et RVB (Rouge, Vert, Bleu). Il y a également la valeur d’<em>Opacité</em> pour régler le niveau de transparence. En bas à gauche de la fenêtre s'affiche la comparaison entre la couleur <em>Actuelle</em> et l’<em>Ancienne</em>. En bas à droite, vous avez la possibilité d'ajouter la couleur sélectionnée à un bouton de couleur.</p>
+<p><img alt="" src="../../../../images/color_picker_ramp.png" /></p>
+<p>Avec la <img src="../../../../images/mIconColorBox.png" /> <em>Palette de couleur</em> ou la <img src="../../../../images/mIconColorWheel.png" /> <em>Roue chromatique</em>, vous parcourez toutes les combinaisons de couleurs possibles. Il y a cependant d'autres possibilités. En utilisant les Aplats de couleur <img src="../../../../images/mIconColorSwatches.png" />, vous pouvez choisir à partir d'une liste prédéfinie. Cette liste correspond aux <em>Couleurs récentes</em>, aux <em>Couleurs standards</em> et aux <em>Couleurs du projet</em>.</p>
+<p><img alt="" src="../../../../images/color_picker_recent_colors.png" /></p>
+<p>Une autre possibilité est d'utiliser le <img src="../../../../images/mIconColorPicker.png" /> <em>Sélecteur de couleur</em> qui permet d'échantillonner une couleur directement avec le pointeur de la souris depuis n'importe quelle partie de l'interface de QGIS et depuis une autre application en appuyant sur la barre espace. Cet outil dépend du système d'exploitation et n'est pas fonctionnel pour le moment sur OSX.</p>
+<p><strong>Raccourci pour la sélection de couleur + copier/coller des couleurs</strong></p>
+<p>Vous pouvez rapidement choisir une <em>Couleur récente</em>, une <em>Couleur standard</em> ou simplement <em>copier</em> / <em>coller</em> une couleur en cliquant sur la flèche située à droite du bouton qui affiche la couleur.</p>
+<p><img alt="" src="../../../../images/quick_color_picker.png" /></p>
+<h3 id="rendu-de-couche">Rendu de couche <a name="#layer-rendering"></a></h3>
+<ul>
+<li>
+<p><em>Transparence de la couche</em> <img alt="slider" src="../../../../images/slider.png" />: permet de rendre visible les couches situées en dessous. Utiliser le curseur pour adapter la visibilité de la couche vectorielle à vos besoins. Vous pouvez également définir directement le pourcentage de transparence dans la zone de texte située à côté.</p>
+</li>
+<li>
+<p><em>Mode de mélange des couches</em> et <em>mode de mélange des objets</em>: Vous pouvez obtenir des effets de rendu spéciaux avec ces outils que vous ne connaissiez auparavant que par le biais de programmes graphiques. Les pixels de vos calques superposés et sous-jacents sont mélangés à l'aide des paramètres décrits ci-dessous.</p>
+<ul>
+<li>
+<p>Normal: il s'agit du mode de fusion standard qui utilise la valeur de transparence (canal alpha) du pixel supérieur pour le fusionner avec le pixel sous-jacent, les couleurs ne sont pas mélangées.</p>
+</li>
+<li>
+<p>Eclaircir: Sélectionne le maximum entre chaque composante depuis les pixels du premier-plan et de l'arrière-plan. Soyez attentif au fait que le résultat obtenu peut présenter un aspect dur et crénelé.</p>
+</li>
+<li>
+<p>Filtrer: Les pixels lumineux de la source sont affichés par dessus la destination, alors que les pixels sombres ne le sont pas. Ce mode est utile pour mélanger la texture d'une couche avec une autre (c'est-à-dire que vous pouvez utiliser un relief ombré pour texturer une autre couche).</p>
+</li>
+<li>
+<p>Eviter: Ce mode va éclaircir et saturer les pixels sous-jacents en se basant sur la luminosité du pixel au-dessus. La brillance des pixels supérieurs va donc provoquer une augmentation de la saturation et de la brillance des pixels inférieurs. Cela fonctionne mieux si les pixels supérieurs ne sont pas lumineux, sinon l'effet sera trop prononcé.</p>
+</li>
+<li>
+<p>Addition: Ce mode de fusion ajoute simplement les valeurs de pixels d'une couche avec une autre. Dans le cas de valeurs obtenues au-dessus de un (en ce qui concerne le RVB), du blanc sera affiché. Ce mode est approprié pour mettre en évidence des entités.</p>
+</li>
+<li>
+<p>Assombrir: Ce mode créé un pixel résultant qui conserve le plus petit composant parmi les pixels du premier-plan et de l'arrière-plan. Comme avec le mode éclaircir, le résultat peut présenter un aspect dur et crénelé.</p>
+</li>
+<li>
+<p>Multiplier: Dans ce cas, les valeurs pour chaque pixel de la couche supérieure sont multipliées par celles des pixels correspondants de la couche inférieure. Les images obtenues sont plus sombres.</p>
+</li>
+<li>
+<p>Découper: Les couleur sombres de la couche supérieure provoquent un obscurcissement des couches inférieures. Découper peut être utilisé pour ajuster et teinter les couches inférieures.</p>
+</li>
+<li>
+<p>Revêtement: Ce mode combine les modes multiplier et filtrer. Dans l'image résultante, les parties lumineuses deviennent plus lumineuses et les parties sombres plus sombres.</p>
+</li>
+<li>
+<p>Lumière douce: Ce mode est très similaire au mode revêtement, mais au lieu d'utiliser multiplier/filtrer il utilise découper/éviter. Il est censé émuler une lumière douce rayonnante dans l'image.</p>
+</li>
+<li>
+<p>Lumière dure: Ce mode est lui aussi très similaire au mode revêtement. Il est censé émuler une lumière très intense projetée dans l'image.</p>
+</li>
+<li>
+<p>Différencier: Ce mode soustrait le pixel supérieur au pixel inférieur et vice-versa, de façon à toujours obtenir une valeur positive. Le mélange avec du noir ne produit aucun changement, étant donné que toutes les couleurs sont nulles.</p>
+</li>
+<li>
+<p>Soutraire: Ce mode soustrait les valeurs de pixel d'une couche avec une autre. En cas de valeurs négatives obtenues, du noir est affiché.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="onglet-etiquettes">Onglet Étiquettes <a name="#labels-menu"></a></h2>
+<p>Le moteur d’<img src="../../../../images/mActionLabeling.png" /> <em>Étiquettes</em> fournit un système d'étiquetage intelligent pour les couches de points, lignes et polygones et ne nécessite que peu de paramètres. Ce nouveau système gère les couches reprojetées à la volée. Les fonctionnalités principales ont été re-designées et KADAS en propose de nouvelles qui améliorent l'étiquetage. Les menus suivants ont été créés pour les couches vectorielles:</p>
+<ul>
+<li>
+<p>Texte</p>
+</li>
+<li>
+<p>Formatage</p>
+</li>
+<li>
+<p>Tampon</p>
+</li>
+<li>
+<p>Fond</p>
+</li>
+<li>
+<p>Ombre</p>
+</li>
+<li>
+<p>Emplacement</p>
+</li>
+<li>
+<p>Rendu</p>
+</li>
+</ul>
+<p>Voyons ce que l'on peut faire avec les nouveaux onglets pour chaque type de couche.</p>
+<p><strong>Étiqueter une couche de points</strong><a name="labeling-point-layers"></a></p>
+<p>Lancez KADAS et chargez une couche vectorielle de points. Sélectionnez la couche dans la légende et cliquez sur le bouton <img src="../../../../images/mActionLabeling.png" /> <em>Paramètres d'étiquetage de la couche</em> de la barre d'outils KADAS.</p>
+<p>La première étape consiste à cocher la case <img src="../../../../images/checkbox.png" /> <em>Étiqueter cette couche avec</em> et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur <img src="../../../../images/mIconExpressionEditorOpen.png" /> si vous souhaitez définir les étiquettes en vous basant sur des expressions.</p>
+<p>Les étapes présentées ci-dessous décrivent un étiquetage simple, sans utilisation des fonctions de <em>Valeurs définies par les données</em>, situées à droite des paramètres à définir.</p>
+<p>Vous pouvez définir le style du texte dans le menu <em>Texte</em>. Utilisez l'option <em>Casse</em> pour influencer le rendu du texte. Vous avez la possibilité d'afficher le texte <em>Tout en majuscules</em>, <em>Tout en minuscules</em> ou <em>Premières lettres en majuscules</em>. Utilisez le mode de fusion pour créer des effets bien connus des logiciels de graphisme.</p>
+<p>Dans le menu <em>Formatage</em>, vous pouvez définir un caractère de retour à la ligne afin de découper l'étiquette sur de multiples lignes. Utilisez l'option <img src="../../../../images/checkbox.png" /> <em>Nombres formatés</em> pour formater les valeurs numériques de la table attributaire. Les chiffres après la virgule sont insérés. L'activation de cette option ajoute par défaut trois chiffres après la virgule.</p>
+<p>Pour créer un tampon, cochez simplement la case <img src="../../../../images/checkbox.png" /> <em>Afficher un tampon</em> depuis le menu <em>Tampon</em>. La couleur du tampon est personnalisable. Vous pouvez également appliquer un mode de fusion.</p>
+<p>Si la case à cocher <em>Colorier le remplissage du tampon</em> est activé, il va interagir avec le texte partiellement transparent et donner des résultats mitigés en matière de transparence de la couleur. La désactivation du remplissage du tampon corrige ce problème (sauf là où l'aspect intérieur du contour du tampon intersecte avec le texte de remplissage) et permet également de faire du texte encadré.</p>
+<p>Dans le menu <em>Fond</em>, vous pouvez définir la forme de votre arrière-plan avec <em>Taille X</em> et <em>Taille Y</em>. Utilisez <em>Taille selon</em> pour ajouter une zone de <em>Tampon</em> à votre arrière-plan. La taille du tampon est définie par défaut ici. Le fond est alors constitué de la zone tampon et du fond défini par les valeurs <em>Taille X</em> et <em>Taille Y</em>. Vous pouvez aussi définir une <em>Rotation</em> correspondant à <em>Angle de l'étiquette</em>, <em>Angle par rapport à l'étiquette</em> ou encore <em>Valeurs fixes</em>. Définissez un <em>Décalage X,Y</em> avec les valeurs X et Y et le fond sera déplacé. En appliquant <em>Angles arrondis X,Y</em>, l'arrière-plan s'arrondit aux angles. Il est également possible de fusionner le fond avec les couches sous-jacentes dans la fenêtre de carte en utilisant le <em>Mode de fusion</em>.</p>
+<p>Utilisez le menu <em>Ombre</em> pour une <em>Ombre portée</em> définie par l'utilisateur. Le dessin de l'arrière-plan est très variable. Choisissez entre <em>l'objet le plus bas de l'étiquette</em>, <em>Texte</em>, <em>Tampon</em> et <em>Fond</em>. L'angle du <em>Décalage</em> dépend de l'orientation de l'étiquette. Si vous cochez la case <em>Utilise une ombre globale</em>, alors le point zéro de l'angle est toujours orienté vers le nord et ne dépend pas de l'orientation de l'étiquette. Vous pouvez influencer l'apparence de l'ombre avec le <em>Rayon d'estompage</em>. Plus le nombre sera faible et plus les ombres seront douces. L'apparence de l'ombre portée peut également être modifiée en choisissant un mode de fusion.</p>
+<p>Sélectionnez le menu <em>Emplacement</em> pour définir la position de l'étiquette et les priorités d'étiquetage. L'option <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Décalage par rapport au point</em> offre maintenant la possibilité d'utiliser les <em>Quadrants</em> pour placer l'étiquette. En outre, vous pouvez modifier l'orientation de l'étiquette avec l'option <em>Rotation</em>. Ainsi, un emplacement dans un quadrant donné avec une rotation donnée est désormais possible. Dans la section <em>Priorité</em> vous pouvez définir la priorité d'emplacement de l'étiquette. Elle interagit avec les étiquettes des autres couches vectorielles du canevas de cartes. S'il y a des étiquettes de couches différentes au même emplacement alors l'étiquette ayant la plus haute priorité sera affichée et les autres ne le seront pas.</p>
+<p>Dans le menu <em>Rendu</em>, vous pouvez définir des options d'étiquettes et d'entités. Sous <em>Options des étiquettes</em>, vous trouverez maintenant le paramètre de visibilité selon l'échelle. Vous pouvez empêcher KADAS de n'afficher qu'un certain nombre d'étiquettes à l'aide de l'option <img src="../../../../images/checkbox.png" /> <em>Afficher toutes les étiquettes pour cette couche (même celles en conflit)</em>. Sous <em>Options des entités</em>, vous pouvez définir si chaque partie d'une entité multi-parties doit avoir son étiquette. Il est possible de définir un nombre limite d'entités à étiqueter et d’ <img src="../../../../images/checkbox.png" /> <em>Éviter que l'étiquette ne recouvre des objets</em>.</p>
+<p><img alt="" src="../../../../images/label_points.png" /></p>
+<p><strong>Étiqueter une couche de lignes</strong></p>
+<p>La première étape consiste à cocher la case <img src="../../../../images/checkbox.png" /> <em>Etiqueter cette couche avec</em> dans l'onglet <em>Étiquettes</em> et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur <img src="../../../../images/mIconExpressionEditorOpen.png" /> si vous souhaitez définir les étiquettes en vous basant sur des expressions.</p>
+<p>Ensuite, vous pouvez définir le style de texte dans le menu <em>Texte</em>. Ici, les options sont identiques à celles proposées pour les couches de points.</p>
+<p>De même, dans le menu <em>Formatage</em>, les paramètres sont identiques à ceux des couches de points.</p>
+<p>Le menu <em>Tampon</em> offre les mêmes fonctions que celles définies dans la section <a href="#labeling-point-layers">Étiqueter une couche de points</a>.</p>
+<p>Le menu <em>Fond</em> offre les mêmes entrées que celles définies dans la section <a href="#labeling-point-layers">Étiqueter une couche de points</a>.</p>
+<p>Le menu <em>Ombre</em> offre les mêmes entrées que celles définies dans la section <a href="#labeling-point-layers">Étiqueter une couche de points</a>.</p>
+<p>Dans le menu <em>Emplacement</em>, vous trouverez des options spécifiques aux couches de lignes. L'étiquette peut avoir un alignement <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Parallèle</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Courbé</em> ou <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Horizontal</em>. Avec les options <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Parallèle</em> et <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Courbé</em>, vous pouvez définir une position <img src="../../../../images/checkbox.png" /> <em>Au-dessus de la ligne</em>, <img src="../../../../images/checkbox.png" /> <em>Sur la ligne</em> ou <img src="../../../../images/checkbox.png" /> <em>En-dessous de la ligne</em>. Il est possible de sélectionner plusieurs options à la fois. Dans ce cas, KADAS recherchera la position optimale pour l'étiquette. Sachez que vous pouvez aussi utiliser l'orientation de la ligne pour positionner l'étiquette. En outre, vous pouvez définir un <em>Angle maximal des lettres (étiquettes courbes)</em> lorsque vous optez pour un emplacement <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Courbé</em>.</p>
+<p>Vous pouvez définir une distance minimale pour répéter les étiquettes. Cette distance peut être en mm ou en unités de la carte.</p>
+<p>Certaines configurations de placement proposeront plus d'options, par exemple, les Emplacements <em>Courbé</em> et <em>Parallèle</em> permettent de définir la position de l'étiquette (au-dessus, en-dessous ou sur la ligne), la <em>Distance</em> à la ligne et, pour <em>Courbé</em>, l'utilisateur peut aussi définir l'angle maximal interne/externe entre les étiquettes courbées. De la même façon que pour les couches de points vous avez la possibilité de définir une <em>Priorité</em> pour les étiquettes.</p>
+<p>Le menu <em>Rendu</em> offre presque les mêmes fonctions que celles définies pour les couches de points. Dans les <em>Options des entités</em>, vous pouvez maintenant <em>Ne pas afficher d'étiquettes pour les entités plus petites que</em>.</p>
+<p><img alt="" src="../../../../images/label_line.png" /></p>
+<p><strong>Étiqueter une couche de polygones</strong></p>
+<p>La première étape consiste à cocher la case <img src="../../../../images/checkbox.png" /> <em>Etiqueter cette couche avec</em> et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur <img src="../../../../images/mIconExpressionEditorOpen.png" /> si vous souhaitez définir les étiquettes en vous basant sur des expressions.</p>
+<p>Le menu <em>Texte</em> définit le style de texte. Les options proposées sont identiques à celles des couches de points et de lignes.</p>
+<p>Le menu <em>Formatage</em> permet de formater l'étiquette sur des lignes multiples comme pour les couches de points ou de lignes.</p>
+<p>Comme pour les points et les lignes, vous pouvez définir une zone tampon autour du texte dans le menu <em>Tampon</em>.</p>
+<p>Utilisez le menu <em>Fond</em> pour créer des arrière-plans personnalisés pour les étiquettes de polygones. Ce menu est identique à celui des couches de points ou de lignes.</p>
+<p>Les entrées du menu <em>Ombre</em> sont identiques à celles des couches de points ou de lignes.</p>
+<p>Le menu <em>Emplacement</em> propose des options spécifiques aux couches de polygones. Il s'agit notamment de <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Décalage par rapport au centroïde</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Horizontal (lent)</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Autour du centroïde</em>, <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Libre (lent)</em> et <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Selon le périmètre</em>.</p>
+<p>Avec l'option <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Décalage par rapport au centroïde</em>, vous pouvez définir si le centroïde est celui du <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>polygone visible</em> ou du <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>polygone complet</em>. Cela signifie que soit le centroïde utilisé correspond à celui de la portion de polygone qui apparaît dans votre carte, soit il est défini par rapport au polygone en entier, que vous l'ayez entièrement affiché dans votre carte ou pas. Vous pouvez placer l'étiquette selon les quadrants et définir un décalage et une rotation. L'option <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Autour du centroïde</em> permet de placer l'étiquette autour du centroïde, à une certaine distance. Là encore, il y a la possibilité de définir si le centroïde est <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>polygone visible</em> ou <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>polygone complet</em>. Avec l'option <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Selon le périmètre</em>, vous pouvez définir une position et une distance de placement pour l'étiquette. Les positions possibles sont <img src="../../../../images/checkbox.png" /> <em>Au-dessus de la ligne</em>, <img src="../../../../images/checkbox.png" /> <em>Sur la ligne</em>, <img src="../../../../images/checkbox.png" /> <em>En-dessous de la ligne</em> et <img src="../../../../images/checkbox.png" /> <em>Orientation de la ligne suivant la position</em>.</p>
+<p>En fonction du choix de la position des étiquettes, plusieurs options sont affichées. Vous pouvez ici choisir la distance au contour des polygones et l'intervalle de répétition des étiquettes sur le contour des polygones.</p>
+<p>De la même façon que pour les couches vectorielles de points et de lignes vous avez le possibilité de définir une <em>Priorité</em> pour les couches vectorielles de polygones.</p>
+<p>Le sous-menu <em>Rendu</em> propose les mêmes fonctions que celles définies pour les couches de lignes. Dans les <em>Options des entités</em>, vous pouvez choisir de <em>Ne pas afficher d'étiquettes pour les entités plus petites que</em>.</p>
+<p><img alt="" src="../../../../images/label_area.png" /></p>
+<p><strong>Défini des étiquettes basées sur des expressions</strong></p>
+<p>QGIS permet d'utiliser des expressions pour étiqueter les entités. Cliquez sur l'icône <img src="../../../../images/mIconExpressionEditorOpen.png" /> dans le menu <em>Étiquettes</em> <img src="../../../../images/mActionLabeling.png" /> de la boîte de dialogue Propriétés. Dans la figure ci-dessous vous pouvez voir un exemple d'expression pour étiqueter les régions de l'Alaska avec leur nom et leur superficie, en se basant sur le champ <em>NAME_2</em>, un texte de description et la fonction <em>$area()</em> en combinaison avec <em>format_number()</em> pour améliorer l'affichage numérique.</p>
+<p><img src="../../../../images/label_expression.png" /></p>
+<p>L'étiquetage basé sur des expressions est simple à utiliser. Tout ce dont vous avez à vous préoccuper est de combiner tous les éléments (chaînes de caractères, champs et fonctions) avec l'opérateur de concaténation || et que les champs soient entourés par des “apostrophes doubles ” et les chaînes par des <em>apostrophes simples</em>. Voici quelques exemples:</p>
+<pre><code> # label based on two fields 'name' and 'place' with a comma as separater
+ "name" || ', ' || "place"
+
+ -&gt; John Smith, Paris
+
+ # label based on two fields 'name' and 'place' separated by comma
+ 'My name is ' || "name" || 'and I live in ' || "place"
+
+ -&gt; My name is John Smith and I live in Paris
+
+ # label based on two fields 'name' and 'place' with a descriptive text
+ # and a line break (\n)
+ 'My name is ' || "name" || '\nI live in ' || "place"
+
+ -&gt; My name is John Smith
+    I live in Paris
+
+ # create a multi-line label based on a field and the $area function
+ # to show the place name and its area size based on unit meter.
+ 'The area of ' || "place" || 'has a size of ' || $area || 'm²'
+
+ -&gt; The area of Paris has a size of 105000000 m²
+
+ # create a CASE ELSE condition. If the population value in field
+ # population is &lt;= 50000 it is a town, otherwise a city.
+ 'This place is a ' || CASE WHEN "population &lt;= 50000" THEN 'town' ELSE 'city' END
+
+-&gt; This place is a town
+</code></pre>
+<p>Comme vous pouvez le constater dans le constructeur d'expressions, vous avez à votre disposition une centaine de fonctions pour créer des expressions simples ou très complexes afin d'étiqueter vos données avec KADAS. Voir <a href="expression.html#vector-expressions"><em>Expressions</em></a> pour plus d'informations et des exemples d'expressions.</p>
+<p><strong>Utiliser des valeurs de paramètres définies par les données pour l'étiquetage</strong></p>
+<p>Avec les fonctions de remplacement défini par les données, les paramètres de l'étiquetage sont remplacées par les entrées de la table d'attributs. Vous pouvez activer et désactiver cette fonction avec le bouton droit de la souris. Survolez le symbole et vous verrez les informations sur le remplacement des données définies, y compris le domaine de la définition actuelle. Nous décrivons maintenant un exemple d'utilisation de la fonction de correction de données défini pour la fonction <img src="../../../../images/mActionMoveLabel.png" /> déplacement d'étiquette.</p>
+<ol>
+<li>
+<p>Importez la couche <code>lakes.shp</code> depuis le jeu de données test de KADAS.</p>
+</li>
+<li>
+<p>Double-cliquez la couche pour ouvrir la fenêtre des Propriétés. Sélectionnez <em>Etiquettes</em> puis <em>Emplacement</em> et enfin <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Décalage par rapport au centroïde</em>.</p>
+</li>
+<li>
+<p>Dans le cadre <em>Défini par les données</em>, cliquez sur l'icône <img src="../../../../images/mIconDataDefine.png" /> pour définir le champ correspondant à la <em>coordonnée</em>. Choisissez <em>xlabel</em> pour X et <em>ylabel</em> pour Y. Les icônes revêtent maintenant une surbrillance jaune.</p>
+</li>
+<li>
+<p>Zoomez sur un lac.</p>
+</li>
+<li>
+<p>Sélectionnez l'outil <img src="../../../../images/mActionMoveLabel.png" /> de la barre d'outils Étiquettes. Vous pouvez maintenant déplacer l'étiquette manuellement vers une autre position. La nouvelle position est sauvegardée dans les colonnes <em>xlabel</em> et <em>ylabel</em> de votre table attributaire.</p>
+</li>
+</ol>
+<p><img alt="" src="../../../../images/label_data_defined.png" /></p>
+<p><img alt="" src="../../../../images/move_label.png" /></p>
+<h2 id="onglet-champs">Onglet Champs <a name="#fields-menu"></a></h2>
+<p><img src="../../../../images/attributes.png" /> Le menu <em>Champs</em> permet de manipuler les champs attributaires du jeu de données sélectionné. Les boutons <img src="../../../../images/mActionNewAttribute.png" />: sup:Nouvelle colonne et <img src="../../../../images/mActionDeleteAttribute.png" />: sup:Effacer une colonne peuvent être utilisés lorsque la couche est en <img src="../../../../images/mActionToggleEditing.png" /> <em>Mode édition</em>.</p>
+<p><strong>Outils d'édition</strong></p>
+<p><img alt="" src="../../../../images/editwidgetsdialog.png" /></p>
+<p>Dans le menu <em>Champs</em> se trouve également une colonne <strong>Outil d'édition</strong>. Cette colonne peut être utilisée pour définir des valeurs ou des plages de valeurs à utiliser pour ce champ précis de la table attributaire. Si vous cliquez sur <strong>[Outil d'édition]</strong>, il s'ouvre une fenêtre de dialogue dans laquelle vous pouvez définir différentes modalités. Celles-ci sont:</p>
+<ul>
+<li>
+<p><strong>Boîte à cocher</strong>: Affiche une case à cocher et vous pouvez définir quelle valeur stocker quand la case est cochée ou pas.</p>
+</li>
+<li>
+<p><strong>Classification</strong>: Affiche une liste déroulante avec les valeurs utilisées pour la classification, si vous avez choisi le style <em>Catégorisé</em> dans l'onglet <em>Style</em> de la fenêtre de propriétés.</p>
+</li>
+<li>
+<p><strong>Couleur</strong>: Affiche un bouton de couleur permettant de choisir une couleur via la fenêtre Sélectionner une couleur.</p>
+</li>
+<li>
+<p><strong>Date/Heure</strong>: Affiche un champ de type date/heure qui peut ouvrir un calendrier permettant de choisir une date, une heure ou les deux. Le champ doit être de type texte. Vous pouvez choisir un format personnalisé, l'affichage d'un calendrier, etc.</p>
+</li>
+<li>
+<p><strong>Énumération</strong>: Ouvre une liste déroulante avec les valeurs qui peuvent être utilisées selon la définition du type de champ. Ce mode d'édition n'est actuellement disponible que pour les couches PostgreSQL.</p>
+</li>
+<li>
+<p><strong>Nom de fichier</strong>: Simplifie la sélection d'un fichier par l'ouverture d'un explorateur de fichiers.</p>
+</li>
+<li>
+<p><strong>Cachée</strong>: Un attribut caché sera invisible. L'utilisateur ne pourra pas visualiser son contenu.</p>
+</li>
+<li>
+<p><strong>Photo</strong>: Champ contenant le nom d'un fichier de photo. La largeur et la hauteur peuvent être précisées.</p>
+</li>
+<li>
+<p><strong>Plage</strong>: Vous permet de spécifier une plage de valeurs numériques disponibles. Il peut s'agir d'une barre coulissante ou d'une zone de texte éditable.</p>
+</li>
+<li>
+<p><strong>Référence de la relation</strong>: Ce widget vous permet d'incorporer le formulaire d'entités de la couche référencée dans le formulaire de la couche courante. <em>vector_relations</em>.</p>
+</li>
+<li>
+<p><strong>Édition de texte</strong> (par défait): Ceci permet l'édition d'un texte simple ou multi-ligne. Si vous choisissez Multi-ligne, vous pouvez spécifier s'il s'agit d'un contenu en HTML.</p>
+</li>
+<li>
+<p><strong>Valeurs uniques</strong>: Vous pouvez sélectionner l'une des valeurs déjà utilisées dans cette colonne. Une ligne est affichée avec le support de l'auto-complétion si la case <em>Éditable</em> est cochée, une boîte de saisie est utilisée sinon.</p>
+</li>
+<li>
+<p><strong>Générateur d'UUID</strong>: Champ en lecture seule qui génère un UUID (Identifiant Unique Universel) lorsqu'il est vide.</p>
+</li>
+<li>
+<p><strong>Liste de valeurs</strong>: Une liste déroulante avec des valeurs prédéfinies. La valeur est stockée dans l'attribut, la description est affichée dans la liste. Vous pouvez définir des valeurs manuellement ou les charger depuis la couche ou depuis un fichier CSV.</p>
+</li>
+<li>
+<p><strong>Valeur relationnelle</strong>: Propose les valeurs stockées dans un champ d'une autre table. Vous choisissez la table, le champ clé et le champ de valeur.</p>
+</li>
+<li>
+<p><strong>Vue web</strong>: Champ contenant une URL. La largeur et la hauteur sont variables.</p>
+</li>
+</ul>
+<p>KADAS a une option avancée 'cachée' pour définir votre propre widget de champ en utilisant python et l'ajouter à cette liste impressionnante de widgets. C'est délicat mais c'est très bien expliqué dans l'excellent blog suivant qui explique comment créer un widget de validation en temps réel qui peut être utilisé comme des widgets décrits. Voir <a href="http://blog.vitu.ch/10142013-1847/write-your-own-qgis-form-elements">http://blog.vitu.ch/10142013-1847/write-your-own-qgis-form-elements</a>.</p>
+<p>Avec <strong>l'Éditeur de mise en page des attributs</strong> vous pouvez maintenant définir des formulaires intégrés. C'est utile pour les travaux de saisie de données ou pour identifier des objets en utilisant l'option d'ouverture automatique du formulaire lorsqu'il y a des objets ayant beaucoup d'attributs. Vous pouvez créer un éditeur ayant plusieurs onglets et groupes nommés pour présenter les champs d'attributs.</p>
+<p>Choisissez <em>Designer par glisser-déposer</em> et une colonne d'attributs. Utilisez l'icône <img src="../../../../images/mActionSignPlus.png" /> pour créer une catégorie pour insérer un onglet ou un groupe nommé. Lors de la création d'une nouvelle catégorie, KADAS insérera un nouvel onglet ou groupe nommé pour la catégorie dans le formulaire intégré. L'étape suivante sera d'assigner les champs pertinents à une catégorie sélectionnée avec l'icône <img src="../../../../images/mActionArrowRight.png" />. Vous pouvez créer plusieurs catégories et utiliser à nouveau les mêmes zones.</p>
+<p>Les autres options de la boîte de dialogue sont <em>Autogénérer</em> et <em>Fournir un fichier UI</em>.</p>
+<ul>
+<li><em>Autogénérer</em> crée simplement des éditeurs pour tous les champs et les met en tableaux.</li>
+<li>L'option <em>Fournir un fichier UI</em> vous permet d'utiliser des dialogues complexes réalisés avec le Qt-Designer. L'utilisation d'un fichier UI permet une grande liberté dans la création d'un dialogue. Pour des informations détaillées, voir <a href="http://nathanw.net/2011/09/05/qgis-tips-custom-feature-forms-with-python-logic/">http://nathanw.net/2011/09/05/qgis-tips-custom-feature-forms-with-python-logic/</a>.</li>
+</ul>
+<p>Les fenêtres de KADAS peuvent être associées à une fonction Python qui peut être appelée à l'ouverture de la fenêtre. Utilisez cette fonction pour ajouter des éléments supplémentaires à vos fenêtres. Un exemple est (dans le module MyForms.py):</p>
+<pre><code>def open(dialog,layer,feature):
+geom = feature.geometry()
+control = dialog.findChild(QWidged,"My line edit")
+</code></pre>
+<p>Référence à la Fonction Python Init comme ceci: <code>MyForms.open</code></p>
+<p>Le fichier MyForms.py doit être présent dans le PYTHONPATH, dans le dossier .qgis2/python ou dans le dossier du projet.</p>
+<p><img alt="" src="../../../../images/attribute_editor_layout.png" /></p>
+<p><img alt="" src="../../../../images/resulting_feature_form.png" /></p>
+<h2 id="onglet-general">Onglet Général <a name="#general-menu"></a></h2>
+<p><img src="../../../../images/general.png" /> Utilisez cet onglet pour définir les paramètres généraux de la couche vecteur. Plusieurs options sont disponibles:</p>
+<p>Informations sur la couche</p>
+<ul>
+<li>
+<p>Changez le nom affiché de la couche dans <em>Nom de la couche</em></p>
+</li>
+<li>
+<p>Définissez le fichier <em>Source de la couche</em> vectorielle</p>
+</li>
+<li>
+<p>Définissez l’<em>Encodage de la source des données</em> pour spécifier le type d'encodage utilisé dans les données source et pour pouvoir les lire correctement</p>
+</li>
+</ul>
+<p>Système de Coordonnées de Référence</p>
+<ul>
+<li>
+<p><em>Sélectionner le SCR</em>, système de coordonnées de référence. Ici vous pouvez visualiser ou modifier le SCR de la couche.</p>
+</li>
+<li>
+<p><em>Créer un index spatial</em> (uniquement pour les formats gérés par OGR),</p>
+</li>
+<li>
+<p><em>Mettre à jour l'emprise</em> dans les informations de la couche,</p>
+</li>
+<li>
+<p>Voir ou modifier la projection de la couche vecteur en cliquant sur <em>Sélectionner le SCR</em></p>
+</li>
+</ul>
+<p><img src="../../../../images/checkbox.png" /> <em>Visibilité dépendante de l'échelle</em></p>
+<ul>
+<li>Vous pouvez définir les échelles <em>Maximum (inclusif)</em> et <em>Minimum (exclusif)</em> de visualisation de la couche. Les échelles peuvent être définies via les boutons <strong>[Un outil pour définir l'échelle de visibilité]</strong>.</li>
+</ul>
+<p>Sous-ensemble de la couche</p>
+<ul>
+<li>Le bouton <strong>[Constructeur de requête]</strong> permet de définir un sous-ensemble de la couche qui sera visualisé en lieu et place de la couche complète (référez-vous également à la section <em>vector_query_builder</em>).</li>
+</ul>
+<p><img alt="" src="../../../../images/vector_general_menu.png" /></p>
+<h2 id="onglet-rendu">Onglet Rendu <a name="#rendering-menu"></a></h2>
+<p>KADAS supports for on-the-fly feature generalisation. This can improve rendering times when drawing many complex features at small scales. This feature can be enabled or disabled in the layer settings using the <img src="../../../../images/checkbox.png" /> <em>Simplify geometry</em> option. There is also a new global setting that enables generalisation by default for newly added layers (see section <a href="../introduction/qgis_configuration.html#gui-options"><em>Options</em></a>). <strong>Note</strong>: Feature generalisation may introduce artefacts into your rendered output in some cases. These may include slivers between polygons and inaccurate rendering when using offset-based symbol layers.</p>
+<h2 id="onglet-infobulles">Onglet Infobulles <a name="#display-menu"></a></h2>
+<p><img src="../../../../images/mActionMapTips.png" /> Cet onglet est spécialement créé pour les infobulles. Il inclut une nouvelle fonctionnalité: les infobulles qui affichent du texte en HTML. Alors que vous pouvez toujours choisir un <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Champ</em> à afficher lors du survol d'une entité sur la carte, il est maintenant possible d'insérer du code HTML qui crée un affichage complexe. Pour activer les infobulles, sélectionnez l'option de menu <em>Vue‣ Infobulles</em>. La figure 1 montre un exemple de code HTML.</p>
+<p><img alt="" src="../../../../images/display_html.png" /></p>
+<p><img alt="" src="../../../../images/map_tip.png" /></p>
+<h2 id="onglet-actions">Onglet Actions <a name="#actions-menu"></a></h2>
+<p><img src="../../../../images/action.png" /> KADAS est capable d'effectuer des actions basées sur les attributs d'une entité. Il peut s'agir de nombreuses actions, par exemple exécuter un programme avec des arguments construits à partir des attributs d'une entité, ou encore, passer des paramètres à un outil de publication de rapports sur internet.</p>
+<p><img alt="" src="../../../../images/action_dialog.png" /></p>
+<p>Les actions sont utiles si vous voulez exécuter fréquemment une application externe ou charger une page web basée sur une ou plusieurs valeurs de votre couche vecteur. Il en existe six types qui peuvent être utilisés de la sorte:</p>
+<ul>
+<li>
+<p>Les actions de type Générique, Mac, Windows et Unix lancent un processus externe.</p>
+</li>
+<li>
+<p>Les actions Python lancent un code Python.</p>
+</li>
+<li>
+<p>Les actions de type Générique et Python sont disponibles quel que soit le système d'exploitation.</p>
+</li>
+<li>
+<p>Les actions Mac, Windows et Unix sont disponibles uniquement depuis les systèmes d'exploitation correspondants (c'est à dire que vous pouvez définir trois actions <em>Éditer</em> qui ouvrent un éditeur et les utilisateurs ne verront que l'action correspondant à leur système d'exploitation).</p>
+</li>
+</ul>
+<p>Quelques exemples d'actions sont fournis. Vous pouvez les charger en cliquant sur <strong>[Ajouter les actions par défaut]</strong>. Un des exemples effectue une recherche basée sur la valeur d'un attribut. C'est ce qui est développé par la suite.</p>
+<p><strong>Définir des actions</strong></p>
+<p>Les actions sur les attributs sont définies depuis la fenêtre <em>Propriétés de la couche</em> vecteur. Pour définir une action, ouvrez la fenêtre <em>Propriétés de la couche</em> vecteur et cliquez sur le menu <em>Actions</em>. Allez à <em>Propriétés de l'action</em>. Sélectionnez le type <em>Générique</em> et fournissez un nom d'identification à l'action. Le texte de l'action doit lui-même contenir le nom de l'application qui sera exécutée lorsque l'action est invoquée. Vous pouvez ajouter un ou plusieurs champs en arguments pour l'application. Lorsque l'action est invoquée, tout jeu de caractères commençant par <code>%</code> suivi d'un champ sera remplacé par la valeur de ce champ. Les caractères spéciaux %% sont remplacés par la valeur du champ sélectionné dans la fenêtre <em>Identifier les résultats</em> ou dans la <em>Table attributaire</em>. Les guillemets double peuvent être utilisés pour regrouper le texte dans un argument unique pour l'application, le script ou le programme. Ils sont ignorés lorsque précédés d'un antislash.</p>
+<p>Si vous avez des noms de champs qui sont des chaînes de caractères d'autres noms de champs (par exemple, <code>col1</code> et <code>col10</code>), vous devez l'indiquer en entourant le nom du champ (et le caractère %) par des crochets (par exemple, <code>[%col10]</code>). Ceci évitera que le nom du champ <code>%col10</code> ne soit confondu avec le nom du champ <code>%col1</code> avec un <code>0</code> à la fin. Les parenthèses seront supprimées par KADAS lorsqu'il se substitue à la valeur du champ. Si vous voulez que le champ substitué soit entouré de crochets, utilisez un deuxième jeu comme celui-ci: <code>[[%col10]]]</code>.</p>
+<p>En utilisant l'outil <em>Identifier les entités</em>, vous ouvrez la fenêtre <em>Identifier les résultats</em>. Elle inclut une entrée <em>(Dérivé)</em> qui contient des informations pertinentes selon le type de couche. Les valeurs de cette entrée sont accessibles de la même manière que les autres champs en ajoutant <code>(Derived).</code> avant le nom du champ. Par exemple, une couche de points a un champ <code>X</code> et <code>Y</code> et leurs valeurs peuvent être utilisées dans l'action avec <code>%(Derived).X</code> et <code>%(Derived).Y</code>. Les attributs dérivés sont disponibles uniquement depuis la fenêtre <em>Identifier les résultats</em> mais pas par la <em>Table d'attributs</em>.</p>
+<p>Deux exemples d'action sont proposés ci-dessous:</p>
+<ul>
+<li><code>konqueror http://www.google.com/search?q=%nam</code></li>
+<li><code>konqueror http://www.google.com/search?q=%%</code></li>
+</ul>
+<p>Dans le premier exemple, le navigateur internet konqueror est lancé avec une URL. L'URL effectue une recherche Google sur la valeur du champ <code>nam</code> de la couche vecteur. Notez que l'application ou le script appelé par l'action doit être dans le path sinon vous devez fournir le chemin complet vers l'application. Pour être certain, nous pouvons réécrire le premier exemple de cette manière: <code>/opt/kde3/bin/konqueror http://www.google.com/search?q=%nam</code>. Ceci assurera que l'application konqueror sera exécutée quand l'action sera invoquée.</p>
+<p>Le deuxième exemple utilise la notation %%, qui ne dépend pas d'un champ particulier pour sa valeur. Lorsque l'action est invoquée, le %% sera remplacé par la valeur du champ sélectionné dans la table des résultats d'identification ou d'attributs.</p>
+<p><strong>Utiliser les actions</strong></p>
+<p>Les actions se lancent depuis la fenêtre <em>Identifier les résultats</em>, depuis la <em>Table d'attributs</em> ou depuis <em>Exécuter l'action de l'entité</em> (rappelez-vous que ces fenêtres s'ouvrent en cliquant sur <img src="../../../../images/mActionIdentify.png" /> <em>Identifier les entités</em>, <img src="../../../../images/mActionOpenTable.png" /> <em>Ouvrir la table d'attributs</em> ou <img src="../../../../images/mAction.png" /> <em>Exécuter l'action de l'entité</em>). Pour lancer une action, faites un clic droit sur un enregistrement et choisissez l'action depuis le menu qui apparaît. Les actions sont listées dans le menu par le nom que vous leur avez donné en les définissant. Cliquez ensuite sur l'action que vous souhaitez lancer.</p>
+<p>Si vous faites appel à une action qui utilise la notation <code>%%</code>, faites un clic droit sur la valeur du champ que vous souhaitez passer à l'application ou au script, dans la fenêtre <em>Identifier les résultats</em> ou dans la <em>Table attributaire</em>.</p>
+<p>Voici un autre exemple qui récupère des données d'une couche vecteur et qui les insère dans un fichier utilisant bash et la commande <code>echo</code> (cela ne marchera que sur  et peut-être <img src="../../../../images/osx.png" />). La couche en question a des champs pour le nom d'espèce <code>taxon_name</code>, la latitude <code>lat</code> et la longitude <code>long</code>. Nous souhaiterions faire une sélection spatiale de localisations et exporter les valeurs des enregistrements sélectionnés dans un fichier texte (ils apparaissent en jaune sur la carte dans QGIS). Voici l'action qui permettra de le faire:</p>
+<pre><code>bash -c "echo \"%taxon_name %lat %long\" &gt;&gt; /tmp/species_localities.txt"
+</code></pre>
+<p>Après avoir sélectionné quelques localités et lancé l'action sur chacune d'entre elles, le fichier de destination ressemblera à ceci:</p>
+<pre><code>Acacia mearnsii -34.0800000000 150.0800000000
+Acacia mearnsii -34.9000000000 150.1200000000
+Acacia mearnsii -35.2200000000 149.9300000000
+Acacia mearnsii -32.2700000000 150.4100000000
+</code></pre>
+<p>Comme exercice, nous allons créer une action qui réalise une recherche Google sur la couche <code>lakes</code>. Tout d'abord, nous avons besoin de déterminer l'URL nécessaire pour effectuer une recherche sur un mot clé. Il suffit simplement d'aller sur Google et faire une recherche simple puis récupérer l'URL dans la barre d'adresse de votre navigateur. De cela, nous en déduisons la formulation: <a href="http://google.com/search?q=qgis">http://google.com/search?q=qgis</a>, où <code>qgis</code> est le terme recherché. À partir de tout cela, nous pouvons poursuivre:</p>
+<ol>
+<li>
+<p>Assurez-vous que la couche <code>lakes</code> est chargée.</p>
+</li>
+<li>
+<p>Ouvrez la fenêtre <em>Propriétés de la couche</em> en double cliquant sur la couche dans la légende ou en faisant un clic droit et en choisissant <em>Propriétés</em> dans le menu qui apparaît.</p>
+</li>
+<li>
+<p>Cliquez sur l'onglet <em>Actions</em></p>
+</li>
+<li>
+<p>Entrez un nom pour l'action, par exemple <code>Recherche Google</code>.</p>
+</li>
+<li>
+<p>Pour l'action, nous devons fournir le nom du programme externe à lancer. Dans ce cas, nous allons utiliser Firefox. Si le programme n'est pas dans votre path, vous devez fournir le chemin complet.</p>
+</li>
+<li>
+<p>A la suite du nom de l'application externe, ajoutez l'URL utilisée pour faire la recherche Google, jusqu'au terme de recherche, mais sans l'ajouter: <code>http://google.com/search?q=</code></p>
+</li>
+<li>
+<p>Le texte dans le champ <em>Action</em> devrait ressembler à ceci: <code>firefox http://google.com/search?q=</code></p>
+</li>
+<li>
+<p>Cliquez sur le menu déroulant contenant les noms des champs pour la couche <code>lakes</code>. Il est situé juste à gauche du bouton <strong>[Insérer un champ]</strong>.</p>
+</li>
+<li>
+<p>Sélectionnez le champ <em>NAMES</em> du menu déroulant et cliquez sur <strong>[Insérer un champ]</strong>.</p>
+</li>
+<li>
+<p>Votre texte Action ressemble maintenant à:</p>
+<p><code>firefox http://google.com/search?q=%NAMES</code></p>
+</li>
+<li>
+<p>Pour finaliser l'action, cliquez sur le bouton <strong>[Ajouter l'action à la liste]</strong>.</p>
+</li>
+</ol>
+<p>L'action est donc entièrement définie et prête à être utilisée. Le texte final de l'action devrait correspondre à ça:</p>
+<pre><code>firefox http://google.com/search?q=%NAMES
+</code></pre>
+<p>Nous pouvons maintenant utiliser l'action. Fermez la fenêtre <em>Propriétés de la couche</em> et zoomez sur une zone d'intérêt. Assurez-vous que la couche <code>lakes</code> est active puis identifiez un lac. Dans la fenêtre de résultats, vous constatez que notre action est maintenant visible:</p>
+<p><img alt="" src="../../../../images/action_identifyaction.png" /></p>
+<p>Quand vous cliquez sur l'action, cela ouvre Firefox et charge l'URL <a href="http://www.google.com/search?q=Tustumena">http://www.google.com/search?q=Tustumena</a>. Il est également possible d'ajouter d'autres champs attributs à l'action. Pour faire cela, vous pouvez ajouter un <code>+</code> à la fin du texte de l'action, sélectionnez un autre champ et cliquez sur <strong>[Insérer un champ]</strong>. Dans cet exemple, la recherche sur un autre champ n'aurait pas de sens.</p>
+<p>Vous pouvez définir de multiples actions pour une couche et chacune apparaitra dans la fenêtre <em>Identifier les résultats</em>.</p>
+<p>Vous pouvez imaginer toutes sortes d'utilisations pour ces actions. Par exemple, si vous avez une couche de points contenant la localisation d'images ou de photos ainsi qu'un nom de fichier, vous pouvez créer une action qui lancera un visualiseur pour afficher les images. Vous pouvez également utiliser les actions pour lancer des rapports sur internet pour un champ attributaire ou une combinaison de champs, en les spécifiant de la même manière que dans l'exemple d'une recherche Google.</p>
+<p>Nous pouvons également fournir des exemples plus complexes, notamment sur la manière d'utiliser des actions <strong>Python</strong>.</p>
+<p>D'ordinaire, lorsque l'on crée une action pour ouvrir un fichier avec une application externe, on peut utiliser un chemin absolu ou relatif. Dans ce dernier cas, le chemin dépend donc de l'emplacement du fichier d'exécution du programme externe. Mais si nous souhaitons utiliser des chemins relatifs à la couche sélectionnée (stockée sous forme de fichier comme un shapefile ou une base SpatiaLite) ? Le code suivant permet de le faire:</p>
+<pre><code>command = "firefox";
+imagerelpath = "images_test/test_image.jpg";
+layer = qgis.utils.iface.activeLayer();
+import os.path;
+layerpath = layer.source() if layer.providerType() == 'ogr'
+  else (qgis.core.QgsDataSourceURI(layer.source()).database()
+  if layer.providerType() == 'spatialite' else None);
+path = os.path.dirname(str(layerpath));
+image = os.path.join(path,imagerelpath);
+import subprocess;
+subprocess.Popen( [command, image ] );
+</code></pre>
+<p>Il faut simplement se rappeler qu'il s'agit d'une action <em>Python</em> et qu'il faut modifier les variables <em>command</em> et <em>imagerelpath</em> selon vos besoins.</p>
+<p>Et si le chemin relatif doit dépendre du fichier de projet (sauvegardé) ? Le code de l'action Python deviendra:</p>
+<pre><code>command="firefox";
+imagerelpath="images/test_image.jpg";
+projectpath=qgis.core.QgsProject.instance().fileName();
+import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
+image=os.path.join(path, imagerelpath);
+import subprocess;
+subprocess.Popen( [command, image ] );
+</code></pre>
+<p>Un autre exemple d'action Python consiste à ajouter de nouvelles couche au projet. L'exemple qui suit montre comment ajouter une couche vecteur et un raster. Les noms des fichiers à ajouter au projet et les noms à donner aux couches dépendent de données attributaires (<em>filename</em> et <em>layername</em> sont deux champs de la table attributaire de la couche sur laquelle l'action est créée):</p>
+<pre><code>qgis.utils.iface.addVectorLayer('/yourpath/[% "filename" %].shp','[% "layername" %]',
+  'ogr')
+</code></pre>
+<p>Pour ajouter un raster (ici une image TIF), cela devient:</p>
+<pre><code>qgis.utils.iface.addRasterLayer('/yourpath/[% "filename" %].tif','[% "layername" %]
+')
+</code></pre>
+<h2 id="onglet-jointures">Onglet Jointures <a name="#joins-menu"></a></h2>
+<p><img src="../../../../images/join.png" /> L'onglet <em>Jointures</em> permet de joindre une table attributaire chargée à une couche vecteur chargée. Après avoir cliqué sur le bouton <img src="../../../../images/mActionSignPlus.png" />, la fenêtre <em>Ajouter une jointure vectorielle</em> apparaît. Vous devez définir une couche de jointure à connecter à la couche cible. Ensuite, vous devez définir un champ de jointure qui sera commun à la table à joindre et à la table attributaire de la couche cible. Vous pouvez enfin spécifier la liste des champs à joindre en cochant la case <img src="../../../../images/checkbox.png" /> <em>Choisir les champs à joindre</em>. Il en résulte que toutes les informations de la table à joindre seront affichés en plus des champs de la table cible. Si vous avez spécifié une liste de champs à joindre, seuls ceux-ci apparaîtront dans la table attributaire de la couche cible.</p>
+<p>Actuellement, KADAS gère les jointures de tables non spatiales aux formats pris en charge par OGR (par exemple CSV, DBF, Excel), au format texte délimité et issues de PostgreSQL.</p>
+<p><img alt="" src="../../../../images/join_attributes.png" /></p>
+<p>De plus, la fenêtre de jointure vous permet de:</p>
+<ul>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Mettre la couche jointe en cache dans la mémoire virtuelle</em></p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Créer un index des attributs joins</em></p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Choisir les champs à joindre</em></p>
+</li>
+<li>
+<p><img src="../../../../images/checkbox.png" /> <em>Personnaliser le préfixe du champ</em></p>
+</li>
+</ul>
+<h2 id="onglet-diagrammes">Onglet Diagrammes <a name="#diagrams-menu"></a></h2>
+<p><img src="../../../../images/diagram.png" /> L'onglet <em>Diagrammes</em> permet d'ajouter une couche de graphiques sur une couche vecteur.</p>
+<p>Cet onglet permet de générer des diagrammes circulaires, textes et des histogrammes.</p>
+<p>L'onglet est subdivisé en quatre sous-onglets: <em>Apparence</em>, <em>Taille</em>, <em>Postion</em> et <em>Options</em>.</p>
+<p>Dans les cas de diagramme texte ou en camembert, les valeurs texte des différentes colonnes de données sont affichées les unes en-dessous des autres à l'intérieur d'un cercle ou dans une boîte avec des diviseurs. Dans l'onglet <em>Taille</em>, la taille du diagramme est basée sur une taille fixe ou sur la mise à l'échelle linéaire selon un attribut de classification. Le placement des diagrammes, qui se fait dans l'onglet <em>Position</em>, est en interaction avec l'étiquetage, donc des conflits de position entre les diagrammes et les étiquettes sont détectés et résolus. En outre, les positions de diagramme peuvent être fixées manuellement.</p>
+<p><img alt="" src="../../../../images/diagram_tab.png" /></p>
+<p>Nous allons vous montrer un exemple en superposant aux frontières de l'Alaska des données concernant la température issues d'une couche vecteur portant sur le climat. Toutes ces couches sont disponibles dans l'échantillon de données QGIS (voir section <a href="../introduction/getting_started.html#label-sampledata"><em>Échantillon de données</em></a>).</p>
+<ol>
+<li>
+<p>Tout d'abord, cliquez sur le bouton <img src="../../../../images/mActionAddOgrLayer.png" /> <em>Ajouter une couche vecteur</em>, naviguez jusqu'au jeu de données exemples de KADAS et ajoutez les deux couches <code>alaska.shp</code> et <code>climate.shp</code>.</p>
+</li>
+<li>
+<p>Double-cliquez sur la couche <code>climate</code> dans la légende pour ouvrir la fenêtre de <em>Propriétés de la Couche</em>.</p>
+</li>
+<li>
+<p>Cliquez sur l'onglet <em>Diagrammes</em>, activez la case <img src="../../../../images/checkbox.png" /> <em>Afficher les diagrammes</em> et choisissez ‘Diagramme texte<code>dans la liste déroulante</code>Type de diagramme`.</p>
+</li>
+<li>
+<p>Dans l'onglet <em>Apparence</em>, nous choisissons le bleu clair comme couleur de fond et définissons une taille fixe de 18 mm dans l'onglet <em>Taille</em>.</p>
+</li>
+<li>
+<p>Dans l'onglet <em>Position</em>, l'emplacement défini est Autour du point.</p>
+</li>
+<li>
+<p>Sur le diagramme, nous souhaiterions afficher les valeurs de trois colonnes T_F_JAN`, <code>T_F_JUL</code> et <code>T_F_MEAN</code>. D'abord, sélectionnez <code>T_F_JAN</code> de la colonne <em>Attributs</em> et cliquez sur le bouton <img src="../../../../images/mActionSignPlus.png" /> puis <code>T_F_JUL</code> et enfin <code>T_F_MEAN</code>.</p>
+</li>
+<li>
+<p>Cliquez maintenant sur <strong>[Appliquer]</strong> pour afficher les diagrammes sur la carte.</p>
+</li>
+<li>
+<p>Vous pouvez adapter la taille du graphique dans l'onglet <em>Taille</em>. Décochez <img src="../../../../images/checkbox.png" /> <em>Taille Fixe</em> et définissez la taille des diagrammes en fonction d'un attribut avec le bouton <strong>[Trouver la valeur maximale]</strong> et la liste déroulante <em>Taille</em>. Si les diagrammes apparaissent trop petits à l'écran, vous pouvez cocher la case <img src="../../../../images/checkbox.png" /> <em>Augmenter la taille des petits diagrammes</em> et définir la Taille minimale des diagrammes.</p>
+</li>
+<li>
+<p>Changez les couleurs des attributs en double-cliquant sur les rectangles colorées dans le champ <em>Attributs utilisés</em>.</p>
+</li>
+<li>
+<p>Cliquez enfin sur <strong>[OK]</strong>.</p>
+</li>
+</ol>
+<p><img src="../../../../images/climate_diagram.png" /></p>
+<p>N'oubliez pas que, dans l'onglet <em>Position</em>, en cochant la case <img src="../../../../images/checkbox.png" /> <em>Source de définition de la position</em>, vous pouvez utiliser des valeurs d'attributs pour choisir l'emplacement des diagrammes. Par ailleurs, dans l'onglet <em>Apparence</em>, vous pouvez définir la visibilité en fonction de l'échelle.</p>
+<p>La taille et les attributs peuvent aussi être une expression. Utilisez le bouton <img src="../../../../images/mIconExpressionEditorOpen.png" /> pour ajouter une expression. Voir <a href="expression.html#vector-expressions"><em>Expressions</em></a> pour plus d'informations et des exemples.</p>
+<h2 id="onglet-metadonnees">Onglet Métadonnées <a name="#metadata-menu"></a></h2>
+<p><img src="../../../../images/metadata.png" /> Le menu <em>Métadonnées</em> comprend les sections <em>Description</em>, <em>Attribution</em>, <em>URL Métadonnées</em>, <em>LegendURL</em> et <em>Propriétés</em>.</p>
+<p>Dans la section <em>Propriétés</em>, vous disposez des informations générales sur la couche, y compris celles spécifiques à son type, sa localisation, le nombre d'entités, le type d'entités et les possibilités d'édition. La table <em>Emprise</em> vous fournit les informations sur l'emprise de la couche et le <em>Système de Référence Spatiale de la Couche</em> qui est une information sur le SCR de la couche. Voici un moyen rapide d'obtenir des informations sur la couche.</p>
+<p>En complément, vous pouvez ajouter ou éditer un titre ainsi qu'un résumé pour la couche dans la section <em>Description</em>. Il est aussi possible de définir ici une <em>Liste de mots-clés</em>. Ces listes de mots-clés peuvent être utilisées dans un catalogue de métadonnées. Si vous souhaitez utiliser un titre depuis un fichier XML de métadonnées, vous devez renseigner un lien dans le champ <em>DataUrl</em>. Utilisez <em>Attribution</em> pour récupérer les données d'attributs depuis un catalogue de métadonnées XML. Dans le champ <em>URL Métadonnées</em>, vous pouvez définir le chemin général d'accès au catalogue de métadonnées XML. Cette information sera stockée dans le fichier de projet KADAS pour les sessions suivantes et sera utilisée par KADAS server.</p>
+<p><img alt="" src="../../../../images/vector_metadata_tab.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../supported_data/" class="btn btn-neutral float-left" title="Données vectorielles"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../expression/" class="btn btn-neutral float-right" title="Expressions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../supported_data/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../expression/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

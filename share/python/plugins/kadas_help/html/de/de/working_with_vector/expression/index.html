@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Ausdrücke - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Ausdr\u00fccke";
+        var mkdocs_page_input_path = "de/working_with_vector/expression.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Benutzeroberfläche</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Erweiterte Funktionalitäten</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Vektorebenen</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Ausdrücke</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#funktionsliste">Funktionsliste </a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../field_calculator/">Feldrechner</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rasterebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Eigenschaftendialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Druckzusammenstellung</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Erweiterte Funktionalitäten &raquo;</li>
+          <li>Vektorebenen &raquo;</li>
+      <li>Ausdrücke</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ausdrucke">Ausdrücke <a name="#expressions"></a></h1>
+<p>Die Funktion <strong>Expressions</strong> steht über den Feldrechner oder das Hinzufügen einer neuen Spaltenschaltfläche in der Attributtabelle oder der Registerkarte Feld in den Layereigenschaften zur Verfügung; über das abgestufte, kategorisierte und regelbasierte Rendering in der Registerkarte Style der Layereigenschaften; über die expressionsbasierte Beschriftung <img src="../../../../images/browsebutton.png" /> in der <img src="../../../../images/mActionLabeling.png" /> <em>Labeling</em> Kernanwendung; durch die Featureauswahl und durch den Diagrammreiter der Layereigenschaften sowie die <em>Haupteigenschaften</em> des Labelelements und die Registerkarte <em>Atlasgenerierung</em> im Print Composer.</p>
+<p>Sie sind eine leistungsfähige Möglichkeit, den Attributwert zu manipulieren, um den Endwert dynamisch zu ändern, um den Geometrie-Stil, den Inhalt des Labels, den Wert für das Diagramm, die Auswahl eines Features oder die Erstellung einer virtuellen Spalte zu ändern.</p>
+<h2 id="funktionsliste">Funktionsliste <a name="#functions-list"></a></h2>
+<p>Die <strong>Funktionsliste</strong> enthält Funktionen genauso wie Felder und Werte. Sehen Sie sich die Hilfefunktionen im <strong>Hilfe zu gewählten Funktionen</strong> Bereich an. In <strong>Ausdruck</strong> sehen Sie die Berechnungsausdrücke, die Sie mit der <strong>Funktionsliste</strong> erstellt haben. Für die gebräuchlichsten Operatoren siehe <strong>Operatoren</strong>.</p>
+<p>Klicken Sie in der <strong>Funktionsliste</strong> auf <em>Felder und Werte</em> um alle durchsuchbaren Attribute der Attributtabelle anschauen zu können. Um ein Attribut dem Feldrechner <strong>Ausdruck</strong> Feld hinzuzufügen doppelklicken Sie seinen Namen in der <em>Felder und Werte</em> Liste. Im Allgmeinen können Sie die diversen Felder, Werte und Funktionen benutzen um den Berechnungsausdruck aufzubauen, oder Sie geben in einfach direkt ins Fenster ein. Um die Werte eines Feldes darzustellen müssen Sie einfach einen Rechtsklick auf das entsprechende Feld machen. Sie können zwischen <em>10 Stichproben</em> und <em>Alle eindeutigen</em> wählen. Auf der rechten Seite öffnet sich die <strong>Feldwerte</strong> Liste mit den eindeutigen Werten. Um dem Feldrechner <strong>Ausdruck</strong> Fenster einen Wert hinzuzufügen, machen Sie einen Doppelklick auf den Namen in der <strong>Feldwerte</strong> Liste.</p>
+<p>Die Gruppen <em>Operatoren</em>, <em>Mathematik</em>, <em>Umwandlungen</em>, <em>Zeichenketten</em>, <em>Geometrie</em> und <em>Datensatz</em> stellen zahlreiche Funktionen zur Verfügung. In <em>Operatoren</em> finden Sie mathematische Operatoren. Suchen Sie in <em>Mathematik</em> nach mathematischen Funktionen. Die <em>Umwandlungen</em> Gruppe enthält Funktionen die einen Datentyp in einen anderen konvertieren. Die <em>Zeichenkette</em> Gruppe stellt Funktionen für Datenketten zur Verfügung. In der <em>Geometrie</em> Gruppe finden Sie Funktionen für Geometrieobjekte. Mit den Funktionen der <em>Datensatz</em> Gruppe können Sie Ihren Datensatz mit einer Nummerierung versehen. Um eine Funktion in die <strong>Ausdruck</strong> Box des Feldrechners hinzuzufügen klicken Sie auf &gt; und doppelklicken Sie dann die Funktion.</p>
+<h3 id="operatoren">Operatoren <a name="#operators"></a></h3>
+<p>Diese Gruppe enthält Operatoren (z.B. +, -, -, *).</p>
+<pre><code>a + b      a plus b
+a - b      a minus b
+a * b      a multiplied by b
+a / b      a divided by b
+a % b      a modulo b (for example, 7 % 2 = 1, or 2 fits into 7 three
+           times with remainder 1)
+a ^ b      a power b (for example, 2^2=4 or 2^3=8)
+a = b      a and b are equal
+a &gt; b      a is larger than b
+a &lt; b      a is smaller than b
+a &lt;&gt; b     a and b are not equal
+a != b     a and b are not equal
+a &lt;= b     a is less than or equal to b
+a &gt;= b     a is larger than or equal to b
+a ~ b      a matches the regular expression b
++ a        positive sign
+- a        negative value of a
+||         joins two values together into a string 'Hello' || ' world'
+LIKE       returns 1 if the string matches the supplied pattern
+ILIKE      returns 1 if the string matches case-insensitive the supplied
+           pattern (ILIKE can be used instead of LIKE to make the match
+           case-insensitive)
+IS         returns 1 if a is the same as b
+OR         returns 1 when condition a or b is true
+AND        returns 1 when condition a and b are true
+NOT        returns 1 if a is not the same as b
+column name "column name"     value of the field column name, take
+                              care to not be confused with simple
+                              quote, see below
+'string'                      a string value, take care to not be
+                              confused with double quote, see above
+NULL                          null value
+a IS NULL                     a has no value
+a IS NOT NULL                 a has a value
+a IN (value[,value])          a is below the values listed
+a NOT IN (value[,value])      a is not below the values listed
+</code></pre>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li>
+<p>Verbindet eine Zeichenkette und einen Wert von einem Spaltennamen:</p>
+<pre><code>'My feature's id is: ' || "gid"
+</code></pre>
+</li>
+<li>
+<p>Testen Sie, ob das Attributfeld "description" mit der Zeichenkette "Hello" im Wert beginnt (beachten Sie die Position des %-Zeichens):</p>
+<pre><code>"description" LIKE 'Hello%'
+</code></pre>
+</li>
+</ul>
+<h3 id="bedingungen">Bedingungen <a name="#conditionals"></a></h3>
+<p>Diese Gruppe enthält Funktionen um bedingte Prüfungen in Ausdrücken zu handhaben.</p>
+<pre><code>CASE                          evaluates multiple expressions and returns a
+                              result
+CASE ELSE                     evaluates multiple expressions and returns a
+                              result
+coalesce                      returns the first non-NULL value from the
+                              expression list
+regexp_match                  returns true if any part of a string matches
+                              the supplied regular expression
+</code></pre>
+<p><strong>Beispiele:</strong></p>
+<ul>
+<li>Sende einen Wert zurück wenn die erste Bedingung wahr ist, sonst einen anderen Wert:<pre><code>CASE WHEN "software" LIKE '%QGIS%' THEN 'QGIS' ELSE 'Other'
+</code></pre>
+</li>
+</ul>
+<h3 id="mathematische-funktionen">Mathematische Funktionen <a name="#mathematical-functions"></a></h3>
+<p>Diese Gruppe enthält mathematische Funktionen (z.B. sqrt, sin und cos).</p>
+<pre><code>sqrt(a)                       square root of a
+abs                           returns the absolute value of a number
+sin(a)                        sine of a
+cos(a)                        cosine of a
+tan(a)                        tangent of a
+asin(a)                       arcsin of a
+acos(a)                       arccos of a
+atan(a)                       arctan of a
+atan2(y,x)                    arctan of y/x using the signs of the two
+                              arguments to determine the quadrant of the
+                              result
+exp                           exponential of a value
+ln                            value of the natural logarithm of the passed
+                              expression
+log10                         value of the base 10 logarithm of the passed
+                              expression
+log                           value of the logarithm of the passed value
+                              and base
+round                         round to number of decimal places
+rand                          random integer within the range specified by
+                              the minimum
+                              and maximum argument (inclusive)
+randf                         random float within the range specified by
+                              the minimum
+                              and maximum argument (inclusive)
+max                           largest value in a set of values
+min                           smallest value in a set of values
+clamp                         restricts an input value to a specified
+                              range
+scale_linear                  transforms a given value from an input
+                              domain to an output
+                              range using linear interpolation
+scale_exp                     transforms a given value from an input
+                              domain to an output
+                              range using an exponential curve
+floor                         rounds a number downwards
+ceil                          rounds a number upwards
+$pi                           pi as value for calculations
+</code></pre>
+<h3 id="umwandlungen">Umwandlungen <a name="#conversions"></a></h3>
+<p>Diese Gruppe enthält Funktionen, um einen Datentypen in einen anderen umzuwandeln (z.B. Zeichenketten zu Ganzzahlen oder umgekehrt).</p>
+<pre><code>toint                        converts a string to integer number
+toreal                       converts a string to real number
+tostring                     converts number to string
+todatetime                   converts a string into Qt data time type
+todate                       converts a string into Qt data type
+totime                       converts a string into Qt time type
+tointerval                   converts a string to an interval type (can be
+                             used to take days, hours, months, etc. off a
+                             date)
+</code></pre>
+<h3 id="datum-und-zeit-funktionen">Datum und Zeit Funktionen <a name="#date-and-time-functions"></a></h3>
+<p>Diese Gruppe enthält Funktionen die auf Datums- und Zeitdaten angewendet werden können.</p>
+<pre><code>$now       current date and time
+age        difference between two dates
+year       extract the year part from a date, or the number of years from
+           an interval
+month      extract the month part from a date, or the number of months
+           from an interval
+week       extract the week number from a date, or the number of weeks
+           from an interval
+day        extract the day from a date, or the number of days from an
+           interval
+hour       extract the hour from a datetime or time, or the number
+           of hours from an interval
+minute     extract the minute from a datetime or time, or the number
+           of minutes from an interval
+second     extract the second from a datetime or time, or the number
+           of minutes from an interval
+</code></pre>
+<p><strong>Einige Beispiele:</strong></p>
+<ul>
+<li>Lassen Sie sich den Monat und das Jahr von heute im Format “10/2014” herausgeben:<pre><code>month($now) || '/' || year($now)
+</code></pre>
+</li>
+</ul>
+<h3 id="zeichenkettenfunktionen">Zeichenkettenfunktionen <a name="#string-functions"></a></h3>
+<p>Diese Gruppe enthält Funktionen für Zeichenketten (z.B. Ersetzen und in Großbuchstaben umwandeln).</p>
+<pre><code>lower                        convert string a to lower case
+upper                        convert string a to upper case
+title                        converts all words of a string to title
+                             case (all words lower case with leading
+                             capital letter)
+trim                         removes all leading and trailing white
+                             space (spaces, tabs, etc.) from a string
+wordwrap                     returns a string wrapped to a maximum/
+                             minimum number of characters
+length                       length of string a
+replace                      returns a string with the supplied string
+                             replaced
+regexp_replace(a,this,that)  returns a string with the supplied regular
+                             expression replaced
+regexp_substr                returns the portion of a string which matches
+                             a supplied regular expression
+substr(*a*,from,len)         returns a part of a string
+concat                       concatenates several strings to one
+strpos                       returns the index of a regular expression
+                             in a string
+left                         returns a substring that contains the n
+                             leftmost characters of the string
+right                        returns a substring that contains the n
+                             rightmost characters of the string
+rpad                         returns a string with supplied width padded
+                             using the fill character
+lpad                         returns a string with supplied width padded
+                             using the fill character
+format                       formats a string using supplied arguments
+format_number                returns a number formatted with the locale
+                             separator for thousands (also truncates the
+                             number to the number of supplied places)
+format_date                  formats a date type or string into a custom
+                             string format
+</code></pre>
+<h3 id="farbfunktionen">Farbfunktionen <a name="#color-functions"></a></h3>
+<p>Diese Gruppe enthält Funktionen zur Farbmanipulation.</p>
+<pre><code>color_rgb       returns a string representation of a color based on its
+                red, green, and blue components
+color_rgba      returns a string representation of a color based on its
+                red, green, blue, and alpha (transparency) components
+ramp_color      returns a string representing a color from a color ramp
+color_hsl       returns a string representation of a color based on its
+                hue, saturation, and lightness attributes
+color_hsla      returns a string representation of a color based on its
+                hue, saturation, lightness and alpha (transparency)
+                attributes
+color_hsv       returns a string representation of a color based on its
+                hue, saturation, and value attributes
+color_hsva      returns a string representation of a color based on its
+                hue, saturation, value and alpha (transparency) attributes
+color_cmyk      returns a string representation of a color based on its
+                cyan, magenta, yellow and black components
+color_cmyka     returns a string representation of a color based on its
+                cyan, magenta, yellow, black and alpha (transparency)
+                components
+</code></pre>
+<h3 id="geometriefunktionen">Geometriefunktionen <a name="#geometry-functions"></a></h3>
+<p>Dies Gruppe enthält Funktionen für das Arbeiten mit Geometrieobjekten (z.B. Länge und Flächeninhalt).</p>
+<pre><code>$geometry        returns the geometry of the current feature (can be used
+                 for processing with other functions)
+$area            returns the area size of the current feature
+$length          returns the length size of the current feature
+$perimeter       returns the perimeter length of the current feature
+$x               returns the x coordinate of the current feature
+$y               returns the y coordinate of the current feature
+xat              retrieves the nth x coordinate of the current feature.
+                 n given as a parameter of the function
+yat              retrieves the nth y coordinate of the current feature.
+                 n given as a parameter of the function
+xmin             returns the minimum x coordinate of a geometry.
+                 Calculations are in the Spatial Reference System of this
+                 Geometry
+xmax             returns the maximum x coordinate of a geometry.
+                 Calculations are in the Spatial Reference System of this
+                 Geometry
+ymin             returns the minimum y coordinate of a geometry.
+                 Calculations are in the Spatial Reference System of this
+                 Geometry
+ymax             returns the maximum y coordinate of a geometry.
+                 Calculations are in the Spatial Reference System of this
+                 Geometry
+geomFromWKT      returns a geometry created from a well-known text (WKT)
+                 representation
+geomFromGML      returns a geometry from a GML representation of geometry
+bbox
+disjoint         returns 1 if the geometries do not share any space
+                 together
+intersects       returns 1 if the geometries spatially intersect
+                 (share any portion of space) and 0 if they don't
+touches          returns 1 if the geometries have at least one point in
+                 common, but their interiors do not intersect
+crosses          returns 1 if the supplied geometries have some, but not
+                 all, interior points in common
+contains         returns true if and only if no points of b lie in the
+                 exterior of a, and at least one point of the interior
+                 of b lies in the interior of a
+overlaps         returns 1 if the geometries share space, are of the
+                 same dimension, but are not completely contained by
+                 each other
+within           returns 1 if geometry a is completely inside geometry b
+buffer           returns a geometry that represents all points whose
+                 distance from this geometry is less than or equal to
+                 distance
+centroid         returns the geometric center of a geometry
+bounds           returns a geometry which represents the bounding box of
+                 an input geometry. Calculations are in the Spatial
+                 Reference System of this Geometry.
+bounds_width     returns the width of the bounding box of a geometry.
+                 Calculations are in the Spatial Reference System of
+                 this Geometry.
+bounds_height    returns the height of the bounding box of a geometry.
+                 Calculations are in the Spatial Reference System of
+                 this Geometry.
+convexHull       returns the convex hull of a geometry (this represents
+                 the minimum convex geometry that encloses all geometries
+                 within the set)
+difference       returns a geometry that represents that part of geometry
+                 a that does not intersect with geometry b
+distance         returns the minimum distance (based on spatial ref)
+                 between two geometries in projected units
+intersection     returns a geometry that represents the shared portion
+                 of geometry a and geometry b
+symDifference    returns a geometry that represents the portions of a and
+                 b that do not intersect
+combine          returns the combination of geometry a and geometry b
+union            returns a geometry that represents the point set union of
+                 the geometries
+geomToWKT        returns the well-known text (WKT) representation of the
+                 geometry without SRID metadata
+geometry         returns the feature's geometry
+transform        returns the geometry transformed from the source CRS to
+                 the dest CRS
+</code></pre>
+<h3 id="datensatzfunktionen">Datensatzfunktionen <a name="#record-functions"></a></h3>
+<p>Diese Gruppe enthält Funktionen die sich auf datensatzbezeichner beziehen.</p>
+<pre><code>$rownum                  returns the number of the current row
+$id                      returns the feature id of the current row
+$currentfeature          returns the current feature being evaluated.
+                         This can be used with the 'attribute' function
+                         to evaluate attribute values from the current
+                         feature.
+$scale                   returns the current scale of the map canvas
+$uuid                    generates a Universally Unique Identifier (UUID)
+                         for each row. Each UUID is 38 characters long.
+getFeature               returns the first feature of a layer matching a
+                         given attribute value.
+attribute                returns the value of a specified attribute from
+                         a feature.
+$map                     returns the id of the current map item if the map
+                         is being drawn in a composition, or "canvas" if
+                         the map is being drawn within the main QGIS
+                         window.
+</code></pre>
+<h3 id="felder-und-werte">Felder und Werte <a name="#fields-and-values"></a></h3>
+<p>Enthält eine Liste von Feldern vom Layer. Auf Beispielwerte kann über einen Rechtsklick zugegriffen werden.</p>
+<p>Wählen Sie einen Feldnamen aus der Liste, machen Sie dann einen Rechtsklick, um auf ein Kontextmenü mit Optionen zum Laden von Beispielwerten aus dem gewählten Feld zuzugreifen.</p>
+<p>Feldnamen sollten in doppelte Anführungsstriche gesetzt werden. Werte oder Zeichenketten sollten in einfache Anführungsstriche gesetzt werden.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../vector_properties/" class="btn btn-neutral float-left" title="Eigenschaftendialog"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../field_calculator/" class="btn btn-neutral float-right" title="Feldrechner">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../vector_properties/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../field_calculator/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

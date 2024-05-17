@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Map - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Map";
+        var mkdocs_page_input_path = "en/map.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Map</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#projects">Projects</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-and-saving-maps">Creating and saving maps</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#open-projects">Open projects</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#printing">Printing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#printing-dialog">Printing dialog</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#print-layouts">Print Layouts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#map-cartouche">Map Cartouche</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#print-output">Print output</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#copy-map-save-map">Copy map / Save map</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#kml-kmz-export-and-import">KML / KMZ export and import</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gpkg-export-and-import">GPKG Export and Import</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Advanced functionalities</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Map</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="map">Map</h1>
+<h2 id="projects"><a name="sec0"></a>Projects</h2>
+<p>Maps can be loaded and saved as projects. The QGIS project format is used, ending with <em>*.qgz</em>. Projects are created from templates. When starting the application, a project is automatically created from an online or offline template, depending on whether the computer is connected to the network.</p>
+<h2 id="creating-and-saving-maps"><a name="sec1"></a>Creating and saving maps</h2>
+<p>The functions <strong><em>New</em></strong>, <strong><em>Open</em></strong>, <strong><em>Save</em></strong> and <strong><em>Save as</em></strong> allow creating new projects (from a template), opening existing projects and saving open projects.</p>
+<h2 id="open-projects"><a name="sec2"></a>Open projects</h2>
+<p>Saved maps (projects) can be opened with the <strong><em>Open</em></strong> functionality.</p>
+<h2 id="printing"><a name="sec3"></a>Printing</h2>
+<p>The <strong><em>Print</em></strong> functionality allows printing the current map or exporting it to a file. </p>
+<p>Printing is based on layouts. By default, layouts for A0 through A6 are available in both landscape and portrait modes, as well as a Custom layout.</p>
+<p>When the layout is selected, the main map window displays a blue semi-transparent rectangle that corresponds to the section to be printed. For fixed-size layouts, this rectangle can be moved in the main map to adjust the print area. The size of the rectangle is derived from the paper size and the scale specified in the print dialog. In the case of the <em>Custom</em> layout, the section is numerically defined along with the scale in the print dialog, and the resulting paper size is dynamically calculated according to this information.</p>
+<p>When printing additional elements, coordinate grid, card cartridge, legend, and scale bar can be shown or hidden as desired. The position of these elements is defined in the layout.</p>
+<p><img src="../../../media/image12.png" /></p>
+<h3 id="printing-dialog">Printing dialog</h3>
+<ul>
+<li><strong>Layout</strong>: Choice of the printing template. A print-preview is displayed.</li>
+<li><strong>Title</strong>: The title to be displayed.</li>
+<li><strong>Scale</strong>: The scale of the printed map</li>
+<li><strong>Grid</strong>: If the Grid secion is expanded, a grid is overlayed on the map.</li>
+<li><strong>Coordinate System</strong>: Choice of the coordinate system to use for the grid</li>
+<li><strong>Interval X</strong>: Grid line spacing in X direction</li>
+<li><strong>Interval Y</strong>: Grid line spacing in Y direction</li>
+<li><strong>Coordinate labels</strong>: Toggling of the coordinate labels</li>
+<li><strong>Map cartouche</strong>: Toggling of the map cartouche</li>
+<li><strong>Edit map cartouche</strong>: Setup of the map cartouche</li>
+<li><strong>Scalebar</strong>: Toggling of the scale bar</li>
+<li><strong>Legend</strong>: Enable or disable the map legend, via the <em>Configure</em> button it is furthermore possible to separately choose which layers are shown in the legend</li>
+<li><strong>File format</strong>: Choice of the file format when exporting to a file</li>
+</ul>
+<h3 id="print-layouts">Print Layouts</h3>
+<p>The print layouts contained in the project can be managed in the <em>Print Layout Manager</em> dialog, which can be opened by pressing the button to the right of the print layout selection. There, individual layouts can be imported, exported and removed from the project.</p>
+<p><img src="../../../media/image12.1.png" /></p>
+<h3 id="map-cartouche">Map Cartouche</h3>
+<p>This dialog allows the user to set up the map <strong><em>cartouche</em></strong>. The meaning of each field is show as a place-holder text. If the <strong>Exercise</strong> checkbox is active, fields for describing an exercise will be activated.</p>
+<p>Furthermore, the map cartouche content can be imported and exported as a separate XML file in the cartouche dialog.</p>
+<h3 id="print-output">Print output</h3>
+<ul>
+<li><strong>Export</strong>: A file-based export will be performed, using the chosen file format.</li>
+<li><strong>Print</strong>: A printer selection dialog will be shown and the printing job will be submitted to the selected printer.</li>
+<li><strong>Close</strong>: Will close the printing dialog.</li>
+<li><strong>Advanced</strong>: Will open the advanced print layout editor</li>
+</ul>
+<h2 id="copy-map-save-map"><a name="sec4"></a>Copy map / Save map</h2>
+<p>These functions allow the user to save the map extent visible in the main map frame to the clipboard or to a file. The contents of the map is saved exactely as it is rendered in the application.</p>
+<p>The function <strong><em>Save map</em></strong> opens a file dialog where the output path and image type (PNG, JPG, etc.) can be selected. A world file (with extension PNGW, JPGW, etc.) saved in the same folder georeferences the image.</p>
+<h2 id="kml-kmz-export-and-import"><a name="sec5"></a>KML / KMZ export and import</h2>
+<p>The map content can be exported as KML or KMZ. Images, raster layers as well as MSS symbols are only exported in the KMZ format.</p>
+<p>KMZ/KML files can also be imported into KADAS.</p>
+<p><em>Note</em>: KMZ and KML are lossy export formats, and therefore not suitable for exchange between KADAS users. The native <em>*.qgs</em> project format should be used for this.</p>
+<h2 id="gpkg-export-and-import"><a name="sec6"></a>GPKG Export and Import</h2>
+<p>The KADAS GeoPackage (GPKG) is a SQLite based file format, which packs both local geodata contained in a project and the project itself into one file, and thus offers a practical possibility to exchange projects and data.</p>
+<p>When performing a GPKG Project Export, you can choose which geodata should be written to the GeoPackage, the project saved in the GPKG will then reference the data directly from the GPKG. In addition, it can be decided whether an existing GPKG should be updated or completely replaced. In the first case, existing data will be preserved in the GPKG, even if not referenced by the project.</p>
+<p>During import, a KADAS project is searched and opened from the GPKG, and geodata referenced from the GPKG are loaded directly from it.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../kadas_gui/" class="btn btn-neutral float-left" title="The Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../view/" class="btn btn-neutral float-right" title="View">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../kadas_gui/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../view/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

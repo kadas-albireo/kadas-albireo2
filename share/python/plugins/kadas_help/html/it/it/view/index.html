@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Vista - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Vista";
+        var mkdocs_page_input_path = "it/view.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Generalità</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Interfaccia</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Mappa</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Vista</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#estensione-precedentesuccessiva">Estensione precedente/successiva</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#segnalibri">Segnalibri</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nuova-finestra-della-mappa">Nuova finestra della mappa</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3d">3D</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#impostazioni">Impostazioni</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#navigazione-nella-vista-3d">Navigazione nella vista 3D</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#griglia">Griglia</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analisi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Disegnare</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigazione</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Impostazioni</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Funzionalita avanzate</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer vettoriali</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Dati vettoriali</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Dialogo delle proprietà</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Espressioni</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Campi per digitazioni numeriche</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Layer raster</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Dati raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Dialogo delle proprietà</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Lavorare con le proiezioni</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Compositore di stampe</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendice</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tasti di scelta rapida</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Licenza</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Vista</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="vista">Vista</h1>
+<h2 id="estensione-precedentesuccessiva"><a name="sec0"></a>Estensione precedente/successiva</h2>
+<p>Spostandosi sulla mappa con la funzione <strong><em>Estensione precedente</em></strong> è possibile tornare all’estensione di mappa mostrato in precedenza. Tramite <strong><em>Estensione successivo</em></strong> si passa all’estensione di mappa selezionato successivamente.</p>
+<h2 id="segnalibri"><a name="sec1"></a>Segnalibri</h2>
+<p>I segnalibri permettono di memorizzare e ripristinare lo stato corrente della mappa, in particolare l'estensione della mappa e la configurazione dei livelli. Nota che il ripristino di un segnalibro non ripristinerà i livelli che nel frattempo sono stati rimossi dal progetto.</p>
+<h2 id="nuova-finestra-della-mappa"><a name="sec2"></a>Nuova finestra della mappa</h2>
+<p>La funzione <strong><em>Nuova vista</em></strong> permette di aprire viste secondarie della mappa. Trascinamento della barra del titolo, queste possono essere posizionate a piacimento, all'interno della finestra principale o disassociata da essa.</p>
+<p>Nelle sottofinestre è possibile attivare o disattivare i layer indipendentemente dalla vista principale. Il riquadro può essere comandato indipendentemente dalla vista principale oppure può essere automaticamente sincronizzato attivando l'icona del lucchetto sulla barra del titolo della sottofinestra.</p>
+<p>Nelle viste secondarie della mappa è disponibile soltanto lo strumento di navigazione, tutti gli altri strumenti possono essere utilizzati unicamente nella vista principale.</p>
+<p>In caso di necessità, è possibile modificare il titolo della sottofinestra.</p>
+<p><img src="../../../media/image13.png" /></p>
+<h2 id="3d"><a name="sec3"></a>3D</h2>
+<p>Con la funzione <strong><em>3D</em></strong> è possibile aprire una finestra in cui viene visualizzato il globo terrestre. La finestra viene disposta automaticamente ma può essere spostata con il mouse all’interno o all’esterno della finestra del programma.</p>
+<p><img src="../../../media/image14.png" /></p>
+<h3 id="impostazioni">Impostazioni</h3>
+<p>Le seguenti funzioni sono disponibili dalla barra titolo della finestra 3D:</p>
+<ul>
+<li><strong>Selezione dei layer</strong>: Permette la selezione dei layer della vista 2D da visualizzare sul globo.</li>
+<li><strong>Sincronizza estensione</strong>: questo bottone permette di sincronizzare l'estensione della vista del globo con l'estensione della finestra principale.</li>
+<li><strong>Ricarica scena</strong>: questo bottone ricarica tutti i layer visualizzati sul globo.</li>
+<li><strong>Impostazioni globo</strong>: questo pulsante apre il dialogo di configurazione del globo. In esso è possibile configurare i modelli di elevazione e le immagini di sfondo. I layer della vista 2D da visualizzare sul globo vengono selezionati dal menu situato a sinistra nella barra del titolo. Per motivi di prestazione, come impostazione standard vengono visualizzati solo i layer locali della vista 2D. Se possibile, i layer delle immagini di sfondo dovrebbero essere selezionati direttamente nel dialogo delle impostazioni del globo.</li>
+</ul>
+<p>Per impostazione predefinita, i layer della vista 2D sono disegnati come immagini drappeggiate sul terreno del globo. Layer vettoriali (tra cui redlining) possono alternativamente venir visualizzati come modelli estrusi 2.5D oppure come modelli 3D. Lo stile del layer viene applicato ai modelli nel limite del possibile. Per la rappresentazione come modelli 3D, le geometrie devono contenere informazioni di quota (coordinate Z), e queste devono essere espresse relative al layer del suolo oppure al layer del mare. Le impostazioni di visualizzazione si possono modificare nel dialogo delle proprietà del rispettivo layer.</p>
+<p><em>Nota</em>: I tooltip dei campi delle impostazioni del Globo del layer descrivono le varie impostazioni in dettaglio.</p>
+<p><em>Nota</em>: L'ombreggiatura dei modelli 3D dipende dalla posizione del sole. Questa può venir controllata inserendo la data e ora desiderata nelle impostazioni del globo.</p>
+<p><img src="../../../media/image15.png" /></p>
+<p>Spilli, immagini e simboli MSS mono-punto vengono visualizzati come billboard.</p>
+<h3 id="navigazione-nella-vista-3d">Navigazione nella vista 3D</h3>
+<ul>
+<li><strong>Rotazione della telecamera</strong>: il controllo di navigazione superiore permette di impostare la rotazione della telecamera.</li>
+<li><strong>Posizione della telecamera</strong>: Il controllo di navigazione inferiore permette di spostare la posizione della telecamera. Il medesimo risultato si ottiene premendo le freccie della tastiera.</li>
+<li><strong>+</strong>: Avvicina la telecamera al globo.</li>
+<li><strong>-</strong>: Allontana la telecamera dal globo.</li>
+</ul>
+<h2 id="griglia"><a name="sec4"></a>Griglia</h2>
+<p>Nella scheda Vista, è possibile attivare la <strong><em>griglia</em></strong> della mappa.</p>
+<p>Nell'area delle proprietà della griglia, è possibile specificare il tipo della griglia, gli intervali e lo stile.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../map/" class="btn btn-neutral float-left" title="Mappa"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../analysis/" class="btn btn-neutral float-right" title="Analisi">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../map/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../analysis/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

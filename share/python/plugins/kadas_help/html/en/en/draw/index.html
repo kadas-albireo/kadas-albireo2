@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Draw - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Draw";
+        var mkdocs_page_input_path = "en/draw.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Draw</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#geometries-and-labels-redlining">Geometries and labels (Redlining)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pins">Pins</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-image">Add Image</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#raster-images">Raster images</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vector-graphics">Vector graphics</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#paste">Paste</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#symtaz-symbols">SymTaZ symbols</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#guide-grid">Guide grid</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bullseye">Bullseye</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#delete-items">Delete items</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Advanced functionalities</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Draw</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="draw">Draw</h1>
+<h2 id="geometries-and-labels-redlining"><a name="sec0"></a>Geometries and labels (Redlining)</h2>
+<p>Geometries of the following types can be drawn:</p>
+<ul>
+<li>Points</li>
+<li>Lines</li>
+<li>Polygons</li>
+<li>Rectangles</li>
+<li>Circles</li>
+<li>Coordinate crosses</li>
+</ul>
+<p>Depending on the geometry type, the border and fill color and patterns can be adjusted, as well as the line width and the points size.</p>
+<p>For labels, the font and size as well as fill color can be adjusted.</p>
+<p>Drawn geometries and texts are stored in the <strong><em>Redlining</em></strong> layer in the map legend.</p>
+<p>Already drawn geometries or texts can be subsequently edited by selecting them on the map. Selected objects can be moved and, depending on the geometry type, nodes can be moved individually or created or removed via the context menu. The z-order of a geometry can be changed via context-menu.</p>
+<p>Existing line and polygon geometries can be continued via context menu on the node.</p>
+<p><img src="../../../media/image6.png" /></p>
+<p>Editing operations on a redlining drawing can be reversed or repeated via CTRL+Z and CTRL+Y or with the corresponding buttons at the bottom of the map frame.</p>
+<p>When creating and editing geometries, relevant measurement values ​​are displayed at the same time.</p>
+<p>Redlining drawings can be copied, cut and pasted using the context menu or the usual keyboard shortcuts CTRL+C, CTRL+X and CTRL+V. Multiple redlining drawings can be selected together with the CTRL key and moved, copied, cut and pasted as a group.</p>
+<h2 id="pins"><a name="sec1"></a>Pins</h2>
+<p>Pings are georeferenced <strong><em>position markers</em></strong>, which can also carry a name and other remarks.</p>
+<p>Position and height can be read in the tooltip of a placed pin. A double-click on the pin opens its attribute dialog. By right-clicking on the pin, its position can be copied to the clipboard.</p>
+<p>Pins are searchable by name and remarks via the global search function.</p>
+<h2 id="add-image"><a name="sec2"></a>Add Image</h2>
+<h3 id="raster-images">Raster images</h3>
+<p>Raster images in the usual formats (JPG, PNG, BMP) can be added as <strong><em>annotations</em></strong> to the map. These are displayed in a speech bubble. If the image is georeferenced (EXIF tags), the balloon is placed in the appropriate location and the location is blocked. The position lock can be toggled via the context menu. Double-clicking on the balloon opens the image with the default image viewer of the operating system. The size of the speech bubble can be changed at its vertices.</p>
+<p>Raster images are stored in the Images layer.</p>
+<h3 id="vector-graphics">Vector graphics</h3>
+<p>The <strong><em>Add Image</em></strong> function can also be used to add SVG graphics to the map. These can be scaled and rotated with the mouse by dragging at the corresponding control points.</p>
+<p>Vector graphics are stored in the <strong><em>SVG graphics</em></strong> layer.</p>
+<p><img src="../../../media/image7.png" /></p>
+<h2 id="paste"><a name="sec3"></a>Paste</h2>
+<p>The <strong><em>Paste</em></strong> function allows to add various types of object to the map from the clipboard:</p>
+<ul>
+<li>Geometries: Are added as redlining objects</li>
+<li>MSS symbols: Are added to the selected MilX layer</li>
+<li>SVG graphics: Are added to the <strong><em>SVG graphics</em></strong> layer</li>
+</ul>
+<h2 id="symtaz-symbols"><a name="sec4"></a>SymTaZ symbols</h2>
+<p>SymTaZ is an external program that can be used to create symbols, tactical signs and civilian signatures in accordance with the Swiss Army's regulation 52.002.03. These symbols can be imported into KADAS, either via <strong><em>Copy to Clipboard (Text Form)</em></strong> in SymTaZ followed by <strong><em>Paste</em></strong> in KADAS, or by saving as SVG in SymTaZ and then opening via <strong><em>Add Image</em></strong> in KADAS.</p>
+<h2 id="guide-grid"><a name="sec5"></a>Guide grid</h2>
+<p>The guide grid is a grid in which the rows and columns are labeled with numbers or letters. The guide grid is stored in its own layer and appears in the map legend. All grid properties as well as the caption display can be personalized. By default, the grid is created according to the current map extent. An arbitrary number of guide grid layers can be created.</p>
+<h2 id="bullseye"><a name="sec6"></a>Bullseye</h2>
+<p>A bullseye is drawn as a number of concentric circles around a selected point and matching axes, separated at regular intervals. Analogously to the guide grid, it is stored in its own layer, and various properties can be freely configured.</p>
+<h2 id="delete-items"><a name="sec7"></a>Delete items</h2>
+<p>Individual objects can be deleted via context menu or DEL key. The <strong><em>Delete Items</em></strong> tool allows you to delete several objects at once from a selected rectangular region. This function can also be called invoken via CTRL + dragging a rectangle in navigation mode.</p>
+<p><img src="../../../media/image8.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../analysis/" class="btn btn-neutral float-left" title="Analysis"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../gps/" class="btn btn-neutral float-right" title="Navigation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../analysis/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../gps/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>GPS Gate - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "GPS Gate";
+        var mkdocs_page_input_path = "en/gpsgate/gpsgate.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Advanced functionalities</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">GPS Gate</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#run-gpsgate">Run GpsGate </a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#running-the-setup-wizard">Running the setup Wizard </a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Advanced functionalities &raquo;</li>
+      <li>GPS Gate</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="gpsgate">GpsGate <a name="#gpsgate"></a></h1>
+<h2 id="run-gpsgate">Run GpsGate <a name="#run-gpsgate"></a></h2>
+<p>You can launch GpsGate under <em>Start&rarr;Programs&rarr;KADAS&rarr;GpsGate</em>.</p>
+<p>The first time GpsGate is run a setup Wizard will start. The Wizard will help you to find your GPS and tell you how to connect your GPS applications to GpsGate.</p>
+<h2 id="running-the-setup-wizard">Running the setup Wizard <a name="#running-the-setup-wizard"></a></h2>
+<p>Make sure you turn your GPS on, and connect it to your computer, if it is a wireless Bluetooth GPS simply turn it on. To speed up the search you can uncheck the types of GPS receivers you do not want to search for. If you are unsure, keep all options checked. After this is done, click “Next” and the Wizard will scan your computer for a connected GPS.</p>
+<p>If you are an advanced user, click “Advanced setup…” for a setup process where you have complete control. You can always run the Wizard again from the Settings Dialog.</p>
+<p><img alt="" src="/images/wizard_select_search_200.gif" /></p>
+<p>Click Next. The Wizard will now start searching for a GPS. This can take some time.</p>
+<p><img alt="" src="/images/wizard_search_200.gif" /></p>
+<p>When the Wizard finds a GPS, a message dialog is displayed. Click “Yes” to accept the found GPS as input. If you have several GPS receivers connected, click “No” until GpsGate finds the receiver you want to use.</p>
+<p><img alt="" src="/images/wizard_device_found_200.gif" /></p>
+<p>If GpsGate won’t find your GPS, you need to use “Advanced Setup…”</p>
+<p>Select Output and click “Next”. If you are unsure, simply click “Next”.</p>
+<p><img alt="" src="/images/wizard_select_output_200.gif" /></p>
+<p>The next screen displays a summary. It is importaint to save this summary. You can save it to a file and print it. You can also find the this information later in the Settings dialog (from the Tray menu).</p>
+<p>You connect Garmin applications like nRoute to the first port in the list, and other NMEA applications to the remaining ports. You can only connect one application to one port at a time. If you need to create more ports you can do that from the Settings Dialog at any time.</p>
+<p><img alt="" src="/images/wizard_summary_200.gif" /></p>
+<p>Now you can start your GPS applications and connect them to the ports created by GpsGate in the last step above. You can run all the GPS applications at the same time!</p>
+<p>When GpsGate is running it is displayed as a Tray Icon. By clicking on this icon you can access its functions.</p>
+<p><img alt="" src="/images/tray_icon_win.gif" /></p>
+<p>You can re-run the Wizard at any time by selecting clicking “Setup Wizard..” in the Settings dialog. Tray icon colors and shapes</p>
+<p>The tray icon always indicates the status of GpsGate. Here is a list of the possible displayed tray icons:</p>
+<p><img alt="" src="/images/red32.gif" />
+No GPS or NMEA data is detected by GpsGate.</p>
+<p><img alt="" src="/images/yellow32.gif" />
+Valid GPS data has been detected at the selected input, but the GPS data has no fix, that is it cannot determine its position (yet).</p>
+<p><img alt="" src="/images/green32.gif" />
+A valid GPS position (fix) has been detected at the selected input.</p>
+<p>If the tray icon is not green your GPS application will not display/use a correct position.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../print_composer/print_composer/" class="btn btn-neutral float-left" title="Print composer"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../appendices/shortcuts/" class="btn btn-neutral float-right" title="Keyboard shortcuts">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../print_composer/print_composer/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../appendices/shortcuts/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

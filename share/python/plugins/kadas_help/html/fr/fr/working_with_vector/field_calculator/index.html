@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Calculatrice de champ - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Calculatrice de champ";
+        var mkdocs_page_input_path = "fr/working_with_vector/field_calculator.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Fonctionnalités avancées</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Couche vecteur</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Calculatrice de champ</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-expression">Onglet Expression </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-editeur-de-fonction">Onglet Editeur de fonction </a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Fonctionnalités avancées &raquo;</li>
+          <li>Couche vecteur &raquo;</li>
+      <li>Calculatrice de champ</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="calculatrice-de-champ">Calculatrice de champ <a name="#field-calculator"></a></h1>
+<p>Le bouton <img src="../../../../images/mActionCalculateField.png" /> <em>Ouvrir la calculatrice de champs</em> de la table d'attributs permet d'opérer des calculs sur la base des valeurs attributaires ou d'utiliser des fonctions, par exemple pour calculer la longueur ou la surface des entités. Les résultats peuvent être écrits dans une nouvelle colonne attributaire, un champ virtuel ou mettre à jour une colonne existante.</p>
+<p><strong>Champ Virtuels</strong></p>
+<ul>
+<li>
+<p>Les champs virtuels ne sont pas permanents et ne sont pas sauvegardés.</p>
+</li>
+<li>
+<p>Pour qu'un champ soit virtuel, il faut le spécifier à sa création.</p>
+</li>
+</ul>
+<p>La calculatrice de champ fonctionne avec toutes les couches qui gèrent le mode édition. Lorsque vous cliquez sur le bouton de la calculatrice de champ, la fenêtre s'ouvre. Si la couche n'est pas en mode édition, un avertissement s'affiche et l'utilisation de la calculatrice de champ basculera automatiquement la couche en édition avant d'effectuer le calcul.</p>
+<p>La barre de calcul de champ n'est visible que si la couche est en mode édition.</p>
+<p>Dans la barre de calcul de champ, vous sélectionnez d'abord le champ à éditer puis ouvrez le calculateur d'expressions pour saisir l'expression ou écrivez directement dans le champ de saisie et enfin cliquez sur le bouton <strong>Tout mettre à jour</strong>.</p>
+<h2 id="onglet-expression">Onglet Expression <a name="#expression-tab"></a></h2>
+<p>Dans la Calculatrice de champ, vous devez d'abord spécifier si vous souhaitez mettre à jour uniquement les entités sélectionnées, créer un nouveau champ où les résultats du calcul seront stockés ou mettre à jour un champ existant.</p>
+<p><img alt="" src="../../../../images/fieldcalculator.png" /></p>
+<p>Si vous choisissez d'ajouter un nouveau champ, vous devez lui donner un nom, un type (nombre entier, nombre décimal ou chaîne de caractère), une longueur et sa précision. Par exemple, si vous créez un champ d'une longueur de 10 et doté d'une précision de 3, vous aurez 6 chiffres avant la virgule, la virgule et 3 chiffres après.</p>
+<p>L'exemple suivant montre comment la calculatrice de champs fonctionne. Il s'agit de calculer la longueur en km de la couche <code>railroads</code> issue de l'échantillon de données KADAS.</p>
+<ol>
+<li>
+<p>Chargez le fichier shapefile <code>railroads.shp</code> dans QGIS et ouvrez sa <img src="../../../../images/mActionOpenTable.png" /> <em>Table d'Attributs</em>.</p>
+</li>
+<li>
+<p>Cliquez sur <img src="../../../../images/mActionToggleEditing.png" /> <em>Basculer en mode édition</em> et ouvrez la <img src="../../../../images/mActionCalculateField.png" /> <em>Calculatrice de champs</em>.</p>
+</li>
+<li>
+<p>Cochez la case <img src="../../../../images/checkbox.png" /> <em>Créer un nouveau champ</em> pour enregistrer le résultat des calculs dans un nouveau champ.</p>
+</li>
+<li>
+<p>Ajoutez <code>longueur</code> dans le nom de ce champ, <code>réel</code> en tant que type et définissez une longueur de 10 et une précision de 3.</p>
+</li>
+<li>
+<p>Double-cliquez maintenant sur la fonction <code>$length</code> de la catégorie <em>Géometrie</em> pour l'ajouter à la zone d'Expression.</p>
+</li>
+<li>
+<p>Terminez en rentrant 1000 à la fin de l'expression et en cliquant sur le bouton <strong>[Ok]</strong>.</p>
+</li>
+<li>
+<p>Vous pouvez maintenant voir la nouvelle colonne <code>longueur</code> dans la table d'attributs.</p>
+</li>
+</ol>
+<p>Les fonctions disponibles sont listées dans <a href="../expression/">Expressions</a>.</p>
+<h2 id="onglet-editeur-de-fonction">Onglet Editeur de fonction <a name="#function-editor-tab"></a></h2>
+<p>With the Function Editor you are able to define your own Python custom functions in a comfortable way. The function editor will create new Python files in <code>qgis2pythonexpressions</code> and will auto load all functions defined when starting QGIS. Be aware that new functions are only saved in the <code>expressions</code> folder and not in the project file. If you have a project that uses one of your custom functions you will need to also share the .py file in the expressions folder.</p>
+<p>Here's a short example on how to create your own functions:</p>
+<pre><code>@qgsfunction(args="auto", group='Custom')
+def myfunc(value1, value2 feature, parent):
+    pass
+</code></pre>
+<p>Ce court exemple crée la fonction <em>myfunc</em> qui vous donnera une fonction avec deux valeurs. Quand vous utilisez l'argument de fonction args=’auto’ le nombre d'arguments de la fonction requis sera calculé selon le nombre d'arguments définis en Python (moins 2 - feature, et parent).</p>
+<p>This function then can be used with the following expression:</p>
+<pre><code>myfunc('test1', 'test2')
+</code></pre>
+<p>Votre fonction sera implémentée dans <em>Custom</em> <em>Fonctions</em> de l'onglet <em>Expression</em> après l'utilisation du bouton <em>Lancer le script</em>.</p>
+<p>Plus d'informations sur la création de code Python peuvent être trouvées sur <a href="http://www.qgis.org/html/en/docs/pyqgis_developer_cookbook/index.html">http://www.qgis.org/html/en/docs/pyqgis_developer_cookbook/index.html</a>.</p>
+<p>L'éditeur de fonction ne se limite pas à la calculatrice de champ, il est disponible à chaque fois que vous travaillez avec des expressions.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../expression/" class="btn btn-neutral float-left" title="Expressions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../working_with_raster/supported_data/" class="btn btn-neutral float-right" title="Données raster">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../expression/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../working_with_raster/supported_data/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

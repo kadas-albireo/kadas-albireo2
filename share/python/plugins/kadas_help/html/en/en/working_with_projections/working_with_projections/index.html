@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Working with projections - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Working with projections";
+        var mkdocs_page_input_path = "en/working_with_projections/working_with_projections.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Advanced functionalities</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Working with projections</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#overview-of-projection-support">Overview of Projection Support </a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#default-datum-transformations">Default datum transformations </a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Advanced functionalities &raquo;</li>
+      <li>Working with projections</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="working-with-projections">Working with Projections <a name="working-with-projections"></a></h1>
+<p>KADAS allows users to define a global and project-wide CRS (coordinate reference system) for layers without a pre-defined CRS. It also allows the user to define custom coordinate reference systems and supports on-the-fly (OTF) projection of vector and raster layers. All of these features allow the user to display layers with different CRSs and have them overlay properly.</p>
+<h2 id="overview-of-projection-support">Overview of Projection Support <a name="overview-of-projection-support"></a></h2>
+<p>KADAS has support for approximately 2,700 known CRSs. Definitions for each CRS are stored in a SQLite database that is installed with KADAS. Normally, you do not need to manipulate the database directly. In fact, doing so may cause projection support to fail. Custom CRSs are stored in a user database.</p>
+<p>The CRSs available in KADAS are based on those defined by the European Petroleum Search Group (EPSG) and the Institut Geographique National de France (IGNF) and are largely abstracted from the spatial reference tables used in GDAL. EPSG identifiers are present in the database and can be used to specify a CRS in KADAS.</p>
+<p>In order to use OTF projection, either your data must contain information about its coordinate reference system or you will need to define a global, layer or project-wide CRS. For PostGIS layers, KADAS uses the spatial reference identifier that was specified when the layer was created. For data supported by OGR, KADAS relies on the presence of a recognized means of specifying the CRS. In the case of shapefiles, this means a file containing the well-known text (WKT) specification of the CRS. This projection file has the same base name as the shapefile and a <code>.prj</code> extension. For example, a shapefile named <code>alaska.shp</code> would have a corresponding projection file named <code>alaska.prj</code>.</p>
+<p>The <em>CRS</em> tab contains the following important components:</p>
+<ol>
+<li><strong>Filter</strong> — If you know the EPSG code, the identifier, or the name for a coordinate reference system, you can use the search feature to find it. Enter the EPSG code, the identifier or the name.</li>
+<li><strong>Recently used coordinate reference systems</strong> — If you have certain CRSs that you frequently use in your everyday GIS work, these will be displayed in this list. Click on one of these items to select the associated CRS.</li>
+<li><strong>Coordinate reference systems of the world</strong> — This is a list of all CRSs supported by KADAS, including Geographic, Projected and Custom coordinate reference systems. To define a CRS, select it from the list by expanding the appropriate node and selecting the CRS. The active CRS is preselected.</li>
+<li><strong>PROJ.4 text</strong> — This is the CRS string used by the PROJ.4 projection engine. This text is read-only and provided for informational purposes.</li>
+</ol>
+<h2 id="default-datum-transformations">Default datum transformations <a name="default-datum-transformations"></a></h2>
+<p>OTF depends on being able to transform data into a ‘default CRS’, and KADAS uses WGS84. For some CRS there are a number of transforms available. KADAS allows you to define the transformation used otherwise KADAS uses a default transformation.</p>
+<p>KADAS asks which transformation to use by opening a dialogue box displaying PROJ.4 text describing the source and destination transforms. Further information may be found by hovering over a transform. User defaults can be saved by selecting <img alt="radiobuttonon" src="/images/radiobuttonon.png" /> <em>Remember selection</em>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../working_with_raster/raster_properties/" class="btn btn-neutral float-left" title="Properties dialog"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../print_composer/print_composer/" class="btn btn-neutral float-right" title="Print composer">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../working_with_raster/raster_properties/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../print_composer/print_composer/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

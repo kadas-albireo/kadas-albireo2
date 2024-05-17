@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Navigation - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Navigation";
+        var mkdocs_page_input_path = "en/gps.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">The Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../analysis/">Analysis</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Draw</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Navigation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#enabling-geolocation">Enabling Geolocation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#moving-with-geolocation">Moving with Geolocation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#drawing-waypoints-and-routes">Drawing waypoints and routes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gpx-export-und-import">GPX export und import</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Advanced functionalities</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vector layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Properties dialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Field calculator</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Supported formats</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Properties dialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Working with projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Print composer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Appendix</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Keyboard shortcuts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Navigation</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="navigation">Navigation</h1>
+<p>The Navigation Tab groups functionalities for interacting with a connected GPS device, as well as tools for drawing, importing and exporting GPX (GPS Exchange Format) waypoints and routes.</p>
+<h2 id="enabling-geolocation"><a name="sec0"></a>Enabling Geolocation</h2>
+<p>To use a GPS device with KADAS on Windows, the GpsGate Splitter application must be installed on the system, see <a href="../gpsgate/gpsgate/">Configuring GPSGate</a>.</p>
+<p>The status of the GPS connection is displayed in the status bar in the lower area of the application window. This button can be toggled to set up resp. terminate a connection. The fill color of the status button changes depending on the current connection status</p>
+<ul>
+<li><strong>Black</strong>: GPS disabled</li>
+<li><strong>Blue</strong>: connection is being initialized</li>
+<li><strong>White</strong>: connection initialized, but no data is being received</li>
+<li><strong>Red</strong>: connection initialized, but no position data is available</li>
+<li><strong>Yellow</strong>: connection initialized, only 2D fix</li>
+<li><strong>Green</strong>: connection initialized, 3D fix</li>
+</ul>
+<p>As soon as KADAS starts receiving position data from the GPS device, a marker will be placed on the map showing the current GPS position.</p>
+<h2 id="moving-with-geolocation"><a name="sec1"></a>Moving with Geolocation</h2>
+<p>This functions enables automatic centering of the visible map extent at the current GPS position.</p>
+<h2 id="drawing-waypoints-and-routes"><a name="sec2"></a>Drawing waypoints and routes</h2>
+<p>These functions allow drawing waypoints and routes, which can later be exported as GPS, for instance to upload to a GPS device.</p>
+<p><strong><em>Waypoints</em></strong> are simple points on the map, fitted with an optional name.</p>
+<p><strong><em>Routes</em></strong> are polylines, fitted with an option name and number.</p>
+<p>Waypoints and routes are managed in a dedicated GPS Routes layer in the layer tree, analogous to redlining layers.</p>
+<p><img src="../../../media/image9.png" /></p>
+<h2 id="gpx-export-und-import"><a name="sec3"></a>GPX export und import</h2>
+<p>These functions allow the user to export drawn waypoints and routed to a GPX file, as well as importing an existing GPX file into the <strong><em>GPS Routes</em></strong> layer.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../draw/" class="btn btn-neutral float-left" title="Draw"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mss/" class="btn btn-neutral float-right" title="MSS">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../draw/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mss/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

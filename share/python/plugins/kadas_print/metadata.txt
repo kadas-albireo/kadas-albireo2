@@ -1,0 +1,17 @@
+[general]
+name=KADAS Print
+qgisMinimumVersion=3.00
+qgisMaximumVersion=3.99
+description=Instantly print map excerpts
+about=The instant print plugin allows to quickly print map excerpts to a file, utilizing an existing composer as page layout.
+version=2.3
+author=Sandro Mani, Sourcepole AG
+email=smani@sourcepole.ch
+tags=print,composer
+
+homepage=https://github.com/kadas-albireo/kadas-albireo2
+tracker=https://github.com/kadas-albireo/kadas-albireo2
+repository=https://github.com/kadas-albireo/kadas-albireo2
+icon=icons/icon.png
+experimental=False
+deprecated=False

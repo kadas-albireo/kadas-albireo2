@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Feldrechner - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Feldrechner";
+        var mkdocs_page_input_path = "de/working_with_vector/field_calculator.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Benutzeroberfläche</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Erweiterte Funktionalitäten</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Vektorebenen</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../expression/">Ausdrücke</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Feldrechner</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#ausdrucke">Ausdrücke </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#funktionseditor">Funktionseditor </a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rasterebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Eigenschaftendialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Druckzusammenstellung</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Erweiterte Funktionalitäten &raquo;</li>
+          <li>Vektorebenen &raquo;</li>
+      <li>Feldrechner</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="feldrechner">Feldrechner <a name="#field-calculator"></a></h1>
+<p>Mit <img src="../../../../images/mActionCalculateField.png" /> <em>Feldrechner</em> Knopf in der Attributtabelle können Sie Berechnungen auf Basis von bestehenden Attributwerten oder definierten Funktionen durchführen, z.B. um die Länge oder die Fläche von Geometrieobjekten zu berechnen. Die Ergebnisse können in eine neue Attributspalte geschrieben werden, in ein virtuelles Feld oder Sie können verwendet werden um Werte in einer vorhandenen Spalte zu updaten.</p>
+<p><strong>Virtuelle Felder</strong></p>
+<ul>
+<li>
+<p>Virtuelle Felder sind nicht dauerhaft vorhanden und werden nicht gespeichert.</p>
+</li>
+<li>
+<p>Ein Feld kann nur beim Erstellen virtuell gemacht werden.</p>
+</li>
+</ul>
+<p>Der Feldrechner ist jetzt über jeden Layer der Bearbeitung unterstützt erreichbar. Wenn Sie auf das Feldrechner Icon klicken öffnet sich ein Dialog. Wenn der Layer nicht im Bearbeitungsmodus ist wird eine Warnung gezeigt und das Verwenden des Feldrechners bewirkt, dass der Layer in den Bearbeitungsmodus gesetzt wird bevor die Berechnung gemacht wird.</p>
+<p>The quick field calculation bar on top of the attribute table is only visible if the layer is editable.</p>
+<p>In der schnellen Feldberechnungsleiste wählen Sie erst einen bestehenden Feldnamen aus, öffnen dann den Ausdrucksdialog um Ihren Ausdruck zu erstellen oder schreiben ihn direkt in das Feld und klicken dann den <strong>Alle aktualisieren</strong> Knopf.</p>
+<h2 id="ausdrucke">Ausdrücke <a name="#expression-tab"></a></h2>
+<p>Im Feldberechnungsdialog müssen Sie erst auswählen ob sie nur ausgewählte Objekte updaten wollen, eine neues Feld anlegen, in das die Ergebnisse der Berechnung eingefügt werden oder ob Sie ein vorhandenes Feld erneuern wollen.</p>
+<p><img alt="" src="../../../../images/fieldcalculator.png" /></p>
+<p>Wenn Sie sich entschließen ein neues Feld hinzuzufügen, müssen Sie einen Feldnamen, einen Feldtyp (Ganzzahl, Dezimalzahl, Text oder Datum), die Ausgabefeldbreite und die Genauigkeit eingeben. Zum Beispiel wenn Sie ein Ausgabefeldbreite von 10 und eine Genauigkeit von 3 wählen, heißt das, dass 6 Einträge vor dem Komma stehen, dann das Komma und dann weitere 3 Einträge für die Genauigkeit.</p>
+<p>A short example illustrates how field calculator works when using the <em>Expression</em> tab. We want to calculate the length in km of the <code>railroads</code> layer from the KADAS sample dataset:</p>
+<ol>
+<li>
+<p>Laden Sie das Shape <code>railroads.shp</code> in KADAS und öffnen Sie die den Dialog <img src="../../../../images/mActionOpenTable.png" /> <em>Attributtabelle öffnen</em>.</p>
+</li>
+<li>
+<p>Klicken Sie auf <img src="../../../../images/mActionToggleEditing.png" /> <em>Bearbeitungsmodus umschalten</em> und öffnen Sie den <img src="../../../../images/mActionCalculateField.png" /> <em>Feldrechner</em> Dialog.</p>
+</li>
+<li>
+<p>Wählen Sie das <img src="../../../../images/checkbox.png" /> <em>Neues Feld anlegen</em> Kontrollkästchen um die Berechnungen in ein neues Feld zu speichern.</p>
+</li>
+<li>
+<p>Setzen Sie <code>laenge</code> als Ausgabefeldname, <code>real</code> als Ausgabefeldtyp und definieren Sie die Ausgabefeldbreite mit 10 und die Ausgabefeldgenauigkeit mit 3.</p>
+</li>
+<li>
+<p>Machen Sie jetzt einen Doppelklick auf die Funktion <code>$length</code> in der <em>Geometrie</em> Gruppe und fügen Sie sie in die Ausdruck Box des Feldrechners ein.</p>
+</li>
+<li>
+<p>Vervollständigen Sie den Ausdruck indem Sie “/1000” im Feldrechnerausdruckfenster und klicken Sie <strong>[OK]</strong>.</p>
+</li>
+<li>
+<p>Sie können jetzt eine neue Spalte <code>laenge</code> in der Attributtabelle finden.</p>
+</li>
+</ol>
+<p>Die erhältlichen Funktionen sind im Kapitel <a href="../expression/">Ausdrücke</a> aufgeführt.</p>
+<h2 id="funktionseditor">Funktionseditor <a name="#function-editor-tab"></a></h2>
+<p>Mit dem Funktionseditor können Sie auf komfortable Weise Ihre eigenen Python-Funktionen definieren. Der Funktionseditor erstellt neue Python-Dateien in <code>qgis2pythonexpressions</code> und lädt automatisch alle beim Start von QGIS definierten Funktionen. Beachten Sie, dass neue Funktionen nur im Ordner <code>expressions</code> und nicht in der Projektdatei gespeichert werden. Wenn Sie ein Projekt haben, das eine Ihrer benutzerdefinierten Funktionen verwendet, müssen Sie die.py-Datei auch im Ordner expressions freigeben.</p>
+<p>Hier ist ein kurzes Beispiel, wie Sie Ihre eigenen Funktionen erstellen können:</p>
+<pre><code>@qgsfunction(args="auto", group='Custom')
+def myfunc(value1, value2 feature, parent):
+    pass
+</code></pre>
+<p>Das kurze Beispiel erstellt eine Funktion <code>myfunc</code>, die Ihnen eine Funktion mit zwei Werten bietet. Bei Verwendung des Funktionsarguments args='auto' wird die Anzahl der benötigten Funktionsargumente aus der Anzahl der Argumente berechnet, mit denen die Funktion in Python definiert wurde (minus 2 - Merkmal und übergeordnet).</p>
+<p>Diese Funktion kann dann mit dem folgenden Ausdruck verwendet werden:</p>
+<pre><code>myfunc('test1','test2')
+</code></pre>
+<p>Ihre Funktion wird in den benutzerdefinierten <em>Funktionen</em> der Registerkarte <em>Ausdruck</em> nach Verwendung der Schaltfläche <em>Skript ausführen</em> implementiert.</p>
+<p>Weitere Informationen zur Erstellung von Python-Code finden Sie unter <a href="http://www.qgis.org/html/en/docs/pyqgis_developer_cookbook/index.html">http://www.qgis.org/html/en/docs/pyqgis_developer_cookbook/index.html</a>.</p>
+<p>Der Funktionseditor beschränkt sich nicht nur auf die Arbeit mit dem Feldrechner, er ist auch immer dann zu finden, wenn Sie mit Ausdrücken arbeiten.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../expression/" class="btn btn-neutral float-left" title="Ausdrücke"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../working_with_raster/supported_data/" class="btn btn-neutral float-right" title="Unterstützte Formate">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../expression/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../working_with_raster/supported_data/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

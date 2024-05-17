@@ -1,0 +1,16 @@
+[general]
+name=KADAS About
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=KADAS about plugin
+about=KADAS about dialog.
+version=2.1.0
+author=Sourcepole
+email=pka@sourcepole.ch
+tags=about
+homepage=https://github.com/kadas-albireo/kadas-albireo2
+tracker=https://github.com/kadas-albireo/kadas-albireo2
+repository=https://github.com/kadas-albireo/kadas-albireo2
+icon=icon.png
+experimental=False
+deprecated=False

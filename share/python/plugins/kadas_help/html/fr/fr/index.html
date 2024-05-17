@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Généralités - KADAS Albireo</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "G\u00e9n\u00e9ralit\u00e9s";
+        var mkdocs_page_input_path = "fr/index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Généralités</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#creation">Création</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conditions-dutilisation">Conditions d’utilisation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#protocole-de-version">Protocole de version</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#version-220-juin-2023">Version 2.2.0 (juin 2023)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#version-210-decembre-2021">Version 2.1.0 (décembre 2021)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#version-200-juliet-2020">Version 2.0.0 (juliet 2020)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#version-12-decembre-2018">Version 1.2 (décembre 2018)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#version-11-novembre-2017">Version 1.1 (Novembre 2017)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#version-10-septembre-2016">Version 1.0 (Septembre 2016)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Fonctionnalités avancées</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Couche vecteur</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_vector/supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_vector/vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_vector/field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Généralités</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="generalites">Généralités</h1>
+<h2 id="creation"><a name="sec0"></a>Création</h2>
+<p>KADAS Albireo est une application d'affichage des cartes basée sur le logiciel SIG professionnel open source "QGIS" et destinée aux utilisateurs non spécialisés. En coopération avec la compagnie Ergnomen, une nouvelle interface utilisateur a été développée, cachant une grande partie des fonctionnalités destinées aux utilisateurs avancés, tout en améliorant les fonctionnalités dans des domaines tels que le dessin, l'analyse de terrain, l'impression et l'interopérabilité.</p>
+<h2 id="conditions-dutilisation"><a name="sec1"></a>Conditions d’utilisation</h2>
+<p>KADAS Albireo est sous General Public License 2.0 (GPLv2).</p>
+<p>La composante MSS/MilX est la propriété de l’entreprise gs-soft AG.</p>
+<p>Les conditions d’utilisation des données sont énumérées dans l’application sous Aide → À propos.</p>
+<h2 id="protocole-de-version"><a name="sec3"></a>Protocole de version</h2>
+<h3 id="version-220-juin-2023">Version 2.2.0 (juin 2023)</h3>
+<ul>
+<li><em>Général</em>:<ul>
+<li>Possibilité de ajouter des couches Esri VectorTile</li>
+<li>Possibilité de ajouter des couches Esri MapService</li>
+<li>Layertree: possibilité de définir l'intervalle de rafraîchissement de la source de données pour les couches à rafraîchissement automatique.</li>
+<li>Permettre l'exportation de l'impression à GeoPDF</li>
+<li>Permet de verrouiller l'échelle de la carte</li>
+<li>Boîte de dialogue configurable pour les nouvelles</li>
+<li>Amélioration de l'importation de géométries 3D à partir de fichiers KML</li>
+</ul>
+</li>
+<li><em>Vue</em>:<ul>
+<li>Permet de prendre des photos instantanées de la vue 3D</li>
+<li>Amélioration de l'étiquetage de la grille MGRS</li>
+</ul>
+</li>
+<li><em>Analyse</em>:<ul>
+<li>Nouvel outil min/max pour interroger le point le plus bas/le plus haut dans la zone sélectionnée</li>
+<li>Sélection du fuseau horaire dans l'outil éphéméride</li>
+<li>Gestion correcte des valeurs NODATA dans le profil de hauteur</li>
+</ul>
+</li>
+<li><em>Dessin</em>:<ul>
+<li>Permettre d'annuler/de refaire toute la session de dessin</li>
+<li>Permet de modifier l'ordre z des dessins</li>
+<li>Permet d'ajouter des images à partir de l'URL</li>
+</ul>
+</li>
+<li><em>MSS</em>:<ul>
+<li>Permet d'annuler/de refaire toute la session de dessin</li>
+<li>Permet de styliser les lignes de repère (largeur, couleur)</li>
+<li>Mise à jour de MSS-2024</li>
+</ul>
+</li>
+<li><em>Aide</em>:<ul>
+<li>Permettre la recherche dans l'aide</li>
+</ul>
+</li>
+</ul>
+<h3 id="version-210-decembre-2021">Version 2.1.0 (décembre 2021)</h3>
+<ul>
+<li><em>Général</em>:<ul>
+<li>Imprimer: Mise à l'échelle correcte des symboles (MSS, épingles, images, ...) en fonction du DPI d'impression.</li>
+<li>GPKG: Permet l'importation de couches de projet</li>
+<li>Arbre des couches: Possibilité de zoomer et de supprimer toutes les couches sélectionnées</li>
+<li>Visibilité basée sur l'échelle également pour les couches redlining/MSS</li>
+<li>Table d'attributs: divers nouveaux outils de sélection et de zoom pour les tables d'attributs</li>
+</ul>
+</li>
+<li><em>Vue</em>:<ul>
+<li>Nouvelle fonction de signets</li>
+</ul>
+</li>
+<li><em>Analyse</em>:<ul>
+<li>Bassin visuel: Possibilité de limiter la plage d'angle vertical de l'observateur</li>
+<li>Profil d’altitude et visibilité: affichage du marqueur dans le graphe lors du survol de la ligne sur la carte</li>
+<li>Nouvel outil éphéméride</li>
+</ul>
+</li>
+<li><em>Dessin</em>:<ul>
+<li>Épingles: Ajout d'un éditeur de texte riche</li>
+<li>Epingles: Permettre d'interagir avec le contenu de l'infobulle avec la souris</li>
+<li>Grille de guidage: Permettre l'étiquetage d'un seul quadrant</li>
+<li>Bullseye: Étiquetage des quadrants</li>
+<li>Nouvel élément de dessin en croix de coordonnées</li>
+</ul>
+</li>
+<li><em>MSS</em>:<ul>
+<li>Paramètres des symboles par couche</li>
+<li>Mise à jour de MSS-2022</li>
+</ul>
+</li>
+</ul>
+<h3 id="version-200-juliet-2020">Version 2.0.0 (juliet 2020)</h3>
+<ul>
+<li>Nouvelle architecture d'application: KADAS est maintenant une application distincte, construite sur les bibliothèques QGIS 3.x</li>
+<li>Nouvelle architecture des éléments de la carte, pour un flux de travail cohérent lors du dessin et de l'édition des objets Redlining, des symboles MSS, etc.</li>
+<li>Utilise le nouveau format de fichier qgz, en évitant l'ancien dossier <code>&lt;nom du projet&gt;_files</code></li>
+<li>Autosave du projet</li>
+<li>Nouveau gestionnaire de plugins pour gérer les plugins externes directement depuis KADAS</li>
+<li>Mode plein écran</li>
+<li>Nouvel outil de grille, supportant aussi les grilles UTM/MGRS sur la carte principale</li>
+<li>Exportation KML/KMZ limitée à une étendue</li>
+<li>Exportation de données GPKG limitée à une étendue</li>
+<li>Les styles de géométrie redlining sont honorés lorsqu'ils sont affichés sous forme d'objets 2,5D ou 3D sur le Globe</li>
+<li>Grille de guidage améliorée</li>
+<li>Mise à jour du MSS à MSS-2021</li>
+</ul>
+<h3 id="version-12-decembre-2018">Version 1.2 (décembre 2018)</h3>
+<ul>
+<li><em>Général</em>:<ul>
+<li>Fonctionnalité d'exportation KML/KMZ améliorée</li>
+<li>Nouvelle fonctionnalité d'importation KML/KMZ</li>
+<li>Nouvelle fonction d'exportation et d'importation GeoPackage</li>
+<li>Possibilité d'ajouter des niveaux CSV/WMS/WFS/WFS/WCS depuis l'interface ribbon</li>
+<li>Possibilité d'ajouter des fonctionnalités à l'interface ribbon à partir de l'API Python</li>
+<li>Ajout de raccourcis clavier pour diverses fonctions d'interface ribbon</li>
+<li>Améliore le "fuzzy matching" dans la recherche de coordonnées</li>
+</ul>
+</li>
+<li><em>Analyse</em>:<ul>
+<li>Tracer les sommets de la ligne de mesure dans le profil d'élévation</li>
+</ul>
+</li>
+<li><em>Dessigner</em>:<ul>
+<li>Prise en charge de la saisie numérique dans le dessin d'objets redlining</li>
+<li>Possibilité du réglage du facteur d'échelle pour les couches d'annotation</li>
+<li>Possibilité d'activer et de désactiver les cadres d'images</li>
+<li>Possibilité de manipuler des groupes d'annotations</li>
+<li>Nouvelle fonctionnalité: grille de guidage</li>
+<li>Nouvelle fonctionnalité: Bullseye</li>
+</ul>
+</li>
+<li><em>GPS</em>:<ul>
+<li>Possibilité de conversion entre les waypoints et les pins</li>
+<li>Possibilité de changer la couleur des waypoints et des itinéraires</li>
+</ul>
+</li>
+<li><em>MSS</em>:<ul>
+<li>Mise à niveau vers MSS-2019</li>
+</ul>
+</li>
+</ul>
+<h3 id="version-11-novembre-2017">Version 1.1 (Novembre 2017)</h3>
+<ul>
+<li>
+<p><em>Général</em>:</p>
+<ul>
+<li>Curseur librement positionnable dans le champ de recherche</li>
+<li>Affichage de la hauteur dans la barre d'état</li>
+<li>Amélioration de la vitesse dans l'affichage de la carte</li>
+<li>Table d'attributs pour les couches vectorielles</li>
+<li>Chargement des graphiques SVG (y compris les graphiques SymTaZ)</li>
+</ul>
+</li>
+<li>
+<p><em>Analyse</em>:</p>
+<ul>
+<li>Mesure géodésique de la distance et de la superficie</li>
+<li>Azimut sélectionnable par rapport au nord de la carte ou géographique</li>
+</ul>
+</li>
+<li>
+<p><em>Dessigner</em>:</p>
+<ul>
+<li>Accrochage aux objets commutable lors du dessin</li>
+<li>Annuler / refaire pendant le dessin</li>
+<li>Les géométries peuvent être déplacées, copiées, coupées et collées, individuellement ou en groupe</li>
+<li>Les géométries existantes peuvent être continuées</li>
+<li>Graphiques SVG (comprenant symboles SymTaZ) peuvent être ajouté à la carte</li>
+<li>Images pas géoréférencées peuvent être ajouté à la carte</li>
+<li>Images et punaises sont stockées dans des couches appropriées</li>
+</ul>
+</li>
+<li>
+<p><em>MSS</em>:</p>
+<ul>
+<li>Mise à niveau vers MSS-2018</li>
+<li>Corriger le format des symboles MSS lors de l'impression</li>
+<li>Le contenu du cartouche peut être importé ou exporté depuis et vers des fichiers MilX ou XML</li>
+<li>Entrée numérique d'attributs lors du dessin de symboles MSS</li>
+</ul>
+</li>
+<li>
+<p><em>3D</em>:</p>
+<ul>
+<li>Support pour les géométries 3D en vue 3D</li>
+</ul>
+</li>
+<li>
+<p><em>Imprimer</em>:</p>
+<ul>
+<li>Possibilité de gérer les modèles d'impression contenus dans un projet</li>
+</ul>
+</li>
+</ul>
+<h3 id="version-10-septembre-2016">Version 1.0 (Septembre 2016)</h3>
+<ul>
+<li>Version initiale</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Index"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="kadas_gui/" class="btn btn-neutral float-right" title="Interface">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="kadas_gui/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

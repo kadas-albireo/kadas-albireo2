@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Eigenschaftendialog - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Eigenschaftendialog";
+        var mkdocs_page_input_path = "de/working_with_raster/raster_properties.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Benutzeroberfläche</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Erweiterte Funktionalitäten</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Vektorebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/expression/">Ausdrücke</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/field_calculator/">Feldrechner</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Rasterebenen</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Eigenschaftendialog</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#menu-allgemein">Menü Allgemein </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#menu-stil">Menü Stil </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#menu-transparenz">Menü Transparenz </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#menu-metadaten">Menü Metadaten </a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Druckzusammenstellung</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Erweiterte Funktionalitäten &raquo;</li>
+          <li>Rasterebenen &raquo;</li>
+      <li>Eigenschaftendialog</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="dialogfenster-rasterlayereigenschaften">Dialogfenster Rasterlayereigenschaften <a name="#raster-properties-dialog"></a></h1>
+<p>Um die Eigenschaften eines Rasterlayers zu sehen oder einzustellen doppelklicken Sie auf den Layernamen in der Legende oder rechtsklicken Sie auf den Layernamen und wählen Sie <em>Eigenschaften</em> aus dem Kontextmenü. Dies öffnet den <em>Layereigenschaften</em> Dialog.</p>
+<p>Es gibt mehrere Menüs in diesem Dialog:</p>
+<ul>
+<li>
+<p><em>Allgemein</em></p>
+</li>
+<li>
+<p><em>Stil</em></p>
+</li>
+<li>
+<p><em>Transparenz</em></p>
+</li>
+<li>
+<p><em>Pyramiden</em></p>
+</li>
+<li>
+<p><em>Histogramm</em></p>
+</li>
+<li>
+<p><em>Metadaten</em></p>
+</li>
+</ul>
+<p><img alt="" src="../../../../images/rasterPropertiesDialog.png" /></p>
+<h2 id="menu-allgemein">Menü Allgemein <a name="#general-menu"></a></h2>
+<h3 id="layerinformation">Layerinformation <a name="#layer-info"></a></h3>
+<p>Das Menü <em>Allgemein</em> stellt grundlegende Informationen über den ausgewählten Rasterlayer dar, einschließlich der Layerquelle, dem Anzeigenamen (der verändert werden kann) und der Anzahl von Spalten, Zeilen und LeerWerten des Rasterlayers.</p>
+<h3 id="koordinatenbezugssystem">Koordinatenbezugssystem <a name="#coordinate-reference-system"></a></h3>
+<p>Hier können Sie das Koordinatenbezugssystem (KBS) als PROJ.4 Text ablesen. Wenn diese Einstellung nicht richtig ist können Sie Sie verändern indem Sie den Knopf <strong>[Angeben]</strong> klicken.</p>
+<h3 id="mastabsabhangige-sichtbarkeit">Maßstabsabhängige Sichtbarkeit <a name="#scale-dependent-visibility"></a></h3>
+<p>Zusätzlich kann eine skalenabhängige Sichtbarkeit eingestellt werden. Dazu muss das Kontrollkästchen aktiviert sein und ein entsprechender Maßstab, indem Ihre Daten im Kartenfenster dargestellt werden, eingetragen werden.</p>
+<p>Unten können Sie einen Thumbnail, sein Legendensymbol und die Palette sehen.</p>
+<h2 id="menu-stil">Menü Stil <a name="#style-menu"></a></h2>
+<h3 id="kanaldarstellung">Kanaldarstellung <a name="#band-rendering"></a></h3>
+<p>KADAS bietet vier verschiedene <em>Darstellungsart</em>. Die ausgewählte Darstellungsart hängt vom Datentyp ab.</p>
+<ol>
+<li>
+<p>Multikanalfarbe - wenn die Datei ein Multiband mit mehreren Kanälen ist (z.B. bei einem Satellitenbild mit mehreren Bändern)</p>
+</li>
+<li>
+<p>Palette - wenn ein Einkanalbild eine indizierte Palette besitzt (z.B. benutzt bei digitalen Topographischen Karten)</p>
+</li>
+<li>
+<p>Einkanalgraustufen - das Bild oder ein Kanal davon wird grau dargestellt; KADAS benutzt diese Darstellung wenn die Datei weder Multibänder, noch eine indizierte Palette noch eine kontinuirliche Palette (z.B. in einer Schummerungskarte benutzt) besitzt.</p>
+</li>
+<li>
+<p>Einkanalpseudofarbe - diese Darstellung ist bei Dateien mit kontinuirlicher Palette oder Farbkarte (z.B. wie sie in Höhenkarten verwendet wird) möglich</p>
+</li>
+</ol>
+<p><strong>Multikanalfarbe</strong></p>
+<p>Mit der Darstellung Multikanalfarbe werden drei ausgewählte Kanäle des Bildes dargestellt, wobei jedes Band due rote, grüne oder blaue Komponente zum Erstellen eines Farbbildes darstellt.</p>
+<p><img alt="" src="../../../../images/rasterMultibandColor.png" /></p>
+<p>Diese Auswahl bietet Ihnen ein breites Spektrum von Optionen zum Verändern des Erscheinungsbildes des Rasterlayers an. Zuerst müssen Sie den Datenbereich Ihres Bildes abrufen. Dieser kann durch das Wählen von <em>Ausdehnung</em> und das Klicken von <strong>[Laden]</strong> ermittelt werden. KADAS kann die <em>Min</em> und <em>Max</em> Werte der Kanäle <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Schätzen (schneller)</em> oder die <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Genau (langsamer)</em> <em>Genauigkeit</em> verwenden.</p>
+<p>Jetzt können Sie die Farben mit Hilfe des <em>Min/Max Werte</em> Bereichs skalieren. Viele Bilder haben ein paar sehr tiefe und hohe Daten. Diese Ausreißer können anhand der <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Kommulativer Anzahlschnitt</em> Einstellung beseitigt werden. Der voreingestellte Datenbereich ist auf 2% bis 98% der Datenwerte eingestellt und kann manuell angepasst werden. Mit dieser Einstellung kann das graue Aussehen des Bildes verschwinden. Mit der Skalierungsoption <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Min/max</em> erstellt KADAS eine Farbtabelle von allen im Originalbild enthaltenen Daten (z.B. erstellt KADAS eine Farbtabelle mit 256 Werten, vorausgesetzt Sie haben 8bit-Kanäle). Sie können Ihre Farbtabelle auch mit der <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Mittlere +/- Standardabweichung x</em> <img src="../../../../images/selectnumber.png" /> berechnen. Dann werden nur Werte innerhalb der Standardabweichung oder innerhalb mehrerer Standardabweichungen verwendet. Dies ist nützlich wenn ein oder zwei Zellen mit anormalen hohen Werten, die einen negativen Effekt auf die Darstellung des Rasterbildes haben, in einem Grid auftauchen.</p>
+<p>Alle Berechnungen können auch für die <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Aktuell</em> Ausdehnung durchgeführt werden.</p>
+<p><strong>Einen einzelnen Kanal eines Mehrkanal-Rasterlayers anzeigen</strong></p>
+<p>Wenn Sie sich nur einen einzelnen Kanal eines Multikanalfarbe Bildes (z.B. Rot) ansehen wollen kommen Sie vielleicht auf die Idee den Grün- und Blaukanal auf ‘’Nicht gesetzt” einzustellen. Dies ist nicht der korrekte Weg. Um den Rotkanal darzustellen stellen Sie den Bildtyp auf ‘Einkanalgraustufen’ ein und wählen Sie dann Rot als Kanal, der für Grau benutzt werden soll, aus</p>
+<p><strong>Palette</strong></p>
+<p>Dies ist die voreingestellt Darstellungsart für Singleband-Dateien die bereits eine Farbtabelle besitzen, wobei jedem Pixel eine bestimmte Farbe zugewiesen wird. In diesem Fall wird die Palette automatisch dargestellt. Wenn Sie die Farben, die einem bestimmten Wert zugewiesen werden, ändern wollen, Doppelklicken Sie auf die Farbe und der <em>Farbauswahl</em> Dialog erscheint. Seit KADAS 2.2. ist es möglich dem Farbwert eine Beschriftung zuzuweisen. Die Beschriftung erscheint dann in der Legende des Rasterlayers.</p>
+<p><img alt="" src="../../../../images/rasterPaletted.png" /></p>
+<p><strong>Kontrastverbesserung</strong></p>
+<p>Wenn GRASS Rasterlayer hinzugefügt werden wird die Option <strong>Kontrastverbesserung</strong> immer automatisch auf <strong>Strecken auf MinMax</strong> eingestellt, ungeachtet der Einstellungen in den KADAS Optionen.</p>
+<p><strong>Einkanalgraustufen</strong></p>
+<p>Mit dieser Darstellungsart können Sie ein Einkanalbild mit einem <em>Farbverlauf</em> darstellen: ‘Schwarz nach Weiß’ oder ‘Weiß nach Schwarz’. Sie können einen <em>Min</em> und einen <em>Max</em> Wert festlegen indem Sie erst <em>Ausdehnung</em> auswählen und dann <strong>[Laden]</strong> drücken. KADAS kann die <em>Min</em> und <em>Max</em> Werte der Kanäle <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Schätzen (schneller)</em> oder die <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Genau (langsamer)</em> <em>Genauigkeit</em> verwenden.</p>
+<p><img alt="" src="../../../../images/rasterSingleBandGray.png" /></p>
+<p>Im <em>Extremwerte laden</em> Abschnitt ist das Skalieren der Farbtabelle möglich. Ausreißer können anhand der <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Kommulativer Anzahlschnitt</em> Einstellung beseitigt werden. Der voreingestellte Datenbereich ist von 2% bis 98% der Datenwerte eingestellt und kann manuell angepasst werden. Mit dieser Einstellung kann der graue Charakter des Bildes verschwinden. Weitere Einstellungen können mit <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Extrema</em> und <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Mittlere +/- Standardabweichung x</em> <img src="../../../../images/selectnumber.png" /> gemacht werden. Während die erste eine Farbtabelle mit allen Daten, die im Originalbild enthalten sind, erstellt, erstellt die zweite eine Farbtabelle die nur Werte innerhalb der Standardabweichung oder mehrerer Standardabweichungen berücksichtigt. Dies ist nützlich wenn Sie eine oder zwei Zellen mit anormal hohen Werten in einem Grid haben die einen negativen Einfluss auf die Darstellung des Rasterlayers haben.</p>
+<p><strong>Einkanalpseudofarbe</strong></p>
+<p>Dies ist eine Darstellungsoption für Einkanaldateien die eine kontinuirliche Palette enthalten. Sie können hier auch individuelle Karten für die einzelnen Kanäle erstellen.</p>
+<p><img alt="" src="../../../../images/rasterSingleBandPseudocolor.png" /></p>
+<p>Es sind drei Typen von Farbinterpolation möglich:</p>
+<ol>
+<li>
+<p>Diskret</p>
+</li>
+<li>
+<p>Linear</p>
+</li>
+<li>Genau</li>
+</ol>
+<p>Im linken Block fügt der Knopf <img src="../../../../images/mActionSignPlus.png" /> <em>Werte manuell hinzufügen</em> einen Wert zu der individuellen Farbtabelle hinzu. Der Knopf <img src="../../../../images/mActionSignMinus.png" /> <em>Gewählte Zeile löschen</em> löscht einen Wert aus der individuellen Farbtabelle und der <img src="../../../../images/mActionArrowDown.png" /> <em>Farbabbildungselemente</em> Knopf sortiert die Farbtabelle gemäß den Pixelwerten in der Wertespalte. Ein Doppelklick auf die Wertespalte macht das Eingeben eines spezifischen Wertes möglich. Das Doppelklicken auf die Farbspalte öffnet den Dialog <em>Change color</em> in dem Sie eine Farbe die auf den Wert angewendet werden soll auswählen können. Des weiteren können Sie auch Beschriftungen für jede Farbe hinzufügen, allerdings wird dieser Wert nicht angezeigt wenn Sie das Objekte abfragen Werkzeug benutzen. Sie können auch auf den Knopf mActionDraw| <em>Farbabbildung aus Kanal laden</em> klicken welcher versucht die Tabelle aus dem Kanal zu laden (falls dieser eine hat). Und Sie können die Knöpfe <img src="../../../../images/mActionFileOpen.png" /> <em>Farbabbildung aus Datei laden</em> oder <img src="../../../../images/mActionFileSaveAs.png" /> <em>Farbabbildung in Datei speichern</em> verwenden um eine bestehende Farbtabelle zu laden oder eine definierte Farbtabelle für andere Sitzungen zu speichern.</p>
+<p>Im rechten Block wird Ihnen durch <em>Neue Farbabbildung generieren</em> das Erstellen von neuen kategorisierten Farbkarten ermöglicht. Für den <em>Modus</em> <img src="../../../../images/selectstring.png" /> ‘Gleiches Intervall’ müssen Sie nur die Anzahl der <em>Klassen</em> <img src="../../../../images/selectnumber.png" /> auswählen und den Knopf <em>Klassifizieren</em> drücken. Sie können die Farben der Farbkarte invertieren indem Sie auf das <img src="../../../../images/checkbox.png" /> <em>Invertieren</em> Kontrollkästchen klicken. Im Fall des <em>Modus</em> <img src="../../../../images/selectstring.png" /> ‘Fortlaufend’ erstellt KADAS automatisch Klassen abhängig von <em>Min</em> und <em>Max</em>. Das Definieren von Extremwerten kann mit Hilfe des <em>Extremwerte laden</em> Abschnitts durchgeführt werden. Viele Bilder haben einige wenige sehr tiefe und hohe Daten. Diese Ausreißer können anhand der <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Kommulativer Anzahlschnitt</em> Einstellung beseitigt werden. Der voreingestellte Datenbereich ist von 2% bis 98% der Datenwerte eingestellt und kann manuell angepasst werden. Anhand dieser Einstellung kann der graue Charakter des Bildes verschwinden. Mit der Skalierungsoption <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Extrema</em> erstellt KADAS eine Farbtabelle mit allen im Originalbild enthaltenen Daten (z.B. erstellt KADAS eine Farbtabelle mit 256 Werten, vorausgesetzt Sie haben 8bit Kanäle). Sie können Ihre Farbtabelle auch anhand der <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Mittlere +/- Standardabweichung x</em> <img src="../../../../images/selectnumber.png" /> berechnen. Dann werden nur Werte innerhalb der Standardabweichung oder mehrerer Standardabweichungen für die Farbtabelle berücksichtigt.</p>
+<h3 id="farbdarstellung">Farbdarstellung <a name="#color-rendering"></a></h3>
+<p>Für jede <em>Kanaldarstellung</em> ist eine <em>Farbdarstellung</em> möglich.</p>
+<p>Sie können auch spezielle Darstellungseffekte für Ihre Rasterdatei(en) erreichen indem Sie Mischmodi verwenden.</p>
+<p>Weitere Einstellungen können durch das Verändern der <em>Helligkeit</em>, der <em>Sättigung</em> und des <em>Kontrast</em> gemacht werden. Sie können auch eine <em>Graustufen</em> Option verwenden bei der Sie zwischen ‘Nach Helligkeit’, ‘Nach Leuchtkraft’ und ‘Nach Durchschnitt’ wählen können. Für einen Farbwert in der Farbtabelle können Sie die ‘Stärke’ verändern.</p>
+<h3 id="abtastung">Abtastung <a name="#resampling"></a></h3>
+<p>Die <em>Abtastung</em> Option kommt zur Erscheinung wenn Sie in ein Bild herein- oder herauszoomen. Abtastungsmodi können die Erscheinung der Karte optimieren. Sie berechnen eine neue Grauwertmatrix anhand einer geometrischen Transformation.</p>
+<p><img alt="" src="../../../../images/rasterRenderAndRessampling.png" /></p>
+<p>Wenn Sie die ‘Nächster Nachbar’ Methode anwenden kann die Karte eine pixelige Struktur bein Hineinzoomen haben. Dieses Erscheinungsbild kann verbessert werden indem man die ‘Bilinear’ oder ‘Kubisch’ Methode verwendet, die scharfe Objekte verwischt. Der Effekt ist ein weicheres Bild. Diese Methode kann z.B. auf digitale Topographische Karten angewendet werden.</p>
+<h2 id="menu-transparenz">Menü Transparenz <a name="#transparency-menu"></a></h2>
+<p>KADAS besitzt die Fähigkeit jeden Rasterlayer auf einem unterschiedlichen Transparenzlevel darzustellen. Verwenden Sie den Transparenzschieberegler <img alt="slider" src="../../../../images/slider.png" /> um einzugeben bis zu welchem Ausmaß die darunterliegenden Layer (falls es welche gibt) sichtbar durch den aktuellen Rasterlayer sein sollen. Dies ist sehr nützlich wenn Sie mehr als einen Rasterlayer überlagern wollen (z.B. wenn eine Schummerungskarte von einer klassifizierten Rasterkarte überlagert werden soll). So wird die Karte dreidimensionaler aussehen.</p>
+<p>Zusätzlich können Sie einen Rasterwert eingeben der als <strong>Leerwert</strong> im <em>Zusätzlicher Leerwert</em> Menü behandelt wird.</p>
+<p>Die Transparenz kann noch flexibler über die <em>Transparente Pixelliste</em> angepasst werden. Die Transparenz jedes Pixels kann hier eingestellt werden.</p>
+<p>Als Beispiel wollen wir die Wasserflächen aus dem Rasterlayer <code>landcover.tif</code> auf eine Transparenz von 20% setzen. Folgende Schritte sind dazu notwendig:</p>
+<ol>
+<li>
+<p>Laden Sie die Rasterdatei <code>landcover.tif</code>.</p>
+</li>
+<li>
+<p>Öffnen Sie den Dialog <em>Layereigenschaften</em> indem Sie auf den Namen in der Legende doppelklicken, oder im Rechte-Maustaste Menü <em>Eigenschaften</em> auswählen.</p>
+</li>
+<li>
+<p>Wählen Sie das Menü <em>Transparenz</em>.</p>
+</li>
+<li>
+<p>Wählen Sie ‘Keines’ aus dem <em>Transparenzkanal</em> Menü.</p>
+</li>
+<li>
+<p>Klicken Sie den <img src="../../../../images/mActionSignPlus.png" /> <em>Werte manuell hinzufügen</em> Knopf. Eine neue Zeile erscheint in der Pixelliste.</p>
+</li>
+<li>
+<p>Geben Sie den Rasterwert in die ‘Von’ und ‘Nach’ Spalte ein (wir benutzen hier 0) und passen Sie die Transparenz auf 20% an.</p>
+</li>
+<li>
+<p>Drücken Sie den Knopf <strong>[Anwenden]</strong> und schauen Sie sich das Ergebnis an.</p>
+</li>
+</ol>
+<p>Sie können Schritte 5 und 6 wiederholen um mehr Werte mit benutzerdefinierter Transparenz einzustellen.</p>
+<p>Wie Sie sehen können ist es recht einfach die benutzerdefinierte Transparenz einzustellen, aber es kann ganz schön viel Arbeit sein. Deswegen können Sie den Knopf <img src="../../../../images/mActionFileSave.png" /> <em>In Datei exportieren</em> benutzen um Ihre Transparenzliste in eine Datei zu speichern. Der Knopf <img src="../../../../images/mActionFileOpen.png" /> <em>Aus Datei importieren</em> lädt Ihre Transparenzeinstellungen und wendet sie auf den aktuellen Rasterlayer an.</p>
+<h2 id="menu-metadaten">Menü Metadaten <a name="#metadata-menu"></a></h2>
+<p>Das <em>Metadaten</em> Menü stellt eine Fülle von Informationen über den Rasterlayer dar, einschließlich Statistiken über jeden Kanal im aktuellen Rasterlayer. In diesem Menü können Einträge für <em>Beschreibung</em>, <em>Beschreibung</em>, <em>Metadaten-URL</em> und <em>Eigenschaften</em> gemacht werden. In <em>Eigenschaften</em> werden Statistiken nach dem Prinzip ‘was brauche ich’ erstellt, so dass es gut sein kann dass für einen Rasterlayer noch keine Statistik erstellt oder gesammelt wurde.</p>
+<p><img alt="" src="../../../../images/rasterMetadata.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../supported_data/" class="btn btn-neutral float-left" title="Unterstützte Formate"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../working_with_projections/working_with_projections/" class="btn btn-neutral float-right" title="Arbeiten mit Projektionen">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../supported_data/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../working_with_projections/working_with_projections/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

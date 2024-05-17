@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Fenêtre Propriétés - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Fen\u00eatre Propri\u00e9t\u00e9s";
+        var mkdocs_page_input_path = "fr/working_with_raster/raster_properties.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Fonctionnalités avancées</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="#">Couche vecteur</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/supported_data/">Données vectorielles</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_vector/field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Raster layers</a>
+    <ul class="current">
+                <li class="toctree-l3"><a class="reference internal" href="../supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Fenêtre Propriétés</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-general">Onglet Général </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-style">Onglet Style </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-transparence">Onglet Transparence </a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#onglet-metadonnees">Onglet Métadonnées </a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Fonctionnalités avancées &raquo;</li>
+          <li>Raster layers &raquo;</li>
+      <li>Fenêtre Propriétés</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="fenetre-proprietes-de-la-couche-raster">Fenêtre Propriétés de la couche raster <a name="#raster-properties-dialog"></a></h1>
+<p>Pour voir et définir les propriétés d'une couche raster, double-cliquez sur le nom de la couche dans la légende de la carte ou faites un clic-droit son nom et choisissez <em>Propriétés</em> dans le menu qui apparaît. La fenêtre des <em>Propriétés de la couche</em> apparaîtra.</p>
+<p>Il y a plusieurs onglets dans cette fenêtre:</p>
+<ul>
+<li>
+<p><em>Général</em></p>
+</li>
+<li>
+<p><em>Style</em></p>
+</li>
+<li>
+<p><em>Transparence</em></p>
+</li>
+<li>
+<p><em>Pyramides</em></p>
+</li>
+<li>
+<p><em>Histogramme</em></p>
+</li>
+<li>
+<p><em>Métadonnées</em></p>
+</li>
+</ul>
+<p><img alt="" src="../../../../images/rasterPropertiesDialog.png" /></p>
+<h2 id="onglet-general">Onglet Général <a name="#general-menu"></a></h2>
+<h3 id="informations-sur-la-couche">Informations sur la couche <a name="#layer-info"></a></h3>
+<p>L'onglet <em>Général</em> affiche des informations basiques sur le raster sélectionné, dont la source de la couche, le nom affiché dans la légende (qui peut être modifié), le nombre de colonnes, lignes et les valeurs <em>no-data</em>.</p>
+<h3 id="systeme-de-coordonnees-de-reference">Système de coordonnées de référence <a name="#coordinate-reference-system"></a></h3>
+<p>Le système de coordonnées de référence (SCR) est également affiché ici au format PROJ.4. S'il est incorrect, il peut être modifié en cliquant sur le bouton <strong>[Spécifier]</strong>.</p>
+<h3 id="visibilite-dependante-de-lechelle">Visibilité dépendante de l'échelle <a name="#scale-dependent-visibility"></a></h3>
+<p>La visibilité en fonction de l'échelle se définit également dans cet onglet. Vous devez activer la case à cocher et définir une échelle appropriée pour l'affichage de vos données sur la carte.</p>
+<p>Tout en bas, sont affichés un aperçu de la couche, son symbole de légende et sa palette.</p>
+<h2 id="onglet-style">Onglet Style <a name="#style-menu"></a></h2>
+<h3 id="rendu-des-bandes-raster">Rendu des bandes raster <a name="#band-rendering"></a></h3>
+<p>KADAS propose quatre <em>Types de rendu</em>. Le choix s'effectue en fonction du type de données.</p>
+<ol>
+<li>
+<p>Couleur à Bandes Multiples - Si le fichier raster est multibande et contient plusieurs bandes (par exemple, avec une image satellite)</p>
+</li>
+<li>
+<p>Palette - Si le fichier ne contient qu'une seule bande indexée (par exemple, pour les cartes topographiques)</p>
+</li>
+<li>
+<p>Bande Grise Unique - (Une seule bande de gris). Le rendu de l'image sera gris. KADAS choisit ce rendu si ce fichier n'est ni multibande, ni une palette indexée, ni une palette continue (utilisée par exemple pour les cartes avec des reliefs ombrés)</p>
+</li>
+<li>
+<p>Pseudo-Couleur à Banque Unique - vous pouvez utiliser ce rendu pour les fichiers contenant une palette continue ou des cartes en couleur (par exemple pour une carte des altitudes)</p>
+</li>
+</ol>
+<p><strong>Couleur à bandes multiples</strong></p>
+<p>Avec ce type de rendu, trois bandes de l'image seront utilisées, chacune correspondant à la composante rouge, verte ou bleue de l'image colorée finale. Vous pouvez choisir parmi différentes méthodes d’<em>Amélioration du contraste</em>: <em>Pas d'amélioration</em>, <em>Étirer jusqu'au MinMax</em>, <em>Étirer et couper jusqu'au MinMax</em> ou <em>Couper jusqu'au MinMax</em>.</p>
+<p><img alt="" src="../../../../images/rasterMultibandColor.png" /></p>
+<p>Ces options vous offrent de nombreuses possibilités de modifier l'apparence de votre couche raster. Premièrement vous devez connaître la plage de valeurs de votre image. Vous pouvez utiliser pour cela l’<em>Emprise</em> et cliquer sur <strong>[Charger]</strong>. Pour les valeurs de <em>Min</em> et de <em>Max</em> de vos bandes, KADAS vous laisse le choix entre une <em>Précision</em> <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Estimée (plus rapide)</em> ou <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Réelle (plus lente)</em>.</p>
+<p>Maintenant vous pouvez échelonner les couleurs grâce à la partie <em>Charger les valeurs min/max</em>. Beaucoup d'images n'ont que très peu de valeurs très faibles ou très élevées. Ces extrêmes peuvent être ignorés en utilisant l'option <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Bornes d'exclusion des valeurs extrêmes</em>. Par défaut la plage proposée va de 2% à 98% des valeurs de données et peut être ajustée manuellement. Avec ce paramétrage, l'aspect gris de l'image peut disparaitre. Avec l'option <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Min / max</em>, KADAS crée une table de couleur à partir de toutes les données de l'image originale (par exemple, KADAS crée une table de couleur avec 256 valeurs, si vous avez des bandes codées sur 8 bits). Vous pouvez également calculer votre table de couleur en utilisant l'option <em>Moyenne +/- écart-type x</em> <img src="../../../../images/selectnumber.png" />. Ainsi, seules les valeurs comprises dans cet intervalle (écart-type ou multiple de l'écart-type) seront considérées. Ceci est utile lorsqu'un ou deux pixels ont des valeurs anormalement élevées et ont un impact négatif sur le rendu du raster.</p>
+<p>Tous les calculs peuvent également être réalisés pour l'emprise <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Actuelle</em>.</p>
+<p><strong>Visualiser une seule bande d'un raster multibande</strong></p>
+<p>Si vous désirez visualiser une seule bande d'une image multibande (par exemple la bande rouge), vous pouvez penser que vous pourriez définir les bandes Verte et Bleue à “Non définie”. Mais ce n'est pas la manière correcte. Pour afficher la bande Rouge, définissez le type d'image à Bande grise unique, puis sélectionnez la bande Rouge comme bande à utiliser pour le gris.</p>
+<p><strong>Palette</strong></p>
+<p>C'est l'option standard pour les fichiers à une seule bande qui incluent déjà une table de couleurs, où à chaque valeur de pixel a été assignée une couleur. Dans ce cas, la palette est utilisée automatiquement. Si vous désirez modifier l'assignement des couleurs pour certaines valeurs, double cliquez simplement sur la couleur et la boîte de dialogue de <em>Sélection de couleur</em> apparaîtra. Il est maintenant possible depuis KADAS 2.2 d'assigner un label aux valeurs de couleur. L'étiquette apparaîtra alors dans la légende de la couche raster.</p>
+<p><img alt="" src="../../../../images/rasterPaletted.png" /></p>
+<p><strong>Amélioration de contraste</strong></p>
+<p>Lors de l'ajout d'une couche raster GRASS, l'option <em>Amélioration de contraste</em> sera automatiquement <em>Étirer jusqu'au MinMax</em>, quelles que soient les options générales de KADAS définies pour cette option.</p>
+<p><strong>Bande grise unique</strong></p>
+<p>Ce type de rendu vous permet de représenter une bande d'un raster par un <em>Dégradé de couleur</em>: <em>Noir vers blanc</em> ou <em>Blanc vers noir</em>. Vous pouvez choisir un <em>Min</em> et un <em>Max</em> en choisissant d'abord une <em>Emprise</em> puis en cliquant sur <strong>[Charger]</strong>. KADAS peut utiliser les valeurs <em>Min</em> et <em>Max</em> <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Estimée (plus rapide)</em> ou utiliser les valeurs <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Réelle (plus lent)</em>.</p>
+<p><img alt="" src="../../../../images/rasterSingleBandGray.png" /></p>
+<p>Grâce à la partie <em>Charger les valeurs min/max</em>, vous pouvez échelonner les couleurs. Les valeurs extrêmes peuvent être ignorées en utilisant l'option <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Bornes d'exclusion des valeurs extrêmes</em>. Par défaut la plage proposée va de 2% à 98% des valeurs de données et peut être ajustée manuellement. Avec ce paramétrage, l'aspect gris de l'image peut disparaitre. D'autres réglages peuvent être effectués via les boutons <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Min / max</em> and <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Moyenne +/- écart-type x</em> <img src="../../../../images/selectnumber.png" />. Le premier crée une table de couleur à partir de toutes les données de l'image originale alors que le deuxième crée une table de couleur qui ne considère que les valeurs comprises dans l'intervalle constitué par l'écart-type ou un multiple de l'écart-type. Ceci est utile lorsqu'un ou deux pixels ont des valeurs anormalement élevées et ont un impact négatif sur le rendu du raster.</p>
+<p><strong>Pseudo-couleur à bande unique</strong></p>
+<p>C'est une option de rendu pour les fichiers à bande unique, incluant une palette de couleurs continues. Vous pouvez aussi créer des palettes de couleurs pour les fichiers à bande unique</p>
+<p><img alt="" src="../../../../images/rasterSingleBandPseudocolor.png" /></p>
+<p>Trois manières de faire une interpolation de couleurs sont disponibles:</p>
+<ol>
+<li>
+<p>Discrète</p>
+</li>
+<li>
+<p>Linéaire</p>
+</li>
+<li>
+<p>Exacte</p>
+</li>
+</ol>
+<p>Sur la partie gauche, le bouton <img src="../../../../images/mActionSignPlus.png" /> <em>Ajouter une valeur manuellement</em>, permet d'ajouter une valeur individuelle à la table de couleurs. Le bouton <img src="../../../../images/mActionSignMinus.png" /> <em>Supprimer la valeur sélectionnée</em> efface une valeur et <img src="../../../../images/mActionArrowDown.png" /> <em>Trier les éléments de la palette de couleurs</em> permet de trier la table de couleurs en fonction des valeurs de pixels. En double-cliquant sur une valeur, vous pouvez l'éditer manuellement. Un double-clic sur une couleur ouvre la fenêtre <em>Modifier la couleur</em> où vous pouvez la modifier. De plus, vous pouvez ajouter une étiquette de légende pour chaque valeur (mais cette information n'apparaîtra pas lors de l'utilisation de l'outil d'identification). Vous pouvez également <img src="../../../../images/mActionDraw.png" /> <em>Charger une palette de couleur depuis la bande</em>, si une table de couleurs a été définie pour la bande. Enfin vous pouvez utiliser les boutons <img src="../../../../images/mActionFileOpen.png" /> <em>Charger une palette de couleur depuis un fichier</em> ou <img src="../../../../images/mActionFileSaveAs.png" /> <em>Exporter une palette de couleur vers un fichier</em> pour importer ou exporter une table de couleur depuis ou vers une autre session.</p>
+<p>Sur la partie droite, il est possible de <em>Générer une nouvelle palette de couleur</em>. Pour le <em>Mode</em> de classification par <img src="../../../../images/selectstring.png" /> <em>Intervalles égaux</em>, vous n'avez qu'à choisir le nombre de <em>Classes</em> <img src="../../../../images/selectnumber.png" /> et cliquez sur le bouton <em>Classer</em>. Vous pouvez inverser l'ordre des couleurs de la palette en cochant la case <img src="../../../../images/checkbox.png" /> <em>Inverser</em>. Dans le cas d'une classification par <em>Mode</em> <img src="../../../../images/selectstring.png" /> <em>Continu</em>, KADAS crée automatiquement les classes en fonction des <em>Min</em> et <em>Max</em>. La partie située en dessous, <em>Charger les valeurs min/max</em>, permet d'ajuster ces valeurs. En effet, beaucoup d'images n'ont que très peu de valeurs très faibles ou très élevées. Ces extrêmes peuvent être ignorés en utilisant l'option <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Bornes d'exclusion des valeurs extrêmes</em>. Par défaut la plage proposée va de 2% à 98% des valeurs de données et peut être ajustée manuellement. Avec ce paramétrage, l'aspect gris de l'image peut disparaitre. Avec l'option <img alt="radiobuttonoff" src="../../../../images/radiobuttonoff.png" /> <em>Min / max</em>, KADAS crée une table de couleur à partir de toutes les données de l'image originale (par exemple, KADAS crée une table de couleur avec 256 valeurs, si vous avez des bandes codées sur 8 bits). Vous pouvez également calculer votre table de couleur en utilisant l'option <em>Moyenne +/- écart-type x</em> <img src="../../../../images/selectnumber.png" />. Ainsi, seules les valeurs comprises dans cet intervalle (écart-type ou multiple de l'écart-type) seront considérées.</p>
+<h3 id="rendu-des-couleurs">Rendu des couleurs <a name="#color-rendering"></a></h3>
+<p>Pour chaque type de <em>Rendu par bande</em>, des options de <em>Rendu de la couleur</em> sont disponibles.</p>
+<p>Vous pouvez réaliser des effets spéciaux sur le rendu de vos rasters en utilisant un des modes de fusion.</p>
+<p>D'autres paramètres permettent de modifier la <em>Luminosité</em>, la <em>Saturation</em> et le <em>Contraste</em>. Vous pouvez également utiliser un <em>Dégradé de gris</em> et le faire <em>Par clarté</em>, <em>Par luminosité</em>, ou <em>Par moyenne</em>. Pour une teinte de couleur, vous pouvez en modifier la <em>Force</em></p>
+<h3 id="re-echantillonnage">Ré-échantillonnage <a name="#resampling"></a></h3>
+<p>Les options de <em>Ré-échantillonnage</em> déterminent l'apparence d'un raster quand vous zoomez ou dé-zoomez. Différents modes de ré-échantillonnage permettent d'optimiser l'apparence d'un raster. Ils calculent une nouvelle matrice de valeurs via une transformation géométrique.</p>
+<p><img alt="" src="../../../../images/rasterRenderAndRessampling.png" /></p>
+<p>En appliquant la méthode <em>Plus proche voisin</em>, le raster peut apparaître pixelisé lorsque l'on zoome dessus. Ce rendu peut être amélioré en choisissant les méthodes <em>Bilinéaire</em> ou <em>Cubique</em> qui adoucissent les angles. L'image est alors lissée. Ces méthodes sont adaptées par exemple aux rasters d'élévation.</p>
+<h2 id="onglet-transparence">Onglet Transparence <a name="#transparency-menu"></a></h2>
+<p>KADAS permet d'afficher chaque raster à des niveaux de transparence différents. Utilisez le curseur de transparence <img alt="slider" src="../../../../images/slider.png" /> pour indiquer dans quelle mesure les couches sous-jacentes (s'il y en a) pourront être visibles à travers cette couche raster. Cela est très utile, si vous désirez superposer plus d'une couche raster (par exemple une carte des reliefs ombrés superposée à une carte raster classifiée). Cela donnera un rendu proche d'un rendu en trois dimensions.</p>
+<p>De plus, vous pouvez entrer une valeur raster qui sera traitée comme <em>NODATA</em> dans <em>Valeur nulle supplémentaire</em>.</p>
+<p>Un moyen encore plus flexible de personnaliser la transparence est d'utiliser la section <em>Options de transparence personnalisée</em>. La transparence de chaque pixel peut être définie dans cet onglet.</p>
+<p>Par exemple, pour donner une transparence de 20% à l'eau sur notre raster d'exemple <code>landcover.tif</code>, les étapes suivantes sont nécessaires:</p>
+<ol>
+<li>
+<p>Chargez le raster <code>landcover.tif</code>.</p>
+</li>
+<li>
+<p>Ouvrez la boîte de dialogue <em>Propriétés de la couche</em> en double-cliquant sur le nom du raster dans la légende ou avec un clic droit et en choisissant <em>Propriétés</em> dans le menu qui apparaît.</p>
+</li>
+<li>
+<p>Sélectionnez l'onglet <em>Transparence</em>.</p>
+</li>
+<li>
+<p>Dans la liste <em>Bande de transparence</em>, choisissez <em>Aucune</em>.</p>
+</li>
+<li>
+<p>Cliquez sur le bouton <img src="../../../../images/mActionSignPlus.png" /> <em>Ajouter des valeurs manuellement</em>. Une nouvelle ligne apparait dans la liste des pixels.</p>
+</li>
+<li>
+<p>Entrez la valeur raster dans les colonnes <em>De</em> et <em>Vers</em> (mettez la valeur 0) puis ajustez la transparence à 20%.</p>
+</li>
+<li>
+<p>Cliquez sur le bouton <strong>[Appliquer]</strong> et regardez la carte.</p>
+</li>
+</ol>
+<p>Vous pouvez répéter les étapes 5 et 6 pour personnaliser la transparence d'autres valeurs.</p>
+<p>Comme vous pouvez le voir, il est assez facile de définir une transparence personnalisée, mais cela peut prendre un peu de temps. Par conséquent, vous pouvez utiliser le bouton <img src="../../../../images/mActionFileSave.png" /> <em>Exporter dans un fichier</em> pour sauver vos paramètres de transparence dans un fichier. Le bouton <img src="../../../../images/mActionFileOpen.png" /> <em>Importer depuis le fichier</em> charge vos paramètres de transparence et les applique à la couche raster actuelle.</p>
+<h2 id="onglet-metadonnees">Onglet Métadonnées <a name="#metadata-menu"></a></h2>
+<p>L'onglet <em>Métadonnées</em> affiche de nombreuses informations sur la couche raster, dont les statistiques sur chaque bande de la couche raster. Les informations sont regroupées par section: <em>Description</em>, <em>Attribution</em>, <em>URL Métadonnées</em> et <em>Propriétés</em>. Les statistiques sont recueillies <em>à la demande</em>, de sorte qu'il est possible que les statistiques sur une couche n'aient pas encore été collectées.</p>
+<p><img alt="" src="../../../../images/rasterMetadata.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../supported_data/" class="btn btn-neutral float-left" title="Données raster"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../working_with_projections/working_with_projections/" class="btn btn-neutral float-right" title="Utiliser les projections">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../supported_data/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../working_with_projections/working_with_projections/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

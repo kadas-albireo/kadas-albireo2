@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Données vectorielles - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Donn\u00e9es vectorielles";
+        var mkdocs_page_input_path = "fr/working_with_vector/supported_data.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Généralités</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../kadas_gui/">Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map/">Carte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../view/">Vue</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../analysis/">Analyse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../draw/">Dessiner</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../settings/">Réglages</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Fonctionnalités avancées</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Couche vecteur</a>
+    <ul class="current">
+                <li class="toctree-l3 current"><a class="reference internal current" href="./">Données vectorielles</a>
+    <ul class="current">
+    <li class="toctree-l4"><a class="reference internal" href="#shapefiles-esri">Shapefiles ESRI </a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../vector_properties/">Fenêtre Propriétés</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../expression/">Expressions</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../field_calculator/">Calculatrice de champ</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Raster layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/supported_data/">Données raster</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../working_with_raster/raster_properties/">Fenêtre Propriétés</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../working_with_projections/working_with_projections/">Utiliser les projections</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../print_composer/print_composer/">Composeur d’impression</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Annexe</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/shortcuts/">Raccourcis</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../appendices/license/">License</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+          <li>Fonctionnalités avancées &raquo;</li>
+          <li>Couche vecteur &raquo;</li>
+      <li>Données vectorielles</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="formats-de-donnees-geres">Formats de données gérés <a name="#supported-data-formats"></a></h1>
+<p>KADAS utilise la bibliothèque OGR pour lire et écrire des données vectorielles incluant les formats ESRI shapefiles, MapInfo et MicroStation; les bases de données AutoCAD DXF, PostGIS, SpatiaLite, Oracle Spatial et MS SQL Spatial et de nombreux autres formats. Les données vectorielles GRASS et PostgreSQL sont gérées par des extensions natives de KADAS. Les données vectorielles peuvent également être lues depuis des archives zip ou gzip. A ce jour, 69 formats de données vectorielles sont gérés par la bibliothèque OGR. La liste complète est disponible sur <a href="http://www.gdal.org/ogr/ogr_formats.html">http://www.gdal.org/ogr/ogr_formats.html</a>.</p>
+<h2 id="shapefiles-esri">Shapefiles ESRI <a name="#esri-shapefiles"></a></h2>
+<p>Le format de fichier vecteur standard utilisé par QGIS est le shapefile ESRI. Il est géré à travers la bibliothèque <span id="index-5"></span>OGR Simple Feature Library (<a href="http://www.gdal.org/ogr/">http://www.gdal.org/ogr/</a>).</p>
+<p>Un shapefile est en réalité composé de plusieurs fichiers. Les trois suivants sont requis:</p>
+<ol>
+<li>
+<p><code>.shp</code> fichier contenant la géométrie des entités.</p>
+</li>
+<li>
+<p><code>.dbf</code> fichier contenant les attributs au format dBase.</p>
+</li>
+<li>
+<p><code>.shx</code> fichier d'index.</p>
+</li>
+</ol>
+<p>Un shapefile inclus également un fichier ayant l'extension <code>.prj</code> qui contient les informations sur le système de coordonnées. Bien que ces informations soient très utiles elles ne sont pas obligatoires. Il peut y avoir encore d'autres fichiers associés aux données shapefile. Si vous souhaitez avoir plus de détails, nous vous recommandons de vous reporter aux spécifications techniques du format shapefile, qui se trouve notamment sur <a href="http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf">http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf</a>.</p>
+<h3 id="charger-un-shapefile">Charger un Shapefile <a name="#loading-a-shapefile"></a></h3>
+<p>When loading a vector layer, the following dialog opens:</p>
+<p><img alt="" src="../../../../images/addvectorlayerdialog.png" /></p>
+<p>Cliquez sur <img alt="radiobuttonon" src="../../../../images/radiobuttonon.png" /> <em>Fichier</em> puis sur le bouton <strong>[Parcourir]</strong>. L'outil ouvre alors une fenêtre de dialogue standard qui vous permet de naviguer dans les répertoires et les fichiers, et charger le shapefile ou tout autre format géré. La boîte de sélection <em>Fichiers de type</em> <img src="../../../../images/selectstring.png" /> vous permet de présélectionner un format de fichier géré par OGR.</p>
+<p>Si vous le souhaitez, vous pouvez également sélectionner le type de codage du shapefile.</p>
+<p><img alt="" src="../../../../images/shapefileopendialog.png" /></p>
+<p>Selecting a shapefile from the list and clicking <strong>[Open]</strong> loads it into KADAS.</p>
+<p><strong>Couleur des couches</strong></p>
+<p>Quand vous ajoutez une couche sur une carte, une couleur aléatoire lui est assignée. En ajoutant plusieurs couches en une fois, différentes couleurs sont assignées à chacune des couches.</p>
+<p>Une fois le shapefile chargé, vous pouvez zoomer dessus en utilisant les outils de navigation sur la carte. Pour changer la symbologie d'une couche, ouvrez la fenêtre <em>Propriétés de la Couche</em> en double-cliquant sur le nom de la couche ou en faisant un clic droit sur son nom dans la légende et en choisissant <em>Propriétés</em> dans le menu qui apparait. Pour plus de détails sur les paramètres de la symbologie des couches vectorielles.</p>
+<h3 id="ameliorer-les-performances-daffichage-des-shapefiles">Améliorer les performances d'affichage des Shapefiles <a name="#improving-performance-for-shapefiles"></a></h3>
+<p>Pour améliorer les performances de dessin d'un shapefile, vous pouvez créer un index spatial. Un index spatial améliorera à la fois la vitesse d'exécution du zoom et du déplacement panoramique. Les index spatiaux utilisés par QGIS ont une extension <code>.qix</code>.</p>
+<p>Voici les étapes de création d'un index spatial:</p>
+<ul>
+<li>
+<p>Chargez un shapefile en cliquant sur le bouton <img src="../../../../images/mActionAddOgrLayer.png" /> <em>Ajouter une couche vecteur</em> de la barre d'outils ou en pressant les touches <code>Ctrl+Shift+V</code>.</p>
+</li>
+<li>
+<p>Ouvrez la fenêtre <em>Propriétés de la Couche</em> en double-cliquant sur le nom de la couche dans la légende ou en faisant un clic droit et en choisissant <em>Propriétés</em> dans le menu qui apparait.</p>
+</li>
+<li>
+<p>Dans l'onglet <em>Général</em>, cliquez sur le bouton <strong>[Créer un index spatial]</strong>.</p>
+</li>
+</ul>
+<h3 id="probleme-de-chargement-de-fichier-prj">Problème de chargement de fichier .prj <a name="#problem-loading-a-shape-prj-file"></a></h3>
+<p>Si vous ouvrez un shapefile disposant d'un fichier <code>.prj</code> et que KADAS ne parvient pas à lire le système de coordonnées de référence, vous allez devoir le définir manuellement via l'onglet <em>Général</em> de la fenêtre de <em>Propriétés de la Couche</em> en cliquant sur le bouton <strong>[Specifier...]</strong>. Cela est dû au fait que ce fichier <code>.prj</code> ne fournit pas les paramètres complets de la projection requis par KADAS et listés dans la fenêtre <em>SCR</em>.</p>
+<p>C'est pour la même raison que lorsque vous créez un nouveau shapefile avec KADAS, deux fichiers de projection différents sont créés. Un fichier <code>.prj</code> contenant un nombre limité de paramètres, compatible avec les logiciels ESRI et un fichier <code>.qpj</code>, fournissant la totalité des paramètres du SCR utilisé. Chaque fois que KADAS trouve un fichier <code>.qpj</code>, il l'utilisera à la place du fichier <code>.prj</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../settings/" class="btn btn-neutral float-left" title="Réglages"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../vector_properties/" class="btn btn-neutral float-right" title="Fenêtre Propriétés">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../settings/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../vector_properties/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

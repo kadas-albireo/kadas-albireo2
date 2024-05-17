@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Analyse - KADAS Albireo</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Analyse";
+        var mkdocs_page_input_path = "de/analysis.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> KADAS Albireo
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">KADAS Albireo</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Allgemeines</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kadas_gui/">Benutzeroberfläche</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map/">Karte</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../view/">Ansicht</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Analyse</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#distanzen-flachen-und-azimut-messen">Distanzen, Flächen und Azimut Messen</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hohenprofil-und-sichtbarkeit">Höhenprofil und Sichtbarkeit</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#neigung-und-schummerung">Neigung und Schummerung</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#einsehbarkeit">Einsehbarkeit</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#minmax">Min/Max</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ephemeriden">Ephemeriden</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../draw/">Zeichnen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gps/">Navigation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mss/">MSS</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../settings/">Einstellungen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Erweiterte Funktionalitäten</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="#">Vektorebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/vector_properties/">Eigenschaftendialog</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/expression/">Ausdrücke</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_vector/field_calculator/">Feldrechner</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="#">Rasterebenen</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/supported_data/">Unterstützte Formate</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../working_with_raster/raster_properties/">Eigenschaftendialog</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../working_with_projections/working_with_projections/">Arbeiten mit Projektionen</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../print_composer/print_composer/">Druckzusammenstellung</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../gpsgate/gpsgate/">GPS Gate</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="#">Anhang</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/shortcuts/">Tastaturkürzel</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../appendices/license/">Lizenz</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">KADAS Albireo</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>KADAS Albireo &raquo;</li>
+      <li>Analyse</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="analyse">Analyse</h1>
+<p>In der Registerkarte <strong><em>Analyse</em></strong> befinden sich die Werkzeuge zum Messen von Distanzen, Flächen, Kreise und Winkeln sowie verschiedene Geländeanalysefunktionen.</p>
+<p>Um die Geländeanalysefunktionen verwenden zu können, muss im aktuellen Projekt ein Höhenmodell definiert sein. Eine Raster-Ebene kann in dessen Kontextmenü in der Kartenlegende als Höhenmodell ausgewählt werden.</p>
+<h2 id="distanzen-flachen-und-azimut-messen"><a name="sec0"></a>Distanzen, Flächen und Azimut Messen</h2>
+<p>Es werden vier Messmethoden angeboten:</p>
+<ul>
+<li>Linie (Distanz)</li>
+<li>Fläche</li>
+<li>Kreisfläche</li>
+<li>Azimuth</li>
+</ul>
+<p>Sämtliche Messfunktionen arbeiten auf einem WGS84 Ellipsoid.</p>
+<p>Nach dem Aktivieren einer Messfunktion kann der Benutzer eine entsprechende Messgeometrie im Kartenfenster zeichnen. Relevante Masse werden direkt neben der Messgeometrie angezeigt.</p>
+<p>Für Distanz- und Flächenmessungen können mehrere Geometrien nacheinander gezeichnet werden. Das Messtotal wird im unteren Bereich des Kartenfensters angezeigt, wo auch die Messeinheit geändert werden kann. Ferner kann mittels dem Picker-Button eine existierende Geometrie gemessen werden.</p>
+<p><img src="../../../media/image3.png" /></p>
+<h2 id="hohenprofil-und-sichtbarkeit"><a name="sec1"></a>Höhenprofil und Sichtbarkeit</h2>
+<p>Mit der <strong><em>Profil Sicht</em></strong> Funktion können sowohl Höhenprofil wie auch Sichtbarkeitsanalysen durchgeführt werden. Um diese Funktion verwenden zu können, muss im Projekt ein Höhenmodell definiert sein. Eine Raster-Ebene kann in dessen Kontextmenü im Karteninhaltsverzeichnis als Höhenmodell ausgewählt werden.</p>
+<p>Um ein Höhenprofil zu erstellen, kann der Benutzer auf der Karte eine Liniengeometrie zeichnen, entlang der das Profil gemessen werden soll. Das Resultat wird im separaten Dialogfenster dargestellt. Alternativ kann mittels Picker-Button auch eine entlang einer existierenden Liniengeometrie gemessen werden.</p>
+<p>Besteht die Liniengeometrie aus nur einem Segment, kann entlang dieser Linie eine Sichtbarkeitsanalyse durchgeführt werden. Dazu muss im Höhenprofildialog die Sichtbarkeit Checkbox aktiv sein. Sichtbare bzw. unsichtbare Bereiche werden dann entsprechend Grün oder Rot gezeichnet. Fährt man mit der Maus in der Karte entlang der Messlinie, wird die entsprechende Position in der Graphik mit einem blauen Punkt angezeigt. Die Sichtbarkeitsanalyse berücksichtigt die Erdkrümmung. Konfigurationsmöglichkeiten der Sichtbarkeitsanalyse sind die Beobachterhöhe, die Zielhöhe sowie ob diese Höhen relativ zum Terrain oder dem Meeresspiegel interpretiert werden sollen. </p>
+<p>Die Höhenprofilgraphik lässt sich zusätzlich in die Zwischenablage kopieren, oder als Bild in die Karte einbetten.</p>
+<p><img src="../../../media/image4.png" /></p>
+<h2 id="neigung-und-schummerung"><a name="sec2"></a>Neigung und Schummerung</h2>
+<p>Die Funktion <strong><em>Neigung</em></strong> berechnet ein Neigungsprofil des Geländes als farbkodiertes Raster.</p>
+<p>Die Funktion <strong><em>Schummerung</em></strong> berechnet die Schattierung des Geländes, welches Halbtransparent über die Karte gelegt wird.</p>
+<p>Um diese Geländeanalysefunktionen verwenden zu können, muss im Projekt ein Höhenmodell definiert sein.</p>
+<p>Beide dieser Analysen werden innerhalb eines rechteckigen Auschnittes der Karte berechnet. Die Schummerung erfordert noch zusätzlich die Eingabe der horizontalen und vertikalen Winkel der Lichtquelle.</p>
+<p>Die Ergebnisse der Neigungs- und Schummerungsanalysen werden als Raster-Ebenen der Karte hinzugefügt, und erscheinen dementsprechend im Karteninhaltsverzeichnis. Beim Speichern des Projektes werden diese Datensätze als Anhänge in der <em><Projektname>.qgz</em> Projektdatei gespeichert.</p>
+<p><img src="../../../media/image5.png" /></p>
+<h2 id="einsehbarkeit"><a name="sec3"></a>Einsehbarkeit</h2>
+<p>Das Werkszeug <strong><em>Einsehbarkeit</em></strong> berechnet den sichtbaren bzw. unsichtbaren Geländebereich in einem Kreissektor, ausgehend vom Kreismittelpunkt – dem Beobachterstandort. Die Einsehbarkeitsanalyse berücksichtigt die Erdkrümmung.</p>
+<p>Um diese Geländeanalysefunktionen verwenden zu können muss im Projekt ein Höhenmodell definiert sein.</p>
+<p>Die Einsehbarkeitsanalyse wird innerhalb eines Kreissektors oder einem Vollkreis berechnet. Beim ersten Mausklick auf die Karte wird der Beobachterstandort definiert, der zweite definiert den Radius, und der dritte den Sektoröffungswinkel. Falls die numerische Eingabe aktiv ist, können diese Parameter auch numerisch eingegeben werden. Nach dem erfassen der Analysefläche können die Berechnungsparameter angepasst werden, nämlich die Beobachterhöhe, die Zielhöhe, ob diese Höhen relativ zum Terrain oder dem Meeresspiegel interpretiert werden sollen, und ob der sichtbare oder der unsichtbare Berich angezeigt werden soll.</p>
+<p>Das Ergebnis wird als Rasterebene der Karte hinzugefügt. Beim Speichern des Projektes wird diese als Anhang in der <em><Projektname>.qgz</em> Projektdatei gespeichert.</p>
+<h2 id="minmax"><a name="sec4"></a>Min/Max</h2>
+<p>Das Werkzeug <strong><em>Min/Max</em></strong> ermöglicht die Berechnung des tiefsten und höchsten Geländepunktes innerhalb eines ausgewählten Bereichs (Rechteck/Polygon/Kreis). Die entsprechenden Punkte werden mit nach oben und unten gerichteten Dreieckssymbolen auf der Karte markiert. Durch Anklicken der Dreieckssymbole können die Koordinaten kopiert, eine Stecknadel hinzugefügt und eine weitere Analysefunktion (z.B. Einsehbarkeit) von diesem Punkt aus gestartet werden.</p>
+<h2 id="ephemeriden"><a name="sec4"></a>Ephemeriden</h2>
+<p>Das Werkzeug <strong><em>Ephemeriden</em></strong> berechnet die Sonnen- und Mondephemeriden (Position, Auf- und Untergangszeiten, Mondphase) an einer ausgewählten Geländeposition und zu einem bestimmten Zeitpunkt. Über die Checkbox kann eingestellt werden, ob das Relief betrachten werden soll.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../view/" class="btn btn-neutral float-left" title="Ansicht"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../draw/" class="btn btn-neutral float-right" title="Zeichnen">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../view/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../draw/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
