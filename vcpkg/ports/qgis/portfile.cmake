@@ -17,7 +17,6 @@ vcpkg_from_github(
         crssync.patch
         bigobj.patch
         mesh.patch
-        qtkeychain-56284.patch
         bindings-install.patch
 )
 
