@@ -1,6 +1,13 @@
-string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF "final-${TAG}")
+message("VERSION: ${VERSION}")
+
+if(${VERSION} STREQUAL "master")
+    set(QGIS_REF ${VERSION})
+else()
+    string(REPLACE "." "_" TAG ${VERSION})
+    set(QGIS_REF "final-${TAG}")
+endif()
+
 set(QGIS_SHA512 d8075b98efe8ebea1ee53273b9427e0a7329ba8f1a96258d962dee52b0c5c08be2bea10b2130fee4c0acbc3f4a94b94da0033e8b6c92857e0c679c051545d3d8)
 
 vcpkg_from_github(
