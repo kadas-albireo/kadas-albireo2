@@ -1,12 +1,5 @@
 
-message("VERSION: ${VERSION}")
-
-if(${VERSION} STREQUAL "master")
-    set(QGIS_REF ${VERSION})
-else()
-    string(REPLACE "." "_" TAG ${VERSION})
-    set(QGIS_REF "final-${TAG}")
-endif()
+set(QGIS_REF 7d1419e823bda4942266122a2ba057dd20cef385)
 
 set(QGIS_SHA512 c3667497aa5de622402c23577b80ce1b2eb4a2ce443c0f1ea8db769b30b69edd90abf688d3c4ae77a2f0f4d22be3e18c21a66be180712f5ff3995ee663754135)
 
