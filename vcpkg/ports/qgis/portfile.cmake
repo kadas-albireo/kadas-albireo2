@@ -16,7 +16,6 @@ vcpkg_from_github(
         exiv2.patch
         crssync.patch
         bigobj.patch
-        poly2tri.patch
         mesh.patch
         delimitedtext.patch
         qtkeychain-56284.patch
