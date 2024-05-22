@@ -21,6 +21,7 @@ vcpkg_from_github(
         delimitedtext.patch
         qtkeychain-56284.patch
         bindings-install.patch
+        wcsLayerName.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
