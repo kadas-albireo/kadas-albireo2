@@ -52,8 +52,8 @@ static QString gridLabel( QChar firstChar, int offset )
 class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasGuideGridLayer *layer, QgsRenderContext *rendererContext )
-      : QgsMapLayerRenderer( layer->id(), rendererContext )
+    Renderer( KadasGuideGridLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderGridConfig( layer->mGridConfig )
       , mRenderOpacity( layer->opacity() )
     {}
@@ -319,7 +319,7 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
 
 QgsMapLayerRenderer *KadasGuideGridLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, &rendererContext );
+  return new Renderer( this, rendererContext );
 }
 
 bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )

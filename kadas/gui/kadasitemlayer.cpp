@@ -33,8 +33,8 @@
 class KadasItemLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasItemLayer *layer, QgsRenderContext *rendererContext )
-      : QgsMapLayerRenderer( layer->id(), rendererContext )
+    Renderer( KadasItemLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
     {
       for ( ItemId id : layer->mItemOrder )
       {
@@ -152,7 +152,7 @@ KadasItemLayer *KadasItemLayer::clone() const
 
 QgsMapLayerRenderer *KadasItemLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, &rendererContext );
+  return new Renderer( this, rendererContext );
 }
 
 QgsRectangle KadasItemLayer::extent() const

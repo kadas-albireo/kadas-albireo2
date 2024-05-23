@@ -31,8 +31,8 @@
 class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasMilxLayer *layer, QgsRenderContext *rendererContext )
-      : QgsMapLayerRenderer( layer->id(), rendererContext )
+    Renderer( KadasMilxLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
     {
       bool omitSinglePoint = renderContext()->customRenderingFlags().contains( "globe" );
       for ( const KadasMapItem *item : layer->items().values() )
@@ -110,7 +110,7 @@ bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
 
 QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, &rendererContext );
+  return new Renderer( this, rendererContext );
 }
 
 KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective ) const

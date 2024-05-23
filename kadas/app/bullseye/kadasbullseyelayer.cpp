@@ -37,8 +37,8 @@
 class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasBullseyeLayer *layer, QgsRenderContext *rendererContext )
-      : QgsMapLayerRenderer( layer->id(), rendererContext )
+    Renderer( KadasBullseyeLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderBullseyeConfig( layer->mBullseyeConfig )
       , mRenderOpacity( layer->opacity() )
       , mLayerCrs( layer->crs() )
@@ -229,7 +229,7 @@ KadasBullseyeLayer *KadasBullseyeLayer::clone() const
 
 QgsMapLayerRenderer *KadasBullseyeLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, &rendererContext );
+  return new Renderer( this, rendererContext );
 }
 
 QgsRectangle KadasBullseyeLayer::extent() const

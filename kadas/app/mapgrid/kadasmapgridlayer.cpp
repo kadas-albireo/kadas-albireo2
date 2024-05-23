@@ -35,8 +35,8 @@
 class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasMapGridLayer *layer, QgsRenderContext *rendererContext )
-      : QgsMapLayerRenderer( layer->id(), rendererContext )
+    Renderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderGridConfig( layer->mGridConfig )
       , mRenderOpacity( layer->opacity() )
     {}
@@ -535,7 +535,7 @@ KadasMapGridLayer *KadasMapGridLayer::clone() const
 
 QgsMapLayerRenderer *KadasMapGridLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, &rendererContext );
+  return new Renderer( this, rendererContext );
 }
 
 QList<KadasMapGridLayer::IdentifyResult> KadasMapGridLayer::identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings )
