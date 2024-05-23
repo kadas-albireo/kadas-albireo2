@@ -33,9 +33,8 @@
 class KadasItemLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
-    Renderer( KadasItemLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id(), &rendererContext )
-      , mRendererContext( rendererContext )
+    Renderer( KadasItemLayer *layer, QgsRenderContext *rendererContext )
+      : QgsMapLayerRenderer( layer->id(), rendererContext )
     {
       for ( ItemId id : layer->mItemOrder )
       {
@@ -46,16 +45,16 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
     bool render() override
     {
-      bool omitSinglePoint = mRendererContext.customRenderingFlags().contains( "globe" );
+      bool omitSinglePoint = renderContext()->customRenderingFlags().contains( "globe" );
       for ( const KadasMapItem *item : mRenderItems )
       {
         if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
-          mRendererContext.painter()->save();
-          mRendererContext.painter()->setOpacity( mRenderOpacity );
-          mRendererContext.setCoordinateTransform( QgsCoordinateTransform( item->crs(), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() ) );
-          item->render( mRendererContext );
-          mRendererContext.painter()->restore();
+          renderContext()->painter()->save();
+          renderContext()->painter()->setOpacity( mRenderOpacity );
+          renderContext()->setCoordinateTransform( QgsCoordinateTransform( item->crs(), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() ) );
+          item->render( *renderContext() );
+          renderContext()->painter()->restore();
         }
       }
       return true;
@@ -64,7 +63,6 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
   private:
     QList<KadasMapItem *> mRenderItems;
     double mRenderOpacity = 1.;
-    QgsRenderContext &mRendererContext;
 };
 
 
@@ -154,7 +152,7 @@ KadasItemLayer *KadasItemLayer::clone() const
 
 QgsMapLayerRenderer *KadasItemLayer::createMapRenderer( QgsRenderContext &rendererContext )
 {
-  return new Renderer( this, rendererContext );
+  return new Renderer( this, &rendererContext );
 }
 
 QgsRectangle KadasItemLayer::extent() const
