@@ -36,18 +36,17 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
     Renderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id() )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderGridConfig( layer->mGridConfig )
       , mRenderOpacity( layer->opacity() )
-      , mRendererContext( rendererContext )
     {}
 
     bool render() override
     {
-      mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mRenderOpacity );
-      mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1. ) );
+      renderContext()->painter()->save();
+      renderContext()->painter()->setOpacity( mRenderOpacity );
+      renderContext()->painter()->setCompositionMode( QPainter::CompositionMode_Source );
+      renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1. ) );
 
       switch ( mRenderGridConfig.gridType )
       {
@@ -72,14 +71,13 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
           break;
       }
 
-      mRendererContext.painter()->restore();
+      renderContext()->painter()->restore();
       return true;
     }
 
   private:
     KadasMapGridLayer::GridConfig mRenderGridConfig;
     double mRenderOpacity = 1.;
-    QgsRenderContext &mRendererContext;
 
     struct GridLabel
     {
@@ -89,9 +87,9 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
     void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags )
     {
-      QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( crs ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
-      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), Qgis::TransformDirection::Reverse );
-      QRectF screenRect = computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
+      QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( crs ), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
+      QgsRectangle area = crst.transformBoundingBox( renderContext()->mapExtent(), Qgis::TransformDirection::Reverse );
+      QRectF screenRect = computeScreenExtent( renderContext()->mapExtent(), renderContext()->mapToPixel() );
 
       QList<GridLabel> leftLabels;
       QList<GridLabel> rightLabels;
@@ -103,8 +101,8 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       double yStart = std::floor( area.yMinimum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
       double yEnd = std::ceil( area.yMaximum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
 
-      const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
-      bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob );
+      const QVariantMap &renderFlags = renderContext()->customRenderingFlags();
+      bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || renderContext()->flags() & Qgis::RenderContextFlag::RenderPreviewJob );
 
       // If chosen intervals would result in over 100 grid lines, reduce interval
       double intervalX = mRenderGridConfig.intervalX;
@@ -132,10 +130,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         while ( y - ySegmentLength <= area.yMaximum() )
         {
           QgsPointXY p = crst.transform( x, y );
-          poly.append( mRendererContext.mapToPixel().transform( p ).toQPointF() );
+          poly.append( renderContext()->mapToPixel().transform( p ).toQPointF() );
           y += ySegmentLength;
         }
-        mRendererContext.painter()->drawPolyline( poly );
+        renderContext()->painter()->drawPolyline( poly );
 
         if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
         {
@@ -179,10 +177,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         while ( x - xSegmentLength <= area.xMaximum() )
         {
           QgsPointXY p = crst.transform( x, y );
-          poly.append( mRendererContext.mapToPixel().transform( p ).toQPointF() );
+          poly.append( renderContext()->mapToPixel().transform( p ).toQPointF() );
           x += xSegmentLength;
         }
-        mRendererContext.painter()->drawPolyline( poly );
+        renderContext()->painter()->drawPolyline( poly );
 
         if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
         {
@@ -218,12 +216,12 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       if ( drawLabels && mRenderGridConfig.labelingMode == LabelingEnabled )
       {
-        double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
-        QFont font = mRendererContext.painter()->font();
+        double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+        QFont font = renderContext()->painter()->font();
         font.setBold( true );
         font.setPointSizeF( mRenderGridConfig.fontSize * dpiScale );
         QFontMetrics fm( font );
-        mRendererContext.painter()->setBrush( mRenderGridConfig.color );
+        renderContext()->painter()->setBrush( mRenderGridConfig.color );
 
         QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
         double screenMargin = 5;
@@ -324,13 +322,13 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
     void drawMgrsGrid()
     {
-      const QVariantMap &renderFlags = mRendererContext.customRenderingFlags();
+      const QVariantMap &renderFlags = renderContext()->customRenderingFlags();
       bool adaptToScreen = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() );
 
-      QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
-      QgsRectangle area = crst.transformBoundingBox( mRendererContext.mapExtent(), Qgis::TransformDirection::Reverse );
-      QRectF screenExtent = computeScreenExtent( mRendererContext.mapExtent(), mRendererContext.mapToPixel() );
-      double mapScale = mRendererContext.rendererScale();
+      QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
+      QgsRectangle area = crst.transformBoundingBox( renderContext()->mapExtent(), Qgis::TransformDirection::Reverse );
+      QRectF screenExtent = computeScreenExtent( renderContext()->mapExtent(), renderContext()->mapToPixel() );
+      double mapScale = renderContext()->rendererScale();
       if ( !adaptToScreen )
       {
         area = area.buffered( area.width() );
@@ -345,41 +343,41 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM, mRenderGridConfig.cellSize );
 
       // Draw grid lines
-      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
+      renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
       for ( const QPolygonF &zoneLine : zoneLines )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : zoneLine )
         {
-          itemLine.append( mRendererContext.mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
+          itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
         }
-        mRendererContext.painter()->drawPolyline( itemLine );
+        renderContext()->painter()->drawPolyline( itemLine );
       }
 
-      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
+      renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
       for ( const QPolygonF &subZoneLine : subZoneLines )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : subZoneLine )
         {
-          itemLine.append( mRendererContext.mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
+          itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
         }
-        mRendererContext.painter()->drawPolyline( itemLine );
+        renderContext()->painter()->drawPolyline( itemLine );
       }
 
-      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
+      renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
       for ( const QPolygonF &gridLine : gridLines )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : gridLine )
         {
-          itemLine.append( mRendererContext.mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
+          itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
         }
-        mRendererContext.painter()->drawPolyline( itemLine );
+        renderContext()->painter()->drawPolyline( itemLine );
       }
 
       // Draw labels
-      bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
+      bool previewJob = renderContext()->flags() & Qgis::RenderContextFlag::RenderPreviewJob;
       if ( previewJob || mRenderGridConfig.labelingMode != LabelingEnabled )
       {
         return;
@@ -412,10 +410,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
-      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
-      mRendererContext.painter()->setBrush( mRenderGridConfig.color );
+      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+      renderContext()->painter()->setBrush( mRenderGridConfig.color );
 
-      QFont font = mRendererContext.painter()->font();
+      QFont font = renderContext()->painter()->font();
       font.setBold( true );
 
       if ( adaptToScreen )
@@ -424,7 +422,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
         for ( const KadasLatLonToUTM::GridLabel &gridLabel : gridLabels )
         {
           const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
-          QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
+          QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
           const QRectF &visibleRect = screenExtent;
           int i = 1, n = gridLine.size();
           QPointF pp = labelPos;
@@ -432,7 +430,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
           {
             for ( ; i < n; ++i )
             {
-              QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
+              QPointF pn = renderContext()->mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
               if ( pn.x() > visibleRect.x() )
               {
                 double lambda = ( visibleRect.x() - pp.x() ) / ( pn.x() - pp.x() );
@@ -446,7 +444,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
           {
             for ( ; i < n; ++i )
             {
-              QPointF pn = mRendererContext.mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
+              QPointF pn = renderContext()->mapToPixel().transform( crst.transform( gridLine[i].x(), gridLine[i].y() ) ).toQPointF();
               if ( pn.y() < visibleRect.y() + visibleRect.height() )
               {
                 double lambda = ( visibleRect.y() + visibleRect.height() - pp.y() ) / ( pn.y() - pp.y() );
@@ -469,8 +467,8 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       {
         const QPointF &pos = zoneLabel.pos;
         const QPointF &maxPos = zoneLabel.maxPos;
-        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+        QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+        QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
         if ( adaptToScreen )
         {
           adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
@@ -489,8 +487,8 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       {
         const QPointF &pos = subZoneLabel.pos;
         const QPointF &maxPos = subZoneLabel.maxPos;
-        QPointF labelPos = mRendererContext.mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-        QPointF maxLabelPos = mRendererContext.mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+        QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+        QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
         if ( adaptToScreen )
         {
           adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
@@ -505,10 +503,10 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
     {
       QPainterPath path;
       path.addText( pos, font, text );
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
-      mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->setPen( Qt::NoPen );
-      mRendererContext.painter()->drawPath( path );
+      renderContext()->painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
+      renderContext()->painter()->drawPath( path );
+      renderContext()->painter()->setPen( Qt::NoPen );
+      renderContext()->painter()->drawPath( path );
     }
 };
 

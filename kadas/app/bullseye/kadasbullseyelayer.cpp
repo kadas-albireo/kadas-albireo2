@@ -38,15 +38,14 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
     Renderer( KadasBullseyeLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id() )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderBullseyeConfig( layer->mBullseyeConfig )
       , mRenderOpacity( layer->opacity() )
       , mLayerCrs( layer->crs() )
-      , mRendererContext( rendererContext )
       , mGeod( GeographicLib::Constants::WGS84_a(), GeographicLib::Constants::WGS84_f() )
     {
       mDa.setEllipsoid( "WGS84" );
-      mDa.setSourceCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ), mRendererContext.transformContext() );
+      mDa.setSourceCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ), renderContext()->transformContext() );
     }
 
     bool render() override
@@ -56,21 +55,21 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         return true;
       }
 
-      const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
-      mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mRenderOpacity );
-      mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mRenderBullseyeConfig.color, mRenderBullseyeConfig.lineWidth ) );
-      QFont font = mRendererContext.painter()->font();
+      renderContext()->painter()->save();
+      renderContext()->painter()->setOpacity( mRenderOpacity );
+      renderContext()->painter()->setCompositionMode( QPainter::CompositionMode_Source );
+      renderContext()->painter()->setPen( QPen( mRenderBullseyeConfig.color, mRenderBullseyeConfig.lineWidth ) );
+      QFont font = renderContext()->painter()->font();
       font.setPixelSize( mRenderBullseyeConfig.fontSize * dpiScale );
-      QFontMetrics metrics( mRendererContext.painter()->font() );
+      QFontMetrics metrics( renderContext()->painter()->font() );
       QColor bufferColor = ( 0.2126 * mRenderBullseyeConfig.color.red() + 0.7152 * mRenderBullseyeConfig.color.green() + 0.0722 * mRenderBullseyeConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
 
       QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-      QgsCoordinateTransform ct( mLayerCrs, crsWgs84, mRendererContext.transformContext() );
-      QgsCoordinateTransform rct( crsWgs84, mRendererContext.coordinateTransform().destinationCrs(), mRendererContext.transformContext() );
+      QgsCoordinateTransform ct( mLayerCrs, crsWgs84, renderContext()->transformContext() );
+      QgsCoordinateTransform rct( crsWgs84, renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
 
       // Draw rings
       QgsPointXY wgsCenter = ct.transform( mRenderBullseyeConfig.center );
@@ -88,7 +87,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         }
         QPainterPath path;
         path.addPolygon( poly );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
         if ( mRenderBullseyeConfig.labelRings )
         {
           QString label = QString( "%1 %2" ).arg( ( iRing + 1 ) * mRenderBullseyeConfig.interval, 0, 'f', 2 ).arg( QgsUnitTypes::toAbbreviatedString( mRenderBullseyeConfig.intervalUnit ) );
@@ -120,7 +119,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         poly.append( mapToPixel.transform( mapPoint ).toQPointF() );
         QPainterPath path;
         path.addPolygon( poly );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
         if ( mRenderBullseyeConfig.labelAxes )
         {
           QString label = QString( "%1°" ).arg( bearing );
@@ -171,7 +170,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         }
       }
 
-      mRendererContext.painter()->restore();
+      renderContext()->painter()->restore();
       return true;
     }
 
@@ -179,28 +178,27 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
     KadasBullseyeLayer::BullseyeConfig mRenderBullseyeConfig;
     double mRenderOpacity = 1.;
     QgsCoordinateReferenceSystem mLayerCrs;
-    QgsRenderContext &mRendererContext;
     QgsDistanceArea mDa;
     GeographicLib::Geodesic mGeod;
 
     QPair<QPointF, QPointF> screenLine( const QgsPoint &p1, const QgsPoint &p2 ) const
     {
-      const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
-      QPointF sp1 = mapToPixel.transform( mRendererContext.coordinateTransform().transform( p1 ) ).toQPointF();
-      QPointF sp2 = mapToPixel.transform( mRendererContext.coordinateTransform().transform( p2 ) ).toQPointF();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      QPointF sp1 = mapToPixel.transform( renderContext()->coordinateTransform().transform( p1 ) ).toQPointF();
+      QPointF sp2 = mapToPixel.transform( renderContext()->coordinateTransform().transform( p2 ) ).toQPointF();
       return qMakePair( sp1, sp2 );
     }
     void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QColor &bufferColor )
     {
       QPainterPath path;
       path.addText( x, y, font, text );
-      mRendererContext.painter()->save();
-      mRendererContext.painter()->setBrush( mRenderBullseyeConfig.color );
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderBullseyeConfig.fontSize / 8. ) ) );
-      mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->setPen( Qt::NoPen );
-      mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->restore();
+      renderContext()->painter()->save();
+      renderContext()->painter()->setBrush( mRenderBullseyeConfig.color );
+      renderContext()->painter()->setPen( QPen( bufferColor, qRound( mRenderBullseyeConfig.fontSize / 8. ) ) );
+      renderContext()->painter()->drawPath( path );
+      renderContext()->painter()->setPen( Qt::NoPen );
+      renderContext()->painter()->drawPath( path );
+      renderContext()->painter()->restore();
     }
 };
 

@@ -53,10 +53,9 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
     Renderer( KadasGuideGridLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id() )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mRenderGridConfig( layer->mGridConfig )
       , mRenderOpacity( layer->opacity() )
-      , mRendererContext( rendererContext )
     {}
 
     bool render() override
@@ -65,19 +64,19 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       {
         return true;
       }
-      bool previewJob = mRendererContext.flags() & Qgis::RenderContextFlag::RenderPreviewJob;
+      bool previewJob = renderContext()->flags() & Qgis::RenderContextFlag::RenderPreviewJob;
 
-      mRendererContext.painter()->save();
-      mRendererContext.painter()->setOpacity( mRenderOpacity );
-      mRendererContext.painter()->setCompositionMode( QPainter::CompositionMode_Source );
-      mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth ) );
-      mRendererContext.painter()->setBrush( mRenderGridConfig.color );
+      renderContext()->painter()->save();
+      renderContext()->painter()->setOpacity( mRenderOpacity );
+      renderContext()->painter()->setCompositionMode( QPainter::CompositionMode_Source );
+      renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth ) );
+      renderContext()->painter()->setBrush( mRenderGridConfig.color );
 
-      const QVariantMap &flags = mRendererContext.customRenderingFlags();
+      const QVariantMap &flags = renderContext()->customRenderingFlags();
       bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
 
       QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
-      double dpiScale = double( mRendererContext.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 
       QFont smallFont;
       smallFont.setPixelSize( 0.5 * mRenderGridConfig.fontSize * dpiScale );
@@ -90,11 +89,11 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       const int labelBoxSize = fontMetrics.height();
       const int smallLabelBoxSize = smallFontMetrics.height();
 
-      QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
-      const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
+      QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
       const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
-      QgsPoint pTL = QgsPoint( mRendererContext.mapExtent().xMinimum(), mRendererContext.mapExtent().yMaximum() );
-      QgsPoint pBR = QgsPoint( mRendererContext.mapExtent().xMaximum(), mRendererContext.mapExtent().yMinimum() );
+      QgsPoint pTL = QgsPoint( renderContext()->mapExtent().xMinimum(), renderContext()->mapExtent().yMaximum() );
+      QgsPoint pBR = QgsPoint( renderContext()->mapExtent().xMaximum(), renderContext()->mapExtent().yMinimum() );
       QPointF screenTL = mapToPixel.transform( crst.transform( pTL ) ).toQPointF();
       QPointF screenBR = mapToPixel.transform( crst.transform( pBR ) ).toQPointF();
       QRectF screenRect( screenTL, screenBR );
@@ -107,7 +106,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       {
         QPainterPath path;
         path.addPolygon( vLine1 );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
       }
       double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
       double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
@@ -118,7 +117,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         QPolygonF vLine2 = vScreenLine( x2, iy );
         QPainterPath path;
         path.addPolygon( vLine2 );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
 
         if ( !previewJob )
         {
@@ -145,8 +144,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 
         if ( quadrantLabeling != DontLabelQuadrants )
         {
-          mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
+          renderContext()->painter()->save();
+          renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
           QSizeF smallLabelBox( smallLabelBoxSize, smallLabelBoxSize );
           QPolygonF vLineMid;
           for ( int i = 0, n = vLine1.size(); i < n; ++i )
@@ -168,8 +167,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           }
           QPainterPath path;
           path.addPolygon( vLineMid );
-          mRendererContext.painter()->drawPath( path );
-          mRendererContext.painter()->restore();
+          renderContext()->painter()->drawPath( path );
+          renderContext()->painter()->restore();
         }
 
         vLine1 = vLine2;
@@ -180,7 +179,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       {
         QPainterPath path;
         path.addPolygon( hLine1 );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
       }
       double sx1 = adaptLabelsToScreen ? std::max( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
       double sx2 = adaptLabelsToScreen ? std::min( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
@@ -191,7 +190,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
         QPolygonF hLine2 = hScreenLine( y, ix );
         QPainterPath path;
         path.addPolygon( hLine2 );
-        mRendererContext.painter()->drawPath( path );
+        renderContext()->painter()->drawPath( path );
 
         if ( !previewJob )
         {
@@ -218,8 +217,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
 
         if ( quadrantLabeling != DontLabelQuadrants )
         {
-          mRendererContext.painter()->save();
-          mRendererContext.painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
+          renderContext()->painter()->save();
+          renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, mRenderGridConfig.lineWidth, Qt::DashLine ) );
           QPolygonF hLineMid;
           if ( quadrantLabeling == LabelOneQuadrant )
           {
@@ -236,13 +235,13 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
           }
           QPainterPath path;
           path.addPolygon( hLineMid );
-          mRendererContext.painter()->drawPath( path );
-          mRendererContext.painter()->restore();
+          renderContext()->painter()->drawPath( path );
+          renderContext()->painter()->restore();
         }
 
         hLine1 = hLine2;
       }
-      mRendererContext.painter()->restore();
+      renderContext()->painter()->restore();
       return true;
     }
     void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
@@ -251,23 +250,22 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       x -= 0.5 * metrics.horizontalAdvance( text );
       y =  y - metrics.descent() + 0.5 * metrics.height();
       path.addText( x, y, font, text );
-      mRendererContext.painter()->save();
-      mRendererContext.painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
-      mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->setPen( Qt::NoPen );
-      mRendererContext.painter()->drawPath( path );
-      mRendererContext.painter()->restore();
+      renderContext()->painter()->save();
+      renderContext()->painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
+      renderContext()->painter()->drawPath( path );
+      renderContext()->painter()->setPen( Qt::NoPen );
+      renderContext()->painter()->drawPath( path );
+      renderContext()->painter()->restore();
     }
 
   private:
     KadasGuideGridLayer::GridConfig mRenderGridConfig;
     double mRenderOpacity = 1.0;
-    QgsRenderContext &mRendererContext;
 
     QPolygonF vScreenLine( double x, double iy ) const
     {
-      QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
-      const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
+      QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
       const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
       QPolygonF screenPoints;
       for ( int row = 0; row <= mRenderGridConfig.rows; ++row )
@@ -280,8 +278,8 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
     }
     QPolygonF hScreenLine( double y, double ix ) const
     {
-      QgsCoordinateTransform crst = mRendererContext.coordinateTransform();
-      const QgsMapToPixel &mapToPixel = mRendererContext.mapToPixel();
+      QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
       const QgsRectangle &gridRect = mRenderGridConfig.gridRect;
       QPolygonF screenPoints;
       for ( int col = 0; col <= mRenderGridConfig.cols; ++col )
