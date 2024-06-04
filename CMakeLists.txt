@@ -99,13 +99,16 @@ if(WITH_BINDINGS)
   ADD_SUBDIRECTORY(python)
 endif()
 
-option(INSTALL_DEMO_DATA "Installs settings and templates" OFF)
+option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
 IF(INSTALL_DEMO_DATA)
-    install(FILES "packaging/files/settings_full.ini" "packaging/files/settings_patch.ini" DESTINATION "share/kadas/")
-    install(DIRECTORY "packaging/files/print_templates" "packaging/files/project_templates" DESTINATION "share/kadas/")
+  install(FILES "share/settings_patch.ini" DESTINATION "share/kadas/")
+  install(DIRECTORY "share/project_templates" DESTINATION "share/kadas/")
 ENDIF()
 
-install(DIRECTORY "share/" DESTINATION "share/kadas/")
+install(DIRECTORY "share/" DESTINATION "share/kadas/"
+  PATTERN "share/settings_patch.ini" EXCLUDE
+  PATTERN "share/project_templates" EXCLUDE
+)
 
 include(VcpkgInstallDeps)
 include(Package)
