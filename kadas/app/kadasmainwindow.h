@@ -33,6 +33,7 @@ class QgsMessageBar;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
 class KadasGpxIntegration;
+class KadasHelpViewer;
 class KadasKmlIntegration;
 class KadasMilxIntegration;
 class KadasMapItem;
@@ -142,6 +143,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void addLocalPicture();
     void addRemotePicture();
     void updateBgLayerZoomResolutions() const;
+    void showHelp() const;
     void showNewsletter();
     void toggleIgnoreDpiScale();
 
@@ -184,6 +186,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QMap<QString, QAction *> mAddedActions;
     QList<QgsCustomDropHandler *> mCustomDropHandlers;
     bool mFullscreen = false;
+
+    KadasHelpViewer *mHelpViewer = nullptr;
 
 };
 

@@ -1,8 +1,8 @@
 /***************************************************************************
-    kadasfileserver.h
-    -----------------
-    copyright            : (C) 2021 by Sandro Mani
-    email                : smani at sourcepole dot ch
+    kadashelpviewer.h
+    ----------------
+    copyright            : (C) 2024 by Damiano Lombardi
+    email                : damiano at opengis dot ch
  ***************************************************************************/
 
 /***************************************************************************
@@ -14,29 +14,27 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QTcpServer>
+#ifndef KADASHELPVIEWER_H
+#define KADASHELPVIEWER_H
 
-#include <kadas/core/kadas_core.h>
+#include <QObject>
 
-class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
+#include <kadas/core/kadasfileserver.h>
+
+class KadasHelpViewer : public QObject
 {
     Q_OBJECT
-  public:
-    KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );
-    const QString &getHost() const { return mHost; }
-    int getPort() const { return mPort; }
 
-    QString getFilesTopDir() const { return mTopdir; }
-    void setFilesTopDir( const QString &topDir );
+  public:
+    KadasHelpViewer( QObject *parent );
+
+  public slots:
+    void showHelp() const;
 
   private:
-    QByteArray genHeaders( int code );
 
-    QString mHost;
-    int mPort;
-    QString mTopdir;
+    KadasFileServer mHelpFileServer;
 
-  private slots:
-    void handleConnection();
-    void sendReply( QTcpSocket *socket );
 };
+
+#endif // KADASHELPVIEWER_H

@@ -76,6 +76,7 @@
 
 #include <kadas/app/kadasapplayerhandling.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadashelpviewer.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadaslayertreemodel.h>
@@ -107,6 +108,7 @@ KadasMainWindow::~KadasMainWindow()
   delete mGpxIntegration;
   delete mKmlIntegration;
   delete mMilxIntegration;
+  delete mHelpViewer;
 }
 
 void KadasMainWindow::init()
@@ -281,6 +283,9 @@ void KadasMainWindow::init()
 #else
   m3DButton->hide();
 #endif
+
+  // Help file server
+  mHelpViewer = new KadasHelpViewer( this );
 
   configureButtons();
 
@@ -722,6 +727,8 @@ void KadasMainWindow::configureButtons()
 
   //help tab
   setActionToButton( mActionHelp, mHelpButton );
+  connect( mActionHelp, &QAction::triggered, this, &KadasMainWindow::showHelp );
+
   setActionToButton( mActionAbout, mAboutButton );
   if ( KadasNewsPopup::isConfigured() )
   {
@@ -1508,6 +1515,11 @@ void KadasMainWindow::updateBgLayerZoomResolutions() const
   {
     mScaleComboBox->updateScales( QStringList() ); // default scales
   }
+}
+
+void KadasMainWindow::showHelp() const
+{
+  mHelpViewer->showHelp();
 }
 
 void KadasMainWindow::showNewsletter()
