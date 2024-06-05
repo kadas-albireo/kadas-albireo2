@@ -8,7 +8,11 @@ jobs:
   sync_translations:
     runs-on: ubuntu-latest
     steps:
+      # use a specific user rather than standard bot to be able to bypass protection rule
+      # https://github.com/orgs/community/discussions/13836
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_GEONINJA_TOKEN }}
 
       - name: Install Requirements
         run: |
@@ -24,8 +28,8 @@ jobs:
 
       - name: Commit
         run: |
-          git config --global user.name "Kadas Bot"
-          git config --global user.email "kadas@users.noreply.github.com"
+          #git config --global user.name "Kadas Bot"
+          #git config --global user.email "kadas@users.noreply.github.com"
           git add i18n
           git commit -a -m "Synchronize translations"
           git push
