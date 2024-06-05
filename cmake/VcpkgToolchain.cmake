@@ -2,12 +2,7 @@ set(NUGET_SOURCE "https://nuget.pkg.github.com/kadas-albireo/index.json")
 set(NUGET_TOKEN "" CACHE STRING "Nuget token")
 
 string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_NAME}" "Windows" _HOST_IS_WINDOWS)
-set(WITH_VCPKG TRUE CACHE BOOL "Use the vcpkg submodule for dependency management.")
-
-if(NOT WITH_VCPKG)
-  message(STATUS "Building with system libraries --")
-  return()
-endif()
+set(VCPKG_MANIFEST_DIR "${CMAKE_SOURCE_DIR}/vcpkg")
 
 if(NOT VCPKG_TAG STREQUAL VCPKG_INSTALLED_VERSION)
   message(STATUS "Updating vcpkg")

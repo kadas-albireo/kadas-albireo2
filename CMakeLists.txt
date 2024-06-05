@@ -19,7 +19,19 @@ if (WITH_BINDINGS)
   list(APPEND VCPKG_MANIFEST_FEATURES "bindings")
 endif()
 
-include(VcpkgToolchain)
+set(WITH_VCPKG TRUE CACHE BOOL "Use the vcpkg submodule for dependency management.")
+set(KADAS_SDK_PATH "" CACHE STRING "Build with VCPKG SDK")
+
+if(NOT KADAS_SDK_PATH STREQUAL "")
+  message(STATUS "Building with KADAS SDK -- ${KADAS_SDK_PATH}")
+  set(CMAKE_TOOLCHAIN_FILE "${KADAS_SDK_PATH}/scripts/buildsystems/vcpkg.cmake")
+  set(WITH_VCPKG ON)
+elseif(WITH_VCPKG)
+  message(STATUS "Building local dependencies with VCPKG --")
+  include(VcpkgToolchain)
+else()
+  message(STATUS "Building with system libraries --")
+endif()
 
 PROJECT(kadas LANGUAGES CXX)
 
@@ -29,6 +41,7 @@ include(GNUInstallDirs)
 include(GenerateExportHeader)
 
 set(CMAKE_CXX_STANDARD 17)
+
 
 SET(KADAS_NAME "Kadas" CACHE STRING "Kadas application name")
 SET(KADAS_FULL_NAME "Kadas Albireo" CACHE STRING "Kadas full application name")
@@ -110,9 +123,11 @@ install(DIRECTORY "share/" DESTINATION "share/kadas/"
   PATTERN "share/project_templates" EXCLUDE
 )
 
-include(VcpkgInstallDeps)
-include(Package)
+if(NOT WITH_VCPKG)
+  include(VcpkgInstallDeps)
+endif()
 
+include(Package)
 
 IF(UNIX)
     install(FILES com.sourcepole.kadas.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)
