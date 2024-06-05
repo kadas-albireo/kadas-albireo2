@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[o:kadas:p:kadas-albireo:r:kadas]
+file_filter = i18n/kadas_<lang>.ts
+source_file = i18n/kadas_en.ts
+source_lang = en
+type = QT

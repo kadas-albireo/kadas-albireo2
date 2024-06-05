@@ -1,0 +1,32 @@
+name: 🌍 Sync Translations
+on:
+  schedule:
+    - cron: "5 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync_translations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.FAIRY_TOKEN }}
+
+      - name: Install Requirements
+        run: |
+          sudo apt-get install -y qttools5-dev-tools
+          # v1.6.5: 2023-02-16
+          curl -OL https://github.com/transifex/cli/releases/download/v1.6.5/tx-linux-amd64.tar.gz
+          tar -xvzf tx-linux-amd64.tar.gz
+
+      - name: 🌍 Pull Translations
+        shell: bash
+        run: TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
+
+      - name: Commit
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "username@users.noreply.github.com"
+          git add i18n
+          git commit -a -m "Synchronize translations"
+          git push
