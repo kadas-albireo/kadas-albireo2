@@ -1,7 +1,7 @@
-string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF "final-${TAG}")
-set(QGIS_SHA512 d8075b98efe8ebea1ee53273b9427e0a7329ba8f1a96258d962dee52b0c5c08be2bea10b2130fee4c0acbc3f4a94b94da0033e8b6c92857e0c679c051545d3d8)
+set(QGIS_REF 7d1419e823bda4942266122a2ba057dd20cef385)
+
+set(QGIS_SHA512 25fd4f7018bcbd130e37fb124de5a131f11551a23f125fcef23134d3e430540664274fab04423bd37278775e93c822f552a3e4a0108dcf7efffed5bee72c15b7)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -16,10 +16,7 @@ vcpkg_from_github(
         exiv2.patch
         crssync.patch
         bigobj.patch
-        poly2tri.patch
         mesh.patch
-        delimitedtext.patch
-        qtkeychain-56284.patch
         bindings-install.patch
         wcsLayerName.patch
 )
@@ -57,20 +54,6 @@ list(APPEND QGIS_OPTIONS "-DWITH_SPATIALITE:BOOL=ON")
 list(APPEND QGIS_OPTIONS "-DWITH_QSPATIALITE:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_PDAL:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_POLY2TRI:BOOL=OFF")
-list(APPEND QGIS_OPTIONS "-DPoly2Tri_LIBRARY=poly2tri::poly2tri")
-
-if(EXISTS "${CURRENT_INSTALLED_DIR}/lib/libqt_poly2tri.a")
-    set(QT_POLY2TRI_DIR_RELEASE "${CURRENT_INSTALLED_DIR}/lib")
-    set(QT_POLY2TRI_DIR_DEBUG "${CURRENT_INSTALLED_DIR}/debug/lib")
-else()
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
-endif()
-if(DEFINED QT_POLY2TRI_DIR_RELEASE)
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
-    list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_DEBUG}/debug/lib/libqt_poly2tri_debug.a) # static qt only
-    list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_RELEASE}/lib/libqt_poly2tri.a) # static qt only
-endif()
-
 
 list(APPEND QGIS_OPTIONS "-DBISON_EXECUTABLE=${BISON}")
 list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")

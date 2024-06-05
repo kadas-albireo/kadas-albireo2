@@ -124,6 +124,8 @@ if(APPLE) # Should be "if qgis is built statically" -- leaving this cleanup as a
   _find_and_link_library(provider_wfs_gui_a QGIS::Gui)
   _find_and_link_library(provider_wcs_gui_a QGIS::Gui)
   _find_and_link_library(provider_virtuallayer_gui_a QGIS::Gui)
+  find_package(poly2tri CONFIG)
+  target_link_libraries(QGIS::Core INTERFACE poly2tri::poly2tri)
 
 endif()
 _qgis_core_add_dependency(Protobuf Protobuf)
