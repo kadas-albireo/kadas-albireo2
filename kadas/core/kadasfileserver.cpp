@@ -32,6 +32,11 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
   QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ) , 2 );
 }
 
+void KadasFileServer::setFilesTopDir(const QString &topDir)
+{
+  mTopdir = topDir;
+}
+
 QByteArray KadasFileServer::genHeaders( int code )
 {
   QByteArray h;
@@ -129,7 +134,7 @@ void KadasFileServer::sendReply( QTcpSocket *socket )
       headers = genHeaders( 404 );
       if ( requestMethod == "GET" )
       {
-        body = "<html><body><p>Error 404: File not found</p></body></html>";
+        body = QString("<html><body><p>Error 404: File not found: '%1'</p></body></html>").arg(QString::fromUtf8(fileRequested)).toUtf8();
       }
     }
   }

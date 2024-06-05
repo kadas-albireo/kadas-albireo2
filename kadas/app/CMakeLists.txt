@@ -23,6 +23,7 @@ set(kadas_SRC
   kadasgpsintegration.cpp
   kadasgpxintegration.cpp
   kadashandlebadlayers.cpp
+  kadashelpviewer.cpp
   kadaslayerrefreshmanager.cpp
   kadaslayertreemodel.cpp
   kadaslayertreeviewmenuprovider.cpp
