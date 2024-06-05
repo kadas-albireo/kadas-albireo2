@@ -1,7 +1,3 @@
-if(NOT WITH_VCPKG)
-    return()
-endif()
-
 add_custom_target(deploy)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")

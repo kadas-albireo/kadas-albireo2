@@ -31,10 +31,10 @@
       }
     ],
     "overlay-ports": [
-      "vcpkg/ports"
+      "ports"
     ],
     "overlay-triplets": [
-      "vcpkg/triplets"
+      "triplets"
     ]
   },
   "name": "kadas-albireo2",
