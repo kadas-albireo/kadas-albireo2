@@ -24,7 +24,7 @@
 
 #include <kadas/app/kadashelpviewer.h>
 
-KadasHelpViewer::KadasHelpViewer( QObject *parent = nullptr )
+KadasHelpViewer::KadasHelpViewer( QObject *parent )
     : QObject( parent )
     , mHelpFileServer(QString(), "127.0.0.1")
 {

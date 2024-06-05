@@ -26,7 +26,7 @@ class KadasHelpViewer : public QObject
     Q_OBJECT
 
   public:
-    KadasHelpViewer( QObject *parent );
+    KadasHelpViewer( QObject *parent = nullptr );
 
   public slots:
     void showHelp() const;
