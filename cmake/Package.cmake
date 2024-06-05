@@ -1,7 +1,7 @@
 set(CPACK_GENERATOR)
 set(CPACK_PACKAGE_EXECUTABLES "kadas;Kadas")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/kadas-albireo/kadas-albireo2")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 if(WIN32)
     set(CREATE_MSI OFF CACHE BOOL "Create a .msi installer (windows only)")
@@ -9,8 +9,8 @@ if(WIN32)
         message(STATUS "   + WIX                             YES ")
         # This is for WiX so that it does not complain about unsupported WiX
         # License file extension.
-        configure_file("${CMAKE_SOURCE_DIR}/COPYING" "${CMAKE_BINARY_DIR}/COPYING.txt" COPYONLY)
-        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.txt")
+        configure_file("${CMAKE_SOURCE_DIR}/LICENSE" "${CMAKE_BINARY_DIR}/LICENSE.txt" COPYONLY)
+        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
 
         set(CPACK_WIX_UPGRADE_GUID 3d1b1ced-39c3-4086-8ab2-4814e0be74df)
         set(CPACK_WIX_PRODUCT_ICON "${CMAKE_SOURCE_DIR}/kadas/resources/logo.ico")
