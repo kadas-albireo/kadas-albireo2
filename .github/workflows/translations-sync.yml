@@ -28,8 +28,8 @@ jobs:
 
       - name: Commit
         run: |
-          #git config --global user.name "Kadas Bot"
-          #git config --global user.email "kadas@users.noreply.github.com"
+          git config --global user.name "Geo Ninja"
+          git config --global user.email "${{ secrets.GH_GEONINJA_EMAIL }}"
           git add i18n
           git commit -a -m "Synchronize translations"
           git push
