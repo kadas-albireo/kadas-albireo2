@@ -1,5 +1,5 @@
 ---
-name: 🪟 Windows
+name: 🪟 Build - Windows
 on:
   push:
     branches:

@@ -1,5 +1,5 @@
 ---
-name: 🍎 MacOS
+name: 🍎 Build - MacOS
 on:
   push:
     branches:

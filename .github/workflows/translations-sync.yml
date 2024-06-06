@@ -1,4 +1,4 @@
-name: 🌍 Sync Translations
+name: 🌍 Translations - Sync
 on:
   schedule:
     - cron: "5 1 * * *"
