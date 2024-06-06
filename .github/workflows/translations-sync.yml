@@ -31,5 +31,5 @@ jobs:
           git config --global user.name "Geo Ninja"
           git config --global user.email "${{ secrets.GH_GEONINJA_EMAIL }}"
           git add i18n
-          git commit -a -m "Synchronize translations"
+          git commit -m "Synchronize translations"
           git push
