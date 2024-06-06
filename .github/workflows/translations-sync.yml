@@ -30,6 +30,5 @@ jobs:
         run: |
           git config --global user.name "Geo Ninja"
           git config --global user.email "${{ secrets.GH_GEONINJA_EMAIL }}"
-          git add i18n
-          git commit -m "Synchronize translations"
+          git add i18n && git commit -m "Synchronize translations" || echo "no changes to translations"
           git push
