@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - msys2
   pull_request:
   release:
     types: ['published']
