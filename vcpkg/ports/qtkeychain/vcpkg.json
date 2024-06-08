@@ -18,7 +18,9 @@
       "name": "vcpkg-cmake-config",
       "host": true
     },
-    "qt5-base"
+    {
+      "name": "qt5-base"
+    }
   ],
   "default-features": [
     "translations"

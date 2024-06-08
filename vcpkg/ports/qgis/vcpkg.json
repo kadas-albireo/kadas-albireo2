@@ -32,7 +32,10 @@
         "name": "libtasn1",
         "platform": "ios"
       },
-      "qt5-base",
+      {
+        "name": "qt5-base",
+        "default-features": false
+      },
       "qt5-svg",
       "qt5-location",
       "qt5-tools",
