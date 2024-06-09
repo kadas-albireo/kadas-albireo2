@@ -306,7 +306,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
 
   // Compute viewshed
-  int roi = std::min( hmapWidth, hmapHeight );
+  int roi = std::max( hmapWidth, hmapHeight );
   progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
   progress->setRange( 0, 8 * roi );
 
