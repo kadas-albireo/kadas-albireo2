@@ -86,7 +86,7 @@ jobs:
           # lrelease is run from cmake for app
           # plugins need to be handled
           for PLUGIN in about gpkg print; do
-            ./build/vcpkg_installed/x64-windows/tools/qt5-tools/bin/lrelease share/python/plugins/${PLUGIN}/kadas_${PLUGIN}_ts.pro
+            ./build/vcpkg_installed/x64-windows/tools/qt5-tools/bin/lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done
     
       - name: 🌋 Build
