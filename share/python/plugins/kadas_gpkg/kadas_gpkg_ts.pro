@@ -7,8 +7,4 @@ kadas_gpkg.py \
 ui_kadas_gpkg_export_dialog.py \
 ui_kadas_gpkg_import_dialog.py
 
-
-
-TRANSLATIONS += i18n/kadas_gpkg_de.ts \
-                i18n/kadas_gpkg_it.ts \
-                i18n/kadas_gpkg_fr.ts
+TRANSLATIONS += i18n/kadas_gpkg_en.ts
