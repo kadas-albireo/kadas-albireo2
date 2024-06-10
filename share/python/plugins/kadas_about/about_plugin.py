@@ -30,7 +30,7 @@ class AboutPlugin:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'KadasAbout_{}.qm'.format(self.locale))
+            'kadas_about_{}.qm'.format(self.locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()

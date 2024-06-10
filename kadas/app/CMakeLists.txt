@@ -107,14 +107,25 @@ SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY)
 SET(kadas_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
 
-FILE(GLOB kadas_TS ${CMAKE_SOURCE_DIR}/i18n/*.ts)
-LIST(SORT kadas_TS)
-SET_SOURCE_FILES_PROPERTIES(${kadas_TS} PROPERTIES OUTPUT_LOCATION ${KADAS_OUTPUT_DIRECTORY}/i18n)
+# Translation
+find_package(Qt5 COMPONENTS LinguistTools)
+file(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/i18n/*.ts)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_BINARY_DIR}/i18n)
+qt_add_translation(QM_FILES ${TS_FILES})
+
+set(KADAS_QM "${CMAKE_BINARY_DIR}/translations.qrc")
+file(WRITE ${KADAS_QM} "<!DOCTYPE RCC><RCC version=\"1.0\">\n  <qresource prefix=\"i18n\">\n")
+foreach(QM_FILE ${QM_FILES})
+  get_filename_component(QM_FILE_NAME ${QM_FILE} NAME)
+  file(APPEND ${KADAS_QM} "\n        <file alias=\"i18n/${QM_FILE_NAME}\">${QM_FILE}</file>")
+endforeach()
+file(APPEND ${KADAS_QM} "  </qresource>\n</RCC>\n")
+
+qt5_add_resources(kadas_RCC ${KADAS_QM})
 
 
 QT5_ADD_RESOURCES(kadas_RCC ${kadas_RCC_SRC})
 QT5_WRAP_UI(kadas_UI_HDR ${kadas_UI})
-QT5_ADD_TRANSLATION(kadas_QM ${kadas_TS})
 
 if(WIN32)
   enable_language(RC)
@@ -191,4 +202,4 @@ endif()
 FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
 
 INSTALL(TARGETS kadas DESTINATION bin)
-INSTALL(FILES ${kadas_QM} DESTINATION share/kadas/i18n)
+INSTALL(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)

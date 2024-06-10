@@ -24,7 +24,13 @@ jobs:
 
       - name: 🌍 Pull Translations
         shell: bash
-        run: TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
+        run: |
+          TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          for PLUGIN in about gpkg print; do
+            lrelease share/python/plugins/${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          done
 
       - name: Commit
         run: |

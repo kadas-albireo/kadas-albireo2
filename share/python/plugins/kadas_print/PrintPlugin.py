@@ -32,7 +32,7 @@ class PrintPlugin(QObject):
         if QSettings().value("locale/userLocale"):
             locale = QSettings().value("locale/userLocale")[0:2]
             localePath = os.path.join(
-                self.pluginDir, 'i18n', 'print_{}.qm'.format(locale))
+                self.pluginDir, 'i18n', 'kadas_print_{}.qm'.format(locale))
 
             if os.path.exists(localePath):
                 self.translator = QTranslator()
