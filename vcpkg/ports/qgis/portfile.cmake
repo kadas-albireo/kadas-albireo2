@@ -22,6 +22,7 @@ vcpkg_from_github(
         qtkeychain-56284.patch
         bindings-install.patch
         wcsLayerName.patch
+	srs-debug.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
