@@ -25,7 +25,7 @@ jobs:
       - name: 🌍 Pull Translations
         shell: bash
         run: |
-          TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -s -a --force
+          TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
 
       - name: Commit
         run: |
