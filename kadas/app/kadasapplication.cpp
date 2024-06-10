@@ -192,14 +192,14 @@ void KadasApplication::init()
   QString translationsPath;
   if ( isRunningFromBuildDir() )
   {
-    translationsPath = QDir( applicationDirPath() ).absoluteFilePath( "../locale" );
+    translationsPath = QDir( applicationDirPath() ).absoluteFilePath( "../i18n" );
   }
   else
   {
-    translationsPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "locale" );
+    translationsPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "i18n" );
   }
   QTranslator *translator = new QTranslator( this );
-  translator->load( QString( "Kadas_%1" ).arg( translation() ), translationsPath );
+  translator->load( QString( "kadas_%1" ).arg( translation() ), translationsPath );
   QApplication::instance()->installTranslator( translator );
 
 #ifdef WITH_CRASHREPORT
