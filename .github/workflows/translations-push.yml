@@ -27,7 +27,7 @@ jobs:
           lupdate -recursive kadas -ts ./i18n/kadas_en.ts
           for PLUGIN in about gpkg print
           do
-            pylupdate5 -noobsolete share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+            pylupdate5 -noobsolete -verbose share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done
 
       - name: "🌍 Push Translations"
