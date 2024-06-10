@@ -54,6 +54,8 @@ class KadasGpkg(QObject):
                 self.translator.load(locale_path)
                 QCoreApplication.installTranslator(self.translator)
 
+        self.kadasGpkgExport = KadasGpkgExport(self.iface)
+
     def initGui(self):
 
         self.menu = QMenu()
@@ -85,4 +87,4 @@ class KadasGpkg(QObject):
         KadasGpkgImport(self.iface).run()
 
     def __exportGpkg(self):
-        KadasGpkgExport(self.iface).run()
+        self.kadasGpkgExport.run()

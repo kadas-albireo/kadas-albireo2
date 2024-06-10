@@ -1,72 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import Qt, QTemporaryDir, QEventLoop
+from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QApplication
 
-from qgis.core import *
+from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer
 from qgis.gui import *
 
 import os
-import re
 import mimetypes
 import sqlite3
 import shutil
 import uuid
 from lxml import etree as ET
 
+from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
 from .kadas_gpkg_export_base import KadasGpkgExportBase
-from .ui_kadas_gpkg_export_dialog import Ui_KadasGpkgExportDialog
-
-
-class KadasGpkgExportDialog(QDialog):
-
-    def __init__(self, parent, iface):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_KadasGpkgExportDialog()
-        self.ui.setupUi(self)
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-
-        self.ui.spinBoxExportScale.setValue(int(iface.mapCanvas().mapSettings().scale()))
-
-        self.ui.buttonSelectFile.clicked.connect(self.__selectOutputFile)
-        self.ui.checkBoxClear.toggled.connect(self.__updateLocalLayerList)
-        self.ui.checkBoxExportScale.toggled.connect(self.ui.spinBoxExportScale.setEnabled)
-
-    def __selectOutputFile(self):
-        lastDir = QSettings().value("/UI/lastImportExportDir", ".")
-        filename = QFileDialog.getSaveFileName(self, self.tr("Select GPKG File..."), lastDir, self.tr("GPKG Database (*.gpkg)"), "", QFileDialog.DontConfirmOverwrite)[0]
-
-        if not filename:
-            return
-
-        if not filename.lower().endswith(".gpkg"):
-            filename += ".gpkg"
-
-        QSettings().setValue("/UI/lastImportExportDir", os.path.dirname(filename))
-        self.ui.lineEditOutputFile.setText(filename)
-
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(filename is not None)
-        self.__updateLocalLayerList()
-
-    def __updateLocalLayerList(self):
-        self.ui.listWidgetLayers.updateLayerList(self.ui.lineEditOutputFile.text() if not self.ui.checkBoxClear.isChecked() else None)
-
-    def outputFile(self):
-        return self.ui.lineEditOutputFile.text()
-
-    def clearOutputFile(self):
-        return self.ui.checkBoxClear.isChecked()
-
-    def selectedLayers(self):
-        return self.ui.listWidgetLayers.getSelectedLayers()
-
-    def buildPyramids(self):
-        return self.ui.checkBoxPyramids.isChecked()
-
-    def rasterExportScale(self):
-        return self.ui.spinBoxExportScale.value() if self.ui.checkBoxExportScale.isChecked() else None
-
 
 class KadasGpkgExport(KadasGpkgExportBase):
 
@@ -74,20 +22,33 @@ class KadasGpkgExport(KadasGpkgExportBase):
         KadasGpkgExportBase.__init__(self)
         self.iface = iface
 
-    def run(self):
+        self.kadasGpkgExportDialog = None
 
-        dialog = KadasGpkgExportDialog(self.iface.mainWindow(), self.iface)
-        if dialog.exec_() != QDialog.Accepted:
+    def run(self):
+        # Check dialog already open
+        if self.kadasGpkgExportDialog is not None:
             return
 
+        self.kadasGpkgExportDialog = KadasGpkgExportDialog(self.iface.mainWindow(), self.iface)
+        self.kadasGpkgExportDialog.finished.connect(self.__dialogFinished)
+        self.kadasGpkgExportDialog.show()
+
+    def __dialogFinished(self, result):
+        if result == QDialog.Accepted:
+            self.__export()
+
+        self.kadasGpkgExportDialog.finished.disconnect()
+        self.kadasGpkgExportDialog.clear()
+        self.kadasGpkgExportDialog = None
+
+    def __export(self):
         # Write project to temporary file
         tmpdir = QTemporaryDir()
 
-        gpkg_filename = dialog.outputFile()
-        selected_layers = dialog.selectedLayers()
+        gpkg_filename = self.kadasGpkgExportDialog.outputFile()
         gpkg_writefile = gpkg_filename
 
-        if dialog.clearOutputFile():
+        if self.kadasGpkgExportDialog.clearOutputFile():
             gpkg_writefile = tmpdir.filePath(os.path.basename(gpkg_filename))
 
         # Open database
@@ -124,7 +85,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         added_layer_ids = []
         added_layers_by_source = {}
         messages = []
-        if not self.write_layers(selected_layers, gpkg_writefile, pdialog, added_layer_ids, added_layers_by_source, messages, dialog.buildPyramids(), None, None, dialog.rasterExportScale()):
+        if not self.write_layers(self.kadasGpkgExportDialog.selectedLayers(), gpkg_writefile, pdialog, added_layer_ids, added_layers_by_source, messages, self.kadasGpkgExportDialog.buildPyramids(), self.kadasGpkgExportDialog.filterExtent(), self.kadasGpkgExportDialog.filterExtentCrs(), self.kadasGpkgExportDialog.rasterExportScale()):
             pdialog.hide()
             QMessageBox.warning(self.iface.mainWindow(), self.tr("GPKG Export"), self.tr("The operation was canceled."))
             return
@@ -172,7 +133,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         conn.commit()
         conn.close()
 
-        if dialog.clearOutputFile():
+        if self.kadasGpkgExportDialog.clearOutputFile():
             try:
                 os.remove(gpkg_filename)
             except:
