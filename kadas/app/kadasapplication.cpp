@@ -191,7 +191,8 @@ void KadasApplication::init()
   // Translations
   QTranslator *translator = new QTranslator( this );
   QString qm_file = QString( "kadas_%1" ).arg( translation() );
-  translator->load( qm_file, QStringLiteral( ":/i18n/" ) );
+  if (! translator->load( qm_file, QStringLiteral( ":/i18n/" ) ) )
+    qWarning() << QString( "Could not load translation %1" ).arg( qm_file );
   QApplication::instance()->installTranslator( translator );
 
 #ifdef WITH_CRASHREPORT
