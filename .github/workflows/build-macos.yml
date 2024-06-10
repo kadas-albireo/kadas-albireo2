@@ -87,6 +87,14 @@ jobs:
           path: |
             sdk/vcpkg-export-*.zip
 
+      - name: Compile plugins translation
+        run: |
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          for PLUGIN in about gpkg print; do
+            ./build/vcpkg_installed/arm64-osx/tools/qt5-tools/bin/lrelease share/python/plugins/${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          done
+
       - name: 🌋 Build
         run: |
           cmake --build build
