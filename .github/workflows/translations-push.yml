@@ -28,6 +28,6 @@ jobs:
           do
             pylupdate5 -noobsolete share/python/plugins/${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done
-0
+
       - name: "🌍 Push Translations"
         run: TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx push --source
