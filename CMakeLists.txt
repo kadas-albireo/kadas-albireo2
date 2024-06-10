@@ -124,6 +124,7 @@ install(DIRECTORY "share/" DESTINATION "share/kadas/"
 )
 
 if(WITH_VCPKG)
+  message("Install VCPG deps")
   include(VcpkgInstallDeps)
 endif()
 
