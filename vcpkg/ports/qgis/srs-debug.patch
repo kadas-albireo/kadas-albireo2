@@ -1,5 +1,5 @@
 diff --git a/src/core/qgsapplication.cpp b/src/core/qgsapplication.cpp
-index 92dcc608b77..d559f4eed2d 100644
+index 92dcc608b77..ea575e339be 100644
 --- a/src/core/qgsapplication.cpp
 +++ b/src/core/qgsapplication.cpp
 @@ -1203,6 +1203,7 @@ QString QgsApplication::iconsPath()
@@ -23,7 +23,7 @@ index 92dcc608b77..d559f4eed2d 100644
 +    path = pkgDataPath() + QStringLiteral( "/resources/srs.db" );
    }
 +  if ( !QFile( path ).exists() )
-+    qWarning( QString( "srs.db file expected at '%1' was not found." ).arg( path ) );
++    qWarning() << QString( "srs.db file expected at '%1' was not found." ).arg( path );
 +
 +  return path;
  }
