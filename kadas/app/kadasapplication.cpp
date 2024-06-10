@@ -189,17 +189,9 @@ void KadasApplication::init()
   mProjectTempDir->setAutoRemove( true );
 
   // Translations
-  QString translationsPath;
-  if ( isRunningFromBuildDir() )
-  {
-    translationsPath = QDir( applicationDirPath() ).absoluteFilePath( "../i18n" );
-  }
-  else
-  {
-    translationsPath = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "i18n" );
-  }
   QTranslator *translator = new QTranslator( this );
-  translator->load( QString( "kadas_%1" ).arg( translation() ), translationsPath );
+  QString qm_file = QString( "kadas_%1" ).arg( translation() );
+  translator->load( qm_file, QStringLiteral( ":/i18n/" ) );
   QApplication::instance()->installTranslator( translator );
 
 #ifdef WITH_CRASHREPORT
