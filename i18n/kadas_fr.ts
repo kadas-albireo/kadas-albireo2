@@ -1,68 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
 <context>
-    <name>CartoucheDialog</name>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="17"/>
-        <source>Map Cartouche</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="36"/>
-        <source>Exercise</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="64"/>
-        <source>Course name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="71"/>
-        <source>Exercise name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="78"/>
-        <source>Document name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="95"/>
-        <source>Exercise organisation</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="127"/>
-        <source>Annex name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="134"/>
-        <source>Title of cartouche</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="157"/>
-        <source>Place, date</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="164"/>
-        <source>&quot;CODE NAME&quot;</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="171"/>
-        <source>Unit</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/cartouchedialog.ui" line="181"/>
-        <source>Scale information</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
     <name>KadasAddImageDialog</name>
     <message>
         <location filename="../kadas/gui/kadasrichtexteditor.cpp" line="266"/>
@@ -1309,92 +1246,6 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <location filename="../kadas/app/globe/kadasglobewidget.cpp" line="127"/>
         <source>Sync with main view</source>
         <translation>Sync avec la vue principale</translation>
-    </message>
-</context>
-<context>
-    <name>KadasGpkgExportDialog</name>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="14"/>
-        <source>GPKG Project Export</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="22"/>
-        <source>Output file:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="42"/>
-        <source>Browse</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="51"/>
-        <source>Clear existing GeoPackage before exporting</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="58"/>
-        <source>The project, including embedded layers (redlining, symbols, pictures, ...), will be written to the GeoPackage.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="68"/>
-        <source>Additionally, the following layers will be added to the GeoPackage:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="110"/>
-        <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="139"/>
-        <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="149"/>
-        <source>Generate pyramids (slow)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_export_dialog.ui" line="158"/>
-        <source>Specify raster export scale:</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>KadasGpkgImportDialog</name>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="14"/>
-        <source>GPKG Import</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="30"/>
-        <source>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="42"/>
-        <source>Input file:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="62"/>
-        <source>Browse</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="86"/>
-        <source>Load entire project</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_gpkg/kadas_gpkg_import_dialog.ui" line="99"/>
-        <source>Import only selected layers:</source>
-        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3564,137 +3415,137 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMainWindow</name>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="149"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="151"/>
         <source>System language</source>
         <translation>Langue du système</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="185"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="187"/>
         <source>Add vector layer</source>
         <translation>Ajouter une couche vecteur</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="186"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="188"/>
         <source>Add raster layer</source>
         <translation>Ajouter une couche raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="187"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="189"/>
         <source>Add CSV layer</source>
         <translation>Ajouter une couche CSV</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="191"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="193"/>
         <source>Add WMS layer</source>
         <translation>Ajouter une couche WMS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="192"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="194"/>
         <source>Add WFS layer</source>
         <translation>Ajouter une couche WFS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="193"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="195"/>
         <source>Add WCS layer</source>
         <translation>Ajouter une couche WCS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="194"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="196"/>
         <source>Add vector tile layer</source>
         <translation>Ajouter une couche de tuile vectorielle</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="195"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="197"/>
         <source>Add XYZ layer</source>
         <translation>Ajouter une couche XYZ</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="196"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="198"/>
         <source>Add MapServer layer</source>
         <translation>Ajouter une couche MapServer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="209"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="211"/>
         <source>Magnifier level</source>
         <translation>Niveau de la loupe</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="673"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="678"/>
         <source>Choose file...</source>
         <translation>Choisir un fichier...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="674"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="679"/>
         <source>Enter URL...</source>
         <translation>Entrer l&apos;URL...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1097"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1104"/>
         <source>Language Changed</source>
         <translation>La langue a changé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1097"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1104"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La langue sera modifiée au prochain démarrage du programme.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1119"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1126"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1123"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1130"/>
         <source>Favorite</source>
         <translation>Favori</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1293"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1300"/>
         <source>Manually set projection</source>
         <translation>Sélectionner manuellement la projection</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1296"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1303"/>
         <source>Unknown layer projection</source>
         <translation>Projection de la couche inconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1297"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1304"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1344"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1351"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1379"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1386"/>
         <source>Downloading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1389"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1396"/>
         <source>Unable to download image</source>
         <translation>Impossible de télécharger l&apos;image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1398"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1405"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible d&apos;enregistrer l&apos;image téléchargée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1440"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1447"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1520"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1532"/>
         <source>Font scaling setting changed</source>
         <translation>Configuration modifiée de l&apos;échelle des caractères</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1520"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1532"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modification de l&apos;échelle des polices sera appliquée lors du prochain lancement du programme.</translation>
     </message>
@@ -6046,152 +5897,6 @@ avec géoloc.</translation>
         <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="41"/>
         <source>World Places</source>
         <translation>Lieux mondiaux</translation>
-    </message>
-</context>
-<context>
-    <name>PrintDialog</name>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="14"/>
-        <source>Print</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="24"/>
-        <source>Border:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="31"/>
-        <source>Extent:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="38"/>
-        <source>Layout:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="45"/>
-        <source>Title:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="62"/>
-        <source>Scalebar</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="69"/>
-        <source>Legend</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="76"/>
-        <source>File format:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="83"/>
-        <source>Map cartouche</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="90"/>
-        <source>Scale:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="97"/>
-        <source>...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="107"/>
-        <source>Only meter based coordinate systems are supported in variable extent mode.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="165"/>
-        <source>X Max.:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="178"/>
-        <source>X Min.:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="201"/>
-        <source>Y Max.:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="214"/>
-        <source>Y Min.:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="260"/>
-        <source> mm</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="276"/>
-        <source>Grid</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="298"/>
-        <source>Coordinate system:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="324"/>
-        <source>Interval X:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="331"/>
-        <source>Coordinate labels</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="357"/>
-        <source>Interval Y:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="376"/>
-        <source>Edit map cartouche</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printdialog.ui" line="386"/>
-        <source>Configure</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>PrintLayoutManager</name>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printlayoutmanager.ui" line="14"/>
-        <source>Print Layout Manager</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printlayoutmanager.ui" line="20"/>
-        <source>Import</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printlayoutmanager.ui" line="30"/>
-        <source>Export</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../share/python/plugins/kadas_print/ui/printlayoutmanager.ui" line="40"/>
-        <source>Remove</source>
-        <translation type="unfinished"/>
     </message>
 </context>
 <context>
