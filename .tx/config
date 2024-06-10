@@ -8,19 +8,19 @@ source_lang = en
 type = QT
 
 [o:kadas:p:kadas-albireo:r:kadas-about]
-file_filter = share/python/plugins/kadas_about/i18n/kadas_about<lang>.ts
+file_filter = share/python/plugins/kadas_about/i18n/kadas_about_<lang>.ts
 source_file = share/python/plugins/kadas_about/i18n/kadas_about_en.ts
 source_lang = en
 type = QT
 
 [o:kadas:p:kadas-albireo:r:kadas-gpkg]
-file_filter = share/python/plugins/kadas_gpkg/i18n/kadas_gpkg<lang>.ts
+file_filter = share/python/plugins/kadas_gpkg/i18n/kadas_gpkg_<lang>.ts
 source_file = share/python/plugins/kadas_gpkg/i18n/kadas_gpkg_en.ts
 source_lang = en
 type = QT
 
 [o:kadas:p:kadas-albireo:r:kadas-print]
-file_filter = share/python/plugins/kadas_print/i18n/kadas_print<lang>.ts
+file_filter = share/python/plugins/kadas_print/i18n/kadas_print_<lang>.ts
 source_file = share/python/plugins/kadas_print/i18n/kadas_print_en.ts
 source_lang = en
 type = QT
