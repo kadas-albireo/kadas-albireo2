@@ -52,7 +52,7 @@ jobs:
                 -D WITH_QTWEBKIT=OFF \
                 -D INSTALL_DEMO_DATA=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src --debug" \
                 -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.exe" \
                 -D PYUIC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyuic5.bat" \
                 -D PYRCC_PROGRAM="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\pyrcc5.bat" \
@@ -61,6 +61,9 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
                 ${CREATE_MSI_CMAKE_VAR}
+
+      - uses: m-kuhn/action-tmate@patch-1
+        if: always()
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v4
@@ -105,5 +108,3 @@ jobs:
           name: kadas-albireo2-msi
           path: |
             build/kadas-*-win64.msi
-
-    
