@@ -119,7 +119,7 @@
     <message>
         <location filename="../ui/ui_cartouchedialog.py" line="135"/>
         <source>&quot;CODE NAME&quot;</source>
-        <translation type="unfinished"/>
+        <translation>&amp;quot;DECKNAME&amp;quot;</translation>
     </message>
     <message>
         <location filename="../ui/ui_cartouchedialog.py" line="136"/>
