@@ -1,15 +1,15 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="en">
 <context>
     <name>KadasGpkg</name>
     <message>
         <location filename="../kadas_gpkg.py" line="63"/>
         <source>GPKG Export</source>
-        <translation>Exportation GPKG</translation>
+        <translation>GPKG Export</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg.py" line="69"/>
         <source>GPKG Import</source>
-        <translation>Importation GPKG</translation>
+        <translation>GPKG Import</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg.py" line="73"/>
@@ -22,53 +22,53 @@
     <message>
         <location filename="../kadas_gpkg_export.py" line="183"/>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="97"/>
         <source>Unable to create or open output file</source>
-        <translation>Impossible de créer ou d&apos;ouvrir le fichier de sortie</translation>
+        <translation>Unable to create or open output file</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="100"/>
         <source>Writing %s...</source>
-        <translation>%s en cours d&apos;écriture...</translation>
+        <translation>Writing %s...</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="100"/>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation>Cancel</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="191"/>
         <source>GPKG Export</source>
-        <translation>Exportation GPKG</translation>
+        <translation>GPKG Export</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="129"/>
         <source>The operation was canceled.</source>
-        <translation>L&apos;opération a été annulée.</translation>
+        <translation>The operation was canceled.</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="148"/>
         <source>Invalid project</source>
-        <translation>Projet invalide</translation>
+        <translation>Invalid project</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="183"/>
         <source>Unable to create output file</source>
-        <translation>Impossible de créer le fichier de sortie</translation>
+        <translation>Unable to create output file</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="187"/>
         <source>GPKG export completed</source>
-        <translation>Exportation GPKG complétée</translation>
+        <translation>GPKG export completed</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="191"/>
         <source>The following layers were not exported to the GeoPackage:
 - %s</source>
-        <translation>Les couches suivantes n&apos;ont pas été écrites dans le GeoPackage:
+        <translation>The following layers were not exported to the GeoPackage:
 - %s</translation>
     </message>
 </context>
@@ -77,22 +77,22 @@
     <message>
         <location filename="../kadas_gpkg_export_base.py" line="105"/>
         <source>Writing %s</source>
-        <translation>%s en cours d&apos;écriture...</translation>
+        <translation>Writing %s</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_base.py" line="100"/>
         <source>Write failed: error %d (%s)</source>
-        <translation>Échec d&apos;écriture %d (%s)</translation>
+        <translation>Write failed: error %d (%s)</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_base.py" line="144"/>
         <source>Write failed: error %d</source>
-        <translation>Échec d&apos;écriture %d</translation>
+        <translation>Write failed: error %d</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_base.py" line="155"/>
         <source>Computing pyramids, please wait...</source>
-        <translation>Les pyramides sont en cours de calcul, veuillez patienter...</translation>
+        <translation>Computing pyramids, please wait...</translation>
     </message>
 </context>
 <context>
@@ -100,62 +100,62 @@
     <message>
         <location filename="../kadas_gpkg_export.py" line="38"/>
         <source>Select GPKG File...</source>
-        <translation>Choisir le fichier GPKG ...</translation>
+        <translation>Select GPKG File...</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export.py" line="38"/>
         <source>GPKG Database (*.gpkg)</source>
-        <translation>Base des données GPKG (*.gpkg)</translation>
+        <translation>GPKG Database (*.gpkg)</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="104"/>
         <source>GPKG Project Export</source>
-        <translation>Exporter projet en GPKG</translation>
+        <translation>GPKG Project Export</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="105"/>
         <source>Output file:</source>
-        <translation>Fichier de sortie:</translation>
+        <translation>Output file:</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="106"/>
         <source>Browse</source>
-        <translation>Parcourir</translation>
+        <translation>Browse</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="107"/>
         <source>Clear existing GeoPackage before exporting</source>
-        <translation>Effacer le GeoPackage existant avant d&apos;exporter</translation>
+        <translation>Clear existing GeoPackage before exporting</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="108"/>
         <source>The project, including embedded layers (redlining, symbols, pictures, ...), will be written to the GeoPackage.</source>
-        <translation>Le projet, incluant les couches intégrées (redlining, symboles, images, ...), sera écrit dans le GeoPackage.</translation>
+        <translation>The project, including embedded layers (redlining, symbols, pictures, ...), will be written to the GeoPackage.</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="109"/>
         <source>Additionally, the following layers will be added to the GeoPackage:</source>
-        <translation>De plus, les couches suivantes seront ajoutées au GeoPackage:</translation>
+        <translation>Additionally, the following layers will be added to the GeoPackage:</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="110"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="111"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="112"/>
         <source>Generate pyramids (slow)</source>
-        <translation>Génération des pyramides (lent)</translation>
+        <translation>Generate pyramids (slow)</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_export_dialog.py" line="113"/>
         <source>Specify raster export scale:</source>
-        <translation>Spécifier l&apos;échelle d&apos;exportation des raster:</translation>
+        <translation>Specify raster export scale:</translation>
     </message>
 </context>
 <context>
@@ -163,27 +163,27 @@
     <message>
         <location filename="../kadas_gpkg_import.py" line="204"/>
         <source>Import Errors</source>
-        <translation>Erreurs d&apos;importation</translation>
+        <translation>Import Errors</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_import.py" line="204"/>
         <source>The following layers could not be imported:%s</source>
-        <translation>Les couches suivantes n&apos;ont pas pu être importées:%s</translation>
+        <translation>The following layers could not be imported:%s</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_import.py" line="208"/>
         <source>Save project?</source>
-        <translation>Enregistrer le projet?</translation>
+        <translation>Save project?</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_import.py" line="208"/>
         <source>The project has unsaved changes. Do you want to save them before proceeding?</source>
-        <translation>Le projet a des modifications non enregistrées. Enregistrer-les avant de continuer?</translation>
+        <translation>The project has unsaved changes. Do you want to save them before proceeding?</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_import.py" line="245"/>
         <source>GPKG import completed</source>
-        <translation>Importation GPKG complétée</translation>
+        <translation>GPKG import completed</translation>
     </message>
 </context>
 <context>
@@ -191,42 +191,42 @@
     <message>
         <location filename="../kadas_gpkg_import.py" line="46"/>
         <source>Select GPKG File...</source>
-        <translation>Choisir le fichier GPKG ...</translation>
+        <translation>Select GPKG File...</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_import.py" line="46"/>
         <source>GPKG Database (*.gpkg)</source>
-        <translation>Base des données GPKG (*.gpkg)</translation>
+        <translation>GPKG Database (*.gpkg)</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="79"/>
         <source>GPKG Import</source>
-        <translation>Importation GPKG</translation>
+        <translation>GPKG Import</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="80"/>
         <source>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="81"/>
         <source>Input file:</source>
-        <translation>Fichier d&apos;entrée :</translation>
+        <translation>Input file:</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="82"/>
         <source>Browse</source>
-        <translation>Parcourir</translation>
+        <translation>Browse</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="83"/>
         <source>Load entire project</source>
-        <translation>Charger le projet entier</translation>
+        <translation>Load entire project</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="84"/>
         <source>Import only selected layers:</source>
-        <translation>Importez uniquement les couches sélectionnées:</translation>
+        <translation>Import only selected layers:</translation>
     </message>
 </context>
 </TS>

@@ -123,7 +123,8 @@ install(DIRECTORY "share/" DESTINATION "share/kadas/"
   PATTERN "share/project_templates" EXCLUDE
 )
 
-if(NOT WITH_VCPKG)
+if(WITH_VCPKG)
+  message("Install VCPKG deps")
   include(VcpkgInstallDeps)
 endif()
 

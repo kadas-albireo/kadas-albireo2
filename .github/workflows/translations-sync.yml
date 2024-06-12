@@ -24,11 +24,17 @@ jobs:
 
       - name: 🌍 Pull Translations
         shell: bash
-        run: TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
+        run: |
+          TX_TOKEN=${{ secrets.TX_TOKEN }} ./tx pull -a --force
 
       - name: Commit
         run: |
           git config --global user.name "Geo Ninja"
           git config --global user.email "${{ secrets.GH_GEONINJA_EMAIL }}"
-          git add i18n && git commit -m "Synchronize translations" || echo "no changes to translations"
+          git add i18n 
+          for PLUGIN in about gpkg print
+          do
+            git add share/python/plugins/kadas_${PLUGIN}/i18n
+          done
+          git commit -m "Synchronize translations" || echo "no changes to translations"
           git push

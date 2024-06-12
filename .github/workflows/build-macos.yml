@@ -77,7 +77,7 @@ jobs:
       - name: 📦 Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
-          ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed
+          ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
 
       - name: 📤 Upload sdk
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
@@ -86,6 +86,15 @@ jobs:
           name: kadas-albireo2-sdk-${{ matrix.triplet }}
           path: |
             sdk/vcpkg-export-*.zip
+
+      - name: Compile plugins translation
+        run: |
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/arm64-osx/tools/qt5/bin:${PATH}"
+          for PLUGIN in about gpkg print; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          done
 
       - name: 🌋 Build
         run: |

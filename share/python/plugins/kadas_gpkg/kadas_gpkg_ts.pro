@@ -9,6 +9,4 @@ ui_kadas_gpkg_import_dialog.py
 FORMS += \
 kadas_gpkg_export_dialog.ui
 
-TRANSLATIONS += i18n/kadas_gpkg_de.ts \
-                i18n/kadas_gpkg_it.ts \
-                i18n/kadas_gpkg_fr.ts
+TRANSLATIONS += i18n/kadas_gpkg_en.ts

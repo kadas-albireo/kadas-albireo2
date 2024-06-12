@@ -80,6 +80,15 @@ jobs:
           name: kadas-albireo2-sdk-x64-windows
           path: |
             sdk/vcpkg-export-*.zip
+
+      - name: Compile plugins translation
+        run: |
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          set PATH=${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\qt5\bin";%PATH%
+          for PLUGIN in about gpkg print; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          done
     
       - name: 🌋 Build
         run: |
