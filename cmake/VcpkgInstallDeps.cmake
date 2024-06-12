@@ -33,7 +33,7 @@ if(MSVC)
         "${VCPKG_BASE_DIR}/bin/*.dll"
     )
     install(FILES ${ALL_LIBS} DESTINATION "bin")
-    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "python/")
+    install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "share/qgis/python/")
     install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
