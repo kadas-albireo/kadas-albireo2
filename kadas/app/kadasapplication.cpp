@@ -185,15 +185,35 @@ void KadasApplication::init()
 {
   QgsApplication::init();
 
-  mProjectTempDir = new QTemporaryDir();
-  mProjectTempDir->setAutoRemove( true );
+  QgsSettings settings;
 
   // Translations
+  QString locale = QLocale::system().name();
+  if ( settings.value( "/locale/overrideFlag", false ).toBool() )
+  {
+    locale = settings.value( "/locale/userLocale", locale ).toString();
+  }
+  else
+  {
+    settings.setValue( "/locale/userLocale", locale );
+  }
+  KadasApplication::setTranslation( locale );
+
   QTranslator *translator = new QTranslator( this );
   QString qm_file = QString( "kadas_%1" ).arg( translation() );
   if (! translator->load( qm_file, QStringLiteral( ":/i18n/" ) ) )
     qWarning() << QString( "Could not load translation %1" ).arg( qm_file );
   QApplication::instance()->installTranslator( translator );
+
+  bool ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
+  if ( !ignoreDpiScale )
+  {
+    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+  }
+
+  mProjectTempDir = new QTemporaryDir();
+  mProjectTempDir->setAutoRemove( true );
+
 
 #ifdef WITH_CRASHREPORT
   // Install crash reporter
@@ -240,7 +260,6 @@ void KadasApplication::init()
   }
 
   // Create / migrate settings
-  QgsSettings settings;
   QFile srcSettings;
   bool settingsEmpty = false;
   if ( settings.value( "timestamp", 0 ).toInt() > 0 )

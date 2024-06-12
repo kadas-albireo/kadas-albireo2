@@ -56,52 +56,8 @@ int main( int argc, char *argv[] )
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
   QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
 
-  QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
-  QString rootProfileFolder = QgsUserProfileManager::resolveProfilesFolder( configLocalStorageLocation );
-
-  bool clearsettings = false;
-  QString profileName = "default";
-  for ( int i = 1; i < argc; ++i )
-  {
-    if ( qstrcmp( argv[i], "--clearsettings" ) == 0 )
-    {
-      clearsettings = true;
-    }
-  }
-
-  QString locale = QLocale::system().name();
-  bool ignoreDpiScale = false;
-  if ( clearsettings )
-  {
-    QDir( QString( "%1/%2" ).arg( rootProfileFolder, profileName ) ).removeRecursively();
-    QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).removeRecursively();
-    QString iniFile = QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/%2/%3.ini" ).arg( profileName, QApplication::organizationDomain(), Kadas::KADAS_RELEASE_NAME ) );
-    QSettings settings( iniFile, QSettings::IniFormat );
-    settings.setValue( "/locale/userLocale", locale );
-    ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
-  }
-  else
-  {
-    QString iniFile = QDir( rootProfileFolder ).absoluteFilePath( QString( "%1/%2/%3.ini" ).arg( profileName, QApplication::organizationDomain(), Kadas::KADAS_RELEASE_NAME ) );
-    QSettings settings( iniFile, QSettings::IniFormat );
-    if ( settings.value( "/locale/overrideFlag", false ).toBool() )
-    {
-      locale = settings.value( "/locale/userLocale", locale ).toString();
-    }
-    else
-    {
-      settings.setValue( "/locale/userLocale", locale );
-    }
-    ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
-  }
-  KadasApplication::setTranslation( locale );
-
-  if ( !ignoreDpiScale )
-  {
-    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
-  }
-
   // Delete any leftover wcs cache
+  QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
   QDir( QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).absoluteFilePath( "wcs_cache" ) ).removeRecursively();
 
   KadasApplication *app = new KadasApplication( argc, argv );
