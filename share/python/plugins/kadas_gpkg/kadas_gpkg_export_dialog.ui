@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>557</width>
-    <height>491</height>
+    <width>768</width>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -96,9 +96,6 @@
        <height>16</height>
       </size>
      </property>
-     <property name="pixmap">
-      <pixmap resource="../../qgis-master/images/images.qrc">:/images/themes/default/mIconSuccess.svg</pixmap>
-     </property>
      <property name="scaledContents">
       <bool>true</bool>
      </property>
@@ -124,9 +121,6 @@
        <width>16</width>
        <height>16</height>
       </size>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../../qgis-master/images/images.qrc">:/images/themes/default/mIconWarning.svg</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -181,6 +175,61 @@
     </layout>
    </item>
    <item row="9" column="0" colspan="2">
+    <widget class="QGroupBox" name="mGroupBoxExtent">
+     <property name="title">
+      <string>Restrict extent to export:</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="2">
+       <widget class="QLabel" name="mLabelYMax">
+        <property name="text">
+         <string>Y Max.:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="mlabelXMin">
+        <property name="text">
+         <string>X Min.:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="mLineEditYMin"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="mLineEditXMin"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="mLabelYMin">
+        <property name="text">
+         <string>Y Min.:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="mLabelXMax">
+        <property name="text">
+         <string>X Max.:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="mLineEditXMax"/>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="mLineEditYMax"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="10" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -196,12 +245,10 @@
   <customwidget>
    <class>KadasGpkgLayersList</class>
    <extends>QListWidget</extends>
-   <header>.kadas_gpkg_layer_list</header>
+   <header>kadas_gpkg.kadas_gpkg_layer_list</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../qgis-master/images/images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

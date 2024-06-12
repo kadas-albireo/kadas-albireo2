@@ -8,3 +8,4 @@ kadas/resources/resources.qrc
 *.orig
 .DS_Store
 .vscode
+__pycache__

@@ -1,7 +1,7 @@
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
+from qgis.core import QgsProject, QgsMapLayer
 
 import os
 import re
@@ -14,6 +14,7 @@ class KadasGpkgLayersList(QListWidget):
     WARN_SIZE = 50 * 1024 * 1024
 
     def __init__(self, parent):
+
         QListWidget.__init__(self, parent)
 
         self.layers = {}
