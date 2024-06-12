@@ -17,7 +17,7 @@ endfunction()
 
 if(MSVC)
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/plugins")
-    set(QGIS_PYTHON_DIR "${VCPKG_BASE_DIR}/python")
+    set(QGIS_PYTHON_DIR "${VCPKG_BASE_DIR}/share/qgis/python")
     file(GLOB PROVIDER_LIBS
         "${QGIS_PLUGIN_DIR}/*provider*.dll"
     )
@@ -73,12 +73,7 @@ if(NOT ${STATUS_CODE} EQUAL 0)
     message(FATAL_ERROR "Error occurred during cacert.pem download: ${ERROR_MESSAGE}")
 endif()
 
-#TODO on windows the qgis share dir is not prefixed: probably something to solve in the qgis port
-if(MSVC)
-    set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR})
-else()
-    set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR}/share/qgis)
-endif()
+set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR}/share/qgis)
 
 add_custom_command(TARGET deploy
                    POST_BUILD

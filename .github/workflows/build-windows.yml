@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     name: build (windows)
-    runs-on: windows-2022
+    runs-on: windows-2019
 
     steps:
       - name: 🐣 Checkout
@@ -82,10 +82,11 @@ jobs:
             sdk/vcpkg-export-*.zip
 
       - name: Compile plugins translation
+        shell: bash
         run: |
           # lrelease is run from cmake for app
           # plugins need to be handled
-          set PATH=${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\qt5\bin";%PATH%
+          export PATH="${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\qt5\bin:${PATH}"
           for PLUGIN in about gpkg print; do
             lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done
