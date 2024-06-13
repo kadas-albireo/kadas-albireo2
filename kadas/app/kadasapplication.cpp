@@ -183,6 +183,8 @@ KadasApplication::~KadasApplication()
 
 void KadasApplication::init()
 {
+  QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+
   QgsApplication::init();
 
   QgsSettings settings;
@@ -204,12 +206,6 @@ void KadasApplication::init()
   if (! translator->load( qm_file, QStringLiteral( ":/i18n/" ) ) )
     qWarning() << QString( "Could not load translation %1" ).arg( qm_file );
   QApplication::instance()->installTranslator( translator );
-
-  bool ignoreDpiScale = settings.value( "/kadas/ignore_dpi_scale", false ).toBool();
-  if ( !ignoreDpiScale )
-  {
-    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
-  }
 
   mProjectTempDir = new QTemporaryDir();
   mProjectTempDir->setAutoRemove( true );
