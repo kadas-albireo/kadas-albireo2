@@ -23,11 +23,14 @@ struct KadasMilxSymbolDesc
   QString symbolType;
 };
 
-struct KadasMilxSymbolSettings
+class KadasMilxSymbolSettings
 {
+
+%TypeHeaderCode
+#include "kadas/gui/milx/kadasmilxclient.h"
+%End
   public:
     static const QMetaObject staticMetaObject;
-
 
   public:
     enum class WorkMode

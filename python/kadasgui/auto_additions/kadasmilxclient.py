@@ -1,7 +1,7 @@
 # The following has been generated automatically from kadas/gui/milx/kadasmilxclient.h
 # monkey patching scoped based enum
-WorkMode.WorkModeInternational.__doc__ = ""
-WorkMode.WorkModeCH.__doc__ = ""
-WorkMode.__doc__ = '\n\n' + '* ``WorkModeInternational``: ' + WorkMode.WorkModeInternational.__doc__ + '\n' + '* ``WorkModeCH``: ' + WorkMode.WorkModeCH.__doc__
+KadasMilxSymbolSettings.WorkMode.WorkModeInternational.__doc__ = ""
+KadasMilxSymbolSettings.WorkMode.WorkModeCH.__doc__ = ""
+KadasMilxSymbolSettings.WorkMode.__doc__ = "\n\n" + '* ``WorkModeInternational``: ' + KadasMilxSymbolSettings.WorkMode.WorkModeInternational.__doc__ + '\n' + '* ``WorkModeCH``: ' + KadasMilxSymbolSettings.WorkMode.WorkModeCH.__doc__
 # --
-.WorkMode.baseClass = 
+KadasMilxSymbolSettings.WorkMode.baseClass = KadasMilxSymbolSettings

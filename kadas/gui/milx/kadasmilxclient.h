@@ -46,7 +46,7 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
   QString symbolType;
 };
 
-struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
+class KADAS_GUI_EXPORT KadasMilxSymbolSettings
 {
   Q_GADGET
 
@@ -56,7 +56,7 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
       WorkModeInternational = 0,
       WorkModeCH = 1
     };
-    Q_ENUM( WorkMode );
+    Q_ENUM( WorkMode )
 
     static constexpr int MinSymbolSize = 25;
     static constexpr int MaxSymbolSize = 150;
