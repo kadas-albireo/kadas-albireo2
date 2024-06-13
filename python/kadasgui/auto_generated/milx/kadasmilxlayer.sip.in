@@ -41,7 +41,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext );
 
-    virtual ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective = PickObjective::PICK_OBJECTIVE_ANY ) const;
+    virtual ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const;
 
 
     void setApproved( bool approved );

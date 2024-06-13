@@ -229,7 +229,7 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return true;
 }
 
-KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective ) const
+KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective ) const
 {
   for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
   {

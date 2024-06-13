@@ -157,7 +157,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QgsRectangle extent() const override;
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
-    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective = PickObjective::PICK_OBJECTIVE_ANY ) const;
+    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const;
 #ifndef SIP_RUN
     [[deprecated( "Use variant taking the mapPos as first parameter instead" )]]
 #endif
