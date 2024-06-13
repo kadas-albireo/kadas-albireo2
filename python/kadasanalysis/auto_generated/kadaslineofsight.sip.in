@@ -12,7 +12,7 @@
 
 class KadasLineOfSight
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/analysis/kadaslineofsight.h"
+#include "kadaslineofsight.h"
 %End
   public:
     static bool computeTargetVisibility( const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTarrainSamples, bool observerPosAbsolute = false, bool targetPosAbsolute = false );

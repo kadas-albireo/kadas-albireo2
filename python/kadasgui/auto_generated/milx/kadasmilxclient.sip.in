@@ -25,29 +25,35 @@ struct KadasMilxSymbolDesc
 
 struct KadasMilxSymbolSettings
 {
-  static const int MinSymbolSize;
-  static const int MaxSymbolSize;
-  static const int DefaultSymbolSize;
+  public:
+    static const QMetaObject staticMetaObject;
 
-  static const int MinLineWidth;
-  static const int MaxLineWidth;
-  static const int DefaultLineWidth;
 
-  static const int DefaultLeaderLineWidth;
-  static const Qt::GlobalColor DefaultLeaderLineColor;
+  public:
+    enum class WorkMode
+    {
+      WorkModeInternational,
+      WorkModeCH
+    };
 
-  enum WorkMode
-  {
-    WorkModeInternational,
-    WorkModeCH
-  };
-  static const WorkMode DefaultWorkMode;
+    static const int MinSymbolSize;
+    static const int MaxSymbolSize;
+    static const int DefaultSymbolSize;
 
-  int symbolSize;
-  int lineWidth;
-  WorkMode workMode;
-  int leaderLineWidth;
-  QColor leaderLineColor;
+    static const int MinLineWidth;
+    static const int MaxLineWidth;
+    static const int DefaultLineWidth;
+
+    static const int DefaultLeaderLineWidth;
+    static const Qt::GlobalColor DefaultLeaderLineColor;
+
+    static const WorkMode DefaultWorkMode;
+
+    int symbolSize;
+    int lineWidth;
+    WorkMode workMode;
+    int leaderLineWidth;
+    QColor leaderLineColor;
 };
 
 /************************************************************************

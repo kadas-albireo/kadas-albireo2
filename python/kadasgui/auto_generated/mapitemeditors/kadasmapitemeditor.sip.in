@@ -15,7 +15,7 @@
 
 class KadasMapItemEditor : QWidget
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -27,10 +27,14 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadasmapitemeditor.h"
 %End
   public:
-    enum EditorType {CreateItemEditor, EditItemEditor};
+    enum class EditorType
+    {
+      CreateItemEditor,
+      EditItemEditor
+    };
 
     KadasMapItemEditor( KadasMapItem *item, QWidget *parent = 0 );
 

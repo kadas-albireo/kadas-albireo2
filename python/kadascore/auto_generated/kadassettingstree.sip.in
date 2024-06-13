@@ -1,0 +1,50 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadassettingstree.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+class KadasSettingsTree
+{
+%Docstring(signature="appended")
+KadasSettingsTree holds the tree structure for the settings
+%End
+
+%TypeHeaderCode
+#include "kadassettingstree.h"
+%End
+  public:
+
+
+    static const QgsSettingsTreeNode *node( const QString &key );
+%Docstring
+Returns the tree node at the given ``key``
+
+.. note::
+
+   For Plugins, use :py:func:`~KadasSettingsTree.createPluginTreeNode` to create nodes for plugin settings.
+%End
+
+    static QgsSettingsTreeNode *createPluginTreeNode( const QString &pluginName );
+%Docstring
+Creates a settings tree node for the given ``pluginName``
+%End
+
+
+    static void unregisterPluginTreeNode( const QString &pluginName );
+%Docstring
+Unregisters the tree node for the given plugin
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadassettingstree.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

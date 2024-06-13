@@ -5,6 +5,18 @@
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
+class QgsSettingsEntryEnumFlag_*settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth )
+{
+%TypeHeaderCode
+#include "kadasmaptoolmeasure.h"
+#include "qgssettingsentry.h"
+typedef QgsSettingsEntryEnumFlag<AzimuthNorth> QgsSettingsEntryEnumFlag_*settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth );
+%End
+  public:
+    QgsSettingsEntryEnumFlag_*settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth )( const QString &key, QgsSettings::Section section, const AzimuthNorth &defaultValue, const QString &description = QString() );
+    QString key( const QString &dynamicKeyPart = QString() ) const;
+    AzimuthNorth value( const QString &dynamicKeyPart = QString(), bool useDefaultValueOverride = false, const AzimuthNorth &defaultValueOverride = AzimuthNorth() ) const;
+};
 
 
 
@@ -13,7 +25,7 @@
 
 class KadasMeasureWidget : KadasMapItemEditor
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -25,10 +37,13 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+#include "kadasmaptoolmeasure.h"
 %End
   public:
-    enum AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
+    enum class AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
+
+    const QgsSettingsEntryEnumFlag_*settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth ) *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth );
+
 
     KadasMeasureWidget( KadasMapItem *item );
 
@@ -49,10 +64,10 @@ class KadasMapToolMeasure : KadasMapToolCreateItem
 {
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+#include "kadasmaptoolmeasure.h"
 %End
   public:
-    enum MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
+    enum class MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
 
     virtual void activate();

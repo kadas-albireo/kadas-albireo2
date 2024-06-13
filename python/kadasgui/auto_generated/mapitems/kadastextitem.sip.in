@@ -12,7 +12,7 @@
 
 class KadasTextItem : KadasAnchoredItem
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadastextitem.h"
+#include "kadastextitem.h"
 %End
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs );

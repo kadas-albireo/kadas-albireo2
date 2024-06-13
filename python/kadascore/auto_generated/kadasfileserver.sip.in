@@ -11,7 +11,7 @@
 
 class KadasFileServer : QTcpServer
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -23,12 +23,15 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/core/kadasfileserver.h"
+#include "kadasfileserver.h"
 %End
   public:
     KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );
     const QString &getHost() const;
     int getPort() const;
+
+    QString getFilesTopDir() const;
+    void setFilesTopDir( const QString &topDir );
 
 };
 /************************************************************************

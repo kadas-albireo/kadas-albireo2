@@ -14,13 +14,13 @@
 
 class KadasMapToolPan : QgsMapTool
 {
-%Docstring
+%Docstring(signature="appended")
 A map tool for panning the map.
-@see QgsMapTool
+@see :py:class:`QgsMapTool`
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolpan.h"
+#include "kadasmaptoolpan.h"
 %End
   public:
     KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteraction = true );

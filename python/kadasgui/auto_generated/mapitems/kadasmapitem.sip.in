@@ -12,9 +12,10 @@
 
 
 
+
 class KadasMapPos
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -26,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadasmapitem.h"
 %End
   public:
     static KadasMapPos fromPoint( const QgsPointXY &pos );
@@ -44,7 +45,7 @@ class KadasMapRect
 {
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadasmapitem.h"
 %End
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
@@ -66,7 +67,7 @@ class KadasItemPos
 {
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadasmapitem.h"
 %End
   public:
     static KadasItemPos fromPoint( const QgsPointXY &pos );
@@ -88,7 +89,7 @@ class KadasItemRect
 {
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadasmapitem.h"
 %End
   public:
     KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
@@ -216,7 +217,7 @@ class KadasMapItem : QObject /Abstract/
 {
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadasmapitem.h"
 %End
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
@@ -330,7 +331,7 @@ Trigger a redraw */
 
     struct State : KadasStateHistory::State
     {
-      enum DrawStatus { Empty, Drawing, Finished };
+      enum class DrawStatus { Empty, Drawing, Finished };
       DrawStatus drawStatus;
       virtual void assign( const State *other ) = 0;
       virtual State *clone() const = 0 /Factory/;
@@ -343,7 +344,7 @@ Trigger a redraw */
     struct NumericAttribute
     {
       QString name;
-      enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      enum class Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
       Type type;
       double min;
       double max;
@@ -369,7 +370,7 @@ Trigger a redraw */
 
     struct EditContext
     {
-      EditContext();
+      EditContext() : mValid( false );
       EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
       bool mValid;
       QgsVertexId vidx;
@@ -383,7 +384,7 @@ Trigger a redraw */
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    enum ContextMenuActions
+    enum class ContextMenuActions
     {
       EditNoAction,
       EditSwitchToDrawingTool

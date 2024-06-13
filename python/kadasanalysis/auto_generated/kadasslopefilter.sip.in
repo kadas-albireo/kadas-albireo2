@@ -13,7 +13,7 @@
 
 class KadasSlopeFilter: KadasNineCellFilter
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/analysis/kadasslopefilter.h"
+#include "kadasslopefilter.h"
 %End
   public:
     KadasSlopeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );

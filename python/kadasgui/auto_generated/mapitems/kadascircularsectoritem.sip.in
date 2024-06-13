@@ -12,7 +12,7 @@
 
 class KadasCircularSectorItem : KadasGeometryItem
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/mapitems/kadascircularsectoritem.h"
+#include "kadascircularsectoritem.h"
 %End
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
@@ -79,7 +79,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     struct State : KadasMapItem::State
     {
-      enum SectorStatus {HaveNothing, HaveCenter, HaveRadius};
+      enum class SectorStatus {HaveNothing, HaveCenter, HaveRadius};
       SectorStatus sectorStatus;
       QList<KadasItemPos> centers;
       QList<double> radii;

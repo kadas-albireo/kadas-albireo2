@@ -13,7 +13,7 @@
 
 class KadasFloatingInputWidgetField : QLineEdit
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadasfloatinginputwidget.h"
 %End
   public:
     KadasFloatingInputWidgetField( int id, int decimals, double min, double max, QWidget *parent = 0 );
@@ -46,7 +46,7 @@ class KadasFloatingInputWidget : QWidget
 {
 
 %TypeHeaderCode
-#include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadasfloatinginputwidget.h"
 %End
   public:
     KadasFloatingInputWidget( QgsMapCanvas *canvas );

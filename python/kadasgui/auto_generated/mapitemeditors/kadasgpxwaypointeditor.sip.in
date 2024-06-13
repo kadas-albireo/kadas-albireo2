@@ -11,7 +11,7 @@
 
 class KadasGpxWaypointEditor : KadasMapItemEditor
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -23,7 +23,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
+#include "kadasgpxwaypointeditor.h"
 %End
   public:
     KadasGpxWaypointEditor( KadasMapItem *item );
