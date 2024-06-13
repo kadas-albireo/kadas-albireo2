@@ -58,7 +58,7 @@ It is not aimed to be manually edited
 """' > python/kadas${module}/auto_additions/__init__.py
 
   # Generate {module}_auto.sip
-  find kadas/${module}/ -name '*.h' | sed -E 's|^kadas/'${module}'/(.*)\.h$|%Include auto_generated/\1.sip|g' > python/kadas${module}/kadas${module}_auto.sip
+  find kadas/${module} -name '*.h' | sed -E 's|^kadas/'${module}'/(.*)\.h$|%Include auto_generated/\1.sip|g' > python/kadas${module}/kadas${module}_auto.sip
 
   while read -r sipfile; do
       echo "$sipfile.in"
