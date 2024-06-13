@@ -183,8 +183,6 @@ KadasApplication::~KadasApplication()
 
 void KadasApplication::init()
 {
-  QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
-
   QgsApplication::init();
 
   QgsSettings settings;
