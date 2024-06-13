@@ -2,13 +2,13 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "1b2372fdd420185c6f516541b81228c55061dca4",
+      "baseline": "eb0f108ebd674c6ed79acb1c2e123208c416af0d",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
       {
         "kind": "git",
-        "baseline": "ff79a0956d18156e493b3c1f6342fd01fe563283",
+        "baseline": "6ede4a1108756899e55fe4d308aaa25410e8e12f",
         "repository": "https://github.com/open-vcpkg/qt5-registry",
         "packages": [
           "py-pyqt5",
@@ -21,7 +21,7 @@
       },
       {
         "kind": "git",
-        "baseline": "719f4a42d3bb6b573503adf50c9216a620cd579f",
+        "baseline": "3edb3eb7092173dddb15359aa48b1599708fd96e",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
