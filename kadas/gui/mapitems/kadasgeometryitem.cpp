@@ -85,6 +85,25 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
     return;
   }
 
+  double dpiScale = outputDpiScale( context );
+
+  QgsAbstractGeometry *paintGeom = mGeometry->clone();
+  paintGeom->transform( context.coordinateTransform() );
+  paintGeom->transform( context.mapToPixel().transform() );
+  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != Qgis::GeometryType::Point )
+  {
+    // Workaround to avoid unintended tranparent outlines in PDF export:
+    // render in 2 steps, brush first...
+    context.painter()->setPen( Qt::NoPen );
+    context.painter()->setBrush( mBrush );
+    paintGeom->draw( *context.painter() );
+
+    // ... and pen second
+    context.painter()->setPen( QPen( mPen.brush(), mPen.widthF() * dpiScale, mPen.style() ) );
+    context.painter()->setBrush( Qt::NoBrush );
+    paintGeom->draw( *context.painter() );
+  }
+
   if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) == Qgis::GeometryType::Polygon )
   {
     context.painter()->setBrush( mBrush );
@@ -93,16 +112,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   {
     context.painter()->setBrush( Qt::NoBrush );
   }
-  double dpiScale = outputDpiScale( context );
   context.painter()->setPen( QPen( mPen.brush(), mPen.widthF() * dpiScale, mPen.style() ) );
-
-  QgsAbstractGeometry *paintGeom = mGeometry->clone();
-  paintGeom->transform( context.coordinateTransform() );
-  paintGeom->transform( context.mapToPixel().transform() );
-  if ( QgsWkbTypes::geometryType( mGeometry->wkbType() ) != Qgis::GeometryType::Point )
-  {
-    paintGeom->draw( *context.painter() );
-  }
 
   // Draw vertices
   QgsVertexId vertexId;
