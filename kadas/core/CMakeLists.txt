@@ -10,6 +10,7 @@ SET(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_config.h)
 ADD_LIBRARY(kadas_core
     ${kadas_core_SRC}
     ${kadas_core_HDR}
+    kadassettingstree.h kadassettingstree.cpp
 )
 
 find_package(zonedetect REQUIRED)

@@ -24,6 +24,7 @@
 #include <qgis/qgsattributetableview.h>
 #include <qgis/qgsattributetablefiltermodel.h>
 #include <qgis/qgsattributetablemodel.h>
+#include <qgis/qgsdockablewidgethelper.h>
 #include <qgis/qgsexpressionselectiondialog.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsvectorlayer.h>
@@ -32,8 +33,12 @@
 
 #include <kadas/gui/kadasattributetabledialog.h>
 
-KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent )
-  : QDockWidget( parent ), mCanvas( canvas ), mMessageBar( messageBar )
+KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent, Qt::DockWidgetArea area )
+  : QDockWidget( parent )
+  , mLayer( layer )
+  , mCanvas( canvas )
+  , mMessageBar( messageBar )
+  , mMainWindow( parent )
 {
   QToolButton *closeButton = new QToolButton( this );
   closeButton->setAutoRaise( true );
@@ -84,11 +89,12 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   setAttribute( Qt::WA_DeleteOnClose );
   setWidget( widget );
   connect( this, &QDockWidget::dockLocationChanged, this, &KadasAttributeTableDialog::storeDockLocation );
+  connect( mLayer, &QObject::destroyed, this, &QDockWidget::deleteLater );
 
-  Qt::DockWidgetArea area = static_cast<Qt::DockWidgetArea>( QgsSettings().value( "kadas/attributedocklocation", Qt::NoDockWidgetArea ).toInt() );
   if ( area == Qt::NoDockWidgetArea )
   {
     setFloating( true );
+    show();
   }
   else
   {
@@ -103,7 +109,7 @@ KadasAttributeTableDialog::~KadasAttributeTableDialog()
 
 void KadasAttributeTableDialog::storeDockLocation( Qt::DockWidgetArea area )
 {
-  QgsSettings().setValue( "kadas/attributedocklocation", area );
+  settingsAttributeTableLocation->setValue( area );
 }
 
 void KadasAttributeTableDialog::showEvent( QShowEvent *ev )
@@ -145,4 +151,42 @@ void KadasAttributeTableDialog::selectByExpression()
 void KadasAttributeTableDialog::zoomToSelected()
 {
   mCanvas->zoomToSelected( mFeatureSelectionManager->layer() );
+}
+
+void KadasAttributeTableDialog::createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = nullptr )
+{
+  int x = element.attribute( QStringLiteral( "x" ), QStringLiteral( "0" ) ).toInt();
+  int y = element.attribute( QStringLiteral( "y" ), QStringLiteral( "0" ) ).toInt();
+  int w = element.attribute( QStringLiteral( "width" ), QStringLiteral( "200" ) ).toInt();
+  int h = element.attribute( QStringLiteral( "height" ), QStringLiteral( "200" ) ).toInt();
+  QRect geometry = QRect( x, y, w, h );
+
+  QString layerId = element.attribute( QStringLiteral( "layer" ) );
+  QgsVectorLayer* layer = QgsProject::instance()->mapLayer<QgsVectorLayer*>( layerId );
+
+  if ( !layer )
+    return;
+
+  Qt::DockWidgetArea area = qgsEnumKeyToValue<Qt::DockWidgetArea>( element.attribute( QStringLiteral( "area" ), qgsEnumValueToKey( Qt::NoDockWidgetArea ) ), Qt::NoDockWidgetArea );
+
+  KadasAttributeTableDialog* table = new KadasAttributeTableDialog( layer, canvas, messageBar, parent, area );
+  if ( area == Qt::DockWidgetArea::NoDockWidgetArea )
+  {
+    table->setGeometry( geometry );
+  }
+}
+
+QDomElement KadasAttributeTableDialog::writeXml( QDomDocument &document )
+{
+  QDomElement element = document.createElement( QStringLiteral( "attributeTable" ) );
+
+  element.setAttribute( QStringLiteral( "x" ), geometry().x() );
+  element.setAttribute( QStringLiteral( "y" ), geometry().y() );
+  element.setAttribute( QStringLiteral( "width" ), geometry().width() );
+  element.setAttribute( QStringLiteral( "height" ), geometry().height() );
+  element.setAttribute( QStringLiteral( "area" ), qgsEnumValueToKey( isFloating() ? Qt::NoDockWidgetArea : mMainWindow->dockWidgetArea( this ) ) );
+
+  element.setAttribute( QStringLiteral( "layer" ), mLayer ? mLayer->id() : QString() );
+
+  return element;
 }
