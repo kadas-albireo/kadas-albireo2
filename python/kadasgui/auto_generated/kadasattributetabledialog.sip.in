@@ -5,18 +5,6 @@
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
-class QgsSettingsEntryEnumFlag_*settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea )
-{
-%TypeHeaderCode
-#include "kadasattributetabledialog.h"
-#include "qgssettingsentry.h"
-typedef QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> QgsSettingsEntryEnumFlag_*settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea );
-%End
-  public:
-    QgsSettingsEntryEnumFlag_*settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea )( const QString &key, QgsSettings::Section section, const Qt::DockWidgetArea &defaultValue, const QString &description = QString() );
-    QString key( const QString &dynamicKeyPart = QString() ) const;
-    Qt::DockWidgetArea value( const QString &dynamicKeyPart = QString(), bool useDefaultValueOverride = false, const Qt::DockWidgetArea &defaultValueOverride = Qt::DockWidgetArea() ) const;
-};
 
 
 
@@ -43,7 +31,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadasattributetabledialog.h"
 %End
   public:
-    const QgsSettingsEntryEnumFlag_*settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea ) *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea );
 
     KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = 0, Qt::DockWidgetArea area = Qt::DockWidgetArea::RightDockWidgetArea );
     ~KadasAttributeTableDialog();

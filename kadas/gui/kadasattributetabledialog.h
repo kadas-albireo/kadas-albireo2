@@ -39,7 +39,7 @@ class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget
     Q_OBJECT
 
   public:
-    static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea );
+    static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeApp, Qt::DockWidgetArea::NoDockWidgetArea ) SIP_SKIP;
 
     KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = nullptr, Qt::DockWidgetArea area = Qt::DockWidgetArea::RightDockWidgetArea );
     ~KadasAttributeTableDialog();
