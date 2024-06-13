@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadascoordinatesearchprovider.h"
+#include "kadas/gui/search/kadascoordinatesearchprovider.h"
 %End
   public:
     KadasCoordinateSearchProvider( QgsMapCanvas *mapCanvas );

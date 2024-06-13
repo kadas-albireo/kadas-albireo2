@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadascircleitem.h"
+#include "kadas/gui/mapitems/kadascircleitem.h"
 %End
   public:
     KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );

@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasbottombar.h"
+#include "kadas/gui/kadasbottombar.h"
 %End
   public:
     KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );

@@ -26,7 +26,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasremotedatasearchprovider.h"
+#include "kadas/gui/search/kadasremotedatasearchprovider.h"
 %End
   public:
     KadasRemoteDataSearchProvider( const QString &remoteDataSearchUrl, QgsMapCanvas *mapCanvas );

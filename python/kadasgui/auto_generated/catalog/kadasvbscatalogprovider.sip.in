@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasvbscatalogprovider.h"
+#include "kadas/gui/catalog/kadasvbscatalogprovider.h"
 %End
   public:
     KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );

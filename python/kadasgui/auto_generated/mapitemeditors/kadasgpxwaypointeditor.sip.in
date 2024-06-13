@@ -23,7 +23,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasgpxwaypointeditor.h"
+#include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 %End
   public:
     KadasGpxWaypointEditor( KadasMapItem *item );

@@ -23,7 +23,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasgpxrouteitem.h"
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 %End
   public:
     KadasGpxRouteItem( QObject *parent = 0 );

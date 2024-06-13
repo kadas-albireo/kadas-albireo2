@@ -26,7 +26,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadaslocaldatasearchprovider.h"
+#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 %End
   public:
     KadasLocalDataSearchProvider( QgsMapCanvas *mapCanvas );
@@ -42,7 +42,7 @@ class KadasLocalDataSearchCrawler : QObject
 {
 
 %TypeHeaderCode
-#include "kadaslocaldatasearchprovider.h"
+#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 %End
   public:
     KadasLocalDataSearchCrawler( const QString &searchText,

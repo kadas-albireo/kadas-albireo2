@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasfloatinginputwidget.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
 %End
   public:
     KadasFloatingInputWidgetField( int id, int decimals, double min, double max, QWidget *parent = 0 );
@@ -46,7 +46,7 @@ class KadasFloatingInputWidget : QWidget
 {
 
 %TypeHeaderCode
-#include "kadasfloatinginputwidget.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
 %End
   public:
     KadasFloatingInputWidget( QgsMapCanvas *canvas );

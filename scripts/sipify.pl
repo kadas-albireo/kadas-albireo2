@@ -1437,7 +1437,7 @@ while ($LINE_IDX < $LINE_COUNT){
         if ( $COMMENT !~ m/^\s*$/ ){
             $LINE .= "%Docstring(signature=\"appended\")\n$COMMENT\n%End\n";
         }
-        $LINE .= "\n%TypeHeaderCode\n#include \"" . basename($headerfile) . "\"";
+        $LINE .= "\n%TypeHeaderCode\n#include \"" . $headerfile . "\"";
         # for template based inheritance, add a typedef to define the base type
         # add it to the class and to the TypeHeaderCode
         # also include the template header

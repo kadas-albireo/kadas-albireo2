@@ -23,7 +23,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasredliningtexteditor.h"
+#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
 %End
   public:
     KadasRedliningTextEditor( KadasMapItem *item );

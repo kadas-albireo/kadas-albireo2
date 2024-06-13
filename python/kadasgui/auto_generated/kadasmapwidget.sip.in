@@ -26,7 +26,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmapwidget.h"
+#include "kadas/gui/kadasmapwidget.h"
 %End
   public:
     KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent = 0 );

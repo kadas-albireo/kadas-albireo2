@@ -112,7 +112,7 @@ class KadasItemLayer : KadasPluginLayer
 {
 
 %TypeHeaderCode
-#include "kadasitemlayer.h"
+#include "kadas/gui/kadasitemlayer.h"
 %End
   public:
     typedef unsigned ItemId;
@@ -167,7 +167,7 @@ class KadasItemLayerType : KadasPluginLayerType
 {
 
 %TypeHeaderCode
-#include "kadasitemlayer.h"
+#include "kadas/gui/kadasitemlayer.h"
 %End
   public:
     KadasItemLayerType();
@@ -180,7 +180,7 @@ class KadasItemLayerRegistry : QObject
 {
 
 %TypeHeaderCode
-#include "kadasitemlayer.h"
+#include "kadas/gui/kadasitemlayer.h"
 %End
   public:
     enum class StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };

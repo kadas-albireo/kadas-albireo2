@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasrectangleitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
 %End
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );

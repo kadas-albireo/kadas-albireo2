@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasstatehistory.h"
+#include "kadas/core/kadasstatehistory.h"
 %End
   public:
     struct State

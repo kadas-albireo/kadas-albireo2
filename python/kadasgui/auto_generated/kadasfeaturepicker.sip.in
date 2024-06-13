@@ -26,14 +26,14 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasfeaturepicker.h"
+#include "kadas/gui/kadasfeaturepicker.h"
 %End
   public:
     class PickResult
 {
 
 %TypeHeaderCode
-#include "kadasfeaturepicker.h"
+#include "kadas/gui/kadasfeaturepicker.h"
 %End
       public:
         PickResult();

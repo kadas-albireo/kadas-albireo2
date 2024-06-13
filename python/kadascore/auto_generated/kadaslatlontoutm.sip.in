@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadaslatlontoutm.h"
+#include "kadas/core/kadaslatlontoutm.h"
 %End
   public:
     struct UTMCoo

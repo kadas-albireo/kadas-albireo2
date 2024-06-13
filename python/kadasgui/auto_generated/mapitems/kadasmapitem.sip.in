@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmapitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
     static KadasMapPos fromPoint( const QgsPointXY &pos );
@@ -45,7 +45,7 @@ class KadasMapRect
 {
 
 %TypeHeaderCode
-#include "kadasmapitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
@@ -67,7 +67,7 @@ class KadasItemPos
 {
 
 %TypeHeaderCode
-#include "kadasmapitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
     static KadasItemPos fromPoint( const QgsPointXY &pos );
@@ -89,7 +89,7 @@ class KadasItemRect
 {
 
 %TypeHeaderCode
-#include "kadasmapitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
     KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
@@ -217,7 +217,7 @@ class KadasMapItem : QObject /Abstract/
 {
 
 %TypeHeaderCode
-#include "kadasmapitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );

@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadaslineofsight.h"
+#include "kadas/analysis/kadaslineofsight.h"
 %End
   public:
     static bool computeTargetVisibility( const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTarrainSamples, bool observerPosAbsolute = false, bool targetPosAbsolute = false );

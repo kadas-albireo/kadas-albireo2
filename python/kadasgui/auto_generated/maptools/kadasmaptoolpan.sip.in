@@ -20,7 +20,7 @@ A map tool for panning the map.
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolpan.h"
+#include "kadas/gui/maptools/kadasmaptoolpan.h"
 %End
   public:
     KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteraction = true );

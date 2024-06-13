@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolmeasure.h"
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
     enum class AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
@@ -51,7 +51,7 @@ class KadasMapToolMeasure : KadasMapToolCreateItem
 {
 
 %TypeHeaderCode
-#include "kadasmaptoolmeasure.h"
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
     enum class MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };

@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 %End
   public:
     KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = 0 )[( QgsMapCanvas *, ItemFactory, KadasItemLayer * )];

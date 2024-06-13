@@ -23,7 +23,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasfileserver.h"
+#include "kadas/core/kadasfileserver.h"
 %End
   public:
     KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );

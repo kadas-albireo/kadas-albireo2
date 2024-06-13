@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasplugininterface.h"
+#include "kadas/gui/kadasplugininterface.h"
 %End
   public:
     static KadasPluginInterface *cast( QgisInterface *iface );

@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolminmax.h"
+#include "kadas/gui/maptools/kadasmaptoolminmax.h"
 %End
   public:
     KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile );

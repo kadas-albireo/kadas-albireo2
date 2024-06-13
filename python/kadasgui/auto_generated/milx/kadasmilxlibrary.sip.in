@@ -25,7 +25,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmilxlibrary.h"
+#include "kadas/gui/milx/kadasmilxlibrary.h"
 %End
   public:
     KadasMilxLibrary( WId winId, QWidget *parent = 0 );

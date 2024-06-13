@@ -27,7 +27,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadaspluginlayer.h"
+#include "kadas/core/kadaspluginlayer.h"
 %End
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() );
@@ -44,7 +44,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 {
 
 %TypeHeaderCode
-#include "kadaspluginlayer.h"
+#include "kadas/core/kadaspluginlayer.h"
 %End
       public:
         IdentifyResult( const QString &featureName, const QMap<QString, QVariant> &attributes, const QgsGeometry &geom );
@@ -62,7 +62,7 @@ class KadasPluginLayerType : QObject, QgsPluginLayerType
 {
 
 %TypeHeaderCode
-#include "kadaspluginlayer.h"
+#include "kadas/core/kadaspluginlayer.h"
 %End
   public:
     KadasPluginLayerType( const QString &name );

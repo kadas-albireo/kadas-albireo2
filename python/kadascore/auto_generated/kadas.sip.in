@@ -17,7 +17,7 @@ class Kadas
 {
 
 %TypeHeaderCode
-#include "kadas.h"
+#include "kadas/core/kadas.h"
 %End
   public:
     static const char *KADAS_VERSION;

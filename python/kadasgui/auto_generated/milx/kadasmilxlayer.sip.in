@@ -24,7 +24,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
 %TypeHeaderCode
-#include "kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 %End
   public:
     static QString layerType();
@@ -80,7 +80,7 @@ class KadasMilxLayerType : KadasPluginLayerType
 {
 
 %TypeHeaderCode
-#include "kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 %End
   public:
     KadasMilxLayerType();
