@@ -370,8 +370,10 @@ Trigger a redraw */
 
     struct EditContext
     {
-      EditContext() : mValid( false );
+      EditContext();
+
       EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+
       bool mValid;
       QgsVertexId vidx;
       KadasMapPos pos;

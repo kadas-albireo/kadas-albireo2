@@ -386,15 +386,18 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // Edit interface (coordinates in map crs, attribute distances in map units)
     struct EditContext
     {
-      EditContext() : mValid( false ) {}
+      EditContext()
+        : mValid( false )
+      {}
+
       EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
         : mValid( true )
         , vidx( _vidx )
         , pos( _pos )
         , attributes( _attributes )
         , cursor( _cursor )
-      {
-      }
+      {}
+
       bool mValid = false;
       QgsVertexId vidx;
       KadasMapPos pos;

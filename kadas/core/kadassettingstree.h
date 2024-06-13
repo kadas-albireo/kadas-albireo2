@@ -18,12 +18,14 @@
 
 #include <qgis/qgssettingstreenode.h>
 
+#include <kadas/core/kadas_core.h>
+
 /**
  * \ingroup core
  * \class KadasSettingsTree
  * \brief KadasSettingsTree holds the tree structure for the settings
  */
-class CORE_EXPORT KadasSettingsTree
+class KADAS_CORE_EXPORT KadasSettingsTree
 {
 
   public:
