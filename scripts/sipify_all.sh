@@ -27,17 +27,30 @@ set -e
 
 DIR=$(git rev-parse --show-toplevel)
 
+# GNU prefix command for bsd/mac os support (gsed, gsplit)
+GP=
+if [[ "$OSTYPE" == *bsd* ]] || [[ "$OSTYPE" =~ darwin* ]]; then
+  GP=g
+fi
+
 pushd ${DIR} > /dev/null
 
 count=0
 
-modules=(core gui analysis)
+if [[ -n $1 ]]; then
+  modules=("$1")
+else
+  modules=(core gui analysis)
+fi
+
+
 for module in "${modules[@]}"; do
+
+  module_dir=${root_dir}/${module}
 
   # clean auto_additions and auto_generated folders
   rm -rf python/kadas${module}/auto_additions/*.py
   rm -rf python/kadas${module}/auto_generated/*.py
-  mkdir -p python/kadas${module}/auto_additions/
   # put back __init__.py
   echo '"""
 This folder is completed using sipify.pl script
@@ -49,17 +62,17 @@ It is not aimed to be manually edited
 
   while read -r sipfile; do
       echo "$sipfile.in"
-      header=$(sed -E 's@(.*)\.sip@kadas/\1.h@; s@^.*/auto_generated/@kadas/'${module}'/@' <<< $sipfile)
-      pyfile=$(sed -E 's@([^\/]+\/)*([^\/]+)\.sip@\2.py@;' <<< $sipfile)
+      header=$(${GP}sed -E 's@(.*)\.sip@kadas/\1.h@; s@^.*/auto_generated/@kadas/'${module}'/@' <<< $sipfile)
+      pyfile=$(${GP}sed -E 's@([^\/]+\/)*([^\/]+)\.sip@\2.py@;' <<< $sipfile)
       if [ ! -f $header ]; then
         echo "*** Missing header: $header for sipfile $sipfile"
       else
-        path=$(sed -r 's@/[^/]+$@@' <<< $sipfile)
+        path=$(${GP}sed -r 's@/[^/]+$@@' <<< $sipfile)
         mkdir -p python/$path
         ./scripts/sipify.pl -s python/$sipfile.in -p python/kadas${module}/auto_additions/${pyfile} $header &
       fi
       count=$((count+1))
-  done < <( sed -n -r "s@^%Include auto_generated/(.*\.sip)@kadas${module}/auto_generated/\1@p" python/kadas${module}/kadas${module}_auto.sip )
+  done < <( ${GP}sed -n -r "s@^%Include auto_generated/(.*\.sip)@kadas${module}/auto_generated/\1@p" python/kadas${module}/kadas${module}_auto.sip )
 done
 wait # wait for sipify processes to finish
 
