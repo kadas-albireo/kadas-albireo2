@@ -113,7 +113,7 @@ void KadasSymbolItem::setState( const KadasMapItem::State *state )
 
 void KadasSymbolItem::render( QgsRenderContext &context ) const
 {
-  if ( constState()->drawStatus == State::Empty )
+  if ( constState()->drawStatus == State::DrawStatus::Empty )
   {
     return;
   }

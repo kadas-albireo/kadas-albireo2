@@ -32,7 +32,11 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     Q_OBJECT
 
   public:
-    enum EditorType {CreateItemEditor, EditItemEditor};
+    enum class EditorType
+    {
+      CreateItemEditor,
+      EditItemEditor
+    };
 
     KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr ) : QWidget( parent ), mItem( item ) {}
 

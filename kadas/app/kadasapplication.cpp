@@ -622,13 +622,13 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
     KadasSymbolItem *item = new KadasSymbolItem( crs );
     item->setup( attachedPath, 0.5, 0.5, 0, 64 );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
-    return qMakePair( item, KadasItemLayerRegistry::SymbolsLayer );
+    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::SymbolsLayer );
   }
   else
   {
     KadasPictureItem *item = new KadasPictureItem( crs );
     item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
-    return qMakePair( item, KadasItemLayerRegistry::PicturesLayer );
+    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::PicturesLayer );
   }
 }
 
@@ -1448,7 +1448,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, 0.5, 0.5 );
       item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer ) );
     }
   }
   else
@@ -1462,7 +1462,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PicturesLayer ) );
     }
   }
   return nullptr;

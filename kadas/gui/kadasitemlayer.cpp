@@ -234,7 +234,7 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, cons
   for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
   {
     KadasMapItem *item = mItems[*it];
-    if ( pickObjective == PICK_OBJECTIVE_TOOLTIP && item->tooltip().isEmpty() )
+    if ( pickObjective == PickObjective::PICK_OBJECTIVE_TOOLTIP && item->tooltip().isEmpty() )
     {
       continue;
     }
@@ -347,7 +347,7 @@ void KadasItemLayerRegistry::writeToProject( QDomDocument &doc )
   for ( auto it = mLayerIdMap.begin(), itEnd = mLayerIdMap.end(); it != itEnd; ++it )
   {
     QDomElement itemEl = doc.createElement( "StandardItemLayer" );
-    itemEl.setAttribute( "layer", it.key() );
+    itemEl.setAttribute( "layer", static_cast<int>( it.key() ) );
     itemEl.setAttribute( "layerId", it.value() );
     itemsEl.appendChild( itemEl );
   }
@@ -375,11 +375,11 @@ const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegist
 {
   static QMap<StandardLayer, QString> names =
   {
-    {RedliningLayer, tr( "Redlining" )},
-    {SymbolsLayer, tr( "Symbols" )},
-    {PicturesLayer, tr( "Pictures" )},
-    {PinsLayer, tr( "Pins" )},
-    {RoutesLayer, tr( "Routes" )}
+    {StandardLayer::RedliningLayer, tr( "Redlining" )},
+    {StandardLayer::SymbolsLayer, tr( "Symbols" )},
+    {StandardLayer::PicturesLayer, tr( "Pictures" )},
+    {StandardLayer::PinsLayer, tr( "Pins" )},
+    {StandardLayer::RoutesLayer, tr( "Routes" )}
   };
   return names;
 }

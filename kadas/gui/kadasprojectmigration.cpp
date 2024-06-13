@@ -203,18 +203,18 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           }
           else
           {
-            KadasPointItem::IconType iconType = KadasPointItem::ICON_CIRCLE;
+            KadasPointItem::IconType iconType = KadasPointItem::IconType::ICON_CIRCLE;
             if ( flags["symbol"] == "circle" )
             {
-              iconType = KadasPointItem::ICON_CIRCLE;
+              iconType = KadasPointItem::IconType::ICON_CIRCLE;
             }
             else if ( flags["symbol"] == "rectangle" )
             {
-              iconType = KadasPointItem::ICON_FULL_BOX;
+              iconType = KadasPointItem::IconType::ICON_FULL_BOX;
             }
             else if ( flags["symbol"] == "triangle" )
             {
-              iconType = KadasPointItem::ICON_FULL_TRIANGLE;
+              iconType = KadasPointItem::IconType::ICON_FULL_TRIANGLE;
             }
 
             geomItem = new KadasPointItem( crs, iconType );

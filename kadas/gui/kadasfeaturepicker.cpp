@@ -38,7 +38,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
     {
       pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
     }
-    else if ( qobject_cast<QgsVectorLayer *> ( layer ) && pickObjective != KadasItemLayer::PICK_OBJECTIVE_TOOLTIP )
+    else if ( qobject_cast<QgsVectorLayer *> ( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
       pickResult = pickVectorLayer( static_cast<QgsVectorLayer *>( layer ), canvas, mapPos, geomType );
     }

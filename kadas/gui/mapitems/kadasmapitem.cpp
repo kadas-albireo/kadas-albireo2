@@ -318,7 +318,7 @@ int KadasMapItem::NumericAttribute::precision( const QgsMapSettings &mapSettings
   {
     return decimals;
   }
-  if ( type == TypeCoordinate )
+  if ( type == Type::TypeCoordinate )
   {
     return mapSettings.destinationCrs().mapUnits() == Qgis::DistanceUnit::Degrees ? 3 : 0;
   }
@@ -329,13 +329,13 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
 {
   switch ( type )
   {
-    case TypeCoordinate:
+    case Type::TypeCoordinate:
       return QString();
-    case TypeDistance:
+    case Type::TypeDistance:
       return QgsUnitTypes::toAbbreviatedString( mapSettings.destinationCrs().mapUnits() );
-    case TypeAngle:
+    case Type::TypeAngle:
       return QString( "°" );
-    case TypeOther:
+    case Type::TypeOther:
       return QString();
   }
   return QString();

@@ -29,7 +29,7 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
   setLayout( new QHBoxLayout() );
   layout()->setSpacing( 2 );
   layout()->setMargin( 0 );
-  if ( type == KadasMapItemEditor::CreateItemEditor )
+  if ( type == KadasMapItemEditor::EditorType::CreateItemEditor )
   {
 
     layout()->addWidget( new QLabel( tr( "Symbol:" ) ) );
@@ -98,7 +98,7 @@ void KadasMilxEditor::symbolSelected( const KadasMilxSymbolDesc &symbolTemplate 
     mSymbolButton->setText( tr( "Select..." ) );
   }
   mSelectedSymbol = symbolTemplate;
-  if ( dynamic_cast<KadasMilxItem *>( mItem ) && mItem->constState()->drawStatus == KadasMapItem::State::Empty )
+  if ( dynamic_cast<KadasMilxItem *>( mItem ) && mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Empty )
   {
     static_cast<KadasMilxItem *>( mItem )->setSymbol( symbolTemplate );
   }

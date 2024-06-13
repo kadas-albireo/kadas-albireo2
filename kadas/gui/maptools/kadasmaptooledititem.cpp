@@ -75,7 +75,7 @@ void KadasMapToolEditItem::activate()
   KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
   if ( factory )
   {
-    mEditor = factory( mItem, KadasMapItemEditor::EditItemEditor );
+    mEditor = factory( mItem, KadasMapItemEditor::EditorType::EditItemEditor );
     mEditor->syncItemToWidget();
     mBottomBar->layout()->addWidget( mEditor );
   }
@@ -181,7 +181,7 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
 
       if ( clickedAction )
       {
-        if ( clickedAction->data() == KadasMapItem::EditSwitchToDrawingTool )
+        if ( clickedAction->data() == static_cast<int>( KadasMapItem::ContextMenuActions::EditSwitchToDrawingTool ) )
         {
           KadasMapCanvasItemManager::removeItem( mItem );
           KadasMapItem *item = mItem;

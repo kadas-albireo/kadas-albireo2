@@ -87,10 +87,9 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
     gridLayout->addWidget( mAzimuthCheckbox, 1, 0 );
 
     mNorthComboBox = new QComboBox();
-    mNorthComboBox->addItem( tr( "Geographic north" ), static_cast<int>( AzimuthGeoNorth ) );
-    mNorthComboBox->addItem( tr( "Map north" ), static_cast<int>( AzimuthMapNorth ) );
-    int defNorth = std::max( 0, QgsSettings().value( "/kadas/last_azimuth_north", static_cast<int>( AzimuthGeoNorth ) ).toInt() );
-    mNorthComboBox->setCurrentIndex( defNorth );
+    mNorthComboBox->addItem( tr( "Geographic north" ), QVariant::fromValue( AzimuthNorth::AzimuthGeoNorth ) );
+    mNorthComboBox->addItem( tr( "Map north" ), QVariant::fromValue( AzimuthNorth::AzimuthMapNorth ) );
+    mNorthComboBox->setCurrentIndex( mNorthComboBox->findData( QVariant::fromValue( settingsLastAzimuthNorth->value() ) ) );
     mNorthComboBox->setEnabled( mAzimuthCheckbox->isChecked() );
     connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
     gridLayout->addWidget( mNorthComboBox, 1, 1 );
@@ -134,7 +133,7 @@ void KadasMeasureWidget::syncWidgetToItem()
   else if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
-    lineItem->setMeasurementMode( KadasLineItem::MeasureLineAndSegments, lineItem->angleUnit() );
+    lineItem->setMeasurementMode( KadasLineItem::MeasurementMode::MeasureLineAndSegments, lineItem->angleUnit() );
   }
   setDistanceUnit( mUnitComboBox->currentIndex() );
 }
@@ -176,12 +175,12 @@ void KadasMeasureWidget::setAzimutEnabled( bool enabled )
 
 void KadasMeasureWidget::setAzimuthNorth( int index )
 {
-  AzimuthNorth north = static_cast<AzimuthNorth>( mNorthComboBox->itemData( index ).toInt() );
-  QgsSettings().setValue( "/kadas/last_azimuth_north", north );
+  AzimuthNorth north =  mNorthComboBox->itemData( index ).value<AzimuthNorth>();
+  settingsLastAzimuthNorth->setValue( north );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
-    lineItem->setMeasurementMode( north == AzimuthGeoNorth ? KadasLineItem::MeasureLineAndSegmentsAndAzimuthGeoNorth : KadasLineItem::MeasureLineAndSegmentsAndAzimuthMapNorth, lineItem->angleUnit() );
+    lineItem->setMeasurementMode( north == AzimuthNorth::AzimuthGeoNorth ? KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthGeoNorth : KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthMapNorth, lineItem->angleUnit() );
   }
 }
 
@@ -208,11 +207,11 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanv
 {
   switch ( measureMode )
   {
-    case MeasureLine:
+    case MeasureMode::MeasureLine:
       return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ) ); };
-    case MeasurePolygon:
+    case MeasureMode::MeasurePolygon:
       return [ = ] { return setupItem( new KadasPolygonItem( canvas->mapSettings().destinationCrs(), true ) ); };
-    case MeasureCircle:
+    case MeasureMode::MeasureCircle:
       return [ = ] { return setupItem( new KadasCircleItem( canvas->mapSettings().destinationCrs(), true ) ); };
   }
   return nullptr;
@@ -268,7 +267,7 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
   }
   else
   {
-    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), mMeasureMode == MeasureLine ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon );
+    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), mMeasureMode == MeasureMode::MeasureLine ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon );
     if ( pickResult.geom )
     {
       addPartFromGeometry( *pickResult.geom, pickResult.crs );

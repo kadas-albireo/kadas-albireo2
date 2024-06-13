@@ -340,7 +340,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
       QList<KadasLatLonToUTM::ZoneLabel> zoneSubLabels;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
-      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == GridMGRS ? KadasLatLonToUTM::GridMGRS : KadasLatLonToUTM::GridUTM, mRenderGridConfig.cellSize );
+      KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM, mRenderGridConfig.cellSize );
 
       // Draw grid lines
       renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );

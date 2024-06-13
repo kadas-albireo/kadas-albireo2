@@ -345,8 +345,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // State interface
     struct State : KadasStateHistory::State
     {
-      enum DrawStatus { Empty, Drawing, Finished };
-      DrawStatus drawStatus = Empty;
+      enum class DrawStatus { Empty, Drawing, Finished };
+      DrawStatus drawStatus = DrawStatus::Empty;
       virtual void assign( const State *other ) = 0;
       virtual State *clone() const = 0 SIP_FACTORY;
       virtual QJsonObject serialize() const = 0;
@@ -358,8 +358,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     struct KADAS_GUI_EXPORT NumericAttribute
     {
       QString name;
-      enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
-      Type type = TypeCoordinate;
+      enum class Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      Type type = Type::TypeCoordinate;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
       int decimals = -1;
@@ -407,7 +407,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    enum ContextMenuActions
+    enum class ContextMenuActions
     {
       EditNoAction,
       EditSwitchToDrawingTool

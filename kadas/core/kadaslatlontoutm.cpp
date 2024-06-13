@@ -780,7 +780,7 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
       {
         continue;
       }
-      if ( mapScale > 500000 && gridMode == GridMGRS )
+      if ( mapScale > 500000 && gridMode == GridMode::GridMGRS )
       {
         computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
         continue;
@@ -813,7 +813,7 @@ void KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, double mapScale,
         }
       }
 
-      if ( gridMode == GridMGRS )
+      if ( gridMode == GridMode::GridMGRS )
       {
         computeSubGrid( 100000, xMin, xMax, yMin, yMax, subZoneLines, &subZoneLabels, 0, mgrs100kIDLabelCallback );
         computeSubGrid( cellSize, xMin, xMax, yMin, yMax, gridLines, 0, &gridLabels, 0, mgrsGridLabelCallback );

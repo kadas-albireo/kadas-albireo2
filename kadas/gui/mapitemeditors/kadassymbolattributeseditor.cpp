@@ -48,7 +48,7 @@ KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
 
 void KadasSymbolAttributesEditor::adjustVisiblity()
 {
-  setEnabled( mItem && mItem->constState()->drawStatus != KadasMapItem::State::Empty );
+  setEnabled( mItem && mItem->constState()->drawStatus != KadasMapItem::State::DrawStatus::Empty );
 }
 
 void KadasSymbolAttributesEditor::setItem( KadasMapItem *item )

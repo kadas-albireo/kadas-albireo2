@@ -28,7 +28,9 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
   public:
     KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile );
     ~KadasMapToolMinMax();
-    enum FilterType { FilterRect, FilterPoly, FilterCircle };
+
+    enum class FilterType { FilterRect, FilterPoly, FilterCircle };
+    Q_ENUM( FilterType )
 
     void setFilterType( FilterType filterType );
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
@@ -41,7 +43,7 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
 
   private:
     KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas, FilterType filterType ) const;
-    FilterType mFilterType = FilterRect;
+    FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
     QPointer<KadasSymbolItem> mPinMin;
     QPointer<KadasSymbolItem> mPinMax;

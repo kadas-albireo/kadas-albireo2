@@ -126,7 +126,7 @@ KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, cons
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
   {
     const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( it.value() );
-    if ( !milxItem || ( pickObjective == PICK_OBJECTIVE_TOOLTIP && milxItem->tooltip().isEmpty() ) )
+    if ( !milxItem || ( pickObjective == PickObjective::PICK_OBJECTIVE_TOOLTIP && milxItem->tooltip().isEmpty() ) )
     {
       continue;
     }

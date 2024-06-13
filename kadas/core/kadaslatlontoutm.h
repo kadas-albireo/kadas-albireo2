@@ -68,7 +68,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static int getZoneNumber( double lon, double lat );
     static QString getHemisphereLetter( double lat );
 
-    enum GridMode { GridUTM, GridMGRS };
+    enum class GridMode { GridUTM, GridMGRS };
     static void computeGrid( const QgsRectangle &bbox, double mapScale,
                              QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
                              QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,

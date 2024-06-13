@@ -45,17 +45,17 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   KadasMapToolCreateItem::ItemFactory pointFactory = [ = ]
   {
     QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::ICON_CIRCLE ) );
+    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::IconType::ICON_CIRCLE ) );
   };
   KadasMapToolCreateItem::ItemFactory squareFactory = [ = ]
   {
     QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::ICON_FULL_BOX ) );
+    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_BOX ) );
   };
   KadasMapToolCreateItem::ItemFactory triangleFactory = [ = ]
   {
     QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::ICON_FULL_TRIANGLE ) );
+    return setEditorFactory( new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_TRIANGLE ) );
   };
   KadasMapToolCreateItem::ItemFactory lineFactory = [ = ]
   {
@@ -158,7 +158,7 @@ KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
 {
   if ( !mLastLayer )
   {
-    mLastLayer = KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RedliningLayer );
+    mLastLayer = KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RedliningLayer );
   }
   return mLastLayer;
 }

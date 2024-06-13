@@ -49,7 +49,7 @@ QJsonObject KadasCircleItem::State::serialize() const
     r.append( p );
   }
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );;
   json["centers"] = c;
   json["ringpos"] = r;
   return json;
@@ -132,7 +132,7 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
 
 bool KadasCircleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->centers.append( toItemPos( firstPoint, mapSettings ) );
   state()->ringpos.append( toItemPos( firstPoint, mapSettings ) );
   recomputeDerived();
@@ -168,7 +168,7 @@ bool KadasCircleItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasCircleItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
@@ -176,14 +176,14 @@ KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
   AttribDefs attributes;
   attributes.insert( AttrX, NumericAttribute{"x"} );
   attributes.insert( AttrY, NumericAttribute{"y"} );
-  attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::TypeDistance, 0} );
+  attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::Type::TypeDistance, 0} );
   return attributes;
 }
 
 KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
-  if ( constState()->drawStatus == State::Drawing )
+  if ( constState()->drawStatus == State::DrawStatus::Drawing )
   {
     KadasMapPos mapCenter = toMapPos( constState()->centers.last(), mapSettings );
     KadasItemPos itemRingPos = toItemPos( pos, mapSettings );
@@ -217,7 +217,7 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     if ( pos.sqrDist( ringPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::TypeDistance, 0} );
+      attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::Type::TypeDistance, 0} );
       return EditContext( QgsVertexId( iPart, 0, 1 ), ringPos, attributes );
     }
 

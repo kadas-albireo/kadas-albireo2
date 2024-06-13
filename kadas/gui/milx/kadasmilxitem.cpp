@@ -83,7 +83,7 @@ QJsonObject KadasMilxItem::State::serialize() const
   marginArray.append( margin.bottom );
 
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   json["attributes"] = attrs;
   json["attributePoints"] = attrPts;
@@ -492,7 +492,7 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   {
     return false;
   }
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->points.append( toItemPos( firstPoint, mapSettings ) );
   state()->pressedPoints = 1;
 
@@ -562,7 +562,7 @@ void KadasMilxItem::endPart()
 {
   if ( !mMssString.isEmpty() )
   {
-    state()->drawStatus = State::Finished;
+    state()->drawStatus = State::DrawStatus::Finished;
     mIsPointSymbol = !isMultiPoint();
   }
 }
@@ -607,14 +607,14 @@ KadasMapItem::EditContext KadasMilxItem::getEditContext( const KadasMapPos &pos,
       double min = it.key() == MilxAttributeAttitude ? std::numeric_limits<double>::lowest() : 0;
       double max = std::numeric_limits<double>::max();
       int decimals = it.key() == MilxAttributeAttitude ? 1 : 0;
-      NumericAttribute::Type type = NumericAttribute::TypeOther;
+      NumericAttribute::Type type = NumericAttribute::Type::TypeOther;
       if ( it.key() == MilxAttributeLength || it.key() == MilxAttributeWidth || it.key() == MilxAttributeRadius )
       {
-        type = NumericAttribute::TypeDistance;
+        type = NumericAttribute::Type::TypeDistance;
       }
       else if ( it.key() == MilxAttributeAttitude )
       {
-        type = NumericAttribute::TypeAngle;
+        type = NumericAttribute::Type::TypeAngle;
       }
       attributes.insert( it.key(), NumericAttribute{KadasMilxClient::attributeName( it.key() ), type, min, max, decimals } );
       return EditContext( QgsVertexId( 0, 1, it.key() ), testPos, attributes );

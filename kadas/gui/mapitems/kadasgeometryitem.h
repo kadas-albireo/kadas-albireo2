@@ -38,7 +38,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     Q_PROPERTY( QBrush iconFill READ iconFill WRITE setIconFill )
 
   public:
-    enum IconType
+    enum class IconType
     {
       /**
       * No icon is used

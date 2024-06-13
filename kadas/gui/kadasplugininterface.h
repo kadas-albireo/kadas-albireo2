@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
   public:
     static KadasPluginInterface *cast( QgisInterface *iface ) { return dynamic_cast<KadasPluginInterface *>( iface ); }
     // KADAS specific interface
-    enum ActionRibbonTabLocation
+    enum class ActionRibbonTabLocation
     {
       NO_TAB,
       MAPS_TAB,
@@ -43,7 +43,7 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
       HELP_TAB,
       CUSTOM_TAB
     };
-    enum ActionClassicMenuLocation
+    enum class ActionClassicMenuLocation
     {
       NO_MENU,
       PROJECT_MENU,

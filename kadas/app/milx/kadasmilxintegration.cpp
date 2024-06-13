@@ -94,9 +94,9 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   setMilXLineWidth( mUi.mLineWidthSlider->value() );
   connect( mUi.mLineWidthSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXLineWidth );
 
-  mUi.mWorkModeCombo->addItem( tr( "International" ), KadasMilxSymbolSettings::WorkModeInternational );
-  mUi.mWorkModeCombo->addItem( tr( "CH" ), KadasMilxSymbolSettings::WorkModeCH );
-  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", KadasMilxSymbolSettings::DefaultWorkMode ) );
+  mUi.mWorkModeCombo->addItem( tr( "International" ), static_cast<int>( KadasMilxSymbolSettings::WorkMode::WorkModeInternational ) );
+  mUi.mWorkModeCombo->addItem( tr( "CH" ), static_cast<int>(  KadasMilxSymbolSettings::WorkMode::WorkModeCH ) );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", static_cast<int>( KadasMilxSymbolSettings::DefaultWorkMode ) ) );
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
 
@@ -181,7 +181,7 @@ void KadasMilxIntegration::readProjectSettings()
 {
   mUi.mSymbolSizeSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "symbol_size", KadasMilxSymbolSettings::DefaultSymbolSize ) );
   mUi.mLineWidthSlider->setValue( QgsProject::instance()->readNumEntry( "milx", "line_width", KadasMilxSymbolSettings::DefaultLineWidth ) );
-  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", KadasMilxSymbolSettings::DefaultWorkMode ) );
+  mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", static_cast<int>( KadasMilxSymbolSettings::DefaultWorkMode ) ) );
   mUi.mLeaderLineWidthSpin->setValue( QgsProject::instance()->readNumEntry( "milx", "leader_line_width", KadasMilxSymbolSettings::DefaultLeaderLineWidth ) );
   mUi.mLeaderLineColorButton->setColor( QgsProject::instance()->readEntry( "milx", "leader_line_color", QColor( KadasMilxSymbolSettings::DefaultLeaderLineColor ).name() ) );
 }

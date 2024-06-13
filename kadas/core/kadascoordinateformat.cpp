@@ -38,7 +38,7 @@ static QRegExp gPatMGRS = QRegExp( "^(\\d+)\\s*(\\w)\\s*(\\w\\w)\\s*[,:;\\s]?\\s
 
 KadasCoordinateFormat::KadasCoordinateFormat()
 {
-  mFormat = KadasCoordinateFormat::Default;
+  mFormat = KadasCoordinateFormat::Format::Default;
   mEpsg = "EPSG:4326";
   mHeightUnit = Qgis::DistanceUnit::Meters;
 }
@@ -91,29 +91,29 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
   }
   switch ( format )
   {
-    case Default:
+    case Format::Default:
     {
       int prec = destCrs.mapUnits() == Qgis::DistanceUnit::Degrees ? 4 : 0;
       return QString( "%1, %2" ).arg( pTrans.x(), 0, 'f', prec ).arg( pTrans.y(), 0, 'f', prec );
     }
-    case DegMinSec:
+    case Format::DegMinSec:
     {
       return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1 );
     }
-    case DegMin:
+    case Format::DegMin:
     {
       return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3 );
     }
-    case DecDeg:
+    case Format::DecDeg:
     {
       return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5 );
     }
-    case UTM:
+    case Format::UTM:
     {
       KadasLatLonToUTM::UTMCoo coo = KadasLatLonToUTM::LL2UTM( pTrans );
       return QString( "%1, %2 (zone %3%4)" ).arg( coo.easting ).arg( coo.northing ).arg( coo.zoneNumber ).arg( coo.zoneLetter );
     }
-    case MGRS:
+    case Format::MGRS:
     {
       KadasLatLonToUTM::UTMCoo utm = KadasLatLonToUTM::LL2UTM( pTrans );
       KadasLatLonToUTM::MGRSCoo mgrs = KadasLatLonToUTM::UTM2MGRS( utm );

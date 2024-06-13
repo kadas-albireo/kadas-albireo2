@@ -31,7 +31,7 @@ KADAS_REGISTER_MAP_ITEM( KadasCoordinateCrossItem, []( const QgsCoordinateRefere
 QJsonObject KadasCoordinateCrossItem::State::serialize() const
 {
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );;
   json["x"] = pos.x();
   json["y"] = pos.y();
   return json;
@@ -177,7 +177,7 @@ void KadasCoordinateCrossItem::setPosition( const KadasItemPos &pos )
 
 bool KadasCoordinateCrossItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->pos = roundToKilometre( toItemPos( firstPoint, mapSettings ) );
   update();
   return false;
@@ -207,7 +207,7 @@ bool KadasCoordinateCrossItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasCoordinateCrossItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasCoordinateCrossItem::drawAttribs() const

@@ -48,29 +48,34 @@ struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
 
 struct KADAS_GUI_EXPORT KadasMilxSymbolSettings
 {
-  static constexpr int MinSymbolSize = 25;
-  static constexpr int MaxSymbolSize = 150;
-  static constexpr int DefaultSymbolSize = 60;
+  Q_GADGET
 
-  static constexpr int MinLineWidth = 1;
-  static constexpr int MaxLineWidth = 5;
-  static constexpr int DefaultLineWidth = 2;
+  public:
+    enum class WorkMode
+    {
+      WorkModeInternational = 0,
+      WorkModeCH = 1
+    };
+    Q_ENUM( WorkMode );
 
-  static constexpr int DefaultLeaderLineWidth = 3;
-  static constexpr Qt::GlobalColor DefaultLeaderLineColor = Qt::black;
+    static constexpr int MinSymbolSize = 25;
+    static constexpr int MaxSymbolSize = 150;
+    static constexpr int DefaultSymbolSize = 60;
 
-  enum WorkMode
-  {
-    WorkModeInternational = 0,
-    WorkModeCH = 1
-  };
-  static constexpr WorkMode DefaultWorkMode = WorkModeCH;
+    static constexpr int MinLineWidth = 1;
+    static constexpr int MaxLineWidth = 5;
+    static constexpr int DefaultLineWidth = 2;
 
-  int symbolSize = DefaultSymbolSize;
-  int lineWidth = DefaultLineWidth;
-  WorkMode workMode = DefaultWorkMode;
-  int leaderLineWidth = DefaultLeaderLineWidth;
-  QColor leaderLineColor = DefaultLeaderLineColor;
+    static constexpr int DefaultLeaderLineWidth = 3;
+    static constexpr Qt::GlobalColor DefaultLeaderLineColor = Qt::black;
+
+    static constexpr WorkMode DefaultWorkMode = WorkMode::WorkModeCH;
+
+    int symbolSize = DefaultSymbolSize;
+    int lineWidth = DefaultLineWidth;
+    WorkMode workMode = DefaultWorkMode;
+    int leaderLineWidth = DefaultLeaderLineWidth;
+    QColor leaderLineColor = DefaultLeaderLineColor;
 };
 
 #ifndef SIP_RUN

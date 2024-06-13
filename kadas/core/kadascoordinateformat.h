@@ -30,7 +30,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 {
     Q_OBJECT
   public:
-    enum Format
+    enum class Format
     {
       Default,
       DegMinSec,
@@ -39,6 +39,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
       UTM,
       MGRS
     };
+    Q_ENUM( Format )
 
     static KadasCoordinateFormat *instance();
     Format getCoordinateDisplayFormat() const;

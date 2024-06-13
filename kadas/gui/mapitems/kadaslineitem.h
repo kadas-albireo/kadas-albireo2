@@ -63,7 +63,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;
 
-    enum MeasurementMode
+    enum class MeasurementMode
     {
       MeasureLineAndSegments,
       MeasureAzimuthMapNorth,
@@ -96,7 +96,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     enum AttribIds {AttrX, AttrY};
 
     bool mGeodesic = false;
-    MeasurementMode mMeasurementMode = MeasureLineAndSegments;
+    MeasurementMode mMeasurementMode = MeasurementMode::MeasureLineAndSegments;
     Qgis::AngleUnit mAngleUnit = Qgis::AngleUnit::Degrees;
 
     QgsMultiLineString *geometry();

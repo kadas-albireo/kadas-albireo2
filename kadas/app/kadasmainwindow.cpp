@@ -691,11 +691,11 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mapCanvas() ); } );
 
   // Analysis tab
-  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureLine ); } );
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureLine ); } );
 
-  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasurePolygon ); } );
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasurePolygon ); } );
 
-  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureCircle ); } );
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureCircle ); } );
 
   setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return new KadasMapToolHeightProfile( mapCanvas() ); } );
 
@@ -1334,7 +1334,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
     item->setEditor( "KadasSymbolAttributesEditor" );
     return item;
   };
-  return new KadasMapToolCreateItem( mapCanvas(), factory, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer ) );
+  return new KadasMapToolCreateItem( mapCanvas(), factory, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
 }
 
 void KadasMainWindow::addLocalPicture()

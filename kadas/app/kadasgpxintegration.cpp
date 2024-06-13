@@ -69,7 +69,7 @@ KadasGpxIntegration::~KadasGpxIntegration()
 
 KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
 {
-  return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::RoutesLayer );
+  return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer );
 }
 
 void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
