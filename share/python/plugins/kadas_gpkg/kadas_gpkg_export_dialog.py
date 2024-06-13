@@ -2,6 +2,7 @@
 import os
 
 from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QDialogButtonBox
 from qgis.PyQt.uic import loadUiType
 
@@ -35,6 +36,9 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
         self.mRectTool = KadasMapToolSelectRect(iface.mapCanvas())
         self.mRectTool.rectChanged.connect(self.__extentChanged)
         iface.mapCanvas().setMapTool(self.mRectTool)
+
+        self.labelCheckIcon.setPixmap(QPixmap(":/images/themes/default/mIconSuccess.svg"))
+        self.labelWarnIcon.setPixmap(QPixmap(":/images/themes/default/mIconWarning.svg"))
 
     def outputFile(self):
         return self.lineEditOutputFile.text()
