@@ -63,7 +63,7 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;
 
-    enum class MeasurementMode
+    enum class MeasurementMode SIP_MONKEYPATCH_SCOPEENUM
     {
       MeasureLineAndSegments,
       MeasureAzimuthMapNorth,

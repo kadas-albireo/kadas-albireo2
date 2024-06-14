@@ -345,7 +345,12 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // State interface
     struct State : KadasStateHistory::State
     {
-      enum class DrawStatus { Empty, Drawing, Finished };
+      enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM
+      {
+        Empty,
+        Drawing,
+        Finished
+      };
       DrawStatus drawStatus = DrawStatus::Empty;
       virtual void assign( const State *other ) = 0;
       virtual State *clone() const = 0 SIP_FACTORY;
@@ -358,7 +363,13 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     struct KADAS_GUI_EXPORT NumericAttribute
     {
       QString name;
-      enum class Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      enum class Type SIP_MONKEYPATCH_SCOPEENUM
+      {
+        TypeCoordinate,
+        TypeDistance,
+        TypeAngle,
+        TypeOther
+      };
       Type type = Type::TypeCoordinate;
       double min = std::numeric_limits<double>::lowest();
       double max = std::numeric_limits<double>::max();
@@ -410,7 +421,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    enum class ContextMenuActions
+
+    enum class ContextMenuActions SIP_MONKEYPATCH_SCOPEENUM
     {
       EditNoAction,
       EditSwitchToDrawingTool

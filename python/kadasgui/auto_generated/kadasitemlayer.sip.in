@@ -183,7 +183,14 @@ class KadasItemLayerRegistry : QObject
 #include "kadas/gui/kadasitemlayer.h"
 %End
   public:
-    enum class StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
+    enum class StandardLayer
+    {
+      RedliningLayer,
+      SymbolsLayer,
+      PicturesLayer,
+      PinsLayer,
+      RoutesLayer
+    };
     static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
     static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
     static void init();

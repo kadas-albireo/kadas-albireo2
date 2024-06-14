@@ -134,7 +134,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     typedef unsigned ItemId;
     static constexpr ItemId ITEM_ID_NULL = 0;
 
-    enum class PickObjective
+    enum class PickObjective SIP_MONKEYPATCH_SCOPEENUM
     {
       PICK_OBJECTIVE_ANY,
       PICK_OBJECTIVE_TOOLTIP
@@ -207,7 +207,14 @@ class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
 {
     Q_OBJECT
   public:
-    enum class StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
+    enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM
+    {
+      RedliningLayer,
+      SymbolsLayer,
+      PicturesLayer,
+      PinsLayer,
+      RoutesLayer
+    };
     static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
     static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
     static void init();

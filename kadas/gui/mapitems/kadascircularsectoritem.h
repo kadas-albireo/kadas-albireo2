@@ -60,7 +60,12 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      enum class SectorStatus {HaveNothing, HaveCenter, HaveRadius};
+      enum class SectorStatus SIP_MONKEYPATCH_SCOPEENUM
+      {
+        HaveNothing,
+        HaveCenter,
+        HaveRadius
+      };
       SectorStatus sectorStatus = SectorStatus::HaveNothing;
       QList<KadasItemPos> centers;
       QList<double> radii;

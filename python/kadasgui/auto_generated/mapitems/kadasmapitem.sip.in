@@ -331,7 +331,12 @@ Trigger a redraw */
 
     struct State : KadasStateHistory::State
     {
-      enum class DrawStatus { Empty, Drawing, Finished };
+      enum class DrawStatus
+      {
+        Empty,
+        Drawing,
+        Finished
+      };
       DrawStatus drawStatus;
       virtual void assign( const State *other ) = 0;
       virtual State *clone() const = 0 /Factory/;
@@ -344,7 +349,13 @@ Trigger a redraw */
     struct NumericAttribute
     {
       QString name;
-      enum class Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
+      enum class Type
+      {
+        TypeCoordinate,
+        TypeDistance,
+        TypeAngle,
+        TypeOther
+      };
       Type type;
       double min;
       double max;
@@ -386,6 +397,7 @@ Trigger a redraw */
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+
     enum class ContextMenuActions
     {
       EditNoAction,

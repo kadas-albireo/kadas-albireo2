@@ -30,7 +30,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 {
     Q_OBJECT
   public:
-    enum class Format
+    enum class Format SIP_MONKEYPATCH_SCOPEENUM
     {
       Default,
       DegMinSec,

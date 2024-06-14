@@ -32,7 +32,7 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     Q_OBJECT
 
   public:
-    enum class EditorType
+    enum class EditorType SIP_MONKEYPATCH_SCOPEENUM
     {
       CreateItemEditor,
       EditItemEditor
