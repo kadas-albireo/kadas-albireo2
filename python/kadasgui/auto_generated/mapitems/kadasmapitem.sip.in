@@ -329,39 +329,49 @@ visibility */
 Trigger a redraw */
 %End
 
-    struct State : KadasStateHistory::State
-    {
-      enum class DrawStatus
-      {
-        Empty,
-        Drawing,
-        Finished
-      };
-      DrawStatus drawStatus;
-      virtual void assign( const State *other ) = 0;
-      virtual State *clone() const = 0 /Factory/;
-      virtual QJsonObject serialize() const = 0;
-      virtual bool deserialize( const QJsonObject &json ) = 0;
+    class State : KadasStateHistory::State
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasmapitem.h"
+%End
+      public:
+        enum class DrawStatus
+        {
+          Empty,
+          Drawing,
+          Finished
+        };
+        DrawStatus drawStatus;
+        virtual void assign( const State *other ) = 0;
+        virtual State *clone() const = 0 /Factory/;
+        virtual QJsonObject serialize() const = 0;
+        virtual bool deserialize( const QJsonObject &json ) = 0;
     };
     const State *constState() const;
     virtual void setState( const State *state );
 
-    struct NumericAttribute
-    {
-      QString name;
-      enum class Type
-      {
-        TypeCoordinate,
-        TypeDistance,
-        TypeAngle,
-        TypeOther
-      };
-      Type type;
-      double min;
-      double max;
-      int decimals;
-      int precision( const QgsMapSettings &mapSettings ) const;
-      QString suffix( const QgsMapSettings &mapSettings ) const;
+    class NumericAttribute
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasmapitem.h"
+%End
+    public:
+        QString name;
+        enum class Type
+        {
+          TypeCoordinate,
+          TypeDistance,
+          TypeAngle,
+          TypeOther
+        };
+        Type type;
+        double min;
+        double max;
+        int decimals;
+        int precision( const QgsMapSettings &mapSettings ) const;
+        QString suffix( const QgsMapSettings &mapSettings ) const;
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;

@@ -343,39 +343,41 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void update();
 
     // State interface
-    struct State : KadasStateHistory::State
+    class State : public KadasStateHistory::State
     {
-      enum class DrawStatus
-      {
-        Empty,
-        Drawing,
-        Finished
-      };
-      DrawStatus drawStatus = DrawStatus::Empty;
-      virtual void assign( const State *other ) = 0;
-      virtual State *clone() const = 0 SIP_FACTORY;
-      virtual QJsonObject serialize() const = 0;
-      virtual bool deserialize( const QJsonObject &json ) = 0;
+      public:
+        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST(KadasMapItem.DrawStatus, DrawStatus)
+        {
+          Empty,
+          Drawing,
+          Finished
+        };
+        DrawStatus drawStatus = DrawStatus::Empty;
+        virtual void assign( const State *other ) = 0;
+        virtual State *clone() const = 0 SIP_FACTORY;
+        virtual QJsonObject serialize() const = 0;
+        virtual bool deserialize( const QJsonObject &json ) = 0;
     };
     const State *constState() const { return mState; }
     virtual void setState( const State *state );
 
-    struct KADAS_GUI_EXPORT NumericAttribute
+    class KADAS_GUI_EXPORT NumericAttribute
     {
-      QString name;
-      enum class Type
-      {
-        TypeCoordinate,
-        TypeDistance,
-        TypeAngle,
-        TypeOther
-      };
-      Type type = Type::TypeCoordinate;
-      double min = std::numeric_limits<double>::lowest();
-      double max = std::numeric_limits<double>::max();
-      int decimals = -1;
-      int precision( const QgsMapSettings &mapSettings ) const;
-      QString suffix( const QgsMapSettings &mapSettings ) const;
+    public:
+        QString name;
+        enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST(KadasMapItem.Type, Type)
+        {
+          TypeCoordinate,
+          TypeDistance,
+          TypeAngle,
+          TypeOther
+        };
+        Type type = Type::TypeCoordinate;
+        double min = std::numeric_limits<double>::lowest();
+        double max = std::numeric_limits<double>::max();
+        int decimals = -1;
+        int precision( const QgsMapSettings &mapSettings ) const;
+        QString suffix( const QgsMapSettings &mapSettings ) const;
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;

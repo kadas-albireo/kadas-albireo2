@@ -1636,7 +1636,7 @@ while ($LINE_IDX < $LINE_COUNT){
         write_output("ENU1", "\n");
 
         my $monkeypatch = "0";
-        $monkeypatch = "1" if defined $is_scope_based eq "1" and $LINE =~ m/SIP_MONKEYPATCH_SCOPEENUM(_UNNEST)?(:?\(\s*(?<emkb>\w+)\s*,\s*(?<emkf>\w+)\s*\))?/;
+        $monkeypatch = "1" if defined $is_scope_based eq "1" and $LINE =~ m/SIP_MONKEYPATCH_SCOPEENUM(_UNNEST)?(:?\(\s*(?<emkb>[\w\.]+)\s*,\s*(?<emkf>\w+)\s*\))?/;
         my $enum_mk_base = "";
         $enum_mk_base = $+{emkb} if defined $+{emkb};
         my $enum_old_name = "";

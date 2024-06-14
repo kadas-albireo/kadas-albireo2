@@ -83,23 +83,23 @@ the Free Software Foundation; either version 2 of the License, or     *
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadascircularsectoritem.h"
 %End
-    public:
-      enum class SectorStatus
-      {
-        HaveNothing,
-        HaveCenter,
-        HaveRadius
-      };
-      SectorStatus sectorStatus;
-      QList<KadasItemPos> centers;
-      QList<double> radii;
-      QList<double> startAngles;
-      QList<double> stopAngles;
-      virtual void assign( const KadasMapItem::State *other );
-      virtual State *clone() const /Factory/;
-      virtual QJsonObject serialize() const;
+      public:
+        enum class SectorStatus
+        {
+          HaveNothing,
+          HaveCenter,
+          HaveRadius
+        };
+        SectorStatus sectorStatus;
+        QList<KadasItemPos> centers;
+        QList<double> radii;
+        QList<double> startAngles;
+        QList<double> stopAngles;
+        virtual void assign( const KadasMapItem::State *other );
+        virtual State *clone() const /Factory/;
+        virtual QJsonObject serialize() const;
 
-      virtual bool deserialize( const QJsonObject &json );
+        virtual bool deserialize( const QJsonObject &json );
 
     };
     const State *constState() const;
