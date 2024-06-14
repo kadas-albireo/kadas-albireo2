@@ -345,7 +345,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // State interface
     struct State : KadasStateHistory::State
     {
-      enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM
+      enum class DrawStatus
       {
         Empty,
         Drawing,
@@ -363,7 +363,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     struct KADAS_GUI_EXPORT NumericAttribute
     {
       QString name;
-      enum class Type SIP_MONKEYPATCH_SCOPEENUM
+      enum class Type
       {
         TypeCoordinate,
         TypeDistance,

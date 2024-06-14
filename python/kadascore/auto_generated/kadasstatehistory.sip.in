@@ -32,7 +32,11 @@ the Free Software Foundation; either version 2 of the License, or     *
     {
       virtual ~State();
     };
-    enum class ChangeType {Undo, Redo};
+    enum class ChangeType
+    {
+      Undo,
+      Redo
+    };
 
     KadasStateHistory( QObject *parent = 0 );
     ~KadasStateHistory();

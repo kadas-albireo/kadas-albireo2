@@ -32,7 +32,11 @@ class KADAS_CORE_EXPORT KadasStateHistory : public QObject
     {
       virtual ~State() {}
     };
-    enum class ChangeType {Undo, Redo};
+    enum class ChangeType
+    {
+      Undo,
+      Redo
+    };
 
     KadasStateHistory( QObject *parent = 0 );
     ~KadasStateHistory();

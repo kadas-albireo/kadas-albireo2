@@ -58,9 +58,10 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     const QgsMultiSurface *geometry() const;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
+    class KADAS_GUI_EXPORT State : public KadasMapItem::State
     {
-      enum class SectorStatus SIP_MONKEYPATCH_SCOPEENUM
+    public:
+      enum class SectorStatus
       {
         HaveNothing,
         HaveCenter,
