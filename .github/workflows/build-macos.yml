@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - osx-python
   pull_request:
   release:
     types: ['published']
@@ -22,7 +23,7 @@ jobs:
 #            triplet: x64-osx
 #            deployment-target: "10.15"
           - os: macos-14
-            triplet: arm64-osx
+            triplet: arm64-osx-dynamic
             deployment-target: "11.0"
     name: build (macos)
     runs-on: ${{ matrix.os }}
@@ -54,17 +55,23 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - uses: m-kuhn/action-tmate@patch-1
+        if: always()
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 🌱 Install dependencies and generate project files
         run: |
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D WITH_BINDINGS=OFF \
                 -D WITH_GLOBE=OFF \
                 -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3

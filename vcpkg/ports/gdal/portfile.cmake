@@ -65,17 +65,6 @@ if(GDAL_USE_ICONV AND VCPKG_TARGET_IS_WINDOWS)
     list(APPEND FEATURE_OPTIONS -D_ICONV_SECOND_ARGUMENT_IS_NOT_CONST=ON)
 endif()
 
-if("python" IN_LIST FEATURES)
-  list(APPEND OPTION_RELEASE
-    "-DSWIG_DIR=${CURRENT_HOST_INSTALLED_DIR}/tools/swig"
-    "-DSWIG_EXECUTABLE=${CURRENT_HOST_INSTALLED_DIR}/tools/swig/swig${VCPKG_HOST_EXECUTABLE_SUFFIX}"
-  )
-else()
-  list(APPEND FEATURE_OPTIONS
-      "-DCMAKE_DISABLE_FIND_PACKAGE_SWIG=ON"
-  )
-endif()
-
 # Compatibility with older Android versions https://github.com/OSGeo/gdal/pull/5941
 if(VCPKG_TARGET_IS_ANDROID AND ANRDOID_PLATFORM VERSION_LESS 24 AND (VCPKG_TARGET_ARCHITECTURE STREQUAL "x86" OR VCPKG_TARGET_ARCHITECTURE STREQUAL "arm"))
     list(APPEND FEATURE_OPTIONS -DBUILD_WITHOUT_64BIT_OFFSET=ON)
@@ -93,6 +82,7 @@ vcpkg_cmake_configure(
         -DCMAKE_DISABLE_FIND_PACKAGE_CSharp=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Java=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_JNI=ON
+#        -DCMAKE_DISABLE_FIND_PACKAGE_SWIG=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Arrow=ON
         -DGDAL_USE_INTERNAL_LIBS=OFF
         -DGDAL_USE_EXTERNAL_LIBS=OFF
@@ -107,12 +97,12 @@ vcpkg_cmake_configure(
         -DGDAL_CHECK_PACKAGE_QHULL_NAMES=Qhull
         "-DGDAL_CHECK_PACKAGE_QHULL_TARGETS=${qhull_target}"
         "-DQHULL_LIBRARY=${qhull_target}"
+        "-DSWIG_DIR=${CURRENT_HOST_INSTALLED_DIR}/tools/swig"
+        "-DSWIG_EXECUTABLE=${CURRENT_HOST_INSTALLED_DIR}/tools/swig/swig${VCPKG_HOST_EXECUTABLE_SUFFIX}"
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
     OPTIONS_DEBUG
         -DBUILD_APPS=OFF
-        -DCMAKE_DISABLE_FIND_PACKAGE_SWIG=ON
-    OPTIONS_RELEASE
-        ${OPTIONS_RELEASE}
+        "-DGDAL_DEBUG_POSTFIX="
     MAYBE_UNUSED_VARIABLES
         QHULL_LIBRARY
 )
@@ -179,13 +169,40 @@ if(NOT bin_files)
 endif()
 
 if("python" IN_LIST FEATURES)
-  file(COPY "${CURRENT_PACKAGES_DIR}/Lib/site-packages/" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
-  # TODO: Generalize for non windows
-  file(COPY "${CURRENT_PACKAGES_DIR}/Scripts" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../Scripts")
+  if(VCPKG_TARGET_IS_WINDOWS)
+    set(PY_LIB_DIR "Lib")
+    set(PY_SCRIPTS_DIR "Scripts")
+  else()
+    set(PY_LIB_DIR "lib/python3.11") # TODO: Make dynamic
+    set(PY_SCRIPTS_DIR "bin")
+  endif()
+
   file(REMOVE_RECURSE
-    "${CURRENT_PACKAGES_DIR}/Lib/site-packages"
-    "${CURRENT_PACKAGES_DIR}/Scripts"
+    "${CURRENT_PACKAGES_DIR}/debug/${PY_LIB_DIR}"
+    "${CURRENT_PACKAGES_DIR}/debug/${PY_SCRIPTS_DIR}"
+  )
+  if(VCPKG_TARGET_IS_WINDOWS)
+    file(COPY "${CURRENT_PACKAGES_DIR}/${PY_LIB_DIR}/site-packages/" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
+    file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/${PY_LIB_DIR}/site-packages")
+    file(COPY "${CURRENT_PACKAGES_DIR}/Scripts" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../Scripts")
+    file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/Scripts")
+  endif()
+  if(VCPKG_TARGET_IS_OSX)
+    file(GLOB_RECURSE macho_files LIST_DIRECTORIES FALSE "${CURRENT_PACKAGES_DIR}/${PY_LIB_DIR}/*")
+    message(STATUS "Checking files ${macho_files}") # TODO: remove
+    list(FILTER macho_files INCLUDE REGEX "\.so$")
+    message(STATUS "--- Filtered files ${macho_files}") # TODO: remove
+    foreach(macho_file IN LISTS macho_files)
+      # Required for testing, as it needs to be able load shared libs from the package (not yet installed) path
+      # Will be overwritten by z_vcpkg_fixup_rpath_macho
+      execute_process(
+        COMMAND install_name_tool -add_rpath "${CURRENT_PACKAGES_DIR}/lib" "${macho_file}"
+        OUTPUT_QUIET
+        ERROR_VARIABLE set_rpath_error
     )
+    endforeach()
+  endif()
+  vcpkg_python_test_import(MODULE "osgeo.gdal")
 endif()
 
 vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/cpl_config.h" "#define GDAL_PREFIX \"${CURRENT_PACKAGES_DIR}\"" "")

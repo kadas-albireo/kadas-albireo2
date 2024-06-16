@@ -2,8 +2,9 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "eb0f108ebd674c6ed79acb1c2e123208c416af0d",
-      "repository": "https://github.com/microsoft/vcpkg"
+      "baseline": "8a3d4379757e65cd5b43d096006eaab6ac663a37",
+      "reference": "8a3d4379757e65cd5b43d096006eaab6ac663a37",
+      "repository": "https://github.com/m-kuhn/vcpkg"
     },
     "registries": [
       {
@@ -46,6 +47,7 @@
     "geographiclib",
     "librsvg",
     "python3",
+    "py-psycopg2",
     "proj-chenyx06a",
     {
       "name": "qgis",
