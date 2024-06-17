@@ -61,7 +61,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     class KADAS_GUI_EXPORT State : public KadasMapItem::State
     {
       public:
-        enum class SectorStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST(KadasCircularSectorItem.State, SectorStatus)
+        enum class SectorStatus
         {
           HaveNothing,
           HaveCenter,

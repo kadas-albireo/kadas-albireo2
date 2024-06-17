@@ -1,31 +1,29 @@
 # The following has been generated automatically from kadas/gui/mapitems/kadasmapitem.h
-KadasMapItem.DrawStatus.DrawStatus = State.DrawStatus
 # monkey patching scoped based enum
-KadasMapItem.DrawStatus.Empty = State.DrawStatus.Empty
-KadasMapItem.DrawStatus.Empty.is_monkey_patched = True
-KadasMapItem.DrawStatus.Empty.__doc__ = ""
-KadasMapItem.DrawStatus.Drawing = State.DrawStatus.Drawing
-KadasMapItem.DrawStatus.Drawing.is_monkey_patched = True
-KadasMapItem.DrawStatus.Drawing.__doc__ = ""
-KadasMapItem.DrawStatus.Finished = State.DrawStatus.Finished
-KadasMapItem.DrawStatus.Finished.is_monkey_patched = True
-KadasMapItem.DrawStatus.Finished.__doc__ = ""
+State.Empty = State.DrawStatus.Empty
+State.Empty.is_monkey_patched = True
+KadasMapItem.State.DrawStatus.Empty.__doc__ = ""
+State.Drawing = State.DrawStatus.Drawing
+State.Drawing.is_monkey_patched = True
+KadasMapItem.State.DrawStatus.Drawing.__doc__ = ""
+State.Finished = State.DrawStatus.Finished
+State.Finished.is_monkey_patched = True
+KadasMapItem.State.DrawStatus.Finished.__doc__ = ""
 State.DrawStatus.__doc__ = "\n\n" + '* ``Empty``: ' + State.DrawStatus.Empty.__doc__ + '\n' + '* ``Drawing``: ' + State.DrawStatus.Drawing.__doc__ + '\n' + '* ``Finished``: ' + State.DrawStatus.Finished.__doc__
 # --
-KadasMapItem.Type.Type = NumericAttribute.Type
 # monkey patching scoped based enum
-KadasMapItem.Type.TypeCoordinate = NumericAttribute.Type.TypeCoordinate
-KadasMapItem.Type.TypeCoordinate.is_monkey_patched = True
-KadasMapItem.Type.TypeCoordinate.__doc__ = ""
-KadasMapItem.Type.TypeDistance = NumericAttribute.Type.TypeDistance
-KadasMapItem.Type.TypeDistance.is_monkey_patched = True
-KadasMapItem.Type.TypeDistance.__doc__ = ""
-KadasMapItem.Type.TypeAngle = NumericAttribute.Type.TypeAngle
-KadasMapItem.Type.TypeAngle.is_monkey_patched = True
-KadasMapItem.Type.TypeAngle.__doc__ = ""
-KadasMapItem.Type.TypeOther = NumericAttribute.Type.TypeOther
-KadasMapItem.Type.TypeOther.is_monkey_patched = True
-KadasMapItem.Type.TypeOther.__doc__ = ""
+NumericAttribute.TypeCoordinate = NumericAttribute.Type.TypeCoordinate
+NumericAttribute.TypeCoordinate.is_monkey_patched = True
+KadasMapItem.NumericAttribute.Type.TypeCoordinate.__doc__ = ""
+NumericAttribute.TypeDistance = NumericAttribute.Type.TypeDistance
+NumericAttribute.TypeDistance.is_monkey_patched = True
+KadasMapItem.NumericAttribute.Type.TypeDistance.__doc__ = ""
+NumericAttribute.TypeAngle = NumericAttribute.Type.TypeAngle
+NumericAttribute.TypeAngle.is_monkey_patched = True
+KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
+NumericAttribute.TypeOther = NumericAttribute.Type.TypeOther
+NumericAttribute.TypeOther.is_monkey_patched = True
+KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
 NumericAttribute.Type.__doc__ = "\n\n" + '* ``TypeCoordinate``: ' + NumericAttribute.Type.TypeCoordinate.__doc__ + '\n' + '* ``TypeDistance``: ' + NumericAttribute.Type.TypeDistance.__doc__ + '\n' + '* ``TypeAngle``: ' + NumericAttribute.Type.TypeAngle.__doc__ + '\n' + '* ``TypeOther``: ' + NumericAttribute.Type.TypeOther.__doc__
 # --
 # monkey patching scoped based enum
