@@ -1709,8 +1709,9 @@ while ($LINE_IDX < $LINE_COUNT){
                         } else {
                             if ( $monkeypatch eq 1 )
                             {
-                                push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$compat_name = $ACTUAL_CLASS.$enum_qualname.$enum_member\n";
-                                push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$compat_name.is_monkey_patched = True\n";
+                                my $complete_class_path = join('.', @CLASSNAME);
+                                push @OUTPUT_PYTHON, "$complete_class_path.$compat_name = $complete_class_path.$enum_qualname.$enum_member\n";
+                                push @OUTPUT_PYTHON, "$complete_class_path.$compat_name.is_monkey_patched = True\n";
                             }
                             if ( $ACTUAL_CLASS ne "" ){
                                 my $complete_class_path = join('.', @CLASSNAME);
