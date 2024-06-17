@@ -43,9 +43,9 @@ KadasMilxLayerPropertiesPage::KadasMilxLayerPropertiesPage( KadasMilxLayer *laye
   mLineWidthSlider->setValue( layer->milxLineWidth() );
 
   mWorkModeCombo = new QComboBox();
-  mWorkModeCombo->addItem( tr( "International" ), KadasMilxSymbolSettings::WorkModeInternational );
-  mWorkModeCombo->addItem( tr( "CH" ), KadasMilxSymbolSettings::WorkModeCH );
-  mWorkModeCombo->setCurrentIndex( layer->milxWorkMode() );
+  mWorkModeCombo->addItem( tr( "International" ), QVariant::fromValue( KadasMilxSymbolSettings::WorkMode::WorkModeInternational ) );
+  mWorkModeCombo->addItem( tr( "CH" ), QVariant::fromValue( KadasMilxSymbolSettings::WorkMode::WorkModeCH ) );
+  mWorkModeCombo->setCurrentIndex( static_cast<int>( layer->milxWorkMode() ) );
 
   mLeaderLineWidthSpin = new QSpinBox();
   mLeaderLineWidthSpin->setRange( 1, 10 );
@@ -80,7 +80,7 @@ void KadasMilxLayerPropertiesPage::apply()
   mLayer->setOverrideMilxSymbolSettings( mGroupBox->isChecked() );
   mLayer->setMilxSymbolSize( mSymbolSizeSlider->value() );
   mLayer->setMilxLineWidth( mLineWidthSlider->value() );
-  mLayer->setMilxWorkMode( static_cast<KadasMilxSymbolSettings::WorkMode>( mWorkModeCombo->currentIndex() ) );
+  mLayer->setMilxWorkMode( mWorkModeCombo->currentData().value<KadasMilxSymbolSettings::WorkMode>() );
   mLayer->setMilxLeaderLineWidth( mLeaderLineWidthSpin->value() );
   mLayer->setMilxLeaderLineColor( mLeaderLineColorButton->color() );
 }
@@ -125,7 +125,7 @@ void KadasMilxLayerPropertiesPageFactory::readLayerConfig( QgsMapLayer *mapLayer
   milxLayer->setOverrideMilxSymbolSettings( elem.attribute( "milx_override_symbol_settings" ).toInt() );
   milxLayer->setMilxSymbolSize( elem.attribute( "milx_symbol_size", QString::number( KadasMilxSymbolSettings::DefaultSymbolSize ) ).toInt() );
   milxLayer->setMilxLineWidth( elem.attribute( "milx_line_width", QString::number( KadasMilxSymbolSettings::DefaultLineWidth ) ).toInt() );
-  milxLayer->setMilxWorkMode( static_cast<KadasMilxSymbolSettings::WorkMode>( elem.attribute( "milx_work_mode", QString::number( KadasMilxSymbolSettings::DefaultWorkMode ) ).toInt() ) );
+  milxLayer->setMilxWorkMode( static_cast<KadasMilxSymbolSettings::WorkMode>( elem.attribute( "milx_work_mode", QString::number( static_cast<int>( KadasMilxSymbolSettings::DefaultWorkMode ) ) ).toInt() ) );
   milxLayer->setMilxLeaderLineWidth( elem.attribute( "milx_leader_line_width" ).toInt() );
   milxLayer->setMilxLeaderLineColor( elem.attribute( "milx_leader_line_color" ) );
 }
@@ -140,7 +140,7 @@ void KadasMilxLayerPropertiesPageFactory::writeLayerConfig( QgsMapLayer *mapLaye
   elem.setAttribute( "milx_override_symbol_settings", milxLayer->overrideMilxSymbolSettings() );
   elem.setAttribute( "milx_symbol_size", milxLayer->milxSymbolSize() );
   elem.setAttribute( "milx_line_width", milxLayer->milxLineWidth() );
-  elem.setAttribute( "milx_work_mode", milxLayer->milxWorkMode() );
+  elem.setAttribute( "milx_work_mode", static_cast<int>( milxLayer->milxWorkMode() ) );
   elem.setAttribute( "milx_leader_line_width", milxLayer->milxLeaderLineWidth() );
   elem.setAttribute( "milx_leader_line_color", milxLayer->milxLeaderLineColor().name() );
 }

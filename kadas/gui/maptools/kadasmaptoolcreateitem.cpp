@@ -87,7 +87,7 @@ void KadasMapToolCreateItem::activate()
   KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
   if ( factory )
   {
-    mEditor = factory( mItem, KadasMapItemEditor::CreateItemEditor );
+    mEditor = factory( mItem, KadasMapItemEditor::EditorType::CreateItemEditor );
     mEditor->syncWidgetToItem();
     mBottomBar->layout()->addWidget( mEditor );
   }
@@ -180,7 +180,7 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent *e )
   }
   else if ( e->button() == Qt::RightButton )
   {
-    if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+    if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
     {
       finishPart();
     }
@@ -201,7 +201,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
   KadasMapPos pos = transformMousePoint( e->mapPoint() );
 
-  if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+  if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
   {
     mItem->setCurrentPoint( pos, canvas()->mapSettings() );
   }
@@ -232,7 +232,7 @@ void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
 {
   if ( e->key() == Qt::Key_Escape )
   {
-    if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+    if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
     {
       mItem->clear();
     }
@@ -299,11 +299,11 @@ KadasMapItem *KadasMapToolCreateItem::takeItem()
 
 void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 {
-  if ( mItem->constState()->drawStatus == KadasMapItem::State::Empty )
+  if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Empty )
   {
     startPart( pos );
   }
-  else if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+  else if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
   {
     // Add point, stop drawing if item does not accept further points
     if ( !mItem->continuePart( canvas()->mapSettings() ) )
@@ -315,7 +315,7 @@ void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
       mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
     }
   }
-  else if ( mItem->constState()->drawStatus == KadasMapItem::State::Finished )
+  else if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Finished )
   {
     if ( !mMultipart )
     {
@@ -334,7 +334,7 @@ void KadasMapToolCreateItem::createItem()
   else
   {
     KadasMapItem::State *state = mItem->constState()->clone();
-    state->drawStatus = KadasMapItem::State::Drawing;
+    state->drawStatus = KadasMapItem::State::DrawStatus::Drawing;
     mItem->setState( state );
     delete state;
   }
@@ -418,7 +418,7 @@ void KadasMapToolCreateItem::commitItem()
   {
     mEditor->setItem( nullptr );
   }
-  if ( mLayer && mItem->constState()->drawStatus == KadasMapItem::State::Finished )
+  if ( mLayer && mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Finished )
   {
     mCurrentItemData->itemId = mLayer->addItem( mItem );
     mLayer->triggerRepaint();
@@ -456,7 +456,7 @@ void KadasMapToolCreateItem::inputChanged()
   KadasMapPos newPos = mItem->positionFromDrawAttribs( values, mCanvas->mapSettings() );
   mInputWidget->adjustCursorAndExtent( newPos );
 
-  if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+  if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
   {
     mItem->setCurrentAttributes( values, canvas()->mapSettings() );
   }
@@ -464,11 +464,11 @@ void KadasMapToolCreateItem::inputChanged()
 
 void KadasMapToolCreateItem::acceptInput()
 {
-  if ( mItem->constState()->drawStatus == KadasMapItem::State::Empty )
+  if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Empty )
   {
     startPart( collectAttributeValues() );
   }
-  else if ( mItem->constState()->drawStatus == KadasMapItem::State::Drawing )
+  else if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Drawing )
   {
     if ( !mItem->continuePart( canvas()->mapSettings() ) )
     {
@@ -479,7 +479,7 @@ void KadasMapToolCreateItem::acceptInput()
       mStateHistory->push( mItem->constState()->clone() );
     }
   }
-  else if ( mItem->constState()->drawStatus == KadasMapItem::State::Finished )
+  else if ( mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Finished )
   {
     if ( !mMultipart )
     {

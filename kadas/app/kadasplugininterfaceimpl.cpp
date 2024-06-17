@@ -173,62 +173,62 @@ QMenu *KadasPluginInterfaceImpl::meshMenu()
 
 void KadasPluginInterfaceImpl::addPluginToMenu(const QString &name, QAction *action)
 {
-  getSubMenu( getClassicMenu( PLUGIN_MENU ), name )->addAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::PLUGIN_MENU ), name )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removePluginMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( PLUGIN_MENU ), name )->removeAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::PLUGIN_MENU ), name )->removeAction( action );
 }
 
 void KadasPluginInterfaceImpl::insertAddLayerAction( QAction *action )
 {
-  getClassicMenu( ADDLAYER_MENU )->addAction( action );
+  getClassicMenu( ActionClassicMenuLocation::ADDLAYER_MENU )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removeAddLayerAction( QAction *action )
 {
-  getClassicMenu( ADDLAYER_MENU )->removeAction( action );
+  getClassicMenu( ActionClassicMenuLocation::ADDLAYER_MENU )->removeAction( action );
 }
 
 void KadasPluginInterfaceImpl::addPluginToDatabaseMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( DATABASE_MENU ), name )->addAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::DATABASE_MENU ), name )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removePluginDatabaseMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( DATABASE_MENU ), name )->removeAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::DATABASE_MENU ), name )->removeAction( action );
 }
 
 void KadasPluginInterfaceImpl::addPluginToRasterMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( RASTER_MENU ), name )->addAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::RASTER_MENU ), name )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removePluginRasterMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( RASTER_MENU ), name )->removeAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::RASTER_MENU ), name )->removeAction( action );
 }
 
 void KadasPluginInterfaceImpl::addPluginToVectorMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( VECTOR_MENU ), name )->addAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::VECTOR_MENU ), name )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removePluginVectorMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( VECTOR_MENU ), name )->removeAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::VECTOR_MENU ), name )->removeAction( action );
 }
 
 void KadasPluginInterfaceImpl::addPluginToWebMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( WEB_MENU ), name )->addAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::WEB_MENU ), name )->addAction( action );
 }
 
 void KadasPluginInterfaceImpl::removePluginWebMenu( const QString &name, QAction *action )
 {
-  getSubMenu( getClassicMenu( WEB_MENU ), name )->removeAction( action );
+  getSubMenu( getClassicMenu( ActionClassicMenuLocation::WEB_MENU ), name )->removeAction( action );
 }
 
 #if _QGIS_VERSION_INT >= 33000
@@ -512,38 +512,38 @@ QMenu *KadasPluginInterfaceImpl::getClassicMenu( ActionClassicMenuLocation class
   QString menuName;
   switch ( classicMenuLocation )
   {
-    case NO_MENU:
+    case ActionClassicMenuLocation::NO_MENU:
       break;
-    case PROJECT_MENU:
+    case ActionClassicMenuLocation::PROJECT_MENU:
       menuName = tr( "Project" ); break;
-    case EDIT_MENU:
+    case ActionClassicMenuLocation::EDIT_MENU:
       menuName = tr( "Edit" ); break;
-    case VIEW_MENU:
+    case ActionClassicMenuLocation::VIEW_MENU:
       menuName = tr( "View" ); break;
-    case LAYER_MENU:
+    case ActionClassicMenuLocation::LAYER_MENU:
       menuName = tr( "Layer" ); break;
-    case NEWLAYER_MENU:
+    case ActionClassicMenuLocation::NEWLAYER_MENU:
       menuName = tr( "New layer" ); break;
-    case ADDLAYER_MENU:
+    case ActionClassicMenuLocation::ADDLAYER_MENU:
       menuName = tr( "Add layer" ); break;
-    case SETTINGS_MENU:
+    case ActionClassicMenuLocation::SETTINGS_MENU:
       menuName = tr( "Settings" ); break;
-    case PLUGIN_MENU:
+    case ActionClassicMenuLocation::PLUGIN_MENU:
       return kApp->mainWindow()->pluginsMenu();
-    case RASTER_MENU:
+    case ActionClassicMenuLocation::RASTER_MENU:
       menuName = tr( "Raster" ); break;
-    case DATABASE_MENU:
+    case ActionClassicMenuLocation::DATABASE_MENU:
       menuName = tr( "Database" ); break;
-    case VECTOR_MENU:
+    case ActionClassicMenuLocation::VECTOR_MENU:
       menuName = tr( "Vector" ); break;
-    case WEB_MENU:
+    case ActionClassicMenuLocation::WEB_MENU:
       menuName = tr( "Web" ); break;
-    case WINDOW_MENU:
+    case ActionClassicMenuLocation::WINDOW_MENU:
       menuName = tr( "Window" ); break;
-    case HELP_MENU:
-    case FIRST_RIGHT_STANDARD_MENU:
+    case ActionClassicMenuLocation::HELP_MENU:
+    case ActionClassicMenuLocation::FIRST_RIGHT_STANDARD_MENU:
       menuName = tr( "Help" ); break;
-    case CUSTOM_MENU:
+    case ActionClassicMenuLocation::CUSTOM_MENU:
       menuName = customName;
       break;
   };
@@ -575,25 +575,25 @@ QWidget *KadasPluginInterfaceImpl::getRibbonTabWidget( ActionRibbonTabLocation r
   QWidget *targetTabWidget = nullptr;
   switch ( ribbonTabLocation )
   {
-    case NO_TAB:
+    case ActionRibbonTabLocation::NO_TAB:
       break;
-    case MAPS_TAB:
+    case ActionRibbonTabLocation::MAPS_TAB:
       targetTabWidget = kApp->mainWindow()->mapsTab(); break;
-    case VIEW_TAB:
+    case ActionRibbonTabLocation::VIEW_TAB:
       targetTabWidget = kApp->mainWindow()->viewTab(); break;
-    case ANALYSIS_TAB:
+    case ActionRibbonTabLocation::ANALYSIS_TAB:
       targetTabWidget = kApp->mainWindow()->analysisTab(); break;
-    case DRAW_TAB:
+    case ActionRibbonTabLocation::DRAW_TAB:
       targetTabWidget = kApp->mainWindow()->drawTab(); break;
-    case GPS_TAB:
+    case ActionRibbonTabLocation::GPS_TAB:
       targetTabWidget = kApp->mainWindow()->gpsTab(); break;
-    case MSS_TAB:
+    case ActionRibbonTabLocation::MSS_TAB:
       targetTabWidget = kApp->mainWindow()->mssTab(); break;
-    case SETTINGS_TAB:
+    case ActionRibbonTabLocation::SETTINGS_TAB:
       targetTabWidget = kApp->mainWindow()->settingsTab(); break;
-    case HELP_TAB:
+    case ActionRibbonTabLocation::HELP_TAB:
       targetTabWidget = kApp->mainWindow()->helpTab(); break;
-    case CUSTOM_TAB:
+    case ActionRibbonTabLocation::CUSTOM_TAB:
       for ( int i = 0, n = kApp->mainWindow()->ribbonTabWidget()->count(); i < n; ++i )
       {
         if ( kApp->mainWindow()->ribbonTabWidget()->tabText( i ) == customName )
@@ -613,7 +613,7 @@ QWidget *KadasPluginInterfaceImpl::getRibbonTabWidget( ActionRibbonTabLocation r
 
 void KadasPluginInterfaceImpl::addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName, QgsMapTool *associatedMapTool )
 {
-  if ( ribbonTabLocation != NO_TAB )
+  if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
   {
     // Add action to ribbon tabs
     QWidget *targetTabWidget = getRibbonTabWidget( ribbonTabLocation, customName );
@@ -639,7 +639,7 @@ void KadasPluginInterfaceImpl::addAction( QAction *action, ActionClassicMenuLoca
 
 void KadasPluginInterfaceImpl::addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
 {
-  if ( ribbonTabLocation != NO_TAB )
+  if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
   {
     // Add action to ribbon tabs
     QWidget *targetTabWidget = getRibbonTabWidget( ribbonTabLocation, customName );
@@ -663,7 +663,7 @@ void KadasPluginInterfaceImpl::addActionMenu( const QString &text, const QIcon &
 
 void KadasPluginInterfaceImpl::removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName, QgsMapTool *associatedMapTool )
 {
-  if ( ribbonTabLocation != NO_TAB )
+  if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
   {
     QWidget *targetTabWidget = getRibbonTabWidget( ribbonTabLocation, customName );
     if ( targetTabWidget )
@@ -685,7 +685,7 @@ void KadasPluginInterfaceImpl::removeAction( QAction *action, ActionClassicMenuL
 
 void KadasPluginInterfaceImpl::removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
 {
-  if ( ribbonTabLocation != NO_TAB )
+  if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
   {
     // Add action to ribbon tabs
     QWidget *targetTabWidget = getRibbonTabWidget( ribbonTabLocation, customName );

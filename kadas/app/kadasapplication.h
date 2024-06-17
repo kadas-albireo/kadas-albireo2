@@ -168,6 +168,8 @@ class KadasApplication : public QgsApplication
     void cleanup();
     void unsetMapToolOnSave();
     void extentChanged();
+    void saveAttributeTableDocks( QDomDocument &doc );
+    void restoreAttributeTables( const QDomDocument &doc );
 };
 
 #endif // KADASAPPLICATION_H

@@ -118,7 +118,7 @@ class KadasItemLayer : KadasPluginLayer
     typedef unsigned ItemId;
     static const ItemId ITEM_ID_NULL;
 
-    enum PickObjective
+    enum class PickObjective
     {
       PICK_OBJECTIVE_ANY,
       PICK_OBJECTIVE_TOOLTIP
@@ -146,7 +146,7 @@ class KadasItemLayer : KadasPluginLayer
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
 
-    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective = PICK_OBJECTIVE_ANY ) const;
+    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const;
     KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 
@@ -172,7 +172,8 @@ class KadasItemLayerType : KadasPluginLayerType
   public:
     KadasItemLayerType();
     virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
+    virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
+
 };
 
 class KadasItemLayerRegistry : QObject
@@ -182,7 +183,14 @@ class KadasItemLayerRegistry : QObject
 #include "kadas/gui/kadasitemlayer.h"
 %End
   public:
-    enum StandardLayer { RedliningLayer, SymbolsLayer, PicturesLayer, PinsLayer, RoutesLayer };
+    enum class StandardLayer
+    {
+      RedliningLayer,
+      SymbolsLayer,
+      PicturesLayer,
+      PinsLayer,
+      RoutesLayer
+    };
     static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
     static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
     static void init();

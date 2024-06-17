@@ -58,18 +58,24 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 
     const QgsMultiSurface *geometry() const;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
+    class KADAS_GUI_EXPORT State : public KadasMapItem::State
     {
-      enum SectorStatus {HaveNothing, HaveCenter, HaveRadius};
-      SectorStatus sectorStatus = HaveNothing;
-      QList<KadasItemPos> centers;
-      QList<double> radii;
-      QList<double> startAngles;
-      QList<double> stopAngles;
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+      public:
+        enum class SectorStatus
+        {
+          HaveNothing,
+          HaveCenter,
+          HaveRadius
+        };
+        SectorStatus sectorStatus = SectorStatus::HaveNothing;
+        QList<KadasItemPos> centers;
+        QList<double> radii;
+        QList<double> startAngles;
+        QList<double> stopAngles;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 

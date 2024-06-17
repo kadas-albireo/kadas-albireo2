@@ -5,6 +5,9 @@ use File::Basename;
 use File::Spec;
 use Getopt::Long;
 use YAML::Tiny;
+use List::Util qw(any);
+use List::Util qw(none);
+
 no if $] >= 5.018000, warnings => 'experimental::smartmatch';
 
 use constant PRIVATE => 0;
@@ -21,14 +24,20 @@ use constant MULTILINE_CONDITIONAL_STATEMENT => 22;
 use constant CODE_SNIPPET => 30;
 use constant CODE_SNIPPET_CPP => 31;
 
+use constant PREPEND_CODE_NO => 40;
+use constant PREPEND_CODE_VIRTUAL => 41;
+use constant PREPEND_CODE_MAKE_PRIVATE => 42;
+
+
 # read arguments
 my $debug = 0;
 my $sip_output = '';
+my $is_qt6 = 0;
 my $python_output = '';
 #my $SUPPORT_TEMPLATE_DOCSTRING = 0;
 #die("usage: $0 [-debug] [-template-doc] headerfile\n") unless GetOptions ("debug" => \$debug, "template-doc" => \$SUPPORT_TEMPLATE_DOCSTRING) && @ARGV == 1;
-die("usage: $0 [-debug] [-sip_output FILE] [-python_output FILE] headerfile\n")
-  unless GetOptions ("debug" => \$debug, "sip_output=s" => \$sip_output, "python_output=s" => \$python_output) && @ARGV == 1;
+die("usage: $0 [-debug] [-qt6] [-sip_output FILE] [-python_output FILE] headerfile\n")
+    unless GetOptions ("debug" => \$debug, "sip_output=s" => \$sip_output, "python_output=s" => \$python_output, "qt6" => \$is_qt6) && @ARGV == 1;
 my $headerfile = $ARGV[0];
 
 # read file
@@ -46,13 +55,19 @@ my $SIP_RUN = 0;
 my $HEADER_CODE = 0;
 my @ACCESS = (PUBLIC);
 my @CLASSNAME = ();
+my @CLASS_AND_STRUCT = ();
 my @DECLARED_CLASSES = ();
 my @EXPORTED = (0);
 my $MULTILINE_DEFINITION = MULTILINE_NO;
 my $ACTUAL_CLASS = '';
 my $PYTHON_SIGNATURE = '';
+my @ENUM_INT_TYPES = ();
+my @ENUM_INTFLAG_TYPES = ();
+my @ENUM_CLASS_NON_INT_TYPES = ();
+my @ENUM_MONKEY_PATCHED_TYPES = ();
 
 my $INDENT = '';
+my $PREV_INDENT = '';
 my $COMMENT = '';
 my $COMMENT_PARAM_LIST = 0;
 my $COMMENT_LAST_LINE_NOTE_WARNING = 0;
@@ -63,8 +78,9 @@ my @SKIPPED_PARAMS_REMOVE = ();
 my $GLOB_IFDEF_NESTING_IDX = 0;
 my @GLOB_BRACKET_NESTING_IDX = (0);
 my $PRIVATE_SECTION_LINE = '';
+my $LAST_ACCESS_SECTION_LINE = '';
 my $RETURN_TYPE = '';
-my $IS_OVERRIDE = 0;
+my $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_NO;
 my $IF_FEATURE_CONDITION = '';
 my $FOUND_SINCE = 0;
 my %QFLAG_HASH;
@@ -74,7 +90,426 @@ my $LINE_IDX = 0;
 my $LINE;
 my @OUTPUT = ();
 my @OUTPUT_PYTHON = ();
+my $DOXY_INSIDE_SIP_RUN = 0;
+my $HAS_PUSHED_FORCE_INT = 0;
 
+my @ALLOWED_NON_CLASS_ENUMS = (
+  "QgsSipifyHeader::MyEnum",
+  "QgsSipifyHeader::OneLiner",
+  "CadConstraint::LockMode",
+  "ColorrampTable",
+  "ElementType",
+  "LabelSettingsTable",
+  "Qgis::MessageLevel",
+  "Qgs3DMapScene::SceneState",
+  "Qgs3DTypes::CullingMode",
+  "Qgs3DTypes::Flag3DRenderer",
+  "QgsAbstractDatabaseProviderConnection::Capability",
+  "QgsAbstractDatabaseProviderConnection::GeometryColumnCapability",
+  "QgsAbstractFeatureIterator::CompileStatus",
+  "QgsAbstractGeometry::AxisOrder",
+  "QgsAbstractGeometry::SegmentationToleranceType",
+  "QgsAbstractGeometry::WkbFlag",
+  "QgsAbstractReportSection::SubSection",
+  "QgsAdvancedDigitizingDockWidget::CadCapacity",
+  "QgsAdvancedDigitizingDockWidget::WidgetSetMode",
+  "QgsApplication::Cursor",
+  "QgsApplication::StyleSheetType",
+  "QgsApplication::endian_t",
+  "QgsArrowSymbolLayer::ArrowType",
+  "QgsArrowSymbolLayer::HeadType",
+  "QgsAttributeEditorContext::FormMode",
+  "QgsAttributeEditorContext::Mode",
+  "QgsAttributeEditorContext::RelationMode",
+  "QgsAttributeEditorRelation::Button",
+  "QgsAttributeForm::FilterType",
+  "QgsAttributeForm::Mode",
+  "QgsAttributeFormWidget::Mode",
+  "QgsAttributeTableConfig::ActionWidgetStyle",
+  "QgsAttributeTableConfig::Type",
+  "QgsAttributeTableFilterModel::ColumnType",
+  "QgsAttributeTableFilterModel::FilterMode",
+  "QgsAuthCertUtils::CaCertSource",
+  "QgsAuthCertUtils::CertTrustPolicy",
+  "QgsAuthCertUtils::CertUsageType",
+  "QgsAuthCertUtils::ConstraintGroup",
+  "QgsAuthImportCertDialog::CertFilter",
+  "QgsAuthImportCertDialog::CertInput",
+  "QgsAuthImportIdentityDialog::BundleTypes",
+  "QgsAuthImportIdentityDialog::IdentityType",
+  "QgsAuthImportIdentityDialog::Validity",
+  "QgsAuthManager::MessageLevel",
+  "QgsAuthMethod::Expansion",
+  "QgsAuthSettingsWidget::WarningType",
+  "QgsBasicNumericFormat::RoundingType",
+  "QgsBearingNumericFormat::FormatDirectionOption",
+  "QgsBlockingNetworkRequest::ErrorCode",
+  "QgsBlurEffect::BlurMethod",
+  "QgsBookmarkManagerModel::Columns",
+  "QgsBrowserProxyModel::FilterSyntax",
+  "QgsCallout::AnchorPoint",
+  "QgsCallout::DrawOrder",
+  "QgsCallout::LabelAnchorPoint",
+  "QgsCheckBoxFieldFormatter::TextDisplayMethod",
+  "QgsClassificationLogarithmic::NegativeValueHandling",
+  "QgsClassificationMethod::ClassPosition",
+  "QgsClassificationMethod::MethodProperty",
+  "QgsClipper::Boundary",
+  "QgsColorButton::Behavior",
+  "QgsColorRampLegendNodeSettings::Direction",
+  "QgsColorRampShader::ClassificationMode",
+  "QgsColorRampShader::Type",
+  "QgsColorRampWidget::Orientation",
+  "QgsColorScheme::SchemeFlag",
+  "QgsColorTextWidget::ColorTextFormat",
+  "QgsColorWidget::ColorComponent",
+  "QgsCompoundColorWidget::Layout",
+  "QgsContrastEnhancement::ContrastEnhancementAlgorithm",
+  "QgsCoordinateFormatter::Format",
+  "QgsCoordinateFormatter::FormatFlag",
+  "QgsCoordinateReferenceSystem::CrsType",
+  "QgsCoordinateReferenceSystemProxyModel::Filter",
+  "QgsCptCityBrowserModel::ViewType",
+  "QgsCptCityDataItem::Type",
+  "QgsCurvedLineCallout::Orientation",
+  "QgsDartMeasurement::Type",
+  "QgsDataDefinedSizeLegend::LegendType",
+  "QgsDataDefinedSizeLegend::VerticalAlignment",
+  "QgsDataProvider::DataCapability",
+  "QgsDataProvider::ProviderProperty",
+  "QgsDataProvider::ReadFlag",
+  "QgsDataSourceUri::SslMode",
+  "QgsDiagramLayerSettings::LinePlacementFlag",
+  "QgsDiagramLayerSettings::Placement",
+  "QgsDiagramSettings::DiagramOrientation",
+  "QgsDiagramSettings::Direction",
+  "QgsDiagramSettings::LabelPlacementMethod",
+  "QgsDoubleSpinBox::ClearValueMode",
+  "QgsDualView::FeatureListBrowsingAction",
+  "QgsDualView::ViewMode",
+  "QgsDxfExport::DxfPolylineFlag",
+  "QgsDxfExport::Flag",
+  "QgsEditorWidgetWrapper::ConstraintResult",
+  "QgsEllipseSymbolLayer::Shape",
+  "QgsErrorMessage::Format",
+  "QgsExpression::ParserErrorType",
+  "QgsExpression::SpatialOperator",
+  "QgsExpressionBuilderWidget::Flag",
+  "QgsExpressionItem::ItemType",
+  "QgsExpressionNode::NodeType",
+  "QgsExpressionNodeBinaryOperator::BinaryOperator",
+  "QgsExpressionNodeUnaryOperator::UnaryOperator",
+  "QgsExtentGroupBox::ExtentState",
+  "QgsExtentWidget::ExtentState",
+  "QgsExtentWidget::WidgetStyle",
+  "QgsExternalResourceWidget::DocumentViewerContent",
+  "QgsFeatureListModel::Role",
+  "QgsFeatureListViewDelegate::Element",
+  "QgsFeatureRenderer::Capability",
+  "QgsFeatureSink::Flag",
+  "QgsFeatureSink::SinkFlag",
+  "QgsFetchedContent::ContentStatus",
+  "QgsFieldConstraints::Constraint",
+  "QgsFieldConstraints::ConstraintOrigin",
+  "QgsFieldConstraints::ConstraintStrength",
+  "QgsFieldFormatter::Flag",
+  "QgsFieldProxyModel::Filter",
+  "QgsFields::FieldOrigin",
+  "QgsFileWidget::RelativeStorage",
+  "QgsFileWidget::StorageMode",
+  "QgsFilterLineEdit::ClearMode",
+  "QgsFloatingWidget::AnchorPoint",
+  "QgsFontButton::Mode",
+  "QgsGeometryCheck::ChangeType",
+  "QgsGeometryCheck::ChangeWhat",
+  "QgsGeometryCheck::CheckType",
+  "QgsGeometryCheck::Flag",
+  "QgsGeometryCheckError::Status",
+  "QgsGeometryCheckError::ValueType",
+  "QgsGeometryEngine::EngineOperationResult",
+  "QgsGeometryRubberBand::IconType",
+  "QgsGeometrySnapper::SnapMode",
+  "QgsGlowEffect::GlowColorType",
+  "QgsGpsConnection::Status",
+  "QgsGraduatedSymbolRenderer::Mode",
+  "QgsGui::HigFlag",
+  "QgsGui::ProjectCrsBehavior",
+  "QgsHueSaturationFilter::GrayscaleMode",
+  "QgsIdentifyMenu::MenuLevel",
+  "QgsImageOperation::FlipType",
+  "QgsImageOperation::GrayscaleMode",
+  "QgsInterpolatedLineColor::ColoringMethod",
+  "QgsInterpolator::Result",
+  "QgsInterpolator::SourceType",
+  "QgsInterpolator::ValueSource",
+  "QgsKernelDensityEstimation::KernelShape",
+  "QgsKernelDensityEstimation::OutputValues",
+  "QgsKernelDensityEstimation::Result",
+  "QgsLabelingEngineSettings::Search",
+  "QgsLayerMetadataResultsModel::Roles",
+  "QgsLayerMetadataResultsModel::Sections",
+  "QgsLayerTreeLayer::LegendNodesSplitBehavior",
+  "QgsLayerTreeModel::Flag",
+  "QgsLayerTreeModelLegendNode::NodeTypes",
+  "QgsLayerTreeNode::NodeType",
+  "QgsLayout::UndoCommand",
+  "QgsLayout::ZValues",
+  "QgsLayoutAligner::Alignment",
+  "QgsLayoutAligner::Distribution",
+  "QgsLayoutAligner::Resize",
+  "QgsLayoutDesignerInterface::StandardTool",
+  "QgsLayoutExporter::ExportResult",
+  "QgsLayoutGridSettings::Style",
+  "QgsLayoutItem::ExportLayerBehavior",
+  "QgsLayoutItem::Flag",
+  "QgsLayoutItem::ReferencePoint",
+  "QgsLayoutItem::UndoCommand",
+  "QgsLayoutItemAbstractGuiMetadata::Flag",
+  "QgsLayoutItemAttributeTable::ContentSource",
+  "QgsLayoutItemHtml::ContentMode",
+  "QgsLayoutItemLabel::Mode",
+  "QgsLayoutItemMap::AtlasScalingMode",
+  "QgsLayoutItemMap::MapItemFlag",
+  "QgsLayoutItemMapGrid::AnnotationCoordinate",
+  "QgsLayoutItemMapGrid::AnnotationDirection",
+  "QgsLayoutItemMapGrid::AnnotationFormat",
+  "QgsLayoutItemMapGrid::AnnotationPosition",
+  "QgsLayoutItemMapGrid::BorderSide",
+  "QgsLayoutItemMapGrid::DisplayMode",
+  "QgsLayoutItemMapGrid::FrameSideFlag",
+  "QgsLayoutItemMapGrid::FrameStyle",
+  "QgsLayoutItemMapGrid::GridStyle",
+  "QgsLayoutItemMapGrid::GridUnit",
+  "QgsLayoutItemMapGrid::TickLengthMode",
+  "QgsLayoutItemMapItem::StackingPosition",
+  "QgsLayoutItemPage::Orientation",
+  "QgsLayoutItemPage::UndoCommand",
+  "QgsLayoutItemPicture::Format",
+  "QgsLayoutItemPicture::NorthMode",
+  "QgsLayoutItemPicture::ResizeMode",
+  "QgsLayoutItemPolyline::MarkerMode",
+  "QgsLayoutItemRegistry::ItemType",
+  "QgsLayoutItemShape::Shape",
+  "QgsLayoutManagerProxyModel::Filter",
+  "QgsLayoutModel::Columns",
+  "QgsLayoutMultiFrame::ResizeMode",
+  "QgsLayoutMultiFrame::UndoCommand",
+  "QgsLayoutNorthArrowHandler::NorthMode",
+  "QgsLayoutObject::PropertyValueType",
+  "QgsLayoutRenderContext::Flag",
+  "QgsLayoutTable::CellStyleGroup",
+  "QgsLayoutTable::EmptyTableMode",
+  "QgsLayoutTable::HeaderHAlignment",
+  "QgsLayoutTable::HeaderMode",
+  "QgsLayoutTable::WrapBehavior",
+  "QgsLayoutView::ClipboardOperation",
+  "QgsLayoutView::PasteMode",
+  "QgsLayoutViewTool::Flag",
+  "QgsLegendStyle::Side",
+  "QgsLegendStyle::Style",
+  "QgsLineSymbolLayer::RenderRingFilter",
+  "QgsLocatorFilter::Flag",
+  "QgsLocatorFilter::Priority",
+  "QgsManageConnectionsDialog::Mode",
+  "QgsManageConnectionsDialog::Type",
+  "QgsMapBoxGlStyleConverter::Result",
+  "QgsMapCanvasAnnotationItem::MouseMoveAction",
+  "QgsMapLayer::LayerFlag",
+  "QgsMapLayer::PropertyType",
+  "QgsMapLayer::ReadFlag",
+  "QgsMapLayer::StyleCategory",
+  "QgsMapLayerDependency::Origin",
+  "QgsMapLayerDependency::Type",
+  "QgsMapLayerElevationProperties::Flag",
+  "QgsMapRendererTask::ErrorType",
+  "QgsMapToPixelSimplifier::SimplifyAlgorithm",
+  "QgsMapToPixelSimplifier::SimplifyFlag",
+  "QgsMapTool::Flag",
+  "QgsMapToolCapture::Capability",
+  "QgsMapToolCapture::CaptureMode",
+  "QgsMapToolEdit::TopologicalResult",
+  "QgsMapToolIdentify::IdentifyMode",
+  "QgsMapToolIdentify::Type",
+  "QgsMarkerSymbolLayer::HorizontalAnchorPoint",
+  "QgsMarkerSymbolLayer::VerticalAnchorPoint",
+  "QgsMasterLayoutInterface::Type",
+  "QgsMediaWidget::Mode",
+  "QgsMergedFeatureRenderer::GeometryOperation",
+  "QgsMesh3DAveragingMethod::Method",
+  "QgsMeshCalculator::Result",
+  "QgsMeshDataBlock::DataType",
+  "QgsMeshDataProviderTemporalCapabilities::MatchingTemporalDatasetMethod",
+  "QgsMeshDatasetGroup::Type",
+  "QgsMeshDatasetGroupMetadata::DataType",
+  "QgsMeshDriverMetadata::MeshDriverCapability",
+  "QgsMeshRendererScalarSettings::DataResamplingMethod",
+  "QgsMeshRendererVectorArrowSettings::ArrowScalingMethod",
+  "QgsMeshRendererVectorSettings::Symbology",
+  "QgsMeshRendererVectorStreamlineSettings::SeedingStartPointsMethod",
+  "QgsMeshTimeSettings::TimeUnit",
+  "QgsMessageOutput::MessageType",
+  "QgsMetadataWidget::Mode",
+  "QgsModelArrowItem::Marker",
+  "QgsModelComponentGraphicItem::Flag",
+  "QgsModelComponentGraphicItem::State",
+  "QgsModelGraphicsScene::Flag",
+  "QgsModelGraphicsScene::ZValues",
+  "QgsModelGraphicsView::ClipboardOperation",
+  "QgsModelGraphicsView::PasteMode",
+  "QgsMultiEditToolButton::State",
+  "QgsNetworkRequestParameters::RequestAttributes",
+  "QgsNewGeoPackageLayerDialog::OverwriteBehavior",
+  "QgsNewHttpConnection::ConnectionType",
+  "QgsNewHttpConnection::Flag",
+  "QgsNewHttpConnection::WfsVersionIndex",
+  "QgsOfflineEditing::ContainerType",
+  "QgsOfflineEditing::ProgressMode",
+  "QgsOgcUtils::FilterVersion",
+  "QgsOgcUtils::GMLVersion",
+  "QgsPaintEffect::DrawMode",
+  "QgsPercentageNumericFormat::InputValues",
+  "QgsPictureSourceLineEditBase::Format",
+  "QgsPointCloud3DSymbol::RenderingStyle",
+  "QgsPointCloudAttribute::DataType",
+  "QgsPointCloudAttributeProxyModel::Filter",
+  "QgsPointCloudDataProvider::Capability",
+  "QgsPointCloudDataProvider::PointCloudIndexGenerationState",
+  "QgsPointDisplacementRenderer::Placement",
+  "QgsPointLocator::Type",
+  "QgsPreviewEffect::PreviewMode",
+  "QgsProcessing::SourceType",
+  "QgsProcessingAlgorithm::Flag",
+  "QgsProcessingAlgorithm::PropertyAvailability",
+  "QgsProcessingAlgorithmDialogBase::LogFormat",
+  "QgsProcessingContext::Flag",
+  "QgsProcessingContext::LogLevel",
+  "QgsProcessingFeatureSource::Flag",
+  "QgsProcessingGui::WidgetType",
+  "QgsProcessingParameterDateTime::Type",
+  "QgsProcessingParameterDefinition::Flag",
+  "QgsProcessingParameterField::DataType",
+  "QgsProcessingParameterFile::Behavior",
+  "QgsProcessingParameterNumber::Type",
+  "QgsProcessingParameterTinInputLayers::Type",
+  "QgsProcessingParameterType::ParameterFlag",
+  "QgsProcessingProvider::Flag",
+  "QgsProcessingToolboxModelNode::NodeType",
+  "QgsProcessingToolboxProxyModel::Filter",
+  "QgsProjectBadLayerHandler::DataType",
+  "QgsProjectBadLayerHandler::ProviderType",
+  "QgsProjectServerValidator::ValidationError",
+  "QgsProjectionSelectionWidget::CrsOption",
+  "QgsPropertyDefinition::DataType",
+  "QgsPropertyDefinition::StandardPropertyTemplate",
+  "QgsPropertyTransformer::Type",
+  "QgsProviderMetadata::ProviderCapability",
+  "QgsProviderMetadata::ProviderMetadataCapability",
+  "QgsProviderRegistry::WidgetMode",
+  "QgsQuadrilateral::ConstructionOption",
+  "QgsQuadrilateral::Point",
+  "QgsRasterCalcNode::Operator",
+  "QgsRasterCalcNode::Type",
+  "QgsRasterCalculator::Result",
+  "QgsRasterDataProvider::ProviderCapability",
+  "QgsRasterDataProvider::TransformType",
+  "QgsRasterFileWriter::RasterFormatOption",
+  "QgsRasterFormatSaveOptionsWidget::Type",
+  "QgsRasterInterface::Capability",
+  "QgsRasterLayerSaveAsDialog::CrsState",
+  "QgsRasterLayerSaveAsDialog::Mode",
+  "QgsRasterLayerSaveAsDialog::ResolutionState",
+  "QgsRasterMatrix::OneArgOperator",
+  "QgsRasterMatrix::TwoArgOperator",
+  "QgsRasterMinMaxOrigin::Extent",
+  "QgsRasterMinMaxOrigin::Limits",
+  "QgsRasterMinMaxOrigin::StatAccuracy",
+  "QgsRasterProjector::Precision",
+  "QgsRasterRange::BoundsType",
+  "QgsReadWriteLocker::Mode",
+  "QgsRegularPolygon::ConstructionOption",
+  "QgsRelationEditorWidget::Button",
+  "QgsRelationReferenceWidget::CanvasExtent",
+  "QgsRendererAbstractMetadata::LayerType",
+  "QgsReportSectionFieldGroup::SectionVisibility",
+  "QgsRubberBand::IconType",
+  "QgsRuleBasedRenderer::FeatureFlags",
+  "QgsSQLStatement::BinaryOperator",
+  "QgsSQLStatement::JoinType",
+  "QgsSQLStatement::NodeType",
+  "QgsSQLStatement::UnaryOperator",
+  "QgsScaleBarSettings::Alignment",
+  "QgsScaleBarSettings::LabelHorizontalPlacement",
+  "QgsScaleBarSettings::LabelVerticalPlacement",
+  "QgsScaleBarSettings::SegmentSizeMode",
+  "QgsSearchWidgetWrapper::FilterFlag",
+  "QgsServerOgcApi::ContentType",
+  "QgsServerOgcApi::Rel",
+  "QgsServerParameter::Name",
+  "QgsServerRequest::Method",
+  "QgsServerRequest::RequestHeader",
+  "QgsServerSettingsEnv::EnvVar",
+  "QgsServerSettingsEnv::Source",
+  "QgsServerWmsDimensionProperties::DefaultDisplay",
+  "QgsServerWmsDimensionProperties::PredefinedWmsDimensionName",
+  "QgsSettings::Section",
+  "QgsSimplifyMethod::MethodType",
+  "QgsSingleBandGrayRenderer::Gradient",
+  "QgsSizeScaleTransformer::ScaleType",
+  "QgsSnappingConfig::ScaleDependencyMode",
+  "QgsSnappingConfig::SnappingType",
+  "QgsSnappingUtils::IndexingStrategy",
+  "QgsSourceSelectProvider::Ordering",
+  "QgsSpatialIndex::Flag",
+  "QgsSpinBox::ClearValueMode",
+  "QgsStatusBar::Anchor",
+  "QgsStoredExpression::Category",
+  "QgsStyle::StyleEntity",
+  "QgsStyleExportImportDialog::Mode",
+  "QgsStyleModel::Column",
+  "QgsSublayersDialog::PromptMode",
+  "QgsSublayersDialog::ProviderType",
+  "QgsTask::Flag",
+  "QgsTask::SubTaskDependency",
+  "QgsTask::TaskStatus",
+  "QgsTemporalProperty::Flag",
+  "QgsTextBackgroundSettings::RotationType",
+  "QgsTextBackgroundSettings::ShapeType",
+  "QgsTextBackgroundSettings::SizeType",
+  "QgsTextDiagram::Orientation",
+  "QgsTextDiagram::Shape",
+  "QgsTextFormatWidget::Mode",
+  "QgsTextMaskSettings::MaskType",
+  "QgsTextShadowSettings::ShadowPlacement",
+  "QgsTicksScaleBarRenderer::TickPosition",
+  "QgsTinInterpolator::TinInterpolation",
+  "QgsTracer::PathError",
+  "QgsValidityCheckContext::ContextType",
+  "QgsValidityCheckResult::Type",
+  "QgsVectorDataProvider::Capability",
+  "QgsVectorFieldSymbolLayer::AngleOrientation",
+  "QgsVectorFieldSymbolLayer::AngleUnits",
+  "QgsVectorFieldSymbolLayer::VectorFieldType",
+  "QgsVectorFileWriter::ActionOnExistingFile",
+  "QgsVectorFileWriter::EditionCapability",
+  "QgsVectorFileWriter::FieldNameSource",
+  "QgsVectorFileWriter::OptionType",
+  "QgsVectorFileWriter::VectorFormatOption",
+  "QgsVectorFileWriter::WriterError",
+  "QgsVectorLayerDirector::Direction",
+  "QgsVectorLayerUtils::CascadedFeatureFlag",
+  "QgsVectorSimplifyMethod::SimplifyAlgorithm",
+  "QgsVectorSimplifyMethod::SimplifyHint",
+  "QgsVertexMarker::IconType",
+  "QgsWeakRelation::WeakRelationType",
+  "QgsWindowManagerInterface::StandardDialog",
+  "Rule::RegisterResult",
+  "Rule::RenderResult",
+  "SmartgroupTable",
+  "SymbolTable",
+  "TagTable",
+  "TagmapTable",
+  "TextFormatTable"
+);
 
 sub read_line {
     my $new_line = $INPUT_LINES[$LINE_IDX];
@@ -86,7 +521,7 @@ sub read_line {
                                   $GLOB_BRACKET_NESTING_IDX[$#GLOB_BRACKET_NESTING_IDX],
                                   $SIP_RUN,
                                   $MULTILINE_DEFINITION,
-                                  $IS_OVERRIDE,
+                                  $IS_OVERRIDE_OR_MAKE_PRIVATE,
                                   $ACTUAL_CLASS,
                                   $#CLASSNAME)." :: ".$new_line."\n";
    $new_line = replace_macros($new_line);
@@ -94,16 +529,24 @@ sub read_line {
 }
 
 sub write_output {
-    my ($dbg_code, $out) = @_;
+    my ($dbg_code, $out, $prepend) = @_;
+    $prepend //= "no";
     if ($debug == 1){
         $dbg_code = sprintf("%d %-4s :: ", $LINE_IDX, $dbg_code);
     }
     else{
         $dbg_code = '';
     }
-    push @OUTPUT, "%If ($IF_FEATURE_CONDITION)\n" if $IF_FEATURE_CONDITION ne '';
-    push @OUTPUT, $dbg_code.$out;
-    push @OUTPUT, "%End\n" if $IF_FEATURE_CONDITION ne '';
+    if ($prepend eq "prepend")
+    {
+       unshift @OUTPUT, $dbg_code . $out;
+    }
+    else
+    {
+      push @OUTPUT, "%If ($IF_FEATURE_CONDITION)\n" if $IF_FEATURE_CONDITION ne '';
+      push @OUTPUT, $dbg_code . $out;
+      push @OUTPUT, "%End\n" if $IF_FEATURE_CONDITION ne '';
+    }
     $IF_FEATURE_CONDITION = '';
 }
 
@@ -125,10 +568,12 @@ sub sip_header_footer {
     # otherwise "sip up to date" test fails. This is because the test uses %Include entries
     # and over there we have to use ./3d/X.h entries because SIP parser does not allow a number
     # as the first letter of a relative path
+    my $headerfile_x = $headerfile;
+    $headerfile_x =~ s/src\/core\/3d/src\/core\/.\/3d/;
     push @header_footer,  "/************************************************************************\n";
     push @header_footer,  " * This file has been generated automatically from                      *\n";
     push @header_footer,  " *                                                                      *\n";
-    push @header_footer, sprintf " * %-*s *\n", 68, $headerfile;
+    push @header_footer, sprintf " * %-*s *\n", 68, $headerfile_x;
     push @header_footer,  " *                                                                      *\n";
     push @header_footer,  " * Do not edit manually ! Edit header and run scripts/sipify.pl again   *\n";
     push @header_footer,  " ************************************************************************/\n";
@@ -137,23 +582,73 @@ sub sip_header_footer {
 
 sub python_header {
     my @header = ();
+    my $headerfile_x = $headerfile;
+    $headerfile_x =~ s/src\/core\/3d/src\/core\/.\/3d/;
     push @header, "# The following has been generated automatically from ";
-    push @header, sprintf "%s\n", $headerfile;
+    push @header, sprintf "%s\n", $headerfile_x;
     return @header;
+}
+
+sub create_class_links {
+    my $line = $_[0];
+
+    if ( $line =~ m/\b((?:Qgs[A-Z]\w+)|(?:Qgis))\b(\.?$|[^\w]{2})/) {
+        if ( defined $ACTUAL_CLASS && $1 !~ $ACTUAL_CLASS ) {
+            $line =~ s/\b(Qgs[A-Z]\w+)\b(\.?$|[^\w]{2})/:py:class:`$1`$2/g;
+        }
+    }
+    $line =~ s/\b(((?:Qgs[A-Z]\w+)|(?:Qgis))\.[a-z]\w+\(\))(?!\w)/:py:func:`$1`/g;
+    if ( defined $ACTUAL_CLASS && $ACTUAL_CLASS) {
+        $line =~ s/(?<!\.)\b(?:([a-z]\w+)\(\))(?!\w)/:py:func:`~$ACTUAL_CLASS.$1`/g;
+    }
+    else {
+        $line =~ s/(?<!\.)\b(?:([a-z]\w+)\(\))(?!\w)/:py:func:`~$1`/g;
+    }
+
+    if ( $line =~ m/\b(?<![`~])((?:Qgs[A-Z]\w+)|(?:Qgis))\b(?!\()/) {
+        if ( (!$ACTUAL_CLASS) || $1 ne $ACTUAL_CLASS ) {
+            $line =~ s/\b(?<![`~])((?:Qgs[A-Z]\w+)|(?:Qgis))\b(?!\()/:py:class:`$1`/g;
+        }
+    }
+
+    return $line;
 }
 
 sub processDoxygenLine {
     my $line = $_[0];
 
+    if ( $line =~ m/\s*#ifdef SIP_RUN/ ) {
+      $DOXY_INSIDE_SIP_RUN = 1;
+      return "";
+    }
+    elsif ( $line =~ m/\s*#ifndef SIP_RUN/ ) {
+      $DOXY_INSIDE_SIP_RUN = 2;
+      return "";
+    }
+    elsif ($DOXY_INSIDE_SIP_RUN != 0 && $line =~ m/\s*#else/ ) {
+      $DOXY_INSIDE_SIP_RUN = $DOXY_INSIDE_SIP_RUN == 1 ? 2 : 1;
+      return "";
+    }
+    elsif ($DOXY_INSIDE_SIP_RUN != 0 && $line =~ m/\s*#endif/ ) {
+      $DOXY_INSIDE_SIP_RUN = 0;
+      return "";
+    }
+
+    if ($DOXY_INSIDE_SIP_RUN == 2) {
+      return "";
+    }
+
     # detect code snippet
-    if ( $line =~ m/\\code(\{\.(\w+)\})?/ ) {
+    if ( $line =~ m/\\code(\{\.?(\w+)\})?/ ) {
         my $codelang = "";
         $codelang = " $2" if (defined $2);
+        $codelang =~ m/(cpp|py|unparsed)/ or exit_with_error("invalid code snippet format: $codelang");
         $COMMENT_CODE_SNIPPET = CODE_SNIPPET;
         $COMMENT_CODE_SNIPPET = CODE_SNIPPET_CPP if ($codelang =~ m/cpp/ );
         $codelang =~ s/py/python/;
+        $codelang =~ s/unparsed/raw/;
         return "\n" if ( $COMMENT_CODE_SNIPPET == CODE_SNIPPET_CPP );
-        return ".. code-block::$codelang\n\n";
+        return "\n.. code-block::$codelang\n\n";
     }
     if ( $line =~ m/\\endcode/ ) {
         $COMMENT_CODE_SNIPPET = 0;
@@ -161,6 +656,7 @@ sub processDoxygenLine {
     }
     if ($COMMENT_CODE_SNIPPET != 0){
         if ( $COMMENT_CODE_SNIPPET == CODE_SNIPPET_CPP ){
+            # cpp code is stripped out
             return "";
         } else {
             if ( $line ne ''){
@@ -180,18 +676,41 @@ sub processDoxygenLine {
     # replace nullptr with None (nullptr means nothing to Python devs)
     $line =~ s/\bnullptr\b/None/g;
 
+    if ( $line =~ m/^\\(?<SUB>sub)?section/) {
+      my $sep = "-";
+      $sep = "~" if defined $+{SUB};
+      $line =~ s/^\\(sub)?section \w+ //;
+      my $sep_line = $line =~ s/[\w ()]/$sep/gr;
+      $line .= "\n".$sep_line;
+    }
+
+    # convert ### style headings
+    if ( $line =~ m/^###\s+(.*)$/) {
+      $line = "$1\n".('-' x length($1));
+    }
+    if ( $line =~ m/^##\s+(.*)$/) {
+      $line = "$1\n".('=' x length($1));
+    }
+
     if ( $line eq '*' ) {
         $line = '';
     }
 
-    # if inside multi-line parameter, ensure additional lines are indented
+    # handle multi-line parameters/returns/lists
     if ($line ne '') {
-        if ( $line !~ m/^\s*[\\:]+(param|note|since|return|deprecated|warning)/ ) {
+        if ( $line =~ m/^\s*[\-#]/ ){
+            # start of a list item, ensure following lines are correctly indented
+            $line = "$PREV_INDENT$line";
+            $INDENT = $PREV_INDENT."  ";
+        }
+        elsif ( $line !~ m/^\s*[\\:]+(param|note|since|return|deprecated|warning|throws)/ ) {
+            # if inside multi-line parameter, ensure additional lines are indented
             $line = "$INDENT$line";
         }
     }
     else
     {
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
     }
     # replace \returns with :return:
@@ -230,17 +749,23 @@ sub processDoxygenLine {
     }
 
     if ( $line =~ m/[\\@](ingroup|class)/ ) {
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
         return "";
     }
     if ( $line =~ m/\\since .*?([\d\.]+)/i ) {
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
         $FOUND_SINCE = 1;
         return "\n.. versionadded:: $1\n";
     }
-    if ( $line =~ m/\\deprecated(.*)/i ) {
+    if ( $line =~ m/\\deprecated(?:\s+since\s+(?:QGIS\s+)(?<DEPR_VERSION>[0-9.]+)(,\s*)?)?(?<DEPR_MESSAGE>.*)?/i ) {
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
-        return "\n.. deprecated::$1\n";
+        my $depr_line = "\n.. deprecated::";
+        $depr_line .= " QGIS $+{DEPR_VERSION}" if (defined $+{DEPR_VERSION});
+        $depr_line .= "\n  $+{DEPR_MESSAGE}\n" if (defined $+{DEPR_MESSAGE});
+        return create_class_links($depr_line);
     }
 
     # create links in see also
@@ -274,26 +799,29 @@ sub processDoxygenLine {
             }
         }
     }
-    else
-    {
+    elsif ( $line !~ m/\\throws.*/ ) {
         # create links in plain text too (less performant)
-        if ( $line =~ m/\b(Qgs[A-Z]\w+)\b(\.?$|[^\w]{2})/) {
-            if ( defined $ACTUAL_CLASS && $1 !~ $ACTUAL_CLASS ) {
-                $line =~ s/\b(Qgs[A-Z]\w+)\b(\.?$|[^\w]{2})/:py:class:`$1`$2/g;
-            }
-        }
-        $line =~ s/\b(Qgs[A-Z]\w+\.[a-z]\w+\(\))(\.|\b|$)/:py:func:`$1`/g;
+        # we don't do this for "throws" lines, as Sphinx does not format these correctly
+        $line = create_class_links($line)
     }
 
     if ( $line =~ m/[\\@]note (.*)/ ) {
         $COMMENT_LAST_LINE_NOTE_WARNING = 1;
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
         return "\n.. note::\n\n   $1\n";
     }
     if ( $line =~ m/[\\@]warning (.*)/ ) {
+        $PREV_INDENT = $INDENT;
         $INDENT = '';
         $COMMENT_LAST_LINE_NOTE_WARNING = 1;
         return "\n.. warning::\n\n   $1\n";
+    }
+    if ( $line =~ m/[\\@]throws (.+?)\b\s*(.*)/ ) {
+        $PREV_INDENT = $INDENT;
+        $INDENT = '';
+        $COMMENT_LAST_LINE_NOTE_WARNING = 1;
+        return "\n:raises $1: $2\n";
     }
 
     if ( $line !~ m/^\s*$/ ){
@@ -311,7 +839,7 @@ sub detect_and_remove_following_body_or_initializerlist {
     # https://regex101.com/r/ZaP3tC/8
     my $python_signature = '';
     do {no warnings 'uninitialized';
-        if ( $LINE =~  m/^(\s*)?((?:(?:explicit|static|const|unsigned|virtual)\s+)*)(([\w:]+(<.*?>)?\s+[*&]?)?(~?\w+|(\w+::)?operator.{1,2})\s*\(([\w=()\/ ,&*<>."-]|::)*\)( +(?:const|SIP_[\w_]+?))*)\s*((\s*[:,]\s+\w+\(.*\))*\s*\{.*\}\s*(?:SIP_[\w_]+)?;?|(?!;))(\s*\/\/.*)?$/
+        if ( $LINE =~  m/^(\s*)?((?:(?:explicit|static|const|unsigned|virtual)\s+)*)(([(?:long )\w:]+(<.*?>)?\s+[*&]?)?(~?\w+|(\w+::)?operator.{1,2})\s*\(([\w=()\/ ,&*<>."-]|::)*\)( +(?:const|SIP_[\w_]+?))*)\s*((\s*[:,]\s+\w+\(.*\))*\s*\{.*\}\s*(?:SIP_[\w_]+)?;?|(?!;))(\s*\/\/.*)?$/
              || $LINE =~ m/SIP_SKIP\s*(?!;)\s*(\/\/.*)?$/
              || $LINE =~ m/^\s*class.*SIP_SKIP/ ){
             dbg_info("remove constructor definition, function bodies, member initializing list");
@@ -373,13 +901,22 @@ sub fix_annotations {
     my $line = $_[0];
 
     # get removed params to be able to drop them out of the API doc
-    if ( $line =~ m/(\w+)\s+SIP_PYARGREMOVE/ ){
-      push @SKIPPED_PARAMS_REMOVE, $1;
-      dbg_info("caught removed param: $SKIPPED_PARAMS_REMOVE[$#SKIPPED_PARAMS_REMOVE]");
+    if ( $line =~ m/(\w+)\s+SIP_PYARGREMOVE/){
+      my @removed_params = $line =~ m/(\w+)\s+SIP_PYARGREMOVE/g;
+      if ( $is_qt6 ){
+        my @removed_params = $line =~ m/(\w+)\s+SIP_PYARGREMOVE6{0,1}/g;
+      }
+      foreach ( @removed_params ) {
+        push @SKIPPED_PARAMS_REMOVE, $_;
+        dbg_info("caught removed param: $SKIPPED_PARAMS_REMOVE[$#SKIPPED_PARAMS_REMOVE]");
+      }
     }
     if ( $line =~ m/(\w+)\s+SIP_OUT/ ){
-      push @SKIPPED_PARAMS_OUT, $1;
-      dbg_info("caught removed param: $SKIPPED_PARAMS_OUT[$#SKIPPED_PARAMS_OUT]");
+      my @out_params = $line =~ m/(\w+)\s+SIP_OUT/g;
+      foreach ( @out_params ) {
+        push @SKIPPED_PARAMS_OUT, $_;
+        dbg_info("caught removed param: $SKIPPED_PARAMS_OUT[$#SKIPPED_PARAMS_OUT]");
+      }
     }
 
     # printed annotations
@@ -398,25 +935,27 @@ sub fix_annotations {
     $line =~ s/\bSIP_NODEFAULTCTORS\b/\/NoDefaultCtors\//;
     $line =~ s/\bSIP_OUT\b/\/Out\//g;
     $line =~ s/\bSIP_RELEASEGIL\b/\/ReleaseGIL\//;
+    $line =~ s/\bSIP_HOLDGIL\b/\/HoldGIL\//;
     $line =~ s/\bSIP_TRANSFER\b/\/Transfer\//g;
     $line =~ s/\bSIP_TRANSFERBACK\b/\/TransferBack\//;
     $line =~ s/\bSIP_TRANSFERTHIS\b/\/TransferThis\//;
     $line =~ s/\bSIP_GETWRAPPER\b/\/GetWrapper\//;
 
     $line =~ s/SIP_PYNAME\(\s*(\w+)\s*\)/\/PyName=$1\//;
-    $line =~ s/SIP_TYPEHINT\(\s*(\w+)\s*\)/\/TypeHint="$1"\//;
+    $line =~ s/SIP_TYPEHINT\(\s*([\w\.\s,\[\]]+?)\s*\)/\/TypeHint="$1"\//g;
     $line =~ s/SIP_VIRTUALERRORHANDLER\(\s*(\w+)\s*\)/\/VirtualErrorHandler=$1\//;
-    $line =~ s/SIP_THROW\(\s*(\w+)\s*\)/throw\( $1 \)/;
+    $line =~ s/SIP_THROW\(\s*([\w\s,]+?)\s*\)/throw\( $1 \)/;
 
     # combine multiple annotations
-    # https://regex101.com/r/uvCt4M/4
+    # https://regex101.com/r/uvCt4M/5
     do {no warnings 'uninitialized';
-        $line =~ s/\/([\w,]+(=\w+)?)\/\s*\/([\w,]+(=\w+)?)\//\/$1,$3\//;
+        $line =~ s/\/([\w,]+(=\"?[\w, [\]]+\"?)?)\/\s*\/([\w,]+(=\"?[\w, [\]]+\"?)?)\//\/$1,$3\//;
         (! $3) or dbg_info("combine multiple annotations -- works only for 2");
     };
 
     # unprinted annotations
     $line =~ s/(\w+)(\<(?>[^<>]|(?2))*\>)?\s+SIP_PYALTERNATIVETYPE\(\s*\'?([^()']+)(\(\s*(?:[^()]++|(?2))*\s*\))?\'?\s*\)/$3/g;
+    $line =~ s/(\w+)\s+SIP_PYARGRENAME\(\s*(\w+)\s*\)/$2/g;
     $line =~ s/=\s+[^=]*?\s+SIP_PYARGDEFAULT\(\s*\'?([^()']+)(\(\s*(?:[^()]++|(?2))*\s*\))?\'?\s*\)/= $1/g;
     # remove argument
     if ($line =~ m/SIP_PYARGREMOVE/){
@@ -435,7 +974,14 @@ sub fix_annotations {
             $line = "$prev_line $line\n";
         }
         # see https://regex101.com/r/5iNptO/4
-        $line =~ s/(?<coma>, +)?(const )?(\w+)(\<(?>[^<>]|(?4))*\>)?\s+[\w&*]+\s+SIP_PYARGREMOVE( = [^()]*(\(\s*(?:[^()]++|(?6))*\s*\))?)?(?(<coma>)|,?)//g;
+        if ( $is_qt6 ){
+          $line =~ s/(?<coma>, +)?(const )?(\w+)(\<(?>[^<>]|(?4))*\>)?\s+[\w&*]+\s+SIP_PYARGREMOVE6{0,1}( = [^()]*(\(\s*(?:[^()]++|(?6))*\s*\))?)?(?(<coma>)|,?)//g;
+        }
+        else {
+          $line =~ s/SIP_PYARGREMOVE6\s*//g;
+          $line =~ s/(?<coma>, +)?(const )?(\w+)(\<(?>[^<>]|(?4))*\>)?\s+[\w&*]+\s+SIP_PYARGREMOVE( = [^()]*(\(\s*(?:[^()]++|(?6))*\s*\))?)?(?(<coma>)|,?)//g;
+        }
+
         $line =~ s/\(\s+\)/()/;
     }
     $line =~ s/SIP_FORCE//;
@@ -449,6 +995,8 @@ sub fix_constants {
     $line =~ s/\bstd::numeric_limits<double>::max\(\)/DBL_MAX/g;
     $line =~ s/\bstd::numeric_limits<double>::lowest\(\)/-DBL_MAX/g;
     $line =~ s/\bstd::numeric_limits<double>::epsilon\(\)/DBL_EPSILON/g;
+    $line =~ s/\bstd::numeric_limits<qlonglong>::min\(\)/LLONG_MIN/g;
+    $line =~ s/\bstd::numeric_limits<qlonglong>::max\(\)/LLONG_MAX/g;
     $line =~ s/\bstd::numeric_limits<int>::max\(\)/INT_MAX/g;
     $line =~ s/\bstd::numeric_limits<int>::min\(\)/INT_MIN/g;
     return $line;
@@ -459,6 +1007,11 @@ sub replace_macros {
     $line =~ s/\bTRUE\b/``True``/g;
     $line =~ s/\bFALSE\b/``False``/g;
     $line =~ s/\bNULLPTR\b/``None``/g;
+    if ( $is_qt6 )
+    {
+        # sip for Qt6 chokes on QList/QVector<QVariantMap>, but is happy if you expand out the map explicitly
+        $line =~ s/(QList<\s*|QVector<\s*)QVariantMap/$1QMap<QString, QVariant>/g;
+    }
     return $line;
 }
 
@@ -469,6 +1022,7 @@ sub detect_comment_block{
     # dbg_info("detect comment strict:" . $args{strict_mode} );
     $COMMENT_PARAM_LIST = 0;
     $INDENT = '';
+    $PREV_INDENT = '';
     $COMMENT_CODE_SNIPPET = 0;
     $COMMENT_LAST_LINE_NOTE_WARNING = 0;
     $FOUND_SINCE = 0;
@@ -514,8 +1068,16 @@ while ($LINE_IDX < $LINE_COUNT){
         next;
     }
 
+    if ( $LINE =~ m/^(.*?)\s*\/\/\s*cppcheck-suppress.*$/ ){
+        $LINE = "$1";
+    }
+
     if ($LINE =~ m/^\s*SIP_FEATURE\( (\w+) \)(.*)$/){
         write_output("SF1", "%Feature $1$2\n");
+        next;
+    }
+    if ($LINE =~ m/^\s*SIP_PROPERTY\((.*)\)$/){
+        write_output("SF1", "%Property($1)\n");
         next;
     }
     if ($LINE =~ m/^\s*SIP_IF_FEATURE\( (\!?\w+) \)(.*)$/){
@@ -541,6 +1103,26 @@ while ($LINE_IDX < $LINE_COUNT){
         $IF_FEATURE_CONDITION = $1;
     }
 
+    if ( $is_qt6 ){
+        $LINE =~ s/int\s*__len__\s*\(\s*\)/Py_ssize_t __len__\(\)/;
+        $LINE =~ s/long\s*__hash__\s*\(\s*\)/Py_hash_t __hash__\(\)/;
+    }
+
+    # do not PYQT5 code if we are in qt6
+    if ( $is_qt6 && $LINE =~ m/^\s*#ifdef SIP_PYQT5_RUN/){
+        dbg_info("do not process PYQT5 code");
+        while ( $LINE !~ m/^#endif/ ){
+            $LINE = read_line();
+        }
+    }
+    # skip PYQT6 code if we are in qt5
+    if ( !$is_qt6 && $LINE =~ m/^\s*#ifdef SIP_PYQT6_RUN/){
+        dbg_info("do not process PYQT6 code");
+        while ( $LINE !~ m/^#endif/ ){
+            $LINE = read_line();
+        }
+    }
+
     # do not process SIP code %XXXCode
     if ( $SIP_RUN == 1 && $LINE =~ m/^ *% *(VirtualErrorHandler|MappedType|Type(?:Header)?Code|Module(?:Header)?Code|Convert(?:From|To)(?:Type|SubClass)Code|MethodCode|Docstring)(.*)?$/ ){
         $LINE = "%$1$2";
@@ -549,6 +1131,10 @@ while ($LINE_IDX < $LINE_COUNT){
         while ( $LINE !~ m/^ *% *End/ ){
             write_output("COD", $LINE."\n");
             $LINE = read_line();
+            if ( $is_qt6 ){
+              $LINE =~ s/SIP_SSIZE_T/Py_ssize_t/g;
+              $LINE =~ s/SIPLong_AsLong/PyLong_AsLong/g;
+            }
             $LINE =~ s/^ *% *(VirtualErrorHandler|MappedType|Type(?:Header)?Code|Module(?:Header)?Code|Convert(?:From|To)(?:Type|SubClass)Code|MethodCode|Docstring)(.*)?$/%$1$2/;
             $LINE =~ s/^\s*SIP_END(.*)$/%End$1/;
         }
@@ -561,6 +1147,14 @@ while ($LINE_IDX < $LINE_COUNT){
         $LINE = "%$1$2";
         $COMMENT = '';
         write_output("COD", $LINE."\n");
+        next;
+    }
+
+    # do not process SIP code %If %End
+    if ( $SIP_RUN == 1 && $LINE =~ m/^ *% (If|End)(.*)?$/ ){
+        $LINE = "%$1$2";
+        $COMMENT = '';
+        write_output("COD", $LINE);
         next;
     }
 
@@ -672,7 +1266,7 @@ while ($LINE_IDX < $LINE_COUNT){
     }
 
     # Skip forward declarations
-    if ($LINE =~ m/^\s*(enum\s+)?(class|struct) \w+(?<external> *SIP_EXTERNAL)?;\s*(\/\/.*)?$/){
+    if ($LINE =~ m/^\s*(template ?\<class T\> |enum\s+)?(class|struct) \w+(?<external> *SIP_EXTERNAL)?;\s*(\/\/.*)?$/){
         if ($+{external}){
             dbg_info('do not skip external forward declaration');
             $COMMENT = '';
@@ -688,7 +1282,7 @@ while ($LINE_IDX < $LINE_COUNT){
         next;
     }
 
-    # insert metaoject for Q_GADGET
+    # insert metaobject for Q_GADGET
     if ($LINE =~ m/^\s*Q_GADGET\b.*?$/){
         if ($LINE !~ m/SIP_SKIP/){
             dbg_info('Q_GADGET');
@@ -719,6 +1313,9 @@ while ($LINE_IDX < $LINE_COUNT){
 
     # Skip Q_OBJECT, Q_PROPERTY, Q_ENUM etc.
     if ($LINE =~ m/^\s*Q_(OBJECT|ENUMS|ENUM|FLAG|PROPERTY|DECLARE_METATYPE|DECLARE_TYPEINFO|NOWARN_DEPRECATED_(PUSH|POP))\b.*?$/){
+        next;
+    }
+    if ($LINE =~ m/^\s*QHASH_FOR_CLASS_ENUM/){
         next;
     }
 
@@ -766,8 +1363,9 @@ while ($LINE_IDX < $LINE_COUNT){
         next;
     }
 
-    if ( $LINE =~ m/^\s*struct(\s+\w+_EXPORT)?\s+\w+$/ ) {
+    if ( $LINE =~ m/^\s*struct(\s+\w+_EXPORT)?\s+(?<structname>\w+)$/ ) {
         dbg_info("  going to struct => public");
+        push @CLASS_AND_STRUCT, $+{structname};
         push @CLASSNAME, $CLASSNAME[$#CLASSNAME]; # fake new class since struct has considered similarly
         push @ACCESS, PUBLIC;
         push @EXPORTED, $EXPORTED[-1];
@@ -775,16 +1373,19 @@ while ($LINE_IDX < $LINE_COUNT){
     }
 
     # class declaration started
-    # https://regex101.com/r/6FWntP/10
-    if ( $LINE =~ m/^(\s*class)\s+([A-Z0-9_]+_EXPORT\s+)?(\w+)(\s*\:\s*(public|protected|private)\s+\w+(< *(\w|::)+ *>)?(::\w+(<\w+>)?)*(,\s*(public|protected|private)\s+\w+(< *(\w|::)+ *>)?(::\w+(<\w+>)?)*)*)?(?<annot>\s*\/?\/?\s*SIP_\w+)?\s*?(\/\/.*|(?!;))$/ ){
+    # https://regex101.com/r/KMQdF5/1 (older versions: https://regex101.com/r/6FWntP/16)
+    if ( $LINE =~ m/^(\s*(class))\s+([A-Z0-9_]+_EXPORT\s+)?(Q_DECL_DEPRECATED\s+)?(?<classname>\w+)(?<domain>\s*\:\s*(public|protected|private)\s+\w+(< *(\w|::)+ *(, *(\w|::)+ *)*>)?(::\w+(<(\w|::)+(, *(\w|::)+)*>)?)*(,\s*(public|protected|private)\s+\w+(< *(\w|::)+ *(, *(\w|::)+)*>)?(::\w+(<\w+(, *(\w|::)+)?>)?)*)*)?(?<annot>\s*\/?\/?\s*SIP_\w+)?\s*?(\/\/.*|(?!;))$/ ){
         dbg_info("class definition started");
         push @ACCESS, PUBLIC;
         push @EXPORTED, 0;
         push @GLOB_BRACKET_NESTING_IDX, 0;
         my @template_inheritance_template = ();
-        my @template_inheritance_class = ();
+        my @template_inheritance_class1 = ();
+        my @template_inheritance_class2 = ();
+        my @template_inheritance_class3 = ();
         do {no warnings 'uninitialized';
-            push @CLASSNAME, $3;
+            push @CLASSNAME, $+{classname};
+            push @CLASS_AND_STRUCT, $+{classname};
             if ($#CLASSNAME == 0){
                 # might be worth to add in-class classes later on
                 # in case of a tamplate based class declaration
@@ -792,27 +1393,36 @@ while ($LINE_IDX < $LINE_COUNT){
                 push @DECLARED_CLASSES, $CLASSNAME[$#CLASSNAME];
             }
             dbg_info("class: ".$CLASSNAME[$#CLASSNAME]);
-            if ($LINE =~ m/\b[A-Z0-9_]+_EXPORT\b/ || $#CLASSNAME != 0 || $INPUT_LINES[$LINE_IDX-2] =~ m/^\s*template</){
+            if ($LINE =~ m/\b[A-Z0-9_]+_EXPORT\b/ || $#CLASSNAME != 0 || $INPUT_LINES[$LINE_IDX-2] =~ m/^\s*template\s*</){
                 # class should be exported except those not at top level or template classes
                 # if class is not exported, then its methods should be (checked whenever leaving out the class)
                 $EXPORTED[-1]++;
             }
         };
-        $LINE = "$1 $3";
+        $LINE = "$1 $+{classname}";
         # Inheritance
-        if ($4){
-            my $m = $4;
+        if (defined $+{domain}){
+            my $m = $+{domain};
             $m =~ s/public +(\w+, *)*(Ui::\w+,? *)+//g; # remove Ui::xxx public inheritance as the namespace is causing troubles
             $m =~ s/public +//g;
             $m =~ s/[,:]?\s*private +\w+(::\w+)?//g;
+
             # detect template based inheritance
-            while ($m =~ /[,:]\s+((?!QList)\w+)< *((\w|::)+) *>/g){
+            # https://regex101.com/r/9LGhyy/1
+            while ($m =~ /[,:]\s+(?<tpl>(?!QList)\w+)< *(?<cls1>(\w|::)+) *(, *(?<cls2>(\w|::)+)? *(, *(?<cls3>(\w|::)+)? *)?)? *>/g){
                 dbg_info("template class");
-                push @template_inheritance_template, $1;
-                push @template_inheritance_class, $2;
+                push @template_inheritance_template, $+{tpl};
+                push @template_inheritance_class1, $+{cls1};
+                push @template_inheritance_class2, $+{cls2} // "";
+                push @template_inheritance_class3, $+{cls3} // "";
+                # dbg_info("template classes (max 3): $+{cls1} $+{cls2} $+{cls3}");
             }
-            $m =~ s/(\b(?!QList)\w+)< *((?:\w|::)+) *>/$1${2}Base/g; # use the typeded as template inheritance
-            $m =~ s/(\w+)< *((?:\w|::)+) *>//g; # remove remaining templates
+            dbg_info("domain: $m");
+            do {no warnings 'uninitialized';
+              # https://regex101.com/r/nOLg2r/1
+              $m =~ s/\b(?<tpl>(?!QList)\w+)< *(?<cls1>(\w|::)+) *(, *(?<cls2>(\w|::)+)? *(, *(?<cls3>(\w|::)+)? *)?)? *>/$+{tpl}$+{cls1}$+{cls2}$+{cls3}Base/g; # use the typeded as template inheritance
+            };
+            $m =~ s/(\w+)< *(?:\w|::)+ *>//g; # remove remaining templates
             $m =~ s/([:,])\s*,/$1/g;
             $m =~ s/(\s*[:,])?\s*$//;
             $LINE .= $m;
@@ -825,7 +1435,7 @@ while ($LINE_IDX < $LINE_COUNT){
 
         $LINE .= "\n{\n";
         if ( $COMMENT !~ m/^\s*$/ ){
-            $LINE .= "%Docstring\n$COMMENT\n%End\n";
+            $LINE .= "%Docstring(signature=\"appended\")\n$COMMENT\n%End\n";
         }
         $LINE .= "\n%TypeHeaderCode\n#include \"" . $headerfile . "\"";
         # for template based inheritance, add a typedef to define the base type
@@ -834,18 +1444,32 @@ while ($LINE_IDX < $LINE_COUNT){
         # see https://www.riverbankcomputing.com/pipermail/pyqt/2015-May/035893.html
         while ( @template_inheritance_template ) {
             my $tpl = pop @template_inheritance_template;
-            my $cls = pop @template_inheritance_class;
-            $LINE = "\ntypedef $tpl<$cls> ${tpl}${cls}Base;\n\n$LINE";
-            if ( not $tpl ~~ @DECLARED_CLASSES ){
+            my $cls1 = pop @template_inheritance_class1;
+            my $cls2 = pop @template_inheritance_class2;
+            my $cls3 = pop @template_inheritance_class3;
+            if ( $cls2 eq ""){
+              $LINE = "\ntypedef $tpl<$cls1> ${tpl}${cls1}Base;\n\n$LINE";
+            } elsif ( $cls3 eq ""){
+              $LINE = "\ntypedef $tpl<$cls1,$cls2> ${tpl}${cls1}${cls2}Base;\n\n$LINE";
+            } else {
+              $LINE = "\ntypedef $tpl<$cls1,$cls2,$cls3> ${tpl}${cls1}${cls2}${cls3}Base;\n\n$LINE";
+            }
+            if ( none { $_ eq $tpl } @DECLARED_CLASSES ){
                 my $tpl_header = lc $tpl . ".h";
                 if ( exists $SIP_CONFIG->{class_headerfile}->{$tpl} ){
                     $tpl_header = $SIP_CONFIG->{class_headerfile}->{$tpl};
                 }
                 $LINE .= "\n#include \"" . $tpl_header . "\"";
             }
-            $LINE .= "\ntypedef $tpl<$cls> ${tpl}${cls}Base;";
+            if ( $cls2 eq ""){
+              $LINE .= "\ntypedef $tpl<$cls1> ${tpl}${cls1}Base;";
+            } elsif ( $cls3 eq ""){
+              $LINE .= "\ntypedef $tpl<$cls1,$cls2> ${tpl}${cls1}${cls2}Base;";
+            } else {
+              $LINE .= "\ntypedef $tpl<$cls1,$cls2,$cls3> ${tpl}${cls1}${cls2}${cls3}Base;";
+            }
         }
-        if ( PRIVATE ~~ @ACCESS && $#ACCESS != 0){
+        if ( ( any{ $_ == PRIVATE } @ACCESS ) && $#ACCESS != 0){
             # do not write anything in PRIVATE context and not top level
             dbg_info("skipping class in private context");
             next;
@@ -878,13 +1502,14 @@ while ($LINE_IDX < $LINE_COUNT){
                     pop(@GLOB_BRACKET_NESTING_IDX);
                     pop(@ACCESS);
                     exit_with_error("Class $CLASSNAME[$#CLASSNAME] should be exported with appropriate [LIB]_EXPORT macro. If this should not be available in python, wrap it in a `#ifndef SIP_RUN` block.")
-                        if $EXPORTED[-1] == 0 and not $CLASSNAME[$#CLASSNAME] ~~ $SIP_CONFIG->{no_export_macro};
+                        if $EXPORTED[-1] == 0 and ($CLASSNAME[$#CLASSNAME] ne $SIP_CONFIG->{no_export_macro});
                     pop @EXPORTED;
                 }
                 pop(@CLASSNAME);
+                pop(@CLASS_AND_STRUCT);
                 if ($#ACCESS == 0){
                     dbg_info("reached top level");
-                    # top level should stasy public
+                    # top level should stay public
                     $ACCESS[$#ACCESS] = PUBLIC;
                 }
                 $COMMENT = '';
@@ -898,6 +1523,7 @@ while ($LINE_IDX < $LINE_COUNT){
     # Private members (exclude SIP_RUN)
     if ( $LINE =~ m/^\s*private( slots)?:/ ){
         $ACCESS[$#ACCESS] = PRIVATE;
+        $LAST_ACCESS_SECTION_LINE = $LINE;
         $PRIVATE_SECTION_LINE = $LINE;
         $COMMENT = '';
         dbg_info("going private");
@@ -905,11 +1531,13 @@ while ($LINE_IDX < $LINE_COUNT){
     }
     elsif ( $LINE =~ m/^\s*(public( slots)?|signals):.*$/ ){
         dbg_info("going public");
+        $LAST_ACCESS_SECTION_LINE = $LINE;
         $ACCESS[$#ACCESS] = PUBLIC;
         $COMMENT = '';
     }
     elsif ( $LINE =~ m/^\s*(protected)( slots)?:.*$/ ){
         dbg_info("going protected");
+        $LAST_ACCESS_SECTION_LINE = $LINE;
         $ACCESS[$#ACCESS] = PROTECTED;
         $COMMENT = '';
     }
@@ -918,7 +1546,7 @@ while ($LINE_IDX < $LINE_COUNT){
         write_output("PRV3", $PRIVATE_SECTION_LINE."\n") if $PRIVATE_SECTION_LINE ne '';
         $PRIVATE_SECTION_LINE = '';
     }
-    elsif ( PRIVATE ~~ @ACCESS && $SIP_RUN == 0 ) {
+    elsif ( ( any{ $_ == PRIVATE } @ACCESS ) && $SIP_RUN == 0 ) {
         $COMMENT = '';
         next;
     }
@@ -934,6 +1562,7 @@ while ($LINE_IDX < $LINE_COUNT){
         if ( $LINE =~ m/^\s*\/\// ){
             if ($LINE =~ m/^\s*\/\/\!\s*(.*?)\n?$/){
                 $COMMENT_PARAM_LIST = 0;
+                $PREV_INDENT = $INDENT;
                 $INDENT = '';
                 $COMMENT_LAST_LINE_NOTE_WARNING = 0;
                 $COMMENT = processDoxygenLine( $1 );
@@ -946,21 +1575,80 @@ while ($LINE_IDX < $LINE_COUNT){
         }
     }
 
+    if ( $is_qt6 eq 1 and $LINE =~ m/^\s*Q_DECLARE_FLAGS\s*\(\s*(?<flags_name>\w+)\s*,\s*(?<flag_name>\w+)\s*\)/ ){
+        # In PyQt6 Flags are mapped to Python enum flag and the plural doesn't exist anymore
+        # https://www.riverbankcomputing.com/static/Docs/PyQt6/pyqt5_differences.html
+        # So we mock it to avoid API break
+        push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$+{flags_name} = lambda flags=0: $ACTUAL_CLASS.$+{flag_name}(flags)\n";
+    }
+
     # Enum declaration
     # For scoped and type based enum, the type has to be removed
-    if ( $LINE =~ m/^(\s*enum\s+(class\s+)?(\w+))(:?\s+SIP_.*)?(\s*:\s*\w+)?(?<oneliner>.*)$/ ){
-        write_output("ENU1", "$1");
-        write_output("ENU1", $+{oneliner}) if defined $+{oneliner};
-        write_output("ENU1", "\n");
-        my $enum_qualname = $3;
+    if ( $LINE =~ m/^\s*Q_DECLARE_FLAGS\s*\(\s*(?<flags_name>\w+)\s*,\s*(?<flag_name>\w+)\s*\)\s*SIP_MONKEYPATCH_FLAGS_UNNEST\s*\(\s*(?<emkb>\w+)\s*,\s*(?<emkf>\w+)\s*\)\s*$/ ){
+        if ("$+{emkb}.$+{emkf}" ne "$ACTUAL_CLASS.$+{flags_name}" ) {
+          push @OUTPUT_PYTHON, "$+{emkb}.$+{emkf} = $ACTUAL_CLASS.$+{flags_name}\n";
+        }
+        push @ENUM_MONKEY_PATCHED_TYPES, [$ACTUAL_CLASS, $+{flags_name}, $+{emkb}, $+{emkf}];
+
+        $LINE =~ s/\s*SIP_MONKEYPATCH_FLAGS_UNNEST\(.*?\)//;
+    }
+    if ( $LINE =~ m/^(\s*enum(\s+Q_DECL_DEPRECATED)?\s+(?<isclass>class\s+)?(?<enum_qualname>\w+))(:?\s+SIP_[^:]*)?(\s*:\s*(?<enum_type>\w+))?(?:\s*SIP_ENUM_BASETYPE\s*\(\s*(?<py_enum_type>\w+)\s*\))?(?<oneliner>.*)$/ ){
+        my $enum_decl = $1;
+        my $enum_qualname = $+{enum_qualname};
+        my $enum_type = $+{enum_type};
+        my $isclass = $+{isclass};
+        my $enum_cpp_name = (defined $ACTUAL_CLASS and $ACTUAL_CLASS) ? ($ACTUAL_CLASS."::$enum_qualname") : "$enum_qualname";
+        if (not defined $isclass and none { $_ eq $enum_cpp_name } @ALLOWED_NON_CLASS_ENUMS ) {
+          exit_with_error("Non class enum exposed to Python -- must be a enum class: $enum_cpp_name");
+        }
+        my $oneliner = $+{oneliner};
         my $is_scope_based = "0";
-        $is_scope_based = "1" if defined $2;
+        $is_scope_based = "1" if defined $isclass;
+        $enum_decl =~ s/\s*\bQ_DECL_DEPRECATED\b//;
+        my $py_enum_type;
+        if ( $LINE =~ m/SIP_ENUM_BASETYPE\(\s*(.*?)\s*\)/ ) {
+           $py_enum_type = $1;
+        }
+        if (defined $py_enum_type and $py_enum_type eq "IntFlag") {
+          push @ENUM_INTFLAG_TYPES, $enum_cpp_name;
+        }
+        if (defined $enum_type and ($enum_type eq "int" or $enum_type eq "quint32")) {
+          push @ENUM_INT_TYPES, "$ACTUAL_CLASS.$enum_qualname";
+          if ( $is_qt6 eq 1 ) {
+            if (defined $py_enum_type) {
+              $enum_decl .= " /BaseType=$py_enum_type/"
+            } else {
+              $enum_decl .= " /BaseType=IntEnum/"
+            }
+          }
+        } elsif (defined $enum_type) {
+          exit_with_error("Unhandled enum type $enum_type for $enum_cpp_name");
+        } elsif (defined $isclass) {
+          push @ENUM_CLASS_NON_INT_TYPES, "$ACTUAL_CLASS.$enum_qualname";
+        } elsif ($is_qt6 eq 1) {
+          # non class enum in qt6 -- we always want these to be IntEnums
+          # for compatibility with qt5 code
+          $enum_decl .= " /BaseType=IntEnum/"
+        }
+
+        write_output("ENU1", "$enum_decl");
+        write_output("ENU1", $oneliner) if defined $oneliner;
+        write_output("ENU1", "\n");
+
         my $monkeypatch = "0";
         $monkeypatch = "1" if defined $is_scope_based eq "1" and $LINE =~ m/SIP_MONKEYPATCH_SCOPEENUM(_UNNEST)?(:?\(\s*(?<emkb>\w+)\s*,\s*(?<emkf>\w+)\s*\))?/;
         my $enum_mk_base = "";
         $enum_mk_base = $+{emkb} if defined $+{emkb};
+        my $enum_old_name = "";
         if (defined $+{emkf} and $monkeypatch eq "1"){
+          $enum_old_name = $+{emkf};
+          if ( $ACTUAL_CLASS ne "" ) {
+            if ($enum_mk_base.$+{emkf} ne $ACTUAL_CLASS.$enum_qualname) {
+              push @OUTPUT_PYTHON, "$enum_mk_base.$+{emkf} = $ACTUAL_CLASS.$enum_qualname\n";
+            }
+          } else {
             push @OUTPUT_PYTHON, "$enum_mk_base.$+{emkf} = $enum_qualname\n";
+          }
         }
         if ($LINE =~ m/\{((\s*\w+)(\s*=\s*[\w\s\d<|]+.*?)?(,?))+\s*\}/){
           # one line declaration
@@ -983,23 +1671,69 @@ while ($LINE_IDX < $LINE_COUNT){
                 next if ($LINE =~ m/^\s*\w+\s*\|/); # multi line declaration as sum of enums
 
                 do {no warnings 'uninitialized';
-                    my $enum_decl = $LINE =~ s/^(\s*(?<em>\w+))(\s+SIP_\w+(?:\([^()]+\))?)?(?:\s*=\s*(?:[\w\s\d|+-]|::|<<)+)?(,?)(:?\s*\/\/!<\s*(?<co>.*)|.*)$/$1$3$4/r;
+                    my $enum_decl = $LINE =~ s/^(\s*(?<em>\w+))(\s+SIP_PYNAME(?:\(\s*(?<pyname>[^() ]+)\s*\)\s*)?)?(\s+SIP_MONKEY\w+(?:\(\s*(?<compat>[^() ]+)\s*\)\s*)?)?(?:\s*=\s*(?<enum_value>(:?[\w\s\d|+-]|::|<<)+))?(?<optional_comma>,?)(:?\s*\/\/!<\s*(?<co>.*)|.*)$/$1$3$+{optional_comma}/r;
                     my $enum_member = $+{em};
                     my $comment = $+{co};
+                    my $compat_name = $+{compat} ? $+{compat} : $enum_member;
+                    my $enum_value = $+{enum_value};
+                    # replace :: with . (changes c++ style namespace/class directives to Python style)
+                    $comment =~ s/::/./g;
+                    $comment =~ s/\"/\\"/g;
+                    $comment =~ s/\\since .*?([\d\.]+)/\\n.. versionadded:: $1\\n/i;
+                    $comment =~ s/\\deprecated (.*)/\\n.. deprecated:: $1\\n/i;
+                    $comment =~ s/^\\n+//;
+                    $comment =~ s/\\n+$//;
                     dbg_info("is_scope_based:$is_scope_based enum_mk_base:$enum_mk_base monkeypatch:$monkeypatch");
+                    if ( defined $enum_value and ($enum_value =~ m/.*\<\<.*/ or $enum_value =~ m/.*0x0.*/)) {
+                       if (none { $_ eq "${ACTUAL_CLASS}::$enum_qualname" } @ENUM_INTFLAG_TYPES) {
+                         exit_with_error("${ACTUAL_CLASS}::$enum_qualname is a flags type, but was not declared with IntFlag type. Add 'SIP_ENUM_BASETYPE(IntFlag)' to the enum class declaration line");
+                      }
+                    }
                     if ($is_scope_based eq "1" and $enum_member ne "") {
                         if ( $monkeypatch eq 1 and $enum_mk_base ne ""){
-		                    push @OUTPUT_PYTHON, "$enum_mk_base.$enum_member = $enum_qualname.$enum_member\n";
-		                    push @OUTPUT_PYTHON, "$enum_mk_base.$enum_member.__doc__ = \"$comment\"\n" ;
-		                    push @enum_members_doc, "'* ``$enum_member``: ' + $enum_qualname.$enum_member.__doc__";
+                          if ( $ACTUAL_CLASS ne "" ) {
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name = $ACTUAL_CLASS.$enum_qualname.$enum_member\n";
+                            if ( $enum_old_name && $compat_name ne $enum_member )
+                            {
+                              push @OUTPUT_PYTHON, "$enum_mk_base.$enum_old_name.$compat_name = $ACTUAL_CLASS.$enum_qualname.$enum_member\n";
+                            }
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name.is_monkey_patched = True\n";
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name.__doc__ = \"$comment\"\n";
+                            push @enum_members_doc, "'* ``$compat_name``: ' + $ACTUAL_CLASS.$enum_qualname.$enum_member.__doc__";
+                          } else {
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name = $enum_qualname.$enum_member\n";
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name.is_monkey_patched = True\n";
+                            push @OUTPUT_PYTHON, "$enum_mk_base.$compat_name.__doc__ = \"$comment\"\n";
+                            push @enum_members_doc, "'* ``$compat_name``: ' + $enum_qualname.$enum_member.__doc__";
+                          }
                         } else {
                             if ( $monkeypatch eq 1 )
                             {
-                                push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$enum_member = $ACTUAL_CLASS.$enum_qualname.$enum_member\n";
+                                my $complete_class_path = join('.', @CLASSNAME);
+                                push @OUTPUT_PYTHON, "$complete_class_path.$compat_name = $complete_class_path.$enum_qualname.$enum_member\n";
+                                push @OUTPUT_PYTHON, "$complete_class_path.$compat_name.is_monkey_patched = True\n";
                             }
-                            push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$enum_qualname.$enum_member.__doc__ = \"$comment\"\n";
-                            push @enum_members_doc, "'* ``$enum_member``: ' + $ACTUAL_CLASS.$enum_qualname.$enum_member.__doc__";
+                            if ( $ACTUAL_CLASS ne "" ){
+                                my $complete_class_path = join('.', @CLASSNAME);
+                                push @OUTPUT_PYTHON, "$complete_class_path.$enum_qualname.$compat_name.__doc__ = \"$comment\"\n";
+                                push @enum_members_doc, "'* ``$compat_name``: ' + $complete_class_path.$enum_qualname.$enum_member.__doc__";
+                            } else {
+                                push @OUTPUT_PYTHON, "$enum_qualname.$compat_name.__doc__ = \"$comment\"\n";
+                                push @enum_members_doc, "'* ``$compat_name``: ' + $enum_qualname.$enum_member.__doc__";
+                            }
                         }
+                    }
+
+                    if ( $is_scope_based eq "0" and $is_qt6 eq 1 and $enum_member ne "" )
+                    {
+                      my $basename = join( ".", @CLASS_AND_STRUCT );
+                      if ( $basename ne "" ){
+                        $enum_member =~ s/^None$/None_/;
+
+                        # With PyQt6, you have to specify the scope to access the enum: https://www.riverbankcomputing.com/static/Docs/PyQt5/gotchas.html#enums
+                        # so we mock
+                        push @OUTPUT_PYTHON, "$basename.$enum_member = $basename.$enum_qualname.$enum_member\n";
+                      }
                     }
                     $enum_decl = fix_annotations($enum_decl);
                     write_output("ENU3", "$enum_decl\n");
@@ -1009,8 +1743,10 @@ while ($LINE_IDX < $LINE_COUNT){
             write_output("ENU4", "$LINE\n");
             if ($is_scope_based eq "1") {
                 $COMMENT =~ s/\n/\\n/g;
+                $COMMENT =~ s/\"/\\"/g;
                 if ( $ACTUAL_CLASS ne "" ){
-                    push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$enum_qualname.__doc__ = '$COMMENT\\n\\n' + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
+                    my $complete_class_path = join('.', @CLASSNAME);
+                    push @OUTPUT_PYTHON, "$complete_class_path.$enum_qualname.__doc__ = \"$COMMENT\\n\\n\" + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
                 } else {
                     push @OUTPUT_PYTHON, "$enum_qualname.__doc__ = '$COMMENT\\n\\n' + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
                 }
@@ -1021,19 +1757,31 @@ while ($LINE_IDX < $LINE_COUNT){
         }
     }
 
-    $IS_OVERRIDE = 1 if ( $LINE =~ m/\boverride\b/);
-    $IS_OVERRIDE = 1 if ( $LINE =~ m/\bFINAL\b/);
+    if( $LINE =~ /.*\/\/\!\</ ) {
+      exit_with_error("\"\\\\!<\" doxygen command must only be used for enum documentation")
+    }
+
+    $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_VIRTUAL if ( $LINE =~ m/\boverride\b/);
+    $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_VIRTUAL if ( $LINE =~ m/\bFINAL\b/);
+    $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_MAKE_PRIVATE if ( $LINE =~ m/\bSIP_MAKE_PRIVATE\b/);
+
+    # remove Q_INVOKABLE
+    $LINE =~ s/^(\s*)Q_INVOKABLE /$1/;
 
     # keyword fixes
     do {no warnings 'uninitialized';
         $LINE =~ s/^(\s*template\s*<)(?:class|typename) (\w+>)(.*)$/$1$2$3/;
+        $LINE =~ s/^(\s*template\s*<)(?:class|typename) (\w+) *, *(?:class|typename) (\w+>)(.*)$/$1$2,$3$4/;
+        # https://regex101.com/r/EB1mpx/1
+        $LINE =~ s/^(\s*template\s*<)(?:class|typename) (\w+) *, *(?:class|typename) (\w+) *, *(?:class|typename) (\w+>)(.*)$/$1$2,$3,$4$5/;
         $LINE =~ s/\s*\boverride\b//;
+        $LINE =~ s/\s*\bSIP_MAKE_PRIVATE\b//;
         $LINE =~ s/\s*\bFINAL\b/ \${SIP_FINAL}/;
         $LINE =~ s/\s*\bextern \b//;
         $LINE =~ s/\s*\bMAYBE_UNUSED \b//;
         $LINE =~ s/\s*\bNODISCARD \b//;
         $LINE =~ s/\s*\bQ_DECL_DEPRECATED\b//;
-        $LINE =~ s/^(\s*)?(const )?(virtual |static )?inline /$1$2$3/;
+        $LINE =~ s/^(\s*)?(const |virtual |static )*inline /$1$2/;
         $LINE =~ s/\bconstexpr\b/const/;
         $LINE =~ s/\bnullptr\b/0/g;
         $LINE =~ s/\s*=\s*default\b//g;
@@ -1067,51 +1815,96 @@ while ($LINE_IDX < $LINE_COUNT){
         }
     };
 
-    $LINE = fix_constants($LINE);
-
     # remove struct member assignment
-    # https://regex101.com/r/tWRGkY/2
-    if ( $SIP_RUN != 1 && $ACCESS[$#ACCESS] == PUBLIC && $LINE =~ m/^(\s*\w+[\w<> *&:,]* \*?\w+) = [\-\w\:\.]+(<\w+( \*)?>)?(\([^()]*\))?\s*;/ ){
+    # https://regex101.com/r/OUwV75/1
+    if ( $SIP_RUN != 1 && $ACCESS[$#ACCESS] == PUBLIC && $LINE =~ m/^(\s*\w+[\w<> *&:,]* \*?\w+) = ([\-\w\:\.]+(< *\w+( \*)? *>)?)+(\([^()]*\))?\s*;/ ){
         dbg_info("remove struct member assignment");
         $LINE = "$1;";
     }
 
     # catch Q_DECLARE_FLAGS
     if ( $LINE =~ m/^(\s*)Q_DECLARE_FLAGS\(\s*(.*?)\s*,\s*(.*?)\s*\)\s*$/ ){
-        my $ACTUAL_CLASS = $CLASSNAME[$#CLASSNAME];
+        my $ACTUAL_CLASS = $#CLASSNAME >= 0 ? $CLASSNAME[$#CLASSNAME].'::' : '';
         dbg_info("Declare flags: $ACTUAL_CLASS");
-        $LINE = "$1typedef QFlags<${ACTUAL_CLASS}::$3> $2;\n";
-        $QFLAG_HASH{"${ACTUAL_CLASS}::$2"} = "${ACTUAL_CLASS}::$3";
+        $LINE = "$1typedef QFlags<${ACTUAL_CLASS}$3> $2;\n";
+        $QFLAG_HASH{"${ACTUAL_CLASS}$2"} = "${ACTUAL_CLASS}$3";
+
+        if ( none { $_ eq "${ACTUAL_CLASS}$3" } @ENUM_INTFLAG_TYPES ){
+           exit_with_error("${ACTUAL_CLASS}$3 is a flags type, but was not declared with IntFlag type. Add 'SIP_ENUM_BASETYPE(IntFlag)' to the enum class declaration line");
+        }
     }
     # catch Q_DECLARE_OPERATORS_FOR_FLAGS
     if ( $LINE =~ m/^(\s*)Q_DECLARE_OPERATORS_FOR_FLAGS\(\s*(.*?)\s*\)\s*$/ ){
-        my $flag = $QFLAG_HASH{$2};
+        my $flags = $2;
+        my $flag = $QFLAG_HASH{$flags};
         $LINE = "$1QFlags<$flag> operator|($flag f1, QFlags<$flag> f2);\n";
-    }
 
-    # remove Q_INVOKABLE
-    $LINE =~ s/^(\s*)Q_INVOKABLE /$1/;
+        my $py_flag = $flag;
+        $py_flag =~ s/::/./;
+
+        if ( any { $_ eq $py_flag } @ENUM_CLASS_NON_INT_TYPES ){
+          exit_with_error("$flag is a flags type, but was not declared with int type. Add ': int' to the enum class declaration line");
+        }
+        elsif ( none { $_ eq $py_flag } @ENUM_INT_TYPES ){
+          if ( $is_qt6 ) {
+            dbg_info("monkey patching operators for non class enum");
+            if ($HAS_PUSHED_FORCE_INT eq 0) {
+              push @OUTPUT_PYTHON, "from enum import Enum\n\n\ndef _force_int(v): return int(v.value) if isinstance(v, Enum) else v\n\n\n";
+              $HAS_PUSHED_FORCE_INT = 1;
+            }
+            push @OUTPUT_PYTHON, "$py_flag.__bool__ = lambda flag: bool(_force_int(flag))\n";
+            push @OUTPUT_PYTHON, "$py_flag.__eq__ = lambda flag1, flag2: _force_int(flag1) == _force_int(flag2)\n";
+            push @OUTPUT_PYTHON, "$py_flag.__and__ = lambda flag1, flag2: _force_int(flag1) & _force_int(flag2)\n";
+            push @OUTPUT_PYTHON, "$py_flag.__or__ = lambda flag1, flag2: $py_flag(_force_int(flag1) | _force_int(flag2))\n";
+          }
+        }
+        if ( !$is_qt6 )
+        {
+           foreach ( @ENUM_MONKEY_PATCHED_TYPES ) {
+             if ( $flags eq "$_->[0]::$_->[1]" )
+             {
+               dbg_info("monkey patching flags");
+               if ($HAS_PUSHED_FORCE_INT eq 0) {
+                 push @OUTPUT_PYTHON, "from enum import Enum\n\n\ndef _force_int(v): return int(v.value) if isinstance(v, Enum) else v\n\n\n";
+                 $HAS_PUSHED_FORCE_INT = 1;
+               }
+               push @OUTPUT_PYTHON, "$py_flag.__or__ = lambda flag1, flag2: $_->[0].$_->[1](_force_int(flag1) | _force_int(flag2))\n";
+             }
+           }
+        }
+    }
 
     do {no warnings 'uninitialized';
         # remove keywords
-        if ( $IS_OVERRIDE == 1 ){
-            # handle multiline definition to add virtual keyword on opening line
+        if ( $IS_OVERRIDE_OR_MAKE_PRIVATE != PREPEND_CODE_NO ){
+            # handle multiline definition to add virtual keyword or making private on opening line
             if ( $MULTILINE_DEFINITION != MULTILINE_NO ){
-                my $virtual_line = $LINE;
-                my $virtual_line_idx = $LINE_IDX;
-                dbg_info("handle multiline definition to add virtual keyword on opening line");
-                while ( $virtual_line !~ m/^[^()]*\(([^()]*\([^()]*\)[^()]*)*[^()]*$/){
-                    $virtual_line_idx--;
-                    $virtual_line = $INPUT_LINES[$virtual_line_idx];
-                    $virtual_line_idx >= 0 or exit_with_error('could not reach opening definition');
+                my $rolling_line = $LINE;
+                my $rolling_line_idx = $LINE_IDX;
+                dbg_info("handle multiline definition to add virtual keyword or making private on opening line");
+                while ( $rolling_line !~ m/^[^()]*\(([^()]*\([^()]*\)[^()]*)*[^()]*$/){
+                    $rolling_line_idx--;
+                    $rolling_line = $INPUT_LINES[$rolling_line_idx];
+                    $rolling_line_idx >= 0 or exit_with_error('could not reach opening definition');
                 }
-                if ( $virtual_line !~ m/^(\s*)virtual\b(.*)$/ ){
-                    my $idx = $#OUTPUT-$LINE_IDX+$virtual_line_idx+2;
-                    #print "len: $#OUTPUT line_idx: $LINE_IDX virt: $virtual_line_idx\n"idx: $idx\n$OUTPUT[$idx]\n";
-                    $OUTPUT[$idx] = fix_annotations($virtual_line =~ s/^(\s*?)\b(.*)$/$1 virtual $2\n/r);
+                if ( $IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_VIRTUAL && $rolling_line !~ m/^(\s*)virtual\b(.*)$/ ){
+                    my $idx = $#OUTPUT-$LINE_IDX+$rolling_line_idx+2;
+                    #print "len: $#OUTPUT line_idx: $LINE_IDX virt: $rolling_line_idx\n"idx: $idx\n$OUTPUT[$idx]\n";
+                    $OUTPUT[$idx] = fix_annotations($rolling_line =~ s/^(\s*?)\b(.*)$/$1 virtual $2\n/r);
+                }
+                elsif ( $IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_MAKE_PRIVATE ) {
+                    dbg_info("prepending private access");
+                    my $idx = $#OUTPUT-$LINE_IDX+$rolling_line_idx+2;
+                    my $private_access = $LAST_ACCESS_SECTION_LINE =~ s/(protected|public)/private/r;
+                    splice @OUTPUT, $idx, 0, $private_access . "\n";
+                    $OUTPUT[$idx+1] = fix_annotations($rolling_line) . "\n";
                 }
             }
-            elsif ( $LINE !~ m/^(\s*)virtual\b(.*)$/ ){
+            elsif ( $IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_MAKE_PRIVATE ) {
+                dbg_info("prepending private access");
+                $LINE = $LAST_ACCESS_SECTION_LINE =~ s/(protected|public)/private/r . "\n" . $LINE . "\n";
+            }
+            elsif (  $IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_VIRTUAL && $LINE !~ m/^(\s*)virtual\b(.*)$/ ){
                 #sip often requires the virtual keyword to be present, or it chokes on covariant return types
                 #in overridden methods
                 dbg_info('adding virtual keyword for overridden method');
@@ -1123,12 +1916,12 @@ while ($LINE_IDX < $LINE_COUNT){
         $PYTHON_SIGNATURE = detect_and_remove_following_body_or_initializerlist();
 
         # remove inline declarations
-        if ( $LINE =~  m/^(\s*)?(static |const )*(([\w:]+(<.*?>)?\s+(\*|&)?)?(\w+)( (?:const*?))*)\s*(\{.*\});(\s*\/\/.*)?$/ ){
+        if ( $LINE =~  m/^(\s*)?(static |const )*(([(?:long )\w:]+(<.*?>)?\s+(\*|&)?)?(\w+)( (?:const*?))*)\s*(\{.*\});(\s*\/\/.*)?$/ ){
             my $newline = "$1$3;";
             $LINE = $newline;
         }
 
-        if ( $LINE =~  m/^\s*(?:const |virtual |static |inline )*(?!explicit)([\w:]+(?:<.*?>)?)\s+(?:\*|&)?(?:\w+|operator.{1,2})\(.*$/ ){
+        if ( $LINE =~  m/^\s*(?:const |virtual |static |inline )*(?!explicit)([(?:long )\w:]+(?:<.*?>)?)\s+(?:\*|&)?(?:\w+|operator.{1,2})\(.*$/ ){
             if ($1 !~ m/(void|SIP_PYOBJECT|operator|return|QFlag)/ ){
                 $RETURN_TYPE = $1;
                 # replace :: with . (changes c++ style namespace/class directives to Python style)
@@ -1163,7 +1956,8 @@ while ($LINE_IDX < $LINE_COUNT){
         # support Docstring for template based classes in SIP 4.19.7+
         $COMMENT_TEMPLATE_DOCSTRING = 1;
     }
-    elsif ( $LINE =~ m/\/\// ||
+    elsif ( $MULTILINE_DEFINITION == MULTILINE_NO &&
+           ($LINE =~ m/\/\// ||
             $LINE =~ m/^\s*typedef / ||
             $LINE =~ m/\s*struct / ||
             $LINE =~ m/operator\[\]\(/ ||
@@ -1172,29 +1966,52 @@ while ($LINE_IDX < $LINE_COUNT){
             $LINE =~ m/^\s*%\w+(.*)?$/ ||
             $LINE =~ m/^\s*namespace\s+\w+/ ||
             $LINE =~ m/^\s*(virtual\s*)?~/ ||
-            detect_non_method_member() == 1 ){
+            detect_non_method_member() == 1
+           )
+          ){
         dbg_info('skipping comment');
         dbg_info('because typedef') if ($LINE =~ m/\s*typedef.*?(?!SIP_DOC_TEMPLATE)/);
         $COMMENT = '';
         $RETURN_TYPE = '';
-        $IS_OVERRIDE = 0;
+        $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_NO;
     }
 
+    $LINE = fix_constants($LINE);
     $LINE = fix_annotations($LINE);
 
     # fix astyle placing space after % character
     $LINE =~ s/\/\s+GetWrapper\s+\//\/GetWrapper\//;
 
+    # handle enum/flags QgsSettingsEntryEnumFlag
+    if ( $LINE =~ m/^(\s*)const QgsSettingsEntryEnumFlag<(.*)> (.+);$/ ) {
+      my $prep_line = "class QgsSettingsEntryEnumFlag_$3
+{
+%TypeHeaderCode
+#include \"" .basename($headerfile) . "\"
+#include \"qgssettingsentry.h\"
+typedef QgsSettingsEntryEnumFlag<$2> QgsSettingsEntryEnumFlag_$3;
+%End
+  public:
+    QgsSettingsEntryEnumFlag_$3( const QString &key, QgsSettings::Section section, const $2 &defaultValue, const QString &description = QString() );
+    QString key( const QString &dynamicKeyPart = QString() ) const;
+    $2 value( const QString &dynamicKeyPart = QString(), bool useDefaultValueOverride = false, const $2 &defaultValueOverride = $2() ) const;
+};";
+    $LINE = "$1const QgsSettingsEntryEnumFlag_$3 $3;";
+    $COMMENT = '';
+    write_output("ENF", "$prep_line\n", "prepend");
+    }
+
     write_output("NOR", "$LINE\n");
-    if ($PYTHON_SIGNATURE ne ''){
-        write_output("PSI", "$PYTHON_SIGNATURE\n");
+
+    if ($PYTHON_SIGNATURE ne '') {
+      write_output("PSI", "$PYTHON_SIGNATURE\n");
     }
 
     # multiline definition (parenthesis left open)
     if ( $MULTILINE_DEFINITION != MULTILINE_NO ){
         dbg_info("on multiline");
-        # https://regex101.com/r/DN01iM/2
-        if ( $LINE =~ m/^([^()]+(\((?:[^()]++|(?1))*\)))*[^()]*\)[^()]*$/){
+        # https://regex101.com/r/DN01iM/4
+        if ( $LINE =~ m/^([^()]+(\((?:[^()]++|(?1))*\)))*[^()]*\)([^()](throw\([^()]+\))?)*$/){
             dbg_info("ending multiline");
             # remove potential following body
             if ( $MULTILINE_DEFINITION != MULTILINE_CONDITIONAL_STATEMENT && $LINE !~ m/(\{.*\}|;)\s*(\/\/.*)?$/ ){
@@ -1226,7 +2043,8 @@ while ($LINE_IDX < $LINE_COUNT){
     # write comment
     if ( $LINE =~ m/^\s*$/ )
     {
-        $IS_OVERRIDE = 0;
+        dbg_info("no more override / private");
+        $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_NO;
         next;
     }
     if ( $LINE =~ m/^\s*template\s*<.*>/ ){
@@ -1234,13 +2052,14 @@ while ($LINE_IDX < $LINE_COUNT){
         next;
     }
     if ( $COMMENT !~ m/^\s*$/ || $RETURN_TYPE ne ''){
-        if ( $IS_OVERRIDE == 1 && $COMMENT =~ m/^\s*$/ ){
+        if ( $IS_OVERRIDE_OR_MAKE_PRIVATE != PREPEND_CODE_VIRTUAL && $COMMENT =~ m/^\s*$/ ){
             # overridden method with no new docs - so don't create a Docstring and use
             # parent class Docstring
         }
         else {
             dbg_info('writing comment');
             if ( $COMMENT !~ m/^\s*$/ ){
+                dbg_info('comment non-empty');
                 my $doc_prepend = "";
                 $doc_prepend = "\@DOCSTRINGSTEMPLATE\@" if $COMMENT_TEMPLATE_DOCSTRING == 1;
                 write_output("CM1", "$doc_prepend%Docstring\n");
@@ -1249,14 +2068,28 @@ while ($LINE_IDX < $LINE_COUNT){
                 my @out_params = ();
                 my $waiting_for_return_to_end = 0;
                 foreach my $comment_line (@comment_lines) {
+
+                  if ( ( $comment_line =~ m/versionadded:/ || $comment_line =~ m/deprecated:/ ) && $#out_params >= 0 ){
+                    dbg_info('out style parameters remain to flush!');
+                    # member has /Out/ parameters, but no return type, so flush out out_params docs now
+                    my $first_out_param = shift(@out_params);
+                    write_output("CM7", "$doc_prepend:return: - $first_out_param\n");
+
+                    foreach my $out_param (@out_params) {
+                      write_output("CM7", "$doc_prepend         - $out_param\n");
+                    }
+                    write_output("CM7", "$doc_prepend\n");
+                    @out_params = ();
+                  }
+
                   # if ( $RETURN_TYPE ne '' && $comment_line =~ m/^\s*\.\. \w/ ){
                   #     # return type must be added before any other paragraph-level markup
                   #     write_output("CM5", ":rtype: $RETURN_TYPE\n\n");
                   #     $RETURN_TYPE = '';
                   # }
                   if ( $comment_line =~ m/^:param\s+(\w+)/) {
-                    if ( $1 ~~ @SKIPPED_PARAMS_OUT || $1 ~~ @SKIPPED_PARAMS_REMOVE ) {
-                      if ( $1 ~~ @SKIPPED_PARAMS_OUT ) {
+                    if ( (any { $_ eq $1 } @SKIPPED_PARAMS_OUT) || (any { $_ eq $1 } @SKIPPED_PARAMS_REMOVE) ) {
+                      if ( any { $_ eq $1 } @SKIPPED_PARAMS_OUT ) {
                         $comment_line =~ s/^:param\s+(\w+):\s*(.*?)$/$1: $2/;
                         $comment_line =~ s/(?:optional|if specified|if given)[,]?\s*//g;
                         push @out_params, $comment_line ;
@@ -1318,10 +2151,16 @@ while ($LINE_IDX < $LINE_COUNT){
         }
         $COMMENT = '';
         $RETURN_TYPE = '';
-        $IS_OVERRIDE = 0;
+        if ($IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_MAKE_PRIVATE){
+          write_output("MKP", $LAST_ACCESS_SECTION_LINE);
+        }
+        $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_NO;
     }
     else {
-        $IS_OVERRIDE = 0;
+        if ($IS_OVERRIDE_OR_MAKE_PRIVATE == PREPEND_CODE_MAKE_PRIVATE){
+          write_output("MKP", $LAST_ACCESS_SECTION_LINE);
+        }
+        $IS_OVERRIDE_OR_MAKE_PRIVATE = PREPEND_CODE_NO;
     }
 }
 

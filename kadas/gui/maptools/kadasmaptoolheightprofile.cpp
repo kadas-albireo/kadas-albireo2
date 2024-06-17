@@ -32,7 +32,7 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
 
-  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::ICON_CIRCLE );
+  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::IconType::ICON_CIRCLE );
   mPosMarker->setIconFill( Qt::blue );
   mPosMarker->setIconOutline( QPen( Qt::blue ) );
   mPosMarker->setZIndex( 100 );
@@ -49,7 +49,7 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory( QgsM
   return [ = ]
   {
     KadasLineItem *item = new KadasLineItem( canvas->mapSettings().destinationCrs() );
-    item->setIconType( KadasGeometryItem::ICON_CIRCLE );
+    item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
     return item;
   };
 }
@@ -123,7 +123,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( !mPicking )
   {
     const KadasLineItem *lineItem = dynamic_cast<const KadasLineItem *>( currentItem() );
-    if ( lineItem && lineItem->constState()->drawStatus == KadasMapItem::State::Finished && !lineItem->constState()->points.isEmpty() )
+    if ( lineItem && lineItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Finished && !lineItem->constState()->points.isEmpty() )
     {
       QgsPointXY p = toMapCoordinates( e->pos() );
       const QList<KadasItemPos> &points = lineItem->constState()->points.front();

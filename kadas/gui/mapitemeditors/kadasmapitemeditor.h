@@ -22,6 +22,7 @@
 #include <QMap>
 #include <QWidget>
 
+#include <qgis/qgis_sip.h>
 #include <kadas/gui/kadas_gui.h>
 
 
@@ -32,7 +33,11 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     Q_OBJECT
 
   public:
-    enum EditorType {CreateItemEditor, EditItemEditor};
+    enum class EditorType SIP_MONKEYPATCH_SCOPEENUM
+    {
+      CreateItemEditor,
+      EditItemEditor
+    };
 
     KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr ) : QWidget( parent ), mItem( item ) {}
 

@@ -314,9 +314,11 @@ void KadasApplication::init()
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::extentsChanged, this, &KadasApplication::extentChanged );
   connect( QgsProject::instance(), &QgsProject::dirtySet, this, &KadasApplication::projectDirtySet );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::restoreAttributeTables );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   // Unset any active tool before writing project to ensure that any pending edits are committed
   connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::unsetMapToolOnSave );
+  connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::saveAttributeTableDocks );
   connect( this, &KadasApplication::focusChanged, this, &KadasApplication::onFocusChanged );
   connect( this, &QApplication::aboutToQuit, this, &KadasApplication::cleanup );
 
@@ -618,13 +620,13 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
     KadasSymbolItem *item = new KadasSymbolItem( crs );
     item->setup( attachedPath, 0.5, 0.5, 0, 64 );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
-    return qMakePair( item, KadasItemLayerRegistry::SymbolsLayer );
+    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::SymbolsLayer );
   }
   else
   {
     KadasPictureItem *item = new KadasPictureItem( crs );
     item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
-    return qMakePair( item, KadasItemLayerRegistry::PicturesLayer );
+    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::PicturesLayer );
   }
 }
 
@@ -984,6 +986,49 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
   return success;
 }
 
+void KadasApplication::saveAttributeTableDocks( QDomDocument &doc )
+{
+  QDomElement qgisNode = doc.firstChildElement( QStringLiteral( "qgis" ) );
+
+  // save attribute tables
+  QDomElement attributeTablesElement = doc.createElement( QStringLiteral( "attributeTables" ) );
+
+  QSet< KadasAttributeTableDialog * > storedDialogs;
+  auto saveDialog = [&storedDialogs, &attributeTablesElement, &doc]( KadasAttributeTableDialog * attributeTableDialog )
+  {
+    if ( storedDialogs.contains( attributeTableDialog ) )
+      return;
+
+    QgsDebugMsgLevel( attributeTableDialog->windowTitle(), 2 );
+    const QDomElement tableElement = attributeTableDialog->writeXml( doc );
+    attributeTablesElement.appendChild( tableElement );
+    storedDialogs.insert( attributeTableDialog );
+  };
+
+  const QList<QWidget * > topLevelWidgets = QgsApplication::topLevelWidgets();
+  for ( QWidget *widget : topLevelWidgets )
+  {
+    const QList< KadasAttributeTableDialog * > dialogChildren = widget->findChildren< KadasAttributeTableDialog * >();
+    for ( KadasAttributeTableDialog *attributeTableDialog : dialogChildren )
+    {
+      saveDialog( attributeTableDialog );
+    }
+  }
+
+  qgisNode.appendChild( attributeTablesElement );
+  }
+
+void KadasApplication::restoreAttributeTables(const QDomDocument &doc)
+{
+  const QDomElement attributeTablesElement = doc.documentElement().firstChildElement( QStringLiteral( "attributeTables" ) );
+  const QDomNodeList attributeTableNodes = attributeTablesElement.elementsByTagName( QStringLiteral( "attributeTable" ) );
+  for ( int i = 0; i < attributeTableNodes.size(); ++i )
+  {
+    const QDomElement attributeTableElement = attributeTableNodes.at( i ).toElement();
+    KadasAttributeTableDialog::createFromXml(attributeTableElement, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow );
+  }
+}
+
 void KadasApplication::addDefaultPrintTemplates()
 {
   QDir printTemplatesDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "print_templates" ) );
@@ -1022,7 +1067,8 @@ void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
   if ( vlayer )
   {
     // Deletes on close
-    ( new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow ) )->show();
+    KadasAttributeTableDialog* table = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
+    table->show();
   }
 }
 
@@ -1400,7 +1446,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, 0.5, 0.5 );
       item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::SymbolsLayer ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer ) );
     }
   }
   else
@@ -1414,7 +1460,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PicturesLayer ) );
+      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PicturesLayer ) );
     }
   }
   return nullptr;

@@ -49,7 +49,7 @@ QJsonObject KadasLineItem::State::serialize() const
     pts.append( prt );
   }
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   return json;
 }
@@ -140,7 +140,7 @@ QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings )
 bool KadasLineItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->points.append( QList<KadasItemPos>() );
   state()->points.last().append( itemPos );
   state()->points.last().append( itemPos );
@@ -182,7 +182,7 @@ bool KadasLineItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasLineItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
@@ -265,11 +265,11 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
     {
       std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
       recomputeDerived();
-    } )->setData( EditSwitchToDrawingTool );
+    } )->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
   }
   else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
   {
-    menu->addAction( tr( "Continue line" ) )->setData( EditSwitchToDrawingTool );
+    menu->addAction( tr( "Continue line" ) )->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
   }
   if ( context.vidx.vertex >= 0 )
   {
@@ -366,7 +366,7 @@ void KadasLineItem::measureGeometry()
 
     switch ( mMeasurementMode )
     {
-      case MeasureLineAndSegments:
+      case MeasurementMode::MeasureLineAndSegments:
       {
         double totLength = 0;
         for ( int i = 1, n = part.size(); i < n; ++i )
@@ -382,21 +382,21 @@ void KadasLineItem::measureGeometry()
         totalLength += totLength;
         break;
       }
-      case MeasureAzimuthGeoNorth:
-      case MeasureAzimuthMapNorth:
+      case MeasurementMode::MeasureAzimuthGeoNorth:
+      case MeasurementMode::MeasureAzimuthMapNorth:
       {
         for ( int i = 1, n = part.size(); i < n; ++i )
         {
           const KadasItemPos &p1 = part[i - 1];
           const KadasItemPos &p2 = part[i];
-          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasureAzimuthGeoNorth );
+          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasurementMode::MeasureAzimuthGeoNorth );
           QString segmentAngle = formatAngle( angle, mAngleUnit );
           addMeasurements( QStringList() << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
         break;
       }
-      case MeasureLineAndSegmentsAndAzimuthGeoNorth:
-      case MeasureLineAndSegmentsAndAzimuthMapNorth:
+      case MeasurementMode::MeasureLineAndSegmentsAndAzimuthGeoNorth:
+      case MeasurementMode::MeasureLineAndSegmentsAndAzimuthMapNorth:
       {
         double totLength = 0;
         for ( int i = 1, n = part.size(); i < n; ++i )
@@ -404,7 +404,7 @@ void KadasLineItem::measureGeometry()
           const KadasItemPos &p1 = part[i - 1];
           const KadasItemPos &p2 = part[i];
           double length = mDa.measureLine( p1, p2 );
-          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasureLineAndSegmentsAndAzimuthGeoNorth );
+          double angle = computeSegmentAzimut( p1, p2, mMeasurementMode == MeasurementMode::MeasureLineAndSegmentsAndAzimuthGeoNorth );
           totLength += length;
           QString segmentAngle = formatAngle( angle, mAngleUnit );
           addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ) << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );

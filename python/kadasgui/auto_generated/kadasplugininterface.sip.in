@@ -13,7 +13,7 @@
 
 class KadasPluginInterface : QgisInterface
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     static KadasPluginInterface *cast( QgisInterface *iface );
-    enum ActionRibbonTabLocation
+    enum class ActionRibbonTabLocation
     {
       NO_TAB,
       MAPS_TAB,
@@ -42,7 +42,7 @@ the Free Software Foundation; either version 2 of the License, or     *
       HELP_TAB,
       CUSTOM_TAB
     };
-    enum ActionClassicMenuLocation
+    enum class ActionClassicMenuLocation
     {
       NO_MENU,
       PROJECT_MENU,

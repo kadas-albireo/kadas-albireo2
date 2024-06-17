@@ -43,7 +43,7 @@
 
 
 KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas, FilterRect ) )
+  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas, FilterType::FilterRect ) )
   , mActionViewshed( actionViewshed )
   , mActionProfile( actionProfile )
 {
@@ -58,9 +58,9 @@ KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *action
   filterTypeWidget->layout()->setContentsMargins( 0, 0, 0, 0 );
 
   mFilterTypeCombo = new QComboBox();
-  mFilterTypeCombo->addItem( tr( "Rectangle" ), KadasMapToolMinMax::FilterRect );
-  mFilterTypeCombo->addItem( tr( "Polygon" ), KadasMapToolMinMax::FilterPoly );
-  mFilterTypeCombo->addItem( tr( "Circle" ), KadasMapToolMinMax::FilterCircle );
+  mFilterTypeCombo->addItem( tr( "Rectangle" ), QVariant::fromValue( KadasMapToolMinMax::FilterType::FilterRect ) );
+  mFilterTypeCombo->addItem( tr( "Polygon" ), QVariant::fromValue( KadasMapToolMinMax::FilterType::FilterPoly ) );
+  mFilterTypeCombo->addItem( tr( "Circle" ), QVariant::fromValue( KadasMapToolMinMax::FilterType::FilterCircle ) );
   mFilterTypeCombo->setCurrentIndex( 0 );
   connect( mFilterTypeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this]( int )
   {
@@ -96,13 +96,13 @@ KadasMapToolCreateItem::ItemFactory KadasMapToolMinMax::itemFactory( const QgsMa
   KadasMapToolCreateItem::ItemFactory factory = nullptr;
   switch ( filterType )
   {
-    case FilterRect:
+    case FilterType::FilterRect:
       factory = [ = ] { return new KadasRectangleItem( canvas->mapSettings().destinationCrs() ); };
       break;
-    case FilterPoly:
+    case FilterType::FilterPoly:
       factory = [ = ] { return new KadasPolygonItem( canvas->mapSettings().destinationCrs() ); };
       break;
-    case FilterCircle:
+    case FilterType::FilterCircle:
       factory = [ = ] { return new KadasCircleItem( canvas->mapSettings().destinationCrs() ); };
       break;
   }
@@ -114,7 +114,7 @@ void KadasMapToolMinMax::setFilterType( FilterType filterType )
   mFilterType = filterType;
   setItemFactory( itemFactory( mCanvas, mFilterType ) );
   mFilterTypeCombo->blockSignals( true );
-  mFilterTypeCombo->setCurrentIndex( mFilterTypeCombo->findData( filterType ) );
+  mFilterTypeCombo->setCurrentIndex( mFilterTypeCombo->findData( QVariant::fromValue( filterType ) ) );
   mFilterTypeCombo->blockSignals( false );
 }
 static inline double pixelToGeoX( double gtrans[6], double px, double py )
@@ -153,7 +153,7 @@ void KadasMapToolMinMax::drawFinished()
 
   const KadasGeometryItem *item = static_cast<const KadasGeometryItem *>( currentItem() );
   QgsAbstractGeometry *geom = nullptr;
-  if ( mFilterType == FilterCircle )
+  if ( mFilterType == FilterType::FilterCircle )
   {
     geom = item->geometry()->segmentize( M_PI / 22.5 );
   }
@@ -207,7 +207,7 @@ void KadasMapToolMinMax::drawFinished()
                             pixelToGeoX( gtrans, x + bx, y + by ),
                             pixelToGeoY( gtrans, x + bx, y + by )
                           ) );
-            if ( mFilterType != FilterRect && !filterGeom.containsPoint( p.toQPointF(), Qt::WindingFill ) )
+            if ( mFilterType != FilterType::FilterRect && !filterGeom.containsPoint( p.toQPointF(), Qt::WindingFill ) )
             {
               continue;
             }
@@ -281,7 +281,7 @@ void KadasMapToolMinMax::canvasPressEvent( QgsMapMouseEvent *e )
   {
     return;
   }
-  if ( currentItem() && currentItem()->constState()->drawStatus != KadasMapItem::State::Drawing && mPinMin && mPinMax )
+  if ( currentItem() && currentItem()->constState()->drawStatus != KadasMapItem::State::DrawStatus::Drawing && mPinMin && mPinMax )
   {
     QgsPointXY mapPos = toMapCoordinates( e->pos() );
     if ( mPinMax->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
@@ -334,7 +334,7 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
     KadasPinItem *pin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
     pin->setEditor( "KadasSymbolAttributesEditor" );
     pin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
-    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::PinsLayer )->addItem( pin );
+    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->addItem( pin );
   } );
   item->setSelected( true );
   menu.exec( mCanvas->mapToGlobal( toCanvasCoordinates( mapPos ) ) );
@@ -363,11 +363,11 @@ void KadasMapToolMinMax::canvasReleaseEvent( QgsMapMouseEvent *e )
       QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( pickResult.geom ) ? static_cast<QgsGeometryCollection *>( pickResult.geom )->geometryN( 0 ) : pickResult.geom;
       if ( QgsWkbTypes::flatType( geom->wkbType() ) == Qgis::WkbType::CurvePolygon )
       {
-        setFilterType( FilterCircle );
+        setFilterType( FilterType::FilterCircle );
       }
       else
       {
-        setFilterType( FilterPoly );
+        setFilterType( FilterType::FilterPoly );
       }
       addPartFromGeometry( *pickResult.geom, pickResult.crs );
     }

@@ -33,7 +33,7 @@ KADAS_REGISTER_MAP_ITEM( KadasSelectionRectItem, []( const QgsCoordinateReferenc
 QJsonObject KadasSelectionRectItem::State::serialize() const
 {
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   return json;
 }
 

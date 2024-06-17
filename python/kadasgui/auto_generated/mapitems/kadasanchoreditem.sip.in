@@ -12,7 +12,7 @@
 
 class KadasAnchoredItem : KadasMapItem /Abstract/
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -96,7 +96,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     const State *constState() const;
 
   protected:
-    enum AttribIds {AttrX, AttrY, AttrA};
 
     State *state();
     virtual State *createEmptyState() const;

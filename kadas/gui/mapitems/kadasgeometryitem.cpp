@@ -62,7 +62,7 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
   , mPen( QPen( Qt::red, 4 ) )
   , mBrush( QColor( 255, 0, 0, 127 ) )
   , mIconSize( 10 )
-  , mIconType( ICON_NONE )
+  , mIconType( IconType::ICON_NONE )
   , mIconPen( Qt::red, 2 )
   , mIconBrush( Qt::white )
 {
@@ -163,7 +163,7 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   outStream << "</Style>\n";
   outStream << "<ExtendedData>\n";
   outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
-  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( mIconType );
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( mIconType ) );
   outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
   outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
   outStream << "</SchemaData>\n";
@@ -189,41 +189,41 @@ void KadasGeometryItem::drawVertex( QgsRenderContext &context, double x, double 
 
   switch ( mIconType )
   {
-    case ICON_NONE:
+    case IconType::ICON_NONE:
       break;
 
-    case ICON_CROSS:
+    case IconType::ICON_CROSS:
       p->drawLine( QLineF( x - s, y, x + s, y ) );
       p->drawLine( QLineF( x, y - s, x, y + s ) );
       break;
 
-    case ICON_X:
+    case IconType::ICON_X:
       p->drawLine( QLineF( x - s, y - s, x + s, y + s ) );
       p->drawLine( QLineF( x - s, y + s, x + s, y - s ) );
       break;
 
-    case ICON_BOX:
+    case IconType::ICON_BOX:
       p->drawLine( QLineF( x - s, y - s, x + s, y - s ) );
       p->drawLine( QLineF( x + s, y - s, x + s, y + s ) );
       p->drawLine( QLineF( x + s, y + s, x - s, y + s ) );
       p->drawLine( QLineF( x - s, y + s, x - s, y - s ) );
       break;
 
-    case ICON_FULL_BOX:
+    case IconType::ICON_FULL_BOX:
       p->drawRect( x - s, y - s, iconSize, iconSize );
       break;
 
-    case ICON_CIRCLE:
+    case IconType::ICON_CIRCLE:
       p->drawEllipse( x - s, y - s, iconSize, iconSize );
       break;
 
-    case ICON_TRIANGLE:
+    case IconType::ICON_TRIANGLE:
       p->drawLine( QLineF( x - s, y + s, x + s, y + s ) );
       p->drawLine( QLineF( x + s, y + s, x, y - s ) );
       p->drawLine( QLineF( x, y - s, x - s, y + s ) );
       break;
 
-    case ICON_FULL_TRIANGLE:
+    case IconType::ICON_FULL_TRIANGLE:
       p->drawPolygon( QPolygonF() <<
                       QPointF( x - s, y + s ) <<
                       QPointF( x + s, y + s ) <<
@@ -245,7 +245,7 @@ KadasMapItem::Margin KadasGeometryItem::margin() const
       maxMeasureLabelHeight = std::max( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
     }
   }
-  int maxPainterMargin = std::ceil( std::max( mIconType != ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
+  int maxPainterMargin = std::ceil( std::max( mIconType != IconType::ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
   int maxW = std::max( maxMeasureLabelWidth, maxPainterMargin );
   int maxH = std::max( maxMeasureLabelHeight, maxPainterMargin );
   return Margin{ maxW, maxH, maxW, maxH };

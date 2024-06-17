@@ -55,25 +55,25 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QList<QgsLayoutDesignerInterface *> openLayoutDesigners() override;
     virtual QgsVectorLayerTools *vectorLayerTools() override;
 
-    virtual QMenu *projectMenu() override { return getClassicMenu( PROJECT_MENU ); }
-    virtual QMenu *editMenu() override { return getClassicMenu( EDIT_MENU ); }
-    virtual QMenu *viewMenu() override { return getClassicMenu( VIEW_MENU ); }
-    virtual QMenu *layerMenu() override { return getClassicMenu( LAYER_MENU ); }
-    virtual QMenu *newLayerMenu() override { return getClassicMenu( NEWLAYER_MENU ); }
-    virtual QMenu *addLayerMenu() override { return getClassicMenu( ADDLAYER_MENU ); }
-    virtual QMenu *settingsMenu() override { return getClassicMenu( SETTINGS_MENU ); }
-    virtual QMenu *pluginMenu() override { return getClassicMenu( PLUGIN_MENU ); }
-    virtual QMenu *rasterMenu() override { return getClassicMenu( RASTER_MENU ); }
-    virtual QMenu *databaseMenu() override { return getClassicMenu( DATABASE_MENU ); }
-    virtual QMenu *vectorMenu() override { return getClassicMenu( VECTOR_MENU ); }
-    virtual QMenu *webMenu() override { return getClassicMenu( WEB_MENU ); }
+    virtual QMenu *projectMenu() override { return getClassicMenu( ActionClassicMenuLocation::PROJECT_MENU ); }
+    virtual QMenu *editMenu() override { return getClassicMenu( ActionClassicMenuLocation::EDIT_MENU ); }
+    virtual QMenu *viewMenu() override { return getClassicMenu( ActionClassicMenuLocation::VIEW_MENU ); }
+    virtual QMenu *layerMenu() override { return getClassicMenu( ActionClassicMenuLocation::LAYER_MENU ); }
+    virtual QMenu *newLayerMenu() override { return getClassicMenu( ActionClassicMenuLocation::NEWLAYER_MENU ); }
+    virtual QMenu *addLayerMenu() override { return getClassicMenu( ActionClassicMenuLocation::ADDLAYER_MENU ); }
+    virtual QMenu *settingsMenu() override { return getClassicMenu( ActionClassicMenuLocation::SETTINGS_MENU ); }
+    virtual QMenu *pluginMenu() override { return getClassicMenu( ActionClassicMenuLocation::PLUGIN_MENU ); }
+    virtual QMenu *rasterMenu() override { return getClassicMenu( ActionClassicMenuLocation::RASTER_MENU ); }
+    virtual QMenu *databaseMenu() override { return getClassicMenu( ActionClassicMenuLocation::DATABASE_MENU ); }
+    virtual QMenu *vectorMenu() override { return getClassicMenu( ActionClassicMenuLocation::VECTOR_MENU ); }
+    virtual QMenu *webMenu() override { return getClassicMenu( ActionClassicMenuLocation::WEB_MENU ); }
 #if _QGIS_VERSION_INT >= 33440
     virtual QMenu *meshMenu() override;
 #endif
     virtual QMenu *firstRightStandardMenu() override { return helpMenu(); }
-    virtual QMenu *windowMenu() override { return getClassicMenu( WINDOW_MENU ); }
-    virtual QMenu *helpMenu() override { return getClassicMenu( HELP_MENU ); }
-    virtual QMenu *pluginHelpMenu() override { return getClassicMenu( HELP_MENU ); }
+    virtual QMenu *windowMenu() override { return getClassicMenu( ActionClassicMenuLocation::WINDOW_MENU ); }
+    virtual QMenu *helpMenu() override { return getClassicMenu( ActionClassicMenuLocation::HELP_MENU ); }
+    virtual QMenu *pluginHelpMenu() override { return getClassicMenu( ActionClassicMenuLocation::HELP_MENU ); }
 
     virtual void addPluginToMenu( const QString &name, QAction *action ) override;
     virtual void removePluginMenu( const QString &name, QAction *action ) override;

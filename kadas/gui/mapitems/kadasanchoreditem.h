@@ -76,7 +76,7 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    enum AttribIds {AttrX, AttrY, AttrA};
+    enum AttribIds {AttrX, AttrY, AttrA} SIP_SKIP;
     double mAnchorX = 0.5;
     double mAnchorY = 0.5;
 

@@ -36,7 +36,7 @@ QJsonObject KadasPointItem::State::serialize() const
     pts.append( p );
   }
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   return json;
 }
@@ -101,7 +101,7 @@ void KadasPointItem::setPosition( const KadasItemPos &pos )
 
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->points.append( toItemPos( firstPoint, mapSettings ) );
   recomputeDerived();
   return false;
@@ -130,7 +130,7 @@ bool KadasPointItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasPointItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const

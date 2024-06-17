@@ -60,7 +60,7 @@ QJsonObject KadasPictureItem::State::serialize() const
   t.append( cameraTarget.y() );
 
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   json["pos"] = p;
   json["angle"] = angle;
   json["offsetX"] = offsetX;
@@ -501,7 +501,7 @@ QString KadasPictureItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip
 
 bool KadasPictureItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->pos = toItemPos( firstPoint, mapSettings );
   update();
   return false;
@@ -530,7 +530,7 @@ bool KadasPictureItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasPictureItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasPictureItem::drawAttribs() const

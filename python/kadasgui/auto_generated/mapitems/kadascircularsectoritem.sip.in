@@ -12,7 +12,7 @@
 
 class KadasCircularSectorItem : KadasGeometryItem
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -77,19 +77,29 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     const QgsMultiSurface *geometry() const;
 
-    struct State : KadasMapItem::State
-    {
-      enum SectorStatus {HaveNothing, HaveCenter, HaveRadius};
-      SectorStatus sectorStatus;
-      QList<KadasItemPos> centers;
-      QList<double> radii;
-      QList<double> startAngles;
-      QList<double> stopAngles;
-      virtual void assign( const KadasMapItem::State *other );
-      virtual State *clone() const /Factory/;
-      virtual QJsonObject serialize() const;
+    class State : KadasMapItem::State
+{
 
-      virtual bool deserialize( const QJsonObject &json );
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadascircularsectoritem.h"
+%End
+      public:
+        enum class SectorStatus
+        {
+          HaveNothing,
+          HaveCenter,
+          HaveRadius
+        };
+        SectorStatus sectorStatus;
+        QList<KadasItemPos> centers;
+        QList<double> radii;
+        QList<double> startAngles;
+        QList<double> stopAngles;
+        virtual void assign( const KadasMapItem::State *other );
+        virtual State *clone() const /Factory/;
+        virtual QJsonObject serialize() const;
+
+        virtual bool deserialize( const QJsonObject &json );
 
     };
     const State *constState() const;

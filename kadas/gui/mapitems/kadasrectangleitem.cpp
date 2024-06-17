@@ -47,7 +47,7 @@ QJsonObject KadasRectangleItem::State::serialize() const
     pt2.append( p );
   }
   QJsonObject json;
-  json["status"] = drawStatus;
+  json["status"] = static_cast<int>( drawStatus );
   json["p1"] = pt1;
   json["p2"] = pt2;
   return json;
@@ -121,7 +121,7 @@ void KadasRectangleItem::setPosition( const KadasItemPos &pos )
 bool KadasRectangleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
-  state()->drawStatus = State::Drawing;
+  state()->drawStatus = State::DrawStatus::Drawing;
   state()->p1.append( itemPos );
   state()->p2.append( itemPos );
   recomputeDerived();
@@ -152,7 +152,7 @@ bool KadasRectangleItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasRectangleItem::endPart()
 {
-  state()->drawStatus = State::Finished;
+  state()->drawStatus = State::DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasRectangleItem::drawAttribs() const

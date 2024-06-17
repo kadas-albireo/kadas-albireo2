@@ -12,9 +12,10 @@
 
 
 
+
 class KadasMapPos
 {
-%Docstring
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -328,28 +329,49 @@ visibility */
 Trigger a redraw */
 %End
 
-    struct State : KadasStateHistory::State
-    {
-      enum DrawStatus { Empty, Drawing, Finished };
-      DrawStatus drawStatus;
-      virtual void assign( const State *other ) = 0;
-      virtual State *clone() const = 0 /Factory/;
-      virtual QJsonObject serialize() const = 0;
-      virtual bool deserialize( const QJsonObject &json ) = 0;
+    class State : KadasStateHistory::State
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasmapitem.h"
+%End
+      public:
+        enum class DrawStatus
+        {
+          Empty,
+          Drawing,
+          Finished
+        };
+        DrawStatus drawStatus;
+        virtual void assign( const State *other ) = 0;
+        virtual State *clone() const = 0 /Factory/;
+        virtual QJsonObject serialize() const = 0;
+        virtual bool deserialize( const QJsonObject &json ) = 0;
     };
     const State *constState() const;
     virtual void setState( const State *state );
 
-    struct NumericAttribute
-    {
-      QString name;
-      enum Type {TypeCoordinate, TypeDistance, TypeAngle, TypeOther};
-      Type type;
-      double min;
-      double max;
-      int decimals;
-      int precision( const QgsMapSettings &mapSettings ) const;
-      QString suffix( const QgsMapSettings &mapSettings ) const;
+    class NumericAttribute
+{
+
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadasmapitem.h"
+%End
+    public:
+        QString name;
+        enum class Type
+        {
+          TypeCoordinate,
+          TypeDistance,
+          TypeAngle,
+          TypeOther
+        };
+        Type type;
+        double min;
+        double max;
+        int decimals;
+        int precision( const QgsMapSettings &mapSettings ) const;
+        QString suffix( const QgsMapSettings &mapSettings ) const;
     };
     typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
     typedef QMap<int, double> AttribValues;
@@ -370,7 +392,9 @@ Trigger a redraw */
     struct EditContext
     {
       EditContext();
+
       EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+
       bool mValid;
       QgsVertexId vidx;
       KadasMapPos pos;
@@ -383,7 +407,8 @@ Trigger a redraw */
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    enum ContextMenuActions
+
+    enum class ContextMenuActions
     {
       EditNoAction,
       EditSwitchToDrawingTool

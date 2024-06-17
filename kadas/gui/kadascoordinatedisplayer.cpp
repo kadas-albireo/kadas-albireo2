@@ -93,27 +93,27 @@ void KadasCoordinateDisplayer::getCoordinateDisplayFormat( KadasCoordinateFormat
   switch ( targetFormat )
   {
     case LV03:
-      format = KadasCoordinateFormat::Default;
+      format = KadasCoordinateFormat::Format::Default;
       epsg = "EPSG:21781";
       return;
     case LV95:
-      format = KadasCoordinateFormat::Default;
+      format = KadasCoordinateFormat::Format::Default;
       epsg = "EPSG:2056";
       return;
     case DMS:
-      format = KadasCoordinateFormat::DegMinSec;
+      format = KadasCoordinateFormat::Format::DegMinSec;
       return;
     case DM:
-      format = KadasCoordinateFormat::DegMin;
+      format = KadasCoordinateFormat::Format::DegMin;
       return;
     case DD:
-      format = KadasCoordinateFormat::DecDeg;
+      format = KadasCoordinateFormat::Format::DecDeg;
       return;
     case UTM:
-      format = KadasCoordinateFormat::UTM;
+      format = KadasCoordinateFormat::Format::UTM;
       return;
     case MGRS:
-      format = KadasCoordinateFormat::MGRS;
+      format = KadasCoordinateFormat::Format::MGRS;
       return;
   }
 }
@@ -125,19 +125,19 @@ QString KadasCoordinateDisplayer::getDisplayString( const QgsPointXY &p, const Q
   switch ( format )
   {
     case LV03:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Default, "EPSG:21781" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::Default, "EPSG:21781" );
     case LV95:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Default, "EPSG:2056" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::Default, "EPSG:2056" );
     case DMS:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::DegMinSec, "EPSG:4326" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::DegMinSec, "EPSG:4326" );
     case DM:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::DegMin, "EPSG:4326" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::DegMin, "EPSG:4326" );
     case DD:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::DecDeg, "EPSG:4326" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::DecDeg, "EPSG:4326" );
     case UTM:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::UTM, "EPSG:4326" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::UTM, "EPSG:4326" );
     case MGRS:
-      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::MGRS, "EPSG:4326" );
+      return KadasCoordinateFormat::getDisplayString( p, crs, KadasCoordinateFormat::Format::MGRS, "EPSG:4326" );
   }
   return QString();
 }

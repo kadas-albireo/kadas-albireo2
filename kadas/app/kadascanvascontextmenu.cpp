@@ -312,11 +312,11 @@ void KadasCanvasContextMenu::measureMinMax()
     QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( mPickResult.geom ) ? static_cast<QgsGeometryCollection *>( mPickResult.geom )->geometryN( 0 ) : mPickResult.geom;
     if ( QgsWkbTypes::flatType( geom->wkbType() ) == Qgis::WkbType::CurvePolygon )
     {
-      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterCircle );
+      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterType::FilterCircle );
     }
     else
     {
-      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterPoly );
+      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterType::FilterPoly );
     }
     static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *geom, mPickResult.crs );
   }
