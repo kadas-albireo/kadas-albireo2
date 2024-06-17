@@ -3,5 +3,5 @@
 KadasCircularSectorItem.State.SectorStatus.HaveNothing.__doc__ = ""
 KadasCircularSectorItem.State.SectorStatus.HaveCenter.__doc__ = ""
 KadasCircularSectorItem.State.SectorStatus.HaveRadius.__doc__ = ""
-State.SectorStatus.__doc__ = "\n\n" + '* ``HaveNothing``: ' + State.SectorStatus.HaveNothing.__doc__ + '\n' + '* ``HaveCenter``: ' + State.SectorStatus.HaveCenter.__doc__ + '\n' + '* ``HaveRadius``: ' + State.SectorStatus.HaveRadius.__doc__
+KadasCircularSectorItem.State.SectorStatus.__doc__ = "\n\n" + '* ``HaveNothing``: ' + KadasCircularSectorItem.State.SectorStatus.HaveNothing.__doc__ + '\n' + '* ``HaveCenter``: ' + KadasCircularSectorItem.State.SectorStatus.HaveCenter.__doc__ + '\n' + '* ``HaveRadius``: ' + KadasCircularSectorItem.State.SectorStatus.HaveRadius.__doc__
 # --

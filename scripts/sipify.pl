@@ -1715,7 +1715,7 @@ while ($LINE_IDX < $LINE_COUNT){
                             if ( $ACTUAL_CLASS ne "" ){
                                 my $complete_class_path = join('.', @CLASSNAME);
                                 push @OUTPUT_PYTHON, "$complete_class_path.$enum_qualname.$compat_name.__doc__ = \"$comment\"\n";
-                                push @enum_members_doc, "'* ``$compat_name``: ' + $ACTUAL_CLASS.$enum_qualname.$enum_member.__doc__";
+                                push @enum_members_doc, "'* ``$compat_name``: ' + $complete_class_path.$enum_qualname.$enum_member.__doc__";
                             } else {
                                 push @OUTPUT_PYTHON, "$enum_qualname.$compat_name.__doc__ = \"$comment\"\n";
                                 push @enum_members_doc, "'* ``$compat_name``: ' + $enum_qualname.$enum_member.__doc__";
@@ -1744,7 +1744,8 @@ while ($LINE_IDX < $LINE_COUNT){
                 $COMMENT =~ s/\n/\\n/g;
                 $COMMENT =~ s/\"/\\"/g;
                 if ( $ACTUAL_CLASS ne "" ){
-                    push @OUTPUT_PYTHON, "$ACTUAL_CLASS.$enum_qualname.__doc__ = \"$COMMENT\\n\\n\" + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
+                    my $complete_class_path = join('.', @CLASSNAME);
+                    push @OUTPUT_PYTHON, "$complete_class_path.$enum_qualname.__doc__ = \"$COMMENT\\n\\n\" + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
                 } else {
                     push @OUTPUT_PYTHON, "$enum_qualname.__doc__ = '$COMMENT\\n\\n' + " . join(" + '\\n' + ", @enum_members_doc) . "\n# --\n";
                 }

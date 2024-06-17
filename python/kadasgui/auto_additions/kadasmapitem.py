@@ -9,7 +9,7 @@ KadasMapItem.State.DrawStatus.Drawing.__doc__ = ""
 State.Finished = State.DrawStatus.Finished
 State.Finished.is_monkey_patched = True
 KadasMapItem.State.DrawStatus.Finished.__doc__ = ""
-State.DrawStatus.__doc__ = "\n\n" + '* ``Empty``: ' + State.DrawStatus.Empty.__doc__ + '\n' + '* ``Drawing``: ' + State.DrawStatus.Drawing.__doc__ + '\n' + '* ``Finished``: ' + State.DrawStatus.Finished.__doc__
+KadasMapItem.State.DrawStatus.__doc__ = "\n\n" + '* ``Empty``: ' + KadasMapItem.State.DrawStatus.Empty.__doc__ + '\n' + '* ``Drawing``: ' + KadasMapItem.State.DrawStatus.Drawing.__doc__ + '\n' + '* ``Finished``: ' + KadasMapItem.State.DrawStatus.Finished.__doc__
 # --
 # monkey patching scoped based enum
 NumericAttribute.TypeCoordinate = NumericAttribute.Type.TypeCoordinate
@@ -24,7 +24,7 @@ KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
 NumericAttribute.TypeOther = NumericAttribute.Type.TypeOther
 NumericAttribute.TypeOther.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
-NumericAttribute.Type.__doc__ = "\n\n" + '* ``TypeCoordinate``: ' + NumericAttribute.Type.TypeCoordinate.__doc__ + '\n' + '* ``TypeDistance``: ' + NumericAttribute.Type.TypeDistance.__doc__ + '\n' + '* ``TypeAngle``: ' + NumericAttribute.Type.TypeAngle.__doc__ + '\n' + '* ``TypeOther``: ' + NumericAttribute.Type.TypeOther.__doc__
+KadasMapItem.NumericAttribute.Type.__doc__ = "\n\n" + '* ``TypeCoordinate``: ' + KadasMapItem.NumericAttribute.Type.TypeCoordinate.__doc__ + '\n' + '* ``TypeDistance``: ' + KadasMapItem.NumericAttribute.Type.TypeDistance.__doc__ + '\n' + '* ``TypeAngle``: ' + KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ + '\n' + '* ``TypeOther``: ' + KadasMapItem.NumericAttribute.Type.TypeOther.__doc__
 # --
 # monkey patching scoped based enum
 KadasMapItem.EditNoAction = KadasMapItem.ContextMenuActions.EditNoAction
