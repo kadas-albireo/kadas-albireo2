@@ -92,31 +92,31 @@ bool KadasMilxClientWorker::initialize()
   {
     mProcess = new QProcess( this );
     connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
-    {
-#ifdef __MINGW32__
-      QString serverDir = QDir( QString( "%1/../opt/mss/" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
-      QString serverPath = QDir( serverDir ).absoluteFilePath( "milxserver.exe" );
-      mProcess->setWorkingDirectory( serverDir );
-#else
-      QString serverPath = "milxserver";
-#endif
-      mProcess->start( QString( "\"%1\"" ).arg( serverPath ) );
-      mProcess->waitForReadyRead( 10000 );
-      QByteArray out = mProcess->readAllStandardOutput();
-      if ( !mProcess->isOpen() )
-      {
-        cleanup();
-        mLastError = tr( "Process failed to start: %1" ).arg( mProcess->errorString() );
-        return false;
-      }
-      else if ( out.isEmpty() )
-      {
-        cleanup();
-        mLastError = tr( "Could not determine process port" );
-        return false;
-      }
-      port = QString( out ).toInt();
+    connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) {
+      qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error );
     }
+    );
+
+    const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
+
+    mProcess->start( serverPath );
+    mProcess->waitForReadyRead( 10000 );
+    QByteArray out = mProcess->readAllStandardOutput();
+    if ( !mProcess->isOpen() )
+    {
+      cleanup();
+      mLastError = tr( "Process failed to start: %1" ).arg( mProcess->errorString() );
+      qWarning() << mLastError;
+      return false;
+    }
+    else if ( out.isEmpty() )
+    {
+      cleanup();
+      mLastError = tr( "Could not determine process port" );
+      qWarning() << mLastError;
+      return false;
+    }
+    port = QString( out ).toInt();
   }
 #else
   int port = atoi( qgetenv( portEnv ) );
