@@ -91,13 +91,19 @@ bool KadasMilxClientWorker::initialize()
   else
   {
     mProcess = new QProcess( this );
-    connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
+    connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, [this]()
+    {
+      qWarning() << QStringLiteral( "milxserver exited" );
+      cleanup();
+    } );
     connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) {
       qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error );
     }
     );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
+
+    qWarning() << QStringLiteral( "Launching milxserver from %1" ).arg( serverPath );
 
     mProcess->start( serverPath );
     mProcess->waitForReadyRead( 10000 );
@@ -116,6 +122,7 @@ bool KadasMilxClientWorker::initialize()
       qWarning() << mLastError;
       return false;
     }
+    qWarning() << "milxserver started on port " << out;
     port = QString( out ).toInt();
   }
 #else
