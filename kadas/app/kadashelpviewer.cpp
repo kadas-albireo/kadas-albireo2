@@ -29,8 +29,8 @@ KadasHelpViewer::KadasHelpViewer( QObject *parent )
     : QObject( parent )
     , mHelpFileServer(QString(), "127.0.0.1")
 {
-  QDir( Kadas::pkgDataPath() ).absoluteFilePath( "/default/docs/html" );
-  mHelpFileServer.setFilesTopDir(docdir);
+  const QString docdir = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "/default/docs/html" );
+  mHelpFileServer.setFilesTopDir( docdir );
 }
 
 void KadasHelpViewer::showHelp() const
