@@ -150,27 +150,27 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="180"/>
         <source>Restrict extent to export:</source>
-        <translation type="unfinished"/>
+        <translation>Umfang der Ausgabe beschränken:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="192"/>
         <source>Y Max.:</source>
-        <translation type="unfinished"/>
+        <translation>Y Max.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="199"/>
         <source>X Min.:</source>
-        <translation type="unfinished"/>
+        <translation>X Min.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="212"/>
         <source>Y Min.:</source>
-        <translation type="unfinished"/>
+        <translation>Y Min.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="219"/>
         <source>X Max.:</source>
-        <translation type="unfinished"/>
+        <translation>X Max.:</translation>
     </message>
 </context>
 <context>

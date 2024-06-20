@@ -303,7 +303,7 @@
     <message>
         <location filename="../PrintTool.py" line="58"/>
         <source>GeoPDF Document (*.geopdf);;</source>
-        <translation type="unfinished"/>
+        <translation>GeoPDF Dokument (*.geopdf);;</translation>
     </message>
     <message>
         <location filename="../PrintTool.py" line="60"/>
