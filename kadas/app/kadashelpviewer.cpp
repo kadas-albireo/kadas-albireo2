@@ -22,16 +22,15 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsuserprofilemanager.h>
 
+#include <kadas/core/kadas.h>
 #include <kadas/app/kadashelpviewer.h>
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
     : QObject( parent )
     , mHelpFileServer(QString(), "127.0.0.1")
 {
-  QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
-  QString rootProfileFolder = QgsUserProfileManager::resolveProfilesFolder( configLocalStorageLocation );
-  QString docdir = rootProfileFolder.append("/default/docs/html");
-  mHelpFileServer.setFilesTopDir(docdir);
+  const QString docdir = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "docs/html" );
+  mHelpFileServer.setFilesTopDir( docdir );
 }
 
 void KadasHelpViewer::showHelp() const
