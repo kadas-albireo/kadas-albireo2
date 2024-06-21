@@ -98,8 +98,9 @@ bool KadasMilxClientWorker::initialize()
     );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
+    mProcess->setProgram( serverPath );
+    mProcess->start();
 
-    mProcess->start( serverPath );
     mProcess->waitForReadyRead( 10000 );
     QByteArray out = mProcess->readAllStandardOutput();
     if ( !mProcess->isOpen() )
