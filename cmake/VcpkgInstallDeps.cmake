@@ -99,6 +99,7 @@ install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/" DESTINATION "${CMAKE_INSTALL_D
 install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/crypto/" DESTINATION "bin/plugins/crypto") # QCA plugins
 install(DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
         DESTINATION "bin"
-        PATTERN "*.sip" EXCLUDE)
+        PATTERN "*.sip" EXCLUDE
+        PATTERN "__pycache__" EXCLUDE)
 
 add_dependencies(kadas deploy)
