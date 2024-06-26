@@ -703,8 +703,7 @@ void KadasRichTextEditor::mouseReleaseEvent( QMouseEvent *e )
       QUrl url( image );
       if ( url.scheme() == "attachment" )
       {
-        QString path = url.path();
-        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
+        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme(), url.path() );
         image = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
       }
       if ( QFile::exists( image ) )
