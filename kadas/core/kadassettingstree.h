@@ -38,7 +38,7 @@ class KADAS_CORE_EXPORT KadasSettingsTree
     static QgsSettingsTreeNode *treeRoot();
 
     // only create first level here
-    static inline QgsSettingsTreeNode *sTreeApp = treeRoot()->createChildNode( QStringLiteral( "app" ) );
+    static inline QgsSettingsTreeNode *sTreeKadas = treeRoot()->createChildNode( QStringLiteral( "kadas" ) );
     static inline QgsSettingsTreeNode *sTreePlugins = treeRoot()->createChildNode( QStringLiteral( "plugins" ) );
 
 #endif
