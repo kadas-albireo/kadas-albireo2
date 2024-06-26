@@ -746,9 +746,9 @@ QString KadasRichTextEditor::text( Qt::TextFormat format ) const
 {
   switch ( format )
   {
-    case Qt::PlainText:
+    case Qt::TextFormat::PlainText:
       return toPlainText();
-    case Qt::RichText:
+    case Qt::TextFormat::RichText:
       return simplifyRichTextFilter( toHtml() );
     default:
       break;
