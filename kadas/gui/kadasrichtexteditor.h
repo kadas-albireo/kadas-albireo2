@@ -39,11 +39,12 @@ class KADAS_GUI_EXPORT KadasRichTextEditor : public QTextEdit
     explicit KadasRichTextEditor( QWidget *parent = nullptr );
     QVariant loadResource( int type, const QUrl &url ) override;
 
+    QString text( Qt::TextFormat format ) const;
+
   public slots:
     void setFontBold( bool b );
     void setFontPointSize( double );
     void setText( const QString &text );
-    QString text( Qt::TextFormat format ) const;
 
   signals:
     void stateChanged();

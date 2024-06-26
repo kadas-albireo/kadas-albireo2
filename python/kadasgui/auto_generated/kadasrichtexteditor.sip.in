@@ -33,11 +33,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual QVariant loadResource( int type, const QUrl &url );
 
 
+    QString text( Qt::TextFormat format ) const;
+
   public slots:
     void setFontBold( bool b );
     void setFontPointSize( double );
     void setText( const QString &text );
-    QString text( Qt::TextFormat format ) const;
 
   signals:
     void stateChanged();
