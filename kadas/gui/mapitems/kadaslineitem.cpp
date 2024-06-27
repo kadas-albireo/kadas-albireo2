@@ -31,8 +31,6 @@
 #include <kadas/gui/mapitems/kadaslineitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasLineItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasLineItem( crs ); } );
-
 QJsonObject KadasLineItem::State::serialize() const
 {
   QJsonArray pts;

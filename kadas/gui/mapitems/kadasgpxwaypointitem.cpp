@@ -23,8 +23,6 @@
 #include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasGpxWaypointItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasGpxWaypointItem(); } );
-
 KadasGpxWaypointItem::KadasGpxWaypointItem()
   : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), IconType::ICON_CIRCLE )
 {

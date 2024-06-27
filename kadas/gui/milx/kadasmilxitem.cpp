@@ -36,8 +36,6 @@
 #include <kadas/app/kadasapplication.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasMilxItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasMilxItem(); } );
-
 QJsonObject KadasMilxItem::State::serialize() const
 {
   QJsonArray pts;

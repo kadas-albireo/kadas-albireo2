@@ -55,8 +55,6 @@ static double toRadAngle( double ageo )
   return arad;
 }
 
-KADAS_REGISTER_MAP_ITEM( KadasCircularSectorItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCircularSectorItem( crs ); } );
-
 QJsonObject KadasCircularSectorItem::State::serialize() const
 {
   QJsonArray c;

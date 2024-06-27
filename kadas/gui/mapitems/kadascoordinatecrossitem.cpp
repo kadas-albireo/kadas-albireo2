@@ -26,8 +26,6 @@
 #include <kadas/gui/mapitems/kadascoordinatecrossitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasCoordinateCrossItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCoordinateCrossItem( crs ); } );
-
 QJsonObject KadasCoordinateCrossItem::State::serialize() const
 {
   QJsonObject json;

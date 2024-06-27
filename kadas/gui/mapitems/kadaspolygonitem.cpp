@@ -32,8 +32,6 @@
 #include <kadas/gui/mapitems/kadaspolygonitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasPolygonItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPolygonItem( crs ); } );
-
 QJsonObject KadasPolygonItem::State::serialize() const
 {
   QJsonArray pts;

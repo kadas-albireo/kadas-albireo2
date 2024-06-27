@@ -28,8 +28,6 @@
 #include <kadas/gui/mapitems/kadascircleitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasCircleItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasCircleItem( crs ); } );
-
 QJsonObject KadasCircleItem::State::serialize() const
 {
   QJsonArray c;

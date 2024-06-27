@@ -500,10 +500,4 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };
 
-#ifndef SIP_RUN
-#define KADAS_REGISTER_MAP_ITEM(classname, factory) \
-  static int register##classname(){ KadasMapItem::registry()->insert(#classname, factory); return 0; } \
-  static int __reg##classname = register##classname();
-#endif
-
 #endif // KADASMAPITEM_H

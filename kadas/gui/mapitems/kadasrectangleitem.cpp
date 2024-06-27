@@ -26,8 +26,6 @@
 #include <kadas/gui/mapitems/kadasrectangleitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasRectangleItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasRectangleItem( crs ); } );
-
 QJsonObject KadasRectangleItem::State::serialize() const
 {
   QJsonArray pt1;

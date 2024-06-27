@@ -28,8 +28,6 @@
 #include <kadas/gui/mapitems/kadasselectionrectitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasSelectionRectItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasSelectionRectItem( crs ); } );
-
 QJsonObject KadasSelectionRectItem::State::serialize() const
 {
   QJsonObject json;

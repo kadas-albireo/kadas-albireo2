@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <thread>
+
 #include <QApplication>
 #include <QDesktopWidget>
 
@@ -27,6 +29,26 @@
 #include <qgis/qgsunittypes.h>
 
 #include <kadas/gui/mapitems/kadasmapitem.h>
+
+#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/mapitems/kadascircularsectoritem.h"
+#include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitems/kadaspictureitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/mapitems/kadasselectionrectitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadastextitem.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
+
+Q_GLOBAL_STATIC(KadasMapItem::Registry, sRegistry)
+
+std::once_flag onceFlagMapItemRegistry;
 
 
 KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs )
@@ -308,8 +330,25 @@ double KadasMapItem::outputDpiScale( const QgsRenderContext &context )
 
 KadasMapItem::Registry *KadasMapItem::registry()
 {
-  static Registry instance;
-  return &instance;
+  std::call_once(onceFlagMapItemRegistry, []() {
+    sRegistry->insert( QStringLiteral( "KadasCircleItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasCircleItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasCircularSectorItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasCircularSectorItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasCoordinateCrossItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasCoordinateCrossItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasGpxRouteItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasGpxRouteItem(); });
+    sRegistry->insert( QStringLiteral( "KadasGpxWaypointItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasGpxWaypointItem(); });
+    sRegistry->insert( QStringLiteral( "KadasLineItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasLineItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasPictureItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasPictureItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasPointItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasPointItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasPolygonItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasPolygonItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasRectangleItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasRectangleItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasSelectionRectItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasSelectionRectItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasSymbolItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasPinItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasPinItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasTextItem"), [](const QgsCoordinateReferenceSystem& crs) { return new KadasTextItem(crs); });
+    sRegistry->insert( QStringLiteral( "KadasMilxItem" ), [](const QgsCoordinateReferenceSystem& crs) { return new KadasMilxItem(); });
+  });
+
+  return sRegistry;
 };
 
 int KadasMapItem::NumericAttribute::precision( const QgsMapSettings &mapSettings ) const
