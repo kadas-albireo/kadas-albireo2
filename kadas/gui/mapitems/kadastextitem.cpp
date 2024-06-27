@@ -24,8 +24,6 @@
 #include <kadas/gui/mapitems/kadastextitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasTextItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasTextItem( crs ); } );
-
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
   : KadasAnchoredItem( crs )
 {

@@ -34,9 +34,6 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasSymbolItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasSymbolItem( crs ); } );
-KADAS_REGISTER_MAP_ITEM( KadasPinItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPinItem( crs ); } );
-
 KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs )
   : KadasAnchoredItem( crs )
 {

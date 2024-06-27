@@ -23,8 +23,6 @@
 #include <kadas/gui/mapitems/kadaspointitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasPointItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPointItem( crs ); } );
-
 QJsonObject KadasPointItem::State::serialize() const
 {
   QJsonArray pts;

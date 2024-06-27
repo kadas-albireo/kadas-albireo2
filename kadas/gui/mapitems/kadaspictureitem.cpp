@@ -37,8 +37,6 @@
 #include <kadas/gui/mapitems/kadaspictureitem.h>
 
 
-KADAS_REGISTER_MAP_ITEM( KadasPictureItem, []( const QgsCoordinateReferenceSystem &crs )  { return new KadasPictureItem( crs ); } );
-
 QJsonObject KadasPictureItem::State::serialize() const
 {
   QJsonArray p;
