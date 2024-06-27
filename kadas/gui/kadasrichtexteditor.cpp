@@ -703,8 +703,7 @@ void KadasRichTextEditor::mouseReleaseEvent( QMouseEvent *e )
       QUrl url( image );
       if ( url.scheme() == "attachment" )
       {
-        QString path = url.path();
-        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
+        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme(), url.path() );
         image = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
       }
       if ( QFile::exists( image ) )
@@ -746,9 +745,9 @@ QString KadasRichTextEditor::text( Qt::TextFormat format ) const
 {
   switch ( format )
   {
-    case Qt::PlainText:
+    case Qt::TextFormat::PlainText:
       return toPlainText();
-    case Qt::RichText:
+    case Qt::TextFormat::RichText:
       return simplifyRichTextFilter( toHtml() );
     default:
       break;
