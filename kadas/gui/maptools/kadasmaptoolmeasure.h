@@ -40,7 +40,7 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     enum class AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
     Q_ENUM( AzimuthNorth )
 
-    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeApp, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
+    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
 
 
     KadasMeasureWidget( KadasMapItem *item );

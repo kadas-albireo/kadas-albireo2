@@ -144,9 +144,9 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     // Set GDAL Proxy Env-Vars for URL
     QUrl url( uri.param( "url" ) );
     QSettings settings;
-    QString gdalHttpProxy = settings.value( "proxy/gdalHttpProxy", "" ).toString();
-    QString gdalProxyUserPwd = settings.value( "proxy/gdalProxyUserPwd", "" ).toString();
-    QString gdalProxyAuth = settings.value( "proxy/gdalProxyAuth", "" ).toString();
+    QString gdalHttpProxy = settingsGdalProxyHttp->value();
+    QString gdalProxyUserPwd = settingsGdalProxyUserPassword->value();
+    QString gdalProxyAuth = settingsGdalProxyAuth->value();
 
     if ( gdalHttpProxy.isEmpty() )
     {
