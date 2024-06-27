@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <threads.h>
+#include <thread>
 
 #include <QApplication>
 #include <QDesktopWidget>
