@@ -84,7 +84,9 @@ void KadasMapToolCreateItem::activate()
     connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
     mBottomBar->layout()->addWidget( layerSelection );
   }
-  KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
+
+  auto registry = KadasMapItemEditor::registry();
+  KadasMapItemEditor::Factory factory = registry->value(mItem->editor());
   if ( factory )
   {
     mEditor = factory( mItem, KadasMapItemEditor::EditorType::CreateItemEditor );

@@ -32,9 +32,6 @@
 #include <kadas/gui/mapitems/kadascircleitem.h>
 #include <kadas/gui/maptools/kadasmaptoolmeasure.h>
 
-
-KADAS_REGISTER_MAP_ITEM_EDITOR( KadasMeasureWidget, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item ); } )
-
 KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {

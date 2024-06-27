@@ -59,10 +59,4 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     KadasMapItem *mItem;
 };
 
-#ifndef SIP_RUN
-#define KADAS_REGISTER_MAP_ITEM_EDITOR(classname, factory) \
-  static int register##classname(){ KadasMapItemEditor::registry()->insert(#classname, factory); return 0; } \
-  static int __reg##classname = register##classname();
-#endif
-
 #endif // KADASMAPITEMEDITOR_H
