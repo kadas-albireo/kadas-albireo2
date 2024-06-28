@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - osx-python
   pull_request:
   release:
     types: ['published']
