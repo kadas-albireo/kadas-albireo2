@@ -21,8 +21,6 @@
 #include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
 
 
-KADAS_REGISTER_MAP_ITEM_EDITOR( KadasRedliningItemEditor, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasRedliningItemEditor( item ); } )
-
 KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {
