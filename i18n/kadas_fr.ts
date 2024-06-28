@@ -593,7 +593,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasCircleItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="370"/>
+        <location filename="../kadas/gui/mapitems/kadascircleitem.cpp" line="368"/>
         <source>Radius: %1</source>
         <translation>Rayon: %1</translation>
     </message>
@@ -3334,24 +3334,24 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasLineItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="264"/>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="272"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="262"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="270"/>
         <source>Continue line</source>
         <translation>Continuer la ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="276"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="274"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="285"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="283"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="380"/>
-        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="412"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="378"/>
+        <location filename="../kadas/gui/mapitems/kadaslineitem.cpp" line="410"/>
         <source>Tot.: %1</source>
         <translation>Tot.: %1</translation>
     </message>
@@ -4444,22 +4444,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMilxItem</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="730"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="728"/>
         <source>Symbol editor...</source>
         <translation>Editeur de symbole...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="751"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="749"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="762"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="760"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="772"/>
+        <location filename="../kadas/gui/milx/kadasmilxitem.cpp" line="770"/>
         <source>Reset offset</source>
         <translation>Supprimer offset</translation>
     </message>
@@ -4598,12 +4598,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPictureItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="628"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="626"/>
         <source>Frame visible</source>
         <translation>Encadrement visible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="632"/>
+        <location filename="../kadas/gui/mapitems/kadaspictureitem.cpp" line="630"/>
         <source>Position locked</source>
         <translation>Position bloquée</translation>
     </message>
@@ -4616,7 +4616,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPinItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadassymbolitem.cpp" line="269"/>
+        <location filename="../kadas/gui/mapitems/kadassymbolitem.cpp" line="266"/>
         <source>&lt;b&gt;Position:&lt;/b&gt; %1&lt;br /&gt;&lt;b&gt;Height:&lt;/b&gt; %2 %3&lt;br /&gt;&lt;b&gt;Name:&lt;/b&gt; %4&lt;br /&gt;&lt;b&gt;Remarks:&lt;/b&gt;&lt;br /&gt;%5</source>
         <translation>&lt;b&gt;Position:&lt;/b&gt; %1&lt;br /&gt;&lt;b&gt;Altitude:&lt;/b&gt; %2 %3&lt;br /&gt;&lt;b&gt;Nom:&lt;/b&gt; %4&lt;br /&gt;&lt;b&gt;Remarques:&lt;/b&gt;&lt;br /&gt;%5</translation>
     </message>
@@ -4822,12 +4822,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPolygonItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspolygonitem.cpp" line="265"/>
+        <location filename="../kadas/gui/mapitems/kadaspolygonitem.cpp" line="263"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadaspolygonitem.cpp" line="274"/>
+        <location filename="../kadas/gui/mapitems/kadaspolygonitem.cpp" line="272"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
