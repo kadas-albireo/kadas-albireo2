@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <thread>
+#include <mutex>
 
 #include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
