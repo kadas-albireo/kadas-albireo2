@@ -66,8 +66,11 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
-      - uses: m-kuhn/action-tmate@patch-1
-        if: failure()
+      # https://github.com/NuGet/Home/issues/10734
+      - name: Fixup symlinks
+        run: |
+          brew install fdupes
+          fdupes -r -1 build/vcpkg_installed/${{ matrix.triplet }}/lib/ | while read line; do master=""; for file in ${line[*]}; do if [ "x${master}" == "x" ]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3
