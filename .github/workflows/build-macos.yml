@@ -55,11 +55,6 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - uses: m-kuhn/action-tmate@patch-1
-        if: always()
-        env:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: 🌱 Install dependencies and generate project files
         run: |
           cmake -S . \
