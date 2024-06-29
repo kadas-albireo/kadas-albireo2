@@ -22,7 +22,7 @@ jobs:
 #            triplet: x64-osx
 #            deployment-target: "10.15"
           - os: macos-14
-            triplet: arm64-osx
+            triplet: arm64-osx-dynamic
             deployment-target: "11.0"
     name: build (macos)
     runs-on: ${{ matrix.os }}
@@ -59,12 +59,18 @@ jobs:
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D WITH_BINDINGS=OFF \
                 -D WITH_GLOBE=OFF \
                 -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+      # https://github.com/NuGet/Home/issues/10734
+      - name: Fixup symlinks
+        run: |
+          brew install fdupes
+          fdupes -r -1 build/vcpkg_installed/${{ matrix.triplet }}/lib/ | while read line; do master=""; for file in ${line[*]}; do if [ "x${master}" == "x" ]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3

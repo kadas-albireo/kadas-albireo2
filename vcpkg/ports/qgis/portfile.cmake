@@ -23,6 +23,8 @@ vcpkg_from_github(
         bindings-install.patch
         wcsLayerName.patch
 	srs-debug.patch
+	sipcxx17.patch
+        byeuic.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -43,8 +45,13 @@ if("bindings" IN_LIST FEATURES)
     list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
 
     # TODO: linux etc
-    list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5.bat")
-    list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5.bat")
+    if(VCPKG_TARGET_IS_WINDOWS)
+        list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5.bat")
+        list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5.bat")
+    else()
+        list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5")
+        list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5")
+    endif()
     list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${PYTHON3_SITEPACKAGES}/qgis")
 else()
     vcpkg_find_acquire_program(PYTHON3)
@@ -274,5 +281,7 @@ vcpkg_install_cmake()
 vcpkg_restore_env_variables(VARS PATH)
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
+
+# configure_file("${CMAKE_CURRENT_LIST_DIR}/vcpkg-cmake-wrapper.cmake.in" "${CURRENT_PACKAGES_DIR}/share/${PORT}/vcpkg-cmake-wrapper.cmake" @ONLY)
 
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")

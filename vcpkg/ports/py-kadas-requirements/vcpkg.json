@@ -1,6 +1,7 @@
 {
   "name": "py-kadas-requirements",
   "version-date": "2024-03-25",
+  "port-version": 1,
   "description": "pip installed python requirements",
   "dependencies": [
     {
