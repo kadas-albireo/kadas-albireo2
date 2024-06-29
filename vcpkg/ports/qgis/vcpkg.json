@@ -91,7 +91,7 @@
             [
                 "py-pyqt5",
                 {
-                  "name": "numpy",
+                  "name": "py-numpy",
                   "platform": "!osx"
                 },
                 "py-psycopg2",
