@@ -26,6 +26,7 @@
         "packages": [
           "python3",
           "py-*",
+          "gdal",
           "vcpkg-python-scripts"
         ]
       }
