@@ -34,6 +34,8 @@ endmacro(PY_COMPILE)
 
 separate_arguments(PYQT5_SIP_FLAGS_args UNIX_COMMAND "${PYQT5_SIP_FLAGS}")
 
+add_definitions(-Dprotected=public)
+
 # core module
 FILE(GLOB_RECURSE sip_files_core kadascore/*.sip kadascore/*.sip.in)
 SET(SIP_EXTRA_FILES_DEPEND ${sip_files_core})
