@@ -26,6 +26,7 @@
 
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertree.h>
+#include <qgis/qgslayertreemodel.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreeregistrybridge.h>
 #include <qgis/qgslayertreeviewdefaultactions.h>
@@ -79,7 +80,6 @@
 #include <kadas/app/kadashelpviewer.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
-#include <kadas/app/kadaslayertreemodel.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
@@ -225,7 +225,7 @@ void KadasMainWindow::init()
   mNumericInputCheckbox->setChecked( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() );
   connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
 
-  KadasLayerTreeModel *model = new KadasLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
+  QgsLayerTreeModel *model = new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
   model->setFlag( QgsLayerTreeModel::AllowNodeReorder );
   model->setFlag( QgsLayerTreeModel::AllowNodeRename );
   model->setFlag( QgsLayerTreeModel::AllowNodeChangeVisibility );
