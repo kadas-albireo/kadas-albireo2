@@ -26,6 +26,7 @@ set(kadas_SRC
   kadashelpviewer.cpp
   kadaslayerrefreshmanager.cpp
   kadaslayertreeviewmenuprovider.cpp
+  kadaslayertreeviewtemporalindicator.cpp
   kadaslayoutappmenuprovider.cpp
   kadaslayoutdesignerdialog.cpp
   kadaslayoutdesignermanager.cpp
@@ -39,6 +40,7 @@ set(kadas_SRC
   kadaspluginmanager.cpp
   kadaspythonintegration.cpp
   kadasredliningintegration.cpp
+  kadastemporalcontroller.cpp
   main.cpp
   bullseye/kadasbullseyelayer.cpp
   bullseye/kadasmaptoolbullseye.cpp
@@ -53,6 +55,7 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
+  qgslayertreeviewindicatorprovider.cpp
 )
 
 set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")

@@ -81,9 +81,11 @@
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
+#include <kadas/app/kadaslayertreeviewtemporalindicator.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasnewspopup.h>
+#include <kadas/app/kadastemporalcontroller.h>
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
@@ -109,6 +111,7 @@ KadasMainWindow::~KadasMainWindow()
   delete mKmlIntegration;
   delete mMilxIntegration;
   delete mHelpViewer;
+  delete mKadasTemporalController;
 }
 
 void KadasMainWindow::init()
@@ -286,6 +289,11 @@ void KadasMainWindow::init()
 
   // Help file server
   mHelpViewer = new KadasHelpViewer( this );
+
+  // Temporal controller
+  mKadasTemporalController = new KadasTemporalController( mapCanvas() );
+  mKadasTemporalController->hide();
+  new KadasLayerTreeViewTemporalIndicator( mLayerTreeView, mKadasTemporalController ); // gets parented to the layer view
 
   configureButtons();
 

@@ -41,6 +41,7 @@ class KadasMapWidgetManager;
 class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
 class KadasRedliningIntegration;
+class KadasTemporalController;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
@@ -175,6 +176,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasMilxIntegration *mMilxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
+    KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
     QToolButton *mPluginsToolButton = nullptr;
     QAction *mActionShowPythonConsole = nullptr;
