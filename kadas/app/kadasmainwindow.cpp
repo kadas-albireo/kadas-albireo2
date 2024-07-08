@@ -31,6 +31,7 @@
 #include <qgis/qgslayertreeregistrybridge.h>
 #include <qgis/qgslayertreeviewdefaultactions.h>
 #include <qgis/qgsmaptool.h>
+#include <qgis/qgsmaplayertemporalproperties.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -323,6 +324,7 @@ void KadasMainWindow::init()
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
   connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
+  connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
@@ -1318,6 +1320,25 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     } );
     mInfoBar->pushItem( item );
   }
+}
+
+void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
+{
+  QgsDataProviderTemporalCapabilities *temporalCapabilities = layer->dataProvider()->temporalCapabilities();
+
+  if( !temporalCapabilities )
+    return;
+
+  if( !temporalCapabilities->hasTemporalCapabilities() )
+    return;
+
+  if( !layer->temporalProperties() )
+    return;
+
+  if( layer->temporalProperties()->isActive() )
+    return;
+
+  layer->temporalProperties()->setIsActive(true);
 }
 
 void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &/*index*/ )

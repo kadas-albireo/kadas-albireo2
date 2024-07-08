@@ -124,6 +124,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void addMapCanvasItem( const KadasMapItem *item );
     void removeMapCanvasItem( const KadasMapItem *item );
     void checkLayerProjection( QgsMapLayer *layer );
+    void checkLayerTemporalCapabilities( QgsMapLayer *layer );
     void layerTreeViewDoubleClicked( const QModelIndex &index );
     void onDecimalPlacesChanged( int places );
     void onLanguageChanged( int idx );
