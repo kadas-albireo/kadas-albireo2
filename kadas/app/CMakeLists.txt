@@ -25,7 +25,6 @@ set(kadas_SRC
   kadashandlebadlayers.cpp
   kadashelpviewer.cpp
   kadaslayerrefreshmanager.cpp
-  kadaslayertreemodel.cpp
   kadaslayertreeviewmenuprovider.cpp
   kadaslayoutappmenuprovider.cpp
   kadaslayoutdesignerdialog.cpp

@@ -93,13 +93,21 @@ bool KadasMapCanvasItem::layerVisible( QgsMapLayer *layer ) const
 void KadasMapCanvasItem::updateRect()
 {
   QgsCoordinateTransform t( mItem->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
-  QgsRectangle bbox = t.transformBoundingBox( mItem->boundingBox() );
-  double mup = mMapCanvas->mapUnitsPerPixel();
-  KadasMapItem::Margin margin = mItem->margin();
-  double handleSize = mItem->selected() ? 0.5 * sHandleSize : 0.;
-  bbox.setXMinimum( bbox.xMinimum() - ( margin.left + handleSize ) * mup );
-  bbox.setXMaximum( bbox.xMaximum() + ( margin.right + handleSize ) * mup );
-  bbox.setYMinimum( bbox.yMinimum() - ( margin.bottom + handleSize ) * mup );
-  bbox.setYMaximum( bbox.yMaximum() + ( margin.top + handleSize ) * mup );
-  setRect( bbox );
+  
+  try
+  {
+    QgsRectangle bbox = t.transformBoundingBox(mItem->boundingBox());
+    double mup = mMapCanvas->mapUnitsPerPixel();
+    KadasMapItem::Margin margin = mItem->margin();
+    double handleSize = mItem->selected() ? 0.5 * sHandleSize : 0.;
+    bbox.setXMinimum(bbox.xMinimum() - (margin.left + handleSize) * mup);
+    bbox.setXMaximum(bbox.xMaximum() + (margin.right + handleSize) * mup);
+    bbox.setYMinimum(bbox.yMinimum() - (margin.bottom + handleSize) * mup);
+    bbox.setYMaximum(bbox.yMaximum() + (margin.top + handleSize) * mup);
+    setRect(bbox);
+  }
+  catch (QgsCsException&)
+  {
+    qWarning() << "Transformation error caught when trying to update a map canvas item.";
+  }
 }

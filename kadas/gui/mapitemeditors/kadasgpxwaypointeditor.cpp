@@ -20,9 +20,6 @@
 #include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
 #include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
 
-
-KADAS_REGISTER_MAP_ITEM_EDITOR( KadasGpxWaypointEditor, []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasGpxWaypointEditor( item ); } )
-
 KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {

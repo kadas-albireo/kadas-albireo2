@@ -4074,77 +4074,77 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMeasureWidget</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="56"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="53"/>
         <source>Measure line</source>
         <translation>Misura linea</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="60"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="57"/>
         <source>Measure polygon</source>
         <translation>Misura poligono</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="64"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="61"/>
         <source>Measure circle</source>
         <translation>Misura cerchio</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="74"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="71"/>
         <source>Metric</source>
         <translation>Metrico</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="75"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="72"/>
         <source>Imperial</source>
         <translation>Imperiale</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="76"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="73"/>
         <source>Nautical</source>
         <translation>Nautico</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="84"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="81"/>
         <source>Azimuth</source>
         <translation>Azimuth</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="90"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="87"/>
         <source>Geographic north</source>
         <translation>Nord geografico</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="91"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="88"/>
         <source>Map north</source>
         <translation>Nord cartina</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="98"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="95"/>
         <source>Degrees</source>
         <translation>Gradi</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="99"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="96"/>
         <source>Radians</source>
         <translation>Radianti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="100"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="97"/>
         <source>Gradians</source>
         <translation>Gradianti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="101"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="98"/>
         <source>Angular Mil</source>
         <translation>Millesimi di radiante</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="111"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="108"/>
         <source>Pick existing geometry</source>
         <translation>Seleziona geometria esistente</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="117"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolmeasure.cpp" line="114"/>
         <source>Clear</source>
         <translation>Cancella</translation>
     </message>
@@ -4942,12 +4942,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRedliningItemEditor</name>
     <message>
-        <location filename="../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp" line="34"/>
+        <location filename="../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp" line="32"/>
         <source>Size:</source>
         <translation>Dimensione:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp" line="34"/>
+        <location filename="../kadas/gui/mapitemeditors/kadasredliningitemeditor.cpp" line="32"/>
         <source>Line width:</source>
         <translation>Spessore linea:</translation>
     </message>
@@ -5194,12 +5194,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasSymbolAttributesEditor</name>
     <message>
-        <location filename="../kadas/gui/mapitemeditors/kadassymbolattributeseditor.cpp" line="36"/>
+        <location filename="../kadas/gui/mapitemeditors/kadassymbolattributeseditor.cpp" line="32"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitemeditors/kadassymbolattributeseditor.cpp" line="38"/>
+        <location filename="../kadas/gui/mapitemeditors/kadassymbolattributeseditor.cpp" line="34"/>
         <source>Remarks:</source>
         <translation>Commenti:</translation>
     </message>
