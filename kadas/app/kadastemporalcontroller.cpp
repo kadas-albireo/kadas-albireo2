@@ -1,11 +1,10 @@
 /***************************************************************************
-    KadasTemporalController.h
-    --------------------
-    copyright            : (C) 2019 by Marco Hugentobler
-    email                : marco at sourcepole dot ch
- ***************************************************************************/
-
-/***************************************************************************
+  kadastemporalcontroller.cpp
+  --------------------------------------
+  Date                 : July 2024
+  Copyright            : (C) 2024 by Damiano Lombardi
+  Email                : damiano@opengis.ch
+ ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
