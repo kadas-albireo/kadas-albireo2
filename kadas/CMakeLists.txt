@@ -2,7 +2,6 @@ ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(analysis)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(app)
-ADD_SUBDIRECTORY(external/qgis/app)
 
 INSTALL (FILES resources/timezone21.bin DESTINATION share/kadas/resources)
 IF(WITH_GLOBE)

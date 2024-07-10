@@ -55,6 +55,7 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
+  external/qgis/app/qgslayertreeviewindicatorprovider.cpp
 )
 
 set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
@@ -85,7 +86,8 @@ FILE(GLOB kadas_HDR
   bullseye/*.h
   guidegrid/*.h
   iamauth/*.h
-  mapgrid/*.h)
+  mapgrid/*.h
+  external/qgis/app/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
     SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
