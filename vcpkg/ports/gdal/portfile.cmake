@@ -77,9 +77,6 @@ if(VCPKG_TARGET_IS_WINDOWS)
 else()
     set(GDAL_PYTHON_INSTALL_PREFIX "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../../")
 endif()
-if(VCPKG_TARGET_IS_OSX)
-    set($ENV{GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY} "Yes")
-endif()
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS

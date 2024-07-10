@@ -55,6 +55,8 @@ jobs:
           xcode-version: latest-stable
 
       - name: 🌱 Install dependencies and generate project files
+        env:
+          GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
         run: |
           cmake -S . \
                 -G Ninja \
