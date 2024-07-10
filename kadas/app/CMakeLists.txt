@@ -55,7 +55,6 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
-  qgslayertreeviewindicatorprovider.cpp
 )
 
 set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
