@@ -130,6 +130,9 @@ MACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
   ADD_LIBRARY(${_logical_name} MODULE ${_sip_output_files} ${EXTRA_OBJECTS})
   SET_PROPERTY(TARGET ${_logical_name} PROPERTY AUTOMOC OFF)
   TARGET_INCLUDE_DIRECTORIES(${_logical_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build)
+  if(NOT MSVC)
+    TARGET_COMPILE_DEFINITIONS(${_logical_name} PRIVATE protected=public)
+  endif()
 
   IF (${SIP_VERSION_STR} VERSION_LESS 5.0.0)
     # require c++14 only -- sip breaks with newer versions due to reliance on throw(...) annotations removed in c++17
