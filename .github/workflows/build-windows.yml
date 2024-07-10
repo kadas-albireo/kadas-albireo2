@@ -60,6 +60,9 @@ jobs:
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
                 ${CREATE_MSI_CMAKE_VAR}
 
+      - uses: m-kuhn/action-tmate@patch-1
+        if: failure()
+
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v4
         if: failure()

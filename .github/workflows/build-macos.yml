@@ -66,6 +66,9 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
+      - uses: m-kuhn/action-tmate@patch-1
+        if: failure()
+
       # https://github.com/NuGet/Home/issues/10734
       - name: Fixup symlinks
         run: |
