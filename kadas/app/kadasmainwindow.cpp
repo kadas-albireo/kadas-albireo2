@@ -77,6 +77,7 @@
 
 #include <kadas/app/kadasapplayerhandling.h>
 #include <kadas/app/kadasapplication.h>
+#include <kadas/app/kadasdevtools.h>
 #include <kadas/app/kadashelpviewer.h>
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
@@ -108,6 +109,7 @@ KadasMainWindow::~KadasMainWindow()
   delete mGpxIntegration;
   delete mKmlIntegration;
   delete mMilxIntegration;
+  delete mKadasDevTools;
   delete mHelpViewer;
 }
 
@@ -283,6 +285,9 @@ void KadasMainWindow::init()
 #else
   m3DButton->hide();
 #endif
+
+  // Development tools
+  mKadasDevTools = new KadasDevTools( this );
 
   // Help file server
   mHelpViewer = new KadasHelpViewer( this );

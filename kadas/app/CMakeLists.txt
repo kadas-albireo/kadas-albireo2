@@ -20,6 +20,7 @@ set(kadas_SRC
   kadasapplayerhandling.cpp
   kadasapplication.cpp
   kadascanvascontextmenu.cpp
+  kadasdevtools.cpp
   kadasgpsintegration.cpp
   kadasgpxintegration.cpp
   kadashandlebadlayers.cpp

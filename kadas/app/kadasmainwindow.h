@@ -31,6 +31,7 @@ class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
 class QgsMessageBar;
 class KadasCoordinateDisplayer;
+class KadasDevTools;
 class KadasGpsIntegration;
 class KadasGpxIntegration;
 class KadasHelpViewer;
@@ -169,6 +170,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
     QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
     KadasCoordinateDisplayer *mCoordinateDisplayer = nullptr;
+    KadasDevTools mKadasDevTools = nullptr;
     KadasGpsIntegration *mGpsIntegration = nullptr;
     KadasGpxIntegration *mGpxIntegration = nullptr;
     KadasKmlIntegration *mKmlIntegration = nullptr;
