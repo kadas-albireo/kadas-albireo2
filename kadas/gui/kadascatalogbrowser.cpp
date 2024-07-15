@@ -269,6 +269,9 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
     QgsMimeDataUtils::UriList uriList = QgsMimeDataUtils::decodeUriList( data );
     if ( !uriList.isEmpty() && !uriList[0].uri.isEmpty() )
     {
+      qDebug() << "uri:" << uriList[0].uri;
+      qDebug() << "metadataUrl:" << data->property( "metadataUrl" ).toString();
+      qDebug() << "sublayers:" << data->property( "sublayers" ).toList();
       emit layerSelected( uriList[0], data->property( "metadataUrl" ).toString(), data->property( "sublayers" ).toList() );
     }
     delete data;
