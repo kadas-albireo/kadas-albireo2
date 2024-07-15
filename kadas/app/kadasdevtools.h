@@ -26,7 +26,7 @@ class KadasDevTools: public KadasBottomBar, private Ui::KadasDevToolsBase
 {
     Q_OBJECT
   public:
-    KadasDevTools();
+    KadasDevTools( QgsMapCanvas *canvas );
     ~KadasDevTools();
 
   private slots:

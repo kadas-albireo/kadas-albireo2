@@ -23,7 +23,7 @@
 #include <kadas/app/kadasdevtools.h>
 
 
-KadasDevTools::KadasDevTools()
+KadasDevTools::KadasDevTools( QgsMapCanvas *canvas )
   : KadasBottomBar( canvas )
 {
   setupUi( this );

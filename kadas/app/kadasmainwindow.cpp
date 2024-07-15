@@ -287,7 +287,7 @@ void KadasMainWindow::init()
 #endif
 
   // Development tools
-  mKadasDevTools = new KadasDevTools( this );
+  mKadasDevTools = new KadasDevTools( mapCanvas() );
 
   // Help file server
   mHelpViewer = new KadasHelpViewer( this );

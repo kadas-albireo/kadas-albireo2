@@ -170,7 +170,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
     QgsLayerTreeMapCanvasBridge *mLayerTreeCanvasBridge = nullptr;
     KadasCoordinateDisplayer *mCoordinateDisplayer = nullptr;
-    KadasDevTools mKadasDevTools = nullptr;
+    KadasDevTools *mKadasDevTools = nullptr;
     KadasGpsIntegration *mGpsIntegration = nullptr;
     KadasGpxIntegration *mGpxIntegration = nullptr;
     KadasKmlIntegration *mKmlIntegration = nullptr;

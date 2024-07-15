@@ -54,6 +54,20 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
   milx/kadasmilxintegration.cpp
+  # external/qgis/app/qgsdevtoolspanelwidget.cpp
+
+  # external/qgis/app/devtools/qgsappdevtoolutils.cpp
+  external/qgis/app/devtools/qgsdevtoolsmodelnode.cpp
+  external/qgis/app/devtools/networklogger/qgsnetworklogger.cpp
+  external/qgis/app/devtools/networklogger/qgsnetworkloggernode.cpp
+  external/qgis/app/devtools/networklogger/qgsnetworkloggerpanelwidget.cpp
+  external/qgis/app/devtools/networklogger/qgsnetworkloggerwidgetfactory.cpp
+  # external/qgis/app/devtools/profiler/qgsprofilerpanelwidget.cpp
+  # external/qgis/app/devtools/profiler/qgsprofilerwidgetfactory.cpp
+  # external/qgis/app/devtools/querylogger/qgsappquerylogger.cpp
+  # external/qgis/app/devtools/querylogger/qgsdatabasequeryloggernode.cpp
+  # external/qgis/app/devtools/querylogger/qgsqueryloggerpanelwidget.cpp
+  # external/qgis/app/devtools/querylogger/qgsqueryloggerwidgetfactory.cpp
 )
 
 set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
@@ -84,7 +98,10 @@ FILE(GLOB kadas_HDR
   bullseye/*.h
   guidegrid/*.h
   iamauth/*.h
-  mapgrid/*.h)
+  mapgrid/*.h
+  external/qgis/app/*.h
+  external/qgis/app/devtools/qgsdevtoolsmodelnode.h
+  external/qgis/app/devtools/networklogger/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
     SET(kadas_HDR ${kadas_HDR} ${globe_HDR})

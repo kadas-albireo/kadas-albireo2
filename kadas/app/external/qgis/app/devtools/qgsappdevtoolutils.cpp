@@ -14,7 +14,6 @@
  ***************************************************************************/
 #include "qgsappdevtoolutils.h"
 
-#include "qgisapp.h"
 #include "qgis.h"
 #include "qgsdevtoolwidgetfactory.h"
 
