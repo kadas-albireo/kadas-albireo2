@@ -1258,7 +1258,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       else
       {
-        entry->group = parent == rootGroup ? parent->insertGroup( 0, entry->name ) : parent->addGroup( entry->name );
+        entry->group = parent == rootGroup ? parent->addGroup( entry->name ) : parent->addGroup( entry->name );
       }
     }
 
