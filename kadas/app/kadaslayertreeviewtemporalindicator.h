@@ -17,7 +17,7 @@
 #define KADASLAYERTREEVIEWTEMPORALINDICATOR_H
 
 
-#include "qgslayertreeviewindicatorprovider.h"
+#include "external/qgis/app/qgslayertreeviewindicatorprovider.h"
 
 class KadasTemporalController;
 
