@@ -16,8 +16,6 @@
 #ifndef QGSLAYERTREEVIEWINDICATORPROVIDER_H
 #define QGSLAYERTREEVIEWINDICATORPROVIDER_H
 
-#include "qgis_gui.h"
-
 #include <QObject>
 #include <QSet>
 #include <memory>
@@ -45,7 +43,7 @@ class QgsMapLayer;
  * - connectSignals() default implementation connects layers to dataSourceChanged()
  * - disconnectSignals() default implementation disconnects layers from dataSourceChanged()
  */
-class GUI_EXPORT QgsLayerTreeViewIndicatorProvider : public QObject
+class QgsLayerTreeViewIndicatorProvider : public QObject
 {
     Q_OBJECT
   public:
@@ -83,11 +81,11 @@ class GUI_EXPORT QgsLayerTreeViewIndicatorProvider : public QObject
 
     // Subclasses MUST override:
     //! Layer filter: layers that pass the test will get the indicator
-    virtual bool acceptLayer( QgsMapLayer *layer ) = 0 SIP_FORCE;
+    virtual bool acceptLayer( QgsMapLayer *layer ) = 0;
     //! Returns the icon name for the given \a layer, icon name is passed to QgsApplication::getThemeIcon()
-    virtual QString iconName( QgsMapLayer *layer ) = 0 SIP_FORCE;
+    virtual QString iconName( QgsMapLayer *layer ) = 0;
     //! Returns the tooltip text for the given \a layer
-    virtual QString tooltipText( QgsMapLayer *layer ) = 0 SIP_FORCE;
+    virtual QString tooltipText( QgsMapLayer *layer ) = 0;
     // End MUST overrides
 
     //! Indicator factory
