@@ -1,0 +1,13 @@
+diff --git a/cmake/SIPMacros.cmake b/cmake/SIPMacros.cmake
+index a0bfb1e6e22..806ddb055ee 100644
+--- a/cmake/SIPMacros.cmake
++++ b/cmake/SIPMacros.cmake
+@@ -177,6 +177,8 @@ MACRO(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
+   IF (${SIP_VERSION_STR} VERSION_LESS 5.0.0)
+     # require c++14 only -- sip breaks with newer versions due to reliance on throw(...) annotations removed in c++17
+     TARGET_COMPILE_FEATURES(${_logical_name} PRIVATE cxx_std_14)
++  ELSE()
++    TARGET_COMPILE_FEATURES(${_logical_name} PRIVATE cxx_std_17)
+   ENDIF (${SIP_VERSION_STR} VERSION_LESS 5.0.0)
+ 
+   SET_TARGET_PROPERTIES(${_logical_name} PROPERTIES CXX_VISIBILITY_PRESET default)

@@ -22,7 +22,7 @@ jobs:
 #            triplet: x64-osx
 #            deployment-target: "10.15"
           - os: macos-14
-            triplet: arm64-osx
+            triplet: arm64-osx-dynamic
             deployment-target: "11.0"
     name: build (macos)
     runs-on: ${{ matrix.os }}
@@ -40,7 +40,7 @@ jobs:
 
       - name: 🔨 Prepare build env
         run: |
-          brew install automake bison flex gnu-sed create-dmg autoconf-archive nasm libtool
+          brew install automake bison flex gnu-sed create-dmg autoconf-archive nasm libtool fdupes
           echo $(brew --prefix bison)/bin >> $GITHUB_PATH
           echo $(brew --prefix flex)/bin >> $GITHUB_PATH
           echo $(brew --prefix libtool)/bin >> $GITHUB_PATH
@@ -55,16 +55,25 @@ jobs:
           xcode-version: latest-stable
 
       - name: 🌱 Install dependencies and generate project files
+        env:
+          GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
         run: |
+          # Install first only with binarycaching, then deduplicate binaries and replace copies with symlinks.
+          # Nuget doesn't understand the symlink concept
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D WITH_BINDINGS=OFF \
                 -D WITH_GLOBE=OFF \
                 -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \
                 -D NUGET_USERNAME=kadas-albireo \
-                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
+                
+                fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
+                
+                cmake -D VCPKG_INSTALL_OPTIONS="" build
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v3
@@ -91,7 +100,7 @@ jobs:
         run: |
           # lrelease is run from cmake for app
           # plugins need to be handled
-          export PATH="${{ github.workspace }}/build/vcpkg_installed/arm64-osx/tools/qt5/bin:${PATH}"
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/qt5/bin:${PATH}"
           for PLUGIN in about gpkg print; do
             lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done

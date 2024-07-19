@@ -1,6 +1,6 @@
 {
   "name": "gdal",
-  "version-semver": "3.8.4",
+  "version-semver": "3.9.1",
   "description": "The Geographic Data Abstraction Library for reading and writing geospatial raster and vector data",
   "homepage": "https://gdal.org",
   "license": null,
@@ -45,6 +45,10 @@
       "description": "Build python bindings",
       "dependencies": [
         "python3",
+	{
+          "name": "py-numpy",
+	  "platform": "!osx"
+	},
         {
           "name": "swig",
           "host": true
@@ -52,13 +56,17 @@
         {
           "name": "py-setuptools",
           "host": true
+        },
+        {
+          "name": "vcpkg-python-scripts",
+          "host": true
         }
       ]
     },
     "aws-ec2-windows": {
       "description": "Optimized detection of AWS EC2 Windows hosts",
       "dependencies": [
-        "atlmfc"
+        "atl"
       ]
     },
     "cfitsio": {
