@@ -126,7 +126,7 @@ if("@VCPKG_LIBRARY_LINKAGE@" STREQUAL "static")
   _find_and_link_library(provider_virtuallayer_gui_a QGIS::Gui)
 
 endif()
-_qgis_core_add_dependency(Protobuf Protobuf)
+# _qgis_core_add_dependency(Protobuf Protobuf)
 # Terrible hack ahead
 # 1. geos and proj add libc++.so to their pkgconfig linker instruction
 # 2. This is propagated through spatialite and GDAL
