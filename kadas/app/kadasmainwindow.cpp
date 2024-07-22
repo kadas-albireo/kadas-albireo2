@@ -31,6 +31,7 @@
 #include <qgis/qgslayertreeregistrybridge.h>
 #include <qgis/qgslayertreeviewdefaultactions.h>
 #include <qgis/qgsmaptool.h>
+#include <qgis/qgsmaplayertemporalproperties.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -81,9 +82,11 @@
 #include <kadas/app/kadasgpsintegration.h>
 #include <kadas/app/kadasgpxintegration.h>
 #include <kadas/app/kadaslayertreeviewmenuprovider.h>
+#include <kadas/app/kadaslayertreeviewtemporalindicator.h>
 #include <kadas/app/kadasmainwindow.h>
 #include <kadas/app/kadasmapwidgetmanager.h>
 #include <kadas/app/kadasnewspopup.h>
+#include <kadas/app/kadastemporalcontroller.h>
 #include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/kadasredliningintegration.h>
@@ -109,6 +112,7 @@ KadasMainWindow::~KadasMainWindow()
   delete mKmlIntegration;
   delete mMilxIntegration;
   delete mHelpViewer;
+  delete mKadasTemporalController;
 }
 
 void KadasMainWindow::init()
@@ -287,6 +291,11 @@ void KadasMainWindow::init()
   // Help file server
   mHelpViewer = new KadasHelpViewer( this );
 
+  // Temporal controller
+  mKadasTemporalController = new KadasTemporalController( mapCanvas() );
+  mKadasTemporalController->hide();
+  new KadasLayerTreeViewTemporalIndicator( mLayerTreeView, mKadasTemporalController ); // gets parented to the layer view
+
   configureButtons();
 
   restoreFavoriteButton( mFavoriteButton1 );
@@ -315,6 +324,7 @@ void KadasMainWindow::init()
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
   connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
+  connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
@@ -1310,6 +1320,25 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     } );
     mInfoBar->pushItem( item );
   }
+}
+
+void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
+{
+  QgsDataProviderTemporalCapabilities *temporalCapabilities = layer->dataProvider()->temporalCapabilities();
+
+  if( !temporalCapabilities )
+    return;
+
+  if( !temporalCapabilities->hasTemporalCapabilities() )
+    return;
+
+  if( !layer->temporalProperties() )
+    return;
+
+  if( layer->temporalProperties()->isActive() )
+    return;
+
+  layer->temporalProperties()->setIsActive(true);
 }
 
 void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &/*index*/ )
