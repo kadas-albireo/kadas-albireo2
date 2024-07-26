@@ -296,6 +296,11 @@ void KadasMainWindow::init()
   mKadasTemporalController->hide();
   new KadasLayerTreeViewTemporalIndicator( mLayerTreeView, mKadasTemporalController ); // gets parented to the layer view
 
+  // Plugin manager
+  mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
+  mPluginManager->hide();
+  mPluginManager->updateAllPlugins();
+
   configureButtons();
 
   restoreFavoriteButton( mFavoriteButton1 );
@@ -1457,18 +1462,7 @@ void KadasMainWindow::removeCustomDropHandler( QgsCustomDropHandler *handler )
 
 void KadasMainWindow::showPluginManager( bool show )
 {
-  if ( show )
-  {
-    if ( !mPluginManager )
-    {
-      mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
-    }
-    mPluginManager->show();
-  }
-  else if ( mPluginManager )
-  {
-    mPluginManager->hide();
-  }
+  mPluginManager->setVisible(show);
 }
 
 void KadasMainWindow::showAuthenticatedUser( const QString &user )
