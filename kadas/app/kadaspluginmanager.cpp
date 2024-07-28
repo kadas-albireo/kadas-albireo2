@@ -98,12 +98,20 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
   mInstalledTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
   mInstalledTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
+  mInstalledTreeWidget->header()->setStretchLastSection( true );
+}
 
+void KadasPluginManager::loadPlugins()
+{
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
   {
+    qWarning() << "KadasPluginManager needs the python integration";
     return;
   }
+
+  mInstalledTreeWidget->clear();
+  mAvailableTreeWidget->clear();
 
   mAvailablePlugins = availablePlugins();
 
@@ -165,7 +173,6 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action ):
     }
   }
 
-  mInstalledTreeWidget->header()->setStretchLastSection( true );
   mAvailableTreeWidget->resizeColumnToContents( 0 );
 }
 

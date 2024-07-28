@@ -94,6 +94,7 @@
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
+#include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
@@ -391,6 +392,10 @@ void KadasApplication::init()
   {
     loadStartupProject();
   }
+
+  // Update plugins
+  mainWindow()->pluginManager()->loadPlugins();
+  mainWindow()->pluginManager()->updateAllPlugins();
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();

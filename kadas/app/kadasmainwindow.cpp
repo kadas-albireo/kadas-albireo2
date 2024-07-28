@@ -298,8 +298,7 @@ void KadasMainWindow::init()
 
   // Plugin manager
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
-  // mPluginManager->hide();
-  // mPluginManager->updateAllPlugins();
+  mPluginManager->hide();
 
   configureButtons();
 
@@ -1462,9 +1461,6 @@ void KadasMainWindow::removeCustomDropHandler( QgsCustomDropHandler *handler )
 
 void KadasMainWindow::showPluginManager( bool show )
 {
-  if(mPluginManager == nullptr)
-    mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
-
   mPluginManager->setVisible(show);
 }
 

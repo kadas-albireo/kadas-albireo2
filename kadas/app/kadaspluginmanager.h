@@ -53,6 +53,7 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
   public:
     KadasPluginManager( QgsMapCanvas *canvas, QAction *action );
 
+    void loadPlugins();
     void updateAllPlugins();
 
   private slots:

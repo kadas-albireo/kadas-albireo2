@@ -102,6 +102,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
+    KadasPluginManager *pluginManager() { return  mPluginManager; }
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
