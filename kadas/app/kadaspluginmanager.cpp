@@ -194,6 +194,8 @@ void KadasPluginManager::updateAllPlugins()
 
     if(availablePluginInfo.version > installedPluginVersion)
     {
+      qDebug() << availablePluginInfo.version << ">" << installedPluginVersion;
+
       QString moduleName = (*it)->data( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole ).toString();
       KadasPluginManagerInstallButton *button = nullptr;
       QList<QTreeWidgetItem *> availableTreeWidgetItems = mAvailableTreeWidget->findItems( installedPluginName, Qt::MatchExactly, 0 );
@@ -207,12 +209,14 @@ void KadasPluginManager::updateAllPlugins()
       if ( button == nullptr )
         continue;
 
+      qDebug() << "Before update";
       bool success = updatePlugin(installedPluginName,
                                   moduleName,
                                   availablePluginInfo.downloadLink,
                                   availablePluginInfo.description,
                                   availablePluginInfo.version,
                                   button);
+      qDebug() << "After update success=" << success;
 
       if ( success )
         kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update" ),
@@ -403,7 +407,9 @@ void KadasPluginManager::installButtonClicked()
 
 bool KadasPluginManager::installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b )
 {
+  qDebug() << "installPlugin 0";
   b->setStatus( KadasPluginManagerInstallButton::Installing );
+  qDebug() << "installPlugin 1";
 
   KadasPythonIntegration *p = KadasApplication::instance()->pythonIntegration();
   if ( !p )
@@ -418,6 +424,8 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     return false;
   }
 
+  qDebug() << "installPlugin 2";
+
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
   QTextStream( stdout ) << downloadUrl << Qt::endl;
@@ -430,6 +438,8 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   } );
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
   e.exec();
+
+  qDebug() << "installPlugin 3";
 
   if ( nf.reply()->error() != QNetworkReply::NoError )
   {
@@ -444,7 +454,7 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
   zip.open( QuaZip::mdUnzip );
   QuaZipFile file( &zip );
   QString moduleName;
-
+  qDebug() << "installPlugin 4";
   for ( bool f = zip.goToFirstFile(); f; f = zip.goToNextFile() )
   {
     QString fileName = zip.getCurrentFileName();
@@ -479,6 +489,8 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     }
   }
 
+  qDebug() << "installPlugin 5";
+
   //insert into mInstalledTreeWidget
   QTreeWidgetItem *installedItem = new QTreeWidgetItem();
   installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_NAME, pluginName );
@@ -496,6 +508,8 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
     setItemActivatable( installedItem );
   }
   mInstalledTreeWidget->addTopLevelItem( installedItem );
+
+  qDebug() << "installPlugin 6";
 
   //change icon in mAvailableTreeWidget
   QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
@@ -545,7 +559,9 @@ bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
 
 bool KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b )
 {
+  qDebug() << "Uninstall:";
   uninstallPlugin( pluginName, moduleName, b );
+  qDebug() << "Reinstall:";
   return installPlugin( pluginName, downloadUrl, pluginTooltip, pluginVersion, b );
 }
 
