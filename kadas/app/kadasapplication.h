@@ -115,7 +115,7 @@ class KadasApplication : public QgsApplication
     void showPythonConsole();
     void unsetMapTool();
 
-    void initWithEventLoop();
+    void initAfterExec();
 
   signals:
     void projectWillBeClosed();

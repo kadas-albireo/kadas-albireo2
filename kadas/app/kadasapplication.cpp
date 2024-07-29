@@ -397,9 +397,7 @@ void KadasApplication::init()
   KadasNewsPopup::showIfNewsAvailable();
 
   // Continue loading application after exec()
-  qDebug() << "before timer";
-  QTimer::singleShot(1, this, &KadasApplication::initWithEventLoop);
-  qDebug() << "after timer";
+  QTimer::singleShot(1, this, &KadasApplication::initAfterExec);
 }
 
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
@@ -1480,9 +1478,8 @@ void KadasApplication::unsetMapTool()
   }
 }
 
-void KadasApplication::initWithEventLoop()
+void KadasApplication::initAfterExec()
 {
-  qDebug() << "in timer";
   // Update plugins
   mainWindow()->pluginManager()->loadPlugins();
   mainWindow()->pluginManager()->updateAllPlugins();
