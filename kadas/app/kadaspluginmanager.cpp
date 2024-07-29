@@ -428,15 +428,24 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const  QStrin
 
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
+  qDebug() << "installPlugin 2.1";
   QTextStream( stdout ) << downloadUrl << Qt::endl;
+  qDebug() << "installPlugin 2.2";
   QUrl repositoryUrl( downloadUrl );
+  qDebug() << "installPlugin 2.3";
   QEventLoop e;
+  qDebug() << "installPlugin 2.4";
   nf.fetchContent( repositoryUrl );
+  qDebug() << "installPlugin 2.5";
   connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot )
   {
+    qDebug() << "installPlugin 2.6.1";
     b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 );
+    qDebug() << "installPlugin 2.6.2";
   } );
+  qDebug() << "installPlugin 2.7";
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
+  qDebug() << "installPlugin 2.8";
   e.exec();
 
   qDebug() << "installPlugin 3";
