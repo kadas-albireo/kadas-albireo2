@@ -393,12 +393,13 @@ void KadasApplication::init()
     loadStartupProject();
   }
 
-  // Update plugins
-  mainWindow()->pluginManager()->loadPlugins();
-  mainWindow()->pluginManager()->updateAllPlugins();
-
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
+
+  // Continue loading application after exec()
+  qDebug() << "before timer";
+  QTimer::singleShot(1, this, &KadasApplication::initWithEventLoop);
+  qDebug() << "after timer";
 }
 
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
@@ -1477,6 +1478,14 @@ void KadasApplication::unsetMapTool()
   {
     mMainWindow->mapCanvas()->unsetMapTool( mMainWindow->mapCanvas()->mapTool() );
   }
+}
+
+void KadasApplication::initWithEventLoop()
+{
+  qDebug() << "in timer";
+  // Update plugins
+  mainWindow()->pluginManager()->loadPlugins();
+  mainWindow()->pluginManager()->updateAllPlugins();
 }
 
 void KadasApplication::extentChanged()
