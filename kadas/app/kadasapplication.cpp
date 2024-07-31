@@ -94,6 +94,7 @@
 #include <kadas/app/kadasmessagelogviewer.h>
 #include <kadas/app/kadasnewspopup.h>
 #include <kadas/app/kadasplugininterfaceimpl.h>
+#include <kadas/app/kadaspluginmanager.h>
 #include <kadas/app/kadaspythonintegration.h>
 #include <kadas/app/bullseye/kadasbullseyelayer.h>
 #include <kadas/app/guidegrid/kadasguidegridlayer.h>
@@ -394,6 +395,9 @@ void KadasApplication::init()
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
+
+  // Continue loading application after exec()
+  QTimer::singleShot(1, this, &KadasApplication::initAfterExec);
 }
 
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
@@ -1472,6 +1476,13 @@ void KadasApplication::unsetMapTool()
   {
     mMainWindow->mapCanvas()->unsetMapTool( mMainWindow->mapCanvas()->mapTool() );
   }
+}
+
+void KadasApplication::initAfterExec()
+{
+  // Update plugins
+  mainWindow()->pluginManager()->loadPlugins();
+  mainWindow()->pluginManager()->updateAllPlugins();
 }
 
 void KadasApplication::extentChanged()

@@ -53,6 +53,9 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
   public:
     KadasPluginManager( QgsMapCanvas *canvas, QAction *action );
 
+    void loadPlugins();
+    void updateAllPlugins();
+
   private slots:
     void installButtonClicked();
     void updateButtonClicked();
@@ -60,6 +63,9 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
     void on_mCloseButton_clicked();
 
   private:
+
+    const int INSTALLED_TREEWIDGET_COLUMN_NAME = 0;
+    const int INSTALLED_TREEWIDGET_COLUMN_VERSION = 1;
 
     struct PluginInfo
     {
@@ -71,13 +77,12 @@ class KadasPluginManager: public KadasBottomBar, private Ui::KadasPluginManagerB
 
     KadasPluginManager();
 
-    /**plugin name, pair<description, download link>*/
     QMap< QString, PluginInfo > mAvailablePlugins;
 
     QMap< QString, PluginInfo > availablePlugins();
     bool installPlugin( const QString &pluginName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b );
     bool uninstallPlugin( const QString &pluginName, const QString &moduleName, KadasPluginManagerInstallButton *b );
-    void updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b );
+    bool updatePlugin( const QString &pluginName, const QString &moduleName, const  QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b );
 
     //tree widget state
     void setItemInstallable( QTreeWidgetItem *item, const QString &version );
