@@ -919,7 +919,7 @@ index fc5fa75ef20..7c0e6b31e39 100644
 -from .ui_qgsplugindependenciesdialogbase import Ui_QgsPluginDependenciesDialogBase
  from qgis.utils import iface
  
-+, _ = uic.loadUiType(Path(__file__).parent / 'qgsplugindependenciesdialogbase.ui')
++Ui_QgsPluginDependenciesDialogBase, _ = uic.loadUiType(Path(__file__).parent / 'qgsplugindependenciesdialogbase.ui')
 +
  
  class QgsPluginDependenciesDialog(QtWidgets.QDialog, Ui_QgsPluginDependenciesDialogBase):
