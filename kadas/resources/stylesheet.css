@@ -93,15 +93,15 @@ QPushButton#mRibbonbarButton:pressed
 }
 
 #mLayersWidget {
-  background-color: rgba(255,255,255,220);
+  background-color: white;
   border: 1px solid #263B4E;
 }
 
-#mLayersWidget > #mLayersBox,
+/*#mLayersWidget > #mLayersBox,
 #mLayersWidget > #mLayersBox > QWidget
 {
   background-color: transparent;
-}
+}*/
 
 #mGeodataToolbar QToolButton {
   color: #FFFFFF;
