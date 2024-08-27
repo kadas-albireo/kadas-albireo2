@@ -97,12 +97,6 @@ QPushButton#mRibbonbarButton:pressed
   border: 1px solid #263B4E;
 }
 
-/*#mLayersWidget > #mLayersBox,
-#mLayersWidget > #mLayersBox > QWidget
-{
-  background-color: transparent;
-}*/
-
 #mGeodataToolbar QToolButton {
   color: #FFFFFF;
   padding: 1px 4px 1px 4px;
