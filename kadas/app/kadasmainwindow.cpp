@@ -1151,6 +1151,8 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
 
 void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers )
 {
+  qDebug() << "addCatalogLayer uri:" << uri.uri << "metadataUrl" << metadataUrl << "sublayers" << sublayers;
+
   QString adjustedUri = uri.uri;
 
   // Adjust layer CRS to project CRS

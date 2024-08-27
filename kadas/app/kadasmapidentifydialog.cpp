@@ -466,26 +466,33 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
           for ( int i = 0, n = store.count(); i < n; ++i )
           {
             QgsFeature feature = store.features().at( i );
-            QTreeWidgetItem *item = nullptr;
+            QTreeWidgetItem *layerItem = nullptr;
             if ( resultIt.key() < rLayer->dataProvider()->subLayers().length() )
             {
               QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
               sublayerName = sublayerNames.value( sublayerName, sublayerName );
-              item = new QTreeWidgetItem( QStringList() << sublayerName );
-              mLayerTreeItemMap[rLayer->id()]->addChild( item );
+              layerItem = new QTreeWidgetItem( QStringList() << sublayerName );
+              mLayerTreeItemMap[rLayer->id()]->addChild( layerItem );
             }
             else
             {
-              item = mLayerTreeItemMap[rLayer->id()];
+              layerItem = mLayerTreeItemMap[rLayer->id()];
             }
+
+            QString label = QString( "%1 [%2]" ).arg( rLayer->name() ).arg( feature.id() );
+            QTreeWidgetItem *featureItem = new QTreeWidgetItem( QStringList() << label );
+            layerItem->addChild( featureItem );
+            featureItem->setExpanded( true );
+            featureItem->setFirstColumnSpanned( true );
+
             for ( int j = 0, m = feature.attributeCount(); j < m; ++j )
             {
               const QgsField &field = feature.fields().at( j );
               QStringList pair = QStringList() << field.displayName() << field.displayString( feature.attribute( j ) );
-              item->addChild( new QTreeWidgetItem( pair ) );
+              featureItem->addChild( new QTreeWidgetItem( pair ) );
             }
-            item->setExpanded( true );
-            item->setFirstColumnSpanned( true );
+            layerItem->setExpanded( true );
+            layerItem->setFirstColumnSpanned( true );
           }
         }
       }
