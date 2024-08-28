@@ -31,63 +31,33 @@
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
 
 
-KadasLocalDataSearchProvider::KadasLocalDataSearchProvider( QgsMapCanvas *mapCanvas )
-  : KadasSearchProvider( mapCanvas )
+const int KadasLocalDataSearchFilter::sResultCountLimit = 50;
+
+
+KadasLocalDataSearchFilter::KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas )
+  : QgsLocatorFilter()
+  , mMapCanvas( mapCanvas )
 {
 }
 
-void KadasLocalDataSearchProvider::startSearch( const QString &searchtext, const SearchRegion &searchRegion )
+QgsLocatorFilter *KadasLocalDataSearchFilter::clone() const
 {
-  QList<QgsMapLayer *> visibleLayers;
-  for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
-  {
-    if ( layer->type() == Qgis::LayerType::Vector && mMapCanvas->layers().contains( layer ) )
-    {
-      visibleLayers.append( layer );
-    }
-  }
-
-  QThread *crawlerThread = new QThread( this );
-  mCrawler = new KadasLocalDataSearchCrawler( searchtext, searchRegion, visibleLayers );
-  mCrawler->moveToThread( crawlerThread );
-  connect( crawlerThread, &QThread::started, mCrawler, &KadasLocalDataSearchCrawler::run );
-  connect( crawlerThread, &QThread::finished, crawlerThread, &QThread::deleteLater );
-  connect( mCrawler, &KadasLocalDataSearchCrawler::searchResultFound, this, &KadasLocalDataSearchProvider::searchResultFound );
-  connect( mCrawler, &KadasLocalDataSearchCrawler::searchFinished, this, &KadasLocalDataSearchProvider::searchFinished );
-  connect( mCrawler, &KadasLocalDataSearchCrawler::searchFinished, crawlerThread, &QThread::quit );
-  connect( mCrawler, &KadasLocalDataSearchCrawler::searchFinished, mCrawler, &QThread::deleteLater );
-  crawlerThread->start();
+  return new KadasLocalDataSearchFilter( mMapCanvas );
 }
 
-void KadasLocalDataSearchProvider::cancelSearch()
-{
-  if ( mCrawler )
-  {
-    mCrawler->abort();
-  }
-}
-
-
-const int KadasLocalDataSearchCrawler::sResultCountLimit = 50;
-
-void KadasLocalDataSearchCrawler::run()
+void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
   int resultCount = 0;
-
-  QString escapedSearchText = mSearchText;
+  QString escapedSearchText = string;
   escapedSearchText.replace( "'", "\\'" );
-  for ( QgsMapLayer *layer : mLayers )
+
+  const QVector<QgsVectorLayer *> layers = QgsProject::instance()->layers<QgsVectorLayer *>();
+  for ( QgsVectorLayer *layer :  layers )
   {
-    QMutexLocker locker( &mAbortMutex );
-    if ( mAborted )
-    {
-      break;
-    }
-    locker.unlock();
+    if ( !mMapCanvas->layers().contains( layer ) )
+      continue;
 
-    QgsVectorLayer *vlayer = static_cast<QgsVectorLayer *>( layer );
-
-    const QgsFields &fields = vlayer->fields();
+    const QgsFields &fields = layer->fields();
     QStringList conditions;
     for ( int idx = 0, nFields = fields.count(); idx < nFields; ++idx )
     {
@@ -97,32 +67,22 @@ void KadasLocalDataSearchCrawler::run()
 
     QgsFeatureRequest req;
     QgsFeature feature;
-    if ( !mSearchRegion.polygon.isEmpty() )
+    if ( !context.targetExtent.isNull() )
     {
-      QgsLineString *exterior = new QgsLineString();
-      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( mSearchRegion.crs ), layer->crs(), QgsProject::instance() );
-      for ( const QgsPointXY &p : mSearchRegion.polygon )
-      {
-        exterior->addVertex( QgsPoint( ct.transform( p ) ) );
-      }
-      QgsPolygon *poly = new QgsPolygon();
-      poly->setExteriorRing( exterior );
-      QgsGeometry filterGeom( poly );
-
-      req.setFilterRect( filterGeom.boundingBox() );
+      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), layer->crs(), QgsProject::instance() );
+      QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
+      req.setFilterRect( box );
       req.setFilterExpression( exprText );
-      QgsFeatureIterator it = vlayer->getFeatures( req );
+      QgsFeatureIterator it = layer->getFeatures( req );
       while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
       {
-        locker.relock();
-        if ( mAborted )
+        if ( feedback->isCanceled() )
         {
           break;
         }
-        locker.unlock();
-        if ( filterGeom.contains( feature.geometry() ) )
+        if ( context.targetExtent.intersects( feature.geometry().boundingBox() ) )
         {
-          buildResult( feature, vlayer );
+          buildResult( feature, layer, escapedSearchText );
           ++resultCount;
         }
       }
@@ -130,66 +90,61 @@ void KadasLocalDataSearchCrawler::run()
     else
     {
       req.setFilterExpression( exprText );
-      QgsFeatureIterator it = vlayer->getFeatures( req );
+      QgsFeatureIterator it = layer->getFeatures( req );
       while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
       {
-        locker.relock();
-        if ( mAborted )
+        if ( feedback->isCanceled() )
         {
           break;
         }
-        locker.unlock();
-        buildResult( feature, vlayer );
+        buildResult( feature, layer, escapedSearchText );
         ++resultCount;
       }
     }
     if ( resultCount >= sResultCountLimit )
     {
-      QgsDebugMsgLevel( "Stopping search due to result count limit hit" , 2 );
+      QgsDebugMsgLevel( "Stopping search due to result count limit hit", 2 );
       break;
     }
   }
-  emit searchFinished();
 }
 
-void KadasLocalDataSearchCrawler::buildResult( const QgsFeature &feature, QgsVectorLayer *layer )
+void KadasLocalDataSearchFilter::triggerResult( const QgsLocatorResult &result )
+{
+  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QgsVectorLayer *layer = QgsProject::instance()->mapLayer<QgsVectorLayer *>( data.value( QStringLiteral( "layer_id" ) ).toString() );
+  QgsFeatureId fid = data.value( QStringLiteral( "feature_id" ) ).value<QgsFeatureId>();
+
+  if ( layer )
+  {
+    mMapCanvas->zoomToFeatureIds( layer, QgsFeatureIds() << fid );
+    mMapCanvas->flashFeatureIds( layer, QgsFeatureIds() << fid );
+  }
+}
+
+
+void KadasLocalDataSearchFilter::buildResult( const QgsFeature &feature, QgsVectorLayer *layer, const QString &searchText )
 {
   // Get the string which matched the search term
   const QgsFields &fields = layer->fields();
-  QString matchText = mSearchText;
+  QString matchText = searchText;
   for ( int idx = 0, nFields = fields.count(); idx < nFields; ++idx )
   {
     QString attribute = feature.attribute( idx ).toString();
-    if ( attribute.contains( mSearchText, Qt::CaseInsensitive ) )
+    if ( attribute.contains( searchText, Qt::CaseInsensitive ) )
     {
       matchText = attribute;
       break;
     }
   }
 
-  KadasSearchProvider::SearchResult result;
-  result.bbox = feature.geometry().boundingBox();
-  result.category = tr( "Layer %1" ).arg( layer->name() );
-  result.categoryPrecedence = 10;
-  result.crs = layer->crs().authid();
-  result.zoomScale = 1000;
-  result.showPin = true;
-  QgsGeometry pt = feature.geometry().pointOnSurface();
-  if ( pt.isEmpty() )
+  QgsLocatorResult result;
+  result.displayString = tr( "%1 (feature %2)" ).arg( matchText ).arg( feature.id() );
+  result.setUserData( QVariantMap(
   {
-    result.pos = pt.asPoint();
-  }
-  else
-  {
-    result.pos = result.bbox.center();
-  }
-  result.text = tr( "%1 (feature %2)" ).arg( matchText ).arg( feature.id() );
-  emit searchResultFound( result );
+    {QStringLiteral( "feature_id" ), feature.id()},
+    {QStringLiteral( "layer_id" ), layer->id() },
+  } ) );
+  emit resultFetched( result );
 }
 
-void KadasLocalDataSearchCrawler::abort()
-{
-  mAbortMutex.lock();
-  mAborted = true;
-  mAbortMutex.unlock();
-}

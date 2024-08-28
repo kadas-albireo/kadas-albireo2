@@ -21,54 +21,34 @@
 #include <QMutex>
 #include <QPointer>
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
+#include <kadas/gui/kadas_gui.h>
+
+class QgsMapCanvas;
 class QgsFeature;
 class QgsMapLayer;
 class QgsVectorLayer;
-class KadasLocalDataSearchCrawler;
 
-class KADAS_GUI_EXPORT KadasLocalDataSearchProvider : public KadasSearchProvider
+class KADAS_GUI_EXPORT KadasLocalDataSearchFilter : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
-    KadasLocalDataSearchProvider( QgsMapCanvas *mapCanvas );
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
-    void cancelSearch() override;
+    KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas );
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "local-data" ); }
+    QString displayName() const override { return tr( "Local data" ); }
+    virtual Priority priority() const override { return Priority::Medium; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
+
 
   private:
-    QPointer<KadasLocalDataSearchCrawler> mCrawler;
-};
-
-
-class KADAS_GUI_EXPORT KadasLocalDataSearchCrawler : public QObject
-{
-    Q_OBJECT
-  public:
-    KadasLocalDataSearchCrawler( const QString &searchText,
-                                 const KadasSearchProvider::SearchRegion &searchRegion,
-                                 QList<QgsMapLayer *> layers, QObject *parent = 0 )
-      : QObject( parent ), mSearchText( searchText ), mSearchRegion( searchRegion ), mLayers( layers ), mAborted( false ) {}
-
-    void abort();
-
-  public slots:
-    void run();
-
-  signals:
-    void searchResultFound( KadasSearchProvider::SearchResult result );
-    void searchFinished();
-
-  private:
+    void buildResult( const QgsFeature &feature, QgsVectorLayer *layer, const QString &searchText );
+    QgsMapCanvas *mMapCanvas = nullptr;
     static const int sResultCountLimit;
-
-    QString mSearchText;
-    KadasSearchProvider::SearchRegion mSearchRegion;
-    QList<QgsMapLayer *> mLayers;
-    QMutex mAbortMutex;
-    bool mAborted;
-
-    void buildResult( const QgsFeature &feature, QgsVectorLayer *layer );
 };
+
 
 #endif // KADASLOCALDATASEARCHPROVIDER_H

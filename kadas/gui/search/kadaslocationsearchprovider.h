@@ -18,35 +18,43 @@
 #ifndef KADASLOCATIONSEARCHPROVIDER_H
 #define KADASLOCATIONSEARCHPROVIDER_H
 
+#include <QPointer>
 #include <QMap>
 #include <QRegExp>
-#include <QTimer>
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <kadas/gui/kadas_gui.h>
 
-class KADAS_GUI_EXPORT KadasLocationSearchProvider : public KadasSearchProvider
+class QgsMapCanvas;
+
+
+class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
-    KadasLocationSearchProvider( QgsMapCanvas *mapCanvas );
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
-    void cancelSearch() override;
+    KadasLocationSearchFilter( QgsMapCanvas *mapCanvas );
+    ~KadasLocationSearchFilter();
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "location-search" ); }
+    QString displayName() const override { return tr( "Location Search" ); }
+    virtual Priority priority() const override { return Priority::Medium; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
+    virtual void clearPreviousResults() override;
 
   private:
+    QgsMapCanvas *mMapCanvas = nullptr;
     static const int sSearchTimeout;
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 
-    QNetworkReply *mNetReply;
     QMap<QString, QPair<QString, int> > mCategoryMap;
     QRegExp mPatBox;
-    QTimer mTimeoutTimer;
 
-  private slots:
-    void replyFinished();
+    QString mPinItemId ;
+    QString mGeometryItemId;
 };
 
 #endif // KADASLOCATIONSEARCHPROVIDER_H

@@ -23,9 +23,19 @@
 #include <kadas/gui/mapitems/kadassymbolitem.h>
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 
-const QString KadasPinSearchProvider::sCategoryName = KadasPinSearchProvider::tr( "Pins" );
 
-void KadasPinSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
+KadasPinSearchProvider::KadasPinSearchProvider( QgsMapCanvas *mapCanvas )
+  : QgsLocatorFilter()
+  , mMapCanvas( mapCanvas )
+{
+}
+
+QgsLocatorFilter *KadasPinSearchProvider::clone() const
+{
+  return new KadasPinSearchProvider( mMapCanvas );
+}
+
+void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
   for ( QgsMapLayer *layer : mMapCanvas->layers() )
   {
@@ -41,20 +51,35 @@ void KadasPinSearchProvider::startSearch( const QString &searchtext, const Searc
       {
         continue;
       }
-      if ( symbolItem->name().contains( searchtext, Qt::CaseInsensitive ) ||
-           symbolItem->remarks().contains( searchtext, Qt::CaseInsensitive ) )
+      if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) ||
+           symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
       {
-        SearchResult searchResult;
-        searchResult.zoomScale = 1000;
-        searchResult.category = sCategoryName;
-        searchResult.categoryPrecedence = 2;
-        searchResult.text = tr( "Pin %1" ).arg( symbolItem->name() );
-        searchResult.pos = symbolItem->constState()->pos;
-        searchResult.crs = symbolItem->crs().authid();
-        searchResult.showPin = false;
-        emit searchResultFound( searchResult );
+        QgsLocatorResult result;
+        QVariantMap resultData;
+
+        //searchResult.zoomScale = 1000;
+        result.displayString = tr( "Pin %1" ).arg( symbolItem->name() );
+        resultData[QStringLiteral( "pos" )] = QgsPointXY( symbolItem->constState()->pos );
+        resultData[QStringLiteral( "crs" )] = symbolItem->crs().authid();
+
+        result.setUserData( resultData );
+        emit resultFetched( result );
       }
     }
   }
-  emit searchFinished();
+}
+
+void KadasPinSearchProvider::triggerResult( const QgsLocatorResult &result )
+{
+  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
+  QString crsIs = data.value( QStringLiteral( "crs" ) ).toString();
+
+  QgsPointXY itemPos = QgsCoordinateTransform(
+                         QgsCoordinateReferenceSystem( crsIs ),
+                         mMapCanvas->mapSettings().destinationCrs(),
+                         QgsProject::instance()
+                       ).transform( pos );
+
+  mMapCanvas->setCenter( itemPos );
 }

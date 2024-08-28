@@ -21,31 +21,36 @@
 #include <QRegExp>
 #include <QTimer>
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <kadas/gui/kadas_gui.h>
 
-class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public KadasSearchProvider
+class QgsMapCanvas;
+
+class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
     KadasWorldLocationSearchProvider( QgsMapCanvas *mapCanvas );
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
-    void cancelSearch() override;
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "world-location-search" ); }
+    QString displayName() const override { return tr( " World Location Search" ); }
+    virtual Priority priority() const override { return Priority::Medium; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
+    virtual void clearPreviousResults() override;
 
   private:
     static const int sSearchTimeout;
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 
-    QNetworkReply *mNetReply;
+    QString mPinItemId ;
+    QString mGeometryItemId;
+    QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int> > mCategoryMap;
     QRegExp mPatBox;
-    QTimer mTimeoutTimer;
-
-  private slots:
-    void replyFinished();
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H

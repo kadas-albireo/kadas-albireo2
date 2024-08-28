@@ -21,10 +21,21 @@
 #include <QNetworkReply>
 #include <QUrlQuery>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsfeedback.h>
+#include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsjsonutils.h>
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgscurve.h>
+#include <qgis/qgscurvepolygon.h>
 
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
 
@@ -34,19 +45,20 @@ const int KadasWorldLocationSearchProvider::sResultCountLimit = 50;
 
 
 KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas *mapCanvas )
-  : KadasSearchProvider( mapCanvas )
+  : QgsLocatorFilter()
+  , mMapCanvas( mapCanvas )
 {
-  mNetReply = 0;
-
   mCategoryMap.insert( "geonames", qMakePair( tr( "World Places" ), 30 ) );
 
   mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
-
-  mTimeoutTimer.setSingleShot( true );
-  connect( &mTimeoutTimer, &QTimer::timeout, this, &KadasWorldLocationSearchProvider::replyFinished );
 }
 
-void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, const SearchRegion & /*searchRegion*/ )
+QgsLocatorFilter *KadasWorldLocationSearchProvider::clone() const
+{
+  return new KadasWorldLocationSearchProvider( mMapCanvas );
+}
+
+void KadasWorldLocationSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -64,7 +76,7 @@ void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, c
   query.removeAllQueryItems( "searchText" );
   query.removeAllQueryItems( "sr" );
   query.addQueryItem( "type", "locations" );
-  query.addQueryItem( "searchText", searchtext );
+  query.addQueryItem( "searchText", string );
   query.addQueryItem( "sr", "4326" );
   if ( !query.hasQueryItem( "limit" ) )
   {
@@ -74,81 +86,145 @@ void KadasWorldLocationSearchProvider::startSearch( const QString &searchtext, c
 
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  mNetReply = QgsNetworkAccessManager::instance()->get( req );
-  connect( mNetReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::replyFinished );
-  mTimeoutTimer.start( sSearchTimeout );
-}
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
 
-void KadasWorldLocationSearchProvider::cancelSearch()
-{
-  if ( mNetReply )
+  connect( feedback, &QgsFeedback::canceled, reply, &QNetworkReply::abort );
+  connect( reply, &QNetworkReply::finished, this, [this, reply]()
   {
-    mTimeoutTimer.stop();
-    disconnect( mNetReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::replyFinished );
-    mNetReply->close();
-    mNetReply->deleteLater();
-    mNetReply = 0;
-  }
-}
-
-void KadasWorldLocationSearchProvider::replyFinished()
-{
-  if ( !mNetReply )
-  {
-    return;
-  }
-
-  if ( mNetReply->error() != QNetworkReply::NoError || !mTimeoutTimer.isActive() )
-  {
-    mNetReply->deleteLater();
-    mNetReply = 0;
-    emit searchFinished();
-    return;
-  }
-
-  QByteArray replyText = mNetReply->readAll();
-  QJsonParseError err;
-  QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
-  if ( doc.isNull() )
-  {
-    QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ) , 2 );
-  }
-  QJsonObject resultMap = doc.object();
-  for ( const QJsonValueRef &item : resultMap["results"].toArray() )
-  {
-    QJsonObject itemMap = item.toObject();
-    QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
-
-
-    QString origin = itemAttrsMap["origin"].toString();
-
-
-    SearchResult searchResult;
-    searchResult.pos = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
-    searchResult.zoomScale = 25000;
-
-    searchResult.category = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
-    searchResult.categoryPrecedence = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 100;
-    searchResult.text = itemAttrsMap["label"].toString();
-    searchResult.text.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
-    searchResult.crs = "EPSG:4326";
-    searchResult.showPin = !itemAttrsMap.contains( "geometryGeoJSON" );
-    if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
+    if ( reply->error() == QNetworkReply::NoError )
     {
-      searchResult.geometry = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
-    }
-    if ( itemAttrsMap.contains( "boundingBox" ) )
-    {
-      static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
-      QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
-      if ( match.isValid() )
+      QByteArray replyText = reply->readAll();
+      QJsonParseError err;
+      QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
+      if ( doc.isNull() )
       {
-        searchResult.bbox = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
+        QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
+      }
+      QJsonObject resultMap = doc.object();
+      const QJsonArray constResults = resultMap["results"].toArray();
+      for ( const QJsonValue &item : constResults )
+      {
+        QJsonObject itemMap = item.toObject();
+        QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
+
+
+        QString origin = itemAttrsMap["origin"].toString();
+
+        QgsLocatorResult result;
+        QVariantMap resultData;
+        resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
+
+        result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
+        // TODO QGIS 3.40: uncomment
+        // result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
+        QString label = itemAttrsMap["label"].toString();
+        label.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
+        result.displayString = label;
+
+        if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
+        {
+          resultData[QStringLiteral( "geometry" )] = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
+        }
+        if ( itemAttrsMap.contains( "boundingBox" ) )
+        {
+          static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
+          QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
+          if ( match.isValid() )
+          {
+            resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
+          }
+        }
+        result.setUserData( resultData );
+        emit resultFetched( result );
       }
     }
-    emit searchResultFound( searchResult );
+    reply->deleteLater();
+  } );
+}
+
+void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
+{
+  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
+  QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
+  QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
+
+  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
+  QgsPointXY itemPos = ct.transform( pos );
+
+  bool geomShown = false;
+  if ( !geometry.isEmpty() )
+  {
+    QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"feature\", \"geometry\": %1}]}" ).arg( geometry );
+    QgsFeatureList features = QgsJsonUtils::stringToFeatureList( feature );
+    if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
+    {
+      QgsGeometry geometry = features[0].geometry();
+      QgsAnnotationItem *item = nullptr;
+      switch ( features[0].geometry().type() )
+      {
+        case Qgis::GeometryType::Point:
+        {
+          QgsPoint *pt = qgsgeometry_cast< QgsPoint * >( geometry.get() );
+          item = new QgsAnnotationMarkerItem( *pt );
+          break;
+        }
+        case Qgis::GeometryType::Line:
+        {
+          QgsCurve *curve = qgsgeometry_cast< QgsCurve * >( geometry.get() );
+          item = new QgsAnnotationLineItem( curve );
+          break;
+        }
+        case Qgis::GeometryType::Polygon:
+        {
+          QgsCurvePolygon *poly = qgsgeometry_cast< QgsCurvePolygon * >( geometry.get() );
+          item = new QgsAnnotationPolygonItem( poly );
+          break;
+        }
+        case Qgis::GeometryType::Unknown:
+        case Qgis::GeometryType::Null:
+          break;
+      }
+      if ( item )
+      {
+        geomShown = true;
+        mGeometryItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+      }
+    }
   }
-  mNetReply->deleteLater();
-  mNetReply = 0;
-  emit searchFinished();
+
+  if ( !geomShown )
+  {
+    QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
+    QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
+    symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+    item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+    mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+  }
+
+  if ( !bbox.isNull() )
+  {
+    bbox = ct.transform( bbox );
+    mMapCanvas->setExtent( bbox );
+  }
+  else
+  {
+    mMapCanvas->setCenter( itemPos );
+  }
+
+}
+
+
+void KadasWorldLocationSearchProvider::clearPreviousResults()
+{
+  if ( !mPinItemId.isEmpty() )
+  {
+    QgsProject::instance()->mainAnnotationLayer()->removeItem( mPinItemId );
+    mPinItemId = QString();
+  }
+  if ( !mGeometryItemId.isEmpty() )
+  {
+    QgsProject::instance()->mainAnnotationLayer()->removeItem( mGeometryItemId );
+    mGeometryItemId = QString();
+  }
 }
