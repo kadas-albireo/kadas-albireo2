@@ -5897,32 +5897,32 @@ avec géoloc.</translation>
         <translation>Ajouter géodonnées</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="408"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="411"/>
         <source>Add Local Layer</source>
         <translation>Ajouter une couche locale</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="422"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="431"/>
         <source>Add Service Layer</source>
         <translation>Ajouter des couches à partir d&apos;un service Web</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="436"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="451"/>
         <source>Refresh Catalog</source>
         <translation>Recharger catalogue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="447"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="468"/>
         <source>Login</source>
         <translation>Connexion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="458"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="485"/>
         <source>Logout</source>
         <translation>Déconnexion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="551"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="578"/>
         <source>Loading...</source>
         <translation>Chargement...</translation>
     </message>

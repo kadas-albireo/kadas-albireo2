@@ -5895,32 +5895,32 @@ bewegen</translation>
         <translation>Geodaten hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="408"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="411"/>
         <source>Add Local Layer</source>
         <translation>Lokale Ebene hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="422"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="431"/>
         <source>Add Service Layer</source>
         <translation>Ebene eines Web Dienstes hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="436"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="451"/>
         <source>Refresh Catalog</source>
         <translation>Katalog neu laden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="447"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="468"/>
         <source>Login</source>
         <translation>Anmelden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="458"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="485"/>
         <source>Logout</source>
         <translation>Abmelden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="551"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="578"/>
         <source>Loading...</source>
         <translation>Laden...</translation>
     </message>
