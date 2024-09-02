@@ -479,7 +479,12 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
               layerItem = mLayerTreeItemMap[rLayer->id()];
             }
 
-            QString label = QString( "%1 [%2]" ).arg( rLayer->name() ).arg( feature.id() );
+            // If OBJECTID available use as identifier
+            QVariant featureId = feature.attribute( "OBJECTID" );
+            if ( ! featureId.isValid() || featureId.isNull() )
+              featureId = feature.id();
+
+            QString label = QString( "%1 [%2]" ).arg( rLayer->name() ).arg( featureId.toString() );
             QTreeWidgetItem *featureItem = new QTreeWidgetItem( QStringList() << label );
             layerItem->addChild( featureItem );
             featureItem->setExpanded( true );
