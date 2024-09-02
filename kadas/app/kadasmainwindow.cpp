@@ -1193,7 +1193,10 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     {
       adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
     }
+
+    qDebug() << "kApp->addVectorLayer(" << adjustedUri << uri.name, uri.providerKey;
     QgsVectorLayer *layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+    qDebug() << "kApp->addVectorLayer OK";
     if ( layer )
     {
       layer->setMetadataUrl( metadataUrl );
