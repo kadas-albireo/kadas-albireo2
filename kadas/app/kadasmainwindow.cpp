@@ -1193,7 +1193,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     {
       adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
     }
-    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+    QgsVectorLayer *layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     if ( layer )
     {
       layer->setMetadataUrl( metadataUrl );
@@ -1264,7 +1264,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
         }
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
-        QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
+        QgsVectorLayer *layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         if ( layer )
         {
           layer->setMetadataUrl( metadataUrl );
