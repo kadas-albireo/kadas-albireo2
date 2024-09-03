@@ -579,8 +579,13 @@ QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QStr
     QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( rootGroup, insOffset ) );
   }
 
+  qDebug() << "KadasAppLayerHandling::addVectorLayer(" << uri << layerName, providerKey;
   QgsVectorLayer *layer = KadasAppLayerHandling::addVectorLayer( uri, layerName, providerKey, !quiet );
 
+  if ( layer == nullptr )
+    qDebug() << "layer is invalid";
+
+  qDebug() << "addMapLayer";
   QgsProject::instance()->addMapLayer( layer );
   if ( adjustInsertionPoint )
   {
