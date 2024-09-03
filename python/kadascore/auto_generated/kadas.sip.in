@@ -30,7 +30,6 @@ class Kadas
     static const char *KADAS_BUILD_DATE;
 
 
-    static QgsSettingsTreeNode *sTreeGdalProxy = KadasSettingsTree::treeRoot()->createChildNode( QStringLiteral( "gdal-proxy" ) );
 
     static QString configPath();
 
