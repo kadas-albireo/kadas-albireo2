@@ -12,7 +12,8 @@
 
 
 
-class KadasLocalDataSearchProvider : KadasSearchProvider
+
+class KadasLocalDataSearchFilter : QgsLocatorFilter
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -29,35 +30,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 %End
   public:
-    KadasLocalDataSearchProvider( QgsMapCanvas *mapCanvas );
-    virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion );
+    KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas );
 
-    virtual void cancelSearch();
+    virtual QgsLocatorFilter *clone() const;
+    virtual QString name() const;
+    virtual QString displayName() const;
+    virtual Priority priority() const;
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback );
+    virtual void triggerResult( const QgsLocatorResult &result );
 
-
-};
-
-
-class KadasLocalDataSearchCrawler : QObject
-{
-
-%TypeHeaderCode
-#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
-%End
-  public:
-    KadasLocalDataSearchCrawler( const QString &searchText,
-                                 const KadasSearchProvider::SearchRegion &searchRegion,
-                                 QList<QgsMapLayer *> layers, QObject *parent = 0 );
-    void abort();
-
-  public slots:
-    void run();
-
-  signals:
-    void searchResultFound( KadasSearchProvider::SearchResult result );
-    void searchFinished();
 
 };
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

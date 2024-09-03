@@ -12,7 +12,8 @@
 
 
 
-class KadasMapServerFindSearchProvider : KadasSearchProvider
+
+class KadasMapServerFindSearchProvider : QgsLocatorFilter
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -30,10 +31,14 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );
-    virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion );
 
-    virtual void cancelSearch();
-
+    virtual QgsLocatorFilter *clone() const;
+    virtual QString name() const;
+    virtual QString displayName() const;
+    virtual Priority priority() const;
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback );
+    virtual void triggerResult( const QgsLocatorResult &result );
+    virtual void clearPreviousResults();
 
 };
 
