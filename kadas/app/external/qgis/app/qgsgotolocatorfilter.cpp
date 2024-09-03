@@ -105,7 +105,7 @@ void QgsGotoLocatorFilter::fetchResults( const QString &string, const QgsLocator
     }
   }
 
-  const QgsCoordinateReferenceSystem currentCrs =mCanvas->mapSettings().destinationCrs();
+  const QgsCoordinateReferenceSystem currentCrs = mCanvas->mapSettings().destinationCrs();
   const QgsCoordinateReferenceSystem wgs84Crs( QStringLiteral( "EPSG:4326" ) );
 
   if ( firstOk && secondOk )

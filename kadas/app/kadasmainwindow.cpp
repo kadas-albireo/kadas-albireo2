@@ -147,14 +147,14 @@ void KadasMainWindow::init()
   mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS, mActionMoveWithGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
 
-  QgsLocatorWidget* lw = new QgsLocatorWidget( mMapCanvas );
+  QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
   lw->setMapCanvas( mMapCanvas );
   lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
   mLocatorLayout->insertWidget( 0, lw );
 
   // TODO when upgrading QGIS
   //mLocatorWidget->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomRight );
-  QgsFloatingWidget* resultContainter = window()->findChild<QgsFloatingWidget *>();
+  QgsFloatingWidget *resultContainter = window()->findChild<QgsFloatingWidget *>();
   resultContainter->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopLeft );
   resultContainter->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::BottomLeft );
 
@@ -381,7 +381,7 @@ void KadasMainWindow::init()
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
-  for ( QgsLocatorFilter * filter : filters )
+  for ( QgsLocatorFilter *filter : filters )
   {
     if ( filter->name() == QStringLiteral( "filters" ) )
     {

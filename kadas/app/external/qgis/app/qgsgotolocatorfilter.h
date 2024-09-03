@@ -31,7 +31,7 @@ class QgsGotoLocatorFilter : public QgsLocatorFilter
   public:
 
 
-    QgsGotoLocatorFilter(QgsMapCanvas *mapCanvas, QObject *parent = nullptr );
+    QgsGotoLocatorFilter( QgsMapCanvas *mapCanvas, QObject *parent = nullptr );
     QgsGotoLocatorFilter *clone() const override;
     virtual QString name() const override { return QStringLiteral( "goto" ); }
     virtual QString displayName() const override { return tr( "Go to Coordinate" ); }
