@@ -145,6 +145,14 @@
         <file alias="/icons/raise">icons/raise.svg</file>
         <file alias="/icons/lower">icons/lower.svg</file>
         <file alias="/icons/camera">icons/camera.png</file>
+        <file alias="/icons/profile/arrow-horizontal">icons/profile/arrow-horizontal.svg</file>
+        <file alias="/icons/profile/arrow-vertical">icons/profile/arrow-vertical.svg</file>
+        <file alias="/icons/profile/down-cumulate">icons/profile/down-cumulate.svg</file>
+        <file alias="/icons/profile/down">icons/profile/down.svg</file>
+        <file alias="/icons/profile/globe">icons/profile/globe.svg</file>
+        <file alias="/icons/profile/mountain">icons/profile/mountain.svg</file>
+        <file alias="/icons/profile/up-cumulate">icons/profile/up-cumulate.svg</file>
+        <file alias="/icons/profile/up">icons/profile/up.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">stylesheet.css</file>

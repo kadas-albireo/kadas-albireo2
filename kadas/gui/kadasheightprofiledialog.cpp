@@ -27,6 +27,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QSpacerItem>
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -67,7 +68,7 @@ class KadasHeightProfileDialog::ScaleDraw : public QwtScaleDraw
     }
     QwtText label( double value ) const override
     {
-      return QLocale::system().toString( value * mFactor );
+      return QLocale::system().toString( value *mFactor );
     }
   private:
     double mFactor;
@@ -111,7 +112,8 @@ class PlotMousePicker : public QwtPlotPicker
 };
 
 KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent, Qt::WindowFlags f )
-  : QDialog( parent, f ), mTool( tool )
+  : QDialog( parent, f )
+  , mTool( tool )
 {
   setWindowTitle( tr( "Height profile" ) );
   setAttribute( Qt::WA_ShowWithoutActivating );
@@ -138,13 +140,69 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   grid->setMajorPen( QPen( Qt::gray ) );
   grid->attach( mPlot );
 
+  QWidget *statWidget = new QWidget( this );
+  QHBoxLayout *statLayout = new QHBoxLayout( this );
+  statLayout->setSpacing( 0 );
+  statWidget->setLayout( statLayout );
+
+  auto createVline = [this]()
+  {
+    QFrame *vline = new QFrame( this );
+    vline->setFrameShape( QFrame::VLine );
+    vline->setFrameShadow( QFrame::Sunken );
+    return vline;
+  };
+
+  statLayout->addWidget( createVline() );
+  statLayout->addSpacing( 10 );
+
+  // statistic with tooltip and list of icons (some stats have 2 icons)
+  const QMap<Statistics, std::pair<QString, QStringList>> labelIcons
+  {
+    { Statistics::HeightDifference, { tr( "Difference of altitude start-end" ), { QStringLiteral( ":/kadas/icons/profile/arrow-vertical" )}}},
+    { Statistics::TotalAscent, { tr( "Ascent" ), { QStringLiteral( ":/kadas/icons/profile/up-cumulate" )}}},
+    { Statistics::TotalDescent, { tr( "Descent" ), { QStringLiteral( ":/kadas/icons/profile/down-cumulate" )}}},
+    { Statistics::MaxHeight, { tr( "Highest Point" ), { QStringLiteral( ":/kadas/icons/profile/up" )}}},
+    { Statistics::MinHeight, { tr( "Lowest Point" ), { QStringLiteral( ":/kadas/icons/profile/down" )}}},
+    { Statistics::LinearDistance, { tr( "Linear distance" ), { QStringLiteral( ":/kadas/icons/profile/globe" ), QStringLiteral( ":/kadas/icons/profile/arrow-horizontal" )}}},
+    { Statistics::PathDistance, { tr( "Path distance" ), { QStringLiteral( ":/kadas/icons/profile/mountain" ), QStringLiteral( ":/kadas/icons/profile/arrow-horizontal" )}}},
+  };
+  QMap<Statistics, std::pair<QString, QStringList>>::const_iterator it = labelIcons.constBegin();
+  for ( ; it != labelIcons.constEnd(); ++it )
+  {
+    QHBoxLayout *valueLayout = new QHBoxLayout( this );
+    valueLayout->setSpacing( 0 );
+    for ( const auto &icon : it.value().second )
+    {
+      QLabel* label = new QLabel( this );
+      label->setMaximumSize( 20, 20 );
+      label->setMinimumSize( 20, 20 );
+      label->setPixmap( QPixmap( icon ).scaled( 18, 18, Qt::AspectRatioMode::KeepAspectRatio ) );
+      label->setToolTip( it.value().first );
+      valueLayout->addWidget( label );
+    }
+    QLabel* valueLabel = new QLabel( this );
+    valueLabel->setToolTip( it.value().first );
+    valueLabel->setAlignment( Qt::AlignmentFlag::AlignLeft | Qt::AlignmentFlag::AlignLeft );
+    valueLayout->addWidget( valueLabel );
+
+    statLayout->addLayout( valueLayout );
+    statLayout->addSpacing( 10 );
+    statLayout->addWidget( createVline() );
+    statLayout->addSpacing( 10 );
+
+    mStatisticsLabels[it.key()] = valueLabel;
+  }
+  statLayout->addSpacerItem( new QSpacerItem( 10, 0, QSizePolicy::MinimumExpanding ) );
+  vboxLayout->addWidget( statWidget );
+
   mPlotMarker = new PaddedPlotMarker();
   mPlotMarker->setSymbol( new QwtSymbol( QwtSymbol::Ellipse, QBrush( Qt::blue ), QPen( Qt::blue ), QSize( 5, 5 ) ) );
   mPlotMarker->setItemAttribute( QwtPlotItem::Margins );
   mPlotMarker->attach( mPlot );
   mPlotMarker->setLabelAlignment( Qt::AlignTop | Qt::AlignHCenter );
 
-  mPlotPicker = new PlotMousePicker( mPlot->canvas(), [this]( const QPoint & pos ) { setMarkerPlotPos( pos ); } );
+  mPlotPicker = new PlotMousePicker( mPlot->canvas(), [this]( const QPoint &pos ) { setMarkerPlotPos( pos ); } );
 
   mNodeMarkersCheckbox = new QCheckBox( tr( "Show vertex lines" ) );
   mNodeMarkersCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_nodemarkers", true ).toBool() );
@@ -238,6 +296,12 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
     mTotLength += mSegmentLengths.back();
     mTotLengthMeters += da.measureLine( mPoints[i], mPoints[i + 1] );
   }
+
+  if ( mPoints.count() > 1 )
+    mTotLinearDistanceMeters = da.measureLine( mPoints.constFirst(), mPoints.constLast() );
+  else
+    mTotLinearDistanceMeters = 0;
+
   mLineOfSightGroupBoxgroupBox->setEnabled( points.size() == 2 );
 
   // At least heightprofile_samples samples or 1 sample per 10m, whichever is larger
@@ -258,7 +322,7 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
   {
     x += mSegmentLengths[i];
   }
-  int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
+  int idx = std::min( int ( x / mTotLength *mNSamples ), mNSamples - 1 );
   QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
@@ -335,6 +399,9 @@ void KadasHeightProfileDialog::replot()
   mObserverHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
   mTargetHeightSpinBox->setSuffix( vertDisplayUnit == Qgis::DistanceUnit::Feet ? " ft" : " m" );
 
+  mStatisticsValues[Statistics::TotalAscent] = 0;
+  mStatisticsValues[Statistics::TotalDescent] = 0;
+
   if ( mPoints.isEmpty() )
   {
     return;
@@ -359,7 +426,7 @@ void KadasHeightProfileDialog::replot()
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( raster, &gtrans[0] ) != CE_None )
   {
-    QgsDebugMsgLevel( "Failed to get raster geotransform" , 2 );
+    QgsDebugMsgLevel( "Failed to get raster geotransform", 2 );
     GDALClose( raster );
     return;
   }
@@ -368,7 +435,7 @@ void KadasHeightProfileDialog::replot()
   QgsCoordinateReferenceSystem rasterCrs( proj );
   if ( !rasterCrs.isValid() )
   {
-    QgsDebugMsgLevel( "Failed to get raster CRS" , 2 );
+    QgsDebugMsgLevel( "Failed to get raster CRS", 2 );
     GDALClose( raster );
     return;
   }
@@ -376,7 +443,7 @@ void KadasHeightProfileDialog::replot()
   GDALRasterBandH band = GDALGetRasterBand( raster, 1 );
   if ( !band )
   {
-    QgsDebugMsgLevel( "Failed to open raster band 0" , 2 );
+    QgsDebugMsgLevel( "Failed to open raster band 0", 2 );
     GDALClose( raster );
     return;
   }
@@ -394,6 +461,8 @@ void KadasHeightProfileDialog::replot()
   mProgressBar->show();
   mCancelButton->show();
   mPlotSamples.clear();
+
+  double lastValue = std::numeric_limits<double>::quiet_NaN();
 
   double x = 0;
   for ( int i = 0, n = mPoints.size() - 1; i < n; ++i )
@@ -425,7 +494,7 @@ void KadasHeightProfileDialog::replot()
       if ( CE_None != GDALRasterIO( band, GF_Read,
                                     std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
       {
-        QgsDebugMsgLevel( "Failed to read pixel values" , 2 );
+        QgsDebugMsgLevel( "Failed to read pixel values", 2 );
         mPlotSamples.append( QPointF( mPlotSamples.size(), 0 ) );
       }
       else
@@ -450,7 +519,28 @@ void KadasHeightProfileDialog::replot()
 
           double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
                          + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
-          mPlotSamples.append( QPointF( mPlotSamples.size(), value * heightConversion ) );
+          mPlotSamples.append( QPointF( mPlotSamples.size(), value *heightConversion ) );
+
+          if ( mStatisticsValues.contains( Statistics::MinHeight ) )
+          {
+            mStatisticsValues[Statistics::MinHeight] = std::min( value, mStatisticsValues[Statistics::MinHeight] );
+            mStatisticsValues[Statistics::MaxHeight] = std::max( value, mStatisticsValues[Statistics::MaxHeight] );
+          }
+          else
+          {
+            mStatisticsValues[Statistics::MinHeight] = value;
+            mStatisticsValues[Statistics::MaxHeight] = value;
+          }
+          if ( !std::isnan( lastValue ) )
+          {
+            double deltaHeight = value - lastValue;
+            if ( deltaHeight > 0 )
+              mStatisticsValues[Statistics::TotalAscent] += deltaHeight;
+            else
+              mStatisticsValues[Statistics::TotalDescent] -= deltaHeight;
+          }
+          lastValue = value;
+
         }
       }
       x += mTotLength / mNSamples;
@@ -474,7 +564,7 @@ void KadasHeightProfileDialog::replot()
 
   // Add separate plot curves for each contiguous set of samples without NODATA values
   QVector<QPointF> sampleSet;
-  for ( const QPointF &p : mPlotSamples )
+  for ( const QPointF &p : std::as_const( mPlotSamples ) )
   {
     if ( p.y() == mNoDataValue )
     {
@@ -534,7 +624,7 @@ void KadasHeightProfileDialog::replot()
       QwtPlotMarker *nodeMarker = new QwtPlotMarker();
       nodeMarker->setLinePen( QPen( Qt::black, 1, Qt::DashLine ) );
       nodeMarker->setLineStyle( QwtPlotMarker::VLine );
-      int idx = std::min( int ( x / mTotLength * mNSamples ), mNSamples - 1 );
+      int idx = std::min( int ( x / mTotLength *mNSamples ), mNSamples - 1 );
       if ( idx < mPlotSamples.length() )
       {
         QPointF sample = mPlotSamples.at( idx );
@@ -543,6 +633,28 @@ void KadasHeightProfileDialog::replot()
         mNodeMarkers.append( nodeMarker );
       }
     }
+  }
+
+  mStatisticsValues[Statistics::PathDistance] = mTotLengthMeters;
+  mStatisticsValues[Statistics::LinearDistance] = mTotLinearDistanceMeters;
+  mStatisticsValues[Statistics::HeightDifference] = mPlotSamples.last().y() - mPlotSamples.first().y();
+
+  QMap<Statistics, double>::const_iterator it = mStatisticsValues.constBegin();
+  for ( ; it != mStatisticsValues.constEnd(); ++it )
+  {
+    QgsUnitTypes::DistanceValue dv;
+    int prec = 0;
+    if ( it.key() == Statistics::LinearDistance || it.key() == Statistics::PathDistance )
+    {
+      dv = QgsUnitTypes::scaledDistance( it.value(), Qgis::DistanceUnit::Meters, 2 );
+      prec = 2;
+    }
+    else
+    {
+      dv.value = it.value();
+      dv.unit = Qgis::DistanceUnit::Meters;
+    }
+    mStatisticsLabels[it.key()]->setText( QgsUnitTypes::formatDistance( dv.value, prec, dv.unit, true ) );
   }
 
   updateLineOfSight( );
@@ -593,7 +705,7 @@ void KadasHeightProfileDialog::updateLineOfSight( )
   double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
   for ( const QPointF &p : mPlotSamples )
   {
-    pX.append( p.x() / mNSamples * mTotLengthMeters );
+    pX.append( p.x() / mNSamples *mTotLengthMeters );
     double hCorr = 0.87 * pX.last() * pX.last() / ( 2 * earthRadius ) * meterToDisplayUnit;
     pY.append( p.y() - hCorr );
   }

@@ -27,11 +27,14 @@ class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
+class QLabel;
 class QProgressBar;
+
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMarker;
 class QwtPlotPicker;
+
 class KadasLineItem;
 class KadasMapToolHeightProfile;
 
@@ -66,6 +69,20 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     class ScaleDraw;
     enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
 
+    enum class Statistics
+    {
+      HeightDifference,
+      TotalAscent,
+      TotalDescent,
+      MaxHeight,
+      MinHeight,
+      LinearDistance,
+      PathDistance
+    };
+
+    QMap<Statistics, double> mStatisticsValues;
+    QMap<Statistics, QLabel *> mStatisticsLabels;
+
     KadasMapToolHeightProfile *mTool = nullptr;
     QwtPlot *mPlot = nullptr;
     QVector<QPointF> mPlotSamples;
@@ -79,8 +96,10 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QList<QwtPlotMarker *> mNodeMarkers;
     QList<QgsPointXY> mPoints;
     QVector<double> mSegmentLengths;
-    double mTotLength = 0.;
-    double mTotLengthMeters = 0.;
+    double mTotLength = 0;
+    double mTotLengthMeters = 0;
+    //! Linear distance i.e. direct from start to end point
+    double mTotLinearDistanceMeters = 0;
     QgsCoordinateReferenceSystem mPointsCrs;
     int mNSamples = 1000;
     QCheckBox *mNodeMarkersCheckbox = nullptr;
