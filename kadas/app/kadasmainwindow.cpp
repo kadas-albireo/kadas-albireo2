@@ -1153,6 +1153,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 {
   QString adjustedUri = uri.uri;
 
+  qDebug() << "adjustedUri" << adjustedUri;
+
+  adjustedUri.append("/0");
+  qDebug() << "adjustedUri/0" << adjustedUri;
+
   // Adjust layer CRS to project CRS
   QgsCoordinateReferenceSystem testCrs;
   for ( QString c : uri.supportedCrs )
