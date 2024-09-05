@@ -17,17 +17,28 @@
 #ifndef KADASPINSEARCHPROVIDER_H
 #define KADASPINSEARCHPROVIDER_H
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
-class KADAS_GUI_EXPORT KadasPinSearchProvider : public KadasSearchProvider
+#include <kadas/gui/kadas_gui.h>
+
+class QgsMapCanvas;
+
+
+class KADAS_GUI_EXPORT KadasPinSearchProvider : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
-    KadasPinSearchProvider( QgsMapCanvas *mapCanvas ) : KadasSearchProvider( mapCanvas ) {}
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
+    KadasPinSearchProvider( QgsMapCanvas *mapCanvas );
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "pins" ); }
+    QString displayName() const override { return tr( "Pins" ); }
+    virtual Priority priority() const override { return Priority::High; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
 
   private:
-    static const QString sCategoryName;
+    QgsMapCanvas *mMapCanvas = nullptr;
 };
 
 #endif // KADASPINSEARCHPROVIDER_H

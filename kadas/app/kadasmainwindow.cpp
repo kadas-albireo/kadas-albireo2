@@ -25,11 +25,14 @@
 #include <gdal.h>
 
 #include <qgis/qgsgui.h>
+#include <qgis/qgsfloatingwidget.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemodel.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreeregistrybridge.h>
 #include <qgis/qgslayertreeviewdefaultactions.h>
+#include <qgis/qgslocator.h>
+#include <qgis/qgslocatorwidget.h>
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsmaplayertemporalproperties.h>
 #include <qgis/qgsmessagebar.h>
@@ -68,9 +71,8 @@
 #include <kadas/gui/maptools/kadasmaptoolviewshed.h>
 #include <kadas/gui/maptools/kadasmaptoolminmax.h>
 
-#include <kadas/gui/search/kadascoordinatesearchprovider.h>
-#include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadaslocaldatasearchprovider.h>
+#include <kadas/gui/search/kadaslocationsearchprovider.h>
 #include <kadas/gui/search/kadasmapserverfindsearchprovider.h>
 #include <kadas/gui/search/kadaspinsearchprovider.h>
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
@@ -99,6 +101,8 @@
 #include <kadas/app/kml/kadaskmlintegration.h>
 #include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
 #include <kadas/app/milx/kadasmilxintegration.h>
+
+#include <kadas/app/external/qgis/app/qgsgotolocatorfilter.h>
 
 KadasMainWindow::KadasMainWindow()
 {
@@ -142,7 +146,17 @@ void KadasMainWindow::init()
 
   mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS, mActionMoveWithGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
-  mSearchWidget->init( mMapCanvas );
+
+  QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
+  lw->setMapCanvas( mMapCanvas );
+  lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
+  mLocatorLayout->insertWidget( 0, lw );
+
+  // TODO when upgrading QGIS
+  //mLocatorWidget->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomRight );
+  QgsFloatingWidget *resultContainter = window()->findChild<QgsFloatingWidget *>();
+  resultContainter->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopLeft );
+  resultContainter->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::BottomLeft );
 
   mLayersWidget->setVisible( false );
   mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
@@ -366,20 +380,24 @@ void KadasMainWindow::init()
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
 
-  mSearchWidget->addSearchProvider( new KadasCoordinateSearchProvider( mMapCanvas ) );
-  mSearchWidget->addSearchProvider( new KadasLocationSearchProvider( mMapCanvas ) );
-  mSearchWidget->addSearchProvider( new KadasLocalDataSearchProvider( mMapCanvas ) );
-  mSearchWidget->addSearchProvider( new KadasPinSearchProvider( mMapCanvas ) );
-  QString remoteDataSearchUrl = QgsSettings().value( "search/remotedatasearchurl", "" ).toString();
-  if ( remoteDataSearchUrl.isEmpty() )
+  const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
+  for ( QgsLocatorFilter *filter : filters )
   {
-    mSearchWidget->addSearchProvider( new KadasMapServerFindSearchProvider( mMapCanvas ) );
+    if ( filter->name() == QStringLiteral( "filters" ) )
+    {
+      // removes the top locator filter (the filter of locator filters)
+      lw->locator()->deregisterFilter( filter );
+      break;
+    }
   }
-  else
-  {
-    mSearchWidget->addSearchProvider( new KadasRemoteDataSearchProvider( remoteDataSearchUrl, mMapCanvas ) );
-  }
-  mSearchWidget->addSearchProvider( new KadasWorldLocationSearchProvider( mMapCanvas ) );
+
+  lw->locator()->registerFilter( new QgsGotoLocatorFilter( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasLocalDataSearchFilter( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasLocationSearchFilter( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasMapServerFindSearchProvider( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasPinSearchProvider( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasRemoteDataSearchProvider( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasWorldLocationSearchProvider( mMapCanvas ) );
 
   mActionShowPythonConsole = new QAction( this );
   QShortcut *pythonConsoleShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_P ), this );
@@ -1022,15 +1040,15 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   // TODO
 //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
 //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString & uri, const QString & baseName, const QString & providerKey ) { kApp->addRasterLayer( uri, baseName, providerKey ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString &uri, const QString &baseName, const QString &providerKey ) { kApp->addRasterLayer( uri, baseName, providerKey ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [ = ]( const QString & uri, const QString & layerName, const QString & providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [ = ]( const QString &uri, const QString &layerName, const QString &providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString & url, const QString & baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString &url, const QString &baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList & layerUris, const QString & enc, const QString & dataSourceType ) { kApp->addVectorLayers( layerUris, enc, dataSourceType ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList &layerUris, const QString &enc, const QString &dataSourceType ) { kApp->addVectorLayers( layerUris, enc, dataSourceType ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, []( const QStringList & layerUris ) { kApp->addRasterLayers( layerUris ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, []( const QStringList &layerUris ) { kApp->addRasterLayers( layerUris ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, dialog, &QDialog::accept );
 
   dialog->exec();
@@ -1161,7 +1179,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
     {
       adjustedUri.replace( QRegExp( "crs=[^&]+" ), "crs=" + c );
-      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ) , 2 );
+      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
       break;
     }
   }
@@ -1173,7 +1191,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     if ( fmt == lastImageEncoding )
     {
       adjustedUri.replace( QRegExp( "format=[^&]+" ), "format=" + fmt );
-      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ) , 2 );
+      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
       break;
     }
   }
@@ -1232,7 +1250,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       entries[id] = new Entry{id, name, parentId, true, nullptr, order++};
     }
     QList<Entry *> sortedEntries = entries.values();
-    std::sort( sortedEntries.begin(), sortedEntries.end(), []( const Entry * a, const Entry * b ) { return a->order < b->order; } );
+    std::sort( sortedEntries.begin(), sortedEntries.end(), []( const Entry *a, const Entry *b ) { return a->order < b->order; } );
 
     QgsLayerTreeGroup *rootGroup = mLayerTreeView->layerTreeModel()->rootGroup();
     // If there are more than one toplevel items, add an extra enclosing group
@@ -1330,19 +1348,19 @@ void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
 {
   QgsDataProviderTemporalCapabilities *temporalCapabilities = layer->dataProvider()->temporalCapabilities();
 
-  if( !temporalCapabilities )
+  if ( !temporalCapabilities )
     return;
 
-  if( !temporalCapabilities->hasTemporalCapabilities() )
+  if ( !temporalCapabilities->hasTemporalCapabilities() )
     return;
 
-  if( !layer->temporalProperties() )
+  if ( !layer->temporalProperties() )
     return;
 
-  if( layer->temporalProperties()->isActive() )
+  if ( layer->temporalProperties()->isActive() )
     return;
 
-  layer->temporalProperties()->setIsActive(true);
+  layer->temporalProperties()->setIsActive( true );
 }
 
 void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &/*index*/ )
@@ -1461,7 +1479,7 @@ void KadasMainWindow::removeCustomDropHandler( QgsCustomDropHandler *handler )
 
 void KadasMainWindow::showPluginManager( bool show )
 {
-  mPluginManager->setVisible(show);
+  mPluginManager->setVisible( show );
 }
 
 void KadasMainWindow::showAuthenticatedUser( const QString &user )

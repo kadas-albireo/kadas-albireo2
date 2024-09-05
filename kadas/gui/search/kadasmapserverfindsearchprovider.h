@@ -22,32 +22,34 @@
 #include <QRegExp>
 #include <QTimer>
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <kadas/gui/kadas_gui.h>
 
-class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider : public KadasSearchProvider
+class QgsMapCanvas;
+
+class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
     KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
-    void cancelSearch() override;
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "server-find" ); }
+    QString displayName() const override { return tr( "Server Find" ); }
+    virtual Priority priority() const override { return Priority::Medium; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
+    virtual void clearPreviousResults() override;
 
   private:
+    QgsMapCanvas *mMapCanvas = nullptr;
     static const int sSearchTimeout;
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 
-    QList<QNetworkReply *> mNetReplies;
-    QgsGeometry *mReplyFilter;
+    QString mGeometryItemId;
     QRegExp mPatBox;
-    QTimer mTimeoutTimer;
-
-  private slots:
-    void replyFinished();
-    void searchTimeout() { cancelSearch(); }
 };
 
 #endif // KADASMAPSERVERFINDSEARCHPROVIDER_H

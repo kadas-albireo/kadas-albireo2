@@ -11,6 +11,8 @@
 
 
 
+
+
 typedef void *GDALDatasetH;
 
 class Kadas
@@ -26,6 +28,8 @@ class Kadas
     static const char *KADAS_FULL_RELEASE_NAME;
     static const char *KADAS_DEV_VERSION;
     static const char *KADAS_BUILD_DATE;
+
+
 
     static QString configPath();
 

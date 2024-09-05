@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1430</width>
-    <height>133</height>
+    <height>154</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -248,20 +248,7 @@
        </widget>
       </item>
       <item>
-       <widget class="KadasSearchBox" name="mSearchWidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>350</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="mLocatorLayout"/>
       </item>
      </layout>
     </widget>
@@ -2654,12 +2641,6 @@ Sight</string>
    <class>KadasRibbonButton</class>
    <extends>QToolButton</extends>
    <header location="global">kadas/gui/kadasribbonbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KadasSearchBox</class>
-   <extends>QWidget</extends>
-   <header location="global">kadas/gui/kadassearchbox.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QgsColorButton</class>

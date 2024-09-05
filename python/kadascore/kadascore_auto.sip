@@ -1,9 +1,9 @@
-%Include auto_generated/kadas.sip
-%Include auto_generated/kadasalgorithms.sip
-%Include auto_generated/kadascoordinateformat.sip
-%Include auto_generated/kadascoordinateutils.sip
 %Include auto_generated/kadasfileserver.sip
+%Include auto_generated/kadas.sip
 %Include auto_generated/kadaslatlontoutm.sip
+%Include auto_generated/kadasalgorithms.sip
 %Include auto_generated/kadaspluginlayer.sip
+%Include auto_generated/kadascoordinateutils.sip
 %Include auto_generated/kadassettingstree.sip
+%Include auto_generated/kadascoordinateformat.sip
 %Include auto_generated/kadasstatehistory.sip

@@ -22,33 +22,37 @@
 #include <QRegExp>
 #include <QTimer>
 
-#include <kadas/gui/kadassearchprovider.h>
+#include <qgis/qgslocatorfilter.h>
 
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <kadas/gui/kadas_gui.h>
 
-class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public KadasSearchProvider
+class QgsMapCanvas;
+
+
+class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
-    KadasRemoteDataSearchProvider( const QString &remoteDataSearchUrl, QgsMapCanvas *mapCanvas );
-    void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) override;
-    void cancelSearch() override;
+    KadasRemoteDataSearchProvider( QgsMapCanvas *mapCanvas );
+
+
+    virtual QgsLocatorFilter *clone() const override;
+    QString name() const override { return QStringLiteral( "remote-data" ); }
+    QString displayName() const override { return tr( "Remote Data" ); }
+    virtual Priority priority() const override { return Priority::Medium; }
+    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
+    virtual void triggerResult( const QgsLocatorResult &result ) override;
+    virtual void clearPreviousResults() override;
 
   private:
     static const int sSearchTimeout;
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 
-    QList<QNetworkReply *> mNetReplies;
-    QgsGeometry *mReplyFilter;
-    QString mRemoteDataSearchUrl;
+    QgsMapCanvas *mMapCanvas = nullptr;
+    QString mPinItemId;
     QRegExp mPatBox;
-    QTimer mTimeoutTimer;
 
-  private slots:
-    void replyFinished();
-    void searchTimeout() { cancelSearch(); }
 };
 
 #endif // KADASREMOTEDATASEARCHPROVIDER_H
