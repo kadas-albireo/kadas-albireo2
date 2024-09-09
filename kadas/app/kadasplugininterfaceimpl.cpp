@@ -661,6 +661,11 @@ void KadasPluginInterfaceImpl::addActionMenu( const QString &text, const QIcon &
   }
 }
 
+void KadasPluginInterfaceImpl::addActionMapCanvasRightClick( QAction *action )
+{
+  KadasCanvasContextMenu::registerAction( action );
+}
+
 void KadasPluginInterfaceImpl::removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName, QgsMapTool *associatedMapTool )
 {
   if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
@@ -710,6 +715,11 @@ void KadasPluginInterfaceImpl::removeActionMenu( QMenu *menu, ActionClassicMenuL
       }
     }
   }
+}
+
+void KadasPluginInterfaceImpl::removeActionMapCanvasRightClick( QAction *action )
+{
+  KadasCanvasContextMenu::unRegisterAction( action );
 }
 
 QAction *KadasPluginInterfaceImpl::findAction( const QString &name )
