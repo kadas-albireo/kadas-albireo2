@@ -32,8 +32,20 @@ class KadasCanvasContextMenu : public QMenu
 {
     Q_OBJECT
   public:
+
+    enum class Menu SIP_MONKEYPATCH_SCOPEENUM
+    {
+      NONE,
+      DRAW,
+      MEASURE,
+      TERRAIN_ANALYSIS
+    };
+
     KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
     ~KadasCanvasContextMenu();
+
+    static void registerAction( QAction *action, Menu insertMenu = Menu::TERRAIN_ANALYSIS );
+    static void unRegisterAction( QAction *action );
 
   private slots:
     void copyCoordinates();
@@ -77,6 +89,8 @@ class KadasCanvasContextMenu : public QMenu
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
     KadasSelectionRectItem *mSelRect = nullptr;
+
+    static QMap<QAction *, Menu> sRegisteredActions;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H
