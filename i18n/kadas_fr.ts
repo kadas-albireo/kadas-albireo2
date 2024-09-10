@@ -1625,37 +1625,37 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="162"/>
         <source>Difference of altitude start-end</source>
-        <translation type="unfinished"/>
+        <translation>Dénivellation départ-fin</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="163"/>
         <source>Ascent</source>
-        <translation type="unfinished"/>
+        <translation>Montée</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="164"/>
         <source>Descent</source>
-        <translation type="unfinished"/>
+        <translation>Descente</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="165"/>
         <source>Highest Point</source>
-        <translation type="unfinished"/>
+        <translation>Point culminant</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="166"/>
         <source>Lowest Point</source>
-        <translation type="unfinished"/>
+        <translation>Point le plus bas</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="167"/>
         <source>Linear distance</source>
-        <translation type="unfinished"/>
+        <translation>Distance à vol d&apos;oiseau</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="168"/>
         <source>Path distance</source>
-        <translation type="unfinished"/>
+        <translation>Longuer chemin</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="207"/>

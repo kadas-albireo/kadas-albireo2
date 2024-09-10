@@ -1623,37 +1623,37 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="162"/>
         <source>Difference of altitude start-end</source>
-        <translation type="unfinished"/>
+        <translation>Höhendifferenz Start-Ende</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="163"/>
         <source>Ascent</source>
-        <translation type="unfinished"/>
+        <translation>Aufstieg</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="164"/>
         <source>Descent</source>
-        <translation type="unfinished"/>
+        <translation>Abstieg</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="165"/>
         <source>Highest Point</source>
-        <translation type="unfinished"/>
+        <translation>Höchster Punkt</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="166"/>
         <source>Lowest Point</source>
-        <translation type="unfinished"/>
+        <translation>Tiefster Punkt</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="167"/>
         <source>Linear distance</source>
-        <translation type="unfinished"/>
+        <translation>Luftlinie</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="168"/>
         <source>Path distance</source>
-        <translation type="unfinished"/>
+        <translation>Wegstrecke</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="207"/>
@@ -3420,7 +3420,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.h" line="41"/>
         <source>Local data</source>
-        <translation type="unfinished"/>
+        <translation>Lokale Daten</translation>
     </message>
 </context>
 <context>
@@ -3428,17 +3428,17 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="50"/>
         <source>Municipalities</source>
-        <translation type="unfinished"/>
+        <translation>Gemeinden</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="51"/>
         <source>Cantons</source>
-        <translation type="unfinished"/>
+        <translation>Kantone</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
         <source>Districts</source>
-        <translation type="unfinished"/>
+        <translation>Bezirke</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
@@ -3448,12 +3448,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
         <source>Zip Codes</source>
-        <translation type="unfinished"/>
+        <translation>Postleitzahlen</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
         <source>Address</source>
-        <translation type="unfinished"/>
+        <translation>Adressen</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
@@ -3502,7 +3502,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="152"/>
         <source>Search for Places, Coordinates, Adresses, ...</source>
-        <translation type="unfinished"/>
+        <translation>Suche nach Orten, Koordinaten, Adressen, ...</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="169"/>
@@ -4818,7 +4818,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="218"/>
         <source>Plugin update</source>
-        <translation type="unfinished"/>
+        <translation>Plugin Aktualisierung</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="219"/>
@@ -4828,7 +4828,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="223"/>
         <source>Plugin update error</source>
-        <translation type="unfinished"/>
+        <translation>Fehlerhafte Plugin Aktualisierung</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="224"/>
