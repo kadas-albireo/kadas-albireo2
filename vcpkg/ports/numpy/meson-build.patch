@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index 1f3b6857c5..264160d132 100644
+--- a/meson.build	
++++ b/meson.build
+@@ -6,7 +6,7 @@ project(
+     ['numpy/_build_utils/gitversion.py'],
+     check: true).stdout().strip(),
+   license: 'BSD-3',
++  meson_version: '>=1.2.3',  # version in vendored-meson is 1.2.99
+-  meson_version: '>=1.2.99',  # version in vendored-meson is 1.2.99
+   default_options: [
+     'buildtype=debugoptimized',
+     'b_ndebug=if-release',

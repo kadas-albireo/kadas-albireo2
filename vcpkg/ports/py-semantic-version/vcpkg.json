@@ -1,0 +1,14 @@
+{
+  "name": "py-semantic-version",
+  "version": "2.10.0",
+  "description": "About Semantic version comparison for Python (see http://semver.org/)",
+  "homepage": "https://python-markdown.github.io/",
+  "license": "BSD-2-Clause",
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "vcpkg-python-scripts"
+  ]
+}

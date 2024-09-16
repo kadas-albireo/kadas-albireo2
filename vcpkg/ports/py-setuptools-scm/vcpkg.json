@@ -1,0 +1,22 @@
+{
+  "name": "py-setuptools-scm",
+  "version": "8.1.0",
+  "description": "the blessed package to manage your versions by scm tags",
+  "homepage": "https://github.com/pypa/setuptools_scm",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "py-packaging",
+      "host": true
+    },
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "py-tomli",
+    "py-typing-extensions",
+    "vcpkg-get-python-packages",
+    "vcpkg-python-scripts",
+    "vcpkg-tool-mecurial"
+  ]
+}

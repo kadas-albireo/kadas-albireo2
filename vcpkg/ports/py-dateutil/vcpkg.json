@@ -1,0 +1,15 @@
+{
+  "name": "py-dateutil",
+  "version": "2.9.0",
+  "description": "Useful extensions to the standard Python datetime features",
+  "homepage": "https://github.com/dateutil/dateutil",
+  "license": null,
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "py-six",
+    "vcpkg-python-scripts"
+  ]
+}

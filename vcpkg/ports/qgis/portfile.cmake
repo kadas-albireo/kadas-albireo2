@@ -1,7 +1,7 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF "final-${TAG}")
-set(QGIS_SHA512 d8075b98efe8ebea1ee53273b9427e0a7329ba8f1a96258d962dee52b0c5c08be2bea10b2130fee4c0acbc3f4a94b94da0033e8b6c92857e0c679c051545d3d8)
+set(QGIS_REF 59bd89d380b5b4cc0c43089750aa9dab73edbf11)
+set(QGIS_SHA512 a33183c950f7eea1d1800966ba903db84baf1f1a8648158040ec5997bca5d3697ec3d941656485fda5d5213be646145517f914bda52e86db2fa0d2c91e3cb202)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -16,15 +16,15 @@ vcpkg_from_github(
         exiv2.patch
         crssync.patch
         bigobj.patch
-        poly2tri.patch
+        # poly2tri.patch
         mesh.patch
-        delimitedtext.patch
-        qtkeychain-56284.patch
-        bindings-install.patch
-        wcsLayerName.patch
-	srs-debug.patch
-	sipcxx17.patch
-        byeuic.patch
+        # delimitedtext.patch
+        # qtkeychain-56284.patch
+        # bindings-install.patch
+        # wcsLayerName.patch
+	    # srs-debug.patch
+	    sipcxx17.patch
+        # byeuic.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -71,18 +71,7 @@ list(APPEND QGIS_OPTIONS "-DPoly2Tri_LIBRARY=poly2tri::poly2tri")
 list(APPEND QGIS_OPTIONS "-D QGIS_DATA_SUBDIR=share/qgis")
 list(APPEND QGIS_OPTIONS "-D QGIS_LIBEXEC_SUBDIR=bin")
 
-if(EXISTS "${CURRENT_INSTALLED_DIR}/lib/libqt_poly2tri.a")
-    set(QT_POLY2TRI_DIR_RELEASE "${CURRENT_INSTALLED_DIR}/lib")
-    set(QT_POLY2TRI_DIR_DEBUG "${CURRENT_INSTALLED_DIR}/debug/lib")
-else()
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
-endif()
-if(DEFINED QT_POLY2TRI_DIR_RELEASE)
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
-    list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_DEBUG}/debug/lib/libqt_poly2tri_debug.a) # static qt only
-    list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_RELEASE}/lib/libqt_poly2tri.a) # static qt only
-endif()
-
+list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
 
 list(APPEND QGIS_OPTIONS "-DBISON_EXECUTABLE=${BISON}")
 list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")

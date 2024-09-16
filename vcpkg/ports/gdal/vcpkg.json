@@ -9,6 +9,10 @@
     "json-c",
     "libgeotiff",
     {
+      "name": "swig",
+      "host": true
+    },
+    {
       "name": "pkgconf",
       "host": true
     },
@@ -45,13 +49,9 @@
       "description": "Build python bindings",
       "dependencies": [
         "python3",
-	{
-          "name": "py-numpy",
-	  "platform": "!osx"
-	},
         {
-          "name": "swig",
-          "host": true
+          "name": "numpy",
+          "platform": "!osx"
         },
         {
           "name": "py-setuptools",

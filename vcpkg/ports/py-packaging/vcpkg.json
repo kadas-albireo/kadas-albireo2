@@ -1,0 +1,10 @@
+{
+  "name": "py-packaging",
+  "version": "24.0",
+  "description": "Core utilities for Python packages",
+  "homepage": "https://packaging.pypa.io/",
+  "license": "MIT",
+  "dependencies": [
+    "vcpkg-python-scripts"
+  ]
+}

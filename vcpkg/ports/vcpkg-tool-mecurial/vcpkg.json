@@ -1,0 +1,11 @@
+{
+  "name": "vcpkg-tool-mecurial",
+  "version-date": "2023-06-27",
+  "description": "Mercurial SCM",
+  "homepage": "https://www.mercurial-scm.org/",
+  "license": "MIT",
+  "supports": "native",
+  "dependencies": [
+    "vcpkg-tool-lessmsi"
+  ]
+}

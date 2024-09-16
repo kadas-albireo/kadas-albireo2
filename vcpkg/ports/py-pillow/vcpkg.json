@@ -1,0 +1,31 @@
+{
+  "name": "py-pillow",
+  "version": "10.4.0",
+  "description": "Python Imaging Library",
+  "homepage": "https://python-pillow.org/",
+  "license": null,
+  "dependencies": [
+    "freetype",
+    "lcms",
+    "libjpeg-turbo",
+    "libraqm",
+    {
+      "name": "libwebp",
+      "features": [
+        "libwebpmux"
+      ]
+    },
+    "openjpeg",
+    {
+      "name": "pkgconf",
+      "host": true
+    },
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "tiff",
+    "vcpkg-python-scripts",
+    "zlib"
+  ]
+}

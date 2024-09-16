@@ -1,0 +1,14 @@
+{
+  "name": "py-typing-extensions",
+  "version": "4.11.0",
+  "description": "Backported and experimental type hints for Python",
+  "homepage": "https://github.com/python/typing_extensions",
+  "license": null,
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "vcpkg-python-scripts"
+  ]
+}
