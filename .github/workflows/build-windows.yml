@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - newdeps
+      - py3d
   pull_request:
   release:
     types: ['published']
