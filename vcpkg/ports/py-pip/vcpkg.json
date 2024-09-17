@@ -1,0 +1,17 @@
+{
+  "name": "py-pip",
+  "version": "24.2",
+  "description": "Tool for installing and managing Python packages",
+  "homepage": "https://pypi.org/project/setuptools",
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "python3",
+    {
+      "name": "vcpkg-python-scripts",
+      "host": true
+    }
+  ]
+}

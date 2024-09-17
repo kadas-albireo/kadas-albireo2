@@ -1,0 +1,17 @@
+{
+  "name": "py-contourpy",
+  "version": "1.3.0",
+  "description": "Python library for calculating contours in 2D quadrilateral grids",
+  "homepage": "https://contourpy.readthedocs.io/",
+  "dependencies": [
+    {
+      "name": "py-setuptools",
+      "host": true
+    },
+    "python3",
+    {
+      "name": "vcpkg-python-scripts",
+      "host": true
+    }
+  ]
+}

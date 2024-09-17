@@ -1,0 +1,23 @@
+{
+  "name": "py-qscintilla-qt5",
+  "version": "2.13.4",
+  "port-version": 1,
+  "description": "Python bindings for QScintilla, which is a port to Qt of the Scintilla editing component. Features syntax highlighting, code-completion and much more (Barebone build without python bindings (missing dependeny PyQt) and without QtDesigner plugin)",
+  "homepage": "https://www.riverbankcomputing.com/software/qscintilla",
+  "license": "GPL-3.0-or-later",
+  "supports": "!xbox",
+  "dependencies": [
+    {
+      "name": "qscintilla-qt5"
+    },
+    "py-pyqt5",
+    {
+      "name": "vcpkg-python-scripts",
+      "host": true
+    },
+    {
+      "name": "vcpkg-qmake-qt5",
+      "host": true
+    }
+  ]
+}

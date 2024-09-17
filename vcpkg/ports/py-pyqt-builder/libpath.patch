@@ -1,0 +1,14 @@
+diff --git a/pyqtbuild/project.py b/pyqtbuild/project.py
+index 20ab60f..4f4d105 100644
+--- a/pyqtbuild/project.py
++++ b/pyqtbuild/project.py
+@@ -73,7 +73,8 @@ class PyQtProject(Project):
+         # these are actually non-user options but we need the 'link_full_dll'
+         # user option in order to set them.
+         if self.py_platform == 'win32':
+-            pylib_dir = os.path.join(sys.base_prefix, 'libs')
++            # vcpkg install python3.lib into [installed]/lib
++            pylib_dir = os.path.join(sys.base_prefix, '..', '..', 'lib')
+ 
+             debug_suffix = '_d' if self.py_debug else ''
+ 

@@ -1,6 +1,6 @@
 {
   "name": "py-matplotlib",
-  "version": "3.9.0",
+  "version": "3.9.2",
   "description": "Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python.",
   "homepage": "https://matplotlib.org/stable/",
   "license": null,
@@ -9,6 +9,7 @@
     "numpy",
     "py-certifi",
     "py-cycler",
+    "py-fonttools",
     "py-dateutil",
     "py-kiwisolver",
     {
