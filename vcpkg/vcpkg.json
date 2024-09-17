@@ -48,11 +48,13 @@
     "librsvg",
     "python3",
     "py-psycopg2",
+    "py-matplotlib",
     "proj-chenyx06a",
     {
       "name": "qgis",
       "features": [
-        "gui"
+        "gui",
+        "3d"
       ]
     },
     {
