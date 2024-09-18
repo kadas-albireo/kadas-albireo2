@@ -25,9 +25,9 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsmaplayer.h>
 
-#include <kadas/gui/milx/kadasmilxclient.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/gui/milx/kadasmilxlayerpropertiespage.h>
+#include "kadas/gui/milx/kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 
 
 KadasMilxLayerPropertiesPage::KadasMilxLayerPropertiesPage( KadasMilxLayer *layer, QgsMapCanvas *canvas, QWidget *parent )

@@ -21,8 +21,8 @@
 
 #include <qgis/qgssettingsentryimpl.h>
 
-#include <kadas/core/kadas_core.h>
-#include <kadas/core/kadassettingstree.h>
+#include "kadas/core/kadas_core.h"
+#include "kadas/core/kadassettingstree.h"
 
 
 class QUrl;

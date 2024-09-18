@@ -17,8 +17,8 @@
 #ifndef KADASHILLSHADEFILTER_H
 #define KADASHILLSHADEFILTER_H
 
-#include <kadas/analysis/kadas_analysis.h>
-#include <kadas/analysis/kadasninecellfilter.h>
+#include "kadas/analysis/kadas_analysis.h"
+#include "kadas/analysis/kadasninecellfilter.h"
 
 
 class KADAS_ANALYSIS_EXPORT KadasHillshadeFilter: public KadasNineCellFilter

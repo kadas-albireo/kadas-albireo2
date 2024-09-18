@@ -16,7 +16,7 @@
 
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/gui/kadasbottombar.h>
+#include "kadas/gui/kadasbottombar.h"
 
 KadasBottomBar::KadasBottomBar( QgsMapCanvas *canvas, const QString &color )
   : QFrame( canvas )

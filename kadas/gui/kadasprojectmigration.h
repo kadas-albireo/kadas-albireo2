@@ -17,7 +17,7 @@
 #ifndef KADASPROJECTMIGRATION_H
 #define KADASPROJECTMIGRATION_H
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 #include <QString>
 
 class QDomDocument;

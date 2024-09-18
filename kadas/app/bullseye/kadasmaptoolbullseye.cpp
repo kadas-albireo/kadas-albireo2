@@ -23,7 +23,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/kadaslayerselectionwidget.h>
+#include "kadas/gui/kadaslayerselectionwidget.h"
 #include <bullseye/kadasbullseyelayer.h>
 #include <bullseye/kadasmaptoolbullseye.h>
 

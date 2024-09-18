@@ -20,8 +20,8 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasmapwidget.h>
-#include <kadasmapwidgetmanager.h>
+#include "kadas/gui/kadasmapwidget.h"
+#include "kadasmapwidgetmanager.h"
 
 KadasMapWidgetManager::KadasMapWidgetManager( QgsMapCanvas *masterCanvas, QMainWindow *parent )
   : QObject( parent ), mMainWindow( parent ), mMasterCanvas( masterCanvas )

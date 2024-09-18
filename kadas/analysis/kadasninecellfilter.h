@@ -22,7 +22,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsrectangle.h>
 
-#include <kadas/analysis/kadas_analysis.h>
+#include "kadas/analysis/kadas_analysis.h"
 
 class QProgressDialog;
 class QgsRasterLayer;

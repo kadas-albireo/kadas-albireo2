@@ -23,8 +23,8 @@
 
 #include <qgis/qgsmessagebar.h>
 
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <kml/kadaskmlexport.h>
 #include <kml/kadaskmlexportdialog.h>
 #include <kml/kadaskmlimport.h>

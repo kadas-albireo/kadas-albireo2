@@ -25,7 +25,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadascoordinatedisplayer.h>
+#include "kadas/gui/kadascoordinatedisplayer.h"
 
 KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLineEdit *coordLineEdit, QLineEdit *heightLineEdit, QComboBox *heightCombo, QgsMapCanvas *mapCanvas, QWidget *parent )
   : QWidget( parent )

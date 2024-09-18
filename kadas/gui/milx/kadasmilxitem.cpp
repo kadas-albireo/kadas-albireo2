@@ -32,8 +32,8 @@
 
 #include <quazip/quazipfile.h>
 
-#include <kadas/gui/milx/kadasmilxitem.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
+#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 
 
 QJsonObject KadasMilxItem::State::serialize() const

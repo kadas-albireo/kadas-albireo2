@@ -33,8 +33,8 @@
 #include <osgEarth/Version>
 #include <osgEarthUtil/EarthManipulator>
 
-#include <kadas/core/kadas.h>
-#include <kadasapplication.h>
+#include "kadas/core/kadas.h"
+#include "kadasapplication.h"
 #include <globe/kadasglobedialog.h>
 #include <globe/kadasglobeintegration.h>
 

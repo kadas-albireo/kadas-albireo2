@@ -26,7 +26,7 @@
 #include <QPixmap>
 #include <QThread>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QNetworkSession;
 class QRect;

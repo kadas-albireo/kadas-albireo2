@@ -27,9 +27,9 @@
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadasapplication.h>
-#include <kadaspythonintegration.h>
+#include "kadas/core/kadas.h"
+#include "kadasapplication.h"
+#include "kadaspythonintegration.h"
 
 PyThreadState *_mainState = nullptr;
 

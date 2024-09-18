@@ -35,7 +35,7 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 static QFont measurementFont()
 {

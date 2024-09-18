@@ -19,10 +19,10 @@
 
 #include <qgis/qgsmaptool.h>
 
-#include <kadas/core/kadasstatehistory.h>
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/core/kadasstatehistory.h"
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 class KadasBottomBar;
 class KadasFloatingInputWidget;

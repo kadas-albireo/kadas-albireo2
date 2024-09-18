@@ -28,7 +28,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 #include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadascircularsectoritem.h"

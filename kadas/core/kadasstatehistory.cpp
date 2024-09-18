@@ -16,7 +16,7 @@
 
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/kadasstatehistory.h>
+#include "kadas/core/kadasstatehistory.h"
 
 KadasStateHistory::KadasStateHistory( QObject *parent )
   : QObject( parent )

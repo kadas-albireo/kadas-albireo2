@@ -17,7 +17,7 @@
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgspoint.h>
 
-#include <kadas/core/kadaslatlontoutm.h>
+#include "kadas/core/kadaslatlontoutm.h"
 
 
 const int KadasLatLonToUTM::NUM_100K_SETS = 6;

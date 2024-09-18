@@ -20,8 +20,8 @@
 #include <qgis/qgsstyle.h>
 #include <qgis/qgssymbolwidgetcontext.h>
 
-#include <kadas/core/kadaspluginlayer.h>
-#include <kadaspluginlayerproperties.h>
+#include "kadas/core/kadaspluginlayer.h"
+#include "kadaspluginlayerproperties.h"
 
 
 KadasPluginLayerRenderingPropertiesWidget::KadasPluginLayerRenderingPropertiesWidget( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent )

@@ -21,7 +21,7 @@
 
 #include <qgis/qgsfeaturestore.h>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QMimeData;
 class QgsPoint;

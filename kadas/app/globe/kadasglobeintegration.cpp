@@ -50,9 +50,9 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 
-#include <kadas/core/kadas.h>
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadas/core/kadas.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <globe/kadasglobebillboardmanager.h>
 #include <globe/kadasglobedialog.h>
 #include <globe/kadasglobeintegration.h>

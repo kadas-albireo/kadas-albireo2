@@ -37,9 +37,9 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadasmapidentifydialog.h>
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadasmapidentifydialog.h"
 
 
 const int KadasMapIdentifyDialog::sGeometryRole = Qt::UserRole + 1;

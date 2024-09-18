@@ -24,8 +24,8 @@
 #include <qgis/qgslayoutpagecollection.h>
 #include <qgis/qgslayoutundostack.h>
 
-#include <kadaslayoutappmenuprovider.h>
-#include <kadaslayoutdesignerdialog.h>
+#include "kadaslayoutappmenuprovider.h"
+#include "kadaslayoutdesignerdialog.h"
 
 
 KadasLayoutAppMenuProvider::KadasLayoutAppMenuProvider( KadasLayoutDesignerDialog *designer )

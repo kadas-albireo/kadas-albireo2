@@ -22,7 +22,7 @@
 #include <QPolygonF>
 
 #include <qgis/qgis_sip.h>
-#include <kadas/core/kadas_core.h>
+#include "kadas/core/kadas_core.h"
 
 class QgsPointXY;
 class QgsRectangle;

@@ -17,9 +17,9 @@
 #ifndef KADASSYMBOLATTRIBUTESEDITOR_H
 #define KADASSYMBOLATTRIBUTESEDITOR_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 
 class QLineEdit;
 class KadasRichTextEditor;

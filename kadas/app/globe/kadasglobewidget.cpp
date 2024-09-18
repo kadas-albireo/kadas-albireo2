@@ -26,8 +26,8 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgslayertree.h>
 
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <globe/kadasglobewidget.h>
 
 

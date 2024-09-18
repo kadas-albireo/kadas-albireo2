@@ -28,18 +28,18 @@
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadaslayerselectionwidget.h>
-#include <kadas/gui/mapitemeditors/kadasgpxrouteeditor.h>
-#include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
-#include <kadas/gui/mapitems/kadasgpxrouteitem.h>
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadaslayerselectionwidget.h"
+#include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
+#include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-#include <kadasapplication.h>
-#include <kadasgpxintegration.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadasgpxintegration.h"
+#include "kadasmainwindow.h"
 
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )

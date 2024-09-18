@@ -17,7 +17,7 @@
 #ifndef KADASGUIDEGRIDLAYER_H
 #define KADASGUIDEGRIDLAYER_H
 
-#include <kadas/core/kadaspluginlayer.h>
+#include "kadas/core/kadaspluginlayer.h"
 
 class KadasGuideGridLayer : public KadasPluginLayer
 {

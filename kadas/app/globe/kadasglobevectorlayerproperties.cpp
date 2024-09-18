@@ -17,8 +17,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsmaplayer.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 #include <globe/kadasglobevectorlayerproperties.h>
 
 

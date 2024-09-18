@@ -29,7 +29,7 @@
 #include <qgis/qgsvectorlayerlabeling.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/kadasitemlayer.h>
+#include "kadas/gui/kadasitemlayer.h"
 #include <kml/kadaskmlexport.h>
 #include <kml/kadaskmllabeling.h>
 

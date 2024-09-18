@@ -21,7 +21,7 @@
 
 #include <qgis/qgsconfig.h>
 
-#include <kadas/gui/kadasplugininterface.h>
+#include "kadas/gui/kadasplugininterface.h"
 
 class KadasApplication;
 

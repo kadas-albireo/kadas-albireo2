@@ -24,8 +24,8 @@
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 #include <globe/featuresource/kadasglobefeaturesource.h>
 #include <globe/featuresource/kadasglobefeatureutils.h>
 

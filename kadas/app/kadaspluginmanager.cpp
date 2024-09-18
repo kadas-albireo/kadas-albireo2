@@ -33,10 +33,10 @@
 #include <qgis/qgsnetworkcontentfetcher.h>
 #include <qgis/qgssettings.h>
 
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
-#include <kadaspluginmanager.h>
-#include <kadaspythonintegration.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
+#include "kadaspluginmanager.h"
+#include "kadaspythonintegration.h"
 
 
 KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )

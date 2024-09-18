@@ -24,7 +24,7 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadas_core.h>
+#include "kadas/core/kadas_core.h"
 
 class QMenu;
 

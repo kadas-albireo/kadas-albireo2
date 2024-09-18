@@ -17,7 +17,7 @@
 #ifndef KADASANCHOREDITEM_H
 #define KADASANCHOREDITEM_H
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 
 class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT

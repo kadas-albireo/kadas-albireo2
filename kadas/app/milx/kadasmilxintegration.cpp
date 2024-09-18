@@ -28,15 +28,15 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/milx/kadasmilxclient.h>
-#include <kadas/gui/milx/kadasmilxeditor.h>
-#include <kadas/gui/milx/kadasmilxitem.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/gui/milx/kadasmilxlayerpropertiespage.h>
-#include <kadas/gui/milx/kadasmilxlibrary.h>
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxeditor.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
+#include "kadas/gui/milx/kadasmilxlibrary.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <milx/kadasmilxintegration.h>
 #include <ui_KadasMilxExportDialog.h>
 

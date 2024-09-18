@@ -17,8 +17,8 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/gui/mapitems/kadasgpxrouteitem.h>
-#include <kadas/gui/mapitemeditors/kadasgpxrouteeditor.h>
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
+#include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
 
 KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )

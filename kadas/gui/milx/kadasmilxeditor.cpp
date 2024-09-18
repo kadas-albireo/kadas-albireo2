@@ -18,9 +18,9 @@
 #include <QLabel>
 #include <QToolButton>
 
-#include <kadas/gui/milx/kadasmilxeditor.h>
-#include <kadas/gui/milx/kadasmilxitem.h>
-#include <kadas/gui/milx/kadasmilxlibrary.h>
+#include "kadas/gui/milx/kadasmilxeditor.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadas/gui/milx/kadasmilxlibrary.h"
 
 KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilxLibrary *library, QWidget *parent )
   : KadasMapItemEditor( item, parent )

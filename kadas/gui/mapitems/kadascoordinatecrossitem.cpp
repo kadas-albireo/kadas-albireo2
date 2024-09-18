@@ -23,7 +23,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/mapitems/kadascoordinatecrossitem.h>
+#include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
 
 
 QJsonObject KadasCoordinateCrossItem::State::serialize() const

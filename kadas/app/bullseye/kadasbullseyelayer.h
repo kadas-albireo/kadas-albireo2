@@ -20,7 +20,7 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadaspluginlayer.h>
+#include "kadas/core/kadaspluginlayer.h"
 
 class QgsMapCanvas;
 class QgsLayerTreeView;

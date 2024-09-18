@@ -27,7 +27,7 @@
 #include <qgis/qgsfilterlineedit.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/milx/kadasmilxlibrary.h>
+#include "kadas/gui/milx/kadasmilxlibrary.h"
 
 const int KadasMilxLibrary::SymbolXmlRole = Qt::UserRole + 1;
 const int KadasMilxLibrary::SymbolMilitaryNameRole = Qt::UserRole + 2;

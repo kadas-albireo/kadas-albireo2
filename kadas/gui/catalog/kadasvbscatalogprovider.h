@@ -17,7 +17,7 @@
 #ifndef KADASVBSCATALOGPROVIDER_H
 #define KADASVBSCATALOGPROVIDER_H
 
-#include <kadas/gui/kadascatalogprovider.h>
+#include "kadas/gui/kadascatalogprovider.h"
 
 class QStandardItem;
 

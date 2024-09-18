@@ -24,10 +24,10 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssinglebandpseudocolorrenderer.h>
 
-#include <kadas/analysis/kadasslopefilter.h>
-#include <kadas/core/kadas.h>
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/maptools/kadasmaptoolslope.h>
+#include "kadas/analysis/kadasslopefilter.h"
+#include "kadas/core/kadas.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
 
 
 KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )

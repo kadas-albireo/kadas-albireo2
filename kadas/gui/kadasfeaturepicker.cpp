@@ -23,10 +23,10 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
-#include <kadas/gui/milx/kadasmilxitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
 {

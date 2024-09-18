@@ -57,9 +57,9 @@
 
 #include <qgis/qgsprovidersublayersdialog.h>
 
-#include <kadasapplayerhandling.h>
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadasapplayerhandling.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 
 int gCanvasFreezeCount = 0;
 

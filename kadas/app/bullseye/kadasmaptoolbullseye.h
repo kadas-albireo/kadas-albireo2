@@ -19,7 +19,7 @@
 
 #include <qgis/qgsmaptool.h>
 
-#include <kadas/gui/kadasbottombar.h>
+#include "kadas/gui/kadasbottombar.h"
 #include "ui_kadasbullseyewidgetbase.h"
 
 class QgsLayerTreeView;

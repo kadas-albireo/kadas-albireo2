@@ -23,7 +23,7 @@
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgsdistancearea.h>
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 struct QgsVertexId;
 

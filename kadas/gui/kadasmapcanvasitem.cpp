@@ -17,9 +17,9 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/kadasmapcanvasitem.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/kadasmapcanvasitem.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas )
   : QgsMapCanvasItem( canvas ), mItem( item )

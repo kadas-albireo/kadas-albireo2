@@ -22,7 +22,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadaslayerselectionwidget.h>
+#include "kadas/gui/kadaslayerselectionwidget.h"
 #include <mapgrid/kadasmapgridlayer.h>
 #include <mapgrid/kadasmaptoolmapgrid.h>
 

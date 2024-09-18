@@ -26,11 +26,11 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
-#include <kadas/gui/mapitems/kadascircleitem.h>
-#include <kadas/gui/maptools/kadasmaptoolmeasure.h>
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 
 KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
   : KadasMapItemEditor( item )

@@ -28,7 +28,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/core/kadaslatlontoutm.h>
+#include "kadas/core/kadaslatlontoutm.h"
 #include <mapgrid/kadasmapgridlayer.h>
 
 

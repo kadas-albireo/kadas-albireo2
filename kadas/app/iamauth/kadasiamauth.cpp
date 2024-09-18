@@ -33,8 +33,8 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <iamauth/kadasiamauth.h>
 
 

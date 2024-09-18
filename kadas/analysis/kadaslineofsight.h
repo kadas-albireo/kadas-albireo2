@@ -17,7 +17,7 @@
 #ifndef KADAS_LINE_OF_SIGHT
 #define KADAS_LINE_OF_SIGHT
 
-#include <kadas/analysis/kadas_analysis.h>
+#include "kadas/analysis/kadas_analysis.h"
 
 class QgsCoordinateReferenceSystem;
 class QgsPoint;

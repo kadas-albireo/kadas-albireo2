@@ -19,8 +19,8 @@
 
 #include <qgis/qgscoordinatereferencesystem.h>
 
-#include <kadas/analysis/kadas_analysis.h>
-#include <kadas/analysis/kadasninecellfilter.h>
+#include "kadas/analysis/kadas_analysis.h"
+#include "kadas/analysis/kadasninecellfilter.h"
 
 
 class KADAS_ANALYSIS_EXPORT KadasSlopeFilter: public KadasNineCellFilter

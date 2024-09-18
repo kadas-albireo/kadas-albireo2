@@ -19,8 +19,8 @@
 
 #include <QDialog>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class QCheckBox;
 class QComboBox;

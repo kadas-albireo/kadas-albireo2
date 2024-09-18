@@ -18,7 +18,7 @@
 
 #include <qgis/qgssettingstreenode.h>
 
-#include <kadas/core/kadas_core.h>
+#include "kadas/core/kadas_core.h"
 
 /**
  * \ingroup core

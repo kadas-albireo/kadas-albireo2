@@ -62,10 +62,10 @@
 #include <qgis/qgsprojectviewsettings.h>
 #include <qgis/qgssettings.h>
 
-#include <kadasapplication.h>
-#include <kadaslayoutappmenuprovider.h>
-#include <kadaslayoutdesignerdialog.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadaslayoutappmenuprovider.h"
+#include "kadaslayoutdesignerdialog.h"
+#include "kadasmainwindow.h"
 
 
 //add some nice zoom levels for zoom comboboxes

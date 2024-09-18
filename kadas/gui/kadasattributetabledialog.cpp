@@ -31,7 +31,7 @@
 #include <qgis/qgsvectorlayercache.h>
 #include <qgis/qgsvectorlayerselectionmanager.h>
 
-#include <kadas/gui/kadasattributetabledialog.h>
+#include "kadas/gui/kadasattributetabledialog.h"
 
 KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent, Qt::DockWidgetArea area )
   : QDockWidget( parent )

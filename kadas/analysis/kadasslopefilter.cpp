@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadas/analysis/kadasslopefilter.h>
+#include "kadas/analysis/kadasslopefilter.h"
 
 
 KadasSlopeFilter::KadasSlopeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )

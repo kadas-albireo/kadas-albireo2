@@ -17,7 +17,7 @@
 #ifndef KADASCIRCULARSECTORITEM_H
 #define KADASCIRCULARSECTORITEM_H
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 class QgsMultiSurface;
 

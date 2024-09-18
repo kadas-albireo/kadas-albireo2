@@ -17,10 +17,10 @@
 #ifndef KADASREDLININGTEXTEDITOR_H
 #define KADASREDLININGTEXTEDITOR_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/ui_kadasredliningtexteditor.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/ui_kadasredliningtexteditor.h"
 
 class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
 {

@@ -20,7 +20,7 @@
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsrubberband.h>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class KADAS_GUI_EXPORT KadasMapToolSelectRect : public QgsMapTool
 {

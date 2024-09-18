@@ -26,10 +26,10 @@
 #include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/kadasmapitemtooltip.h>
-#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
-#include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/kadasmapitemtooltip.h"
+#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
+#include "kadas/gui/maptools/kadasmaptoolpan.h"
 
 
 KadasMapToolPan::KadasMapToolPan( QgsMapCanvas *canvas, bool allowItemInteraction )

@@ -24,7 +24,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 
-#include <kadas/gui/mapitems/kadascircularsectoritem.h>
+#include "kadas/gui/mapitems/kadascircularsectoritem.h"
 
 
 static double toGeoAngle( double arad )

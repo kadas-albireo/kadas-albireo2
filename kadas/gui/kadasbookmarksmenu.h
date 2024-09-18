@@ -19,7 +19,7 @@
 
 #include <QMenu>
 #include <qgis/qgsrectangle.h>
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QDomDocument;
 class QgsLayerTreeView;

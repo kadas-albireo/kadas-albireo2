@@ -44,7 +44,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasrichtexteditor.h>
+#include "kadas/gui/kadasrichtexteditor.h"
 
 // Richtext simplification filter helpers: Elements to be discarded
 static inline bool filterElement( const QStringRef &name )

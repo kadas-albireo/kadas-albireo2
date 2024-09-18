@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <kadasmessagelogviewer.h>
+#include "kadasmessagelogviewer.h"
 
 KadasMessageLogViewer::KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl )
   : QgsMessageLogViewer( parent, fl )

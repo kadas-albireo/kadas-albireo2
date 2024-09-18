@@ -23,14 +23,14 @@
 #include <qgis/qgssnappingutils.h>
 
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasbottombar.h>
-#include <kadas/gui/kadasfloatinginputwidget.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasmaptooledititem.h"
 
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer )

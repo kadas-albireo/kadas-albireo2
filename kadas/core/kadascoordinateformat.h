@@ -21,7 +21,7 @@
 
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/core/kadas_core.h>
+#include "kadas/core/kadas_core.h"
 
 class QgsPointXY;
 class QgsCoordinateReferenceSystem;

@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "ui_kadastemporalcontroller.h"
-#include <kadas/gui/kadasbottombar.h>
+#include "kadas/gui/kadasbottombar.h"
 
 class KadasRibbonButton;
 class QgsTemporalControllerWidget;

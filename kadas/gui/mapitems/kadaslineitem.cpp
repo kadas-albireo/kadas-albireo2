@@ -28,7 +28,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/mapitems/kadaslineitem.h>
+#include "kadas/gui/mapitems/kadaslineitem.h"
 
 
 QJsonObject KadasLineItem::State::serialize() const

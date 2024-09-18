@@ -23,7 +23,7 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
 
-#include <kadas/gui/kadasfeaturepicker.h>
+#include "kadas/gui/kadasfeaturepicker.h"
 
 class QTemporaryDir;
 class QgsLayerTreeGroup;

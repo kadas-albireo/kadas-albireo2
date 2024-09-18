@@ -18,7 +18,7 @@
 #define KADASARCGISPORTALCATALOGPROVIDER_H
 
 #include <QSet>
-#include <kadas/gui/kadascatalogprovider.h>
+#include "kadas/gui/kadascatalogprovider.h"
 
 class QStandardItem;
 

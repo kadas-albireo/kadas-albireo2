@@ -26,7 +26,7 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasbookmarksmenu.h>
+#include "kadas/gui/kadasbookmarksmenu.h"
 
 
 KadasBookmarksMenu::KadasBookmarksMenu( QgsMapCanvas *canvas, QgsMessageBar *messageBar, QWidget *parent )

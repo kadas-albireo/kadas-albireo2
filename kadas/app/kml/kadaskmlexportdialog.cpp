@@ -21,10 +21,10 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/maptools/kadasmaptoolselectrect.h>
-#include <kadasapplication.h>
-#include <kadasmainwindow.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/maptools/kadasmaptoolselectrect.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
 #include <kml/kadaskmlexportdialog.h>
 
 KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent, Qt::WindowFlags f )

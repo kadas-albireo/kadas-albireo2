@@ -21,8 +21,8 @@
 
 #include <QObject>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasitemlayer.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasitemlayer.h"
 
 class QMenu;
 class QgsMapCanvas;

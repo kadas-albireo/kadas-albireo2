@@ -26,17 +26,17 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasbottombar.h>
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitems/kadaspointitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/mapitems/kadasselectionrectitem.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadasselectionrectitem.h"
+#include "kadas/gui/maptools/kadasmaptooledititem.h"
+#include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 
 KadasMapToolEditItemGroup::KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer )
   : QgsMapTool( canvas ), mItems( items ), mLayer( layer )

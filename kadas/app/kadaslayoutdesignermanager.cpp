@@ -16,10 +16,10 @@
 
 #include <qgis/qgsprintlayout.h>
 
-#include <kadasapplication.h>
-#include <kadaslayoutdesignerdialog.h>
-#include <kadaslayoutdesignermanager.h>
-#include <kadasmainwindow.h>
+#include "kadasapplication.h"
+#include "kadaslayoutdesignerdialog.h"
+#include "kadaslayoutdesignermanager.h"
+#include "kadasmainwindow.h"
 
 KadasLayoutDesignerManager *KadasLayoutDesignerManager::instance()
 {

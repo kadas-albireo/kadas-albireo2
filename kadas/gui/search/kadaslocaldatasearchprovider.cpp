@@ -28,7 +28,7 @@
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsgeometry.h>
 
-#include <kadas/gui/search/kadaslocaldatasearchprovider.h>
+#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 
 
 const int KadasLocalDataSearchFilter::sResultCountLimit = 50;

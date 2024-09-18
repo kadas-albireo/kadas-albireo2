@@ -20,7 +20,7 @@
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmapsettings.h>
 
-#include <kadas/gui/mapitems/kadaspointitem.h>
+#include "kadas/gui/mapitems/kadaspointitem.h"
 
 
 QJsonObject KadasPointItem::State::serialize() const

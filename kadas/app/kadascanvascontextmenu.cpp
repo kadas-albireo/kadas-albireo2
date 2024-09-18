@@ -23,22 +23,22 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/kadasitemcontextmenuactions.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadasselectionrectitem.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
-#include <kadas/gui/maptools/kadasmaptoolminmax.h>
-#include <kadas/gui/maptools/kadasmaptoolslope.h>
-#include <kadasapplication.h>
-#include <kadascanvascontextmenu.h>
-#include <kadasmainwindow.h>
-#include <kadasmapidentifydialog.h>
-#include <kadasredliningintegration.h>
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/kadasitemcontextmenuactions.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadasselectionrectitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasmaptooledititem.h"
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
+#include "kadas/gui/maptools/kadasmaptoolminmax.h"
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
+#include "kadasapplication.h"
+#include "kadascanvascontextmenu.h"
+#include "kadasmainwindow.h"
+#include "kadasmapidentifydialog.h"
+#include "kadasredliningintegration.h"
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )

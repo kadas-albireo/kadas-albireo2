@@ -25,7 +25,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadaslayerselectionwidget.h>
+#include "kadas/gui/kadaslayerselectionwidget.h"
 
 
 KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, LayerFilter filter, LayerCreator creator, QWidget *parent )

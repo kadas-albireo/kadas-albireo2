@@ -32,16 +32,16 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/core/kadasalgorithms.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/mapitems/kadaspointitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
-#include <kadas/gui/mapitems/kadastextitem.h>
-#include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
-#include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
-#include <kadasapplication.h>
+#include "kadas/core/kadasalgorithms.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadastextitem.h"
+#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
+#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
+#include "kadasapplication.h"
 #include <kml/kadaskmlimport.h>
 
 #ifdef WITH_GLOBE

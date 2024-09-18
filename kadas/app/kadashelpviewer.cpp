@@ -22,8 +22,8 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsuserprofilemanager.h>
 
-#include <kadas/core/kadas.h>
-#include <kadashelpviewer.h>
+#include "kadas/core/kadas.h"
+#include "kadashelpviewer.h"
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
     : QObject( parent )

@@ -17,9 +17,9 @@
 #ifndef KADASMILXLAYER_H
 #define KADASMILXLAYER_H
 
-#include <kadas/core/kadaspluginlayer.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/milx/kadasmilxclient.h>
+#include "kadas/core/kadaspluginlayer.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 
 
 class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer

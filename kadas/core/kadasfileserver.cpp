@@ -20,7 +20,7 @@
 #include <QTimer>
 
 #include <qgis/qgslogger.h>
-#include <kadas/core/kadasfileserver.h>
+#include "kadas/core/kadasfileserver.h"
 
 KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, int port )
 {

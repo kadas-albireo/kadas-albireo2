@@ -30,8 +30,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
 
 
 KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs )

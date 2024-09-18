@@ -22,9 +22,9 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/core/kadascoordinateutils.h>
-#include <kadas/core/kadaslatlontoutm.h>
+#include "kadas/core/kadas.h"
+#include "kadas/core/kadascoordinateutils.h"
+#include "kadas/core/kadaslatlontoutm.h"
 
 double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg )
 {

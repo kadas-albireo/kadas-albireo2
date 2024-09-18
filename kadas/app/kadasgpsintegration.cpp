@@ -20,10 +20,10 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadasgpsintegration.h>
-#include <kadasmainwindow.h>
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadasgpsintegration.h"
+#include "kadasmainwindow.h"
 
 KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps, QAction *actionMoveWithGps )
   : QObject( mainWindow ), mMainWindow( mainWindow ), mGpsToolButton( gpsToolButton ), mActionEnableGps( actionEnableGps ), mActionMoveWithGps( actionMoveWithGps )

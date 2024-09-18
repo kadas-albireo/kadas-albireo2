@@ -28,10 +28,10 @@
 #include <qgis/qgsrasterrenderer.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/analysis/kadashillshadefilter.h>
-#include <kadas/core/kadas.h>
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
+#include "kadas/analysis/kadashillshadefilter.h"
+#include "kadas/core/kadas.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 
 
 

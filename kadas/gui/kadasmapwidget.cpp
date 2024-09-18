@@ -30,11 +30,11 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasmapcanvasitem.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/kadasmapwidget.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/maptools/kadasmaptoolpan.h>
+#include "kadas/gui/kadasmapcanvasitem.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasmapwidget.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/maptools/kadasmaptoolpan.h"
 
 KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
   : QDockWidget( parent ), mNumber( number ), mId( id ), mMasterCanvas( masterCanvas )

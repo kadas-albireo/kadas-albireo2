@@ -18,9 +18,9 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include <kadas/gui/kadasrichtexteditor.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
+#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {

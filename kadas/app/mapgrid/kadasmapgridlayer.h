@@ -17,7 +17,7 @@
 #ifndef KADASMAPGRIDLAYER_H
 #define KADASMAPGRIDLAYER_H
 
-#include <kadas/core/kadaspluginlayer.h>
+#include "kadas/core/kadaspluginlayer.h"
 
 class KadasMapGridLayer : public KadasPluginLayer
 {

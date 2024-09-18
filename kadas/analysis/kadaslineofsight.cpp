@@ -23,8 +23,8 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/analysis/kadaslineofsight.h>
-#include <kadas/core/kadas.h>
+#include "kadas/analysis/kadaslineofsight.h"
+#include "kadas/core/kadas.h"
 
 
 bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTerrainSamples, bool observerPosAbsolute, bool targetPosAbsolute )
