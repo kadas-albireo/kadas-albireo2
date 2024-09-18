@@ -96,9 +96,10 @@
 #include "kadasplugininterfaceimpl.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
-#include <bullseye/kadasbullseyelayer.h>
-#include <guidegrid/kadasguidegridlayer.h>
-#include <mapgrid/kadasmapgridlayer.h>
+#include "kadasbullseyelayer.h"
+#include "kadasguidegridlayer.h"
+#include "kadasmapgridlayer.h"
+#include "kadasmapswipetool.h"
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -369,6 +370,8 @@ void KadasApplication::init()
 
   // Layer refresh manager
   mLayerRefreshManager = new KadasLayerRefreshManager( this );
+
+  mMapSwipeTool = new KadasMapSwipeMapTool( mMainWindow->mapCanvas() );
 
   mMainWindow->show();
   splash.finish( mMainWindow );

@@ -34,6 +34,7 @@ class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMen
     QgsLayerTreeView *mView = nullptr;
 
   private slots:
+    void enableMapSwipe();
     void removeLayerTreeItems();
     void setLayerTransparency( int value );
     void setLayerRefreshRate( int value );

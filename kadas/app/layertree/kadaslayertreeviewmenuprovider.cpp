@@ -32,6 +32,7 @@
 #include "kadaslayerrefreshmanager.h"
 #include "kadaslayertreeviewmenuprovider.h"
 #include "kadasmainwindow.h"
+#include "kadasmapswipetool.h"
 
 KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
   mView( view )
@@ -40,7 +41,7 @@ KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView
 
 QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 {
-  if ( !mView )
+  if (!mView )
   {
     return nullptr;
   }
@@ -89,11 +90,16 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         }
       }
       menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
+
+      QString swipeActionText = tr( "&Compare with Swipe Tool" );
+      if ( KadasApplication::instance()->mapSwipeTool()->isActive() )
+        swipeActionText = tr( "&Add to Comparison with Swipe Tool" );
+      menu->addAction( QgsApplication::getThemeIcon( "/mIconSwipe.svg" ), swipeActionText, this, &KadasLayerTreeViewMenuProvider::enableMapSwipe );
+
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
-
 
       if ( layer->type() == Qgis::LayerType::Raster && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
       {
@@ -128,7 +134,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if ( !layer )
+  if (!layer )
   {
     return nullptr;
   }
@@ -181,7 +187,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
   refreshRateSpin->setSuffix( " s" );
   refreshRateSpin->setValue( kApp->layerRefreshManager()->layerRefreshInterval( mView->currentLayer()->id() ) );
   refreshRateSpin->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-  connect( refreshRateSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasLayerTreeViewMenuProvider::setLayerRefreshRate );
+  connect( refreshRateSpin, qOverload<int>(&QSpinBox::valueChanged ), this, &KadasLayerTreeViewMenuProvider::setLayerRefreshRate );
   refreshRateLayout->addWidget( refreshRateSpin );
 
   QWidgetAction *transpAction = new QWidgetAction( parent );
@@ -192,7 +198,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
 QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *parent )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if ( !layer )
+  if (!layer )
   {
     return nullptr;
   }
@@ -203,6 +209,18 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
   heightmapAction->setChecked( currentHeightmap == layer->id() );
   connect( heightmapAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap );
   return heightmapAction;
+}
+
+void KadasLayerTreeViewMenuProvider::enableMapSwipe()
+{
+  const QList<QgsMapLayer *> selectedLayers = mView->selectedLayersRecursive();
+  if ( selectedLayers.isEmpty() )
+  {
+    return;
+  }
+
+  KadasApplication::instance()->mapSwipeTool()->addLayers( selectedLayers );
+  KadasApplication::instance()->mainWindow()->mapCanvas()->setMapTool( KadasApplication::instance()->mapSwipeTool() );
 }
 
 void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()
@@ -227,18 +245,18 @@ void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()
 void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if ( !layer )
+  if (!layer )
   {
     return;
   }
 
   if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
-    static_cast<QgsVectorLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
+    static_cast<QgsVectorLayer *>( layer )->setOpacity(( 100 - value ) / 100. );
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    static_cast<KadasPluginLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
+    static_cast<KadasPluginLayer *>( layer )->setOpacity(( 100 - value ) / 100. );
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {
