@@ -21,7 +21,7 @@
 #include <qgis/qgsproject.h>
 
 #include <kadas/gui/kadasmapwidget.h>
-#include <kadas/app/kadasmapwidgetmanager.h>
+#include <kadasmapwidgetmanager.h>
 
 KadasMapWidgetManager::KadasMapWidgetManager( QgsMapCanvas *masterCanvas, QMainWindow *parent )
   : QObject( parent ), mMainWindow( parent ), mMasterCanvas( masterCanvas )

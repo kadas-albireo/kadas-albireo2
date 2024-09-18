@@ -17,8 +17,8 @@
 #include <QTimer>
 #include <osgEarthUtil/EarthManipulator>
 
-#include <kadas/app/globe/kadasglobeintegration.h>
-#include <kadas/app/globe/kadasglobeinteractionhandlers.h>
+#include <globe/kadasglobeintegration.h>
+#include <globe/kadasglobeinteractionhandlers.h>
 
 #define MOVE_DELTA 0.05
 

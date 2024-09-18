@@ -78,31 +78,31 @@
 #include <kadas/gui/search/kadasremotedatasearchprovider.h>
 #include <kadas/gui/search/kadasworldlocationsearchprovider.h>
 
-#include <kadas/app/kadasapplayerhandling.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadashelpviewer.h>
-#include <kadas/app/kadasgpsintegration.h>
-#include <kadas/app/kadasgpxintegration.h>
-#include <kadas/app/kadaslayertreeviewmenuprovider.h>
-#include <kadas/app/kadaslayertreeviewtemporalindicator.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadasnewspopup.h>
-#include <kadas/app/kadastemporalcontroller.h>
-#include <kadas/app/kadaspluginmanager.h>
-#include <kadas/app/kadaspythonintegration.h>
-#include <kadas/app/kadasredliningintegration.h>
-#include <kadas/app/bullseye/kadasmaptoolbullseye.h>
+#include <kadasapplayerhandling.h>
+#include <kadasapplication.h>
+#include <kadashelpviewer.h>
+#include <kadasgpsintegration.h>
+#include <kadasgpxintegration.h>
+#include <kadaslayertreeviewmenuprovider.h>
+#include <kadaslayertreeviewtemporalindicator.h>
+#include <kadasmainwindow.h>
+#include <kadasmapwidgetmanager.h>
+#include <kadasnewspopup.h>
+#include <kadastemporalcontroller.h>
+#include <kadaspluginmanager.h>
+#include <kadaspythonintegration.h>
+#include <kadasredliningintegration.h>
+#include <bullseye/kadasmaptoolbullseye.h>
 #ifdef WITH_GLOBE
-#include <kadas/app/globe/kadasglobeintegration.h>
+#include <globe/kadasglobeintegration.h>
 #endif
-#include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
-#include <kadas/app/iamauth/kadasiamauth.h>
-#include <kadas/app/kml/kadaskmlintegration.h>
-#include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
-#include <kadas/app/milx/kadasmilxintegration.h>
+#include <guidegrid/kadasmaptoolguidegrid.h>
+#include <iamauth/kadasiamauth.h>
+#include <kml/kadaskmlintegration.h>
+#include <mapgrid/kadasmaptoolmapgrid.h>
+#include <milx/kadasmilxintegration.h>
 
-#include <kadas/app/external/qgis/app/qgsgotolocatorfilter.h>
+#include <external/qgis/app/qgsgotolocatorfilter.h>
 
 KadasMainWindow::KadasMainWindow()
 {

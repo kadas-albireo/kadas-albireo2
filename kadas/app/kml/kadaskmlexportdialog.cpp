@@ -23,9 +23,9 @@
 
 #include <kadas/gui/kadasitemlayer.h>
 #include <kadas/gui/maptools/kadasmaptoolselectrect.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kml/kadaskmlexportdialog.h>
+#include <kadasapplication.h>
+#include <kadasmainwindow.h>
+#include <kml/kadaskmlexportdialog.h>
 
 KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent, Qt::WindowFlags f )
   : QDialog( parent, f )

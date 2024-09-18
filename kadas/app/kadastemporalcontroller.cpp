@@ -18,9 +18,9 @@
 
 #include <qgis/qgstemporalcontrollerwidget.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadastemporalcontroller.h>
+#include <kadasapplication.h>
+#include <kadasmainwindow.h>
+#include <kadastemporalcontroller.h>
 
 
 KadasTemporalController::KadasTemporalController( QgsMapCanvas *canvas )

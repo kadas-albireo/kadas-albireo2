@@ -17,8 +17,8 @@
 #include <qgis/qgsdataprovider.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadaslayerrefreshmanager.h>
+#include <kadasapplication.h>
+#include <kadaslayerrefreshmanager.h>
 
 KadasLayerRefreshManager::KadasLayerRefreshManager( QObject *parent )
   : QObject( parent )

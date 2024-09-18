@@ -21,7 +21,7 @@
 #include <qgis/qgssymbolwidgetcontext.h>
 
 #include <kadas/core/kadaspluginlayer.h>
-#include <kadas/app/kadaspluginlayerproperties.h>
+#include <kadaspluginlayerproperties.h>
 
 
 KadasPluginLayerRenderingPropertiesWidget::KadasPluginLayerRenderingPropertiesWidget( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent )

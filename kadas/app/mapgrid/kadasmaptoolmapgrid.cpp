@@ -23,8 +23,8 @@
 #include <qgis/qgsproject.h>
 
 #include <kadas/gui/kadaslayerselectionwidget.h>
-#include <kadas/app/mapgrid/kadasmapgridlayer.h>
-#include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
+#include <mapgrid/kadasmapgridlayer.h>
+#include <mapgrid/kadasmaptoolmapgrid.h>
 
 KadasMapToolMapGrid::KadasMapToolMapGrid( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : QgsMapTool( canvas )

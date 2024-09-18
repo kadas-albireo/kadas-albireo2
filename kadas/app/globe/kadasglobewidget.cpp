@@ -26,9 +26,9 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgslayertree.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/globe/kadasglobewidget.h>
+#include <kadasapplication.h>
+#include <kadasmainwindow.h>
+#include <globe/kadasglobewidget.h>
 
 
 KadasGlobeWidget::KadasGlobeWidget( QAction *action3D, QWidget *parent )

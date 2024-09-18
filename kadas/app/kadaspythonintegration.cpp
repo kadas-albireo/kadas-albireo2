@@ -28,8 +28,8 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadaspythonintegration.h>
+#include <kadasapplication.h>
+#include <kadaspythonintegration.h>
 
 PyThreadState *_mainState = nullptr;
 

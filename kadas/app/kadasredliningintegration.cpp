@@ -34,9 +34,9 @@
 #include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasredliningintegration.h>
+#include <kadasapplication.h>
+#include <kadasmainwindow.h>
+#include <kadasredliningintegration.h>
 
 KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
   : QObject( parent ), mButtonNewObject( buttonNewObject )

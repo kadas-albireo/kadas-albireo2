@@ -39,7 +39,7 @@
 
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/app/kadasmapidentifydialog.h>
+#include <kadasmapidentifydialog.h>
 
 
 const int KadasMapIdentifyDialog::sGeometryRole = Qt::UserRole + 1;

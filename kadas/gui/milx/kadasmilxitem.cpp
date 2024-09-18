@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
 #include <QDesktopWidget>
 #include <QJsonArray>
 #include <QMainWindow>
@@ -33,7 +34,6 @@
 
 #include <kadas/gui/milx/kadasmilxitem.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/app/kadasapplication.h>
 
 
 QJsonObject KadasMilxItem::State::serialize() const

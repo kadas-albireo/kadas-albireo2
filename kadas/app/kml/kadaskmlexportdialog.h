@@ -21,7 +21,7 @@
 
 #include <qgis/qgsrectangle.h>
 
-#include <kadas/app/kml/kadaskmlexport.h>
+#include <kml/kadaskmlexport.h>
 #include "ui_kadaskmlexportdialogbase.h"
 
 class QgsMapLayer;

@@ -23,7 +23,7 @@
 #include <qgis/qgsuserprofilemanager.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/app/kadashelpviewer.h>
+#include <kadashelpviewer.h>
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
     : QObject( parent )

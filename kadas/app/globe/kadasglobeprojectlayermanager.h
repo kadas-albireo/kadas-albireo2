@@ -23,7 +23,7 @@
 #include <osgEarth/MapNode>
 #include <osgEarth/ImageLayer>
 
-#include <kadas/app/globe/kadasglobetilesource.h>
+#include <globe/kadasglobetilesource.h>
 
 
 class KadasGlobeProjectLayerManager : public QObject

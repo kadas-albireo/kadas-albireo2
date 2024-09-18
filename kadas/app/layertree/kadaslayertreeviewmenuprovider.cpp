@@ -28,10 +28,10 @@
 
 #include <kadas/core/kadaspluginlayer.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadaslayerrefreshmanager.h>
-#include <kadas/app/kadaslayertreeviewmenuprovider.h>
-#include <kadas/app/kadasmainwindow.h>
+#include <kadasapplication.h>
+#include <kadaslayerrefreshmanager.h>
+#include <kadaslayertreeviewmenuprovider.h>
+#include <kadasmainwindow.h>
 
 KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
   mView( view )

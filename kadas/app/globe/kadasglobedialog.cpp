@@ -34,9 +34,9 @@
 #include <osgEarthUtil/EarthManipulator>
 
 #include <kadas/core/kadas.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/globe/kadasglobedialog.h>
-#include <kadas/app/globe/kadasglobeintegration.h>
+#include <kadasapplication.h>
+#include <globe/kadasglobedialog.h>
+#include <globe/kadasglobeintegration.h>
 
 KadasGlobeDialog::KadasGlobeDialog( QWidget *parent, Qt::WindowFlags fl )
   : QDialog( parent, fl )

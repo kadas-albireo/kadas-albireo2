@@ -27,10 +27,10 @@
 
 #include <kadas/gui/kadasmapwidget.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadasplugininterfaceimpl.h>
+#include <kadasapplication.h>
+#include <kadasmainwindow.h>
+#include <kadasmapwidgetmanager.h>
+#include <kadasplugininterfaceimpl.h>
 #include "kadasplugininterfaceimpl.h"
 
 KadasPluginInterfaceImpl::KadasPluginInterfaceImpl( KadasApplication *app )

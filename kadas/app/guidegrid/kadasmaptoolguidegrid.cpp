@@ -24,8 +24,8 @@
 #include <qgis/qgsproject.h>
 
 #include <kadas/gui/kadaslayerselectionwidget.h>
-#include <kadas/app/guidegrid/kadasguidegridlayer.h>
-#include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
+#include <guidegrid/kadasguidegridlayer.h>
+#include <guidegrid/kadasmaptoolguidegrid.h>
 
 KadasMapToolGuideGrid::KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : QgsMapTool( canvas )

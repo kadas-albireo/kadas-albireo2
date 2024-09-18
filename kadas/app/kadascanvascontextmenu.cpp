@@ -34,11 +34,11 @@
 #include <kadas/gui/maptools/kadasmaptoolhillshade.h>
 #include <kadas/gui/maptools/kadasmaptoolminmax.h>
 #include <kadas/gui/maptools/kadasmaptoolslope.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadascanvascontextmenu.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasmapidentifydialog.h>
-#include <kadas/app/kadasredliningintegration.h>
+#include <kadasapplication.h>
+#include <kadascanvascontextmenu.h>
+#include <kadasmainwindow.h>
+#include <kadasmapidentifydialog.h>
+#include <kadasredliningintegration.h>
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )

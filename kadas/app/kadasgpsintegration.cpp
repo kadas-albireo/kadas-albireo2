@@ -22,8 +22,8 @@
 
 #include <kadas/gui/kadasmapcanvasitemmanager.h>
 #include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/app/kadasgpsintegration.h>
-#include <kadas/app/kadasmainwindow.h>
+#include <kadasgpsintegration.h>
+#include <kadasmainwindow.h>
 
 KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps, QAction *actionMoveWithGps )
   : QObject( mainWindow ), mMainWindow( mainWindow ), mGpsToolButton( gpsToolButton ), mActionEnableGps( actionEnableGps ), mActionMoveWithGps( actionMoveWithGps )

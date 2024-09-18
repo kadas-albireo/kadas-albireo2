@@ -37,9 +37,9 @@
 #include <kadas/gui/mapitems/kadaslineitem.h>
 #include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasgpxintegration.h>
-#include <kadas/app/kadasmainwindow.h>
+#include <kadasapplication.h>
+#include <kadasgpxintegration.h>
+#include <kadasmainwindow.h>
 
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )

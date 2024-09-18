@@ -26,7 +26,7 @@
 #include <qgis/qgsgeometry.h>
 
 #include <kadas/gui/kadasitemlayer.h>
-#include <kadas/app/globe/featuresource/kadasglobefeatureoptions.h>
+#include <globe/featuresource/kadasglobefeatureoptions.h>
 
 class KadasGlobeFeatureSource : public QObject, public osgEarth::Features::FeatureSource
 {

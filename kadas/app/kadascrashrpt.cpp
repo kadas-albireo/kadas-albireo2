@@ -22,7 +22,7 @@
 #include <qgis/qgssettings.h>
 
 #include <kadas/core/kadas.h>
-#include <kadas/app/kadascrashrpt.h>
+#include <kadascrashrpt.h>
 
 
 bool KadasCrashRpt::install()

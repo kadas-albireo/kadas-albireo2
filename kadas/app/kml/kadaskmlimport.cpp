@@ -41,11 +41,11 @@
 #include <kadas/gui/mapitems/kadastextitem.h>
 #include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
 #include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kml/kadaskmlimport.h>
+#include <kadasapplication.h>
+#include <kml/kadaskmlimport.h>
 
 #ifdef WITH_GLOBE
-#include <kadas/app/globe/kadasglobevectorlayerproperties.h>
+#include <globe/kadasglobevectorlayerproperties.h>
 #endif
 
 

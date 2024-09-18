@@ -21,8 +21,8 @@
 #include <qgis/labelposition.h>
 #include <qgis/feature.h>
 
-#include <kadas/app/kml/kadaskmlexport.h>
-#include <kadas/app/kml/kadaskmllabeling.h>
+#include <kml/kadaskmlexport.h>
+#include <kml/kadaskmllabeling.h>
 
 
 KadasKMLLabelProvider::KadasKMLLabelProvider( QTextStream *outStream, QgsVectorLayer *layer, const QgsPalLayerSettings *settings )

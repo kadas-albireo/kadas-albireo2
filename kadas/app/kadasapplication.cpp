@@ -79,26 +79,26 @@
 #include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
 #include <kadas/gui/maptools/kadasmaptoolpan.h>
 #include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasapplayerhandling.h>
-#include <kadas/app/kadascanvascontextmenu.h>
+#include <kadasapplication.h>
+#include <kadasapplayerhandling.h>
+#include <kadascanvascontextmenu.h>
 #ifdef WITH_CRASHREPORT
-#include <kadas/app/kadascrashrpt.h>
+#include <kadascrashrpt.h>
 #endif
-#include <kadas/app/kadashandlebadlayers.h>
-#include <kadas/app/kadaspluginlayerproperties.h>
-#include <kadas/app/kadaslayoutdesignermanager.h>
-#include <kadas/app/kadaslayerrefreshmanager.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadasmessagelogviewer.h>
-#include <kadas/app/kadasnewspopup.h>
-#include <kadas/app/kadasplugininterfaceimpl.h>
-#include <kadas/app/kadaspluginmanager.h>
-#include <kadas/app/kadaspythonintegration.h>
-#include <kadas/app/bullseye/kadasbullseyelayer.h>
-#include <kadas/app/guidegrid/kadasguidegridlayer.h>
-#include <kadas/app/mapgrid/kadasmapgridlayer.h>
+#include <kadashandlebadlayers.h>
+#include <kadaspluginlayerproperties.h>
+#include <kadaslayoutdesignermanager.h>
+#include <kadaslayerrefreshmanager.h>
+#include <kadasmainwindow.h>
+#include <kadasmapwidgetmanager.h>
+#include <kadasmessagelogviewer.h>
+#include <kadasnewspopup.h>
+#include <kadasplugininterfaceimpl.h>
+#include <kadaspluginmanager.h>
+#include <kadaspythonintegration.h>
+#include <bullseye/kadasbullseyelayer.h>
+#include <guidegrid/kadasguidegridlayer.h>
+#include <mapgrid/kadasmapgridlayer.h>
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )

@@ -22,9 +22,9 @@
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadashandlebadlayers.h>
-#include <kadas/app/kadasmainwindow.h>
+#include <kadasapplication.h>
+#include <kadashandlebadlayers.h>
+#include <kadasmainwindow.h>
 
 
 void KadasHandleBadLayersHandler::handleBadLayers( const QList<QDomNode> &layers )
