@@ -1,139 +1,130 @@
 {
-    "name": "qgis",
-    "version": "3.34.4",
-    "homepage": "https://qgis.org",
-    "description": "QGIS is a free, open source, cross platform (lin/win/mac) geographical information system (GIS)",
-    "dependencies": [
-      "draco",
-      "expat",
-      "libxml2",
-      "libzip",
-      "zlib",
-      "libspatialindex",
-      "libspatialite",
-      {
-        "name": "gdal",
-        "features":["poppler"]
-      },
-      {
-        "name": "exiv2",
-        "features":
-        [
-          "xmp"
-        ]
-      },
-      "gsl",
-      "libpq",
-      "protobuf",
-      "proj",
-      "geos",
-      "nlohmann-json",
-      "jhasse-poly2tri",
-      {
-        "name": "libtasn1",
-        "platform": "ios"
-      },
-      "qt5-base",
-      "qt5-svg",
-      "qt5-location",
-      "qt5-tools",
-      "qt5-multimedia",
-      {
-        "name": "qt5-macextras",
-        "platform": "osx"
-      },
-      {
-        "name": "libtasn1",
-        "platform": "osx"
-      },
-      {
-        "name": "qt5-winextras",
-        "platform": "windows"
-      },
-      {
-        "name": "qca",
-        "default-features": false
-      },
-      "qtkeychain"
-    ],
-    "features":
-	{
-            "opencl" : {
-              "description": "Should OpenCL support be added",
-              "dependencies":
-              [
-                  "opencl"
-              ]
+  "name": "qgis",
+  "version": "3.34.4",
+  "description": "QGIS is a free, open source, cross platform (lin/win/mac) geographical information system (GIS)",
+  "homepage": "https://qgis.org",
+  "dependencies": [
+    "draco",
+    {
+      "name": "exiv2",
+      "features": [
+        "xmp"
+      ]
     },
-            "server":
+    "expat",
+    {
+      "name": "gdal",
+      "features": [
+        "poppler"
+      ]
+    },
+    "geos",
+    "gsl",
+    "jhasse-poly2tri",
+    "libpq",
+    "libspatialindex",
+    "libspatialite",
+    {
+      "name": "libtasn1",
+      "platform": "ios"
+    },
+    {
+      "name": "libtasn1",
+      "platform": "osx"
+    },
+    "libxml2",
+    "libzip",
+    "nlohmann-json",
+    "proj",
+    "protobuf",
+    {
+      "name": "qca",
+      "default-features": false
+    },
+    "qt5-base",
+    "qt5-location",
+    {
+      "name": "qt5-macextras",
+      "platform": "osx"
+    },
+    "qt5-multimedia",
+    "qt5-svg",
+    "qt5-tools",
+    {
+      "name": "qt5-winextras",
+      "platform": "windows"
+    },
+    "qtkeychain",
+    "zlib"
+  ],
+  "features": {
+    "3d": {
+      "description": "Determines whether QGIS 3D library should be built",
+      "dependencies": [
+        "qt5-3d"
+      ]
+    },
+    "bindings": {
+      "description": "Determines whether Python bindings should be built",
+      "dependencies": [
         {
-            "description": "Determines whether QGIS server should be built",
-            "dependencies":
-            [
-                "fastcgi"
-            ]
+          "name": "numpy",
+          "platform": "!osx"
         },
-            "process":
+        "py-psycopg2",
         {
-            "description": "Determines whether the command line QGIS process tool should be built"
+          "name": "py-pyqt5",
+          "features": [
+            "3d"
+          ]
         },
-            "3d":
+        "py-qscintilla-qt5",
         {
-            "description": "Determines whether QGIS 3D library should be built",
-            "dependencies":
-            [
-                "qt5-3d"
-            ]
-        },
-            "bindings":
-        {
-            "description": "Determines whether Python bindings should be built",
-            "dependencies":
-            [
-                "py-pyqt5",
-                {
-                  "name": "py-numpy",
-                  "platform": "!osx"
-                },
-                "py-psycopg2",
-                "py-qscintilla-qt5",
-                {
-                  "name": "vcpkg-python-scripts",
-                  "host": true
-                }
-            ]
-        },
-            "gui":
-        {
-            "description": "Determines whether the QGIS gui should be built",
-            "dependencies":
-            [
-                "qwt-qt5",
-                "qscintilla-qt5"
-            ]
-        },
-            "desktop":
-        {
-            "description": "Determines whether the QGIS desktop (main app) should be built"
-        },
-            "customwidgets":
-        {
-            "description": "Determines whether the QGIS custom widgets for QtCreator should be built"
-        },
-            "quick":
-        {
-            "description": "Build the QGIS quick components for mobile interfaces",
-            "dependencies":
-            [
-                "qt5-quickcontrols2",
-                "qt5-declarative"
-            ]
-        },
-            "webkit":
-            {
-              "description": "webkit",
-              "dependencies": ["qt5-webkit"]
-            }
+          "name": "vcpkg-python-scripts",
+          "host": true
+        }
+      ]
+    },
+    "customwidgets": {
+      "description": "Determines whether the QGIS custom widgets for QtCreator should be built"
+    },
+    "desktop": {
+      "description": "Determines whether the QGIS desktop (main app) should be built"
+    },
+    "gui": {
+      "description": "Determines whether the QGIS gui should be built",
+      "dependencies": [
+        "qscintilla-qt5",
+        "qwt-qt5"
+      ]
+    },
+    "opencl": {
+      "description": "Should OpenCL support be added",
+      "dependencies": [
+        "opencl"
+      ]
+    },
+    "process": {
+      "description": "Determines whether the command line QGIS process tool should be built"
+    },
+    "quick": {
+      "description": "Build the QGIS quick components for mobile interfaces",
+      "dependencies": [
+        "qt5-declarative",
+        "qt5-quickcontrols2"
+      ]
+    },
+    "server": {
+      "description": "Determines whether QGIS server should be built",
+      "dependencies": [
+        "fastcgi"
+      ]
+    },
+    "webkit": {
+      "description": "webkit",
+      "dependencies": [
+        "qt5-webkit"
+      ]
+    }
   }
-    
-  }
+}
