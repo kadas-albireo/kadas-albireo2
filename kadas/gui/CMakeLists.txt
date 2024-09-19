@@ -36,7 +36,7 @@ ADD_LIBRARY(kadas_gui
 pkg_search_module(CAIRO IMPORTED_TARGET cairo REQUIRED)
 pkg_search_module(LIBRSVG IMPORTED_TARGET librsvg-2.0 REQUIRED)
 pkg_search_module(SVG2SVGT IMPORTED_TARGET svg2svgt REQUIRED)
-find_package(exiv2 REQUIRED)
+
 find_package(Qwt REQUIRED)
 find_package(GeographicLib REQUIRED)
 

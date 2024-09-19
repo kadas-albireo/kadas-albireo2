@@ -159,7 +159,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QVariantMap data = result.userData().value<QVariantMap>();
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
 

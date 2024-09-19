@@ -27,6 +27,7 @@
       "protobuf",
       "proj",
       "geos",
+      "nlohmann-json",
       "jhasse-poly2tri",
       {
         "name": "libtasn1",

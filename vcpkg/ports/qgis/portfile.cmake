@@ -1,7 +1,7 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF "final-${TAG}")
-set(QGIS_SHA512 d8075b98efe8ebea1ee53273b9427e0a7329ba8f1a96258d962dee52b0c5c08be2bea10b2130fee4c0acbc3f4a94b94da0033e8b6c92857e0c679c051545d3d8)
+set(QGIS_REF 22036c1bce7614b72224938452fed8e58592d65f)
+set(QGIS_SHA512 e69b3cc72197da4e07dd5c7c84756e7d5bc2b21eb63cd5180a2e1982b1d9d104874eb2c16763f653873fac0ca154696f16ff678c283f055c8f93bf4c1162e2ac)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -16,15 +16,9 @@ vcpkg_from_github(
         exiv2.patch
         crssync.patch
         bigobj.patch
-        poly2tri.patch
         mesh.patch
-        delimitedtext.patch
-        qtkeychain-56284.patch
         bindings-install.patch
-        wcsLayerName.patch
-	srs-debug.patch
-	sipcxx17.patch
-        byeuic.patch
+        sipcxx17.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -44,15 +38,7 @@ if("bindings" IN_LIST FEATURES)
     vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
     list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
 
-    # TODO: linux etc
-    if(VCPKG_TARGET_IS_WINDOWS)
-        list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5.bat")
-        list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5.bat")
-    else()
-        list(APPEND QGIS_OPTIONS "-DPYUIC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyuic5")
-        list(APPEND QGIS_OPTIONS "-DPYRCC_PROGRAM=${CURRENT_HOST_INSTALLED_DIR}/tools/python3/pyrcc5")
-    endif()
-    list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${PYTHON3_SITEPACKAGES}/qgis")
+    list(APPEND QGIS_OPTIONS "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis")
 else()
     vcpkg_find_acquire_program(PYTHON3)
     list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
@@ -71,19 +57,6 @@ list(APPEND QGIS_OPTIONS "-DPoly2Tri_LIBRARY=poly2tri::poly2tri")
 list(APPEND QGIS_OPTIONS "-D QGIS_DATA_SUBDIR=share/qgis")
 list(APPEND QGIS_OPTIONS "-D QGIS_LIBEXEC_SUBDIR=bin")
 
-if(EXISTS "${CURRENT_INSTALLED_DIR}/lib/libqt_poly2tri.a")
-    set(QT_POLY2TRI_DIR_RELEASE "${CURRENT_INSTALLED_DIR}/lib")
-    set(QT_POLY2TRI_DIR_DEBUG "${CURRENT_INSTALLED_DIR}/debug/lib")
-else()
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_LIBRARY=poly2tri::poly2tri)
-endif()
-if(DEFINED QT_POLY2TRI_DIR_RELEASE)
-    list(APPEND QGIS_OPTIONS -DPoly2Tri_INCLUDE_DIR:PATH=${CMAKE_CURRENT_LIST_DIR}/poly2tri)
-    list(APPEND QGIS_OPTIONS_DEBUG -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_DEBUG}/debug/lib/libqt_poly2tri_debug.a) # static qt only
-    list(APPEND QGIS_OPTIONS_RELEASE -DPoly2Tri_LIBRARY:PATH=${QT_POLY2TRI_DIR_RELEASE}/lib/libqt_poly2tri.a) # static qt only
-endif()
-
-
 list(APPEND QGIS_OPTIONS "-DBISON_EXECUTABLE=${BISON}")
 list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 # By default QGIS installs includes into "include" on Windows and into "include/qgis" everywhere else
@@ -93,6 +66,7 @@ list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 list(APPEND QGIS_OPTIONS "-DQGIS_MACAPP_FRAMEWORK=FALSE")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
+list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
     list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)
