@@ -77,6 +77,7 @@ if(MSVC)
   target_compile_definitions(QGIS::Core INTERFACE NOMINMAX)
 endif()
 
+_qgis_core_add_dependency(qca Qca CONFIG)
 _qgis_core_add_dependency(nlohmann_json::nlohmann_json nlohmann_json CONFIG)
 find_package(exiv2 CONFIG REQUIRED)
 target_link_libraries(QGIS::Core INTERFACE Exiv2::exiv2lib)
