@@ -235,7 +235,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
         }
       }
 #else
-      int capabilities = rlayer->dataProvider()->capabilities();
+      Qgis::RasterInterfaceCapabilities capabilities = rlayer->dataProvider()->capabilities();
       Qgis::RasterIdentifyFormat format = Qgis::RasterIdentifyFormat::Undefined;
       if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyFeature )
         format = Qgis::RasterIdentifyFormat::Feature;
