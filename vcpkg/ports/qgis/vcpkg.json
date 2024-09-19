@@ -68,7 +68,7 @@
       "description": "Determines whether Python bindings should be built",
       "dependencies": [
         {
-          "name": "numpy",
+          "name": "py-numpy",
           "platform": "!osx"
         },
         "py-psycopg2",
