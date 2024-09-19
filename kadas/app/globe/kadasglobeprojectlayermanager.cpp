@@ -24,9 +24,9 @@
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayerlabeling.h>
 
-#include <kadas/app/globe/kadasglobeprojectlayermanager.h>
-#include <kadas/app/globe/kadasglobevectorlayerproperties.h>
-#include <kadas/app/globe/featuresource/kadasglobefeatureoptions.h>
+#include <globe/kadasglobeprojectlayermanager.h>
+#include <globe/kadasglobevectorlayerproperties.h>
+#include <globe/featuresource/kadasglobefeatureoptions.h>
 
 void KadasGlobeProjectLayerManager::init( osg::ref_ptr<osgEarth::MapNode> mapNode, const QStringList &visibleLayerIds )
 {

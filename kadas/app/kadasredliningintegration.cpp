@@ -22,21 +22,21 @@
 
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadascircleitem.h>
-#include <kadas/gui/mapitems/kadascoordinatecrossitem.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/mapitems/kadaspointitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/mapitems/kadastextitem.h>
-#include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
-#include <kadas/gui/mapitemeditors/kadasredliningtexteditor.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/mapitems/kadastextitem.h"
+#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
+#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasredliningintegration.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
+#include "kadasredliningintegration.h"
 
 KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
   : QObject( parent ), mButtonNewObject( buttonNewObject )

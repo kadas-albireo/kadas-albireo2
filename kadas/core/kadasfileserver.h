@@ -16,7 +16,7 @@
 
 #include <QTcpServer>
 
-#include <kadas/core/kadas_core.h>
+#include "kadas/core/kadas_core.h"
 
 class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
 {

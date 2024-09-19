@@ -25,7 +25,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/app/guidegrid/kadasguidegridlayer.h>
+#include <guidegrid/kadasguidegridlayer.h>
 
 static QString gridLabel( QChar firstChar, int offset )
 {

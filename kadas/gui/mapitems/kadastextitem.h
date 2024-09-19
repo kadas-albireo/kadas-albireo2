@@ -17,7 +17,7 @@
 #ifndef KADASTEXTITEM_H
 #define KADASTEXTITEM_H
 
-#include <kadas/gui/mapitems/kadasanchoreditem.h>
+#include "kadas/gui/mapitems/kadasanchoreditem.h"
 
 
 class KADAS_GUI_EXPORT KadasTextItem : public KadasAnchoredItem

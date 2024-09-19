@@ -22,8 +22,8 @@
 
 #include <qgis/qgspoint.h>
 
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/kadas_gui.h"
 
 class QComboBox;
 class QLabel;

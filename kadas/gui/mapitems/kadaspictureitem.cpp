@@ -32,9 +32,9 @@
 
 #include <quazip/quazipfile.h>
 
-#include <kadas/core/kadascoordinateutils.h>
-#include <kadas/analysis/kadaslineofsight.h>
-#include <kadas/gui/mapitems/kadaspictureitem.h>
+#include "kadas/core/kadascoordinateutils.h"
+#include "kadas/analysis/kadaslineofsight.h"
+#include "kadas/gui/mapitems/kadaspictureitem.h"
 
 
 QJsonObject KadasPictureItem::State::serialize() const

@@ -22,7 +22,7 @@
 #include <osg/Camera>
 #include <osgEarth/Version>
 
-#include <kadas/app/globe/kadasglobedialog.h>
+#include <globe/kadasglobedialog.h>
 
 class QAction;
 class QgsPointXY;

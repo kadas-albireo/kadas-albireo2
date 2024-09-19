@@ -17,8 +17,8 @@
 #ifndef KADASMAPTOOLDELETEITEMS_H
 #define KADASMAPTOOLDELETEITEMS_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
 {

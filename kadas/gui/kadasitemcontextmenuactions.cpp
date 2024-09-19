@@ -26,14 +26,14 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/kadasitemcontextmenuactions.h>
-#include <kadas/gui/mapitems/kadascircleitem.h>
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
-#include <kadas/gui/mapitems/kadaspointitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/kadasitemcontextmenuactions.h"
+#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
 
 
 KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item, KadasItemLayer *layer, KadasItemLayer::ItemId layerItemId, QObject *parent )

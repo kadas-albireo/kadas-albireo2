@@ -20,8 +20,8 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgslogger.h>
 
-#include <kadas/gui/kadascatalogbrowser.h>
-#include <kadas/gui/kadascatalogprovider.h>
+#include "kadas/gui/kadascatalogbrowser.h"
+#include "kadas/gui/kadascatalogprovider.h"
 
 
 KadasCatalogProvider::KadasCatalogProvider( KadasCatalogBrowser *browser )

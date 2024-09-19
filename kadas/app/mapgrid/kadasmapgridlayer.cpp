@@ -28,8 +28,8 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/core/kadaslatlontoutm.h>
-#include <kadas/app/mapgrid/kadasmapgridlayer.h>
+#include "kadas/core/kadaslatlontoutm.h"
+#include <mapgrid/kadasmapgridlayer.h>
 
 
 class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer

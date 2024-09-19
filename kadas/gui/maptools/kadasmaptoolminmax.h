@@ -17,8 +17,8 @@
 #ifndef KADASMAPTOOLMINMAX_H
 #define KADASMAPTOOLMINMAX_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class KadasSymbolItem;
 

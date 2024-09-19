@@ -29,8 +29,8 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/gui/kadasprojecttemplateselectiondialog.h>
+#include "kadas/core/kadas.h"
+#include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 
 
 KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidget *parent )

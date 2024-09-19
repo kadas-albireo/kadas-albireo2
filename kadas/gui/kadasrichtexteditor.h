@@ -22,7 +22,7 @@
 #include <QTextEdit>
 #include <QToolBar>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QComboBox;
 class QDialogButtonBox;

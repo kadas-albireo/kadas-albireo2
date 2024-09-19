@@ -21,7 +21,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/mapitems/kadastextitem.h>
+#include "kadas/gui/mapitems/kadastextitem.h"
 
 
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )

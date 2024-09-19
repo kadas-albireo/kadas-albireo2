@@ -18,7 +18,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/maptools/kadasmaptoolselectrect.h>
+#include "kadas/gui/maptools/kadasmaptoolselectrect.h"
 
 
 KadasMapToolSelectRect::KadasMapToolSelectRect( QgsMapCanvas *mapCanvas )

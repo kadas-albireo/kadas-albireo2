@@ -19,7 +19,7 @@
 
 #include <QObject>
 
-#include <kadas/core/kadasfileserver.h>
+#include "kadas/core/kadasfileserver.h"
 
 class KadasHelpViewer : public QObject
 {

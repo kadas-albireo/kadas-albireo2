@@ -17,7 +17,7 @@
 #ifndef KADASCIRCLEITEM_H
 #define KADASCIRCLEITEM_H
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 class QgsCurvePolygon;
 class QgsMultiSurface;

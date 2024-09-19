@@ -20,8 +20,8 @@
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 
-#include <kadas/core/kadaspluginlayer.h>
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/core/kadaspluginlayer.h"
+#include "kadas/gui/kadas_gui.h"
 
 class QMenu;
 class QuaZip;

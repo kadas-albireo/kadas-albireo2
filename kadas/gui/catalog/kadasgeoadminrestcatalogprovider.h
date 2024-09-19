@@ -17,7 +17,7 @@
 #ifndef KADASGEOADMINRESTCATALOGPROVIDER_H
 #define KADASGEOADMINRESTCATALOGPROVIDER_H
 
-#include <kadas/gui/kadascatalogprovider.h>
+#include "kadas/gui/kadascatalogprovider.h"
 
 class QStandardItem;
 

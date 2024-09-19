@@ -19,8 +19,8 @@
 
 #include <qgis/qgsmaptool.h>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasfeaturepicker.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasfeaturepicker.h"
 
 class QPinchGesture;
 class QgsFeature;

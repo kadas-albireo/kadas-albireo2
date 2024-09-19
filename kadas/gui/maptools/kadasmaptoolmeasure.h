@@ -20,11 +20,11 @@
 #include <qgis/qgsunittypes.h>
 #include <qgis/qgssettingsentryenumflag.h>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasbottombar.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/core/kadassettingstree.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/core/kadassettingstree.h"
 
 class QCheckBox;
 class QComboBox;

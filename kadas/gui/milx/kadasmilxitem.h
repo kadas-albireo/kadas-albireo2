@@ -17,8 +17,8 @@
 #ifndef KADASMILXITEM_H
 #define KADASMILXITEM_H
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/milx/kadasmilxclient.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 
 // MilX items always in EPSG:4326
 class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem

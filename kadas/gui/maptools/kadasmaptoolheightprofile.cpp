@@ -19,12 +19,12 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/kadasheightprofiledialog.h>
-#include <kadas/gui/mapitems/kadaspointitem.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/kadasheightprofiledialog.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
 KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   : KadasMapToolCreateItem( canvas, lineFactory( canvas ) )

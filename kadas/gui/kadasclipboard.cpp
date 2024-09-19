@@ -25,8 +25,8 @@
 #include <qgis/qgsmapsettings.h>
 
 
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 KadasClipboard *KadasClipboard::instance()
 {

@@ -25,8 +25,8 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/analysis/kadasninecellfilter.h>
+#include "kadas/core/kadas.h"
+#include "kadas/analysis/kadasninecellfilter.h"
 
 
 KadasNineCellFilter::KadasNineCellFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs )

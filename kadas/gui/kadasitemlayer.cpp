@@ -26,8 +26,8 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 
 class KadasItemLayer::Renderer : public QgsMapLayerRenderer

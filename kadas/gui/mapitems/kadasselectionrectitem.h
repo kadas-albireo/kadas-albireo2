@@ -17,7 +17,7 @@
 #ifndef KADASSELECTIONRECTITEM_H
 #define KADASSELECTIONRECTITEM_H
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 
 class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem

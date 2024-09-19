@@ -25,7 +25,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/mapitems/kadascircleitem.h>
+#include "kadas/gui/mapitems/kadascircleitem.h"
 
 
 QJsonObject KadasCircleItem::State::serialize() const

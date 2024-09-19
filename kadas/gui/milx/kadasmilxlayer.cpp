@@ -23,9 +23,9 @@
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/milx/kadasmilxclient.h>
-#include <kadas/gui/milx/kadasmilxitem.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
+#include "kadas/gui/milx/kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 
 
 class KadasMilxLayer::Renderer : public QgsMapLayerRenderer

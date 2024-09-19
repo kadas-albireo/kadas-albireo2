@@ -17,8 +17,8 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
-#include <kadas/gui/mapitemeditors/kadasredliningitemeditor.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
+#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
 
 
 KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )

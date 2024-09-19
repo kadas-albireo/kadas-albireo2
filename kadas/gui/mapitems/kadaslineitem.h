@@ -17,7 +17,7 @@
 #ifndef KADASLINEITEM_H
 #define KADASLINEITEM_H
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 class QgsMultiLineString;
 

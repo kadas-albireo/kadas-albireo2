@@ -20,7 +20,7 @@
 #include <QDialog>
 #include <QMap>
 
-#include <kadas/core/kadaspluginlayer.h>
+#include "kadas/core/kadaspluginlayer.h"
 
 class QNetworkReply;
 class QTreeWidget;

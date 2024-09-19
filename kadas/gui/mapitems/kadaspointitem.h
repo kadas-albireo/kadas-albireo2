@@ -17,7 +17,7 @@
 #ifndef KADASPOINTITEM_H
 #define KADASPOINTITEM_H
 
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
 {

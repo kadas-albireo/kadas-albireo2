@@ -26,7 +26,7 @@ class QStandardItemModel;
 class QTreeView;
 class QgsFilterLineEdit;
 
-#include <kadas/gui/milx/kadasmilxclient.h>
+#include "kadas/gui/milx/kadasmilxclient.h"
 
 class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
 {

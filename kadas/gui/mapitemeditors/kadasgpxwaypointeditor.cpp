@@ -17,8 +17,8 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssymbollayerutils.h>
 
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
-#include <kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h>
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 
 KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )

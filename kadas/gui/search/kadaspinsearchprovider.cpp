@@ -19,9 +19,9 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/search/kadaspinsearchprovider.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/search/kadaspinsearchprovider.h"
 
 
 KadasPinSearchProvider::KadasPinSearchProvider( QgsMapCanvas *mapCanvas )

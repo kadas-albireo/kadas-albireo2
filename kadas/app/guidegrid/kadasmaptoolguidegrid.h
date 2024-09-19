@@ -20,7 +20,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmaptool.h>
 
-#include <kadas/gui/kadasbottombar.h>
+#include "kadas/gui/kadasbottombar.h"
 #include "ui_kadasguidegridwidgetbase.h"
 
 class QgsLayerTreeView;

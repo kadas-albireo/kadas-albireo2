@@ -26,9 +26,9 @@
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsvertexid.h>
 
-#include <kadas/core/kadasstatehistory.h>
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
+#include "kadas/core/kadasstatehistory.h"
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 
 class QMenu;
 class QuaZip;

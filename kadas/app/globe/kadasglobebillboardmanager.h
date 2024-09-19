@@ -20,7 +20,7 @@
 #include <QMap>
 #include <osgEarthAnnotation/PlaceNode>
 
-#include <kadas/gui/kadasitemlayer.h>
+#include "kadas/gui/kadasitemlayer.h"
 
 class KadasGlobeBillboardManager : public QObject
 {

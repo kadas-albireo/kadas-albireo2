@@ -17,7 +17,7 @@
 #ifndef KADASGPXWAYPOINTITEM_H
 #define KADASGPXWAYPOINTITEM_H
 
-#include <kadas/gui/mapitems/kadaspointitem.h>
+#include "kadas/gui/mapitems/kadaspointitem.h"
 
 class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 {

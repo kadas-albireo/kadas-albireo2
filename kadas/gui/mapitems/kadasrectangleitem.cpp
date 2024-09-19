@@ -23,7 +23,7 @@
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgspoint.h>
 
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
 
 
 QJsonObject KadasRectangleItem::State::serialize() const

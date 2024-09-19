@@ -50,16 +50,16 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 
-#include <kadas/core/kadas.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/globe/kadasglobebillboardmanager.h>
-#include <kadas/app/globe/kadasglobedialog.h>
-#include <kadas/app/globe/kadasglobeintegration.h>
-#include <kadas/app/globe/kadasglobeinteractionhandlers.h>
-#include <kadas/app/globe/kadasglobeprojectlayermanager.h>
-#include <kadas/app/globe/kadasglobevectorlayerproperties.h>
-#include <kadas/app/globe/kadasglobewidget.h>
+#include "kadas/core/kadas.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
+#include <globe/kadasglobebillboardmanager.h>
+#include <globe/kadasglobedialog.h>
+#include <globe/kadasglobeintegration.h>
+#include <globe/kadasglobeinteractionhandlers.h>
+#include <globe/kadasglobeprojectlayermanager.h>
+#include <globe/kadasglobevectorlayerproperties.h>
+#include <globe/kadasglobewidget.h>
 
 #include "osg/osgQtViewerWidget.h"
 

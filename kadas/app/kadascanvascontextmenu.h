@@ -21,7 +21,7 @@
 
 #include <qgis/qgspointxy.h>
 
-#include <kadas/gui/kadasfeaturepicker.h>
+#include "kadas/gui/kadasfeaturepicker.h"
 
 class QgsGeometryRubberBand;
 class KadasItemContextMenuActions;

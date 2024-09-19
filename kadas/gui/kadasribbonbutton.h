@@ -19,7 +19,7 @@
 
 #include <QToolButton>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
 {

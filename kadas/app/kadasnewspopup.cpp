@@ -37,7 +37,7 @@
 #include <QAxWidget>
 #endif
 
-#include <kadas/app/kadasnewspopup.h>
+#include "kadasnewspopup.h"
 
 KadasNewsPopup *KadasNewsPopup::sInstance = nullptr;
 

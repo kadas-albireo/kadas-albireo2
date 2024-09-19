@@ -20,7 +20,7 @@
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgspoint.h>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QLabel;
 class KadasBottomBar;

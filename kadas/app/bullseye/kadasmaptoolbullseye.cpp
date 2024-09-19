@@ -23,9 +23,9 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/kadaslayerselectionwidget.h>
-#include <kadas/app/bullseye/kadasbullseyelayer.h>
-#include <kadas/app/bullseye/kadasmaptoolbullseye.h>
+#include "kadas/gui/kadaslayerselectionwidget.h"
+#include <bullseye/kadasbullseyelayer.h>
+#include <bullseye/kadasmaptoolbullseye.h>
 
 KadasMapToolBullseye::KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : QgsMapTool( canvas )

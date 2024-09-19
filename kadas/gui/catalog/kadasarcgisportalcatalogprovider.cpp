@@ -29,9 +29,9 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/gui/kadascatalogbrowser.h>
-#include <kadas/gui/catalog/kadasarcgisportalcatalogprovider.h>
+#include "kadas/core/kadas.h"
+#include "kadas/gui/kadascatalogbrowser.h"
+#include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
 KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl ), mServicePreference( params.value( "preferred", "wms" ) ), mCatalogTag( params.value( "tag", "milcatalog" ) )

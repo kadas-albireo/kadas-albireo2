@@ -33,9 +33,9 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/iamauth/kadasiamauth.h>
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
+#include <iamauth/kadasiamauth.h>
 
 
 class StackedDialog : public QDialog

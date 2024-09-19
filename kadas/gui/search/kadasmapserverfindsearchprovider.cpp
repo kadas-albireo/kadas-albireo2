@@ -39,7 +39,7 @@
 #include <qgis/qgsjsonutils.h>
 
 
-#include <kadas/gui/search/kadasmapserverfindsearchprovider.h>
+#include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
 
 
 const int KadasMapServerFindSearchProvider::sSearchTimeout = 10000;

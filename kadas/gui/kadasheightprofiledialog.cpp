@@ -50,14 +50,14 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvector.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/kadasheightprofiledialog.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadaslineitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
+#include "kadas/core/kadas.h"
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/kadasheightprofiledialog.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
 
 class KadasHeightProfileDialog::ScaleDraw : public QwtScaleDraw

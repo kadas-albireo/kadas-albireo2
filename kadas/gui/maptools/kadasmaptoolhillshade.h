@@ -17,8 +17,8 @@
 #ifndef KADASMAPTOOLHILLSHADE_H
 #define KADASMAPTOOLHILLSHADE_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
 {

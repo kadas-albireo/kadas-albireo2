@@ -24,7 +24,7 @@
 
 #include <qgis/qgslocatorfilter.h>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
 

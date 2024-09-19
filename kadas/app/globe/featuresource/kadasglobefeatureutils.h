@@ -30,8 +30,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/mapitems/kadasgeometryitem.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 
 class KadasGlobeFeatureUtils

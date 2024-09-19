@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include "ui_kadaspluginmanager.h"
-#include <kadas/gui/kadasbottombar.h>
+#include "kadas/gui/kadasbottombar.h"
 
 class QProgressBar;
 class KadasRibbonButton;

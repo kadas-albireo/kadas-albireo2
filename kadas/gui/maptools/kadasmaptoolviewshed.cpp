@@ -32,13 +32,13 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/analysis/kadasviewshedfilter.h>
-#include <kadas/gui/mapitems/kadascircularsectoritem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/maptools/kadasmaptoolviewshed.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include "kadas/core/kadas.h"
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/analysis/kadasviewshedfilter.h"
+#include "kadas/gui/mapitems/kadascircularsectoritem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/maptools/kadasmaptoolviewshed.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
 KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )

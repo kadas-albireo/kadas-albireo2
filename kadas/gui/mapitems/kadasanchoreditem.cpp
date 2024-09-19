@@ -22,7 +22,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/mapitems/kadasanchoreditem.h>
+#include "kadas/gui/mapitems/kadasanchoreditem.h"
 
 
 QJsonObject KadasAnchoredItem::State::serialize() const

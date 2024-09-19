@@ -22,7 +22,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgspoint.h>
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QComboBox;
 class QLineEdit;

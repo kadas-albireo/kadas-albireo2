@@ -23,7 +23,7 @@
 #include <qgis/qgsmaprendererparalleljob.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/app/globe/kadasglobetilesource.h>
+#include <globe/kadasglobetilesource.h>
 
 
 KadasGlobeTileStatistics *KadasGlobeTileStatistics::s_instance = 0;

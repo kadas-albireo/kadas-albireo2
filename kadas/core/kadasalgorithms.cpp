@@ -18,7 +18,7 @@
 #include <list>
 #include <vector>
 
-#include <kadas/core/kadasalgorithms.h>
+#include "kadas/core/kadasalgorithms.h"
 
 
 struct Cluster1D

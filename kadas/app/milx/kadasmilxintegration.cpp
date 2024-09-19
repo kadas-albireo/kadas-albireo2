@@ -28,17 +28,17 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/milx/kadasmilxclient.h>
-#include <kadas/gui/milx/kadasmilxeditor.h>
-#include <kadas/gui/milx/kadasmilxitem.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/gui/milx/kadasmilxlayerpropertiespage.h>
-#include <kadas/gui/milx/kadasmilxlibrary.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/milx/kadasmilxintegration.h>
-#include <kadas/app/ui_KadasMilxExportDialog.h>
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxeditor.h"
+#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
+#include "kadas/gui/milx/kadasmilxlibrary.h"
+#include "kadasapplication.h"
+#include "kadasmainwindow.h"
+#include <milx/kadasmilxintegration.h>
+#include <ui_KadasMilxExportDialog.h>
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   : QObject( parent ), mUi( ui ), mMilxLibrary( nullptr )

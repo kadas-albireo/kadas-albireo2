@@ -36,7 +36,7 @@
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
 
-#include <kadas/gui/search/kadaslocationsearchprovider.h>
+#include "kadas/gui/search/kadaslocationsearchprovider.h"
 
 
 const int KadasLocationSearchFilter::sSearchTimeout = 10000;

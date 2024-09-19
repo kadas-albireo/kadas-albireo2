@@ -24,17 +24,17 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgssnappingutils.h>
 
-#include <kadas/gui/kadasbottombar.h>
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/kadasfloatinginputwidget.h>
-#include <kadas/gui/kadasitemcontextmenuactions.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/maptools/kadasmaptoolcreateitem.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptooledititemgroup.h>
+#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadas/gui/kadasitemcontextmenuactions.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasmaptooledititem.h"
+#include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 
 
 KadasMapToolEditItem::KadasMapToolEditItem( QgsMapCanvas *canvas, const KadasItemLayer::ItemId &itemId, KadasItemLayer *layer )

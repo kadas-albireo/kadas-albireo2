@@ -29,7 +29,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
 
 
 QJsonObject KadasPolygonItem::State::serialize() const

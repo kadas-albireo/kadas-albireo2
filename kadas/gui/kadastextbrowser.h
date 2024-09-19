@@ -17,7 +17,7 @@
 #ifndef KADASTEXTBROWSER_H
 #define KADASTEXTBROWSER_H
 
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 #include <QTextBrowser>
 

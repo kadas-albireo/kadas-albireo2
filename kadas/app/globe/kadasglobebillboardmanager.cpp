@@ -19,9 +19,9 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/app/globe/kadasglobebillboardmanager.h>
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include <globe/kadasglobebillboardmanager.h>
 
 
 KadasGlobeBillboardManager::KadasGlobeBillboardManager( QObject *parent )

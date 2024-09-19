@@ -30,8 +30,8 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/app/bullseye/kadasbullseyelayer.h>
-#include <kadas/app/bullseye/kadasmaptoolbullseye.h>
+#include <bullseye/kadasbullseyelayer.h>
+#include <bullseye/kadasmaptoolbullseye.h>
 
 
 class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer

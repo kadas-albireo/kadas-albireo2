@@ -21,7 +21,7 @@
 #include <qgis/qgsmaplayerconfigwidgetfactory.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/gui/kadaslayerpropertiesdialog.h>
+#include "kadas/gui/kadaslayerpropertiesdialog.h"
 
 KadasLayerPropertiesDialog::KadasLayerPropertiesDialog( QgsMapLayer *layer, QWidget *parent )
   : QDialog( parent )

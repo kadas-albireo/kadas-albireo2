@@ -23,8 +23,8 @@
 #include <qgis/qgspallabeling.h>
 #include <qgis/qgswkbtypes.h>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/kadasitemlayer.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasitemlayer.h"
 
 class QgsMapLayer;
 class QgsMapCanvas;

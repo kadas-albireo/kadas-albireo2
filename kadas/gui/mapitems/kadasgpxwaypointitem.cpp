@@ -20,7 +20,7 @@
 
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/mapitems/kadasgpxwaypointitem.h>
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 
 
 KadasGpxWaypointItem::KadasGpxWaypointItem()

@@ -25,7 +25,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/mapitems/kadasselectionrectitem.h>
+#include "kadas/gui/mapitems/kadasselectionrectitem.h"
 
 
 QJsonObject KadasSelectionRectItem::State::serialize() const

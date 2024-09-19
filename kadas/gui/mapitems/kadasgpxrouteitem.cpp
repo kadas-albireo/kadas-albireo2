@@ -20,7 +20,7 @@
 
 #include <qgis/qgsrendercontext.h>
 
-#include <kadas/gui/mapitems/kadasgpxrouteitem.h>
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 
 
 KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )

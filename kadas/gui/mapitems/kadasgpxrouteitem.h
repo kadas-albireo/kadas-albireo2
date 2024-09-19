@@ -17,7 +17,7 @@
 #ifndef KADASGPXROUTEITEM_H
 #define KADASGPXROUTEITEM_H
 
-#include <kadas/gui/mapitems/kadaslineitem.h>
+#include "kadas/gui/mapitems/kadaslineitem.h"
 
 class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
 {

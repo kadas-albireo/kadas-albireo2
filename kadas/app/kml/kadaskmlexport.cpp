@@ -29,9 +29,9 @@
 #include <qgis/qgsvectorlayerlabeling.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/app/kml/kadaskmlexport.h>
-#include <kadas/app/kml/kadaskmllabeling.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include <kml/kadaskmlexport.h>
+#include <kml/kadaskmllabeling.h>
 
 bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLayer *> &layers, double exportScale, const QgsCoordinateReferenceSystem &mapCrs, const QgsRectangle &exportMapRect )
 {

@@ -21,8 +21,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/app/kadascrashrpt.h>
+#include "kadas/core/kadas.h"
+#include "kadascrashrpt.h"
 
 
 bool KadasCrashRpt::install()

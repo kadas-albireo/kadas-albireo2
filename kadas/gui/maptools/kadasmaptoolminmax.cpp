@@ -30,16 +30,16 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/analysis/kadasninecellfilter.h>
-#include <kadas/gui/mapitems/kadascircleitem.h>
-#include <kadas/gui/mapitems/kadaspolygonitem.h>
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/maptools/kadasmaptoolminmax.h>
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
+#include "kadas/core/kadas.h"
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/analysis/kadasninecellfilter.h"
+#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/maptools/kadasmaptoolminmax.h"
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
 KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile )

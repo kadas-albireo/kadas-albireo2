@@ -17,8 +17,8 @@
 #ifndef KADASMILXEDITOR_H
 #define KADASMILXEDITOR_H
 
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/milx/kadasmilxclient.h>
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 
 class QLabel;
 class QToolButton;

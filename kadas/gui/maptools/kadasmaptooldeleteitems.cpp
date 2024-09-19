@@ -22,10 +22,10 @@
 
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitem.h>
-#include <kadas/gui/mapitems/kadasrectangleitem.h>
-#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
+#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
 KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )

@@ -30,8 +30,8 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/core/kadas_config.h>
+#include "kadas/core/kadas.h"
+#include "kadas/core/kadas_config.h"
 
 #ifdef Q_OS_WINDOWS
 #include <windows.h>

@@ -17,10 +17,10 @@
 #ifndef KADASGPXWAYPOINTEDITOR_H
 #define KADASGPXWAYPOINTEDITOR_H
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitemeditors/kadasmapitemeditor.h>
-#include <kadas/gui/ui_kadasgpxwaypointeditor.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/ui_kadasgpxwaypointeditor.h"
 
 class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
 {

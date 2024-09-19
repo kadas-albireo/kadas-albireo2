@@ -17,7 +17,7 @@
 #ifndef KADASSYMBOLITEM_H
 #define KADASSYMBOLITEM_H
 
-#include <kadas/gui/mapitems/kadasanchoreditem.h>
+#include "kadas/gui/mapitems/kadasanchoreditem.h"
 
 
 class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem

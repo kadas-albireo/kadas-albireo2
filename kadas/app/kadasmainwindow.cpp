@@ -44,65 +44,65 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/gui/kadasbookmarksmenu.h>
-#include <kadas/gui/kadasclipboard.h>
-#include <kadas/gui/kadascoordinatedisplayer.h>
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/kadasmapcanvasitem.h>
-#include <kadas/gui/kadasmapcanvasitemmanager.h>
-#include <kadas/gui/kadasprojecttemplateselectiondialog.h>
+#include "kadas/core/kadas.h"
+#include "kadas/gui/kadasbookmarksmenu.h"
+#include "kadas/gui/kadasclipboard.h"
+#include "kadas/gui/kadascoordinatedisplayer.h"
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapcanvasitem.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 
-#include <kadas/gui/catalog/kadasarcgisrestcatalogprovider.h>
-#include <kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h>
-#include <kadas/gui/catalog/kadasvbscatalogprovider.h>
-#include <kadas/gui/catalog/kadasarcgisportalcatalogprovider.h>
+#include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
+#include "kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h"
+#include "kadas/gui/catalog/kadasvbscatalogprovider.h"
+#include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
-#include <kadas/gui/mapitems/kadasmapitem.h>
-#include <kadas/gui/mapitems/kadaspictureitem.h>
-#include <kadas/gui/mapitems/kadassymbolitem.h>
-#include <kadas/gui/mapitemeditors/kadassymbolattributeseditor.h>
-#include <kadas/gui/maptools/kadasmaptooldeleteitems.h>
-#include <kadas/gui/maptools/kadasmaptooledititem.h>
-#include <kadas/gui/maptools/kadasmaptoolheightprofile.h>
-#include <kadas/gui/maptools/kadasmaptoolhillshade.h>
-#include <kadas/gui/maptools/kadasmaptoolmeasure.h>
-#include <kadas/gui/maptools/kadasmaptoolslope.h>
-#include <kadas/gui/maptools/kadasmaptoolviewshed.h>
-#include <kadas/gui/maptools/kadasmaptoolminmax.h>
+#include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/mapitems/kadaspictureitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
+#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
+#include "kadas/gui/maptools/kadasmaptooledititem.h"
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
+#include "kadas/gui/maptools/kadasmaptoolviewshed.h"
+#include "kadas/gui/maptools/kadasmaptoolminmax.h"
 
-#include <kadas/gui/search/kadaslocaldatasearchprovider.h>
-#include <kadas/gui/search/kadaslocationsearchprovider.h>
-#include <kadas/gui/search/kadasmapserverfindsearchprovider.h>
-#include <kadas/gui/search/kadaspinsearchprovider.h>
-#include <kadas/gui/search/kadasremotedatasearchprovider.h>
-#include <kadas/gui/search/kadasworldlocationsearchprovider.h>
+#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
+#include "kadas/gui/search/kadaslocationsearchprovider.h"
+#include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
+#include "kadas/gui/search/kadaspinsearchprovider.h"
+#include "kadas/gui/search/kadasremotedatasearchprovider.h"
+#include "kadas/gui/search/kadasworldlocationsearchprovider.h"
 
-#include <kadas/app/kadasapplayerhandling.h>
-#include <kadas/app/kadasapplication.h>
-#include <kadas/app/kadashelpviewer.h>
-#include <kadas/app/kadasgpsintegration.h>
-#include <kadas/app/kadasgpxintegration.h>
-#include <kadas/app/kadaslayertreeviewmenuprovider.h>
-#include <kadas/app/kadaslayertreeviewtemporalindicator.h>
-#include <kadas/app/kadasmainwindow.h>
-#include <kadas/app/kadasmapwidgetmanager.h>
-#include <kadas/app/kadasnewspopup.h>
-#include <kadas/app/kadastemporalcontroller.h>
-#include <kadas/app/kadaspluginmanager.h>
-#include <kadas/app/kadaspythonintegration.h>
-#include <kadas/app/kadasredliningintegration.h>
-#include <kadas/app/bullseye/kadasmaptoolbullseye.h>
+#include "kadasapplayerhandling.h"
+#include "kadasapplication.h"
+#include "kadashelpviewer.h"
+#include "kadasgpsintegration.h"
+#include "kadasgpxintegration.h"
+#include "kadaslayertreeviewmenuprovider.h"
+#include "kadaslayertreeviewtemporalindicator.h"
+#include "kadasmainwindow.h"
+#include "kadasmapwidgetmanager.h"
+#include "kadasnewspopup.h"
+#include "kadastemporalcontroller.h"
+#include "kadaspluginmanager.h"
+#include "kadaspythonintegration.h"
+#include "kadasredliningintegration.h"
+#include <bullseye/kadasmaptoolbullseye.h>
 #ifdef WITH_GLOBE
-#include <kadas/app/globe/kadasglobeintegration.h>
+#include <globe/kadasglobeintegration.h>
 #endif
-#include <kadas/app/guidegrid/kadasmaptoolguidegrid.h>
-#include <kadas/app/iamauth/kadasiamauth.h>
-#include <kadas/app/kml/kadaskmlintegration.h>
-#include <kadas/app/mapgrid/kadasmaptoolmapgrid.h>
-#include <kadas/app/milx/kadasmilxintegration.h>
+#include <guidegrid/kadasmaptoolguidegrid.h>
+#include <iamauth/kadasiamauth.h>
+#include <kml/kadaskmlintegration.h>
+#include <mapgrid/kadasmaptoolmapgrid.h>
+#include <milx/kadasmilxintegration.h>
 
-#include <kadas/app/external/qgis/app/qgsgotolocatorfilter.h>
+#include <external/qgis/app/qgsgotolocatorfilter.h>
 
 KadasMainWindow::KadasMainWindow()
 {

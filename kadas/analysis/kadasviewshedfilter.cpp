@@ -27,8 +27,8 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsunittypes.h>
 
-#include <kadas/core/kadas.h>
-#include <kadas/analysis/kadasviewshedfilter.h>
+#include "kadas/core/kadas.h"
+#include "kadas/analysis/kadasviewshedfilter.h"
 
 
 static inline double geoToPixelX( double gtrans[6], double x, double y )

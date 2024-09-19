@@ -33,8 +33,8 @@
 
 #include <qgis/qgssettings.h>
 
-#include <kadas/gui/milx/kadasmilxclient.h>
-#include <kadas/gui/milx/kadasmilxinterface.h>
+#include "kadas/gui/milx/kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxinterface.h"
 
 
 KadasMilxClientWorker::KadasMilxClientWorker( bool sync )

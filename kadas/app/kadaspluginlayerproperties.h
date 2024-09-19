@@ -19,7 +19,7 @@
 
 #include <qgis/qgsmaplayerconfigwidget.h>
 
-#include <kadas/gui/kadaslayerpropertiesdialog.h>
+#include "kadas/gui/kadaslayerpropertiesdialog.h"
 
 class QGroupBox;
 class QgsScaleRangeWidget;

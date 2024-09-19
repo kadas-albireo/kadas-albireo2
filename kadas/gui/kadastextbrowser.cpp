@@ -21,7 +21,7 @@
 #include <QMenu>
 #include <QMimeData>
 
-#include <kadas/gui/kadastextbrowser.h>
+#include "kadas/gui/kadastextbrowser.h"
 
 
 KadasTextBrowser::KadasTextBrowser( QWidget *parent )

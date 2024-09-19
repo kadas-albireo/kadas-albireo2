@@ -17,9 +17,9 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsmaplayer.h>
 
-#include <kadas/gui/kadasitemlayer.h>
-#include <kadas/gui/milx/kadasmilxlayer.h>
-#include <kadas/app/globe/kadasglobevectorlayerproperties.h>
+#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
+#include <globe/kadasglobevectorlayerproperties.h>
 
 
 Q_DECLARE_METATYPE( KadasGlobeVectorLayerConfig * )

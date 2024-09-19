@@ -19,8 +19,8 @@
 
 #include <QDockWidget>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/core/kadassettingstree.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/core/kadassettingstree.h"
 
 #include <qgis/qgssettingsentryenumflag.h>
 

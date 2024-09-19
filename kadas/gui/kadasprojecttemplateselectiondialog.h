@@ -19,8 +19,8 @@
 
 #include <QDialog>
 
-#include <kadas/gui/kadas_gui.h>
-#include <kadas/gui/ui_kadasprojecttemplateselectiondialog.h>
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/ui_kadasprojecttemplateselectiondialog.h"
 
 class QDir;
 class QFileIconProvider;

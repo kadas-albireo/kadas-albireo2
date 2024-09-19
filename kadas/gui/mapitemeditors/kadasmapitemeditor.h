@@ -23,7 +23,7 @@
 #include <QWidget>
 
 #include <qgis/qgis_sip.h>
-#include <kadas/gui/kadas_gui.h>
+#include "kadas/gui/kadas_gui.h"
 
 
 class KadasMapItem;

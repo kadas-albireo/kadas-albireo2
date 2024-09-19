@@ -22,8 +22,8 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
-#include <kadas/core/kadascoordinateformat.h>
-#include <kadas/gui/kadascoordinateinput.h>
+#include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/kadascoordinateinput.h"
 
 KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
   : QWidget( parent )

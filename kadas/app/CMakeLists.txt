@@ -25,8 +25,6 @@ set(kadas_SRC
   kadashandlebadlayers.cpp
   kadashelpviewer.cpp
   kadaslayerrefreshmanager.cpp
-  kadaslayertreeviewmenuprovider.cpp
-  kadaslayertreeviewtemporalindicator.cpp
   kadaslayoutappmenuprovider.cpp
   kadaslayoutdesignerdialog.cpp
   kadaslayoutdesignermanager.cpp
@@ -42,19 +40,29 @@ set(kadas_SRC
   kadasredliningintegration.cpp
   kadastemporalcontroller.cpp
   main.cpp
+
   bullseye/kadasbullseyelayer.cpp
   bullseye/kadasmaptoolbullseye.cpp
+
   guidegrid/kadasguidegridlayer.cpp
   guidegrid/kadasmaptoolguidegrid.cpp
+
   iamauth/kadasiamauth.cpp
+
   kml/kadaskmlexport.cpp
   kml/kadaskmlexportdialog.cpp
   kml/kadaskmlimport.cpp
   kml/kadaskmlintegration.cpp
   kml/kadaskmllabeling.cpp
+
+  layertree/kadaslayertreeviewmenuprovider.cpp
+  layertree/kadaslayertreeviewtemporalindicator.cpp
+
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
+
   milx/kadasmilxintegration.cpp
+
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
   external/qgis/app/qgsgotolocatorfilter.cpp
 )
@@ -87,6 +95,7 @@ FILE(GLOB kadas_HDR
   bullseye/*.h
   guidegrid/*.h
   iamauth/*.h
+  layertree/*.h
   mapgrid/*.h
   external/qgis/app/*.h)
 IF(WITH_GLOBE)
@@ -179,7 +188,20 @@ TARGET_LINK_LIBRARIES(kadas
   kadas_gui
 )
 
-target_include_directories(kadas PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(kadas PUBLIC
+    ${CMAKE_SOURCE_DIR}/kadas/app
+    ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
+    ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
+    ${CMAKE_SOURCE_DIR}/kadas/app/globe
+    ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
+    ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
+    ${CMAKE_SOURCE_DIR}/kadas/app/kml
+    ${CMAKE_SOURCE_DIR}/kadas/app/layertree
+    ${CMAKE_SOURCE_DIR}/kadas/app/mapgrid
+    ${CMAKE_SOURCE_DIR}/kadas/app/milx
+
+    ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there
+)
 
 if(WITH_CRASHREPORT)
   target_link_libraries(kadas ${CRASHRPT_LIBRARY})

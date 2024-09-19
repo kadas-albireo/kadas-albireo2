@@ -36,7 +36,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 
-#include <kadas/gui/search/kadasremotedatasearchprovider.h>
+#include "kadas/gui/search/kadasremotedatasearchprovider.h"
 
 
 const int KadasRemoteDataSearchProvider::sSearchTimeout = 10000;

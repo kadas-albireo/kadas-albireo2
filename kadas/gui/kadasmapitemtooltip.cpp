@@ -20,10 +20,10 @@
 
 #include <qgis/qgsmapcanvas.h>
 
-#include <kadas/gui/kadasfeaturepicker.h>
-#include <kadas/gui/kadasmapcanvasitem.h>
-#include <kadas/gui/kadasmapitemtooltip.h>
-#include <kadas/gui/mapitems/kadasmapitem.h>
+#include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/kadasmapcanvasitem.h"
+#include "kadas/gui/kadasmapitemtooltip.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   : QTextEdit( canvas )
