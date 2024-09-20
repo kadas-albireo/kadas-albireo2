@@ -99,7 +99,6 @@
 #include "kadasbullseyelayer.h"
 #include "kadasguidegridlayer.h"
 #include "kadasmapgridlayer.h"
-#include "kadasmapswipetool.h"
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -370,8 +369,6 @@ void KadasApplication::init()
 
   // Layer refresh manager
   mLayerRefreshManager = new KadasLayerRefreshManager( this );
-
-  mMapSwipeTool = new KadasMapSwipeMapTool( mMainWindow->mapCanvas() );
 
   mMainWindow->show();
   splash.finish( mMainWindow );

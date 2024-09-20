@@ -91,10 +91,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       }
       menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
 
-      QString swipeActionText = tr( "&Compare with Swipe Tool" );
-      if ( KadasApplication::instance()->mapSwipeTool()->isActive() )
-        swipeActionText = tr( "&Add to Comparison with Swipe Tool" );
-      menu->addAction( QgsApplication::getThemeIcon( "/mIconSwipe.svg" ), swipeActionText, this, &KadasLayerTreeViewMenuProvider::enableMapSwipe );
+      KadasMapSwipeMapTool::addContextMenuAction( layer, KadasApplication::instance()->mainWindow()->mapCanvas(), menu, this );
 
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
@@ -209,18 +206,6 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
   heightmapAction->setChecked( currentHeightmap == layer->id() );
   connect( heightmapAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap );
   return heightmapAction;
-}
-
-void KadasLayerTreeViewMenuProvider::enableMapSwipe()
-{
-  const QList<QgsMapLayer *> selectedLayers = mView->selectedLayersRecursive();
-  if ( selectedLayers.isEmpty() )
-  {
-    return;
-  }
-
-  KadasApplication::instance()->mapSwipeTool()->addLayers( selectedLayers );
-  KadasApplication::instance()->mainWindow()->mapCanvas()->setMapTool( KadasApplication::instance()->mapSwipeTool() );
 }
 
 void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()

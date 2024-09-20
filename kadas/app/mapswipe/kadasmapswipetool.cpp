@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 
+#include <QMenu>
+
 #include <qgsmessagebar.h>
 #include <qgsmessagebaritem.h>
 #include <qgsmapcanvas.h>
@@ -25,6 +27,41 @@
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 
+
+void KadasMapSwipeMapTool::addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas *canvas , QMenu *menu, QObject *parent )
+{
+  QIcon icon = QgsApplication::getThemeIcon( "/mIconSwipe.svg" );
+  KadasMapSwipeMapTool* tool = qobject_cast<KadasMapSwipeMapTool*>( canvas->mapTool() );
+
+  if ( !tool )
+  {
+    auto lambda = [canvas, layer] (){
+      KadasMapSwipeMapTool *tool = new KadasMapSwipeMapTool( canvas );
+      tool->addLayers( {layer} );
+      canvas->setMapTool( tool );
+    };
+    menu->addAction( icon, tr( "&Compare with Swipe Tool" ), parent, lambda );
+  }
+  else
+  {
+    if ( tool->mLayers.contains( layer ) )
+    {
+      auto lambda = [tool, canvas, layer] (){
+        tool->removeLayers( {layer} );
+        if ( tool->mLayers.isEmpty() )
+          canvas->unsetMapTool( tool );
+      };
+      menu->addAction( icon, tr( "&Remove from comparison" ), parent, lambda );
+    }
+    else
+    {
+      auto lambda = [tool, canvas, layer] (){
+        tool->addLayers( {layer} );
+      };
+      menu->addAction( icon, tr( "&Add to Comparison with Swipe Tool" ), parent, lambda );
+    }
+  }
+}
 
 KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
@@ -41,20 +78,24 @@ KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
   });
 }
 
+KadasMapSwipeMapTool::~KadasMapSwipeMapTool()
+{
+}
+
 void KadasMapSwipeMapTool::addLayers( const QList<QgsMapLayer *> &layers )
 {
   for ( QgsMapLayer *layer : layers )
     mLayers.insert( layer );
+  updateMessageBar();
   mMapCanvasItem->setLayers( mLayers );
+}
 
-  QStringList layerNames;
-  std::transform( mLayers.constBegin(), mLayers.constEnd(), std::back_inserter( layerNames ), []( const auto & layer ){ return layer->name(); } );
-
-  QgsMessageBar *messageBar = KadasApplication::instance()->mainWindow()->messageBar();
-  mMessageBarItem = messageBar->createMessage( tr("Swipe Tool" ), tr( "Comparing Layers %1" ).arg(layerNames.join( QStringLiteral( ", " ) ) ) );
-  if ( mMessageBarItem )
-    messageBar->popWidget( mMessageBarItem );
-  messageBar->pushItem( mMessageBarItem );
+void KadasMapSwipeMapTool::removeLayers( const QList<QgsMapLayer *> &layers )
+{
+  for ( QgsMapLayer *layer : layers )
+    mLayers.remove( layer );
+  updateMessageBar();
+  mMapCanvasItem->setLayers( mLayers );
 }
 
 bool KadasMapSwipeMapTool::isActive() const
@@ -129,4 +170,19 @@ void KadasMapSwipeMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
     canvas()->setCursor( QCursor( Qt::PointingHandCursor ) );
     mMapCanvasItem->setPixelPosition( e->x(), e->y() );
   }
+}
+
+void KadasMapSwipeMapTool::updateMessageBar()
+{
+  QgsMessageBar *messageBar = KadasApplication::instance()->mainWindow()->messageBar();
+  if ( mMessageBarItem )
+    messageBar->popWidget( mMessageBarItem );
+
+  if ( mLayers.isEmpty() )
+    return;
+
+  QStringList layerNames;
+  std::transform( mLayers.constBegin(), mLayers.constEnd(), std::back_inserter( layerNames ), []( const auto & layer ){ return layer->name(); } );
+  mMessageBarItem = messageBar->createMessage( tr("Swipe Tool" ), tr( "Comparing Layers %1" ).arg(layerNames.join( QStringLiteral( ", " ) ) ) );
+  messageBar->pushItem( mMessageBarItem );
 }
