@@ -2037,39 +2037,39 @@ Annullare queste attività e riprovare.</translation>
 <context>
     <name>KadasLayerTreeViewMenuProvider</name>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="66"/>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="95"/>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="122"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="66"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="95"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="122"/>
         <source>&amp;Remove</source>
         <translation>&amp;Rimuovi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="104"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="104"/>
         <source>&amp;Open Attribute Table</source>
         <translation>&amp;Apri tabella attributi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="110"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="110"/>
         <source>Show layer info</source>
         <translation>Informazioni layer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="114"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="114"/>
         <source>&amp;Properties</source>
         <translation>&amp;Proprietà</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="153"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="153"/>
         <source>Transparency:</source>
         <translation>Trasparenza:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="175"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="175"/>
         <source>Data refresh rate:</source>
         <translation>Frequenza aggiornamento dati:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewmenuprovider.cpp" line="200"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="200"/>
         <source>Use as heightmap</source>
         <translation>Utilizza come modello di elevazione</translation>
     </message>
@@ -2077,7 +2077,7 @@ Annullare queste attività e riprovare.</translation>
 <context>
     <name>KadasLayerTreeViewTemporalIndicator</name>
     <message>
-        <location filename="../kadas/app/kadaslayertreeviewtemporalindicator.cpp" line="83"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewtemporalindicator.cpp" line="83"/>
         <source>&lt;b&gt;Temporal layer&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
