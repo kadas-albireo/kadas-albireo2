@@ -32,6 +32,7 @@ void KadasMapSwipeCanvasItem::enable()
 {
   mIsVertical = true;
   mPixelLength = int( boundingRect().width() / 2 );
+  updateCanvas();
 }
 
 void KadasMapSwipeCanvasItem::disable( bool clearLayers )
@@ -51,7 +52,7 @@ void KadasMapSwipeCanvasItem::setLayers( const QSet<QgsMapLayer *> &layers )
   refreshMap();
 }
 
-void KadasMapSwipeCanvasItem::setPixeLength( int x, int y )
+void KadasMapSwipeCanvasItem::setPixelPosition( int x, int y )
 {
   if ( mIsVertical)
     mPixelLength =  x;
@@ -89,7 +90,6 @@ void KadasMapSwipeCanvasItem::refreshMap()
 
 void KadasMapSwipeCanvasItem::paint( QPainter *painter )
 {
-  qDebug() << "drawing " << mPixelLength;
   if ( std::isnan( mPixelLength ) || mRemovedLayers.isEmpty() )
     return;
 

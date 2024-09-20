@@ -35,7 +35,7 @@ class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
     //! Sets the layers which will be removed from rendering
     void setLayers(const QSet<QgsMapLayer *> &layers );
 
-    void setPixeLength( int x , int y );
+    void setPixelPosition( int x , int y );
 
     void setVertical( bool vertical );
 

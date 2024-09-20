@@ -116,7 +116,7 @@ void KadasMapSwipeMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
       if ( dX*dX + dY*dY  > 50 )
           mDirectionDefined = true;
     }
-    mMapCanvasItem->setPixeLength( e->x(), e->y() );
+    mMapCanvasItem->setPixelPosition( e->x(), e->y() );
   }
 }
 
@@ -127,5 +127,6 @@ void KadasMapSwipeMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
   {
     mIsSwiping = false;
     canvas()->setCursor( QCursor( Qt::PointingHandCursor ) );
+    mMapCanvasItem->setPixelPosition( e->x(), e->y() );
   }
 }

@@ -22,7 +22,7 @@
 #include "kadaslayertreeviewtemporalindicator.h"
 #include "kadastemporalcontroller.h"
 
-KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator( QgsLayerTreeView *view, KadasTemporalController *kadasTemporalController )
+KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator(QgsLayerTreeView *view , KadasTemporalController *kadasTemporalController)
   : QgsLayerTreeViewIndicatorProvider( view )
   , mKadasTemporalController( kadasTemporalController )
 {
@@ -30,7 +30,7 @@ KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator( QgsLay
 
 void KadasLayerTreeViewTemporalIndicator::connectSignals( QgsMapLayer *layer )
 {
-  if (!layer || !layer->temporalProperties() )
+  if ( !layer || !layer->temporalProperties() )
     return;
 
   connect( layer->temporalProperties(), &QgsMapLayerTemporalProperties::changed, this, [ this, layer ]( ) { this->onLayerChanged( layer ); } );
@@ -39,11 +39,11 @@ void KadasLayerTreeViewTemporalIndicator::connectSignals( QgsMapLayer *layer )
 void KadasLayerTreeViewTemporalIndicator::onIndicatorClicked( const QModelIndex &index )
 {
   QgsLayerTreeNode *node = mLayerTreeView->index2node( index );
-  if (!QgsLayerTree::isLayer( node ) )
+  if ( !QgsLayerTree::isLayer( node ) )
     return;
 
   QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
-  if (!layer )
+  if ( !layer )
     return;
 
   switch ( layer->type() )
@@ -51,7 +51,7 @@ void KadasLayerTreeViewTemporalIndicator::onIndicatorClicked( const QModelIndex 
     case Qgis::LayerType::Raster:
     case Qgis::LayerType::Mesh:
     case Qgis::LayerType::Vector:
-      mKadasTemporalController->setVisible(!mKadasTemporalController->isVisible() );
+      mKadasTemporalController->setVisible( !mKadasTemporalController->isVisible() );
       break;
     case Qgis::LayerType::Plugin:
     case Qgis::LayerType::VectorTile:
@@ -65,7 +65,7 @@ void KadasLayerTreeViewTemporalIndicator::onIndicatorClicked( const QModelIndex 
 
 bool KadasLayerTreeViewTemporalIndicator::acceptLayer( QgsMapLayer *layer )
 {
-  if (!layer )
+  if ( !layer )
     return false;
   if ( layer->temporalProperties() &&
        layer->temporalProperties()->isActive() )
@@ -85,7 +85,7 @@ QString KadasLayerTreeViewTemporalIndicator::tooltipText( QgsMapLayer * )
 
 void KadasLayerTreeViewTemporalIndicator::onLayerChanged( QgsMapLayer *layer )
 {
-  if (!layer )
+  if ( !layer )
     return;
   updateLayerIndicator( layer );
 }
