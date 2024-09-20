@@ -100,16 +100,20 @@ void KadasMapSwipeCanvasItem::paint( QPainter *painter )
     int h = boundingRect().height() - 2;
     int w = mPixelLength;
     line = QLine( w - 1, 0, w - 1, h - 1 );
-    rect = QRect(w, 0, mRenderedMapImage.width()-w, mRenderedMapImage.height());
+    rect = QRect(w, 0, mRenderedMapImage.width()-w, mRenderedMapImage.height() );
   }
   else
   {
     int h = boundingRect().height() - mPixelLength;
     int w = boundingRect().width() - 2;
     line = QLine( 0, h - 1, w - 1, h - 1 );
-    rect = QRect( 0, h, mRenderedMapImage.width(), mRenderedMapImage.height()-h);
+    rect = QRect( 0, h, mRenderedMapImage.width(), mRenderedMapImage.height()-h );
   }
 
-  painter->drawImage( rect, mRenderedMapImage, rect );
+  painter->drawImage(
+        rect,
+        mRenderedMapImage.scaled(mRenderedMapImage.width()/mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height()/mRenderedMapImage.devicePixelRatioF()),
+        rect
+  );
   painter->drawLine( line );
 }
