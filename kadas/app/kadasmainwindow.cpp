@@ -96,6 +96,7 @@
 #ifdef WITH_GLOBE
 #include <globe/kadasglobeintegration.h>
 #endif
+#include <3d/kadas3dintegration.h>
 #include <guidegrid/kadasmaptoolguidegrid.h>
 #include <iamauth/kadasiamauth.h>
 #include <kml/kadaskmlintegration.h>
@@ -301,6 +302,8 @@ void KadasMainWindow::init()
 #else
   m3DButton->hide();
 #endif
+
+  Kadas3DIntegration *my3Dintegration = new Kadas3DIntegration( mAction3D, mMapCanvas, this );
 
   // Help file server
   mHelpViewer = new KadasHelpViewer( this );

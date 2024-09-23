@@ -65,7 +65,16 @@ set(kadas_SRC
   mapswipe/kadasmapswipetool.cpp
 
   milx/kadasmilxintegration.cpp
-
+  3d/kadas3dintegration.cpp
+  3d/kadas3dmapcanvaswidget.cpp
+  3d/kadas3dmapconfigwidget.cpp
+  3d/kadas3dnavigationwidget.cpp
+  3d/kadasambientocclusionsettingswidget.cpp
+  3d/kadaslightswidget.cpp
+  3d/kadasmesh3dsymbolwidget.cpp
+  3d/kadasphongmaterialwidget.cpp
+  3d/kadasshadowrenderingsettingswidget.cpp
+  3d/kadasskyboxrenderingsettingswidget.cpp
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
   external/qgis/app/qgsgotolocatorfilter.cpp
 )
@@ -101,6 +110,16 @@ FILE(GLOB kadas_HDR
   layertree/*.h
   mapgrid/*.h
   mapswipe/*.h
+  3d/kadas3dintegration.h
+  3d/kadas3dmapcanvaswidget.h
+  3d/kadas3dmapconfigwidget.h
+  3d/kadas3dnavigationwidget.h
+  3d/kadasambientocclusionsettingswidget.h
+  3d/kadaslightswidget.h
+  3d/kadasmesh3dsymbolwidget.h
+  3d/kadasphongmaterialwidget.h
+  3d/kadasshadowrenderingsettingswidget.h
+  3d/kadasskyboxrenderingsettingswidget.h
   external/qgis/app/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
@@ -184,6 +203,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
+  QGIS::3D
   Python3::Python
   ${kadas_RC_LIBS}
 
