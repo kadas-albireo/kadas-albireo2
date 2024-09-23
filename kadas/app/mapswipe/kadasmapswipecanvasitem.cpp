@@ -40,7 +40,7 @@ void KadasMapSwipeCanvasItem::disable( bool clearLayers )
   if ( clearLayers )
     mRemovedLayers.clear();
 
-  mPixelLength = std::numeric_limits<int>::quiet_NaN();
+  mPixelLength = -1;
 
   refreshMap();
   updateCanvas();
@@ -90,7 +90,7 @@ void KadasMapSwipeCanvasItem::refreshMap()
 
 void KadasMapSwipeCanvasItem::paint( QPainter *painter )
 {
-  if ( std::isnan( mPixelLength ) || mRemovedLayers.isEmpty() )
+  if ( mPixelLength < 0 || mRemovedLayers.isEmpty() )
     return;
 
   QLine line;

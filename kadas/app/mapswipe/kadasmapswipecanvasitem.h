@@ -46,7 +46,7 @@ class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
     virtual void paint( QPainter *painter ) override;
 
   private:
-    int mPixelLength = std::numeric_limits<double>::quiet_NaN();
+    int mPixelLength = -1;
     QSet<QgsMapLayer *> mRemovedLayers;
     bool mIsVertical = true;
     QImage mRenderedMapImage;
