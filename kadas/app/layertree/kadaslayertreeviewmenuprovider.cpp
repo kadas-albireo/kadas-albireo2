@@ -41,7 +41,7 @@ KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView
 
 QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 {
-  if (!mView )
+  if ( !mView )
   {
     return nullptr;
   }
@@ -131,7 +131,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 QAction *KadasLayerTreeViewMenuProvider::actionLayerTransparency( QMenu *parent )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if (!layer )
+  if ( !layer )
   {
     return nullptr;
   }
@@ -184,7 +184,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
   refreshRateSpin->setSuffix( " s" );
   refreshRateSpin->setValue( kApp->layerRefreshManager()->layerRefreshInterval( mView->currentLayer()->id() ) );
   refreshRateSpin->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-  connect( refreshRateSpin, qOverload<int>(&QSpinBox::valueChanged ), this, &KadasLayerTreeViewMenuProvider::setLayerRefreshRate );
+  connect( refreshRateSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasLayerTreeViewMenuProvider::setLayerRefreshRate );
   refreshRateLayout->addWidget( refreshRateSpin );
 
   QWidgetAction *transpAction = new QWidgetAction( parent );
@@ -195,7 +195,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
 QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *parent )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if (!layer )
+  if ( !layer )
   {
     return nullptr;
   }
@@ -230,18 +230,18 @@ void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()
 void KadasLayerTreeViewMenuProvider::setLayerTransparency( int value )
 {
   QgsMapLayer *layer = mView->currentLayer();
-  if (!layer )
+  if ( !layer )
   {
     return;
   }
 
   if ( qobject_cast<QgsVectorLayer *>( layer ) )
   {
-    static_cast<QgsVectorLayer *>( layer )->setOpacity(( 100 - value ) / 100. );
+    static_cast<QgsVectorLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
   }
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
-    static_cast<KadasPluginLayer *>( layer )->setOpacity(( 100 - value ) / 100. );
+    static_cast<KadasPluginLayer *>( layer )->setOpacity( ( 100 - value ) / 100. );
   }
   else if ( qobject_cast<QgsRasterLayer *>( layer ) && static_cast<QgsRasterLayer *>( layer )->renderer() )
   {
