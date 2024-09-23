@@ -1692,9 +1692,34 @@ Sight</string>
              <bool>true</bool>
             </property>
            </widget>
-          </item>
-          <item>
+         </item>
+         <item>
            <widget class="KadasRibbonButton" name="mSaveMilxButton">
+             <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+               <size>
+                 <width>0</width>
+                 <height>80</height>
+               </size>
+             </property>
+             <property name="maximumSize">
+               <size>
+                 <width>80</width>
+                 <height>80</height>
+               </size>
+             </property>
+             <property name="text">
+               <string>Export MILXLY</string>
+             </property>
+           </widget>
+          </item>
+          <item>mMilxKmlExportButton
+           <widget class="KadasRibbonButton" name="mMilxKmlExportButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1714,7 +1739,7 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>Export MILXLY</string>
+             <string>Export KML</string>
             </property>
            </widget>
           </item>
@@ -2478,7 +2503,19 @@ Sight</string>
    <property name="toolTip">
     <string>Export MILXLY</string>
    </property>
-  </action>
+ </action>
+ <action name="mActionMilxKmlExport">
+   <property name="icon">
+     <iconset resource="../../resources/resources.qrc">
+       <normaloff>:/kadas/icons/kml_export</normaloff>:/kadas/icons/kml_export</iconset>
+   </property>
+   <property name="text">
+     <string>Export KML</string>
+   </property>
+   <property name="toolTip">
+     <string>Export KML</string>
+   </property>
+ </action>
   <action name="mActionLoadMilx">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">

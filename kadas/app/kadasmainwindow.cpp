@@ -282,6 +282,7 @@ void KadasMainWindow::init()
   milxUi.mMssTab = mMssTab;
   milxUi.mActionMilx = mActionMilx;
   milxUi.mActionSaveMilx = mActionSaveMilx;
+  milxUi.mActionMilxKmlExport = mActionMilxKmlExport;
   milxUi.mActionLoadMilx = mActionLoadMilx;
   milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
   milxUi.mLineWidthSlider = mLineWidthSlider;
@@ -750,6 +751,7 @@ void KadasMainWindow::configureButtons()
   // MSS tab
   setActionToButton( mActionMilx, mMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_S ) );
   setActionToButton( mActionSaveMilx, mSaveMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_E ) );
+  setActionToButton( mActionMilxKmlExport, mMilxKmlExportButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_K ) );
   setActionToButton( mActionLoadMilx, mLoadMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_I ) );
 
   // Settings tab

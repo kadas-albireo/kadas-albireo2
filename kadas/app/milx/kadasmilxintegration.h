@@ -52,6 +52,7 @@ class KadasMilxIntegration : public QObject
       QWidget *mMssTab;
       QAction *mActionMilx;
       QAction *mActionSaveMilx;
+      QAction *mActionMilxKmlExport;
       QAction *mActionLoadMilx;
       QSlider *mSymbolSizeSlider;
       QSlider *mLineWidthSlider;
@@ -78,6 +79,7 @@ class KadasMilxIntegration : public QObject
   private slots:
     void createMilx( bool active );
     void saveMilxly();
+    void exportKml();
     void openMilxly();
     void readProjectSettings();
     void setMilXSymbolSize( int value );
