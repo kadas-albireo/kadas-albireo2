@@ -61,6 +61,9 @@ set(kadas_SRC
   mapgrid/kadasmapgridlayer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
 
+  mapswipe/kadasmapswipecanvasitem.cpp
+  mapswipe/kadasmapswipetool.cpp
+
   milx/kadasmilxintegration.cpp
 
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
@@ -97,6 +100,7 @@ FILE(GLOB kadas_HDR
   iamauth/*.h
   layertree/*.h
   mapgrid/*.h
+  mapswipe/*.h
   external/qgis/app/*.h)
 IF(WITH_GLOBE)
     FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
@@ -198,6 +202,7 @@ target_include_directories(kadas PUBLIC
     ${CMAKE_SOURCE_DIR}/kadas/app/kml
     ${CMAKE_SOURCE_DIR}/kadas/app/layertree
     ${CMAKE_SOURCE_DIR}/kadas/app/mapgrid
+    ${CMAKE_SOURCE_DIR}/kadas/app/mapswipe
     ${CMAKE_SOURCE_DIR}/kadas/app/milx
 
     ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there

@@ -96,9 +96,9 @@
 #include "kadasplugininterfaceimpl.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
-#include <bullseye/kadasbullseyelayer.h>
-#include <guidegrid/kadasguidegridlayer.h>
-#include <mapgrid/kadasmapgridlayer.h>
+#include "kadasbullseyelayer.h"
+#include "kadasguidegridlayer.h"
+#include "kadasmapgridlayer.h"
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )

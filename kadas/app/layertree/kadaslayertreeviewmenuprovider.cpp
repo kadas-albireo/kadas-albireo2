@@ -32,6 +32,7 @@
 #include "kadaslayerrefreshmanager.h"
 #include "kadaslayertreeviewmenuprovider.h"
 #include "kadasmainwindow.h"
+#include "kadasmapswipetool.h"
 
 KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
   mView( view )
@@ -89,11 +90,13 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         }
       }
       menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
+
+      KadasMapSwipeMapTool::addContextMenuAction( layer, KadasApplication::instance()->mainWindow()->mapCanvas(), menu, this );
+
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
       menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
-
 
       if ( layer->type() == Qgis::LayerType::Raster && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
       {
