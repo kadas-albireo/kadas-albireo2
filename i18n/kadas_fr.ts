@@ -2040,39 +2040,39 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasLayerTreeViewMenuProvider</name>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="66"/>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="95"/>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="122"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="67"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="99"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="125"/>
         <source>&amp;Remove</source>
         <translation>&amp;Supprimer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="104"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="107"/>
         <source>&amp;Open Attribute Table</source>
         <translation>&amp;Ouvrir la table d&apos;attributs</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="110"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="113"/>
         <source>Show layer info</source>
         <translation>informations de la couche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="114"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="117"/>
         <source>&amp;Properties</source>
         <translation>&amp;Propriétés</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="153"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="156"/>
         <source>Transparency:</source>
         <translation>Transparence:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="175"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="178"/>
         <source>Data refresh rate:</source>
         <translation>Fréquence de rafraîchissement:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="200"/>
+        <location filename="../kadas/app/layertree/kadaslayertreeviewmenuprovider.cpp" line="203"/>
         <source>Use as heightmap</source>
         <translation>Utiliser comme modèle d&apos;élévation</translation>
     </message>
@@ -3779,6 +3779,34 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.h" line="39"/>
         <source>Server Find</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>KadasMapSwipeMapTool</name>
+    <message>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="43"/>
+        <source>&amp;Compare with Swipe Tool</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="54"/>
+        <source>&amp;Remove from comparison</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="61"/>
+        <source>&amp;Add to Comparison with Swipe Tool</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <source>Swipe Tool</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <source>Comparing Layers %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
