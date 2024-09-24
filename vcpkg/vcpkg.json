@@ -52,7 +52,8 @@
     {
       "name": "qgis",
       "features": [
-        "gui"
+        "gui",
+        "3d"
       ]
     },
     {
