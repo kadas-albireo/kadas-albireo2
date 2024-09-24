@@ -1,0 +1,34 @@
+diff --git a/src/core/qgsjsonutils.cpp b/src/core/qgsjsonutils.cpp
+index 8bd89997d0c..f0f1978f72b 100644
+--- a/src/core/qgsjsonutils.cpp
++++ b/src/core/qgsjsonutils.cpp
+@@ -351,7 +351,11 @@ QVariantList QgsJsonUtils::parseArray( const QString &json, QMetaType::Type type
+     const auto jObj( json::parse( json.toStdString() ) );
+     if ( ! jObj.is_array() )
+     {
+-      throw json::parse_error::create( 0, 0, QStringLiteral( "JSON value must be an array" ).toStdString() );
++#if NLOHMANN_JSON_VERSION_MAJOR >= 3 && NLOHMANN_JSON_VERSION_MINOR >= 11
++      throw json::parse_error::create( 0, 0, "JSON value must be an array", &jObj );
++#else
++      throw json::parse_error::create( 0, 0, "JSON value must be an array" );
++#endif
+     }
+     for ( const auto &item : jObj )
+     {
+diff --git a/src/providers/spatialite/qgsspatialiteprovider.cpp b/src/providers/spatialite/qgsspatialiteprovider.cpp
+index 2eaddd8a632..3b357382c50 100644
+--- a/src/providers/spatialite/qgsspatialiteprovider.cpp
++++ b/src/providers/spatialite/qgsspatialiteprovider.cpp
+@@ -4708,7 +4708,11 @@ bool QgsSpatiaLiteProvider::changeAttributeValues( const QgsChangedAttributesMap
+             const auto jObj = QgsJsonUtils::jsonFromVariant( val );
+             if ( ! jObj.is_array() )
+             {
+-              throw json::parse_error::create( 0, 0, tr( "JSON value must be an array" ).toStdString() );
++#if NLOHMANN_JSON_VERSION_MAJOR >= 3 && NLOHMANN_JSON_VERSION_MINOR >= 11
++              throw json::parse_error::create( 0, 0, "JSON value must be an array", &jObj );
++#else
++              throw json::parse_error::create( 0, 0, "JSON value must be an array" );
++#endif
+             }
+             jRepr = QString::fromStdString( jObj.dump( ) );
+             sql += QStringLiteral( "%1=%2" ).arg( QgsSqliteUtils::quotedIdentifier( fld.name() ),  QgsSqliteUtils::quotedString( jRepr ) );

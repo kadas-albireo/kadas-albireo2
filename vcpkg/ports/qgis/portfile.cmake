@@ -19,6 +19,7 @@ vcpkg_from_github(
         mesh.patch
         bindings-install.patch
         sipcxx17.patch
+        nlohmann-json.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -27,6 +28,8 @@ file(REMOVE ${SOURCE_PATH}/cmake/FindEXIV2.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindExpat.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindIconv.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindPoly2Tri.cmake)
+
+file(REMOVE_RECURSE ${SOURCE_PATH}/external/nlohmann)
 
 vcpkg_find_acquire_program(FLEX)
 vcpkg_find_acquire_program(BISON)
