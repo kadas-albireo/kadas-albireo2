@@ -56,7 +56,7 @@ void KadasMilxExportDialog::setExportMode( ExportMode exportMode )
     ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageMilx );
     break;
   case ExportMode::Kml:
-    ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageMilx );
+    ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageKml );
     break;
   }
 }
