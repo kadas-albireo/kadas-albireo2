@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/plugins/Ephem" >
+        <file>icons/icon.png</file>
+        <file>icons/dawn_end.svg</file>
+        <file>icons/dawn_start.svg</file>
+        <file>icons/icon.png</file>
+        <file>icons/icon.svg</file>
+        <file>icons/midday.svg</file>
+        <file>icons/moonrise.svg</file>
+        <file>icons/moonset.svg</file>
+        <file>icons/sunrise.svg</file>
+        <file>icons/sunset.svg</file>
+        <file>icons/moon_0.svg</file>
+        <file>icons/moon_100.svg</file>
+        <file>icons/moon_12.svg</file>
+        <file>icons/moon_25.svg</file>
+        <file>icons/moon_37.svg</file>
+        <file>icons/moon_50.svg</file>
+        <file>icons/moon_62.svg</file>
+        <file>icons/moon_75.svg</file>
+        <file>icons/moon_87.svg</file>
+        <file>icons/az_moon.svg</file>
+        <file>icons/az_sun.svg</file>
+    </qresource>
+</RCC>
