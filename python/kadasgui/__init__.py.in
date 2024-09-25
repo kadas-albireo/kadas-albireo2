@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# The two next lines are required because qgis.gui depends on qgis.3d (Qgs3DMapCanvas is used in the QgisInterface base class)
 from kadas._kadascore import *
 from qgis._3d import *
 
