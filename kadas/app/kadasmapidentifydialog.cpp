@@ -235,14 +235,17 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
         }
       }
 #else
-      int capabilities = rlayer->dataProvider()->capabilities();
+      Qgis::RasterInterfaceCapabilities capabilities = rlayer->dataProvider()->capabilities();
       Qgis::RasterIdentifyFormat format = Qgis::RasterIdentifyFormat::Undefined;
-      if ( capabilities & QgsRasterInterface::IdentifyFeature ) format = Qgis::RasterIdentifyFormat::Feature;
-      else if ( capabilities & QgsRasterInterface::IdentifyValue ) format = Qgis::RasterIdentifyFormat::Value;
-      else if ( capabilities & QgsRasterInterface::IdentifyText ) format = Qgis::RasterIdentifyFormat::Text;
-//        else if ( capabilities & QgsRasterInterface::IdentifyHtml ) format = Qgis::RasterIdentifyFormat::Html;
+      if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyFeature )
+        format = Qgis::RasterIdentifyFormat::Feature;
+      else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyValue )
+        format = Qgis::RasterIdentifyFormat::Value;
+      else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyText )
+        format = Qgis::RasterIdentifyFormat::Text;
+//        else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyHtml ) format = Qgis::RasterIdentifyFormat::Html;
 
-      if ( ( capabilities & QgsRasterDataProvider::Identify ) && format != Qgis::RasterIdentifyFormat::Undefined )
+      if ( ( capabilities & Qgis::RasterInterfaceCapability::Identify ) && format != Qgis::RasterIdentifyFormat::Undefined )
       {
         QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), rlayer->crs(), QgsProject::instance()->transformContext() );
         QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), 0.25 * mCanvas->width(), 0.25 * mCanvas->height(), mCanvas->mapSettings().outputDpi() );

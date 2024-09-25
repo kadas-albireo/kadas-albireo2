@@ -1033,7 +1033,7 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   {
     return;
   }
-  QgsAbstractDataSourceWidget *dialog = provider->createDataSourceWidget( this, QgsGuiUtils::ModalDialogFlags, QgsProviderRegistry::None );
+  QgsAbstractDataSourceWidget *dialog = provider->createDataSourceWidget( this, QgsGuiUtils::ModalDialogFlags, QgsProviderRegistry::WidgetMode::Standalone );
   dialog->setMapCanvas( mMapCanvas );
   dialog->setAttribute( Qt::WA_DeleteOnClose );
   QString sourceProvider = provider->providerKey();

@@ -78,6 +78,9 @@ if(MSVC)
 endif()
 
 _qgis_core_add_dependency(qca Qca CONFIG)
+_qgis_core_add_dependency(nlohmann_json::nlohmann_json nlohmann_json CONFIG)
+find_package(exiv2 CONFIG REQUIRED)
+target_link_libraries(QGIS::Core INTERFACE Exiv2::exiv2lib)
 
 if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as an exercise for later (should be part of the vcpkg qgis port)
   _find_and_link_library(authmethod_basic_a QGIS::Core)

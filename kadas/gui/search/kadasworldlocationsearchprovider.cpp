@@ -144,7 +144,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QVariantMap data = result.userData().value<QVariantMap>();
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
   QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();

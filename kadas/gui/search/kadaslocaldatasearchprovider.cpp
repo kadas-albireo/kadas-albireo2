@@ -111,7 +111,7 @@ void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsL
 
 void KadasLocalDataSearchFilter::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QVariantMap data = result.userData().value<QVariantMap>();
   QgsVectorLayer *layer = QgsProject::instance()->mapLayer<QgsVectorLayer *>( data.value( QStringLiteral( "layer_id" ) ).toString() );
   QgsFeatureId fid = data.value( QStringLiteral( "feature_id" ) ).value<QgsFeatureId>();
 

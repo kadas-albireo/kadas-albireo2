@@ -190,7 +190,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
 
 void KadasRemoteDataSearchProvider::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QVariantMap data = result.userData().value<QVariantMap>();
   QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString crs = data.value( QStringLiteral( "crs" ) ).toString();

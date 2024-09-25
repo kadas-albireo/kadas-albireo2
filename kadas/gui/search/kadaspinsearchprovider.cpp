@@ -71,7 +71,7 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
 
 void KadasPinSearchProvider::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.getUserData().value<QVariantMap>();
+  QVariantMap data = result.userData().value<QVariantMap>();
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString crsIs = data.value( QStringLiteral( "crs" ) ).toString();
 
