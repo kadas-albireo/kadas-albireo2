@@ -1346,6 +1346,9 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
 
 void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
 {
+  if ( !layer->dataProvider() )
+    return;
+
   QgsDataProviderTemporalCapabilities *temporalCapabilities = layer->dataProvider()->temporalCapabilities();
 
   if ( !temporalCapabilities )
