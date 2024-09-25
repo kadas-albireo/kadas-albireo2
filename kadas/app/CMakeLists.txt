@@ -175,9 +175,9 @@ TARGET_LINK_LIBRARIES(kadas
 
 target_include_directories(kadas PUBLIC
     ${CMAKE_SOURCE_DIR}/kadas/app
+    ${CMAKE_SOURCE_DIR}/kadas/app/3d
     ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
     ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
-    ${CMAKE_SOURCE_DIR}/kadas/app/globe
     ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
     ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
     ${CMAKE_SOURCE_DIR}/kadas/app/kml

@@ -91,14 +91,14 @@
 #include "kadastemporalcontroller.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
+#include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
-#include <bullseye/kadasmaptoolbullseye.h>
-#include <3d/kadas3dintegration.h>
-#include <guidegrid/kadasmaptoolguidegrid.h>
-#include <iamauth/kadasiamauth.h>
-#include <kml/kadaskmlintegration.h>
-#include <mapgrid/kadasmaptoolmapgrid.h>
-#include <milx/kadasmilxintegration.h>
+#include "kadasmaptoolbullseye.h"
+#include "kadasmaptoolguidegrid.h"
+#include "kadasiamauth.h"
+#include "kadaskmlintegration.h"
+#include "kadasmaptoolmapgrid.h"
+#include "kadasmilxintegration.h"
 
 #include <external/qgis/app/qgsgotolocatorfilter.h>
 
