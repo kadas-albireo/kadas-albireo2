@@ -19,7 +19,7 @@
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
-#include <milx/kadasmilxexportdialog.h>
+#include "milx/kadasmilxexportdialog.h"
 
 KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
   : QDialog( parent )
@@ -41,11 +41,6 @@ KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
       ui.comboCartouche->addItem( layer->name(), layer->id() );
     }
   }
-}
-
-KadasMilxExportDialog::~KadasMilxExportDialog()
-{
-
 }
 
 void KadasMilxExportDialog::setExportMode( ExportMode exportMode )

@@ -175,7 +175,7 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool getSupportedLibraryVersionTags( QStringList &versionTags, QStringList &versionNames );
     static bool upgradeMilXFile( const QString &inputXml, QString &outputXml, bool &valid, QString &messages );
     static bool downgradeMilXFile( const QString &inputXml, QString &outputXml, const QString &mssVersion, bool &valid, QString &messages );
-    static bool exportKml( const QString &inputXml, QString &outputXml, bool &valid, QString &messages );
+    static bool exportKml( const QString &inputXml, QByteArray &outputData, bool &valid, QString &messages );
     static bool validateSymbolXml( const QString &symbolXml, const QString &mssVersion, QString &adjustedSymbolXml, bool &valid, QString &messages );
 
     static void quit() { delete instance(); }

@@ -37,8 +37,8 @@
 #include "kadas/gui/milx/kadasmilxlibrary.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
-#include <milx/kadasmilxintegration.h>
-#include <milx/kadasmilxexportdialog.h>
+#include "milx/kadasmilxintegration.h"
+#include "milx/kadasmilxexportdialog.h"
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   : QObject( parent )
@@ -404,52 +404,20 @@ void KadasMilxIntegration::exportKml()
 
   QStringList exportLayers = exportDialog.selectedLayers();
 
-  QStringList filters;
-  filters.append( tr( "Compressed KML Layer (*.kmz)" ) );
-  filters.append( tr( "KML Layer (*.kml)" ) );
-
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
-  QString selectedFilter;
 
-  QString filename = QFileDialog::getSaveFileName( 0, tr( "Select Output" ), lastDir, filters.join( ";;" ), &selectedFilter );
+  QString filename = QFileDialog::getSaveFileName( 0, tr( "Select Output" ), lastDir, tr( "Compressed KML Layer (*.kmz)" ) );
   if ( filename.isEmpty() )
   {
     return;
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-  if ( selectedFilter == filters[0] && !filename.endsWith( ".kmz", Qt::CaseInsensitive ) )
+  if ( !filename.endsWith( ".kmz", Qt::CaseInsensitive ) )
   {
     filename += ".kmz";
   }
-  else if ( selectedFilter == filters[1] && !filename.endsWith( ".kml", Qt::CaseInsensitive ) )
-  {
-    filename += ".kml";
-  }
-  QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
 
-  QIODevice *dev = 0;
-  QuaZip *zip = 0;
-  if ( selectedFilter == filters[0] )
-  {
-    zip = new QuaZip( filename );
-    zip->open( QuaZip::mdCreate );
-    dev = new QuaZipFile( zip );
-    QuaZipNewInfo info( "Layer.kml" );
-    info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
-    static_cast<QuaZipFile *>( dev )->open( QIODevice::WriteOnly, info );
-  }
-  else
-  {
-    dev = new QFile( filename );
-    dev->open( QIODevice::WriteOnly );
-  }
-  if ( !dev->isOpen() )
-  {
-    delete dev;
-    delete zip;
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), tr( "Failed to open the output file for writing." ), Qgis::Critical, 5 );
-    return;
-  }
+  QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
 
   int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
 
@@ -514,32 +482,21 @@ void KadasMilxIntegration::exportKml()
 
   qDebug() << "-----------------------------------------------------------------------------------";
 
-  QString outputXml;
+  QByteArray outputData;
   bool valid = false;
   QString messages;
-  if ( !KadasMilxClient::exportKml( inputXml, outputXml, valid, messages ) )
+  if ( !KadasMilxClient::exportKml( inputXml, outputData, valid, messages ) )
   {
-    delete dev;
-    delete zip;
     kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export failed" ), tr( "Failed to write output." ), Qgis::Critical, 5 );
     return;
   }
 
-  qDebug() << "outputXml";
-  qDebug() << outputXml;
+  qDebug() << "outputData";
+  qDebug() << outputData;
 
   qDebug() << "messages" << messages;
 
-  if ( valid )
-  {
-    dev->write( outputXml.toUtf8() );
-    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export completed" ), "", Qgis::Info, 5 );
-    if ( !messages.isEmpty() )
-    {
-      showMessageDialog( tr( "Export Messages" ), tr( "The following messages were emitted while exporting:" ), messages );
-    }
-  }
-  else
+  if ( !valid )
   {
     kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), "", Qgis::Critical, 5 );
     if ( !messages.isEmpty() )
@@ -548,8 +505,20 @@ void KadasMilxIntegration::exportKml()
     }
   }
 
-  delete dev;
-  delete zip;
+  QFile outputFile( filename );
+  if ( !outputFile.open( QIODevice::WriteOnly ) )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), tr( "Failed to open the output file for writing." ), Qgis::Critical, 5 );
+    return;
+  }
+
+  outputFile.write( outputData );
+  outputFile.close();
+  kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export completed" ), "", Qgis::Info, 5 );
+  if ( !messages.isEmpty() )
+  {
+    showMessageDialog( tr( "Export Messages" ), tr( "The following messages were emitted while exporting:" ), messages );
+  }
 }
 
 void KadasMilxIntegration::openMilxly()

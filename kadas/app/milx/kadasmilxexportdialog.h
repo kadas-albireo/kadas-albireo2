@@ -31,7 +31,6 @@ class KadasMilxExportDialog : public QDialog
     };
 
     KadasMilxExportDialog(QWidget *parent = 0);
-    ~KadasMilxExportDialog();
 
     void setExportMode( ExportMode exportMode );
 

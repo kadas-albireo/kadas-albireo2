@@ -92,15 +92,15 @@
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
 #include "kadasredliningintegration.h"
-#include <bullseye/kadasmaptoolbullseye.h>
+#include "bullseye/kadasmaptoolbullseye.h"
 #ifdef WITH_GLOBE
 #include <globe/kadasglobeintegration.h>
 #endif
-#include <guidegrid/kadasmaptoolguidegrid.h>
-#include <iamauth/kadasiamauth.h>
-#include <kml/kadaskmlintegration.h>
-#include <mapgrid/kadasmaptoolmapgrid.h>
-#include <milx/kadasmilxintegration.h>
+#include "guidegrid/kadasmaptoolguidegrid.h"
+#include "iamauth/kadasiamauth.h"
+#include "kml/kadaskmlintegration.h"
+#include "mapgrid/kadasmaptoolmapgrid.h"
+#include "milx/kadasmilxintegration.h"
 
 #include <external/qgis/app/qgsgotolocatorfilter.h>
 
