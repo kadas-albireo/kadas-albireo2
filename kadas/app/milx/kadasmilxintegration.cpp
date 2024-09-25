@@ -477,11 +477,6 @@ void KadasMilxIntegration::exportKml()
   }
   QString inputXml = doc.toString();
 
-  qDebug() << "inputXml";
-  qDebug() << inputXml;
-
-  qDebug() << "-----------------------------------------------------------------------------------";
-
   QByteArray outputData;
   bool valid = false;
   QString messages;
@@ -490,11 +485,6 @@ void KadasMilxIntegration::exportKml()
     kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export failed" ), tr( "Failed to write output." ), Qgis::Critical, 5 );
     return;
   }
-
-  qDebug() << "outputData";
-  qDebug() << outputData;
-
-  qDebug() << "messages" << messages;
 
   if ( !valid )
   {
