@@ -47,7 +47,6 @@ jobs:
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
                 -D WITH_BINDINGS=ON \
-                -D WITH_GLOBE=OFF \
                 -D INSTALL_DEMO_DATA=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
