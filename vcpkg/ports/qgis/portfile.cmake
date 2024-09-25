@@ -20,6 +20,7 @@ vcpkg_from_github(
         bindings-install.patch
         sipcxx17.patch
         nlohmann-json.patch
+        install-private-headers.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)

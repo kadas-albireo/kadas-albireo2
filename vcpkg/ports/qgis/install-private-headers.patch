@@ -1,0 +1,32 @@
+diff --git a/src/3d/CMakeLists.txt b/src/3d/CMakeLists.txt
+index c958b6654c6..333487a059f 100644
+--- a/src/3d/CMakeLists.txt
++++ b/src/3d/CMakeLists.txt
+@@ -189,9 +189,11 @@ set(QGIS_3D_HDRS
+   terrain/qgsquantizedmeshterraingenerator.h
+   terrain/qgsterraindownloader.h
+   terrain/qgsterraingenerator.h
++  terrain/qgsterrainentity_p.h
+   terrain/qgsterraintileloader_p.h
+ 
+   chunks/qgschunkloader_p.h
++  chunks/qgschunknode_p.h
+   chunks/qgschunkqueuejob_p.h
+ 
+   mesh/qgsmeshterraingenerator.h
+@@ -206,7 +208,6 @@ set(QGIS_3D_PRIVATE_HDRS
+   chunks/qgschunkboundsentity_p.h
+   chunks/qgschunkedentity_p.h
+   chunks/qgschunklist_p.h
+-  chunks/qgschunknode_p.h
+   symbols/qgsline3dsymbol_p.h
+   symbols/qgslinematerial_p.h
+   symbols/qgslinevertexdata_p.h
+@@ -215,7 +216,6 @@ set(QGIS_3D_PRIVATE_HDRS
+   symbols/qgspointcloud3dsymbol_p.h
+   terrain/qgsdemterraintilegeometry_p.h
+   terrain/qgsdemterraintileloader_p.h
+-  terrain/qgsterrainentity_p.h
+   terrain/qgsterraintexturegenerator_p.h
+   terrain/qgsterraintextureimage_p.h
+   terrain/qgsterraintileentity_p.h
