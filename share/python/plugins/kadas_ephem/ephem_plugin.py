@@ -49,9 +49,13 @@ class EphemPlugin:
         self.iface.addAction(self.action, self.iface.PLUGIN_MENU,
                              self.iface.ANALYSIS_TAB)
 
+        self.iface.addActionMapCanvasRightClick(self.action)
+
     def unload(self):
         self.iface.removeAction(self.action, self.iface.PLUGIN_MENU,
                                 self.iface.ANALYSIS_TAB)
+
+        self.iface.removeActionMapCanvasRightClick(self.action)
 
     def toolToggled(self, active):
         if active:
