@@ -115,8 +115,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
         resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
 
         result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
-        // TODO QGIS 3.40: uncomment
-        // result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
+        result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
         QString label = itemAttrsMap["label"].toString();
         label.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
         result.displayString = label;

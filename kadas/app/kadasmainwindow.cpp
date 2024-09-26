@@ -150,13 +150,8 @@ void KadasMainWindow::init()
   QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
   lw->setMapCanvas( mMapCanvas );
   lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
+  lw->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomLeft );
   mLocatorLayout->insertWidget( 0, lw );
-
-  // TODO when upgrading QGIS
-  //mLocatorWidget->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomRight );
-  QgsFloatingWidget *resultContainter = window()->findChild<QgsFloatingWidget *>();
-  resultContainter->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopLeft );
-  resultContainter->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::BottomLeft );
 
   mLayersWidget->setVisible( false );
   mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
