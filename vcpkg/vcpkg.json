@@ -62,7 +62,15 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect"
+    "zonedetect",
+    {
+      "name": "ffmpeg",
+      "platform": "windows",
+      "features": [
+        "ffmpeg",
+        "ffprobe"
+      ]
+    }
   ],
   "features": {
     "bindings": {
@@ -83,12 +91,6 @@
             "python"
           ]
         }
-      ]
-    },
-    "globe": {
-      "description": "Globe",
-      "dependencies": [
-        "osgearth"
       ]
     },
     "webkit": {
