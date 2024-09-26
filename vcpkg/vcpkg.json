@@ -65,6 +65,7 @@
     "zonedetect",
     {
       "name": "ffmpeg",
+      "platform": "windows",
       "features": [
         "ffmpeg",
         "ffprobe"
@@ -90,12 +91,6 @@
             "python"
           ]
         }
-      ]
-    },
-    "globe": {
-      "description": "Globe",
-      "dependencies": [
-        "osgearth"
       ]
     },
     "webkit": {
