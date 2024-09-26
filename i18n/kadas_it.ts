@@ -3605,37 +3605,37 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1402"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1405"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1437"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1440"/>
         <source>Downloading...</source>
         <translation>Scaricando...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1447"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1450"/>
         <source>Unable to download image</source>
         <translation>Impossibile scaricare l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1456"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1459"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible salvare l&apos;immagine scaricata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1487"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1490"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>Font scaling setting changed</source>
         <translation>Configurazione scala carattere modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modifica della scala dei caratteri verrà applicata al successivo avvio del programma.</translation>
     </message>
@@ -3762,7 +3762,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Risultati identificazione</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="443"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="446"/>
         <source>Band %1</source>
         <translation>Banda %1</translation>
     </message>

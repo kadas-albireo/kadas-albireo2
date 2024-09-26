@@ -3607,37 +3607,37 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1402"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1405"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1437"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1440"/>
         <source>Downloading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1447"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1450"/>
         <source>Unable to download image</source>
         <translation>Impossible de télécharger l&apos;image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1456"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1459"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible d&apos;enregistrer l&apos;image téléchargée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1487"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1490"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>Font scaling setting changed</source>
         <translation>Configuration modifiée de l&apos;échelle des caractères</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modification de l&apos;échelle des polices sera appliquée lors du prochain lancement du programme.</translation>
     </message>
@@ -3764,7 +3764,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Résultats identification</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="443"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="446"/>
         <source>Band %1</source>
         <translation>Bande %1</translation>
     </message>

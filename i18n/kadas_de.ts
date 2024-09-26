@@ -3443,7 +3443,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
         <source>Places</source>
-        <translation type="unfinished"/>
+        <translation>Orte</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
@@ -3458,12 +3458,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
         <source>General place name directory</source>
-        <translation type="unfinished"/>
+        <translation>Allgemeines Verzeichnis der Ortschaften</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="41"/>
         <source>Location Search</source>
-        <translation type="unfinished"/>
+        <translation>Standortsuche</translation>
     </message>
 </context>
 <context>
@@ -3605,37 +3605,37 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Die Projektion der Ebene %1 ist unbekannt, möglicherweise sind die Objekte falsch platziert.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1402"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1405"/>
         <source>Select Image</source>
         <translation>Bild auswählen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1437"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1440"/>
         <source>Downloading...</source>
         <translation>Herunterladen...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1447"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1450"/>
         <source>Unable to download image</source>
         <translation>Datei konnte nicht heruntergeladen werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1456"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1459"/>
         <source>Unable to save downloaded image</source>
         <translation>Heruntergeladenes Bild kann nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1487"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1490"/>
         <source>Authenticated as:</source>
         <translation>Authentifiziert als:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>Font scaling setting changed</source>
         <translation>Fontskalierung Konfiguration geändert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1572"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1575"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>Die Änderung der Schriftskalierung wird beim nächsten Programmstart übernommen.</translation>
     </message>
@@ -3762,7 +3762,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Abfrageergebnisse</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="443"/>
+        <location filename="../kadas/app/kadasmapidentifydialog.cpp" line="446"/>
         <source>Band %1</source>
         <translation>Band %1</translation>
     </message>
@@ -3777,7 +3777,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.h" line="39"/>
         <source>Server Find</source>
-        <translation type="unfinished"/>
+        <translation>Server finden</translation>
     </message>
 </context>
 <context>
@@ -3785,27 +3785,27 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="43"/>
         <source>&amp;Compare with Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Vergleichen mit dem Swipe Werkzeug</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="54"/>
         <source>&amp;Remove from comparison</source>
-        <translation type="unfinished"/>
+        <translation>&amp;vom Vergleich entfernen</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="61"/>
         <source>&amp;Add to Comparison with Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Zum Vergleich mit dem Swipe Werkzeug hinzufügen</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
         <source>Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>Wischwerkzeug</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
         <source>Comparing Layers %1</source>
-        <translation type="unfinished"/>
+        <translation>Ebenen vergleichen %1</translation>
     </message>
 </context>
 <context>
@@ -4851,7 +4851,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="219"/>
         <source>Plugin &apos;%1&apos; has been updated to version %2</source>
-        <translation type="unfinished"/>
+        <translation>Plugin &apos;%1&apos; ist auf Version %2 aktualisiert worden</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="223"/>
