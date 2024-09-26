@@ -36,7 +36,7 @@ if(MSVC)
     install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "share/qgis/python/")
     install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
     install(FILES "${VCPKG_BASE_DIR}/bin/ffmpeg.exe" DESTINATION "bin/")
-    install(FILES "${VCPKG_BASE_DIR}/bin/ffprove.exe" DESTINATION "bin/")
+    install(FILES "${VCPKG_BASE_DIR}/bin/ffprobe.exe" DESTINATION "bin/")
 else()
     set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
     file(GLOB PROVIDER_LIBS
