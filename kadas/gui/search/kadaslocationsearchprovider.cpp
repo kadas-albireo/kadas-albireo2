@@ -126,8 +126,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
 
     QgsLocatorResult result;
     result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
-    //TODO when QGIS 3.40
-    //result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 0;
+    result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 0;
     result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
 
     QVariantMap resultData;
