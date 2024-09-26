@@ -91,14 +91,6 @@ jobs:
 
       - name: 🌋 Build
         run: |
-          find build -name 'ffmpeg.exe'
-          find build -name 'ffprobe.exe'
-
-      - uses: mxschmitt/action-tmate@v3
-        if: always()
-          
-      - name: 🌋 Build
-        run: |
           cmake --build build --config Release
 
       # A preliminary smoke test to determine basic functional python
