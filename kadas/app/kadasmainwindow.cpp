@@ -93,12 +93,12 @@
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
-#include "kadasmaptoolbullseye.h"
-#include "kadasmaptoolguidegrid.h"
-#include "kadasiamauth.h"
-#include "kadaskmlintegration.h"
-#include "kadasmaptoolmapgrid.h"
-#include "kadasmilxintegration.h"
+#include "bullseye/kadasmaptoolbullseye.h"
+#include "guidegrid/kadasmaptoolguidegrid.h"
+#include "iamauth/kadasiamauth.h"
+#include "kml/kadaskmlintegration.h"
+#include "mapgrid/kadasmaptoolmapgrid.h"
+#include "milx/kadasmilxintegration.h"
 
 #include <external/qgis/app/qgsgotolocatorfilter.h>
 
@@ -148,13 +148,8 @@ void KadasMainWindow::init()
   QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
   lw->setMapCanvas( mMapCanvas );
   lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
+  lw->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomLeft );
   mLocatorLayout->insertWidget( 0, lw );
-
-  // TODO when upgrading QGIS
-  //mLocatorWidget->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomRight );
-  QgsFloatingWidget *resultContainter = window()->findChild<QgsFloatingWidget *>();
-  resultContainter->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopLeft );
-  resultContainter->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::BottomLeft );
 
   mLayersWidget->setVisible( false );
   mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
@@ -280,6 +275,7 @@ void KadasMainWindow::init()
   milxUi.mMssTab = mMssTab;
   milxUi.mActionMilx = mActionMilx;
   milxUi.mActionSaveMilx = mActionSaveMilx;
+  milxUi.mActionMilxKmlExport = mActionMilxKmlExport;
   milxUi.mActionLoadMilx = mActionLoadMilx;
   milxUi.mSymbolSizeSlider = mSymbolSizeSlider;
   milxUi.mLineWidthSlider = mLineWidthSlider;
@@ -742,6 +738,7 @@ void KadasMainWindow::configureButtons()
   // MSS tab
   setActionToButton( mActionMilx, mMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_S ) );
   setActionToButton( mActionSaveMilx, mSaveMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_E ) );
+  setActionToButton( mActionMilxKmlExport, mMilxKmlExportButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_K ) );
   setActionToButton( mActionLoadMilx, mLoadMilxButton, QKeySequence( Qt::CTRL + Qt::Key_M, Qt::CTRL + Qt::Key_I ) );
 
   // Settings tab

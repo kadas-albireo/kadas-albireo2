@@ -48,6 +48,8 @@ set(kadas_SRC
   mapswipe/kadasmapswipetool.cpp
 
   milx/kadasmilxintegration.cpp
+  milx/kadasmilxexportdialog.cpp
+
   3d/kadas3dintegration.cpp
   3d/kadas3dmapcanvaswidget.cpp
   3d/kadas3dmapconfigwidget.cpp
@@ -58,6 +60,8 @@ set(kadas_SRC
   3d/kadasphongmaterialwidget.cpp
   3d/kadasshadowrenderingsettingswidget.cpp
   3d/kadasskyboxrenderingsettingswidget.cpp
+
+
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
   external/qgis/app/qgsgotolocatorfilter.cpp
 )
@@ -97,7 +101,8 @@ FILE(GLOB kadas_UI
   kml/*.ui
   bullseye/*.ui
   guidegrid/*.ui
-  mapgrid/*.ui)
+  mapgrid/*.ui
+  milx/*.ui)
 LIST(SORT kadas_UI)
 
 SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")

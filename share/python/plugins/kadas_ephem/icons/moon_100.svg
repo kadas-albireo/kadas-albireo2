@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="38"
+   height="38"
+   viewBox="0 0 10.054167 10.054167"
+   version="1.1"
+   id="svg1790"
+   sodipodi:docname="moon_0.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1792"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     units="px"
+     inkscape:zoom="6.4706222"
+     inkscape:cx="-7.1863259"
+     inkscape:cy="21.249888"
+     inkscape:window-width="1600"
+     inkscape:window-height="837"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-global="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3680" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1787" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g6649"
+       transform="translate(4.8451828,3.8529947)">
+      <path
+         id="path8847"
+         style="fill:none;stroke:#000000;stroke-width:0.0281284;stroke-miterlimit:10"
+         inkscape:connector-curvature="0"
+         d="m 0.18190053,5.3933578 c 2.33016177,0 4.21926917,-1.8891075 4.21926917,-4.2192692 0,-2.3301617 -1.8891074,-4.2192691 -4.21926917,-4.2192691" />
+      <path
+         id="path8847-7"
+         style="fill:none;stroke:#000000;stroke-width:0.0281284;stroke-miterlimit:10"
+         inkscape:connector-curvature="0"
+         d="m 0.18190053,5.3933578 c -2.33016193,0 -4.21926913,-1.8891075 -4.21926913,-4.2192692 0,-2.3301617 1.8891072,-4.2192691 4.21926913,-4.2192691" />
+    </g>
+  </g>
+</svg>
