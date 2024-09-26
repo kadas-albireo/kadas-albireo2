@@ -88,10 +88,17 @@ jobs:
           for PLUGIN in about gpkg print; do
             lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
           done
-    
+
       - name: 🌋 Build
         run: |
-          tree build/vcpkg_installed/x64-windows
+          find build -name 'ffmpeg.exe'
+          find build -name 'ffprobe.exe'
+
+      - uses: mxschmitt/action-tmate@v3
+        if: always()
+          
+      - name: 🌋 Build
+        run: |
           cmake --build build --config Release
 
       # A preliminary smoke test to determine basic functional python
