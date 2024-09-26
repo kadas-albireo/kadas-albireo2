@@ -10,7 +10,7 @@ idna==3.7
 kerberos_proxy_auth==0.0.2
 pycparser==2.22
 pyspnego==0.10.2
-python_certifi_win32==1.6.1
+pip-system-certs==4.0
 requests==2.32.3
 requests_kerberos==0.14.0
 sspilib==0.1.0
