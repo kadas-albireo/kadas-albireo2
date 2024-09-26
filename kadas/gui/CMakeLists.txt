@@ -39,6 +39,7 @@ pkg_search_module(SVG2SVGT IMPORTED_TARGET svg2svgt REQUIRED)
 
 find_package(Qwt REQUIRED)
 find_package(GeographicLib REQUIRED)
+find_package(exiv2 REQUIRED)
 
 TARGET_LINK_LIBRARIES(kadas_gui
   Qt5::Widgets
