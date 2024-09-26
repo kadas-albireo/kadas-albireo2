@@ -91,6 +91,7 @@ jobs:
     
       - name: 🌋 Build
         run: |
+          tree build/vcpkg_installed/x64-windows
           cmake --build build --config Release
 
       # A preliminary smoke test to determine basic functional python
