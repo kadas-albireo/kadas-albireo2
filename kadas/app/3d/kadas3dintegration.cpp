@@ -52,6 +52,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
       }
       else
       {
+        // happens e.g. when the project extent is unknown. Keep the button unchecked.
         mAction3D->setChecked( false );
       }
     }
@@ -65,7 +66,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
 Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString &name )
 {
   // initialize from project
-  QgsRectangle fullExtent = mMapCanvas->projectExtent();
+  const QgsRectangle fullExtent = mMapCanvas->projectExtent();
 
   // some layers may go crazy and make full extent unusable
   // we can't go any further - invalid extent would break everything
@@ -78,79 +79,60 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   Kadas3DMapCanvasWidget *canvasWidget = new Kadas3DMapCanvasWidget( name, true );
   canvasWidget->setMainCanvas( mMapCanvas );
 
-  if ( canvasWidget )
+  QgsProject *prj = QgsProject::instance();
+  QgsSettings settings;
+
+  Qgs3DMapSettings *map = new Qgs3DMapSettings;
+  if ( !prj->crs().isGeographic() )
   {
-    QgsProject *prj = QgsProject::instance();
-    QgsSettings settings;
-
-    Qgs3DMapSettings *map = new Qgs3DMapSettings;
-    if ( !prj->crs().isGeographic() )
-    {
-      map->setCrs( prj->crs() );
-    }
-    else
-    {
-      map->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
-    }
-
-    const QgsReferencedRectangle projectExtent = prj->viewSettings()->fullExtent();
-    const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), map->crs(), prj->transformContext() );
-    map->setOrigin( QgsVector3D( fullExtent.center().x(), fullExtent.center().y(), 0 ) );
-    map->setSelectionColor( mMapCanvas->selectionColor() );
-    map->setBackgroundColor( mMapCanvas->canvasColor() );
-    map->setLayers( mMapCanvas->layers( true ) );
-    map->setTemporalRange( mMapCanvas->temporalRange() );
-
-    const Qgis::NavigationMode defaultNavMode = settings.enumValue( QStringLiteral( "map3d/defaultNavigation" ), Qgis::NavigationMode::TerrainBased, QgsSettings::App );
-    map->setCameraNavigationMode( defaultNavMode );
-
-    map->setCameraMovementSpeed( settings.value( QStringLiteral( "map3d/defaultMovementSpeed" ), 5, QgsSettings::App ).toDouble() );
-    const Qt3DRender::QCameraLens::ProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qt3DRender::QCameraLens::PerspectiveProjection, QgsSettings::App );
-    map->setProjectionType( defaultProjection );
-    map->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
-
-    map->setTransformContext( QgsProject::instance()->transformContext() );
-    map->setPathResolver( QgsProject::instance()->pathResolver() );
-    map->setMapThemeCollection( QgsProject::instance()->mapThemeCollection() );
-
-    map->configureTerrainFromProject( QgsProject::instance()->elevationProperties(), fullExtent );
-
-    // new scenes default to a single directional light
-    map->setLightSources( QList<QgsLightSource *>() << new QgsDirectionalLightSettings() );
-    map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
-    map->setRendererUsage( Qgis::RendererUsage::View );
-
-    connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map]
-    {
-      map->setTransformContext( QgsProject::instance()->transformContext() );
-    } );
-
-    canvasWidget->setMapSettings( map );
-
-    const QgsRectangle canvasExtent = Qgs3DUtils::tryReprojectExtent2D( mMapCanvas->extent(), mMapCanvas->mapSettings().destinationCrs(), map->crs(), prj->transformContext() );
-    float dist = static_cast<float>( std::max( canvasExtent.width(), canvasExtent.height() ) );
-    canvasWidget->mapCanvas3D()->setViewFromTop( canvasExtent.center(), dist, static_cast<float>( mMapCanvas->rotation() ) );
-
-    const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
-    if ( canvasWidget->mapCanvas3D()->cameraController() )
-      canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
-
-    QDomImplementation DomImplementation;
-    QDomDocumentType documentType =
-      DomImplementation.createDocumentType(
-        QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" ) );
-    QDomDocument doc( documentType );
-
-    /*
-    QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
-    elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
-
-    write3DMapViewSettings(canvasWidget, doc, elem3DMap);
-
-    QgsProject::instance()->viewsManager()->register3DViewSettings(uniqueName, elem3DMap);
-    QgsProject::instance()->viewsManager()->set3DViewInitiallyVisible(uniqueName, true);
-    */
-
-    return canvasWidget;
+    map->setCrs( prj->crs() );
   }
+  else
+  {
+    map->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+  }
+
+  const QgsReferencedRectangle projectExtent = prj->viewSettings()->fullExtent();
+  const QgsRectangle fullExtent3d = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), map->crs(), prj->transformContext() );
+  map->setOrigin( QgsVector3D( fullExtent3d.center().x(), fullExtent3d.center().y(), 0 ) );
+  map->setSelectionColor( mMapCanvas->selectionColor() );
+  map->setBackgroundColor( mMapCanvas->canvasColor() );
+  map->setLayers( mMapCanvas->layers( true ) );
+  map->setTemporalRange( mMapCanvas->temporalRange() );
+
+  const Qgis::NavigationMode defaultNavMode = settings.enumValue( QStringLiteral( "map3d/defaultNavigation" ), Qgis::NavigationMode::TerrainBased, QgsSettings::App );
+  map->setCameraNavigationMode( defaultNavMode );
+
+  map->setCameraMovementSpeed( settings.value( QStringLiteral( "map3d/defaultMovementSpeed" ), 5, QgsSettings::App ).toDouble() );
+  const Qt3DRender::QCameraLens::ProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qt3DRender::QCameraLens::PerspectiveProjection, QgsSettings::App );
+  map->setProjectionType( defaultProjection );
+  map->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
+
+  map->setTransformContext( QgsProject::instance()->transformContext() );
+  map->setPathResolver( QgsProject::instance()->pathResolver() );
+  map->setMapThemeCollection( QgsProject::instance()->mapThemeCollection() );
+
+  map->configureTerrainFromProject( QgsProject::instance()->elevationProperties(), fullExtent3d );
+
+  // new scenes default to a single directional light
+  map->setLightSources( QList<QgsLightSource *>() << new QgsDirectionalLightSettings() );
+  map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
+  map->setRendererUsage( Qgis::RendererUsage::View );
+
+  connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map]
+  {
+    map->setTransformContext( QgsProject::instance()->transformContext() );
+  } );
+
+  canvasWidget->setMapSettings( map );
+
+  const QgsRectangle canvasExtent = Qgs3DUtils::tryReprojectExtent2D( mMapCanvas->extent(), mMapCanvas->mapSettings().destinationCrs(), map->crs(), prj->transformContext() );
+  float dist = static_cast<float>( std::max( canvasExtent.width(), canvasExtent.height() ) );
+  canvasWidget->mapCanvas3D()->setViewFromTop( canvasExtent.center(), dist, static_cast<float>( mMapCanvas->rotation() ) );
+
+  const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
+  if ( canvasWidget->mapCanvas3D()->cameraController() )
+    canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
+
+  return canvasWidget;
 }

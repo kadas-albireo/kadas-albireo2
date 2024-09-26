@@ -324,13 +324,6 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   }
   QAction *dockAction = mDockableWidgetHelper->createDockUndockAction( tr( "Dock 3D Map View" ), this );
   toolBar->addAction( dockAction );
-
-#if 0 // TODO !!!
-  connect( mDockableWidgetHelper, &QgsDockableWidgetHelper::closed, this, [ = ]()
-  {
-    QgisApp::instance()->close3DMapView( canvasName() );
-  } );
-#endif
 }
 
 void Kadas3DMapCanvasWidget::saveAsImage()
