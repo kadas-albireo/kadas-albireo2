@@ -62,7 +62,14 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect"
+    "zonedetect",
+    {
+      "name": "ffmpeg",
+      "features": [
+        "ffmpeg",
+        "ffprobe"
+      ]
+    }
   ],
   "features": {
     "bindings": {
