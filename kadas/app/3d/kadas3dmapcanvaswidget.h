@@ -18,6 +18,7 @@
 
 #include "qmenu.h"
 #include "qgsdockwidget.h"
+#include "qgsdockablewidgethelper.h"
 
 #include "qobjectuniqueptr.h"
 #include "qtoolbutton.h"
@@ -109,7 +110,7 @@ class Kadas3DMapCanvasWidget : public QWidget
     QTimer *mLabelNavSpeedHideTimeout = nullptr;
     // Qgs3DMapToolIdentify *mMapToolIdentify = nullptr;
     // Qgs3DMapToolMeasureLine *mMapToolMeasureLine = nullptr;
-    std::unique_ptr<QgsMapToolExtent> mMapToolExtent;
+    // std::unique_ptr<QgsMapToolExtent> mMapToolExtent;
     QgsMapTool *mMapToolPrevious = nullptr;
     QMenu *mExportMenu = nullptr;
     QMenu *mMapThemeMenu = nullptr;

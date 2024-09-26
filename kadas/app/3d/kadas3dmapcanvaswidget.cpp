@@ -53,7 +53,6 @@
 //#include "qgsmap3dexportwidget.h"
 //#include "qgs3dmapexportsettings.h"
 
-#include "qgsdockablewidgethelper.h"
 #include "qgsrubberband.h"
 
 #include <QWidget>
@@ -450,9 +449,11 @@ void Kadas3DMapCanvasWidget::setMainCanvas( QgsMapCanvas *canvas )
 {
   mMainCanvas = canvas;
 
+#if 0
   mMapToolExtent = std::make_unique< QgsMapToolExtent >( canvas );
   mMapToolExtent->setAction( mActionSetSceneExtent );
   connect( mMapToolExtent.get(), &QgsMapToolExtent::extentChanged, this, &Kadas3DMapCanvasWidget::setSceneExtent );
+#endif
 
   connect( mMainCanvas, &QgsMapCanvas::layersChanged, this, &Kadas3DMapCanvasWidget::onMainCanvasLayersChanged );
   connect( mMainCanvas, &QgsMapCanvas::canvasColorChanged, this, &Kadas3DMapCanvasWidget::onMainCanvasColorChanged );
