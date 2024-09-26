@@ -1,0 +1,1083 @@
+From 0118590a6c90fa40051940b1133530f0b8df7480 Mon Sep 17 00:00:00 2001
+From: Matthias Kuhn <matthias@opengis.ch>
+Date: Thu, 26 Sep 2024 13:16:38 +0200
+Subject: [PATCH] Install 3D headers
+
+---
+ src/3d/CMakeLists.txt                         | 27 +++++-----
+ ...unkedentity_p.cpp => qgschunkedentity.cpp} |  8 +--
+ ...gschunkedentity_p.h => qgschunkedentity.h} | 12 ++---
+ src/3d/chunks/qgschunklist_p.cpp              |  2 +-
+ ...gschunkloader_p.cpp => qgschunkloader.cpp} |  6 +--
+ .../{qgschunkloader_p.h => qgschunkloader.h}  | 10 ++--
+ .../{qgschunknode_p.cpp => qgschunknode.cpp}  |  8 +--
+ .../{qgschunknode_p.h => qgschunknode.h}      |  6 +--
+ ...unkqueuejob_p.cpp => qgschunkqueuejob.cpp} |  4 +-
+ ...gschunkqueuejob_p.h => qgschunkqueuejob.h} |  8 +--
+ src/3d/mesh/qgsmeshterraingenerator.cpp       |  3 +-
+ src/3d/mesh/qgsmeshterraingenerator.h         | 24 ---------
+ src/3d/mesh/qgsmeshterraintileloader_p.h      | 50 +++++++++++++++++++
+ src/3d/qgs3daxis.cpp                          |  2 +-
+ src/3d/qgs3dmapscene.cpp                      |  6 +--
+ ...psceneentity_p.h => qgs3dmapsceneentity.h} |  8 +--
+ src/3d/qgs3dsceneexporter.cpp                 |  5 +-
+ src/3d/qgs3dutils.cpp                         |  4 +-
+ src/3d/qgscameracontroller.cpp                |  2 +-
+ src/3d/qgspointcloudlayerchunkloader_p.cpp    |  2 +-
+ src/3d/qgspointcloudlayerchunkloader_p.h      |  4 +-
+ src/3d/qgsrulebasedchunkloader_p.cpp          |  2 +-
+ src/3d/qgsrulebasedchunkloader_p.h            |  4 +-
+ src/3d/qgstiledscenechunkloader_p.h           |  6 +--
+ src/3d/qgstilingscheme.cpp                    |  2 +-
+ src/3d/qgsvectorlayerchunkloader_p.cpp        |  2 +-
+ src/3d/qgsvectorlayerchunkloader_p.h          |  4 +-
+ src/3d/qgsvirtualpointcloudentity_p.h         |  4 +-
+ src/3d/terrain/qgsdemterraintileloader_p.cpp  |  4 +-
+ src/3d/terrain/qgsdemterraintileloader_p.h    |  4 +-
+ src/3d/terrain/qgsflatterraingenerator.cpp    |  4 +-
+ src/3d/terrain/qgsflatterraingenerator.h      |  2 +-
+ .../qgsquantizedmeshterraingenerator.cpp      |  8 +--
+ .../qgsquantizedmeshterraingenerator.h        |  4 +-
+ ...rrainentity_p.cpp => qgsterrainentity.cpp} |  6 +--
+ ...gsterrainentity_p.h => qgsterrainentity.h} | 12 ++---
+ src/3d/terrain/qgsterraingenerator.h          |  2 +-
+ src/3d/terrain/qgsterraintexturegenerator_p.h |  2 +-
+ src/3d/terrain/qgsterraintileentity_p.h       |  2 +-
+ ...eloader_p.cpp => qgsterraintileloader.cpp} |  8 +--
+ ...ntileloader_p.h => qgsterraintileloader.h} | 12 ++---
+ 41 files changed, 161 insertions(+), 134 deletions(-)
+ rename src/3d/chunks/{qgschunkedentity_p.cpp => qgschunkedentity.cpp} (99%)
+ rename src/3d/chunks/{qgschunkedentity_p.h => qgschunkedentity.h} (97%)
+ rename src/3d/chunks/{qgschunkloader_p.cpp => qgschunkloader.cpp} (97%)
+ rename src/3d/chunks/{qgschunkloader_p.h => qgschunkloader.h} (97%)
+ rename src/3d/chunks/{qgschunknode_p.cpp => qgschunknode.cpp} (98%)
+ rename src/3d/chunks/{qgschunknode_p.h => qgschunknode.h} (99%)
+ rename src/3d/chunks/{qgschunkqueuejob_p.cpp => qgschunkqueuejob.cpp} (94%)
+ rename src/3d/chunks/{qgschunkqueuejob_p.h => qgschunkqueuejob.h} (96%)
+ create mode 100644 src/3d/mesh/qgsmeshterraintileloader_p.h
+ rename src/3d/{qgs3dmapsceneentity_p.h => qgs3dmapsceneentity.h} (97%)
+ rename src/3d/terrain/{qgsterrainentity_p.cpp => qgsterrainentity.cpp} (98%)
+ rename src/3d/terrain/{qgsterrainentity_p.h => qgsterrainentity.h} (95%)
+ rename src/3d/terrain/{qgsterraintileloader_p.cpp => qgsterraintileloader.cpp} (97%)
+ rename src/3d/terrain/{qgsterraintileloader_p.h => qgsterraintileloader.h} (93%)
+
+diff --git a/src/3d/CMakeLists.txt b/src/3d/CMakeLists.txt
+index c958b6654c6..367e7fae8b4 100644
+--- a/src/3d/CMakeLists.txt
++++ b/src/3d/CMakeLists.txt
+@@ -56,11 +56,11 @@ set(QGIS_3D_SRCS
+   qgsvirtualpointcloudentity_p.cpp
+ 
+   chunks/qgschunkboundsentity_p.cpp
+-  chunks/qgschunkedentity_p.cpp
++  chunks/qgschunkedentity.cpp
+   chunks/qgschunklist_p.cpp
+-  chunks/qgschunkloader_p.cpp
+-  chunks/qgschunknode_p.cpp
+-  chunks/qgschunkqueuejob_p.cpp
++  chunks/qgschunkloader.cpp
++  chunks/qgschunknode.cpp
++  chunks/qgschunkqueuejob.cpp
+ 
+   lights/qgsdirectionallightsettings.cpp
+   lights/qgslightsource.cpp
+@@ -102,11 +102,11 @@ set(QGIS_3D_SRCS
+   terrain/qgsonlineterraingenerator.cpp
+   terrain/qgsquantizedmeshterraingenerator.cpp
+   terrain/qgsterraindownloader.cpp
+-  terrain/qgsterrainentity_p.cpp
++  terrain/qgsterrainentity.cpp
+   terrain/qgsterraingenerator.cpp
+   terrain/qgsterraintexturegenerator_p.cpp
+   terrain/qgsterraintextureimage_p.cpp
+-  terrain/qgsterraintileloader_p.cpp
++  terrain/qgsterraintileloader.cpp
+ 
+   mesh/qgsmesh3dgeometry_p.cpp
+   mesh/qgsmesh3dentity_p.cpp
+@@ -124,6 +124,7 @@ set(QGIS_3D_HDRS
+   qgs3dmapsettings.h
+   qgs3dmaptool.h
+   qgs3drendercontext.h
++  qgs3dmapsceneentity.h
+   qgs3dsceneexporter.h
+   qgs3dtypes.h
+   qgs3dutils.h
+@@ -189,10 +190,13 @@ set(QGIS_3D_HDRS
+   terrain/qgsquantizedmeshterraingenerator.h
+   terrain/qgsterraindownloader.h
+   terrain/qgsterraingenerator.h
+-  terrain/qgsterraintileloader_p.h
++  terrain/qgsterraintileloader.h
++  terrain/qgsterrainentity.h
+ 
+-  chunks/qgschunkloader_p.h
+-  chunks/qgschunkqueuejob_p.h
++  chunks/qgschunkloader.h
++  chunks/qgschunkqueuejob.h
++  chunks/qgschunknode.h
++  chunks/qgschunkedentity.h
+ 
+   mesh/qgsmeshterraingenerator.h
+ )
+@@ -202,11 +206,8 @@ set(QGIS_3D_PRIVATE_HDRS
+   qgsvectorlayerchunkloader_p.h
+   qgspointcloudlayerchunkloader_p.h
+   qgsvirtualpointcloudentity_p.h
+-  qgs3dmapsceneentity_p.h
+   chunks/qgschunkboundsentity_p.h
+-  chunks/qgschunkedentity_p.h
+   chunks/qgschunklist_p.h
+-  chunks/qgschunknode_p.h
+   symbols/qgsline3dsymbol_p.h
+   symbols/qgslinematerial_p.h
+   symbols/qgslinevertexdata_p.h
+@@ -215,13 +216,13 @@ set(QGIS_3D_PRIVATE_HDRS
+   symbols/qgspointcloud3dsymbol_p.h
+   terrain/qgsdemterraintilegeometry_p.h
+   terrain/qgsdemterraintileloader_p.h
+-  terrain/qgsterrainentity_p.h
+   terrain/qgsterraintexturegenerator_p.h
+   terrain/qgsterraintextureimage_p.h
+   terrain/qgsterraintileentity_p.h
+   mesh/qgsmesh3dentity_p.h
+   mesh/qgsmesh3dgeometry_p.h
+   mesh/qgsmesh3dmaterial_p.h
++  mesh/qgsmeshterraintileloader_p.h
+   qgscolorramptexture.h
+ )
+ 
+diff --git a/src/3d/chunks/qgschunkedentity_p.cpp b/src/3d/chunks/qgschunkedentity.cpp
+similarity index 99%
+rename from src/3d/chunks/qgschunkedentity_p.cpp
+rename to src/3d/chunks/qgschunkedentity.cpp
+index fe78f64cd4b..13d726823f2 100644
+--- a/src/3d/chunks/qgschunkedentity_p.cpp
++++ b/src/3d/chunks/qgschunkedentity.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkedentity_p.cpp
++  qgschunkedentity.cpp
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,7 +13,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgschunkedentity_p.h"
++#include "qgschunkedentity.h"
+ 
+ #include <QElapsedTimer>
+ #include <QVector4D>
+@@ -21,8 +21,8 @@
+ #include "qgs3dutils.h"
+ #include "qgschunkboundsentity_p.h"
+ #include "qgschunklist_p.h"
+-#include "qgschunkloader_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunkloader.h"
++#include "qgschunknode.h"
+ 
+ #include "qgseventtracing.h"
+ 
+diff --git a/src/3d/chunks/qgschunkedentity_p.h b/src/3d/chunks/qgschunkedentity.h
+similarity index 97%
+rename from src/3d/chunks/qgschunkedentity_p.h
+rename to src/3d/chunks/qgschunkedentity.h
+index f7bbc5f23cd..4f277428c60 100644
+--- a/src/3d/chunks/qgschunkedentity_p.h
++++ b/src/3d/chunks/qgschunkedentity.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkedentity_p.h
++  qgschunkedentity.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSCHUNKEDENTITY_P_H
+-#define QGSCHUNKEDENTITY_P_H
++#ifndef QGSCHUNKEDENTITY_H
++#define QGSCHUNKEDENTITY_H
+ 
+ ///@cond PRIVATE
+ 
+@@ -27,7 +27,7 @@
+ // version without notice, or even be removed.
+ //
+ 
+-#include "qgs3dmapsceneentity_p.h"
++#include "qgs3dmapsceneentity.h"
+ #include <numeric>
+ 
+ #define SIP_NO_FILE
+@@ -52,7 +52,7 @@ namespace QgsRayCastingUtils
+ 
+ #include <QTime>
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ 
+ 
+ /**
+@@ -171,4 +171,4 @@ class QgsChunkedEntity : public Qgs3DMapSceneEntity
+ 
+ /// @endcond
+ 
+-#endif // QGSCHUNKEDENTITY_P_H
++#endif // QGSCHUNKEDENTITY_H
+diff --git a/src/3d/chunks/qgschunklist_p.cpp b/src/3d/chunks/qgschunklist_p.cpp
+index 382cec33011..95ae834fc10 100644
+--- a/src/3d/chunks/qgschunklist_p.cpp
++++ b/src/3d/chunks/qgschunklist_p.cpp
+@@ -15,7 +15,7 @@
+ 
+ #include "qgschunklist_p.h"
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ 
+ ///@cond PRIVATE
+ 
+diff --git a/src/3d/chunks/qgschunkloader_p.cpp b/src/3d/chunks/qgschunkloader.cpp
+similarity index 97%
+rename from src/3d/chunks/qgschunkloader_p.cpp
+rename to src/3d/chunks/qgschunkloader.cpp
+index a9c7c15eb5f..59ce928df7d 100644
+--- a/src/3d/chunks/qgschunkloader_p.cpp
++++ b/src/3d/chunks/qgschunkloader.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkloader_p.cpp
++  qgschunkloader.cpp
+   --------------------------------------
+   Date                 : October 2020
+   Copyright            : (C) 2020 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgschunkloader_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunkloader.h"
++#include "qgschunknode.h"
+ 
+ #include <QVector>
+ ///@cond PRIVATE
+diff --git a/src/3d/chunks/qgschunkloader_p.h b/src/3d/chunks/qgschunkloader.h
+similarity index 97%
+rename from src/3d/chunks/qgschunkloader_p.h
+rename to src/3d/chunks/qgschunkloader.h
+index 02692501739..d726f5c2a5d 100644
+--- a/src/3d/chunks/qgschunkloader_p.h
++++ b/src/3d/chunks/qgschunkloader.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkloader_p.h
++  qgschunkloader.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSCHUNKLOADER_P_H
+-#define QGSCHUNKLOADER_P_H
++#ifndef QGSCHUNKLOADER_H
++#define QGSCHUNKLOADER_H
+ 
+ ///@cond PRIVATE
+ 
+@@ -27,7 +27,7 @@
+ // version without notice, or even be removed.
+ //
+ 
+-#include "qgschunkqueuejob_p.h"
++#include "qgschunkqueuejob.h"
+ 
+ #define SIP_NO_FILE
+ 
+@@ -142,4 +142,4 @@ class _3D_EXPORT QgsQuadtreeChunkLoaderFactory : public QgsChunkLoaderFactory
+ 
+ /// @endcond
+ 
+-#endif // QGSCHUNKLOADER_P_H
++#endif // QGSCHUNKLOADER_H
+diff --git a/src/3d/chunks/qgschunknode_p.cpp b/src/3d/chunks/qgschunknode.cpp
+similarity index 98%
+rename from src/3d/chunks/qgschunknode_p.cpp
+rename to src/3d/chunks/qgschunknode.cpp
+index 4b92a8a5f34..54b53c406b9 100644
+--- a/src/3d/chunks/qgschunknode_p.cpp
++++ b/src/3d/chunks/qgschunknode.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunknode_p.cpp
++  qgschunknode.cpp
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,11 +13,11 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ 
+-#include "qgschunkedentity_p.h"  // for ChunkLoader destructor
++#include "qgschunkedentity.h"  // for ChunkLoader destructor
+ #include "qgschunklist_p.h"
+-#include "qgschunkloader_p.h"
++#include "qgschunkloader.h"
+ #include <Qt3DCore/QEntity>
+ 
+ ///@cond PRIVATE
+diff --git a/src/3d/chunks/qgschunknode_p.h b/src/3d/chunks/qgschunknode.h
+similarity index 99%
+rename from src/3d/chunks/qgschunknode_p.h
+rename to src/3d/chunks/qgschunknode.h
+index d8f63aaffc6..a32aa3372e5 100644
+--- a/src/3d/chunks/qgschunknode_p.h
++++ b/src/3d/chunks/qgschunknode.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunknode_p.h
++  qgschunknode.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSCHUNKNODE_P_H
+-#define QGSCHUNKNODE_P_H
++#ifndef QGSCHUNKNODE_H
++#define QGSCHUNKNODE_H
+ 
+ ///@cond PRIVATE
+ 
+diff --git a/src/3d/chunks/qgschunkqueuejob_p.cpp b/src/3d/chunks/qgschunkqueuejob.cpp
+similarity index 94%
+rename from src/3d/chunks/qgschunkqueuejob_p.cpp
+rename to src/3d/chunks/qgschunkqueuejob.cpp
+index a44d53fac0b..ddc3d016d1a 100644
+--- a/src/3d/chunks/qgschunkqueuejob_p.cpp
++++ b/src/3d/chunks/qgschunkqueuejob.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkqueuejob_p.cpp
++  qgschunkqueuejob.cpp
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,7 +13,7 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgschunkqueuejob_p.h"
++#include "qgschunkqueuejob.h"
+ 
+ ///@cond PRIVATE
+ 
+diff --git a/src/3d/chunks/qgschunkqueuejob_p.h b/src/3d/chunks/qgschunkqueuejob.h
+similarity index 96%
+rename from src/3d/chunks/qgschunkqueuejob_p.h
+rename to src/3d/chunks/qgschunkqueuejob.h
+index 21c6c24cd80..f86af4d1faf 100644
+--- a/src/3d/chunks/qgschunkqueuejob_p.h
++++ b/src/3d/chunks/qgschunkqueuejob.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgschunkqueuejob_p.h
++  qgschunkqueuejob.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSCHUNKQUEUEJOB_P_H
+-#define QGSCHUNKQUEUEJOB_P_H
++#ifndef QGSCHUNKQUEUEJOB_H
++#define QGSCHUNKQUEUEJOB_H
+ 
+ ///@cond PRIVATE
+ 
+@@ -101,4 +101,4 @@ class QgsChunkQueueJobFactory
+ 
+ /// @endcond
+ 
+-#endif // QGSCHUNKQUEUEJOB_P_H
++#endif // QGSCHUNKQUEUEJOB_H
+diff --git a/src/3d/mesh/qgsmeshterraingenerator.cpp b/src/3d/mesh/qgsmeshterraingenerator.cpp
+index 96afbe0c94a..1f512228f15 100644
+--- a/src/3d/mesh/qgsmeshterraingenerator.cpp
++++ b/src/3d/mesh/qgsmeshterraingenerator.cpp
+@@ -16,13 +16,14 @@
+  ***************************************************************************/
+ 
+ #include "qgsmeshterraingenerator.h"
++#include "qgsmeshterraintileloader_p.h"
+ 
+ #include <Qt3DRender/QMaterial>
+ 
+ #include "qgsmesh3dentity_p.h"
+ #include "qgsmeshlayer.h"
+ #include "qgsmeshlayer3drenderer.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgsmeshlayerutils.h"
+ #include "qgs3dmapsettings.h"
+ #include "qgs3drendercontext.h"
+diff --git a/src/3d/mesh/qgsmeshterraingenerator.h b/src/3d/mesh/qgsmeshterraingenerator.h
+index 652a9d30ec4..b26b5d4d787 100644
+--- a/src/3d/mesh/qgsmeshterraingenerator.h
++++ b/src/3d/mesh/qgsmeshterraingenerator.h
+@@ -23,33 +23,9 @@
+ #include "qgsmeshlayer.h"
+ #include "qgstriangularmesh.h"
+ #include "qgsterraingenerator.h"
+-#include "qgsterraintileloader_p.h"
+ 
+ #define SIP_NO_FILE
+ 
+-///@cond PRIVATE
+-
+-//! Chunk loader for mesh terrain implementation
+-class QgsMeshTerrainTileLoader: public QgsTerrainTileLoader
+-{
+-    Q_OBJECT
+-  public:
+-    //! Construct the loader for a node
+-    QgsMeshTerrainTileLoader( QgsTerrainEntity *terrain,
+-                              QgsChunkNode *node,
+-                              const QgsTriangularMesh &triangularMesh,
+-                              const QgsMesh3DSymbol *symbol );
+-
+-    //! Create the 3D entity and returns it
+-    Qt3DCore::QEntity *createEntity( Qt3DCore::QEntity *parent ) override;
+-
+-  private:
+-    QgsTriangularMesh mTriangularMesh;
+-    std::unique_ptr< QgsMesh3DSymbol > mSymbol;
+-};
+-
+-///@endcond
+-
+ /**
+  * \ingroup 3d
+  * \brief Implementation of terrain generator that uses the Z values of a mesh layer to build a terrain
+diff --git a/src/3d/mesh/qgsmeshterraintileloader_p.h b/src/3d/mesh/qgsmeshterraintileloader_p.h
+new file mode 100644
+index 00000000000..4bea9525ab4
+--- /dev/null
++++ b/src/3d/mesh/qgsmeshterraintileloader_p.h
+@@ -0,0 +1,50 @@
++/***************************************************************************
++                         qgsmeshterraintileloader_p.h
++                         -------------------------
++    begin                : September 2024
++    copyright            : (C) 2024 by Matthias Kuhn
++    email                : matthias@opengis.ch
++ ***************************************************************************/
++
++/***************************************************************************
++ *                                                                         *
++ *   This program is free software; you can redistribute it and/or modify  *
++ *   it under the terms of the GNU General Public License as published by  *
++ *   the Free Software Foundation; either version 2 of the License, or     *
++ *   (at your option) any later version.                                   *
++ *                                                                         *
++ ***************************************************************************/
++
++#ifndef QGSMESHTERRAINTILELOADER_H
++#define QGSMESHTERRAINTILELOADER_H
++
++#include "qgsmesh3dsymbol.h"
++#include "qgstriangularmesh.h"
++#include "qgsterraintileloader.h"
++
++#define SIP_NO_FILE
++
++///@cond PRIVATE
++
++//! Chunk loader for mesh terrain implementation
++class QgsMeshTerrainTileLoader: public QgsTerrainTileLoader
++{
++    Q_OBJECT
++  public:
++    //! Construct the loader for a node
++    QgsMeshTerrainTileLoader( QgsTerrainEntity *terrain,
++                              QgsChunkNode *node,
++                              const QgsTriangularMesh &triangularMesh,
++                              const QgsMesh3DSymbol *symbol );
++
++    //! Create the 3D entity and returns it
++    Qt3DCore::QEntity *createEntity( Qt3DCore::QEntity *parent ) override;
++
++  private:
++    QgsTriangularMesh mTriangularMesh;
++    std::unique_ptr< QgsMesh3DSymbol > mSymbol;
++};
++
++///@endcond
++
++#endif
+diff --git a/src/3d/qgs3daxis.cpp b/src/3d/qgs3daxis.cpp
+index 6a2e6d1b473..dd20209ab2e 100644
+--- a/src/3d/qgs3daxis.cpp
++++ b/src/3d/qgs3daxis.cpp
+@@ -36,7 +36,7 @@
+ 
+ #include "qgsmapsettings.h"
+ #include "qgs3dmapscene.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgscoordinatereferencesystemutils.h"
+ #include "qgscoordinatereferencesystem.h"
+ #include "qgswindow3dengine.h"
+diff --git a/src/3d/qgs3dmapscene.cpp b/src/3d/qgs3dmapscene.cpp
+index 2452aa8de86..daa5eed906c 100644
+--- a/src/3d/qgs3dmapscene.cpp
++++ b/src/3d/qgs3dmapscene.cpp
+@@ -48,8 +48,8 @@
+ #include "qgs3dutils.h"
+ #include "qgsabstract3drenderer.h"
+ #include "qgscameracontroller.h"
+-#include "qgschunkedentity_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunkedentity.h"
++#include "qgschunknode.h"
+ #include "qgseventtracing.h"
+ #include "qgsmeshlayer.h"
+ #include "qgsmeshlayer3drenderer.h"
+@@ -58,7 +58,7 @@
+ #include "qgspointcloudlayer.h"
+ #include "qgspointcloudlayer3drenderer.h"
+ #include "qgssourcecache.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgsterraingenerator.h"
+ #include "qgstiledscenelayer.h"
+ #include "qgstiledscenelayer3drenderer.h"
+diff --git a/src/3d/qgs3dmapsceneentity_p.h b/src/3d/qgs3dmapsceneentity.h
+similarity index 97%
+rename from src/3d/qgs3dmapsceneentity_p.h
+rename to src/3d/qgs3dmapsceneentity.h
+index ffadb37c2e4..0a3151eb944 100644
+--- a/src/3d/qgs3dmapsceneentity_p.h
++++ b/src/3d/qgs3dmapsceneentity.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgs3dmapsceneentity_p.h
++  qgs3dmapsceneentity.h
+   --------------------------------------
+   Date                 : May 2023
+   Copyright            : (C) 2023 by Stefanos Natsis
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGS3DMAPSCENEENTITY_P_H
+-#define QGS3DMAPSCENEENTITY_P_H
++#ifndef QGS3DMAPSCENEENTITY_H
++#define QGS3DMAPSCENEENTITY_H
+ 
+ ///@cond PRIVATE
+ 
+@@ -116,4 +116,4 @@ class Qgs3DMapSceneEntity : public Qt3DCore::QEntity
+ 
+ /// @endcond
+ 
+-#endif // QGS3DMAPSCENEENTITY_P_H
++#endif // QGS3DMAPSCENEENTITY_H
+diff --git a/src/3d/qgs3dsceneexporter.cpp b/src/3d/qgs3dsceneexporter.cpp
+index bf80f1a9c9e..bcd7882962a 100644
+--- a/src/3d/qgs3dsceneexporter.cpp
++++ b/src/3d/qgs3dsceneexporter.cpp
+@@ -64,8 +64,8 @@ typedef Qt3DCore::QGeometry Qt3DQGeometry;
+ 
+ #include "qgsbillboardgeometry.h"
+ #include "qgsterraintileentity_p.h"
+-#include "qgsterrainentity_p.h"
+-#include "qgschunknode_p.h"
++#include "qgsterrainentity.h"
++#include "qgschunknode.h"
+ #include "qgsterraingenerator.h"
+ #include "qgs3dmapsettings.h"
+ #include "qgsflatterraingenerator.h"
+@@ -76,6 +76,7 @@ typedef Qt3DCore::QGeometry Qt3DQGeometry;
+ #include "qgsterraintextureimage_p.h"
+ #include "qgsterraintexturegenerator_p.h"
+ #include "qgsmeshterraingenerator.h"
++#include "qgsmeshterraintileloader_p.h"
+ #include "qgsvectorlayer.h"
+ #include "qgsabstract3drenderer.h"
+ #include "qgsvectorlayer3drenderer.h"
+diff --git a/src/3d/qgs3dutils.cpp b/src/3d/qgs3dutils.cpp
+index 7e8122ce005..e116ec18b62 100644
+--- a/src/3d/qgs3dutils.cpp
++++ b/src/3d/qgs3dutils.cpp
+@@ -29,8 +29,8 @@
+ #include "qgsabstract3dengine.h"
+ #include "qgsterraingenerator.h"
+ #include "qgscameracontroller.h"
+-#include "qgschunkedentity_p.h"
+-#include "qgsterrainentity_p.h"
++#include "qgschunkedentity.h"
++#include "qgsterrainentity.h"
+ #include "qgsraycastingutils_p.h"
+ #include "qgspointcloudrenderer.h"
+ #include "qgspointcloud3dsymbol.h"
+diff --git a/src/3d/qgscameracontroller.cpp b/src/3d/qgscameracontroller.cpp
+index cfb70930414..6729fd79e7c 100644
+--- a/src/3d/qgscameracontroller.cpp
++++ b/src/3d/qgscameracontroller.cpp
+@@ -17,7 +17,7 @@
+ #include "qgsvector3d.h"
+ #include "qgswindow3dengine.h"
+ #include "qgs3dmapscene.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgis.h"
+ #include "qgs3dutils.h"
+ 
+diff --git a/src/3d/qgspointcloudlayerchunkloader_p.cpp b/src/3d/qgspointcloudlayerchunkloader_p.cpp
+index 10de64dd3bd..d6678a27612 100644
+--- a/src/3d/qgspointcloudlayerchunkloader_p.cpp
++++ b/src/3d/qgspointcloudlayerchunkloader_p.cpp
+@@ -17,7 +17,7 @@
+ 
+ #include "qgs3dutils.h"
+ #include "qgspointcloudlayer3drenderer.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgslogger.h"
+ #include "qgspointcloudindex.h"
+ #include "qgspointcloudrequest.h"
+diff --git a/src/3d/qgspointcloudlayerchunkloader_p.h b/src/3d/qgspointcloudlayerchunkloader_p.h
+index 8a7ef6222f3..8df770eb142 100644
+--- a/src/3d/qgspointcloudlayerchunkloader_p.h
++++ b/src/3d/qgspointcloudlayerchunkloader_p.h
+@@ -27,8 +27,8 @@
+ // version without notice, or even be removed.
+ //
+ 
+-#include "qgschunkloader_p.h"
+-#include "qgschunkedentity_p.h"
++#include "qgschunkloader.h"
++#include "qgschunkedentity.h"
+ #include "qgspointcloud3dsymbol.h"
+ #include "qgspointcloud3dsymbol_p.h"
+ #include "qgspointcloudlayer3drenderer.h"
+diff --git a/src/3d/qgsrulebasedchunkloader_p.cpp b/src/3d/qgsrulebasedchunkloader_p.cpp
+index 4f6cebdeca7..0fc3985e435 100644
+--- a/src/3d/qgsrulebasedchunkloader_p.cpp
++++ b/src/3d/qgsrulebasedchunkloader_p.cpp
+@@ -21,7 +21,7 @@
+ #include "qgspoint3dsymbol.h"
+ #include "qgspolygon3dsymbol.h"
+ #include "qgsraycastingutils_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgseventtracing.h"
+ 
+ #include "qgsvectorlayer.h"
+diff --git a/src/3d/qgsrulebasedchunkloader_p.h b/src/3d/qgsrulebasedchunkloader_p.h
+index dd7e9c3e604..f2a45d06664 100644
+--- a/src/3d/qgsrulebasedchunkloader_p.h
++++ b/src/3d/qgsrulebasedchunkloader_p.h
+@@ -27,8 +27,8 @@
+ // version without notice, or even be removed.
+ //
+ 
+-#include "qgschunkloader_p.h"
+-#include "qgschunkedentity_p.h"
++#include "qgschunkloader.h"
++#include "qgschunkedentity.h"
+ #include "qgsrulebased3drenderer.h"
+ #include "qgs3drendercontext.h"
+ #include <QFutureWatcher>
+diff --git a/src/3d/qgstiledscenechunkloader_p.h b/src/3d/qgstiledscenechunkloader_p.h
+index 19589bfb3d4..bb6798a23a6 100644
+--- a/src/3d/qgstiledscenechunkloader_p.h
++++ b/src/3d/qgstiledscenechunkloader_p.h
+@@ -28,9 +28,9 @@
+ //
+ 
+ #include "qgscoordinatetransform.h"
+-#include "qgschunkedentity_p.h"
+-#include "qgschunkloader_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunkedentity.h"
++#include "qgschunkloader.h"
++#include "qgschunknode.h"
+ #include "qgstiledsceneindex.h"
+ #include "qgstiledscenetile.h"
+ #include "qgs3drendercontext.h"
+diff --git a/src/3d/qgstilingscheme.cpp b/src/3d/qgstilingscheme.cpp
+index 6559ea9c556..f697dec5408 100644
+--- a/src/3d/qgstilingscheme.cpp
++++ b/src/3d/qgstilingscheme.cpp
+@@ -15,7 +15,7 @@
+ 
+ #include "qgstilingscheme.h"
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgsrectangle.h"
+ 
+ QgsTilingScheme::QgsTilingScheme( const QgsRectangle &fullExtent, const QgsCoordinateReferenceSystem &crs )
+diff --git a/src/3d/qgsvectorlayerchunkloader_p.cpp b/src/3d/qgsvectorlayerchunkloader_p.cpp
+index 0636a7cd20c..525fafd3bca 100644
+--- a/src/3d/qgsvectorlayerchunkloader_p.cpp
++++ b/src/3d/qgsvectorlayerchunkloader_p.cpp
+@@ -21,7 +21,7 @@
+ #include "qgsraycastingutils_p.h"
+ #include "qgsabstractvectorlayer3drenderer.h"
+ #include "qgstessellatedpolygongeometry.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgseventtracing.h"
+ #include "qgslogger.h"
+ #include "qgsvectorlayer.h"
+diff --git a/src/3d/qgsvectorlayerchunkloader_p.h b/src/3d/qgsvectorlayerchunkloader_p.h
+index cb247a1119a..d47abf10d3e 100644
+--- a/src/3d/qgsvectorlayerchunkloader_p.h
++++ b/src/3d/qgsvectorlayerchunkloader_p.h
+@@ -27,9 +27,9 @@
+ // version without notice, or even be removed.
+ //
+ 
+-#include "qgschunkloader_p.h"
++#include "qgschunkloader.h"
+ #include "qgsfeature3dhandler_p.h"
+-#include "qgschunkedentity_p.h"
++#include "qgschunkedentity.h"
+ 
+ #define SIP_NO_FILE
+ 
+diff --git a/src/3d/qgsvirtualpointcloudentity_p.h b/src/3d/qgsvirtualpointcloudentity_p.h
+index a9527634da4..8bc960a548c 100644
+--- a/src/3d/qgsvirtualpointcloudentity_p.h
++++ b/src/3d/qgsvirtualpointcloudentity_p.h
+@@ -29,8 +29,8 @@
+ //
+ 
+ #include "qgscoordinatetransform.h"
+-#include "qgschunkedentity_p.h"
+-#include "qgs3dmapsceneentity_p.h"
++#include "qgschunkedentity.h"
++#include "qgs3dmapsceneentity.h"
+ #include "qgs3drendercontext.h"
+ 
+ class QgsAABB;
+diff --git a/src/3d/terrain/qgsdemterraintileloader_p.cpp b/src/3d/terrain/qgsdemterraintileloader_p.cpp
+index 6529f871ae0..9b1eecae25b 100644
+--- a/src/3d/terrain/qgsdemterraintileloader_p.cpp
++++ b/src/3d/terrain/qgsdemterraintileloader_p.cpp
+@@ -16,12 +16,12 @@
+ #include "qgsdemterraintileloader_p.h"
+ 
+ #include "qgs3dmapsettings.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgsdemterraingenerator.h"
+ #include "qgsdemterraintilegeometry_p.h"
+ #include "qgseventtracing.h"
+ #include "qgsonlineterraingenerator.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgsterraintexturegenerator_p.h"
+ #include "qgsterraintileentity_p.h"
+ #include "qgsterraingenerator.h"
+diff --git a/src/3d/terrain/qgsdemterraintileloader_p.h b/src/3d/terrain/qgsdemterraintileloader_p.h
+index 991dfe7d201..198700960f3 100644
+--- a/src/3d/terrain/qgsdemterraintileloader_p.h
++++ b/src/3d/terrain/qgsdemterraintileloader_p.h
+@@ -34,10 +34,10 @@
+ #include <QElapsedTimer>
+ #include <QMutex>
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgscoordinatetransformcontext.h"
+ #include "qgsrectangle.h"
+-#include "qgsterraintileloader_p.h"
++#include "qgsterraintileloader.h"
+ #include "qgstilingscheme.h"
+ 
+ class QgsRasterDataProvider;
+diff --git a/src/3d/terrain/qgsflatterraingenerator.cpp b/src/3d/terrain/qgsflatterraingenerator.cpp
+index f953a315d03..fc6962837da 100644
+--- a/src/3d/terrain/qgsflatterraingenerator.cpp
++++ b/src/3d/terrain/qgsflatterraingenerator.cpp
+@@ -19,8 +19,8 @@
+ #include <Qt3DCore/QTransform>
+ 
+ #include "qgs3dmapsettings.h"
+-#include "qgschunknode_p.h"
+-#include "qgsterrainentity_p.h"
++#include "qgschunknode.h"
++#include "qgsterrainentity.h"
+ #include "qgsterraintileentity_p.h"
+ #include "qgs3dutils.h"
+ /// @cond PRIVATE
+diff --git a/src/3d/terrain/qgsflatterraingenerator.h b/src/3d/terrain/qgsflatterraingenerator.h
+index 08a575f966b..d11de4d1011 100644
+--- a/src/3d/terrain/qgsflatterraingenerator.h
++++ b/src/3d/terrain/qgsflatterraingenerator.h
+@@ -19,7 +19,7 @@
+ #include "qgis_3d.h"
+ 
+ #include "qgsterraingenerator.h"
+-#include "qgsterraintileloader_p.h"
++#include "qgsterraintileloader.h"
+ #include <Qt3DExtras/QPlaneGeometry>
+ 
+ #define SIP_NO_FILE
+diff --git a/src/3d/terrain/qgsquantizedmeshterraingenerator.cpp b/src/3d/terrain/qgsquantizedmeshterraingenerator.cpp
+index 204bad2b763..23b8c50025c 100644
+--- a/src/3d/terrain/qgsquantizedmeshterraingenerator.cpp
++++ b/src/3d/terrain/qgsquantizedmeshterraingenerator.cpp
+@@ -14,8 +14,8 @@
+  ***************************************************************************/
+ 
+ #include "qgsquantizedmeshterraingenerator.h"
+-#include "qgschunkloader_p.h"
+-#include "qgschunknode_p.h"
++#include "qgschunkloader.h"
++#include "qgschunknode.h"
+ #include "qgscoordinatetransform.h"
+ #include "qgslogger.h"
+ #include "qgsmesh3dentity_p.h"
+@@ -25,14 +25,14 @@
+ #include "qgsquantizedmeshtiles.h"
+ #include "qgsrectangle.h"
+ #include "qgsterraintileentity_p.h"
+-#include "qgsterraintileloader_p.h"
++#include "qgsterraintileloader.h"
+ #include "qgstiledsceneindex.h"
+ #include "qgstiledscenelayer.h"
+ #include "qgstiledscenetile.h"
+ #include "qgstiles.h"
+ #include "qgstriangularmesh.h"
+ #include "qgsgltf3dutils.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgs3dmapsettings.h"
+ #include "qgsvector3d.h"
+ #include "qgsapplication.h"
+diff --git a/src/3d/terrain/qgsquantizedmeshterraingenerator.h b/src/3d/terrain/qgsquantizedmeshterraingenerator.h
+index c63c3b4c3f1..5f059bd03ae 100644
+--- a/src/3d/terrain/qgsquantizedmeshterraingenerator.h
++++ b/src/3d/terrain/qgsquantizedmeshterraingenerator.h
+@@ -15,10 +15,10 @@
+ 
+ #pragma once
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgscoordinatetransform.h"
+ #include "qgsmaplayerref.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgsterraingenerator.h"
+ #include "qgsquantizedmeshdataprovider.h"
+ #include "qgstiledsceneindex.h"
+diff --git a/src/3d/terrain/qgsterrainentity_p.cpp b/src/3d/terrain/qgsterrainentity.cpp
+similarity index 98%
+rename from src/3d/terrain/qgsterrainentity_p.cpp
+rename to src/3d/terrain/qgsterrainentity.cpp
+index f8db623125e..74840a61a4b 100644
+--- a/src/3d/terrain/qgsterrainentity_p.cpp
++++ b/src/3d/terrain/qgsterrainentity.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgsterrainentity_p.cpp
++  qgsterrainentity.cpp
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,11 +13,11 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ 
+ #include "qgsaabb.h"
+ #include "qgs3dmapsettings.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgsdemterraintilegeometry_p.h"
+ #include "qgseventtracing.h"
+ #include "qgsraycastingutils_p.h"
+diff --git a/src/3d/terrain/qgsterrainentity_p.h b/src/3d/terrain/qgsterrainentity.h
+similarity index 95%
+rename from src/3d/terrain/qgsterrainentity_p.h
+rename to src/3d/terrain/qgsterrainentity.h
+index 81e629c14d7..08cd1e8501c 100644
+--- a/src/3d/terrain/qgsterrainentity_p.h
++++ b/src/3d/terrain/qgsterrainentity.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgsterrainentity_p.h
++  qgsterrainentity.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSTERRAINENTITY_P_H
+-#define QGSTERRAINENTITY_P_H
++#ifndef QGSTERRAINENTITY_H
++#define QGSTERRAINENTITY_H
+ 
+ ///@cond PRIVATE
+ 
+@@ -29,8 +29,8 @@
+ 
+ #define SIP_NO_FILE
+ 
+-#include "qgschunkedentity_p.h"
+-#include "qgschunkqueuejob_p.h"
++#include "qgschunkedentity.h"
++#include "qgschunkqueuejob.h"
+ 
+ #include <memory>
+ 
+@@ -111,4 +111,4 @@ class TerrainMapUpdateJob : public QgsChunkQueueJob
+ 
+ /// @endcond
+ 
+-#endif // QGSTERRAINENTITY_P_H
++#endif // QGSTERRAINENTITY_H
+diff --git a/src/3d/terrain/qgsterraingenerator.h b/src/3d/terrain/qgsterraingenerator.h
+index d4e2f1e9031..ae06f9890e7 100644
+--- a/src/3d/terrain/qgsterraingenerator.h
++++ b/src/3d/terrain/qgsterraingenerator.h
+@@ -19,7 +19,7 @@
+ #include "qgis_3d.h"
+ 
+ #include "qgstilingscheme.h"
+-#include "qgschunkloader_p.h"
++#include "qgschunkloader.h"
+ 
+ class QgsAABB;
+ class Qgs3DMapSettings;
+diff --git a/src/3d/terrain/qgsterraintexturegenerator_p.h b/src/3d/terrain/qgsterraintexturegenerator_p.h
+index 609170814d9..e7548e82628 100644
+--- a/src/3d/terrain/qgsterraintexturegenerator_p.h
++++ b/src/3d/terrain/qgsterraintexturegenerator_p.h
+@@ -37,7 +37,7 @@ class QgsRasterLayer;
+ #include <QObject>
+ #include <QSize>
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgsrectangle.h"
+ 
+ class Qgs3DMapSettings;
+diff --git a/src/3d/terrain/qgsterraintileentity_p.h b/src/3d/terrain/qgsterraintileentity_p.h
+index 5d9475b1b67..7915e3d0631 100644
+--- a/src/3d/terrain/qgsterraintileentity_p.h
++++ b/src/3d/terrain/qgsterraintileentity_p.h
+@@ -31,7 +31,7 @@ class QgsTerrainTextureImage;
+ 
+ #include <Qt3DCore/QEntity>
+ 
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ 
+ /**
+  * \ingroup 3d
+diff --git a/src/3d/terrain/qgsterraintileloader_p.cpp b/src/3d/terrain/qgsterraintileloader.cpp
+similarity index 97%
+rename from src/3d/terrain/qgsterraintileloader_p.cpp
+rename to src/3d/terrain/qgsterraintileloader.cpp
+index 16e8959a104..13ebb46bbc6 100644
+--- a/src/3d/terrain/qgsterraintileloader_p.cpp
++++ b/src/3d/terrain/qgsterraintileloader.cpp
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgsterraintileloader_p.cpp
++  qgsterraintileloader.cpp
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,13 +13,13 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#include "qgsterraintileloader_p.h"
++#include "qgsterraintileloader.h"
+ 
+ #include "qgs3dmapsettings.h"
+ #include "qgs3dutils.h"
+-#include "qgschunknode_p.h"
++#include "qgschunknode.h"
+ #include "qgsphongtexturedmaterial.h"
+-#include "qgsterrainentity_p.h"
++#include "qgsterrainentity.h"
+ #include "qgsterraingenerator.h"
+ #include "qgsterraintextureimage_p.h"
+ #include "qgsterraintexturegenerator_p.h"
+diff --git a/src/3d/terrain/qgsterraintileloader_p.h b/src/3d/terrain/qgsterraintileloader.h
+similarity index 93%
+rename from src/3d/terrain/qgsterraintileloader_p.h
+rename to src/3d/terrain/qgsterraintileloader.h
+index bf24f61241b..39840de1153 100644
+--- a/src/3d/terrain/qgsterraintileloader_p.h
++++ b/src/3d/terrain/qgsterraintileloader.h
+@@ -1,5 +1,5 @@
+ /***************************************************************************
+-  qgsterraintileloader_p.h
++  qgsterraintileloader.h
+   --------------------------------------
+   Date                 : July 2017
+   Copyright            : (C) 2017 by Martin Dobias
+@@ -13,8 +13,8 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
+-#ifndef QGSTERRAINTILELOADER_P_H
+-#define QGSTERRAINTILELOADER_P_H
++#ifndef QGSTERRAINTILELOADER_H
++#define QGSTERRAINTILELOADER_H
+ 
+ /// @cond PRIVATE
+ 
+@@ -29,13 +29,11 @@
+ 
+ #define SIP_NO_FILE
+ 
+-#include "qgschunkloader_p.h"
++#include "qgschunkloader.h"
+ 
+ #include <QImage>
+ #include "qgsrectangle.h"
+ 
+-#define SIP_NO_FILE
+-
+ class QgsPhongMaterialSettings;
+ class QgsTerrainEntity;
+ class QgsTerrainTileEntity;
+@@ -89,4 +87,4 @@ class QgsTerrainTileLoader : public QgsChunkLoader
+ 
+ /// @endcond
+ 
+-#endif // QGSTERRAINTILELOADER_P_H
++#endif // QGSTERRAINTILELOADER_H
+-- 
+2.46.0
+

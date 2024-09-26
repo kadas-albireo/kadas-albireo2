@@ -63,7 +63,6 @@ jobs:
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D WITH_GLOBE=OFF \
                 -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \

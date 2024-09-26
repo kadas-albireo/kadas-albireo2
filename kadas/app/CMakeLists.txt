@@ -1,21 +1,4 @@
 FIND_PACKAGE(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
-
-IF(WITH_GLOBE)    
-    FIND_PACKAGE(OSG REQUIRED)
-    FIND_PACKAGE(osgEarth REQUIRED)
-    ADD_DEFINITIONS(-DWITH_GLOBE)
-    INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
-    
-    SET(GLOBE_LIBS 
-    ${OSGDB_LIBRARY}
-    ${OSGGA_LIBRARY}
-    ${OSGUTIL_LIBRARY}
-    ${OSG_LIBRARY}
-    ${OSGVIEWER_LIBRARY}
-    ${OPENTHREADS_LIBRARY}
-    )
-ENDIF()
-
 set(kadas_SRC
   kadasapplayerhandling.cpp
   kadasapplication.cpp
@@ -67,6 +50,18 @@ set(kadas_SRC
   milx/kadasmilxintegration.cpp
   milx/kadasmilxexportdialog.cpp
 
+  3d/kadas3dintegration.cpp
+  3d/kadas3dmapcanvaswidget.cpp
+  3d/kadas3dmapconfigwidget.cpp
+  3d/kadas3dnavigationwidget.cpp
+  3d/kadasambientocclusionsettingswidget.cpp
+  3d/kadaslightswidget.cpp
+  3d/kadasmesh3dsymbolwidget.cpp
+  3d/kadasphongmaterialwidget.cpp
+  3d/kadasshadowrenderingsettingswidget.cpp
+  3d/kadasskyboxrenderingsettingswidget.cpp
+
+
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
   external/qgis/app/qgsgotolocatorfilter.cpp
 )
@@ -76,21 +71,6 @@ set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
 endif()
-
-if(WITH_GLOBE)
-  set(kadas_SRC ${kadas_SRC}
-    globe/kadasglobebillboardmanager.cpp
-    globe/kadasglobedialog.cpp
-    globe/kadasglobeintegration.cpp
-    globe/kadasglobeinteractionhandlers.cpp
-    globe/kadasglobeprojectlayermanager.cpp
-    globe/kadasglobetilesource.cpp
-    globe/kadasglobevectorlayerproperties.cpp
-    globe/kadasglobewidget.cpp
-    globe/osg/osgQtGraphicsWindow.cpp
-    globe/osg/osgQtViewerWidget.cpp
-  )
-endif(WITH_GLOBE)
 
 FILE(GLOB kadas_HDR
   *.h
@@ -102,11 +82,18 @@ FILE(GLOB kadas_HDR
   layertree/*.h
   mapgrid/*.h
   mapswipe/*.h
+  3d/kadas3dintegration.h
+  3d/kadas3dmapcanvaswidget.h
+  3d/kadas3dmapconfigwidget.h
+  3d/kadas3dnavigationwidget.h
+  3d/kadasambientocclusionsettingswidget.h
+  3d/kadaslightswidget.h
+  3d/kadasmesh3dsymbolwidget.h
+  3d/kadasphongmaterialwidget.h
+  3d/kadasshadowrenderingsettingswidget.h
+  3d/kadasskyboxrenderingsettingswidget.h
   external/qgis/app/*.h)
-IF(WITH_GLOBE)
-    FILE(GLOB globe_HDR globe/*.h globe/osg/*.h)
-    SET(kadas_HDR ${kadas_HDR} ${globe_HDR})
-ENDIF(WITH_GLOBE)
+
 LIST(SORT kadas_HDR)
 
 FILE(GLOB kadas_UI
@@ -116,10 +103,6 @@ FILE(GLOB kadas_UI
   guidegrid/*.ui
   mapgrid/*.ui
   milx/*.ui)
-IF(WITH_GLOBE)
-    FILE(GLOB globe_UI globe/*.ui)
-    SET(kadas_UI ${kadas_UI} ${globe_UI})
-ENDIF(WITH_GLOBE)
 LIST(SORT kadas_UI)
 
 SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")
@@ -186,6 +169,7 @@ TARGET_LINK_LIBRARIES(kadas
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
   QGIS::Gui
+  QGIS::3D
   Python3::Python
   ${kadas_RC_LIBS}
 
@@ -196,9 +180,9 @@ TARGET_LINK_LIBRARIES(kadas
 
 target_include_directories(kadas PUBLIC
     ${CMAKE_SOURCE_DIR}/kadas/app
+    ${CMAKE_SOURCE_DIR}/kadas/app/3d
     ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
     ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
-    ${CMAKE_SOURCE_DIR}/kadas/app/globe
     ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
     ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
     ${CMAKE_SOURCE_DIR}/kadas/app/kml
@@ -217,11 +201,6 @@ endif()
 
 if (WITH_QTWEBKIT)
   TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)
-endif()
-
-if (WITH_GLOBE)
-  TARGET_LINK_LIBRARIES(kadas osgEarth)
-  ADD_SUBDIRECTORY(globe/featuresource)
 endif()
 
 if (WITH_BINDINGS)

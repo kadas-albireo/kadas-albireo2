@@ -20,6 +20,7 @@ vcpkg_from_github(
         bindings-install.patch
         sipcxx17.patch
         nlohmann-json.patch
+        install-private-headers.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -54,7 +55,6 @@ list(APPEND QGIS_OPTIONS "-DWITH_SPATIALITE:BOOL=ON")
 list(APPEND QGIS_OPTIONS "-DWITH_QSPATIALITE:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_PDAL:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_POLY2TRI:BOOL=OFF")
-list(APPEND QGIS_OPTIONS "-DPoly2Tri_LIBRARY=poly2tri::poly2tri")
 
 # Fixup windows install prefixes
 list(APPEND QGIS_OPTIONS "-D QGIS_DATA_SUBDIR=share/qgis")

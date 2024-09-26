@@ -44,10 +44,6 @@
 #include "kadasapplication.h"
 #include <kml/kadaskmlimport.h>
 
-#ifdef WITH_GLOBE
-#include <globe/kadasglobevectorlayerproperties.h>
-#endif
-
 
 bool KadasKMLImport::importFile( const QString &filename, QString &errMsg )
 {
@@ -255,7 +251,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           hasZ = QgsWkbTypes::hasZ( geom->wkbType() );
 
-#ifdef WITH_GLOBE
+#if 0 // ! TODO: kml import 3d integration
           if ( hasZ )
           {
             KadasGlobeVectorLayerConfig *config = KadasGlobeVectorLayerConfig::getConfig( itemLayer );

@@ -14,6 +14,7 @@ This module defines the following :prop_tgt:`IMPORTED` target:
  - ``QGIS::Core``
  - ``QGIS::Gui``
  - ``QGIS::Analysis``
+ - ``QGIS::3D``
 
 Variables
 ^^^^^^^^^
@@ -99,7 +100,11 @@ if(Gui IN_LIST QGIS_FIND_COMPONENTS)
       target_link_libraries(QGIS::Core INTERFACE QGIS::Native)
   endif()
 endif()
-
+if(3D IN_LIST QGIS_FIND_COMPONENTS)
+  _find_qgis_library(3d 3D)
+  find_package(Qt5 COMPONENTS 3DCore 3DRender 3DInput 3DLogic 3DExtras)
+  target_link_libraries(QGIS::3D INTERFACE QGIS::Core Qt5::3DCore Qt5::3DRender Qt5::3DInput Qt5::3DLogic Qt5::3DExtras)
+endif()
 
 if(QGIS_INCLUDE_DIR)
   set(_qgsconfig_h "${QGIS_INCLUDE_DIR}/qgis/qgsconfig.h")
