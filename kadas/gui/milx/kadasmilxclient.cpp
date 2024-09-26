@@ -697,6 +697,25 @@ bool KadasMilxClient::downgradeMilXFile( const QString &inputXml, QString &outpu
   return true;
 }
 
+bool KadasMilxClient::exportKml( const QString &inputXml, QByteArray &outputData, bool &valid, QString &messages )
+{
+  QByteArray request;
+  QDataStream istream( &request, QIODevice::WriteOnly );
+  istream << MILX_REQUEST_MILX_TO_KML;
+  istream << inputXml;
+
+  QByteArray response;
+  if ( !instance()->processRequest( request, response, MILX_REPLY_MILX_TO_KML ) )
+  {
+    return false;
+  }
+
+  QDataStream ostream( &response, QIODevice::ReadOnly );
+  MilXServerReply replycmd = 0; ostream >> replycmd;
+  ostream >> outputData >> valid >> messages;
+  return true;
+}
+
 bool KadasMilxClient::validateSymbolXml( const QString &symbolXml, const QString &mssVersion, QString &adjustedSymbolXml, bool &valid, QString &messages )
 {
   QByteArray request;

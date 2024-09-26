@@ -52,6 +52,7 @@ MilXServerRequest MILX_REQUEST_GET_LIBRARY_VERSION_TAGS = 50; // {MILX_REQUEST_G
 MilXServerRequest MILX_REQUEST_UPGRADE_MILXLY = 51; // {MILX_REQUEST_UPGRADE_MILXLY, InputXml:QString}
 MilXServerRequest MILX_REQUEST_DOWNGRADE_MILXLY = 52; // {MILX_REQUEST_DOWNGRADE_MILXLY, InputXml:QString, MssVersion:QString}
 MilXServerRequest MILX_REQUEST_VALIDATE_SYMBOLXML = 53; // {MILX_REQUEST_VALIDATE_SYMBOLXML, SymbolXml:QString, MssVersion:QString}
+MilXServerRequest MILX_REQUEST_MILX_TO_KML = 54; // {MILX_REQUEST_MILX_TO_KML, InputXml:QString}
 
 typedef quint8 MilXServerReply;
 
@@ -84,6 +85,7 @@ MilXServerReply MILX_REPLY_GET_LIBRARY_VERSION_TAGS = 150; // {MILX_REPLY_GET_LI
 MilXServerReply MILX_REPLY_UPGRADE_MILXLY = 151; // {MILX_REPLY_UPGRADE_MILXLY, OutputXml:QString, valid:bool, messages:QString}
 MilXServerReply MILX_REPLY_DOWNGRADE_MILXLY = 152; // {MILX_REPLY_DOWNGRADE_MILXLY, OutputXml:QString, valid:bool, messages:QString}
 MilXServerReply MILX_REPLY_VALIDATE_SYMBOLXML = 153; // {MILX_REPLY_VALIDATE_SYMBOLXML, AdjustedSymbolXml:QString, valid:bool, messages:QString}
+MilXServerReply MILX_REPLY_MILX_TO_KML = 154;
 
 #endif // SIP_RUN
 #endif // KADASMILXINTERFACE_H

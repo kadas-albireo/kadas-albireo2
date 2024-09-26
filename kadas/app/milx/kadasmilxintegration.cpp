@@ -37,11 +37,13 @@
 #include "kadas/gui/milx/kadasmilxlibrary.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
-#include <milx/kadasmilxintegration.h>
-#include <ui_KadasMilxExportDialog.h>
+#include "milx/kadasmilxintegration.h"
+#include "milx/kadasmilxexportdialog.h"
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
-  : QObject( parent ), mUi( ui ), mMilxLibrary( nullptr )
+  : QObject( parent )
+  , mUi( ui )
+  , mMilxLibrary( nullptr )
 {
   QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
   if ( licenseKey.isEmpty() )
@@ -79,6 +81,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   connect( mUi.mActionMilx, &QAction::triggered, this, &KadasMilxIntegration::createMilx );
   connect( mUi.mActionSaveMilx, &QAction::triggered, this, &KadasMilxIntegration::saveMilxly );
+  connect( mUi.mActionMilxKmlExport, &QAction::triggered, this, &KadasMilxIntegration::exportKml );
   connect( mUi.mActionLoadMilx, &QAction::triggered, this, &KadasMilxIntegration::openMilxly );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMilxIntegration::readProjectSettings );
 
@@ -236,44 +239,19 @@ void KadasMilxIntegration::saveMilxly()
 {
   kApp->unsetMapTool();
 
-  QDialog exportDialog;
-  Ui::KadasMilxExportDialog ui;
-  ui.setupUi( &exportDialog );
+  KadasMilxExportDialog exportDialog;
+  exportDialog.setExportMode( KadasMilxExportDialog::ExportMode::Milx );
 
-  ui.comboCartouche->addItem( tr( "Don't add" ) );
-  for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
-  {
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
-    {
-      QListWidgetItem *item = new QListWidgetItem( layer->name() );
-      item->setData( Qt::UserRole, layer->id() );
-      item->setCheckState( kApp->mainWindow()->mapCanvas()->layers().contains( layer ) ? Qt::Checked : Qt::Unchecked );
-      ui.listWidget->addItem( item );
-      ui.comboCartouche->addItem( layer->name(), layer->id() );
-    }
-  }
   QStringList versionTags, versionNames;
   KadasMilxClient::getSupportedLibraryVersionTags( versionTags, versionNames );
-  for ( int i = 0, n = versionTags.size(); i < n; ++i )
-  {
-    ui.comboMilxVersion->addItem( versionNames[i], versionTags[i] );
-  }
-  ui.comboMilxVersion->setCurrentIndex( 0 );
+  exportDialog.setVersions( versionNames, versionTags );
 
   if ( exportDialog.exec() == QDialog::Rejected )
   {
     return;
   }
 
-  QStringList exportLayers;
-  for ( int i = 0, n = ui.listWidget->count(); i < n; ++i )
-  {
-    QListWidgetItem *item = ui.listWidget->item( i );
-    if ( item->checkState() == Qt::Checked )
-    {
-      exportLayers.append( item->data( Qt::UserRole ).toString() );
-    }
-  }
+  QStringList exportLayers = exportDialog.selectedLayers();
 
   QStringList filters;
   filters.append( tr( "Compressed MilX Layer (*.milxlyz)" ) );
@@ -296,7 +274,7 @@ void KadasMilxIntegration::saveMilxly()
   {
     filename += ".milxly";
   }
-  QString targetVersionTag = ui.comboMilxVersion->currentData().toString();
+  QString targetVersionTag = exportDialog.selectedVersionTag();
   QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
 
   QIODevice *dev = 0;
@@ -336,7 +314,7 @@ void KadasMilxIntegration::saveMilxly()
   milxVersionEl.appendChild( doc.createTextNode( currentVersionTag ) );
   milxDocumentEl.appendChild( milxVersionEl );
 
-  QString cartoucheLayerId = ui.comboCartouche->currentData().toString();
+  QString cartoucheLayerId = exportDialog.selectedCartoucheLayerId();
   QString cartouche = QgsProject::instance()->readEntry( "VBS-Print", "cartouche" );
 
   // Replace custom texts by "Custom" since the MSS Schema Validator enforces this
@@ -410,6 +388,127 @@ void KadasMilxIntegration::saveMilxly()
 
   delete dev;
   delete zip;
+}
+
+void KadasMilxIntegration::exportKml()
+{
+  kApp->unsetMapTool();
+
+  KadasMilxExportDialog exportDialog;
+  exportDialog.setExportMode( KadasMilxExportDialog::ExportMode::Kml );
+
+  if ( exportDialog.exec() == QDialog::Rejected )
+  {
+    return;
+  }
+
+  const QStringList exportLayers = exportDialog.selectedLayers();
+
+  QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
+
+  QString filename = QFileDialog::getSaveFileName( 0, tr( "Select Output" ), lastDir, tr( "Compressed KML Layer (*.kmz)" ) );
+  if ( filename.isEmpty() )
+  {
+    return;
+  }
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
+  if ( !filename.endsWith( ".kmz", Qt::CaseInsensitive ) )
+  {
+    filename += ".kmz";
+  }
+
+  QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
+
+  int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
+
+  QDomDocument doc;
+  doc.appendChild( doc.createProcessingInstruction( "xml", "version=\"1.0\" encoding=\"UTF-8\"" ) );
+  QDomElement milxDocumentEl = doc.createElement( "MilXDocument_Layer" );
+  milxDocumentEl.setAttribute( "xmlns", "http://gs-soft.com/MilX/V3.1" );
+  milxDocumentEl.setAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+  doc.appendChild( milxDocumentEl );
+
+  QDomElement milxVersionEl = doc.createElement( "MssLibraryVersionTag" );
+  milxVersionEl.appendChild( doc.createTextNode( currentVersionTag ) );
+  milxDocumentEl.appendChild( milxVersionEl );
+
+  QString cartoucheLayerId = exportDialog.selectedCartoucheLayerId();
+  QString cartouche = QgsProject::instance()->readEntry( "VBS-Print", "cartouche" );
+
+  // Replace custom texts by "Custom" since the MSS Schema Validator enforces this
+  QStringList validClassifications = QStringList() << "None" << "Internal" << "Confidential" << "Secret";
+  QDomDocument cartoucheDoc;
+  cartoucheDoc.setContent( cartouche );
+  QDomNodeList exClassifications = cartoucheDoc.elementsByTagName( "ExerciseClassification" );
+  if ( !exClassifications.isEmpty() )
+  {
+    QDomElement el = exClassifications.at( 0 ).toElement();
+    QString classification = el.text();
+    if ( !validClassifications.contains( classification ) )
+      el.replaceChild( cartoucheDoc.createTextNode( "Custom" ), el.firstChild() );
+  }
+
+  QDomNodeList missingClassifications = cartoucheDoc.elementsByTagName( "MissionClassification" );
+  if ( !missingClassifications.isEmpty() )
+  {
+    QDomElement el = missingClassifications.at( 0 ).toElement();
+    QString classification = el.text();
+    if ( !validClassifications.contains( classification ) )
+      el.replaceChild( cartoucheDoc.createTextNode( "Custom" ), el.firstChild() );
+  }
+  cartouche = cartoucheDoc.toString();
+
+  for ( const QString &layerId : exportLayers )
+  {
+    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
+    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    {
+      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+      milxDocumentEl.appendChild( milxLayerEl );
+      static_cast<KadasMilxLayer *>( layer )->exportToMilxly( milxLayerEl, dpi );
+
+      if ( cartoucheLayerId == layerId )
+      {
+        QDomDocument cartoucheDoc;
+        cartoucheDoc.setContent( cartouche );
+        milxLayerEl.appendChild( cartoucheDoc.documentElement() );
+      }
+    }
+  }
+  QString inputXml = doc.toString();
+
+  QByteArray outputData;
+  bool valid = false;
+  QString messages;
+  if ( !KadasMilxClient::exportKml( inputXml, outputData, valid, messages ) )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export failed" ), tr( "Failed to write output." ), Qgis::Critical, 5 );
+    return;
+  }
+
+  if ( !valid )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), "", Qgis::Critical, 5 );
+    if ( !messages.isEmpty() )
+    {
+      showMessageDialog( tr( "Export Failed" ), tr( "The export failed:" ), messages );
+    }
+  }
+
+  QFile outputFile( filename );
+  if ( !outputFile.open( QIODevice::WriteOnly ) )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "Export Failed" ), tr( "Failed to open the output file for writing." ), Qgis::Critical, 5 );
+    return;
+  }
+
+  outputFile.write( outputData );
+  outputFile.close();
+  kApp->mainWindow()->messageBar()->pushMessage( tr( "MilX export completed" ), "", Qgis::Info, 5 );
+  if ( !messages.isEmpty() )
+  {
+    showMessageDialog( tr( "Export Messages" ), tr( "The following messages were emitted while exporting:" ), messages );
+  }
 }
 
 void KadasMilxIntegration::openMilxly()

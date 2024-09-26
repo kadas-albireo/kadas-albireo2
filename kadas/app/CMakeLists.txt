@@ -65,6 +65,7 @@ set(kadas_SRC
   mapswipe/kadasmapswipetool.cpp
 
   milx/kadasmilxintegration.cpp
+  milx/kadasmilxexportdialog.cpp
 
   external/qgis/app/qgslayertreeviewindicatorprovider.cpp
   external/qgis/app/qgsgotolocatorfilter.cpp
@@ -113,7 +114,8 @@ FILE(GLOB kadas_UI
   kml/*.ui
   bullseye/*.ui
   guidegrid/*.ui
-  mapgrid/*.ui)
+  mapgrid/*.ui
+  milx/*.ui)
 IF(WITH_GLOBE)
     FILE(GLOB globe_UI globe/*.ui)
     SET(kadas_UI ${kadas_UI} ${globe_UI})
