@@ -3,8 +3,4 @@ SOURCES += \
 	ephem_tool.py \
 	ui_EphemToolWidget.py
 
-
-
-TRANSLATIONS += i18n/kadas_ephem_de.ts \
-                i18n/kadas_ephem_it.ts \
-                i18n/kadas_ephem_fr.ts
+TRANSLATIONS += i18n/kadas_ephem_en.ts
