@@ -402,7 +402,7 @@ void KadasMilxIntegration::exportKml()
     return;
   }
 
-  QStringList exportLayers = exportDialog.selectedLayers();
+  const QStringList exportLayers = exportDialog.selectedLayers();
 
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
 

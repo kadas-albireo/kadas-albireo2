@@ -30,7 +30,8 @@ KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
 
   ui.comboCartouche->addItem( tr( "Don't add" ) );
 
-  for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
+  const QList<QgsMapLayer> layers = QgsProject::instance()->mapLayers().values();
+  for ( QgsMapLayer *layer : layers )
   {
     if ( qobject_cast<KadasMilxLayer *>( layer ) )
     {
