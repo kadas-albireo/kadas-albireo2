@@ -1,0 +1,47 @@
+[general]
+name=KADAS Ephem
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=KADAS ephem plugin
+about=KADAS ephem plugin.
+version=1.3
+author=Sourcepole
+email=smani@sourcepole.ch
+
+
+changelog=
+ Rev 1.3 (30.06.2023)
+  - Catch cases where sun/moon never rises/sets
+
+ Rev 1.2 (16.02.2023)
+ - Improve rise/set computation with relief
+
+ Rev 1.1 (19.12.2022)
+ - Add timezone support
+ - Display sun and moon azimuth on map
+
+ Rev 1.0.2 (15.02.2022)
+ - Fix ephemeris computation in polar circle
+
+ Rev 1.0.1 (24.08.2021)
+  - Fix typo in translation path
+  - Exit tool if ESC is pressed
+
+ Rev 1.0 (18.08.2021)
+  - Implement relief handling
+
+ Rev 0.9 (17.08.2021)
+  - Initial test release
+
+ Rev 0.1 (14.07.2021)
+  - Prerelease
+
+# Tags are comma separated with spaces allowed
+tags=about
+
+homepage=https://github.com/kadas-albireo/kadas-ephem-plugin
+tracker=https://github.com/kadas-albireo/kadas-ephem-plugin
+repository=https://github.com/kadas-albireo/kadas-ephem-plugin
+icon=icons/icon.png
+experimental=False
+deprecated=False
