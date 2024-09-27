@@ -150,7 +150,7 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="180"/>
         <source>Restrict extent to export:</source>
-        <translation type="unfinished"/>
+        <translation>Estensione da esportare:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="192"/>
