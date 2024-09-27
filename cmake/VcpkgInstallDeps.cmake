@@ -27,6 +27,10 @@ if(MSVC)
     # From QGIS CMakeLists.txt
     set(QGIS_PLUGIN_INSTALL_PREFIX "plugins")
 
+    # Additional Qt plugins (3D)
+    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/" DESTINATION "bin/plugins/renderers/")
+    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/rendererplugins/" DESTINATION "bin/plugins/rendererplugins/")
+
     # At least python3.dll, qgis_analysis.dll and gsl.dll are missing
     # Copy everything
     file(GLOB ALL_LIBS
