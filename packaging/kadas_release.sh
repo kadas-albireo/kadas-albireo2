@@ -36,16 +36,5 @@ cp -a $filesdir/* $distroot/share/kadas/
 # Copy proj datum grid shifts
 wget -O $distroot/share/proj/CHENyx06a.gsb https://github.com/OSGeo/proj-datumgrid/raw/master/europe/CHENyx06a.gsb
 
-# Install python plugins
-mkdir -p $distroot/share/kadas/python/plugins
-for plugin in kadas-print-plugin kadas-about-plugin kadas-help-plugin kadas-gpkg-plugin; do
-  version=master
-  wget -O $plugin.zip https://github.com/kadas-albireo/$plugin/archive/$version.zip
-  unzip $plugin.zip
-  mv $plugin-$version/* $distroot/share/kadas/python/plugins/
-  rm -rf $plugin-$version $plugin.zip
-done
-rm -f $distroot/share/kadas/python/plugins/README.md
-
 # Remove empty directories
 find $distroot -type d -empty -delete
