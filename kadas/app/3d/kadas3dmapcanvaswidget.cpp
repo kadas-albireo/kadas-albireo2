@@ -315,7 +315,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   onTotalPendingJobsCountChanged();
 
-  mDockableWidgetHelper = std::make_unique<QgsDockableWidgetHelper>( isDocked, mCanvasName, this, QgsDockableWidgetHelper::sOwnerWindow);
+  mDockableWidgetHelper = new QgsDockableWidgetHelper( isDocked, mCanvasName, this, QgsDockableWidgetHelper::sOwnerWindow);
   if ( QDialog *dialog = mDockableWidgetHelper->dialog() )
   {
     QFontMetrics fm( font() );
