@@ -29,7 +29,8 @@ if(MSVC)
 
     # Additional Qt plugins (3D)
     install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/" DESTINATION "bin/plugins/renderers/")
-    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/rendererplugins/" DESTINATION "bin/plugins/rendererplugins/")
+    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderplugins/" DESTINATION "bin/plugins/renderplugins/")
+
 
     # At least python3.dll, qgis_analysis.dll and gsl.dll are missing
     # Copy everything
