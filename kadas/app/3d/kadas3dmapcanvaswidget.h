@@ -62,7 +62,7 @@ class Kadas3DMapCanvasWidget : public QWidget
     Qgs3DMapToolMeasureLine *measurementLineTool() { return mMapToolMeasureLine; }
 #endif
 
-    QgsDockableWidgetHelper *dockableWidgetHelper() { return mDockableWidgetHelper.get(); }
+    QgsDockableWidgetHelper *dockableWidgetHelper() { return mDockableWidgetHelper; }
 
     void setCanvasName( const QString &name );
     QString canvasName() const { return mCanvasName; }
@@ -130,7 +130,7 @@ class Kadas3DMapCanvasWidget : public QWidget
     QAction *mActionEffects = nullptr;
     QAction *mActionOptions = nullptr;
     QAction *mActionSetSceneExtent = nullptr;
-    std::unique_ptr<QgsDockableWidgetHelper> mDockableWidgetHelper;
+    QgsDockableWidgetHelper *mDockableWidgetHelper;
     QObjectUniquePtr< QgsRubberBand > mViewFrustumHighlight;
     QObjectUniquePtr< QgsRubberBand > mViewExtentHighlight;
     QPointer<QDialog> mConfigureDialog;
