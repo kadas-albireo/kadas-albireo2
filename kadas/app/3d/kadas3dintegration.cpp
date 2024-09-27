@@ -24,6 +24,7 @@
 #include <qgis/qgscameracontroller.h>
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
 
+#include <qgs3d.h>
 #include <qgs3dmapsettings.h>
 #include <qgs3dutils.h>
 #include <qgsmapcanvas.h>
@@ -36,6 +37,8 @@
 Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanvas, QObject *parent )
   : QObject( parent ), mAction3D( action3D ), mMapCanvas( mapCanvas )
 {
+  Qgs3D::initialize();
+
   connect( mAction3D, &QAction::triggered, [ this ]()
   {
     if ( !m3DMapCanvasWidget )
