@@ -28,6 +28,13 @@ else()
   message(STATUS "Building with system libraries --")
 endif()
 
+if (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+  message (STATUS "Debug output enabled")
+  set(QGISDEBUG TRUE)
+else()
+  set(QGISDEBUG FALSE)
+endif()
+
 PROJECT(kadas LANGUAGES CXX)
 
 set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
