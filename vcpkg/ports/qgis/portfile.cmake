@@ -20,7 +20,6 @@ vcpkg_from_github(
         bindings-install.patch
         sipcxx17.patch
         nlohmann-json.patch
-        install-private-headers.patch
         qgis-debug.patch
 )
 
