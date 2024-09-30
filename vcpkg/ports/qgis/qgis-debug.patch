@@ -1,0 +1,19 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 13aefcfe5e7..49153f47bb1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -777,12 +777,8 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)")
+   add_definitions( -fno-strict-aliasing )
+ endif()
+ 
+-if (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+-  message (STATUS "Debug output enabled")
+-  set(QGISDEBUG TRUE)
+-else()
+-  set(QGISDEBUG FALSE)
+-endif()
++message (STATUS "Debug output enabled")
++set(QGISDEBUG TRUE)
+ 
+ set (AGGRESSIVE_SAFE_MODE FALSE CACHE BOOL "Forces a aggressive safe mode where issues like unsafe thread access will resort in fatal exceptions")
+ 

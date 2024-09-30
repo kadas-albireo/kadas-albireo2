@@ -21,6 +21,7 @@ vcpkg_from_github(
         sipcxx17.patch
         nlohmann-json.patch
         install-private-headers.patch
+        qgis-debug.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
