@@ -1,7 +1,7 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF 22036c1bce7614b72224938452fed8e58592d65f)
-set(QGIS_SHA512 e69b3cc72197da4e07dd5c7c84756e7d5bc2b21eb63cd5180a2e1982b1d9d104874eb2c16763f653873fac0ca154696f16ff678c283f055c8f93bf4c1162e2ac)
+set(QGIS_REF d4d76845261c5cf74421d55e68682b5824e2230b)
+set(QGIS_SHA512 ae28388e062b6c0fe151f7ce0add897548c367f0897ba71494d767cf048a925daf5bb0a82f08520110b4011037b41be81effa314c27496194e8d147a7f7fe55f)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -20,7 +20,7 @@ vcpkg_from_github(
         bindings-install.patch
         sipcxx17.patch
         nlohmann-json.patch
-        install-private-headers.patch
+        qgis-debug.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
