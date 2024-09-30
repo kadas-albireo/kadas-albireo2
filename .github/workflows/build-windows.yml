@@ -8,6 +8,15 @@ on:
   release:
     types: ['published']
   workflow_dispatch:
+    inputs:
+      buildType:
+          description: 'CMAKE BUILD TYPE'
+          required: true
+          default: 'RelWithDebInfo'
+          type: choice
+          options:
+          - Release
+          - RelWithDebInfo
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -38,13 +47,22 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
+      - name: Define build type
+        shell: bash
+        run: |
+          if [[ ${{ github.event_name}} == 'release' ]]; then
+            echo "CMAKE_BUILD_TYPE=Release" >> $GITHUB_ENV
+          else
+            echo "CMAKE_BUILD_TYPE=${{ github.event.inputs.buildType || 'RelWithDebInfo' }}" >> $GITHUB_ENV
+          fi
+
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D CMAKE_BUILD_TYPE=Release \
+                -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
                 -D WITH_BINDINGS=ON \
                 -D INSTALL_DEMO_DATA=ON \
