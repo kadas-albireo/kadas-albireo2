@@ -55,11 +55,11 @@ jobs:
           else
             echo "CMAKE_BUILD_TYPE=${{ github.event.inputs.buildType || 'RelWithDebInfo' }}" >> $GITHUB_ENV
           fi
-          echo "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
+          echo "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
           cmake -S . \
                 -G Ninja \
                 -B build \
