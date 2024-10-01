@@ -54,8 +54,8 @@
 #include <qgis/qgsmaplayerutils.h>
 #include <qgis/qgsfieldformatter.h>
 #include <qgis/qgsabstractdatabaseproviderconnection.h>
-
 #include <qgis/qgsprovidersublayersdialog.h>
+#include <qgis/qgsvectortileutils.h>
 
 #include "kadasapplayerhandling.h"
 #include "kadasapplication.h"
@@ -452,15 +452,18 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
 
   QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
 
+  QString updatedUri = uri;
+  QgsVectorTileUtils::updateUriSources( updatedUri, true );
+
   // create the layer
   const QgsVectorTileLayer::LayerOptions options( QgsProject::instance()->transformContext() );
-  std::unique_ptr<QgsVectorTileLayer> layer( new QgsVectorTileLayer( uri, base, options ) );
+  std::unique_ptr<QgsVectorTileLayer> layer( new QgsVectorTileLayer( updatedUri, base, options ) );
 
   if ( !layer || !layer->isValid() )
   {
     if ( showWarningOnInvalid )
     {
-      QString msg = QObject::tr( "%1 is not a valid or recognized data source." ).arg( uri );
+      QString msg = QObject::tr( "%1 is not a valid or recognized data source." ).arg( updatedUri );
       kApp->mainWindow()->messageBar()->pushMessage( QObject::tr( "Invalid Data Source" ), msg, Qgis::MessageLevel::Critical );
     }
 
