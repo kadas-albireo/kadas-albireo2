@@ -22,7 +22,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="75"/>
         <source>Zoom Full</source>
-        <translation type="unfinished"/>
+        <translation>Zoom complet</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="79"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="91"/>
         <source>Identify</source>
-        <translation type="unfinished"/>
+        <translation>Identifier</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="95"/>
@@ -42,17 +42,17 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="108"/>
         <source>Animations</source>
-        <translation type="unfinished"/>
+        <translation>Animations</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="115"/>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>export</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="122"/>
         <source>Save as Image…</source>
-        <translation type="unfinished"/>
+        <translation>sauvegarder comme image</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="126"/>
@@ -93,7 +93,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="197"/>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effets</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="203"/>
@@ -113,12 +113,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="233"/>
         <source>Configure…</source>
-        <translation type="unfinished"/>
+        <translation>Configurer...</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="243"/>
         <source>Save as Image</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder comme image</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="243"/>
@@ -191,12 +191,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
         <source>DEM (Raster Layer)</source>
-        <translation type="unfinished"/>
+        <translation>MNE (Couche Raster)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>Online</source>
-        <translation type="unfinished"/>
+        <translation>En ligne</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
@@ -221,32 +221,32 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="209"/>
         <source>Left</source>
-        <translation type="unfinished"/>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="210"/>
         <source>Center</source>
-        <translation type="unfinished"/>
+        <translation>Centre</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="211"/>
         <source>Right</source>
-        <translation type="unfinished"/>
+        <translation>Droite</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="213"/>
         <source>Top</source>
-        <translation type="unfinished"/>
+        <translation>Haut</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="214"/>
         <source>Middle</source>
-        <translation type="unfinished"/>
+        <translation>Milieu</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="215"/>
         <source>Bottom</source>
-        <translation type="unfinished"/>
+        <translation>Bas</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="233"/>
