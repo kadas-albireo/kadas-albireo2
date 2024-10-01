@@ -25,28 +25,30 @@
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
-class QTemporaryDir;
-class QgsLayerTreeGroup;
 class QNetworkRequest;
+class QTemporaryDir;
+
+class QStackedWidget;
+class QgsLayerTreeGroup;
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
-class KadasMessageLogViewer;
 class QgsMessageOutput;
 class QgsPointCloudLayer;
 class QgsPrintLayout;
 class QgsRasterLayer;
-class QStackedWidget;
 class QgsVectorLayer;
 class QgsVectorTileLayer;
+
 class KadasClipboard;
 class KadasGpxIntegration;
+class KadasLayerRefreshManager;
 class KadasMainWindow;
 class KadasMapToolPan;
-class KadasPythonIntegration;
+class KadasMessageLogViewer;
 class KadasPluginInterface;
+class KadasPythonIntegration;
 class KadasRedliningIntegration;
-class KadasLayerRefreshManager;
 
 #define kApp KadasApplication::instance()
 
@@ -65,8 +67,8 @@ class KadasApplication : public QgsApplication
     void init();
 
     KadasMainWindow *mainWindow() const { return mMainWindow; }
-    KadasPythonIntegration *pythonIntegration() { return mPythonIntegration; }
-    KadasLayerRefreshManager *layerRefreshManager() { return mLayerRefreshManager; }
+    KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
+    KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
