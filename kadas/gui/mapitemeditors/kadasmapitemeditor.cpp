@@ -20,6 +20,7 @@
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
+#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
 #include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
 #include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
@@ -34,6 +35,7 @@ KadasMapItemEditor::Registry *KadasMapItemEditor::registry()
     sRegistry->insert( QStringLiteral( "KadasGpxRouteEditor" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasGpxRouteEditor( item ); } );
     sRegistry->insert( QStringLiteral( "KadasSymbolAttributesEditor" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasSymbolAttributesEditor( item ); } );
     sRegistry->insert( QStringLiteral( "KadasGpxWaypointEditor" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasGpxWaypointEditor( item ); } );
+    sRegistry->insert( QStringLiteral( "KadasRedliningItemEditor" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasRedliningItemEditor( item ); } );
     sRegistry->insert( QStringLiteral( "KadasRedliningTextEditor" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasRedliningTextEditor( item ); } );
     sRegistry->insert( QStringLiteral( "KadasMeasureWidget" ), [] ( KadasMapItem* item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item ); } );
   });
