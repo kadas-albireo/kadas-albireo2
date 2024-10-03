@@ -65,34 +65,34 @@ void KadasMapToolCreateItem::activate()
   createItem();
   setupNumericInputWidget();
   mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
-  mBottomBar = new KadasBottomBar( canvas() );
-  mBottomBar->setLayout( new QHBoxLayout() );
-  mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
+  mBottomBar = new KadasBottomBar( mCanvas );
+  QHBoxLayout* layout = new QHBoxLayout( mCanvas );
+  layout->setContentsMargins( 8, 4, 8, 4 );
   if ( !mToolLabel.isEmpty() )
   {
     QLabel *label = new QLabel( mToolLabel );
     QFont font = label->font();
     font.setBold( true );
     label->setFont( font );
-    mBottomBar->layout()->addWidget( label );
+    layout->addWidget( label );
   }
   if ( mBottomBarExtra )
   {
-    mBottomBar->layout()->addWidget( mBottomBarExtra );
+    layout->addWidget( mBottomBarExtra );
   }
   if ( mShowLayerSelection )
   {
     KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerTreeView, mLayerSelectionFilter, mLayerCreator );
     layerSelection->setSelectedLayer( mLayer );
     connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
-    mBottomBar->layout()->addWidget( layerSelection );
+    layout->addWidget( layerSelection );
   }
   KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
   if ( factory )
   {
     mEditor = factory( mItem, KadasMapItemEditor::EditorType::CreateItemEditor );
     mEditor->syncWidgetToItem();
-    mBottomBar->layout()->addWidget( mEditor );
+    layout->addWidget( mEditor );
   }
 
   if ( mUndoRedoVisible )
@@ -103,7 +103,7 @@ void KadasMapToolCreateItem::activate()
     undoButton->setEnabled( false );
     connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
     connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-    mBottomBar->layout()->addWidget( undoButton );
+    layout->addWidget( undoButton );
 
     QPushButton *redoButton = new QPushButton();
     redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
@@ -111,15 +111,17 @@ void KadasMapToolCreateItem::activate()
     redoButton->setEnabled( false );
     connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
     connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-    mBottomBar->layout()->addWidget( redoButton );
+    layout->addWidget( redoButton );
   }
 
   QPushButton *closeButton = new QPushButton();
   closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
   closeButton->setToolTip( tr( "Close" ) );
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  mBottomBar->layout()->addWidget( closeButton );
+  layout->addWidget( closeButton );
 
+  mBottomBar->setLayout( layout );
+  mBottomBar->adjustSize();
   mBottomBar->show();
   QgsMapTool::activate();
 }

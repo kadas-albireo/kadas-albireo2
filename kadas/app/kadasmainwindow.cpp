@@ -1473,6 +1473,9 @@ void KadasMainWindow::removeCustomDropHandler( QgsCustomDropHandler *handler )
 
 void KadasMainWindow::showPluginManager( bool show )
 {
+  if ( show )
+    mPluginManager->adjustSize();
+
   mPluginManager->setVisible( show );
 }
 

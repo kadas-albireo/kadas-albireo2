@@ -47,6 +47,7 @@ KadasMapToolGuideGrid::KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTree
   connect( mWidget, &KadasGuideGridWidget::requestPick, this, &KadasMapToolGuideGrid::setPickMode );
   connect( mWidget, &KadasGuideGridWidget::close, this, &KadasMapToolGuideGrid::close );
 
+  mWidget->adjustSize();
   mWidget->show();
 }
 

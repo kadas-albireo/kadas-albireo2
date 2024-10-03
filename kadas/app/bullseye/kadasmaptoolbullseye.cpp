@@ -47,6 +47,7 @@ KadasMapToolBullseye::KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( mWidget, &KadasBullseyeWidget::requestPickCenter, this, &KadasMapToolBullseye::setPicking );
   connect( mWidget, &KadasBullseyeWidget::close, this, &KadasMapToolBullseye::close );
 
+  mWidget->adjustSize();
   mWidget->show();
 }
 

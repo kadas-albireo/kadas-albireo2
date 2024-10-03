@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>KadasTemporalControllerBase</class>
- <widget class="QFrame" name="KadasTemporalControllerBase">
+ <widget class="QWidget" name="KadasTemporalControllerBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,15 +9,6 @@
     <width>858</width>
     <height>163</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Frame</string>
-  </property>
-  <property name="frameShape">
-   <enum>QFrame::Shape::StyledPanel</enum>
-  </property>
-  <property name="frameShadow">
-   <enum>QFrame::Shadow::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">

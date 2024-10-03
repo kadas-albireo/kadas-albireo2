@@ -111,6 +111,7 @@ void KadasMapToolEditItem::activate()
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
   mBottomBar->layout()->addWidget( closeButton );
 
+  mBottomBar->adjustSize();
   mBottomBar->show();
 }
 

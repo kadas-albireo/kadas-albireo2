@@ -11,7 +11,7 @@
 
 
 
-class KadasBottomBar : QFrame
+class KadasBottomBar : QgsFloatingWidget
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -29,14 +29,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );
-    virtual bool eventFilter( QObject *obj, QEvent *event );
-
-    virtual void showEvent( QShowEvent * /*event*/ );
-
 
   protected:
-
-    void updatePosition();
 };
 
 /************************************************************************
