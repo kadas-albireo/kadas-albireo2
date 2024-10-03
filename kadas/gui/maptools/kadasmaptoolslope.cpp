@@ -31,7 +31,8 @@
 
 
 KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
+  : KadasMapToolCreateItem( mapCanvas, this )
+  , KadasMapItemInterface()
 {
   setCursor( Qt::ArrowCursor );
   setUndoRedoVisible( false );
@@ -39,13 +40,10 @@ KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolSlope::drawFinished );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolSlope::itemFactory( const QgsMapCanvas *canvas ) const
+KadasMapItem* KadasMapToolSlope::createItem() const
 {
-  return [ = ]
-  {
-    KadasRectangleItem *item = new KadasRectangleItem( canvas->mapSettings().destinationCrs() );
-    return item;
-  };
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  return item;
 }
 
 void KadasMapToolSlope::drawFinished()

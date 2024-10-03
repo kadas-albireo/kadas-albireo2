@@ -28,8 +28,11 @@
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
+
+
 KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
+  : KadasMapToolCreateItem( mapCanvas, this )
+  , KadasMapItemInterface()
 {
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolDeleteItems::drawFinished );
 
@@ -37,15 +40,12 @@ KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
   setUndoRedoVisible( false );
 }
 
-KadasMapToolDeleteItems::ItemFactory KadasMapToolDeleteItems::itemFactory( QgsMapCanvas *canvas ) const
+KadasMapItem* KadasMapToolDeleteItems::createItem() const
 {
-  return [ = ]
-  {
-    KadasRectangleItem *item = new KadasRectangleItem( canvas->mapSettings().destinationCrs() );
-    item->setFill( Qt::NoBrush );
-    item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
-    return item;
-  };
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  item->setFill( Qt::NoBrush );
+  item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
+  return item;
 }
 
 void KadasMapToolDeleteItems::drawFinished()
@@ -144,3 +144,4 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
     }
   }
 }
+

@@ -33,6 +33,13 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     Q_OBJECT
 
   public:
+    static inline const QString GPX_ROUTE = QStringLiteral( "KadasGpxRouteEditor" );
+    static inline const QString SYMBOL_ATTRIBUTES =  QStringLiteral( "KadasSymbolAttributesEditor" );
+    static inline const QString GPX_WAYPOINT = QStringLiteral( "KadasGpxWaypointEditor" );
+    static inline const QString REDLINING_ITEM = QStringLiteral( "KadasRedliningItemEditor" );
+    static inline const QString REDLINING_TEXT = QStringLiteral( "KadasRedliningTextEditor" );
+    static inline const QString MEASURE_WIDGET = QStringLiteral( "KadasMeasureWidget" );
+
     enum class EditorType SIP_MONKEYPATCH_SCOPEENUM
     {
       CreateItemEditor,

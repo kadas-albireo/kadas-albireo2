@@ -18,19 +18,21 @@
 #define KADASMAPTOOLSLOPE_H
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
     KadasMapToolSlope( QgsMapCanvas *mapCanvas );
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
+    KadasMapItem* createItem() const override;
+
   private slots:
     void drawFinished();
 
-    KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas ) const;
 };
 
 #endif // KADASMAPTOOLSLOPE_H

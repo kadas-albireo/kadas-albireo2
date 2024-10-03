@@ -18,11 +18,12 @@
 #define KADASMAPTOOLMINMAX_H
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class KadasSymbolItem;
 
-class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
@@ -37,12 +38,13 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
 
+    KadasMapItem* createItem() const override;
+
   private slots:
     void requestPick();
     void drawFinished();
 
   private:
-    KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas, FilterType filterType ) const;
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
     QPointer<KadasSymbolItem> mPinMin;

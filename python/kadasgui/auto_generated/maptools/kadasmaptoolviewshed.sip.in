@@ -42,7 +42,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 };
 
-class KadasMapToolViewshed : KadasMapToolCreateItem
+class KadasMapToolViewshed : KadasMapToolCreateItem, KadasMapItemInterface
 {
 
 %TypeHeaderCode
@@ -50,6 +50,8 @@ class KadasMapToolViewshed : KadasMapToolCreateItem
 %End
   public:
     KadasMapToolViewshed( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem* createItem() const;
+
 
 };
 

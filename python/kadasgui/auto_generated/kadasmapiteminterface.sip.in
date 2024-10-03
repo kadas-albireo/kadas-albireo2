@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/maptools/kadasmaptooldeleteitems.h                         *
+ * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -9,38 +9,28 @@
 
 
 
-class KadasMapToolDeleteItems : KadasMapToolCreateItem, KadasMapItemInterface
+
+class KadasMapItemInterface
 {
 %Docstring(signature="appended")
-*************************************************************************
-
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
-
-**************************************************************************
+An interface for map items creation
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 %End
   public:
-    KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );
-    virtual void activate();
+    KadasMapItemInterface();
 
-    void deleteItems( const KadasMapRect &filterRect );
+    virtual ~KadasMapItemInterface();
 
-    virtual KadasMapItem* createItem() const;
-
-
-
+    virtual KadasMapItem* createItem() const = 0;
 };
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/maptools/kadasmaptooldeleteitems.h                         *
+ * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

@@ -21,6 +21,9 @@
 
 #include <qgis/qgscustomdrophandler.h>
 
+#include "kadas/gui/kadasmapiteminterface.h"
+
+
 class QAction;
 class QComboBox;
 class QSlider;
@@ -32,6 +35,13 @@ class KadasMilxLayer;
 class KadasMilxLayerPropertiesPageFactory;
 class KadasMilxLibrary;
 
+
+class KadasMilxInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMilxInterface() = default;
+    KadasMapItem* createItem() const override;
+};
 
 class KadasMilxDropHandler : public QgsCustomDropHandler
 {

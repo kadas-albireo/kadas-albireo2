@@ -21,6 +21,7 @@
 #include <qgis/qgssettingsentryenumflag.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
@@ -69,7 +70,7 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     void updateTotal();
 };
 
-class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
@@ -82,13 +83,13 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
 
+    KadasMapItem* createItem() const override;
+
   private:
     bool mPickFeature = false;
     MeasureMode mMeasureMode = MeasureMode::MeasureLine;
 
-    KadasMapToolCreateItem::ItemFactory itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const;
     KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
-
 
   private slots:
     void requestPick();

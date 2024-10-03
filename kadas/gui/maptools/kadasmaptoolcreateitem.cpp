@@ -27,15 +27,16 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 
 
-KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer )
+KadasMapToolCreateItem::KadasMapToolCreateItem(QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
-  , mItemFactory( itemFactory )
+  , mInterface( interface )
   , mLayer( layer )
 {
 }
@@ -52,6 +53,8 @@ KadasMapToolCreateItem::~KadasMapToolCreateItem()
 {
   delete mInputWidget;
   mInputWidget = nullptr;
+  delete mInterface;
+  mInterface = nullptr;
 }
 
 void KadasMapToolCreateItem::activate()
@@ -141,14 +144,14 @@ void KadasMapToolCreateItem::setExtraBottomBarContents( QWidget *widget )
 {
   mBottomBarExtra = widget;
 }
-
-void KadasMapToolCreateItem::setItemFactory( ItemFactory itemFactory )
+/*
+void KadasMapToolCreateItem::setItemFactory( KadasMapItemInterface *interface )
 {
-  mItemFactory = itemFactory;
+  mInterface = interface;
   clear();
   setupNumericInputWidget();
 }
-
+*/
 void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
 {
   mLayerTreeView = layerTreeView;
@@ -327,9 +330,9 @@ void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 
 void KadasMapToolCreateItem::createItem()
 {
-  if ( !mItem && mItemFactory )
+  if ( !mItem && mInterface )
   {
-    mItem = mItemFactory();
+    mItem = mInterface->createItem();
   }
   else
   {
@@ -373,7 +376,7 @@ void KadasMapToolCreateItem::finishPart()
   mItem->endPart();
   mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
   emit partFinished();
-  if ( !mItemFactory )
+  if ( !mInterface )
   {
     KadasMapItem *item = mItem;
     KadasMapCanvasItemManager::removeItem( mItem ); // Edit tool adds item again

@@ -36,7 +36,8 @@
 
 
 KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
+  : KadasMapToolCreateItem( mapCanvas, this )
+  , KadasMapItemInterface()
 {
   setCursor( Qt::ArrowCursor );
   setUndoRedoVisible( false );
@@ -44,13 +45,10 @@ KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolHillshade::itemFactory( const QgsMapCanvas *canvas ) const
+KadasMapItem* KadasMapToolHillshade::createItem() const
 {
-  return [ = ]
-  {
-    KadasRectangleItem *item = new KadasRectangleItem( canvas->mapSettings().destinationCrs() );
-    return item;
-  };
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  return item;
 }
 
 void KadasMapToolHillshade::drawFinished()

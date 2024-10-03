@@ -183,20 +183,18 @@ void KadasViewshedDialog::adjustMinAngle()
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasMapToolViewshed::KadasMapToolViewshed( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
+  : KadasMapToolCreateItem( mapCanvas, this )
+  , KadasMapItemInterface()
 {
   setCursor( Qt::ArrowCursor );
   setToolLabel( tr( "Compute viewshed" ) );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolViewshed::drawFinished );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolViewshed::itemFactory( const QgsMapCanvas *canvas ) const
+KadasMapItem* KadasMapToolViewshed::createItem() const
 {
-  return [ = ]
-  {
-    KadasCircularSectorItem *item = new KadasCircularSectorItem( canvas->mapSettings().destinationCrs() );
-    return item;
-  };
+  KadasCircularSectorItem *item = new KadasCircularSectorItem( mCanvas->mapSettings().destinationCrs() );
+  return item;
 }
 
 void KadasMapToolViewshed::drawFinished()

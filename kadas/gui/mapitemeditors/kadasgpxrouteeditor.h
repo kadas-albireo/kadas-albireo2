@@ -22,6 +22,7 @@
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/ui_kadasgpxrouteeditor.h"
 
+
 class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
 {
     Q_OBJECT

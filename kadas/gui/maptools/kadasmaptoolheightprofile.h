@@ -20,6 +20,8 @@
 #include <qgis/qgsmaptool.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
+
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class QgsCoordinateReferenceSystem;
@@ -27,7 +29,7 @@ class QgsGeometry;
 class KadasHeightProfileDialog;
 class KadasPointItem;
 
-class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
@@ -44,6 +46,8 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     void setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void setMarkerPos( double distance );
 
+    KadasMapItem* createItem() const override;
+
   public slots:
     void pickLine();
 
@@ -51,8 +55,6 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     KadasPointItem *mPosMarker = nullptr;
     KadasHeightProfileDialog *mDialog = nullptr;
     bool mPicking = false;
-
-    static ItemFactory lineFactory( QgsMapCanvas *canvas );
 
   private slots:
     void drawCleared();

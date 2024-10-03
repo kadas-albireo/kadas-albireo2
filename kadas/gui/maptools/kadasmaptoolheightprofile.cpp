@@ -27,7 +27,7 @@
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
 KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
-  : KadasMapToolCreateItem( canvas, lineFactory( canvas ) )
+  : KadasMapToolCreateItem( canvas, this )
 {
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
@@ -44,14 +44,11 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   connect( this, &KadasMapToolCreateItem::cleared, this, &KadasMapToolHeightProfile::drawCleared );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory( QgsMapCanvas *canvas )
+KadasMapItem* KadasMapToolHeightProfile::createItem() const
 {
-  return [ = ]
-  {
-    KadasLineItem *item = new KadasLineItem( canvas->mapSettings().destinationCrs() );
-    item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
-    return item;
-  };
+  KadasLineItem *item = new KadasLineItem( mCanvas->mapSettings().destinationCrs() );
+  item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
+  return item;
 }
 
 void KadasMapToolHeightProfile::activate()

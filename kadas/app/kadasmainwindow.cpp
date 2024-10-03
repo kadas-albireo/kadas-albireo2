@@ -102,6 +102,14 @@
 
 #include <external/qgis/app/qgsgotolocatorfilter.h>
 
+
+KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
+{
+  KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  item->setEditor( "KadasSymbolAttributesEditor" );
+  return item;
+}
+
 KadasMainWindow::KadasMainWindow()
 {
   KadasWindowBase::setupUi( this );
@@ -1371,13 +1379,7 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  KadasMapToolCreateItem::ItemFactory factory = []
-  {
-    KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    item->setEditor( "KadasSymbolAttributesEditor" );
-    return item;
-  };
-  return new KadasMapToolCreateItem( mapCanvas(), factory, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
+  return new KadasMapToolCreateItem( mapCanvas(), new KadasSymbolAttributesEditorInterface(), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
 }
 
 void KadasMainWindow::addLocalPicture()

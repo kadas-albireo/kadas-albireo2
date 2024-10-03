@@ -194,22 +194,24 @@ void KadasMeasureWidget::updateTotal()
 
 
 KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode )
-  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) ), mMeasureMode( measureMode )
+  : KadasMapToolCreateItem( canvas, this )
+  , KadasMapItemInterface()
+  , mMeasureMode( measureMode )
 {
   setMultipart( true );
   setSnappingEnabled( true );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const
+KadasMapItem* KadasMapToolMeasure::createItem() const
 {
-  switch ( measureMode )
+  switch ( mMeasureMode )
   {
     case MeasureMode::MeasureLine:
-      return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ) ); };
+      return setupItem( new KadasLineItem( mCanvas->mapSettings().destinationCrs(), true ) );
     case MeasureMode::MeasurePolygon:
-      return [ = ] { return setupItem( new KadasPolygonItem( canvas->mapSettings().destinationCrs(), true ) ); };
+      return setupItem( new KadasPolygonItem( mCanvas->mapSettings().destinationCrs(), true ) );
     case MeasureMode::MeasureCircle:
-      return [ = ] { return setupItem( new KadasCircleItem( canvas->mapSettings().destinationCrs(), true ) ); };
+      return setupItem( new KadasCircleItem( mCanvas->mapSettings().destinationCrs(), true ) );
   }
   return nullptr;
 }

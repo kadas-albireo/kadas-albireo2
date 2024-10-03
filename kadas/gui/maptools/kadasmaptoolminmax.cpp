@@ -43,7 +43,8 @@
 
 
 KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas, FilterType::FilterRect ) )
+  : KadasMapToolCreateItem( mapCanvas, this )
+  , mFilterType( FilterType::FilterRect )
   , mActionViewshed( actionViewshed )
   , mActionProfile( actionProfile )
 {
@@ -91,28 +92,23 @@ KadasMapToolMinMax::~KadasMapToolMinMax()
   }
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolMinMax::itemFactory( const QgsMapCanvas *canvas, FilterType filterType ) const
+KadasMapItem* KadasMapToolMinMax::createItem() const
 {
-  KadasMapToolCreateItem::ItemFactory factory = nullptr;
-  switch ( filterType )
+  switch ( mFilterType )
   {
     case FilterType::FilterRect:
-      factory = [ = ] { return new KadasRectangleItem( canvas->mapSettings().destinationCrs() ); };
-      break;
+      return new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
     case FilterType::FilterPoly:
-      factory = [ = ] { return new KadasPolygonItem( canvas->mapSettings().destinationCrs() ); };
-      break;
+      return new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() );
     case FilterType::FilterCircle:
-      factory = [ = ] { return new KadasCircleItem( canvas->mapSettings().destinationCrs() ); };
-      break;
+      return new KadasCircleItem( mCanvas->mapSettings().destinationCrs() );
   }
-  return factory;
+  return nullptr;
 }
 
 void KadasMapToolMinMax::setFilterType( FilterType filterType )
 {
   mFilterType = filterType;
-  setItemFactory( itemFactory( mCanvas, mFilterType ) );
   mFilterTypeCombo->blockSignals( true );
   mFilterTypeCombo->setCurrentIndex( mFilterTypeCombo->findData( QVariant::fromValue( filterType ) ) );
   mFilterTypeCombo->blockSignals( false );

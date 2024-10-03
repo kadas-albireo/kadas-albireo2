@@ -18,9 +18,10 @@
 #define KADASMAPTOOLDELETEITEMS_H
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
@@ -28,8 +29,8 @@ class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
     void activate() override;
     void deleteItems( const KadasMapRect &filterRect );
 
-  private:
-    ItemFactory itemFactory( QgsMapCanvas *canvas ) const;
+    KadasMapItem* createItem() const override;
+
 
   private slots:
     void drawFinished();

@@ -11,7 +11,8 @@
 
 
 
-class KadasMapToolHeightProfile : KadasMapToolCreateItem
+
+class KadasMapToolHeightProfile : KadasMapToolCreateItem, KadasMapItemInterface
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -46,6 +47,9 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     void setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void setMarkerPos( double distance );
+
+    virtual KadasMapItem* createItem() const;
+
 
   public slots:
     void pickLine();

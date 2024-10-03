@@ -18,19 +18,21 @@
 #define KADASMAPTOOLHILLSHADE_H
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem, public KadasMapItemInterface
 {
     Q_OBJECT
   public:
     KadasMapToolHillshade( QgsMapCanvas *mapCanvas );
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
+    KadasMapItem* createItem() const override;
+
   private slots:
     void drawFinished();
 
-    KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas ) const;
 };
 
 #endif // KADASMAPTOOLHILLSHADE_H
