@@ -21,7 +21,7 @@
 
 #include <QObject>
 
-#include <kadas/gui/kadasmapiteminterface.h>
+#include "kadas/gui/kadasmapiteminterface.h"
 
 
 
