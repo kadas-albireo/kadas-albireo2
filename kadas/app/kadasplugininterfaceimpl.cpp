@@ -30,6 +30,7 @@
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
+#include "kadascanvascontextmenu.h"
 #include "kadasplugininterfaceimpl.h"
 #include "kadasplugininterfaceimpl.h"
 
