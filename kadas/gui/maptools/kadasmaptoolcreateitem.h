@@ -17,6 +17,7 @@
 #ifndef KADASMAPTOOLCREATEITEM_H
 #define KADASMAPTOOLCREATEITEM_H
 
+#include <qgis/qgis_sip.h>
 #include <qgis/qgsmaptool.h>
 
 #include "kadas/core/kadasstatehistory.h"
@@ -34,7 +35,10 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 {
     Q_OBJECT
   public:
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = nullptr );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = nullptr ) SIP_SKIP;
+
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface SIP_TRANSFER, KadasItemLayer *layer = nullptr );
+
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
 

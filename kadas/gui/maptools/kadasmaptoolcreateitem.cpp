@@ -34,12 +34,19 @@
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 
 
-KadasMapToolCreateItem::KadasMapToolCreateItem(QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer )
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
   , mInterface( std::move( interface ) )
   , mLayer( layer )
 {
 }
+
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
+  : QgsMapTool( canvas )
+  , mInterface( std::move( std::unique_ptr<KadasMapItemInterface>( interface ) ) )
+{}
+
+
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
   : QgsMapTool( canvas )

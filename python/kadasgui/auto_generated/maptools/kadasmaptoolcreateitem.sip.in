@@ -28,7 +28,9 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 %End
   public:
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = 0 );
+
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface /Transfer/, KadasItemLayer *layer = 0 );
+
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = 0 );
     ~KadasMapToolCreateItem();
 
