@@ -169,7 +169,7 @@ void KadasMilxIntegration::createMilx( bool active )
     KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
     KadasLayerSelectionWidget::LayerCreator layerCreator = [ = ]( const QString & name ) { return new KadasMilxLayer( name ); };
 
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, new KadasMilxInterface(), getOrCreateLayer() );
+    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), layerFilter, layerCreator );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );

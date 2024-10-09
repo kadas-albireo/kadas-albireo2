@@ -34,7 +34,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 {
     Q_OBJECT
   public:
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface, KadasItemLayer *layer = nullptr );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = nullptr );
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
 
@@ -129,7 +129,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
   private:
     QgsLayerTreeView *mLayerTreeView = nullptr;
-    KadasMapItemInterface* mInterface = nullptr;
+    std::unique_ptr<KadasMapItemInterface> mInterface;
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
 

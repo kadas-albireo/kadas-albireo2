@@ -34,9 +34,9 @@
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 
 
-KadasMapToolCreateItem::KadasMapToolCreateItem(QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
+KadasMapToolCreateItem::KadasMapToolCreateItem(QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
-  , mInterface( interface )
+  , mInterface( std::move( interface ) )
   , mLayer( layer )
 {
 }
@@ -53,8 +53,6 @@ KadasMapToolCreateItem::~KadasMapToolCreateItem()
 {
   delete mInputWidget;
   mInputWidget = nullptr;
-  delete mInterface;
-  mInterface = nullptr;
 }
 
 void KadasMapToolCreateItem::activate()
