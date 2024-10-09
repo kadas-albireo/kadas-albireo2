@@ -70,7 +70,8 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     void updateTotal();
 };
 
-class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem, public KadasMapItemInterface
+
+class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
@@ -83,16 +84,23 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem, publ
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
 
-    KadasMapItem* createItem() const override;
-
   private:
     bool mPickFeature = false;
     MeasureMode mMeasureMode = MeasureMode::MeasureLine;
 
-    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
-
   private slots:
     void requestPick();
+};
+
+class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode ) : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
+    QgsMapCanvas* mCanvas = nullptr;
+    KadasMapToolMeasure::MeasureMode mMeasureMode = KadasMapToolMeasure::MeasureMode::MeasureLine;
 };
 
 #endif // KADASMAPTOOLMEASURE_H

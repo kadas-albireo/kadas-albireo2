@@ -119,44 +119,44 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
   mActionNewPoint = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point" ), this );
   mActionNewPoint->setCheckable( true );
-  connect( mActionNewPoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasPointItemInterface() ); } );
+  connect( mActionNewPoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasPointItemInterface>( KadasPointItemInterface() ) ) ); } );
 
   mActionNewSquare = new QAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square" ), this );
   mActionNewSquare->setCheckable( true );
-  connect( mActionNewSquare, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasSquareItemInterface() ); } );
+  connect( mActionNewSquare, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasSquareItemInterface>( KadasSquareItemInterface() ) ) ); } );
 
   mActionNewTriangle = new QAction( QIcon( ":/kadas/icons/redlining_triangle" ), tr( "Triangle" ), this );
   mActionNewTriangle->setCheckable( true );
-  connect( mActionNewTriangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasTriangleItemInterface() ); } );
+  connect( mActionNewTriangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasTriangleItemInterface>( KadasTriangleItemInterface() ) ) ); } );
 
   mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
   mActionNewLine->setCheckable( true );
-  connect( mActionNewLine, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasLineItemInterface() ); } );
+  connect( mActionNewLine, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasLineItemInterface>( KadasLineItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_L ), kApp->mainWindow() ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
   mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
-  connect( mActionNewRectangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasRectangleItemInterface() ); } );
+  connect( mActionNewRectangle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRectangleItemInterface>( KadasRectangleItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
   mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
   mActionNewPolygon->setCheckable( true );
-  connect( mActionNewPolygon, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasPolygonItemInterface() ); } );
+  connect( mActionNewPolygon, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasPolygonItemInterface>( KadasPolygonItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_P ), kApp->mainWindow() ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
   mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
   mActionNewCircle->setCheckable( true );
-  connect( mActionNewCircle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasCircleItemInterface() ); } );
+  connect( mActionNewCircle, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasCircleItemInterface>( KadasCircleItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
   mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
-  connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasTextItemInterface() ); } );
+  connect( mActionNewText, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasTextItemInterface>( KadasTextItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   mActionNewCoordCross = new QAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this );
   mActionNewCoordCross->setCheckable( true );
-  connect( mActionNewCoordCross, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, new KadasCoordCrossItemInterface() ); } );
+  connect( mActionNewCoordCross, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasCoordCrossItemInterface>( KadasCoordCrossItemInterface() ) ) ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
 
   QMenu *menuNewMarker = new QMenu();
@@ -187,13 +187,13 @@ KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
   return mLastLayer;
 }
 
-void KadasRedliningIntegration::toggleCreateItem(bool active, KadasMapItemInterface *interface )
+void KadasRedliningIntegration::toggleCreateItem(bool active, std::unique_ptr<KadasMapItemInterface> interface )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *> ( QObject::sender() );
   if ( active )
   {
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, interface, getOrCreateLayer() );
+    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
 
     KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name )

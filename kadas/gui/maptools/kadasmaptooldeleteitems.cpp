@@ -28,24 +28,22 @@
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
-
-
-KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, this )
-  , KadasMapItemInterface()
-{
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolDeleteItems::drawFinished );
-
-  setToolLabel( tr( "Delete map items" ) );
-  setUndoRedoVisible( false );
-}
-
-KadasMapItem* KadasMapToolDeleteItems::createItem() const
+KadasMapItem* KadasMapToolDeleteItemsInterface::createItem() const
 {
   KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
   item->setFill( Qt::NoBrush );
   item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
   return item;
+}
+
+
+KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
+  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolDeleteItemsInterface>( KadasMapToolDeleteItemsInterface( mapCanvas ) ) ) )
+{
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolDeleteItems::drawFinished );
+
+  setToolLabel( tr( "Delete map items" ) );
+  setUndoRedoVisible( false );
 }
 
 void KadasMapToolDeleteItems::drawFinished()

@@ -1379,7 +1379,7 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  return new KadasMapToolCreateItem( mapCanvas(), new KadasSymbolAttributesEditorInterface(), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
+  return new KadasMapToolCreateItem( mapCanvas(), std::move( std::make_unique<KadasSymbolAttributesEditorInterface>(  KadasSymbolAttributesEditorInterface() ) ), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
 }
 
 void KadasMainWindow::addLocalPicture()

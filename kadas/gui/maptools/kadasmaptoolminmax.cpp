@@ -42,8 +42,27 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
+KadasMapItem* KadasMapToolMinMaxItemInterface::createItem() const
+{
+  switch ( mFilterType )
+  {
+    case KadasMapToolMinMax::FilterType::FilterRect:
+      return new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+    case KadasMapToolMinMax::FilterType::FilterPoly:
+      return new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() );
+    case KadasMapToolMinMax::FilterType::FilterCircle:
+      return new KadasCircleItem( mCanvas->mapSettings().destinationCrs() );
+  }
+  return nullptr;
+}
+
+void KadasMapToolMinMaxItemInterface::setFilterType( KadasMapToolMinMax::FilterType filterType )
+{
+  mFilterType = filterType;
+}
+
 KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile )
-  : KadasMapToolCreateItem( mapCanvas, this )
+  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolMinMaxItemInterface>( KadasMapToolMinMaxItemInterface( mapCanvas ) ) ) )
   , mFilterType( FilterType::FilterRect )
   , mActionViewshed( actionViewshed )
   , mActionProfile( actionProfile )
@@ -92,23 +111,10 @@ KadasMapToolMinMax::~KadasMapToolMinMax()
   }
 }
 
-KadasMapItem* KadasMapToolMinMax::createItem() const
-{
-  switch ( mFilterType )
-  {
-    case FilterType::FilterRect:
-      return new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
-    case FilterType::FilterPoly:
-      return new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() );
-    case FilterType::FilterCircle:
-      return new KadasCircleItem( mCanvas->mapSettings().destinationCrs() );
-  }
-  return nullptr;
-}
-
 void KadasMapToolMinMax::setFilterType( FilterType filterType )
 {
   mFilterType = filterType;
+  static_cast<KadasMapToolMinMaxItemInterface*>( mInterface.get() )->setFilterType( filterType );
   mFilterTypeCombo->blockSignals( true );
   mFilterTypeCombo->setCurrentIndex( mFilterTypeCombo->findData( QVariant::fromValue( filterType ) ) );
   mFilterTypeCombo->blockSignals( false );

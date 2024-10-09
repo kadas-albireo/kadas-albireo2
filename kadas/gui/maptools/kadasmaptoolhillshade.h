@@ -21,14 +21,21 @@
 #include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem, public KadasMapItemInterface
+class KADAS_GUI_EXPORT KadasMapToolHillshadeItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    QgsMapCanvas* mCanvas = nullptr;
+};
+
+class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
     KadasMapToolHillshade( QgsMapCanvas *mapCanvas );
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
-
-    KadasMapItem* createItem() const override;
 
   private slots:
     void drawFinished();

@@ -10,7 +10,9 @@
 
 
 
-class KadasMapToolMinMax : KadasMapToolCreateItem, KadasMapItemInterface
+
+
+class KadasMapToolMinMax : KadasMapToolCreateItem
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -40,10 +42,22 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
 
 
+};
+
+
+class KadasMapToolMinMaxItemInterface : KadasMapItemInterface
+{
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolminmax.h"
+%End
+  public:
+    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas );
     virtual KadasMapItem* createItem() const;
 
-
+    void setFilterType( KadasMapToolMinMax:: FilterType filterType );
 };
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

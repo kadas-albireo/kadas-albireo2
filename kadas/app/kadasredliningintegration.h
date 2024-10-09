@@ -125,7 +125,7 @@ class KadasRedliningIntegration : public QObject
 
     QPointer<KadasItemLayer> mLastLayer;
 
-    void toggleCreateItem(bool active, KadasMapItemInterface *interface );
+    void toggleCreateItem(bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
   private slots:
     void activateNewButtonObject();

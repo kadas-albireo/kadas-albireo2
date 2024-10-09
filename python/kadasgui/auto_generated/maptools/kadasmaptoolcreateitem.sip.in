@@ -122,6 +122,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem();
 
+  protected:
+
 };
 
 /************************************************************************

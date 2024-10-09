@@ -127,9 +127,11 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem() { return mItem; }
 
+  protected:
+    std::unique_ptr<KadasMapItemInterface> mInterface;
+
   private:
     QgsLayerTreeView *mLayerTreeView = nullptr;
-    std::unique_ptr<KadasMapItemInterface> mInterface;
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
 

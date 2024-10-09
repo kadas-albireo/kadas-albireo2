@@ -61,12 +61,20 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     void adjustMinAngle();
 };
 
-class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem, public KadasMapItemInterface
+class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    QgsMapCanvas* mCanvas = nullptr;
+};
+
+class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
     KadasMapToolViewshed( QgsMapCanvas *mapCanvas );
-    KadasMapItem* createItem() const override;
 
   private slots:
     void drawFinished();

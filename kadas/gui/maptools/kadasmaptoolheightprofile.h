@@ -29,7 +29,16 @@ class QgsGeometry;
 class KadasHeightProfileDialog;
 class KadasPointItem;
 
-class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem, public KadasMapItemInterface
+class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    QgsMapCanvas* mCanvas = nullptr;
+};
+
+class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
@@ -45,8 +54,6 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 
     void setGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void setMarkerPos( double distance );
-
-    KadasMapItem* createItem() const override;
 
   public slots:
     void pickLine();

@@ -29,21 +29,20 @@
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
 #include "kadas/gui/maptools/kadasmaptoolslope.h"
 
+KadasMapItem* KadasMapToolSlopeItemInterface::createItem() const
+{
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  return item;
+}
+
 
 KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, this )
-  , KadasMapItemInterface()
+  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolSlopeItemInterface>( KadasMapToolSlopeItemInterface( mapCanvas ) ) ) )
 {
   setCursor( Qt::ArrowCursor );
   setUndoRedoVisible( false );
   setToolLabel( tr( "Compute slope" ) );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolSlope::drawFinished );
-}
-
-KadasMapItem* KadasMapToolSlope::createItem() const
-{
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
-  return item;
 }
 
 void KadasMapToolSlope::drawFinished()

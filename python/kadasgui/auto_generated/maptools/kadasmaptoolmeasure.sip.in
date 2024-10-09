@@ -47,7 +47,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 };
 
-class KadasMapToolMeasure : KadasMapToolCreateItem, KadasMapItemInterface
+
+class KadasMapToolMeasure : KadasMapToolCreateItem
 {
 
 %TypeHeaderCode
@@ -68,8 +69,17 @@ class KadasMapToolMeasure : KadasMapToolCreateItem, KadasMapItemInterface
     virtual void keyReleaseEvent( QKeyEvent *e );
 
 
-    virtual KadasMapItem* createItem() const;
+};
 
+class KadasMapToolMeasureItemInterface : KadasMapItemInterface
+{
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+%End
+  public:
+    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode );
+    virtual KadasMapItem* createItem() const;
 
 };
 

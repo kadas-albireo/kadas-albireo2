@@ -23,7 +23,9 @@
 
 class KadasSymbolItem;
 
-class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem, public KadasMapItemInterface
+
+
+class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
@@ -37,8 +39,6 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem, publi
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-
-    KadasMapItem* createItem() const override;
 
   private slots:
     void requestPick();
@@ -55,5 +55,18 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem, publi
 
     void showContextMenu( KadasMapItem *item ) const;
 };
+
+
+class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+    void setFilterType( KadasMapToolMinMax:: FilterType filterType );
+private:
+    QgsMapCanvas* mCanvas = nullptr;
+    KadasMapToolMinMax::FilterType mFilterType = KadasMapToolMinMax::FilterType::FilterRect;
+};
+
 
 #endif // KADASMAPTOOLMINMAX_H

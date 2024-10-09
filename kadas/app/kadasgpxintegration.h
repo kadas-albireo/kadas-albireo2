@@ -69,7 +69,7 @@ class KadasGpxIntegration : public QObject
     static bool importGpx( const QString &filename, QString &errorMsg );
 
   private:
-    void toggleCreateItem(bool active, KadasMapItemInterface *interface );
+    void toggleCreateItem(bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
     KadasGpxDropHandler mDropHandler;
 
