@@ -84,7 +84,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
   protected:
     State *state() { return static_cast<State *>( mState ); }
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
-    virtual void renderPrivate( QgsRenderContext &context, double dpiScale, double offsetX, double offsetY, double width, double height ) const = 0;
+    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     bool mPosLocked = false;
 
