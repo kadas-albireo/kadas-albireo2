@@ -26,8 +26,16 @@
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
+KadasMapItem* KadasMapToolHeightProfileItemInterface::createItem() const
+{
+  KadasLineItem *item = new KadasLineItem( mCanvas->mapSettings().destinationCrs() );
+  item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
+  return item;
+}
+
+
 KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
-  : KadasMapToolCreateItem( canvas, lineFactory( canvas ) )
+  : KadasMapToolCreateItem( canvas, std::move( std::make_unique<KadasMapToolHeightProfileItemInterface>( KadasMapToolHeightProfileItemInterface( canvas ) ) ) )
 {
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
@@ -42,16 +50,6 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   mDialog = new KadasHeightProfileDialog( this, 0, Qt::WindowStaysOnTopHint );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHeightProfile::drawFinished );
   connect( this, &KadasMapToolCreateItem::cleared, this, &KadasMapToolHeightProfile::drawCleared );
-}
-
-KadasMapToolCreateItem::ItemFactory KadasMapToolHeightProfile::lineFactory( QgsMapCanvas *canvas )
-{
-  return [ = ]
-  {
-    KadasLineItem *item = new KadasLineItem( canvas->mapSettings().destinationCrs() );
-    item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
-    return item;
-  };
 }
 
 void KadasMapToolHeightProfile::activate()

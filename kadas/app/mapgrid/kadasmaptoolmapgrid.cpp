@@ -45,6 +45,7 @@ KadasMapToolMapGrid::KadasMapToolMapGrid( QgsMapCanvas *canvas, QgsLayerTreeView
   setCursor( Qt::ArrowCursor );
   connect( mWidget, &KadasMapGridWidget::close, this, &KadasMapToolMapGrid::close );
 
+  mWidget->adjustSize();
   mWidget->show();
 }
 

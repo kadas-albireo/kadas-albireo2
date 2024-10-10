@@ -41,21 +41,23 @@
 #include "kadasgpxintegration.h"
 #include "kadasmainwindow.h"
 
+
+KadasMapItem *KadasWayPointInterface::createItem() const
+{
+  return new KadasGpxWaypointItem();
+}
+
+KadasMapItem *KadasRouteInterface::createItem() const
+{
+  return new KadasGpxRouteItem();
+}
+
+
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
-
-  KadasMapToolCreateItem::ItemFactory waypointFactory = [ = ]
-  {
-    return new KadasGpxWaypointItem();
-  };
-  KadasMapToolCreateItem::ItemFactory routeFactory = [ = ]
-  {
-    return new KadasGpxRouteItem();
-  };
-
-  connect( actionWaypoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, waypointFactory ); } );
-  connect( actionRoute, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, routeFactory ); } );
+  connect( actionWaypoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
+  connect( actionRoute, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
   connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
   connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
 
@@ -72,13 +74,13 @@ KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
   return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer );
 }
 
-void KadasGpxIntegration::toggleCreateItem( bool active, const std::function<KadasMapItem*() > &itemFactory )
+void KadasGpxIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *> ( QObject::sender() );
   if ( active )
   {
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
+    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
     tool->setAction( action );
     KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name )

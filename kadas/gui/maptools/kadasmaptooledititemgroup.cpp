@@ -69,6 +69,7 @@ void KadasMapToolEditItemGroup::activate()
   mBottomBar->layout()->addWidget( closeButton );
 
   mBottomBar->show();
+  mBottomBar->adjustSize();
 }
 
 void KadasMapToolEditItemGroup::deactivate()

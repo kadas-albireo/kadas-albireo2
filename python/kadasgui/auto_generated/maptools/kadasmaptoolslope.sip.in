@@ -9,7 +9,7 @@
 
 
 
-class KadasMapToolSlope : KadasMapToolCreateItem
+class KadasMapToolSlopeItemInterface : KadasMapItemInterface
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -21,6 +21,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 **************************************************************************
 %End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
+%End
+  public:
+    KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem* createItem() const;
+
+};
+
+class KadasMapToolSlope : KadasMapToolCreateItem
+{
 
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolslope.h"

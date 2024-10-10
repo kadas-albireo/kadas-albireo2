@@ -14,41 +14,22 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QHBoxLayout>
+
 #include <qgis/qgsmapcanvas.h>
 
 #include "kadas/gui/kadasbottombar.h"
 
 KadasBottomBar::KadasBottomBar( QgsMapCanvas *canvas, const QString &color )
-  : QFrame( canvas )
-  , mCanvas( canvas )
+  : QgsFloatingWidget( canvas )
 {
-  mCanvas->installEventFilter( this );
+  setAnchorWidget( canvas );
+  setAnchorPoint( QgsFloatingWidget::BottomMiddle );
+  setAnchorWidgetPoint( QgsFloatingWidget::BottomMiddle );
 
+  QHBoxLayout *containerLayout = new QHBoxLayout();
+  containerLayout->setContentsMargins( 0, 0, 0, 0 );
   setObjectName( "QgsBottomBar" );
-  setStyleSheet( QString( "QFrame#QgsBottomBar { background-color: %1; }" ).arg( color ) );
+  setStyleSheet( QString( "QWidget#QgsBottomBar { background-color: %1; }" ).arg( color ) );
   setCursor( Qt::ArrowCursor );
-}
-
-bool KadasBottomBar::eventFilter( QObject *obj, QEvent *event )
-{
-  if ( obj == mCanvas && event->type() == QEvent::Resize )
-  {
-    updatePosition();
-  }
-  return QObject::eventFilter( obj, event );
-}
-
-void KadasBottomBar::showEvent( QShowEvent * /*event*/ )
-{
-  setFixedSize( size() );
-  updatePosition();
-}
-
-void KadasBottomBar::updatePosition()
-{
-  int w = width();
-  int h = height();
-  QRect canvasGeometry = mCanvas->geometry();
-  move( canvasGeometry.x() + 0.5 * ( canvasGeometry.width() - w ),
-        canvasGeometry.y() + canvasGeometry.height() - h );
 }

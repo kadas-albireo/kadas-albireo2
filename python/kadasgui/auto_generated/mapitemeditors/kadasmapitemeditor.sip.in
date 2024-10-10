@@ -30,6 +30,13 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 %End
   public:
+    static const QString GPX_ROUTE;
+    static const QString SYMBOL_ATTRIBUTES;
+    static const QString GPX_WAYPOINT;
+    static const QString REDLINING_ITEM;
+    static const QString REDLINING_TEXT;
+    static const QString MEASURE_WIDGET;
+
     enum class EditorType
     {
       CreateItemEditor,

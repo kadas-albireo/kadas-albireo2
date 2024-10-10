@@ -21,6 +21,7 @@
 #include <qgis/qgssettingsentryenumflag.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
@@ -69,6 +70,7 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     void updateTotal();
 };
 
+
 class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
 {
     Q_OBJECT
@@ -86,12 +88,19 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
     bool mPickFeature = false;
     MeasureMode mMeasureMode = MeasureMode::MeasureLine;
 
-    KadasMapToolCreateItem::ItemFactory itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const;
-    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
-
-
   private slots:
     void requestPick();
+};
+
+class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode ) : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
+    QgsMapCanvas* mCanvas = nullptr;
+    KadasMapToolMeasure::MeasureMode mMeasureMode = KadasMapToolMeasure::MeasureMode::MeasureLine;
 };
 
 #endif // KADASMAPTOOLMEASURE_H

@@ -40,6 +40,13 @@
 #include "milx/kadasmilxintegration.h"
 #include "milx/kadasmilxexportdialog.h"
 
+
+KadasMapItem *KadasMilxInterface::createItem() const
+{
+  return new KadasMilxItem();
+}
+
+
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   : QObject( parent )
   , mUi( ui )
@@ -159,15 +166,10 @@ void KadasMilxIntegration::createMilx( bool active )
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   if ( active )
   {
-
-    KadasMapToolCreateItem::ItemFactory itemFactory = [ = ]
-    {
-      return new KadasMilxItem();
-    };
     KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
     KadasLayerSelectionWidget::LayerCreator layerCreator = [ = ]( const QString & name ) { return new KadasMilxLayer( name ); };
 
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, itemFactory, getOrCreateLayer() );
+    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), layerFilter, layerCreator );
     kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );

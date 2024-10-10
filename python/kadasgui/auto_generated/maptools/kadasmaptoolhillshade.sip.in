@@ -9,7 +9,7 @@
 
 
 
-class KadasMapToolHillshade : KadasMapToolCreateItem
+class KadasMapToolHillshadeItemInterface : KadasMapItemInterface
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -21,6 +21,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 **************************************************************************
 %End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
+%End
+  public:
+    KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem* createItem() const;
+
+};
+
+class KadasMapToolHillshade : KadasMapToolCreateItem
+{
 
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"

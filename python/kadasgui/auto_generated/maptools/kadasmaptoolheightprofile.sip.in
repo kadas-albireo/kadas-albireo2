@@ -11,7 +11,8 @@
 
 
 
-class KadasMapToolHeightProfile : KadasMapToolCreateItem
+
+class KadasMapToolHeightProfileItemInterface : KadasMapItemInterface
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -23,6 +24,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 **************************************************************************
 %End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
+%End
+  public:
+    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem* createItem() const;
+
+};
+
+class KadasMapToolHeightProfile : KadasMapToolCreateItem
+{
 
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"

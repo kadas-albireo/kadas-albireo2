@@ -1,7 +1,7 @@
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasbottombar.h                                           *
+ * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/
@@ -10,33 +10,27 @@
 
 
 
-
-class KadasBottomBar : QgsFloatingWidget
+class KadasMapItemInterface
 {
 %Docstring(signature="appended")
-*************************************************************************
-
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
-
-**************************************************************************
+An interface for map items creation
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 %End
   public:
-    KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );
+    KadasMapItemInterface();
 
-  protected:
+    virtual ~KadasMapItemInterface();
+
+    virtual KadasMapItem* createItem() const = 0;
 };
 
 /************************************************************************
  * This file has been generated automatically from                      *
  *                                                                      *
- * kadas/gui/kadasbottombar.h                                           *
+ * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
  * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
  ************************************************************************/

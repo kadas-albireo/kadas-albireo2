@@ -17,23 +17,19 @@
 #ifndef KADASBOTTOMBAR_H
 #define KADASBOTTOMBAR_H
 
-#include <QFrame>
+#include <qgsfloatingwidget.h>
 
 #include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
 
-class KADAS_GUI_EXPORT KadasBottomBar : public QFrame
+class KADAS_GUI_EXPORT KadasBottomBar : public QgsFloatingWidget
 {
   public:
     KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );
-    bool eventFilter( QObject *obj, QEvent *event ) override;
-    void showEvent( QShowEvent * /*event*/ ) override;
 
   protected:
     QgsMapCanvas *mCanvas;
-
-    void updatePosition();
 };
 
 #endif // KADASBOTTOMBAR_H

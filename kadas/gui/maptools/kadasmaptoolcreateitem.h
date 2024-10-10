@@ -17,6 +17,7 @@
 #ifndef KADASMAPTOOLCREATEITEM_H
 #define KADASMAPTOOLCREATEITEM_H
 
+#include <qgis/qgis_sip.h>
 #include <qgis/qgsmaptool.h>
 
 #include "kadas/core/kadasstatehistory.h"
@@ -28,46 +29,16 @@
 class KadasBottomBar;
 class KadasFloatingInputWidget;
 class KadasItemLayer;
+class KadasMapItemInterface;
 
 class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 {
     Q_OBJECT
   public:
-#ifndef SIP_RUN
-    typedef std::function<KadasMapItem*() > ItemFactory;
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer = nullptr );
-#else
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, SIP_PYCALLABLE itemFactory, KadasItemLayer *layer = nullptr )[( QgsMapCanvas *, ItemFactory, KadasItemLayer * )];
-    % MethodCode
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = nullptr ) SIP_SKIP;
 
-    // Make sure the callable doesn't get garbage collected, this is needed because refcount for a1 is 0
-    // and the creation function pointer is passed to the metadata and it needs to be kept in memory.
-    Py_INCREF( a1 );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface SIP_TRANSFER, KadasItemLayer *layer = nullptr );
 
-    Py_BEGIN_ALLOW_THREADS
-
-    auto factory = [a1]() -> KadasMapItem *
-    {
-      KadasMapItem *result = nullptr;
-      SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a1, NULL );
-      if ( s )
-      {
-        int state;
-        int sipIsError = 0;
-        result = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
-        sipReleaseType( result, sipType_KadasMapItem, state );
-      }
-      SIP_UNBLOCK_THREADS
-      return result;
-    };
-
-    sipCpp = new sipKadasMapToolCreateItem( a0, factory, a2 );
-
-    Py_END_ALLOW_THREADS
-
-    % End
-#endif
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
 
@@ -89,39 +60,8 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void setToolLabel( const QString &label ) { mToolLabel = label; }
     void setUndoRedoVisible( bool undoRedoVisible ) { mUndoRedoVisible = undoRedoVisible; }
     void setExtraBottomBarContents( QWidget *widget );
-#ifndef SIP_RUN
-    void setItemFactory( ItemFactory itemFactory );
-#else
-    void setItemFactory( SIP_PYCALLABLE itemFactory );
-    % MethodCode
+    //void setItemFactory( KadasMapItemInterface* interface );
 
-    // Make sure the callables doesn't get garbage collected
-    // and the creation function pointer is passed to the metadata and it needs to be kept in memory.
-    Py_INCREF( a0 );
-
-    Py_BEGIN_ALLOW_THREADS
-
-    auto factory = [a0]() -> KadasMapItem *
-    {
-      KadasMapItem *result = nullptr;
-      SIP_BLOCK_THREADS
-      PyObject *s = sipCallMethod( NULL, a0, NULL );
-      if ( s )
-      {
-        int state;
-        int sipIsError = 0;
-        result = reinterpret_cast<KadasMapItem *>( sipConvertToType( s, sipType_KadasMapItem, NULL, SIP_NOT_NONE, &state, &sipIsError ) );
-        sipReleaseType( result, sipType_KadasMapItem, state );
-      }
-      SIP_UNBLOCK_THREADS
-      return result;
-    };
-
-    sipCpp->setItemFactory( factory );
-    Py_END_ALLOW_THREADS
-
-    % End
-#endif
 #ifndef SIP_RUN
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator = nullptr );
 #else
@@ -191,9 +131,11 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasMapItem::AttribValues collectAttributeValues() const;
     KadasMapItem *mutableItem() { return mItem; }
 
+  protected:
+    std::unique_ptr<KadasMapItemInterface> mInterface;
+
   private:
     QgsLayerTreeView *mLayerTreeView = nullptr;
-    ItemFactory mItemFactory = nullptr;
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
 

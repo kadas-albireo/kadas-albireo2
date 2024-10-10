@@ -27,18 +27,26 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 
 
-KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, ItemFactory itemFactory, KadasItemLayer *layer )
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
-  , mItemFactory( itemFactory )
+  , mInterface( std::move( interface ) )
   , mLayer( layer )
 {
 }
+
+KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
+  : QgsMapTool( canvas )
+  , mInterface( std::move( std::unique_ptr<KadasMapItemInterface>( interface ) ) )
+{}
+
+
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
   : QgsMapTool( canvas )
@@ -62,34 +70,34 @@ void KadasMapToolCreateItem::activate()
   createItem();
   setupNumericInputWidget();
   mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
-  mBottomBar = new KadasBottomBar( canvas() );
-  mBottomBar->setLayout( new QHBoxLayout() );
-  mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
+  mBottomBar = new KadasBottomBar( mCanvas );
+  QHBoxLayout* layout = new QHBoxLayout( mCanvas );
+  layout->setContentsMargins( 8, 4, 8, 4 );
   if ( !mToolLabel.isEmpty() )
   {
     QLabel *label = new QLabel( mToolLabel );
     QFont font = label->font();
     font.setBold( true );
     label->setFont( font );
-    mBottomBar->layout()->addWidget( label );
+    layout->addWidget( label );
   }
   if ( mBottomBarExtra )
   {
-    mBottomBar->layout()->addWidget( mBottomBarExtra );
+    layout->addWidget( mBottomBarExtra );
   }
   if ( mShowLayerSelection )
   {
     KadasLayerSelectionWidget *layerSelection = new KadasLayerSelectionWidget( mCanvas, mLayerTreeView, mLayerSelectionFilter, mLayerCreator );
     layerSelection->setSelectedLayer( mLayer );
     connect( layerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasMapToolCreateItem::setTargetLayer );
-    mBottomBar->layout()->addWidget( layerSelection );
+    layout->addWidget( layerSelection );
   }
   KadasMapItemEditor::Factory factory = KadasMapItemEditor::registry()->value( mItem->editor() );
   if ( factory )
   {
     mEditor = factory( mItem, KadasMapItemEditor::EditorType::CreateItemEditor );
     mEditor->syncWidgetToItem();
-    mBottomBar->layout()->addWidget( mEditor );
+    layout->addWidget( mEditor );
   }
 
   if ( mUndoRedoVisible )
@@ -100,7 +108,7 @@ void KadasMapToolCreateItem::activate()
     undoButton->setEnabled( false );
     connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
     connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-    mBottomBar->layout()->addWidget( undoButton );
+    layout->addWidget( undoButton );
 
     QPushButton *redoButton = new QPushButton();
     redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
@@ -108,15 +116,17 @@ void KadasMapToolCreateItem::activate()
     redoButton->setEnabled( false );
     connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
     connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-    mBottomBar->layout()->addWidget( redoButton );
+    layout->addWidget( redoButton );
   }
 
   QPushButton *closeButton = new QPushButton();
   closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
   closeButton->setToolTip( tr( "Close" ) );
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  mBottomBar->layout()->addWidget( closeButton );
+  layout->addWidget( closeButton );
 
+  mBottomBar->setLayout( layout );
+  mBottomBar->adjustSize();
   mBottomBar->show();
   QgsMapTool::activate();
 }
@@ -141,14 +151,14 @@ void KadasMapToolCreateItem::setExtraBottomBarContents( QWidget *widget )
 {
   mBottomBarExtra = widget;
 }
-
-void KadasMapToolCreateItem::setItemFactory( ItemFactory itemFactory )
+/*
+void KadasMapToolCreateItem::setItemFactory( KadasMapItemInterface *interface )
 {
-  mItemFactory = itemFactory;
+  mInterface = interface;
   clear();
   setupNumericInputWidget();
 }
-
+*/
 void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, KadasLayerSelectionWidget::LayerFilter filter, KadasLayerSelectionWidget::LayerCreator creator )
 {
   mLayerTreeView = layerTreeView;
@@ -327,9 +337,9 @@ void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 
 void KadasMapToolCreateItem::createItem()
 {
-  if ( !mItem && mItemFactory )
+  if ( !mItem && mInterface )
   {
-    mItem = mItemFactory();
+    mItem = mInterface->createItem();
   }
   else
   {
@@ -373,7 +383,7 @@ void KadasMapToolCreateItem::finishPart()
   mItem->endPart();
   mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
   emit partFinished();
-  if ( !mItemFactory )
+  if ( !mInterface )
   {
     KadasMapItem *item = mItem;
     KadasMapCanvasItemManager::removeItem( mItem ); // Edit tool adds item again

@@ -18,9 +18,12 @@
 #define KADASMAPTOOLMINMAX_H
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class KadasSymbolItem;
+
+
 
 class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
 {
@@ -42,7 +45,6 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
     void drawFinished();
 
   private:
-    KadasMapToolCreateItem::ItemFactory itemFactory( const QgsMapCanvas *canvas, FilterType filterType ) const;
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
     QPointer<KadasSymbolItem> mPinMin;
@@ -53,5 +55,18 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
 
     void showContextMenu( KadasMapItem *item ) const;
 };
+
+
+class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+    void setFilterType( KadasMapToolMinMax:: FilterType filterType );
+private:
+    QgsMapCanvas* mCanvas = nullptr;
+    KadasMapToolMinMax::FilterType mFilterType = KadasMapToolMinMax::FilterType::FilterRect;
+};
+
 
 #endif // KADASMAPTOOLMINMAX_H

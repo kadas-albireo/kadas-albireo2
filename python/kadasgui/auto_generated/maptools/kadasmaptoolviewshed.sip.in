@@ -42,6 +42,18 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 };
 
+class KadasMapToolViewshedItemInterface : KadasMapItemInterface
+{
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptoolviewshed.h"
+%End
+  public:
+    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem* createItem() const;
+
+};
+
 class KadasMapToolViewshed : KadasMapToolCreateItem
 {
 

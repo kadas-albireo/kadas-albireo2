@@ -20,12 +20,23 @@
 #include <qgis/qgsmaptool.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasmapiteminterface.h"
+
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 class QgsCoordinateReferenceSystem;
 class QgsGeometry;
 class KadasHeightProfileDialog;
 class KadasPointItem;
+
+class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapItemInterface
+{
+  public:
+    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem* createItem() const override;
+  private:
+    QgsMapCanvas* mCanvas = nullptr;
+};
 
 class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 {
@@ -51,8 +62,6 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     KadasPointItem *mPosMarker = nullptr;
     KadasHeightProfileDialog *mDialog = nullptr;
     bool mPicking = false;
-
-    static ItemFactory lineFactory( QgsMapCanvas *canvas );
 
   private slots:
     void drawCleared();

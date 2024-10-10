@@ -11,6 +11,7 @@
 %Include auto_generated/maptools/kadasmaptoolhillshade.sip
 %Include auto_generated/maptools/kadasmaptoolheightprofile.sip
 %Include auto_generated/kadassearchprovider.sip
+%Include auto_generated/kadasmapiteminterface.sip
 %Include auto_generated/kadasitemcontextmenuactions.sip
 %Include auto_generated/kadasmapcanvasitemmanager.sip
 %Include auto_generated/kadascatalogbrowser.sip

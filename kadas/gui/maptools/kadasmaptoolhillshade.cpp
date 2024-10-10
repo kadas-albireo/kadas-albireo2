@@ -34,23 +34,20 @@
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 
 
+KadasMapItem* KadasMapToolHillshadeItemInterface::createItem() const
+{
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  return item;
+}
+
 
 KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, itemFactory( mapCanvas ) )
+  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolHillshadeItemInterface>( KadasMapToolHillshadeItemInterface( mapCanvas ) ) ) )
 {
   setCursor( Qt::ArrowCursor );
   setUndoRedoVisible( false );
   setToolLabel( tr( "Compute hillshade" ) );
   connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
-}
-
-KadasMapToolCreateItem::ItemFactory KadasMapToolHillshade::itemFactory( const QgsMapCanvas *canvas ) const
-{
-  return [ = ]
-  {
-    KadasRectangleItem *item = new KadasRectangleItem( canvas->mapSettings().destinationCrs() );
-    return item;
-  };
 }
 
 void KadasMapToolHillshade::drawFinished()

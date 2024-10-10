@@ -192,33 +192,35 @@ void KadasMeasureWidget::updateTotal()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+KadasMapItem* KadasMapToolMeasureItemInterface::createItem() const
+{
+  switch ( mMeasureMode )
+  {
+    case KadasMapToolMeasure::MeasureMode::MeasureLine:
+      return setupItem( new KadasLineItem( mCanvas->mapSettings().destinationCrs(), true ) );
+    case KadasMapToolMeasure::MeasureMode::MeasurePolygon:
+      return setupItem( new KadasPolygonItem( mCanvas->mapSettings().destinationCrs(), true ) );
+    case KadasMapToolMeasure::MeasureMode::MeasureCircle:
+      return setupItem( new KadasCircleItem( mCanvas->mapSettings().destinationCrs(), true ) );
+  }
+  return nullptr;
+}
+
+KadasGeometryItem *KadasMapToolMeasureItemInterface::setupItem( KadasGeometryItem *item ) const
+{
+  item->setEditor( "KadasMeasureWidget" );
+  return item;
+}
+
 
 KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode )
-  : KadasMapToolCreateItem( canvas, itemFactory( canvas, measureMode ) ), mMeasureMode( measureMode )
+  : KadasMapToolCreateItem( canvas, std::move( std::make_unique<KadasMapToolMeasureItemInterface>( KadasMapToolMeasureItemInterface( canvas, measureMode ) ) ) )
+  , mMeasureMode( measureMode )
 {
   setMultipart( true );
   setSnappingEnabled( true );
 }
 
-KadasMapToolCreateItem::ItemFactory KadasMapToolMeasure::itemFactory( QgsMapCanvas *canvas, MeasureMode measureMode ) const
-{
-  switch ( measureMode )
-  {
-    case MeasureMode::MeasureLine:
-      return [ = ] { return setupItem( new KadasLineItem( canvas->mapSettings().destinationCrs(), true ) ); };
-    case MeasureMode::MeasurePolygon:
-      return [ = ] { return setupItem( new KadasPolygonItem( canvas->mapSettings().destinationCrs(), true ) ); };
-    case MeasureMode::MeasureCircle:
-      return [ = ] { return setupItem( new KadasCircleItem( canvas->mapSettings().destinationCrs(), true ) ); };
-  }
-  return nullptr;
-}
-
-KadasGeometryItem *KadasMapToolMeasure::setupItem( KadasGeometryItem *item ) const
-{
-  item->setEditor( "KadasMeasureWidget" );
-  return item;
-}
 
 void KadasMapToolMeasure::activate()
 {
