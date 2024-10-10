@@ -167,16 +167,16 @@ QImage KadasPictureItem::readImage( double dpiScale ) const
   return reader.read().convertToFormat( QImage::Format_ARGB32 );
 }
 
-void KadasPictureItem::renderPrivate(QgsRenderContext &context , double dpiScale, double offsetX, double offsetY, double width, double height) const
+void KadasPictureItem::renderPrivate(QgsRenderContext &context , const QPointF &center , double dpiScale) const
 {
   if ( dpiScale != 1. )
   {
     QImage image = readImage(dpiScale);
-    context.painter()->drawImage( QPointF( offsetX - 0.5 * width - 0.5, -offsetY - 0.5 * height - 0.5 ), image );
+    context.painter()->drawImage( center, image );
   }
   else
   {
-    context.painter()->drawImage( QPointF( offsetX - 0.5 * width - 0.5, -offsetY - 0.5 * height - 0.5 ), mImage );
+    context.painter()->drawImage( center, mImage );
   }
 }
 

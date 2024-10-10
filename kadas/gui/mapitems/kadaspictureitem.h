@@ -56,7 +56,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
   protected:
     KadasMapItem *_clone() const override { return new KadasPictureItem( crs() ); } SIP_FACTORY
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
-    void renderPrivate( QgsRenderContext &context, double dpiScale, double offsetX, double offsetY, double width, double height  ) const override;
+    void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const override;
     void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
 
   private:

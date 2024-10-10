@@ -20,7 +20,7 @@
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 
-class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem
+class KADAS_GUI_EXPORT KadasRectangleItemBase  SIP_ABSTRACT: public KadasMapItem
 {
     Q_OBJECT
     Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
@@ -82,12 +82,15 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem
     virtual void setState( const KadasMapItem::State *state ) override;
 
   protected:
+    State *state() { return static_cast<State *>( mState ); }
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
-    virtual void renderPrivate( QgsRenderContext &context, double dpiScale, double offsetX, double offsetY, double width, double height ) const = 0;
+    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     bool mPosLocked = false;
 
   private:
+    friend class KadasProjectMigration;
+
     enum AttribIds {AttrX, AttrY};
     QImage mImage;
     bool mFrame = true;
@@ -95,7 +98,6 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem
     static constexpr int sFramePadding = 4;
     static constexpr int sArrowWidth = 6;
 
-    State *state() { return static_cast<State *>( mState ); }
 
     QList<KadasMapPos> cornerPoints( const QgsMapSettings &settings ) const;
 };

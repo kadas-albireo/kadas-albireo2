@@ -348,7 +348,8 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
     context.painter()->drawPath( path );
   }
 
-  renderPrivate(context, dpiScale, offsetX, offsetY, w, h );
+  QPointF center = QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 );
+  renderPrivate(context, center, dpiScale );
 }
 
 bool KadasRectangleItemBase::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
