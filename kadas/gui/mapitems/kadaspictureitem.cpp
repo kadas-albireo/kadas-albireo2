@@ -68,7 +68,7 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
 {
   if ( json.contains( "cameraTarget" ) )
   {
-    json["anchor"] = json["cameraTarget"];
+    json["rectangle-center"] = json["cameraTarget"];
   }
   return KadasRectangleItemBase::State::deserialize( json );
 }
@@ -128,7 +128,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   {
     state()->mPos = cameraPos;
     state()->mFootprint = footprint;
-    state()->mAnchorPoint = cameraTarget;
+    state()->mRectangleCenterPoint = cameraTarget;
     mPosLocked = true;
   }
 
@@ -167,16 +167,16 @@ QImage KadasPictureItem::readImage( double dpiScale ) const
   return reader.read().convertToFormat( QImage::Format_ARGB32 );
 }
 
-void KadasPictureItem::renderPrivate(QgsRenderContext &context , const QPointF &center , double dpiScale) const
+void KadasPictureItem::renderPrivate(QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const
 {
   if ( dpiScale != 1. )
   {
-    QImage image = readImage(dpiScale);
-    context.painter()->drawImage( center, image );
+    QImage image = readImage( dpiScale );
+    context.painter()->drawImage( rect, image );
   }
   else
   {
-    context.painter()->drawImage( center, mImage );
+    context.painter()->drawImage( rect, mImage );
   }
 }
 
