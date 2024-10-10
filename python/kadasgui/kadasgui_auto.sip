@@ -54,6 +54,7 @@
 %Include auto_generated/mapitems/kadasselectionrectitem.sip
 %Include auto_generated/mapitems/kadasgpxrouteitem.sip
 %Include auto_generated/mapitems/kadascircleitem.sip
+%Include auto_generated/mapitems/kadasrectangleitembase.sip
 %Include auto_generated/mapitems/kadaslineitem.sip
 %Include auto_generated/mapitems/kadaspolygonitem.sip
 %Include auto_generated/mapitems/kadasanchoreditem.sip
