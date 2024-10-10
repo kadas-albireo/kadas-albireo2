@@ -40,6 +40,8 @@
 #include "kadasmapidentifydialog.h"
 #include "kadasredliningintegration.h"
 
+QMap<QAction *, KadasCanvasContextMenu::Menu> KadasCanvasContextMenu::sRegisteredActions;
+
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )
 {
@@ -81,13 +83,15 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     mGeomSel->setGeometry( geom );
 
   }
+
+  QMenu *drawMenu = nullptr;
   if ( mPickResult.isEmpty() )
   {
     if ( !KadasClipboard::instance()->isEmpty() )
     {
       addAction( QgsApplication::getThemeIcon( "/mActionEditPaste.svg" ), tr( "Paste" ), this, &KadasCanvasContextMenu::paste );
     }
-    QMenu *drawMenu = new QMenu();
+    drawMenu = new QMenu();
     addAction( tr( "Draw" ) )->setMenu( drawMenu );
     drawMenu->addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Pin marker" ), this, &KadasCanvasContextMenu::drawPin );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point marker" ), this, &KadasCanvasContextMenu::drawPointMarker );
@@ -102,9 +106,12 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
   }
   addSeparator();
+
+  QMenu *measureMenu = nullptr;
+  QMenu *analysisMenu = nullptr;
   if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line || geomType == Qgis::GeometryType::Polygon )
   {
-    QMenu *measureMenu = new QMenu();
+    measureMenu = new QMenu();
     addAction( tr( "Measure" ) )->setMenu( measureMenu );
 
     if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line )
@@ -124,7 +131,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
 
-    QMenu *analysisMenu = new QMenu();
+    analysisMenu = new QMenu();
     addAction( tr( "Terrain analysis" ) )->setMenu( analysisMenu );
     analysisMenu->addAction( QIcon( ":/kadas/icons/slope_color" ), tr( "Slope" ), this, &KadasCanvasContextMenu::terrainSlope );
     analysisMenu->addAction( QIcon( ":/kadas/icons/hillshade_color" ), tr( "Hillshade" ), this, &KadasCanvasContextMenu::terrainHillshade );
@@ -148,12 +155,45 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QIcon( ":/kadas/icons/copy_map" ), tr( "Copy map" ), this, &KadasCanvasContextMenu::copyMap );
     addAction( QgsApplication::getThemeIcon( "/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
   }
+
+  for ( QAction *action : sRegisteredActions.keys() )
+  {
+    Menu menu = sRegisteredActions.value( action );
+
+    if ( Menu::DRAW == menu && drawMenu )
+    {
+      drawMenu->addAction( action );
+      continue;
+    }
+    else if ( Menu::MEASURE == menu && measureMenu )
+    {
+      measureMenu->addAction( action );
+      continue;
+    }
+    else if ( Menu::TERRAIN_ANALYSIS == menu && analysisMenu )
+    {
+      analysisMenu->addAction( action );
+      continue;
+    }
+
+    addAction( action );
+  }
 }
 
 KadasCanvasContextMenu::~KadasCanvasContextMenu()
 {
   delete mGeomSel;
   delete mSelRect;
+}
+
+void KadasCanvasContextMenu::registerAction( QAction *action, Menu insertMenu )
+{
+  sRegisteredActions.insert( action, insertMenu );
+}
+
+void KadasCanvasContextMenu::unRegisterAction( QAction *action )
+{
+  sRegisteredActions.remove( action );
 }
 
 void KadasCanvasContextMenu::identify()

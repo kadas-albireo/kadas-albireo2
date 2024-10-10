@@ -21,6 +21,8 @@
 
 #include "kadas/gui/kadas_gui.h"
 
+
+class QgsMapLayer;
 class KadasMapItem;
 
 
