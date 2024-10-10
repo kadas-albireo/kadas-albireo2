@@ -41,15 +41,19 @@ class EphemPlugin:
         return QCoreApplication.translate('Ephem', message)
 
     def initGui(self):
-        icon = QIcon(os.path.join(os.path.dirname(__file__), 'icons/icon.png'))
-        self.action = QAction(icon, self.tr(u'Ephemeris'),
+        icon_path = os.path.join(os.path.dirname(__file__), 'icons/icon.png')
+        self.action = QAction(QIcon(icon_path), self.tr(u'Ephemeris'),
                               self.iface.mainWindow())
         self.action.setCheckable(True)
         self.action.toggled.connect(self.toolToggled)
         self.iface.addAction(self.action, self.iface.PLUGIN_MENU,
                              self.iface.ANALYSIS_TAB)
 
-        self.iface.addActionMapCanvasRightClick(self.action)
+        icon_dark_path = os.path.join(os.path.dirname(__file__), 'icons/icon_color.svg')
+        self.actionCanvasRightClick = QAction(QIcon(icon_dark_path), self.action.text(),
+                                      self.iface.mainWindow())
+        self.actionCanvasRightClick.triggered.connect(self.actionMapCanvasRightClickTriggered)
+        self.iface.addActionMapCanvasRightClick(self.actionCanvasRightClick)
 
     def unload(self):
         self.iface.removeAction(self.action, self.iface.PLUGIN_MENU,
@@ -65,3 +69,7 @@ class EphemPlugin:
         elif self.iface.mapCanvas().mapTool() and self.iface.mapCanvas().mapTool().action() == self.action:
             self.iface.mapCanvas().unsetMapTool(self.iface.mapCanvas().mapTool())
             self.ephem_tool = None
+
+    def actionMapCanvasRightClickTriggered(self):
+        if self.ephem_tool is None:
+            self.toolToggled(True)
