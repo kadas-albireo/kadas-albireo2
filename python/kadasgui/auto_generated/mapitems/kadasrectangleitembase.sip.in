@@ -10,8 +10,9 @@
 
 
 
-class KadasRectangleItemBase  /Abstract/: public KadasMapItem
-%Docstring
+class KadasRectangleItemBase : KadasMapItem /Abstract/
+{
+%Docstring(signature="appended")
 *************************************************************************
 
 This program is free software; you can redistribute it and/or modify  *
@@ -21,7 +22,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 **************************************************************************
 %End
-{
 
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasrectangleitembase.h"
@@ -105,8 +105,7 @@ the Free Software Foundation; either version 2 of the License, or     *
   protected:
     State *state();
     virtual State *createEmptyState() const;
-    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
-    virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
+
 
 };
 
