@@ -89,7 +89,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     {
       KadasItemPos mPos;
       QList<KadasItemPos> mFootprint;
-      KadasItemPos mAnchorPoint;
+      KadasItemPos mRectangleCenterPoint;
       double mAngle;
       double mOffsetX;
       double mOffsetY;

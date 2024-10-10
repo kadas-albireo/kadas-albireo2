@@ -53,9 +53,9 @@ QJsonObject KadasRectangleItemBase::State::serialize() const
     fp.append( footprintPos.y() );
     footprint.append( fp );
   }
-  QJsonArray anchorPoint;
-  anchorPoint.append( mAnchorPoint.x() );
-  anchorPoint.append( mAnchorPoint.y() );
+  QJsonArray rectCenterPoint;
+  rectCenterPoint.append( mRectangleCenterPoint.x() );
+  rectCenterPoint.append( mRectangleCenterPoint.y() );
 
   QJsonObject json;
   json["status"] = static_cast<int>( drawStatus );
@@ -65,7 +65,7 @@ QJsonObject KadasRectangleItemBase::State::serialize() const
   json["offsetY"] = mOffsetY;
   json["size"] = size;
   json["footprint"] = footprint;
-  json["anchor"] = anchorPoint;
+  json["rectangle-center"] = rectCenterPoint;
   return json;
 }
 
@@ -86,8 +86,8 @@ bool KadasRectangleItemBase::State::deserialize( const QJsonObject &json )
     QJsonArray fp = v.toArray();
     mFootprint.append( KadasItemPos( fp.at( 0 ).toDouble(), fp.at( 1 ).toDouble() ) );
   }
-  QJsonArray t = json["anchor"].toArray();
-  mAnchorPoint = KadasItemPos( t.at( 0 ).toDouble(), t.at( 1 ).toDouble() );
+  QJsonArray t = json["rectangle-center"].toArray();
+  mRectangleCenterPoint = KadasItemPos( t.at( 0 ).toDouble(), t.at( 1 ).toDouble() );
   return true;
 }
 
@@ -224,11 +224,11 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
   pos.transform( context.coordinateTransform() );
   pos.transform( context.mapToPixel().transform() );
 
-  // Draw footprint
+  // Draw footprint TODO move to picture rendering
   QPolygonF poly;
   if ( constState()->mFootprint.size() == 4 )
   {
-    QgsPoint target( constState()->mAnchorPoint );
+    QgsPoint target( constState()->mRectangleCenterPoint );
     target.transform( context.coordinateTransform() );
     target.transform( context.mapToPixel().transform() );
 
@@ -268,6 +268,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
   double h = constState()->mSize.height() * dpiScale;
   double offsetX = constState()->mOffsetX * dpiScale;
   double offsetY = constState()->mOffsetY * dpiScale;
+
 
   // Draw frame
   if ( mFrame )
@@ -348,8 +349,9 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
     context.painter()->drawPath( path );
   }
 
-  QPointF center = QPointF( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5 );
-  renderPrivate(context, center, dpiScale );
+  const QPointF center = QPointF( offsetX, -offsetY );
+  const QRect rect( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5, w, h );
+  renderPrivate(context, center, rect, dpiScale );
 }
 
 bool KadasRectangleItemBase::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
