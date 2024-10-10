@@ -20,7 +20,7 @@
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 
-class KADAS_GUI_EXPORT KadasRectangleItemBase  SIP_ABSTRACT: public KadasMapItem
+class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
     Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
@@ -84,11 +84,12 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase  SIP_ABSTRACT: public KadasMapItem
   protected:
     State *state() { return static_cast<State *>( mState ); }
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
-    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
-    virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
+
     bool mPosLocked = false;
 
   private:
+    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
+    virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
     friend class KadasProjectMigration;
 
     enum AttribIds {AttrX, AttrY};
