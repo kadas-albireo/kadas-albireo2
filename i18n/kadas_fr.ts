@@ -47,12 +47,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="115"/>
         <source>Export</source>
-        <translation>export</translation>
+        <translation>Exporter</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="122"/>
         <source>Save as Image…</source>
-        <translation>sauvegarder comme image</translation>
+        <translation>Sauvegarder comme image</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="126"/>
@@ -138,7 +138,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="483"/>
         <source>3D Configuration</source>
-        <translation type="unfinished"/>
+        <translation>Configuration 3D</translation>
     </message>
     <message numerus="yes">
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="593"/>
@@ -275,7 +275,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="264"/>
         <source>Show in 2D map view</source>
-        <translation type="unfinished"/>
+        <translation>Vue Carte 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="489"/>
@@ -364,12 +364,12 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="41"/>
         <source>Radius</source>
-        <translation type="unfinished"/>
+        <translation>Rayon</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="48"/>
         <source>Intensity</source>
-        <translation type="unfinished"/>
+        <translation>Intensité</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="55"/>
@@ -384,7 +384,7 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="103"/>
         <source>%</source>
-        <translation type="unfinished"/>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="23"/>
@@ -3664,7 +3664,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="331"/>
         <source>Altitude</source>
-        <translation type="unfinished"/>
+        <translation>Altitude</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="424"/>
@@ -3701,12 +3701,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="228"/>
         <source>Add Directional Light</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter lumière directionnelle</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="228"/>
         <source>It is not possible to add more than 4 directional lights to the scene.</source>
-        <translation type="unfinished"/>
+        <translation>Il n&apos;est pas possible d&apos;ajouter plus de 4 lumières directionnelles à la scène</translation>
     </message>
 </context>
 <context>
@@ -3760,7 +3760,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.h" line="41"/>
         <source>Local data</source>
-        <translation type="unfinished"/>
+        <translation>Donnée locale</translation>
     </message>
 </context>
 <context>
@@ -3768,17 +3768,17 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="50"/>
         <source>Municipalities</source>
-        <translation type="unfinished"/>
+        <translation>Municipalités</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="51"/>
         <source>Cantons</source>
-        <translation type="unfinished"/>
+        <translation>Cantons</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
         <source>Districts</source>
-        <translation type="unfinished"/>
+        <translation>Districts</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
@@ -4779,7 +4779,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/milx/kadasmilxexportdialog.cpp" line="31"/>
         <source>Don&apos;t add</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas ajouter</translation>
     </message>
 </context>
 <context>
@@ -4889,7 +4889,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="411"/>
         <source>Compressed KML Layer (*.kmz)</source>
-        <translation type="unfinished"/>
+        <translation>Couche KML compressée (*.kmz)</translation>
     </message>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="519"/>
@@ -6587,7 +6587,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="240"/>
         <source>Extent</source>
-        <translation type="unfinished"/>
+        <translation>Etendue</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="319"/>
@@ -6610,12 +6610,12 @@ avec géoloc.</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1016"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1080"/>
         <source> px</source>
-        <translation type="unfinished"/>
+        <translation>px</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="365"/>
         <source>Elevation</source>
-        <translation type="unfinished"/>
+        <translation>Élévation</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="379"/>
@@ -6625,7 +6625,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="386"/>
         <source>Vertical scale</source>
-        <translation type="unfinished"/>
+        <translation>Échelle verticale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="403"/>
@@ -6635,12 +6635,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="431"/>
         <source>Terrain Shading</source>
-        <translation type="unfinished"/>
+        <translation>Ombrage du terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="606"/>
         <source>Show Shadows</source>
-        <translation type="unfinished"/>
+        <translation>Ombrage activé</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="636"/>
@@ -6730,12 +6730,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="889"/>
         <source>Show Skybox</source>
-        <translation type="unfinished"/>
+        <translation>Voir Skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="963"/>
         <source>Advanced Settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres avancés</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="969"/>
@@ -6772,12 +6772,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1066"/>
         <source>Max. screen error</source>
-        <translation type="unfinished"/>
+        <translation>Max. erreur d&apos;écran</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1073"/>
         <source>Show labels</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les étiquettes</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1090"/>
@@ -6787,7 +6787,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1097"/>
         <source>Map tile resolution</source>
-        <translation type="unfinished"/>
+        <translation>Résolution de la tuile de carte</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1104"/>
@@ -6802,12 +6802,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1121"/>
         <source>Zoom levels</source>
-        <translation type="unfinished"/>
+        <translation>Niveaux de zoom</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1128"/>
         <source>Max. ground error</source>
-        <translation type="unfinished"/>
+        <translation>Max. erreur de terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1135"/>
