@@ -430,13 +430,13 @@ void KadasApplication::extractPortalToken()
       if ( obj.contains( QStringLiteral( "token" ) ) )
       {
         QgsDebugMsgLevel( QString( "ESRI Token found" ), 2 );
-        QNetworkCookie cookie( QString( "agstoken=\"token\": \"%1\"" ).arg( obj[QStringLiteral( "token" )].toString() ).toLocal8Bit() );
+        QString cookie = QString( "agstoken=\"token\": \"%1\"" ).arg( obj[QStringLiteral( "token" )].toString() );
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-        QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( ";" );
+        QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( "," );
         for ( const QString &url : cookieUrls )
         {
           QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 2 );
-          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
+          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url.trimmed() );
         }
       }
     }
