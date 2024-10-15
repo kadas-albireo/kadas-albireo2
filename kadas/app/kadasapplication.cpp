@@ -381,7 +381,7 @@ void KadasApplication::init()
   KadasItemLayerRegistry::init();
 
   // Extract portal token if necessary before loading startup project
-  QString tokenUrl = settings.value( "/kadas/portalTokenUrl" ).toString();
+  QString tokenUrl = settings.value( "/portal/token-url" ).toString();
   if ( !tokenUrl.isEmpty() )
   {
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
@@ -432,7 +432,12 @@ void KadasApplication::extractPortalToken()
         QgsDebugMsgLevel( QString( "ESRI Token found" ), 2 );
         QNetworkCookie cookie( QString( "agstoken=\"token\": \"%1\"" ).arg( obj[QStringLiteral( "token" )].toString() ).toLocal8Bit() );
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-        jar->insertCookie( cookie );
+        QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( ";" );
+        for ( const QString &url : cookieUrls )
+        {
+          QgsDebugMsgLevel( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) , 2 );
+          jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
+        }
       }
     }
     else
@@ -1697,7 +1702,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   {
     QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ) , 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
-    if ( data.startsWith( "esri_auth=" ) )
+    if ( data.startsWith( "agstoken=" ) )
     {
       QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
       if ( tokenRe.indexIn( QString( data ) ) != -1 )
