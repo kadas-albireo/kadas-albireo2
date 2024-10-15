@@ -435,7 +435,7 @@ void KadasApplication::extractPortalToken()
         QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( ";" );
         for ( const QString &url : cookieUrls )
         {
-          QgsDebugMsgLevel( QString( "Setting cookie for url %1: %2" ).arg( url, cookie ) , 2 );
+          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 2 );
           jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url );
         }
       }
