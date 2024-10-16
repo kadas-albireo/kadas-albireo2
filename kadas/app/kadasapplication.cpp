@@ -384,12 +384,14 @@ void KadasApplication::init()
   QString tokenUrl = settings.value( "/portal/token-url" ).toString();
   if ( !tokenUrl.isEmpty() )
   {
+    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 2 );
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     connect( reply, &QNetworkReply::finished, this, &KadasApplication::extractPortalToken );
   }
   else
   {
+    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 2 );
     loadStartupProject();
   }
 
