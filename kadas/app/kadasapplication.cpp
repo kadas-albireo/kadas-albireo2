@@ -259,18 +259,18 @@ void KadasApplication::init()
   bool settingsEmpty = false;
   if ( settings.value( "timestamp", 0 ).toInt() > 0 )
   {
-    QgsDebugMsgLevel( "Patching settings" , 2 );
+    QgsDebugMsgLevel( "Patching settings" , 1 );
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_patch.ini" ) );
   }
   else
   {
-    QgsDebugMsgLevel( "Copying full settings" , 2 );
+    QgsDebugMsgLevel( "Copying full settings" , 1 );
     settingsEmpty = true;
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_full.ini" ) );
   }
   if ( srcSettings.exists() )
   {
-    QgsDebugMsgLevel( QString( "Reading settings from %1" ).arg( srcSettings.fileName() ), 2 );
+    QgsDebugMsgLevel( QString( "Reading settings from %1" ).arg( srcSettings.fileName() ), 1 );
     QgsSettings newSettings( srcSettings.fileName(), QSettings::IniFormat );
     QString timestamp = settings.value( "timestamp", "0" ).toString();
     QString newtimestamp = newSettings.value( "timestamp" ).toString();
@@ -284,7 +284,7 @@ void KadasApplication::init()
   }
   else
   {
-    QgsDebugMsgLevel( QString( "Could not find settings settings file %1" ).arg( srcSettings.fileName() ), 2 );
+    QgsDebugMsgLevel( QString( "Could not find settings settings file %1" ).arg( srcSettings.fileName() ), 1 );
   }
 
   // Set help path
@@ -389,14 +389,14 @@ void KadasApplication::init()
   QString tokenUrl = settings.value( "/portal/token-url" ).toString();
   if ( !tokenUrl.isEmpty() )
   {
-    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 2 );
+    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     connect( reply, &QNetworkReply::finished, this, &KadasApplication::extractPortalToken );
   }
   else
   {
-    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 2 );
+    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
     loadStartupProject();
   }
 
@@ -436,25 +436,25 @@ void KadasApplication::extractPortalToken()
       QJsonObject obj = doc.object();
       if ( obj.contains( QStringLiteral( "token" ) ) )
       {
-        QgsDebugMsgLevel( QString( "ESRI Token found" ), 2 );
+        QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
         QString cookie = QString( "agstoken=\"token\": \"%1\"" ).arg( obj[QStringLiteral( "token" )].toString() );
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
         QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( "," );
         for ( const QString &url : cookieUrls )
         {
-          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 2 );
+          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 1 );
           jar->setCookiesFromUrl( QList<QNetworkCookie>() << QNetworkCookie( cookie.toLocal8Bit() ), url.trimmed() );
         }
       }
     }
     else
     {
-      QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 2 );
+      QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
     }
   }
   else
   {
-    QgsDebugMsgLevel( QString( "error fetching token %1" ).arg( reply->error() ), 2 );
+    QgsDebugMsgLevel( QString( "error fetching token %1" ).arg( reply->error() ), 1 );
   }
   loadStartupProject();
 }
