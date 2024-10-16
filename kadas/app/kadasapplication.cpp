@@ -270,6 +270,7 @@ void KadasApplication::init()
   }
   if ( srcSettings.exists() )
   {
+    QgsDebugMsgLevel( QString( "Reading settings from %1" ).arg( srcSettings.fileName() ), 2 );
     QgsSettings newSettings( srcSettings.fileName(), QSettings::IniFormat );
     QString timestamp = settings.value( "timestamp", "0" ).toString();
     QString newtimestamp = newSettings.value( "timestamp" ).toString();
@@ -280,6 +281,10 @@ void KadasApplication::init()
       mergeChildSettingsGroups( settings, newSettings );
     }
     settings.sync();
+  }
+  else
+  {
+    QgsDebugMsgLevel( QString( "Could not find settings settings file %1" ).arg( srcSettings.fileName() ), 2 );
   }
 
   // Set help path
