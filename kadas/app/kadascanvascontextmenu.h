@@ -35,7 +35,7 @@ class KadasCanvasContextMenu : public QMenu
 
     static const QString ACTION_PROPERTY_MAP_POSITION;
 
-    enum class Menu SIP_MONKEYPATCH_SCOPEENUM
+    enum class Menu
     {
       NONE,
       DRAW,
