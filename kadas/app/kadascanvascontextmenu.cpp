@@ -86,14 +86,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
 
   }
 
-  QMenu *drawMenu = nullptr;
   if ( mPickResult.isEmpty() )
   {
     if ( !KadasClipboard::instance()->isEmpty() )
     {
       addAction( QgsApplication::getThemeIcon( "/mActionEditPaste.svg" ), tr( "Paste" ), this, &KadasCanvasContextMenu::paste );
     }
-    drawMenu = new QMenu();
+    QMenu *drawMenu = new QMenu();
     addAction( tr( "Draw" ) )->setMenu( drawMenu );
     drawMenu->addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Pin marker" ), this, &KadasCanvasContextMenu::drawPin );
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point marker" ), this, &KadasCanvasContextMenu::drawPointMarker );
@@ -106,14 +105,19 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
     drawMenu->addAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this, &KadasCanvasContextMenu::drawCoordinateCross );
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
+
+    const QList<QAction *> registeredDrawActions = sRegisteredActions.keys( Menu::DRAW );
+    for ( QAction *action : registeredDrawActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      drawMenu->addAction( action );
+    }
   }
   addSeparator();
 
-  QMenu *measureMenu = nullptr;
-  QMenu *analysisMenu = nullptr;
   if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line || geomType == Qgis::GeometryType::Polygon )
   {
-    measureMenu = new QMenu();
+    QMenu *measureMenu = new QMenu();
     addAction( tr( "Measure" ) )->setMenu( measureMenu );
 
     if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line )
@@ -133,7 +137,14 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
 
-    analysisMenu = new QMenu();
+    const QList<QAction *> registeredMeasureActions = sRegisteredActions.keys( Menu::MEASURE );
+    for ( QAction *action : registeredMeasureActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      measureMenu->addAction( action );
+    }
+
+    QMenu *analysisMenu = new QMenu();
     addAction( tr( "Terrain analysis" ) )->setMenu( analysisMenu );
     analysisMenu->addAction( QIcon( ":/kadas/icons/slope_color" ), tr( "Slope" ), this, &KadasCanvasContextMenu::terrainSlope );
     analysisMenu->addAction( QIcon( ":/kadas/icons/hillshade_color" ), tr( "Hillshade" ), this, &KadasCanvasContextMenu::terrainHillshade );
@@ -149,6 +160,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_min_max" ), tr( "Min/max" ), this, &KadasCanvasContextMenu::measureMinMax );
     }
+
+    const QList<QAction *> registeredAnalysisActions = sRegisteredActions.keys( Menu::TERRAIN_ANALYSIS );
+    for ( QAction *action : registeredAnalysisActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      analysisMenu->addAction( action );
+    }
   }
 
   if ( mPickResult.isEmpty() )
@@ -158,28 +176,11 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QgsApplication::getThemeIcon( "/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
   }
 
-  for ( QAction *action : sRegisteredActions.keys() )
+  // Remaining actions
+  const QList<QAction *> registeredActions = sRegisteredActions.keys( Menu::NONE );
+  for ( QAction *action : registeredActions )
   {
     action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
-
-    Menu menu = sRegisteredActions.value( action );
-
-    if ( Menu::DRAW == menu && drawMenu )
-    {
-      drawMenu->addAction( action );
-      continue;
-    }
-    else if ( Menu::MEASURE == menu && measureMenu )
-    {
-      measureMenu->addAction( action );
-      continue;
-    }
-    else if ( Menu::TERRAIN_ANALYSIS == menu && analysisMenu )
-    {
-      analysisMenu->addAction( action );
-      continue;
-    }
-
     addAction( action );
   }
 }
