@@ -7,13 +7,13 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.uic import loadUiType
 from qgis.core import *
 from qgis.gui import *
 from kadas.kadascore import *
 from kadas.kadasgui import *
 from kadas.kadasanalysis import *
 
-from .ui_EphemToolWidget import Ui_EphemToolWidget
 
 class EphemTool(QgsMapTool):
 
@@ -67,6 +67,11 @@ class EphemTool(QgsMapTool):
         self.widget.setPos(wgsCrst.transform(pos), mrcCrst.transform(pos))
         self.widget.recompute()
 
+
+Ui_EphemToolWidget, _ = loadUiType(
+    os.path.join(os.path.dirname(__file__), "EphemToolWidget.ui")
+)
+
 class EphemToolWidget(KadasBottomBar):
 
     close = pyqtSignal()
@@ -80,21 +85,13 @@ class EphemToolWidget(KadasBottomBar):
 
         self.iface = iface
 
-        self.setLayout(QHBoxLayout())
-        self.layout().setSpacing(10)
-
-        base = QWidget()
         self.ui = Ui_EphemToolWidget()
-        self.ui.setupUi(base)
-        self.layout().addWidget(base)
+        self.ui.setupUi(self)
 
-        closeButton = QPushButton()
-        closeButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        closeButton.setIcon(QIcon(":/kadas/icons/close"))
-        closeButton.setToolTip(self.tr("Close"))
-        closeButton.clicked.connect(self.close)
-        self.layout().addWidget(closeButton)
-        self.layout().setAlignment(closeButton, Qt.AlignTop)
+        self.ui.closeButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.ui.closeButton.setIcon(QIcon(":/kadas/icons/close"))
+        self.ui.closeButton.setToolTip(self.tr("Close"))
+        self.ui.closeButton.clicked.connect(self.close)
 
         self.ui.dateTimeEdit.setDateTime(QDateTime.currentDateTime())
         self.ui.dateTimeEdit.editingFinished.connect(self.recompute)
@@ -126,7 +123,6 @@ class EphemToolWidget(KadasBottomBar):
         KadasMapCanvasItemManager.addItem(self.moonAzIcon)
         self.moonAzIcon.setVisible(False)
 
-
     def getTimestamp(self):
         datetime = self.ui.dateTimeEdit.dateTime()
         if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
@@ -135,7 +131,6 @@ class EphemToolWidget(KadasBottomBar):
             tz = QTimeZone(KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")))
             datetime = QDateTime(datetime.date(), datetime.time(), QTimeZone(tz))
         return datetime.toSecsSinceEpoch()
-
 
     def setPos(self, wgsPos, mrcPos):
         self.wgsPos = wgsPos

@@ -11,11 +11,10 @@
 """
 
 import os
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from kadas.kadasgui import *
-from . import resources
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+from kadas.kadasgui import KadasPluginInterface
 from .ephem_tool import EphemTool
 
 
@@ -42,9 +41,7 @@ class EphemPlugin:
         return QCoreApplication.translate('Ephem', message)
 
     def initGui(self):
-        icon_path = ':/plugins/Ephem/icons/icon.png'
-        icon = QIcon(icon_path)
-
+        icon = QIcon(os.path.join(os.path.dirname(__file__), 'icons/icon.png'))
         self.action = QAction(icon, self.tr(u'Ephemeris'),
                               self.iface.mainWindow())
         self.action.setCheckable(True)

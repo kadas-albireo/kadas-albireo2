@@ -1,9 +1,7 @@
 <RCC>
     <qresource prefix="/plugins/Ephem" >
-        <file>icons/icon.png</file>
         <file>icons/dawn_end.svg</file>
         <file>icons/dawn_start.svg</file>
-        <file>icons/icon.png</file>
         <file>icons/icon.svg</file>
         <file>icons/midday.svg</file>
         <file>icons/moonrise.svg</file>
