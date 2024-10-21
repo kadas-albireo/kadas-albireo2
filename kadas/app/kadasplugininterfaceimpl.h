@@ -359,10 +359,12 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     //! Generic action adder
     void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) override;
     void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) override;
+    void addActionMapCanvasRightClick( QAction *action ) override;
 
     //! Generic action remover
     void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) override;
     void removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) override;
+    void removeActionMapCanvasRightClick( QAction *action ) override;
 
     //! Generic action finder
     QAction *findAction( const QString &name ) override;

@@ -72,10 +72,12 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
     //! Generic action adder
     virtual void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) = 0;
     virtual void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
+    virtual void addActionMapCanvasRightClick( QAction *action ) = 0;
 
     //! Generic action remover
     virtual void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) = 0;
     virtual void removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
+    virtual void removeActionMapCanvasRightClick( QAction *action ) = 0;
 
     //! Generic action finder
     virtual QAction *findAction( const QString &name ) = 0;

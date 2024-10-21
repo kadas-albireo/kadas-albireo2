@@ -41,17 +41,25 @@ class EphemPlugin:
         return QCoreApplication.translate('Ephem', message)
 
     def initGui(self):
-        icon = QIcon(os.path.join(os.path.dirname(__file__), 'icons/icon.png'))
-        self.action = QAction(icon, self.tr(u'Ephemeris'),
+        icon_path = os.path.join(os.path.dirname(__file__), 'icons/icon.png')
+        self.action = QAction(QIcon(icon_path), self.tr(u'Ephemeris'),
                               self.iface.mainWindow())
         self.action.setCheckable(True)
         self.action.toggled.connect(self.toolToggled)
         self.iface.addAction(self.action, self.iface.PLUGIN_MENU,
                              self.iface.ANALYSIS_TAB)
 
+        icon_dark_path = os.path.join(os.path.dirname(__file__), 'icons/icon_color.svg')
+        self.actionCanvasRightClick = QAction(QIcon(icon_dark_path), self.action.text(),
+                                      self.iface.mainWindow())
+        self.actionCanvasRightClick.triggered.connect(self.action.toggle)
+        self.iface.addActionMapCanvasRightClick(self.actionCanvasRightClick)
+
     def unload(self):
         self.iface.removeAction(self.action, self.iface.PLUGIN_MENU,
                                 self.iface.ANALYSIS_TAB)
+
+        self.iface.removeActionMapCanvasRightClick(self.action)
 
     def toolToggled(self, active):
         if active:

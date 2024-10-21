@@ -40,6 +40,12 @@
 #include "kadasmapidentifydialog.h"
 #include "kadasredliningintegration.h"
 
+const QString KadasCanvasContextMenu::ACTION_PROPERTY_MAP_POSITION("MapPosition");
+
+typedef QMap<QAction *, KadasCanvasContextMenu::Menu> RegisteredAction;
+
+Q_GLOBAL_STATIC(RegisteredAction, sRegisteredActions)
+
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )
 {
@@ -81,6 +87,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     mGeomSel->setGeometry( geom );
 
   }
+
   if ( mPickResult.isEmpty() )
   {
     if ( !KadasClipboard::instance()->isEmpty() )
@@ -100,8 +107,16 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     drawMenu->addAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
     drawMenu->addAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this, &KadasCanvasContextMenu::drawCoordinateCross );
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
+
+    const QList<QAction *> registeredDrawActions = sRegisteredActions->keys( Menu::DRAW );
+    for ( QAction *action : registeredDrawActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      drawMenu->addAction( action );
+    }
   }
   addSeparator();
+
   if ( mPickResult.isEmpty() || geomType == Qgis::GeometryType::Line || geomType == Qgis::GeometryType::Polygon )
   {
     QMenu *measureMenu = new QMenu();
@@ -124,6 +139,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
 
+    const QList<QAction *> registeredMeasureActions = sRegisteredActions->keys( Menu::MEASURE );
+    for ( QAction *action : registeredMeasureActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      measureMenu->addAction( action );
+    }
+
     QMenu *analysisMenu = new QMenu();
     addAction( tr( "Terrain analysis" ) )->setMenu( analysisMenu );
     analysisMenu->addAction( QIcon( ":/kadas/icons/slope_color" ), tr( "Slope" ), this, &KadasCanvasContextMenu::terrainSlope );
@@ -140,6 +162,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     {
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_min_max" ), tr( "Min/max" ), this, &KadasCanvasContextMenu::measureMinMax );
     }
+
+    const QList<QAction *> registeredAnalysisActions = sRegisteredActions->keys( Menu::TERRAIN_ANALYSIS );
+    for ( QAction *action : registeredAnalysisActions )
+    {
+      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      analysisMenu->addAction( action );
+    }
   }
 
   if ( mPickResult.isEmpty() )
@@ -148,12 +177,35 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QIcon( ":/kadas/icons/copy_map" ), tr( "Copy map" ), this, &KadasCanvasContextMenu::copyMap );
     addAction( QgsApplication::getThemeIcon( "/mActionFilePrint.svg" ), tr( "Print" ), this, &KadasCanvasContextMenu::print );
   }
+
+  // Remaining actions
+  const QList<QAction *> registeredActions = sRegisteredActions->keys( Menu::NONE );
+  for ( QAction *action : registeredActions )
+  {
+    action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+    addAction( action );
+  }
 }
 
 KadasCanvasContextMenu::~KadasCanvasContextMenu()
 {
+  for ( QAction *action : sRegisteredActions->keys() )
+  {
+    action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), QVariant());
+  }
+
   delete mGeomSel;
   delete mSelRect;
+}
+
+void KadasCanvasContextMenu::registerAction( QAction *action, Menu insertMenu )
+{
+  sRegisteredActions->insert( action, insertMenu );
+}
+
+void KadasCanvasContextMenu::unRegisterAction( QAction *action )
+{
+  sRegisteredActions->remove( action );
 }
 
 void KadasCanvasContextMenu::identify()
@@ -215,99 +267,194 @@ void KadasCanvasContextMenu::paste()
 void KadasCanvasContextMenu::drawPin()
 {
   kApp->mainWindow()->actionPin()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawPointMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewPoint()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawSquareMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewSquare()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawTriangleMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewTriangle()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawLine()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewLine()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawRectangle()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewRectangle()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawPolygon()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewPolygon()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawCircle()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewCircle()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawText()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewText()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::drawCoordinateCross()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewCoordinateCross()->trigger();
-}
 
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
+}
 
 void KadasCanvasContextMenu::measureLine()
 {
   kApp->mainWindow()->actionMeasureLine()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  if ( mPickResult.geom )
   {
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
+  else
+  {
+    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
   }
 }
 
 void KadasCanvasContextMenu::measurePolygon()
 {
   kApp->mainWindow()->actionMeasureArea()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  if ( mPickResult.geom )
   {
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
+  else
+  {
+    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
   }
 }
 
 void KadasCanvasContextMenu::measureCircle()
 {
   kApp->mainWindow()->actionMeasureCircle()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  if ( mPickResult.geom )
   {
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
+  else
+  {
+    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
   }
 }
 
 void KadasCanvasContextMenu::measureHeightProfile()
 {
   kApp->mainWindow()->actionMeasureHeightProfile()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  if ( mPickResult.geom )
   {
     static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
+  }
+  else
+  {
+    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
   }
 }
 
 void KadasCanvasContextMenu::measureMinMax()
 {
   kApp->mainWindow()->actionMeasureMinMax()->trigger();
-  QgsMapTool *tool = kApp->mainWindow()->mapCanvas()->mapTool();
-  if ( mPickResult.geom && dynamic_cast<KadasMapToolCreateItem *>( tool ) )
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  if ( mPickResult.geom )
   {
     QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( mPickResult.geom ) ? static_cast<QgsGeometryCollection *>( mPickResult.geom )->geometryN( 0 ) : mPickResult.geom;
     if ( QgsWkbTypes::flatType( geom->wkbType() ) == Qgis::WkbType::CurvePolygon )
@@ -318,7 +465,11 @@ void KadasCanvasContextMenu::measureMinMax()
     {
       static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterType::FilterPoly );
     }
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *geom, mPickResult.crs );
+    tool->addPartFromGeometry( *geom, mPickResult.crs );
+  }
+  else
+  {
+    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
   }
 }
 
@@ -349,6 +500,12 @@ void KadasCanvasContextMenu::terrainHillshade()
 void KadasCanvasContextMenu::terrainViewshed()
 {
   kApp->mainWindow()->actionTerrainViewshed()->trigger();
+
+  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  if ( !tool )
+    return;
+
+  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::print()

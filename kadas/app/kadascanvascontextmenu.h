@@ -32,8 +32,22 @@ class KadasCanvasContextMenu : public QMenu
 {
     Q_OBJECT
   public:
+
+    static const QString ACTION_PROPERTY_MAP_POSITION;
+
+    enum class Menu
+    {
+      NONE,
+      DRAW,
+      MEASURE,
+      TERRAIN_ANALYSIS
+    };
+
     KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
     ~KadasCanvasContextMenu();
+
+    static void registerAction( QAction *action, Menu insertMenu = Menu::TERRAIN_ANALYSIS );
+    static void unRegisterAction( QAction *action );
 
   private slots:
     void copyCoordinates();
