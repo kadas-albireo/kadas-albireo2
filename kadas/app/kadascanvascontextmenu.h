@@ -91,8 +91,6 @@ class KadasCanvasContextMenu : public QMenu
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
     KadasSelectionRectItem *mSelRect = nullptr;
-
-    static QMap<QAction *, Menu> sRegisteredActions;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H

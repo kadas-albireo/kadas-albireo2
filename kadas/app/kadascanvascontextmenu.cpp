@@ -42,7 +42,9 @@
 
 const QString KadasCanvasContextMenu::ACTION_PROPERTY_MAP_POSITION("MapPosition");
 
-QMap<QAction *, KadasCanvasContextMenu::Menu> KadasCanvasContextMenu::sRegisteredActions;
+typedef QMap<QAction *, KadasCanvasContextMenu::Menu> RegisteredAction;
+
+Q_GLOBAL_STATIC(RegisteredAction, sRegisteredActions)
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )
@@ -106,7 +108,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     drawMenu->addAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this, &KadasCanvasContextMenu::drawCoordinateCross );
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
 
-    const QList<QAction *> registeredDrawActions = sRegisteredActions.keys( Menu::DRAW );
+    const QList<QAction *> registeredDrawActions = sRegisteredActions->keys( Menu::DRAW );
     for ( QAction *action : registeredDrawActions )
     {
       action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
@@ -137,7 +139,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
       measureMenu->addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Height profile" ), this, &KadasCanvasContextMenu::measureHeightProfile );
     }
 
-    const QList<QAction *> registeredMeasureActions = sRegisteredActions.keys( Menu::MEASURE );
+    const QList<QAction *> registeredMeasureActions = sRegisteredActions->keys( Menu::MEASURE );
     for ( QAction *action : registeredMeasureActions )
     {
       action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
@@ -161,7 +163,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
       analysisMenu->addAction( QIcon( ":/kadas/icons/measure_min_max" ), tr( "Min/max" ), this, &KadasCanvasContextMenu::measureMinMax );
     }
 
-    const QList<QAction *> registeredAnalysisActions = sRegisteredActions.keys( Menu::TERRAIN_ANALYSIS );
+    const QList<QAction *> registeredAnalysisActions = sRegisteredActions->keys( Menu::TERRAIN_ANALYSIS );
     for ( QAction *action : registeredAnalysisActions )
     {
       action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
@@ -177,7 +179,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
   }
 
   // Remaining actions
-  const QList<QAction *> registeredActions = sRegisteredActions.keys( Menu::NONE );
+  const QList<QAction *> registeredActions = sRegisteredActions->keys( Menu::NONE );
   for ( QAction *action : registeredActions )
   {
     action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
@@ -187,7 +189,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
 
 KadasCanvasContextMenu::~KadasCanvasContextMenu()
 {
-  for ( QAction *action : sRegisteredActions.keys() )
+  for ( QAction *action : sRegisteredActions->keys() )
   {
     action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), QVariant());
   }
@@ -198,12 +200,12 @@ KadasCanvasContextMenu::~KadasCanvasContextMenu()
 
 void KadasCanvasContextMenu::registerAction( QAction *action, Menu insertMenu )
 {
-  sRegisteredActions.insert( action, insertMenu );
+  sRegisteredActions->insert( action, insertMenu );
 }
 
 void KadasCanvasContextMenu::unRegisterAction( QAction *action )
 {
-  sRegisteredActions.remove( action );
+  sRegisteredActions->remove( action );
 }
 
 void KadasCanvasContextMenu::identify()
