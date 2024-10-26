@@ -4,7 +4,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="78"/>
         <source>New 3D Map View</source>
-        <translation type="unfinished"/>
+        <translation>Nouvelle vue cartographique 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="78"/>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="71"/>
         <source>Camera Control</source>
-        <translation type="unfinished"/>
+        <translation>Contrôle caméra</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="75"/>
@@ -37,7 +37,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="95"/>
         <source>Measurement Line</source>
-        <translation type="unfinished"/>
+        <translation>Mesurer une ligne</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="108"/>
@@ -58,7 +58,7 @@
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="126"/>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="556"/>
         <source>Export 3D Scene</source>
-        <translation type="unfinished"/>
+        <translation>Exporter une scène 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="136"/>
@@ -68,7 +68,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="149"/>
         <source>Camera</source>
-        <translation type="unfinished"/>
+        <translation>Caméra</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="155"/>
@@ -171,22 +171,22 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
         <source>Walk Mode (First Person)</source>
-        <translation type="unfinished"/>
+        <translation>Mode marche (première personne)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="76"/>
         <source>Perspective Projection</source>
-        <translation type="unfinished"/>
+        <translation>Projection en perspective</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="77"/>
         <source>Orthogonal Projection</source>
-        <translation type="unfinished"/>
+        <translation>Projection orthogonale</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="100"/>
         <source>Flat Terrain</source>
-        <translation type="unfinished"/>
+        <translation>Terrain plat</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
@@ -201,7 +201,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Maillage</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="104"/>
@@ -211,7 +211,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="206"/>
         <source>Coordinate Reference System</source>
-        <translation type="unfinished"/>
+        <translation>Système de coordonnées de références</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="207"/>
@@ -252,25 +252,25 @@
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="233"/>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="238"/>
         <source>Top Left</source>
-        <translation type="unfinished"/>
+        <translation>Coin supérieur gauche</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="234"/>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="239"/>
         <source>Top Right</source>
-        <translation type="unfinished"/>
+        <translation>Coin supérieur droite</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="235"/>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="240"/>
         <source>Bottom Left</source>
-        <translation type="unfinished"/>
+        <translation>Coin inférieur gauche</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="236"/>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="241"/>
         <source>Bottom Right</source>
-        <translation type="unfinished"/>
+        <translation>Coin inférieur droite</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="264"/>
@@ -3620,13 +3620,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="147"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="436"/>
         <source>Y</source>
-        <translation type="unfinished"/>
+        <translation>Y</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="213"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="264"/>
         <source>Intensity</source>
-        <translation type="unfinished"/>
+        <translation>Intensité</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="220"/>
@@ -3637,13 +3637,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="227"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="401"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Couleur</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="234"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="457"/>
         <source>X</source>
-        <translation type="unfinished"/>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="241"/>
@@ -3653,13 +3653,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="289"/>
         <source>Azimuth</source>
-        <translation type="unfinished"/>
+        <translation>Azimut</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="296"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="338"/>
         <source>°</source>
-        <translation type="unfinished"/>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="331"/>
@@ -3676,17 +3676,17 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="464"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="471"/>
         <source>--</source>
-        <translation type="unfinished"/>
+        <translation>--</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="50"/>
         <source>Point Light</source>
-        <translation type="unfinished"/>
+        <translation>Lumière ponctuelle</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="54"/>
         <source>Directional Light</source>
-        <translation type="unfinished"/>
+        <translation>Lumière directionnelle</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="215"/>
@@ -7077,7 +7077,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/external/qgis/app/qgsgotolocatorfilter.h" line="37"/>
         <source>Go to Coordinate</source>
-        <translation type="unfinished"/>
+        <translation>Aller vers une coordonnée</translation>
     </message>
 </context>
 <context>
