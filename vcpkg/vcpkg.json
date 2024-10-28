@@ -8,7 +8,7 @@
     "registries": [
       {
         "kind": "git",
-        "baseline": "6ede4a1108756899e55fe4d308aaa25410e8e12f",
+        "baseline": "d4bc16c09fae1c10c74827ffe73b6c54b287021d",
         "repository": "https://github.com/open-vcpkg/qt5-registry",
         "packages": [
           "py-pyqt5",
@@ -27,6 +27,8 @@
           "python3",
           "py-*",
           "gdal",
+          "vcpkg-tool-mercurial",
+          "pybind11",
           "vcpkg-python-scripts"
         ]
       }
@@ -44,16 +46,24 @@
   "homepage": "https://github.com/kadas-albireo/kadas-albireo2",
   "dependencies": [
     "cairo",
+    {
+      "name": "ffmpeg",
+      "features": [
+        "ffmpeg",
+        "ffprobe"
+      ],
+      "platform": "windows"
+    },
     "geographiclib",
     "librsvg",
-    "python3",
-    "py-psycopg2",
     "proj-chenyx06a",
+    "py-psycopg2",
+    "python3",
     {
       "name": "qgis",
       "features": [
-        "gui",
-        "3d"
+        "3d",
+        "gui"
       ]
     },
     {
@@ -62,33 +72,44 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect",
-    {
-      "name": "ffmpeg",
-      "platform": "windows",
-      "features": [
-        "ffmpeg",
-        "ffprobe"
-      ]
-    }
+    "zonedetect"
   ],
   "features": {
     "bindings": {
       "description": "Build with python bindings",
       "dependencies": [
-        "py-pip",
+        {
+          "name": "gdal",
+          "features": [
+            "python"
+          ]
+        },
+        "py-autopep8",
+        "py-charset-normalizer",
+        "py-dateutil",
+        "py-flask",
+        "py-idna",
+        "py-isort",
+        "py-jinja2",
         "py-kadas-requirements",
+        "py-markupsafe",
+        "py-matplotlib",
+        "py-numpy",
+        "py-owslib",
+        "py-pip",
+        "py-pip",
+        "py-psycopg2",
+        "py-pyqt6",
+        "py-pytz",
+        "py-pyyaml",
+        "py-qscintilla",
+        "py-requests",
+        "py-six",
         {
           "name": "qgis",
           "features": [
             "bindings",
             "desktop"
-          ]
-        },
-        {
-          "name": "gdal",
-          "features": [
-            "python"
           ]
         }
       ]
