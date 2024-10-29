@@ -148,7 +148,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="615"/>
         <source>(none)</source>
-        <translation type="unfinished"/>
+        <translation>(aucun)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="724"/>
@@ -216,7 +216,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="207"/>
         <source>Cube</source>
-        <translation type="unfinished"/>
+        <translation>Cube</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="209"/>
@@ -280,7 +280,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="489"/>
         <source>An elevation layer must be selected for a DEM terrain</source>
-        <translation type="unfinished"/>
+        <translation>Une couche d&apos;élévation doit être sélectionnée pour un MNT</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="497"/>
@@ -3598,13 +3598,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="33"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="43"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="87"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="450"/>
         <source>Z</source>
-        <translation type="unfinished"/>
+        <translation>Z</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="107"/>
@@ -3793,7 +3793,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
         <source>Address</source>
-        <translation type="unfinished"/>
+        <translation>Adresse</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
@@ -5131,7 +5131,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="28"/>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Aucun</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="45"/>
@@ -5281,7 +5281,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="218"/>
         <source>Plugin update</source>
-        <translation type="unfinished"/>
+        <translation>Mettre à jour l&apos;extension</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="219"/>
@@ -5734,7 +5734,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasshadowrenderingsettingswidget.cpp" line="55"/>
         <source>Directional light %1</source>
-        <translation type="unfinished"/>
+        <translation>Lumière directionnelle %1</translation>
     </message>
 </context>
 <context>
@@ -5742,12 +5742,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasskyboxrenderingsettingswidget.cpp" line="29"/>
         <source>Panoramic Texture</source>
-        <translation type="unfinished"/>
+        <translation>Texture panoramique</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasskyboxrenderingsettingswidget.cpp" line="30"/>
         <source>Distinct Faces</source>
-        <translation type="unfinished"/>
+        <translation>Faces distinctes</translation>
     </message>
 </context>
 <context>
@@ -6146,7 +6146,7 @@ avec géoloc.</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2513"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2516"/>
         <source>Export KML</source>
-        <translation type="unfinished"/>
+        <translation>Exporter KML</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1767"/>
@@ -6525,29 +6525,29 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="91"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Général</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="94"/>
         <source>General settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres généraux</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="103"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="307"/>
         <source>Terrain</source>
-        <translation type="unfinished"/>
+        <translation>Terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="106"/>
         <source>Terrain settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres de terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="115"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="522"/>
         <source>Lights</source>
-        <translation type="unfinished"/>
+        <translation>Lumières</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="118"/>
@@ -6557,7 +6557,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="127"/>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effets</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="130"/>
@@ -6577,12 +6577,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="151"/>
         <source>Advanced</source>
-        <translation type="unfinished"/>
+        <translation>Avancé</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="154"/>
         <source>Advanced settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres avancés</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="240"/>
@@ -6598,7 +6598,7 @@ avec géoloc.</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="326"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1047"/>
         <source> map units</source>
-        <translation type="unfinished"/>
+        <translation>Unités de carte</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
@@ -6620,7 +6620,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="379"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="386"/>
@@ -6630,7 +6630,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="403"/>
         <source>Offset</source>
-        <translation type="unfinished"/>
+        <translation>Décalage</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="431"/>
@@ -6660,7 +6660,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="751"/>
         <source>Camera</source>
-        <translation type="unfinished"/>
+        <translation>Caméra</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="757"/>
@@ -6670,7 +6670,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="764"/>
         <source>°</source>
-        <translation type="unfinished"/>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="774"/>
@@ -6685,7 +6685,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="807"/>
         <source>Movement speed</source>
-        <translation type="unfinished"/>
+        <translation>Vitesse de mouvement</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="817"/>
@@ -6700,12 +6700,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="836"/>
         <source>Horizontal position</source>
-        <translation type="unfinished"/>
+        <translation>Position horizontale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="846"/>
         <source>Vertical position</source>
-        <translation type="unfinished"/>
+        <translation>Position verticale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="859"/>
@@ -6792,7 +6792,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1104"/>
         <source>Show frames per second (FPS)</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les images par seconde (FPS)</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1114"/>
@@ -6812,7 +6812,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1135"/>
         <source>0</source>
-        <translation type="unfinished"/>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1142"/>
