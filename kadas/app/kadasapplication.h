@@ -58,6 +58,9 @@ class KadasApplication : public QgsApplication
 
   public:
 
+    static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
+    static const QgsSettingsEntryString * settingsPortalTokenUrl;
+
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
 
