@@ -101,6 +101,11 @@
 #include "kadasmapgridlayer.h"
 
 
+
+const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
+const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+
+
 static QStringList splitSubLayerDef( const QString &subLayerDef )
 {
   return subLayerDef.split( QgsDataProvider::sublayerSeparator() );
@@ -386,7 +391,7 @@ void KadasApplication::init()
   KadasItemLayerRegistry::init();
 
   // Extract portal token if necessary before loading startup project
-  QString tokenUrl = settings.value( "/portal/token-url" ).toString();
+  QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
     QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
@@ -438,7 +443,7 @@ void KadasApplication::extractPortalToken()
       {
         QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
         QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-        QStringList cookieUrls = QgsSettings().value( "/portal/cookieurls", "" ).toString().split( "," );
+        const QStringList cookieUrls = settingsPortalCookieUrls->value();
         for ( const QString &url : cookieUrls )
         {
           QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 1 );
