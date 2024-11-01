@@ -351,7 +351,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
   const QPointF center = QPointF( offsetX, -offsetY );
   const QRect rect( offsetX - 0.5 * w - 0.5, -offsetY - 0.5 * h - 0.5, w, h );
-  renderPrivate(context, center, rect, dpiScale );
+  renderPrivate( context, center, rect, dpiScale );
 }
 
 bool KadasRectangleItemBase::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
