@@ -36,7 +36,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     Renderer( KadasItemLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id(), &rendererContext )
     {
-      for ( ItemId id : layer->mItemOrder )
+      for ( ItemId id : std::as_const( layer->mItemOrder ) )
       {
         mRenderItems.append( layer->mItems[id]->clone() );
       }
@@ -45,8 +45,8 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
     bool render() override
     {
-      bool omitSinglePoint = renderContext()->customRenderingFlags().contains( "globe" );
-      for ( const KadasMapItem *item : mRenderItems )
+      bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
+      for ( const KadasMapItem *item : std::as_const( mRenderItems ) )
       {
         if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
