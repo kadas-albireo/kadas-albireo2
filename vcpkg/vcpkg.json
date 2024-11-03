@@ -95,9 +95,18 @@
         "py-jinja2",
         "py-kerberos-proxy-auth",
         "py-markupsafe",
-        "py-matplotlib",
-        "py-numpy",
-        "py-opencv-contrib-python",
+        {
+          "name": "py-matplotlib",
+          "platform": "windows"
+        },
+        {
+          "name": "py-numpy",
+          "platform": "windows"
+        },
+        {
+          "name": "py-opencv-contrib-python",
+          "platform": "windows"
+        },
         "py-owslib",
         "py-pip",
         "py-pip-system-certs",
@@ -106,7 +115,10 @@
         "py-pytz",
         "py-pyyaml",
         "py-qscintilla",
-        "py-requests-kerberos",
+        {
+          "name": "py-requests-kerberos",
+          "platform": "windows"
+        },
         "py-six",
         {
           "name": "qgis",
