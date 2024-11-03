@@ -21,7 +21,7 @@
       },
       {
         "kind": "git",
-        "baseline": "d489a74130fadbcc56af0c8f9d312a49ca6a7c1a",
+        "baseline": "a45e0573ed76c16d4b71485740b4857df1dd7326",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
@@ -29,7 +29,8 @@
           "gdal",
           "vcpkg-tool-mercurial",
           "pybind11",
-          "vcpkg-python-scripts"
+          "vcpkg-python-scripts",
+          "vcpkg-tool-rust"
         ]
       }
     ],
@@ -87,23 +88,25 @@
         "py-autopep8",
         "py-charset-normalizer",
         "py-dateutil",
+        "py-ephem",
         "py-flask",
-        "py-idna",
+        "py-geographiclib",
         "py-isort",
         "py-jinja2",
-        "py-kadas-requirements",
+        "py-kerberos-proxy-auth",
         "py-markupsafe",
         "py-matplotlib",
         "py-numpy",
+        "py-opencv-contrib-python",
         "py-owslib",
         "py-pip",
-        "py-pip",
+        "py-pip-system-certs",
         "py-psycopg2",
         "py-pyqt6",
         "py-pytz",
         "py-pyyaml",
         "py-qscintilla",
-        "py-requests",
+        "py-requests-kerberos",
         "py-six",
         {
           "name": "qgis",
