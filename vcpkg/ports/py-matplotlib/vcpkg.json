@@ -1,0 +1,43 @@
+{
+  "name": "py-matplotlib",
+  "version": "3.9.2",
+  "port-version": 1,
+  "description": "Matplotlib is a comprehensive library for creating static, animated, and interactive visualizations in Python.",
+  "homepage": "https://matplotlib.org/stable/",
+  "license": null,
+  "dependencies": [
+    "freetype",
+    "py-certifi",
+    "py-cycler",
+    "py-dateutil",
+    "py-fonttools",
+    "py-kiwisolver",
+    {
+      "name": "py-meson",
+      "host": true
+    },
+    "py-numpy",
+    "py-pillow",
+    "py-pyparsing",
+    {
+      "name": "py-setuptools-scm",
+      "host": true
+    },
+    {
+      "name": "pybind11",
+      "features": [
+        "scripts"
+      ]
+    },
+    "qhull",
+    "vcpkg-python-scripts",
+    {
+      "name": "python3",
+      "host": true
+    },
+    {
+      "name": "vcpkg-tool-meson",
+      "host": true
+    }
+  ]
+}
