@@ -93,7 +93,10 @@
         "py-geographiclib",
         "py-isort",
         "py-jinja2",
-        "py-kerberos-proxy-auth",
+        {
+          "name": "py-kerberos-proxy-auth",
+          "platform": "windows"
+        },
         "py-markupsafe",
         {
           "name": "py-matplotlib",
