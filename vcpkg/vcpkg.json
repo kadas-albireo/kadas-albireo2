@@ -111,10 +111,10 @@
         "py-pip",
         "py-pip-system-certs",
         "py-psycopg2",
-        "py-pyqt6",
+        "py-pyqt5",
         "py-pytz",
         "py-pyyaml",
-        "py-qscintilla",
+        "py-qscintilla-qt5",
         {
           "name": "py-requests-kerberos",
           "platform": "windows"
