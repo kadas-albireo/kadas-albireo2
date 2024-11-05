@@ -9,7 +9,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="78"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;étendue du projet n&apos;est pas valide. Veuillez ajouter ou activer une couche pour le rendu.</translation>
     </message>
 </context>
 <context>
@@ -6552,7 +6552,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="118"/>
         <source>Lights settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres des lumières</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="127"/>
@@ -6562,7 +6562,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="130"/>
         <source>Effects settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres des effets</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="139"/>
@@ -6675,7 +6675,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="774"/>
         <source>Field of View</source>
-        <translation type="unfinished"/>
+        <translation>Champ de vue</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="784"/>
