@@ -98,7 +98,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="203"/>
         <source>Show Shadows</source>
-        <translation type="unfinished"/>
+        <translation>Montrer l&apos;ombre</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="213"/>
@@ -295,7 +295,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="516"/>
         <source>No lights exist in the scene</source>
-        <translation type="unfinished"/>
+        <translation>Aucune lumière n&apos;existe dans la scène</translation>
     </message>
 </context>
 <context>
@@ -3696,7 +3696,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="215"/>
         <source>It is not possible to add more than 8 lights to the scene.</source>
-        <translation type="unfinished"/>
+        <translation>Il n&apos;est pas possible d&apos;ajouter plus de 8 lumières à la scène</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="228"/>
@@ -3783,7 +3783,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
         <source>Places</source>
-        <translation type="unfinished"/>
+        <translation>Places</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
@@ -4619,7 +4619,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="33"/>
         <source>Single Color</source>
-        <translation type="unfinished"/>
+        <translation>Couleur unique</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="36"/>
@@ -4629,12 +4629,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="37"/>
         <source>Front</source>
-        <translation type="unfinished"/>
+        <translation>Devant</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="38"/>
         <source>Back</source>
-        <translation type="unfinished"/>
+        <translation>Derrière</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="40"/>
@@ -6567,12 +6567,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="139"/>
         <source>Camera &amp; Skybox</source>
-        <translation type="unfinished"/>
+        <translation>Caméra &amp; Skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="142"/>
         <source>Camera and skybox settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres caméra et skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="151"/>
@@ -6640,7 +6640,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="606"/>
         <source>Show Shadows</source>
-        <translation>Ombrage activé</translation>
+        <translation>Montrer l&apos;ombre</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="636"/>
@@ -6665,7 +6665,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="757"/>
         <source>Projection type</source>
-        <translation type="unfinished"/>
+        <translation>Type de projection</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="764"/>
@@ -6680,7 +6680,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="784"/>
         <source>Navigation mode</source>
-        <translation type="unfinished"/>
+        <translation>Mode de navigation</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="807"/>
@@ -6695,7 +6695,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="826"/>
         <source>Axis type</source>
-        <translation type="unfinished"/>
+        <translation>Type d&apos;axe</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="836"/>
@@ -6746,13 +6746,13 @@ avec géoloc.</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="984"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1173"/>
         <source>Size</source>
-        <translation type="unfinished"/>
+        <translation>Taille</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="991"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1166"/>
         <source>Corner</source>
-        <translation type="unfinished"/>
+        <translation>Coin</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1026"/>
