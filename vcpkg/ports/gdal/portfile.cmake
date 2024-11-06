@@ -2,7 +2,7 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OSGeo/gdal
     REF "v${VERSION}"
-    SHA512 d9ab5d94dc870df17b010166d3ebbe897a1f673ba05bf31cd4bed437b6db303dd9e373ba5099d3a191ff3e48c995556fb5bcc77d03d975614df4aa20a2c2b085
+    SHA512 fccdcf484bdc833dc5f0d6ad1fce9d152fa8b861cf23b634400d8bf7fd97d2c33a6b87050538c5a6c896d4ba870469134521cc44fdad3e071adffbf29329cb9b
     HEAD_REF master
     PATCHES
         find-link-libraries.patch
@@ -73,16 +73,15 @@ endif()
 string(REPLACE "dynamic" "" qhull_target "Qhull::qhull${VCPKG_LIBRARY_LINKAGE}_r")
 
 if(VCPKG_TARGET_IS_WINDOWS)
-    list(APPEND GDAL_OPTIONS "-DGDAL_PYTHON_INSTALL_PREFIX=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../")
+    set(GDAL_PYTHON_INSTALL_PREFIX "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../")
 else()
-    list(APPEND GDAL_OPTIONS "-DGDAL_PYTHON_INSTALL_PREFIX=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../../")
+    set(GDAL_PYTHON_INSTALL_PREFIX "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../../")
 endif()
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         -DVCPKG_HOST_TRIPLET=${HOST_TRIPLET} # for host pkgconf in PATH
         ${FEATURE_OPTIONS}
-	${GDAL_OPTIONS}
         -DBUILD_DOCS=OFF
         -DBUILD_TESTING=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_CSharp=ON
@@ -105,6 +104,7 @@ vcpkg_cmake_configure(
         "-DQHULL_LIBRARY=${qhull_target}"
         "-DSWIG_DIR=${CURRENT_HOST_INSTALLED_DIR}/tools/swig"
         "-DSWIG_EXECUTABLE=${CURRENT_HOST_INSTALLED_DIR}/tools/swig/swig${VCPKG_HOST_EXECUTABLE_SUFFIX}"
+        "-DGDAL_PYTHON_INSTALL_PREFIX=${GDAL_PYTHON_INSTALL_PREFIX}"
         -DONLY_GENERATE_FOR_NON_DEBUG=ON # Python bindings only for release
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
     OPTIONS_DEBUG
@@ -188,8 +188,7 @@ if("python" IN_LIST FEATURES)
         ERROR_VARIABLE set_rpath_error
     )
     endforeach()
-  endif()
-  if(VCPKG_TARGET_IS_WINDOWS)
+  elseif(VCPKG_TARGET_IS_WINDOWS)
     file(COPY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/swig/python/osgeo" DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
   endif()
   vcpkg_python_test_import(MODULE "osgeo.gdal")

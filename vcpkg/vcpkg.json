@@ -21,13 +21,16 @@
       },
       {
         "kind": "git",
-        "baseline": "601aef70da863790d9a1c23106796500878089ac",
+        "baseline": "df20cabbf820245aff3286b521bb5f19bc6d1d86",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
           "py-*",
           "gdal",
-          "vcpkg-python-scripts"
+          "vcpkg-tool-mercurial",
+          "pybind11",
+          "vcpkg-python-scripts",
+          "vcpkg-tool-rust"
         ]
       }
     ],
@@ -44,16 +47,24 @@
   "homepage": "https://github.com/kadas-albireo/kadas-albireo2",
   "dependencies": [
     "cairo",
+    {
+      "name": "ffmpeg",
+      "features": [
+        "ffmpeg",
+        "ffprobe"
+      ],
+      "platform": "windows"
+    },
     "geographiclib",
     "librsvg",
-    "python3",
-    "py-psycopg2",
     "proj-chenyx06a",
+    "py-psycopg2",
+    "python3",
     {
       "name": "qgis",
       "features": [
-        "gui",
-        "3d"
+        "3d",
+        "gui"
       ]
     },
     {
@@ -62,33 +73,62 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect",
-    {
-      "name": "ffmpeg",
-      "platform": "windows",
-      "features": [
-        "ffmpeg",
-        "ffprobe"
-      ]
-    }
+    "zonedetect"
   ],
   "features": {
     "bindings": {
       "description": "Build with python bindings",
       "dependencies": [
+        {
+          "name": "gdal",
+          "features": [
+            "python"
+          ]
+        },
+        "py-autopep8",
+        "py-charset-normalizer",
+        "py-dateutil",
+        "py-ephem",
+        "py-flask",
+        "py-geographiclib",
+        "py-isort",
+        "py-jinja2",
+        {
+          "name": "py-kerberos-proxy-auth",
+          "platform": "windows"
+        },
+        "py-lxml",
+        "py-markupsafe",
+        {
+          "name": "py-matplotlib",
+          "platform": "windows"
+        },
+        {
+          "name": "py-numpy",
+          "platform": "windows"
+        },
+        {
+          "name": "py-opencv-contrib-python",
+          "platform": "windows"
+        },
+        "py-owslib",
         "py-pip",
-        "py-kadas-requirements",
+        "py-pip-system-certs",
+        "py-psycopg2",
+        "py-pyqt5",
+        "py-pytz",
+        "py-pyyaml",
+        "py-qscintilla-qt5",
+        {
+          "name": "py-requests-kerberos",
+          "platform": "windows"
+        },
+        "py-six",
         {
           "name": "qgis",
           "features": [
             "bindings",
             "desktop"
-          ]
-        },
-        {
-          "name": "gdal",
-          "features": [
-            "python"
           ]
         }
       ]
