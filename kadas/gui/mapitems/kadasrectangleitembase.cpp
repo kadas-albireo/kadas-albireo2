@@ -447,6 +447,7 @@ void KadasRectangleItemBase::edit( const EditContext &context, const KadasMapPos
   else if ( context.vidx.vertex >= 1 && context.vidx.vertex <= 4 )
   {
     editPrivate( newPoint, mapSettings );
+    update();
   }
   else if ( mFrame )
   {
