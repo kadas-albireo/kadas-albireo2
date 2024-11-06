@@ -97,6 +97,7 @@
           "name": "py-kerberos-proxy-auth",
           "platform": "windows"
         },
+        "py-lxml",
         "py-markupsafe",
         {
           "name": "py-matplotlib",
