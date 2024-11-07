@@ -132,7 +132,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
     if ( mSelectionRect->hitTest( hitPos, mCanvas->mapSettings() ) )
     {
       mMoveRefPos = e->mapPoint();
-      for ( KadasMapItem *item : mItems )
+      for ( KadasMapItem *item : std::as_const( mItems ) )
       {
         QgsCoordinateTransform crst( item->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
         mItemRefPos.append( crst.transform( item->position() ) );

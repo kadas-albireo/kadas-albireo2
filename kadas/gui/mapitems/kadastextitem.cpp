@@ -14,30 +14,44 @@
  *                                                                         *
  ***************************************************************************/
 
+
+#include <QAction>
+#include <QMenu>
+
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgstextdocument.h>
+#include <qgis/qgstextrenderer.h>
 
 #include "kadas/gui/mapitems/kadastextitem.h"
 
 
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasAnchoredItem( crs )
+  : KadasRectangleItemBase( crs )
 {
-  clear();
 }
 
 void KadasTextItem::setText( const QString &text )
 {
   mText = text;
   QFontMetrics metrics( mFont );
-  state()->size.setWidth( metrics.horizontalAdvance( mText ) );
-  state()->size.setHeight( metrics.height() );
+  if ( mFrameAutoResize )
+  {
+    state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
+    state()->mSize.setHeight( metrics.height() );
+  }
   update();
   emit propertyChanged();
+}
+
+void KadasTextItem::setAngle( double angle )
+{
+  state()->mAngle = angle;
+  update();
 }
 
 void KadasTextItem::setFillColor( const QColor &c )
@@ -58,47 +72,61 @@ void KadasTextItem::setFont( const QFont &font )
 {
   mFont = font;
   QFontMetrics metrics( mFont );
-  state()->size.setWidth( metrics.horizontalAdvance( mText ) );
-  state()->size.setHeight( metrics.height() );
+  if ( mFrameAutoResize )
+  {
+    state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
+    state()->mSize.setHeight( metrics.height() );
+  }
   update();
   emit propertyChanged();
 }
 
+void KadasTextItem::setFrameAutoResize( bool frameAutoResize )
+{
+  mFrameAutoResize = frameAutoResize;
+  emit propertyChanged();
+  if ( mFrameAutoResize )
+    setFont( mFont );
+}
+
 QImage KadasTextItem::symbolImage() const
 {
-  QImage image( constState()->size, QImage::Format_ARGB32 );
+  // TODO: remove, this seems unused
+  QImage image( constState()->mSize, QImage::Format_ARGB32 );
   image.fill( Qt::transparent );
   QPainter painter( &image );
 
   painter.setBrush( QBrush( mFillColor ) );
   painter.setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
   painter.setFont( mFont );
-  painter.drawText( QRect( 0, 0, constState()->size.width(), constState()->size.height() ), mText );
+  painter.drawText( QRect( 0, 0, constState()->mSize.width(), constState()->mSize.height() ), mText );
   return image;
 }
 
-void KadasTextItem::render( QgsRenderContext &context ) const
+void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const
 {
   QFont font = mFont;
   font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
-
-  QgsPointXY mapPos = context.coordinateTransform().transform( constState()->pos );
-  QPointF pos = context.mapToPixel().transform( mapPos ).toQPointF();
   QFontMetrics metrics( font );
-  QRect bbox = metrics.boundingRect( mText );
-  int baselineOffset = metrics.ascent() - mAnchorY * metrics.height();
+  QPointF baseLineCenter = center + QPointF( 0, metrics.descent() );
 
-  context.painter()->setBrush( QBrush( mFillColor ) );
-  context.painter()->setPen( QPen( mOutlineColor, font.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
-  context.painter()->setFont( font );
-  context.painter()->translate( pos );
-  context.painter()->rotate( -constState()->angle );
-  context.painter()->scale( mSymbolScale, mSymbolScale );
-  QPainterPath path;
-  path.addText( -mAnchorX * bbox.width(), baselineOffset, font, mText );
-  context.painter()->drawPath( path );
-  context.painter()->setPen( Qt::transparent );
-  context.painter()->drawPath( path );
+  // no idea why this works, otherwise text scales up when edited
+  // the rendex context is coming from KadasMapItem when edited while it comes from the QgsMapLayerRenderer otherwise
+  double scale = 1.0;
+  if ( context.painter()->device()->physicalDpiX() )
+    scale = 1.0 / context.painter()->device()->physicalDpiX() * context.painter()->device()->logicalDpiX();
+
+  QgsTextFormat format;
+  format.setFont( font );
+  format.setSize( font.pointSize() * scale );
+  format.setColor( mFillColor );
+  QgsTextBufferSettings bs;
+  bs.setColor( mOutlineColor );
+  bs.setSize( 1 );
+  bs.setEnabled( true );
+  format.setBuffer( bs );
+
+  QgsTextRenderer::drawText( baseLineCenter, -constState()->mAngle, Qgis::TextHorizontalAlignment::Center, {mText}, context, format, false );
 }
 
 QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
@@ -116,4 +144,40 @@ QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   outStream << "</Placemark>" << "\n";
   outStream.flush();
   return outString;
+}
+
+void KadasTextItem::editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
+{
+  QSize oldSize = state()->mSize;
+
+  double scale = mapSettings.mapUnitsPerPixel() * mSymbolScale;
+  KadasMapPos mapPos = toMapPos( constState()->mPos, mapSettings );
+  KadasMapPos frameCenter( mapPos.x() + constState()->mOffsetX * scale, mapPos.y() + constState()->mOffsetY * scale );
+
+  QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
+
+  double ratio = std::min( 2 * qAbs( halfSize.x() / oldSize.width() ),  2 * qAbs( halfSize.y() / oldSize.height() ) );
+
+  if ( mFrameAutoResize )
+  {
+    QFont font = mFont;
+    font.setPointSizeF( font.pointSizeF() * ratio );
+    setFont( font );
+  }
+  else
+  {
+    state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
+    state()->mSize.setHeight( 2 * qAbs( halfSize.y() ) );
+    update();
+  }
+}
+
+void KadasTextItem::populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
+{
+  if ( frameVisible() )
+  {
+    QAction *lockedAction = menu->addAction( tr( "Auto resize frame" ), [this]( bool autoResize ) { setFrameAutoResize( autoResize ); } );
+    lockedAction->setCheckable( true );
+    lockedAction->setChecked( mFrameAutoResize );
+  }
 }

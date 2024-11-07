@@ -68,7 +68,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
     {
       KadasItemPos mPos;
       QList<KadasItemPos> mFootprint;
-      KadasItemPos mAnchorPoint;
+      KadasItemPos mRectangleCenterPoint;
       double mAngle = 0.;
       double mOffsetX = 0.;
       double mOffsetY = 0.;
@@ -88,8 +88,10 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
     bool mPosLocked = false;
 
   private:
-    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, double dpiScale ) const = 0;
+    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const = 0;
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual void populateContextMenuPrivate(QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings) {}
+
     friend class KadasProjectMigration;
 
     enum AttribIds {AttrX, AttrY};

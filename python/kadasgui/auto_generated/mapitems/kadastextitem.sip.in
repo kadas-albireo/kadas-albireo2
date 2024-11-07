@@ -10,7 +10,7 @@
 
 
 
-class KadasTextItem : KadasAnchoredItem
+class KadasTextItem : KadasRectangleItemBase
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -39,11 +39,21 @@ the Free Software Foundation; either version 2 of the License, or     *
     QColor outlineColor() const;
     void setFont( const QFont &font );
     const QFont &font() const;
+    void setFrameAutoResize( bool frameAutoResize );
+    bool frameAutoResize() const;
+    void setAngle( double angle );
 
     virtual QImage symbolImage() const;
 
 
-    virtual void render( QgsRenderContext &context ) const;
+
+  signals:
+    void frameAutoResizeChanged( bool frameAutoResize );
+
+  protected:
+      virtual void renderPrivate( QgsRenderContext &context, const QPointF& center, const QRect &rect, double dpiScale ) const;
+      virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );
+      virtual void populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings );
 
 
 };

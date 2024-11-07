@@ -54,7 +54,9 @@ void KadasMapCanvasItem::paint( QPainter *painter )
     {
       return;
     }
+
     QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
+
     rc.setMapExtent( mMapCanvas->mapSettings().visibleExtent() );
     rc.setExtent( mMapCanvas->mapSettings().extent() );
     rc.setMapToPixel( mMapCanvas->mapSettings().mapToPixel() );
