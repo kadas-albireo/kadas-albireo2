@@ -55,26 +55,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
       return;
     }
 
-    //QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
-
-    QgsRenderContext rc;
-    rc.setPainter( painter );
-    if ( painter && painter->device() )
-    {
-      rc.setScaleFactor( painter->device()->physicalDpiX() / 25.4 );
-      //rc.setScaleFactor( painter->device()->logicalDpiX() / 25.4 );
-    }
-    else
-    {
-      rc.setScaleFactor( 3.465 ); //assume 88 dpi as standard value
-    }
-
-    if ( painter && painter->renderHints() & QPainter::Antialiasing )
-      rc.setFlag( Qgis::RenderContextFlag::Antialiasing, true );
-    if ( painter && painter->renderHints() & QPainter::SmoothPixmapTransform )
-      rc.setFlag( Qgis::RenderContextFlag::HighQualityImageTransforms, true );
-    if ( painter && painter->renderHints() & QPainter::LosslessImageRendering )
-      rc.setFlag( Qgis::RenderContextFlag::LosslessImageRendering, true );
+    QgsRenderContext rc = QgsRenderContext::fromQPainter( painter );
 
     rc.setMapExtent( mMapCanvas->mapSettings().visibleExtent() );
     rc.setExtent( mMapCanvas->mapSettings().extent() );
