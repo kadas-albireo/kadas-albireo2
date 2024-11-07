@@ -91,6 +91,13 @@ class KADAS_GUI_EXPORT KadasItemPos
 #else
     KadasItemPos( double x = 0., double y = 0 ) : mX( x ), mY( y ) {}
 #endif
+    bool operator== ( const KadasItemPos &other ) const {
+      return mX == other.mX &&
+          mY == other.mY &&
+          hasZ() == other.hasZ() &&
+          ( !hasZ() || mZ == other.mZ );
+    }
+
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
