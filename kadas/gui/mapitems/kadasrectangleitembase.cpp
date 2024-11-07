@@ -474,6 +474,8 @@ void KadasRectangleItemBase::populateContextMenu( QMenu *menu, const EditContext
   QAction *lockedAction = menu->addAction( tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
   lockedAction->setCheckable( true );
   lockedAction->setChecked( mPosLocked );
+
+  populateContextMenuPrivate( menu, context, clickPos, mapSettings );
 }
 
 KadasMapItem::AttribValues KadasRectangleItemBase::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const

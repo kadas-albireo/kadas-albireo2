@@ -15,6 +15,9 @@
  ***************************************************************************/
 
 
+#include <QAction>
+#include <QMenu>
+
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
@@ -36,7 +39,7 @@ void KadasTextItem::setText( const QString &text )
 {
   mText = text;
   QFontMetrics metrics( mFont );
-  if ( mFrameAutoSize )
+  if ( mFrameAutoResize )
   {
     state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
     state()->mSize.setHeight( metrics.height() );
@@ -69,13 +72,21 @@ void KadasTextItem::setFont( const QFont &font )
 {
   mFont = font;
   QFontMetrics metrics( mFont );
-  if ( mFrameAutoSize )
+  if ( mFrameAutoResize )
   {
     state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
     state()->mSize.setHeight( metrics.height() );
   }
   update();
   emit propertyChanged();
+}
+
+void KadasTextItem::setFrameAutoResize( bool frameAutoResize )
+{
+  mFrameAutoResize = frameAutoResize;
+  emit propertyChanged();
+  if ( mFrameAutoResize )
+    setFont( mFont );
 }
 
 QImage KadasTextItem::symbolImage() const
@@ -137,11 +148,36 @@ QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
 
 void KadasTextItem::editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
+  QSize oldSize = state()->mSize;
+
   double scale = mapSettings.mapUnitsPerPixel() * mSymbolScale;
   KadasMapPos mapPos = toMapPos( constState()->mPos, mapSettings );
   KadasMapPos frameCenter( mapPos.x() + constState()->mOffsetX * scale, mapPos.y() + constState()->mOffsetY * scale );
 
   QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
-  state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
-  state()->mSize.setHeight( 2 * qAbs( halfSize.y() ) );
+
+  double ratio = std::min( 2 * qAbs( halfSize.x() / oldSize.width() ),  2 * qAbs( halfSize.y() / oldSize.height() ) );
+
+  if ( mFrameAutoResize )
+  {
+    QFont font = mFont;
+    font.setPointSizeF( font.pointSizeF() * ratio );
+    setFont( font );
+  }
+  else
+  {
+    state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
+    state()->mSize.setHeight( 2 * qAbs( halfSize.y() ) );
+    update();
+  }
+}
+
+void KadasTextItem::populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
+{
+  if ( frameVisible() )
+  {
+    QAction *lockedAction = menu->addAction( tr( "Auto resize frame" ), [this]( bool autoResize ) { setFrameAutoResize( autoResize ); } );
+    lockedAction->setCheckable( true );
+    lockedAction->setChecked( mFrameAutoResize );
+  }
 }

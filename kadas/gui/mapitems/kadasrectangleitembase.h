@@ -90,6 +90,8 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
   private:
     virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const = 0;
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual void populateContextMenuPrivate(QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings) {}
+
     friend class KadasProjectMigration;
 
     enum AttribIds {AttrX, AttrY};
