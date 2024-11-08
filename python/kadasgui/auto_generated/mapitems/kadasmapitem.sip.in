@@ -73,12 +73,6 @@ class KadasItemPos
     static KadasItemPos fromPoint( const QgsPointXY &pos );
 
     KadasItemPos( double x = 0., double y = 0 );
-    bool operator== ( const KadasItemPos &other ) const {
-      return mX == other.mX &&
-          mY == other.mY &&
-          hasZ() == other.hasZ() &&
-          ( !hasZ() || mZ == other.mZ );
-    }
 
     double x() const;
     void setX( double x );
