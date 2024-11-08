@@ -17,7 +17,11 @@
 #ifndef KADASMAPGRIDLAYER_H
 #define KADASMAPGRIDLAYER_H
 
+#include <qgscoordinateformatter.h>
+#include <qgsmaplayerrenderer.h>
+
 #include "kadas/core/kadaspluginlayer.h"
+
 
 class KadasMapGridLayer : public KadasPluginLayer
 {
@@ -56,8 +60,6 @@ class KadasMapGridLayer : public KadasPluginLayer
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
   private:
-    class Renderer;
-
     struct GridConfig
     {
       GridType gridType = GridLV95;
@@ -68,6 +70,30 @@ class KadasMapGridLayer : public KadasPluginLayer
       QColor color = Qt::black;
       LabelingMode labelingMode = LabelingEnabled;
     } mGridConfig;
+
+    class Renderer : public QgsMapLayerRenderer
+    {
+      public:
+        Renderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext );
+
+        bool render() override;
+
+      private:
+        GridConfig mRenderGridConfig;
+        double mRenderOpacity = 1.;
+
+        struct GridLabel
+        {
+          QString text;
+          QPointF screenPos;
+        };
+
+        void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags );
+        void adjustZoneLabelPos( QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent );
+        QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
+        void drawMgrsGrid();
+        void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
+    };
 };
 
 
