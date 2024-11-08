@@ -1657,9 +1657,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   bool includeMetadata = true;
   bool disableRasterTiles = false;
   bool simplify = true;
-  bool geoPdf = false;
+  bool geospatialPdf = false;
   bool useOgcBestPracticeFormat = false;
-  bool exportGeoPdfFeatures = true;
+  bool exportGeospatialPdfFeatures = true;
   QStringList exportThemes;
   if ( mLayout )
   {
@@ -1669,9 +1669,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
     includeMetadata = mLayout->customProperty( QStringLiteral( "pdfIncludeMetadata" ), 1 ).toBool();
     disableRasterTiles = mLayout->customProperty( QStringLiteral( "pdfDisableRasterTiles" ), 0 ).toBool();
     simplify = mLayout->customProperty( QStringLiteral( "pdfSimplify" ), 1 ).toBool();
-    geoPdf = mLayout->customProperty( QStringLiteral( "pdfCreateGeoPdf" ), 0 ).toBool();
+    geospatialPdf = mLayout->customProperty( QStringLiteral( "pdfCreateGeoPdf" ), 0 ).toBool();
     useOgcBestPracticeFormat = mLayout->customProperty( QStringLiteral( "pdfOgcBestPracticeFormat" ), 0 ).toBool();
-    exportGeoPdfFeatures = mLayout->customProperty( QStringLiteral( "pdfExportGeoPdfFeatures" ), 1 ).toBool();
+    exportGeospatialPdfFeatures = mLayout->customProperty( QStringLiteral( "pdfExportGeoPdfFeatures" ), 1 ).toBool();
     const QString themes = mLayout->customProperty( QStringLiteral( "pdfExportThemes" ) ).toString();
     if ( !themes.isEmpty() )
       exportThemes = themes.split( QStringLiteral( "~~~" ) );
@@ -1693,9 +1693,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   dialog.setMetadataEnabled( includeMetadata );
   dialog.setRasterTilingDisabled( disableRasterTiles );
   dialog.setGeometriesSimplified( simplify );
-  dialog.setExportGeoPdf( geoPdf );
+  dialog.setExportGeospatialPdf( geospatialPdf );
   dialog.setUseOgcBestPracticeFormat( useOgcBestPracticeFormat );
-  dialog.setExportGeoPdf( exportGeoPdfFeatures );
+  dialog.setExportGeospatialPdf( exportGeospatialPdfFeatures );
   dialog.setExportThemes( exportThemes );
 
   if ( dialog.exec() != QDialog::Accepted )
@@ -1707,9 +1707,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   disableRasterTiles = dialog.rasterTilingDisabled();
   simplify = dialog.geometriesSimplified();
   Qgis::TextRenderFormat textRenderFormat = dialog.textRenderFormat();
-  geoPdf = dialog.exportGeoPdf();
+  geospatialPdf = dialog.exportGeospatialPdf();
   useOgcBestPracticeFormat = dialog.useOgcBestPracticeFormat();
-  exportGeoPdfFeatures = dialog.exportGeoPdf();
+  exportGeospatialPdfFeatures = dialog.exportGeospatialPdf();
   exportThemes = dialog.exportThemes();
 
   if ( mLayout )
@@ -1721,9 +1721,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
     mLayout->setCustomProperty( QStringLiteral( "pdfDisableRasterTiles" ), disableRasterTiles ? 1 : 0 );
     mLayout->setCustomProperty( QStringLiteral( "pdfTextFormat" ), static_cast< int >( textRenderFormat ) );
     mLayout->setCustomProperty( QStringLiteral( "pdfSimplify" ), simplify ? 1 : 0 );
-    mLayout->setCustomProperty( QStringLiteral( "pdfCreateGeoPdf" ), geoPdf ? 1 : 0 );
+    mLayout->setCustomProperty( QStringLiteral( "pdfCreateGeoPdf" ), geospatialPdf ? 1 : 0 );
     mLayout->setCustomProperty( QStringLiteral( "pdfOgcBestPracticeFormat" ), useOgcBestPracticeFormat ? 1 : 0 );
-    mLayout->setCustomProperty( QStringLiteral( "pdfExportGeoPdfFeatures" ), exportGeoPdfFeatures ? 1 : 0 );
+    mLayout->setCustomProperty( QStringLiteral( "pdfExportGeoPdfFeatures" ), exportGeospatialPdfFeatures ? 1 : 0 );
     mLayout->setCustomProperty( QStringLiteral( "pdfExportThemes" ), exportThemes.join( QStringLiteral( "~~~" ) ) );
   }
 
@@ -1732,10 +1732,10 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   settings.exportMetadata = includeMetadata;
   settings.textRenderFormat = textRenderFormat;
   settings.simplifyGeometries = simplify;
-  settings.writeGeoPdf = geoPdf;
+  settings.writeGeoPdf = geospatialPdf;
   settings.useOgcBestPracticeFormatGeoreferencing = useOgcBestPracticeFormat;
   settings.useIso32000ExtensionFormatGeoreferencing = !useOgcBestPracticeFormat;
-  settings.includeGeoPdfFeatures = exportGeoPdfFeatures;
+  settings.includeGeoPdfFeatures = exportGeospatialPdfFeatures;
   settings.exportThemes = exportThemes;
   settings.predefinedMapScales = predefinedScales();
 
