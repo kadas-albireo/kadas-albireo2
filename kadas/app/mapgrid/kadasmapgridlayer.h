@@ -17,8 +17,7 @@
 #ifndef KADASMAPGRIDLAYER_H
 #define KADASMAPGRIDLAYER_H
 
-#include <qgscoordinateformatter.h>
-#include <qgsmaplayerrenderer.h>
+
 
 #include "kadas/core/kadaspluginlayer.h"
 
@@ -31,6 +30,17 @@ class KadasMapGridLayer : public KadasPluginLayer
 
     enum GridType {GridLV03, GridLV95, GridDD, GridDM, GridDMS, GridUTM, GridMGRS};
     enum LabelingMode {LabelingDisabled, LabelingEnabled};
+
+    struct GridConfig
+    {
+      GridType gridType = GridLV95;
+      double intervalX = 10000;
+      double intervalY = 10000;
+      int cellSize = 0;
+      int fontSize = 15;
+      QColor color = Qt::black;
+      LabelingMode labelingMode = LabelingEnabled;
+    };
 
     KadasMapGridLayer( const QString &name );
     void setup( GridType type, double intervalX, double intervalY, int cellSize );
@@ -50,6 +60,8 @@ class KadasMapGridLayer : public KadasPluginLayer
     int fontSize() const { return mGridConfig.fontSize; }
     LabelingMode labelingMode() const { return mGridConfig.labelingMode; }
 
+    GridConfig gridConfig() const { return mGridConfig; }
+
   public slots:
     void setColor( const QColor &color ) { mGridConfig.color = color; }
     void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
@@ -60,40 +72,8 @@ class KadasMapGridLayer : public KadasPluginLayer
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
   private:
-    struct GridConfig
-    {
-      GridType gridType = GridLV95;
-      double intervalX = 10000;
-      double intervalY = 10000;
-      int cellSize = 0;
-      int fontSize = 15;
-      QColor color = Qt::black;
-      LabelingMode labelingMode = LabelingEnabled;
-    } mGridConfig;
+    GridConfig mGridConfig;
 
-    class Renderer : public QgsMapLayerRenderer
-    {
-      public:
-        Renderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext );
-
-        bool render() override;
-
-      private:
-        GridConfig mRenderGridConfig;
-        double mRenderOpacity = 1.;
-
-        struct GridLabel
-        {
-          QString text;
-          QPointF screenPos;
-        };
-
-        void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags );
-        void adjustZoneLabelPos( QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent );
-        QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
-        void drawMgrsGrid();
-        void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
-    };
 };
 
 

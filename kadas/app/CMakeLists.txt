@@ -42,6 +42,7 @@ set(kadas_SRC
   layertree/kadaslayertreeviewtemporalindicator.cpp
 
   mapgrid/kadasmapgridlayer.cpp
+  mapgrid/kadasmapgridlayerrenderer.cpp
   mapgrid/kadasmaptoolmapgrid.cpp
 
   mapswipe/kadasmapswipecanvasitem.cpp
