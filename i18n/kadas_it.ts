@@ -5460,12 +5460,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRectangleItemBase</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="467"/>
+        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="470"/>
         <source>Frame visible</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="471"/>
+        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="474"/>
         <source>Position locked</source>
         <translation type="unfinished"/>
     </message>
@@ -5856,9 +5856,14 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasTextItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.h" line="34"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.h" line="35"/>
         <source>Text</source>
         <translation>Testo</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="179"/>
+        <source>Auto resize frame</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
