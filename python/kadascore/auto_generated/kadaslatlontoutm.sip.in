@@ -68,15 +68,6 @@ the Free Software Foundation; either version 2 of the License, or     *
       QList<ZoneLabel> subZoneLabel;
       QList<GridLabel> gridLabels;
 
-      {
-        lhs.zoneLines << rhs.zoneLines;
-        lhs.subZoneLines << rhs.subZoneLines;
-        lhs.gridLines << rhs.gridLines;
-        lhs.zoneLabels << rhs.zoneLabels;
-        lhs.subZoneLabel << rhs.subZoneLabel;
-        lhs.gridLabels << rhs.gridLabels;
-        return lhs;
-      }
     };
 
     static QgsPointXY UTM2LL( const UTMCoo &utm, bool &ok );

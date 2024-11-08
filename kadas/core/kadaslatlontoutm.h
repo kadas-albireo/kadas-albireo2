@@ -71,7 +71,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       QList<ZoneLabel> subZoneLabel;
       QList<GridLabel> gridLabels;
 
-      friend Grid& operator<<( Grid &lhs, const Grid& rhs )
+      friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
       {
         lhs.zoneLines << rhs.zoneLines;
         lhs.subZoneLines << rhs.subZoneLines;
