@@ -101,7 +101,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       double yStart = std::floor( area.yMinimum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
       double yEnd = std::ceil( area.yMaximum() / mRenderGridConfig.intervalY ) * mRenderGridConfig.intervalY;
 
-      const QVariantMap &renderFlags = renderContext()->customRenderingFlags();
+      const QVariantMap &renderFlags = renderContext()->customProperties();
       bool drawLabels = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() || renderContext()->flags() & Qgis::RenderContextFlag::RenderPreviewJob );
 
       // If chosen intervals would result in over 100 grid lines, reduce interval
@@ -322,7 +322,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
     void drawMgrsGrid()
     {
-      const QVariantMap &renderFlags = renderContext()->customRenderingFlags();
+      const QVariantMap &renderFlags = renderContext()->customProperties();
       bool adaptToScreen = !( renderFlags["globe"].toBool() || renderFlags["kml"].toBool() );
 
       QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
@@ -344,7 +344,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       // Draw grid lines
       renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
-      for ( const QPolygonF &zoneLine : zoneLines )
+      for ( const QPolygonF &zoneLine : std::as_const( zoneLines ) )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : zoneLine )
@@ -355,7 +355,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
-      for ( const QPolygonF &subZoneLine : subZoneLines )
+      for ( const QPolygonF &subZoneLine : std::as_const( subZoneLines ) )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : subZoneLine )
@@ -366,7 +366,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       }
 
       renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
-      for ( const QPolygonF &gridLine : gridLines )
+      for ( const QPolygonF &gridLine : std::as_const( gridLines ) )
       {
         QPolygonF itemLine;
         for ( const QPointF &point : gridLine )
@@ -419,7 +419,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
       if ( adaptToScreen )
       {
         font.setPointSizeF( gridLabelSize );
-        for ( const KadasLatLonToUTM::GridLabel &gridLabel : gridLabels )
+        for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( gridLabels ) )
         {
           const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
           QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
@@ -463,7 +463,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       font.setPointSizeF( zoneFontSize * dpiScale );
       QFontMetrics fm( font );
-      for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : zoneLabels )
+      for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( zoneLabels ) )
       {
         const QPointF &pos = zoneLabel.pos;
         const QPointF &maxPos = zoneLabel.maxPos;
@@ -483,7 +483,7 @@ class KadasMapGridLayer::Renderer : public QgsMapLayerRenderer
 
       font.setPointSizeF( subZoneFontSize );
       fm = QFontMetrics( font );
-      for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : zoneSubLabels )
+      for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( zoneSubLabels ) )
       {
         const QPointF &pos = subZoneLabel.pos;
         const QPointF &maxPos = subZoneLabel.maxPos;
