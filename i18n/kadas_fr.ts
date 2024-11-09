@@ -3983,7 +3983,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapGridLayerType</name>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="581"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="103"/>
         <source>Edit</source>
         <translation>Éditer</translation>
     </message>

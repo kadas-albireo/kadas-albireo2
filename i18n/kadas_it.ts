@@ -3981,7 +3981,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapGridLayerType</name>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="581"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridlayer.cpp" line="103"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
