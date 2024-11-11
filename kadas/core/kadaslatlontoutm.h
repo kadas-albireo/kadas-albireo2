@@ -67,9 +67,9 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       QList<QPolygonF> zoneLines;
       QList<QPolygonF> subZoneLines;
       QList<QPolygonF> gridLines;
-      QList<ZoneLabel> zoneLabels;
-      QList<ZoneLabel> subZoneLabel;
-      QList<GridLabel> gridLabels;
+      QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+      QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
+      QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
       {
