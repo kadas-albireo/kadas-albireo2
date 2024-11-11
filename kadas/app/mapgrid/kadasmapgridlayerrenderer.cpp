@@ -313,17 +313,16 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     area = area.buffered( area.width() );
   }
 
-  QList<QPolygonF> zoneLines;
-  QList<QPolygonF> subZoneLines;
-  QList<QPolygonF> gridLines;
-  QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
-  QList<KadasLatLonToUTM::ZoneLabel> zoneSubLabels;
-  QList<KadasLatLonToUTM::GridLabel> gridLabels;
-  KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM, mRenderGridConfig.cellSize );
+  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::computeGrid(
+        area,
+        mapScale,
+        mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM,
+        mRenderGridConfig.cellSize
+        );
 
   // Draw grid lines
   renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
-  for ( const QPolygonF &zoneLine : std::as_const( zoneLines ) )
+  for ( const QPolygonF &zoneLine : std::as_const( grid.zoneLines ) )
   {
     QPolygonF itemLine;
     for ( const QPointF &point : zoneLine )
@@ -334,7 +333,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   }
 
   renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
-  for ( const QPolygonF &subZoneLine : std::as_const( subZoneLines ) )
+  for ( const QPolygonF &subZoneLine : std::as_const( grid.subZoneLines ) )
   {
     QPolygonF itemLine;
     for ( const QPointF &point : subZoneLine )
@@ -345,7 +344,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   }
 
   renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
-  for ( const QPolygonF &gridLine : std::as_const( gridLines ) )
+  for ( const QPolygonF &gridLine : std::as_const( grid.gridLines ) )
   {
     QPolygonF itemLine;
     for ( const QPointF &point : gridLine )
@@ -398,9 +397,9 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   if ( adaptToScreen )
   {
     font.setPointSizeF( gridLabelSize );
-    for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( gridLabels ) )
+    for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
-      const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
+      const QPolygonF &gridLine = grid.gridLines[gridLabel.lineIdx];
       QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
       const QRectF &visibleRect = screenExtent;
       int i = 1, n = gridLine.size();
@@ -442,7 +441,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   font.setPointSizeF( zoneFontSize * dpiScale );
   QFontMetrics fm( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( zoneLabels ) )
+  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
   {
     const QPointF &pos = zoneLabel.pos;
     const QPointF &maxPos = zoneLabel.maxPos;
@@ -462,7 +461,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   font.setPointSizeF( subZoneFontSize );
   fm = QFontMetrics( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( zoneSubLabels ) )
+  for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( grid.subZoneLabel ) )
   {
     const QPointF &pos = subZoneLabel.pos;
     const QPointF &maxPos = subZoneLabel.maxPos;

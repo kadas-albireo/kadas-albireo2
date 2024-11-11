@@ -59,6 +59,17 @@ the Free Software Foundation; either version 2 of the License, or     *
       bool horiz;
     };
 
+    struct Grid
+    {
+      QList<QPolygonF> zoneLines;
+      QList<QPolygonF> subZoneLines;
+      QList<QPolygonF> gridLines;
+      QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+      QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
+      QList<KadasLatLonToUTM::GridLabel> gridLabels;
+
+    };
+
     static QgsPointXY UTM2LL( const UTMCoo &utm, bool &ok );
     static UTMCoo LL2UTM( const QgsPointXY &pLatLong );
     static MGRSCoo UTM2MGRS( const UTMCoo &utmcoo );
@@ -72,10 +83,8 @@ the Free Software Foundation; either version 2 of the License, or     *
       GridUTM,
       GridMGRS
     };
-    static void computeGrid( const QgsRectangle &bbox, double mapScale,
-                             QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
-                             QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,
-                             KadasLatLonToUTM::GridMode gridMode, int cellSize );
+
+    static Grid computeGrid( const QgsRectangle &bbox, double mapScale, KadasLatLonToUTM::GridMode gridMode, int cellSize );
 
 };
 
