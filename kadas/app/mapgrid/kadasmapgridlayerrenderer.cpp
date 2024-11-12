@@ -323,7 +323,10 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   // Draw grid lines
   for ( const auto &gridLine : std::as_const( grid.lines ) )
   {
-    renderContext()->painter()->setPen( level2pen(gridLine.first) );
+    if ( gridLine.first == KadasLatLonToUTM::Level::OnlyLabels )
+      continue;
+
+    renderContext()->painter()->setPen( level2pen( gridLine.first ) );
 
     QPolygonF itemLine;
     for ( const QPointF &point : std::as_const( gridLine.second ) )
@@ -470,13 +473,13 @@ void KadasMapGridLayerRenderer::drawGridLabel(const QPointF &pos, const QString 
 QPen KadasMapGridLayerRenderer::level2pen(KadasLatLonToUTM::Level level) const
 {
   switch (level) {
-  case KadasLatLonToUTM::Level::Zone:
-    return QPen( mRenderGridConfig.color, 3 );
-  case KadasLatLonToUTM::Level::Grid:
-    return QPen( mRenderGridConfig.color, 1 );
-  case KadasLatLonToUTM::Level::SubGrid:
-    return QPen( mRenderGridConfig.color, .4 );
-  default:
-    return QPen();
+  case KadasLatLonToUTM::Level::Major:
+    return QPen( mRenderGridConfig.color, 2 );
+  case KadasLatLonToUTM::Level::Minor:
+    return QPen( mRenderGridConfig.color, .8 );
+  case KadasLatLonToUTM::Level::OnlyLabels:
+    Q_ASSERT( false );
+    break;
   }
+  return QPen();
 }

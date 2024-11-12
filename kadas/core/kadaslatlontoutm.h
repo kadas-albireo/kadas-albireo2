@@ -64,9 +64,9 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
 
     enum class Level
     {
-      Zone,
-      Grid,
-      SubGrid
+      Major,
+      Minor,
+      OnlyLabels
     };
 
     struct Grid
@@ -116,7 +116,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
     static void utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
-    static void mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
+    static void mgrsGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
 };
 
 #endif // KADASLATLONTOUTM_H

@@ -765,10 +765,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << std::pair( Level::Grid, polyGridLineX( xMin, yMin, yMax, 1 ) )
-                 << std::pair( Level::Grid, polyGridLineX( xMax, yMin, yMax, 1. ) )
-                 << std::pair( Level::Grid, polyGridLineY( xMin, xMax, 1., yMin ) )
-                 << std::pair( Level::Grid, polyGridLineY( xMin, xMax, 1., yMax ) );
+      grid.lines << std::pair( Level::Minor, polyGridLineX( xMin, yMin, yMax, 1 ) )
+                 << std::pair( Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
+                 << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
+                 << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
       int zoneNumber = KadasLatLonToUTM::getZoneNumber( x1, y1 );
       ZoneLabel label;
       label.pos = QPointF( xMax, yMax );
@@ -783,78 +783,76 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       QList<std::pair<Level, int>> levels;
       if ( cellSize == 0 )
       {
-        if ( mapScale > 5000000 )
+        if ( mapScale > 1000000 )
         {
-        }
-        else if ( mapScale > 1000000 )
-        {
-          levels << std::pair(Level::Grid, 100000);
+          levels << std::pair(Level::Major, 100000);
         }
         else if ( mapScale > 600000 )
         {
-          levels << std::pair(Level::Grid, 100000);
-          levels << std::pair(Level::SubGrid, 50000);
+          levels << std::pair(Level::Major, 100000);
+          levels << std::pair(Level::Minor, 50000);
         }
         else if ( mapScale > 300000 )
         {
-          levels << std::pair(Level::Grid, 50000);
-          levels << std::pair(Level::SubGrid, 10000);
+          levels << std::pair(Level::Major, 50000);
+          levels << std::pair(Level::Minor, 10000);
         }
         else if ( mapScale > 60000 )
         {
-          levels << std::pair(Level::Grid, 10000);
-          levels << std::pair(Level::SubGrid, 5000);
+          levels << std::pair(Level::Major, 10000);
+          levels << std::pair(Level::Minor, 5000);
         }
         else if ( mapScale > 30000 )
         {
-          levels << std::pair(Level::Grid, 5000);
-          levels << std::pair(Level::SubGrid, 1000);
+          levels << std::pair(Level::Major, 5000);
+          levels << std::pair(Level::Minor, 1000);
         }
         else if ( mapScale > 6000 )
         {
-          levels << std::pair(Level::Grid, 1000);
-          levels << std::pair(Level::SubGrid, 500);
+          levels << std::pair(Level::Major, 1000);
+          levels << std::pair(Level::Minor, 500);
         }
         else if ( mapScale > 3000 )
         {
-          levels << std::pair(Level::Grid, 500);
-          levels << std::pair(Level::SubGrid, 100);
+          levels << std::pair(Level::Major, 500);
+          levels << std::pair(Level::Minor, 100);
         }
         else if ( mapScale > 600 )
         {
-          levels << std::pair(Level::Grid, 100);
-          levels << std::pair(Level::SubGrid, 50);
+          levels << std::pair(Level::Minor, 100);
+          levels << std::pair(Level::Minor, 50);
         }
         else if ( mapScale > 300 )
         {
-          levels << std::pair(Level::Grid, 50);
-          levels << std::pair(Level::SubGrid, 10);
+          levels << std::pair(Level::Major, 50);
+          levels << std::pair(Level::Minor, 10);
         }
         else if ( mapScale > 60 )
         {
-          levels << std::pair(Level::Grid, 10);
-          levels << std::pair(Level::SubGrid, 5);
+          levels << std::pair(Level::Major, 10);
+          levels << std::pair(Level::Minor, 5);
         }
         else if ( mapScale > 30 )
         {
-          levels << std::pair(Level::Grid, 5);
-          levels << std::pair(Level::SubGrid, 1);
+          levels << std::pair(Level::Major, 5);
+          levels << std::pair(Level::Minor, 1);
         }
         else
         {
-          levels << std::pair(Level::SubGrid, 1);
+          levels << std::pair(Level::Minor, 1);
         }
       }
 
       if ( gridMode == GridMode::GridMGRS )
       {
-        grid << computeSubGrid( 100000, Level::Zone, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
-        for ( const auto &level : std::as_const(levels) )
+        grid << computeSubGrid( 100000, Level::OnlyLabels, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
+        for ( const auto &level : std::as_const( levels ) )
           grid << computeSubGrid( level.second, level.first, xMin, xMax, yMin, yMax, nullptr, mgrsGridLabelCallback );
       }
       else
       {
-        grid << computeSubGrid( cellSize, Level::Grid, xMin, xMax, yMin, yMax, nullptr, utmGridLabelCallback );
+        for ( const auto &level : std::as_const( levels ) )
+          grid << computeSubGrid( level.second, level.first, xMin, xMax, yMin, yMax, nullptr, utmGridLabelCallback );
       }
     }
   }
@@ -1002,8 +1000,8 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
       }
       ycoo.easting += cellSize;
     }
-    yLine.append( truncateGridLineXMax( yLine.back(), QPointF( q.x(), q.y() ), xMax ) );
     coo.northing += cellSize;
+    yLine.append( truncateGridLineXMax( yLine.back(), QPointF( q.x(), q.y() ), xMax ) );
     subGrid.lines.append( {level, yLine} );
   }
 
@@ -1027,7 +1025,7 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
   return label;
 }
 
-void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
+void KadasLatLonToUTM::utmGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
   int cellSizeClamp = std::max( 1000, cellSize ); // No labeling below 1km grid
   int rest = std::max( 1, 1000 / cellSize );
@@ -1046,7 +1044,7 @@ void KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSiz
   gridLabels.append( label );
 }
 
-void KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
+void KadasLatLonToUTM::mgrsGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels )
 {
   cellSize = std::max( 1000, cellSize ); // No labeling below 1km grid
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon, lat ) );
