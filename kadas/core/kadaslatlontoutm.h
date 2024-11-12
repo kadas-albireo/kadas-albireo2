@@ -74,7 +74,6 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       QList<QPolygonF> zoneLines;
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<QPolygonF> subZoneLines;
       QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
 
       QList<std::pair<Level,QPolygonF>> gridLines;
@@ -84,7 +83,6 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       {
         lhs.zoneLines << rhs.zoneLines;
         lhs.zoneLabels << rhs.zoneLabels;
-        lhs.subZoneLines << rhs.subZoneLines;
         lhs.subZoneLabel << rhs.subZoneLabel;
         lhs.gridLines << rhs.gridLines;
         lhs.gridLabels << rhs.gridLabels;
