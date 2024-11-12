@@ -62,22 +62,31 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       bool horiz;
     };
 
+    enum class Level
+    {
+      Zone,
+      Grid,
+      SubGrid
+    };
+
     struct Grid
     {
       QList<QPolygonF> zoneLines;
-      QList<QPolygonF> subZoneLines;
-      QList<QPolygonF> gridLines;
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+
+      QList<QPolygonF> subZoneLines;
       QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
+
+      QList<std::pair<Level,QPolygonF>> gridLines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
       {
         lhs.zoneLines << rhs.zoneLines;
-        lhs.subZoneLines << rhs.subZoneLines;
-        lhs.gridLines << rhs.gridLines;
         lhs.zoneLabels << rhs.zoneLabels;
+        lhs.subZoneLines << rhs.subZoneLines;
         lhs.subZoneLabel << rhs.subZoneLabel;
+        lhs.gridLines << rhs.gridLines;
         lhs.gridLabels << rhs.gridLabels;
         return lhs;
       }
@@ -108,7 +117,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static double getMinNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
     typedef void ( gridLabelCallback_t )( double, double, int, bool, int, QList<GridLabel> & );
-    static Grid computeSubGrid( int cellSize, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
+    static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
     static void utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
     static void mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
