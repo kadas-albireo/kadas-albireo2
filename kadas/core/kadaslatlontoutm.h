@@ -71,20 +71,18 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
 
     struct Grid
     {
-      QList<QPolygonF> zoneLines;
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
       QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
 
-      QList<std::pair<Level,QPolygonF>> gridLines;
+      QList<std::pair<Level,QPolygonF>> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
       {
-        lhs.zoneLines << rhs.zoneLines;
         lhs.zoneLabels << rhs.zoneLabels;
         lhs.subZoneLabel << rhs.subZoneLabel;
-        lhs.gridLines << rhs.gridLines;
+        lhs.lines << rhs.lines;
         lhs.gridLabels << rhs.gridLabels;
         return lhs;
       }

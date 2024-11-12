@@ -765,8 +765,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.zoneLines << polyGridLineX( xMin, yMin, yMax, 1 ) << polyGridLineX( xMax, yMin, yMax, 1. );
-      grid.zoneLines << polyGridLineY( xMin, xMax, 1., yMin ) << polyGridLineY( xMin, xMax, 1., yMax );
+      grid.lines << std::pair( Level::Grid, polyGridLineX( xMin, yMin, yMax, 1 ) )
+                 << std::pair( Level::Grid, polyGridLineX( xMax, yMin, yMax, 1. ) )
+                 << std::pair( Level::Grid, polyGridLineY( xMin, xMax, 1., yMin ) )
+                 << std::pair( Level::Grid, polyGridLineY( xMin, xMax, 1., yMax ) );
       int zoneNumber = KadasLatLonToUTM::getZoneNumber( x1, y1 );
       ZoneLabel label;
       label.pos = QPointF( xMax, yMax );
@@ -778,20 +780,17 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       if ( mapScale > 5000000 )
         continue;
 
-      if ( mapScale > 600000 && gridMode == GridMode::GridMGRS )
-      {
-        grid << computeSubGrid( 100000, Level::Grid, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
-        continue;
-      }
-
       QList<std::pair<Level, int>> levels;
       if ( cellSize == 0 )
       {
-        if ( mapScale > 1000000 )
+        if ( mapScale > 5000000 )
+        {
+        }
+        else if ( mapScale > 1000000 )
         {
           levels << std::pair(Level::Grid, 100000);
         }
-        if ( mapScale > 600000 )
+        else if ( mapScale > 600000 )
         {
           levels << std::pair(Level::Grid, 100000);
           levels << std::pair(Level::SubGrid, 50000);
@@ -911,7 +910,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     // No grid labels below 1km grid
     if ( lineLabelCallback && ( coo.easting % 1000 ) == 0 )
     {
-      lineLabelCallback( xLine.last().x(), xLine.last().y(), cellSize, false, subGrid.gridLines.size(), subGrid.gridLabels );
+      lineLabelCallback( xLine.last().x(), xLine.last().y(), cellSize, false, subGrid.lines.size(), subGrid.gridLabels );
     }
     if ( zoneLabelCallback && restn != 0 )
     {
@@ -947,7 +946,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
       }
     }
     coo.easting += cellSize;
-    subGrid.gridLines.append( {level, xLine} );
+    subGrid.lines.append( {level, xLine} );
   }
 
   // Y lines (horizontal)
@@ -978,7 +977,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     // No grid labels below 1km grid
     if ( lineLabelCallback && ( coo.northing % 1000 ) == 0 )
     {
-      lineLabelCallback( yLine.last().x(), yLine.last().y(), cellSize, true, subGrid.gridLines.size(), subGrid.gridLabels );
+      lineLabelCallback( yLine.last().x(), yLine.last().y(), cellSize, true, subGrid.lines.size(), subGrid.gridLabels );
     }
     if ( zoneLabelCallback && reste != 0 )
     {
@@ -1005,7 +1004,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     }
     yLine.append( truncateGridLineXMax( yLine.back(), QPointF( q.x(), q.y() ), xMax ) );
     coo.northing += cellSize;
-    subGrid.gridLines.append( {level, yLine} );
+    subGrid.lines.append( {level, yLine} );
   }
 
   return subGrid;
