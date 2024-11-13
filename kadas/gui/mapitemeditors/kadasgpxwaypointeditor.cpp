@@ -40,11 +40,11 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   QFont font;
   font.fromString( QgsSettings().value( "/gpx/waypoint_label_font", "" ).toString() );
   mUi.mFontComboBox->setCurrentFont( font );
-  mUi.mSpinBoxSize->setValue( font.pointSize() );
+  mUi.mSpinBoxLabelSize->setValue( font.pointSize() );
   mUi.mPushButtonBold->setChecked( font.bold() );
   mUi.mPushButtonItalic->setChecked( font.italic() );
   connect( mUi.mFontComboBox, &QFontComboBox::currentFontChanged, this, &KadasGpxWaypointEditor::saveLabelFont );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::fontSizeChanged );
+  connect( mUi.mSpinBoxLabelSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::fontSizeChanged );
   connect( mUi.mPushButtonBold, &QPushButton::toggled, this, &KadasGpxWaypointEditor::saveLabelFont );
   connect( mUi.mPushButtonItalic, &QPushButton::toggled, this, &KadasGpxWaypointEditor::saveLabelFont );
 
@@ -83,9 +83,9 @@ void KadasGpxWaypointEditor::syncItemToWidget()
   mUi.mFontComboBox->setCurrentFont( fontFamily );
   mUi.mFontComboBox->blockSignals( false );
 
-  mUi.mSpinBoxSize->blockSignals( true );
-  mUi.mSpinBoxSize->setValue( waypointItem->labelFont().pointSize() );
-  mUi.mSpinBoxSize->blockSignals( false );
+  mUi.mSpinBoxLabelSize->blockSignals( true );
+  mUi.mSpinBoxLabelSize->setValue( waypointItem->labelFont().pointSize() );
+  mUi.mSpinBoxLabelSize->blockSignals( false );
 
   mUi.mPushButtonBold->blockSignals( true );
   mUi.mPushButtonBold->setChecked( waypointItem->labelFont().bold() );
@@ -129,7 +129,7 @@ QFont KadasGpxWaypointEditor::currentFont() const
   QFont font = mUi.mFontComboBox->currentFont();
   font.setBold( mUi.mPushButtonBold->isChecked() );
   font.setItalic( mUi.mPushButtonItalic->isChecked() );
-  font.setPointSize( mUi.mSpinBoxSize->value() );
+  font.setPointSize( mUi.mSpinBoxLabelSize->value() );
   return font;
 }
 
