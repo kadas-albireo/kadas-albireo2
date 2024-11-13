@@ -35,12 +35,17 @@ class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
   private:
     Ui::KadasGpxWaypointEditorBase mUi;
 
+    QFont currentFont() const;
+
   signals:
     void styleChanged();
 
   private slots:
     void saveColor();
     void saveSize();
+    void saveLabelFont();
+    void saveLabelColor();
+    void fontSizeChanged(int size);
 };
 
 #endif // KADASGPXWAYPOINTEDITOR_H

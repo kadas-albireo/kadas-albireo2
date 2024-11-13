@@ -19,6 +19,7 @@
 #include <QPainterPath>
 
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgstextrenderer.h>
 
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 
@@ -42,12 +43,32 @@ KadasGpxWaypointItem::KadasGpxWaypointItem()
   setIconFill( QBrush( color ) );
 }
 
+QString KadasGpxWaypointItem::exportName() const
+{
+  if ( name().isEmpty() )
+    return itemName();
+
+  return name();
+}
+
 void KadasGpxWaypointItem::setName( const QString &name )
 {
   mName = name;
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
+  emit propertyChanged();
+}
+
+void KadasGpxWaypointItem::setLabelFont(const QFont &labelFont)
+{
+  mLabelFont = labelFont;
+  emit propertyChanged();
+}
+
+void KadasGpxWaypointItem::setLabelColor(const QColor &labelColor)
+{
+  mLabelColor = labelColor;
   emit propertyChanged();
 }
 
@@ -69,15 +90,45 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
   // Draw name label
   if ( !mName.isEmpty() && !constState()->points.isEmpty() )
   {
-    QColor bufferColor = ( 0.2126 * mIconBrush.color().red() + 0.7152 * mIconBrush.color().green() + 0.0722 * mIconBrush.color().blue() ) > 128 ? Qt::black : Qt::white;
     QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( constState()->points.front() ) ).toQPointF();
-    QPointF offset( 0.5 * mIconSize, -0.5 * mIconSize );
-    QPainterPath path;
-    path.addText( pos + offset, mLabelFont, mName );
-    context.painter()->setPen( QPen( bufferColor, 2 ) );
-    context.painter()->setBrush( mIconBrush );
-    context.painter()->drawPath( path );
-    context.painter()->setPen( Qt::NoPen );
-    context.painter()->drawPath( path );
+    pos += QPointF( 0.5 * mIconSize, -0.5 * mIconSize );
+    QColor bufferColor = ( 0.2126 * mIconBrush.color().red() + 0.7152 * mIconBrush.color().green() + 0.0722 * mIconBrush.color().blue() ) > 128 ? Qt::black : Qt::white;
+
+    QFont font = mLabelFont;
+    font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
+    QFontMetrics metrics( font );
+    pos += QPointF( metrics.width( mName ) / 2.0, 0.0 );
+
+    // no idea why this works, otherwise text scales up when edited
+    // the rendex context is coming from KadasMapItem when edited while it comes from the QgsMapLayerRenderer otherwise
+    double scale = 1.0;
+    if ( context.painter()->device()->physicalDpiX() )
+      scale = 1.0 / context.painter()->device()->physicalDpiX() * context.painter()->device()->logicalDpiX();
+
+    QgsTextFormat format;
+    format.setFont( font );
+    format.setSize( font.pointSize() * scale );
+    if( mLabelColor.isValid() )
+      format.setColor( mLabelColor );
+    else
+      format.setColor( mIconBrush.color() );
+    QgsTextBufferSettings bs;
+    bs.setColor( bufferColor );
+    bs.setSize( 1 );
+    bs.setEnabled( true );
+    format.setBuffer( bs );
+
+    QgsTextRenderer::drawText( pos, 0.0, Qgis::TextHorizontalAlignment::Center, {mName}, context, format, false );
+
+    // QPainterPath path;
+    // path.addText( pos + offset, mLabelFont, mName );
+    // context.painter()->setPen( QPen( bufferColor, 2 ) );
+    // context.painter()->drawPath( path );
+    // context.painter()->setPen( Qt::NoPen );
+    // if( mLabelColor.isValid() )
+    //   context.painter()->setBrush( QBrush( mLabelColor ) );
+    // else
+    //   context.painter()->setBrush( QBrush( mIconBrush ) );
+    // context.painter()->drawPath( path );
   }
 }

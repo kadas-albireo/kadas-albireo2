@@ -175,6 +175,11 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
   return success;
 }
 
+QString KadasMapItem::exportName() const
+{
+  return itemName();
+}
+
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;

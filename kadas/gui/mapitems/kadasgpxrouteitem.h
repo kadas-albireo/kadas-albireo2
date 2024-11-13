@@ -29,6 +29,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     KadasGpxRouteItem( QObject *parent = nullptr );
 
     QString itemName() const override { return tr( "Route" ); }
+    QString exportName() const override;
 
     const QString &name() const { return mName; }
     void setName( const QString &name );

@@ -264,6 +264,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool deserialize( const QJsonObject &json );
 
     virtual QString itemName() const = 0;
+    virtual QString exportName() const;
 
     /* The item crs */
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }

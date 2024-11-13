@@ -38,6 +38,14 @@ KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
   setFill( QBrush( color ) );
 }
 
+QString KadasGpxRouteItem::exportName() const
+{
+  if ( name().isEmpty() )
+    return itemName();
+
+  return name();
+}
+
 void KadasGpxRouteItem::setName( const QString &name )
 {
   mName = name;
