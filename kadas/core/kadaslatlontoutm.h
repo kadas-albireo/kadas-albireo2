@@ -112,11 +112,11 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static QString getLetter100kID( int column, int row, int parm );
     static double getMinNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
-    typedef void ( gridLabelCallback_t )( double, double, int, bool, int, QList<GridLabel> & );
+    typedef GridLabel ( gridLabelCallback_t )( double, double, int, bool, int );
     static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
-    static void utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
-    static void mgrsGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
+    static GridLabel utmGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx);
+    static GridLabel mgrsGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx );
 };
 
 #endif // KADASLATLONTOUTM_H
