@@ -344,29 +344,6 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   }
 
   double gridLabelSize = mRenderGridConfig.fontSize;
-
-  //double zoneFontSize = 0;
-  // if ( mapScale > 20000000 )
-  // {
-  //   zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
-  // }
-  // else if ( mapScale > 10000000 )
-  // {
-  //   zoneFontSize = mRenderGridConfig.fontSize;
-  // }
-  // else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
-  // {
-  //   zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  // }
-  // else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
-  // {
-  //   zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
-  // }
-  // else
-  // {
-  //   zoneFontSize = 2 * mRenderGridConfig.fontSize;
-  // }
-
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
   double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
   renderContext()->painter()->setBrush( mRenderGridConfig.color );
