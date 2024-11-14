@@ -433,29 +433,11 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     {
       adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
     }
-    labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
-    labelPos.ry() += fm.height();
-    if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
+    labelPos.rx() += 2;
+    labelPos.ry() -= 2;
+    if ( labelPos.x() + fm.horizontalAdvance( zoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
     {
       drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
-    }
-  }
-
-  font.setPointSizeF( subZoneFontSize );
-  fm = QFontMetrics( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( grid.subZoneLabel ) )
-  {
-    const QPointF &pos = subZoneLabel.pos;
-    const QPointF &maxPos = subZoneLabel.maxPos;
-    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-    if ( adaptToScreen )
-    {
-      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-    }
-    if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-    {
-      drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
     }
   }
 }

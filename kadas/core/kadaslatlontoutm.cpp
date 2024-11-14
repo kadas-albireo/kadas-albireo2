@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDebug>
+
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgspoint.h>
 
@@ -765,14 +767,14 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << std::pair( Level::Minor, polyGridLineX( xMin, yMin, yMax, 1 ) )
+      grid.lines << std::pair( Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
                  << std::pair( Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
                  << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
                  << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
       int zoneNumber = KadasLatLonToUTM::getZoneNumber( x1, y1 );
       ZoneLabel label;
-      label.pos = QPointF( xMax, yMax );
-      label.maxPos = QPointF( xMin, yMin );
+      label.pos = QPointF( xMin, yMin );
+      label.maxPos = QPointF( xMax, yMax );
       label.label = QString( "%1%2" ).arg( zoneNumber ).arg( KadasLatLonToUTM::getHemisphereLetter( y1 ) );
       grid.zoneLabels.append( label );
 
@@ -787,10 +789,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
         {
           levels << std::pair(Level::Major, 100000);
         }
-        else if ( mapScale > 600000 )
+        else if ( mapScale > 500000 )
         {
           levels << std::pair(Level::Major, 100000);
-          levels << std::pair(Level::Minor, 50000);
+          levels << std::pair(Level::Minor, 20000);
         }
         else if ( mapScale > 300000 )
         {
@@ -1022,10 +1024,11 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
   label.pos = QPointF( posX, posY );
   label.label = getLetter100kID( setColumn, setRow, setParm );
   label.maxPos = QPointF( maxLon, maxLat );
+
   return label;
 }
 
-KadasLatLonToUTM::GridLabel KadasLatLonToUTM::utmGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx )
+KadasLatLonToUTM::GridLabel KadasLatLonToUTM::utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx )
 {
   int cellSizeClamp = std::max( 1000, cellSize ); // No labeling below 1km grid
   int rest = std::max( 1, 1000 / cellSize );
@@ -1044,8 +1047,11 @@ KadasLatLonToUTM::GridLabel KadasLatLonToUTM::utmGridLabelCallback(double lon, d
   return label;
 }
 
-KadasLatLonToUTM::GridLabel KadasLatLonToUTM::mgrsGridLabelCallback(double lon, double lat, int cellSize, bool horiz, int lineIdx )
+KadasLatLonToUTM::GridLabel KadasLatLonToUTM::mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx )
 {
+  if ( cellSize >= 100000 )
+    return GridLabel();
+
   cellSize = std::max( 1000, cellSize ); // No labeling below 1km grid
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon, lat ) );
   GridLabel label;
@@ -1059,5 +1065,6 @@ KadasLatLonToUTM::GridLabel KadasLatLonToUTM::mgrsGridLabelCallback(double lon, 
   }
   label.horiz = horiz;
   label.lineIdx = lineIdx;
+
   return label;
 }

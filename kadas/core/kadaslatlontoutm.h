@@ -73,17 +73,19 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     {
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
-
       QList<std::pair<Level,QPolygonF>> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
       {
+        int lineCount = lhs.lines.count();
+        int labelCount = lhs.gridLabels.count();
+
         lhs.zoneLabels << rhs.zoneLabels;
-        lhs.subZoneLabel << rhs.subZoneLabel;
         lhs.lines << rhs.lines;
         lhs.gridLabels << rhs.gridLabels;
+        for ( int i = labelCount; i < lhs.gridLabels.count(); i++ )
+          lhs.gridLabels[i].lineIdx += lineCount;
         return lhs;
       }
     };
