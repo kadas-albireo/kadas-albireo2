@@ -433,8 +433,8 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     {
       adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
     }
-    labelPos.rx() += 2;
-    labelPos.ry() -= 2;
+    labelPos.rx() += 3;
+    labelPos.ry() -= 3;
     if ( labelPos.x() + fm.horizontalAdvance( zoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
     {
       drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );

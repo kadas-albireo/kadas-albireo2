@@ -95,8 +95,9 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static MGRSCoo UTM2MGRS( const UTMCoo &utmcoo );
     static UTMCoo MGRS2UTM( const MGRSCoo &mgrs, bool &ok );
 
-    static int getZoneNumber( double lon, double lat );
-    static QString getHemisphereLetter( double lat );
+    static int zoneNumber( double lon, double lat );
+    static QString hemisphereLetter( double lat );
+    static QString zoneName( double lon, double lat );
 
     enum class GridMode SIP_MONKEYPATCH_SCOPEENUM
     {
@@ -111,8 +112,8 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static const QString SET_ORIGIN_COLUMN_LETTERS;
     static const QString SET_ORIGIN_ROW_LETTERS;
 
-    static QString getLetter100kID( int column, int row, int parm );
-    static double getMinNorthing( int zoneLetter );
+    static QString mgrsLetter100kID( int column, int row, int parm );
+    static double minNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
     typedef GridLabel ( gridLabelCallback_t )( double, double, int, bool, int );
     static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );

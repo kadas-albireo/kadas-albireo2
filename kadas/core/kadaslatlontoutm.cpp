@@ -92,7 +92,7 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::LL2UTM( const QgsPointXY &pLatLong )
   double Lat = pLatLong.y();
   double LatRad = Lat / 180. * M_PI;
   double LongRad = Long / 180. * M_PI;
-  int ZoneNumber = getZoneNumber( Long, Lat );
+  int ZoneNumber = zoneNumber( Long, Lat );
 
   //+3 puts origin in middle of zone
   double LongOriginRad = ( ( ZoneNumber - 1 ) * 6 - 180 + 3 ) / 180. * M_PI;
@@ -120,11 +120,11 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::LL2UTM( const QgsPointXY &pLatLong )
   }
 
   coo.zoneNumber = ZoneNumber;
-  coo.zoneLetter = getHemisphereLetter( Lat );
+  coo.zoneLetter = hemisphereLetter( Lat );
   return coo;
 }
 
-int KadasLatLonToUTM::getZoneNumber( double lon, double lat )
+int KadasLatLonToUTM::zoneNumber( double lon, double lat )
 {
   int zoneNumber = std::floor( ( lon + 180. ) / 6. ) + 1;
 
@@ -163,7 +163,7 @@ int KadasLatLonToUTM::getZoneNumber( double lon, double lat )
   return zoneNumber;
 }
 
-QString KadasLatLonToUTM::getHemisphereLetter( double lat )
+QString KadasLatLonToUTM::hemisphereLetter( double lat )
 {
   if ( ( 84 >= lat ) && ( lat >= 72 ) )
   {
@@ -250,6 +250,11 @@ QString KadasLatLonToUTM::getHemisphereLetter( double lat )
   return "Z";
 }
 
+QString KadasLatLonToUTM::zoneName( double lon, double lat )
+{
+  return QString( "%1%2" ).arg( zoneNumber( lon, lat ) ).arg( hemisphereLetter( lat ) );
+}
+
 KadasLatLonToUTM::MGRSCoo KadasLatLonToUTM::UTM2MGRS( const UTMCoo &utmcoo )
 {
   int setParm = utmcoo.zoneNumber % NUM_100K_SETS;
@@ -266,7 +271,7 @@ KadasLatLonToUTM::MGRSCoo KadasLatLonToUTM::UTM2MGRS( const UTMCoo &utmcoo )
   mgrscoo.northing = utmcoo.northing % 100000;
   mgrscoo.zoneLetter = utmcoo.zoneLetter;
   mgrscoo.zoneNumber = utmcoo.zoneNumber;
-  mgrscoo.letter100kID = getLetter100kID( setColumn, setRow, setParm );
+  mgrscoo.letter100kID = mgrsLetter100kID( setColumn, setRow, setParm );
   return mgrscoo;
 }
 
@@ -359,14 +364,14 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::MGRS2UTM( const MGRSCoo &mgrs, bool &
       northing100k += 100000.0;
     }
 
-    double minNorthing = getMinNorthing( mgrs.zoneLetter.at( 0 ).unicode() );
-    if ( minNorthing < 0.0 )
+    double _minNorthing = minNorthing( mgrs.zoneLetter.at( 0 ).unicode() );
+    if ( _minNorthing < 0.0 )
     {
       // Invalid zone letter
       ok = false;
       return utm;
     }
-    while ( northing100k < minNorthing )
+    while ( northing100k < _minNorthing )
     {
       northing100k += 2000000;
     }
@@ -378,7 +383,7 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::MGRS2UTM( const MGRSCoo &mgrs, bool &
   return utm;
 }
 
-double KadasLatLonToUTM::getMinNorthing( int zoneLetter )
+double KadasLatLonToUTM::minNorthing( int zoneLetter )
 {
   double northing;
   switch ( zoneLetter )
@@ -449,7 +454,7 @@ double KadasLatLonToUTM::getMinNorthing( int zoneLetter )
   return northing;
 }
 
-QString KadasLatLonToUTM::getLetter100kID( int column, int row, int parm )
+QString KadasLatLonToUTM::mgrsLetter100kID( int column, int row, int parm )
 {
   // colOrigin and rowOrigin are the letters at the origin of the set
   int index = parm - 1;
@@ -767,16 +772,19 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << std::pair( Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
-                 << std::pair( Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
-                 << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
-                 << std::pair( Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
-      int zoneNumber = KadasLatLonToUTM::getZoneNumber( x1, y1 );
-      ZoneLabel label;
-      label.pos = QPointF( xMin, yMin );
-      label.maxPos = QPointF( xMax, yMax );
-      label.label = QString( "%1%2" ).arg( zoneNumber ).arg( KadasLatLonToUTM::getHemisphereLetter( y1 ) );
-      grid.zoneLabels.append( label );
+      grid.lines << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
+                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
+                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
+                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
+
+      if ( gridMode != GridMode::GridMGRS || mapScale > 2000000 )
+      {
+        ZoneLabel label;
+        label.pos = QPointF( xMin, yMin );
+        label.maxPos = QPointF( xMax, yMax );
+        label.label = zoneName( x1, y1 );
+        grid.zoneLabels.append( label );
+      }
 
       // Sub-grid
       if ( mapScale > 5000000 )
@@ -787,7 +795,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       {
         if ( mapScale > 1000000 )
         {
-          levels << std::pair(Level::Major, 100000);
+          levels << std::pair( mapScale > 2000000 ? Level::Minor : Level::Major, 100000);
         }
         else if ( mapScale > 500000 )
         {
@@ -847,7 +855,8 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
 
       if ( gridMode == GridMode::GridMGRS )
       {
-        grid << computeSubGrid( 100000, Level::OnlyLabels, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
+        if ( mapScale <= 2000000 )
+          grid << computeSubGrid( 100000, Level::OnlyLabels, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
         for ( const auto &level : std::as_const( levels ) )
           grid << computeSubGrid( level.second, level.first, xMin, xMax, yMin, yMax, nullptr, mgrsGridLabelCallback );
       }
@@ -1022,7 +1031,7 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
   }
   ZoneLabel label;
   label.pos = QPointF( posX, posY );
-  label.label = getLetter100kID( setColumn, setRow, setParm );
+  label.label = QString( "%1 %2" ).arg( zoneName( posX, posY ), mgrsLetter100kID( setColumn, setRow, setParm ) );
   label.maxPos = QPointF( maxLon, maxLat );
 
   return label;
