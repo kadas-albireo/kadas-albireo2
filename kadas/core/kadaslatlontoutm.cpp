@@ -803,57 +803,45 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
         }
         else if ( mapScale > 500000 )
         {
-          levels << std::pair(Level::Major, 100000);
-          levels << std::pair(Level::Minor, 20000);
+          levels << std::pair( Level::Major, 100000 );
+          levels << std::pair( Level::Minor, 20000 );
         }
         else if ( mapScale > 300000 )
         {
-          levels << std::pair(Level::Major, 50000);
-          levels << std::pair(Level::Minor, 10000);
+          levels << std::pair( Level::Major, 100000 );
+          levels << std::pair( Level::Minor, 10000 );
         }
         else if ( mapScale > 60000 )
         {
-          levels << std::pair(Level::Major, 10000);
-          levels << std::pair(Level::Minor, 5000);
+          levels << std::pair( Level::Minor, 5000 );
         }
-        else if ( mapScale > 30000 )
+        else if ( mapScale > 20000 )
         {
-          levels << std::pair(Level::Major, 5000);
-          levels << std::pair(Level::Minor, 1000);
+          levels << std::pair( Level::Minor, 1000 );
         }
         else if ( mapScale > 6000 )
         {
-          levels << std::pair(Level::Major, 1000);
-          levels << std::pair(Level::Minor, 500);
+          levels << std::pair( Level::Minor, 500 );
         }
         else if ( mapScale > 3000 )
         {
-          levels << std::pair(Level::Major, 500);
-          levels << std::pair(Level::Minor, 100);
+          levels << std::pair( Level::Minor, 100 );
         }
         else if ( mapScale > 600 )
         {
-          levels << std::pair(Level::Minor, 100);
-          levels << std::pair(Level::Minor, 50);
+          levels << std::pair( Level::Minor, 50 );
         }
         else if ( mapScale > 300 )
         {
-          levels << std::pair(Level::Major, 50);
-          levels << std::pair(Level::Minor, 10);
+          levels << std::pair( Level::Minor, 10 );
         }
         else if ( mapScale > 60 )
         {
-          levels << std::pair(Level::Major, 10);
-          levels << std::pair(Level::Minor, 5);
-        }
-        else if ( mapScale > 30 )
-        {
-          levels << std::pair(Level::Major, 5);
-          levels << std::pair(Level::Minor, 1);
+          levels << std::pair( Level::Minor, 5 );
         }
         else
         {
-          levels << std::pair(Level::Minor, 1);
+          levels << std::pair( Level::Minor, 1 );
         }
       }
 
@@ -1070,16 +1058,20 @@ KadasLatLonToUTM::GridLabel KadasLatLonToUTM::mgrsGridLabelCallback( double lon,
   if ( cellSize >= 100000 )
     return GridLabel();
 
+  int precision = 1;
+  while ( precision*10 < cellSize )
+    precision *= 10;
+
   cellSize = std::max( 1000, cellSize ); // No labeling below 1km grid
   UTMCoo utmcoo = LL2UTM( QgsPointXY( lon, lat ) );
   GridLabel label;
   if ( horiz )
   {
-    label.label = QString::number( std::round( double( utmcoo.northing % 100000 ) / cellSize ) * cellSize, 'f', 0 ).rightJustified( 5, '0' );
+    label.label = QString::number( std::round( double( utmcoo.northing % 100000 ) / precision ), 'f', 0 );
   }
   else
   {
-    label.label = QString::number( std::round( double( utmcoo.easting % 100000 ) / cellSize ) * cellSize, 'f', 0 ).rightJustified( 5, '0' );
+    label.label = QString::number( std::round( double( utmcoo.easting % 100000 ) / precision ), 'f', 0 );
   }
   label.horiz = horiz;
   label.lineIdx = lineIdx;
