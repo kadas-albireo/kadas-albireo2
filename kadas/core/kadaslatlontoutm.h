@@ -53,6 +53,11 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       QPointF pos;
       QString label;
       QPointF maxPos;
+      // values used for scale dependent font size
+      double fontSizeMin = 15;
+      int fontSizeMinScale = 2;
+      double fontSizeMax = 15;
+      int fontSizeMaxScale = 1;
     };
 
     struct GridLabel

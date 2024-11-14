@@ -343,31 +343,29 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     return;
   }
 
-  double zoneFontSize = 0;
-  double subZoneFontSize = 0;
   double gridLabelSize = mRenderGridConfig.fontSize;
-  if ( mapScale > 20000000 )
-  {
-    zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 10000000 )
-  {
-    zoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
-    subZoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else
-  {
-    zoneFontSize = 2 * mRenderGridConfig.fontSize;
-    subZoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
+
+  //double zoneFontSize = 0;
+  // if ( mapScale > 20000000 )
+  // {
+  //   zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
+  // }
+  // else if ( mapScale > 10000000 )
+  // {
+  //   zoneFontSize = mRenderGridConfig.fontSize;
+  // }
+  // else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
+  // {
+  //   zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
+  // }
+  // else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
+  // {
+  //   zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
+  // }
+  // else
+  // {
+  //   zoneFontSize = 2 * mRenderGridConfig.fontSize;
+  // }
 
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
   double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
@@ -421,10 +419,13 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     }
   }
 
-  font.setPointSizeF( zoneFontSize * dpiScale );
-  QFontMetrics fm( font );
   for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
   {
+    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+
+    font.setPointSizeF( zoneFontSize * dpiScale );
+    QFontMetrics fm( font );
+
     const QPointF &pos = zoneLabel.pos;
     const QPointF &maxPos = zoneLabel.maxPos;
     QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
@@ -435,7 +436,9 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     }
     labelPos.rx() += 3;
     labelPos.ry() -= 3;
-    if ( labelPos.x() + fm.horizontalAdvance( zoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
+
+    double labelAdvance = fm.horizontalAdvance( zoneLabel.label );
+    if ( labelPos.x() +  labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
     {
       drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
     }
@@ -464,4 +467,35 @@ QPen KadasMapGridLayerRenderer::level2pen(KadasLatLonToUTM::Level level) const
     break;
   }
   return QPen();
+}
+
+double KadasMapGridLayerRenderer::exponentialScale(double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent )
+{
+  if ( domainMin >= domainMax )
+  {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  if ( exponent <= 0 )
+  {
+    std::numeric_limits<double>::quiet_NaN();
+  }
+  // outside of domain?
+  if ( value >= domainMax )
+  {
+    return rangeMax;
+  }
+  else if ( value <= domainMin )
+  {
+    return rangeMin;
+  }
+
+  // calculate linear scale
+  double m = ( rangeMax - rangeMin ) / ( domainMax - domainMin );
+  double c = rangeMin - ( domainMin * m );
+  // Return linearly scaled value
+  return m * value + c;
+
+  // Return exponentially scaled value
+  double ratio = ( std::pow( exponent, value - domainMin ) - 1 ) / ( std::pow( exponent, domainMax - domainMin ) - 1 );
+  return ( rangeMax - rangeMin ) * ratio + rangeMin;
 }

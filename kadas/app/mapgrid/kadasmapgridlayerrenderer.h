@@ -47,6 +47,8 @@ class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
     void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
 
     QPen level2pen( KadasLatLonToUTM::Level level ) const;
+    static double exponentialScale( double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent = 1 );
+
 };
 
 #endif // KADASMAPGRIDLAYERRENDERER_H

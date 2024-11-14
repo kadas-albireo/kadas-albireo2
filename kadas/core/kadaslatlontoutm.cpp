@@ -783,6 +783,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
         label.pos = QPointF( xMin, yMin );
         label.maxPos = QPointF( xMax, yMax );
         label.label = zoneName( x1, y1 );
+        label.fontSizeMin = 10;
+        label.fontSizeMinScale = 30000000;
+        label.fontSizeMax = 20;
+        label.fontSizeMaxScale = 15000000;
         grid.zoneLabels.append( label );
       }
 
@@ -855,7 +859,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
 
       if ( gridMode == GridMode::GridMGRS )
       {
-        if ( mapScale <= 2000000 )
+        if ( mapScale <= 3000000 )
           grid << computeSubGrid( 100000, Level::OnlyLabels, xMin, xMax, yMin, yMax, mgrs100kIDLabelCallback, nullptr );
         for ( const auto &level : std::as_const( levels ) )
           grid << computeSubGrid( level.second, level.first, xMin, xMax, yMin, yMax, nullptr, mgrsGridLabelCallback );
@@ -1034,6 +1038,11 @@ KadasLatLonToUTM::ZoneLabel KadasLatLonToUTM::mgrs100kIDLabelCallback( double po
   label.label = QString( "%1 %2" ).arg( zoneName( posX, posY ), mgrsLetter100kID( setColumn, setRow, setParm ) );
   label.maxPos = QPointF( maxLon, maxLat );
 
+  label.fontSizeMin = 10;
+  label.fontSizeMinScale = 5000000;
+  label.fontSizeMax = 20;
+  label.fontSizeMaxScale = 1000000;
+
   return label;
 }
 
@@ -1077,3 +1086,5 @@ KadasLatLonToUTM::GridLabel KadasLatLonToUTM::mgrsGridLabelCallback( double lon,
 
   return label;
 }
+
+
