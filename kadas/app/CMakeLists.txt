@@ -2,6 +2,7 @@ FIND_PACKAGE(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
 set(kadas_SRC
   kadasapplayerhandling.cpp
   kadasapplication.cpp
+  kadasbookmarksmenu.cpp
   kadascanvascontextmenu.cpp
   kadasgpsintegration.cpp
   kadasgpxintegration.cpp
