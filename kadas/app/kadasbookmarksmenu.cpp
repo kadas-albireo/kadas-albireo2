@@ -17,6 +17,7 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
+#include <QMessageBox>
 #include <QToolButton>
 #include <QWidgetAction>
 
@@ -27,8 +28,8 @@
 #include <qgis/qgsproject.h>
 
 #include "kadasapplication.h"
-#include "kadasmainwindow.h"
 #include "kadasbookmarksmenu.h"
+#include "kadasmainwindow.h"
 
 
 KadasBookmarksMenu::KadasBookmarksMenu( QgsMapCanvas *canvas, QgsMessageBar *messageBar, QWidget *parent )
@@ -80,18 +81,43 @@ void KadasBookmarksMenu::addBookmark()
     return;
   }
 
+  bool replaceExisting = false;
+  Bookmark *bookmark = nullptr;
+
+  for ( QList<Bookmark*>::iterator it = mBookmarks.begin(); it != mBookmarks.end(); it++ )
+  {
+    if ( (*it)->name == name )
+    {
+      int res = QMessageBox::question( kApp->mainWindow(), tr( "Replace Bookmark" ),
+                                       tr( "Are you sure you want to replace the existing bookmark “%1”?" ).arg( name ),
+                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
+      if ( res != QMessageBox::Yes )
+        return;
+
+      replaceExisting = true;
+      bookmark = *it;
+      break;
+    }
+  }
+  if ( !bookmark )
+  {
+    bookmark = new Bookmark();
+    bookmark->name = name;
+  }
+
   QgsLayerTreeGroup *root = QgsProject::instance()->layerTreeRoot();
   QgsLayerTreeModel *model =  kApp->mainWindow()->layerTreeView()->layerTreeModel();
   QgsMapThemeCollection::MapThemeRecord record = QgsMapThemeCollection::createThemeFromCurrentState( root, model );
   QgsProject::instance()->mapThemeCollection()->insert( name, record );
 
-  Bookmark *bookmark = new Bookmark;
-  bookmark->name = name;
   bookmark->crs = mCanvas->mapSettings().destinationCrs().authid();
   bookmark->extent = mCanvas->mapSettings().extent();
-  bookmark->groupVisibilities.clear();
 
-  addBookmarkAction( bookmark );
+  bookmark->groupVisibilities.clear();
+  bookmark->layerVisibilities.clear();
+
+  if ( !replaceExisting )
+    addBookmarkAction( bookmark );
 }
 
 void KadasBookmarksMenu::restoreBookmark( Bookmark *bookmark )
