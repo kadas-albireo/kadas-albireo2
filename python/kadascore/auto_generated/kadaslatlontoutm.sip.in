@@ -50,6 +50,10 @@ the Free Software Foundation; either version 2 of the License, or     *
       QPointF pos;
       QString label;
       QPointF maxPos;
+      double fontSizeMin;
+      int fontSizeMinScale;
+      double fontSizeMax;
+      int fontSizeMaxScale;
     };
 
     struct GridLabel
@@ -59,13 +63,25 @@ the Free Software Foundation; either version 2 of the License, or     *
       bool horiz;
     };
 
+    enum class Level
+    {
+      Major,
+      Minor,
+      OnlyLabels
+    };
+
+    struct LineLevel {
+      LineLevel(KadasLatLonToUTM::Level level, QPolygonF line);
+
+      KadasLatLonToUTM::Level level;
+      QPolygonF line;
+    };
+
     struct Grid
     {
-      QList<QPolygonF> zoneLines;
-      QList<QPolygonF> subZoneLines;
-      QList<QPolygonF> gridLines;
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
-      QList<KadasLatLonToUTM::ZoneLabel> subZoneLabel;
+
+      QList<KadasLatLonToUTM::LineLevel> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
     };
@@ -75,8 +91,9 @@ the Free Software Foundation; either version 2 of the License, or     *
     static MGRSCoo UTM2MGRS( const UTMCoo &utmcoo );
     static UTMCoo MGRS2UTM( const MGRSCoo &mgrs, bool &ok );
 
-    static int getZoneNumber( double lon, double lat );
-    static QString getHemisphereLetter( double lat );
+    static int zoneNumber( double lon, double lat );
+    static QString hemisphereLetter( double lat );
+    static QString zoneName( double lon, double lat );
 
     enum class GridMode
     {

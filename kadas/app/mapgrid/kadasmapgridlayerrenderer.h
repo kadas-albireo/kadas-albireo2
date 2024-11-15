@@ -21,6 +21,7 @@
 #include <qgsmaplayerrenderer.h>
 
 #include "kadasmapgridlayer.h"
+#include "kadas/core/kadaslatlontoutm.h"
 
 class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
 {
@@ -44,6 +45,10 @@ class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
     QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
     void drawMgrsGrid();
     void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
+
+    QPen level2pen( KadasLatLonToUTM::Level level ) const;
+    static double exponentialScale( double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent = 1 );
+
 };
 
 #endif // KADASMAPGRIDLAYERRENDERER_H

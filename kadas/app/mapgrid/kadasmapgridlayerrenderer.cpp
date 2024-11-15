@@ -321,33 +321,15 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
         );
 
   // Draw grid lines
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
-  for ( const QPolygonF &zoneLine : std::as_const( grid.zoneLines ) )
+  for ( const auto &gridLine : std::as_const( grid.lines ) )
   {
-    QPolygonF itemLine;
-    for ( const QPointF &point : zoneLine )
-    {
-      itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
-    }
-    renderContext()->painter()->drawPolyline( itemLine );
-  }
+    if ( gridLine.level == KadasLatLonToUTM::Level::OnlyLabels )
+      continue;
 
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
-  for ( const QPolygonF &subZoneLine : std::as_const( grid.subZoneLines ) )
-  {
-    QPolygonF itemLine;
-    for ( const QPointF &point : subZoneLine )
-    {
-      itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
-    }
-    renderContext()->painter()->drawPolyline( itemLine );
-  }
+    renderContext()->painter()->setPen( level2pen( gridLine.level ) );
 
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
-  for ( const QPolygonF &gridLine : std::as_const( grid.gridLines ) )
-  {
     QPolygonF itemLine;
-    for ( const QPointF &point : gridLine )
+    for ( const QPointF &point : std::as_const( gridLine.line ) )
     {
       itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
     }
@@ -361,32 +343,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     return;
   }
 
-  double zoneFontSize = 0;
-  double subZoneFontSize = 0;
   double gridLabelSize = mRenderGridConfig.fontSize;
-  if ( mapScale > 20000000 )
-  {
-    zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 10000000 )
-  {
-    zoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
-    subZoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else
-  {
-    zoneFontSize = 2 * mRenderGridConfig.fontSize;
-    subZoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
-
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
   double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
   renderContext()->painter()->setBrush( mRenderGridConfig.color );
@@ -399,7 +356,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     font.setPointSizeF( gridLabelSize );
     for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
-      const QPolygonF &gridLine = grid.gridLines[gridLabel.lineIdx];
+      const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].line;
       QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
       const QRectF &visibleRect = screenExtent;
       int i = 1, n = gridLine.size();
@@ -439,10 +396,13 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     }
   }
 
-  font.setPointSizeF( zoneFontSize * dpiScale );
-  QFontMetrics fm( font );
   for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
   {
+    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+
+    font.setPointSizeF( zoneFontSize * dpiScale );
+    QFontMetrics fm( font );
+
     const QPointF &pos = zoneLabel.pos;
     const QPointF &maxPos = zoneLabel.maxPos;
     QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
@@ -451,29 +411,13 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     {
       adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
     }
-    labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
-    labelPos.ry() += fm.height();
-    if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
+    labelPos.rx() += 3;
+    labelPos.ry() -= 3;
+
+    double labelAdvance = fm.horizontalAdvance( zoneLabel.label );
+    if ( labelPos.x() +  labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
     {
       drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
-    }
-  }
-
-  font.setPointSizeF( subZoneFontSize );
-  fm = QFontMetrics( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( grid.subZoneLabel ) )
-  {
-    const QPointF &pos = subZoneLabel.pos;
-    const QPointF &maxPos = subZoneLabel.maxPos;
-    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-    if ( adaptToScreen )
-    {
-      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-    }
-    if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-    {
-      drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
     }
   }
 }
@@ -486,4 +430,49 @@ void KadasMapGridLayerRenderer::drawGridLabel(const QPointF &pos, const QString 
   renderContext()->painter()->drawPath( path );
   renderContext()->painter()->setPen( Qt::NoPen );
   renderContext()->painter()->drawPath( path );
+}
+
+QPen KadasMapGridLayerRenderer::level2pen(KadasLatLonToUTM::Level level) const
+{
+  switch (level) {
+  case KadasLatLonToUTM::Level::Major:
+    return QPen( mRenderGridConfig.color, 2 );
+  case KadasLatLonToUTM::Level::Minor:
+    return QPen( mRenderGridConfig.color, .8 );
+  case KadasLatLonToUTM::Level::OnlyLabels:
+    Q_ASSERT( false );
+    break;
+  }
+  return QPen();
+}
+
+double KadasMapGridLayerRenderer::exponentialScale(double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent )
+{
+  if ( domainMin >= domainMax )
+  {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  if ( exponent <= 0 )
+  {
+    std::numeric_limits<double>::quiet_NaN();
+  }
+  // outside of domain?
+  if ( value >= domainMax )
+  {
+    return rangeMax;
+  }
+  else if ( value <= domainMin )
+  {
+    return rangeMin;
+  }
+
+  // calculate linear scale
+  double m = ( rangeMax - rangeMin ) / ( domainMax - domainMin );
+  double c = rangeMin - ( domainMin * m );
+  // Return linearly scaled value
+  return m * value + c;
+
+  // Return exponentially scaled value
+  double ratio = ( std::pow( exponent, value - domainMin ) - 1 ) / ( std::pow( exponent, domainMax - domainMin ) - 1 );
+  return ( rangeMax - rangeMin ) * ratio + rangeMin;
 }
