@@ -88,7 +88,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     {
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<LineLevel> lines;
+      QList<KadasLatLonToUTM::LineLevel> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
