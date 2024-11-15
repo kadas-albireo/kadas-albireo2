@@ -21,7 +21,6 @@ vcpkg_from_github(
         sipcxx17.patch
         nlohmann-json.patch
         qgis-debug.patch
-        maptheme-pr59455.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
