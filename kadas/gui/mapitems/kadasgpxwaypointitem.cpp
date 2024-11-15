@@ -138,15 +138,25 @@ QString KadasGpxWaypointItem::asKml(const QgsRenderContext &context, QuaZip *kmz
   outStream << "<Placemark>\n";
   outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
   outStream << "<Style>\n";
-  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
-            .arg( outline().width() ).arg( color2hex( outline().color() ) ).arg( fill().style() != Qt::NoBrush ? 1 : 0 ).arg( color2hex( fill().color() ) );
+  outStream << QString( "<IconStyle>" );
+  outStream << QString( "<color>%1</color>" ).arg( color2hex( fill().color() ) );
+  // With icon scale=1 google earth normalize the icon to 32 pixels
+  outStream << QString( "<scale>%1</scale>" ).arg( iconSize() / 32.0 );
+  outStream << QString( "</IconStyle>\n" );
   if ( ! mName.isEmpty() )
   {
     outStream << QString( "<LabelStyle>" );
     if ( mLabelColor.isValid() )
+    {
       outStream << QString( "<color>%1</color>" ).arg( color2hex( mLabelColor ) );
+    }
     if ( mLabelFont.pointSize() > -1 )
+    {
+      // With label scale=1 google earth normalize the text to 16 pixels.
+      // In kadas by default we use point size 10. Dividing by 10 we get
+      // a similar text size in both applications
       outStream << QString ( "<scale>%1</scale>" ).arg( mLabelFont.pointSize() / 10.0 );
+    }
     outStream << QString( "</LabelStyle>\n" );
   }
   outStream << "</Style>\n";
