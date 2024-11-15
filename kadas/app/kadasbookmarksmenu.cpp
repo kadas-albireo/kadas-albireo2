@@ -57,19 +57,26 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
 {
   mBookmarks.append( bookmark );
 
-  QToolButton *deleteButton = new QToolButton();
+  QWidget *widget = new QWidget( this );
+
+  QToolButton *refreshButton = new QToolButton( widget );
+  refreshButton->setIcon( QIcon( ":/kadas/icons/refresh-v2" ) );
+  refreshButton->setAutoRaise( true );
+
+  QToolButton *deleteButton = new QToolButton( widget );
   deleteButton->setIcon( QgsApplication::getThemeIcon( "/mIconDelete.svg" ) );
   deleteButton->setAutoRaise( true );
 
-  QWidget *widget = new QWidget( this );
   widget->setLayout( new QHBoxLayout );
   widget->layout()->setContentsMargins( 20, 2, 2, 2 );
   widget->layout()->addWidget( new QLabel( bookmark->name ) );
+  widget->layout()->addWidget( refreshButton );
   widget->layout()->addWidget( deleteButton );
   QWidgetAction *widgetAction = new QWidgetAction( this );
   widgetAction->setDefaultWidget( widget );
-  connect( deleteButton, &QToolButton::clicked, [this, widgetAction, bookmark] { deleteBookmark( widgetAction, bookmark ); } );
-  connect( widgetAction, &QWidgetAction::triggered, this, [this, bookmark] { restoreBookmark( bookmark ); } );
+  connect( refreshButton, &QToolButton::clicked, this, [=] { resetBookmark( bookmark ); } );
+  connect( deleteButton, &QToolButton::clicked, this, [=] { deleteBookmark( widgetAction, bookmark ); } );
+  connect( widgetAction, &QWidgetAction::triggered, this, [=] { restoreBookmark( bookmark ); } );
   addAction( widgetAction );
 }
 
@@ -118,6 +125,20 @@ void KadasBookmarksMenu::addBookmark()
 
   if ( !replaceExisting )
     addBookmarkAction( bookmark );
+}
+
+void KadasBookmarksMenu::resetBookmark( Bookmark *bookmark )
+{
+  QgsLayerTreeGroup *root = QgsProject::instance()->layerTreeRoot();
+  QgsLayerTreeModel *model =  kApp->mainWindow()->layerTreeView()->layerTreeModel();
+  QgsMapThemeCollection::MapThemeRecord record = QgsMapThemeCollection::createThemeFromCurrentState( root, model );
+  QgsProject::instance()->mapThemeCollection()->insert( bookmark->name, record );
+
+  bookmark->crs = mCanvas->mapSettings().destinationCrs().authid();
+  bookmark->extent = mCanvas->mapSettings().extent();
+
+  bookmark->groupVisibilities.clear();
+  bookmark->layerVisibilities.clear();
 }
 
 void KadasBookmarksMenu::restoreBookmark( Bookmark *bookmark )
