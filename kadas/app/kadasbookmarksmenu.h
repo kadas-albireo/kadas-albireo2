@@ -58,7 +58,7 @@ class KADAS_GUI_EXPORT KadasBookmarksMenu : public QMenu
 
   private slots:
     void addBookmark();
-    void resetBookmark( Bookmark* bookmark );
+    void replaceBookmark( Bookmark* bookmark );
     void restoreBookmark(Bookmark *bookmark );
     void deleteBookmark( QAction *action, Bookmark *bookmark );
 
