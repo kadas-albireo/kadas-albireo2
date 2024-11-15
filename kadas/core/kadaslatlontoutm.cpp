@@ -772,10 +772,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
-                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
-                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
-                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
+      grid.lines << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
+                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
+                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
+                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
 
       if ( gridMode != GridMode::GridMGRS || mapScale > 2000000 )
       {

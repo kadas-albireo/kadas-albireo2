@@ -323,13 +323,13 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   // Draw grid lines
   for ( const auto &gridLine : std::as_const( grid.lines ) )
   {
-    if ( gridLine.first == KadasLatLonToUTM::Level::OnlyLabels )
+    if ( gridLine.level == KadasLatLonToUTM::Level::OnlyLabels )
       continue;
 
-    renderContext()->painter()->setPen( level2pen( gridLine.first ) );
+    renderContext()->painter()->setPen( level2pen( gridLine.level ) );
 
     QPolygonF itemLine;
-    for ( const QPointF &point : std::as_const( gridLine.second ) )
+    for ( const QPointF &point : std::as_const( gridLine.line ) )
     {
       itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
     }
@@ -356,7 +356,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     font.setPointSizeF( gridLabelSize );
     for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
-      const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].second;
+      const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].line;
       QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
       const QRectF &visibleRect = screenExtent;
       int i = 1, n = gridLine.size();

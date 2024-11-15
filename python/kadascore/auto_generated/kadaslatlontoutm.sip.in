@@ -70,11 +70,18 @@ the Free Software Foundation; either version 2 of the License, or     *
       OnlyLabels
     };
 
+    struct LineLevel {
+      LineLevel(KadasLatLonToUTM::Level level, QPolygonF line);
+
+      KadasLatLonToUTM::Level level;
+      QPolygonF line;
+    };
+
     struct Grid
     {
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<QPair<KadasLatLonToUTM::Level, QPolygonF>> lines;
+      QList<LineLevel> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
     };

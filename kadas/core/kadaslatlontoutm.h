@@ -74,11 +74,21 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
       OnlyLabels
     };
 
+    struct LineLevel {
+      LineLevel(KadasLatLonToUTM::Level level, QPolygonF line)
+        : level( level )
+        , line( line )
+      {}
+
+      KadasLatLonToUTM::Level level;
+      QPolygonF line;
+    };
+
     struct Grid
     {
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<QPair<KadasLatLonToUTM::Level, QPolygonF>> lines;
+      QList<LineLevel> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
       friend Grid& operator<<( Grid &lhs, const Grid& rhs ) SIP_SKIP
