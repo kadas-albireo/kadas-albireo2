@@ -74,7 +74,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     {
       QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<std::pair<KadasLatLonToUTM::Level, QPolygonF>> lines;
+      QList<QPair<KadasLatLonToUTM::Level, QPolygonF>> lines;
       QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
     };

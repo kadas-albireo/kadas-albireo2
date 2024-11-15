@@ -772,10 +772,10 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
-                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
-                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
-                 << std::pair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
+      grid.lines << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
+                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
+                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
+                 << QPair( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
 
       if ( gridMode != GridMode::GridMGRS || mapScale > 2000000 )
       {
@@ -794,54 +794,54 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       if ( mapScale > 5000000 )
         continue;
 
-      QList<std::pair<Level, int>> levels;
+      QList<QPair<Level, int>> levels;
       if ( cellSize == 0 )
       {
         if ( mapScale > 1000000 )
         {
-          levels << std::pair( mapScale > 2000000 ? Level::Minor : Level::Major, 100000);
+          levels << QPair( mapScale > 2000000 ? Level::Minor : Level::Major, 100000);
         }
         else if ( mapScale > 500000 )
         {
-          levels << std::pair( Level::Major, 100000 );
-          levels << std::pair( Level::Minor, 20000 );
+          levels << QPair( Level::Major, 100000 );
+          levels << QPair( Level::Minor, 20000 );
         }
         else if ( mapScale > 300000 )
         {
-          levels << std::pair( Level::Major, 100000 );
-          levels << std::pair( Level::Minor, 10000 );
+          levels << QPair( Level::Major, 100000 );
+          levels << QPair( Level::Minor, 10000 );
         }
         else if ( mapScale > 60000 )
         {
-          levels << std::pair( Level::Minor, 5000 );
+          levels << QPair( Level::Minor, 5000 );
         }
         else if ( mapScale > 20000 )
         {
-          levels << std::pair( Level::Minor, 1000 );
+          levels << QPair( Level::Minor, 1000 );
         }
         else if ( mapScale > 6000 )
         {
-          levels << std::pair( Level::Minor, 500 );
+          levels << QPair( Level::Minor, 500 );
         }
         else if ( mapScale > 3000 )
         {
-          levels << std::pair( Level::Minor, 100 );
+          levels << QPair( Level::Minor, 100 );
         }
         else if ( mapScale > 600 )
         {
-          levels << std::pair( Level::Minor, 50 );
+          levels << QPair( Level::Minor, 50 );
         }
         else if ( mapScale > 300 )
         {
-          levels << std::pair( Level::Minor, 10 );
+          levels << QPair( Level::Minor, 10 );
         }
         else if ( mapScale > 60 )
         {
-          levels << std::pair( Level::Minor, 5 );
+          levels << QPair( Level::Minor, 5 );
         }
         else
         {
-          levels << std::pair( Level::Minor, 1 );
+          levels << QPair( Level::Minor, 1 );
         }
       }
 
