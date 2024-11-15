@@ -24,6 +24,8 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     Q_OBJECT
     Q_PROPERTY( QString name READ name WRITE setName )
     Q_PROPERTY( QString number READ number WRITE setNumber )
+    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
+    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxRouteItem( QObject *parent = nullptr );
@@ -37,6 +39,12 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     const QString &number() const { return mNumber; }
     void setNumber( const QString &number );
 
+    const QFont &labelFont() const { return mLabelFont; }
+    void setLabelFont( const QFont &labelFont );
+
+    const QColor &labelColor() const { return mLabelColor; }
+    void setLabelColor( const QColor &labelColor );
+
     Margin margin() const override;
     void render( QgsRenderContext &context ) const override;
 
@@ -47,6 +55,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     QString mNumber;
     QFont mLabelFont;
     QSize mLabelSize;
+    QColor mLabelColor;
 };
 
 #endif // KADASGPXROUTEITEM_H

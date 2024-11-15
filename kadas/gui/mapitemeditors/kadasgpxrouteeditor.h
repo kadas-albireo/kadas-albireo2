@@ -38,6 +38,8 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
   private:
     Ui::KadasGpxRouteEditorBase mUi;
 
+    QFont currentFont() const;
+
   signals:
     void styleChanged();
 
@@ -45,6 +47,9 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
     void saveColor();
     void saveSize();
     void toggleItemMeasurements( bool enabled );
+    void saveLabelFont();
+    void saveLabelColor();
+    void fontSizeChanged(int size);
 };
 
 #endif // KADASGPXROUTEEDITOR_H

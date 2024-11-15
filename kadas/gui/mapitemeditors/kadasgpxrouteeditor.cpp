@@ -41,9 +41,31 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   mUi.mToolButtonColor->setColor( initialOutlineColor );
   connect( mUi.mToolButtonColor, &QgsColorButton::colorChanged, this, &KadasGpxRouteEditor::saveColor );
 
+  QFont font;
+  font.fromString( QgsSettings().value( "/gpx/route_label_font", "" ).toString() );
+  mUi.mFontComboBox->setCurrentFont( font );
+  mUi.mSpinBoxLabelSize->setValue( font.pointSize() );
+  mUi.mPushButtonBold->setChecked( font.bold() );
+  mUi.mPushButtonItalic->setChecked( font.italic() );
+  connect( mUi.mFontComboBox, &QFontComboBox::currentFontChanged, this, &KadasGpxRouteEditor::saveLabelFont );
+  connect( mUi.mSpinBoxLabelSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::fontSizeChanged );
+  connect( mUi.mPushButtonBold, &QPushButton::toggled, this, &KadasGpxRouteEditor::saveLabelFont );
+  connect( mUi.mPushButtonItalic, &QPushButton::toggled, this, &KadasGpxRouteEditor::saveLabelFont );
+
+  mUi.mToolButtonLabelColor->setAllowOpacity( true );
+  mUi.mToolButtonLabelColor->setShowNoColor( true );
+  QColor initialLabelColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/gpx/route_label_color", "255,255,0,255" ).toString() );
+  mUi.mToolButtonLabelColor->setColor( initialLabelColor );
+  connect( mUi.mToolButtonLabelColor, &QgsColorButton::colorChanged, this, &KadasGpxRouteEditor::saveLabelColor );
+
   connect( this, &KadasGpxRouteEditor::styleChanged, this, &KadasGpxRouteEditor::syncWidgetToItem );
 
   toggleItemMeasurements( true );
+}
+
+KadasGpxRouteEditor::~KadasGpxRouteEditor()
+{
+  toggleItemMeasurements( false );
 }
 
 void KadasGpxRouteEditor::setItem( KadasMapItem *item )
@@ -76,6 +98,28 @@ void KadasGpxRouteEditor::syncItemToWidget()
   mUi.mLineEditNumber->blockSignals( true );
   mUi.mLineEditNumber->setText( routeItem->number() );
   mUi.mLineEditNumber->blockSignals( false );
+
+  mUi.mFontComboBox->blockSignals( true );
+  QFont fontFamily;
+  fontFamily.setFamily( routeItem->labelFont().family() );
+  mUi.mFontComboBox->setCurrentFont( fontFamily );
+  mUi.mFontComboBox->blockSignals( false );
+
+  mUi.mSpinBoxLabelSize->blockSignals( true );
+  mUi.mSpinBoxLabelSize->setValue( routeItem->labelFont().pointSize() );
+  mUi.mSpinBoxLabelSize->blockSignals( false );
+
+  mUi.mPushButtonBold->blockSignals( true );
+  mUi.mPushButtonBold->setChecked( routeItem->labelFont().bold() );
+  mUi.mPushButtonBold->blockSignals( false );
+
+  mUi.mPushButtonItalic->blockSignals( true );
+  mUi.mPushButtonItalic->setChecked( routeItem->labelFont().italic() );
+  mUi.mPushButtonItalic->blockSignals( false );
+
+  mUi.mToolButtonLabelColor->blockSignals( true );
+  mUi.mToolButtonLabelColor->setColor( routeItem->labelColor() );
+  mUi.mToolButtonLabelColor->blockSignals( false );
 }
 
 void KadasGpxRouteEditor::syncWidgetToItem()
@@ -93,11 +137,18 @@ void KadasGpxRouteEditor::syncWidgetToItem()
   routeItem->setFill( QBrush( outlineColor ) );
   routeItem->setName( mUi.mLineEditName->text() );
   routeItem->setNumber( mUi.mLineEditNumber->text() );
+
+  routeItem->setLabelFont( currentFont() );
+  routeItem->setLabelColor( mUi.mToolButtonLabelColor->color() );
 }
 
-KadasGpxRouteEditor::~KadasGpxRouteEditor()
+QFont KadasGpxRouteEditor::currentFont() const
 {
-  toggleItemMeasurements( false );
+  QFont font = mUi.mFontComboBox->currentFont();
+  font.setBold( mUi.mPushButtonBold->isChecked() );
+  font.setItalic( mUi.mPushButtonItalic->isChecked() );
+  font.setPointSize( mUi.mSpinBoxLabelSize->value() );
+  return font;
 }
 
 void KadasGpxRouteEditor::toggleItemMeasurements( bool enabled )
@@ -121,4 +172,22 @@ void KadasGpxRouteEditor::saveSize()
 {
   QgsSettings().setValue( "/gpx/route_size", mUi.mSpinBoxSize->value() );
   emit styleChanged();
+}
+
+void KadasGpxRouteEditor::saveLabelFont()
+{
+  QgsSettings().setValue( "/gpx/route_label_font", currentFont().toString() );
+  emit styleChanged();
+}
+
+void KadasGpxRouteEditor::saveLabelColor()
+{
+  QgsSettings().setValue( "/gpx/route_label_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonLabelColor->color() ) );
+  emit styleChanged();
+}
+
+void KadasGpxRouteEditor::fontSizeChanged(int size)
+{
+  Q_UNUSED(size)
+  saveLabelFont();
 }
