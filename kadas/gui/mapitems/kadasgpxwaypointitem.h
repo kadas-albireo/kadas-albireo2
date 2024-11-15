@@ -43,6 +43,9 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 
     Margin margin() const override;
     void render( QgsRenderContext &context ) const override;
+#ifndef SIP_RUN
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
   protected:
     KadasMapItem *_clone() const override { return new KadasGpxWaypointItem( ); } SIP_FACTORY

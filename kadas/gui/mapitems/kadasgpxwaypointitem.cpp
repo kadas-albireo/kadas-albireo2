@@ -18,8 +18,10 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgstextrenderer.h>
+#include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 
@@ -119,16 +121,47 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     format.setBuffer( bs );
 
     QgsTextRenderer::drawText( pos, 0.0, Qgis::TextHorizontalAlignment::Center, {mName}, context, format, false );
-
-    // QPainterPath path;
-    // path.addText( pos + offset, mLabelFont, mName );
-    // context.painter()->setPen( QPen( bufferColor, 2 ) );
-    // context.painter()->drawPath( path );
-    // context.painter()->setPen( Qt::NoPen );
-    // if( mLabelColor.isValid() )
-    //   context.painter()->setBrush( QBrush( mLabelColor ) );
-    // else
-    //   context.painter()->setBrush( QBrush( mIconBrush ) );
-    // context.painter()->drawPath( path );
   }
+}
+
+QString KadasGpxWaypointItem::asKml(const QgsRenderContext &context, QuaZip *kmzZip) const
+{
+  if ( !mGeometry )
+  {
+    return QString();
+  }
+
+  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
+  outStream << "<Style>\n";
+  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
+            .arg( outline().width() ).arg( color2hex( outline().color() ) ).arg( fill().style() != Qt::NoBrush ? 1 : 0 ).arg( color2hex( fill().color() ) );
+  if ( ! mName.isEmpty() )
+  {
+    outStream << QString( "<LabelStyle>" );
+    if ( mLabelColor.isValid() )
+      outStream << QString( "<color>%1</color>" ).arg( color2hex( mLabelColor ) );
+    if ( mLabelFont.pointSize() > -1 )
+      outStream << QString ( "<scale>%1</scale>" ).arg( mLabelFont.pointSize() / 10.0 );
+    outStream << QString( "</LabelStyle>\n" );
+  }
+  outStream << "</Style>\n";
+  outStream << "<ExtendedData>\n";
+  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( mIconType ) );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << "</SchemaData>\n";
+  outStream << "</ExtendedData>\n";
+  QgsAbstractGeometry *geom = mGeometry->segmentize();
+  geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
+  outStream << geom->asKml( 6 ) << "\n";
+  delete geom;
+  outStream << "</Placemark>\n";
+  outStream.flush();
+  return outString;
 }
