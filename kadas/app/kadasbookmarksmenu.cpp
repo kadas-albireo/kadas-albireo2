@@ -59,22 +59,24 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
 
   QWidget *widget = new QWidget( this );
 
-  QToolButton *refreshButton = new QToolButton( widget );
-  refreshButton->setIcon( QIcon( ":/kadas/icons/refresh-v2" ) );
-  refreshButton->setAutoRaise( true );
+  QToolButton *resetButton = new QToolButton( widget );
+  resetButton->setIcon( QIcon( ":/kadas/icons/refresh-v2" ) );
+  resetButton->setToolTip( tr( "Reset bookmark" ) );
+  resetButton->setAutoRaise( true );
 
   QToolButton *deleteButton = new QToolButton( widget );
   deleteButton->setIcon( QgsApplication::getThemeIcon( "/mIconDelete.svg" ) );
+  deleteButton->setToolTip( tr( "Delete bookmark" ) );
   deleteButton->setAutoRaise( true );
 
   widget->setLayout( new QHBoxLayout );
   widget->layout()->setContentsMargins( 20, 2, 2, 2 );
   widget->layout()->addWidget( new QLabel( bookmark->name ) );
-  widget->layout()->addWidget( refreshButton );
+  widget->layout()->addWidget( resetButton );
   widget->layout()->addWidget( deleteButton );
   QWidgetAction *widgetAction = new QWidgetAction( this );
   widgetAction->setDefaultWidget( widget );
-  connect( refreshButton, &QToolButton::clicked, this, [=] { resetBookmark( bookmark ); } );
+  connect( resetButton, &QToolButton::clicked, this, [=] { resetBookmark( bookmark ); } );
   connect( deleteButton, &QToolButton::clicked, this, [=] { deleteBookmark( widgetAction, bookmark ); } );
   connect( widgetAction, &QWidgetAction::triggered, this, [=] { restoreBookmark( bookmark ); } );
   addAction( widgetAction );
