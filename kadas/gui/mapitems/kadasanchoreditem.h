@@ -84,7 +84,7 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     State *createEmptyState() const override { return new State(); } SIP_FACTORY
     QList<KadasMapPos> rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const;
 
-    static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
+    static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize ) SIP_SKIP;
 };
 
 #endif // KADASANCHOREDITEM_H

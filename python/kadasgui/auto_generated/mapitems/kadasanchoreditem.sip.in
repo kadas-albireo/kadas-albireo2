@@ -101,7 +101,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual State *createEmptyState() const;
     QList<KadasMapPos> rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const;
 
-    static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 };
 
 /************************************************************************
