@@ -53,7 +53,7 @@ for module in "${modules[@]}"; do
   rm -rf python/kadas${module}/auto_generated/*.py
   # put back __init__.py
   echo '"""
-This folder is completed using sipify.pl script
+This folder is completed using sipify.py script
 It is not aimed to be manually edited
 """' > python/kadas${module}/auto_additions/__init__.py
 
@@ -69,7 +69,7 @@ It is not aimed to be manually edited
       else
         path=$(${GP}sed -r 's@/[^/]+$@@' <<< $sipfile)
         mkdir -p python/$path
-        ./scripts/sipify.pl -s python/$sipfile.in -p python/kadas${module}/auto_additions/${pyfile} $header &
+        ./scripts/sipify.py -s python/$sipfile.in -p python/kadas${module}/auto_additions/${pyfile} $header &
       fi
       count=$((count+1))
   done < <( ${GP}sed -n -r "s@^%Include auto_generated/(.*\.sip)@kadas${module}/auto_generated/\1@p" python/kadas${module}/kadas${module}_auto.sip )
