@@ -14,11 +14,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <qgis/qgssettings.h>
-#include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
+
+
+const QgsSettingsEntryInteger *KadasGpxRouteEditor::settingsGpxRouteSize = new QgsSettingsEntryInteger( QStringLiteral( "route_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Route size." ) );
+const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteColor = new QgsSettingsEntryColor( QStringLiteral( "route_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Route color." ) );
+const QgsSettingsEntryString *KadasGpxRouteEditor::settingsGpxRouteLabelFont = new QgsSettingsEntryString( QStringLiteral( "route_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Route label font." ) );
+const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteLabelColor = new QgsSettingsEntryColor( QStringLiteral( "route_label_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Route label color." ) );
+
 
 KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
@@ -31,18 +38,17 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   connect( mUi.mLineEditNumber, &QLineEdit::textChanged, this, &KadasGpxRouteEditor::syncWidgetToItem );
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
-  mUi.mSpinBoxSize->setValue( QgsSettings().value( "/gpx/route_size", 2 ).toInt() );
+  mUi.mSpinBoxSize->setValue( settingsGpxRouteSize->value() );
   connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
   mUi.mToolButtonColor->setProperty( "settings_key", "outline_color" );
-  QColor initialOutlineColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/gpx/route_color", "255,255,0,255" ).toString() );
-  mUi.mToolButtonColor->setColor( initialOutlineColor );
+  mUi.mToolButtonColor->setColor( settingsGpxRouteColor->value() );
   connect( mUi.mToolButtonColor, &QgsColorButton::colorChanged, this, &KadasGpxRouteEditor::saveColor );
 
   QFont font;
-  font.fromString( QgsSettings().value( "/gpx/route_label_font", "" ).toString() );
+  font.fromString( settingsGpxRouteLabelFont->value() );
   mUi.mFontComboBox->setCurrentFont( font );
   mUi.mSpinBoxLabelSize->setValue( font.pointSize() );
   mUi.mPushButtonBold->setChecked( font.bold() );
@@ -54,8 +60,7 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
 
   mUi.mToolButtonLabelColor->setAllowOpacity( true );
   mUi.mToolButtonLabelColor->setShowNoColor( true );
-  QColor initialLabelColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/gpx/route_label_color", "255,255,0,255" ).toString() );
-  mUi.mToolButtonLabelColor->setColor( initialLabelColor );
+  mUi.mToolButtonLabelColor->setColor( settingsGpxRouteLabelColor->value() );
   connect( mUi.mToolButtonLabelColor, &QgsColorButton::colorChanged, this, &KadasGpxRouteEditor::saveLabelColor );
 
   connect( this, &KadasGpxRouteEditor::styleChanged, this, &KadasGpxRouteEditor::syncWidgetToItem );
@@ -163,26 +168,25 @@ void KadasGpxRouteEditor::toggleItemMeasurements( bool enabled )
 
 void KadasGpxRouteEditor::saveColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *> ( QObject::sender() );
-  QgsSettings().setValue( "/gpx/route_color", QgsSymbolLayerUtils::encodeColor( btn->color() ) );
+  settingsGpxRouteColor->setValue( mUi.mToolButtonColor->color() );
   emit styleChanged();
 }
 
 void KadasGpxRouteEditor::saveSize()
 {
-  QgsSettings().setValue( "/gpx/route_size", mUi.mSpinBoxSize->value() );
+  settingsGpxRouteSize->setValue( mUi.mSpinBoxSize->value() );
   emit styleChanged();
 }
 
 void KadasGpxRouteEditor::saveLabelFont()
 {
-  QgsSettings().setValue( "/gpx/route_label_font", currentFont().toString() );
+  settingsGpxRouteLabelFont->setValue( currentFont().toString() );
   emit styleChanged();
 }
 
 void KadasGpxRouteEditor::saveLabelColor()
 {
-  QgsSettings().setValue( "/gpx/route_label_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonLabelColor->color() ) );
+  settingsGpxRouteLabelColor->setValue( mUi.mToolButtonLabelColor->color() );
   emit styleChanged();
 }
 

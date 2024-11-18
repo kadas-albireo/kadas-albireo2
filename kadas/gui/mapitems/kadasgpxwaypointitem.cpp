@@ -101,11 +101,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     QFontMetrics metrics( font );
     pos += QPointF( metrics.width( mName ) / 2.0, 0.0 );
 
-    // no idea why this works, otherwise text scales up when edited
-    // the rendex context is coming from KadasMapItem when edited while it comes from the QgsMapLayerRenderer otherwise
-    double scale = 1.0;
-    if ( context.painter()->device()->physicalDpiX() )
-      scale = 1.0 / context.painter()->device()->physicalDpiX() * context.painter()->device()->logicalDpiX();
+    double scale = getTextRenderScale( context );
 
     QgsTextFormat format;
     format.setFont( font );

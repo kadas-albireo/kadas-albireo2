@@ -333,6 +333,17 @@ double KadasMapItem::outputDpiScale( const QgsRenderContext &context )
   return double( context.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
 }
 
+double KadasMapItem::getTextRenderScale( const QgsRenderContext &context )
+{
+  // no idea why this works, otherwise text scales up when edited
+  // the render context is coming from KadasMapItem when edited while it comes from the QgsMapLayerRenderer otherwise
+  double scale = 1.0;
+  if ( context.painter()->device()->physicalDpiX() )
+    scale = 1.0 / context.painter()->device()->physicalDpiX() * context.painter()->device()->logicalDpiX();
+
+  return scale;
+}
+
 KadasMapItem::Registry *KadasMapItem::registry()
 {
   std::call_once(onceFlagMapItemRegistry, []() {

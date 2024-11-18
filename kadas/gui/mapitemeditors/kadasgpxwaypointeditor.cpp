@@ -14,11 +14,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <qgis/qgssettings.h>
-#include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
+
+
+const QgsSettingsEntryInteger *KadasGpxWaypointEditor::settingsGpxWaypointSize = new QgsSettingsEntryInteger( QStringLiteral( "waypoint_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Waypoint size." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Waypoint color." ) );
+const QgsSettingsEntryString *KadasGpxWaypointEditor::settingsGpxWaypointLabelFont = new QgsSettingsEntryString( QStringLiteral( "waypoint_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Waypoint label font." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointLabelColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_label_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Waypoint label color." ) );
 
 KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
@@ -28,17 +34,16 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   connect( mUi.mLineEditName, &QLineEdit::textChanged, this, &KadasGpxWaypointEditor::syncWidgetToItem );
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
-  mUi.mSpinBoxSize->setValue( QgsSettings().value( "/gpx/waypoint_size", 2 ).toInt() );
+  mUi.mSpinBoxSize->setValue( settingsGpxWaypointSize->value() );
   connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
-  QColor initialOutlineColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/gpx/waypoint_color", "255,255,0,255" ).toString() );
-  mUi.mToolButtonColor->setColor( initialOutlineColor );
+  mUi.mToolButtonColor->setColor( settingsGpxWaypointColor->value() );
   connect( mUi.mToolButtonColor, &QgsColorButton::colorChanged, this, &KadasGpxWaypointEditor::saveColor );
 
   QFont font;
-  font.fromString( QgsSettings().value( "/gpx/waypoint_label_font", "" ).toString() );
+  font.fromString( settingsGpxWaypointLabelFont->value() );
   mUi.mFontComboBox->setCurrentFont( font );
   mUi.mSpinBoxLabelSize->setValue( font.pointSize() );
   mUi.mPushButtonBold->setChecked( font.bold() );
@@ -50,8 +55,7 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
 
   mUi.mToolButtonLabelColor->setAllowOpacity( true );
   mUi.mToolButtonLabelColor->setShowNoColor( true );
-  QColor initialLabelColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/gpx/waypoint_label_color", "255,255,0,255" ).toString() );
-  mUi.mToolButtonLabelColor->setColor( initialLabelColor );
+  mUi.mToolButtonLabelColor->setColor( settingsGpxWaypointLabelColor->value() );
   connect( mUi.mToolButtonLabelColor, &QgsColorButton::colorChanged, this, &KadasGpxWaypointEditor::saveLabelColor );
 
   connect( this, &KadasGpxWaypointEditor::styleChanged, this, &KadasGpxWaypointEditor::syncWidgetToItem );
@@ -135,25 +139,25 @@ QFont KadasGpxWaypointEditor::currentFont() const
 
 void KadasGpxWaypointEditor::saveColor()
 {
-  QgsSettings().setValue( "/gpx/waypoint_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonColor->color() ) );
+  settingsGpxWaypointColor->setValue( mUi.mToolButtonColor->color() );
   emit styleChanged();
 }
 
 void KadasGpxWaypointEditor::saveSize()
 {
-  QgsSettings().setValue( "/gpx/waypoint_size", mUi.mSpinBoxSize->value() );
+  settingsGpxWaypointSize->setValue( mUi.mSpinBoxSize->value() );
   emit styleChanged();
 }
 
 void KadasGpxWaypointEditor::saveLabelFont()
 {
-  QgsSettings().setValue( "/gpx/waypoint_label_font", currentFont().toString() );
+  settingsGpxWaypointLabelFont->setValue( currentFont().toString() );
   emit styleChanged();
 }
 
 void KadasGpxWaypointEditor::saveLabelColor()
 {
-  QgsSettings().setValue( "/gpx/waypoint_label_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonLabelColor->color() ) );
+  settingsGpxWaypointLabelColor->setValue( mUi.mToolButtonLabelColor->color() );
   emit styleChanged();
 }
 
