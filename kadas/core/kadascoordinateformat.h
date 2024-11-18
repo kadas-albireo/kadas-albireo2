@@ -30,7 +30,7 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 {
     Q_OBJECT
   public:
-    enum class Format SIP_MONKEYPATCH_SCOPEENUM
+    enum class Format SIP_MONKEYPATCH_SCOPEENUM : int
     {
       Default,
       DegMinSec,
@@ -42,12 +42,12 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
     Q_ENUM( Format )
 
     static KadasCoordinateFormat *instance();
-    Format getCoordinateDisplayFormat() const;
+    KadasCoordinateFormat::Format getCoordinateDisplayFormat() const;
     const QString &getCoordinateDisplayCrs() const;
     Qgis::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
 
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
-    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg );
+    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, KadasCoordinateFormat::Format format, const QString &epsg );
 
     double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
 #ifndef SIP_RUN
@@ -55,14 +55,14 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
 #endif
     static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
 
-    QgsPointXY parseCoordinate( const QString &text, Format format, bool &valid ) const;
+    QgsPointXY parseCoordinate( const QString &text, KadasCoordinateFormat::Format format, bool &valid ) const;
 
   public slots:
-    void setCoordinateDisplayFormat( Format format, const QString &epsg );
+    void setCoordinateDisplayFormat( KadasCoordinateFormat::Format format, const QString &epsg );
     void setHeightDisplayUnit( Qgis::DistanceUnit heightUnit );
 
   signals:
-    void coordinateDisplayFormatChanged( Format format, const QString &epsg );
+    void coordinateDisplayFormatChanged( KadasCoordinateFormat::Format format, const QString &epsg );
     void heightDisplayUnitChanged( Qgis::DistanceUnit heightUnit );
 
   private:
