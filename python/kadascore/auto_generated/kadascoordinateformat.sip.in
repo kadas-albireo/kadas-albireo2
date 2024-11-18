@@ -48,7 +48,11 @@ the Free Software Foundation; either version 2 of the License, or     *
     static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, KadasCoordinateFormat::Format format, const QString &epsg );
 
     double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
-    static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 );
+
+ static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 ) /Deprecated/;
+%Docstring
+\deprecated use KadasCoordinateUtils.getHeightAtPos
+%End
 
     QgsPointXY parseCoordinate( const QString &text, KadasCoordinateFormat::Format format, bool &valid ) const;
 

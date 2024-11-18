@@ -20,7 +20,6 @@ KadasSettingsTree holds the tree structure for the settings
 %End
   public:
 
-
     static const QgsSettingsTreeNode *node( const QString &key );
 %Docstring
 Returns the tree node at the given ``key``
