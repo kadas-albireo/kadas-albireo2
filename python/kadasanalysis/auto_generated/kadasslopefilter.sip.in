@@ -11,7 +11,7 @@
 
 
 
-class KadasSlopeFilter: KadasNineCellFilter
+class KadasSlopeFilter : KadasNineCellFilter
 {
 %Docstring(signature="appended")
 *************************************************************************

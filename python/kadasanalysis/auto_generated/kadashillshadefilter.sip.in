@@ -10,7 +10,7 @@
 
 
 
-class KadasHillshadeFilter: KadasNineCellFilter
+class KadasHillshadeFilter : KadasNineCellFilter
 {
 %Docstring(signature="appended")
 *************************************************************************
