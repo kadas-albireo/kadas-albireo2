@@ -30,7 +30,20 @@ KadasPluginInterface.ActionRibbonTabLocation.HELP_TAB.__doc__ = ""
 KadasPluginInterface.CUSTOM_TAB = KadasPluginInterface.ActionRibbonTabLocation.CUSTOM_TAB
 KadasPluginInterface.CUSTOM_TAB.is_monkey_patched = True
 KadasPluginInterface.ActionRibbonTabLocation.CUSTOM_TAB.__doc__ = ""
-KadasPluginInterface.ActionRibbonTabLocation.__doc__ = "\n\n" + '* ``NO_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.NO_TAB.__doc__ + '\n' + '* ``MAPS_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.MAPS_TAB.__doc__ + '\n' + '* ``VIEW_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.VIEW_TAB.__doc__ + '\n' + '* ``ANALYSIS_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.ANALYSIS_TAB.__doc__ + '\n' + '* ``DRAW_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.DRAW_TAB.__doc__ + '\n' + '* ``GPS_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.GPS_TAB.__doc__ + '\n' + '* ``MSS_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.MSS_TAB.__doc__ + '\n' + '* ``SETTINGS_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.SETTINGS_TAB.__doc__ + '\n' + '* ``HELP_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.HELP_TAB.__doc__ + '\n' + '* ``CUSTOM_TAB``: ' + KadasPluginInterface.ActionRibbonTabLocation.CUSTOM_TAB.__doc__
+KadasPluginInterface.ActionRibbonTabLocation.__doc__ = """
+
+* ``NO_TAB``: 
+* ``MAPS_TAB``: 
+* ``VIEW_TAB``: 
+* ``ANALYSIS_TAB``: 
+* ``DRAW_TAB``: 
+* ``GPS_TAB``: 
+* ``MSS_TAB``: 
+* ``SETTINGS_TAB``: 
+* ``HELP_TAB``: 
+* ``CUSTOM_TAB``: 
+
+"""
 # --
 # monkey patching scoped based enum
 KadasPluginInterface.NO_MENU = KadasPluginInterface.ActionClassicMenuLocation.NO_MENU
@@ -84,5 +97,30 @@ KadasPluginInterface.ActionClassicMenuLocation.HELP_MENU.__doc__ = ""
 KadasPluginInterface.CUSTOM_MENU = KadasPluginInterface.ActionClassicMenuLocation.CUSTOM_MENU
 KadasPluginInterface.CUSTOM_MENU.is_monkey_patched = True
 KadasPluginInterface.ActionClassicMenuLocation.CUSTOM_MENU.__doc__ = ""
-KadasPluginInterface.ActionClassicMenuLocation.__doc__ = "\n\n" + '* ``NO_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.NO_MENU.__doc__ + '\n' + '* ``PROJECT_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.PROJECT_MENU.__doc__ + '\n' + '* ``EDIT_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.EDIT_MENU.__doc__ + '\n' + '* ``VIEW_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.VIEW_MENU.__doc__ + '\n' + '* ``LAYER_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.LAYER_MENU.__doc__ + '\n' + '* ``NEWLAYER_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.NEWLAYER_MENU.__doc__ + '\n' + '* ``ADDLAYER_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.ADDLAYER_MENU.__doc__ + '\n' + '* ``SETTINGS_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.SETTINGS_MENU.__doc__ + '\n' + '* ``PLUGIN_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.PLUGIN_MENU.__doc__ + '\n' + '* ``RASTER_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.RASTER_MENU.__doc__ + '\n' + '* ``DATABASE_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.DATABASE_MENU.__doc__ + '\n' + '* ``VECTOR_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.VECTOR_MENU.__doc__ + '\n' + '* ``WEB_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.WEB_MENU.__doc__ + '\n' + '* ``FIRST_RIGHT_STANDARD_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.FIRST_RIGHT_STANDARD_MENU.__doc__ + '\n' + '* ``WINDOW_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.WINDOW_MENU.__doc__ + '\n' + '* ``HELP_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.HELP_MENU.__doc__ + '\n' + '* ``CUSTOM_MENU``: ' + KadasPluginInterface.ActionClassicMenuLocation.CUSTOM_MENU.__doc__
+KadasPluginInterface.ActionClassicMenuLocation.__doc__ = """
+
+* ``NO_MENU``: 
+* ``PROJECT_MENU``: 
+* ``EDIT_MENU``: 
+* ``VIEW_MENU``: 
+* ``LAYER_MENU``: 
+* ``NEWLAYER_MENU``: 
+* ``ADDLAYER_MENU``: 
+* ``SETTINGS_MENU``: 
+* ``PLUGIN_MENU``: 
+* ``RASTER_MENU``: 
+* ``DATABASE_MENU``: 
+* ``VECTOR_MENU``: 
+* ``WEB_MENU``: 
+* ``FIRST_RIGHT_STANDARD_MENU``: 
+* ``WINDOW_MENU``: 
+* ``HELP_MENU``: 
+* ``CUSTOM_MENU``: 
+
+"""
 # --
+try:
+    KadasPluginInterface.cast = staticmethod(KadasPluginInterface.cast)
+    KadasPluginInterface.__signal_arguments__ = {'printLayoutAdded': ['layout: QgsPrintLayout'], 'printLayoutWillBeRemoved': ['layout: QgsPrintLayout']}
+except NameError:
+    pass

@@ -15,5 +15,13 @@ KadasLineItem.MeasurementMode.MeasureLineAndSegmentsAndAzimuthMapNorth.__doc__ =
 KadasLineItem.MeasureLineAndSegmentsAndAzimuthGeoNorth = KadasLineItem.MeasurementMode.MeasureLineAndSegmentsAndAzimuthGeoNorth
 KadasLineItem.MeasureLineAndSegmentsAndAzimuthGeoNorth.is_monkey_patched = True
 KadasLineItem.MeasurementMode.MeasureLineAndSegmentsAndAzimuthGeoNorth.__doc__ = ""
-KadasLineItem.MeasurementMode.__doc__ = "\n\n" + '* ``MeasureLineAndSegments``: ' + KadasLineItem.MeasurementMode.MeasureLineAndSegments.__doc__ + '\n' + '* ``MeasureAzimuthMapNorth``: ' + KadasLineItem.MeasurementMode.MeasureAzimuthMapNorth.__doc__ + '\n' + '* ``MeasureAzimuthGeoNorth``: ' + KadasLineItem.MeasurementMode.MeasureAzimuthGeoNorth.__doc__ + '\n' + '* ``MeasureLineAndSegmentsAndAzimuthMapNorth``: ' + KadasLineItem.MeasurementMode.MeasureLineAndSegmentsAndAzimuthMapNorth.__doc__ + '\n' + '* ``MeasureLineAndSegmentsAndAzimuthGeoNorth``: ' + KadasLineItem.MeasurementMode.MeasureLineAndSegmentsAndAzimuthGeoNorth.__doc__
+KadasLineItem.MeasurementMode.__doc__ = """
+
+* ``MeasureLineAndSegments``: 
+* ``MeasureAzimuthMapNorth``: 
+* ``MeasureAzimuthGeoNorth``: 
+* ``MeasureLineAndSegmentsAndAzimuthMapNorth``: 
+* ``MeasureLineAndSegmentsAndAzimuthGeoNorth``: 
+
+"""
 # --

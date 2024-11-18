@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptooldeleteitems.h                         *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -51,5 +51,5 @@ class KadasMapToolDeleteItems : KadasMapToolCreateItem
  *                                                                      *
  * kadas/gui/maptools/kadasmaptooldeleteitems.h                         *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

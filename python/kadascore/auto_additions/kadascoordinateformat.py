@@ -18,6 +18,20 @@ KadasCoordinateFormat.Format.UTM.__doc__ = ""
 KadasCoordinateFormat.MGRS = KadasCoordinateFormat.Format.MGRS
 KadasCoordinateFormat.MGRS.is_monkey_patched = True
 KadasCoordinateFormat.Format.MGRS.__doc__ = ""
-KadasCoordinateFormat.Format.__doc__ = "\n\n" + '* ``Default``: ' + KadasCoordinateFormat.Format.Default.__doc__ + '\n' + '* ``DegMinSec``: ' + KadasCoordinateFormat.Format.DegMinSec.__doc__ + '\n' + '* ``DegMin``: ' + KadasCoordinateFormat.Format.DegMin.__doc__ + '\n' + '* ``DecDeg``: ' + KadasCoordinateFormat.Format.DecDeg.__doc__ + '\n' + '* ``UTM``: ' + KadasCoordinateFormat.Format.UTM.__doc__ + '\n' + '* ``MGRS``: ' + KadasCoordinateFormat.Format.MGRS.__doc__
+KadasCoordinateFormat.Format.__doc__ = """
+
+* ``Default``: 
+* ``DegMinSec``: 
+* ``DegMin``: 
+* ``DecDeg``: 
+* ``UTM``: 
+* ``MGRS``: 
+
+"""
 # --
 KadasCoordinateFormat.Format.baseClass = KadasCoordinateFormat
+try:
+    KadasCoordinateFormat.instance = staticmethod(KadasCoordinateFormat.instance)
+    KadasCoordinateFormat.__signal_arguments__ = {'coordinateDisplayFormatChanged': ['format: KadasCoordinateFormat.Format', 'epsg: str'], 'heightDisplayUnitChanged': ['heightUnit: Qgis.DistanceUnit']}
+except NameError:
+    pass

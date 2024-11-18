@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/mapitems/kadasmapitem.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -463,5 +463,5 @@ Trigger a redraw */
  *                                                                      *
  * kadas/gui/mapitems/kadasmapitem.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
