@@ -1,13 +1,13 @@
 # The following has been generated automatically from kadas/gui/mapitems/kadasmapitem.h
 # monkey patching scoped based enum
-State.Empty = KadasMapItem.State.DrawStatus.Empty
-State.Empty.is_monkey_patched = True
+KadasMapItem.State.Empty = KadasMapItem.State.DrawStatus.Empty
+KadasMapItem.State.Empty.is_monkey_patched = True
 KadasMapItem.State.DrawStatus.Empty.__doc__ = ""
-State.Drawing = KadasMapItem.State.DrawStatus.Drawing
-State.Drawing.is_monkey_patched = True
+KadasMapItem.State.Drawing = KadasMapItem.State.DrawStatus.Drawing
+KadasMapItem.State.Drawing.is_monkey_patched = True
 KadasMapItem.State.DrawStatus.Drawing.__doc__ = ""
-State.Finished = KadasMapItem.State.DrawStatus.Finished
-State.Finished.is_monkey_patched = True
+KadasMapItem.State.Finished = KadasMapItem.State.DrawStatus.Finished
+KadasMapItem.State.Finished.is_monkey_patched = True
 KadasMapItem.State.DrawStatus.Finished.__doc__ = ""
 State.DrawStatus.__doc__ = """
 
@@ -18,17 +18,17 @@ State.DrawStatus.__doc__ = """
 """
 # --
 # monkey patching scoped based enum
-NumericAttribute.TypeCoordinate = KadasMapItem.NumericAttribute.Type.TypeCoordinate
-NumericAttribute.TypeCoordinate.is_monkey_patched = True
+KadasMapItem.NumericAttribute.TypeCoordinate = KadasMapItem.NumericAttribute.Type.TypeCoordinate
+KadasMapItem.NumericAttribute.TypeCoordinate.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeCoordinate.__doc__ = ""
-NumericAttribute.TypeDistance = KadasMapItem.NumericAttribute.Type.TypeDistance
-NumericAttribute.TypeDistance.is_monkey_patched = True
+KadasMapItem.NumericAttribute.TypeDistance = KadasMapItem.NumericAttribute.Type.TypeDistance
+KadasMapItem.NumericAttribute.TypeDistance.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeDistance.__doc__ = ""
-NumericAttribute.TypeAngle = KadasMapItem.NumericAttribute.Type.TypeAngle
-NumericAttribute.TypeAngle.is_monkey_patched = True
+KadasMapItem.NumericAttribute.TypeAngle = KadasMapItem.NumericAttribute.Type.TypeAngle
+KadasMapItem.NumericAttribute.TypeAngle.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
-NumericAttribute.TypeOther = KadasMapItem.NumericAttribute.Type.TypeOther
-NumericAttribute.TypeOther.is_monkey_patched = True
+KadasMapItem.NumericAttribute.TypeOther = KadasMapItem.NumericAttribute.Type.TypeOther
+KadasMapItem.NumericAttribute.TypeOther.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
 NumericAttribute.Type.__doc__ = """
 
