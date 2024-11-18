@@ -39,7 +39,6 @@ BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: false
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
@@ -109,7 +108,6 @@ SpacesInCStyleCastParentheses: true
 SpacesInParentheses: true
 SpacesInSquareBrackets: false
 Standard:        Cpp11
-Macros: [SIP_RUN, SIP_MONKEYPATCH_SCOPEENUM_UNNEST]
 TabWidth:        2
 UseTab:       Never
 
