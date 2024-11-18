@@ -48,7 +48,6 @@
 %Include auto_generated/kadasmapitemtooltip.sip
 %Include auto_generated/kadasheightprofiledialog.sip
 %Include auto_generated/kadasplugininterface.sip
-%Include auto_generated/kadasbookmarksmenu.sip
 %Include auto_generated/kadascoordinateinput.sip
 %Include auto_generated/kadaslayerselectionwidget.sip
 %Include auto_generated/mapitemeditors/kadasmapitemeditor.sip

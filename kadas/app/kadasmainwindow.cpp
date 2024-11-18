@@ -45,7 +45,6 @@
 #include <qgis/qgssourceselectprovider.h>
 
 #include "kadas/core/kadas.h"
-#include "kadas/gui/kadasbookmarksmenu.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -80,6 +79,7 @@
 
 #include "kadasapplayerhandling.h"
 #include "kadasapplication.h"
+#include "kadasbookmarksmenu.h"
 #include "kadashelpviewer.h"
 #include "kadasgpsintegration.h"
 #include "kadasgpxintegration.h"
