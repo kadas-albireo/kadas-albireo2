@@ -9,7 +9,7 @@ KadasMapItem.State.DrawStatus.Drawing.__doc__ = ""
 KadasMapItem.State.Finished = KadasMapItem.State.DrawStatus.Finished
 KadasMapItem.State.Finished.is_monkey_patched = True
 KadasMapItem.State.DrawStatus.Finished.__doc__ = ""
-State.DrawStatus.__doc__ = """
+KadasMapItem.State.DrawStatus.__doc__ = """
 
 * ``Empty``: 
 * ``Drawing``: 
@@ -30,7 +30,7 @@ KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
 KadasMapItem.NumericAttribute.TypeOther = KadasMapItem.NumericAttribute.Type.TypeOther
 KadasMapItem.NumericAttribute.TypeOther.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
-NumericAttribute.Type.__doc__ = """
+KadasMapItem.NumericAttribute.Type.__doc__ = """
 
 * ``TypeCoordinate``: 
 * ``TypeDistance``: 
