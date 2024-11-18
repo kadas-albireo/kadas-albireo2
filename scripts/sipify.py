@@ -1281,11 +1281,11 @@ def convert_type(cpp_type: str) -> str:
             return f"{container}[{convert_type(inner_type.strip())}]"
 
     if cpp_type not in type_mapping:
-        if cpp_type.startswith('Q'):
+        if cpp_type.startswith('Q') or cpp_type.startswith('Kadas'):
             cpp_type = cpp_type.replace('::', '.')
             return cpp_type
 
-        assert False, cpp_type
+        assert False, f"In {CONTEXT.header_file}, bad format '{cpp_type}'"
 
     return type_mapping[cpp_type]
 
@@ -1770,7 +1770,7 @@ while CONTEXT.line_idx < CONTEXT.line_count:
         if CONTEXT.comment.strip():
             CONTEXT.current_line += "%Docstring(signature=\"appended\")\n" + CONTEXT.comment + "\n%End\n"
 
-        CONTEXT.current_line += f"\n%TypeHeaderCode\n#include \"{os.path.basename(CONTEXT.header_file)}\""
+        CONTEXT.current_line += f"\n%TypeHeaderCode\n#include \"{CONTEXT.header_file}\""
 
         # for template based inheritance, add a typedef to define the base type
         while template_inheritance_template:
@@ -2246,9 +2246,9 @@ while CONTEXT.line_idx < CONTEXT.line_count:
 
     # TODO needs fixing!!
     # original perl regex was:
-    #       ^(?<staticconst> *(?<static>static )?const \w+(?:<(?:[\w<>, ]|::)+>)? \w+)(?: = [^()]+?(\((?:[^()]++|(?3))*\))?[^()]*?)?(?<endingchar>[|;]) *(\/\/.*?)?$
+    #       ^(?<staticconst> *(?<static>static )?const (\w+::)*\w+(?:<(?:[\w<>, ]|::)+>)? \w+)(?: = [^()]+?(\((?:[^()]++|(?3))*\))?[^()]*?)?(?<endingchar>[|;]) *(\/\/.*?)?$
     match = re.search(
-        r'^(?P<staticconst> *(?P<static>static )?const \w+(?:<(?:[\w<>, ]|::)+>)? \w+)(?: = [^()]+?(\((?:[^()]|\([^()]*\))*\))?[^()]*?)?(?P<endingchar>[|;]) *(//.*)?$',
+        r'^(?P<staticconst> *(?P<static>static )?const (\w+::)*\w+(?:<(?:[\w<>, ]|::)+>)? \w+)(?: = [^()]+?(\((?:[^()]|\([^()]*\))*\))?[^()]*?)?(?P<endingchar>[|;]) *(//.*)?$',
         CONTEXT.current_line
     )
     if match:
@@ -2560,7 +2560,7 @@ while CONTEXT.line_idx < CONTEXT.line_count:
         prep_line = f"""class QgsSettingsEntryEnumFlag_{var_name}
     {{
     %TypeHeaderCode
-    #include "{os.path.basename(CONTEXT.header_file)}"
+    #include "{CONTEXT.header_file}"
     #include "qgssettingsentry.h"
     typedef QgsSettingsEntryEnumFlag<{enum_type}> QgsSettingsEntryEnumFlag_{var_name};
     %End
