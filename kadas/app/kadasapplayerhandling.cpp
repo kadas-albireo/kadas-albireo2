@@ -763,6 +763,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
       case Qgis::LayerType::Annotation:
       case Qgis::LayerType::Plugin:
       case Qgis::LayerType::VectorTile:
+      case Qgis::LayerType::TiledScene:
       case Qgis::LayerType::Group:
         // not supported here yet!
         break;
