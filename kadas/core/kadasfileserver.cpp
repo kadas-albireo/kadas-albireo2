@@ -29,10 +29,10 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
   mHost = serverAddress().toString();
   mPort = serverPort();
   connect( this, &QTcpServer::newConnection, this, &KadasFileServer::handleConnection );
-  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ) , 2 );
+  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
 }
 
-void KadasFileServer::setFilesTopDir(const QString &topDir)
+void KadasFileServer::setFilesTopDir( const QString &topDir )
 {
   mTopdir = topDir;
 }
@@ -75,14 +75,12 @@ void KadasFileServer::handleConnection()
       else
       {
         QTimer *timeoutTimer = new QTimer( socket );
-        connect( timeoutTimer, &QTimer::timeout, socket, [socket]
-        {
+        connect( timeoutTimer, &QTimer::timeout, socket, [socket] {
           socket->close();
           socket->deleteLater();
         } );
         timeoutTimer->start( 500 );
-        connect( socket, &QTcpSocket::readyRead, socket, [this, socket, timeoutTimer]
-        {
+        connect( socket, &QTcpSocket::readyRead, socket, [this, socket, timeoutTimer] {
           timeoutTimer->stop();
           timeoutTimer->deleteLater();
           sendReply( socket );
@@ -134,7 +132,7 @@ void KadasFileServer::sendReply( QTcpSocket *socket )
       headers = genHeaders( 404 );
       if ( requestMethod == "GET" )
       {
-        body = QString("<html><body><p>Error 404: File not found: '%1'</p></body></html>").arg(QString::fromUtf8(fileRequested)).toUtf8();
+        body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ) ).toUtf8();
       }
     }
   }

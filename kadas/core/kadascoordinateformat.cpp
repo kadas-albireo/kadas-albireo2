@@ -28,10 +28,10 @@
 #include "kadas/core/kadaslatlontoutm.h"
 
 static QRegExp gPatDflt = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)?$" ) );
-static QRegExp gPatDD   = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)%1?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)%1?$" ).arg( QChar( 0x00B0 ) ) );
-static QRegExp gPatDM   = QRegExp( QString( "^(\\d+)%1(\\d+\\.?\\d*)[%2%3%4]([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+\\.?\\d*)[%2%3%4]([NnSsEeWw])$" ).arg( QChar( 0x00B0 ) ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) ) );
-static QRegExp gPatDMS  = QRegExp( QString( "^(\\d+)%1(\\d+)[%2%3%4](\\d+\\.?\\d*)[%5]([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+)[%2%3%4](\\d+\\.?\\d*)[\"%5]([NnSsEeWw])$" ).arg( QChar( 0x00B0 ) ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) ).arg( QChar( 0x2033 ) ) );
-static QRegExp gPatUTM  = QRegExp( "^([\\d']+\\.?\\d*)[,\\s]\\s*([\\d']+\\.?\\d*)\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
+static QRegExp gPatDD = QRegExp( QString( "^(-?[\\d']+\\.?\\d*)%1?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)%1?$" ).arg( QChar( 0x00B0 ) ) );
+static QRegExp gPatDM = QRegExp( QString( "^(\\d+)%1(\\d+\\.?\\d*)[%2%3%4]([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+\\.?\\d*)[%2%3%4]([NnSsEeWw])$" ).arg( QChar( 0x00B0 ) ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) ) );
+static QRegExp gPatDMS = QRegExp( QString( "^(\\d+)%1(\\d+)[%2%3%4](\\d+\\.?\\d*)[%5]([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+)[%2%3%4](\\d+\\.?\\d*)[\"%5]([NnSsEeWw])$" ).arg( QChar( 0x00B0 ) ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) ).arg( QChar( 0x2033 ) ) );
+static QRegExp gPatUTM = QRegExp( "^([\\d']+\\.?\\d*)[,\\s]\\s*([\\d']+\\.?\\d*)\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
 static QRegExp gPatUTM2 = QRegExp( "^(\\d+)\\s*([A-Za-z])\\s+([\\d']+\\.?\\d*)[,\\s]\\s*([\\d']+\\.?\\d*)$" );
 static QRegExp gPatMGRS = QRegExp( "^(\\d+)\\s*(\\w)\\s*(\\w\\w)\\s*[,:;\\s]?\\s*(\\d{5})\\s*[,:;\\s]?\\s*(\\d{5})$" );
 
@@ -140,7 +140,7 @@ double KadasCoordinateFormat::getHeightAtPos( const QgsPointXY &p, const QgsCoor
 
 QgsPointXY KadasCoordinateFormat::parseCoordinate( const QString &text, Format format, bool &valid ) const
 {
-  valid =  true;
+  valid = true;
   if ( format == Format::Default )
   {
     if ( gPatDflt.exactMatch( text ) )

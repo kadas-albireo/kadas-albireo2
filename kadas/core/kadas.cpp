@@ -78,7 +78,6 @@ static QString resolveResourcePath()
 
 static QByteArray X509_to_PEM( X509 *cert )
 {
-
   BIO *bio = BIO_new( BIO_s_mem() );
   if ( NULL == bio )
   {
@@ -134,7 +133,7 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     return nullptr;
   }
 
-  QString providerType  = layer->providerType();
+  QString providerType = layer->providerType();
   QString layerSource = layer->source();
 
   QgsDataSourceUri uri;
@@ -150,7 +149,7 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
 
     if ( gdalHttpProxy.isEmpty() )
     {
-      QgsDebugMsgLevel( "Querying gdalProxyConfig for " + url.toString() , 2 );
+      QgsDebugMsgLevel( "Querying gdalProxyConfig for " + url.toString(), 2 );
       QList<QNetworkProxy> proxies = QNetworkProxyFactory::systemProxyForQuery( QNetworkProxyQuery( url ) );
       if ( !proxies.isEmpty() && !proxies[0].hostName().isEmpty() )
       {
@@ -159,9 +158,9 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
           gdalProxyUserPwd = QString( "%1:%2" ).arg( proxies[0].user() ).arg( proxies[0].password() );
       }
 
-      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ) , 2 );
-      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ) , 2 );
-      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ) , 2 );
+      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
+      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
+      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
 
       if ( !gdalHttpProxy.isEmpty() )
       {
@@ -238,17 +237,17 @@ void Kadas::importSslCertificates()
 {
   // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
   QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
-  QgsDebugMsgLevel( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ) , 2 );
+  QgsDebugMsgLevel( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ), 2 );
   for ( const QString &certFilename : certDir.entryList( QStringList() << "*.pem", QDir::Files ) )
   {
     QFile certFile( certDir.absoluteFilePath( certFilename ) );
     if ( certFile.open( QIODevice::ReadOnly ) )
     {
-      QgsDebugMsgLevel( QString( "Reading certificate file %1" ).arg( certFile.fileName() ) , 2 );
+      QgsDebugMsgLevel( QString( "Reading certificate file %1" ).arg( certFile.fileName() ), 2 );
       QByteArray pem = certFile.readAll();
       QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
-      QgsDebugMsgLevel( QString( "Adding %1 certificates" ).arg( certs.size() ) , 2 );
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+      QgsDebugMsgLevel( QString( "Adding %1 certificates" ).arg( certs.size() ), 2 );
+#if QT_VERSION >= QT_VERSION_CHECK( 5, 15, 0 )
       QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
 #else
       for ( const QSslCertificate &cert : certs )
@@ -292,9 +291,9 @@ void Kadas::importSslCertificates()
       {
         strcpy( cert_name, "Unknown" );
       }
-      QgsDebugMsgLevel( QString( "Checking system certificate %1" ).arg( cert_name ) , 2 );
+      QgsDebugMsgLevel( QString( "Checking system certificate %1" ).arg( cert_name ), 2 );
 
-      encoded_cert = ( const unsigned char * )pContext->pbCertEncoded;
+      encoded_cert = ( const unsigned char * ) pContext->pbCertEncoded;
       if ( !encoded_cert )
         continue;
 
@@ -332,7 +331,7 @@ void Kadas::importSslCertificates()
             break;
           }
 
-          enhkey_usage = ( CERT_ENHKEY_USAGE * )tmp;
+          enhkey_usage = ( CERT_ENHKEY_USAGE * ) tmp;
           enhkey_usage_size = req_size;
         }
 
@@ -343,7 +342,7 @@ void Kadas::importSslCertificates()
             /* "If GetLastError returns CRYPT_E_NOT_FOUND, the certificate is
                good for all uses. If it returns zero, the certificate has no
                valid uses." */
-            if ( ( HRESULT )GetLastError() != CRYPT_E_NOT_FOUND )
+            if ( ( HRESULT ) GetLastError() != CRYPT_E_NOT_FOUND )
               continue;
           }
           else
@@ -377,7 +376,7 @@ void Kadas::importSslCertificates()
 
       QByteArray pem = X509_to_PEM( x509 );
       QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
-      QgsDebugMsgLevel( QString( "Importing %1 certificates from system certificate %2" ).arg( certs.size() ).arg( cert_name ) , 2 );
+      QgsDebugMsgLevel( QString( "Importing %1 certificates from system certificate %2" ).arg( certs.size() ).arg( cert_name ), 2 );
       QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
       X509_free( x509 );
     }
