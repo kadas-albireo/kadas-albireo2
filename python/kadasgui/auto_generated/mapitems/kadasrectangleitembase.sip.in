@@ -104,7 +104,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
   protected:
     State *state();
-    virtual State *createEmptyState() const;
+    virtual State *createEmptyState() const /Factory/;
 
 
 };

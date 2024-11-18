@@ -83,7 +83,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 
   protected:
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
     bool mPosLocked = false;
 

@@ -71,8 +71,8 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
     void setPosition( const KadasItemPos &pos ) override {}
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasSelectionRectItem( crs() ); } SIP_FACTORY
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSelectionRectItem( crs() ); }
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
     QList<KadasMapItem *> mItems;

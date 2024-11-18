@@ -40,7 +40,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     void render( QgsRenderContext &context ) const override;
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasGpxRouteItem( ); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxRouteItem( ); }
 
     QString mName;
     QString mNumber;

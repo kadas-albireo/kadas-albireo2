@@ -130,8 +130,8 @@ class KadasMilxItem : KadasMapItem
     static bool validateMssString( const QString &mssString, QString &adjustedMssString /Out/, QString &messages /Out/ );
 
   protected:
-    virtual KadasMapItem *_clone() const;
-    virtual KadasMilxItem::State *createEmptyState() const;
+    virtual KadasMapItem *_clone() const /Factory/;
+    virtual KadasMilxItem::State *createEmptyState() const /Factory/;
 
 };
 

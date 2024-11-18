@@ -74,8 +74,8 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasPolygonItem( crs() ); } SIP_FACTORY
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPolygonItem( crs() ); }
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
 

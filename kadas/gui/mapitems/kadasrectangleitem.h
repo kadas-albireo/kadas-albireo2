@@ -68,14 +68,14 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
 
   private:
     enum AttribIds {AttrX, AttrY};
 
-    KadasMapItem *_clone() const override { return new KadasRectangleItem( crs() ); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasRectangleItem( crs() ); }
     QgsMultiPolygon *geometry();
     State *state() { return static_cast<State *>( mState ); }
 };

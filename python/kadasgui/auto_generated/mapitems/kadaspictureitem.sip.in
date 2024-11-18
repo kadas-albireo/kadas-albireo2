@@ -56,8 +56,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 
   protected:
-    virtual KadasMapItem *_clone() const;
-    virtual State *createEmptyState() const;
+    virtual KadasMapItem *_clone() const /Factory/;
+    virtual State *createEmptyState() const /Factory/;
     virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const;
 
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings );

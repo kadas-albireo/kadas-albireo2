@@ -391,7 +391,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
         DrawStatus drawStatus = DrawStatus::Empty;
         virtual void assign( const State *other ) = 0;
-        virtual State *clone() const = 0 SIP_FACTORY;
+        virtual State *clone() const SIP_FACTORY = 0;
         virtual QJsonObject serialize() const = 0;
         virtual bool deserialize( const QJsonObject &json ) = 0;
     };

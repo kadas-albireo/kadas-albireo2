@@ -127,8 +127,8 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     static bool validateMssString( const QString &mssString, QString &adjustedMssString SIP_OUT, QString &messages SIP_OUT );
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
-    KadasMilxItem::State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasMilxItem(); }
+    KadasMilxItem::State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
     friend class KadasMilxLayer;
