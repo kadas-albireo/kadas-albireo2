@@ -27,7 +27,7 @@
 class QProgressDialog;
 class QgsRasterLayer;
 
-class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
+class KADAS_ANALYSIS_EXPORT KadasNineCellFilter SIP_ABSTRACT
 {
   public:
     /**Constructor that takes input file, output file and output format (GDAL string)*/

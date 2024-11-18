@@ -12,7 +12,7 @@
 
 
 
-class KadasNineCellFilter
+class KadasNineCellFilter /Abstract/
 {
 %Docstring(signature="appended")
 *************************************************************************
