@@ -65,23 +65,28 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      KadasItemPos pos;
-      double angle;
-      QSize size;
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        KadasItemPos pos;
+        double angle;
+        QSize size;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    enum AttribIds {AttrX, AttrY, AttrA} SIP_SKIP;
+    enum AttribIds SIP_SKIP
+    {
+      AttrX,
+      AttrY,
+      AttrA
+    };
     double mAnchorX = 0.5;
     double mAnchorY = 0.5;
 
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
     QList<KadasMapPos> rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const;
 
     static void rotateNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize ) SIP_SKIP;
