@@ -94,8 +94,9 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
       while ( walkDist < dist )
       {
         QPointF dir( ( p2.x() - p1.x() ) / dist, ( p2.y() - p1.y() ) / dist );
-        double angle = std::atan2( dir.y(), dir.x() )  / M_PI * 180.;
-        while ( angle < 0 ) angle += 360.;
+        double angle = std::atan2( dir.y(), dir.x() ) / M_PI * 180.;
+        while ( angle < 0 )
+          angle += 360.;
         QPointF nor( dir.y(), -dir.x() );
         if ( angle > 90 && angle < 270 )
         {

@@ -83,7 +83,8 @@ int KadasFloatingInputWidget::addInputField( const QString &label, KadasFloating
 {
   QGridLayout *gridLayout = static_cast<QGridLayout *>( layout() );
   int row = gridLayout->isEmpty() ? 0 : gridLayout->rowCount();
-  gridLayout->addWidget( new QLabel( label ), row, 0, 1, 1 );;
+  gridLayout->addWidget( new QLabel( label ), row, 0, 1, 1 );
+  ;
   gridLayout->addWidget( widget, row, 1, 1, 1 );
   gridLayout->addWidget( new QLabel( suffix ), row, 2, 1, 1 );
   mInputFields.insert( widget->id(), widget );

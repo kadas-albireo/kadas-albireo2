@@ -117,7 +117,7 @@ void KadasLineItem::setPosition( const KadasItemPos &pos )
   }
   if ( mGeometry )
   {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
   }
   update();
 }
@@ -129,7 +129,7 @@ QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings )
   {
     for ( const KadasItemPos &pos : part )
     {
-      nodes.append( {toMapPos( pos, settings )} );
+      nodes.append( { toMapPos( pos, settings ) } );
     }
   }
   return nodes;
@@ -166,7 +166,7 @@ bool KadasLineItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // If current point is same as last one, drop last point and end geometry
   int n = state()->points.last().size();
-  if ( n > 2 && state()->points.last() [n - 1] == state()->points.last() [n - 2] )
+  if ( n > 2 && state()->points.last()[n - 1] == state()->points.last()[n - 2] )
   {
     state()->points.last().removeLast();
     recomputeDerived();
@@ -186,8 +186,8 @@ void KadasLineItem::endPart()
 KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 
@@ -259,11 +259,11 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
 {
   if ( context.vidx.vertex == 0 )
   {
-    menu->addAction( tr( "Continue line" ), menu, [this, context]
-    {
-      std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
-      recomputeDerived();
-    } )->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
+    menu->addAction( tr( "Continue line" ), menu, [this, context] {
+          std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
+          recomputeDerived();
+        } )
+      ->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
   }
   else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
   {
@@ -271,8 +271,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   if ( context.vidx.vertex >= 0 )
   {
-    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context]
-    {
+    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context] {
       state()->points[context.vidx.part].removeAt( context.vidx.vertex );
       recomputeDerived();
     } );
@@ -280,8 +279,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [ = ]
-    {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );
@@ -428,7 +426,7 @@ double KadasLineItem::computeSegmentAzimut( const KadasItemPos &p1, const KadasI
   {
     angle = std::atan2( p2.x() - p1.x(), p2.y() - p1.y() );
   }
-  angle = qRound( angle *  1000 ) / 1000.;
+  angle = qRound( angle * 1000 ) / 1000.;
   angle = angle < 0 ? angle + 2 * M_PI : angle;
   angle = angle >= 2 * M_PI ? angle - 2 * M_PI : angle;
   return angle;
@@ -463,7 +461,7 @@ void KadasLineItem::recomputeDerived()
         {
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
           double dist = line.Distance();
-          int nIntervals = std::max( 1, int ( std::ceil( dist / sdist ) ) );
+          int nIntervals = std::max( 1, int( std::ceil( dist / sdist ) ) );
           for ( int j = 0; j < nIntervals; ++j )
           {
             double lat, lon;

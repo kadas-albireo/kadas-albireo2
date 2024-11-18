@@ -63,7 +63,6 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
     void itemPicked( const KadasFeaturePicker::PickResult &result );
 
   protected:
-
     //! Flag to indicate whether interaction with map items is allowed
     bool mAllowItemInteraction;
 
@@ -85,7 +84,6 @@ class KADAS_GUI_EXPORT KadasMapToolPan : public QgsMapTool
     KadasMapItemTooltip *mTooltipWidget = nullptr;
 
     void pinchTriggered( QPinchGesture *gesture );
-
 };
 
 #endif // KADASMAPTOOLPAN_H

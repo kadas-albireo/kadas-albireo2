@@ -31,7 +31,6 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
   layout()->setMargin( 0 );
   if ( type == KadasMapItemEditor::EditorType::CreateItemEditor )
   {
-
     layout()->addWidget( new QLabel( tr( "Symbol:" ) ) );
 
     mSymbolButton = new QToolButton();

@@ -29,7 +29,8 @@
 QJsonObject KadasCoordinateCrossItem::State::serialize() const
 {
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );;
+  json["status"] = static_cast<int>( drawStatus );
+  ;
   json["x"] = pos.x();
   json["y"] = pos.y();
   return json;
@@ -57,12 +58,12 @@ KadasItemRect KadasCoordinateCrossItem::boundingBox() const
 
 KadasMapItem::Margin KadasCoordinateCrossItem::margin() const
 {
-  return {sCrossSize, sCrossSize, sCrossSize, sCrossSize};
+  return { sCrossSize, sCrossSize, sCrossSize, sCrossSize };
 }
 
 QList<KadasMapItem::Node> KadasCoordinateCrossItem::nodes( const QgsMapSettings &settings ) const
 {
-  return {{toMapPos( constState()->pos, settings )}};
+  return { { toMapPos( constState()->pos, settings ) } };
 }
 
 bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
@@ -95,16 +96,12 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
   }
   else
   {
-    QgsLineString hLine( QVector<QgsPointXY>
-    {
+    QgsLineString hLine( QVector<QgsPointXY> {
       QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ),
-      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() )
-    } );
-    QgsLineString vLine( QVector<QgsPointXY>
-    {
+      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() ) } );
+    QgsLineString vLine( QVector<QgsPointXY> {
       QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ),
-      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize )
-    } );
+      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize ) } );
 
     result = geomEngine->intersects( &hLine ) || geomEngine->intersects( &vLine );
   }
@@ -127,15 +124,13 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
 
   struct LabelData
   {
-    double x, y;
-    double mapCoord;
-    double angle;
+      double x, y;
+      double mapCoord;
+      double angle;
   };
-  QList<LabelData> labels =
-  {
-    {screenPos.x() - crossSize, screenPos.y() - 12, constState()->pos.y(), 0},
-    {screenPos.x() - 12, screenPos.y() + crossSize, constState()->pos.x(), -90}
-  };
+  QList<LabelData> labels = {
+    { screenPos.x() - crossSize, screenPos.y() - 12, constState()->pos.y(), 0 },
+    { screenPos.x() - 12, screenPos.y() + crossSize, constState()->pos.x(), -90 } };
 
   QFont font = context.painter()->font();
   font.setPixelSize( sFontSize * outputDpiScale( context ) );
@@ -211,8 +206,8 @@ void KadasCoordinateCrossItem::endPart()
 KadasMapItem::AttribDefs KadasCoordinateCrossItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 

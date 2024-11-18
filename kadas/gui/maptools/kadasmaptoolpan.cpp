@@ -144,8 +144,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
         QgsRectangle oe = mCanvas->mapSettings().extent();
         QgsRectangle e(
           c.x() - oe.width() / 2.0, c.y() - oe.height() / 2.0,
-          c.x() + oe.width() / 2.0, c.y() + oe.height() / 2.0
-        );
+          c.x() + oe.width() / 2.0, c.y() + oe.height() / 2.0 );
         e.scale( scaleFactor, &c );
         mCanvas->setExtent( e, true );
         mCanvas->refresh();
@@ -193,7 +192,7 @@ void KadasMapToolPan::pinchTriggered( QPinchGesture *gesture )
   if ( gesture->state() == Qt::GestureFinished )
   {
     //a very small totalScaleFactor indicates a two finger tap (pinch gesture without pinching)
-    if ( 0.98 < gesture->totalScaleFactor()  && gesture->totalScaleFactor() < 1.02 )
+    if ( 0.98 < gesture->totalScaleFactor() && gesture->totalScaleFactor() < 1.02 )
     {
       mCanvas->zoomOut();
     }
@@ -203,7 +202,7 @@ void KadasMapToolPan::pinchTriggered( QPinchGesture *gesture )
       QPoint pos = gesture->centerPoint().toPoint();
       pos = mCanvas->mapFromGlobal( pos );
       // transform the mouse pos to map coordinates
-      QgsPointXY center  = mCanvas->getCoordinateTransform()->toMapCoordinates( pos.x(), pos.y() );
+      QgsPointXY center = mCanvas->getCoordinateTransform()->toMapCoordinates( pos.x(), pos.y() );
       QgsRectangle r = mCanvas->extent();
       r.scale( 1 / gesture->totalScaleFactor(), &center );
       mCanvas->setExtent( r );

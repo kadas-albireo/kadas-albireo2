@@ -28,7 +28,7 @@
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
-KadasMapItem* KadasMapToolDeleteItemsInterface::createItem() const
+KadasMapItem *KadasMapToolDeleteItemsInterface::createItem() const
 {
   KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
   item->setFill( Qt::NoBrush );
@@ -142,4 +142,3 @@ void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
     }
   }
 }
-

@@ -52,7 +52,7 @@ void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsL
   escapedSearchText.replace( "'", "\\'" );
 
   const QVector<QgsVectorLayer *> layers = QgsProject::instance()->layers<QgsVectorLayer *>();
-  for ( QgsVectorLayer *layer :  layers )
+  for ( QgsVectorLayer *layer : layers )
   {
     if ( !mMapCanvas->layers().contains( layer ) )
       continue;
@@ -141,10 +141,9 @@ void KadasLocalDataSearchFilter::buildResult( const QgsFeature &feature, QgsVect
   QgsLocatorResult result;
   result.displayString = tr( "%1 (feature %2)" ).arg( matchText ).arg( feature.id() );
   result.setUserData( QVariantMap(
-  {
-    {QStringLiteral( "feature_id" ), feature.id()},
-    {QStringLiteral( "layer_id" ), layer->id() },
-  } ) );
+    {
+      { QStringLiteral( "feature_id" ), feature.id() },
+      { QStringLiteral( "layer_id" ), layer->id() },
+    } ) );
   emit resultFetched( result );
 }
-

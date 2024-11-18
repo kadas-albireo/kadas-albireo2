@@ -74,7 +74,6 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
   mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 
   update();
-
 }
 
 void KadasSymbolItem::setFilePath( const QString &path )
@@ -124,7 +123,7 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   context.painter()->translate( pos.x(), pos.y() );
   context.painter()->rotate( -constState()->angle );
   context.painter()->scale( mSymbolScale * dpiScale, mSymbolScale * dpiScale );
-  context.painter()->translate( - mAnchorX * constState()->size.width(), - mAnchorY * constState()->size.height() );
+  context.painter()->translate( -mAnchorX * constState()->size.width(), -mAnchorY * constState()->size.height() );
   if ( mScalable )
   {
     svg2svgt::Logger logger;
@@ -140,7 +139,6 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
     }
     QSize renderSize = constState()->size;
     svgRenderer.render( context.painter(), QRectF( 0, 0, renderSize.width(), renderSize.height() ) );
-
   }
   else
   {
@@ -264,11 +262,11 @@ void KadasPinItem::updateTooltip()
     posStr = QString( "%1 (%2)" ).arg( QgsPointXY( position() ).toString() ).arg( crs().authid() );
   }
   QString toolTipText = tr( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
-                        .arg( posStr )
-                        .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
-                        .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? "ft" : "m" )
-                        .arg( name() )
-                        .arg( remarks() );
+                          .arg( posStr )
+                          .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
+                          .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? "ft" : "m" )
+                          .arg( name() )
+                          .arg( remarks() );
   blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
   setTooltip( toolTipText );
   blockSignals( false );

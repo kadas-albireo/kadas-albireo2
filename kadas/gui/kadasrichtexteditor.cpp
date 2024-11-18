@@ -365,8 +365,8 @@ void KadasAddImageDialog::accept()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasColorAction::KadasColorAction( QObject *parent ):
-  QAction( parent )
+KadasColorAction::KadasColorAction( QObject *parent )
+  : QAction( parent )
 {
   setText( tr( "Text Color" ) );
   setColor( Qt::black );
@@ -399,13 +399,8 @@ void KadasColorAction::chooseColor()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent ) :
-  QToolBar( parent ),
-  m_link_action( new QAction( this ) ),
-  m_image_action( new QAction( this ) ),
-  m_color_action( new KadasColorAction( this ) ),
-  m_font_size_input( new QComboBox ),
-  m_editor( editor )
+KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent )
+  : QToolBar( parent ), m_link_action( new QAction( this ) ), m_image_action( new QAction( this ) ), m_color_action( new KadasColorAction( this ) ), m_font_size_input( new QComboBox ), m_editor( editor )
 {
   // Font size combo box
   m_font_size_input->setEditable( false );
@@ -527,8 +522,7 @@ void KadasRichTextEditorToolBar::sizeInputActivated( const QString &size )
 
 void KadasRichTextEditorToolBar::setVAlignSuper( bool super )
 {
-  const QTextCharFormat::VerticalAlignment align = super ?
-      QTextCharFormat::AlignSuperScript : QTextCharFormat::AlignNormal;
+  const QTextCharFormat::VerticalAlignment align = super ? QTextCharFormat::AlignSuperScript : QTextCharFormat::AlignNormal;
 
   QTextCharFormat charFormat = m_editor->currentCharFormat();
   charFormat.setVerticalAlignment( align );
@@ -539,8 +533,7 @@ void KadasRichTextEditorToolBar::setVAlignSuper( bool super )
 
 void KadasRichTextEditorToolBar::setVAlignSub( bool sub )
 {
-  const QTextCharFormat::VerticalAlignment align = sub ?
-      QTextCharFormat::AlignSubScript : QTextCharFormat::AlignNormal;
+  const QTextCharFormat::VerticalAlignment align = sub ? QTextCharFormat::AlignSubScript : QTextCharFormat::AlignNormal;
 
   QTextCharFormat charFormat = m_editor->currentCharFormat();
   charFormat.setVerticalAlignment( align );
@@ -573,8 +566,7 @@ void KadasRichTextEditorToolBar::updateActions()
   const QTextCursor cursor = m_editor->textCursor();
   const QTextCharFormat charFormat = cursor.charFormat();
   const QFont font = charFormat.font();
-  const QTextCharFormat::VerticalAlignment valign =
-    charFormat.verticalAlignment();
+  const QTextCharFormat::VerticalAlignment valign = charFormat.verticalAlignment();
   const bool superScript = valign == QTextCharFormat::AlignSuperScript;
   const bool subScript = valign == QTextCharFormat::AlignSubScript;
 

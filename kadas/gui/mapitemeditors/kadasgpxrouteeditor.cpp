@@ -32,7 +32,7 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( QgsSettings().value( "/gpx/route_size", 2 ).toInt() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::saveSize );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
@@ -102,7 +102,7 @@ KadasGpxRouteEditor::~KadasGpxRouteEditor()
 
 void KadasGpxRouteEditor::toggleItemMeasurements( bool enabled )
 {
-  KadasGpxRouteItem *routeItem = qobject_cast<KadasGpxRouteItem *> ( mItem );
+  KadasGpxRouteItem *routeItem = qobject_cast<KadasGpxRouteItem *>( mItem );
   if ( !routeItem )
   {
     return;
@@ -112,7 +112,7 @@ void KadasGpxRouteEditor::toggleItemMeasurements( bool enabled )
 
 void KadasGpxRouteEditor::saveColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *> ( QObject::sender() );
+  QgsColorButton *btn = qobject_cast<QgsColorButton *>( QObject::sender() );
   QgsSettings().setValue( "/gpx/route_color", QgsSymbolLayerUtils::encodeColor( btn->color() ) );
   emit styleChanged();
 }

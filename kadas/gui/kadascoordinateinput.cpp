@@ -48,7 +48,7 @@ KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
   mCrsCombo->setItemData( mCrsCombo->count() - 1, QVariant::fromValue( KadasCoordinateFormat::Format::DegMinSec ), sFormatRole );
   mCrsCombo->setItemData( mCrsCombo->count() - 1, "EPSG:4326", sAuthidRole );
   mCrsCombo->addItem( "DM" );
-  mCrsCombo->setItemData( mCrsCombo->count() - 1, QVariant::fromValue( KadasCoordinateFormat::Format::DegMin), sFormatRole );
+  mCrsCombo->setItemData( mCrsCombo->count() - 1, QVariant::fromValue( KadasCoordinateFormat::Format::DegMin ), sFormatRole );
   mCrsCombo->setItemData( mCrsCombo->count() - 1, "EPSG:4326", sAuthidRole );
   mCrsCombo->addItem( "DD" );
   mCrsCombo->setItemData( mCrsCombo->count() - 1, QVariant::fromValue( KadasCoordinateFormat::Format::Default ), sFormatRole );

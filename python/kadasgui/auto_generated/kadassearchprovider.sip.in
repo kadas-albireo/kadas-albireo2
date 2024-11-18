@@ -32,25 +32,24 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     struct SearchResult
     {
-      QString category;
-      int categoryPrecedence;
-      QString text;
-      QgsPointXY pos;
-      QgsRectangle bbox;
-      QString crs;
-      double zoomScale;
-      bool showPin;
-      bool fuzzy;
-      QString geometry;
+        QString category;
+        int categoryPrecedence;
+        QString text;
+        QgsPointXY pos;
+        QgsRectangle bbox;
+        QString crs;
+        double zoomScale;
+        bool showPin;
+        bool fuzzy;
+        QString geometry;
     };
     struct SearchRegion
     {
-      QgsPolylineXY polygon;
-      QString crs;
+        QgsPolylineXY polygon;
+        QString crs;
     };
 
     KadasSearchProvider( QgsMapCanvas *mapCanvas );
-    virtual ~KadasSearchProvider();
     virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) = 0;
     virtual void cancelSearch();
 

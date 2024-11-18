@@ -32,17 +32,18 @@ class KadasPointItem;
 class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem *createItem() const override;
+
   private:
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
 };
 
 class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
-
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );
 
     void canvasPressEvent( QgsMapMouseEvent *e ) override;

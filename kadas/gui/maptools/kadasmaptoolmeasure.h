@@ -38,10 +38,14 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
 {
     Q_OBJECT
   public:
-    enum class AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
+    enum class AzimuthNorth
+    {
+      AzimuthMapNorth,
+      AzimuthGeoNorth
+    };
     Q_ENUM( AzimuthNorth )
 
-    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>(QStringLiteral("last-azimuth-north"), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
+    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>( QStringLiteral( "last-azimuth-north" ), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
 
 
     KadasMeasureWidget( KadasMapItem *item );
@@ -75,7 +79,12 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
 {
     Q_OBJECT
   public:
-    enum class MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
+    enum class MeasureMode
+    {
+      MeasureLine,
+      MeasurePolygon,
+      MeasureCircle
+    };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
 
     void activate() override;
@@ -95,11 +104,13 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
 class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode ) : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
+    KadasMapItem *createItem() const override;
+
   private:
     KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
     KadasMapToolMeasure::MeasureMode mMeasureMode = KadasMapToolMeasure::MeasureMode::MeasureLine;
 };
 

@@ -34,7 +34,7 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
 
   public:
     static inline const QString GPX_ROUTE = QStringLiteral( "KadasGpxRouteEditor" );
-    static inline const QString SYMBOL_ATTRIBUTES =  QStringLiteral( "KadasSymbolAttributesEditor" );
+    static inline const QString SYMBOL_ATTRIBUTES = QStringLiteral( "KadasSymbolAttributesEditor" );
     static inline const QString GPX_WAYPOINT = QStringLiteral( "KadasGpxWaypointEditor" );
     static inline const QString REDLINING_ITEM = QStringLiteral( "KadasRedliningItemEditor" );
     static inline const QString REDLINING_TEXT = QStringLiteral( "KadasRedliningTextEditor" );
@@ -46,13 +46,14 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
       EditItemEditor
     };
 
-    KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr ) : QWidget( parent ), mItem( item ) {}
+    KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr )
+      : QWidget( parent ), mItem( item ) {}
 
     virtual void setItem( KadasMapItem *item ) { mItem = item; }
 
     // TODO: SIP
 #ifndef SIP_RUN
-    typedef std::function<KadasMapItemEditor*( KadasMapItem *, EditorType ) > Factory;
+    typedef std::function<KadasMapItemEditor *( KadasMapItem *, EditorType )> Factory;
     typedef QMap<QString, Factory> Registry;
     static Registry *registry();
 #endif

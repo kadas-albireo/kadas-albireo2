@@ -90,7 +90,7 @@ void KadasCrsSelection::setMapCrs()
   {
     return;
   }
-  QAction *action = qobject_cast<QAction *> ( QObject::sender() );
+  QAction *action = qobject_cast<QAction *>( QObject::sender() );
   QgsCoordinateReferenceSystem crs( action->data().toString() );
   mMapCanvas->setDestinationCrs( crs );
   setText( crs.description() );

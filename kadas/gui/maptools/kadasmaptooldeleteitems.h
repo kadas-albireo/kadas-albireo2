@@ -24,10 +24,12 @@
 class KADAS_GUI_EXPORT KadasMapToolDeleteItemsInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem *createItem() const override;
+
   private:
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
 };
 
 

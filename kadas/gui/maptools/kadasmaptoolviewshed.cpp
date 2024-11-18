@@ -102,7 +102,7 @@ KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
   spinRadius->setValue( radius );
   spinRadius->setSuffix( " m" );
   spinRadius->setKeyboardTracking( false );
-  connect( spinRadius, qOverload<double> ( &QDoubleSpinBox::valueChanged ), this, &KadasViewshedDialog::radiusChanged );
+  connect( spinRadius, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasViewshedDialog::radiusChanged );
   heightDialogLayout->addWidget( spinRadius, 3, 1, 1, 2 );
 
   heightDialogLayout->addWidget( new QLabel( tr( "Accuracy:" ) ), 4, 0, 1, 1 );
@@ -182,7 +182,7 @@ void KadasViewshedDialog::adjustMinAngle()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasMapItem* KadasMapToolViewshedItemInterface::createItem() const
+KadasMapItem *KadasMapToolViewshedItemInterface::createItem() const
 {
   KadasCircularSectorItem *item = new KadasCircularSectorItem( mCanvas->mapSettings().destinationCrs() );
   return item;
@@ -265,10 +265,8 @@ void KadasMapToolViewshed::drawFinished()
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
     QgsPalettedRasterRenderer *renderer = new QgsPalettedRasterRenderer( 0, 1,
-    {
-      QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ),
-      QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) )
-    } );
+                                                                         { QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ),
+                                                                           QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) ) } );
     layer->setRenderer( renderer );
     layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
@@ -280,19 +278,18 @@ void KadasMapToolViewshed::drawFinished()
 
     pin->setTooltip(
       tr( "<b>Observer position</b>: %1<br />" )
-      .arg( KadasCoordinateFormat::instance()->getDisplayString( pin->position(), pin->crs() ) ) +
-      tr( "<b>Observer height</b>: %1 %2 %3<br />" )
-      .arg( viewshedDialog.observerHeight() )
-      .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-      .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) +
-      tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" )
-      .arg( viewshedDialog.observerMinVertAngle() )
-      .arg( viewshedDialog.observerMaxVertAngle() ) +
-      tr( "<b>Target height</b>: %1 %2 %3" )
-      .arg( viewshedDialog.targetHeight() )
-      .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-      .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
-    );
+        .arg( KadasCoordinateFormat::instance()->getDisplayString( pin->position(), pin->crs() ) )
+      + tr( "<b>Observer height</b>: %1 %2 %3<br />" )
+          .arg( viewshedDialog.observerHeight() )
+          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+          .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+      + tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" )
+          .arg( viewshedDialog.observerMinVertAngle() )
+          .arg( viewshedDialog.observerMaxVertAngle() )
+      + tr( "<b>Target height</b>: %1 %2 %3" )
+          .arg( viewshedDialog.targetHeight() )
+          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+          .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) );
     KadasMapCanvasItemManager::addItem( pin );
   }
   else if ( !errMsg.isEmpty() )

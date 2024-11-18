@@ -75,7 +75,6 @@ class KADAS_GUI_EXPORT KadasFloatingInputWidget : public QWidget
     QgsMapCanvas *mCanvas;
     KadasFloatingInputWidgetField *mFocusedInput;
     QMap<int, KadasFloatingInputWidgetField *> mInputFields;
-
 };
 
 #endif // KADASFLOATINGINPUTWIDGET_H

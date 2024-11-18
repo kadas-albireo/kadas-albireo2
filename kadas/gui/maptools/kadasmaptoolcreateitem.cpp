@@ -47,13 +47,11 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapIt
 {}
 
 
-
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer )
   : QgsMapTool( canvas )
   , mItem( item )
   , mLayer( layer )
 {
-
 }
 
 KadasMapToolCreateItem::~KadasMapToolCreateItem()
@@ -71,7 +69,7 @@ void KadasMapToolCreateItem::activate()
   setupNumericInputWidget();
   mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
   mBottomBar = new KadasBottomBar( mCanvas );
-  QHBoxLayout* layout = new QHBoxLayout( mCanvas );
+  QHBoxLayout *layout = new QHBoxLayout( mCanvas );
   layout->setContentsMargins( 8, 4, 8, 4 );
   if ( !mToolLabel.isEmpty() )
   {
@@ -199,7 +197,6 @@ void KadasMapToolCreateItem::canvasPressEvent( QgsMapMouseEvent *e )
       canvas()->unsetMapTool( this );
     }
   }
-
 }
 
 void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )

@@ -59,7 +59,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   QDomDocument doc;
   if ( !doc.setContent( &file ) )
   {
-    QgsDebugMsgLevel( "Failed to parse project" , 2 );
+    QgsDebugMsgLevel( "Failed to parse project", 2 );
     return fileName;
   }
   QString basedir = QFileInfo( fileName ).path();
@@ -84,7 +84,7 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   QDomElement root = doc.documentElement();
   if ( root.tagName() != "qgis" )
   {
-    QgsDebugMsgLevel( "Invalid project (incorrect root tag name)" , 2 );
+    QgsDebugMsgLevel( "Invalid project (incorrect root tag name)", 2 );
     return false;
   }
 
@@ -319,7 +319,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
   QDomNodeList svgItems = root.elementsByTagName( "SVGAnnotationItem" );
   if ( !svgItems.isEmpty() )
   {
-
     QMap<QString, QDomElement> newMapLayerEls;
     for ( int i = 0, n = svgItems.size(); i < n; ++i )
     {
@@ -372,7 +371,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
   QDomNodeList imageItems = root.elementsByTagName( "GeoImageAnnotationItem" );
   if ( !imageItems.isEmpty() )
   {
-
     QMap<QString, QDomElement> newMapLayerEls;
     for ( int i = 0, n = imageItems.size(); i < n; ++i )
     {
@@ -423,7 +421,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
   QDomNodeList pinItems = root.elementsByTagName( "PinAnnotationItem" );
   if ( !pinItems.isEmpty() )
   {
-
     QMap<QString, QDomElement> newMapLayerEls;
     for ( int i = 0, n = pinItems.size(); i < n; ++i )
     {

@@ -127,13 +127,13 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     QgsLocatorResult result;
     result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
     result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 0;
-    result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
+    result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
 
     QVariantMap resultData;
     if ( mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
     {
       resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                             mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+                                                           mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
     }
     // When bbox is empty, fallback to pos + zoomScale is used
     resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
@@ -165,8 +165,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   QgsPointXY itemPos = QgsCoordinateTransform(
                          QgsCoordinateReferenceSystem::fromOgcWmsCrs( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-                       ).transform( pos );
+                         QgsProject::instance() )
+                         .transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
@@ -189,19 +189,19 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast< QgsPoint * >( geometry.get() );
+          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
           item = new QgsAnnotationMarkerItem( *pt );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast< QgsCurve * >( geometry.get() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
           item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast< QgsCurvePolygon * >( geometry.get() );
+          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
           item = new QgsAnnotationPolygonItem( poly );
           break;
         }
