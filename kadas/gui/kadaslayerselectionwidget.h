@@ -35,9 +35,10 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
   public:
 #ifndef SIP_RUN
     typedef std::function<bool( QgsMapLayer * )> LayerFilter;
-    typedef std::function<QgsMapLayer*( const QString & )> LayerCreator;
+    typedef std::function<QgsMapLayer *( const QString & )> LayerCreator;
 
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, LayerFilter filter = nullptr, LayerCreator creator = nullptr, QWidget *parent = nullptr );
+    // clang-format off
 #else
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator, QWidget *parent = nullptr )[( QgsMapCanvas *, QgsLayerTreeView *, LayerFilter, LayerCreator, QWidget * )];
     % MethodCode
@@ -93,7 +94,10 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
 
     % End
 #endif
-    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = nullptr ) : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent ) {}
+    // clang-format on
+
+    KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = nullptr )
+      : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent ) {}
     void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
@@ -105,7 +109,6 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     void selectedLayerChanged( QgsMapLayer *layer );
 
   private:
-
     QgsMapCanvas *mCanvas = nullptr;
     QgsLayerTreeView *mLayerTreeView = nullptr;
     QLabel *mLabel = nullptr;
