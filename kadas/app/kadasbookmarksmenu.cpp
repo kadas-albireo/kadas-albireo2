@@ -93,9 +93,9 @@ void KadasBookmarksMenu::addBookmark()
   bool replaceExisting = false;
   Bookmark *bookmark = nullptr;
 
-  for ( QList<Bookmark*>::iterator it = mBookmarks.begin(); it != mBookmarks.end(); it++ )
+  for ( QList<Bookmark *>::iterator it = mBookmarks.begin(); it != mBookmarks.end(); it++ )
   {
-    if ( (*it)->name == name )
+    if ( ( *it )->name == name )
     {
       int res = QMessageBox::question( kApp->mainWindow(), tr( "Replace Bookmark" ),
                                        tr( "Are you sure you want to replace the existing bookmark “%1”?" ).arg( name ),
@@ -115,7 +115,7 @@ void KadasBookmarksMenu::addBookmark()
   }
 
   QgsLayerTreeGroup *root = QgsProject::instance()->layerTreeRoot();
-  QgsLayerTreeModel *model =  kApp->mainWindow()->layerTreeView()->layerTreeModel();
+  QgsLayerTreeModel *model = kApp->mainWindow()->layerTreeView()->layerTreeModel();
   QgsMapThemeCollection::MapThemeRecord record = QgsMapThemeCollection::createThemeFromCurrentState( root, model );
   QgsProject::instance()->mapThemeCollection()->insert( name, record );
 
@@ -132,7 +132,7 @@ void KadasBookmarksMenu::addBookmark()
 void KadasBookmarksMenu::replaceBookmark( Bookmark *bookmark )
 {
   QgsLayerTreeGroup *root = QgsProject::instance()->layerTreeRoot();
-  QgsLayerTreeModel *model =  kApp->mainWindow()->layerTreeView()->layerTreeModel();
+  QgsLayerTreeModel *model = kApp->mainWindow()->layerTreeView()->layerTreeModel();
   QgsMapThemeCollection::MapThemeRecord record = QgsMapThemeCollection::createThemeFromCurrentState( root, model );
   QgsProject::instance()->mapThemeCollection()->insert( bookmark->name, record );
 
@@ -198,7 +198,7 @@ void KadasBookmarksMenu::restoreBookmark( Bookmark *bookmark )
 
     // now create the map theme and delete old state
     QgsLayerTreeGroup *root = QgsProject::instance()->layerTreeRoot();
-    QgsLayerTreeModel *model =  kApp->mainWindow()->layerTreeView()->layerTreeModel();
+    QgsLayerTreeModel *model = kApp->mainWindow()->layerTreeView()->layerTreeModel();
     QgsMapThemeCollection::MapThemeRecord record = QgsMapThemeCollection::createThemeFromCurrentState( root, model );
     QgsProject::instance()->mapThemeCollection()->insert( bookmark->name, record );
 
@@ -234,10 +234,10 @@ void KadasBookmarksMenu::saveToProject( QDomDocument &doc )
     bookmarkEl.setAttribute( "crs", bookmark->crs );
     bookmarkEl.setAttribute( "extent",
                              QString( "%1;%2;%3;%4" )
-                             .arg( bookmark->extent.xMinimum(), 0, 'f', 4 )
-                             .arg( bookmark->extent.yMinimum(), 0, 'f', 4 )
-                             .arg( bookmark->extent.xMaximum(), 0, 'f', 4 )
-                             .arg( bookmark->extent.yMaximum(), 0, 'f', 4 ) );
+                               .arg( bookmark->extent.xMinimum(), 0, 'f', 4 )
+                               .arg( bookmark->extent.yMinimum(), 0, 'f', 4 )
+                               .arg( bookmark->extent.xMaximum(), 0, 'f', 4 )
+                               .arg( bookmark->extent.yMaximum(), 0, 'f', 4 ) );
     bookmarksEl.appendChild( bookmarkEl );
   }
   root.appendChild( bookmarksEl );

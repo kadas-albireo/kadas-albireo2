@@ -17,7 +17,7 @@
 #include "kadashillshadefilter.h"
 
 KadasHillshadeFilter::KadasHillshadeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, double lightAzimuth,
-    double lightAngle, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
+                                            double lightAngle, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
   : KadasNineCellFilter( layer, outputFile, outputFormat, filterRegion, filterRegionCrs )
   , mLightAzimuth( lightAzimuth )
   , mLightAngle( lightAngle )
@@ -26,8 +26,8 @@ KadasHillshadeFilter::KadasHillshadeFilter( const QgsRasterLayer *layer, const Q
 
 
 float KadasHillshadeFilter::processNineCellWindow( float *x11, float *x21, float *x31,
-    float *x12, float *x22, float *x32,
-    float *x13, float *x23, float *x33 )
+                                                   float *x12, float *x22, float *x32,
+                                                   float *x13, float *x23, float *x33 )
 {
   float derX = calcFirstDerX( x11, x21, x31, x12, x22, x32, x13, x23, x33 );
   float derY = calcFirstDerY( x11, x21, x31, x12, x22, x32, x13, x23, x33 );
@@ -41,7 +41,7 @@ float KadasHillshadeFilter::processNineCellWindow( float *x11, float *x21, float
   float slope_rad = atan( sqrt( derX * derX + derY * derY ) );
   float azimuth_rad = mLightAzimuth * M_PI / 180.0;
   float aspect_rad = 0;
-  if ( derX == 0 && derY == 0 )   //aspect undefined, take a neutral value. Better solutions?
+  if ( derX == 0 && derY == 0 ) //aspect undefined, take a neutral value. Better solutions?
   {
     aspect_rad = azimuth_rad / 2.0;
   }

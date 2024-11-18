@@ -57,9 +57,8 @@ class KadasApplication : public QgsApplication
     Q_OBJECT
 
   public:
-
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
-    static const QgsSettingsEntryString * settingsPortalTokenUrl;
+    static const QgsSettingsEntryString *settingsPortalTokenUrl;
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
@@ -75,8 +74,8 @@ class KadasApplication : public QgsApplication
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
-    void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType, bool quiet = false )  const;
-    void addRasterLayers( const QStringList &layerUris, bool quiet = false )  const;
+    void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType, bool quiet = false ) const;
+    void addRasterLayers( const QStringList &layerUris, bool quiet = false ) const;
     QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
@@ -132,10 +131,10 @@ class KadasApplication : public QgsApplication
   private:
     struct DataSourceMigrations
     {
-      QMap<QString, QString> files;
-      QMap<QString, QMap<QString, QPair<QString, QString>>> wms;
-      QMap<QString, QString> ams;
-      QList<QPair<QString, QString>> strings;
+        QMap<QString, QString> files;
+        QMap<QString, QMap<QString, QPair<QString, QString>>> wms;
+        QMap<QString, QString> ams;
+        QList<QPair<QString, QString>> strings;
     };
 
     KadasPluginInterface *mPythonInterface = nullptr;

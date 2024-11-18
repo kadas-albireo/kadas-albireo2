@@ -23,7 +23,7 @@
 #include "kadas/analysis/kadasninecellfilter.h"
 
 
-class KADAS_ANALYSIS_EXPORT KadasSlopeFilter: public KadasNineCellFilter
+class KADAS_ANALYSIS_EXPORT KadasSlopeFilter : public KadasNineCellFilter
 {
   public:
     KadasSlopeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );

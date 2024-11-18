@@ -32,9 +32,7 @@ class KadasHelpViewer : public QObject
     void showHelp() const;
 
   private:
-
     KadasFileServer mHelpFileServer;
-
 };
 
 #endif // KADASHELPVIEWER_H

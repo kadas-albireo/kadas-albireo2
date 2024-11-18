@@ -28,8 +28,8 @@ KadasTemporalController::KadasTemporalController( QgsMapCanvas *canvas )
 {
   setupUi( this );
 
-  mQgsTemporalControllerWidget = new QgsTemporalControllerWidget(this);
-  mTemporalControllerVerticalLayout->addWidget(mQgsTemporalControllerWidget);
+  mQgsTemporalControllerWidget = new QgsTemporalControllerWidget( this );
+  mTemporalControllerVerticalLayout->addWidget( mQgsTemporalControllerWidget );
 
   canvas->setTemporalController( mQgsTemporalControllerWidget->temporalController() );
 
@@ -45,7 +45,3 @@ void KadasTemporalController::on_mCloseButton_clicked()
 {
   hide();
 }
-
-
-
-

@@ -37,11 +37,11 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void addCustomActionForLayerType( QAction *action, QString menu, Qgis::LayerType type, bool allLayers ) override;
     virtual void addCustomActionForLayer( QAction *action, QgsMapLayer *layer ) override;
     virtual bool removeCustomActionForLayerType( QAction *action ) override;
-    virtual QList< QgsMapCanvas * > mapCanvases() override;
+    virtual QList<QgsMapCanvas *> mapCanvases() override;
     virtual QgsMapCanvas *createNewMapCanvas( const QString &name ) override;
     virtual void closeMapCanvas( const QString &name ) override;
 #if _QGIS_VERSION_INT >= 33500
-    virtual QList< Qgs3DMapCanvas * > mapCanvases3D() override;
+    virtual QList<Qgs3DMapCanvas *> mapCanvases3D() override;
     virtual Qgs3DMapCanvas *createNewMapCanvas3D( const QString &name ) override;
     virtual void closeMapCanvas3D( const QString &name ) override;
 #endif
@@ -125,7 +125,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual bool addProject( const QString &project ) override;
     virtual bool newProject( bool promptToSaveFlag = false ) override;
 
-    virtual void reloadConnections( ) override;
+    virtual void reloadConnections() override;
     virtual bool setActiveLayer( QgsMapLayer *layer ) override;
     virtual void showLayerProperties( QgsMapLayer *l, const QString &page = QString() ) override;
     virtual QDialog *showAttributeTable( QgsVectorLayer *l, const QString &filterExpression = QString() ) override;
@@ -154,8 +154,8 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     // Unsupported QGIS interface
     virtual QMap<QString, QVariant> defaultStyleSheetOptions() override { return QMap<QString, QVariant>(); }
     virtual QFont defaultStyleSheetFont() override { return QFont(); }
-    virtual void buildStyleSheet( const QMap<QString, QVariant> &opts ) override { }
-    virtual void saveStyleSheetOptions( const QMap<QString, QVariant> &opts ) override { }
+    virtual void buildStyleSheet( const QMap<QString, QVariant> &opts ) override {}
+    virtual void saveStyleSheetOptions( const QMap<QString, QVariant> &opts ) override {}
     virtual QgsAdvancedDigitizingDockWidget *cadDockWidget() override { return nullptr; }
     virtual QList<QgsMapDecoration *> activeDecorations() override { return QList<QgsMapDecoration *>(); }
 
@@ -178,21 +178,21 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     virtual int addToolBarIcon( QAction *qAction ) override { return -1; }
     virtual QAction *addToolBarWidget( QWidget *widget SIP_TRANSFER ) override { return nullptr; }
-    virtual void removeToolBarIcon( QAction *qAction ) override { }
+    virtual void removeToolBarIcon( QAction *qAction ) override {}
     virtual QAction *addRasterToolBarWidget( QWidget *widget SIP_TRANSFER ) override { return nullptr; }
     virtual int addRasterToolBarIcon( QAction *qAction ) override { return -1; }
-    virtual void removeRasterToolBarIcon( QAction *qAction ) override { }
+    virtual void removeRasterToolBarIcon( QAction *qAction ) override {}
     virtual int addVectorToolBarIcon( QAction *qAction ) override { return -1; }
-    virtual QAction *addVectorToolBarWidget( QWidget *widget SIP_TRANSFER ) override {  return nullptr; }
-    virtual void removeVectorToolBarIcon( QAction *qAction ) override { }
+    virtual QAction *addVectorToolBarWidget( QWidget *widget SIP_TRANSFER ) override { return nullptr; }
+    virtual void removeVectorToolBarIcon( QAction *qAction ) override {}
     virtual int addDatabaseToolBarIcon( QAction *qAction ) override { return -1; }
     virtual QAction *addDatabaseToolBarWidget( QWidget *widget SIP_TRANSFER ) override { return nullptr; }
-    virtual void removeDatabaseToolBarIcon( QAction *qAction ) override { }
+    virtual void removeDatabaseToolBarIcon( QAction *qAction ) override {}
     virtual int addWebToolBarIcon( QAction *qAction ) override { return -1; }
     virtual QAction *addWebToolBarWidget( QWidget *widget SIP_TRANSFER ) override { return nullptr; }
-    virtual void removeWebToolBarIcon( QAction *qAction ) override { }
-    virtual QToolBar *addToolBar( const QString &name ) SIP_FACTORY override{ return nullptr; }
-    virtual void addToolBar( QToolBar *toolbar SIP_TRANSFER, Qt::ToolBarArea area = Qt::TopToolBarArea ) override { }
+    virtual void removeWebToolBarIcon( QAction *qAction ) override {}
+    virtual QToolBar *addToolBar( const QString &name ) SIP_FACTORY override { return nullptr; }
+    virtual void addToolBar( QToolBar *toolbar SIP_TRANSFER, Qt::ToolBarArea area = Qt::TopToolBarArea ) override {}
 
     virtual QAction *actionNewProject() override { return nullptr; }
     virtual QAction *actionOpenProject() override { return nullptr; }
@@ -295,7 +295,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QAction *actionCircle3Tangents() override { return nullptr; }
     virtual QAction *actionCircle2TangentsPoint() override { return nullptr; }
     virtual QAction *actionCircleCenterPoint() override { return nullptr; }
-    virtual QAction *actionEllipseCenter2Points()override { return nullptr; }
+    virtual QAction *actionEllipseCenter2Points() override { return nullptr; }
     virtual QAction *actionEllipseCenterPoint() override { return nullptr; }
     virtual QAction *actionEllipseExtent() override { return nullptr; }
     virtual QAction *actionEllipseFoci() override { return nullptr; }
@@ -309,28 +309,28 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
 
     virtual QActionGroup *mapToolActionGroup() override { return nullptr; }
 
-    virtual void preloadForm( const QString &uifile ) override { }
-    virtual void registerLocatorFilter( QgsLocatorFilter *filter SIP_TRANSFER ) override { }
-    virtual void deregisterLocatorFilter( QgsLocatorFilter *filter ) override { }
-    virtual void invalidateLocatorResults() override { }
-    virtual bool askForDatumTransform( QgsCoordinateReferenceSystem sourceCrs, QgsCoordinateReferenceSystem destinationCrs ) override { return false;}
+    virtual void preloadForm( const QString &uifile ) override {}
+    virtual void registerLocatorFilter( QgsLocatorFilter *filter SIP_TRANSFER ) override {}
+    virtual void deregisterLocatorFilter( QgsLocatorFilter *filter ) override {}
+    virtual void invalidateLocatorResults() override {}
+    virtual bool askForDatumTransform( QgsCoordinateReferenceSystem sourceCrs, QgsCoordinateReferenceSystem destinationCrs ) override { return false; }
     virtual QgsBrowserGuiModel *browserModel() override { return nullptr; }
 
-    virtual void addWindow( QAction *action ) override { }
-    virtual void removeWindow( QAction *action ) override { }
+    virtual void addWindow( QAction *action ) override {}
+    virtual void removeWindow( QAction *action ) override {}
 
-    virtual void addUserInputWidget( QWidget *widget ) override { }
+    virtual void addUserInputWidget( QWidget *widget ) override {}
     virtual void showOptionsDialog( QWidget *parent = nullptr, const QString &currentPage = QString() ) override;
 
-    virtual void addDockWidget( Qt::DockWidgetArea area, QDockWidget *dockwidget ) override { }
-    virtual void removeDockWidget( QDockWidget *dockwidget ) override { }
+    virtual void addDockWidget( Qt::DockWidgetArea area, QDockWidget *dockwidget ) override {}
+    virtual void removeDockWidget( QDockWidget *dockwidget ) override {}
 
-    virtual void registerMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) override { }
-    virtual void unregisterMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) override { }
-    virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
-    virtual void unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override { }
+    virtual void registerMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) override {}
+    virtual void unregisterMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) override {}
+    virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override {}
+    virtual void unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) override {}
 
-    virtual void locatorSearch( const QString &searchText ) override { }
+    virtual void locatorSearch( const QString &searchText ) override {}
     virtual QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() override;
 
     virtual void showProjectPropertiesDialog( const QString &currentPage = QString() ) override {};

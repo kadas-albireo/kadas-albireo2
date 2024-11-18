@@ -56,6 +56,7 @@ class KadasNewsWebView : public QAxWidget
     {
       dynamicCall( "Navigate(const QString&)", url.toString() );
     }
+
   protected:
     virtual bool translateKeyEvent( int message, int keycode ) const
     {
@@ -66,14 +67,16 @@ class KadasNewsWebView : public QAxWidget
     }
 };
 
-#elif defined(WITH_QTWEBKIT)
+#elif defined( WITH_QTWEBKIT )
 class ExternalLinkDelegateWebView : public QWebView
 {
   public:
-    ExternalLinkDelegateWebView( QWidget *parent = nullptr ) : QWebView( parent )
+    ExternalLinkDelegateWebView( QWidget *parent = nullptr )
+      : QWebView( parent )
     {
       connect( this, &QWebView::urlChanged, this, &ExternalLinkDelegateWebView::openUrlInExternalBrowserAndDestory );
     }
+
   private:
     void openUrlInExternalBrowserAndDestory( const QUrl &url )
     {
@@ -85,7 +88,8 @@ class ExternalLinkDelegateWebView : public QWebView
 class KadasNewsWebView : public QWebView
 {
   public:
-    KadasNewsWebView( QWidget *parent = nullptr ) : QWebView( parent )
+    KadasNewsWebView( QWidget *parent = nullptr )
+      : QWebView( parent )
     {
       settings()->setAttribute( QWebSettings::JavascriptCanOpenWindows, true );
       settings()->setAttribute( QWebSettings::JavascriptCanAccessClipboard, true );
@@ -98,18 +102,18 @@ class KadasNewsWebView : public QWebView
     }
 };
 #else
- class KadasNewsWebView : public QWidget
- {
- public:
-   KadasNewsWebView( QWidget *parent = nullptr )
-     : QWidget( parent )
-   {}
+class KadasNewsWebView : public QWidget
+{
+  public:
+    KadasNewsWebView( QWidget *parent = nullptr )
+      : QWidget( parent )
+    {}
 
-   void load( const QUrl &url)
-   {
-     QDesktopServices::openUrl( url );
-   }
- };
+    void load( const QUrl &url )
+    {
+      QDesktopServices::openUrl( url );
+    }
+};
 
 #endif
 
@@ -130,8 +134,7 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
   }
 
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( portalNewsUrl ) ) );
-  connect( reply, &QNetworkReply::finished, [reply, force, lastPortalNewsVer]
-  {
+  connect( reply, &QNetworkReply::finished, [reply, force, lastPortalNewsVer] {
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     reply->deleteLater();
     QVariantList results = rootMap["results"].toList();
@@ -177,10 +180,10 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
         {
           QDesktopServices::openUrl( url );
           QgsSettings().setValue( "kadas/lastPortalNewsVer", version );
-//          sInstance = new KadasNewsPopup( url );
-//          sInstance->show();
+          //          sInstance = new KadasNewsPopup( url );
+          //          sInstance->show();
         }
-//        sInstance->raise();
+        //        sInstance->raise();
       }
     }
   } );

@@ -23,14 +23,11 @@
 class QgsMapCanvas;
 
 
-
 class QgsGotoLocatorFilter : public QgsLocatorFilter
 {
     Q_OBJECT
 
   public:
-
-
     QgsGotoLocatorFilter( QgsMapCanvas *mapCanvas, QObject *parent = nullptr );
     QgsGotoLocatorFilter *clone() const override;
     virtual QString name() const override { return QStringLiteral( "goto" ); }
@@ -44,7 +41,6 @@ class QgsGotoLocatorFilter : public QgsLocatorFilter
 
   private:
     QgsMapCanvas *mCanvas = nullptr;
-
 };
 
 #endif // QGSGOTOLOCATORFILTERS_H

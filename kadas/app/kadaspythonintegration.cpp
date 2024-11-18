@@ -53,8 +53,8 @@ void KadasPythonIntegration::showConsole()
 
 bool KadasPythonIntegration::checkSystemImports()
 {
-  runString( QStringLiteral( "import sys" ) );   // import sys module (for display / exception hooks)
-  runString( QStringLiteral( "import os" ) );   // import os module (for user paths)
+  runString( QStringLiteral( "import sys" ) ); // import sys module (for display / exception hooks)
+  runString( QStringLiteral( "import os" ) );  // import os module (for user paths)
 
 #ifdef Q_OS_WIN
   runString( "oldhome=None" );
@@ -82,7 +82,7 @@ bool KadasPythonIntegration::checkSystemImports()
   pluginpaths << '"' + homePluginsPath() + '"';
   pluginpaths << '"' + kadasPluginsPath() + '"';
   pluginpaths << '"' + qgisPluginsPath() + '"';
-  QgsDebugMsgLevel( "Plugin paths: " + pluginpaths.join( "; " ) , 2 );
+  QgsDebugMsgLevel( "Plugin paths: " + pluginpaths.join( "; " ), 2 );
 
   // expect that bindings are installed locally, so add the path to modules
   // also add path to plugins
@@ -90,7 +90,7 @@ bool KadasPythonIntegration::checkSystemImports()
   newpaths << '"' + qgisPythonPath() + '"';
   newpaths << '"' + kadasPythonPath() + '"';
   newpaths << '"' + homePythonPath() + '"';
-  QgsDebugMsgLevel( "Python paths: " + pluginpaths.join( "; " ) , 2 );
+  QgsDebugMsgLevel( "Python paths: " + pluginpaths.join( "; " ), 2 );
   newpaths << pluginpaths;
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
@@ -136,7 +136,7 @@ bool KadasPythonIntegration::checkSystemImports()
   // tell the utils script where to look for the plugins
   runString( QStringLiteral( "qgis.utils.plugin_paths = [%1]" ).arg( pluginpaths.join( ',' ) ) );
   runString( QStringLiteral( "qgis.utils.sys_plugin_path = \"%1\"" ).arg( qgisPluginsPath() ) );
-  runString( QStringLiteral( "qgis.utils.home_plugin_path = \"%1\"" ).arg( homePluginsPath() ) );    // note - homePluginsPath() returns a python expression, not a string literal
+  runString( QStringLiteral( "qgis.utils.home_plugin_path = \"%1\"" ).arg( homePluginsPath() ) ); // note - homePluginsPath() returns a python expression, not a string literal
 
 #ifdef Q_OS_WIN
   runString( "if oldhome: os.environ['HOME']=oldhome\n" );
@@ -152,8 +152,8 @@ void KadasPythonIntegration::init()
 
   mPythonEnabled = true;
 
-  mMainModule = PyImport_AddModule( "__main__" );  // borrowed reference
-  mMainDict = PyModule_GetDict( mMainModule );  // borrowed reference
+  mMainModule = PyImport_AddModule( "__main__" ); // borrowed reference
+  mMainDict = PyModule_GetDict( mMainModule );    // borrowed reference
 }
 
 void KadasPythonIntegration::finish()
@@ -190,7 +190,7 @@ void KadasPythonIntegration::initPython( KadasPluginInterface *iface, const bool
   if ( iface )
   {
     // initialize 'iface' object
-    runString( QStringLiteral( "qgis.utils.initInterface(%1)" ).arg( reinterpret_cast< quint64 >( iface ) ) );
+    runString( QStringLiteral( "qgis.utils.initInterface(%1)" ).arg( reinterpret_cast<quint64>( iface ) ) );
   }
 
   if ( !checkQgisUser() )
@@ -293,7 +293,11 @@ bool KadasPythonIntegration::runString( const QString &command, QString msgOnErr
 
 QString KadasPythonIntegration::getTraceback()
 {
-#define TRACEBACK_FETCH_ERROR(what) {errMsg = what; goto done;}
+#define TRACEBACK_FETCH_ERROR( what ) \
+  {                                   \
+    errMsg = what;                    \
+    goto done;                        \
+  }
 
   // acquire global interpreter lock to ensure we are in a consistent state
   PyGILState_STATE gstate;
@@ -320,7 +324,7 @@ QString KadasPythonIntegration::getTraceback()
     TRACEBACK_FETCH_ERROR( QStringLiteral( "can't import %1" ).arg( iomod ) );
   }
 
-  obStringIO = PyObject_CallMethod( modStringIO, reinterpret_cast< const char * >( "StringIO" ), nullptr );
+  obStringIO = PyObject_CallMethod( modStringIO, reinterpret_cast<const char *>( "StringIO" ), nullptr );
 
   /* Construct a cStringIO object */
   if ( !obStringIO )
@@ -334,8 +338,8 @@ QString KadasPythonIntegration::getTraceback()
     TRACEBACK_FETCH_ERROR( QStringLiteral( "can't import traceback" ) );
   }
 
-  obResult = PyObject_CallMethod( modTB,  reinterpret_cast< const char * >( "print_exception" ),
-                                  reinterpret_cast< const char * >( "OOOOO" ),
+  obResult = PyObject_CallMethod( modTB, reinterpret_cast<const char *>( "print_exception" ),
+                                  reinterpret_cast<const char *>( "OOOOO" ),
                                   type, value ? value : Py_None,
                                   traceback ? traceback : Py_None,
                                   Py_None,
@@ -348,7 +352,7 @@ QString KadasPythonIntegration::getTraceback()
 
   Py_DECREF( obResult );
 
-  obResult = PyObject_CallMethod( obStringIO,  reinterpret_cast< const char * >( "getvalue" ), nullptr );
+  obResult = PyObject_CallMethod( obStringIO, reinterpret_cast<const char *>( "getvalue" ), nullptr );
   if ( !obResult )
   {
     TRACEBACK_FETCH_ERROR( QStringLiteral( "getvalue() failed." ) );
@@ -393,12 +397,12 @@ QString KadasPythonIntegration::getTypeAsString( PyObject *obj )
 
   if ( PyType_Check( obj ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "got type" ) , 2 );
+    QgsDebugMsgLevel( QStringLiteral( "got type" ), 2 );
     return QString( ( ( PyTypeObject * ) obj )->tp_name );
   }
   else
   {
-    QgsDebugMsgLevel( QStringLiteral( "got object" ) , 2 );
+    QgsDebugMsgLevel( QStringLiteral( "got object" ), 2 );
     return PyObjectToQString( obj );
   }
 }
@@ -465,7 +469,7 @@ QString KadasPythonIntegration::PyObjectToQString( PyObject *obj ) const
   }
 
   // if conversion to Unicode failed, try to convert it to classic string, i.e. str(obj)
-  PyObject *obj_str = PyObject_Str( obj );  // new reference
+  PyObject *obj_str = PyObject_Str( obj ); // new reference
   if ( obj_str )
   {
     result = QString::fromUtf8( PyUnicode_AsUTF8( obj_str ) );
@@ -474,7 +478,7 @@ QString KadasPythonIntegration::PyObjectToQString( PyObject *obj ) const
   }
 
   // some problem with conversion to Unicode string
-  QgsDebugMsgLevel( QStringLiteral( "unable to convert PyObject to a QString!" ) , 2 );
+  QgsDebugMsgLevel( QStringLiteral( "unable to convert PyObject to a QString!" ), 2 );
   return QStringLiteral( "(qgis error)" );
 }
 
@@ -559,9 +563,7 @@ void KadasPythonIntegration::restorePlugins()
   {
     // check if the plugin was active on last session
     if (
-      settings.value( "/PythonPlugins/" + packageName ).toBool() ||
-      defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()
-    )
+      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool() )
     {
       loadPlugin( packageName );
     }
@@ -583,9 +585,9 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
     return true;
   }
 
-  QString pluginName  = getPluginMetadata( packageName, QStringLiteral( "name" ) );
+  QString pluginName = getPluginMetadata( packageName, QStringLiteral( "name" ) );
   QString description = getPluginMetadata( packageName, QStringLiteral( "description" ) );
-  QString version     = getPluginMetadata( packageName, QStringLiteral( "version" ) );
+  QString version = getPluginMetadata( packageName, QStringLiteral( "version" ) );
   if ( pluginName == QLatin1String( "__error__" ) || description == QLatin1String( "__error__" ) || version == QLatin1String( "__error__" ) )
   {
     QgsMessageLog::logMessage( QObject::tr( "Error when reading metadata of plugin %1" ).arg( packageName ), QObject::tr( "Plugins" ) );
@@ -798,21 +800,15 @@ bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const 
   if ( qgisMinor == 99 )
   {
     // we want the API version, so for x.99 bump it up to the next major release: e.g. 2.99 to 3.0.0
-    qgisMajor ++;
+    qgisMajor++;
     qgisMinor = 0;
     qgisBugfix = 0;
   };
 
   // build XxYyZz strings with trailing zeroes if needed
-  QString minVer = QStringLiteral( "%1%2%3" ).arg( minVerMajor, 2, 10, QChar( '0' ) )
-                   .arg( minVerMinor, 2, 10, QChar( '0' ) )
-                   .arg( minVerBugfix, 2, 10, QChar( '0' ) );
-  QString maxVer = QStringLiteral( "%1%2%3" ).arg( maxVerMajor, 2, 10, QChar( '0' ) )
-                   .arg( maxVerMinor, 2, 10, QChar( '0' ) )
-                   .arg( maxVerBugfix, 2, 10, QChar( '0' ) );
-  QString curVer = QStringLiteral( "%1%2%3" ).arg( qgisMajor, 2, 10, QChar( '0' ) )
-                   .arg( qgisMinor, 2, 10, QChar( '0' ) )
-                   .arg( qgisBugfix, 2, 10, QChar( '0' ) );
+  QString minVer = QStringLiteral( "%1%2%3" ).arg( minVerMajor, 2, 10, QChar( '0' ) ).arg( minVerMinor, 2, 10, QChar( '0' ) ).arg( minVerBugfix, 2, 10, QChar( '0' ) );
+  QString maxVer = QStringLiteral( "%1%2%3" ).arg( maxVerMajor, 2, 10, QChar( '0' ) ).arg( maxVerMinor, 2, 10, QChar( '0' ) ).arg( maxVerBugfix, 2, 10, QChar( '0' ) );
+  QString curVer = QStringLiteral( "%1%2%3" ).arg( qgisMajor, 2, 10, QChar( '0' ) ).arg( qgisMinor, 2, 10, QChar( '0' ) ).arg( qgisBugfix, 2, 10, QChar( '0' ) );
 
   // compare
   return ( minVer <= curVer && maxVer >= curVer );

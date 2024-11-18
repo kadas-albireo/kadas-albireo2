@@ -21,7 +21,7 @@
 #include "kadas/analysis/kadasninecellfilter.h"
 
 
-class KADAS_ANALYSIS_EXPORT KadasHillshadeFilter: public KadasNineCellFilter
+class KADAS_ANALYSIS_EXPORT KadasHillshadeFilter : public KadasNineCellFilter
 {
   public:
     KadasHillshadeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, double lightAzimuth = 300,

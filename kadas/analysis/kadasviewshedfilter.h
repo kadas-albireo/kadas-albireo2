@@ -38,7 +38,6 @@ class KADAS_ANALYSIS_EXPORT KadasViewshedFilter
                                  double observerMinVertAngle, double observerMaxVertAngle, double radius,
                                  const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
                                  const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
-
 };
 
 #endif // KADASVIEWSHEDFILTER_H

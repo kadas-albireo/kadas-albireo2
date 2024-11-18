@@ -33,8 +33,7 @@ KadasPhongMaterialWidget::KadasPhongMaterialWidget( QWidget *parent, bool hasOpa
   connect( btnDiffuse, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
   connect( btnAmbient, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
   connect( btnSpecular, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
-  connect( spinShininess, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, [ = ]
-  {
+  connect( spinShininess, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, [=] {
     updateWidgetState();
     emit changed();
   } );
@@ -109,7 +108,7 @@ void KadasPhongMaterialWidget::setTechnique( QgsMaterialSettingsRenderingTechniq
 
 void KadasPhongMaterialWidget::setSettings( const QgsAbstractMaterialSettings *settings, QgsVectorLayer *layer )
 {
-  const QgsPhongMaterialSettings *phongMaterial = dynamic_cast< const QgsPhongMaterialSettings * >( settings );
+  const QgsPhongMaterialSettings *phongMaterial = dynamic_cast<const QgsPhongMaterialSettings *>( settings );
   if ( !phongMaterial )
     return;
   btnDiffuse->setColor( phongMaterial->diffuse() );
@@ -126,16 +125,16 @@ void KadasPhongMaterialWidget::setSettings( const QgsAbstractMaterialSettings *s
 
   mPropertyCollection = settings->dataDefinedProperties();
 
-  mDiffuseDataDefinedButton->init( static_cast< int >( QgsAbstractMaterialSettings::Property::Diffuse ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
-  mAmbientDataDefinedButton->init( static_cast< int >( QgsAbstractMaterialSettings::Property::Ambient ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
-  mSpecularDataDefinedButton->init( static_cast< int >( QgsAbstractMaterialSettings::Property::Specular ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
+  mDiffuseDataDefinedButton->init( static_cast<int>( QgsAbstractMaterialSettings::Property::Diffuse ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
+  mAmbientDataDefinedButton->init( static_cast<int>( QgsAbstractMaterialSettings::Property::Ambient ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
+  mSpecularDataDefinedButton->init( static_cast<int>( QgsAbstractMaterialSettings::Property::Specular ), mPropertyCollection, settings->propertyDefinitions(), layer, true );
 
   updateWidgetState();
 }
 
 QgsAbstractMaterialSettings *KadasPhongMaterialWidget::settings()
 {
-  std::unique_ptr< QgsPhongMaterialSettings > m = std::make_unique< QgsPhongMaterialSettings >();
+  std::unique_ptr<QgsPhongMaterialSettings> m = std::make_unique<QgsPhongMaterialSettings>();
   m->setDiffuse( btnDiffuse->color() );
   m->setAmbient( btnAmbient->color() );
   m->setSpecular( btnSpecular->color() );

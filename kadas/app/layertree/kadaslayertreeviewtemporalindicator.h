@@ -44,7 +44,6 @@ class KadasLayerTreeViewTemporalIndicator : public QgsLayerTreeViewIndicatorProv
     QString tooltipText( QgsMapLayer *layer ) override;
 
     KadasTemporalController *mKadasTemporalController;
-
 };
 
 #endif // KADASLAYERTREEVIEWTEMPORALINDICATOR_H

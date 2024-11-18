@@ -24,7 +24,6 @@
 #include "kadas/gui/kadasmapiteminterface.h"
 
 
-
 class QAction;
 class QToolButton;
 
@@ -40,56 +39,56 @@ class KadasPointItemInterface : public KadasMapItemInterface
 {
   public:
     KadasPointItemInterface() = default;
-    KadasMapItem* createItem() const override;
+    KadasMapItem *createItem() const override;
 };
 
 class KadasSquareItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasSquareItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasSquareItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasTriangleItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasTriangleItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasTriangleItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasLineItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasLineItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasLineItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasRectangleItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasRectangleItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasRectangleItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasPolygonItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasPolygonItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasPolygonItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasCircleItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasCircleItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasCircleItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasTextItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasTextItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasTextItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 class KadasCoordCrossItemInterface : public KadasMapItemInterface
 {
-public:
-  KadasCoordCrossItemInterface() = default;
-  KadasMapItem* createItem() const override;
+  public:
+    KadasCoordCrossItemInterface() = default;
+    KadasMapItem *createItem() const override;
 };
 
 
@@ -125,7 +124,7 @@ class KadasRedliningIntegration : public QObject
 
     QPointer<KadasItemLayer> mLastLayer;
 
-    void toggleCreateItem(bool active, std::unique_ptr<KadasMapItemInterface> interface );
+    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
   private slots:
     void activateNewButtonObject();

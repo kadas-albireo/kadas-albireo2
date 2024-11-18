@@ -39,15 +39,13 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
 {
   Qgs3D::initialize();
 
-  connect( mAction3D, &QAction::triggered, [ this ]()
-  {
+  connect( mAction3D, &QAction::triggered, [this]() {
     if ( !m3DMapCanvasWidget )
     {
       m3DMapCanvasWidget = createNewMapCanvas3D( "3D Map" );
       if ( m3DMapCanvasWidget )
       {
-        connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]()
-        {
+        connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]() {
           m3DMapCanvasWidget->deleteLater();
           m3DMapCanvasWidget = nullptr;
           mAction3D->setChecked( false );
@@ -122,8 +120,7 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
   map->setRendererUsage( Qgis::RendererUsage::View );
 
-  connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map]
-  {
+  connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] {
     map->setTransformContext( QgsProject::instance()->transformContext() );
   } );
 

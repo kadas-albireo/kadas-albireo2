@@ -82,7 +82,7 @@ KadasMesh3DSymbolWidget::KadasMesh3DSymbolWidget( QgsMeshLayer *meshLayer, QWidg
 
   connect( mArrowsFixedSizeCheckBox, &QCheckBox::clicked, this, &KadasMesh3DSymbolWidget::changed );
 
-  connect( mGroupBoxTextureSettings, &QgsCollapsibleGroupBox::collapsedStateChanged, this,  &KadasMesh3DSymbolWidget::onTextureSettingsCollapseStateChanged );
+  connect( mGroupBoxTextureSettings, &QgsCollapsibleGroupBox::collapsedStateChanged, this, &KadasMesh3DSymbolWidget::onTextureSettingsCollapseStateChanged );
 }
 
 void KadasMesh3DSymbolWidget::setSymbol( const QgsMesh3DSymbol *symbol )
@@ -104,7 +104,7 @@ void KadasMesh3DSymbolWidget::setSymbol( const QgsMesh3DSymbol *symbol )
   mMeshSingleColorButton->setColor( symbol->singleMeshColor() );
   mColorRampShaderWidget->setFromShader( symbol->colorRampShader() );
   mColorRampShaderWidget->setMinimumMaximumAndClassify( symbol->colorRampShader().minimumValue(),
-      symbol->colorRampShader().maximumValue() );
+                                                        symbol->colorRampShader().maximumValue() );
 
   setColorRampMinMax( symbol->colorRampShader().minimumValue(), symbol->colorRampShader().maximumValue() );
   mComboBoxDatasetVertical->setCurrentIndex( symbol->verticalDatasetGroupIndex() );
@@ -158,9 +158,9 @@ void KadasMesh3DSymbolWidget::setLayer( QgsMeshLayer *meshLayer, bool updateSymb
   {
     mDatasetGroupListModel->syncToLayer( meshLayer );
     QgsMeshLayer3DRenderer *renderer = static_cast<QgsMeshLayer3DRenderer *>( meshLayer->renderer3D() );
-    if ( renderer &&  renderer->type() == QLatin1String( "mesh" ) )
+    if ( renderer && renderer->type() == QLatin1String( "mesh" ) )
     {
-      if ( renderer->symbol() &&  renderer->symbol()->type() == QLatin1String( "mesh" ) )
+      if ( renderer->symbol() && renderer->symbol()->type() == QLatin1String( "mesh" ) )
       {
         setSymbol( static_cast<const QgsMesh3DSymbol *>( renderer->symbol() ) );
         return;
@@ -168,14 +168,14 @@ void KadasMesh3DSymbolWidget::setLayer( QgsMeshLayer *meshLayer, bool updateSymb
     }
   }
 
-  const std::unique_ptr< QgsMesh3DSymbol > defaultSymbol = std::make_unique< QgsMesh3DSymbol >();
+  const std::unique_ptr<QgsMesh3DSymbol> defaultSymbol = std::make_unique<QgsMesh3DSymbol>();
   // set symbol does not take ownership!
   setSymbol( defaultSymbol.get() );
 
   reloadColorRampShaderMinMax(); //As the symbol is new, the Color ramp shader needs to be initialized with min max value
 }
 
-QgsMeshLayer *KadasMesh3DSymbolWidget::meshLayer() const {return mLayer;}
+QgsMeshLayer *KadasMesh3DSymbolWidget::meshLayer() const { return mLayer; }
 
 double KadasMesh3DSymbolWidget::lineEditValue( const QLineEdit *lineEdit ) const
 {
@@ -189,7 +189,7 @@ double KadasMesh3DSymbolWidget::lineEditValue( const QLineEdit *lineEdit ) const
 
 std::unique_ptr<QgsMesh3DSymbol> KadasMesh3DSymbolWidget::symbol() const
 {
-  std::unique_ptr< QgsMesh3DSymbol > sym( mSymbol->clone() );
+  std::unique_ptr<QgsMesh3DSymbol> sym( mSymbol->clone() );
 
   sym->setCullingMode( static_cast<Qgs3DTypes::CullingMode>( mCullingMode->currentData().toInt() ) );
   sym->setSmoothedTriangles( mChkSmoothTriangles->isChecked() );
@@ -253,7 +253,7 @@ void KadasMesh3DSymbolWidget::onColorRampShaderMinMaxChanged()
 void KadasMesh3DSymbolWidget::onColoringTypeChanged()
 {
   mGroupBoxColorRampShader->setVisible( mComboBoxTextureType->currentData() == QgsMesh3DSymbol::ColorRamp );
-  mMeshSingleColorWidget->setVisible( mComboBoxTextureType->currentData()  == QgsMesh3DSymbol::SingleColor );
+  mMeshSingleColorWidget->setVisible( mComboBoxTextureType->currentData() == QgsMesh3DSymbol::SingleColor );
 }
 
 void KadasMesh3DSymbolWidget::onTextureSettingsCollapseStateChanged( bool collapsed )

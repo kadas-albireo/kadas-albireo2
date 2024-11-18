@@ -21,11 +21,11 @@
 #include "kadasmapswipecanvasitem.h"
 
 
-KadasMapSwipeCanvasItem::KadasMapSwipeCanvasItem( QgsMapCanvas* mapCanvas )
+KadasMapSwipeCanvasItem::KadasMapSwipeCanvasItem( QgsMapCanvas *mapCanvas )
   : QgsMapCanvasItem( mapCanvas )
 {
-  QObject::connect(mapCanvas, &QgsMapCanvas::extentsChanged, [=](){refreshMap();} );
-  QObject::connect(mapCanvas, &QgsMapCanvas::layersChanged, [=](){refreshMap();} );
+  QObject::connect( mapCanvas, &QgsMapCanvas::extentsChanged, [=]() { refreshMap(); } );
+  QObject::connect( mapCanvas, &QgsMapCanvas::layersChanged, [=]() { refreshMap(); } );
 }
 
 void KadasMapSwipeCanvasItem::enable()
@@ -54,10 +54,10 @@ void KadasMapSwipeCanvasItem::setLayers( const QSet<QgsMapLayer *> &layers )
 
 void KadasMapSwipeCanvasItem::setPixelPosition( int x, int y )
 {
-  if ( mIsVertical)
-    mPixelLength =  x;
+  if ( mIsVertical )
+    mPixelLength = x;
   else
-    mPixelLength =  boundingRect().height() - y;
+    mPixelLength = boundingRect().height() - y;
   refreshMap();
 }
 
@@ -71,7 +71,7 @@ void KadasMapSwipeCanvasItem::refreshMap()
 {
   QgsMapSettings settings( mMapCanvas->mapSettings() );
   QList<QgsMapLayer *> mapLayers = settings.layers();
-  for ( QgsMapLayer * layer : std::as_const( mRemovedLayers ) )
+  for ( QgsMapLayer *layer : std::as_const( mRemovedLayers ) )
     mapLayers.removeOne( layer );
 
   settings.setLayers( mapLayers );
@@ -80,8 +80,7 @@ void KadasMapSwipeCanvasItem::refreshMap()
   setRect( mMapCanvas->extent() );
   QgsMapRendererParallelJob job( settings );
   job.start();
-  QObject::connect(&job, &QgsMapRendererParallelJob::finished, [this, &job]()
-  {
+  QObject::connect( &job, &QgsMapRendererParallelJob::finished, [this, &job]() {
     mRenderedMapImage = job.renderedImage();
   } );
   job.waitForFinished();
@@ -100,20 +99,19 @@ void KadasMapSwipeCanvasItem::paint( QPainter *painter )
     int h = boundingRect().height() - 2;
     int w = mPixelLength;
     line = QLine( w - 1, 0, w - 1, h - 1 );
-    rect = QRect(w, 0, mRenderedMapImage.width()-w, mRenderedMapImage.height() );
+    rect = QRect( w, 0, mRenderedMapImage.width() - w, mRenderedMapImage.height() );
   }
   else
   {
     int h = boundingRect().height() - mPixelLength;
     int w = boundingRect().width() - 2;
     line = QLine( 0, h - 1, w - 1, h - 1 );
-    rect = QRect( 0, h, mRenderedMapImage.width(), mRenderedMapImage.height()-h );
+    rect = QRect( 0, h, mRenderedMapImage.width(), mRenderedMapImage.height() - h );
   }
 
   painter->drawImage(
-        rect,
-        mRenderedMapImage.scaled(mRenderedMapImage.width()/mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height()/mRenderedMapImage.devicePixelRatioF()),
-        rect
-  );
+    rect,
+    mRenderedMapImage.scaled( mRenderedMapImage.width() / mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height() / mRenderedMapImage.devicePixelRatioF() ),
+    rect );
   painter->drawLine( line );
 }

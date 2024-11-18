@@ -100,8 +100,7 @@ bool KadasMapGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*documen
 
 void KadasMapGridLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
-  {
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer] {
     mActionMapGridTool->trigger();
   } );
 }

@@ -43,8 +43,7 @@ void KadasLayoutDesignerManager::openDesigner( QgsPrintLayout *layout )
   }
 
   KadasLayoutDesignerDialog *dialog = new KadasLayoutDesignerDialog( kApp->mainWindow() );
-  connect( dialog, &QObject::destroyed, this, [this]( QObject * obj )
-  {
+  connect( dialog, &QObject::destroyed, this, [this]( QObject *obj ) {
     mOpenDialogs.removeAll( obj );
   } );
   dialog->setCurrentLayout( layout );

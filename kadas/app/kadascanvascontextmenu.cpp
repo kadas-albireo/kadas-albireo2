@@ -40,11 +40,11 @@
 #include "kadasmapidentifydialog.h"
 #include "kadasredliningintegration.h"
 
-const QString KadasCanvasContextMenu::ACTION_PROPERTY_MAP_POSITION("MapPosition");
+const QString KadasCanvasContextMenu::ACTION_PROPERTY_MAP_POSITION( "MapPosition" );
 
 typedef QMap<QAction *, KadasCanvasContextMenu::Menu> RegisteredAction;
 
-Q_GLOBAL_STATIC(RegisteredAction, sRegisteredActions)
+Q_GLOBAL_STATIC( RegisteredAction, sRegisteredActions )
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
   : mMapPos( mapPos ), mCanvas( canvas )
@@ -69,7 +69,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addSeparator();
     addAction( QIcon( ":/kadas/icons/lower" ), tr( "Lower" ), this, &KadasCanvasContextMenu::lowerItem );
     addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
-    KadasItemLayer *itemLayer = static_cast< KadasItemLayer * >( mPickResult.layer );
+    KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( mPickResult.layer );
     mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
     mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
     mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
@@ -85,7 +85,6 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     mGeomSel->setIconType( QgsGeometryRubberBand::ICON_NONE );
     mGeomSel->setStrokeWidth( 2 );
     mGeomSel->setGeometry( geom );
-
   }
 
   if ( mPickResult.isEmpty() )
@@ -111,7 +110,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     const QList<QAction *> registeredDrawActions = sRegisteredActions->keys( Menu::DRAW );
     for ( QAction *action : registeredDrawActions )
     {
-      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      action->setProperty( ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos );
       drawMenu->addAction( action );
     }
   }
@@ -142,7 +141,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     const QList<QAction *> registeredMeasureActions = sRegisteredActions->keys( Menu::MEASURE );
     for ( QAction *action : registeredMeasureActions )
     {
-      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      action->setProperty( ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos );
       measureMenu->addAction( action );
     }
 
@@ -166,7 +165,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     const QList<QAction *> registeredAnalysisActions = sRegisteredActions->keys( Menu::TERRAIN_ANALYSIS );
     for ( QAction *action : registeredAnalysisActions )
     {
-      action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+      action->setProperty( ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos );
       analysisMenu->addAction( action );
     }
   }
@@ -182,7 +181,7 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
   const QList<QAction *> registeredActions = sRegisteredActions->keys( Menu::NONE );
   for ( QAction *action : registeredActions )
   {
-    action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos);
+    action->setProperty( ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), mMapPos );
     addAction( action );
   }
 }
@@ -191,7 +190,7 @@ KadasCanvasContextMenu::~KadasCanvasContextMenu()
 {
   for ( QAction *action : sRegisteredActions->keys() )
   {
-    action->setProperty(ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), QVariant());
+    action->setProperty( ACTION_PROPERTY_MAP_POSITION.toUtf8().constData(), QVariant() );
   }
 
   delete mGeomSel;
@@ -222,8 +221,8 @@ void KadasCanvasContextMenu::copyCoordinates()
     posStr = QString( "%1 (%2)" ).arg( mMapPos.toString() ).arg( mapCrs.authid() );
   }
   QString text = QString( "%1\n%2" )
-                 .arg( posStr )
-                 .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mMapPos, mapCrs ) );
+                   .arg( posStr )
+                   .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mMapPos, mapCrs ) );
   QApplication::clipboard()->setText( text );
 }
 
@@ -251,12 +250,12 @@ void KadasCanvasContextMenu::editItem()
 
 void KadasCanvasContextMenu::raiseItem()
 {
-  static_cast< KadasItemLayer * >( mPickResult.layer )->raiseItem( mPickResult.itemId );
+  static_cast<KadasItemLayer *>( mPickResult.layer )->raiseItem( mPickResult.itemId );
 }
 
 void KadasCanvasContextMenu::lowerItem()
 {
-  static_cast< KadasItemLayer * >( mPickResult.layer )->lowerItem( mPickResult.itemId );
+  static_cast<KadasItemLayer *>( mPickResult.layer )->lowerItem( mPickResult.itemId );
 }
 
 void KadasCanvasContextMenu::paste()

@@ -41,7 +41,8 @@
 class StackedDialog : public QDialog
 {
   public:
-    StackedDialog( QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags() ) : QDialog( parent, flags )
+    StackedDialog( QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags() )
+      : QDialog( parent, flags )
     {
       mLayout = new QStackedLayout();
       setLayout( mLayout );
@@ -88,6 +89,7 @@ class WebWidget : public QAxWidget
       QAxObject *document = querySubObject( "Document()" );
       return document->property( "cookie" ).toString().split( QRegExp( "\\s*;\\s*" ) );
     }
+
   protected:
     virtual bool translateKeyEvent( int message, int keycode ) const
     {
@@ -166,7 +168,7 @@ void KadasIamAuth::checkLoginComplete( QString /*addr*/ )
       QStringList pair = cookie.split( "=" );
       if ( !pair.isEmpty() && pair.first() == "esri_auth" )
       {
-//        QMessageBox::information( mLoginDialog, tr( "Authentication successful" ), QString( "Url: %1\nCookie: %2" ).arg( baseUrl.toString() ).arg( cookie ) );
+        //        QMessageBox::information( mLoginDialog, tr( "Authentication successful" ), QString( "Url: %1\nCookie: %2" ).arg( baseUrl.toString() ).arg( cookie ) );
         kApp->mainWindow()->messageBar()->pushMessage( tr( "Authentication successful" ), Qgis::Info, 5 );
         mLoginDialog->accept();
         mLoginDialog->deleteLater();
@@ -196,7 +198,7 @@ void KadasIamAuth::handleNewWindow( IDispatch **ppDisp, bool & /*cancel*/, uint 
     connect( webWidget, SIGNAL( WindowClosing( bool, bool & ) ), this, SLOT( handleWindowClose( bool, bool & ) ) );
     IDispatch *appDisp;
     QAxObject *appDispObj = webWidget->querySubObject( "Application()" );
-    appDispObj->queryInterface( IID_IDispatch, ( void ** )&appDisp );
+    appDispObj->queryInterface( IID_IDispatch, ( void ** ) &appDisp );
     *ppDisp = appDisp;
     mLoginDialog->pushWidget( webWidget );
   }
@@ -226,7 +228,7 @@ void KadasIamAuth::performLogout()
 
 void KadasIamAuth::checkLogoutComplete()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   if ( reply->error() == QNetworkReply::NoError )
   {
     QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();

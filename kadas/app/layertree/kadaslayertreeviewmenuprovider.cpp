@@ -34,8 +34,8 @@
 #include "kadasmainwindow.h"
 #include "kadasmapswipetool.h"
 
-KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
-  mView( view )
+KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view )
+  : mView( view )
 {
 }
 
@@ -179,7 +179,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
   refreshRateLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
   refreshRateLayout->addWidget( refreshRateLabel );
 
-  QSpinBox *refreshRateSpin = new QSpinBox( );
+  QSpinBox *refreshRateSpin = new QSpinBox();
   refreshRateSpin->setRange( 0, 1000000 );
   refreshRateSpin->setSuffix( " s" );
   refreshRateSpin->setValue( kApp->layerRefreshManager()->layerRefreshInterval( mView->currentLayer()->id() ) );

@@ -30,15 +30,12 @@ class KadasLayoutAppMenuProvider : public QObject, public QgsLayoutViewMenuProvi
     Q_OBJECT
 
   public:
-
     KadasLayoutAppMenuProvider( KadasLayoutDesignerDialog *designer );
 
     QMenu *createContextMenu( QWidget *parent, QgsLayout *layout, QPointF layoutPoint ) const override;
 
   private:
-
     KadasLayoutDesignerDialog *mDesigner = nullptr;
-
 };
 
 #endif // KADASLAYOUTAPPMENUPROVIDER_H

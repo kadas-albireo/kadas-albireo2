@@ -133,8 +133,8 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.comboBoxQuadrants->addItem( tr( "Label one quadrant" ), KadasGuideGridLayer::LabelOneQuadrant );
   ui.comboBoxQuadrants->addItem( tr( "Label all quadrants" ), KadasGuideGridLayer::LabelAllQuadrants );
 
-  auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
-  auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
+  auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
@@ -443,7 +443,6 @@ void KadasGuideGridWidget::switchLabels()
   ui.comboBoxColLabels->blockSignals( false );
   ui.comboBoxRowLabels->blockSignals( false );
   updateLabeling();
-
 }
 
 void KadasGuideGridWidget::updateLabeling()

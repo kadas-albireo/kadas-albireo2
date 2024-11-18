@@ -22,7 +22,7 @@
 #include "kadaslayertreeviewtemporalindicator.h"
 #include "kadastemporalcontroller.h"
 
-KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator(QgsLayerTreeView *view , KadasTemporalController *kadasTemporalController)
+KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator( QgsLayerTreeView *view, KadasTemporalController *kadasTemporalController )
   : QgsLayerTreeViewIndicatorProvider( view )
   , mKadasTemporalController( kadasTemporalController )
 {
@@ -33,7 +33,7 @@ void KadasLayerTreeViewTemporalIndicator::connectSignals( QgsMapLayer *layer )
   if ( !layer || !layer->temporalProperties() )
     return;
 
-  connect( layer->temporalProperties(), &QgsMapLayerTemporalProperties::changed, this, [ this, layer ]( ) { this->onLayerChanged( layer ); } );
+  connect( layer->temporalProperties(), &QgsMapLayerTemporalProperties::changed, this, [this, layer]() { this->onLayerChanged( layer ); } );
 }
 
 void KadasLayerTreeViewTemporalIndicator::onIndicatorClicked( const QModelIndex &index )
@@ -67,8 +67,7 @@ bool KadasLayerTreeViewTemporalIndicator::acceptLayer( QgsMapLayer *layer )
 {
   if ( !layer )
     return false;
-  if ( layer->temporalProperties() &&
-       layer->temporalProperties()->isActive() )
+  if ( layer->temporalProperties() && layer->temporalProperties()->isActive() )
     return true;
   return false;
 }

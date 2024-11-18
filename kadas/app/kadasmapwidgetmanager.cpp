@@ -108,13 +108,13 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
   mMainWindow->addDockWidget( addArea, mapWidget );
   if ( addArea == Qt::RightDockWidgetArea )
   {
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.width() }, Qt::Horizontal );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.height() }, Qt::Vertical );
   }
   else
   {
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.height() }, Qt::Vertical );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.width() }, Qt::Horizontal );
   }
   mMapWidgets.append( mapWidget );
   return mapWidget;
@@ -149,7 +149,7 @@ void KadasMapWidgetManager::clearMapWidgets()
 
 void KadasMapWidgetManager::mapWidgetDestroyed()
 {
-  KadasMapWidget *mapWidget = qobject_cast<KadasMapWidget *> ( QObject::sender() );
+  KadasMapWidget *mapWidget = qobject_cast<KadasMapWidget *>( QObject::sender() );
   if ( mapWidget )
   {
     mMapWidgets.removeAll( mapWidget );
@@ -228,9 +228,7 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
       mapWidget->widget()->setFixedSize(
         QSize(
           attributes.namedItem( "width" ).nodeValue().toInt(),
-          attributes.namedItem( "height" ).nodeValue().toInt()
-        )
-      );
+          attributes.namedItem( "height" ).nodeValue().toInt() ) );
       ba = QByteArray::fromBase64( attributes.namedItem( "extent" ).nodeValue().toLocal8Bit() );
       QRectF extent;
       ds >> extent;

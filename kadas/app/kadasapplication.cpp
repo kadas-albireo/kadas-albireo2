@@ -101,7 +101,6 @@
 #include "kadasmapgridlayer.h"
 
 
-
 const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
 const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
 
@@ -124,7 +123,7 @@ static void setupVectorLayer( const QString &vectorLayerPath,
   QString subLayerNameFormatted = rawLayerName;
   if ( settings.value( QStringLiteral( "qgis/formatLayerName" ), false ).toBool() )
   {
-    subLayerNameFormatted =  QgsMapLayer::formatLayerName( subLayerNameFormatted );
+    subLayerNameFormatted = QgsMapLayer::formatLayerName( subLayerNameFormatted );
   }
 
   if ( elements.size() >= 4 && layer->name().compare( rawLayerName, Qt::CaseInsensitive ) != 0
@@ -138,21 +137,14 @@ static void setupVectorLayer( const QString &vectorLayerPath,
   // Except for a few select extensions, known to be always single layer dataset.
   QFileInfo fi( vectorLayerPath );
   QString ext = fi.suffix().toLower();
-  if ( providerKey == QLatin1String( "ogr" ) &&
-       ext != QLatin1String( "shp" ) &&
-       ext != QLatin1String( "mif" ) &&
-       ext != QLatin1String( "tab" ) &&
-       ext != QLatin1String( "csv" ) &&
-       ext != QLatin1String( "geojson" ) &&
-       ! vectorLayerPath.contains( QStringLiteral( "layerid=" ) ) &&
-       ! vectorLayerPath.contains( QStringLiteral( "layername=" ) ) )
+  if ( providerKey == QLatin1String( "ogr" ) && ext != QLatin1String( "shp" ) && ext != QLatin1String( "mif" ) && ext != QLatin1String( "tab" ) && ext != QLatin1String( "csv" ) && ext != QLatin1String( "geojson" ) && !vectorLayerPath.contains( QStringLiteral( "layerid=" ) ) && !vectorLayerPath.contains( QStringLiteral( "layername=" ) ) )
   {
     auto uriParts = QgsProviderRegistry::instance()->decodeUri(
-                      layer->providerType(), layer->dataProvider()->dataSourceUri() );
+      layer->providerType(), layer->dataProvider()->dataSourceUri() );
     QString composedURI( uriParts.value( QStringLiteral( "path" ) ).toString() );
     composedURI += "|layername=" + rawLayerName;
 
-    auto newLayer = std::make_unique<QgsVectorLayer> ( composedURI, layer->name(), QStringLiteral( "ogr" ), options );
+    auto newLayer = std::make_unique<QgsVectorLayer>( composedURI, layer->name(), QStringLiteral( "ogr" ), options );
     if ( newLayer && newLayer->isValid() )
     {
       delete layer;
@@ -164,7 +156,7 @@ static void setupVectorLayer( const QString &vectorLayerPath,
 
 KadasApplication *KadasApplication::instance()
 {
-  return qobject_cast<KadasApplication *> ( QCoreApplication::instance() );
+  return qobject_cast<KadasApplication *>( QCoreApplication::instance() );
 }
 
 bool KadasApplication::isRunningFromBuildDir()
@@ -207,7 +199,7 @@ void KadasApplication::init()
 
   QTranslator *translator = new QTranslator( this );
   QString qm_file = QString( "kadas_%1" ).arg( translation() );
-  if (! translator->load( qm_file, QStringLiteral( ":/i18n/" ) ) )
+  if ( !translator->load( qm_file, QStringLiteral( ":/i18n/" ) ) )
     qWarning() << QString( "Could not load translation %1" ).arg( qm_file );
   QApplication::instance()->installTranslator( translator );
 
@@ -222,32 +214,28 @@ void KadasApplication::init()
 
   QgsApplication::initQgis();
 
-  QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
-      const QgsCoordinateReferenceSystem & destinationCrs,
-      const QgsDatumTransform::GridDetails & grid )
-  {
+  QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs,
+                                                                    const QgsCoordinateReferenceSystem &destinationCrs,
+                                                                    const QgsDatumTransform::GridDetails &grid ) {
     mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 requires missing grid %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( grid.shortName ) );
   } );
 
-  QgsCoordinateTransform::setCustomMissingPreferredGridHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
-      const QgsCoordinateReferenceSystem & destinationCrs,
-      const QgsDatumTransform::TransformDetails & /*preferredOperation*/,
-      const QgsDatumTransform::TransformDetails & /*availableOperation*/ )
-  {
+  QgsCoordinateTransform::setCustomMissingPreferredGridHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs,
+                                                                     const QgsCoordinateReferenceSystem &destinationCrs,
+                                                                     const QgsDatumTransform::TransformDetails & /*preferredOperation*/,
+                                                                     const QgsDatumTransform::TransformDetails & /*availableOperation*/ ) {
     mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
   } );
 
-  QgsCoordinateTransform::setCustomCoordinateOperationCreationErrorHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
-      const QgsCoordinateReferenceSystem & destinationCrs,
-      const QString & error )
-  {
+  QgsCoordinateTransform::setCustomCoordinateOperationCreationErrorHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs,
+                                                                                 const QgsCoordinateReferenceSystem &destinationCrs,
+                                                                                 const QString &error ) {
     mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable: %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( error ) );
   } );
 
-  QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler( [ = ]( const QgsCoordinateReferenceSystem & sourceCrs,
-      const QgsCoordinateReferenceSystem & destinationCrs,
-      const QgsDatumTransform::TransformDetails & /*desired*/ )
-  {
+  QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs,
+                                                                         const QgsCoordinateReferenceSystem &destinationCrs,
+                                                                         const QgsDatumTransform::TransformDetails & /*desired*/ ) {
     mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
   } );
 
@@ -264,12 +252,12 @@ void KadasApplication::init()
   bool settingsEmpty = false;
   if ( settings.value( "timestamp", 0 ).toInt() > 0 )
   {
-    QgsDebugMsgLevel( "Patching settings" , 1 );
+    QgsDebugMsgLevel( "Patching settings", 1 );
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_patch.ini" ) );
   }
   else
   {
-    QgsDebugMsgLevel( "Copying full settings" , 1 );
+    QgsDebugMsgLevel( "Copying full settings", 1 );
     settingsEmpty = true;
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_full.ini" ) );
   }
@@ -308,9 +296,8 @@ void KadasApplication::init()
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
   // Add network request logger
-  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest * req )
-  {
-    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ) , 2 );
+  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) {
+    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
   // Create main window
@@ -345,15 +332,13 @@ void KadasApplication::init()
   mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
-  QgsPathResolver::setPathPreprocessor( [this]( const QString & path ) { return migrateDatasource( path ); } );
+  QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
 
-  QgsDockableWidgetHelper::sAddTabifiedDockWidgetFunction = [](Qt::DockWidgetArea dockArea, QDockWidget* dock, const QStringList& tabSiblings, bool raiseTab)
-  {
+  QgsDockableWidgetHelper::sAddTabifiedDockWidgetFunction = []( Qt::DockWidgetArea dockArea, QDockWidget *dock, const QStringList &tabSiblings, bool raiseTab ) {
     // If we want to add tabified dock widgets as QGIS does, we need to implement this
     // KadasApplication::instance()->addTabifiedDockWidget(dockArea, dock, tabSiblings, raiseTab);
   };
-  QgsDockableWidgetHelper::sAppStylesheetFunction = []()->QString
-  {
+  QgsDockableWidgetHelper::sAppStylesheetFunction = []() -> QString {
     return KadasApplication::instance()->styleSheet();
   };
   QgsDockableWidgetHelper::sOwnerWindow = mMainWindow;
@@ -409,7 +394,7 @@ void KadasApplication::init()
   KadasNewsPopup::showIfNewsAvailable();
 
   // Continue loading application after exec()
-  QTimer::singleShot(1, this, &KadasApplication::initAfterExec);
+  QTimer::singleShot( 1, this, &KadasApplication::initAfterExec );
 }
 
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
@@ -430,7 +415,7 @@ void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSetti
 
 void KadasApplication::extractPortalToken()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   if ( reply->error() == QNetworkReply::NoError )
   {
     QByteArray data = reply->readAll();
@@ -446,7 +431,7 @@ void KadasApplication::extractPortalToken()
         const QStringList cookieUrls = settingsPortalCookieUrls->value();
         for ( const QString &url : cookieUrls )
         {
-          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ) , 1 );
+          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ), 1 );
           QNetworkCookie cookie = QNetworkCookie( QByteArray( "agstoken" ), obj[QStringLiteral( "token" )].toString().toLocal8Bit() );
           jar->setCookiesFromUrl( QList<QNetworkCookie>() << cookie, url.trimmed() );
         }
@@ -525,7 +510,6 @@ void KadasApplication::loadStartupProject()
               projectCreateFromTemplate( QString(), url );
             }
           }
-
         }
       }
       else
@@ -569,7 +553,7 @@ QgsRasterLayer *KadasApplication::addRasterLayer( const QString &uri, const QStr
   return layer;
 }
 
-QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet, int insOffset, bool adjustInsertionPoint )  const
+QgsVectorLayer *KadasApplication::addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet, int insOffset, bool adjustInsertionPoint ) const
 {
   if ( adjustInsertionPoint )
   {
@@ -594,7 +578,7 @@ void KadasApplication::addVectorLayers( const QStringList &layerUris, const QStr
   KadasAppLayerHandling::addOgrVectorLayers( layerUris, enc, dataSourceType, ok, !quiet );
 }
 
-void KadasApplication::addRasterLayers( const QStringList &layerUris, bool quiet )  const
+void KadasApplication::addRasterLayers( const QStringList &layerUris, bool quiet ) const
 {
   bool ok = false;
   KadasAppLayerHandling::addGdalRasterLayers( layerUris, ok, !quiet );
@@ -640,8 +624,7 @@ KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasM
   dialog.setLayout( new QVBoxLayout() );
   dialog.layout()->setMargin( 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
-  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer * layer )
-  {
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
     if ( !dynamic_cast<KadasItemLayer *>( layer ) )
     {
       return false;
@@ -692,8 +675,8 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     loop.exec( QEventLoop::ExcludeUserInputEvents );
     if ( reply->error() != QNetworkReply::NoError )
     {
-      QgsDebugMsgLevel( QString( "Could not read %1" ).arg( templateUrl.toString() ) , 2 );
-      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      QgsDebugMsgLevel( QString( "Could not read %1" ).arg( templateUrl.toString() ), 2 );
+      QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
     QString projectFileName = templateUrl.fragment();
@@ -704,8 +687,8 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     zip.open( QuaZip::mdUnzip );
     if ( !zip.setCurrentFile( projectFileName, QuaZip::csInsensitive ) )
     {
-      QgsDebugMsgLevel( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ) , 2 );
-      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      QgsDebugMsgLevel( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ), 2 );
+      QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
     QuaZipFile zipFile( &zip );
@@ -717,8 +700,8 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     }
     else
     {
-      QgsDebugMsgLevel( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ) , 2 );
-      QMessageBox::critical( mMainWindow, tr( "Error" ),  tr( "Failed to read the project template." ) );
+      QgsDebugMsgLevel( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ), 2 );
+      QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
     unzipFile.close();
@@ -748,8 +731,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
     QgsSettings settings;
     QString lastUsedDir = settings.value( "UI/lastProjectDir", QDir::homePath() ).toString();
     fileName = QFileDialog::getOpenFileName(
-                 mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)"
-               );
+      mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)" );
     if ( fileName.isEmpty() )
     {
       return false;
@@ -781,8 +763,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   QStringList filesToAttach;
   QString migratedFileName = KadasProjectMigration::migrateProject( openFileName, filesToAttach );
 
-  QString attachResolverId = QgsPathResolver::setPathPreprocessor( [filesToAttach]( const QString & path )
-  {
+  QString attachResolverId = QgsPathResolver::setPathPreprocessor( [filesToAttach]( const QString &path ) {
     if ( filesToAttach.contains( path ) )
     {
       QString attachedFile = QgsProject::instance()->createAttachedFile( QFileInfo( path ).fileName() );
@@ -911,8 +892,8 @@ bool KadasApplication::projectSaveDirty()
   if ( QgsProject::instance()->isDirty() )
   {
     QMessageBox::StandardButton response = QMessageBox::question(
-        mMainWindow, tr( "Save Project" ), tr( "Do you want to save the current project?" ),
-        QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
+      mMainWindow, tr( "Save Project" ), tr( "Do you want to save the current project?" ),
+      QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
     if ( response == QMessageBox::Yes )
     {
       return projectSave();
@@ -937,13 +918,12 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
 
     QString path = QFileDialog::getSaveFileName(
-                     mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)"
-                   );
+      mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)" );
     if ( path.isEmpty() )
     {
       return false;
     }
-    settings.setValue( QStringLiteral( "UI/lastProjectDir" ), QFileInfo( path ).absolutePath() ) ;
+    settings.setValue( QStringLiteral( "UI/lastProjectDir" ), QFileInfo( path ).absolutePath() );
     if ( !path.endsWith( ".qgz", Qt::CaseInsensitive ) )
     {
       path += ".qgz";
@@ -996,9 +976,8 @@ void KadasApplication::saveAttributeTableDocks( QDomDocument &doc )
   // save attribute tables
   QDomElement attributeTablesElement = doc.createElement( QStringLiteral( "attributeTables" ) );
 
-  QSet< KadasAttributeTableDialog * > storedDialogs;
-  auto saveDialog = [&storedDialogs, &attributeTablesElement, &doc]( KadasAttributeTableDialog * attributeTableDialog )
-  {
+  QSet<KadasAttributeTableDialog *> storedDialogs;
+  auto saveDialog = [&storedDialogs, &attributeTablesElement, &doc]( KadasAttributeTableDialog *attributeTableDialog ) {
     if ( storedDialogs.contains( attributeTableDialog ) )
       return;
 
@@ -1008,10 +987,10 @@ void KadasApplication::saveAttributeTableDocks( QDomDocument &doc )
     storedDialogs.insert( attributeTableDialog );
   };
 
-  const QList<QWidget * > topLevelWidgets = QgsApplication::topLevelWidgets();
+  const QList<QWidget *> topLevelWidgets = QgsApplication::topLevelWidgets();
   for ( QWidget *widget : topLevelWidgets )
   {
-    const QList< KadasAttributeTableDialog * > dialogChildren = widget->findChildren< KadasAttributeTableDialog * >();
+    const QList<KadasAttributeTableDialog *> dialogChildren = widget->findChildren<KadasAttributeTableDialog *>();
     for ( KadasAttributeTableDialog *attributeTableDialog : dialogChildren )
     {
       saveDialog( attributeTableDialog );
@@ -1019,16 +998,16 @@ void KadasApplication::saveAttributeTableDocks( QDomDocument &doc )
   }
 
   qgisNode.appendChild( attributeTablesElement );
-  }
+}
 
-void KadasApplication::restoreAttributeTables(const QDomDocument &doc)
+void KadasApplication::restoreAttributeTables( const QDomDocument &doc )
 {
   const QDomElement attributeTablesElement = doc.documentElement().firstChildElement( QStringLiteral( "attributeTables" ) );
   const QDomNodeList attributeTableNodes = attributeTablesElement.elementsByTagName( QStringLiteral( "attributeTable" ) );
   for ( int i = 0; i < attributeTableNodes.size(); ++i )
   {
     const QDomElement attributeTableElement = attributeTableNodes.at( i ).toElement();
-    KadasAttributeTableDialog::createFromXml(attributeTableElement, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow );
+    KadasAttributeTableDialog::createFromXml( attributeTableElement, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow );
   }
 }
 
@@ -1045,7 +1024,7 @@ void KadasApplication::addDefaultPrintTemplates()
 
 void KadasApplication::saveMapAsImage()
 {
-  QPair< QString, QString> fileAndFilter = QgsGuiUtils::getSaveAsImageName( mMainWindow, tr( "Choose an Image File" ) );
+  QPair<QString, QString> fileAndFilter = QgsGuiUtils::getSaveAsImageName( mMainWindow, tr( "Choose an Image File" ) );
   if ( fileAndFilter.first.isEmpty() )
   {
     return;
@@ -1070,7 +1049,7 @@ void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
   if ( vlayer )
   {
     // Deletes on close
-    KadasAttributeTableDialog* table = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
+    KadasAttributeTableDialog *table = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
     table->show();
   }
 }
@@ -1155,7 +1134,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   {
     layerUrl = QUrlQuery( layer->source() ).queryItemValue( "url" );
   }
-  QgsDebugMsgLevel( QString( "GDI layer url is %1" ).arg( layerUrl ) , 2 );
+  QgsDebugMsgLevel( QString( "GDI layer url is %1" ).arg( layerUrl ), 2 );
   if ( layerUrl.isEmpty() )
   {
     return;
@@ -1165,11 +1144,10 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   {
     gdiBaseUrl += "/";
   }
-  QUrl searchUrl( gdiBaseUrl + "sharing/rest/search?f=pjson&q=" +  QUrl::toPercentEncoding( "url:" + layerUrl ) );
-  QgsDebugMsgLevel( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ) , 2 );
+  QUrl searchUrl( gdiBaseUrl + "sharing/rest/search?f=pjson&q=" + QUrl::toPercentEncoding( "url:" + layerUrl ) );
+  QgsDebugMsgLevel( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ), 2 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( searchUrl ) );
-  connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply]
-  {
+  connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply] {
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     QVariantList results = rootMap["results"].toList();
     if ( results.length() == 1 )
@@ -1177,7 +1155,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
       QVariantMap result = results.at( 0 ).toMap();
       QString id = result["id"].toString();
       QString metadataUrl = gdiBaseUrl + "home/item.html?id=" + id;
-      QgsDebugMsgLevel( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ) , 2 );
+      QgsDebugMsgLevel( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ), 2 );
       QDesktopServices::openUrl( metadataUrl );
     }
     else
@@ -1318,7 +1296,7 @@ void KadasApplication::onMapToolChanged( QgsMapTool *newTool, QgsMapTool *oldToo
   if ( oldTool )
   {
     disconnect( oldTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
-//    disconnect( oldTool, SIGNAL( messageDiscarded() ), this, SLOT( removeMapToolMessage() ) );
+    //    disconnect( oldTool, SIGNAL( messageDiscarded() ), this, SLOT( removeMapToolMessage() ) );
     if ( dynamic_cast<KadasMapToolPan *>( oldTool ) )
     {
       disconnect( static_cast<KadasMapToolPan *>( oldTool ), &KadasMapToolPan::itemPicked, this, &KadasApplication::handleItemPicked );
@@ -1490,13 +1468,12 @@ void KadasApplication::extentChanged()
   const QgsMapCanvas *mapCanvas = mMainWindow->mapCanvas();
   mMainWindow->layerTreeView()->layerTreeModel()->setLegendMapViewData(
     mapCanvas->mapUnitsPerPixel(),
-    static_cast< int >( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale()
-  );
+    static_cast<int>( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale() );
 }
 
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &result )
 {
-  if ( qobject_cast<KadasItemLayer *> ( result.layer ) )
+  if ( qobject_cast<KadasItemLayer *>( result.layer ) )
   {
     KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
@@ -1707,12 +1684,12 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   {
     return;
   }
-  QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ) , 2 );
+  QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ), 2 );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
   QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
   for ( const QNetworkCookie &cookie : cookies )
   {
-    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ) , 2 );
+    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
@@ -1722,7 +1699,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
         query.addQueryItem( "token", tokenRe.cap( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
-        QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ) , 2 );
+        QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );
         break;
       }
     }
@@ -1790,13 +1767,13 @@ bool KadasApplication::askUserForDatumTransform( const QgsCoordinateReferenceSys
 
 bool KadasApplication::checkTasksDependOnProject()
 {
-  QSet< QString > activeTaskDescriptions;
+  QSet<QString> activeTaskDescriptions;
   QMap<QString, QgsMapLayer *> layers = QgsProject::instance()->mapLayers();
   QMap<QString, QgsMapLayer *>::const_iterator layerIt = layers.constBegin();
 
   for ( ; layerIt != layers.constEnd(); ++layerIt )
   {
-    QList< QgsTask * > tasks = QgsApplication::taskManager()->tasksDependentOnLayer( layerIt.value() );
+    QList<QgsTask *> tasks = QgsApplication::taskManager()->tasksDependentOnLayer( layerIt.value() );
     if ( !tasks.isEmpty() )
     {
       const auto constTasks = tasks;

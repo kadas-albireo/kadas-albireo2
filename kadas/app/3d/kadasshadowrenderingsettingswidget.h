@@ -34,7 +34,6 @@ class KadasShadowRenderingSettingsWidget : public QWidget, private Ui::ShadowRen
     QgsShadowSettings toShadowSettings();
   public slots:
     void onDirectionalLightsCountChanged( int newCount );
-
 };
 
 #endif // SHADOWRENDERINGSETTINGSWIDGET_H

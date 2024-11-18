@@ -50,7 +50,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
 
   //open input file
   int xSize, ySize;
-  GDALDatasetH  inputDataset = openInputFile( xSize, ySize );
+  GDALDatasetH inputDataset = openInputFile( xSize, ySize );
   if ( inputDataset == NULL )
   {
     errorMsg = QApplication::translate( "KadasNineCellFilter", "Unable to open input file" );
@@ -149,12 +149,12 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     }
     else
     {
-      QgsDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1" , 2 );
+      QgsDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1", 2 );
       mZFactor = 1;
     }
   }
 
-  if ( ySize < 3 )   //we require at least three rows (should be true for most datasets)
+  if ( ySize < 3 ) //we require at least three rows (should be true for most datasets)
   {
     GDALClose( inputDataset );
     GDALClose( outputDataset );
@@ -206,7 +206,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
       scanLine3 = ( float * ) CPLMalloc( sizeof( float ) * xSize );
     }
 
-    if ( i == ySize - 1 )   //fill the row below the bottom with nodata values
+    if ( i == ySize - 1 ) //fill the row below the bottom with nodata values
     {
       for ( int a = 0; a < xSize; ++a )
       {
@@ -219,7 +219,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
       Q_UNUSED( err );
     }
 
-    #pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule( static )
     for ( int j = 0; j < xSize; ++j )
     {
       if ( j == 0 )
@@ -307,13 +307,11 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordina
   QgsCoordinateTransform ct( regionCrs, datasetCrs, QgsProject::instance() );
 
   // Transform raster geo position to pixel coordinates
-  QgsPointXY regionPoints[4] =
-  {
+  QgsPointXY regionPoints[4] = {
     QgsPointXY( region.xMinimum(), region.yMinimum() ),
     QgsPointXY( region.xMaximum(), region.yMinimum() ),
     QgsPointXY( region.xMaximum(), region.yMaximum() ),
-    QgsPointXY( region.xMinimum(), region.yMaximum() )
-  };
+    QgsPointXY( region.xMinimum(), region.yMaximum() ) };
   QgsPointXY pRaster = ct.transform( regionPoints[0] );
   double col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
   double row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
@@ -327,10 +325,10 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordina
     pRaster = ct.transform( regionPoints[i] );
     col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
     row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );
-    colStart  = std::min( colStart, static_cast <int>( std::floor( col ) ) );
-    colEnd  = std::max( colEnd, static_cast <int>( std::ceil( col ) ) );
-    rowStart = std::min( rowStart, static_cast <int>( std::floor( row ) ) );
-    rowEnd = std::max( rowEnd, static_cast <int>( std::ceil( row ) ) );
+    colStart = std::min( colStart, static_cast<int>( std::floor( col ) ) );
+    colEnd = std::max( colEnd, static_cast<int>( std::ceil( col ) ) );
+    rowStart = std::min( rowStart, static_cast<int>( std::floor( row ) ) );
+    rowEnd = std::max( rowEnd, static_cast<int>( std::ceil( row ) ) );
   }
 
   colStart = std::max( colStart, 0 );
@@ -419,24 +417,24 @@ float KadasNineCellFilter::calcFirstDerX( float *x11, float *x21, float *x31, fl
   double sum = 0;
 
   //first row
-  if ( *x31 != mInputNodataValue && *x11 != mInputNodataValue )   //the normal case
+  if ( *x31 != mInputNodataValue && *x11 != mInputNodataValue ) //the normal case
   {
     sum += ( *x31 - *x11 );
     weight += 2;
   }
-  else if ( *x31 == mInputNodataValue && *x11 != mInputNodataValue && *x21 != mInputNodataValue )     //probably 3x3 window is at the border
+  else if ( *x31 == mInputNodataValue && *x11 != mInputNodataValue && *x21 != mInputNodataValue ) //probably 3x3 window is at the border
   {
     sum += ( *x21 - *x11 );
     weight += 1;
   }
-  else if ( *x11 == mInputNodataValue && *x31 != mInputNodataValue && *x21 != mInputNodataValue )     //probably 3x3 window is at the border
+  else if ( *x11 == mInputNodataValue && *x31 != mInputNodataValue && *x21 != mInputNodataValue ) //probably 3x3 window is at the border
   {
     sum += ( *x31 - *x21 );
     weight += 1;
   }
 
   //second row
-  if ( *x32 != mInputNodataValue && *x12 != mInputNodataValue )   //the normal case
+  if ( *x32 != mInputNodataValue && *x12 != mInputNodataValue ) //the normal case
   {
     sum += 2 * ( *x32 - *x12 );
     weight += 4;
@@ -453,7 +451,7 @@ float KadasNineCellFilter::calcFirstDerX( float *x11, float *x21, float *x31, fl
   }
 
   //third row
-  if ( *x33 != mInputNodataValue && *x13 != mInputNodataValue )   //the normal case
+  if ( *x33 != mInputNodataValue && *x13 != mInputNodataValue ) //the normal case
   {
     sum += ( *x33 - *x13 );
     weight += 2;
@@ -486,7 +484,7 @@ float KadasNineCellFilter::calcFirstDerY( float *x11, float *x21, float *x31, fl
   int weight = 0;
 
   //first row
-  if ( *x11 != mInputNodataValue && *x13 != mInputNodataValue )   //normal case
+  if ( *x11 != mInputNodataValue && *x13 != mInputNodataValue ) //normal case
   {
     sum += ( *x11 - *x13 );
     weight += 2;
@@ -543,4 +541,3 @@ float KadasNineCellFilter::calcFirstDerY( float *x11, float *x21, float *x31, fl
 
   return sum / ( weight * mCellSizeY * mZFactor );
 }
-

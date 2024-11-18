@@ -89,6 +89,7 @@ class KadasCanvasRefreshBlocker
         }
       }
     }
+
   private:
     bool mReleased = false;
 };
@@ -111,13 +112,13 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 
     case Qgis::LayerType::Mesh:
     {
-      QgsMeshLayer *meshLayer = qobject_cast< QgsMeshLayer *>( layer );
+      QgsMeshLayer *meshLayer = qobject_cast<QgsMeshLayer *>( layer );
       QDateTime referenceTime = QgsProject::instance()->timeSettings()->temporalRange().begin();
       if ( !referenceTime.isValid() ) // If project reference time is invalid, use current date
         referenceTime = QDateTime( QDate::currentDate(), QTime( 0, 0, 0 ), Qt::UTC );
 
-      if ( meshLayer->dataProvider() && !qobject_cast< QgsMeshLayerTemporalProperties * >( meshLayer->temporalProperties() )->referenceTime().isValid() )
-        qobject_cast< QgsMeshLayerTemporalProperties * >( meshLayer->temporalProperties() )->setReferenceTime( referenceTime, meshLayer->dataProvider()->temporalCapabilities() );
+      if ( meshLayer->dataProvider() && !qobject_cast<QgsMeshLayerTemporalProperties *>( meshLayer->temporalProperties() )->referenceTime().isValid() )
+        qobject_cast<QgsMeshLayerTemporalProperties *>( meshLayer->temporalProperties() )->setReferenceTime( referenceTime, meshLayer->dataProvider()->temporalCapabilities() );
 
       bool ok = false;
       meshLayer->loadDefaultStyle( ok );
@@ -161,13 +162,13 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
     {
       case Qgis::LayerType::Vector:
       {
-        QgsVectorLayer *vl = qobject_cast< QgsVectorLayer * >( layer );
+        QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
 
         // try to automatically load related tables for OGR layers
         if ( vl->providerType() == QLatin1String( "ogr" ) )
         {
           // first need to create weak relations!!
-          std::unique_ptr< QgsAbstractDatabaseProviderConnection > conn { QgsMapLayerUtils::databaseConnection( vl ) };
+          std::unique_ptr<QgsAbstractDatabaseProviderConnection> conn { QgsMapLayerUtils::databaseConnection( vl ) };
           if ( conn && ( conn->capabilities() & QgsAbstractDatabaseProviderConnection::Capability::RetrieveRelationships ) )
           {
             const QVariantMap uriParts = QgsProviderRegistry::instance()->decodeUri( layer->providerType(), layer->source() );
@@ -175,7 +176,7 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
             if ( layerName.isEmpty() )
               continue;
 
-            const QList< QgsWeakRelation > relations = conn->relationships( QString(), layerName );
+            const QList<QgsWeakRelation> relations = conn->relationships( QString(), layerName );
             if ( !relations.isEmpty() )
             {
               vl->setWeakRelations( relations );
@@ -198,7 +199,7 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
   }
 }
 
-QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringList &layers, const QString &encoding, const QString &dataSourceType, bool &ok, bool showWarningOnInvalid )
+QList<QgsMapLayer *> KadasAppLayerHandling::addOgrVectorLayers( const QStringList &layers, const QString &encoding, const QString &dataSourceType, bool &ok, bool showWarningOnInvalid )
 {
   //note: this method ONLY supports vector layers from the OGR provider!
   ok = false;
@@ -224,8 +225,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
 
       // if needed prompt for zipitem layers
       QString vsiPrefix = QgsZipItem::vsiPrefix( uri );
-      if ( ! uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) &&
-           ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
+      if ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
       {
         if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Vector } ) )
           continue;
@@ -256,20 +256,20 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
     const auto scheme { QUrl( uri ).scheme() };
     const bool isRemoteUrl { scheme.startsWith( QLatin1String( "http" ) ) || scheme == QLatin1String( "ftp" ) };
 
-    std::unique_ptr< QgsTemporaryCursorOverride > cursorOverride;
+    std::unique_ptr<QgsTemporaryCursorOverride> cursorOverride;
     if ( isVsiCurl || isRemoteUrl )
     {
-      cursorOverride = std::make_unique< QgsTemporaryCursorOverride >( Qt::WaitCursor );
+      cursorOverride = std::make_unique<QgsTemporaryCursorOverride>( Qt::WaitCursor );
       kApp->mainWindow()->messageBar()->pushInfo( QObject::tr( "Remote layer" ), QObject::tr( "loading %1, please wait …" ).arg( uri ) );
       qApp->processEvents();
     }
 
-    QList< QgsProviderSublayerDetails > sublayers = QgsProviderRegistry::instance()->providerMetadata( QStringLiteral( "ogr" ) )->querySublayers( uri, Qgis::SublayerQueryFlag::IncludeSystemTables );
+    QList<QgsProviderSublayerDetails> sublayers = QgsProviderRegistry::instance()->providerMetadata( QStringLiteral( "ogr" ) )->querySublayers( uri, Qgis::SublayerQueryFlag::IncludeSystemTables );
     // filter out non-vector sublayers
-    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
-    {
-      return sublayer.type() != Qgis::LayerType::Vector;
-    } ), sublayers.end() );
+    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails &sublayer ) {
+                       return sublayer.type() != Qgis::LayerType::Vector;
+                     } ),
+                     sublayers.end() );
 
     cursorOverride.reset();
 
@@ -292,7 +292,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
           case SublayerHandling::AskUser:
           {
             // prompt user for sublayers
-            QgsProviderSublayersDialog dlg( uri, QStringLiteral( "ogr" ), path, sublayers, {Qgis::LayerType::Vector}, kApp->mainWindow() );
+            QgsProviderSublayersDialog dlg( uri, QStringLiteral( "ogr" ), path, sublayers, { Qgis::LayerType::Vector }, kApp->mainWindow() );
 
             if ( dlg.exec() )
               sublayers = dlg.selectedLayers();
@@ -309,10 +309,10 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
               // requery sublayers, resolving geometry types
               sublayers = QgsProviderRegistry::instance()->querySublayers( uri, Qgis::SublayerQueryFlag::ResolveGeometryType );
               // filter out non-vector sublayers
-              sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
-              {
-                return sublayer.type() != Qgis::LayerType::Vector;
-              } ), sublayers.end() );
+              sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails &sublayer ) {
+                                 return sublayer.type() != Qgis::LayerType::Vector;
+                               } ),
+                               sublayers.end() );
             }
             break;
           }
@@ -327,10 +327,10 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
         // requery sublayers, resolving geometry types
         sublayers = QgsProviderRegistry::instance()->querySublayers( uri, Qgis::SublayerQueryFlag::ResolveGeometryType );
         // filter out non-vector sublayers
-        sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails & sublayer )
-        {
-          return sublayer.type() != Qgis::LayerType::Vector;
-        } ), sublayers.end() );
+        sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), []( const QgsProviderSublayerDetails &sublayer ) {
+                           return sublayer.type() != Qgis::LayerType::Vector;
+                         } ),
+                         sublayers.end() );
       }
 
       // now add sublayers
@@ -338,15 +338,12 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
       {
         addedLayers << addSublayers( sublayers, baseName, groupName );
       }
-
     }
     else
     {
       QString msg = QObject::tr( "%1 is not a valid or recognized data source." ).arg( uri );
       // If the failed layer was a vsicurl type, give the user a chance to try the normal download.
-      if ( isVsiCurl &&
-           QMessageBox::question( kApp->mainWindow(), QObject::tr( "Invalid Data Source" ),
-                                  QObject::tr( "Download with \"Protocol\" source type has failed, do you want to try the \"File\" source type?" ) ) == QMessageBox::Yes )
+      if ( isVsiCurl && QMessageBox::question( kApp->mainWindow(), QObject::tr( "Invalid Data Source" ), QObject::tr( "Download with \"Protocol\" source type has failed, do you want to try the \"File\" source type?" ) ) == QMessageBox::Yes )
       {
         QString fileUri = uri;
         fileUri.replace( QLatin1String( "/vsicurl/" ), " " );
@@ -373,14 +370,14 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addOgrVectorLayers( const QStringL
   {
     if ( !encoding.isEmpty() )
     {
-      if ( QgsVectorLayer *vl = qobject_cast< QgsVectorLayer * >( l ) )
+      if ( QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( l ) )
         vl->setProviderEncoding( encoding );
     }
 
     kApp->askUserForDatumTransform( l->crs(), QgsProject::instance()->crs(), l );
     KadasAppLayerHandling::postProcessAddedLayer( l );
   }
-//  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
+  //  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
 
   ok = true;
   addedLayers.append( layersToAdd );
@@ -420,7 +417,7 @@ QgsPointCloudLayer *KadasAppLayerHandling::addPointCloudLayer( const QString &ur
 
 
   QgsProject::instance()->addMapLayer( layer.get() );
-//  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
+  //  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
 
   return layer.release();
 }
@@ -474,7 +471,7 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
   KadasAppLayerHandling::postProcessAddedLayer( layer.get() );
 
   QgsProject::instance()->addMapLayer( layer.get() );
-//  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
+  //  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
 
   return layer.release();
 }
@@ -482,13 +479,13 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
 bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const QList<Qgis::LayerType> &acceptableTypes )
 {
   // query sublayers
-  QList< QgsProviderSublayerDetails > sublayers = QgsProviderRegistry::instance()->querySublayers( path, Qgis::SublayerQueryFlag::IncludeSystemTables );
+  QList<QgsProviderSublayerDetails> sublayers = QgsProviderRegistry::instance()->querySublayers( path, Qgis::SublayerQueryFlag::IncludeSystemTables );
 
   // filter out non-matching sublayers
-  sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails & sublayer )
-  {
-    return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
-  } ), sublayers.end() );
+  sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails &sublayer ) {
+                     return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
+                   } ),
+                   sublayers.end() );
 
   if ( sublayers.empty() )
     return false;
@@ -521,10 +518,10 @@ bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const 
         {
           // requery sublayers, resolving geometry types
           sublayers = QgsProviderRegistry::instance()->querySublayers( path, Qgis::SublayerQueryFlag::ResolveGeometryType );
-          sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails & sublayer )
-          {
-            return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
-          } ), sublayers.end() );
+          sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails &sublayer ) {
+                             return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
+                           } ),
+                           sublayers.end() );
         }
         break;
       }
@@ -538,10 +535,10 @@ bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const 
   {
     // requery sublayers, resolving geometry types
     sublayers = QgsProviderRegistry::instance()->querySublayers( path, Qgis::SublayerQueryFlag::ResolveGeometryType );
-    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails & sublayer )
-    {
-      return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
-    } ), sublayers.end() );
+    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [acceptableTypes]( const QgsProviderSublayerDetails &sublayer ) {
+                       return !acceptableTypes.empty() && !acceptableTypes.contains( sublayer.type() );
+                     } ),
+                     sublayers.end() );
   }
 
   // now add sublayers
@@ -557,7 +554,7 @@ bool KadasAppLayerHandling::askUserForZipItemLayers( const QString &path, const 
     }
 
     addSublayers( sublayers, base, groupName );
-//    QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
+    //    QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
   }
 
   return true;
@@ -647,7 +644,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
     std::reverse( sortedLayers.begin(), sortedLayers.end() );
   }
 
-  QList< QgsMapLayer * > result;
+  QList<QgsMapLayer *> result;
   result.reserve( sortedLayers.size() );
 
   for ( const QgsProviderSublayerDetails &sublayer : std::as_const( sortedLayers ) )
@@ -703,7 +700,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
     // next runs -- so in those cases we can't assume that the project's CRS has been matched to the actual desired CRS yet.
     // In these cases we don't need to show the coordinate operation selection choice, so just hardcode an exception in here to avoid that...
     QgsCoordinateReferenceSystem projectCrsAfterLayerAdd = QgsProject::instance()->crs();
-    const QgsGui::ProjectCrsBehavior projectCrsBehavior = QgsSettings().enumValue( QStringLiteral( "/projections/newProjectCrsBehavior" ),  QgsGui::UseCrsOfFirstLayerAdded, QgsSettings::App );
+    const QgsGui::ProjectCrsBehavior projectCrsBehavior = QgsSettings().enumValue( QStringLiteral( "/projections/newProjectCrsBehavior" ), QgsGui::UseCrsOfFirstLayerAdded, QgsSettings::App );
     switch ( projectCrsBehavior )
     {
       case QgsGui::UseCrsOfFirstLayerAdded:
@@ -738,11 +735,10 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
   return result;
 }
 
-QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName, bool &ok, bool allowInteractive, bool suppressBulkLayerPostProcessing )
+QList<QgsMapLayer *> KadasAppLayerHandling::openLayer( const QString &fileName, bool &ok, bool allowInteractive, bool suppressBulkLayerPostProcessing )
 {
-  QList< QgsMapLayer * > openedLayers;
-  auto postProcessAddedLayers = [suppressBulkLayerPostProcessing, &openedLayers]
-  {
+  QList<QgsMapLayer *> openedLayers;
+  auto postProcessAddedLayers = [suppressBulkLayerPostProcessing, &openedLayers] {
     if ( !suppressBulkLayerPostProcessing )
       KadasAppLayerHandling::postProcessAddedLayers( openedLayers );
   };
@@ -751,7 +747,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
   const QFileInfo fileInfo( fileName );
 
   // highest priority = delegate to provider registry to handle
-  const QList< QgsProviderRegistry::ProviderCandidateDetails > candidateProviders = QgsProviderRegistry::instance()->preferredProvidersForUri( fileName );
+  const QList<QgsProviderRegistry::ProviderCandidateDetails> candidateProviders = QgsProviderRegistry::instance()->preferredProvidersForUri( fileName );
   if ( candidateProviders.size() == 1 && candidateProviders.at( 0 ).layerTypes().size() == 1 )
   {
     // one good candidate provider and possible layer type -- that makes things nice and easy!
@@ -862,7 +858,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
     }
   }
 
-  QList< QgsProviderSublayerModel::NonLayerItem > nonLayerItems;
+  QList<QgsProviderSublayerModel::NonLayerItem> nonLayerItems;
   if ( QgsProjectStorage *ps = QgsApplication::projectStorageRegistry()->projectStorageFromUri( fileName ) )
   {
     const QStringList projects = ps->listProjects( fileName );
@@ -878,7 +874,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
   }
 
   // query sublayers
-  QList< QgsProviderSublayerDetails > sublayers = QgsProviderRegistry::instance()->querySublayers( fileName, Qgis::SublayerQueryFlag::IncludeSystemTables );
+  QList<QgsProviderSublayerDetails> sublayers = QgsProviderRegistry::instance()->querySublayers( fileName, Qgis::SublayerQueryFlag::IncludeSystemTables );
 
   if ( !sublayers.empty() || !nonLayerItems.empty() )
   {
@@ -947,7 +943,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
       }
 
       openedLayers.append( addSublayers( sublayers, base, groupName ) );
-//      KadasAppLayerHandling()->activateDeactivateLayerRelatedActions( KadasAppLayerHandling()->activeLayer() );
+      //      KadasAppLayerHandling()->activateDeactivateLayerRelatedActions( KadasAppLayerHandling()->activeLayer() );
     }
     else if ( !nonLayerItems.empty() )
     {
@@ -1001,17 +997,17 @@ QList< QgsMapLayer * > KadasAppLayerHandling::openLayer( const QString &fileName
 
 QgsVectorLayer *KadasAppLayerHandling::addVectorLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid )
 {
-  return addLayerPrivate< QgsVectorLayer >( Qgis::LayerType::Vector, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "ogr" ), showWarningOnInvalid );
+  return addLayerPrivate<QgsVectorLayer>( Qgis::LayerType::Vector, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "ogr" ), showWarningOnInvalid );
 }
 
 QgsRasterLayer *KadasAppLayerHandling::addRasterLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid )
 {
-  return addLayerPrivate< QgsRasterLayer >( Qgis::LayerType::Raster, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "gdal" ), showWarningOnInvalid );
+  return addLayerPrivate<QgsRasterLayer>( Qgis::LayerType::Raster, uri, baseName, !provider.isEmpty() ? provider : QLatin1String( "gdal" ), showWarningOnInvalid );
 }
 
 QgsMeshLayer *KadasAppLayerHandling::addMeshLayer( const QString &uri, const QString &baseName, const QString &provider )
 {
-  return addLayerPrivate< QgsMeshLayer >( Qgis::LayerType::Mesh, uri, baseName, provider, true );
+  return addLayerPrivate<QgsMeshLayer>( Qgis::LayerType::Mesh, uri, baseName, provider, true );
 }
 
 QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringList &uris, bool &ok, bool showWarningOnInvalid )
@@ -1028,7 +1024,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
   // be ogr layers. We'll set returnValue to false if one or more layers fail
   // to load.
 
-  QList< QgsMapLayer * > res;
+  QList<QgsMapLayer *> res;
 
   for ( const QString &uri : uris )
   {
@@ -1036,8 +1032,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
 
     // if needed prompt for zipitem layers
     QString vsiPrefix = QgsZipItem::vsiPrefix( uri );
-    if ( ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) ) &&
-         ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
+    if ( ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) ) && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
     {
       if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Raster } ) )
         continue;
@@ -1046,10 +1041,10 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
     const bool isVsiCurl { uri.startsWith( QLatin1String( "/vsicurl" ), Qt::CaseInsensitive ) };
     const bool isRemoteUrl { uri.startsWith( QLatin1String( "http" ) ) || uri == QLatin1String( "ftp" ) };
 
-    std::unique_ptr< QgsTemporaryCursorOverride > cursorOverride;
+    std::unique_ptr<QgsTemporaryCursorOverride> cursorOverride;
     if ( isVsiCurl || isRemoteUrl )
     {
-      cursorOverride = std::make_unique< QgsTemporaryCursorOverride >( Qt::WaitCursor );
+      cursorOverride = std::make_unique<QgsTemporaryCursorOverride>( Qt::WaitCursor );
       kApp->mainWindow()->messageBar()->pushInfo( QObject::tr( "Remote layer" ), QObject::tr( "loading %1, please wait …" ).arg( uri ) );
       qApp->processEvents();
     }
@@ -1061,9 +1056,9 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
       // set the layer name to the file base name unless provided explicitly
       QString layerName;
       const QVariantMap uriDetails = QgsProviderRegistry::instance()->decodeUri( QStringLiteral( "gdal" ), uri );
-      if ( !uriDetails[ QStringLiteral( "layerName" ) ].toString().isEmpty() )
+      if ( !uriDetails[QStringLiteral( "layerName" )].toString().isEmpty() )
       {
-        layerName = uriDetails[ QStringLiteral( "layerName" ) ].toString();
+        layerName = uriDetails[QStringLiteral( "layerName" )].toString();
       }
       else
       {
@@ -1072,7 +1067,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
 
       // try to create the layer
       cursorOverride.reset();
-      QgsRasterLayer *layer = addLayerPrivate< QgsRasterLayer >( Qgis::LayerType::Raster, uri, layerName, QStringLiteral( "gdal" ), showWarningOnInvalid );
+      QgsRasterLayer *layer = addLayerPrivate<QgsRasterLayer>( Qgis::LayerType::Raster, uri, layerName, QStringLiteral( "gdal" ), showWarningOnInvalid );
       res << layer;
 
       if ( layer && layer->isValid() )
@@ -1162,8 +1157,8 @@ void KadasAppLayerHandling::openLayerDefinition( const QString &filename )
 
   if ( loaded )
   {
-    const QList< QgsReadWriteContext::ReadWriteMessage > messages = context.takeMessages();
-    QVector< QgsReadWriteContext::ReadWriteMessage > shownMessages;
+    const QList<QgsReadWriteContext::ReadWriteMessage> messages = context.takeMessages();
+    QVector<QgsReadWriteContext::ReadWriteMessage> shownMessages;
     for ( const QgsReadWriteContext::ReadWriteMessage &message : messages )
     {
       if ( shownMessages.contains( message ) )
@@ -1195,7 +1190,7 @@ void KadasAppLayerHandling::addLayerDefinition()
   openLayerDefinition( path );
 }
 
-QList< QgsMapLayer * > KadasAppLayerHandling::addDatabaseLayers( const QStringList &layerPathList, const QString &providerKey, bool &ok )
+QList<QgsMapLayer *> KadasAppLayerHandling::addDatabaseLayers( const QStringList &layerPathList, const QString &providerKey, bool &ok )
 {
   ok = false;
   QList<QgsMapLayer *> myList;
@@ -1223,7 +1218,7 @@ QList< QgsMapLayer * > KadasAppLayerHandling::addDatabaseLayers( const QStringLi
     QgsVectorLayer *layer = new QgsVectorLayer( uri.uri( false ), uri.table(), providerKey, options );
     Q_CHECK_PTR( layer );
 
-    if ( ! layer )
+    if ( !layer )
     {
       QApplication::restoreOverrideCursor();
 
@@ -1291,27 +1286,25 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
   {
     // run layer path through QgsPathResolver so that all inbuilt paths and other localised paths are correctly expanded
     path = QgsPathResolver().readPath( uriElements.value( QStringLiteral( "path" ) ).toString() );
-    uriElements[ QStringLiteral( "path" ) ] = path;
+    uriElements[QStringLiteral( "path" )] = path;
   }
   // Not all providers implement decodeUri(), so use original uri if uriElements is empty
   const QString updatedUri = uriElements.isEmpty() ? uri : QgsProviderRegistry::instance()->encodeUri( providerKey, uriElements );
 
-  const bool canQuerySublayers = QgsProviderRegistry::instance()->providerMetadata( providerKey ) &&
-                                 ( QgsProviderRegistry::instance()->providerMetadata( providerKey )->capabilities() & QgsProviderMetadata::QuerySublayers );
+  const bool canQuerySublayers = QgsProviderRegistry::instance()->providerMetadata( providerKey ) && ( QgsProviderRegistry::instance()->providerMetadata( providerKey )->capabilities() & QgsProviderMetadata::QuerySublayers );
 
   T *result = nullptr;
   if ( canQuerySublayers )
   {
     // query sublayers
-    QList< QgsProviderSublayerDetails > sublayers = QgsProviderRegistry::instance()->providerMetadata( providerKey ) ?
-        QgsProviderRegistry::instance()->providerMetadata( providerKey )->querySublayers( updatedUri, Qgis::SublayerQueryFlag::IncludeSystemTables )
-        : QgsProviderRegistry::instance()->querySublayers( updatedUri );
+    QList<QgsProviderSublayerDetails> sublayers = QgsProviderRegistry::instance()->providerMetadata( providerKey ) ? QgsProviderRegistry::instance()->providerMetadata( providerKey )->querySublayers( updatedUri, Qgis::SublayerQueryFlag::IncludeSystemTables )
+                                                                                                                   : QgsProviderRegistry::instance()->querySublayers( updatedUri );
 
     // filter out non-matching sublayers
-    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [type]( const QgsProviderSublayerDetails & sublayer )
-    {
-      return sublayer.type() != type;
-    } ), sublayers.end() );
+    sublayers.erase( std::remove_if( sublayers.begin(), sublayers.end(), [type]( const QgsProviderSublayerDetails &sublayer ) {
+                       return sublayer.type() != type;
+                     } ),
+                     sublayers.end() );
 
     if ( sublayers.empty() )
     {
@@ -1331,20 +1324,20 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
       {
         case SublayerHandling::AskUser:
         {
-          QgsProviderSublayersDialog dlg( updatedUri, QString(), path, sublayers, {type}, kApp->mainWindow() );
+          QgsProviderSublayersDialog dlg( updatedUri, QString(), path, sublayers, { type }, kApp->mainWindow() );
           if ( dlg.exec() )
           {
-            const QList< QgsProviderSublayerDetails > selectedLayers = dlg.selectedLayers();
+            const QList<QgsProviderSublayerDetails> selectedLayers = dlg.selectedLayers();
             if ( !selectedLayers.isEmpty() )
             {
-              result = qobject_cast< T * >( addSublayers( selectedLayers, baseName, dlg.groupName() ).value( 0 ) );
+              result = qobject_cast<T *>( addSublayers( selectedLayers, baseName, dlg.groupName() ).value( 0 ) );
             }
           }
           break;
         }
         case SublayerHandling::LoadAll:
         {
-          result = qobject_cast< T * >( addSublayers( sublayers, baseName, QString() ).value( 0 ) );
+          result = qobject_cast<T *>( addSublayers( sublayers, baseName, QString() ).value( 0 ) );
           break;
         }
         case SublayerHandling::AbortLoading:
@@ -1353,7 +1346,7 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
     }
     else
     {
-      result = qobject_cast< T * >( addSublayers( sublayers, name, QString() ).value( 0 ) );
+      result = qobject_cast<T *>( addSublayers( sublayers, name, QString() ).value( 0 ) );
 
       if ( result )
       {
@@ -1370,7 +1363,7 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
   {
     QgsMapLayerFactory::LayerOptions options( QgsProject::instance()->transformContext() );
     options.loadDefaultStyle = false;
-    result = qobject_cast< T * >( QgsMapLayerFactory::createLayer( uri, name, type, options, providerKey ) );
+    result = qobject_cast<T *>( QgsMapLayerFactory::createLayer( uri, name, type, options, providerKey ) );
     if ( result )
     {
       QString base( baseName );
@@ -1386,7 +1379,7 @@ T *KadasAppLayerHandling::addLayerPrivate( Qgis::LayerType type, const QString &
     }
   }
 
-//  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
+  //  QgisApp::instance()->activateDeactivateLayerRelatedActions( QgisApp::instance()->activeLayer() );
   return result;
 }
 
@@ -1406,13 +1399,10 @@ const QList<QgsVectorLayerRef> KadasAppLayerHandling::findBrokenLayerDependencie
         for ( const QgsVectorLayerRef &dependency : constDependencies )
         {
           // I guess we need and isNull()/isValid() method for the ref
-          if ( dependency.layer ||
-               ! dependency.name.isEmpty() ||
-               ! dependency.source.isEmpty() ||
-               ! dependency.layerId.isEmpty() )
+          if ( dependency.layer || !dependency.name.isEmpty() || !dependency.source.isEmpty() || !dependency.layerId.isEmpty() )
           {
             const QgsVectorLayer *depVl { QgsVectorLayerRef( dependency ).resolveWeakly( QgsProject::instance(), matchType ) };
-            if ( ! depVl || ! depVl->isValid() )
+            if ( !depVl || !depVl->isValid() )
             {
               brokenDependencies.append( dependency );
             }
@@ -1428,7 +1418,7 @@ const QList<QgsVectorLayerRef> KadasAppLayerHandling::findBrokenLayerDependencie
     const QList<QgsWeakRelation> weakRelations { vl->weakRelations() };
     for ( const QgsWeakRelation &weakRelation : weakRelations )
     {
-      QList< QgsVectorLayerRef > dependencies;
+      QList<QgsVectorLayerRef> dependencies;
 
       if ( !( dependencyFlags & DependencyFlag::LoadAllRelationships ) )
       {
@@ -1481,7 +1471,7 @@ const QList<QgsVectorLayerRef> KadasAppLayerHandling::findBrokenLayerDependencie
             break;
           }
         }
-        if ( ! refFound )
+        if ( !refFound )
         {
           brokenDependencies.append( dependency );
         }
@@ -1511,7 +1501,7 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
       {
         // Retrieve the DB connection (if any)
 
-        std::unique_ptr< QgsAbstractDatabaseProviderConnection > conn { QgsMapLayerUtils::databaseConnection( vl ) };
+        std::unique_ptr<QgsAbstractDatabaseProviderConnection> conn { QgsMapLayerUtils::databaseConnection( vl ) };
         if ( conn )
         {
           QString tableSchema;
@@ -1533,12 +1523,11 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
           }
 
           // Helper to find layers in connections
-          auto layerFinder = [ &conn, &dependency, &providerName ]( const QString & tableSchema, const QString & tableName ) -> QgsVectorLayer *
-          {
+          auto layerFinder = [&conn, &dependency, &providerName]( const QString &tableSchema, const QString &tableName ) -> QgsVectorLayer * {
             // First try the current schema (or no schema if it's not supported from the provider)
             try
             {
-              const QString layerUri { conn->tableUri( tableSchema, tableName )};
+              const QString layerUri { conn->tableUri( tableSchema, tableName ) };
               // Aggressive doesn't mean stupid: check if a layer with the same URI
               // was already loaded, this catches a corner case for renamed/moved GPKGS
               // where the dependency was actually loaded but it was found as broken
@@ -1553,7 +1542,7 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
                 }
               }
               // Load it!
-              std::unique_ptr< QgsVectorLayer > newVl = std::make_unique< QgsVectorLayer >( layerUri, !dependency.name.isEmpty() ? dependency.name : tableName, providerName );
+              std::unique_ptr<QgsVectorLayer> newVl = std::make_unique<QgsVectorLayer>( layerUri, !dependency.name.isEmpty() ? dependency.name : tableName, providerName );
               if ( newVl->isValid() )
               {
                 QgsVectorLayer *res = newVl.get();
@@ -1571,7 +1560,7 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
           loadedLayer = layerFinder( tableSchema, tableName );
 
           // Try different schemas
-          if ( ! loadedLayer && conn->capabilities().testFlag( QgsAbstractDatabaseProviderConnection::Capability::Schemas ) && ! tableSchema.isEmpty() )
+          if ( !loadedLayer && conn->capabilities().testFlag( QgsAbstractDatabaseProviderConnection::Capability::Schemas ) && !tableSchema.isEmpty() )
           {
             const QStringList schemas { conn->schemas() };
             for ( const QString &schemaName : schemas )
@@ -1588,7 +1577,7 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
           }
         }
       }
-      if ( ! loadedLayer )
+      if ( !loadedLayer )
       {
         const QString msg { QObject::tr( "layer '%1' requires layer '%2' to be loaded but '%2' could not be found, please load it manually if possible." ).arg( vl->name(), dependency.name ) };
         kApp->mainWindow()->messageBar()->pushWarning( QObject::tr( "Missing layer form dependency" ), msg );
@@ -1596,8 +1585,8 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
       else if ( !( dependencyFlags & DependencyFlag::SilentLoad ) )
       {
         kApp->mainWindow()->messageBar()->pushSuccess( QObject::tr( "Missing layer form dependency" ), QObject::tr( "Layer dependency '%2' required by '%1' was automatically loaded." )
-            .arg( vl->name(),
-                  loadedLayer->name() ) );
+                                                                                                         .arg( vl->name(),
+                                                                                                               loadedLayer->name() ) );
       }
     }
   }
@@ -1607,10 +1596,10 @@ void KadasAppLayerHandling::resolveVectorLayerWeakRelations( QgsVectorLayer *vec
 {
   if ( vectorLayer && vectorLayer->isValid() )
   {
-    const QList<QgsWeakRelation> constWeakRelations { vectorLayer->weakRelations( ) };
+    const QList<QgsWeakRelation> constWeakRelations { vectorLayer->weakRelations() };
     for ( const QgsWeakRelation &rel : constWeakRelations )
     {
-      const QList< QgsRelation > relations { rel.resolvedRelations( QgsProject::instance(), matchType ) };
+      const QList<QgsRelation> relations { rel.resolvedRelations( QgsProject::instance(), matchType ) };
       for ( const QgsRelation &relation : relations )
       {
         if ( relation.isValid() )
@@ -1637,9 +1626,8 @@ void KadasAppLayerHandling::resolveVectorLayerWeakRelations( QgsVectorLayer *vec
 
 void KadasAppLayerHandling::onVectorLayerStyleLoaded( QgsVectorLayer *vl, QgsMapLayer::StyleCategories categories )
 {
-  if ( vl && vl->isValid( ) )
+  if ( vl && vl->isValid() )
   {
-
     // Check broken dependencies in forms
     if ( categories.testFlag( QgsMapLayer::StyleCategory::Forms ) )
     {
@@ -1653,4 +1641,3 @@ void KadasAppLayerHandling::onVectorLayerStyleLoaded( QgsVectorLayer *vl, QgsMap
     }
   }
 }
-

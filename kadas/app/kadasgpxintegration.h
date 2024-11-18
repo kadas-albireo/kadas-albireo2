@@ -34,19 +34,18 @@ class KadasItemLayer;
 class KadasMainWindow;
 
 
-
 class KadasWayPointInterface : public KadasMapItemInterface
 {
   public:
     KadasWayPointInterface() = default;
-    KadasMapItem* createItem() const override;
+    KadasMapItem *createItem() const override;
 };
 
 class KadasRouteInterface : public KadasMapItemInterface
 {
   public:
     KadasRouteInterface() = default;
-    KadasMapItem* createItem() const override;
+    KadasMapItem *createItem() const override;
 };
 
 class KadasGpxDropHandler : public QgsCustomDropHandler
@@ -69,7 +68,7 @@ class KadasGpxIntegration : public QObject
     static bool importGpx( const QString &filename, QString &errorMsg );
 
   private:
-    void toggleCreateItem(bool active, std::unique_ptr<KadasMapItemInterface> interface );
+    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
     KadasGpxDropHandler mDropHandler;
 

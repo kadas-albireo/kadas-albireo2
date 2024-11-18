@@ -23,8 +23,17 @@ class KadasGuideGridLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
-    enum LabelingPos {LabelsInside, LabelsOutside};
-    enum QuadrantLabeling {DontLabelQuadrants, LabelOneQuadrant, LabelAllQuadrants};
+    enum LabelingPos
+    {
+      LabelsInside,
+      LabelsOutside
+    };
+    enum QuadrantLabeling
+    {
+      DontLabelQuadrants,
+      LabelOneQuadrant,
+      LabelAllQuadrants
+    };
     static QString layerType() { return "guide_grid"; }
 
     KadasGuideGridLayer( const QString &name );
@@ -34,7 +43,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     KadasGuideGridLayer *clone() const override;
     QList<IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    QgsRectangle extent() const override  { return mGridConfig.gridRect; }
+    QgsRectangle extent() const override { return mGridConfig.gridRect; }
 
     int cols() const { return mGridConfig.cols; }
     int rows() const { return mGridConfig.rows; }
@@ -52,7 +61,11 @@ class KadasGuideGridLayer : public KadasPluginLayer
     void setColor( const QColor &color ) { mGridConfig.color = color; }
     void setLineWidth( int lineWidth ) { mGridConfig.lineWidth = lineWidth; }
     void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
-    void setLabelingMode( QChar rowChar, QChar colChar ) { mGridConfig.rowChar = rowChar; mGridConfig.colChar = colChar; }
+    void setLabelingMode( QChar rowChar, QChar colChar )
+    {
+      mGridConfig.rowChar = rowChar;
+      mGridConfig.colChar = colChar;
+    }
     void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
     void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
 
@@ -65,18 +78,18 @@ class KadasGuideGridLayer : public KadasPluginLayer
 
     struct GridConfig
     {
-      QgsRectangle gridRect;
-      int cols = 0;
-      int rows = 0;
-      bool colSizeLocked = false;
-      bool rowSizeLocked = false;
-      int fontSize = 30;
-      QColor color = Qt::red;
-      int lineWidth = 1;
-      QChar rowChar = 'A';
-      QChar colChar = '1';
-      LabelingPos labelingPos = LabelsInside;
-      QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
+        QgsRectangle gridRect;
+        int cols = 0;
+        int rows = 0;
+        bool colSizeLocked = false;
+        bool rowSizeLocked = false;
+        int fontSize = 30;
+        QColor color = Qt::red;
+        int lineWidth = 1;
+        QChar rowChar = 'A';
+        QChar colChar = '1';
+        LabelingPos labelingPos = LabelsInside;
+        QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
     } mGridConfig;
 };
 

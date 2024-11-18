@@ -350,7 +350,6 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
   {
     for ( int ix = 0; ix < totPixels; ix += tileSize )
     {
-
       progress->setValue( tileCounter );
       QApplication::processEvents();
       if ( progress->wasCanceled() )
@@ -451,7 +450,10 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
     int fill = 1; // TODO?
 
     outStream << QString( "<LineStyle><color>%1</color><width>%2</width></LineStyle><PolyStyle><color>%3</color><fill>%4</fill></PolyStyle>" )
-              .arg( convertColor( outlineColor ) ).arg( width ).arg( convertColor( fillColor ) ).arg( fill );
+                   .arg( convertColor( outlineColor ) )
+                   .arg( width )
+                   .arg( convertColor( fillColor ) )
+                   .arg( fill );
   }
   outStream << "</Style>\n";
 }
@@ -459,8 +461,8 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
 QString KadasKMLExport::convertColor( const QColor &c )
 {
   return QString( "%1%2%3%4" )
-         .arg( c.alpha(), 2, 16, QChar( '0' ) )
-         .arg( c.blue(), 2, 16, QChar( '0' ) )
-         .arg( c.green(), 2, 16, QChar( '0' ) )
-         .arg( c.red(), 2, 16, QChar( '0' ) );
+    .arg( c.alpha(), 2, 16, QChar( '0' ) )
+    .arg( c.blue(), 2, 16, QChar( '0' ) )
+    .arg( c.green(), 2, 16, QChar( '0' ) )
+    .arg( c.red(), 2, 16, QChar( '0' ) );
 }

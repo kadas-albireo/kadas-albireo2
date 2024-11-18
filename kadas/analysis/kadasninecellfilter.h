@@ -57,13 +57,13 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
       nodata value if not present or outside of the border. Must be implemented by subclasses*/
     virtual float processNineCellWindow( float *x11, float *x21, float *x31,
                                          float *x12, float *x22, float *x32,
-                                         float *x13, float *x23, float *x33 ) = 0;
+                                         float *x13, float *x23, float *x33 )
+      = 0;
 
     /**Computes the window of the raster which contains the specified region of the raster*/
     static bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
 
   private:
-
     /**Opens the input file and returns the dataset handle and the number of pixels in x-/y- direction*/
     GDALDatasetH openInputFile( int &nCellsX, int &nCellsY );
     /**Opens the output driver and tests if it supports the creation of a new dataset
@@ -74,7 +74,6 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter
     GDALDatasetH openOutputFile( GDALDatasetH inputDataset, const QgsCoordinateReferenceSystem &inputCrs, GDALDriverH outputDriver, int colStart, int rowStart, int xSize, int ySize );
 
   protected:
-
     /**Calculates the first order derivative in x-direction according to Horn (1981)*/
     float calcFirstDerX( float *x11, float *x21, float *x31, float *x12, float *x22, float *x32, float *x13, float *x23, float *x33 );
     /**Calculates the first order derivative in y-direction according to Horn (1981)*/
