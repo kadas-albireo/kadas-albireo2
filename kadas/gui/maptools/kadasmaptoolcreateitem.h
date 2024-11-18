@@ -37,7 +37,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
   public:
     KadasMapToolCreateItem( QgsMapCanvas *canvas, std::unique_ptr<KadasMapItemInterface> interface, KadasItemLayer *layer = nullptr ) SIP_SKIP;
 
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface SIP_TRANSFER, KadasItemLayer *layer = nullptr );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface SIP_TRANSFER, KadasItemLayer *layer = nullptr );
 
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = nullptr );
     ~KadasMapToolCreateItem();
@@ -67,6 +67,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 #else
     // TODO: creator should be optional
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
+    // clang-format off
     % MethodCode
 
     // Make sure the callables doesn't get garbage collected, this is needed because refcount for a1/a2 is 0
@@ -109,6 +110,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     Py_END_ALLOW_THREADS
 
     % End
+    // clang-format on
 #endif
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void addPoint( const KadasMapPos &mapPos );
@@ -141,15 +143,16 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
 
     struct ItemData
     {
-      KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
-      QMap<QString, QVariant> props;
+        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
+        QMap<QString, QVariant> props;
     };
     struct ToolState : KadasStateHistory::State
     {
-      ToolState( State *_itemState, QSharedPointer<ItemData> _itemData ) : itemState( _itemState ), itemData( _itemData ) {}
-      ~ToolState() { delete itemState; }
-      State *itemState = nullptr;
-      QSharedPointer<ItemData> itemData;
+        ToolState( State *_itemState, QSharedPointer<ItemData> _itemData )
+          : itemState( _itemState ), itemData( _itemData ) {}
+        ~ToolState() { delete itemState; }
+        State *itemState = nullptr;
+        QSharedPointer<ItemData> itemData;
     };
     KadasStateHistory *mStateHistory = nullptr;
     QSharedPointer<ItemData> mCurrentItemData;
@@ -180,7 +183,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void stateChanged( KadasStateHistory::ChangeType changeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
     void setTargetLayer( QgsMapLayer *layer );
     void storeItemProps();
-
 };
 
 #endif // KADASMAPTOOLCREATEITEM_H
