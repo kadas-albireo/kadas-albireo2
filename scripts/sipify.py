@@ -2168,7 +2168,7 @@ while CONTEXT.line_idx < CONTEXT.line_count:
                 enum_member_doc_string = "\n".join(enum_members_doc)
                 if CONTEXT.actual_class:
                     CONTEXT.output_python.append(
-                        f'{CONTEXT.actual_class}.{enum_qualname}.__doc__ = """{CONTEXT.comment}\n\n{enum_member_doc_string}\n\n"""\n# --\n')
+                        f'{".".join(CONTEXT.classname)}.{enum_qualname}.__doc__ = """{CONTEXT.comment}\n\n{enum_member_doc_string}\n\n"""\n# --\n')
                 else:
                     CONTEXT.output_python.append(
                         f'{enum_qualname}.__doc__ = """{CONTEXT.comment}\n\n{enum_member_doc_string}\n\n"""\n# --\n')

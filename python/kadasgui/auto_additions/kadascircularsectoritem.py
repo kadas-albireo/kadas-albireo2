@@ -3,7 +3,7 @@
 KadasCircularSectorItem.State.SectorStatus.HaveNothing.__doc__ = ""
 KadasCircularSectorItem.State.SectorStatus.HaveCenter.__doc__ = ""
 KadasCircularSectorItem.State.SectorStatus.HaveRadius.__doc__ = ""
-State.SectorStatus.__doc__ = """
+KadasCircularSectorItem.State.SectorStatus.__doc__ = """
 
 * ``HaveNothing``: 
 * ``HaveCenter``: 
