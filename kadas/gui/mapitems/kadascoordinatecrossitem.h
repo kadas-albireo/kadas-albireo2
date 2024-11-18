@@ -60,11 +60,11 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      KadasItemPos pos;
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        KadasItemPos pos;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
@@ -73,7 +73,11 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY
+    };
     static constexpr int sCrossSize = 80;
     static constexpr int sFontSize = 24;
 

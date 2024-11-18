@@ -58,12 +58,12 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      QList<KadasItemPos> p1;
-      QList<KadasItemPos> p2;
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        QList<KadasItemPos> p1;
+        QList<KadasItemPos> p2;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
@@ -73,7 +73,11 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     void measureGeometry() override;
 
   private:
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY
+    };
 
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasRectangleItem( crs() ); }
     QgsMultiPolygon *geometry();

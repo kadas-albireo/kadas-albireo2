@@ -80,12 +80,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     struct State : KadasMapItem::State
     {
-      KadasItemPos pos;
-      virtual void assign( const KadasMapItem::State *other );
-      virtual State *clone() const /Factory/;
-      virtual QJsonObject serialize() const;
+        KadasItemPos pos;
+        virtual void assign( const KadasMapItem::State *other );
+        virtual State *clone() const /Factory/;
+        virtual QJsonObject serialize() const;
 
-      virtual bool deserialize( const QJsonObject &json );
+        virtual bool deserialize( const QJsonObject &json );
 
     };
     const State *constState() const;

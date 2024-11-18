@@ -358,7 +358,7 @@ Trigger a redraw */
 
         DrawStatus drawStatus;
         virtual void assign( const State *other ) = 0;
-        virtual State *clone() const /Factory/ = 0;
+        virtual State *clone() const = 0 /Factory/;
         virtual QJsonObject serialize() const = 0;
         virtual bool deserialize( const QJsonObject &json ) = 0;
     };

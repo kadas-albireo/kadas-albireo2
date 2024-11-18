@@ -86,7 +86,14 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     void measureGeometry() override;
 
   private:
-    enum AttribIds {AttrX, AttrY, AttrR, AttrA1, AttrA2};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY,
+      AttrR,
+      AttrA1,
+      AttrA2
+    };
 
     QgsMultiSurface *geometry();
     State *state() { return static_cast<State *>( mState ); }

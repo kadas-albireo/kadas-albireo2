@@ -46,10 +46,10 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 
     struct KADAS_GUI_EXPORT State : KadasRectangleItemBase::State
     {
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     void setState( const KadasMapItem::State *state ) override;
 
@@ -61,7 +61,11 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 
   private:
     QImage readImage( double dpiScale = 1 ) const;
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY
+    };
     QString mFilePath;
     QImage mImage;
 
