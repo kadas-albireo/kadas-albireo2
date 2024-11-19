@@ -159,7 +159,8 @@ KadasMapItem::Margin KadasRectangleItemBase::margin() const
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.width() - constState()->mOffsetX + framePadding ) * mSymbolScale ) ),
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.height() + constState()->mOffsetY + framePadding ) * mSymbolScale ) ),
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.width() + constState()->mOffsetX + framePadding ) * mSymbolScale ) ),
-    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.height() - constState()->mOffsetY + framePadding ) * mSymbolScale ) ) };
+    static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.height() - constState()->mOffsetY + framePadding ) * mSymbolScale ) )
+  };
 }
 
 QList<KadasMapPos> KadasRectangleItemBase::cornerPoints( const QgsMapSettings &settings ) const
@@ -202,12 +203,7 @@ bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapS
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -276,10 +272,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
     double framew = w + 2 * sFramePadding * dpiScale;
     double frameh = h + 2 * sFramePadding * dpiScale;
-    QRectF frameRectangle( offsetX - 0.5 * framew,
-                           -offsetY - 0.5 * frameh,
-                           framew,
-                           frameh );
+    QRectF frameRectangle( offsetX - 0.5 * framew, -offsetY - 0.5 * frameh, framew, frameh );
 
     QPolygonF poly;
     poly.append( frameRectangle.bottomLeft() );
@@ -494,6 +487,8 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
     std::array<float, 9> {
       cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
       u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa ) }
-      .data() );
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+    }
+      .data()
+  );
 }

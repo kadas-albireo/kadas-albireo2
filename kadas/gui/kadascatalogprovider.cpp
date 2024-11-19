@@ -78,7 +78,8 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7&SmoothPixmapTransform=1"
                       "&layers=%1&crs=%2&format=%3&tileMatrixSet=%4"
-                      "&styles=%5&url=%6%7" )
+                      "&styles=%5&url=%6%7"
+  )
                       .arg( layerid )
                       .arg( supportedCrs )
                       .arg( imgFormat )
@@ -165,7 +166,8 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7"
                       "&IgnoreReportedLayerExtents=1&crs=%1&format=%2"
-                      "%3&url=%4" )
+                      "%3&url=%4"
+  )
                       .arg( supportedCrs[0] )
                       .arg( imgFormat )
                       .arg( subLayerParams )

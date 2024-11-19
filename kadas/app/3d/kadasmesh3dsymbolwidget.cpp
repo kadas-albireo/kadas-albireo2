@@ -50,8 +50,7 @@ KadasMesh3DSymbolWidget::KadasMesh3DSymbolWidget( QgsMeshLayer *meshLayer, QWidg
   connect( mChkSmoothTriangles, &QCheckBox::clicked, this, &KadasMesh3DSymbolWidget::changed );
   connect( mGroupBoxWireframe, &QGroupBox::toggled, this, &KadasMesh3DSymbolWidget::changed );
   connect( mColorButtonWireframe, &QgsColorButton::colorChanged, this, &KadasMesh3DSymbolWidget::changed );
-  connect( mSpinBoxWireframeLineWidth, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ),
-           this, &KadasMesh3DSymbolWidget::changed );
+  connect( mSpinBoxWireframeLineWidth, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, &KadasMesh3DSymbolWidget::changed );
   connect( mLodSlider, &QSlider::valueChanged, this, &KadasMesh3DSymbolWidget::changed );
 
   connect( mColorRampShaderMinMaxReloadButton, &QPushButton::clicked, this, &KadasMesh3DSymbolWidget::reloadColorRampShaderMinMax );
@@ -60,25 +59,20 @@ KadasMesh3DSymbolWidget::KadasMesh3DSymbolWidget( QgsMeshLayer *meshLayer, QWidg
   connect( mColorRampShaderMinEdit, &QLineEdit::editingFinished, this, &KadasMesh3DSymbolWidget::onColorRampShaderMinMaxChanged );
   connect( mColorRampShaderMaxEdit, &QLineEdit::editingFinished, this, &KadasMesh3DSymbolWidget::onColorRampShaderMinMaxChanged );
 
-  connect( mComboBoxTextureType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ),
-           this, &KadasMesh3DSymbolWidget::onColoringTypeChanged );
-  connect( mComboBoxTextureType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ),
-           this, &KadasMesh3DSymbolWidget::changed );
+  connect( mComboBoxTextureType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &KadasMesh3DSymbolWidget::onColoringTypeChanged );
+  connect( mComboBoxTextureType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &KadasMesh3DSymbolWidget::changed );
 
   connect( mMeshSingleColorButton, &QgsColorButton::colorChanged, this, &KadasMesh3DSymbolWidget::changed );
 
-  connect( mSpinBoxVerticaleScale, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ),
-           this, &KadasMesh3DSymbolWidget::changed );
+  connect( mSpinBoxVerticaleScale, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, &KadasMesh3DSymbolWidget::changed );
 
-  connect( mComboBoxDatasetVertical, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ),
-           this, &KadasMesh3DSymbolWidget::changed );
+  connect( mComboBoxDatasetVertical, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &KadasMesh3DSymbolWidget::changed );
 
   connect( mCheckBoxVerticalMagnitudeRelative, &QCheckBox::clicked, this, &KadasMesh3DSymbolWidget::changed );
 
   connect( mGroupBoxArrowsSettings, &QGroupBox::toggled, this, &KadasMesh3DSymbolWidget::changed );
 
-  connect( mArrowsSpacingSpinBox, static_cast<void ( QDoubleSpinBox::* )()>( &QDoubleSpinBox::editingFinished ),
-           this, &KadasMesh3DSymbolWidget::changed );
+  connect( mArrowsSpacingSpinBox, static_cast<void ( QDoubleSpinBox::* )()>( &QDoubleSpinBox::editingFinished ), this, &KadasMesh3DSymbolWidget::changed );
 
   connect( mArrowsFixedSizeCheckBox, &QCheckBox::clicked, this, &KadasMesh3DSymbolWidget::changed );
 
@@ -103,8 +97,7 @@ void KadasMesh3DSymbolWidget::setSymbol( const QgsMesh3DSymbol *symbol )
   mComboBoxTextureType->setCurrentIndex( mComboBoxTextureType->findData( symbol->renderingStyle() ) );
   mMeshSingleColorButton->setColor( symbol->singleMeshColor() );
   mColorRampShaderWidget->setFromShader( symbol->colorRampShader() );
-  mColorRampShaderWidget->setMinimumMaximumAndClassify( symbol->colorRampShader().minimumValue(),
-                                                        symbol->colorRampShader().maximumValue() );
+  mColorRampShaderWidget->setMinimumMaximumAndClassify( symbol->colorRampShader().minimumValue(), symbol->colorRampShader().maximumValue() );
 
   setColorRampMinMax( symbol->colorRampShader().minimumValue(), symbol->colorRampShader().maximumValue() );
   mComboBoxDatasetVertical->setCurrentIndex( symbol->verticalDatasetGroupIndex() );

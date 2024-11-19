@@ -184,7 +184,8 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
   QgsPointXY itemPos = QgsCoordinateTransform(
                          QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance() )
+                         QgsProject::instance()
+  )
                          .transform( pos );
 
   mMapCanvas->setCenter( itemPos );

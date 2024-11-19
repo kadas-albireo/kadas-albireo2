@@ -214,7 +214,8 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
         attributes.namedItem( "number" ).nodeValue().toInt(),
         attributes.namedItem( "id " ).nodeValue(),
         attributes.namedItem( "title" ).nodeValue(),
-        mMasterCanvas );
+        mMasterCanvas
+      );
       mapWidget->setAttribute( Qt::WA_DeleteOnClose );
       ba = QByteArray::fromBase64( attributes.namedItem( "layers" ).nodeValue().toLocal8Bit() );
       QStringList layersList;
@@ -228,7 +229,9 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
       mapWidget->widget()->setFixedSize(
         QSize(
           attributes.namedItem( "width" ).nodeValue().toInt(),
-          attributes.namedItem( "height" ).nodeValue().toInt() ) );
+          attributes.namedItem( "height" ).nodeValue().toInt()
+        )
+      );
       ba = QByteArray::fromBase64( attributes.namedItem( "extent" ).nodeValue().toLocal8Bit() );
       QRectF extent;
       ds >> extent;

@@ -1584,9 +1584,7 @@ void KadasAppLayerHandling::resolveVectorLayerDependencies( QgsVectorLayer *vl, 
       }
       else if ( !( dependencyFlags & DependencyFlag::SilentLoad ) )
       {
-        kApp->mainWindow()->messageBar()->pushSuccess( QObject::tr( "Missing layer form dependency" ), QObject::tr( "Layer dependency '%2' required by '%1' was automatically loaded." )
-                                                                                                         .arg( vl->name(),
-                                                                                                               loadedLayer->name() ) );
+        kApp->mainWindow()->messageBar()->pushSuccess( QObject::tr( "Missing layer form dependency" ), QObject::tr( "Layer dependency '%2' required by '%1' was automatically loaded." ).arg( vl->name(), loadedLayer->name() ) );
       }
     }
   }

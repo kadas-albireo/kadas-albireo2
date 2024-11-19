@@ -97,9 +97,7 @@ void KadasBookmarksMenu::addBookmark()
   {
     if ( ( *it )->name == name )
     {
-      int res = QMessageBox::question( kApp->mainWindow(), tr( "Replace Bookmark" ),
-                                       tr( "Are you sure you want to replace the existing bookmark “%1”?" ).arg( name ),
-                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
+      int res = QMessageBox::question( kApp->mainWindow(), tr( "Replace Bookmark" ), tr( "Are you sure you want to replace the existing bookmark “%1”?" ).arg( name ), QMessageBox::Yes | QMessageBox::No, QMessageBox::No );
       if ( res != QMessageBox::Yes )
         return;
 
@@ -232,12 +230,7 @@ void KadasBookmarksMenu::saveToProject( QDomDocument &doc )
     QDomElement bookmarkEl = doc.createElement( "kadasbookmark" );
     bookmarkEl.setAttribute( "name", bookmark->name );
     bookmarkEl.setAttribute( "crs", bookmark->crs );
-    bookmarkEl.setAttribute( "extent",
-                             QString( "%1;%2;%3;%4" )
-                               .arg( bookmark->extent.xMinimum(), 0, 'f', 4 )
-                               .arg( bookmark->extent.yMinimum(), 0, 'f', 4 )
-                               .arg( bookmark->extent.xMaximum(), 0, 'f', 4 )
-                               .arg( bookmark->extent.yMaximum(), 0, 'f', 4 ) );
+    bookmarkEl.setAttribute( "extent", QString( "%1;%2;%3;%4" ).arg( bookmark->extent.xMinimum(), 0, 'f', 4 ).arg( bookmark->extent.yMinimum(), 0, 'f', 4 ).arg( bookmark->extent.xMaximum(), 0, 'f', 4 ).arg( bookmark->extent.yMaximum(), 0, 'f', 4 ) );
     bookmarksEl.appendChild( bookmarkEl );
   }
   root.appendChild( bookmarksEl );

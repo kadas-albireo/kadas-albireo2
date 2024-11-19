@@ -224,18 +224,15 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     {
       if ( j == 0 )
       {
-        resultLine[j] = processNineCellWindow( &mInputNodataValue, &scanLine1[j], &scanLine1[j + 1], &mInputNodataValue, &scanLine2[j],
-                                               &scanLine2[j + 1], &mInputNodataValue, &scanLine3[j], &scanLine3[j + 1] );
+        resultLine[j] = processNineCellWindow( &mInputNodataValue, &scanLine1[j], &scanLine1[j + 1], &mInputNodataValue, &scanLine2[j], &scanLine2[j + 1], &mInputNodataValue, &scanLine3[j], &scanLine3[j + 1] );
       }
       else if ( j == xSize - 1 )
       {
-        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &mInputNodataValue, &scanLine2[j - 1], &scanLine2[j],
-                                               &mInputNodataValue, &scanLine3[j - 1], &scanLine3[j], &mInputNodataValue );
+        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &mInputNodataValue, &scanLine2[j - 1], &scanLine2[j], &mInputNodataValue, &scanLine3[j - 1], &scanLine3[j], &mInputNodataValue );
       }
       else
       {
-        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &scanLine1[j + 1], &scanLine2[j - 1], &scanLine2[j],
-                                               &scanLine2[j + 1], &scanLine3[j - 1], &scanLine3[j], &scanLine3[j + 1] );
+        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &scanLine1[j + 1], &scanLine2[j - 1], &scanLine2[j], &scanLine2[j + 1], &scanLine3[j - 1], &scanLine3[j], &scanLine3[j + 1] );
       }
     }
 
@@ -311,7 +308,8 @@ bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordina
     QgsPointXY( region.xMinimum(), region.yMinimum() ),
     QgsPointXY( region.xMaximum(), region.yMinimum() ),
     QgsPointXY( region.xMaximum(), region.yMaximum() ),
-    QgsPointXY( region.xMinimum(), region.yMaximum() ) };
+    QgsPointXY( region.xMinimum(), region.yMaximum() )
+  };
   QgsPointXY pRaster = ct.transform( regionPoints[0] );
   double col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
   double row = ( -gtrans[0] * gtrans[4] + gtrans[1] * gtrans[3] - gtrans[1] * pRaster.y() + gtrans[4] * pRaster.x() ) / ( gtrans[2] * gtrans[4] - gtrans[1] * gtrans[5] );

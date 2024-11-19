@@ -34,7 +34,8 @@ KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *
 bool KadasMapCanvasItem::isVisible() const
 {
   if (
-    ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) ) )
+    ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
+  )
   {
     return false;
   }
@@ -46,7 +47,8 @@ void KadasMapCanvasItem::paint( QPainter *painter )
   if ( mItem && mItem->isVisible() )
   {
     if (
-      ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) ) )
+      ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
+    )
     {
       return;
     }

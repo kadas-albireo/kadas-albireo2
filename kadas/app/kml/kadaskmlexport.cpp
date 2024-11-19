@@ -115,8 +115,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setExtent( fullExtent );
   rc.setMapExtent( fullExtent );
   rc.setScaleFactor( dpi / 25.4 );
-  rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
-                                   fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
+  rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(), fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
   rc.setCustomProperty( "kml", true );
 
   // Render layers
@@ -357,8 +356,7 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
         return;
       }
 
-      QgsRectangle tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution,
-                               renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
+      QgsRectangle tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution, renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
       if ( renderTile( image, tileExtent, mapLayer ) )
       {
         QString filename = QString( "%1_%2.png" ).arg( mapLayer->id() ).arg( tileCounter++ );

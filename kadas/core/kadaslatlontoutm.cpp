@@ -858,11 +858,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
   return grid;
 }
 
-KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level level,
-                                                         double xMin, double xMax,
-                                                         double yMin, double yMax,
-                                                         zoneLabelCallback_t *zoneLabelCallback,
-                                                         gridLabelCallback_t *lineLabelCallback )
+KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback, gridLabelCallback_t *lineLabelCallback )
 {
   KadasLatLonToUTM::Grid subGrid;
   QgsPointXY p, q, r;

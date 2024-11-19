@@ -144,6 +144,7 @@ void KadasLocalDataSearchFilter::buildResult( const QgsFeature &feature, QgsVect
     {
       { QStringLiteral( "feature_id" ), feature.id() },
       { QStringLiteral( "layer_id" ), layer->id() },
-    } ) );
+    }
+  ) );
   emit resultFetched( result );
 }

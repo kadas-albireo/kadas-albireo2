@@ -264,9 +264,7 @@ void KadasMapToolViewshed::drawFinished()
   if ( success )
   {
     QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
-    QgsPalettedRasterRenderer *renderer = new QgsPalettedRasterRenderer( 0, 1,
-                                                                         { QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ),
-                                                                           QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) ) } );
+    QgsPalettedRasterRenderer *renderer = new QgsPalettedRasterRenderer( 0, 1, { QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ), QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) ) } );
     layer->setRenderer( renderer );
     layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
@@ -289,7 +287,8 @@ void KadasMapToolViewshed::drawFinished()
       + tr( "<b>Target height</b>: %1 %2 %3" )
           .arg( viewshedDialog.targetHeight() )
           .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-          .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) ) );
+          .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+    );
     KadasMapCanvasItemManager::addItem( pin );
   }
   else if ( !errMsg.isEmpty() )

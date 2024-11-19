@@ -221,10 +221,8 @@ void KadasCircularSectorItem::setCurrentPoint( const KadasMapPos &p, const QgsMa
     const double &radius = state()->radii.back();
     const double &startAngle = state()->startAngles.back();
     const double &stopAngle = state()->stopAngles.back();
-    KadasItemPos pStart( center.x() + radius * std::cos( startAngle ),
-                         center.y() + radius * std::sin( startAngle ) );
-    KadasItemPos pEnd( center.x() + radius * std::cos( stopAngle ),
-                       center.y() + radius * std::sin( stopAngle ) );
+    KadasItemPos pStart( center.x() + radius * std::cos( startAngle ), center.y() + radius * std::sin( startAngle ) );
+    KadasItemPos pEnd( center.x() + radius * std::cos( stopAngle ), center.y() + radius * std::sin( stopAngle ) );
     KadasMapPos mapPStart = toMapPos( pStart, mapSettings );
     KadasMapPos mapPEnd = toMapPos( pEnd, mapSettings );
     if ( mapPStart.sqrDist( mapPEnd ) < pickTolSqr( mapSettings ) )
@@ -377,12 +375,9 @@ void KadasCircularSectorItem::recomputeDerived()
     if ( stopAngle - startAngle < 2 * M_PI - std::numeric_limits<float>::epsilon() )
     {
       double alphaMid = 0.5 * ( startAngle + 2 * M_PI + stopAngle );
-      QgsPoint pStart = QgsPoint( center.x() + radius * std::cos( startAngle ),
-                                  center.y() + radius * std::sin( startAngle ) );
-      QgsPoint pMid = QgsPoint( center.x() + radius * std::cos( alphaMid ),
-                                center.y() + radius * std::sin( alphaMid ) );
-      QgsPoint pEnd = QgsPoint( center.x() + radius * std::cos( stopAngle ),
-                                center.y() + radius * std::sin( stopAngle ) );
+      QgsPoint pStart = QgsPoint( center.x() + radius * std::cos( startAngle ), center.y() + radius * std::sin( startAngle ) );
+      QgsPoint pMid = QgsPoint( center.x() + radius * std::cos( alphaMid ), center.y() + radius * std::sin( alphaMid ) );
+      QgsPoint pEnd = QgsPoint( center.x() + radius * std::cos( stopAngle ), center.y() + radius * std::sin( stopAngle ) );
       exterior->addCurve( new QgsCircularString( pStart, pMid, pEnd ) );
 
       exterior->addCurve( new QgsLineString( QgsPointSequence() << pEnd << QgsPoint( center ) << pStart ) );
@@ -390,12 +385,7 @@ void KadasCircularSectorItem::recomputeDerived()
     else
     {
       QgsCircularString *arc = new QgsCircularString();
-      arc->setPoints( QgsPointSequence()
-                      << QgsPoint( center.x(), center.y() + radius )
-                      << QgsPoint( center.x() + radius, center.y() )
-                      << QgsPoint( center.x(), center.y() - radius )
-                      << QgsPoint( center.x() - radius, center.y() )
-                      << QgsPoint( center.x(), center.y() + radius ) );
+      arc->setPoints( QgsPointSequence() << QgsPoint( center.x(), center.y() + radius ) << QgsPoint( center.x() + radius, center.y() ) << QgsPoint( center.x(), center.y() - radius ) << QgsPoint( center.x() - radius, center.y() ) << QgsPoint( center.x(), center.y() + radius ) );
       exterior->addCurve( arc );
     }
     QgsPolygon *poly = new QgsPolygon;

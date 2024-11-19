@@ -395,8 +395,7 @@ QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   exportContext.setExtent( worldExtent );
   exportContext.setMapExtent( worldExtent );
   double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * context.scaleFactor() * 1000 / context.rendererScale();
-  exportContext.setMapToPixel( QgsMapToPixel( 1.0 / factor, worldExtent.center().x(), worldExtent.center().y(),
-                                              worldExtent.width() * factor, worldExtent.height() * factor, 0 ) );
+  exportContext.setMapToPixel( QgsMapToPixel( 1.0 / factor, worldExtent.center().x(), worldExtent.center().y(), worldExtent.width() * factor, worldExtent.height() * factor, 0 ) );
 
   KadasMilxClient::NPointSymbol symbol = toSymbol( exportContext.mapToPixel(), exportContext.coordinateTransform().destinationCrs() );
   KadasMilxClient::NPointSymbolGraphic result;

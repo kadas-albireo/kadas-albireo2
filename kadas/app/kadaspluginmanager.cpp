@@ -208,23 +208,12 @@ void KadasPluginManager::updateAllPlugins()
       if ( button == nullptr )
         continue;
 
-      bool success = updatePlugin( installedPluginName,
-                                   moduleName,
-                                   availablePluginInfo.downloadLink,
-                                   availablePluginInfo.description,
-                                   availablePluginInfo.version,
-                                   button );
+      bool success = updatePlugin( installedPluginName, moduleName, availablePluginInfo.downloadLink, availablePluginInfo.description, availablePluginInfo.version, button );
 
       if ( success )
-        kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update" ),
-                                                       tr( "Plugin '%1' has been updated to version %2" ).arg( installedPluginName, availablePluginInfo.version ),
-                                                       Qgis::Info,
-                                                       kApp->mainWindow()->messageTimeout() );
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update" ), tr( "Plugin '%1' has been updated to version %2" ).arg( installedPluginName, availablePluginInfo.version ), Qgis::Info, kApp->mainWindow()->messageTimeout() );
       else
-        kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update error" ),
-                                                       tr( "Plugin '%1' update failed" ).arg( installedPluginName ),
-                                                       Qgis::Warning,
-                                                       kApp->mainWindow()->messageTimeout() );
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update error" ), tr( "Plugin '%1' update failed" ).arg( installedPluginName ), Qgis::Warning, kApp->mainWindow()->messageTimeout() );
     }
 
     ++it;

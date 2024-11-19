@@ -16,8 +16,7 @@
 
 #include "kadashillshadefilter.h"
 
-KadasHillshadeFilter::KadasHillshadeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, double lightAzimuth,
-                                            double lightAngle, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
+KadasHillshadeFilter::KadasHillshadeFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, double lightAzimuth, double lightAngle, const QgsRectangle &filterRegion, const QgsCoordinateReferenceSystem &filterRegionCrs )
   : KadasNineCellFilter( layer, outputFile, outputFormat, filterRegion, filterRegionCrs )
   , mLightAzimuth( lightAzimuth )
   , mLightAngle( lightAngle )
@@ -25,9 +24,7 @@ KadasHillshadeFilter::KadasHillshadeFilter( const QgsRasterLayer *layer, const Q
 }
 
 
-float KadasHillshadeFilter::processNineCellWindow( float *x11, float *x21, float *x31,
-                                                   float *x12, float *x22, float *x32,
-                                                   float *x13, float *x23, float *x33 )
+float KadasHillshadeFilter::processNineCellWindow( float *x11, float *x21, float *x31, float *x12, float *x22, float *x32, float *x13, float *x23, float *x33 )
 {
   float derX = calcFirstDerX( x11, x21, x31, x12, x22, x32, x13, x23, x33 );
   float derY = calcFirstDerY( x11, x21, x31, x12, x22, x32, x13, x23, x33 );

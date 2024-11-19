@@ -206,7 +206,8 @@ void KadasMapToolMinMax::drawFinished()
           {
             QgsPointXY p( crst.transform(
               pixelToGeoX( gtrans, x + bx, y + by ),
-              pixelToGeoY( gtrans, x + bx, y + by ) ) );
+              pixelToGeoY( gtrans, x + bx, y + by )
+            ) );
             if ( mFilterType != FilterType::FilterRect && !filterGeom.containsPoint( p.toQPointF(), Qt::WindingFill ) )
             {
               continue;

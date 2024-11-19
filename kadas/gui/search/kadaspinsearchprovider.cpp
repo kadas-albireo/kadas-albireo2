@@ -78,7 +78,8 @@ void KadasPinSearchProvider::triggerResult( const QgsLocatorResult &result )
   QgsPointXY itemPos = QgsCoordinateTransform(
                          QgsCoordinateReferenceSystem( crsIs ),
                          mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance() )
+                         QgsProject::instance()
+  )
                          .transform( pos );
 
   mMapCanvas->setCenter( itemPos );

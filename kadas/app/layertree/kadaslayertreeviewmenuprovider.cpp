@@ -104,8 +104,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       }
       else if ( layer->type() == Qgis::LayerType::Vector )
       {
-        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ),
-                         this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ), this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
       }
       // For gdi layers, also add info icon
       if ( layer->providerType() == "wms" || layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )

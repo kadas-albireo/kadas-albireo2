@@ -359,7 +359,8 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   const TileData &firstTile = overlayData.tiles.front();
   QSize totSize(
     qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ),
-    qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() ) );
+    qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() )
+  );
 
   // Compute image rectangles and merge overlapping images
   QList<KadasAlgorithms::Rect> rects;

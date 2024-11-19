@@ -107,10 +107,7 @@ class KadasAppLayerHandling
      * If \a showWarningOnInvalid layers is TRUE then a user facing warning will be raised
      * if the \a uri does not result in a valid point cloud layer.
      */
-    static QgsPointCloudLayer *addPointCloudLayer( const QString &uri,
-                                                   const QString &baseName,
-                                                   const QString &provider,
-                                                   bool showWarningOnInvalid = true );
+    static QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid = true );
 
     /**
      * Adds a plugin layer from a given \a uri and \a provider.
@@ -178,10 +175,7 @@ class KadasAppLayerHandling
      * categories ("Forms" for the form widgets and "Relations" for layer weak relations).
      * \return a list of weak references to broken layer dependencies
      */
-    static const QList<QgsVectorLayerRef> findBrokenLayerDependencies( QgsVectorLayer *vectorLayer,
-                                                                       QgsMapLayer::StyleCategories categories = QgsMapLayer::StyleCategory::AllStyleCategories,
-                                                                       QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name,
-                                                                       DependencyFlags dependencyFlags = DependencyFlags() );
+    static const QList<QgsVectorLayerRef> findBrokenLayerDependencies( QgsVectorLayer *vectorLayer, QgsMapLayer::StyleCategories categories = QgsMapLayer::StyleCategory::AllStyleCategories, QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name, DependencyFlags dependencyFlags = DependencyFlags() );
 
     /**
      * Scans the \a vectorLayer for broken dependencies and automatically
@@ -190,10 +184,7 @@ class KadasAppLayerHandling
      * used to exclude one of the currently implemented search categories
      * ("Forms" for the form widgets and "Relations" for layer weak relations).
      */
-    static void resolveVectorLayerDependencies( QgsVectorLayer *vectorLayer,
-                                                QgsMapLayer::StyleCategories categories = QgsMapLayer::AllStyleCategories,
-                                                QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name,
-                                                DependencyFlags dependencyFlags = DependencyFlags() );
+    static void resolveVectorLayerDependencies( QgsVectorLayer *vectorLayer, QgsMapLayer::StyleCategories categories = QgsMapLayer::AllStyleCategories, QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name, DependencyFlags dependencyFlags = DependencyFlags() );
 
     /**
      * Scans the \a vectorLayer for weak relations and automatically

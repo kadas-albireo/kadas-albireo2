@@ -104,8 +104,7 @@ class KadasRichTextEditorToolBar : QToolBar
 #include "kadas/gui/kadasrichtexteditor.h"
 %End
   public:
-    KadasRichTextEditorToolBar( KadasRichTextEditor *editor,
-                                QWidget *parent = 0 );
+    KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent = 0 );
 
   public slots:
     void updateActions();

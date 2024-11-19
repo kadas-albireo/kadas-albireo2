@@ -286,8 +286,7 @@ void Kadas::importSslCertificates()
         break;
 
       char cert_name[256];
-      if ( !CertGetNameStringA( pContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0,
-                                NULL, cert_name, sizeof( cert_name ) ) )
+      if ( !CertGetNameStringA( pContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, cert_name, sizeof( cert_name ) ) )
       {
         strcpy( cert_name, "Unknown" );
       }
@@ -302,9 +301,7 @@ void Kadas::importSslCertificates()
         continue;
 
       /* If key usage exists check for signing attribute */
-      if ( CertGetIntendedKeyUsage( pContext->dwCertEncodingType,
-                                    pContext->pCertInfo,
-                                    key_usage, sizeof( key_usage ) ) )
+      if ( CertGetIntendedKeyUsage( pContext->dwCertEncodingType, pContext->pCertInfo, key_usage, sizeof( key_usage ) ) )
       {
         if ( !( key_usage[0] & CERT_KEY_CERT_SIGN_KEY_USAGE ) )
           continue;
@@ -352,8 +349,7 @@ void Kadas::importSslCertificates()
 
             for ( i = 0; i < enhkey_usage->cUsageIdentifier; ++i )
             {
-              if ( !strcmp( "1.3.6.1.5.5.7.3.1" /* OID server auth */,
-                            enhkey_usage->rgpszUsageIdentifier[i] ) )
+              if ( !strcmp( "1.3.6.1.5.5.7.3.1" /* OID server auth */, enhkey_usage->rgpszUsageIdentifier[i] ) )
               {
                 found = true;
                 break;

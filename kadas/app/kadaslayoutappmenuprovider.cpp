@@ -130,9 +130,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
     }
     QAction *removePageAction = new QAction( tr( "Remove Page" ), menu );
     connect( removePageAction, &QAction::triggered, this, [layout, page]() {
-      if ( QMessageBox::question( nullptr, tr( "Remove Page" ),
-                                  tr( "Remove page from layout?" ),
-                                  QMessageBox::Yes | QMessageBox::No )
+      if ( QMessageBox::question( nullptr, tr( "Remove Page" ), tr( "Remove page from layout?" ), QMessageBox::Yes | QMessageBox::No )
            == QMessageBox::Yes )
       {
         layout->pageCollection()->deletePage( page );

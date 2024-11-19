@@ -293,7 +293,8 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
     painter.setRenderHint( QPainter::SmoothPixmapTransform );
     painter.drawImage(
       QRectF( 0.5 * ( iconSize.width() - scale * image.width() ), 0.5 * ( iconSize.height() - scale * image.height() ), scale * image.width(), scale * image.height() ),
-      image );
+      image
+    );
   }
   icon = QIcon( QPixmap::fromImage( iconImage ) );
   // Create category group item if necessary

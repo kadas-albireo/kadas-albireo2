@@ -271,8 +271,10 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
     std::array<float, 9> {
       cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
       u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa ) }
-      .data() );
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+    }
+      .data()
+  );
 }
 
 bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget )
@@ -399,7 +401,8 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
         KadasItemPos::fromPoint( crst.transform( pTerrBottomLeft ) ),
         KadasItemPos::fromPoint( crst.transform( pTerrBottomRight ) ),
         KadasItemPos::fromPoint( crst.transform( pTerrTopRight ) ),
-        KadasItemPos::fromPoint( crst.transform( pTerrTopLeft ) ) };
+        KadasItemPos::fromPoint( crst.transform( pTerrTopLeft ) )
+      };
       cameraTarget = KadasItemPos::fromPoint( crst.transform( target ) );
     }
   }

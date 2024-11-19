@@ -114,8 +114,7 @@ void QgsGotoLocatorFilter::fetchResults( const QString &string, const QgsLocator
 
     if ( !posIsWgs84 && currentCrs != wgs84Crs )
     {
-      const QgsPointXY point( currentCrsIsXY ? firstNumber : secondNumber,
-                              currentCrsIsXY ? secondNumber : firstNumber );
+      const QgsPointXY point( currentCrsIsXY ? firstNumber : secondNumber, currentCrsIsXY ? secondNumber : firstNumber );
       data.insert( QStringLiteral( "point" ), point );
 
       const QList<Qgis::CrsAxisDirection> axisList = currentCrs.axisOrdering();

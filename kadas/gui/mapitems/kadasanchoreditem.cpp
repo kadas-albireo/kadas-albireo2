@@ -166,12 +166,7 @@ bool KadasAnchoredItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );

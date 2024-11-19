@@ -392,7 +392,8 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
     << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
     << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
     << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
-    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight ) );
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
+  );
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 

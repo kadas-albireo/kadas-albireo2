@@ -168,8 +168,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
           const QString crs = itemAttrsMap["sr"].toString();
           QgsPointXY pos( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
           resultData[QStringLiteral( "crs" )] = crs;
-          resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                                               mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+          resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(), mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
           if ( !bbox.isNull() && !bbox.contains( pos ) )
             continue;
 
@@ -197,7 +196,8 @@ void KadasRemoteDataSearchProvider::triggerResult( const QgsLocatorResult &resul
   QgsPointXY itemPos = QgsCoordinateTransform(
                          QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance() )
+                         QgsProject::instance()
+  )
                          .transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );

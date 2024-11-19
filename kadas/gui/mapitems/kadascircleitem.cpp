@@ -393,10 +393,7 @@ void KadasCircleItem::computeCircle( const KadasItemPos &center, const KadasItem
 {
   QgsCircularString *string = new QgsCircularString();
   double radius = std::sqrt( ringpos.sqrDist( center ) );
-  string->setPoints( QgsPointSequence()
-                     << QgsPoint( center.x(), center.y() + radius )
-                     << QgsPoint( center.x(), center.y() - radius )
-                     << QgsPoint( center.x(), center.y() + radius ) );
+  string->setPoints( QgsPointSequence() << QgsPoint( center.x(), center.y() + radius ) << QgsPoint( center.x(), center.y() - radius ) << QgsPoint( center.x(), center.y() + radius ) );
   QgsCompoundCurve *curve = new QgsCompoundCurve();
   curve->addCurve( string );
   QgsCurvePolygon *poly = new QgsCurvePolygon();

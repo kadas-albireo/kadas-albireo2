@@ -112,6 +112,7 @@ void KadasMapSwipeCanvasItem::paint( QPainter *painter )
   painter->drawImage(
     rect,
     mRenderedMapImage.scaled( mRenderedMapImage.width() / mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height() / mRenderedMapImage.devicePixelRatioF() ),
-    rect );
+    rect
+  );
   painter->drawLine( line );
 }

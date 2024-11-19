@@ -95,8 +95,7 @@ bool KadasPythonIntegration::checkSystemImports()
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
   // import SIP
-  if ( !runString( QStringLiteral( "from qgis.PyQt import sip" ),
-                   QObject::tr( "Couldn't load SIP module." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
+  if ( !runString( QStringLiteral( "from qgis.PyQt import sip" ), QObject::tr( "Couldn't load SIP module." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
   {
     return false;
   }
@@ -106,15 +105,13 @@ bool KadasPythonIntegration::checkSystemImports()
   apiV2classes << QStringLiteral( "QDate" ) << QStringLiteral( "QDateTime" ) << QStringLiteral( "QString" ) << QStringLiteral( "QTextStream" ) << QStringLiteral( "QTime" ) << QStringLiteral( "QUrl" ) << QStringLiteral( "QVariant" );
   for ( const QString &clsName : apiV2classes )
   {
-    if ( !runString( QStringLiteral( "sip.setapi('%1', 2)" ).arg( clsName ),
-                     QObject::tr( "Couldn't set SIP API versions." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
+    if ( !runString( QStringLiteral( "sip.setapi('%1', 2)" ).arg( clsName ), QObject::tr( "Couldn't set SIP API versions." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
     {
       return false;
     }
   }
   // import Qt bindings
-  if ( !runString( QStringLiteral( "from PyQt5 import QtCore, QtGui" ),
-                   QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
+  if ( !runString( QStringLiteral( "from PyQt5 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
   {
     return false;
   }
@@ -338,12 +335,7 @@ QString KadasPythonIntegration::getTraceback()
     TRACEBACK_FETCH_ERROR( QStringLiteral( "can't import traceback" ) );
   }
 
-  obResult = PyObject_CallMethod( modTB, reinterpret_cast<const char *>( "print_exception" ),
-                                  reinterpret_cast<const char *>( "OOOOO" ),
-                                  type, value ? value : Py_None,
-                                  traceback ? traceback : Py_None,
-                                  Py_None,
-                                  obStringIO );
+  obResult = PyObject_CallMethod( modTB, reinterpret_cast<const char *>( "print_exception" ), reinterpret_cast<const char *>( "OOOOO" ), type, value ? value : Py_None, traceback ? traceback : Py_None, Py_None, obStringIO );
 
   if ( !obResult )
   {
@@ -563,7 +555,8 @@ void KadasPythonIntegration::restorePlugins()
   {
     // check if the plugin was active on last session
     if (
-      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool() )
+      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()
+    )
     {
       loadPlugin( packageName );
     }

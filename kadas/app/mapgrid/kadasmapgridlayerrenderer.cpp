@@ -320,7 +320,8 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     area,
     mapScale,
     mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM,
-    mRenderGridConfig.cellSize );
+    mRenderGridConfig.cellSize
+  );
 
   // Draw grid lines
   for ( const auto &gridLine : std::as_const( grid.lines ) )

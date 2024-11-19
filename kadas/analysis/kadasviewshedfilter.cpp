@@ -51,11 +51,7 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
-                                           const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
-                                           bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
-                                           double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress,
-                                           QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
+bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle, double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
 {
   // Open input file
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
@@ -107,7 +103,8 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
   int obs[2] = {
     qRound( geoToPixelX( gtrans, observerPos.x(), observerPos.y() ) ),
-    qRound( geoToPixelY( gtrans, observerPos.x(), observerPos.y() ) ) };
+    qRound( geoToPixelY( gtrans, observerPos.x(), observerPos.y() ) )
+  };
   double earthRadius = 6370000;
   if ( datasetCrs.mapUnits() != Qgis::DistanceUnit::Meters )
   {

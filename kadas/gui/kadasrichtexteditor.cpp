@@ -53,9 +53,7 @@ static inline bool filterElement( const QStringRef &name )
 }
 
 // Richtext simplification filter helpers: Filter attributes of elements
-static inline void filterAttributes( const QStringRef &name,
-                                     QXmlStreamAttributes *atts,
-                                     bool *paragraphAlignmentFound )
+static inline void filterAttributes( const QStringRef &name, QXmlStreamAttributes *atts, bool *paragraphAlignmentFound )
 {
   if ( atts->isEmpty() )
     return;
@@ -146,10 +144,7 @@ QString simplifyRichTextFilter( const QString &in, bool *isPlainTextPtr = nullpt
   return out;
 }
 
-static QAction *createCheckableAction( const QIcon &icon, const QString &text,
-                                       QObject *receiver, const char *slot,
-                                       KadasRichTextEditor *editor,
-                                       QObject *parent = nullptr )
+static QAction *createCheckableAction( const QIcon &icon, const QString &text, QObject *receiver, const char *slot, KadasRichTextEditor *editor, QObject *parent = nullptr )
 {
   QAction *result = new QAction( parent );
   result->setIcon( icon );
@@ -408,13 +403,11 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   for ( int font_size : font_sizes )
     m_font_size_input->addItem( QString::number( font_size ) );
 
-  connect( m_font_size_input, &QComboBox::textActivated,
-           this, &KadasRichTextEditorToolBar::sizeInputActivated );
+  connect( m_font_size_input, &QComboBox::textActivated, this, &KadasRichTextEditorToolBar::sizeInputActivated );
   addWidget( m_font_size_input );
 
   // Text color button
-  connect( m_color_action, &KadasColorAction::colorChanged,
-           this, &KadasRichTextEditorToolBar::colorChanged );
+  connect( m_color_action, &KadasColorAction::colorChanged, this, &KadasRichTextEditorToolBar::colorChanged );
   addAction( m_color_action );
 
   addSeparator();
@@ -438,8 +431,7 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   // Left, center, right and justified alignment buttons
 
   QActionGroup *alignment_group = new QActionGroup( this );
-  connect( alignment_group, &QActionGroup::triggered,
-           this, &KadasRichTextEditorToolBar::alignmentActionTriggered );
+  connect( alignment_group, &QActionGroup::triggered, this, &KadasRichTextEditorToolBar::alignmentActionTriggered );
 
   m_align_left_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textleft" ), tr( "Left Align" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_left_action );
@@ -606,10 +598,8 @@ void KadasRichTextEditorToolBar::updateActions()
 KadasRichTextEditor::KadasRichTextEditor( QWidget *parent )
   : QTextEdit( parent )
 {
-  connect( this, &KadasRichTextEditor::currentCharFormatChanged,
-           this, &KadasRichTextEditor::stateChanged );
-  connect( this, &KadasRichTextEditor::cursorPositionChanged,
-           this, &KadasRichTextEditor::stateChanged );
+  connect( this, &KadasRichTextEditor::currentCharFormatChanged, this, &KadasRichTextEditor::stateChanged );
+  connect( this, &KadasRichTextEditor::cursorPositionChanged, this, &KadasRichTextEditor::stateChanged );
   connect( this->document(), &QTextDocument::contentsChange, this, &KadasRichTextEditor::contentsChange );
 }
 

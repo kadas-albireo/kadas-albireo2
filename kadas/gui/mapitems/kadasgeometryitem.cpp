@@ -279,12 +279,7 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( r.xMinimum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( r.xMinimum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -469,7 +464,8 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
       mapPos,
       width,
       metrics.height() * measurements.size(),
-      center } );
+      center
+    } );
   }
 }
 

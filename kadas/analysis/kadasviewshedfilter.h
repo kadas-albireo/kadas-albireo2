@@ -31,13 +31,7 @@ class QgsRasterLayer;
 class KADAS_ANALYSIS_EXPORT KadasViewshedFilter
 {
   public:
-    static bool computeViewshed( const QgsRasterLayer *layer,
-                                 const QString &outputFile, const QString &outputFormat,
-                                 QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
-                                 double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr,
-                                 double observerMinVertAngle, double observerMaxVertAngle, double radius,
-                                 const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
-                                 const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
+    static bool computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle, double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
 };
 
 #endif // KADASVIEWSHEDFILTER_H

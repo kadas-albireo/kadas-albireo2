@@ -44,7 +44,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->zoom( 5 );
-    } );
+    }
+  );
 
   // Zoom out button
   QObject::connect(
@@ -53,7 +54,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->zoom( -5 );
-    } );
+    }
+  );
 
   // Tilt up button
   QObject::connect(
@@ -62,7 +64,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( 1 );
-    } );
+    }
+  );
 
   // Tilt down button
   QObject::connect(
@@ -71,7 +74,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( -1 );
-    } );
+    }
+  );
 
   // Compas
   QwtCompassMagnetNeedle *compasNeedle = new QwtCompassMagnetNeedle();
@@ -83,7 +87,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->setCameraHeadingAngle( float( mCompass->value() ) );
-    } );
+    }
+  );
 
   // Move up button
   QObject::connect(
@@ -92,7 +97,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->moveView( 0, 1 );
-    } );
+    }
+  );
 
   // Move right button
   QObject::connect(
@@ -101,7 +107,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->moveView( 1, 0 );
-    } );
+    }
+  );
 
   // Move down button
   QObject::connect(
@@ -110,7 +117,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->moveView( 0, -1 );
-    } );
+    }
+  );
 
   // Move left button
   QObject::connect(
@@ -119,7 +127,8 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     m3DMapCanvas,
     [=] {
       m3DMapCanvas->cameraController()->moveView( -1, 0 );
-    } );
+    }
+  );
 
   mCameraInfoItemModel = new QStandardItemModel( this );
 

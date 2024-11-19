@@ -52,8 +52,7 @@ KadasCoordinateCrossItem::KadasCoordinateCrossItem( const QgsCoordinateReference
 
 KadasItemRect KadasCoordinateCrossItem::boundingBox() const
 {
-  return KadasItemRect( constState()->pos.x(), constState()->pos.y(),
-                        constState()->pos.x(), constState()->pos.y() );
+  return KadasItemRect( constState()->pos.x(), constState()->pos.y(), constState()->pos.x(), constState()->pos.y() );
 }
 
 KadasMapItem::Margin KadasCoordinateCrossItem::margin() const
@@ -72,12 +71,7 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
   KadasMapPos itemMapPos = toMapPos( constState()->pos, settings );
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
   bool result = false;
@@ -85,12 +79,7 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
   {
     QgsPolygon crossRect;
     QgsLineString *exterior = new QgsLineString();
-    exterior->setPoints( QgsPointSequence()
-                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize )
-                         << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() - mapCrossSize )
-                         << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() + mapCrossSize )
-                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() + mapCrossSize )
-                         << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize ) );
+    exterior->setPoints( QgsPointSequence() << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize ) << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() - mapCrossSize ) << QgsPoint( itemMapPos.x() + mapCrossSize, itemMapPos.y() + mapCrossSize ) << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() + mapCrossSize ) << QgsPoint( itemMapPos.x() - mapCrossSize, itemMapPos.y() - mapCrossSize ) );
     crossRect.setExteriorRing( exterior );
     result = geomEngine->contains( &crossRect );
   }
@@ -98,10 +87,12 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
   {
     QgsLineString hLine( QVector<QgsPointXY> {
       QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ),
-      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() ) } );
+      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() )
+    } );
     QgsLineString vLine( QVector<QgsPointXY> {
       QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ),
-      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize ) } );
+      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize )
+    } );
 
     result = geomEngine->intersects( &hLine ) || geomEngine->intersects( &vLine );
   }
@@ -130,7 +121,8 @@ void KadasCoordinateCrossItem::render( QgsRenderContext &context ) const
   };
   QList<LabelData> labels = {
     { screenPos.x() - crossSize, screenPos.y() - 12, constState()->pos.y(), 0 },
-    { screenPos.x() - 12, screenPos.y() + crossSize, constState()->pos.x(), -90 } };
+    { screenPos.x() - 12, screenPos.y() + crossSize, constState()->pos.x(), -90 }
+  };
 
   QFont font = context.painter()->font();
   font.setPixelSize( sFontSize * outputDpiScale( context ) );

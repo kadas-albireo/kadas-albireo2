@@ -378,7 +378,8 @@ const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegist
     { StandardLayer::SymbolsLayer, tr( "Symbols" ) },
     { StandardLayer::PicturesLayer, tr( "Pictures" ) },
     { StandardLayer::PinsLayer, tr( "Pins" ) },
-    { StandardLayer::RoutesLayer, tr( "Routes" ) } };
+    { StandardLayer::RoutesLayer, tr( "Routes" ) }
+  };
   return names;
 }
 

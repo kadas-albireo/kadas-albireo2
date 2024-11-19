@@ -570,7 +570,8 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       { "jp2", "j2w" },
       { "png", "pgw" },
       { "tif", "tfw" },
-      { "tiff", "tfw" } };
+      { "tiff", "tfw" }
+    };
 
     for ( const QUrl &url : event->mimeData()->urls() )
     {
@@ -1326,7 +1327,8 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     QgsMessageBarItem *item = new QgsMessageBarItem(
       tr( "Unknown layer projection" ),
       tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ),
-      btn, Qgis::Warning, messageTimeout() );
+      btn, Qgis::Warning, messageTimeout()
+    );
     connect( btn, &QPushButton::clicked, [=] {
       mInfoBar->popWidget( item );
       kApp->showLayerProperties( layer );

@@ -132,8 +132,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     QVariantMap resultData;
     if ( mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
     {
-      resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                                           mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+      resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(), mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
     }
     // When bbox is empty, fallback to pos + zoomScale is used
     resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
@@ -165,7 +164,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   QgsPointXY itemPos = QgsCoordinateTransform(
                          QgsCoordinateReferenceSystem::fromOgcWmsCrs( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance() )
+                         QgsProject::instance()
+  )
                          .transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );

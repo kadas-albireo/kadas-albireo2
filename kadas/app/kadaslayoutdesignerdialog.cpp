@@ -1042,7 +1042,8 @@ void KadasLayoutDesignerDialog::saveAsTemplate()
     this,
     tr( "Save template" ),
     lastSaveDir,
-    tr( "Layout templates" ) + " (*.qpt *.QPT)" );
+    tr( "Layout templates" ) + " (*.qpt *.QPT)"
+  );
   if ( saveFileName.isEmpty() )
     return;
 
@@ -1158,8 +1159,7 @@ void KadasLayoutDesignerDialog::renameLayout()
 
 void KadasLayoutDesignerDialog::deleteLayout()
 {
-  if ( QMessageBox::question( this, tr( "Delete Layout" ), tr( "Are you sure you want to delete the layout “%1”?" ).arg( currentLayout()->name() ),
-                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No )
+  if ( QMessageBox::question( this, tr( "Delete Layout" ), tr( "Are you sure you want to delete the layout “%1”?" ).arg( currentLayout()->name() ), QMessageBox::Yes | QMessageBox::No, QMessageBox::No )
        != QMessageBox::Yes )
     return;
 
@@ -1211,9 +1211,7 @@ void KadasLayoutDesignerDialog::print()
       {
         message = tr( "Successfully printed layout." );
       }
-      mMessageBar->pushMessage( tr( "Print layout" ),
-                                message,
-                                Qgis::Success, 0 );
+      mMessageBar->pushMessage( tr( "Print layout" ), message, Qgis::Success, 0 );
       break;
     }
 
@@ -1229,19 +1227,15 @@ void KadasLayoutDesignerDialog::print()
         message = tr( "Could not create print device." );
       }
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Print Layout" ),
-                            message,
-                            QMessageBox::Ok,
-                            QMessageBox::Ok );
+      QMessageBox::warning( this, tr( "Print Layout" ), message, QMessageBox::Ok, QMessageBox::Ok );
       break;
     }
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Memory Allocation Error" ),
-                            tr( "Printing the layout "
-                                "resulted in a memory overflow.\n\n"
-                                "Please try a lower resolution or a smaller paper size." ),
+      QMessageBox::warning( this, tr( "Memory Allocation Error" ), tr( "Printing the layout "
+                                                                       "resulted in a memory overflow.\n\n"
+                                                                       "Please try a lower resolution or a smaller paper size." ),
                             QMessageBox::Ok, QMessageBox::Ok );
       break;
 
@@ -1289,9 +1283,7 @@ void KadasLayoutDesignerDialog::exportToRaster()
   switch ( result )
   {
     case QgsLayoutExporter::Success:
-      mMessageBar->pushMessage( tr( "Export layout" ),
-                                tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( fileNExt.first ).toString(), QDir::toNativeSeparators( fileNExt.first ) ),
-                                Qgis::Success, 0 );
+      mMessageBar->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( fileNExt.first ).toString(), QDir::toNativeSeparators( fileNExt.first ) ), Qgis::Success, 0 );
       break;
 
     case QgsLayoutExporter::PrintError:
@@ -1303,22 +1295,18 @@ void KadasLayoutDesignerDialog::exportToRaster()
 
     case QgsLayoutExporter::FileError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Image Export Error" ),
-                            tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( QDir::toNativeSeparators( exporter.errorFile() ) ),
-                            QMessageBox::Ok,
-                            QMessageBox::Ok );
+      QMessageBox::warning( this, tr( "Image Export Error" ), tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( QDir::toNativeSeparators( exporter.errorFile() ) ), QMessageBox::Ok, QMessageBox::Ok );
       break;
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Image Export Error" ),
-                            tr( "Trying to create image %1 (%2×%3 @ %4dpi ) "
-                                "resulted in a memory overflow.\n\n"
-                                "Please try a lower resolution or a smaller paper size." )
-                              .arg( QDir::toNativeSeparators( exporter.errorFile() ) )
-                              .arg( imageSize.width() )
-                              .arg( imageSize.height() )
-                              .arg( settings.dpi ),
+      QMessageBox::warning( this, tr( "Image Export Error" ), tr( "Trying to create image %1 (%2×%3 @ %4dpi ) "
+                                                                  "resulted in a memory overflow.\n\n"
+                                                                  "Please try a lower resolution or a smaller paper size." )
+                                                                .arg( QDir::toNativeSeparators( exporter.errorFile() ) )
+                                                                .arg( imageSize.width() )
+                                                                .arg( imageSize.height() )
+                                                                .arg( settings.dpi ),
                             QMessageBox::Ok, QMessageBox::Ok );
       break;
   }
@@ -1334,7 +1322,8 @@ void KadasLayoutDesignerDialog::exportToPdf()
     this,
     tr( "Export to PDF" ),
     outputFileName,
-    tr( "PDF Format" ) + " (*.pdf *.PDF)" );
+    tr( "PDF Format" ) + " (*.pdf *.PDF)"
+  );
   this->activateWindow();
   if ( outputFileName.isEmpty() )
   {
@@ -1367,35 +1356,26 @@ void KadasLayoutDesignerDialog::exportToPdf()
   {
     case QgsLayoutExporter::Success:
     {
-      mMessageBar->pushMessage( tr( "Export layout" ),
-                                tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( outputFileName ).toString(), QDir::toNativeSeparators( outputFileName ) ),
-                                Qgis::Success, 0 );
+      mMessageBar->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( outputFileName ).toString(), QDir::toNativeSeparators( outputFileName ) ), Qgis::Success, 0 );
       break;
     }
 
     case QgsLayoutExporter::FileError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Export to PDF" ),
-                            tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( outputFileName ),
-                            QMessageBox::Ok,
-                            QMessageBox::Ok );
+      QMessageBox::warning( this, tr( "Export to PDF" ), tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( outputFileName ), QMessageBox::Ok, QMessageBox::Ok );
       break;
 
     case QgsLayoutExporter::PrintError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Export to PDF" ),
-                            tr( "Could not create print device." ),
-                            QMessageBox::Ok,
-                            QMessageBox::Ok );
+      QMessageBox::warning( this, tr( "Export to PDF" ), tr( "Could not create print device." ), QMessageBox::Ok, QMessageBox::Ok );
       break;
 
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Export to PDF" ),
-                            tr( "Exporting the PDF "
-                                "resulted in a memory overflow.\n\n"
-                                "Please try a lower resolution or a smaller paper size." ),
+      QMessageBox::warning( this, tr( "Export to PDF" ), tr( "Exporting the PDF "
+                                                             "resulted in a memory overflow.\n\n"
+                                                             "Please try a lower resolution or a smaller paper size." ),
                             QMessageBox::Ok, QMessageBox::Ok );
       break;
 

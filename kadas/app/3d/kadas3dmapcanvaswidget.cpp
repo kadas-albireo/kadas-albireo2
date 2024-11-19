@@ -67,20 +67,20 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   QToolBar *toolBar = new QToolBar( this );
   // toolBar->setIconSize( QgisApp::instance()->iconSize( true ) );
 
-  QAction *actionCameraControl = toolBar->addAction( QIcon( QgsApplication::iconPath( "mActionPan.svg" ) ),
-                                                     tr( "Camera Control" ), this, &Kadas3DMapCanvasWidget::cameraControl );
+  QAction *actionCameraControl = toolBar->addAction( QIcon( QgsApplication::iconPath( "mActionPan.svg" ) ), tr( "Camera Control" ), this, &Kadas3DMapCanvasWidget::cameraControl );
   actionCameraControl->setCheckable( true );
 
-  toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionZoomFullExtent.svg" ) ),
-                      tr( "Zoom Full" ), this, &Kadas3DMapCanvasWidget::resetView );
+  toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionZoomFullExtent.svg" ) ), tr( "Zoom Full" ), this, &Kadas3DMapCanvasWidget::resetView );
 
   QAction *toggleOnScreenNavigation = toolBar->addAction(
     QgsApplication::getThemeIcon( QStringLiteral( "mAction3DNavigation.svg" ) ),
-    tr( "Toggle On-Screen Navigation" ) );
+    tr( "Toggle On-Screen Navigation" )
+  );
 
   toggleOnScreenNavigation->setCheckable( true );
   toggleOnScreenNavigation->setChecked(
-    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), true, QgsSettings::Gui ).toBool() );
+    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), true, QgsSettings::Gui ).toBool()
+  );
   QObject::connect( toggleOnScreenNavigation, &QAction::toggled, this, &Kadas3DMapCanvasWidget::toggleNavigationWidget );
 
   toolBar->addSeparator();
@@ -117,8 +117,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   QToolButton *exportButton = qobject_cast<QToolButton *>( toolBar->widgetForAction( mActionExport ) );
   exportButton->setPopupMode( QToolButton::ToolButtonPopupMode::InstantPopup );
 
-  mExportMenu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionSaveMapAsImage.svg" ) ),
-                          tr( "Save as Image…" ), this, &Kadas3DMapCanvasWidget::saveAsImage );
+  mExportMenu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionSaveMapAsImage.svg" ) ), tr( "Save as Image…" ), this, &Kadas3DMapCanvasWidget::saveAsImage );
 
 #if 0
   mExportMenu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "3d.svg" ) ),
@@ -221,8 +220,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   mEffectsMenu->addAction( mActionEnableAmbientOcclusion );
 
   // Options Menu
-  QAction *configureAction = new QAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionOptions.svg" ) ),
-                                          tr( "Configure…" ), this );
+  QAction *configureAction = new QAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionOptions.svg" ) ), tr( "Configure…" ), this );
   connect( configureAction, &QAction::triggered, this, &Kadas3DMapCanvasWidget::configure );
   toolBar->addAction( configureAction );
 
@@ -296,7 +294,8 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   hLayout->addWidget( mNavigationWidget );
 
   toggleNavigationWidget(
-    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool() );
+    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool()
+  );
 
   layout->addLayout( hLayout );
   // layout->addWidget( mAnimationWidget );
@@ -417,9 +416,7 @@ void Kadas3DMapCanvasWidget::setMapSettings( Qgs3DMapSettings *map )
   // mAnimationWidget->setMap( map );
 
   // Disable button for switching the map theme if the terrain generator is a mesh, or if there is no terrain
-  mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled()
-                                 || !mCanvas->mapSettings()->terrainGenerator()
-                                 || mCanvas->mapSettings()->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
+  mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled() || !mCanvas->mapSettings()->terrainGenerator() || mCanvas->mapSettings()->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
   mLabelFpsCounter->setVisible( map->isFpsCounterEnabled() );
 
   connect( map, &Qgs3DMapSettings::viewFrustumVisualizationEnabledChanged, this, &Kadas3DMapCanvasWidget::onViewFrustumVisualizationEnabledChanged );
@@ -491,7 +488,8 @@ void Kadas3DMapCanvasWidget::configure()
     const QgsVector3D p = Qgs3DUtils::transformWorldCoordinates(
       oldLookingAt,
       oldOrigin, oldCrs,
-      map->origin(), map->crs(), QgsProject::instance()->transformContext() );
+      map->origin(), map->crs(), QgsProject::instance()->transformContext()
+    );
 
     if ( p != oldLookingAt )
     {
@@ -502,9 +500,7 @@ void Kadas3DMapCanvasWidget::configure()
     }
 
     // Disable map theme button if the terrain generator is a mesh, or if there is no terrain
-    mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled()
-                                   || !mCanvas->mapSettings()->terrainGenerator()
-                                   || map->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
+    mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled() || !mCanvas->mapSettings()->terrainGenerator() || map->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
   };
 
   connect( buttons, &QDialogButtonBox::rejected, mConfigureDialog, &QDialog::reject );
