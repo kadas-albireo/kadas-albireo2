@@ -12,3 +12,7 @@ repos:
   hooks:
   - id: clang-format
     types_or: [c++, c, c#]
+
+ci:
+  autofix_prs: true
+  autoupdate_schedule: quarterly
