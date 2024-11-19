@@ -62,13 +62,13 @@ void KadasGpxRouteItem::setNumber( const QString &number )
   emit propertyChanged();
 }
 
-void KadasGpxRouteItem::setLabelFont(const QFont &labelFont)
+void KadasGpxRouteItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
   emit propertyChanged();
 }
 
-void KadasGpxRouteItem::setLabelColor(const QColor &labelColor)
+void KadasGpxRouteItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
   emit propertyChanged();

@@ -22,9 +22,9 @@
 
 
 const QgsSettingsEntryInteger *KadasGpxWaypointEditor::settingsGpxWaypointSize = new QgsSettingsEntryInteger( QStringLiteral( "waypoint_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Waypoint size." ) );
-const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Waypoint color." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint color." ) );
 const QgsSettingsEntryString *KadasGpxWaypointEditor::settingsGpxWaypointLabelFont = new QgsSettingsEntryString( QStringLiteral( "waypoint_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Waypoint label font." ) );
-const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointLabelColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_label_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Waypoint label color." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointLabelColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_label_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint label color." ) );
 
 KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
@@ -35,7 +35,7 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( settingsGpxWaypointSize->value() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::saveSize );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
@@ -49,7 +49,7 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   mUi.mPushButtonBold->setChecked( font.bold() );
   mUi.mPushButtonItalic->setChecked( font.italic() );
   connect( mUi.mFontComboBox, &QFontComboBox::currentFontChanged, this, &KadasGpxWaypointEditor::saveLabelFont );
-  connect( mUi.mSpinBoxLabelSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::fontSizeChanged );
+  connect( mUi.mSpinBoxLabelSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::fontSizeChanged );
   connect( mUi.mPushButtonBold, &QPushButton::toggled, this, &KadasGpxWaypointEditor::saveLabelFont );
   connect( mUi.mPushButtonItalic, &QPushButton::toggled, this, &KadasGpxWaypointEditor::saveLabelFont );
 
@@ -161,8 +161,8 @@ void KadasGpxWaypointEditor::saveLabelColor()
   emit styleChanged();
 }
 
-void KadasGpxWaypointEditor::fontSizeChanged(int size)
+void KadasGpxWaypointEditor::fontSizeChanged( int size )
 {
-  Q_UNUSED(size)
+  Q_UNUSED( size )
   saveLabelFont();
 }

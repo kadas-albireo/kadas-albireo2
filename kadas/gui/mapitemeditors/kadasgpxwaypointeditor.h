@@ -33,11 +33,10 @@ class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
     Q_OBJECT
 
   public:
-
-    static const QgsSettingsEntryInteger * settingsGpxWaypointSize;
-    static const QgsSettingsEntryColor * settingsGpxWaypointColor;
-    static const QgsSettingsEntryString * settingsGpxWaypointLabelFont;
-    static const QgsSettingsEntryColor * settingsGpxWaypointLabelColor;
+    static const QgsSettingsEntryInteger *settingsGpxWaypointSize;
+    static const QgsSettingsEntryColor *settingsGpxWaypointColor;
+    static const QgsSettingsEntryString *settingsGpxWaypointLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxWaypointLabelColor;
 
     KadasGpxWaypointEditor( KadasMapItem *item );
 
@@ -57,7 +56,7 @@ class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
     void saveSize();
     void saveLabelFont();
     void saveLabelColor();
-    void fontSizeChanged(int size);
+    void fontSizeChanged( int size );
 };
 
 #endif // KADASGPXWAYPOINTEDITOR_H

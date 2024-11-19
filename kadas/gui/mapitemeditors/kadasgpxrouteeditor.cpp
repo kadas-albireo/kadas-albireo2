@@ -22,9 +22,9 @@
 
 
 const QgsSettingsEntryInteger *KadasGpxRouteEditor::settingsGpxRouteSize = new QgsSettingsEntryInteger( QStringLiteral( "route_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Route size." ) );
-const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteColor = new QgsSettingsEntryColor( QStringLiteral( "route_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Route color." ) );
+const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteColor = new QgsSettingsEntryColor( QStringLiteral( "route_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Route color." ) );
 const QgsSettingsEntryString *KadasGpxRouteEditor::settingsGpxRouteLabelFont = new QgsSettingsEntryString( QStringLiteral( "route_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Route label font." ) );
-const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteLabelColor = new QgsSettingsEntryColor( QStringLiteral( "route_label_color" ), KadasSettingsTree::sTreeGpx, QColor(255, 255, 0, 255), QStringLiteral( "Route label color." ) );
+const QgsSettingsEntryColor *KadasGpxRouteEditor::settingsGpxRouteLabelColor = new QgsSettingsEntryColor( QStringLiteral( "route_label_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Route label color." ) );
 
 
 KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
@@ -39,7 +39,7 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( settingsGpxRouteSize->value() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::saveSize );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
@@ -54,7 +54,7 @@ KadasGpxRouteEditor::KadasGpxRouteEditor( KadasMapItem *item )
   mUi.mPushButtonBold->setChecked( font.bold() );
   mUi.mPushButtonItalic->setChecked( font.italic() );
   connect( mUi.mFontComboBox, &QFontComboBox::currentFontChanged, this, &KadasGpxRouteEditor::saveLabelFont );
-  connect( mUi.mSpinBoxLabelSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::fontSizeChanged );
+  connect( mUi.mSpinBoxLabelSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxRouteEditor::fontSizeChanged );
   connect( mUi.mPushButtonBold, &QPushButton::toggled, this, &KadasGpxRouteEditor::saveLabelFont );
   connect( mUi.mPushButtonItalic, &QPushButton::toggled, this, &KadasGpxRouteEditor::saveLabelFont );
 
@@ -190,8 +190,8 @@ void KadasGpxRouteEditor::saveLabelColor()
   emit styleChanged();
 }
 
-void KadasGpxRouteEditor::fontSizeChanged(int size)
+void KadasGpxRouteEditor::fontSizeChanged( int size )
 {
-  Q_UNUSED(size)
+  Q_UNUSED( size )
   saveLabelFont();
 }

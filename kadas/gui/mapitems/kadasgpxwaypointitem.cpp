@@ -62,13 +62,13 @@ void KadasGpxWaypointItem::setName( const QString &name )
   emit propertyChanged();
 }
 
-void KadasGpxWaypointItem::setLabelFont(const QFont &labelFont)
+void KadasGpxWaypointItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
   emit propertyChanged();
 }
 
-void KadasGpxWaypointItem::setLabelColor(const QColor &labelColor)
+void KadasGpxWaypointItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
   emit propertyChanged();
@@ -106,7 +106,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     QgsTextFormat format;
     format.setFont( font );
     format.setSize( font.pointSize() * scale );
-    if( mLabelColor.isValid() )
+    if ( mLabelColor.isValid() )
       format.setColor( mLabelColor );
     else
       format.setColor( mIconBrush.color() );
@@ -116,18 +116,18 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     bs.setEnabled( true );
     format.setBuffer( bs );
 
-    QgsTextRenderer::drawText( pos, 0.0, Qgis::TextHorizontalAlignment::Center, {mName}, context, format, false );
+    QgsTextRenderer::drawText( pos, 0.0, Qgis::TextHorizontalAlignment::Center, { mName }, context, format, false );
   }
 }
 
-QString KadasGpxWaypointItem::asKml(const QgsRenderContext &context, QuaZip *kmzZip) const
+QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
   if ( !mGeometry )
   {
     return QString();
   }
 
-  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
 
   QString outString;
   QTextStream outStream( &outString );
@@ -139,7 +139,7 @@ QString KadasGpxWaypointItem::asKml(const QgsRenderContext &context, QuaZip *kmz
   // With icon scale=1 google earth normalize the icon to 32 pixels
   outStream << QString( "<scale>%1</scale>" ).arg( iconSize() / 32.0 );
   outStream << QString( "</IconStyle>\n" );
-  if ( ! mName.isEmpty() )
+  if ( !mName.isEmpty() )
   {
     outStream << QString( "<LabelStyle>" );
     if ( mLabelColor.isValid() )
@@ -151,7 +151,7 @@ QString KadasGpxWaypointItem::asKml(const QgsRenderContext &context, QuaZip *kmz
       // With label scale=1 google earth normalize the text to 16 pixels.
       // In kadas by default we use point size 10. Dividing by 10 we get
       // a similar text size in both applications
-      outStream << QString ( "<scale>%1</scale>" ).arg( mLabelFont.pointSize() / 10.0 );
+      outStream << QString( "<scale>%1</scale>" ).arg( mLabelFont.pointSize() / 10.0 );
     }
     outStream << QString( "</LabelStyle>\n" );
   }

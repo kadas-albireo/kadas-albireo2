@@ -33,11 +33,10 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
     Q_OBJECT
 
   public:
-
-    static const QgsSettingsEntryInteger * settingsGpxRouteSize;
-    static const QgsSettingsEntryColor * settingsGpxRouteColor;
-    static const QgsSettingsEntryString * settingsGpxRouteLabelFont;
-    static const QgsSettingsEntryColor * settingsGpxRouteLabelColor;
+    static const QgsSettingsEntryInteger *settingsGpxRouteSize;
+    static const QgsSettingsEntryColor *settingsGpxRouteColor;
+    static const QgsSettingsEntryString *settingsGpxRouteLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxRouteLabelColor;
 
     KadasGpxRouteEditor( KadasMapItem *item );
     ~KadasGpxRouteEditor();
@@ -60,7 +59,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
     void toggleItemMeasurements( bool enabled );
     void saveLabelFont();
     void saveLabelColor();
-    void fontSizeChanged(int size);
+    void fontSizeChanged( int size );
 };
 
 #endif // KADASGPXROUTEEDITOR_H
