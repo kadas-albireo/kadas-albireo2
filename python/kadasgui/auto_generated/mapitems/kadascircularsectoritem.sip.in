@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/mapitems/kadascircularsectoritem.h                         *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -105,8 +105,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     const State *constState() const;
 
   protected:
-    virtual KadasMapItem *_clone() const;
-    virtual State *createEmptyState() const;
+    virtual KadasMapItem *_clone() const /Factory/;
+    virtual State *createEmptyState() const /Factory/;
     virtual void recomputeDerived();
 
     virtual void measureGeometry();
@@ -119,5 +119,5 @@ the Free Software Foundation; either version 2 of the License, or     *
  *                                                                      *
  * kadas/gui/mapitems/kadascircularsectoritem.h                         *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

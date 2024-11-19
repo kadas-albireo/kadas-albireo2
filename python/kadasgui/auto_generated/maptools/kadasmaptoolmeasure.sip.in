@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolmeasure.h                             *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -28,7 +28,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
-    enum class AzimuthNorth {AzimuthMapNorth, AzimuthGeoNorth};
+    enum class AzimuthNorth
+    {
+      AzimuthMapNorth,
+      AzimuthGeoNorth
+    };
 
 
 
@@ -55,7 +59,12 @@ class KadasMapToolMeasure : KadasMapToolCreateItem
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
-    enum class MeasureMode { MeasureLine, MeasurePolygon, MeasureCircle };
+    enum class MeasureMode
+    {
+      MeasureLine,
+      MeasurePolygon,
+      MeasureCircle
+    };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
 
     virtual void activate();
@@ -79,7 +88,6 @@ class KadasMapToolMeasureItemInterface : KadasMapItemInterface
 %End
   public:
     KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode );
-    virtual KadasMapItem* createItem() const;
 
 };
 
@@ -88,5 +96,5 @@ class KadasMapToolMeasureItemInterface : KadasMapItemInterface
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolmeasure.h                             *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

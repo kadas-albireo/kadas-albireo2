@@ -122,12 +122,12 @@ void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &cen
   bs.setEnabled( true );
   format.setBuffer( bs );
 
-  QgsTextRenderer::drawText( baseLineCenter, -constState()->mAngle, Qgis::TextHorizontalAlignment::Center, {mText}, context, format, false );
+  QgsTextRenderer::drawText( baseLineCenter, -constState()->mAngle, Qgis::TextHorizontalAlignment::Center, { mText }, context, format, false );
 }
 
 QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
-  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
   QgsPointXY pos = QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ).transform( position() );
 
   QString outString;
@@ -152,7 +152,7 @@ void KadasTextItem::editPrivate( const KadasMapPos &newPoint, const QgsMapSettin
 
   QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
 
-  double ratio = std::min( 2 * qAbs( halfSize.x() / oldSize.width() ),  2 * qAbs( halfSize.y() / oldSize.height() ) );
+  double ratio = std::min( 2 * qAbs( halfSize.x() / oldSize.width() ), 2 * qAbs( halfSize.y() / oldSize.height() ) );
 
   if ( mFrameAutoResize )
   {

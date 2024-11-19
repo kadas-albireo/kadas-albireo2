@@ -61,7 +61,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QImage mImage;
     bool mScalable = false;
 
-    KadasMapItem *_clone() const override { return new KadasSymbolItem( crs() ); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSymbolItem( crs() ); }
 };
 
 

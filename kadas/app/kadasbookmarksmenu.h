@@ -18,7 +18,9 @@
 #define KADASBOOKMARKSMENU_H
 
 #include <QMenu>
+
 #include <qgis/qgsrectangle.h>
+
 #include "kadas/gui/kadas_gui.h"
 
 class QDomDocument;
@@ -37,11 +39,15 @@ class KADAS_GUI_EXPORT KadasBookmarksMenu : public QMenu
   private:
     struct Bookmark
     {
-      QString name;
-      QString crs;
-      QgsRectangle extent;
-      QMap<QString, bool> layerVisibilities;
-      QMap<QString, bool> groupVisibilities;
+        QString name;
+        QString crs;
+        QgsRectangle extent;
+
+        // for backward compatibility
+        // it's easier to keep the old structure until it's activated again
+        // could be dropped in future versions
+        QMap<QString, bool> layerVisibilities;
+        QMap<QString, bool> groupVisibilities;
     };
     QList<Bookmark *> mBookmarks;
     QgsMapCanvas *mCanvas = nullptr;
@@ -52,7 +58,8 @@ class KADAS_GUI_EXPORT KadasBookmarksMenu : public QMenu
 
   private slots:
     void addBookmark();
-    void restoreBookmark( const Bookmark *bookmark );
+    void replaceBookmark( Bookmark *bookmark );
+    void restoreBookmark( Bookmark *bookmark );
     void deleteBookmark( QAction *action, Bookmark *bookmark );
 
     void saveToProject( QDomDocument &doc );

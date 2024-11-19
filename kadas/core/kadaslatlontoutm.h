@@ -18,6 +18,7 @@
 #define KADASLATLONTOUTM_H
 
 #include <QString>
+#include <QList>
 #include <QPair>
 #include <QPolygonF>
 
@@ -32,33 +33,77 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
   public:
     struct UTMCoo
     {
-      int easting;
-      int northing;
-      int zoneNumber;
-      QString zoneLetter;
+        int easting;
+        int northing;
+        int zoneNumber;
+        QString zoneLetter;
     };
 
     struct MGRSCoo
     {
-      int easting;
-      int northing;
-      int zoneNumber;
-      QString zoneLetter;
-      QString letter100kID;
+        int easting;
+        int northing;
+        int zoneNumber;
+        QString zoneLetter;
+        QString letter100kID;
     };
 
     struct ZoneLabel
     {
-      QPointF pos;
-      QString label;
-      QPointF maxPos;
+        QPointF pos;
+        QString label;
+        QPointF maxPos;
+        // values used for scale dependent font size
+        double fontSizeMin = 15;
+        int fontSizeMinScale = 2;
+        double fontSizeMax = 15;
+        int fontSizeMaxScale = 1;
     };
 
     struct GridLabel
     {
-      QString label;
-      int lineIdx;
-      bool horiz;
+        QString label;
+        int lineIdx;
+        bool horiz;
+    };
+
+    enum class Level
+    {
+      Major,
+      Minor,
+      OnlyLabels
+    };
+
+    struct LineLevel
+    {
+        LineLevel( KadasLatLonToUTM::Level level, QPolygonF line )
+          : level( level )
+          , line( line )
+        {}
+
+        KadasLatLonToUTM::Level level;
+        QPolygonF line;
+    };
+
+    struct Grid
+    {
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+
+        QList<KadasLatLonToUTM::LineLevel> lines;
+        QList<KadasLatLonToUTM::GridLabel> gridLabels;
+
+        friend Grid &operator<<( Grid &lhs, const Grid &rhs ) SIP_SKIP
+        {
+          int lineCount = lhs.lines.count();
+          int labelCount = lhs.gridLabels.count();
+
+          lhs.zoneLabels << rhs.zoneLabels;
+          lhs.lines << rhs.lines;
+          lhs.gridLabels << rhs.gridLabels;
+          for ( int i = labelCount; i < lhs.gridLabels.count(); i++ )
+            lhs.gridLabels[i].lineIdx += lineCount;
+          return lhs;
+        }
     };
 
     static QgsPointXY UTM2LL( const UTMCoo &utm, bool &ok );
@@ -66,32 +111,31 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static MGRSCoo UTM2MGRS( const UTMCoo &utmcoo );
     static UTMCoo MGRS2UTM( const MGRSCoo &mgrs, bool &ok );
 
-    static int getZoneNumber( double lon, double lat );
-    static QString getHemisphereLetter( double lat );
+    static int zoneNumber( double lon, double lat );
+    static QString hemisphereLetter( double lat );
+    static QString zoneName( double lon, double lat );
 
     enum class GridMode SIP_MONKEYPATCH_SCOPEENUM
     {
       GridUTM,
       GridMGRS
     };
-    static void computeGrid( const QgsRectangle &bbox, double mapScale,
-                             QList<QPolygonF> &zoneLines, QList<QPolygonF> &subZoneLines, QList<QPolygonF> &gridLines,
-                             QList<KadasLatLonToUTM::ZoneLabel> &zoneLabels, QList<KadasLatLonToUTM::ZoneLabel> &subZoneLabels, QList<KadasLatLonToUTM::GridLabel> &gridLabels,
-                             KadasLatLonToUTM::GridMode gridMode, int cellSize );
+
+    static Grid computeGrid( const QgsRectangle &bbox, double mapScale, KadasLatLonToUTM::GridMode gridMode, int cellSize );
 
   private:
     static const int NUM_100K_SETS;
     static const QString SET_ORIGIN_COLUMN_LETTERS;
     static const QString SET_ORIGIN_ROW_LETTERS;
 
-    static QString getLetter100kID( int column, int row, int parm );
-    static double getMinNorthing( int zoneLetter );
+    static QString mgrsLetter100kID( int column, int row, int parm );
+    static double minNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
-    typedef void ( gridLabelCallback_t )( double, double, int, bool, int, QList<GridLabel> & );
-    static void computeSubGrid( int cellSize, double xMin, double xMax, double yMin, double yMax, QList<QPolygonF> &gridLines, QList<ZoneLabel> *zoneLabels = 0, QList<GridLabel> *gridLabels = 0, zoneLabelCallback_t *zoneLabelCallback = 0, gridLabelCallback_t *lineLabelCallback = 0 );
+    typedef GridLabel( gridLabelCallback_t )( double, double, int, bool, int );
+    static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
-    static void utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
-    static void mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx, QList<GridLabel> &gridLabels );
+    static GridLabel utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx );
+    static GridLabel mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx );
 };
 
 #endif // KADASLATLONTOUTM_H

@@ -73,7 +73,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
   mUnitComboBox->addItem( tr( "Nautical" ), static_cast<int>( Qgis::DistanceUnit::NauticalMiles ) );
   int defUnit = QgsSettings().value( "/kadas/last_measure_unit", static_cast<int>( Qgis::DistanceUnit::Meters ) ).toInt();
   mUnitComboBox->setCurrentIndex( mUnitComboBox->findData( defUnit ) );
-  connect( mUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
+  connect( mUnitComboBox, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setDistanceUnit );
   gridLayout->addWidget( mUnitComboBox, 0, 2 );
 
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
@@ -88,7 +88,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
     mNorthComboBox->addItem( tr( "Map north" ), QVariant::fromValue( AzimuthNorth::AzimuthMapNorth ) );
     mNorthComboBox->setCurrentIndex( mNorthComboBox->findData( QVariant::fromValue( settingsLastAzimuthNorth->value() ) ) );
     mNorthComboBox->setEnabled( mAzimuthCheckbox->isChecked() );
-    connect( mNorthComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
+    connect( mNorthComboBox, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAzimuthNorth );
     gridLayout->addWidget( mNorthComboBox, 1, 1 );
 
     mAngleUnitComboBox = new QComboBox();
@@ -99,7 +99,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
     int defUnit = std::max( 0, QgsSettings().value( "/kadas/last_azimuth_unit", static_cast<int>( Qgis::AngleUnit::MilNATO ) ).toInt() );
     mAngleUnitComboBox->setCurrentIndex( mAngleUnitComboBox->findData( defUnit ) );
     mAngleUnitComboBox->setEnabled( mAzimuthCheckbox->isChecked() );
-    connect( mAngleUnitComboBox, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
+    connect( mAngleUnitComboBox, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMeasureWidget::setAngleUnit );
     gridLayout->addWidget( mAngleUnitComboBox, 1, 2 );
   }
 
@@ -172,7 +172,7 @@ void KadasMeasureWidget::setAzimutEnabled( bool enabled )
 
 void KadasMeasureWidget::setAzimuthNorth( int index )
 {
-  AzimuthNorth north =  mNorthComboBox->itemData( index ).value<AzimuthNorth>();
+  AzimuthNorth north = mNorthComboBox->itemData( index ).value<AzimuthNorth>();
   settingsLastAzimuthNorth->setValue( north );
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
@@ -192,7 +192,7 @@ void KadasMeasureWidget::updateTotal()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasMapItem* KadasMapToolMeasureItemInterface::createItem() const
+KadasMapItem *KadasMapToolMeasureItemInterface::createItem() const
 {
   switch ( mMeasureMode )
   {

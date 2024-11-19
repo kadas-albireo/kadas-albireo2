@@ -33,9 +33,9 @@ class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
     void disable( bool clearLayers = false );
 
     //! Sets the layers which will be removed from rendering
-    void setLayers(const QSet<QgsMapLayer *> &layers );
+    void setLayers( const QSet<QgsMapLayer *> &layers );
 
-    void setPixelPosition( int x , int y );
+    void setPixelPosition( int x, int y );
 
     void setVertical( bool vertical );
 

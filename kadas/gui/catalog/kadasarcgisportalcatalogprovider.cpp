@@ -46,7 +46,7 @@ KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QStrin
       QStringList fields = lines[line].split( ";" );
       if ( fields.length() >= 4 )
       {
-        mIsoTopics.insert( fields[0], {fields[1] + "/" + fields[2], fields[3]} );
+        mIsoTopics.insert( fields[0], { fields[1] + "/" + fields[2], fields[3] } );
       }
     }
   }
@@ -71,7 +71,7 @@ void KadasArcGisPortalCatalogProvider::load()
 
 void KadasArcGisPortalCatalogProvider::replyFinished()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   QUrl reqUrl = reply->request().url();
   QString detailBaseUrl = reqUrl.toString().replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
   bool lastRequest = true;
@@ -122,7 +122,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    QStringList typeOrder = {"wmts", "map service", "wms"};
+    QStringList typeOrder = { "wmts", "map service", "wms" };
     int pos = 0;
     for ( const QString &entry : mServicePreference.split( "," ) )
     {
@@ -135,9 +135,9 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       ++pos;
     }
     QMap<QString, std::function<void( const ResultEntry & )>> typeHandlers;
-    typeHandlers.insert( "map service", [this]( const ResultEntry & entry ) { readAMSCapabilities( entry ); } );
-    typeHandlers.insert( "wmts", [this]( const ResultEntry & entry ) { readWMTSDetail( entry ); } );
-    typeHandlers.insert( "wms", [this]( const ResultEntry & entry ) { readWMSDetail( entry ); } );
+    typeHandlers.insert( "map service", [this]( const ResultEntry &entry ) { readAMSCapabilities( entry ); } );
+    typeHandlers.insert( "wmts", [this]( const ResultEntry &entry ) { readWMTSDetail( entry ); } );
+    typeHandlers.insert( "wms", [this]( const ResultEntry &entry ) { readWMSDetail( entry ); } );
 
     for ( const auto &layerTypeMap : mLayers )
     {
@@ -185,13 +185,13 @@ void KadasArcGisPortalCatalogProvider::readWMTSDetail( const ResultEntry &entry 
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilities );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
   QString layerIdentifier = rootMap["wmtsInfo"].toMap()["layerIdentifier"].toString();
@@ -199,15 +199,15 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
   QString WMTSCapUrl = QString( entry->url ).replace( QRegularExpression( "/WMTS/.*$" ), "/WMTS/WMTSCapabilities.xml" );
   QNetworkRequest req( ( QUrl( WMTSCapUrl ) ) );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
-  capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
+  capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layeridentifier", layerIdentifier );
-  QgsDebugMsgLevel( QString( "Reading WMTS capabilities %1 for layer %2" ).arg( WMTSCapUrl ).arg( layerIdentifier ) , 2 );
+  QgsDebugMsgLevel( QString( "Reading WMTS capabilities %1 for layer %2" ).arg( WMTSCapUrl ).arg( layerIdentifier ), 2 );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QString layerIdentifier = reply->property( "layeridentifier" ).toString();
@@ -248,13 +248,13 @@ void KadasArcGisPortalCatalogProvider::readWMSDetail( const ResultEntry &entry )
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilities );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
   QVariantList layers = rootMap["layers"].toList();
@@ -266,15 +266,15 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
 
   QNetworkRequest req( QUrl( entry->url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
-  capReply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( entry ) ) );
+  capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layername", layerName );
-  QgsDebugMsgLevel( QString( "Reading WMS capabilities %1 for layer %2" ).arg( req.url().toString() ).arg( layerName ) , 2 );
+  QgsDebugMsgLevel( QString( "Reading WMS capabilities %1 for layer %2" ).arg( req.url().toString() ).arg( layerName ), 2 );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
 }
 
 void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QString layerName = reply->property( "layername" ).toString();
@@ -343,13 +343,13 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const ResultEntry &e
 
   QNetworkRequest req( url );
   QNetworkReply *reply = nam->get( req );
-  reply->setProperty( "entry", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
+  reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo );
 }
 
 void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QString url = entry->url;
@@ -385,7 +385,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     crs.createFromString( spatialReference );
     if ( crs.authid().startsWith( "USER:" ) )
     {
-      crs.createFromString( "EPSG:4326" );    // If we can't recognize the SRS, fall back to WGS84
+      crs.createFromString( "EPSG:4326" ); // If we can't recognize the SRS, fall back to WGS84
     }
 
     // Parse formats

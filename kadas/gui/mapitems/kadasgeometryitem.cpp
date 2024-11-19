@@ -151,7 +151,7 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
     return QString();
   }
 
-  auto color2hex = []( const QColor & c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
 
   QString outString;
   QTextStream outStream( &outString );
@@ -159,7 +159,10 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
   outStream << "<Style>\n";
   outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
-            .arg( outline().width() ).arg( color2hex( outline().color() ) ).arg( fill().style() != Qt::NoBrush ? 1 : 0 ).arg( color2hex( fill().color() ) );
+                 .arg( outline().width() )
+                 .arg( color2hex( outline().color() ) )
+                 .arg( fill().style() != Qt::NoBrush ? 1 : 0 )
+                 .arg( color2hex( fill().color() ) );
   outStream << "</Style>\n";
   outStream << "<ExtendedData>\n";
   outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
@@ -224,10 +227,7 @@ void KadasGeometryItem::drawVertex( QgsRenderContext &context, double x, double 
       break;
 
     case IconType::ICON_FULL_TRIANGLE:
-      p->drawPolygon( QPolygonF() <<
-                      QPointF( x - s, y + s ) <<
-                      QPointF( x + s, y + s ) <<
-                      QPointF( x, y - s ) );
+      p->drawPolygon( QPolygonF() << QPointF( x - s, y + s ) << QPointF( x + s, y + s ) << QPointF( x, y - s ) );
       break;
   }
   p->restore();
@@ -245,10 +245,10 @@ KadasMapItem::Margin KadasGeometryItem::margin() const
       maxMeasureLabelHeight = std::max( maxMeasureLabelHeight, label.height / 2 + 1 ) + sLabelOffset;
     }
   }
-  int maxPainterMargin = std::ceil( std::max( mIconType != IconType::ICON_NONE ? mIconSize *mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
+  int maxPainterMargin = std::ceil( std::max( mIconType != IconType::ICON_NONE ? mIconSize * mSymbolScale : 0., mPen.widthF() ) / 2. + 1 );
   int maxW = std::max( maxMeasureLabelWidth, maxPainterMargin );
   int maxH = std::max( maxMeasureLabelHeight, maxPainterMargin );
-  return Margin{ maxW, maxH, maxW, maxH };
+  return Margin { maxW, maxH, maxW, maxH };
 }
 
 void KadasGeometryItem::updateMeasurements()
@@ -279,12 +279,7 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( r.xMinimum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMinimum() )
-                       << QgsPoint( r.xMaximum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMaximum() )
-                       << QgsPoint( r.xMinimum(), r.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( r.xMinimum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -397,7 +392,7 @@ QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settin
   QgsPoint p;
   while ( mGeometry->nextVertex( vidx, p ) )
   {
-    points.append( {toMapPos( KadasItemPos( p.x(), p.y() ), settings )} );
+    points.append( { toMapPos( KadasItemPos( p.x(), p.y() ), settings ) } );
   }
   return points;
 }
@@ -464,8 +459,7 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
   }
   if ( !measurements.isEmpty() )
   {
-    mMeasurementLabels.append( MeasurementLabel
-    {
+    mMeasurementLabels.append( MeasurementLabel {
       measurements.join( "\n" ),
       mapPos,
       width,
@@ -480,7 +474,8 @@ static KadasItemPos projectPointOnSegment( const KadasItemPos &p, const KadasIte
   double nx = s2.y() - s1.y();
   double ny = -( s2.x() - s1.x() );
   double t = ( p.x() * ny - p.y() * nx - s1.x() * ny + s1.y() * nx ) / ( ( s2.x() - s1.x() ) * ny - ( s2.y() - s1.y() ) * nx );
-  return t < 0. ? s1 : t > 1. ? s2 : KadasItemPos( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+  return t < 0. ? s1 : t > 1. ? s2
+                              : KadasItemPos( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
 }
 
 QgsVertexId KadasGeometryItem::insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const

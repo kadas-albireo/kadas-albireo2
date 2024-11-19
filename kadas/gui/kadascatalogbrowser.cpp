@@ -29,16 +29,20 @@
 class KadasCatalogBrowser::CatalogItem : public QStandardItem
 {
   public:
-    CatalogItem() : QStandardItem() {}
-    CatalogItem( const QString &text ) : QStandardItem( text ) {}
-    CatalogItem( const QIcon &icon, const QString &text ) : QStandardItem( icon, text ) {}
-    explicit CatalogItem( int rows, int columns = 1 ) : QStandardItem( rows, columns ) {}
+    CatalogItem()
+      : QStandardItem() {}
+    CatalogItem( const QString &text )
+      : QStandardItem( text ) {}
+    CatalogItem( const QIcon &icon, const QString &text )
+      : QStandardItem( icon, text ) {}
+    explicit CatalogItem( int rows, int columns = 1 )
+      : QStandardItem( rows, columns ) {}
 
-    bool operator< ( const QStandardItem &other ) const
+    bool operator<( const QStandardItem &other ) const
     {
       int i1 = data( s_sortIndexRole ).toInt();
       int i2 = other.data( s_sortIndexRole ).toInt();
-      return i1 >= 0 && i2 >= 0 ? i1 < i2 : QStandardItem::operator < ( other );
+      return i1 >= 0 && i2 >= 0 ? i1 < i2 : QStandardItem::operator<( other );
     }
 
     static const int s_uriRole;
@@ -57,7 +61,8 @@ const int KadasCatalogBrowser::CatalogItem::s_sortIndexRole = Qt::UserRole + 4;
 class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
 {
   public:
-    CatalogModel( QObject *parent = 0 ) : QStandardItemModel( parent )
+    CatalogModel( QObject *parent = 0 )
+      : QStandardItemModel( parent )
     {
     }
 
@@ -139,7 +144,8 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
 class KadasCatalogBrowser::TreeFilterProxyModel : public QSortFilterProxyModel
 {
   public:
-    TreeFilterProxyModel( QObject *parent = 0 ) : QSortFilterProxyModel( parent )
+    TreeFilterProxyModel( QObject *parent = 0 )
+      : QSortFilterProxyModel( parent )
     {
     }
 

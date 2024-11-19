@@ -108,13 +108,13 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
   mMainWindow->addDockWidget( addArea, mapWidget );
   if ( addArea == Qt::RightDockWidgetArea )
   {
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.width() }, Qt::Horizontal );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.height() }, Qt::Vertical );
   }
   else
   {
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.height()}, Qt::Vertical );
-    mMainWindow->resizeDocks( {mapWidget}, {initialSize.width()}, Qt::Horizontal );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.height() }, Qt::Vertical );
+    mMainWindow->resizeDocks( { mapWidget }, { initialSize.width() }, Qt::Horizontal );
   }
   mMapWidgets.append( mapWidget );
   return mapWidget;
@@ -149,7 +149,7 @@ void KadasMapWidgetManager::clearMapWidgets()
 
 void KadasMapWidgetManager::mapWidgetDestroyed()
 {
-  KadasMapWidget *mapWidget = qobject_cast<KadasMapWidget *> ( QObject::sender() );
+  KadasMapWidget *mapWidget = qobject_cast<KadasMapWidget *>( QObject::sender() );
   if ( mapWidget )
   {
     mMapWidgets.removeAll( mapWidget );
@@ -214,7 +214,8 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
         attributes.namedItem( "number" ).nodeValue().toInt(),
         attributes.namedItem( "id " ).nodeValue(),
         attributes.namedItem( "title" ).nodeValue(),
-        mMasterCanvas );
+        mMasterCanvas
+      );
       mapWidget->setAttribute( Qt::WA_DeleteOnClose );
       ba = QByteArray::fromBase64( attributes.namedItem( "layers" ).nodeValue().toLocal8Bit() );
       QStringList layersList;

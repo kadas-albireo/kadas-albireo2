@@ -127,22 +127,12 @@ bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapS
 
   QgsPolygon itemRect;
   QgsLineString *points = new QgsLineString();
-  points->setPoints( QgsPointSequence()
-                     << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() )
-                     << QgsPoint( mapRect.xMaximum(), mapRect.yMinimum() )
-                     << QgsPoint( mapRect.xMaximum(), mapRect.yMaximum() )
-                     << QgsPoint( mapRect.xMinimum(), mapRect.yMaximum() )
-                     << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() ) );
+  points->setPoints( QgsPointSequence() << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() ) << QgsPoint( mapRect.xMaximum(), mapRect.yMinimum() ) << QgsPoint( mapRect.xMaximum(), mapRect.yMaximum() ) << QgsPoint( mapRect.xMinimum(), mapRect.yMaximum() ) << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() ) );
   itemRect.setExteriorRing( points );
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );

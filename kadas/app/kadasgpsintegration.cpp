@@ -73,7 +73,7 @@ void KadasGpsIntegration::connectGPS()
   disconnectGPS(); // cleanup
   QString port = QgsSettings().value( "/kadas/gps_port", "" ).toString();
   QgsGpsDetector *gpsDetector = new QgsGpsDetector( port ); // deletes itself automatically
-  connect( gpsDetector, qOverload<QgsGpsConnection *> ( &QgsGpsDetector::detected ), this, &KadasGpsIntegration::gpsConnected );
+  connect( gpsDetector, qOverload<QgsGpsConnection *>( &QgsGpsDetector::detected ), this, &KadasGpsIntegration::gpsConnected );
   connect( gpsDetector, &QgsGpsDetector::detectionFailed, this, &KadasGpsIntegration::gpsConnectionFailed );
   gpsDetector->advance();
 }
@@ -158,7 +158,6 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
   }
   mMarker->setPosition( KadasItemPos::fromPoint( position ) );
   mMarker->setAngle( -info.direction );
-
 }
 
 void KadasGpsIntegration::updateGpsFixIcon()

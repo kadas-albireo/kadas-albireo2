@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolpan.h                                 *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -65,12 +65,10 @@ Overridden mouse release event
 
 
 
-
     void pinchTriggered( QPinchGesture *gesture );
 %Docstring
 Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
 %End
-
 };
 
 /************************************************************************
@@ -78,5 +76,5 @@ Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolpan.h                                 *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

@@ -52,8 +52,7 @@ void KadasLayerRefreshManager::setLayerRefreshInterval( const QString &layerId, 
   {
     QTimer *timer = new QTimer( this );
     timer->setSingleShot( false );
-    connect( timer, &QTimer::timeout, this, [layerId]
-    {
+    connect( timer, &QTimer::timeout, this, [layerId] {
       QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
       if ( layer && layer->dataProvider() )
       {

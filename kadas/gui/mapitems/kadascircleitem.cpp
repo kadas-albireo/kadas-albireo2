@@ -47,7 +47,8 @@ QJsonObject KadasCircleItem::State::serialize() const
     r.append( p );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );;
+  json["status"] = static_cast<int>( drawStatus );
+  ;
   json["centers"] = c;
   json["ringpos"] = r;
   return json;
@@ -112,7 +113,7 @@ void KadasCircleItem::setPosition( const KadasItemPos &pos )
   }
   if ( mGeometry )
   {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
   }
   update();
 }
@@ -122,8 +123,8 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
   QList<Node> points;
   for ( int i = 0, n = constState()->centers.size(); i < n; ++i )
   {
-    points.append( {toMapPos( constState()->centers[i], settings )} );
-    points.append( {toMapPos( constState()->ringpos[i], settings )} );
+    points.append( { toMapPos( constState()->centers[i], settings ) } );
+    points.append( { toMapPos( constState()->ringpos[i], settings ) } );
   }
   return points;
 }
@@ -172,9 +173,9 @@ void KadasCircleItem::endPart()
 KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
-  attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::Type::TypeDistance, 0} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
+  attributes.insert( AttrR, NumericAttribute { "r", NumericAttribute::Type::TypeDistance, 0 } );
   return attributes;
 }
 
@@ -210,12 +211,11 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
 {
   for ( int iPart = 0, nParts = constState()->centers.size(); iPart < nParts; ++iPart )
   {
-
     KadasMapPos ringPos = toMapPos( constState()->ringpos[iPart], mapSettings );
     if ( pos.sqrDist( ringPos ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrR, NumericAttribute{"r", NumericAttribute::Type::TypeDistance, 0} );
+      attributes.insert( AttrR, NumericAttribute { "r", NumericAttribute::Type::TypeDistance, 0 } );
       return EditContext( QgsVertexId( iPart, 0, 1 ), ringPos, attributes );
     }
 
@@ -223,8 +223,8 @@ KadasMapItem::EditContext KadasCircleItem::getEditContext( const KadasMapPos &po
     if ( pos.sqrDist( center ) < pickTolSqr( mapSettings ) )
     {
       AttribDefs attributes;
-      attributes.insert( AttrX, NumericAttribute{"x"} );
-      attributes.insert( AttrY, NumericAttribute{"y"} );
+      attributes.insert( AttrX, NumericAttribute { "x" } );
+      attributes.insert( AttrY, NumericAttribute { "y" } );
       return EditContext( QgsVertexId( iPart, 0, 0 ), center, attributes );
     }
   }
@@ -393,11 +393,7 @@ void KadasCircleItem::computeCircle( const KadasItemPos &center, const KadasItem
 {
   QgsCircularString *string = new QgsCircularString();
   double radius = std::sqrt( ringpos.sqrDist( center ) );
-  string->setPoints( QgsPointSequence()
-                     << QgsPoint( center.x(), center.y() + radius )
-                     << QgsPoint( center.x(), center.y() - radius )
-                     << QgsPoint( center.x(), center.y() + radius )
-                   );
+  string->setPoints( QgsPointSequence() << QgsPoint( center.x(), center.y() + radius ) << QgsPoint( center.x(), center.y() - radius ) << QgsPoint( center.x(), center.y() + radius ) );
   QgsCompoundCurve *curve = new QgsCompoundCurve();
   curve->addCurve( string );
   QgsCurvePolygon *poly = new QgsCurvePolygon();
@@ -426,17 +422,17 @@ void KadasCircleItem::computeGeoCircle( const KadasItemPos &center, const KadasI
   QgsPointXY ps = mDa.computeSpheroidProject( p1, radius, M_PI );
   int shift = 0;
   int nPoints = wgsPoints.size();
-  if ( qFuzzyCompare( qAbs( pn.x() - p1.x() ), 180 ) )     // crosses north pole
+  if ( qFuzzyCompare( qAbs( pn.x() - p1.x() ), 180 ) ) // crosses north pole
   {
     wgsPoints[nPoints - 1].setX( p1.x() - 179.999 );
     wgsPoints[1].setX( p1.x() + 179.999 );
     wgsPoints.append( QgsPoint( p1.x() - 179.999, clampLatitude ) );
     wgsPoints[0] = QgsPoint( p1.x() + 179.999, clampLatitude );
-    wgsPoints.prepend( QgsPoint( p1.x(), clampLatitude ) );   // Needed to ensure first point does not overflow in longitude below
-    wgsPoints.append( QgsPoint( p1.x(), clampLatitude ) );   // Needed to ensure last point does not overflow in longitude below
+    wgsPoints.prepend( QgsPoint( p1.x(), clampLatitude ) ); // Needed to ensure first point does not overflow in longitude below
+    wgsPoints.append( QgsPoint( p1.x(), clampLatitude ) );  // Needed to ensure last point does not overflow in longitude below
     shift = 3;
   }
-  if ( qFuzzyCompare( qAbs( ps.x() - p1.x() ), 180 ) )     // crosses south pole
+  if ( qFuzzyCompare( qAbs( ps.x() - p1.x() ), 180 ) ) // crosses south pole
   {
     wgsPoints[181 + shift].setX( p1.x() - 179.999 );
     wgsPoints[179 + shift].setX( p1.x() + 179.999 );
@@ -447,7 +443,7 @@ void KadasCircleItem::computeGeoCircle( const KadasItemPos &center, const KadasI
   // 0: left-overflow, 1: center, 2: right-overflow
   QList<QgsPointXY> poly[3];
   int current = 1;
-  poly[1].append( wgsPoints[0] );  // First point is always in center region
+  poly[1].append( wgsPoints[0] ); // First point is always in center region
   nPoints = wgsPoints.size();
   for ( int j = 1; j < nPoints; ++j )
   {

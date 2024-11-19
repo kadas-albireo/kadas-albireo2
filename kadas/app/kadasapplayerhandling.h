@@ -40,7 +40,6 @@ class KadasAppLayerHandling
     Q_GADGET
 
   public:
-
     enum class SublayerHandling
     {
       AskUser,
@@ -67,7 +66,7 @@ class KadasAppLayerHandling
      * If \a showWarningOnInvalid layers is TRUE then a user facing warning will be raised
      * if a uri does not result in a valid vector layer.
      */
-    static QList< QgsMapLayer * > addOgrVectorLayers( const QStringList &uris, const QString &encoding, const QString &dataSourceType, bool &ok, bool showWarningOnInvalid = true );
+    static QList<QgsMapLayer *> addOgrVectorLayers( const QStringList &uris, const QString &encoding, const QString &dataSourceType, bool &ok, bool showWarningOnInvalid = true );
 
     /**
      * Adds a raster layer from a given \a uri and \a provider.
@@ -88,7 +87,7 @@ class KadasAppLayerHandling
      * If \a showWarningOnInvalid layers is TRUE then a user facing warning will be raised
      * if a uri does not result in a valid vector layer.
      */
-    static QList< QgsMapLayer * > addGdalRasterLayers( const QStringList &uris, bool &ok, bool showWarningOnInvalid = true );
+    static QList<QgsMapLayer *> addGdalRasterLayers( const QStringList &uris, bool &ok, bool showWarningOnInvalid = true );
 
     /**
      * Adds a mesh layer from a given \a uri and \a provider.
@@ -108,10 +107,7 @@ class KadasAppLayerHandling
      * If \a showWarningOnInvalid layers is TRUE then a user facing warning will be raised
      * if the \a uri does not result in a valid point cloud layer.
      */
-    static QgsPointCloudLayer *addPointCloudLayer( const QString &uri,
-        const QString &baseName,
-        const QString &provider,
-        bool showWarningOnInvalid = true );
+    static QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &provider, bool showWarningOnInvalid = true );
 
     /**
      * Adds a plugin layer from a given \a uri and \a provider.
@@ -137,7 +133,7 @@ class KadasAppLayerHandling
      * method has been called for each layer in turn. All added layers will already
      * have been added to the project.
      */
-    static void postProcessAddedLayers( const QList< QgsMapLayer * > &layers );
+    static void postProcessAddedLayers( const QList<QgsMapLayer *> &layers );
 
     /**
      * Open a map layer from a file.
@@ -147,7 +143,7 @@ class KadasAppLayerHandling
      *
      * \returns a list of added map layers if the file is successfully opened
      */
-    static QList< QgsMapLayer * > openLayer( const QString &fileName, bool &ok, bool allowInteractive = false, bool suppressBulkLayerPostProcessing = false );
+    static QList<QgsMapLayer *> openLayer( const QString &fileName, bool &ok, bool allowInteractive = false, bool suppressBulkLayerPostProcessing = false );
 
     //! Add a 'pre-made' map layer to the project
     static void addMapLayer( QgsMapLayer *mapLayer );
@@ -158,7 +154,7 @@ class KadasAppLayerHandling
     static void addLayerDefinition();
 
     //! Add a list of database layers to the map
-    static QList< QgsMapLayer * > addDatabaseLayers( const QStringList &layerPathList, const QString &providerKey, bool &ok );
+    static QList<QgsMapLayer *> addDatabaseLayers( const QStringList &layerPathList, const QString &providerKey, bool &ok );
 
     /**
      * Flags which control the behavior of loading layer dependencies.
@@ -166,7 +162,7 @@ class KadasAppLayerHandling
     enum class DependencyFlag : int
     {
       LoadAllRelationships = 1 << 1, //!< Causes all relationships to be loaded, regardless of whether the originating table is the referenced or referencing table. By default relationships are only loaded when the originating table is the referencing table.
-      SilentLoad = 1 << 2, //!< Dependencies are loaded without any user-visible notifications.
+      SilentLoad = 1 << 2,           //!< Dependencies are loaded without any user-visible notifications.
     };
     Q_ENUM( DependencyFlag )
     Q_DECLARE_FLAGS( DependencyFlags, DependencyFlag )
@@ -179,10 +175,7 @@ class KadasAppLayerHandling
      * categories ("Forms" for the form widgets and "Relations" for layer weak relations).
      * \return a list of weak references to broken layer dependencies
      */
-    static const QList< QgsVectorLayerRef > findBrokenLayerDependencies( QgsVectorLayer *vectorLayer,
-        QgsMapLayer::StyleCategories categories = QgsMapLayer::StyleCategory::AllStyleCategories,
-        QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name,
-        DependencyFlags dependencyFlags = DependencyFlags() );
+    static const QList<QgsVectorLayerRef> findBrokenLayerDependencies( QgsVectorLayer *vectorLayer, QgsMapLayer::StyleCategories categories = QgsMapLayer::StyleCategory::AllStyleCategories, QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name, DependencyFlags dependencyFlags = DependencyFlags() );
 
     /**
      * Scans the \a vectorLayer for broken dependencies and automatically
@@ -191,10 +184,7 @@ class KadasAppLayerHandling
      * used to exclude one of the currently implemented search categories
      * ("Forms" for the form widgets and "Relations" for layer weak relations).
      */
-    static void resolveVectorLayerDependencies( QgsVectorLayer *vectorLayer,
-        QgsMapLayer::StyleCategories categories = QgsMapLayer::AllStyleCategories,
-        QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name,
-        DependencyFlags dependencyFlags = DependencyFlags() );
+    static void resolveVectorLayerDependencies( QgsVectorLayer *vectorLayer, QgsMapLayer::StyleCategories categories = QgsMapLayer::AllStyleCategories, QgsVectorLayerRef::MatchType matchType = QgsVectorLayerRef::MatchType::Name, DependencyFlags dependencyFlags = DependencyFlags() );
 
     /**
      * Scans the \a vectorLayer for weak relations and automatically
@@ -215,7 +205,6 @@ class KadasAppLayerHandling
     static void onVectorLayerStyleLoaded( QgsVectorLayer *vl, const QgsMapLayer::StyleCategories categories );
 
   private:
-
     template<typename T> static T *addLayerPrivate( Qgis::LayerType type, const QString &uri, const QString &baseName, const QString &providerKey, bool guiWarnings = true );
 
     /**
@@ -232,12 +221,11 @@ class KadasAppLayerHandling
      * This method will open a dialog so the user can select GDAL sublayers to load
      * \returns TRUE if any items were loaded
      */
-    static bool askUserForZipItemLayers( const QString &path, const QList< Qgis::LayerType > &acceptableTypes );
+    static bool askUserForZipItemLayers( const QString &path, const QList<Qgis::LayerType> &acceptableTypes );
 
-    static SublayerHandling shouldAskUserForSublayers( const QList< QgsProviderSublayerDetails > &layers, bool hasNonLayerItems = false );
+    static SublayerHandling shouldAskUserForSublayers( const QList<QgsProviderSublayerDetails> &layers, bool hasNonLayerItems = false );
 
-    static QList< QgsMapLayer * > addSublayers( const QList< QgsProviderSublayerDetails> &layers, const QString &baseName, const QString &groupName );
-
+    static QList<QgsMapLayer *> addSublayers( const QList<QgsProviderSublayerDetails> &layers, const QString &baseName, const QString &groupName );
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS( KadasAppLayerHandling::DependencyFlags );
 

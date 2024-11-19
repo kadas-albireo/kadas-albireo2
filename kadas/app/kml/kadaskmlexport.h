@@ -48,7 +48,6 @@ class KadasKMLExport : public QObject
     void writeMapItems( const QString &layerId, QTextStream &outStream, QuaZip *quaZip );
     bool renderTile( QImage &img, const QgsRectangle &extent, QgsMapLayer *mapLayer );
     void addStyle( QTextStream &outStream, QgsFeature &f, QgsFeatureRenderer &r, QgsRenderContext &rc );
-
 };
 
 #endif // KADASKMLEXPORT_H

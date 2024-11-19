@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/kadasrichtexteditor.h                                      *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -104,8 +104,7 @@ class KadasRichTextEditorToolBar : QToolBar
 #include "kadas/gui/kadasrichtexteditor.h"
 %End
   public:
-    KadasRichTextEditorToolBar( KadasRichTextEditor *editor,
-                                QWidget *parent = 0 );
+    KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent = 0 );
 
   public slots:
     void updateActions();
@@ -117,5 +116,5 @@ class KadasRichTextEditorToolBar : QToolBar
  *                                                                      *
  * kadas/gui/kadasrichtexteditor.h                                      *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

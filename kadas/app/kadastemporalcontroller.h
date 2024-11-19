@@ -19,17 +19,16 @@
 class KadasRibbonButton;
 class QgsTemporalControllerWidget;
 
-class KadasTemporalController: public KadasBottomBar, private Ui::KadasTemporalControllerBase
+class KadasTemporalController : public KadasBottomBar, private Ui::KadasTemporalControllerBase
 {
     Q_OBJECT
   public:
-    KadasTemporalController(QgsMapCanvas *canvas);
+    KadasTemporalController( QgsMapCanvas *canvas );
     ~KadasTemporalController();
 
   private slots:
     void on_mCloseButton_clicked();
 
   private:
-
     QgsTemporalControllerWidget *mQgsTemporalControllerWidget;
 };

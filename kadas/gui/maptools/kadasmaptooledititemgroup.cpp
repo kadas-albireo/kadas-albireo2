@@ -211,11 +211,11 @@ void KadasMapToolEditItemGroup::keyPressEvent( QKeyEvent *e )
   }
   else if ( ( e->key() == Qt::Key_Z && e->modifiers() == Qt::ControlModifier ) || e->key() == Qt::Key_Backspace )
   {
-//    mStateHistory->undo();
+    //    mStateHistory->undo();
   }
   else if ( e->key() == Qt::Key_Y && e->modifiers() == Qt::ControlModifier )
   {
-//    mStateHistory->redo();
+    //    mStateHistory->redo();
   }
   else if ( e->key() == Qt::Key_C && e->modifiers() == Qt::ControlModifier )
   {

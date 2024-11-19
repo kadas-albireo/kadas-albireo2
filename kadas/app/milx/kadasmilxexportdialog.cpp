@@ -46,14 +46,14 @@ KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
 
 void KadasMilxExportDialog::setExportMode( ExportMode exportMode )
 {
-  switch (exportMode)
+  switch ( exportMode )
   {
-  case ExportMode::Milx:
-    ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageMilx );
-    break;
-  case ExportMode::Kml:
-    ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageKml );
-    break;
+    case ExportMode::Milx:
+      ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageMilx );
+      break;
+    case ExportMode::Kml:
+      ui.stackedWidgetOptions->setCurrentWidget( ui.stackedWidgetOptionsPageKml );
+      break;
   }
 }
 
@@ -91,6 +91,3 @@ QString KadasMilxExportDialog::selectedVersionTag() const
 {
   return ui.comboMilxVersion->currentData().toString();
 }
-
-
-

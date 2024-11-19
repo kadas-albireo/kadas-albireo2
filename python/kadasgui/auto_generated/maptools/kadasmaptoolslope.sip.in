@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolslope.h                               *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -27,7 +27,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem* createItem() const;
 
 };
 
@@ -48,5 +47,5 @@ class KadasMapToolSlope : KadasMapToolCreateItem
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolslope.h                               *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

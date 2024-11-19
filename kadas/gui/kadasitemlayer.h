@@ -29,6 +29,7 @@ class KadasMapItem;
 class KadasMapPos;
 
 #ifdef SIP_RUN
+// clang-format off
 //
 // copied from PyQt4 QMap<int, TYPE> and adapted to unsigned
 //
@@ -125,6 +126,7 @@ class KadasMapPos;
   return sipGetState( sipTransferObj );
   % End
 };
+// clang-format on
 #endif
 
 class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer

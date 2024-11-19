@@ -33,8 +33,8 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
   public:
     struct SearchResult
     {
-      QString category;
-      /**
+        QString category;
+        /**
        * Lower number means higher precedence.
        * 1: coordinate
        * 2: pins
@@ -49,23 +49,24 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
        * 30: world locations
        * 100: unknown
        */
-      int categoryPrecedence;
-      QString text;
-      QgsPointXY pos;
-      QgsRectangle bbox;
-      QString crs;
-      double zoomScale;
-      bool showPin;
-      bool fuzzy = false;
-      QString geometry;
+        int categoryPrecedence;
+        QString text;
+        QgsPointXY pos;
+        QgsRectangle bbox;
+        QString crs;
+        double zoomScale;
+        bool showPin;
+        bool fuzzy = false;
+        QString geometry;
     };
     struct SearchRegion
     {
-      QgsPolylineXY polygon;
-      QString crs;
+        QgsPolylineXY polygon;
+        QString crs;
     };
 
-    KadasSearchProvider( QgsMapCanvas *mapCanvas ) : mMapCanvas( mapCanvas ) { }
+    KadasSearchProvider( QgsMapCanvas *mapCanvas )
+      : mMapCanvas( mapCanvas ) {}
     virtual ~KadasSearchProvider() {}
     virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) = 0;
     virtual void cancelSearch() {}

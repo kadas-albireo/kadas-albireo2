@@ -24,7 +24,7 @@
 #include "kadas/core/kadaslatlontoutm.h"
 
 
-KadasMapGridLayerRenderer::KadasMapGridLayerRenderer(KadasMapGridLayer *layer, QgsRenderContext &rendererContext)
+KadasMapGridLayerRenderer::KadasMapGridLayerRenderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext )
   : QgsMapLayerRenderer( layer->id(), &rendererContext )
   , mRenderGridConfig( layer->gridConfig() )
   , mRenderOpacity( layer->opacity() )
@@ -39,32 +39,32 @@ bool KadasMapGridLayerRenderer::render()
 
   switch ( mRenderGridConfig.gridType )
   {
-  case KadasMapGridLayer::GridType::GridLV03:
-    drawCrsGrid( "EPSG:21781", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
-    break;
-  case KadasMapGridLayer::GridType::GridLV95:
-    drawCrsGrid( "EPSG:2056", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
-    break;
-  case KadasMapGridLayer::GridType::GridDD:
-    drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDecimalDegrees, 3, QgsCoordinateFormatter::FormatFlags() );
-    break;
-  case KadasMapGridLayer::GridType::GridDM:
-    drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDegreesMinutes, 1, QgsCoordinateFormatter::FlagDegreesUseStringSuffix | QgsCoordinateFormatter::FlagDegreesPadMinutesSeconds );
-    break;
-  case KadasMapGridLayer::GridType::GridDMS:
-    drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 0, QgsCoordinateFormatter::FlagDegreesUseStringSuffix | QgsCoordinateFormatter::FlagDegreesPadMinutesSeconds );
-    break;
-  case KadasMapGridLayer::GridType::GridUTM:
-  case KadasMapGridLayer::GridType::GridMGRS:
-    drawMgrsGrid();
-    break;
+    case KadasMapGridLayer::GridType::GridLV03:
+      drawCrsGrid( "EPSG:21781", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
+      break;
+    case KadasMapGridLayer::GridType::GridLV95:
+      drawCrsGrid( "EPSG:2056", 100000, QgsCoordinateFormatter::FormatPair, 0, QgsCoordinateFormatter::FormatFlags() );
+      break;
+    case KadasMapGridLayer::GridType::GridDD:
+      drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDecimalDegrees, 3, QgsCoordinateFormatter::FormatFlags() );
+      break;
+    case KadasMapGridLayer::GridType::GridDM:
+      drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDegreesMinutes, 1, QgsCoordinateFormatter::FlagDegreesUseStringSuffix | QgsCoordinateFormatter::FlagDegreesPadMinutesSeconds );
+      break;
+    case KadasMapGridLayer::GridType::GridDMS:
+      drawCrsGrid( "EPSG:4326", 1, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 0, QgsCoordinateFormatter::FlagDegreesUseStringSuffix | QgsCoordinateFormatter::FlagDegreesPadMinutesSeconds );
+      break;
+    case KadasMapGridLayer::GridType::GridUTM:
+    case KadasMapGridLayer::GridType::GridMGRS:
+      drawMgrsGrid();
+      break;
   }
 
   renderContext()->painter()->restore();
   return true;
 }
 
-void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags)
+void KadasMapGridLayerRenderer::drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags )
 {
   QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( crs ), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
   QgsRectangle area = crst.transformBoundingBox( renderContext()->mapExtent(), Qgis::TransformDirection::Reverse );
@@ -118,7 +118,8 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
     {
       int iSegment = 0, nSegments = poly.size() - 1;
       // Bottom edge label pos
-      for ( ; iSegment < nSegments && poly[1 + iSegment].y() >= screenRect.bottom(); ++iSegment );
+      for ( ; iSegment < nSegments && poly[1 + iSegment].y() >= screenRect.bottom(); ++iSegment )
+        ;
       if ( iSegment < nSegments )
       {
         QgsPoint inter;
@@ -126,13 +127,14 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
         QgsGeometryUtils::segmentIntersection( QgsPoint( poly[iSegment] ), QgsPoint( poly[iSegment + 1] ), QgsPoint( screenRect.bottomLeft() ), QgsPoint( screenRect.bottomRight() ), inter, isInter );
         if ( isInter )
         {
-          bottomLabels.append( {QgsCoordinateFormatter::formatX( x, format, precision, flags ), inter.toQPointF()} );
+          bottomLabels.append( { QgsCoordinateFormatter::formatX( x, format, precision, flags ), inter.toQPointF() } );
         }
       }
 
       // Top edge label pos
       iSegment = nSegments - 2;
-      for ( ; iSegment >= 0 && poly[1 + iSegment].y() <= screenRect.top(); --iSegment );
+      for ( ; iSegment >= 0 && poly[1 + iSegment].y() <= screenRect.top(); --iSegment )
+        ;
       if ( iSegment >= 0 )
       {
         QgsPoint inter;
@@ -140,7 +142,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
         QgsGeometryUtils::segmentIntersection( QgsPoint( poly[iSegment] ), QgsPoint( poly[iSegment + 1] ), QgsPoint( screenRect.topLeft() ), QgsPoint( screenRect.topRight() ), inter, isInter );
         if ( isInter )
         {
-          topLabels.append( {QgsCoordinateFormatter::formatX( x, format, precision, flags ), inter.toQPointF()} );
+          topLabels.append( { QgsCoordinateFormatter::formatX( x, format, precision, flags ), inter.toQPointF() } );
         }
       }
     }
@@ -165,7 +167,8 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
     {
       int iSegment = 0, nSegments = poly.size() - 1;
       // Left edge label pos
-      for ( ; iSegment < nSegments && poly[1 + iSegment].y() <= screenRect.left(); ++iSegment );
+      for ( ; iSegment < nSegments && poly[1 + iSegment].y() <= screenRect.left(); ++iSegment )
+        ;
       if ( iSegment < nSegments )
       {
         QgsPoint inter;
@@ -173,13 +176,14 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
         QgsGeometryUtils::segmentIntersection( QgsPoint( poly[iSegment] ), QgsPoint( poly[iSegment + 1] ), QgsPoint( screenRect.bottomLeft() ), QgsPoint( screenRect.topLeft() ), inter, isInter );
         if ( isInter )
         {
-          leftLabels.append( {QgsCoordinateFormatter::formatY( y, format, precision, flags ), inter.toQPointF()} );
+          leftLabels.append( { QgsCoordinateFormatter::formatY( y, format, precision, flags ), inter.toQPointF() } );
         }
       }
 
       // Right edge label pos
       iSegment = nSegments - 2;
-      for ( ; iSegment >= 0 && poly[1 + iSegment].y() >= screenRect.right(); --iSegment );
+      for ( ; iSegment >= 0 && poly[1 + iSegment].y() >= screenRect.right(); --iSegment )
+        ;
       if ( iSegment >= 0 )
       {
         QgsPoint inter;
@@ -187,7 +191,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
         QgsGeometryUtils::segmentIntersection( QgsPoint( poly[iSegment] ), QgsPoint( poly[iSegment + 1] ), QgsPoint( screenRect.bottomRight() ), QgsPoint( screenRect.topRight() ), inter, isInter );
         if ( isInter )
         {
-          rightLabels.append( {QgsCoordinateFormatter::formatY( y, format, precision, flags ), inter.toQPointF()} );
+          rightLabels.append( { QgsCoordinateFormatter::formatY( y, format, precision, flags ), inter.toQPointF() } );
         }
       }
     }
@@ -254,10 +258,9 @@ void KadasMapGridLayerRenderer::drawCrsGrid(const QString &crs, double segmentLe
       }
     }
   }
-
 }
 
-void KadasMapGridLayerRenderer::adjustZoneLabelPos(QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent)
+void KadasMapGridLayerRenderer::adjustZoneLabelPos( QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent )
 {
   if ( !visibleExtent.contains( labelPos ) )
   {
@@ -286,7 +289,7 @@ void KadasMapGridLayerRenderer::adjustZoneLabelPos(QPointF &labelPos, const QPoi
   }
 }
 
-QRect KadasMapGridLayerRenderer::computeScreenExtent(const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel)
+QRect KadasMapGridLayerRenderer::computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel )
 {
   QPoint topLeft = mapToPixel.transform( mapExtent.xMinimum(), mapExtent.yMinimum() ).toQPointF().toPoint();
   QPoint topRight = mapToPixel.transform( mapExtent.xMaximum(), mapExtent.yMinimum() ).toQPointF().toPoint();
@@ -313,42 +316,23 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     area = area.buffered( area.width() );
   }
 
-  QList<QPolygonF> zoneLines;
-  QList<QPolygonF> subZoneLines;
-  QList<QPolygonF> gridLines;
-  QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
-  QList<KadasLatLonToUTM::ZoneLabel> zoneSubLabels;
-  QList<KadasLatLonToUTM::GridLabel> gridLabels;
-  KadasLatLonToUTM::computeGrid( area, mapScale, zoneLines, subZoneLines, gridLines, zoneLabels, zoneSubLabels, gridLabels, mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM, mRenderGridConfig.cellSize );
+  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::computeGrid(
+    area,
+    mapScale,
+    mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM,
+    mRenderGridConfig.cellSize
+  );
 
   // Draw grid lines
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 3 ) );
-  for ( const QPolygonF &zoneLine : std::as_const( zoneLines ) )
+  for ( const auto &gridLine : std::as_const( grid.lines ) )
   {
-    QPolygonF itemLine;
-    for ( const QPointF &point : zoneLine )
-    {
-      itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
-    }
-    renderContext()->painter()->drawPolyline( itemLine );
-  }
+    if ( gridLine.level == KadasLatLonToUTM::Level::OnlyLabels )
+      continue;
 
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1.5 ) );
-  for ( const QPolygonF &subZoneLine : std::as_const( subZoneLines ) )
-  {
-    QPolygonF itemLine;
-    for ( const QPointF &point : subZoneLine )
-    {
-      itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
-    }
-    renderContext()->painter()->drawPolyline( itemLine );
-  }
+    renderContext()->painter()->setPen( level2pen( gridLine.level ) );
 
-  renderContext()->painter()->setPen( QPen( mRenderGridConfig.color, 1 ) );
-  for ( const QPolygonF &gridLine : std::as_const( gridLines ) )
-  {
     QPolygonF itemLine;
-    for ( const QPointF &point : gridLine )
+    for ( const QPointF &point : std::as_const( gridLine.line ) )
     {
       itemLine.append( renderContext()->mapToPixel().transform( crst.transform( point.x(), point.y() ) ).toQPointF() );
     }
@@ -362,32 +346,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     return;
   }
 
-  double zoneFontSize = 0;
-  double subZoneFontSize = 0;
   double gridLabelSize = mRenderGridConfig.fontSize;
-  if ( mapScale > 20000000 )
-  {
-    zoneFontSize = 0.66 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 10000000 )
-  {
-    zoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 5000000 )   // Zones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
-  else if ( mapScale > 500000 )   // Zones and subzones only, see KadasLatLonToUTM::computeGrid
-  {
-    zoneFontSize = 1.8 * mRenderGridConfig.fontSize;
-    subZoneFontSize = mRenderGridConfig.fontSize;
-  }
-  else
-  {
-    zoneFontSize = 2 * mRenderGridConfig.fontSize;
-    subZoneFontSize = 1.33 * mRenderGridConfig.fontSize;
-  }
-
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
   double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
   renderContext()->painter()->setBrush( mRenderGridConfig.color );
@@ -398,9 +357,9 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   if ( adaptToScreen )
   {
     font.setPointSizeF( gridLabelSize );
-    for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( gridLabels ) )
+    for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
-      const QPolygonF &gridLine = gridLines[gridLabel.lineIdx];
+      const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].line;
       QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( gridLine.front().x(), gridLine.front().y() ) ).toQPointF();
       const QRectF &visibleRect = screenExtent;
       int i = 1, n = gridLine.size();
@@ -440,10 +399,13 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     }
   }
 
-  font.setPointSizeF( zoneFontSize * dpiScale );
-  QFontMetrics fm( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( zoneLabels ) )
+  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
   {
+    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+
+    font.setPointSizeF( zoneFontSize * dpiScale );
+    QFontMetrics fm( font );
+
     const QPointF &pos = zoneLabel.pos;
     const QPointF &maxPos = zoneLabel.maxPos;
     QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
@@ -452,34 +414,18 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     {
       adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
     }
-    labelPos.rx() -= fm.horizontalAdvance( zoneLabel.label );
-    labelPos.ry() += fm.height();
-    if ( labelPos.x() > maxLabelPos.x() && labelPos.y() < maxLabelPos.y() )
+    labelPos.rx() += 3;
+    labelPos.ry() -= 3;
+
+    double labelAdvance = fm.horizontalAdvance( zoneLabel.label );
+    if ( labelPos.x() + labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
     {
       drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
     }
   }
-
-  font.setPointSizeF( subZoneFontSize );
-  fm = QFontMetrics( font );
-  for ( const KadasLatLonToUTM::ZoneLabel &subZoneLabel : std::as_const( zoneSubLabels ) )
-  {
-    const QPointF &pos = subZoneLabel.pos;
-    const QPointF &maxPos = subZoneLabel.maxPos;
-    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-    if ( adaptToScreen )
-    {
-      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-    }
-    if ( labelPos.x() + fm.horizontalAdvance( subZoneLabel.label ) < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-    {
-      drawGridLabel( labelPos, subZoneLabel.label, font, bufferColor );
-    }
-  }
 }
 
-void KadasMapGridLayerRenderer::drawGridLabel(const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor)
+void KadasMapGridLayerRenderer::drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor )
 {
   QPainterPath path;
   path.addText( pos, font, text );
@@ -487,4 +433,50 @@ void KadasMapGridLayerRenderer::drawGridLabel(const QPointF &pos, const QString 
   renderContext()->painter()->drawPath( path );
   renderContext()->painter()->setPen( Qt::NoPen );
   renderContext()->painter()->drawPath( path );
+}
+
+QPen KadasMapGridLayerRenderer::level2pen( KadasLatLonToUTM::Level level ) const
+{
+  switch ( level )
+  {
+    case KadasLatLonToUTM::Level::Major:
+      return QPen( mRenderGridConfig.color, 2 );
+    case KadasLatLonToUTM::Level::Minor:
+      return QPen( mRenderGridConfig.color, .8 );
+    case KadasLatLonToUTM::Level::OnlyLabels:
+      Q_ASSERT( false );
+      break;
+  }
+  return QPen();
+}
+
+double KadasMapGridLayerRenderer::exponentialScale( double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent )
+{
+  if ( domainMin >= domainMax )
+  {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  if ( exponent <= 0 )
+  {
+    std::numeric_limits<double>::quiet_NaN();
+  }
+  // outside of domain?
+  if ( value >= domainMax )
+  {
+    return rangeMax;
+  }
+  else if ( value <= domainMin )
+  {
+    return rangeMin;
+  }
+
+  // calculate linear scale
+  double m = ( rangeMax - rangeMin ) / ( domainMax - domainMin );
+  double c = rangeMin - ( domainMin * m );
+  // Return linearly scaled value
+  return m * value + c;
+
+  // Return exponentially scaled value
+  double ratio = ( std::pow( exponent, value - domainMin ) - 1 ) / ( std::pow( exponent, domainMax - domainMin ) - 1 );
+  return ( rangeMax - rangeMin ) * ratio + rangeMin;
 }

@@ -33,7 +33,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   }
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( QgsSettings().value( "/Redlining/size", 1 ).toInt() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasRedliningItemEditor::saveOutlineWidth );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasRedliningItemEditor::saveOutlineWidth );
 
   mUi.mToolButtonBorderColor->setAllowOpacity( true );
   mUi.mToolButtonBorderColor->setShowNoColor( true );
@@ -49,7 +49,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DashDotLine ), QString(), static_cast<int>( Qt::DashDotLine ) );
   mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DotLine ), QString(), static_cast<int>( Qt::DotLine ) );
   mUi.mComboBoxOutlineStyle->setCurrentIndex( QgsSettings().value( "/Redlining/outline_style", "1" ).toInt() );
-  connect( mUi.mComboBoxOutlineStyle, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
+  connect( mUi.mComboBoxOutlineStyle, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
   mUi.mToolButtonFillColor->setAllowOpacity( true );
   mUi.mToolButtonFillColor->setShowNoColor( true );
@@ -68,7 +68,7 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::FDiagPattern ), QString(), static_cast<int>( Qt::FDiagPattern ) );
   mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::CrossPattern ), QString(), static_cast<int>( Qt::CrossPattern ) );
   mUi.mComboBoxFillStyle->setCurrentIndex( QgsSettings().value( "/Redlining/fill_style", "1" ).toInt() );
-  connect( mUi.mComboBoxFillStyle, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
+  connect( mUi.mComboBoxFillStyle, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
   if ( geometryItem && geometryItem->geometryType() == Qgis::GeometryType::Line )
   {
@@ -151,7 +151,7 @@ KadasRedliningItemEditor::~KadasRedliningItemEditor()
 
 void KadasRedliningItemEditor::toggleItemMeasurements( bool enabled )
 {
-  KadasGeometryItem *geometryItem = qobject_cast<KadasGeometryItem *> ( mItem );
+  KadasGeometryItem *geometryItem = qobject_cast<KadasGeometryItem *>( mItem );
   if ( !geometryItem )
   {
     return;
@@ -161,7 +161,7 @@ void KadasRedliningItemEditor::toggleItemMeasurements( bool enabled )
 
 void KadasRedliningItemEditor::saveColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *> ( QObject::sender() );
+  QgsColorButton *btn = qobject_cast<QgsColorButton *>( QObject::sender() );
   QString key = QString( "/Redlining/" ) + btn->property( "settings_key" ).toString();
   QgsSettings().setValue( key, QgsSymbolLayerUtils::encodeColor( btn->color() ) );
   emit styleChanged();
@@ -175,7 +175,7 @@ void KadasRedliningItemEditor::saveOutlineWidth()
 
 void KadasRedliningItemEditor::saveStyle()
 {
-  QComboBox *combo = qobject_cast<QComboBox *> ( QObject::sender() );
+  QComboBox *combo = qobject_cast<QComboBox *>( QObject::sender() );
   QString key = QString( "/Redlining/" ) + combo->property( "settings_key" ).toString();
   QgsSettings().setValue( key, combo->currentIndex() );
   emit styleChanged();

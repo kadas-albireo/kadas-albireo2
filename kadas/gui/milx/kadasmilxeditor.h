@@ -45,7 +45,6 @@ class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor
     QToolButton *mSymbolButton = nullptr;
     QLabel *mEditLabel = nullptr;
     KadasMilxSymbolDesc mSelectedSymbol;
-
 };
 
 #endif // KADASMILXEDITOR_H

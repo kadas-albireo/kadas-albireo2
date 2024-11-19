@@ -28,7 +28,7 @@
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
 
 
-KadasArcGisRestCatalogProvider::KadasArcGisRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &/*params*/ )
+KadasArcGisRestCatalogProvider::KadasArcGisRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> & /*params*/ )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
 {
 }
@@ -60,7 +60,7 @@ void KadasArcGisRestCatalogProvider::parseFolder( const QString &path, const QSt
 
 void KadasArcGisRestCatalogProvider::parseFolderDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   QString path = reply->property( "path" ).toString();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
@@ -79,7 +79,7 @@ void KadasArcGisRestCatalogProvider::parseFolderDo()
     }
     for ( const QVariant &serviceData : folderData["services"].toList() )
     {
-      parseService( QString( "/" ) + serviceData.toMap() ["name"].toString(), catTitles );
+      parseService( QString( "/" ) + serviceData.toMap()["name"].toString(), catTitles );
     }
   }
 
@@ -98,7 +98,7 @@ void KadasArcGisRestCatalogProvider::parseService( const QString &path, const QS
 
 void KadasArcGisRestCatalogProvider::parseServiceDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   QString path = reply->property( "path" ).toString();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
@@ -108,7 +108,7 @@ void KadasArcGisRestCatalogProvider::parseServiceDo()
     QVariantMap serviceData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     if ( serviceData.contains( "singleFusedMapCache" ) )
     {
-      QString catName = serviceData["documentInfo"].toMap() ["Title"].toString();
+      QString catName = serviceData["documentInfo"].toMap()["Title"].toString();
       if ( catName.isEmpty() )
       {
         catName = QFileInfo( path ).baseName();
@@ -144,7 +144,7 @@ void KadasArcGisRestCatalogProvider::parseWMTS( const QString &path, const QStri
 
 void KadasArcGisRestCatalogProvider::parseWMTSDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   QString path = reply->property( "path" ).toString();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
@@ -186,7 +186,7 @@ void KadasArcGisRestCatalogProvider::parseWMS( const QString &path, const QStrin
 
 void KadasArcGisRestCatalogProvider::parseWMSDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
   QString url = reply->property( "url" ).toString();

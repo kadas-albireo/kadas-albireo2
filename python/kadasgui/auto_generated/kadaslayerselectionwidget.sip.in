@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/kadaslayerselectionwidget.h                                *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -82,8 +82,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     Py_END_ALLOW_THREADS
 
 %End
+
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = 0 );
-    void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
 
@@ -100,5 +100,5 @@ the Free Software Foundation; either version 2 of the License, or     *
  *                                                                      *
  * kadas/gui/kadaslayerselectionwidget.h                                *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

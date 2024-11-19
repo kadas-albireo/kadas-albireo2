@@ -34,11 +34,11 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
 
   for ( QgsMapLayer *layer : canvas->layers() )
   {
-    if ( qobject_cast<KadasItemLayer *> ( layer ) )
+    if ( qobject_cast<KadasItemLayer *>( layer ) )
     {
       pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
     }
-    else if ( qobject_cast<QgsVectorLayer *> ( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
+    else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
       pickResult = pickVectorLayer( static_cast<QgsVectorLayer *>( layer ), canvas, mapPos, geomType );
     }
@@ -96,9 +96,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   {
     return pickResult;
   }
-  if ( vlayer->hasScaleBasedVisibility() &&
-       ( vlayer->maximumScale() > canvas->mapSettings().scale() ||
-         vlayer->minimumScale() <= canvas->mapSettings().scale() ) )
+  if ( vlayer->hasScaleBasedVisibility() && ( vlayer->maximumScale() > canvas->mapSettings().scale() || vlayer->minimumScale() <= canvas->mapSettings().scale() ) )
   {
     return pickResult;
   }

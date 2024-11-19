@@ -34,7 +34,7 @@
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 
 
-KadasMapItem* KadasMapToolHillshadeItemInterface::createItem() const
+KadasMapItem *KadasMapToolHillshadeItemInterface::createItem() const
 {
   KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
   return item;
@@ -90,11 +90,11 @@ void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordi
   anglesDialogLayout->addWidget( new QLabel( tr( "Azimuth (horizontal angle):" ) ), 0, 0, 1, 1 );
   anglesDialogLayout->addWidget( new QLabel( tr( "Vertical angle:" ) ), 1, 0, 1, 1 );
   QDoubleSpinBox *spinHorAngle = new QDoubleSpinBox();
-  spinHorAngle ->setRange( 0, 359.9 );
-  spinHorAngle ->setDecimals( 1 );
-  spinHorAngle ->setValue( 315 );
+  spinHorAngle->setRange( 0, 359.9 );
+  spinHorAngle->setDecimals( 1 );
+  spinHorAngle->setValue( 315 );
   spinHorAngle->setWrapping( true );
-  spinHorAngle ->setSuffix( QChar( 0x00B0 ) );
+  spinHorAngle->setSuffix( QChar( 0x00B0 ) );
   anglesDialogLayout->addWidget( spinHorAngle, 0, 1, 1, 1 );
   QDoubleSpinBox *spinVerAngle = new QDoubleSpinBox();
   spinVerAngle->setRange( 0, 90. );

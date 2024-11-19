@@ -3,9 +3,8 @@
  *                                                                      *
  * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
-
 
 
 
@@ -24,7 +23,7 @@ An interface for map items creation
 
     virtual ~KadasMapItemInterface();
 
-    virtual KadasMapItem* createItem() const = 0;
+    virtual KadasMapItem *createItem() const = 0;
 };
 
 /************************************************************************
@@ -32,5 +31,5 @@ An interface for map items creation
  *                                                                      *
  * kadas/gui/kadasmapiteminterface.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

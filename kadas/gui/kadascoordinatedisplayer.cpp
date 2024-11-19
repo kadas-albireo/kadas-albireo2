@@ -66,12 +66,12 @@ KadasCoordinateDisplayer::KadasCoordinateDisplayer( QToolButton *crsButton, QLin
 
   mHeightSelectionCombo->addItem( tr( "Meters" ), static_cast<int>( Qgis::DistanceUnit::Meters ) );
   mHeightSelectionCombo->addItem( tr( "Feet" ), static_cast<int>( Qgis::DistanceUnit::Feet ) );
-  mHeightSelectionCombo->setCurrentIndex( -1 );  // to ensure currentIndexChanged is triggered below
+  mHeightSelectionCombo->setCurrentIndex( -1 ); // to ensure currentIndexChanged is triggered below
 
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, this, &KadasCoordinateDisplayer::displayCoordinates );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasCoordinateDisplayer::syncProjectCrs );
   connect( crsSelectionMenu, &QMenu::triggered, this, &KadasCoordinateDisplayer::displayFormatChanged );
-  connect( mHeightSelectionCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasCoordinateDisplayer::heightUnitChanged );
+  connect( mHeightSelectionCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasCoordinateDisplayer::heightUnitChanged );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasCoordinateDisplayer::readProjectSettings );
 
   mHeightSelectionCombo->setCurrentIndex( QgsSettings().value( "/Qgis/heightUnit", 0 ).toInt() );
@@ -198,5 +198,5 @@ void KadasCoordinateDisplayer::readProjectSettings()
   {
     displayCrs = 0;
   }
-  displayFormatChanged( mCRSSelectionButton->menu()->actions() [displayCrs] );
+  displayFormatChanged( mCRSSelectionButton->menu()->actions()[displayCrs] );
 }

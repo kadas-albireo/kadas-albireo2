@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/kadasitemlayer.h                                           *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -11,6 +11,7 @@
 
 
 
+// clang-format off
 //
 // copied from PyQt4 QMap<int, TYPE> and adapted to unsigned
 //
@@ -107,6 +108,7 @@
   return sipGetState( sipTransferObj );
 %End
 };
+// clang-format on
 
 class KadasItemLayer : KadasPluginLayer
 {
@@ -205,5 +207,5 @@ class KadasItemLayerRegistry : QObject
  *                                                                      *
  * kadas/gui/kadasitemlayer.h                                           *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

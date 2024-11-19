@@ -35,7 +35,6 @@ class KadasPythonIntegration : public QObject
     Q_OBJECT
 
   public:
-
     KadasPythonIntegration( QObject *parent = nullptr );
     ~KadasPythonIntegration();
 
@@ -106,7 +105,8 @@ class KadasPythonIntegration : public QObject
 class KadasPythonRunner : public QgsPythonRunner
 {
   public:
-    explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration ) : mPythonIntegration( pythonIntegration ) {}
+    explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration )
+      : mPythonIntegration( pythonIntegration ) {}
 
     bool runCommand( QString command, QString messageOnError = QString() ) override
     {

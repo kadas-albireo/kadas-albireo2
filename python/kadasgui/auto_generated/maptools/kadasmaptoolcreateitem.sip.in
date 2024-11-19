@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolcreateitem.h                          *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -29,7 +29,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
 
-    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface* interface /Transfer/, KadasItemLayer *layer = 0 );
+    KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface /Transfer/, KadasItemLayer *layer = 0 );
 
     KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItem *item, KadasItemLayer *layer = 0 );
     ~KadasMapToolCreateItem();
@@ -61,6 +61,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     // TODO: creator should be optional
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
+    // clang-format off
 %MethodCode
 
     // Make sure the callables doesn't get garbage collected, this is needed because refcount for a1/a2 is 0
@@ -103,6 +104,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     Py_END_ALLOW_THREADS
 
 %End
+    // clang-format on
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void addPoint( const KadasMapPos &mapPos );
 
@@ -133,5 +135,5 @@ the Free Software Foundation; either version 2 of the License, or     *
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolcreateitem.h                          *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

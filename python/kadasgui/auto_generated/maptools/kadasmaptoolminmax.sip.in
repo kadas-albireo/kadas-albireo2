@@ -3,9 +3,8 @@
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolminmax.h                              *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
-
 
 
 
@@ -32,7 +31,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile );
     ~KadasMapToolMinMax();
 
-    enum class FilterType { FilterRect, FilterPoly, FilterCircle };
+    enum class FilterType
+    {
+      FilterRect,
+      FilterPoly,
+      FilterCircle
+    };
 
     void setFilterType( FilterType filterType );
     virtual void canvasPressEvent( QgsMapMouseEvent *e );
@@ -53,9 +57,8 @@ class KadasMapToolMinMaxItemInterface : KadasMapItemInterface
 %End
   public:
     KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem* createItem() const;
+    void setFilterType( KadasMapToolMinMax::FilterType filterType );
 
-    void setFilterType( KadasMapToolMinMax:: FilterType filterType );
 };
 
 
@@ -64,5 +67,5 @@ class KadasMapToolMinMaxItemInterface : KadasMapItemInterface
  *                                                                      *
  * kadas/gui/maptools/kadasmaptoolminmax.h                              *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/mapitems/kadasmapitem.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -33,12 +33,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     static KadasMapPos fromPoint( const QgsPointXY &pos );
 
     KadasMapPos( double x = 0., double y = 0. );
-    double x() const;
     void setX( double x );
     double y() const;
     void setY( double y );
     operator QgsPointXY() const;
     double sqrDist( const KadasMapPos &p ) const;
+
 };
 
 class KadasMapRect
@@ -49,8 +49,11 @@ class KadasMapRect
 %End
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
+
     KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 );
+
     KadasMapRect( const KadasMapPos &center, double span );
+
     double xMinimum() const;
     void setXMinimum( double xMin );
     double yMinimum() const;
@@ -61,7 +64,9 @@ class KadasMapRect
     void setYMaximum( double ymax );
     operator QgsRectangle() const;
     KadasMapPos center() const;
+
 };
+
 
 class KadasItemPos
 {
@@ -73,6 +78,8 @@ class KadasItemPos
     static KadasItemPos fromPoint( const QgsPointXY &pos );
 
     KadasItemPos( double x = 0., double y = 0 );
+
+
     double x() const;
     void setX( double x );
     double y() const;
@@ -83,7 +90,9 @@ class KadasItemPos
     operator QgsPointXY() const;
     operator QgsPoint() const;
     double sqrDist( const KadasItemPos &p ) const;
+
 };
+
 
 class KadasItemRect
 {
@@ -93,7 +102,9 @@ class KadasItemRect
 %End
   public:
     KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
+
     KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 );
+
     double xMinimum() const;
     void setXMinimum( double xMin );
     double yMinimum() const;
@@ -104,9 +115,11 @@ class KadasItemRect
     void setYMaximum( double ymax );
     operator QgsRectangle() const;
     KadasItemPos center() const;
+
 };
 
 
+// clang-format off
 //
 // adapted from PyQt5 QPair<_TYPE1_, _TYPE2_> and QPair<float, float>
 //
@@ -211,7 +224,7 @@ class KadasItemRect
   return sipGetState( sipTransferObj );
 %End
 };
-
+// clang-format on
 
 class KadasMapItem : QObject /Abstract/
 {
@@ -240,17 +253,17 @@ Bounding box in geographic coordinates */
 
     struct Margin
     {
-      int left;
-      int top;
-      int right;
-      int bottom;
+        int left;
+        int top;
+        int right;
+        int bottom;
     };
     virtual Margin margin() const;
 
     struct Node
     {
-      KadasMapPos pos;
-      // TODO
+        KadasMapPos pos;
+        // TODO
     };
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
@@ -342,6 +355,7 @@ Trigger a redraw */
           Drawing,
           Finished
         };
+
         DrawStatus drawStatus;
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 /Factory/;
@@ -357,7 +371,7 @@ Trigger a redraw */
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
-    public:
+      public:
         QString name;
         enum class Type
         {
@@ -391,18 +405,18 @@ Trigger a redraw */
 
     struct EditContext
     {
-      EditContext();
+        EditContext();
 
-      EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+        EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
 
-      bool mValid;
-      QgsVertexId vidx;
-      KadasMapPos pos;
-      AttribDefs attributes;
-      Qt::CursorShape cursor;
-      bool isValid() const;
-      bool operator== ( const EditContext &other ) const;
-      bool operator!= ( const EditContext &other ) const;
+        bool mValid;
+        QgsVertexId vidx;
+        KadasMapPos pos;
+        AttribDefs attributes;
+        Qt::CursorShape cursor;
+        bool isValid() const;
+        bool operator==( const EditContext &other ) const;
+        bool operator!=( const EditContext &other ) const;
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
@@ -462,5 +476,5 @@ Trigger a redraw */
  *                                                                      *
  * kadas/gui/mapitems/kadasmapitem.h                                    *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

@@ -80,13 +80,20 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasCircularSectorItem( crs() ); } SIP_FACTORY
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCircularSectorItem( crs() ); }
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
 
   private:
-    enum AttribIds {AttrX, AttrY, AttrR, AttrA1, AttrA2};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY,
+      AttrR,
+      AttrA1,
+      AttrA2
+    };
 
     QgsMultiSurface *geometry();
     State *state() { return static_cast<State *>( mState ); }

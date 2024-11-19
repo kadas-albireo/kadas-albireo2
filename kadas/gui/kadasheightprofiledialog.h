@@ -67,7 +67,11 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
 
   private:
     class ScaleDraw;
-    enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
+    enum HeightMode
+    {
+      HeightRelToGround,
+      HeightRelToSeaLevel
+    };
 
     enum class Statistics
     {

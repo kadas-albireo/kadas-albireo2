@@ -69,17 +69,17 @@ class KadasBullseyeLayer : public KadasPluginLayer
 
     struct BullseyeConfig
     {
-      QgsPointXY center;
-      int rings;
-      double interval;
-      Qgis::DistanceUnit intervalUnit = Qgis::DistanceUnit::NauticalMiles;
-      double axesInterval;
-      QColor color = Qt::black;
-      int fontSize = 20;
-      bool labelAxes = false;
-      bool labelQuadrants = false;
-      bool labelRings = false;
-      int lineWidth = 1;
+        QgsPointXY center;
+        int rings;
+        double interval;
+        Qgis::DistanceUnit intervalUnit = Qgis::DistanceUnit::NauticalMiles;
+        double axesInterval;
+        QColor color = Qt::black;
+        int fontSize = 20;
+        bool labelAxes = false;
+        bool labelQuadrants = false;
+        bool labelRings = false;
+        int lineWidth = 1;
     } mBullseyeConfig;
 };
 

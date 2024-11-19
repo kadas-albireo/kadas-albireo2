@@ -152,14 +152,13 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     void updateMeasurements();
 
   private:
-
     struct MeasurementLabel
     {
-      QString string;
-      KadasItemPos pos;
-      int width;
-      int height;
-      bool center;
+        QString string;
+        KadasItemPos pos;
+        int width;
+        int height;
+        bool center;
     };
     QList<MeasurementLabel> mMeasurementLabels;
 

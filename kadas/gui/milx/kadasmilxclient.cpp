@@ -94,8 +94,7 @@ bool KadasMilxClientWorker::initialize()
     connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
     connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) {
       qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error );
-    }
-    );
+    } );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
     mProcess->setProgram( serverPath );
@@ -136,8 +135,7 @@ bool KadasMilxClientWorker::initialize()
 
     // If the saved network configuration is not currently discovered use the system default
     QNetworkConfiguration config = manager.configurationFromIdentifier( id );
-    if ( ( config.state() & QNetworkConfiguration::Discovered ) !=
-         QNetworkConfiguration::Discovered )
+    if ( ( config.state() & QNetworkConfiguration::Discovered ) != QNetworkConfiguration::Discovered )
     {
       config = manager.defaultConfiguration();
     }
@@ -165,14 +163,14 @@ bool KadasMilxClientWorker::initialize()
   QTimer timeoutTimer;
   timeoutTimer.setSingleShot( true );
   connect( mTcpSocket, &QTcpSocket::disconnected, this, &KadasMilxClientWorker::cleanup );
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#if QT_VERSION >= QT_VERSION_CHECK( 5, 15, 0 )
   connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::errorOccurred ), this, &KadasMilxClientWorker::handleSocketError );
 #else
   connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::error ), this, &KadasMilxClientWorker::handleSocketError );
 #endif
   {
     QEventLoop evLoop;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#if QT_VERSION >= QT_VERSION_CHECK( 5, 15, 0 )
     connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::errorOccurred ), &evLoop, &QEventLoop::quit );
 #else
     connect( mTcpSocket, qOverload<QAbstractSocket::SocketError>( &QTcpSocket::error ), &evLoop, &QEventLoop::quit );
@@ -206,7 +204,8 @@ bool KadasMilxClientWorker::initialize()
     return false;
   }
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> mLibraryVersionTag;
 
   return true;
@@ -266,12 +265,12 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
       requiredSize = *reinterpret_cast<qint32 *>( response.left( sizeof( qint32 ) ).data() );
       response = response.mid( sizeof( qint32 ) );
     }
-  }
-  while ( response.size() < requiredSize );
+  } while ( response.size() < requiredSize );
   Q_ASSERT( mTcpSocket->bytesAvailable() == 0 );
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   if ( replycmd == MILX_REPLY_ERROR )
   {
     ostream >> mLastError;
@@ -398,7 +397,8 @@ bool KadasMilxClient::getSymbolMetadata( const QString &symbolId, KadasMilxSymbo
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   QByteArray svgxml;
   ostream >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints >> result.symbolType;
   result.icon = renderSvg( svgxml );
@@ -419,7 +419,8 @@ bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<Ka
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   int nResults;
   ostream >> nResults;
   if ( nResults != symbolIds.size() )
@@ -451,7 +452,8 @@ bool KadasMilxClient::appendPoint( const QRect &visibleExtent, int dpi, const NP
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
@@ -469,7 +471,8 @@ bool KadasMilxClient::insertPoint( const QRect &visibleExtent, int dpi, const NP
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
@@ -487,7 +490,8 @@ bool KadasMilxClient::movePoint( const QRect &visibleExtent, int dpi, const NPoi
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
@@ -505,7 +509,8 @@ bool KadasMilxClient::moveAttributePoint( const QRect &visibleExtent, int dpi, c
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
@@ -523,7 +528,8 @@ bool KadasMilxClient::canDeletePoint( const NPointSymbol &symbol, const KadasMil
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> canDelete;
   return true;
 }
@@ -541,7 +547,8 @@ bool KadasMilxClient::deletePoint( const QRect &visibleExtent, int dpi, const NP
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result );
   return true;
 }
@@ -566,7 +573,8 @@ bool KadasMilxClient::editSymbol( const QRect &visibleExtent, int dpi, const NPo
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> newSymbolXml;
   ostream >> newSymbolMilitaryName;
   KadasMilxClient::deserializeSymbol( ostream, result );
@@ -593,7 +601,8 @@ bool KadasMilxClient::createSymbol( QString &symbolId, KadasMilxSymbolDesc &resu
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   QByteArray svgxml;
   ostream >> symbolId >> result.name >> result.militaryName >> svgxml >> result.hasVariablePoints >> result.minNumPoints >> result.symbolType;
   result.icon = renderSvg( svgxml );
@@ -615,7 +624,8 @@ bool KadasMilxClient::updateSymbol( const QRect &visibleExtent, int dpi, const N
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   KadasMilxClient::deserializeSymbol( ostream, result, returnPoints );
   return true;
 }
@@ -641,7 +651,8 @@ bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, const 
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   int nOutSymbols;
   ostream >> nOutSymbols;
   if ( nOutSymbols != nSymbols )
@@ -651,7 +662,8 @@ bool KadasMilxClient::updateSymbols( const QRect &visibleExtent, int dpi, const 
   for ( int i = 0; i < nOutSymbols; ++i )
   {
     NPointSymbolGraphic symbolGraphic;
-    QByteArray svgxml; ostream >> svgxml;
+    QByteArray svgxml;
+    ostream >> svgxml;
     symbolGraphic.graphic = renderSvg( svgxml );
     ostream >> symbolGraphic.offset;
     result.append( symbolGraphic );
@@ -673,7 +685,8 @@ bool KadasMilxClient::upgradeMilXFile( const QString &inputXml, QString &outputX
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> outputXml >> valid >> messages;
   return true;
 }
@@ -692,7 +705,8 @@ bool KadasMilxClient::downgradeMilXFile( const QString &inputXml, QString &outpu
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> outputXml >> valid >> messages;
   return true;
 }
@@ -711,7 +725,8 @@ bool KadasMilxClient::exportKml( const QString &inputXml, QByteArray &outputData
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> outputData >> valid >> messages;
   return true;
 }
@@ -730,7 +745,8 @@ bool KadasMilxClient::validateSymbolXml( const QString &symbolXml, const QString
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> adjustedSymbolXml >> valid >> messages;
   return true;
 }
@@ -750,7 +766,8 @@ bool KadasMilxClient::hitTest( const NPointSymbol &symbol, const QPoint &clickPo
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> hitTestResult;
   return true;
 }
@@ -773,7 +790,8 @@ bool KadasMilxClient::pickSymbol( const QList<NPointSymbol> &symbols, const QPoi
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> selectedSymbol >> boundingBox;
   return true;
 }
@@ -791,7 +809,8 @@ bool KadasMilxClient::getSupportedLibraryVersionTags( QStringList &versionTags, 
   }
 
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> versionTags >> versionNames;
   return true;
 }
@@ -815,12 +834,13 @@ bool KadasMilxClient::getControlPointIndices( const QString &symbolXml, int nPoi
     return false;
   }
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> controlPoints;
   return true;
 }
 
-bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList< QPair<int, double> > &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings )
+bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double>> &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings )
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
@@ -832,7 +852,8 @@ bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> 
     return false;
   }
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> points >> controlPoints;
   return true;
 }
@@ -848,7 +869,8 @@ bool KadasMilxClient::getMilitaryName( const QString &symbolXml, QString &milita
     return false;
   }
   QDataStream ostream( &response, QIODevice::ReadOnly );
-  MilXServerReply replycmd = 0; ostream >> replycmd;
+  MilXServerReply replycmd = 0;
+  ostream >> replycmd;
   ostream >> militaryName;
   return true;
 }

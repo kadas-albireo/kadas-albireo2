@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/gui/kadasattributetabledialog.h                                *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -36,7 +36,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     ~KadasAttributeTableDialog();
 
     QDomElement writeXml( QDomDocument &document );
-    static void createFromXml(const QDomElement &element , QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent);
+    static void createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent );
 
   protected:
     virtual void showEvent( QShowEvent *ev );
@@ -49,5 +49,5 @@ the Free Software Foundation; either version 2 of the License, or     *
  *                                                                      *
  * kadas/gui/kadasattributetabledialog.h                                *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

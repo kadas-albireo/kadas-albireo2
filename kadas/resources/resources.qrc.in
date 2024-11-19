@@ -42,6 +42,7 @@
         <file alias="icons/waypoints">icons/waypoints.png</file>
         <file alias="icons/gpx_export">icons/gpx_export.png</file>
         <file alias="icons/refresh">icons/refresh.png</file>
+        <file alias="icons/refresh-v2">icons/refresh-v2.png</file>
         <file alias="icons/print">icons/print.png</file>
         <file alias="icons/routing">icons/routing.png</file>
         <file alias="icons/new_map_view">icons/new_map_view.png</file>

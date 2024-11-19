@@ -56,8 +56,8 @@ KadasMapItem *KadasRouteInterface::createItem() const
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
-  connect( actionWaypoint, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
-  connect( actionRoute, &QAction::triggered, this, [ = ]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
+  connect( actionWaypoint, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
+  connect( actionRoute, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
   connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
   connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
 
@@ -77,14 +77,13 @@ KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
 void KadasGpxIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
-  QAction *action = qobject_cast<QAction *> ( QObject::sender() );
+  QAction *action = qobject_cast<QAction *>( QObject::sender() );
   if ( active )
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
     tool->setAction( action );
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
-    KadasLayerSelectionWidget::LayerCreator creator = []( const QString & name )
-    {
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
+    KadasLayerSelectionWidget::LayerCreator creator = []( const QString &name ) {
       return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
     };
     tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
@@ -214,8 +213,7 @@ void KadasGpxIntegration::saveGpx()
   QDialog dialog;
   dialog.setWindowTitle( tr( "Export to GPX" ) );
   dialog.setLayout( new QVBoxLayout );
-  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), kApp->mainWindow()->layerTreeView(), []( QgsMapLayer * layer )
-  {
+  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), kApp->mainWindow()->layerTreeView(), []( QgsMapLayer *layer ) {
     if ( !dynamic_cast<KadasItemLayer *>( layer ) )
     {
       return false;
@@ -354,4 +352,3 @@ bool KadasGpxDropHandler::handleMimeDataV2( const QMimeData *data )
   }
   return handled > 0;
 }
-

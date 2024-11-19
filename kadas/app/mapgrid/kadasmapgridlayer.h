@@ -18,7 +18,6 @@
 #define KADASMAPGRIDLAYER_H
 
 
-
 #include "kadas/core/kadaspluginlayer.h"
 
 
@@ -28,18 +27,31 @@ class KadasMapGridLayer : public KadasPluginLayer
   public:
     static QString layerType() { return "map_grid"; }
 
-    enum GridType {GridLV03, GridLV95, GridDD, GridDM, GridDMS, GridUTM, GridMGRS};
-    enum LabelingMode {LabelingDisabled, LabelingEnabled};
+    enum GridType
+    {
+      GridLV03,
+      GridLV95,
+      GridDD,
+      GridDM,
+      GridDMS,
+      GridUTM,
+      GridMGRS
+    };
+    enum LabelingMode
+    {
+      LabelingDisabled,
+      LabelingEnabled
+    };
 
     struct GridConfig
     {
-      GridType gridType = GridLV95;
-      double intervalX = 10000;
-      double intervalY = 10000;
-      int cellSize = 0;
-      int fontSize = 15;
-      QColor color = Qt::black;
-      LabelingMode labelingMode = LabelingEnabled;
+        GridType gridType = GridLV95;
+        double intervalX = 10000;
+        double intervalY = 10000;
+        int cellSize = 0;
+        int fontSize = 15;
+        QColor color = Qt::black;
+        LabelingMode labelingMode = LabelingEnabled;
     };
 
     KadasMapGridLayer( const QString &name );
@@ -49,7 +61,7 @@ class KadasMapGridLayer : public KadasPluginLayer
     KadasMapGridLayer *clone() const override;
     QList<IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings ) override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    QgsRectangle extent() const override  { return QgsRectangle(); }
+    QgsRectangle extent() const override { return QgsRectangle(); }
 
     GridType gridType() const { return mGridConfig.gridType; }
     double intervalX() const { return mGridConfig.intervalX; }
@@ -73,7 +85,6 @@ class KadasMapGridLayer : public KadasPluginLayer
 
   private:
     GridConfig mGridConfig;
-
 };
 
 

@@ -47,12 +47,11 @@ class KadasRedliningIntegration;
 class KadasTemporalController;
 
 
-
 class KadasSymbolAttributesEditorInterface : public KadasMapItemInterface
 {
   public:
     KadasSymbolAttributesEditorInterface() = default;
-    KadasMapItem* createItem() const override;
+    KadasMapItem *createItem() const override;
 };
 
 
@@ -114,7 +113,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
-    KadasPluginManager *pluginManager() { return  mPluginManager; }
+    KadasPluginManager *pluginManager() { return mPluginManager; }
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
@@ -175,7 +174,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRibbonButton *addRibbonButton( QWidget *tabWidget );
     void configureButtons();
     void restoreFavoriteButton( QToolButton *button );
-    void setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut = QKeySequence(), const std::function<QgsMapTool*() > &toolFactory = nullptr );
+    void setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut = QKeySequence(), const std::function<QgsMapTool *()> &toolFactory = nullptr );
     void showSourceSelectDialog( const QString &provider );
     void updateWidgetPositions();
 
@@ -204,7 +203,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     bool mFullscreen = false;
 
     KadasHelpViewer *mHelpViewer = nullptr;
-
 };
 
 #endif // KADASMAINWINDOW_H

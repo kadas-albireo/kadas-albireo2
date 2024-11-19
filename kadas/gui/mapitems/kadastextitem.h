@@ -62,13 +62,12 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasRectangleItemBase
     QFont mFont;
     bool mFrameAutoResize = true;
 
-    KadasMapItem *_clone() const override { return new KadasTextItem( crs() ); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasTextItem( crs() ); }
 
   protected:
-      virtual void renderPrivate( QgsRenderContext &context, const QPointF& center, const QRect &rect, double dpiScale ) const override;
-      virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
-      void populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
-
+    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const override;
+    virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
+    void populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
 };
 
 #endif // KADASTEXTITEM_H

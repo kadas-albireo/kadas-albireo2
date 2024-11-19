@@ -63,7 +63,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
 
   // List queryable rasters
   typedef QPair<QString, QString> LayerIdName; // <layerid, layername>
-  QList< LayerIdName > queryableLayers;
+  QList<LayerIdName> queryableLayers;
   const auto layers = QgsProject::instance()->layers<QgsRasterLayer *>();
   for ( const QgsRasterLayer *rlayer : layers )
   {
@@ -137,12 +137,11 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
     reply->setProperty( "layerName", ql.second );
 
     connect( feedback, &QgsFeedback::canceled, reply, &QNetworkReply::abort );
-    connect( reply, &QNetworkReply::finished, this, [this, reply, &bbox]()
-    {
+    connect( reply, &QNetworkReply::finished, this, [this, reply, &bbox]() {
       if ( reply->error() == QNetworkReply::NoError )
       {
         QString layerName = reply->property( "layerName" ).toString();
-        layerName.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
+        layerName.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
 
         QByteArray replyText = reply->readAll();
         QJsonParseError err;
@@ -169,8 +168,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
           const QString crs = itemAttrsMap["sr"].toString();
           QgsPointXY pos( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
           resultData[QStringLiteral( "crs" )] = crs;
-          resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(),
-                                                 mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+          resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(), mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
           if ( !bbox.isNull() && !bbox.contains( pos ) )
             continue;
 
@@ -199,7 +197,8 @@ void KadasRemoteDataSearchProvider::triggerResult( const QgsLocatorResult &resul
                          QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
                          QgsProject::instance()
-                       ).transform( pos );
+  )
+                         .transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );

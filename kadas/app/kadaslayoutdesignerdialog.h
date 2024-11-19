@@ -53,7 +53,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     Q_OBJECT
 
   public:
-
     KadasLayoutDesignerDialog( QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() );
 
     /**
@@ -192,7 +191,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     void aboutToClose();
 
   protected:
-
     void closeEvent( QCloseEvent * ) override;
 
   private slots:
@@ -211,7 +209,7 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
 
     void addPages();
     void statusMessageReceived( const QString &message );
-    void undoRedoOccurredForItems( const QSet< QString > &itemUuids );
+    void undoRedoOccurredForItems( const QSet<QString> &itemUuids );
     void saveAsTemplate();
     void addItemsFromTemplate();
     void newLayout();
@@ -228,7 +226,6 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     void backgroundTaskCountChanged( int total );
 
   private:
-
     static bool sInitializedRegistry;
 
     KadasAppLayoutDesignerInterface *mInterface = nullptr;
@@ -263,8 +260,8 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
     QgsLayoutViewToolEditNodes *mNodesTool = nullptr;
     QgsLayoutViewToolMoveItemContent *mMoveContentTool = nullptr;
 
-    QMap< QString, QToolButton * > mItemGroupToolButtons;
-    QMap< QString, QMenu * > mItemGroupSubmenus;
+    QMap<QString, QToolButton *> mItemGroupToolButtons;
+    QMap<QString, QMenu *> mItemGroupSubmenus;
 
     KadasLayoutAppMenuProvider *mMenuProvider = nullptr;
 
@@ -293,19 +290,19 @@ class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesi
 
     struct PanelStatus
     {
-      PanelStatus( bool visible = true, bool active = false )
-        : isVisible( visible )
-        , isActive( active )
-      {}
-      bool isVisible;
-      bool isActive;
+        PanelStatus( bool visible = true, bool active = false )
+          : isVisible( visible )
+          , isActive( active )
+        {}
+        bool isVisible;
+        bool isActive;
     };
-    QMap< QString, PanelStatus > mPanelStatus;
+    QMap<QString, PanelStatus> mPanelStatus;
 
     bool mBlockItemOptions = false;
 
     //! Page & Printer Setup
-    std::unique_ptr< QPrinter > mPrinter;
+    std::unique_ptr<QPrinter> mPrinter;
 
     QString mTitle;
     QString mSectionTitle;
@@ -350,8 +347,8 @@ class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
     QgsMasterLayoutInterface *masterLayout() override;
     QgsLayoutView *view() override { return mDesigner->view(); }
     QgsMessageBar *messageBar() override { return mDesigner->messageBar(); }
-    void selectItems( const QList< QgsLayoutItem * > &items ) override { mDesigner->selectItems( items ); }
-    void setAtlasPreviewEnabled( bool enabled ) override { }
+    void selectItems( const QList<QgsLayoutItem *> &items ) override { mDesigner->selectItems( items ); }
+    void setAtlasPreviewEnabled( bool enabled ) override {}
     bool atlasPreviewEnabled() const override { return false; }
     void showItemOptions( QgsLayoutItem *item, bool bringPanelToFront = true ) override { mDesigner->showItemOptions( item, bringPanelToFront ); }
     QMenu *layoutMenu() override { return mDesigner->mLayoutMenu; }
@@ -377,7 +374,6 @@ class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
     void showRulers( bool visible ) override { mDesigner->showRulers( visible ); }
 
   private:
-
     KadasLayoutDesignerDialog *mDesigner = nullptr;
 };
 

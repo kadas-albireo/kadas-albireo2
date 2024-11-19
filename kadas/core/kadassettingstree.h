@@ -27,9 +27,7 @@
  */
 class KADAS_CORE_EXPORT KadasSettingsTree
 {
-
   public:
-
 #ifndef SIP_RUN
 
     /**
@@ -49,7 +47,7 @@ class KADAS_CORE_EXPORT KadasSettingsTree
      * Returns the tree node at the given \a key
      * \note For Plugins, use createPluginTreeNode() to create nodes for plugin settings.
      */
-    static const QgsSettingsTreeNode *node( const QString &key ) {return treeRoot()->childNode( key );}
+    static const QgsSettingsTreeNode *node( const QString &key ) { return treeRoot()->childNode( key ); }
 
     /**
      * Creates a settings tree node for the given \a pluginName

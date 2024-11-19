@@ -114,8 +114,8 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   layout()->addWidget( closeButton );
   layout()->setAlignment( closeButton, Qt::AlignTop );
 
-  auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) != nullptr; };
-  auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) != nullptr; };
+  auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
@@ -153,7 +153,7 @@ KadasBullseyeLayer *KadasBullseyeWidget::createLayer( QString layerName )
   double extentHeight = da.measureLine( QgsPoint( extent.center().x(), extent.yMinimum() ), QgsPoint( extent.center().x(), extent.yMaximum() ) );
   double interval = 0.5 * extentHeight * QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, Qgis::DistanceUnit::NauticalMiles ) / 6; // Half height divided by nr rings+1, in nm
   KadasBullseyeLayer *bullseyeLayer = new KadasBullseyeLayer( layerName );
-  bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval,  Qgis::DistanceUnit::NauticalMiles, 45 );
+  bullseyeLayer->setup( mCanvas->extent().center(), mCanvas->mapSettings().destinationCrs(), 5, interval, Qgis::DistanceUnit::NauticalMiles, 45 );
   return bullseyeLayer;
 }
 
@@ -184,7 +184,7 @@ void KadasBullseyeWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxAxesInterval->setValue( mCurrentLayer->axesInterval() );
   ui.spinBoxAxesInterval->blockSignals( false );
   ui.comboBoxRingIntervalUnit->blockSignals( true );
-  ui.comboBoxRingIntervalUnit->setCurrentIndex( ui.comboBoxRingIntervalUnit->findData( QVariant::fromValue( mCurrentLayer->ringIntervalUnit() ) ) ) ;
+  ui.comboBoxRingIntervalUnit->setCurrentIndex( ui.comboBoxRingIntervalUnit->findData( QVariant::fromValue( mCurrentLayer->ringIntervalUnit() ) ) );
   ui.comboBoxRingIntervalUnit->blockSignals( false );
   ui.spinBoxLineWidth->blockSignals( true );
   ui.spinBoxLineWidth->setValue( mCurrentLayer->lineWidth() );

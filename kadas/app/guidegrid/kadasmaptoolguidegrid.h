@@ -34,7 +34,12 @@ class KadasMapToolGuideGrid : public QgsMapTool
     Q_OBJECT
 
   public:
-    enum PickMode {PICK_NONE, PICK_TOP_LEFT, PICK_BOTTOM_RIGHT};
+    enum PickMode
+    {
+      PICK_NONE,
+      PICK_TOP_LEFT,
+      PICK_BOTTOM_RIGHT
+    };
     KadasMapToolGuideGrid( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
     ~KadasMapToolGuideGrid();
 

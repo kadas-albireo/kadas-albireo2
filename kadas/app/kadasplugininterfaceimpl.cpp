@@ -74,7 +74,7 @@ bool KadasPluginInterfaceImpl::removeCustomActionForLayerType( QAction *action )
   return false;
 }
 
-QList< QgsMapCanvas * > KadasPluginInterfaceImpl::mapCanvases()
+QList<QgsMapCanvas *> KadasPluginInterfaceImpl::mapCanvases()
 {
   QList<QgsMapCanvas *> canvases;
   canvases.append( kApp->mainWindow()->mapCanvas() );
@@ -99,25 +99,25 @@ void KadasPluginInterfaceImpl::closeMapCanvas( const QString &name )
 
 QList<Qgs3DMapCanvas *> KadasPluginInterfaceImpl::mapCanvases3D()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return QList<Qgs3DMapCanvas *>();
 }
 
-Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D(const QString &name)
+Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &name )
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
-void KadasPluginInterfaceImpl::closeMapCanvas3D(const QString &name)
+void KadasPluginInterfaceImpl::closeMapCanvas3D( const QString &name )
 {
-  Q_UNUSED(name)
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  Q_UNUSED( name )
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 #endif
 
-QSize KadasPluginInterfaceImpl::iconSize(bool dockedToolbar) const
+QSize KadasPluginInterfaceImpl::iconSize( bool dockedToolbar ) const
 {
   return QSize();
 }
@@ -154,25 +154,25 @@ QgsMessageBar *KadasPluginInterfaceImpl::messageBar()
 
 QList<QgsLayoutDesignerInterface *> KadasPluginInterfaceImpl::openLayoutDesigners()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return QList<QgsLayoutDesignerInterface *>();
 }
 
 QgsVectorLayerTools *KadasPluginInterfaceImpl::vectorLayerTools()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 #if _QGIS_VERSION_INT >= 33440
 QMenu *KadasPluginInterfaceImpl::meshMenu()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
 
-void KadasPluginInterfaceImpl::addPluginToMenu(const QString &name, QAction *action)
+void KadasPluginInterfaceImpl::addPluginToMenu( const QString &name, QAction *action )
 {
   getSubMenu( getClassicMenu( ActionClassicMenuLocation::PLUGIN_MENU ), name )->addAction( action );
 }
@@ -235,43 +235,43 @@ void KadasPluginInterfaceImpl::removePluginWebMenu( const QString &name, QAction
 #if _QGIS_VERSION_INT >= 33000
 QMenu *KadasPluginInterfaceImpl::projectImportExportMenu()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
-void KadasPluginInterfaceImpl::addProjectImportAction(QAction *action)
+void KadasPluginInterfaceImpl::addProjectImportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
-void KadasPluginInterfaceImpl::removeProjectImportAction(QAction *action)
+void KadasPluginInterfaceImpl::removeProjectImportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
-void KadasPluginInterfaceImpl::addProjectExportAction(QAction *action)
+void KadasPluginInterfaceImpl::addProjectExportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
-void KadasPluginInterfaceImpl::removeProjectExportAction(QAction *action)
+void KadasPluginInterfaceImpl::removeProjectExportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
-void KadasPluginInterfaceImpl::openDataSourceManagerPage(const QString &pageName)
+void KadasPluginInterfaceImpl::openDataSourceManagerPage( const QString &pageName )
 {
   Q_UNUSED( pageName )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 QgsUserProfileManager *KadasPluginInterfaceImpl::userProfileManager()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
@@ -333,12 +333,10 @@ QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const 
 
 void KadasPluginInterfaceImpl::addPluginToMeshMenu( const QString &, QAction * )
 {
-
 }
 
 void KadasPluginInterfaceImpl::removePluginMeshMenu( const QString &, QAction * )
 {
-
 }
 
 QgsVectorTileLayer *KadasPluginInterfaceImpl::addVectorTileLayer( const QString &url, const QString &baseName )
@@ -357,12 +355,12 @@ QgsPointCloudLayer *KadasPluginInterfaceImpl::addPointCloudLayer( const QString 
 }
 
 #if _QGIS_VERSION_INT >= 33400
-QgsTiledSceneLayer *KadasPluginInterfaceImpl::addTiledSceneLayer(const QString &url, const QString &baseName, const QString &providerKey)
+QgsTiledSceneLayer *KadasPluginInterfaceImpl::addTiledSceneLayer( const QString &url, const QString &baseName, const QString &providerKey )
 {
   Q_UNUSED( url )
   Q_UNUSED( baseName )
   Q_UNUSED( providerKey )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ) , 2 );
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
@@ -382,7 +380,7 @@ bool KadasPluginInterfaceImpl::newProject( bool promptToSaveFlag )
   return kApp->projectNew( promptToSaveFlag );
 }
 
-void KadasPluginInterfaceImpl::reloadConnections( )
+void KadasPluginInterfaceImpl::reloadConnections()
 {
   // TODO ?
 }
@@ -516,34 +514,47 @@ QMenu *KadasPluginInterfaceImpl::getClassicMenu( ActionClassicMenuLocation class
     case ActionClassicMenuLocation::NO_MENU:
       break;
     case ActionClassicMenuLocation::PROJECT_MENU:
-      menuName = tr( "Project" ); break;
+      menuName = tr( "Project" );
+      break;
     case ActionClassicMenuLocation::EDIT_MENU:
-      menuName = tr( "Edit" ); break;
+      menuName = tr( "Edit" );
+      break;
     case ActionClassicMenuLocation::VIEW_MENU:
-      menuName = tr( "View" ); break;
+      menuName = tr( "View" );
+      break;
     case ActionClassicMenuLocation::LAYER_MENU:
-      menuName = tr( "Layer" ); break;
+      menuName = tr( "Layer" );
+      break;
     case ActionClassicMenuLocation::NEWLAYER_MENU:
-      menuName = tr( "New layer" ); break;
+      menuName = tr( "New layer" );
+      break;
     case ActionClassicMenuLocation::ADDLAYER_MENU:
-      menuName = tr( "Add layer" ); break;
+      menuName = tr( "Add layer" );
+      break;
     case ActionClassicMenuLocation::SETTINGS_MENU:
-      menuName = tr( "Settings" ); break;
+      menuName = tr( "Settings" );
+      break;
     case ActionClassicMenuLocation::PLUGIN_MENU:
       return kApp->mainWindow()->pluginsMenu();
     case ActionClassicMenuLocation::RASTER_MENU:
-      menuName = tr( "Raster" ); break;
+      menuName = tr( "Raster" );
+      break;
     case ActionClassicMenuLocation::DATABASE_MENU:
-      menuName = tr( "Database" ); break;
+      menuName = tr( "Database" );
+      break;
     case ActionClassicMenuLocation::VECTOR_MENU:
-      menuName = tr( "Vector" ); break;
+      menuName = tr( "Vector" );
+      break;
     case ActionClassicMenuLocation::WEB_MENU:
-      menuName = tr( "Web" ); break;
+      menuName = tr( "Web" );
+      break;
     case ActionClassicMenuLocation::WINDOW_MENU:
-      menuName = tr( "Window" ); break;
+      menuName = tr( "Window" );
+      break;
     case ActionClassicMenuLocation::HELP_MENU:
     case ActionClassicMenuLocation::FIRST_RIGHT_STANDARD_MENU:
-      menuName = tr( "Help" ); break;
+      menuName = tr( "Help" );
+      break;
     case ActionClassicMenuLocation::CUSTOM_MENU:
       menuName = customName;
       break;
@@ -579,21 +590,29 @@ QWidget *KadasPluginInterfaceImpl::getRibbonTabWidget( ActionRibbonTabLocation r
     case ActionRibbonTabLocation::NO_TAB:
       break;
     case ActionRibbonTabLocation::MAPS_TAB:
-      targetTabWidget = kApp->mainWindow()->mapsTab(); break;
+      targetTabWidget = kApp->mainWindow()->mapsTab();
+      break;
     case ActionRibbonTabLocation::VIEW_TAB:
-      targetTabWidget = kApp->mainWindow()->viewTab(); break;
+      targetTabWidget = kApp->mainWindow()->viewTab();
+      break;
     case ActionRibbonTabLocation::ANALYSIS_TAB:
-      targetTabWidget = kApp->mainWindow()->analysisTab(); break;
+      targetTabWidget = kApp->mainWindow()->analysisTab();
+      break;
     case ActionRibbonTabLocation::DRAW_TAB:
-      targetTabWidget = kApp->mainWindow()->drawTab(); break;
+      targetTabWidget = kApp->mainWindow()->drawTab();
+      break;
     case ActionRibbonTabLocation::GPS_TAB:
-      targetTabWidget = kApp->mainWindow()->gpsTab(); break;
+      targetTabWidget = kApp->mainWindow()->gpsTab();
+      break;
     case ActionRibbonTabLocation::MSS_TAB:
-      targetTabWidget = kApp->mainWindow()->mssTab(); break;
+      targetTabWidget = kApp->mainWindow()->mssTab();
+      break;
     case ActionRibbonTabLocation::SETTINGS_TAB:
-      targetTabWidget = kApp->mainWindow()->settingsTab(); break;
+      targetTabWidget = kApp->mainWindow()->settingsTab();
+      break;
     case ActionRibbonTabLocation::HELP_TAB:
-      targetTabWidget = kApp->mainWindow()->helpTab(); break;
+      targetTabWidget = kApp->mainWindow()->helpTab();
+      break;
     case ActionRibbonTabLocation::CUSTOM_TAB:
       for ( int i = 0, n = kApp->mainWindow()->ribbonTabWidget()->count(); i < n; ++i )
       {
@@ -752,4 +771,3 @@ void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
 {
   kApp->showLayoutDesigner( layout );
 }
-

@@ -27,10 +27,10 @@ class QgsMessageBarItem;
 
 class KadasMapSwipeMapTool : public QgsMapTool
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-    static void addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas *canvas, QMenu* menu , QObject *parent = nullptr );
+    static void addContextMenuAction( QgsMapLayer *layer, QgsMapCanvas *canvas, QMenu *menu, QObject *parent = nullptr );
 
     KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas );
 
@@ -60,7 +60,6 @@ class KadasMapSwipeMapTool : public QgsMapTool
     QCursor mCursorH = QCursor( Qt::SplitHCursor );
     bool mIsSwiping = false;
     bool mDirectionDefined = false;
-
 };
 
 #endif // KADASMAPSWIPETOOL_H

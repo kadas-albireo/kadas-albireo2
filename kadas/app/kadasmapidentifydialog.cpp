@@ -243,7 +243,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
         format = Qgis::RasterIdentifyFormat::Value;
       else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyText )
         format = Qgis::RasterIdentifyFormat::Text;
-//        else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyHtml ) format = Qgis::RasterIdentifyFormat::Html;
+      //        else if ( capabilities & Qgis::RasterInterfaceCapability::IdentifyHtml ) format = Qgis::RasterIdentifyFormat::Html;
 
       if ( ( capabilities & Qgis::RasterInterfaceCapability::Identify ) && format != Qgis::RasterIdentifyFormat::Undefined )
       {
@@ -256,9 +256,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     else if ( dynamic_cast<QgsVectorLayer *>( layer ) )
     {
       QgsVectorLayer *vlayer = static_cast<QgsVectorLayer *>( layer );
-      if ( vlayer->hasScaleBasedVisibility() &&
-           ( vlayer->maximumScale() > mCanvas->mapSettings().scale() ||
-             vlayer->minimumScale() <= mCanvas->mapSettings().scale() ) )
+      if ( vlayer->hasScaleBasedVisibility() && ( vlayer->maximumScale() > mCanvas->mapSettings().scale() || vlayer->minimumScale() <= mCanvas->mapSettings().scale() ) )
       {
         continue;
       }
@@ -302,10 +300,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     query.addQueryItem( "geometryType", "esriGeometryPoint" );
     query.addQueryItem( "geometry", QString( "%1,%2" ).arg( worldPos.x(), 0, 'f', 10 ).arg( worldPos.y(), 0, 'f', 10 ) );
     query.addQueryItem( "imageDisplay", QString( "%1,%2,%3" ).arg( mCanvas->width() ).arg( mCanvas->height() ).arg( mCanvas->mapSettings().outputDpi() ) );
-    query.addQueryItem( "mapExtent", QString( "%1,%2,%3,%4" ).arg( worldExtent.xMinimum(), 0, 'f', 10 )
-                        .arg( worldExtent.yMinimum(), 0, 'f', 10 )
-                        .arg( worldExtent.xMaximum(), 0, 'f', 10 )
-                        .arg( worldExtent.yMaximum(), 0, 'f', 10 ) );
+    query.addQueryItem( "mapExtent", QString( "%1,%2,%3,%4" ).arg( worldExtent.xMinimum(), 0, 'f', 10 ).arg( worldExtent.yMinimum(), 0, 'f', 10 ).arg( worldExtent.xMaximum(), 0, 'f', 10 ).arg( worldExtent.yMaximum(), 0, 'f', 10 ) );
     query.addQueryItem( "tolerance", "15" );
     query.addQueryItem( "layers", rlayerIds.join( "," ) );
     identifyUrl.setQuery( query );
@@ -437,8 +432,10 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
 
   switch ( result.format() )
   {
-    case Qgis::RasterIdentifyFormat::Undefined: break;
-    case Qgis::RasterIdentifyFormat::Html: break;
+    case Qgis::RasterIdentifyFormat::Undefined:
+      break;
+    case Qgis::RasterIdentifyFormat::Html:
+      break;
     case Qgis::RasterIdentifyFormat::Value:
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
@@ -452,7 +449,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
     {
       for ( auto resultIt = results.begin(), resultEnd = results.end(); resultIt != resultEnd; ++resultIt )
       {
-        QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+        QString sublayerName = rLayer->dataProvider()->subLayers()[resultIt.key()];
         QTreeWidgetItem *item = new QTreeWidgetItem( QStringList() << sublayerName << resultIt.value().toString() );
         mLayerTreeItemMap[rLayer->id()]->addChild( item );
       }
@@ -472,7 +469,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
             QTreeWidgetItem *layerItem = nullptr;
             if ( resultIt.key() < rLayer->dataProvider()->subLayers().length() )
             {
-              QString sublayerName = rLayer->dataProvider()->subLayers()[ resultIt.key() ];
+              QString sublayerName = rLayer->dataProvider()->subLayers()[resultIt.key()];
               sublayerName = sublayerNames.value( sublayerName, sublayerName );
               layerItem = new QTreeWidgetItem( QStringList() << sublayerName );
               mLayerTreeItemMap[rLayer->id()]->addChild( layerItem );
@@ -484,7 +481,7 @@ void KadasMapIdentifyDialog::addRasterIdentifyResult( QgsRasterLayer *rLayer, co
 
             // If OBJECTID available use as identifier
             QVariant featureId = feature.attribute( "OBJECTID" );
-            if ( ! featureId.isValid() || featureId.isNull() )
+            if ( !featureId.isValid() || featureId.isNull() )
               featureId = feature.id();
 
             QString label = QString( "%1 [%2]" ).arg( rLayer->name() ).arg( featureId.toString() );
@@ -585,4 +582,3 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
     resultItem->setFirstColumnSpanned( true );
   }
 }
-

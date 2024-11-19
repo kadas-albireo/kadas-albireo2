@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/core/kadassettingstree.h                                       *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -19,7 +19,6 @@ KadasSettingsTree holds the tree structure for the settings
 #include "kadas/core/kadassettingstree.h"
 %End
   public:
-
 
     static const QgsSettingsTreeNode *node( const QString &key );
 %Docstring
@@ -47,5 +46,5 @@ Unregisters the tree node for the given plugin
  *                                                                      *
  * kadas/core/kadassettingstree.h                                       *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

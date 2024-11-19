@@ -24,10 +24,12 @@
 class KADAS_GUI_EXPORT KadasMapToolHillshadeItemInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem *createItem() const override;
+
   private:
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
 };
 
 class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
@@ -39,7 +41,6 @@ class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
 
   private slots:
     void drawFinished();
-
 };
 
 #endif // KADASMAPTOOLHILLSHADE_H

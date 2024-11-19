@@ -2,5 +2,14 @@
 # monkey patching scoped based enum
 KadasStateHistory.ChangeType.Undo.__doc__ = ""
 KadasStateHistory.ChangeType.Redo.__doc__ = ""
-KadasStateHistory.ChangeType.__doc__ = "\n\n" + '* ``Undo``: ' + KadasStateHistory.ChangeType.Undo.__doc__ + '\n' + '* ``Redo``: ' + KadasStateHistory.ChangeType.Redo.__doc__
+KadasStateHistory.ChangeType.__doc__ = """
+
+* ``Undo``: 
+* ``Redo``: 
+
+"""
 # --
+try:
+    KadasStateHistory.__signal_arguments__ = {'canUndoChanged': [': bool'], 'canRedoChanged': [': bool'], 'stateChanged': ['changeType: KadasStateHistory.ChangeType', 'state: KadasStateHistory.State', 'prevState: KadasStateHistory.State']}
+except AttributeError:
+    pass

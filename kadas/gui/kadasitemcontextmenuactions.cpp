@@ -103,8 +103,8 @@ void KadasItemContextMenuActions::copyItemPosition()
     posStr = QString( "%1 (%2)" ).arg( mapPos.toString() ).arg( mapCrs.authid() );
   }
   QString text = QString( "%1\n%2" )
-                 .arg( posStr )
-                 .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
+                   .arg( posStr )
+                   .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
   QApplication::clipboard()->setText( text );
 }
 

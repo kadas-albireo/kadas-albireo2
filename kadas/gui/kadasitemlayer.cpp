@@ -40,7 +40,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
       {
         mRenderItems.append( layer->mItems[id]->clone() );
       }
-      std::stable_sort( mRenderItems.begin(), mRenderItems.end(), []( KadasMapItem * a, KadasMapItem * b ) { return a->zIndex() < b->zIndex(); } );
+      std::stable_sort( mRenderItems.begin(), mRenderItems.end(), []( KadasMapItem *a, KadasMapItem *b ) { return a->zIndex() < b->zIndex(); } );
       mRenderOpacity = layer->opacity();
     }
     bool render() override
@@ -359,7 +359,7 @@ KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer laye
   KadasItemLayer *itemLayer = nullptr;
   if ( instance()->mLayerIdMap.contains( layer ) )
   {
-    itemLayer = qobject_cast<KadasItemLayer *> ( QgsProject::instance()->mapLayer( instance()->mLayerIdMap[layer] ) );
+    itemLayer = qobject_cast<KadasItemLayer *>( QgsProject::instance()->mapLayer( instance()->mLayerIdMap[layer] ) );
   }
 
   if ( !itemLayer && standardLayerNames().contains( layer ) )
@@ -373,13 +373,12 @@ KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer laye
 
 const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
 {
-  static QMap<StandardLayer, QString> names =
-  {
-    {StandardLayer::RedliningLayer, tr( "Redlining" )},
-    {StandardLayer::SymbolsLayer, tr( "Symbols" )},
-    {StandardLayer::PicturesLayer, tr( "Pictures" )},
-    {StandardLayer::PinsLayer, tr( "Pins" )},
-    {StandardLayer::RoutesLayer, tr( "Routes" )}
+  static QMap<StandardLayer, QString> names = {
+    { StandardLayer::RedliningLayer, tr( "Redlining" ) },
+    { StandardLayer::SymbolsLayer, tr( "Symbols" ) },
+    { StandardLayer::PicturesLayer, tr( "Pictures" ) },
+    { StandardLayer::PinsLayer, tr( "Pins" ) },
+    { StandardLayer::RoutesLayer, tr( "Routes" ) }
   };
   return names;
 }
@@ -408,8 +407,7 @@ void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *l
     scaleSlider->setValue( log10( itemLayer->symbolScale() ) * 10 );
     scaleSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
     scaleSlider->setTracking( false );
-    connect( scaleSlider, &QSlider::valueChanged, this, [ = ]( double value )
-    {
+    connect( scaleSlider, &QSlider::valueChanged, this, [=]( double value ) {
       itemLayer->setSymbolScale( pow( 10., value / 10. ) );
     } );
     transpLayout->addWidget( scaleSlider );

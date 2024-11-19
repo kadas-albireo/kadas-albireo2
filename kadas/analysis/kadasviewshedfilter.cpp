@@ -51,11 +51,7 @@ static inline double pixelToGeoY( double gtrans[6], double px, double py )
   return gtrans[3] + px * gtrans[4] + py * gtrans[5];
 }
 
-bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos,
-    const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight,
-    bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle,
-    double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress,
-    QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
+bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle, double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion, int accuracyFactor )
 {
   // Open input file
   GDALDatasetH inputDataset = Kadas::gdalOpenForLayer( layer );
@@ -105,8 +101,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
   int terWidth = GDALGetRasterXSize( inputDataset );
   int terHeight = GDALGetRasterYSize( inputDataset );
 
-  int obs[2] =
-  {
+  int obs[2] = {
     qRound( geoToPixelX( gtrans, observerPos.x(), observerPos.y() ) ),
     qRound( geoToPixelY( gtrans, observerPos.x(), observerPos.y() ) )
   };
@@ -306,7 +301,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
 
   // Compute viewshed
-  int roi = std::sqrt(std::pow(hmapWidth, 2) + std::pow(hmapHeight, 2));
+  int roi = std::sqrt( std::pow( hmapWidth, 2 ) + std::pow( hmapHeight, 2 ) );
   progress->setLabelText( QApplication::translate( "KadasViewshedFilter", "Computing viewshed..." ) );
   progress->setRange( 0, 8 * roi );
 
@@ -354,7 +349,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
     }
 
     // Line of sight from observer to target.
-    int delta[2] = {target[0] - obs[0], target[1] - obs[1]};
+    int delta[2] = { target[0] - obs[0], target[1] - obs[1] };
     int inciny = qAbs( delta[0] ) < qAbs( delta[1] );
 
     // Step along coord (X or Y) that varies most from observer to target.
@@ -371,11 +366,11 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
       if ( i * slope > 0 )
       {
-        p[1 - inciny] = obs[1 - inciny] + int ( std::ceil( i * slope - 0.5 ) );
+        p[1 - inciny] = obs[1 - inciny] + int( std::ceil( i * slope - 0.5 ) );
       }
       else
       {
-        p[1 - inciny] = obs[1 - inciny] + int ( std::floor( i * slope + 0.5 ) );
+        p[1 - inciny] = obs[1 - inciny] + int( std::floor( i * slope + 0.5 ) );
       }
 
       if ( p[0] < colStart || p[0] > colEnd || p[1] < rowStart || p[1] > rowEnd )
@@ -385,7 +380,7 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
 
       //Is the point in the outside of the viewshed area?
       double dx = qAbs( p[0] - obs[0] ), dy = qAbs( p[1] - obs[1] );
-      if ( !( dx <= roi && dy <= roi && dx * dx + dy * dy <= double ( roi ) * double ( roi ) ) )
+      if ( !( dx <= roi && dy <= roi && dx * dx + dy * dy <= double( roi ) * double( roi ) ) )
       {
         break;
       }
@@ -413,10 +408,10 @@ bool KadasViewshedFilter::computeViewshed( const QgsRasterLayer *layer, const QS
       pElev -= 0.87 * geoDistSqr / ( 2 * earthRadius );
 
       // Update the slope if the current slope is greater than the old one
-      double s = double ( pElev - observerHeight ) / double ( qAbs( p[inciny] - obs[inciny] ) );
+      double s = double( pElev - observerHeight ) / double( qAbs( p[inciny] - obs[inciny] ) );
       horizon_slope = std::max( horizon_slope, s );
 
-      double horizon_alt =  observerHeight + horizon_slope * qAbs( p[inciny] - obs[inciny] );
+      double horizon_alt = observerHeight + horizon_slope * qAbs( p[inciny] - obs[inciny] );
       double tHeight = targetHeight;
       if ( targetHeightRelToTerr )
       {

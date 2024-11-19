@@ -3,7 +3,7 @@
  *                                                                      *
  * kadas/analysis/kadasviewshedfilter.h                                 *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/
 
 
@@ -31,14 +31,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/analysis/kadasviewshedfilter.h"
 %End
   public:
-    static bool computeViewshed( const QgsRasterLayer *layer,
-                                 const QString &outputFile, const QString &outputFormat,
-                                 QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs,
-                                 double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr,
-                                 double observerMinVertAngle, double observerMaxVertAngle, double radius,
-                                 const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg,
-                                 const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
-
+    static bool computeViewshed( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, QgsPointXY observerPos, const QgsCoordinateReferenceSystem &observerPosCrs, double observerHeight, double targetHeight, bool observerHeightRelToTerr, bool targetHeightRelToTerr, double observerMinVertAngle, double observerMaxVertAngle, double radius, const Qgis::DistanceUnit distanceElevUnit, QProgressDialog *progress, QString *errMsg, const QVector<QgsPointXY> &filterRegion = QVector<QgsPointXY>(), int accuracyFactor = 1 );
 };
 
 /************************************************************************
@@ -46,5 +39,5 @@ the Free Software Foundation; either version 2 of the License, or     *
  *                                                                      *
  * kadas/analysis/kadasviewshedfilter.h                                 *
  *                                                                      *
- * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
  ************************************************************************/

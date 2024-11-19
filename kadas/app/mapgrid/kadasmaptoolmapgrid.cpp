@@ -94,8 +94,8 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   layout()->addWidget( closeButton );
   layout()->setAlignment( closeButton, Qt::AlignTop );
 
-  auto layerFilter = []( QgsMapLayer * layer ) { return dynamic_cast<KadasMapGridLayer *>( layer ) != nullptr; };
-  auto layerCreator = [this]( const QString & name ) { return createLayer( name ); };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMapGridLayer *>( layer ) != nullptr; };
+  auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );
 
@@ -110,7 +110,7 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   mCellSizeLabel = new QLabel( tr( "Cell size:" ) );
   mCellSizeLabel->setVisible( false );
   static_cast<QGridLayout *>( ui.widgetLayerSetup->layout() )->addWidget( mCellSizeLabel, 0, 2, 1, 2 );
-  mCellSizeCombo = new QComboBox( );
+  mCellSizeCombo = new QComboBox();
   mCellSizeCombo->addItem( tr( "Dynamic" ), 0 );
   mCellSizeCombo->addItem( tr( "1 m" ), 1 );
   mCellSizeCombo->addItem( tr( "10 m" ), 10 );
@@ -194,24 +194,24 @@ void KadasMapGridWidget::updateType( int idx, bool updateValues )
 
   struct IntervalConfig
   {
-    bool spinEnabled = false;
-    double lower = 0, upper = 0, decimals = 0, value = 0;
-    QString suffix;
+      bool spinEnabled = false;
+      double lower = 0, upper = 0, decimals = 0, value = 0;
+      QString suffix;
   } config;
   switch ( type )
   {
     case KadasMapGridLayer::GridLV03:
     case KadasMapGridLayer::GridLV95:
-      config = {true, 1, 100000, 0, 10000, QString( " m" )};
+      config = { true, 1, 100000, 0, 10000, QString( " m" ) };
       break;
     case KadasMapGridLayer::GridDD:
     case KadasMapGridLayer::GridDM:
     case KadasMapGridLayer::GridDMS:
-      config = {true, 0.001, 100, 3, 1, QString( " deg" )};
+      config = { true, 0.001, 100, 3, 1, QString( " deg" ) };
       break;
     case KadasMapGridLayer::GridUTM:
     case KadasMapGridLayer::GridMGRS:
-      config = {false, 0, 0, 0, 0, QString()};
+      config = { false, 0, 0, 0, 0, QString() };
       break;
   }
 

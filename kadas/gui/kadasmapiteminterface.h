@@ -2,7 +2,6 @@
 #define KADASMAPITEMINTERFACE_H
 
 
-
 #include "kadas/gui/kadas_gui.h"
 
 class KadasMapItem;
@@ -17,7 +16,7 @@ class KADAS_GUI_EXPORT KadasMapItemInterface
 
     virtual ~KadasMapItemInterface() {}
 
-    virtual KadasMapItem* createItem() const = 0;
+    virtual KadasMapItem *createItem() const = 0;
 };
 
 #endif // KADASMAPITEMINTERFACE_H

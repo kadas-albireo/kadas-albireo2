@@ -91,7 +91,7 @@ void KadasPointItem::setPosition( const KadasItemPos &pos )
     }
     if ( mGeometry )
     {
-      mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+      mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
     }
     update();
   }
@@ -134,8 +134,8 @@ void KadasPointItem::endPart()
 KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 

@@ -34,7 +34,7 @@
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/catalog/kadasvbscatalogprovider.h"
 
-KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &/*params*/ )
+KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> & /*params*/ )
   : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
 {
 }
@@ -62,7 +62,7 @@ void KadasVBSCatalogProvider::load()
 
 void KadasVBSCatalogProvider::replyFinished()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   if ( reply->error() == QNetworkReply::NoError )
   {
     QVariantMap listData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
@@ -117,13 +117,13 @@ void KadasVBSCatalogProvider::readWMTSCapabilities( const QString &wmtsUrl, cons
   mPendingTasks += 1;
   QNetworkRequest req( ( QUrl( wmtsUrl ) ) );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entries", QVariant::fromValue<void *>( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasVBSCatalogProvider::readWMTSCapabilitiesDo );
 }
 
 void KadasVBSCatalogProvider::readWMTSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
@@ -142,7 +142,7 @@ void KadasVBSCatalogProvider::readWMTSCapabilitiesDo()
         {
           QString title;
           QMimeData *mimeData;
-          const ResultEntry &entry = ( *entries ) [layerid];
+          const ResultEntry &entry = ( *entries )[layerid];
           parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry.metadataUrl, QString( "&referer=%1" ).arg( referer ), title, layerid, mimeData );
           QStringList sortIndices = entry.sortIndices.split( "/" );
           mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
@@ -161,13 +161,13 @@ void KadasVBSCatalogProvider::readWMSCapabilities( const QString &wmsUrl, const 
   QNetworkRequest req( QUrl( wmsUrl + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "url", wmsUrl );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entries", QVariant::fromValue<void *>( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasVBSCatalogProvider::readWMSCapabilitiesDo );
 }
 
 void KadasVBSCatalogProvider::readWMSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString url = reply->property( "url" ).toString();
@@ -197,13 +197,13 @@ void KadasVBSCatalogProvider::readAMSCapabilities( const QString &amsUrl, const 
   QNetworkRequest req( url );
   QNetworkReply *reply = nam->get( req );
   reply->setProperty( "url", amsUrl );
-  reply->setProperty( "entries", QVariant::fromValue<void *> ( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
+  reply->setProperty( "entries", QVariant::fromValue<void *>( reinterpret_cast<void *>( new EntryMap( entries ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasVBSCatalogProvider::readAMSCapabilitiesDo );
 }
 
 void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
 {
-  QNetworkReply *reply = qobject_cast<QNetworkReply *> ( QObject::sender() );
+  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
   reply->deleteLater();
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString url = reply->property( "url" ).toString();
@@ -239,7 +239,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
     crs.createFromString( spatialReference );
     if ( crs.authid().startsWith( "USER:" ) )
     {
-      crs.createFromString( "EPSG:4326" );    // If we can't recognize the SRS, fall back to WGS84
+      crs.createFromString( "EPSG:4326" ); // If we can't recognize the SRS, fall back to WGS84
     }
 
     // Parse formats
@@ -273,7 +273,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       QgsMimeDataUtils::Uri mimeDataUri;
       mimeDataUri.layerType = "raster";
       mimeDataUri.providerKey = "arcgismapserver";
-      const ResultEntry &entry = ( *entries ) [layerName];
+      const ResultEntry &entry = ( *entries )[layerName];
       mimeDataUri.name = entry.title;
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
       mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
@@ -328,7 +328,6 @@ void KadasVBSCatalogProvider::searchMatchingWMSLayer( const QDomNode &layerItem,
   }
   for ( const QDomNode &subLayerItem : childrenByTagName( layerItem.toElement(), "Layer" ) )
   {
-
     searchMatchingWMSLayer( subLayerItem, entries, url, imgFormats, parentCrs );
   }
 }
