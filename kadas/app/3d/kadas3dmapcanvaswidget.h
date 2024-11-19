@@ -46,7 +46,7 @@ class Kadas3DMapCanvasWidget : public QWidget
     Q_OBJECT
   public:
     Kadas3DMapCanvasWidget( const QString &name, bool isDocked );
-    
+
     //! takes ownership
     void setMapSettings( Qgs3DMapSettings *map );
 
@@ -131,8 +131,8 @@ class Kadas3DMapCanvasWidget : public QWidget
     QAction *mActionOptions = nullptr;
     QAction *mActionSetSceneExtent = nullptr;
     QgsDockableWidgetHelper *mDockableWidgetHelper;
-    QObjectUniquePtr< QgsRubberBand > mViewFrustumHighlight;
-    QObjectUniquePtr< QgsRubberBand > mViewExtentHighlight;
+    QObjectUniquePtr<QgsRubberBand> mViewFrustumHighlight;
+    QObjectUniquePtr<QgsRubberBand> mViewExtentHighlight;
     QPointer<QDialog> mConfigureDialog;
     QgsMessageBar *mMessageBar = nullptr;
     bool mGpuMemoryLimitReachedReported = false;
@@ -141,7 +141,6 @@ class Kadas3DMapCanvasWidget : public QWidget
     QWidget *mContainer = nullptr;
     //! On-Screen Navigation widget.
     Kadas3DNavigationWidget *mNavigationWidget = nullptr;
-
 };
 
 #endif // KADAS3DMAPCANVASWIDGET_H

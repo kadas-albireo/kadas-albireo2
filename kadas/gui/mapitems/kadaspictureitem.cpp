@@ -54,7 +54,7 @@ class QVector3 : public QGenericMatrix<1, 3, float>
     float operator[]( int idx ) const { return ( *this )( idx, 0 ); }
     operator std::array<float, 3>() const
     {
-      return {( *this )[0], ( *this )[1], ( *this )[2]};
+      return { ( *this )[0], ( *this )[1], ( *this )[2] };
     }
 };
 
@@ -167,7 +167,7 @@ QImage KadasPictureItem::readImage( double dpiScale ) const
   return reader.read().convertToFormat( QImage::Format_ARGB32 );
 }
 
-void KadasPictureItem::renderPrivate(QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const
+void KadasPictureItem::renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const
 {
   if ( dpiScale != 1. )
   {
@@ -243,19 +243,19 @@ QString KadasPictureItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip
 
 void KadasPictureItem::editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-    QImageReader reader( mFilePath );
+  QImageReader reader( mFilePath );
 
-    double scale = mapSettings.mapUnitsPerPixel() * mSymbolScale;
-    KadasMapPos mapPos = toMapPos( constState()->mPos, mapSettings );
-    KadasMapPos frameCenter( mapPos.x() + constState()->mOffsetX * scale, mapPos.y() + constState()->mOffsetY * scale );
+  double scale = mapSettings.mapUnitsPerPixel() * mSymbolScale;
+  KadasMapPos mapPos = toMapPos( constState()->mPos, mapSettings );
+  KadasMapPos frameCenter( mapPos.x() + constState()->mOffsetX * scale, mapPos.y() + constState()->mOffsetY * scale );
 
-    QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
-    state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
-    state()->mSize.setHeight( state()->mSize.width() / double( reader.size().width() ) * reader.size().height() );
+  QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
+  state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
+  state()->mSize.setHeight( state()->mSize.width() / double( reader.size().width() ) * reader.size().height() );
 
-    reader.setBackgroundColor( Qt::white );
-    reader.setScaledSize( state()->mSize );
-    mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
+  reader.setBackgroundColor( Qt::white );
+  reader.setScaledSize( state()->mSize );
+  mImage = reader.read().convertToFormat( QImage::Format_ARGB32 );
 }
 
 void KadasPictureItem::onDoubleClick( const QgsMapSettings &mapSettings )
@@ -268,13 +268,13 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
   float sina = std::sin( angle );
   float cosa = std::cos( angle );
   return QMatrix3x3(
-           std::array<float, 9>
-  {
-    cosa + u[0] * u[0] * ( 1 - cosa ),         u[0] * u[1] * ( 1 - cosa ) - u[2] * sina,  u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
-    u[0] * u[1] * ( 1 - cosa ) + u[2] * sina,  cosa + u[1] * u[1] * ( 1 - cosa ),         u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-    u[0] * u[2] * ( 1 - cosa ) - u[1] * sina,  u[1] * u[2] * ( 1 - cosa ) + u[0] * sina,  cosa + u[2] * u[2] * ( 1 - cosa )
-  }.data()
-         );
+    std::array<float, 9> {
+      cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
+      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+    }
+      .data()
+  );
 }
 
 bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget )
@@ -307,8 +307,7 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
   Exiv2::ExifData::iterator itLonRef = exifData.findKey( Exiv2::ExifKey( "Exif.GPSInfo.GPSLongitudeRef" ) );
   Exiv2::ExifData::iterator itLonVal = exifData.findKey( Exiv2::ExifKey( "Exif.GPSInfo.GPSLongitude" ) );
 
-  if ( itLatRef == exifData.end() || itLatVal == exifData.end() ||
-       itLonRef == exifData.end() || itLonVal == exifData.end() )
+  if ( itLatRef == exifData.end() || itLatVal == exifData.end() || itLonRef == exifData.end() || itLonVal == exifData.end() )
   {
     return false;
   }
@@ -348,31 +347,31 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
     if ( !data.isEmpty() && data.contains( "ImgRoll" ) && data.contains( "ImgPitch" ) && data.contains( "HorizontalFOV" ) && data.contains( "VerticalFOV" ) )
     {
       double alt = parseExifRational( QString::fromStdString( itAltitude->value().toString() ) );
-      double direction = parseExifRational( QString::fromStdString( itDirection->value().toString( ) ) );
+      double direction = parseExifRational( QString::fromStdString( itDirection->value().toString() ) );
 
-      QVector3 ey( {0, 1, 0} );
+      QVector3 ey( { 0, 1, 0 } );
 
       // Camera rotation matrix
       float yaw = -direction / 180. * M_PI;
       float roll = data["ImgRoll"].toDouble() / 180. * M_PI;
       float pitch = data["ImgPitch"].toDouble() / 180. * M_PI;
 
-      QMatrix3x3 Rcz = rotAngleAxis( {0, 0, 1}, yaw );
-      QMatrix3x3 Rcy = rotAngleAxis( QVector3( Rcz * QVector3( {0, 1, 0} ) ), roll );
-      QMatrix3x3 Rcx = rotAngleAxis( QVector3( Rcy * Rcz * QVector3( {1, 0, 0} ) ), pitch );
+      QMatrix3x3 Rcz = rotAngleAxis( { 0, 0, 1 }, yaw );
+      QMatrix3x3 Rcy = rotAngleAxis( QVector3( Rcz * QVector3( { 0, 1, 0 } ) ), roll );
+      QMatrix3x3 Rcx = rotAngleAxis( QVector3( Rcy * Rcz * QVector3( { 1, 0, 0 } ) ), pitch );
 
       QMatrix3x3 R = Rcx * Rcy * Rcz;
 
       // Aperture boundary direction vectors wrt unrotated camera
       float halfHFov = 0.5 * data["HorizontalFOV"].toDouble() / 180. * M_PI;
       float halfVFov = 0.5 * data["VerticalFOV"].toDouble() / 180. * M_PI;
-      QMatrix3x3 Rz = rotAngleAxis( {0, 0, 1}, halfHFov );
-      QMatrix3x3 Rx = rotAngleAxis( QVector3( Rz * QVector3( {1, 0, 0} ) ), -halfVFov );
+      QMatrix3x3 Rz = rotAngleAxis( { 0, 0, 1 }, halfHFov );
+      QMatrix3x3 Rx = rotAngleAxis( QVector3( Rz * QVector3( { 1, 0, 0 } ) ), -halfVFov );
 
       QVector3 bottomleft = Rx * Rz * ey;
-      QVector3 bottomright( {-bottomleft[0], bottomleft[1], bottomleft[2]} );
-      QVector3 topleft( {bottomleft[0], bottomleft[1], -bottomleft[2]} );
-      QVector3 topright( {-topleft[0], topleft[1], topleft[2]} );
+      QVector3 bottomright( { -bottomleft[0], bottomleft[1], bottomleft[2] } );
+      QVector3 topleft( { bottomleft[0], bottomleft[1], -bottomleft[2] } );
+      QVector3 topright( { -topleft[0], topleft[1], topleft[2] } );
 
       // Aperture boundary direction vectors wrt camera
       QVector3 rbottomleft = R * bottomleft;
@@ -398,8 +397,7 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
       QgsPoint target( mrcPos.x() + reye[0] * .75 * d, mrcPos.y() + reye[1] * .75 * d, mrcPos.z() + reye[2] * .75 * d );
 
       QgsCoordinateTransform crst( crs3857, destCrs, QgsProject::instance() );
-      footprint =
-      {
+      footprint = {
         KadasItemPos::fromPoint( crst.transform( pTerrBottomLeft ) ),
         KadasItemPos::fromPoint( crst.transform( pTerrBottomRight ) ),
         KadasItemPos::fromPoint( crst.transform( pTerrTopRight ) ),
@@ -407,7 +405,6 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
       };
       cameraTarget = KadasItemPos::fromPoint( crst.transform( target ) );
     }
-
   }
 
   return true;

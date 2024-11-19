@@ -31,7 +31,8 @@ Q_NOWARN_DEPRECATED_POP
 
 #include <Qt3DRender/QCamera>
 
-Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidget *parent ) : QWidget( parent )
+Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidget *parent )
+  : QWidget( parent )
 {
   setupUi( this );
 
@@ -41,10 +42,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mZoomInButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->zoom( 5 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->zoom( 5 );
+    }
   );
 
   // Zoom out button
@@ -52,10 +52,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mZoomOutButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->zoom( -5 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->zoom( -5 );
+    }
   );
 
   // Tilt up button
@@ -63,10 +62,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mTiltUpButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( 1 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( 1 );
+    }
   );
 
   // Tilt down button
@@ -74,10 +72,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mTiltDownButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( -1 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->tiltUpAroundViewCenter( -1 );
+    }
   );
 
   // Compas
@@ -88,10 +85,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mCompass,
     &QwtDial::valueChanged,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->setCameraHeadingAngle( float( mCompass->value() ) );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->setCameraHeadingAngle( float( mCompass->value() ) );
+    }
   );
 
   // Move up button
@@ -99,10 +95,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mMoveUpButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->moveView( 0, 1 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->moveView( 0, 1 );
+    }
   );
 
   // Move right button
@@ -110,10 +105,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mMoveRightButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->moveView( 1, 0 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->moveView( 1, 0 );
+    }
   );
 
   // Move down button
@@ -121,10 +115,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mMoveDownButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->moveView( 0, -1 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->moveView( 0, -1 );
+    }
   );
 
   // Move left button
@@ -132,10 +125,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     mMoveLeftButton,
     &QToolButton::clicked,
     m3DMapCanvas,
-    [ = ]
-  {
-    m3DMapCanvas->cameraController()->moveView( -1, 0 );
-  }
+    [=] {
+      m3DMapCanvas->cameraController()->moveView( -1, 0 );
+    }
   );
 
   mCameraInfoItemModel = new QStandardItemModel( this );
@@ -154,7 +146,7 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
   mCameraInfo->horizontalHeader()->hide();
   mCameraInfo->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeMode::Stretch );
 
-  QObject::connect( mCameraInfoCheckBox, &QCheckBox::clicked, m3DMapCanvas, [ = ]( bool enabled ) { mCameraInfo->setVisible( enabled ); } );
+  QObject::connect( mCameraInfoCheckBox, &QCheckBox::clicked, m3DMapCanvas, [=]( bool enabled ) { mCameraInfo->setVisible( enabled ); } );
 }
 
 void Kadas3DNavigationWidget::updateFromCamera()

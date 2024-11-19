@@ -89,8 +89,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
 
   connect( feedback, &QgsFeedback::canceled, reply, &QNetworkReply::abort );
-  connect( reply, &QNetworkReply::finished, this, [this, reply]()
-  {
+  connect( reply, &QNetworkReply::finished, this, [this, reply]() {
     if ( reply->error() == QNetworkReply::NoError )
     {
       QByteArray replyText = reply->readAll();
@@ -117,7 +116,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
         result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
         result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
         QString label = itemAttrsMap["label"].toString();
-        label.replace( QRegExp( "<[^>]+>" ), "" );   // Remove HTML tags
+        label.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
         result.displayString = label;
 
         if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
@@ -164,19 +163,19 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast< QgsPoint * >( geometry.get() );
+          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
           item = new QgsAnnotationMarkerItem( *pt );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast< QgsCurve * >( geometry.get() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
           item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast< QgsCurvePolygon * >( geometry.get() );
+          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
           item = new QgsAnnotationPolygonItem( poly );
           break;
         }
@@ -210,7 +209,6 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
   {
     mMapCanvas->setCenter( itemPos );
   }
-
 }
 
 

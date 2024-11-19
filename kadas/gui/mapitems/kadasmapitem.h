@@ -44,13 +44,15 @@ class KADAS_GUI_EXPORT KadasMapPos
   public:
     static KadasMapPos fromPoint( const QgsPointXY &pos ) { return KadasMapPos( pos.x(), pos.y() ); }
 
-    KadasMapPos( double x = 0., double y = 0. ) : mX( x ), mY( y ) {}
+    KadasMapPos( double x = 0., double y = 0. )
+      : mX( x ), mY( y ) {}
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
     void setY( double y ) { mY = y; }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     double sqrDist( const KadasMapPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
+
   private:
     double mX = 0.;
     double mY = 0.;
@@ -59,11 +61,21 @@ class KADAS_GUI_EXPORT KadasMapPos
 class KADAS_GUI_EXPORT KadasMapRect
 {
   public:
-    KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. ) : mXmin( xMin ), mYmin( yMin ), mXmax( xMax ), mYmax( yMax ) {}
+    KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
+      : mXmin( xMin ), mYmin( yMin ), mXmax( xMax ), mYmax( yMax )
+    {}
+
     KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) ), mYmin( std::min( p1.y(), p2.y() ) ),
-        mXmax( std::max( p1.x(), p2.x() ) ), mYmax( std::max( p1.y(), p2.y() ) ) {}
-    KadasMapRect( const KadasMapPos &center, double span ) : mXmin( center.x() - span ), mYmin( center.y() - span ), mXmax( center.x() + span ), mYmax( center.y() + span ) {}
+      : mXmin( std::min( p1.x(), p2.x() ) )
+      , mYmin( std::min( p1.y(), p2.y() ) )
+      , mXmax( std::max( p1.x(), p2.x() ) )
+      , mYmax( std::max( p1.y(), p2.y() ) )
+    {}
+
+    KadasMapRect( const KadasMapPos &center, double span )
+      : mXmin( center.x() - span ), mYmin( center.y() - span ), mXmax( center.x() + span ), mYmax( center.y() + span )
+    {}
+
     double xMinimum() const { return mXmin; }
     void setXMinimum( double xMin ) { mXmin = xMin; }
     double yMinimum() const { return mYmin; }
@@ -74,6 +86,7 @@ class KADAS_GUI_EXPORT KadasMapRect
     void setYMaximum( double ymax ) { mYmax = ymax; }
     operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
     KadasMapPos center() const { return KadasMapPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
+
   private:
     double mXmin = 0.;
     double mYmin = 0.;
@@ -81,22 +94,21 @@ class KADAS_GUI_EXPORT KadasMapRect
     double mYmax = 0.;
 };
 
+
 class KADAS_GUI_EXPORT KadasItemPos
 {
   public:
     static KadasItemPos fromPoint( const QgsPointXY &pos ) { return KadasItemPos( pos.x(), pos.y() ); }
 
-#ifndef SIP_RUN
-    KadasItemPos( double x = 0., double y = 0, double z = std::numeric_limits<double>::quiet_NaN() ) : mX( x ), mY( y ), mZ( z ) {}
-#else
-    KadasItemPos( double x = 0., double y = 0 ) : mX( x ), mY( y ) {}
-#endif
-    bool operator== ( const KadasItemPos &other ) const SIP_SKIP
+    KadasItemPos( double x = 0., double y = 0, double z SIP_PYARGREMOVE = std::numeric_limits<double>::quiet_NaN() )
+      : mX( x )
+      , mY( y )
+      , mZ( z )
+    {}
+
+    bool operator==( const KadasItemPos &other ) const SIP_SKIP
     {
-      return mX == other.mX &&
-          mY == other.mY &&
-          hasZ() == other.hasZ() &&
-          ( !hasZ() || mZ == other.mZ );
+      return mX == other.mX && mY == other.mY && hasZ() == other.hasZ() && ( !hasZ() || mZ == other.mZ );
     }
 
     double x() const { return mX; }
@@ -109,19 +121,31 @@ class KADAS_GUI_EXPORT KadasItemPos
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     operator QgsPoint() const { return QgsPoint( mX, mY, mZ ); }
     double sqrDist( const KadasItemPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
+
   private:
     double mX = 0.;
     double mY = 0.;
     double mZ = 0.;
 };
 
+
 class KADAS_GUI_EXPORT KadasItemRect
 {
   public:
-    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. ) : mXmin( xMin ), mYmin( yMin ), mXmax( xMax ), mYmax( yMax ) {}
+    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
+      : mXmin( xMin )
+      , mYmin( yMin )
+      , mXmax( xMax )
+      , mYmax( yMax )
+    {}
+
     KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) ), mYmin( std::min( p1.y(), p2.y() ) ),
-        mXmax( std::max( p1.x(), p2.x() ) ), mYmax( std::max( p1.y(), p2.y() ) ) {}
+      : mXmin( std::min( p1.x(), p2.x() ) )
+      , mYmin( std::min( p1.y(), p2.y() ) )
+      , mXmax( std::max( p1.x(), p2.x() ) )
+      , mYmax( std::max( p1.y(), p2.y() ) )
+    {}
+
     double xMinimum() const { return mXmin; }
     void setXMinimum( double xMin ) { mXmin = xMin; }
     double yMinimum() const { return mYmin; }
@@ -132,6 +156,7 @@ class KADAS_GUI_EXPORT KadasItemRect
     void setYMaximum( double ymax ) { mYmax = ymax; }
     operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
     KadasItemPos center() const { return KadasItemPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
+
   private:
     double mXmin = 0.;
     double mYmin = 0.;
@@ -141,6 +166,7 @@ class KADAS_GUI_EXPORT KadasItemRect
 
 
 #ifdef SIP_RUN
+// clang-format off
 //
 // adapted from PyQt5 QPair<_TYPE1_, _TYPE2_> and QPair<float, float>
 //
@@ -245,8 +271,8 @@ class KADAS_GUI_EXPORT KadasItemRect
   return sipGetState( sipTransferObj );
   % End
 };
+// clang-format on
 #endif
-
 
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
@@ -275,22 +301,22 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* Margin in screen units */
     struct Margin
     {
-      int left = 0;
-      int top = 0;
-      int right = 0;
-      int bottom = 0;
+        int left = 0;
+        int top = 0;
+        int right = 0;
+        int bottom = 0;
     };
     virtual Margin margin() const { return Margin(); }
 
     /* Nodes for editing */
     struct Node
     {
-      KadasMapPos pos;
+        KadasMapPos pos;
 #ifndef SIP_RUN
-      typedef void ( *node_renderer_t )( QPainter *, const QPointF &, int );
-      node_renderer_t render = defaultNodeRenderer;
+        typedef void ( *node_renderer_t )( QPainter *, const QPointF &, int );
+        node_renderer_t render = defaultNodeRenderer;
 #else
-      // TODO
+        // TODO
 #endif
     };
 
@@ -354,12 +380,15 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     class State : public KadasStateHistory::State
     {
       public:
-        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST(KadasMapItem.DrawStatus, DrawStatus)
+        // clang-format off
+        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
         {
           Empty,
           Drawing,
           Finished
         };
+        //< clang-format on
+
         DrawStatus drawStatus = DrawStatus::Empty;
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 SIP_FACTORY;
@@ -371,15 +400,17 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     class KADAS_GUI_EXPORT NumericAttribute
     {
-    public:
+      public:
         QString name;
-        enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST(KadasMapItem.Type, Type)
+        // clang-format off
+        enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.Type, Type )
         {
           TypeCoordinate,
           TypeDistance,
           TypeAngle,
           TypeOther
         };
+        // clang-format on
         Type type = Type::TypeCoordinate;
         double min = std::numeric_limits<double>::lowest();
         double max = std::numeric_limits<double>::max();
@@ -407,26 +438,26 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // Edit interface (coordinates in map crs, attribute distances in map units)
     struct EditContext
     {
-      EditContext()
-        : mValid( false )
-      {}
+        EditContext()
+          : mValid( false )
+        {}
 
-      EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
-        : mValid( true )
-        , vidx( _vidx )
-        , pos( _pos )
-        , attributes( _attributes )
-        , cursor( _cursor )
-      {}
+        EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
+          : mValid( true )
+          , vidx( _vidx )
+          , pos( _pos )
+          , attributes( _attributes )
+          , cursor( _cursor )
+        {}
 
-      bool mValid = false;
-      QgsVertexId vidx;
-      KadasMapPos pos;
-      AttribDefs attributes;
-      Qt::CursorShape cursor;
-      bool isValid() const { return mValid; }
-      bool operator== ( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
-      bool operator!= ( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
+        bool mValid = false;
+        QgsVertexId vidx;
+        KadasMapPos pos;
+        AttribDefs attributes;
+        Qt::CursorShape cursor;
+        bool isValid() const { return mValid; }
+        bool operator==( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
+        bool operator!=( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
@@ -453,7 +484,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     // TODO: SIP
 #ifndef SIP_RUN
-    typedef std::function<KadasMapItem*( const QgsCoordinateReferenceSystem & ) > RegistryItemFactory;
+    typedef std::function<KadasMapItem *( const QgsCoordinateReferenceSystem & )> RegistryItemFactory;
     typedef QMap<QString, RegistryItemFactory> Registry;
     static Registry *registry();
 #endif

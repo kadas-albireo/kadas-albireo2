@@ -14,13 +14,13 @@
 
 struct KadasMilxSymbolDesc
 {
-  QString symbolXml;
-  QString name;
-  QString militaryName;
-  QImage icon;
-  bool hasVariablePoints;
-  int minNumPoints;
-  QString symbolType;
+    QString symbolXml;
+    QString name;
+    QString militaryName;
+    QImage icon;
+    bool hasVariablePoints;
+    int minNumPoints;
+    QString symbolType;
 };
 
 class KadasMilxSymbolSettings

@@ -48,7 +48,8 @@ QJsonObject KadasPolygonItem::State::serialize() const
     pts.append( prt );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );;
+  json["status"] = static_cast<int>( drawStatus );
+  ;
   json["points"] = pts;
   return json;
 }
@@ -94,7 +95,7 @@ QList<KadasMapItem::Node> KadasPolygonItem::nodes( const QgsMapSettings &setting
   {
     for ( const KadasItemPos &pos : part )
     {
-      nodes.append( {toMapPos( pos, settings )} );
+      nodes.append( { toMapPos( pos, settings ) } );
     }
   }
   return nodes;
@@ -132,7 +133,7 @@ void KadasPolygonItem::setPosition( const KadasItemPos &pos )
   }
   if ( mGeometry )
   {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
   }
   update();
 }
@@ -168,7 +169,7 @@ bool KadasPolygonItem::continuePart( const QgsMapSettings &mapSettings )
 {
   // If current point is same as last one, drop last point and end geometry
   int n = state()->points.last().size();
-  if ( n > 2 && state()->points.last() [n - 1] == state()->points.last() [n - 2] )
+  if ( n > 2 && state()->points.last()[n - 1] == state()->points.last()[n - 2] )
   {
     state()->points.last().removeLast();
     recomputeDerived();
@@ -187,8 +188,8 @@ void KadasPolygonItem::endPart()
 KadasMapItem::AttribDefs KadasPolygonItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 
@@ -260,8 +261,7 @@ void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &cont
 {
   if ( context.vidx.vertex >= 0 )
   {
-    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context]
-    {
+    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context] {
       state()->points[context.vidx.part].removeAt( context.vidx.vertex );
       recomputeDerived();
     } );
@@ -269,8 +269,7 @@ void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &cont
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [ = ]
-    {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );
@@ -377,7 +376,7 @@ void KadasPolygonItem::recomputeDerived()
         {
           GeographicLib::GeodesicLine line = geod.InverseLine( wgsPoints[i].y(), wgsPoints[i].x(), wgsPoints[i + 1].y(), wgsPoints[i + 1].x() );
           double dist = line.Distance();
-          int nIntervals = std::max( 1, int ( std::ceil( dist / sdist ) ) );
+          int nIntervals = std::max( 1, int( std::ceil( dist / sdist ) ) );
           for ( int j = 0; j < nIntervals; ++j )
           {
             double lat, lon;

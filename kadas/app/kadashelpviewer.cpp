@@ -26,8 +26,8 @@
 #include "kadashelpviewer.h"
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
-    : QObject( parent )
-    , mHelpFileServer(QString(), "127.0.0.1")
+  : QObject( parent )
+  , mHelpFileServer( QString(), "127.0.0.1" )
 {
   const QString docdir = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "docs/html" );
   mHelpFileServer.setFilesTopDir( docdir );
@@ -35,15 +35,13 @@ KadasHelpViewer::KadasHelpViewer( QObject *parent )
 
 void KadasHelpViewer::showHelp() const
 {
-  const QString locale = QSettings().value("locale/userLocale", "en").toString();
-  QString lang = locale.left(2);
+  const QString locale = QSettings().value( "locale/userLocale", "en" ).toString();
+  QString lang = locale.left( 2 );
 
-  QDir qDir(mHelpFileServer.getFilesTopDir());
-  if(!qDir.exists(lang))
-      lang = "en";
+  QDir qDir( mHelpFileServer.getFilesTopDir() );
+  if ( !qDir.exists( lang ) )
+    lang = "en";
 
-  QUrl url(QString("http:///%1:%2/%3/").arg(mHelpFileServer.getHost())
-                                       .arg(mHelpFileServer.getPort())
-                                       .arg(lang));
-  QDesktopServices::openUrl(url);
+  QUrl url( QString( "http:///%1:%2/%3/" ).arg( mHelpFileServer.getHost() ).arg( mHelpFileServer.getPort() ).arg( lang ) );
+  QDesktopServices::openUrl( url );
 }

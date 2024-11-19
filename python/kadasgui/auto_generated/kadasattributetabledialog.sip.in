@@ -36,7 +36,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     ~KadasAttributeTableDialog();
 
     QDomElement writeXml( QDomDocument &document );
-    static void createFromXml(const QDomElement &element , QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent);
+    static void createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent );
 
   protected:
     virtual void showEvent( QShowEvent *ev );

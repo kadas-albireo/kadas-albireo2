@@ -90,8 +90,7 @@ double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoord
   double col = ( -gtrans[0] * gtrans[5] + gtrans[2] * gtrans[3] - gtrans[2] * pRaster.y() + gtrans[5] * pRaster.x() ) / ( gtrans[1] * gtrans[5] - gtrans[2] * gtrans[4] );
 
   double pixValues[4] = {};
-  if ( CE_None != GDALRasterIO( band, GF_Read,
-                                std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
+  if ( CE_None != GDALRasterIO( band, GF_Read, std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
   {
     if ( errMsg )
     {

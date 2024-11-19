@@ -11,6 +11,7 @@
 
 
 
+// clang-format off
 //
 // copied from PyQt4 QMap<int, TYPE> and adapted to unsigned
 //
@@ -107,6 +108,7 @@
   return sipGetState( sipTransferObj );
 %End
 };
+// clang-format on
 
 class KadasItemLayer : KadasPluginLayer
 {

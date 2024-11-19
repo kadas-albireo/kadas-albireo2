@@ -19,7 +19,7 @@
 
 #include <qgis/qgslayertreeview.h>
 
-class KadasLayerTreeViewMenuProvider: public QObject, public QgsLayerTreeViewMenuProvider
+class KadasLayerTreeViewMenuProvider : public QObject, public QgsLayerTreeViewMenuProvider
 {
     Q_OBJECT
   public:

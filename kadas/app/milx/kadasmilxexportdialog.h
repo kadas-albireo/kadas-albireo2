@@ -23,14 +23,13 @@ class KadasMilxExportDialog : public QDialog
 {
     Q_OBJECT
   public:
-
     enum class ExportMode
     {
       Milx,
       Kml
     };
 
-    KadasMilxExportDialog(QWidget *parent = 0);
+    KadasMilxExportDialog( QWidget *parent = 0 );
 
     void setExportMode( ExportMode exportMode );
 

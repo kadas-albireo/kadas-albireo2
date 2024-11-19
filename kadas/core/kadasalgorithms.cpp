@@ -23,14 +23,14 @@
 
 struct Cluster1D
 {
-  int min, max;
-  std::vector<const KadasAlgorithms::Rect *> rects;
+    int min, max;
+    std::vector<const KadasAlgorithms::Rect *> rects;
 };
 
 struct Cluster2D
 {
-  int x1, y1, x2, y2;
-  std::vector<const KadasAlgorithms::Rect *> rects;
+    int x1, y1, x2, y2;
+    std::vector<const KadasAlgorithms::Rect *> rects;
 };
 
 static int linescan( const std::vector<const KadasAlgorithms::Rect *> &rects, int axis, std::list<Cluster1D> &clusters )
@@ -39,18 +39,18 @@ static int linescan( const std::vector<const KadasAlgorithms::Rect *> &rects, in
   {
     for ( const KadasAlgorithms::Rect *rect : rects )
     {
-      clusters.push_back( {rect->x1, rect->x2, {rect}} );
+      clusters.push_back( { rect->x1, rect->x2, { rect } } );
     }
   }
   else
   {
     for ( const KadasAlgorithms::Rect *rect : rects )
     {
-      clusters.push_back( {rect->y1, rect->y2, {rect}} );
+      clusters.push_back( { rect->y1, rect->y2, { rect } } );
     }
   }
 
-  clusters.sort( []( const Cluster1D & c1, const Cluster1D & c2 ) { return c1.min < c2.min; } );
+  clusters.sort( []( const Cluster1D &c1, const Cluster1D &c2 ) { return c1.min < c2.min; } );
 
   // Merge neighboring clusters
   auto it = clusters.begin();
@@ -58,7 +58,8 @@ static int linescan( const std::vector<const KadasAlgorithms::Rect *> &rects, in
   ++it;
   while ( it != clusters.end() )
   {
-    auto prev = it; --prev;
+    auto prev = it;
+    --prev;
     Cluster1D &c1 = *prev;
     Cluster1D &c2 = *it;
     if ( c2.min < c1.max )
@@ -88,7 +89,7 @@ static void clusters( const std::vector<const KadasAlgorithms::Rect *> &rects, s
     if ( count == 1 )
     {
       const Cluster1D &cy = clustersY.front();
-      output.push_back( {cx.min, cy.min, cx.max, cy.max, cy.rects} );
+      output.push_back( { cx.min, cy.min, cx.max, cy.max, cy.rects } );
     }
     else
     {

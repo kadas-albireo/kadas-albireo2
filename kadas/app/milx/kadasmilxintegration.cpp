@@ -55,7 +55,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
   if ( licenseKey.isEmpty() )
   {
-    QgsDebugMsgLevel( "MilX license key is empty, disabling MilX integration." , 2 );
+    QgsDebugMsgLevel( "MilX license key is empty, disabling MilX integration.", 2 );
     return;
   }
 
@@ -82,7 +82,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   if ( !KadasMilxClient::init() )
   {
-    QgsDebugMsgLevel( "Failed to initialize the MilX library." , 2 );
+    QgsDebugMsgLevel( "Failed to initialize the MilX library.", 2 );
     return;
   }
 
@@ -105,7 +105,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   connect( mUi.mLineWidthSlider, &QSlider::valueChanged, this, &KadasMilxIntegration::setMilXLineWidth );
 
   mUi.mWorkModeCombo->addItem( tr( "International" ), static_cast<int>( KadasMilxSymbolSettings::WorkMode::WorkModeInternational ) );
-  mUi.mWorkModeCombo->addItem( tr( "CH" ), static_cast<int>(  KadasMilxSymbolSettings::WorkMode::WorkModeCH ) );
+  mUi.mWorkModeCombo->addItem( tr( "CH" ), static_cast<int>( KadasMilxSymbolSettings::WorkMode::WorkModeCH ) );
   mUi.mWorkModeCombo->setCurrentIndex( QgsProject::instance()->readNumEntry( "milx", "work_mode", static_cast<int>( KadasMilxSymbolSettings::DefaultWorkMode ) ) );
   setMilXWorkMode( mUi.mWorkModeCombo->currentIndex() );
   connect( mUi.mWorkModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMilxIntegration::setMilXWorkMode );
@@ -120,8 +120,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
-  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem * item, KadasMapItemEditor::EditorType type )
-  {
+  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) {
     return new KadasMilxEditor( item, type, mMilxLibrary );
   } );
 
@@ -166,8 +165,8 @@ void KadasMilxIntegration::createMilx( bool active )
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   if ( active )
   {
-    KadasLayerSelectionWidget::LayerFilter layerFilter = [ = ]( QgsMapLayer * layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator layerCreator = [ = ]( const QString & name ) { return new KadasMilxLayer( name ); };
+    KadasLayerSelectionWidget::LayerFilter layerFilter = [=]( QgsMapLayer *layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
+    KadasLayerSelectionWidget::LayerCreator layerCreator = [=]( const QString &name ) { return new KadasMilxLayer( name ); };
 
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );
@@ -277,7 +276,8 @@ void KadasMilxIntegration::saveMilxly()
     filename += ".milxly";
   }
   QString targetVersionTag = exportDialog.selectedVersionTag();
-  QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
+  QString currentVersionTag;
+  KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
 
   QIODevice *dev = 0;
   QuaZip *zip = 0;
@@ -419,7 +419,8 @@ void KadasMilxIntegration::exportKml()
     filename += ".kmz";
   }
 
-  QString currentVersionTag; KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
+  QString currentVersionTag;
+  KadasMilxClient::getCurrentLibraryVersionTag( currentVersionTag );
 
   int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
 
@@ -596,7 +597,7 @@ bool KadasMilxIntegration::importMilxly( const QString &filename, QString &error
 
   QDomNodeList milxLayerEls = milxDocumentEl.elementsByTagName( "MilXLayer" );
   QList<KadasMilxLayer *> importedLayers;
-  QList< QPair<QString, QString> > cartouches;
+  QList<QPair<QString, QString>> cartouches;
   for ( int iLayer = 0, nLayers = milxLayerEls.count(); iLayer < nLayers; ++iLayer )
   {
     QDomElement milxLayerEl = milxLayerEls.at( iLayer ).toElement();

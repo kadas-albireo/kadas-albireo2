@@ -43,8 +43,7 @@ static QString gridLabel( QChar firstChar, int offset )
       int res = offset % 26;
       label.prepend( QChar( 'A' + res ) );
       offset /= 26;
-    }
-    while ( offset > 0 );
+    } while ( offset > 0 );
     return label;
   }
 }
@@ -248,7 +247,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
     {
       QPainterPath path;
       x -= 0.5 * metrics.horizontalAdvance( text );
-      y =  y - metrics.descent() + 0.5 * metrics.height();
+      y = y - metrics.descent() + 0.5 * metrics.height();
       path.addText( x, y, font, text );
       renderContext()->painter()->save();
       renderContext()->painter()->setPen( QPen( bufferColor, qRound( mRenderGridConfig.fontSize / 8. ) ) );
@@ -352,8 +351,12 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   if ( !layerEl.attribute( "labellingMode" ).isEmpty() )
   {
     // Compatibility
-    enum LabellingMode { LABEL_A_1, LABEL_1_A };
-    int labellingMode =  static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
+    enum LabellingMode
+    {
+      LABEL_A_1,
+      LABEL_1_A
+    };
+    int labellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
     if ( labellingMode == LABEL_A_1 )
     {
       mGridConfig.rowChar = 'A';
@@ -385,11 +388,11 @@ QList<KadasGuideGridLayer::IdentifyResult> KadasGuideGridLayer::identify( const 
   QgsLineString *ring = new QgsLineString();
   ring->setPoints(
     QgsPointSequence()
-    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - j * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
     << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
     << QgsPoint( mGridConfig.gridRect.xMinimum() + ( i + 1 ) * colWidth, mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
-    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
-    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth,     mGridConfig.gridRect.yMaximum() - j * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - ( j + 1 ) * rowHeight )
+    << QgsPoint( mGridConfig.gridRect.xMinimum() + i * colWidth, mGridConfig.gridRect.yMaximum() - j * rowHeight )
   );
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
@@ -442,8 +445,7 @@ bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument & /*docum
 
 void KadasGuideGridLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
-  {
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer] {
     mActionGuideGridTool->trigger();
   } );
 }

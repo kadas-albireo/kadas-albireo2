@@ -76,19 +76,19 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     struct State : KadasMapItem::State
     {
-      QList<KadasItemPos> p1;
-      QList<KadasItemPos> p2;
-      virtual void assign( const KadasMapItem::State *other );
-      virtual State *clone() const /Factory/;
-      virtual QJsonObject serialize() const;
+        QList<KadasItemPos> p1;
+        QList<KadasItemPos> p2;
+        virtual void assign( const KadasMapItem::State *other );
+        virtual State *clone() const /Factory/;
+        virtual QJsonObject serialize() const;
 
-      virtual bool deserialize( const QJsonObject &json );
+        virtual bool deserialize( const QJsonObject &json );
 
     };
     const State *constState() const;
 
   protected:
-    virtual State *createEmptyState() const;
+    virtual State *createEmptyState() const /Factory/;
     virtual void recomputeDerived();
 
     virtual void measureGeometry();

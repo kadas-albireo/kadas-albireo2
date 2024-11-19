@@ -57,19 +57,19 @@ class KadasMilxItem : KadasMapItem
 
     struct State : KadasMapItem::State
     {
-      QList<KadasItemPos> points;
-      QMap<int, double> attributes;
-      QMap<int, KadasItemPos> attributePoints;
-      QList<int> controlPoints;
-      QPoint userOffset;
-      int pressedPoints;
-      Margin margin;
+        QList<KadasItemPos> points;
+        QMap<int, double> attributes;
+        QMap<int, KadasItemPos> attributePoints;
+        QList<int> controlPoints;
+        QPoint userOffset;
+        int pressedPoints;
+        Margin margin;
 
-      virtual void assign( const KadasMapItem::State *other );
-      virtual State *clone() const /Factory/;
-      virtual QJsonObject serialize() const;
+        virtual void assign( const KadasMapItem::State *other );
+        virtual State *clone() const /Factory/;
+        virtual QJsonObject serialize() const;
 
-      virtual bool deserialize( const QJsonObject &json );
+        virtual bool deserialize( const QJsonObject &json );
 
     };
     virtual void setState( const KadasMapItem::State *state );
@@ -130,8 +130,8 @@ class KadasMilxItem : KadasMapItem
     static bool validateMssString( const QString &mssString, QString &adjustedMssString /Out/, QString &messages /Out/ );
 
   protected:
-    virtual KadasMapItem *_clone() const;
-    virtual KadasMilxItem::State *createEmptyState() const;
+    virtual KadasMapItem *_clone() const /Factory/;
+    virtual KadasMilxItem::State *createEmptyState() const /Factory/;
 
 };
 

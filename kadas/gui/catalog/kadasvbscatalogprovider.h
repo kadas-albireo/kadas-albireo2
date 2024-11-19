@@ -34,18 +34,18 @@ class KADAS_GUI_EXPORT KadasVBSCatalogProvider : public KadasCatalogProvider
   private:
     struct ResultEntry
     {
-      ResultEntry() {}
-      ResultEntry( const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, bool _flatten = false )
-        : category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), flatten( _flatten ) {}
-      ResultEntry( const ResultEntry &entry )
-        : category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ) {}
-      QString category;
-      QString title;
-      QString sortIndices;
-      QString metadataUrl;
-      bool flatten;
+        ResultEntry() {}
+        ResultEntry( const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, bool _flatten = false )
+          : category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), flatten( _flatten ) {}
+        ResultEntry( const ResultEntry &entry )
+          : category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ) {}
+        QString category;
+        QString title;
+        QString sortIndices;
+        QString metadataUrl;
+        bool flatten;
     };
-    typedef QMap< QString, ResultEntry > EntryMap;
+    typedef QMap<QString, ResultEntry> EntryMap;
 
     QString mBaseUrl;
     int mPendingTasks;

@@ -55,24 +55,24 @@ KadasMapItem.ContextMenuActions.__doc__ = """
 # --
 try:
     KadasMapPos.fromPoint = staticmethod(KadasMapPos.fromPoint)
-except NameError:
+except AttributeError:
     pass
 try:
     KadasItemPos.fromPoint = staticmethod(KadasItemPos.fromPoint)
-except NameError:
+except AttributeError:
     pass
 try:
     KadasMapItem.fromXml = staticmethod(KadasMapItem.fromXml)
     KadasMapItem.defaultNodeRenderer = staticmethod(KadasMapItem.defaultNodeRenderer)
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
-except NameError:
+except AttributeError:
     pass
 try:
     KadasMapItem.Margin.__doc__ = """Margin in screen units */"""
-except NameError:
+except AttributeError:
     pass
 try:
     KadasMapItem.Node.__doc__ = """Nodes for editing */"""
-except NameError:
+except AttributeError:
     pass

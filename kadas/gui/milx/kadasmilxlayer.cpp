@@ -44,7 +44,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
           continue;
         }
         mRenderSymbols.append( milxItem->toSymbol( renderContext()->mapToPixel(), renderContext()->coordinateTransform().destinationCrs(), !layer->mIsApproved ) );
-        mRenderItemData.append( {milxItem->constState()->userOffset, milxItem->isMultiPoint()} );
+        mRenderItemData.append( { milxItem->constState()->userOffset, milxItem->isMultiPoint() } );
         mSymSettings = layer->milxSymbolSettings();
         mRenderOpacity = layer->opacity();
       }
@@ -89,8 +89,8 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
   private:
     struct RenderItemData
     {
-      QPoint userOffset;
-      bool isMultiPoint;
+        QPoint userOffset;
+        bool isMultiPoint;
     };
     QList<KadasMilxClient::NPointSymbol> mRenderSymbols;
     QList<RenderItemData> mRenderItemData;
@@ -211,7 +211,7 @@ bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, 
 {
   setName( milxLayerEl.firstChildElement( "Name" ).text() );
   float symbolSize = milxLayerEl.firstChildElement( "SymbolSize" ).text().toFloat(); // This is in mm
-  symbolSize = ( symbolSize * dpi ) / 25.4; // mm to px
+  symbolSize = ( symbolSize * dpi ) / 25.4;                                          // mm to px
   QString crs = milxLayerEl.firstChildElement( "CoordSystemType" ).text();
   if ( crs.isEmpty() )
   {
@@ -265,8 +265,7 @@ void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *l
   if ( dynamic_cast<KadasMilxLayer *>( layer ) )
   {
     KadasMilxLayer *milxLayer = static_cast<KadasMilxLayer *>( layer );
-    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer]
-    {
+    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer] {
       milxLayer->setApproved( !milxLayer->isApproved() );
     } );
     action->setCheckable( true );

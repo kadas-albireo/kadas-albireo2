@@ -54,7 +54,13 @@ class KADAS_GUI_EXPORT KadasMapToolSelectRect : public QgsMapTool
 
     QgsRubberBand *mRubberband = nullptr;
     QgsRubberBand *mOldRubberband = nullptr;
-    enum {InteractionNone, InteractionMoving, InteractionResizing} mInteraction = InteractionNone;
+    enum
+    {
+      InteractionNone,
+      InteractionMoving,
+      InteractionResizing
+    } mInteraction
+      = InteractionNone;
 
     QList<QgsPointXY> mResizePoints;
     QList<std::function<void( const QgsPointXY )>> mResizeHandlers;

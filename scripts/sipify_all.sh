@@ -51,6 +51,10 @@ for module in "${modules[@]}"; do
   # clean auto_additions and auto_generated folders
   rm -rf python/kadas${module}/auto_additions/*.py
   rm -rf python/kadas${module}/auto_generated/*.py
+
+  mkdir -p python/kadas${module}/auto_additions
+  mkdir -p python/kadas${module}/auto_generated
+
   # put back __init__.py
   echo '"""
 This folder is completed using sipify.py script

@@ -54,7 +54,7 @@ int main( int argc, char *argv[] )
   QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, Kadas::configPath() );
 
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
-  QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );  
+  QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
   QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   // Delete any leftover wcs cache

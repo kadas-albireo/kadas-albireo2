@@ -137,7 +137,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       if ( mRenderBullseyeConfig.labelQuadrants )
       {
         const char firstLetter = 'F';
-        QList<char> labelChars = {firstLetter};
+        QList<char> labelChars = { firstLetter };
         for ( int iRing = 0; iRing < mRenderBullseyeConfig.rings; ++iRing )
         {
           double r = mRenderBullseyeConfig.interval * ( 0.5 + iRing ) * intervalUnit2meters;
@@ -263,7 +263,13 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
   if ( layerEl.hasAttribute( "labellingMode" ) )
   {
     // Backwards compatibility with KADAS-2.0
-    enum LabellingMode { NO_LABELS, LABEL_AXES, LABEL_RINGS, LABEL_AXES_RINGS };
+    enum LabellingMode
+    {
+      NO_LABELS,
+      LABEL_AXES,
+      LABEL_RINGS,
+      LABEL_AXES_RINGS
+    };
     LabellingMode labellingMode = static_cast<LabellingMode>( layerEl.attribute( "labellingMode" ).toInt() );
     mBullseyeConfig.labelAxes = labellingMode == LABEL_AXES || labellingMode == LABEL_AXES_RINGS;
     mBullseyeConfig.labelQuadrants = false;
@@ -305,8 +311,7 @@ bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &document,
 
 void KadasBullseyeLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer]
-  {
+  menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [this, layer] {
     mActionBullseyeTool->trigger();
   } );
 }

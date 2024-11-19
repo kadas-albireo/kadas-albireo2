@@ -323,7 +323,7 @@ void KadasMapToolEditItem::clearNumericInput()
   mInputWidget = nullptr;
 }
 
-void KadasMapToolEditItem::stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State */*prevState*/ )
+void KadasMapToolEditItem::stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State * /*prevState*/ )
 {
   mItem->setState( static_cast<const KadasMapItem::State *>( state ) );
 }
@@ -343,7 +343,6 @@ void KadasMapToolEditItem::inputChanged()
 {
   if ( mEditContext.isValid() )
   {
-
     KadasMapItem::AttribValues values = collectAttributeValues();
 
     // Ignore the move event emitted by re-positioning the mouse cursor:

@@ -79,7 +79,14 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7&SmoothPixmapTransform=1"
                       "&layers=%1&crs=%2&format=%3&tileMatrixSet=%4"
                       "&styles=%5&url=%6%7"
-                    ).arg( layerid ).arg( supportedCrs ).arg( imgFormat ).arg( tileMatrixSet ).arg( styleId ).arg( url ).arg( extraParams );
+  )
+                      .arg( layerid )
+                      .arg( supportedCrs )
+                      .arg( imgFormat )
+                      .arg( tileMatrixSet )
+                      .arg( styleId )
+                      .arg( url )
+                      .arg( extraParams );
   mimeDataUri.uri += "&tileDimensions=" + dimensionParams; // Add this last because it contains % (from %3D) which confuses .arg
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", layerInfoUrl );
@@ -89,9 +96,9 @@ QStringList KadasCatalogProvider::parseWMSFormats( const QDomDocument &doc ) con
 {
   QStringList formats;
   QDomElement getMapItem = doc.firstChildElement( "WMS_Capabilities" )
-                           .firstChildElement( "Capability" )
-                           .firstChildElement( "Request" )
-                           .firstChildElement( "GetMap" );
+                             .firstChildElement( "Capability" )
+                             .firstChildElement( "Request" )
+                             .firstChildElement( "GetMap" );
   for ( const QDomNode &formatItem : childrenByTagName( getMapItem, "Format" ) )
   {
     formats.append( formatItem.toElement().text() );
@@ -159,7 +166,12 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7"
                       "&IgnoreReportedLayerExtents=1&crs=%1&format=%2"
-                      "%3&url=%4" ).arg( supportedCrs[0] ).arg( imgFormat ).arg( subLayerParams ).arg( url );
+                      "%3&url=%4"
+  )
+                      .arg( supportedCrs[0] )
+                      .arg( imgFormat )
+                      .arg( subLayerParams )
+                      .arg( url );
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", layerInfoUrl );
   return true;
@@ -176,4 +188,3 @@ QStandardItem *KadasCatalogProvider::getCategoryItem( const QStringList &titles,
   }
   return cat;
 }
-

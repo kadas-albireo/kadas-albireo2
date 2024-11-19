@@ -50,10 +50,10 @@ class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 
-    QMap<QString, QPair<QString, int> > mCategoryMap;
+    QMap<QString, QPair<QString, int>> mCategoryMap;
     QRegExp mPatBox;
 
-    QString mPinItemId ;
+    QString mPinItemId;
     QString mGeometryItemId;
 };
 

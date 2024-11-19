@@ -47,7 +47,6 @@ class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, pri
     void itemDoubleClicked( QTreeWidgetItem *item, int column );
     void createProject();
     void parseServiceReply();
-
 };
 
 #endif // KADASPROJECTTEMPLATESELECTIONDIALOG_H

@@ -29,6 +29,7 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
     void load() override;
   private slots:
     void replyFinished();
+
   private:
     QString mBaseUrl;
 

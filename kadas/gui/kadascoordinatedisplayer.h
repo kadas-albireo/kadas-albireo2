@@ -41,7 +41,16 @@ class KADAS_GUI_EXPORT KadasCoordinateDisplayer : public QWidget
     QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
 
   private:
-    enum TargetFormat { LV03, LV95, DMS, DM, DD, UTM, MGRS };
+    enum TargetFormat
+    {
+      LV03,
+      LV95,
+      DMS,
+      DM,
+      DD,
+      UTM,
+      MGRS
+    };
     QgsMapCanvas *mMapCanvas;
     QToolButton *mCRSSelectionButton;
     QLineEdit *mCoordinateLineEdit;

@@ -65,12 +65,10 @@ Overridden mouse release event
 
 
 
-
     void pinchTriggered( QPinchGesture *gesture );
 %Docstring
 Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
 %End
-
 };
 
 /************************************************************************

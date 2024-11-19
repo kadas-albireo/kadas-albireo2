@@ -62,7 +62,7 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
 {
   // List queryable rasters
   typedef QPair<QString, QString> LayerUrlName; // <layerurl, layername>
-  QList< LayerUrlName > queryableLayers;
+  QList<LayerUrlName> queryableLayers;
   const auto layers = QgsProject::instance()->layers<QgsRasterLayer *>();
   for ( const QgsRasterLayer *rlayer : layers )
   {
@@ -114,7 +114,10 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
     QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
     QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
     spatialFilter = QString( "{\"spatialRel\": \"esriSpatialRelIntersects\", \"geometryType\": \"esriGeometryEnvelope\", \"geometry\": { \"xmin\": %1, \"ymin\": %2, \"xmax\": %3, \"ymax\": %4, \"spatialReference\": {\"wkid\": 4326}}}" )
-                    .arg( box.xMinimum(), 0, 'f', 4 ).arg( box.yMinimum(), 0, 'f', 4 ).arg( box.xMaximum(), 0, 'f', 4 ).arg( box.yMaximum(), 0, 'f', 4 );
+                      .arg( box.xMinimum(), 0, 'f', 4 )
+                      .arg( box.yMinimum(), 0, 'f', 4 )
+                      .arg( box.xMaximum(), 0, 'f', 4 )
+                      .arg( box.yMaximum(), 0, 'f', 4 );
   }
 
   for ( const LayerUrlName &ql : queryableLayers )
@@ -131,8 +134,7 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
     req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     connect( feedback, &QgsFeedback::canceled, reply, &QNetworkReply::abort );
-    connect( reply, &QNetworkReply::finished, this, [this, reply]()
-    {
+    connect( reply, &QNetworkReply::finished, this, [this, reply]() {
       if ( reply->error() == QNetworkReply::NoError )
       {
         QByteArray replyText = reply->readAll();
@@ -183,7 +185,8 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
                          QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
                          mMapCanvas->mapSettings().destinationCrs(),
                          QgsProject::instance()
-                       ).transform( pos );
+  )
+                         .transform( pos );
 
   mMapCanvas->setCenter( itemPos );
 
@@ -201,19 +204,19 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast< QgsPoint * >( geometry.get() );
+          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
           item = new QgsAnnotationMarkerItem( *pt );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast< QgsCurve * >( geometry.get() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
           item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast< QgsCurvePolygon * >( geometry.get() );
+          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
           item = new QgsAnnotationPolygonItem( poly );
           break;
         }

@@ -31,7 +31,6 @@
 #include <kml/kadaskmlintegration.h>
 
 
-
 KadasKmlIntegration::KadasKmlIntegration( QToolButton *kmlButton, QObject *parent )
   : mKMLButton( kmlButton )
 {

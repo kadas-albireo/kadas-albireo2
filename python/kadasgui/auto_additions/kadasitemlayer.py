@@ -42,10 +42,10 @@ KadasItemLayerRegistry.StandardLayer.__doc__ = """
 try:
     KadasItemLayer.layerType = staticmethod(KadasItemLayer.layerType)
     KadasItemLayer.__signal_arguments__ = {'itemAdded': ['itemId: KadasItemLayer.ItemId'], 'itemRemoved': ['itemId: KadasItemLayer.ItemId']}
-except NameError:
+except AttributeError:
     pass
 try:
     KadasItemLayerRegistry.getOrCreateItemLayer = staticmethod(KadasItemLayerRegistry.getOrCreateItemLayer)
     KadasItemLayerRegistry.init = staticmethod(KadasItemLayerRegistry.init)
-except NameError:
+except AttributeError:
     pass

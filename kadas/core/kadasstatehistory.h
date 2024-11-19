@@ -30,7 +30,7 @@ class KADAS_CORE_EXPORT KadasStateHistory : public QObject
   public:
     struct State
     {
-      virtual ~State() {}
+        virtual ~State() {}
     };
     enum class ChangeType : int
     {

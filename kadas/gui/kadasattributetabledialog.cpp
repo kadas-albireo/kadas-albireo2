@@ -52,7 +52,7 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   titleWidget->setLayout( new QHBoxLayout );
   titleWidget->layout()->setContentsMargins( 0, 0, 0, 0 );
   titleWidget->layout()->addWidget( new QLabel( tr( "Layer Attributes: %1" ).arg( layer->name() ) ) );
-  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 );   // spacer
+  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 ); // spacer
   titleWidget->layout()->addWidget( closeButton );
   setTitleBarWidget( titleWidget );
   resize( 800, 480 );
@@ -162,14 +162,14 @@ void KadasAttributeTableDialog::createFromXml( const QDomElement &element, QgsMa
   QRect geometry = QRect( x, y, w, h );
 
   QString layerId = element.attribute( QStringLiteral( "layer" ) );
-  QgsVectorLayer* layer = QgsProject::instance()->mapLayer<QgsVectorLayer*>( layerId );
+  QgsVectorLayer *layer = QgsProject::instance()->mapLayer<QgsVectorLayer *>( layerId );
 
   if ( !layer )
     return;
 
   Qt::DockWidgetArea area = qgsEnumKeyToValue<Qt::DockWidgetArea>( element.attribute( QStringLiteral( "area" ), qgsEnumValueToKey( Qt::NoDockWidgetArea ) ), Qt::NoDockWidgetArea );
 
-  KadasAttributeTableDialog* table = new KadasAttributeTableDialog( layer, canvas, messageBar, parent, area );
+  KadasAttributeTableDialog *table = new KadasAttributeTableDialog( layer, canvas, messageBar, parent, area );
   if ( area == Qt::DockWidgetArea::NoDockWidgetArea )
   {
     table->setGeometry( geometry );

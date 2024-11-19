@@ -39,13 +39,13 @@ class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget
     Q_OBJECT
 
   public:
-    static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(QStringLiteral("attribute-dock-location"), KadasSettingsTree::sTreeKadas, Qt::DockWidgetArea::NoDockWidgetArea ) SIP_SKIP;
+    static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>( QStringLiteral( "attribute-dock-location" ), KadasSettingsTree::sTreeKadas, Qt::DockWidgetArea::NoDockWidgetArea ) SIP_SKIP;
 
     KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = nullptr, Qt::DockWidgetArea area = Qt::DockWidgetArea::RightDockWidgetArea );
     ~KadasAttributeTableDialog();
 
     QDomElement writeXml( QDomDocument &document );
-    static void createFromXml(const QDomElement &element , QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent);
+    static void createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent );
 
   protected:
     void showEvent( QShowEvent *ev ) override;
@@ -53,9 +53,9 @@ class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget
   private:
     QgsMapCanvas *mCanvas = nullptr;
     QgsMessageBar *mMessageBar = nullptr;
-    QgsVectorLayer* mLayer = nullptr;
+    QgsVectorLayer *mLayer = nullptr;
     QgsVectorLayerSelectionManager *mFeatureSelectionManager = nullptr;
-    QMainWindow* mMainWindow = nullptr;
+    QMainWindow *mMainWindow = nullptr;
 
   private slots:
     void storeDockLocation( Qt::DockWidgetArea area );

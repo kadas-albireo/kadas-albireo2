@@ -40,7 +40,7 @@ class KadasMilxInterface : public KadasMapItemInterface
 {
   public:
     KadasMilxInterface() = default;
-    KadasMapItem* createItem() const override;
+    KadasMapItem *createItem() const override;
 };
 
 class KadasMilxDropHandler : public QgsCustomDropHandler
@@ -58,17 +58,17 @@ class KadasMilxIntegration : public QObject
   public:
     struct MilxUi
     {
-      QTabWidget *mRibbonWidget;
-      QWidget *mMssTab;
-      QAction *mActionMilx;
-      QAction *mActionSaveMilx;
-      QAction *mActionMilxKmlExport;
-      QAction *mActionLoadMilx;
-      QSlider *mSymbolSizeSlider;
-      QSlider *mLineWidthSlider;
-      QComboBox *mWorkModeCombo;
-      QSpinBox *mLeaderLineWidthSpin;
-      QgsColorButton *mLeaderLineColorButton;
+        QTabWidget *mRibbonWidget;
+        QWidget *mMssTab;
+        QAction *mActionMilx;
+        QAction *mActionSaveMilx;
+        QAction *mActionMilxKmlExport;
+        QAction *mActionLoadMilx;
+        QSlider *mSymbolSizeSlider;
+        QSlider *mLineWidthSlider;
+        QComboBox *mWorkModeCombo;
+        QSpinBox *mLeaderLineWidthSpin;
+        QgsColorButton *mLeaderLineColorButton;
     };
     KadasMilxIntegration( const MilxUi &ui, QObject *parent = nullptr );
     ~KadasMilxIntegration();

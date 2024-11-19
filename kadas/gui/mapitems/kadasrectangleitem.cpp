@@ -111,7 +111,7 @@ void KadasRectangleItem::setPosition( const KadasItemPos &pos )
   }
   if ( mGeometry )
   {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint & p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
+    mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
   }
   update();
 }
@@ -156,8 +156,8 @@ void KadasRectangleItem::endPart()
 KadasMapItem::AttribDefs KadasRectangleItem::drawAttribs() const
 {
   KadasMapItem::AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 

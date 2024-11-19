@@ -115,8 +115,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   rc.setExtent( fullExtent );
   rc.setMapExtent( fullExtent );
   rc.setScaleFactor( dpi / 25.4 );
-  rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(),
-                                   fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
+  rc.setMapToPixel( QgsMapToPixel( 1.0 / factor, fullExtent.center().x(), fullExtent.center().y(), fullExtent.width() * factor, fullExtent.height() * factor, 0 ) );
   rc.setCustomProperty( "kml", true );
 
   // Render layers
@@ -350,7 +349,6 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
   {
     for ( int ix = 0; ix < totPixels; ix += tileSize )
     {
-
       progress->setValue( tileCounter );
       QApplication::processEvents();
       if ( progress->wasCanceled() )
@@ -358,8 +356,7 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
         return;
       }
 
-      QgsRectangle tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution,
-                               renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
+      QgsRectangle tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution, renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
       if ( renderTile( image, tileExtent, mapLayer ) )
       {
         QString filename = QString( "%1_%2.png" ).arg( mapLayer->id() ).arg( tileCounter++ );
@@ -451,7 +448,10 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
     int fill = 1; // TODO?
 
     outStream << QString( "<LineStyle><color>%1</color><width>%2</width></LineStyle><PolyStyle><color>%3</color><fill>%4</fill></PolyStyle>" )
-              .arg( convertColor( outlineColor ) ).arg( width ).arg( convertColor( fillColor ) ).arg( fill );
+                   .arg( convertColor( outlineColor ) )
+                   .arg( width )
+                   .arg( convertColor( fillColor ) )
+                   .arg( fill );
   }
   outStream << "</Style>\n";
 }
@@ -459,8 +459,8 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
 QString KadasKMLExport::convertColor( const QColor &c )
 {
   return QString( "%1%2%3%4" )
-         .arg( c.alpha(), 2, 16, QChar( '0' ) )
-         .arg( c.blue(), 2, 16, QChar( '0' ) )
-         .arg( c.green(), 2, 16, QChar( '0' ) )
-         .arg( c.red(), 2, 16, QChar( '0' ) );
+    .arg( c.alpha(), 2, 16, QChar( '0' ) )
+    .arg( c.blue(), 2, 16, QChar( '0' ) )
+    .arg( c.green(), 2, 16, QChar( '0' ) )
+    .arg( c.red(), 2, 16, QChar( '0' ) );
 }

@@ -35,7 +35,8 @@ QJsonObject KadasAnchoredItem::State::serialize() const
   s.append( size.height() );
 
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );;
+  json["status"] = static_cast<int>( drawStatus );
+  ;
   json["pos"] = p;
   json["angle"] = angle;
   json["size"] = s;
@@ -95,10 +96,10 @@ KadasItemRect KadasAnchoredItem::boundingBox() const
 
 QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const
 {
-  double dx1 = - mAnchorX  * constState()->size.width() * mSymbolScale;
-  double dx2 = + ( 1. - mAnchorX ) * constState()->size.width() * mSymbolScale;
-  double dy1 = - ( 1. - mAnchorY ) * constState()->size.height() * mSymbolScale;
-  double dy2 = + mAnchorY * constState()->size.height() * mSymbolScale;
+  double dx1 = -mAnchorX * constState()->size.width() * mSymbolScale;
+  double dx2 = +( 1. - mAnchorX ) * constState()->size.width() * mSymbolScale;
+  double dy1 = -( 1. - mAnchorY ) * constState()->size.height() * mSymbolScale;
+  double dy2 = +mAnchorY * constState()->size.height() * mSymbolScale;
 
   KadasMapPos mapPos = toMapPos( position(), settings );
   double x = mapPos.x();
@@ -132,7 +133,7 @@ KadasMapItem::Margin KadasAnchoredItem::margin() const
   int iRight = std::ceil( std::max( std::max( p1.x(), p2.x() ), std::max( p3.x(), p4.x() ) ) );
   int iTop = std::floor( std::min( std::min( p1.y(), p2.y() ), std::min( p3.y(), p4.y() ) ) );
   int iBottom = std::ceil( std::max( std::max( p1.y(), p2.y() ), std::max( p3.y(), p4.y() ) ) );
-  return Margin{ -iLeft, -iTop, iRight, iBottom };
+  return Margin { -iLeft, -iTop, iRight, iBottom };
 }
 
 QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settings ) const
@@ -143,12 +144,12 @@ QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settin
     return nodes;
   }
   QList<KadasMapPos> points = rotatedCornerPoints( constState()->angle, settings );
-  nodes.append( {points[0]} );
-  nodes.append( {points[1]} );
-  nodes.append( {points[2]} );
-  nodes.append( {points[3]} );
-  nodes.append( {KadasMapPos( 0.5 * ( points[1].x() + points[2].x() ), 0.5 * ( points[1].y() + points[2].y() ) ), rotateNodeRenderer} );
-  nodes.append( {toMapPos( constState()->pos, settings ), anchorNodeRenderer} );
+  nodes.append( { points[0] } );
+  nodes.append( { points[1] } );
+  nodes.append( { points[2] } );
+  nodes.append( { points[3] } );
+  nodes.append( { KadasMapPos( 0.5 * ( points[1].x() + points[2].x() ), 0.5 * ( points[1].y() + points[2].y() ) ), rotateNodeRenderer } );
+  nodes.append( { toMapPos( constState()->pos, settings ), anchorNodeRenderer } );
   return nodes;
 }
 
@@ -165,12 +166,7 @@ bool KadasAnchoredItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -216,8 +212,8 @@ void KadasAnchoredItem::endPart()
 KadasMapItem::AttribDefs KadasAnchoredItem::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttribIds::AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttribIds::AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttribIds::AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttribIds::AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 
@@ -241,7 +237,7 @@ KadasMapItem::EditContext KadasAnchoredItem::getEditContext( const KadasMapPos &
   if ( pos.sqrDist( rotateHandlePos ) < pickTolSqr( mapSettings ) )
   {
     AttribDefs attributes;
-    attributes.insert( AttrA, NumericAttribute{QString( QChar( 0x03B1 ) ), NumericAttribute::Type::TypeAngle} );
+    attributes.insert( AttrA, NumericAttribute { QString( QChar( 0x03B1 ) ), NumericAttribute::Type::TypeAngle } );
     return EditContext( QgsVertexId( 0, 0, 1 ), rotateHandlePos, attributes );
   }
   if ( hitTest( pos, mapSettings ) )

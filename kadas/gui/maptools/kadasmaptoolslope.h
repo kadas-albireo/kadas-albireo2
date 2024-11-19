@@ -24,10 +24,12 @@
 class KADAS_GUI_EXPORT KadasMapToolSlopeItemInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem *createItem() const override;
+
   private:
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
 };
 
 class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem
@@ -39,7 +41,6 @@ class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasMapToolCreateItem
 
   private slots:
     void drawFinished();
-
 };
 
 #endif // KADASMAPTOOLSLOPE_H

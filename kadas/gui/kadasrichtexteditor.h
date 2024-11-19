@@ -125,8 +125,7 @@ class KADAS_GUI_EXPORT KadasRichTextEditorToolBar : public QToolBar
 {
     Q_OBJECT
   public:
-    KadasRichTextEditorToolBar( KadasRichTextEditor *editor,
-                                QWidget *parent = nullptr );
+    KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent = nullptr );
 
   public slots:
     void updateActions();

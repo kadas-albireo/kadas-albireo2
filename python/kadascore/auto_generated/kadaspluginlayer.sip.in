@@ -13,7 +13,7 @@
 
 
 
-class KadasPluginLayer : QgsPluginLayer
+class KadasPluginLayer : QgsPluginLayer /Abstract/
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -31,7 +31,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() );
-    virtual QString layerTypeKey() const = 0;
 
     virtual void setTransformContext( const QgsCoordinateTransformContext &ctx );
     virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;

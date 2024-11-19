@@ -68,23 +68,23 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     // State interface
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      QList<KadasItemPos> points;
+        QList<KadasItemPos> points;
 #ifndef SIP_RUN
-      QMap<KadasMilxAttrType, double> attributes;
-      QMap<KadasMilxAttrType, KadasItemPos> attributePoints;
+        QMap<KadasMilxAttrType, double> attributes;
+        QMap<KadasMilxAttrType, KadasItemPos> attributePoints;
 #else
-      QMap<int, double> attributes;
-      QMap<int, KadasItemPos> attributePoints;
+        QMap<int, double> attributes;
+        QMap<int, KadasItemPos> attributePoints;
 #endif
-      QList<int> controlPoints;
-      QPoint userOffset;
-      int pressedPoints = 0;
-      Margin margin;
+        QList<int> controlPoints;
+        QPoint userOffset;
+        int pressedPoints = 0;
+        Margin margin;
 
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     void setState( const KadasMapItem::State *state ) override;
     const State *constState() const { return static_cast<State *>( mState ); }
@@ -127,8 +127,8 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     static bool validateMssString( const QString &mssString, QString &adjustedMssString SIP_OUT, QString &messages SIP_OUT );
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasMilxItem(); } SIP_FACTORY
-    KadasMilxItem::State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasMilxItem(); }
+    KadasMilxItem::State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
     friend class KadasMilxLayer;
@@ -157,7 +157,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
 
     QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    QList< QPair<int, double> > computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
+    QList<QPair<int, double>> computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
     double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
     void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
@@ -167,7 +167,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     static void finalize( KadasMilxItem *item, bool isCorridor );
     static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
-
 };
 
 #endif // KADASMILXITEM_H

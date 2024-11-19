@@ -53,9 +53,7 @@ static inline bool filterElement( const QStringRef &name )
 }
 
 // Richtext simplification filter helpers: Filter attributes of elements
-static inline void filterAttributes( const QStringRef &name,
-                                     QXmlStreamAttributes *atts,
-                                     bool *paragraphAlignmentFound )
+static inline void filterAttributes( const QStringRef &name, QXmlStreamAttributes *atts, bool *paragraphAlignmentFound )
 {
   if ( atts->isEmpty() )
     return;
@@ -146,10 +144,7 @@ QString simplifyRichTextFilter( const QString &in, bool *isPlainTextPtr = nullpt
   return out;
 }
 
-static QAction *createCheckableAction( const QIcon &icon, const QString &text,
-                                       QObject *receiver, const char *slot,
-                                       KadasRichTextEditor *editor,
-                                       QObject *parent = nullptr )
+static QAction *createCheckableAction( const QIcon &icon, const QString &text, QObject *receiver, const char *slot, KadasRichTextEditor *editor, QObject *parent = nullptr )
 {
   QAction *result = new QAction( parent );
   result->setIcon( icon );
@@ -365,8 +360,8 @@ void KadasAddImageDialog::accept()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasColorAction::KadasColorAction( QObject *parent ):
-  QAction( parent )
+KadasColorAction::KadasColorAction( QObject *parent )
+  : QAction( parent )
 {
   setText( tr( "Text Color" ) );
   setColor( Qt::black );
@@ -399,13 +394,8 @@ void KadasColorAction::chooseColor()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent ) :
-  QToolBar( parent ),
-  m_link_action( new QAction( this ) ),
-  m_image_action( new QAction( this ) ),
-  m_color_action( new KadasColorAction( this ) ),
-  m_font_size_input( new QComboBox ),
-  m_editor( editor )
+KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent )
+  : QToolBar( parent ), m_link_action( new QAction( this ) ), m_image_action( new QAction( this ) ), m_color_action( new KadasColorAction( this ) ), m_font_size_input( new QComboBox ), m_editor( editor )
 {
   // Font size combo box
   m_font_size_input->setEditable( false );
@@ -413,13 +403,11 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   for ( int font_size : font_sizes )
     m_font_size_input->addItem( QString::number( font_size ) );
 
-  connect( m_font_size_input, &QComboBox::textActivated,
-           this, &KadasRichTextEditorToolBar::sizeInputActivated );
+  connect( m_font_size_input, &QComboBox::textActivated, this, &KadasRichTextEditorToolBar::sizeInputActivated );
   addWidget( m_font_size_input );
 
   // Text color button
-  connect( m_color_action, &KadasColorAction::colorChanged,
-           this, &KadasRichTextEditorToolBar::colorChanged );
+  connect( m_color_action, &KadasColorAction::colorChanged, this, &KadasRichTextEditorToolBar::colorChanged );
   addAction( m_color_action );
 
   addSeparator();
@@ -443,8 +431,7 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   // Left, center, right and justified alignment buttons
 
   QActionGroup *alignment_group = new QActionGroup( this );
-  connect( alignment_group, &QActionGroup::triggered,
-           this, &KadasRichTextEditorToolBar::alignmentActionTriggered );
+  connect( alignment_group, &QActionGroup::triggered, this, &KadasRichTextEditorToolBar::alignmentActionTriggered );
 
   m_align_left_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textleft" ), tr( "Left Align" ), editor, nullptr, editor, alignment_group );
   addAction( m_align_left_action );
@@ -527,8 +514,7 @@ void KadasRichTextEditorToolBar::sizeInputActivated( const QString &size )
 
 void KadasRichTextEditorToolBar::setVAlignSuper( bool super )
 {
-  const QTextCharFormat::VerticalAlignment align = super ?
-      QTextCharFormat::AlignSuperScript : QTextCharFormat::AlignNormal;
+  const QTextCharFormat::VerticalAlignment align = super ? QTextCharFormat::AlignSuperScript : QTextCharFormat::AlignNormal;
 
   QTextCharFormat charFormat = m_editor->currentCharFormat();
   charFormat.setVerticalAlignment( align );
@@ -539,8 +525,7 @@ void KadasRichTextEditorToolBar::setVAlignSuper( bool super )
 
 void KadasRichTextEditorToolBar::setVAlignSub( bool sub )
 {
-  const QTextCharFormat::VerticalAlignment align = sub ?
-      QTextCharFormat::AlignSubScript : QTextCharFormat::AlignNormal;
+  const QTextCharFormat::VerticalAlignment align = sub ? QTextCharFormat::AlignSubScript : QTextCharFormat::AlignNormal;
 
   QTextCharFormat charFormat = m_editor->currentCharFormat();
   charFormat.setVerticalAlignment( align );
@@ -573,8 +558,7 @@ void KadasRichTextEditorToolBar::updateActions()
   const QTextCursor cursor = m_editor->textCursor();
   const QTextCharFormat charFormat = cursor.charFormat();
   const QFont font = charFormat.font();
-  const QTextCharFormat::VerticalAlignment valign =
-    charFormat.verticalAlignment();
+  const QTextCharFormat::VerticalAlignment valign = charFormat.verticalAlignment();
   const bool superScript = valign == QTextCharFormat::AlignSuperScript;
   const bool subScript = valign == QTextCharFormat::AlignSubScript;
 
@@ -614,10 +598,8 @@ void KadasRichTextEditorToolBar::updateActions()
 KadasRichTextEditor::KadasRichTextEditor( QWidget *parent )
   : QTextEdit( parent )
 {
-  connect( this, &KadasRichTextEditor::currentCharFormatChanged,
-           this, &KadasRichTextEditor::stateChanged );
-  connect( this, &KadasRichTextEditor::cursorPositionChanged,
-           this, &KadasRichTextEditor::stateChanged );
+  connect( this, &KadasRichTextEditor::currentCharFormatChanged, this, &KadasRichTextEditor::stateChanged );
+  connect( this, &KadasRichTextEditor::cursorPositionChanged, this, &KadasRichTextEditor::stateChanged );
   connect( this->document(), &QTextDocument::contentsChange, this, &KadasRichTextEditor::contentsChange );
 }
 

@@ -138,7 +138,7 @@ void KadasMainWindow::init()
   statusBar()->addPermanentWidget( statusWidget, 0 );
 
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->enableAntiAliasing( QgsSettings().value( "/kadas/mapAntialiasing", true ).toBool() ) ;
+  mMapCanvas->enableAntiAliasing( QgsSettings().value( "/kadas/mapAntialiasing", true ).toBool() );
   mMapCanvas->enableMapTileRendering( QgsSettings().value( "/kadas/mapTileRendering", true ).toBool() );
   mMapCanvas->setMapUpdateInterval( QgsSettings().value( "/kadas/mapUpdateInterval", 500 ).toInt() );
   mMapCanvas->setCachingEnabled( QgsSettings().value( "kadas/enableRenderCaching", true ).toBool() );
@@ -183,13 +183,13 @@ void KadasMainWindow::init()
     int idx = mLanguageCombo->findData( userLocale.left( 2 ).toLower() );
     mLanguageCombo->setCurrentIndex( std::max( 0, idx ) );
   }
-  connect( mLanguageCombo, qOverload<int> ( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
+  connect( mLanguageCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMainWindow::onLanguageChanged );
 
   mCheckboxIgnoreSystemScaling->setChecked( QgsSettings().value( "/kadas/ignore_dpi_scale", false ).toBool() );
   connect( mCheckboxIgnoreSystemScaling, &QCheckBox::toggled, this, &KadasMainWindow::toggleIgnoreDpiScale );
 
   mSpinBoxDecimalPlaces->setValue( QgsSettings().value( "/kadas/measure_decimals", "2" ).toInt() );
-  connect( mSpinBoxDecimalPlaces, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
+  connect( mSpinBoxDecimalPlaces, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMainWindow::onDecimalPlacesChanged );
 
   mSnappingCheckbox->setChecked( QgsSettings().value( "/kadas/snapping_enabled", false ).toBool() );
   connect( mSnappingCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onSnappingChanged );
@@ -234,8 +234,7 @@ void KadasMainWindow::init()
   connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
   connect( mScaleLockButton, &QToolButton::toggled, this, &KadasMainWindow::toggleScaleLock );
   connect( mMagnifierSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
-  connect( mMapCanvas, &QgsMapCanvas::magnificationChanged, [this]( double value )
-  {
+  connect( mMapCanvas, &QgsMapCanvas::magnificationChanged, [this]( double value ) {
     mMagnifierSpinBox->blockSignals( true );
     mMagnifierSpinBox->setValue( value * 100 );
     mMagnifierSpinBox->blockSignals( false );
@@ -325,14 +324,14 @@ void KadasMainWindow::init()
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::checkOnTheFlyProjection );
   connect( mMapCanvas, &QgsMapCanvas::scaleChanged, this, &KadasMainWindow::showScale );
   connect( mMapCanvas, &QgsMapCanvas::mapToolSet, this, &KadasMainWindow::switchToTabForTool );
-  connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, qOverload<> ( &QTimer::start ) );
+  connect( mMapCanvas, &QgsMapCanvas::renderStarting, &mLoadingTimer, qOverload<>( &QTimer::start ) );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( mMapCanvas, &QgsMapCanvas::currentLayerChanged, mLayerTreeView, &QgsLayerTreeView::setCurrentLayer );
   connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
-  connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mMapCanvas->unsetMapTool( mMapCanvas->mapTool() ); } );   // Clear tool when changing active kadas tab
+  connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mMapCanvas->unsetMapTool( mMapCanvas->mapTool() ); } ); // Clear tool when changing active kadas tab
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
   connect( mZoomOutButton, &QPushButton::clicked, this, &KadasMainWindow::zoomOut );
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
@@ -532,7 +531,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
   if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) )
   {
     QString actionName = QString::fromLocal8Bit( event->mimeData()->data( "application/qgis-kadas-button" ).data() );
-    QAction *action = findChild<QAction *> ( actionName );
+    QAction *action = findChild<QAction *>( actionName );
     if ( !action )
     {
       action = mAddedActions.value( actionName, nullptr );
@@ -562,17 +561,16 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
     {
       mapItemFormats.insert( QString( "%1" ).arg( QString( format ).toLower() ) );
     }
-    mapItemFormats.insert( ".svg" );  // Ensure svg is present
+    mapItemFormats.insert( ".svg" ); // Ensure svg is present
     mapItemFormats.remove( ".tif" ); // Remove tif to ensure it is opened as raster layer
 
-    static QMap<QString, QString> worldFileSuffixes =
-    {
-      {"gif", "gfw"},
-      {"jpg", "jgw"},
-      {"jp2", "j2w"},
-      {"png", "pgw"},
-      {"tif", "tfw"},
-      {"tiff", "tfw"}
+    static QMap<QString, QString> worldFileSuffixes = {
+      { "gif", "gfw" },
+      { "jpg", "jgw" },
+      { "jp2", "j2w" },
+      { "png", "pgw" },
+      { "tif", "tfw" },
+      { "tiff", "tfw" }
     };
 
     for ( const QUrl &url : event->mimeData()->urls() )
@@ -646,7 +644,7 @@ void KadasMainWindow::restoreFavoriteButton( QToolButton *button )
     return;
   }
 
-  QAction *action = findChild<QAction *> ( actionName );
+  QAction *action = findChild<QAction *>( actionName );
   if ( action )
   {
     setActionToButton( action, button );
@@ -692,7 +690,7 @@ void KadasMainWindow::configureButtons()
   mBookmarksButton->setPopupMode( QToolButton::InstantPopup );
 
   setActionToButton( mActionNewMapWindow, mNewMapWindowButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_N ) );
-  connect( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, qOverload<> ( &KadasMapWidgetManager::addMapWidget ) );
+  connect( mActionNewMapWindow, &QAction::triggered, mMapWidgetManager, qOverload<>( &KadasMapWidgetManager::addMapWidget ) );
 
   setActionToButton( mAction3D, m3DButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
   // signal connected by plugin
@@ -770,7 +768,7 @@ void KadasMainWindow::configureButtons()
   }
 }
 
-void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut, const std::function<QgsMapTool*() > &toolFactory )
+void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut, const std::function<QgsMapTool *()> &toolFactory )
 {
   button->setDefaultAction( action );
   button->setIconSize( QSize( 32, 32 ) );
@@ -779,8 +777,7 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
     button->setCheckable( action->isCheckable() );
     if ( button->isCheckable() )
     {
-      connect( action, &QAction::toggled, this, [this, toolFactory, action]( bool active )
-      {
+      connect( action, &QAction::toggled, this, [this, toolFactory, action]( bool active ) {
         if ( active )
         {
           mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
@@ -803,8 +800,7 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
     }
     else
     {
-      connect( action, &QAction::triggered, this, [this, toolFactory]
-      {
+      connect( action, &QAction::triggered, this, [this, toolFactory] {
         mMapCanvas->setMapTool( toolFactory() );
       } );
     }
@@ -973,8 +969,8 @@ void KadasMainWindow::checkOnTheFlyProjection()
   }
   if ( !reprojLayers.isEmpty() )
   {
-//    mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
-//    mInfoBar->pushItem( mReprojMsgItem.data() );
+    //    mReprojMsgItem = new QgsMessageBarItem( tr( "On the fly projection enabled" ), tr( "The following layers are being reprojected to the selected CRS: %1. Performance may suffer." ).arg( reprojLayers.join( ", " ) ), Qgis::Info, 10, this );
+    //    mInfoBar->pushItem( mReprojMsgItem.data() );
   }
 }
 
@@ -1035,11 +1031,11 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   dialog->setAttribute( Qt::WA_DeleteOnClose );
   QString sourceProvider = provider->providerKey();
   // TODO
-//  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
-//  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
+  //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
+  //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString &uri, const QString &baseName, const QString &providerKey ) { kApp->addRasterLayer( uri, baseName, providerKey ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [ = ]( const QString &uri, const QString &layerName, const QString &providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [=]( const QString &uri, const QString &layerName, const QString &providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString &url, const QString &baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
@@ -1085,7 +1081,7 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
       {
         for ( int i = 0, n = mRibbonWidget->count(); i < n; ++i )
         {
-          if ( mRibbonWidget->widget( i )->findChild<QWidget *> ( widget->objectName() ) )
+          if ( mRibbonWidget->widget( i )->findChild<QWidget *>( widget->objectName() ) )
           {
             mRibbonWidget->blockSignals( true );
             mRibbonWidget->setCurrentIndex( i );
@@ -1150,7 +1146,7 @@ void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )
 
 void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
 {
-  KadasRibbonButton *button = qobject_cast<KadasRibbonButton *> ( QObject::sender() );
+  KadasRibbonButton *button = qobject_cast<KadasRibbonButton *>( QObject::sender() );
   QMenu menu;
   QAction *removeAction = menu.addAction( tr( "Remove" ) );
   if ( menu.exec( button->mapToGlobal( pos ) ) == removeAction )
@@ -1218,12 +1214,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   {
     struct Entry
     {
-      int id;
-      QString name;
-      int parentId;
-      bool leaf;
-      QgsLayerTreeGroup *group;
-      int order;
+        int id;
+        QString name;
+        int parentId;
+        bool leaf;
+        QgsLayerTreeGroup *group;
+        int order;
     };
     QMap<int, Entry *> entries;
 
@@ -1244,7 +1240,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       {
         entries[parentId]->leaf = false;
       }
-      entries[id] = new Entry{id, name, parentId, true, nullptr, order++};
+      entries[id] = new Entry { id, name, parentId, true, nullptr, order++ };
     }
     QList<Entry *> sortedEntries = entries.values();
     std::sort( sortedEntries.begin(), sortedEntries.end(), []( const Entry *a, const Entry *b ) { return a->order < b->order; } );
@@ -1308,7 +1304,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
-  Q_UNUSED( canvasItem );  //item is already added automatically to canvas scene
+  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
 }
 
 void KadasMainWindow::removeMapCanvasItem( const KadasMapItem *item )
@@ -1331,9 +1327,9 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     QgsMessageBarItem *item = new QgsMessageBarItem(
       tr( "Unknown layer projection" ),
       tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ),
-      btn, Qgis::Warning, messageTimeout() );
-    connect( btn, &QPushButton::clicked, [ = ]
-    {
+      btn, Qgis::Warning, messageTimeout()
+    );
+    connect( btn, &QPushButton::clicked, [=] {
       mInfoBar->popWidget( item );
       kApp->showLayerProperties( layer );
     } );
@@ -1363,7 +1359,7 @@ void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
   layer->temporalProperties()->setIsActive( true );
 }
 
-void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex &/*index*/ )
+void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex & /*index*/ )
 {
   QgsMapLayer *layer = mLayerTreeView->currentLayer();
   if ( layer )
@@ -1379,7 +1375,7 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  return new KadasMapToolCreateItem( mapCanvas(), std::move( std::make_unique<KadasSymbolAttributesEditorInterface>(  KadasSymbolAttributesEditorInterface() ) ), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
+  return new KadasMapToolCreateItem( mapCanvas(), std::move( std::make_unique<KadasSymbolAttributesEditorInterface>( KadasSymbolAttributesEditorInterface() ) ), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
 }
 
 void KadasMainWindow::addLocalPicture()
@@ -1390,7 +1386,7 @@ void KadasMainWindow::addLocalPicture()
   {
     formats.insert( QString( "*.%1" ).arg( QString( format ).toLower() ) );
   }
-  formats.insert( "*.svg" );  // Ensure svg is present
+  formats.insert( "*.svg" ); // Ensure svg is present
 
   QString filter = QString( "Images (%1)" ).arg( QStringList( formats.values() ).join( " " ) );
   QString filename = QFileDialog::getOpenFileName( this, tr( "Select Image" ), lastDir, filter );
@@ -1569,4 +1565,3 @@ void KadasMainWindow::toggleIgnoreDpiScale()
   QMessageBox::information( this, tr( "Font scaling setting changed" ), tr( "The font scaling change will be applied at the next program launch." ) );
   QgsSettings().setValue( "/kadas/ignore_dpi_scale", mCheckboxIgnoreSystemScaling->isChecked() );
 }
-

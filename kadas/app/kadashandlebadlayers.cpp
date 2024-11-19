@@ -170,7 +170,7 @@ void KadasHandleBadLayers::accept()
   for ( int i = 0; i < mLayerList->rowCount(); i++ )
   {
     int idx = mLayerList->item( i, 0 )->data( LayerIndexRole ).toInt();
-    QDomNode &node = const_cast<QDomNode &>( mLayers[ idx ] );
+    QDomNode &node = const_cast<QDomNode &>( mLayers[idx] );
 
     QString name = mLayerList->item( i, 0 )->text();
     QString datasource = mLayerList->item( i, 2 )->text();
@@ -185,7 +185,7 @@ void KadasHandleBadLayers::accept()
       QgsDataProvider::ProviderOptions options;
       QString path = QgsProject::instance()->pathResolver().readPath( datasource );
       layer->setDataSource( path, name, provider, options );
-      dataSourceFixed  = layer->isValid();
+      dataSourceFixed = layer->isValid();
       if ( dataSourceFixed )
       {
         QString errorMsg;
@@ -194,10 +194,7 @@ void KadasHandleBadLayers::accept()
         context.setProjectTranslator( QgsProject::instance() );
         if ( !layer->readSymbology( node, errorMsg, context ) )
         {
-          QgsDebugMsgLevel( QStringLiteral( "Failed to restore original layer style from node XML for layer %1: %2" )
-                       .arg( layer->name( ) )
-                       .arg( errorMsg ),
-                       2 );
+          QgsDebugMsgLevel( QStringLiteral( "Failed to restore original layer style from node XML for layer %1: %2" ).arg( layer->name() ).arg( errorMsg ), 2 );
         }
         mLayerList->removeRow( i-- );
       }

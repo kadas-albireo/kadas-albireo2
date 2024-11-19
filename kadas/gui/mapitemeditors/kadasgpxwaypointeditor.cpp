@@ -29,7 +29,7 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
 
   mUi.mSpinBoxSize->setRange( 1, 100 );
   mUi.mSpinBoxSize->setValue( QgsSettings().value( "/gpx/waypoint_size", 2 ).toInt() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::saveSize );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGpxWaypointEditor::saveSize );
 
   mUi.mToolButtonColor->setAllowOpacity( true );
   mUi.mToolButtonColor->setShowNoColor( true );
@@ -39,7 +39,6 @@ KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   connect( mUi.mToolButtonColor, &QgsColorButton::colorChanged, this, &KadasGpxWaypointEditor::saveColor );
 
   connect( this, &KadasGpxWaypointEditor::styleChanged, this, &KadasGpxWaypointEditor::syncWidgetToItem );
-
 }
 
 void KadasGpxWaypointEditor::syncItemToWidget()
@@ -86,7 +85,7 @@ void KadasGpxWaypointEditor::syncWidgetToItem()
 
 void KadasGpxWaypointEditor::saveColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *> ( QObject::sender() );
+  QgsColorButton *btn = qobject_cast<QgsColorButton *>( QObject::sender() );
   QgsSettings().setValue( "/gpx/waypoint_color", QgsSymbolLayerUtils::encodeColor( btn->color() ) );
   emit styleChanged();
 }

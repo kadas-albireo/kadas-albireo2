@@ -29,7 +29,7 @@
 
 
 KadasLayerSelectionWidget::KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, LayerFilter filter, LayerCreator creator, QWidget *parent )
-  : QWidget( parent ),  mCanvas( canvas ), mLayerTreeView( layerTreeView ), mFilter( filter ), mCreator( creator )
+  : QWidget( parent ), mCanvas( canvas ), mLayerTreeView( layerTreeView ), mFilter( filter ), mCreator( creator )
 {
   setLayout( new QHBoxLayout() );
   layout()->setSpacing( 2 );

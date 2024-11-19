@@ -100,7 +100,6 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
   QDomNodeList placemarkEls = documentEl.elementsByTagName( "Placemark" );
   if ( !placemarkEls.isEmpty() )
   {
-
     // Styles / StyleMaps with id
     QMap<QString, StyleData> styleMap;
     QDomNodeList styleEls = documentEl.elementsByTagName( "Style" );
@@ -167,7 +166,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       if ( geoms.isEmpty() )
       {
         // Placemark without geometry
-        QgsDebugMsgLevel( "Could not parse placemark geometry" , 2 );
+        QgsDebugMsgLevel( "Could not parse placemark geometry", 2 );
         continue;
       }
 
@@ -370,7 +369,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   {
     int i = qRound( ( tile.bbox.xMinimum() - overlayData.bbox.xMinimum() ) / overlayData.bbox.width() * totSize.width() );
     int j = qRound( ( overlayData.bbox.yMaximum() - tile.bbox.yMaximum() ) / overlayData.bbox.height() * totSize.height() );
-    rects.append( {i, j, i + tile.size.width(), j + tile.size.height(), &tile} );
+    rects.append( { i, j, i + tile.size.width(), j + tile.size.height(), &tile } );
   }
 
   const QList<KadasAlgorithms::Cluster> clusters = KadasAlgorithms::overlappingRects( rects );
@@ -441,7 +440,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << Qt::endl;
   vrtStream << " </GeoTransform>" << Qt::endl;
 
-  for ( const QPair<int, QString> &band : QList<QPair<int, QString>> {qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) )} )
+  for ( const QPair<int, QString> &band : QList<QPair<int, QString>> { qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) ) } )
   {
     vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << Qt::endl;
     vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << Qt::endl;

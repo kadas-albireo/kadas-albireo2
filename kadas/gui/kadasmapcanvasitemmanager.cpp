@@ -36,12 +36,12 @@ void KadasMapCanvasItemManager::addItem( KadasMapItem *item )
 {
   instance()->mMapItems.append( item );
   connect( item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed );
-  emit instance()->itemAdded( item );
+  emit instance() -> itemAdded( item );
 }
 
 void KadasMapCanvasItemManager::removeItem( KadasMapItem *item )
 {
-  emit instance()->itemWillBeRemoved( item );
+  emit instance() -> itemWillBeRemoved( item );
   instance()->mMapItems.removeAll( item );
 }
 
@@ -72,7 +72,7 @@ void KadasMapCanvasItemManager::clear()
 
 void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
 {
-  KadasMapItem *item = qobject_cast<KadasMapItem *> ( QObject::sender() );
+  KadasMapItem *item = qobject_cast<KadasMapItem *>( QObject::sender() );
   if ( item )
   {
     removeItem( item );

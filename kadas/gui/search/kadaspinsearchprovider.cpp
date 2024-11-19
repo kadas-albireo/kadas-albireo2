@@ -37,7 +37,7 @@ QgsLocatorFilter *KadasPinSearchProvider::clone() const
 
 void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
-  const QList<QgsMapLayer*> layers = mMapCanvas->layers();
+  const QList<QgsMapLayer *> layers = mMapCanvas->layers();
   for ( QgsMapLayer *layer : layers )
   {
     KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer );
@@ -52,8 +52,7 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
       {
         continue;
       }
-      if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) ||
-           symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
+      if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) || symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
       {
         QgsLocatorResult result;
         QVariantMap resultData;
@@ -80,7 +79,8 @@ void KadasPinSearchProvider::triggerResult( const QgsLocatorResult &result )
                          QgsCoordinateReferenceSystem( crsIs ),
                          mMapCanvas->mapSettings().destinationCrs(),
                          QgsProject::instance()
-                       ).transform( pos );
+  )
+                         .transform( pos );
 
   mMapCanvas->setCenter( itemPos );
 }

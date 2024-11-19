@@ -9,7 +9,6 @@
 
 
 
-
 class KadasMapItemInterface
 {
 %Docstring(signature="appended")
@@ -24,7 +23,7 @@ An interface for map items creation
 
     virtual ~KadasMapItemInterface();
 
-    virtual KadasMapItem* createItem() const = 0;
+    virtual KadasMapItem *createItem() const = 0;
 };
 
 /************************************************************************

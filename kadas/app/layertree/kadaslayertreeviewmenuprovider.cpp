@@ -34,8 +34,8 @@
 #include "kadasmainwindow.h"
 #include "kadasmapswipetool.h"
 
-KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view ) :
-  mView( view )
+KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view )
+  : mView( view )
 {
 }
 
@@ -104,8 +104,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       }
       else if ( layer->type() == Qgis::LayerType::Vector )
       {
-        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ),
-                         this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ), this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
       }
       // For gdi layers, also add info icon
       if ( layer->providerType() == "wms" || layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )
@@ -179,7 +178,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerRefreshRate( QMenu *parent )
   refreshRateLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
   refreshRateLayout->addWidget( refreshRateLabel );
 
-  QSpinBox *refreshRateSpin = new QSpinBox( );
+  QSpinBox *refreshRateSpin = new QSpinBox();
   refreshRateSpin->setRange( 0, 1000000 );
   refreshRateSpin->setSuffix( " s" );
   refreshRateSpin->setValue( kApp->layerRefreshManager()->layerRefreshInterval( mView->currentLayer()->id() ) );

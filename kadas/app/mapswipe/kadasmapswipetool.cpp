@@ -28,16 +28,16 @@
 #include "kadasmainwindow.h"
 
 
-void KadasMapSwipeMapTool::addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas *canvas , QMenu *menu, QObject *parent )
+void KadasMapSwipeMapTool::addContextMenuAction( QgsMapLayer *layer, QgsMapCanvas *canvas, QMenu *menu, QObject *parent )
 {
   QIcon icon = QgsApplication::getThemeIcon( "/mIconSwipe.svg" );
-  KadasMapSwipeMapTool* tool = qobject_cast<KadasMapSwipeMapTool*>( canvas->mapTool() );
+  KadasMapSwipeMapTool *tool = qobject_cast<KadasMapSwipeMapTool *>( canvas->mapTool() );
 
   if ( !tool )
   {
-    auto lambda = [canvas, layer] (){
+    auto lambda = [canvas, layer]() {
       KadasMapSwipeMapTool *tool = new KadasMapSwipeMapTool( canvas );
-      tool->addLayers( {layer} );
+      tool->addLayers( { layer } );
       canvas->setMapTool( tool );
     };
     menu->addAction( icon, tr( "&Compare with Swipe Tool" ), parent, lambda );
@@ -46,8 +46,8 @@ void KadasMapSwipeMapTool::addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas
   {
     if ( tool->mLayers.contains( layer ) )
     {
-      auto lambda = [tool, canvas, layer] (){
-        tool->removeLayers( {layer} );
+      auto lambda = [tool, canvas, layer]() {
+        tool->removeLayers( { layer } );
         if ( tool->mLayers.isEmpty() )
           canvas->unsetMapTool( tool );
       };
@@ -55,8 +55,8 @@ void KadasMapSwipeMapTool::addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas
     }
     else
     {
-      auto lambda = [tool, canvas, layer] (){
-        tool->addLayers( {layer} );
+      auto lambda = [tool, canvas, layer]() {
+        tool->addLayers( { layer } );
       };
       menu->addAction( icon, tr( "&Add to Comparison with Swipe Tool" ), parent, lambda );
     }
@@ -65,9 +65,9 @@ void KadasMapSwipeMapTool::addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas
 
 KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
-  , mMapCanvasItem( new KadasMapSwipeCanvasItem(mapCanvas) )
+  , mMapCanvasItem( new KadasMapSwipeCanvasItem( mapCanvas ) )
 {
-  connect(QgsProject::instance(), qOverload<const QList< QgsMapLayer * > & >( &QgsProject::layersWillBeRemoved ), this, [=]( const QList<QgsMapLayer *> &layers ){
+  connect( QgsProject::instance(), qOverload<const QList<QgsMapLayer *> &>( &QgsProject::layersWillBeRemoved ), this, [=]( const QList<QgsMapLayer *> &layers ) {
     for ( QgsMapLayer *layer : layers )
       mLayers.remove( layer );
     mMapCanvasItem->setLayers( mLayers );
@@ -75,7 +75,7 @@ KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
     {
       deactivate();
     }
-  });
+  } );
 }
 
 KadasMapSwipeMapTool::~KadasMapSwipeMapTool()
@@ -154,8 +154,8 @@ void KadasMapSwipeMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
       bool isVertical = dX > dY;
       mMapCanvasItem->setVertical( isVertical );
       canvas()->setCursor( isVertical ? mCursorH : mCursorV );
-      if ( dX*dX + dY*dY  > 50 )
-          mDirectionDefined = true;
+      if ( dX * dX + dY * dY > 50 )
+        mDirectionDefined = true;
     }
     mMapCanvasItem->setPixelPosition( e->x(), e->y() );
   }
@@ -182,7 +182,7 @@ void KadasMapSwipeMapTool::updateMessageBar()
     return;
 
   QStringList layerNames;
-  std::transform( mLayers.constBegin(), mLayers.constEnd(), std::back_inserter( layerNames ), []( const auto & layer ){ return layer->name(); } );
-  mMessageBarItem = messageBar->createMessage( tr("Swipe Tool" ), tr( "Comparing Layers %1" ).arg(layerNames.join( QStringLiteral( ", " ) ) ) );
+  std::transform( mLayers.constBegin(), mLayers.constEnd(), std::back_inserter( layerNames ), []( const auto &layer ) { return layer->name(); } );
+  mMessageBarItem = messageBar->createMessage( tr( "Swipe Tool" ), tr( "Comparing Layers %1" ).arg( layerNames.join( QStringLiteral( ", " ) ) ) );
   messageBar->pushItem( mMessageBarItem );
 }

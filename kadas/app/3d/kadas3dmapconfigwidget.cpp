@@ -50,7 +50,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   const QgsSettings settings;
 
   const int iconSize = QgsGuiUtils::scaleIconSize( 20 );
-  m3DOptionsListWidget->setIconSize( QSize( iconSize, iconSize ) ) ;
+  m3DOptionsListWidget->setIconSize( QSize( iconSize, iconSize ) );
 
   mCameraNavigationModeCombo->addItem( tr( "Terrain Based" ), QVariant::fromValue( Qgis::NavigationMode::TerrainBased ) );
   mCameraNavigationModeCombo->addItem( tr( "Walk Mode (First Person)" ), QVariant::fromValue( Qgis::NavigationMode::Walk ) );
@@ -58,7 +58,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   // get rid of annoying outer focus rect on Mac
   m3DOptionsListWidget->setAttribute( Qt::WA_MacShowFocusRect, false );
   m3DOptionsListWidget->setCurrentRow( settings.value( QStringLiteral( "Windows/3DMapConfig/Tab" ), 0 ).toInt() );
-  connect( m3DOptionsListWidget, &QListWidget::currentRowChanged, this, [ = ]( int index ) { m3DOptionsStackedWidget->setCurrentIndex( index ); } );
+  connect( m3DOptionsListWidget, &QListWidget::currentRowChanged, this, [=]( int index ) { m3DOptionsStackedWidget->setCurrentIndex( index ); } );
   m3DOptionsStackedWidget->setCurrentIndex( m3DOptionsListWidget->currentRow() );
 
   if ( !settings.contains( QStringLiteral( "Windows/3DMapConfig/OptionsSplitState" ) ) )
@@ -75,8 +75,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
 
   cboCameraProjectionType->addItem( tr( "Perspective Projection" ), Qt3DRender::QCameraLens::PerspectiveProjection );
   cboCameraProjectionType->addItem( tr( "Orthogonal Projection" ), Qt3DRender::QCameraLens::OrthographicProjection );
-  connect( cboCameraProjectionType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, [ = ]()
-  {
+  connect( cboCameraProjectionType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, [=]() {
     spinCameraFieldOfView->setEnabled( cboCameraProjectionType->currentIndex() == cboCameraProjectionType->findData( Qt3DRender::QCameraLens::PerspectiveProjection ) );
   } );
 
@@ -203,16 +202,16 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
 
   // ==================
   // Page: 3D axis
-  mCbo3dAxisType->addItem( tr( "Coordinate Reference System" ), static_cast< int >( Qgs3DAxisSettings::Mode::Crs ) );
-  mCbo3dAxisType->addItem( tr( "Cube" ), static_cast< int >( Qgs3DAxisSettings::Mode::Cube ) );
+  mCbo3dAxisType->addItem( tr( "Coordinate Reference System" ), static_cast<int>( Qgs3DAxisSettings::Mode::Crs ) );
+  mCbo3dAxisType->addItem( tr( "Cube" ), static_cast<int>( Qgs3DAxisSettings::Mode::Cube ) );
 
-  mCbo3dAxisHorizPos->addItem( tr( "Left" ), static_cast< int >( Qt::AnchorPoint::AnchorLeft ) );
-  mCbo3dAxisHorizPos->addItem( tr( "Center" ), static_cast< int >( Qt::AnchorPoint::AnchorHorizontalCenter ) );
-  mCbo3dAxisHorizPos->addItem( tr( "Right" ), static_cast< int >( Qt::AnchorPoint::AnchorRight ) );
+  mCbo3dAxisHorizPos->addItem( tr( "Left" ), static_cast<int>( Qt::AnchorPoint::AnchorLeft ) );
+  mCbo3dAxisHorizPos->addItem( tr( "Center" ), static_cast<int>( Qt::AnchorPoint::AnchorHorizontalCenter ) );
+  mCbo3dAxisHorizPos->addItem( tr( "Right" ), static_cast<int>( Qt::AnchorPoint::AnchorRight ) );
 
-  mCbo3dAxisVertPos->addItem( tr( "Top" ), static_cast< int >( Qt::AnchorPoint::AnchorTop ) );
-  mCbo3dAxisVertPos->addItem( tr( "Middle" ), static_cast< int >( Qt::AnchorPoint::AnchorVerticalCenter ) );
-  mCbo3dAxisVertPos->addItem( tr( "Bottom" ), static_cast< int >( Qt::AnchorPoint::AnchorBottom ) );
+  mCbo3dAxisVertPos->addItem( tr( "Top" ), static_cast<int>( Qt::AnchorPoint::AnchorTop ) );
+  mCbo3dAxisVertPos->addItem( tr( "Middle" ), static_cast<int>( Qt::AnchorPoint::AnchorVerticalCenter ) );
+  mCbo3dAxisVertPos->addItem( tr( "Bottom" ), static_cast<int>( Qt::AnchorPoint::AnchorBottom ) );
 
   init3DAxisPage();
 
@@ -301,9 +300,7 @@ void Kadas3DMapConfigWidget::apply()
       {
         // if we already have a DEM terrain generator, check whether there was actually any change
         QgsDemTerrainGenerator *oldDemTerrainGen = static_cast<QgsDemTerrainGenerator *>( mMap->terrainGenerator() );
-        if ( oldDemTerrainGen->layer() == demLayer &&
-             oldDemTerrainGen->resolution() == spinTerrainResolution->value() &&
-             oldDemTerrainGen->skirtHeight() == spinTerrainSkirtHeight->value() )
+        if ( oldDemTerrainGen->layer() == demLayer && oldDemTerrainGen->resolution() == spinTerrainResolution->value() && oldDemTerrainGen->skirtHeight() == spinTerrainSkirtHeight->value() )
           tGenNeedsUpdate = false;
       }
 
@@ -324,8 +321,7 @@ void Kadas3DMapConfigWidget::apply()
       if ( mMap->terrainGenerator()->type() == QgsTerrainGenerator::Online )
       {
         QgsOnlineTerrainGenerator *oldOnlineTerrainGen = static_cast<QgsOnlineTerrainGenerator *>( mMap->terrainGenerator() );
-        if ( oldOnlineTerrainGen->resolution() == spinTerrainResolution->value() &&
-             oldOnlineTerrainGen->skirtHeight() == spinTerrainSkirtHeight->value() )
+        if ( oldOnlineTerrainGen->resolution() == spinTerrainResolution->value() && oldOnlineTerrainGen->skirtHeight() == spinTerrainSkirtHeight->value() )
           tGenNeedsUpdate = false;
       }
 
@@ -345,7 +341,7 @@ void Kadas3DMapConfigWidget::apply()
       QgsMeshTerrainGenerator *newTerrainGenerator = new QgsMeshTerrainGenerator;
       newTerrainGenerator->setCrs( mMap->crs(), QgsProject::instance()->transformContext() );
       newTerrainGenerator->setLayer( meshLayer );
-      std::unique_ptr< QgsMesh3DSymbol > symbol = mMeshSymbolWidget->symbol();
+      std::unique_ptr<QgsMesh3DSymbol> symbol = mMeshSymbolWidget->symbol();
       symbol->setVerticalScale( spinTerrainScale->value() );
       newTerrainGenerator->setSymbol( symbol.release() );
       mMap->setTerrainGenerator( newTerrainGenerator );
@@ -362,8 +358,8 @@ void Kadas3DMapConfigWidget::apply()
   }
 
   mMap->setFieldOfView( spinCameraFieldOfView->value() );
-  mMap->setProjectionType( cboCameraProjectionType->currentData().value< Qt3DRender::QCameraLens::ProjectionType >() );
-  mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value< Qgis::NavigationMode>() );
+  mMap->setProjectionType( cboCameraProjectionType->currentData().value<Qt3DRender::QCameraLens::ProjectionType>() );
+  mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value<Qgis::NavigationMode>() );
   mMap->setCameraMovementSpeed( mCameraMovementSpeed->value() );
   mMap->setTerrainVerticalScale( spinTerrainScale->value() );
   mMap->setMapTileResolution( spinMapResolution->value() );
@@ -380,8 +376,8 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setTerrainShadingEnabled( groupTerrainShading->isChecked() );
   mMap->setIsDebugOverlayEnabled( mDebugOverlayCheckBox->isChecked() );
 
-  const std::unique_ptr< QgsAbstractMaterialSettings > terrainMaterial( widgetTerrainMaterial->settings() );
-  if ( QgsPhongMaterialSettings *phongMaterial = dynamic_cast< QgsPhongMaterialSettings * >( terrainMaterial.get() ) )
+  const std::unique_ptr<QgsAbstractMaterialSettings> terrainMaterial( widgetTerrainMaterial->settings() );
+  if ( QgsPhongMaterialSettings *phongMaterial = dynamic_cast<QgsPhongMaterialSettings *>( terrainMaterial.get() ) )
     mMap->setTerrainShadingMaterial( *phongMaterial );
 
   mMap->setLightSources( widgetLights->lightSources() );
@@ -483,7 +479,7 @@ void Kadas3DMapConfigWidget::validate()
   switch ( static_cast<QgsTerrainGenerator::Type>( cboTerrainType->currentData().toInt() ) )
   {
     case QgsTerrainGenerator::Dem:
-      if ( ! cboTerrainLayer->currentLayer() )
+      if ( !cboTerrainLayer->currentLayer() )
       {
         valid = false;
         mMessageBar->pushMessage( tr( "An elevation layer must be selected for a DEM terrain" ), Qgis::MessageLevel::Critical );
@@ -491,7 +487,7 @@ void Kadas3DMapConfigWidget::validate()
       break;
 
     case QgsTerrainGenerator::Mesh:
-      if ( ! cboTerrainLayer->currentLayer() )
+      if ( !cboTerrainLayer->currentLayer() )
       {
         valid = false;
         mMessageBar->pushMessage( tr( "An elevation layer must be selected for a mesh terrain" ), Qgis::MessageLevel::Critical );
@@ -499,7 +495,7 @@ void Kadas3DMapConfigWidget::validate()
       break;
 
     case QgsTerrainGenerator::QuantizedMesh:
-      if ( ! cboTerrainLayer->currentLayer() )
+      if ( !cboTerrainLayer->currentLayer() )
       {
         valid = false;
         mMessageBar->pushMessage( tr( "An elevation layer must be selected for a quantized mesh terrain" ), Qgis::MessageLevel::Critical );
@@ -533,11 +529,11 @@ void Kadas3DMapConfigWidget::init3DAxisPage()
   else
   {
     mGroupBox3dAxis->setChecked( true );
-    mCbo3dAxisType->setCurrentIndex( mCbo3dAxisType->findData( static_cast< int >( s.mode() ) ) );
+    mCbo3dAxisType->setCurrentIndex( mCbo3dAxisType->findData( static_cast<int>( s.mode() ) ) );
   }
 
-  mCbo3dAxisHorizPos->setCurrentIndex( mCbo3dAxisHorizPos->findData( static_cast< int >( s.horizontalPosition() ) ) );
-  mCbo3dAxisVertPos->setCurrentIndex( mCbo3dAxisVertPos->findData( static_cast< int >( s.verticalPosition() ) ) );
+  mCbo3dAxisHorizPos->setCurrentIndex( mCbo3dAxisHorizPos->findData( static_cast<int>( s.horizontalPosition() ) ) );
+  mCbo3dAxisVertPos->setCurrentIndex( mCbo3dAxisVertPos->findData( static_cast<int>( s.verticalPosition() ) ) );
 }
 
 void Kadas3DMapConfigWidget::on3DAxisChanged()
@@ -546,7 +542,7 @@ void Kadas3DMapConfigWidget::on3DAxisChanged()
   Qgs3DAxisSettings::Mode m;
 
   if ( mGroupBox3dAxis->isChecked() )
-    m = static_cast< Qgs3DAxisSettings::Mode >( mCbo3dAxisType->currentData().toInt() );
+    m = static_cast<Qgs3DAxisSettings::Mode>( mCbo3dAxisType->currentData().toInt() );
   else
     m = Qgs3DAxisSettings::Mode::Off;
 
@@ -556,8 +552,8 @@ void Kadas3DMapConfigWidget::on3DAxisChanged()
   }
   else
   {
-    const Qt::AnchorPoint hPos = static_cast< Qt::AnchorPoint >( mCbo3dAxisHorizPos->currentData().toInt() );
-    const Qt::AnchorPoint vPos = static_cast< Qt::AnchorPoint >( mCbo3dAxisVertPos->currentData().toInt() );
+    const Qt::AnchorPoint hPos = static_cast<Qt::AnchorPoint>( mCbo3dAxisHorizPos->currentData().toInt() );
+    const Qt::AnchorPoint vPos = static_cast<Qt::AnchorPoint>( mCbo3dAxisVertPos->currentData().toInt() );
 
     if ( s.horizontalPosition() != hPos || s.verticalPosition() != vPos )
     {

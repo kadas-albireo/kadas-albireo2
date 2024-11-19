@@ -39,7 +39,8 @@ const int KadasMilxLibrary::SymbolTypeRole = Qt::UserRole + 5;
 class KadasMilxLibrary::TreeFilterProxyModel : public QSortFilterProxyModel
 {
   public:
-    TreeFilterProxyModel( QObject *parent = 0 ) : QSortFilterProxyModel( parent )
+    TreeFilterProxyModel( QObject *parent = 0 )
+      : QSortFilterProxyModel( parent )
     {
     }
 
@@ -155,7 +156,6 @@ void KadasMilxLibrary::filterChanged( const QString &text )
 
 void KadasMilxLibrary::itemClicked( const QModelIndex &index )
 {
-
   QModelIndex sourceIndex = mFilterProxyModel->mapToSource( index );
   QList<QModelIndex> indexStack;
   indexStack.prepend( sourceIndex );
@@ -282,7 +282,8 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
 QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &value, const QImage &image, const QSize &viewIconSize, bool isLeaf, const QString &symbolXml, const QString &symbolMilitaryName, int symbolPointCount, bool symbolHasVariablePoints, const QString &symbolType )
 {
   QIcon icon;
-  QSize iconSize = isLeaf ? viewIconSize : !image.isNull() ? QSize( 32, 32 ) : QSize( 1, 32 );
+  QSize iconSize = isLeaf ? viewIconSize : !image.isNull() ? QSize( 32, 32 )
+                                                           : QSize( 1, 32 );
   QImage iconImage( iconSize, QImage::Format_ARGB32 );
   iconImage.fill( Qt::transparent );
   if ( !image.isNull() )
@@ -292,7 +293,8 @@ QStandardItem *KadasMilxLibrary::addItem( QStandardItem *parent, const QString &
     painter.setRenderHint( QPainter::SmoothPixmapTransform );
     painter.drawImage(
       QRectF( 0.5 * ( iconSize.width() - scale * image.width() ), 0.5 * ( iconSize.height() - scale * image.height() ), scale * image.width(), scale * image.height() ),
-      image );
+      image
+    );
   }
   icon = QIcon( QPixmap::fromImage( iconImage ) );
   // Create category group item if necessary

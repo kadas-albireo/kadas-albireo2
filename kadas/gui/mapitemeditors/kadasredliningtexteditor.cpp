@@ -21,8 +21,6 @@
 #include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
 
 
-
-
 KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )
 {
@@ -41,7 +39,7 @@ KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
   connect( mUi.mFontComboBox, &QFontComboBox::currentFontChanged, this, &KadasRedliningTextEditor::saveFont );
 
   mUi.mSpinBoxSize->setValue( font.pointSize() );
-  connect( mUi.mSpinBoxSize, qOverload<int> ( &QSpinBox::valueChanged ), this, &KadasRedliningTextEditor::saveFont );
+  connect( mUi.mSpinBoxSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasRedliningTextEditor::saveFont );
 
   mUi.mPushButtonBold->setChecked( font.bold() );
   connect( mUi.mPushButtonBold, &QPushButton::toggled, this, &KadasRedliningTextEditor::saveFont );
@@ -128,7 +126,7 @@ QFont KadasRedliningTextEditor::currentFont() const
 
 void KadasRedliningTextEditor::saveColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *> ( QObject::sender() );
+  QgsColorButton *btn = qobject_cast<QgsColorButton *>( QObject::sender() );
   QString key = QString( "/Redlining/" ) + btn->property( "settings_key" ).toString();
   QgsSettings().setValue( key, QgsSymbolLayerUtils::encodeColor( btn->color() ) );
   emit styleChanged();

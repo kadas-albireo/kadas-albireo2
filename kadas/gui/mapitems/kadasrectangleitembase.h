@@ -66,35 +66,39 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
-      KadasItemPos mPos;
-      QList<KadasItemPos> mFootprint;
-      KadasItemPos mRectangleCenterPoint;
-      double mAngle = 0.;
-      double mOffsetX = 0.;
-      double mOffsetY = 0.;
-      QSize mSize;
-      virtual void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      virtual State *clone() const override SIP_FACTORY { return new State( *this ); }
-      virtual QJsonObject serialize() const override;
-      virtual bool deserialize( const QJsonObject &json ) override;
+        KadasItemPos mPos;
+        QList<KadasItemPos> mFootprint;
+        KadasItemPos mRectangleCenterPoint;
+        double mAngle = 0.;
+        double mOffsetX = 0.;
+        double mOffsetY = 0.;
+        QSize mSize;
+        virtual void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        virtual State *clone() const override SIP_FACTORY { return new State( *this ); }
+        virtual QJsonObject serialize() const override;
+        virtual bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }
     virtual void setState( const KadasMapItem::State *state ) override;
 
   protected:
     State *state() { return static_cast<State *>( mState ); }
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
     bool mPosLocked = false;
 
   private:
     virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const = 0;
     virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
-    virtual void populateContextMenuPrivate(QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings) {}
+    virtual void populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}
 
     friend class KadasProjectMigration;
 
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY
+    };
     QImage mImage;
     bool mFrame = true;
 

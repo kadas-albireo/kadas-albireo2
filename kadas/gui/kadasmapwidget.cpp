@@ -78,9 +78,9 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   titleWidget->setLayout( new QHBoxLayout() );
   titleWidget->layout()->addWidget( mLayerSelectionButton );
   titleWidget->layout()->addWidget( mLockViewButton );
-  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 );   // spacer
+  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 ); // spacer
   titleWidget->layout()->addWidget( mTitleStackedWidget );
-  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 );   // spacer
+  static_cast<QHBoxLayout *>( titleWidget->layout() )->addWidget( new QWidget( this ), 1 ); // spacer
   titleWidget->layout()->addWidget( mCloseButton );
   titleWidget->layout()->setContentsMargins( 0, 0, 0, 0 );
 
@@ -89,7 +89,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
 
   mMapCanvas = new QgsMapCanvas( this );
   mMapCanvas->setCanvasColor( Qt::transparent );
-  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() ) ;
+  mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() );
   mMapCanvas->enableMapTileRendering( mMasterCanvas->mapSettings().flags() & Qgis::MapSettingsFlag::RenderMapTile );
   mMapCanvas->setMapUpdateInterval( mMasterCanvas->mapUpdateInterval() );
   mMapCanvas->setCachingEnabled( mMasterCanvas->isCachingEnabled() );
@@ -215,8 +215,7 @@ void KadasMapWidget::updateLayerSelectionMenu()
     }
   }
   mLayerSelectionMenu->clear();
-  mLayerSelectionMenu->addAction( tr( "Sync with main view" ), this, [this]
-  {
+  mLayerSelectionMenu->addAction( tr( "Sync with main view" ), this, [this] {
     for ( QgsMapLayer *layer : mMasterCanvas->layers() )
     {
       mInitialLayers.append( layer->id() );
@@ -306,10 +305,7 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
     mTitleStackedWidget->setCurrentWidget( mTitleLabel );
     return true;
   }
-  else if ( obj == mTitleLineEdit && ev->type() == QEvent::KeyPress && (
-              static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Enter ||
-              static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Return ||
-              static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Escape ) )
+  else if ( obj == mTitleLineEdit && ev->type() == QEvent::KeyPress && ( static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Enter || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Return || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Escape ) )
   {
     setWindowTitle( mTitleLineEdit->text() );
     mTitleLabel->setText( mTitleLineEdit->text() );
@@ -336,7 +332,7 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
 void KadasMapWidget::addMapCanvasItem( const KadasMapItem *item )
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
-  Q_UNUSED( canvasItem );  //item is already added automatically to canvas scene
+  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
 }
 
 void KadasMapWidget::removeMapCanvasItem( const KadasMapItem *item )

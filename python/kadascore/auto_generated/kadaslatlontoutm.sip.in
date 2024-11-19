@@ -30,37 +30,37 @@ the Free Software Foundation; either version 2 of the License, or     *
   public:
     struct UTMCoo
     {
-      int easting;
-      int northing;
-      int zoneNumber;
-      QString zoneLetter;
+        int easting;
+        int northing;
+        int zoneNumber;
+        QString zoneLetter;
     };
 
     struct MGRSCoo
     {
-      int easting;
-      int northing;
-      int zoneNumber;
-      QString zoneLetter;
-      QString letter100kID;
+        int easting;
+        int northing;
+        int zoneNumber;
+        QString zoneLetter;
+        QString letter100kID;
     };
 
     struct ZoneLabel
     {
-      QPointF pos;
-      QString label;
-      QPointF maxPos;
-      double fontSizeMin;
-      int fontSizeMinScale;
-      double fontSizeMax;
-      int fontSizeMaxScale;
+        QPointF pos;
+        QString label;
+        QPointF maxPos;
+        double fontSizeMin;
+        int fontSizeMinScale;
+        double fontSizeMax;
+        int fontSizeMaxScale;
     };
 
     struct GridLabel
     {
-      QString label;
-      int lineIdx;
-      bool horiz;
+        QString label;
+        int lineIdx;
+        bool horiz;
     };
 
     enum class Level
@@ -70,19 +70,20 @@ the Free Software Foundation; either version 2 of the License, or     *
       OnlyLabels
     };
 
-    struct LineLevel {
-      LineLevel(KadasLatLonToUTM::Level level, QPolygonF line);
+    struct LineLevel
+    {
+        LineLevel( KadasLatLonToUTM::Level level, QPolygonF line );
 
-      KadasLatLonToUTM::Level level;
-      QPolygonF line;
+        KadasLatLonToUTM::Level level;
+        QPolygonF line;
     };
 
     struct Grid
     {
-      QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
 
-      QList<KadasLatLonToUTM::LineLevel> lines;
-      QList<KadasLatLonToUTM::GridLabel> gridLabels;
+        QList<KadasLatLonToUTM::LineLevel> lines;
+        QList<KadasLatLonToUTM::GridLabel> gridLabels;
 
     };
 

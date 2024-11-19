@@ -46,22 +46,26 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 
     struct KADAS_GUI_EXPORT State : KadasRectangleItemBase::State
     {
-      void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-      State *clone() const override SIP_FACTORY { return new State( *this ); }
-      QJsonObject serialize() const override;
-      bool deserialize( const QJsonObject &json ) override;
+        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+        State *clone() const override SIP_FACTORY { return new State( *this ); }
+        QJsonObject serialize() const override;
+        bool deserialize( const QJsonObject &json ) override;
     };
     void setState( const KadasMapItem::State *state ) override;
 
   protected:
-    KadasMapItem *_clone() const override { return new KadasPictureItem( crs() ); } SIP_FACTORY
-    State *createEmptyState() const override { return new State(); } SIP_FACTORY
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPictureItem( crs() ); }
+    State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const override;
     void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
 
   private:
     QImage readImage( double dpiScale = 1 ) const;
-    enum AttribIds {AttrX, AttrY};
+    enum AttribIds
+    {
+      AttrX,
+      AttrY
+    };
     QString mFilePath;
     QImage mImage;
 

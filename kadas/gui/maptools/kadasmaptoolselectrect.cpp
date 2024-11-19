@@ -24,7 +24,6 @@
 KadasMapToolSelectRect::KadasMapToolSelectRect( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
 {
-
 }
 
 void KadasMapToolSelectRect::setRect( const QgsRectangle &rect )
@@ -58,7 +57,6 @@ void KadasMapToolSelectRect::canvasMoveEvent( QgsMapMouseEvent *e )
   double tol = QgsSettings().value( "/kadas/snapping_radius", 10 ).toInt();
   if ( mInteraction == InteractionNone )
   {
-
     // Determine cursor
     QRectF r = canvasRect( mRect );
     bool left = qAbs( r.left() - e->x() ) < tol;
@@ -179,22 +177,22 @@ void KadasMapToolSelectRect::canvasPressEvent( QgsMapMouseEvent *e )
 
       if ( qAbs( p1.x() - e->x() ) < tol )
       {
-        mResizeHandlers.append( [this]( const QgsPointXY & p ) { mResizePoints[0].setX( p.x() ); } );
+        mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[0].setX( p.x() ); } );
         mResizeMoveOffset.setX( ( e->x() - p1.x() ) * mup );
       }
       else if ( qAbs( p2.x() - e->x() ) < tol )
       {
-        mResizeHandlers.append( [this]( const QgsPointXY & p ) { mResizePoints[1].setX( p.x() ); } );
+        mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[1].setX( p.x() ); } );
         mResizeMoveOffset.setX( ( e->x() - p2.x() ) * mup );
       }
       if ( qAbs( p1.y() - e->y() ) < tol )
       {
-        mResizeHandlers.append( [this]( const QgsPointXY & p ) { mResizePoints[1].setY( p.y() ); } );
+        mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[1].setY( p.y() ); } );
         mResizeMoveOffset.setY( -( e->y() - p1.y() ) * mup );
       }
       else if ( qAbs( p2.y() - e->y() ) < tol )
       {
-        mResizeHandlers.append( [this]( const QgsPointXY & p ) { mResizePoints[0].setY( p.y() ); } );
+        mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[0].setY( p.y() ); } );
         mResizeMoveOffset.setY( -( e->y() - p2.y() ) * mup );
       }
     }

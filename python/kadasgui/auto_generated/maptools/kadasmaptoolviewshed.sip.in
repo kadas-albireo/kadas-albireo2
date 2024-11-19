@@ -50,7 +50,6 @@ class KadasMapToolViewshedItemInterface : KadasMapItemInterface
 %End
   public:
     KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem* createItem() const;
 
 };
 

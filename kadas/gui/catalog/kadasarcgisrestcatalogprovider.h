@@ -29,6 +29,7 @@ class KADAS_GUI_EXPORT KadasArcGisRestCatalogProvider : public KadasCatalogProvi
   public:
     KadasArcGisRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
+
   private:
     QString mBaseUrl;
     int mPendingTasks;

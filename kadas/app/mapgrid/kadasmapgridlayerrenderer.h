@@ -36,8 +36,8 @@ class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
 
     struct GridLabel
     {
-      QString text;
-      QPointF screenPos;
+        QString text;
+        QPointF screenPos;
     };
 
     void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags );
@@ -48,7 +48,6 @@ class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
 
     QPen level2pen( KadasLatLonToUTM::Level level ) const;
     static double exponentialScale( double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent = 1 );
-
 };
 
 #endif // KADASMAPGRIDLAYERRENDERER_H

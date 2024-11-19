@@ -46,7 +46,11 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     void radiusChanged( double radius );
 
   private:
-    enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
+    enum HeightMode
+    {
+      HeightRelToGround,
+      HeightRelToSeaLevel
+    };
     QDoubleSpinBox *mSpinBoxObserverHeight = nullptr;
     QDoubleSpinBox *mSpinBoxTargetHeight = nullptr;
     QSpinBox *mSpinBoxObserverMinAngle = nullptr;
@@ -64,10 +68,12 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
 class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface : public KadasMapItemInterface
 {
   public:
-    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas ) : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem* createItem() const override;
+    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas )
+      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+    KadasMapItem *createItem() const override;
+
   private:
-    QgsMapCanvas* mCanvas = nullptr;
+    QgsMapCanvas *mCanvas = nullptr;
 };
 
 class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
@@ -79,7 +85,6 @@ class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
   private slots:
     void drawFinished();
     void adjustRadius( double newRadius );
-
 };
 
 #endif // KADASMAPTOOLVIEWSHED_H

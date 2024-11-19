@@ -75,4 +75,3 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
 };
 
 #endif // KADASFEATUREPICKER_H
-

@@ -155,8 +155,7 @@ KadasItemRect KadasRectangleItemBase::boundingBox() const
 KadasMapItem::Margin KadasRectangleItemBase::margin() const
 {
   double framePadding = mFrame ? sFramePadding : 0;
-  return Margin
-  {
+  return Margin {
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.width() - constState()->mOffsetX + framePadding ) * mSymbolScale ) ),
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.height() + constState()->mOffsetY + framePadding ) * mSymbolScale ) ),
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.width() + constState()->mOffsetX + framePadding ) * mSymbolScale ) ),
@@ -183,11 +182,11 @@ QList<KadasMapItem::Node> KadasRectangleItemBase::nodes( const QgsMapSettings &s
 {
   QList<KadasMapPos> points = cornerPoints( settings );
   QList<Node> nodes;
-  nodes.append( {points[0]} );
-  nodes.append( {points[1]} );
-  nodes.append( {points[2]} );
-  nodes.append( {points[3]} );
-  nodes.append( {toMapPos( constState()->mPos, settings ), anchorNodeRenderer} );
+  nodes.append( { points[0] } );
+  nodes.append( { points[1] } );
+  nodes.append( { points[2] } );
+  nodes.append( { points[3] } );
+  nodes.append( { toMapPos( constState()->mPos, settings ), anchorNodeRenderer } );
   return nodes;
 }
 
@@ -204,12 +203,7 @@ bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapS
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence()
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMinimum() )
-                       << QgsPoint( rect.xMaximum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMaximum() )
-                       << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -278,10 +272,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
     double framew = w + 2 * sFramePadding * dpiScale;
     double frameh = h + 2 * sFramePadding * dpiScale;
-    QRectF frameRectangle(offsetX - 0.5 * framew,
-                          -offsetY - 0.5 * frameh,
-                          framew,
-                          frameh);
+    QRectF frameRectangle( offsetX - 0.5 * framew, -offsetY - 0.5 * frameh, framew, frameh );
 
     QPolygonF poly;
     poly.append( frameRectangle.bottomLeft() );
@@ -303,10 +294,10 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
       if ( offsetX > 0 && offsetY > 0 )
         nearestCorner = frameRectangle.bottomLeft();
 
-      else if ( offsetX > 0 && offsetY <= 0)
+      else if ( offsetX > 0 && offsetY <= 0 )
         nearestCorner = frameRectangle.topLeft();
 
-      else if ( offsetX <= 0 && offsetY <= 0)
+      else if ( offsetX <= 0 && offsetY <= 0 )
         nearestCorner = frameRectangle.topRight();
 
       // Determine triangle quadrant
@@ -327,13 +318,13 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
       QgsPointXY framePos;
       QgsVector baseDir;
-      if ( quadrant == QUADRANT_LEFT || quadrant == QUADRANT_RIGHT )   // Triangle to the left (quadrant = 0) or right (quadrant = 2)
+      if ( quadrant == QUADRANT_LEFT || quadrant == QUADRANT_RIGHT ) // Triangle to the left (quadrant = 0) or right (quadrant = 2)
       {
         baseDir = QgsVector( 0, quadrant == 0 ? -1 : 1 );
         framePos.setX( quadrant == 0 ? offsetX - 0.5 * framew : offsetX + 0.5 * framew );
         framePos.setY( std::min( std::max( -offsetY - 0.5 * frameh + arrowWidth, 0. ), -offsetY + 0.5 * frameh - arrowWidth ) );
       }
-      else     // Triangle above (quadrant = 1) or below (quadrant = 3)
+      else // Triangle above (quadrant = 1) or below (quadrant = 3)
       {
         framePos.setX( std::min( std::max( offsetX - 0.5 * framew + arrowWidth, 0. ), offsetX + 0.5 * framew - arrowWidth ) );
         framePos.setY( quadrant == 1 ? -offsetY - 0.5 * frameh : -offsetY + 0.5 * frameh );
@@ -391,8 +382,8 @@ void KadasRectangleItemBase::endPart()
 KadasMapItem::AttribDefs KadasRectangleItemBase::drawAttribs() const
 {
   AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute{"x"} );
-  attributes.insert( AttrY, NumericAttribute{"y"} );
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
   return attributes;
 }
 
@@ -493,11 +484,11 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
   float sina = std::sin( angle );
   float cosa = std::cos( angle );
   return QMatrix3x3(
-           std::array<float, 9>
-  {
-    cosa + u[0] * u[0] * ( 1 - cosa ),         u[0] * u[1] * ( 1 - cosa ) - u[2] * sina,  u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
-    u[0] * u[1] * ( 1 - cosa ) + u[2] * sina,  cosa + u[1] * u[1] * ( 1 - cosa ),         u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-    u[0] * u[2] * ( 1 - cosa ) - u[1] * sina,  u[1] * u[2] * ( 1 - cosa ) + u[0] * sina,  cosa + u[2] * u[2] * ( 1 - cosa )
-  }.data()
-         );
+    std::array<float, 9> {
+      cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
+      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+    }
+      .data()
+  );
 }
