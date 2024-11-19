@@ -11,5 +11,5 @@ KadasStateHistory.ChangeType.__doc__ = """
 # --
 try:
     KadasStateHistory.__signal_arguments__ = {'canUndoChanged': [': bool'], 'canRedoChanged': [': bool'], 'stateChanged': ['changeType: KadasStateHistory.ChangeType', 'state: KadasStateHistory.State', 'prevState: KadasStateHistory.State']}
-except NameError:
+except ValueError:
     pass

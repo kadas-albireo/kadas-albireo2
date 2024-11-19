@@ -33,5 +33,5 @@ KadasCoordinateFormat.Format.baseClass = KadasCoordinateFormat
 try:
     KadasCoordinateFormat.instance = staticmethod(KadasCoordinateFormat.instance)
     KadasCoordinateFormat.__signal_arguments__ = {'coordinateDisplayFormatChanged': ['format: KadasCoordinateFormat.Format', 'epsg: str'], 'heightDisplayUnitChanged': ['heightUnit: Qgis.DistanceUnit']}
-except NameError:
+except ValueError:
     pass
