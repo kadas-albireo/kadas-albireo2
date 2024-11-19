@@ -53,14 +53,15 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter SIP_ABSTRACT
     double outputNodataValue() const { return mOutputNodataValue; }
     void setOutputNodataValue( double value ) { mOutputNodataValue = value; }
 
-    /**Calculates output value from nine input values. The input values and the output value can be equal to the
-      nodata value if not present or outside of the border. Must be implemented by subclasses*/
-    virtual float processNineCellWindow( float *x11, float *x21, float *x31,
-                                         float *x12, float *x22, float *x32,
-                                         float *x13, float *x23, float *x33 )
-      = 0;
+    //! Calculates output value from nine input values. The input values and the output value can be equal to the
+    //! nodata value if not present or outside of the border. Must be implemented by subclasses
+    virtual float processNineCellWindow(
+      float *x11, float *x21, float *x31,
+      float *x12, float *x22, float *x32,
+      float *x13, float *x23, float *x33
+    ) = 0;
 
-    /**Computes the window of the raster which contains the specified region of the raster*/
+    //! Computes the window of the raster which contains the specified region of the raster
     static bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
 
   private:
