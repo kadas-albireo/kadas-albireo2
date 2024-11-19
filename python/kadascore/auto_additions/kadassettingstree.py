@@ -2,5 +2,5 @@
 try:
     KadasSettingsTree.createPluginTreeNode = staticmethod(KadasSettingsTree.createPluginTreeNode)
     KadasSettingsTree.unregisterPluginTreeNode = staticmethod(KadasSettingsTree.unregisterPluginTreeNode)
-except ValueError:
+except AttributeError:
     pass

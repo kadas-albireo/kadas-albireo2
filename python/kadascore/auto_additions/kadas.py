@@ -6,5 +6,5 @@ try:
     Kadas.projectTemplatesPath = staticmethod(Kadas.projectTemplatesPath)
     Kadas.gdalOpenForLayer = staticmethod(Kadas.gdalOpenForLayer)
     Kadas.importSslCertificates = staticmethod(Kadas.importSslCertificates)
-except ValueError:
+except AttributeError:
     pass

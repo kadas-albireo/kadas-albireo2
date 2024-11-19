@@ -122,5 +122,5 @@ KadasPluginInterface.ActionClassicMenuLocation.__doc__ = """
 try:
     KadasPluginInterface.cast = staticmethod(KadasPluginInterface.cast)
     KadasPluginInterface.__signal_arguments__ = {'printLayoutAdded': ['layout: QgsPrintLayout'], 'printLayoutWillBeRemoved': ['layout: QgsPrintLayout']}
-except ValueError:
+except AttributeError:
     pass

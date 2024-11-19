@@ -6,5 +6,5 @@ try:
     KadasMapCanvasItemManager.removeItemAfterRefresh = staticmethod(KadasMapCanvasItemManager.removeItemAfterRefresh)
     KadasMapCanvasItemManager.clear = staticmethod(KadasMapCanvasItemManager.clear)
     KadasMapCanvasItemManager.__signal_arguments__ = {'itemAdded': ['item: KadasMapItem'], 'itemWillBeRemoved': ['item: KadasMapItem']}
-except ValueError:
+except AttributeError:
     pass

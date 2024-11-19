@@ -4,5 +4,5 @@ try:
     KadasMilxItem.fromMssStringAndPoints = staticmethod(KadasMilxItem.fromMssStringAndPoints)
     KadasMilxItem.computeScreenExtent = staticmethod(KadasMilxItem.computeScreenExtent)
     KadasMilxItem.validateMssString = staticmethod(KadasMilxItem.validateMssString)
-except ValueError:
+except AttributeError:
     pass

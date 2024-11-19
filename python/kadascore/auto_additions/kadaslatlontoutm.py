@@ -34,5 +34,5 @@ try:
     KadasLatLonToUTM.hemisphereLetter = staticmethod(KadasLatLonToUTM.hemisphereLetter)
     KadasLatLonToUTM.zoneName = staticmethod(KadasLatLonToUTM.zoneName)
     KadasLatLonToUTM.computeGrid = staticmethod(KadasLatLonToUTM.computeGrid)
-except ValueError:
+except AttributeError:
     pass

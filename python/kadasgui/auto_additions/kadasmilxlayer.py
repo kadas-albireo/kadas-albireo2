@@ -2,5 +2,5 @@
 try:
     KadasMilxLayer.layerType = staticmethod(KadasMilxLayer.layerType)
     KadasMilxLayer.__signal_arguments__ = {'approvedChanged': ['approved: bool']}
-except ValueError:
+except AttributeError:
     pass
