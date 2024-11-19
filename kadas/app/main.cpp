@@ -19,6 +19,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextCodec>
+#include <QSurfaceFormat>
 
 #include <qgis/qgslogger.h>
 #include <qgis/qgsproject.h>
@@ -56,6 +57,24 @@ int main( int argc, char *argv[] )
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
   QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
   QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+
+  // Initialize the default surface format for all
+  // QWindow and QWindow derived components
+#if !defined( QT_NO_OPENGL )
+  QSurfaceFormat format;
+  format.setRenderableType( QSurfaceFormat::OpenGL );
+#ifdef Q_OS_MAC
+  format.setVersion( 4, 1 ); //OpenGL is deprecated on MacOS, use last supported version
+  format.setProfile( QSurfaceFormat::CoreProfile );
+#else
+  format.setVersion( 4, 3 );
+  format.setProfile( QSurfaceFormat::CompatibilityProfile ); // Chromium only supports core profile on mac
+#endif
+  format.setDepthBufferSize( 24 );
+  format.setSamples( 4 );
+  format.setStencilBufferSize( 8 );
+  QSurfaceFormat::setDefaultFormat( format );
+#endif
 
   // Delete any leftover wcs cache
   QString configLocalStorageLocation = QStandardPaths::standardLocations( QStandardPaths::AppDataLocation ).value( 0 );
