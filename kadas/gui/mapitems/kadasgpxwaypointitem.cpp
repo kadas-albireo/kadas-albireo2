@@ -18,7 +18,10 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgstextrenderer.h>
+#include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 
@@ -42,12 +45,32 @@ KadasGpxWaypointItem::KadasGpxWaypointItem()
   setIconFill( QBrush( color ) );
 }
 
+QString KadasGpxWaypointItem::exportName() const
+{
+  if ( name().isEmpty() )
+    return itemName();
+
+  return name();
+}
+
 void KadasGpxWaypointItem::setName( const QString &name )
 {
   mName = name;
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
+  emit propertyChanged();
+}
+
+void KadasGpxWaypointItem::setLabelFont( const QFont &labelFont )
+{
+  mLabelFont = labelFont;
+  emit propertyChanged();
+}
+
+void KadasGpxWaypointItem::setLabelColor( const QColor &labelColor )
+{
+  mLabelColor = labelColor;
   emit propertyChanged();
 }
 
@@ -69,15 +92,82 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
   // Draw name label
   if ( !mName.isEmpty() && !constState()->points.isEmpty() )
   {
-    QColor bufferColor = ( 0.2126 * mIconBrush.color().red() + 0.7152 * mIconBrush.color().green() + 0.0722 * mIconBrush.color().blue() ) > 128 ? Qt::black : Qt::white;
     QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( constState()->points.front() ) ).toQPointF();
-    QPointF offset( 0.5 * mIconSize, -0.5 * mIconSize );
-    QPainterPath path;
-    path.addText( pos + offset, mLabelFont, mName );
-    context.painter()->setPen( QPen( bufferColor, 2 ) );
-    context.painter()->setBrush( mIconBrush );
-    context.painter()->drawPath( path );
-    context.painter()->setPen( Qt::NoPen );
-    context.painter()->drawPath( path );
+    pos += QPointF( 0.5 * mIconSize, -0.5 * mIconSize );
+    QColor bufferColor = ( 0.2126 * mIconBrush.color().red() + 0.7152 * mIconBrush.color().green() + 0.0722 * mIconBrush.color().blue() ) > 128 ? Qt::black : Qt::white;
+
+    QFont font = mLabelFont;
+    font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
+    QFontMetrics metrics( font );
+    pos += QPointF( metrics.width( mName ) / 2.0, 0.0 );
+
+    double scale = getTextRenderScale( context );
+
+    QgsTextFormat format;
+    format.setFont( font );
+    format.setSize( font.pointSize() * scale );
+    if ( mLabelColor.isValid() )
+      format.setColor( mLabelColor );
+    else
+      format.setColor( mIconBrush.color() );
+    QgsTextBufferSettings bs;
+    bs.setColor( bufferColor );
+    bs.setSize( 1 );
+    bs.setEnabled( true );
+    format.setBuffer( bs );
+
+    QgsTextRenderer::drawText( pos, 0.0, Qgis::TextHorizontalAlignment::Center, { mName }, context, format, false );
   }
+}
+
+QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+{
+  if ( !mGeometry )
+  {
+    return QString();
+  }
+
+  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
+  outStream << "<Style>\n";
+  outStream << QString( "<IconStyle>" );
+  outStream << QString( "<color>%1</color>" ).arg( color2hex( fill().color() ) );
+  // With icon scale=1 google earth normalize the icon to 32 pixels
+  outStream << QString( "<scale>%1</scale>" ).arg( iconSize() / 32.0 );
+  outStream << QString( "</IconStyle>\n" );
+  if ( !mName.isEmpty() )
+  {
+    outStream << QString( "<LabelStyle>" );
+    if ( mLabelColor.isValid() )
+    {
+      outStream << QString( "<color>%1</color>" ).arg( color2hex( mLabelColor ) );
+    }
+    if ( mLabelFont.pointSize() > -1 )
+    {
+      // With label scale=1 google earth normalize the text to 16 pixels.
+      // In kadas by default we use point size 10. Dividing by 10 we get
+      // a similar text size in both applications
+      outStream << QString( "<scale>%1</scale>" ).arg( mLabelFont.pointSize() / 10.0 );
+    }
+    outStream << QString( "</LabelStyle>\n" );
+  }
+  outStream << "</Style>\n";
+  outStream << "<ExtendedData>\n";
+  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( mIconType ) );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << "</SchemaData>\n";
+  outStream << "</ExtendedData>\n";
+  QgsAbstractGeometry *geom = mGeometry->segmentize();
+  geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
+  outStream << geom->asKml( 6 ) << "\n";
+  delete geom;
+  outStream << "</Placemark>\n";
+  outStream.flush();
+  return outString;
 }

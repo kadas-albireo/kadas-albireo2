@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>42</height>
+    <width>593</width>
+    <height>74</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,45 @@
    <property name="spacing">
     <number>2</number>
    </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="mLabelName">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="mLineEditName"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="mLabelNumber">
+     <property name="text">
+      <string>Number:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLineEdit" name="mLineEditNumber"/>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLabel" name="mLabelColor">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Color:</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="5">
     <widget class="QgsColorButton" name="mToolButtonColor">
      <property name="sizePolicy">
@@ -51,8 +90,8 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="mLabelColor">
+   <item row="0" column="6">
+    <widget class="QLabel" name="mLabelSize">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -60,32 +99,9 @@
       </size>
      </property>
      <property name="text">
-      <string>Color:</string>
+      <string>Line width:</string>
      </property>
     </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="mLabelName">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Name:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="mLabelNumber">
-     <property name="text">
-      <string>Number:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="mLineEditName"/>
    </item>
    <item row="0" column="7">
     <widget class="QSpinBox" name="mSpinBoxSize">
@@ -103,21 +119,82 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="6">
-    <widget class="QLabel" name="mLabelSize">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Line width:</string>
+      <string>Font:</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QLineEdit" name="mLineEditNumber"/>
+   <item row="1" column="1" colspan="7">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QFontComboBox" name="mFontComboBox"/>
+     </item>
+     <item>
+      <widget class="QgsColorButton" name="mToolButtonLabelColor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>32</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>48</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="mSpinBoxLabelSize">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="minimum">
+        <number>5</number>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mPushButtonBold">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/kadas/icons/textBold</normaloff>:/kadas/icons/textBold</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mPushButtonItalic">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/kadas/icons/textItalic</normaloff>:/kadas/icons/textItalic</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

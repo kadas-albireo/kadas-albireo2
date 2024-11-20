@@ -291,6 +291,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool deserialize( const QJsonObject &json );
 
     virtual QString itemName() const = 0;
+    virtual QString exportName() const;
 
     /* The item crs */
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
@@ -523,6 +524,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static double outputDpiScale( const QgsRenderContext &context );
+    static double getTextRenderScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;

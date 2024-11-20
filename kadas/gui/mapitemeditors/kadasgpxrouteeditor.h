@@ -22,12 +22,22 @@
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/ui_kadasgpxrouteeditor.h"
 
+class QgsSettingsEntryInteger;
+class QgsSettingsEntryColor;
+class QgsSettingsEntryString;
+class QgsSettingsEntryColor;
+
 
 class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
 {
     Q_OBJECT
 
   public:
+    static const QgsSettingsEntryInteger *settingsGpxRouteSize;
+    static const QgsSettingsEntryColor *settingsGpxRouteColor;
+    static const QgsSettingsEntryString *settingsGpxRouteLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxRouteLabelColor;
+
     KadasGpxRouteEditor( KadasMapItem *item );
     ~KadasGpxRouteEditor();
 
@@ -38,6 +48,8 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
   private:
     Ui::KadasGpxRouteEditorBase mUi;
 
+    QFont currentFont() const;
+
   signals:
     void styleChanged();
 
@@ -45,6 +57,9 @@ class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
     void saveColor();
     void saveSize();
     void toggleItemMeasurements( bool enabled );
+    void saveLabelFont();
+    void saveLabelColor();
+    void fontSizeChanged( int size );
 };
 
 #endif // KADASGPXROUTEEDITOR_H

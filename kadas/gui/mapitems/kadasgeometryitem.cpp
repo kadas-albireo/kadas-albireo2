@@ -156,7 +156,7 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   QString outString;
   QTextStream outStream( &outString );
   outStream << "<Placemark>\n";
-  outStream << QString( "<name>%1</name>\n" ).arg( itemName() );
+  outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
   outStream << "<Style>\n";
   outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
                  .arg( outline().width() )

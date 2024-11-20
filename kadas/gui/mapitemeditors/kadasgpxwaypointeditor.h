@@ -22,11 +22,22 @@
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 #include "kadas/gui/ui_kadasgpxwaypointeditor.h"
 
+class QgsSettingsEntryInteger;
+class QgsSettingsEntryColor;
+class QgsSettingsEntryString;
+class QgsSettingsEntryColor;
+
+
 class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
 {
     Q_OBJECT
 
   public:
+    static const QgsSettingsEntryInteger *settingsGpxWaypointSize;
+    static const QgsSettingsEntryColor *settingsGpxWaypointColor;
+    static const QgsSettingsEntryString *settingsGpxWaypointLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxWaypointLabelColor;
+
     KadasGpxWaypointEditor( KadasMapItem *item );
 
     void syncItemToWidget() override;
@@ -35,12 +46,17 @@ class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
   private:
     Ui::KadasGpxWaypointEditorBase mUi;
 
+    QFont currentFont() const;
+
   signals:
     void styleChanged();
 
   private slots:
     void saveColor();
     void saveSize();
+    void saveLabelFont();
+    void saveLabelColor();
+    void fontSizeChanged( int size );
 };
 
 #endif // KADASGPXWAYPOINTEDITOR_H

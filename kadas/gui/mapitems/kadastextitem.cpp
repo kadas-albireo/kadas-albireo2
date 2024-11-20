@@ -110,11 +110,7 @@ void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &cen
   QFontMetrics metrics( font );
   QPointF baseLineCenter = center + QPointF( 0, metrics.descent() );
 
-  // no idea why this works, otherwise text scales up when edited
-  // the rendex context is coming from KadasMapItem when edited while it comes from the QgsMapLayerRenderer otherwise
-  double scale = 1.0;
-  if ( context.painter()->device()->physicalDpiX() )
-    scale = 1.0 / context.painter()->device()->physicalDpiX() * context.painter()->device()->logicalDpiX();
+  double scale = getTextRenderScale( context );
 
   QgsTextFormat format;
   format.setFont( font );

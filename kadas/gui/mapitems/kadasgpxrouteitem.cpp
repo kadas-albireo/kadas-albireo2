@@ -38,6 +38,14 @@ KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
   setFill( QBrush( color ) );
 }
 
+QString KadasGpxRouteItem::exportName() const
+{
+  if ( name().isEmpty() )
+    return itemName();
+
+  return name();
+}
+
 void KadasGpxRouteItem::setName( const QString &name )
 {
   mName = name;
@@ -51,6 +59,18 @@ void KadasGpxRouteItem::setNumber( const QString &number )
 {
   mNumber = number;
   update();
+  emit propertyChanged();
+}
+
+void KadasGpxRouteItem::setLabelFont( const QFont &labelFont )
+{
+  mLabelFont = labelFont;
+  emit propertyChanged();
+}
+
+void KadasGpxRouteItem::setLabelColor( const QColor &labelColor )
+{
+  mLabelColor = labelColor;
   emit propertyChanged();
 }
 
@@ -78,7 +98,6 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
 
     QPainterPath path;
     path.addText( QPointF( 0, 0 ), mLabelFont, mName );
-    context.painter()->setBrush( mBrush );
 
     double interval = mLabelSize.width() + 150;
     double walkDist = 0;
@@ -108,8 +127,10 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
         context.painter()->save();
         context.painter()->translate( pos );
         context.painter()->rotate( angle );
+        context.painter()->setBrush( mBrush );
         context.painter()->setPen( QPen( bufferColor, 2 ) );
         context.painter()->drawPath( path );
+        context.painter()->setBrush( QBrush( mLabelColor ) );
         context.painter()->setPen( Qt::NoPen );
         context.painter()->drawPath( path );
         context.painter()->restore();

@@ -39,6 +39,7 @@ class KADAS_CORE_EXPORT KadasSettingsTree
     static inline QgsSettingsTreeNode *sTreeKadas = treeRoot()->createChildNode( QStringLiteral( "kadas" ) );
     static inline QgsSettingsTreeNode *sTreePortal = treeRoot()->createChildNode( QStringLiteral( "portal" ) );
     static inline QgsSettingsTreeNode *sTreePlugins = treeRoot()->createChildNode( QStringLiteral( "plugins" ) );
+    static inline QgsSettingsTreeNode *sTreeGpx = treeRoot()->createChildNode( QStringLiteral( "gpx" ) );
 
 #endif
 
