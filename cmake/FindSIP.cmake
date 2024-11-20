@@ -1,5 +1,5 @@
 # Find SIP
-# ~~~~~~~~
+# ~~~
 #
 # SIP website: http://www.riverbankcomputing.co.uk/sip/index.php
 #
@@ -20,43 +20,52 @@
 # SIP_DEFAULT_SIP_DIR - Default directory where .sip files should be installed
 #     into.
 
-# Copyright (c) 2007, Simon Edwards <simon@simonzone.com>
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+# Copyright (c) 2007, Simon Edwards <simon@simonzone.com> Redistribution and use
+# is allowed according to the terms of the BSD license. For details see the
+# accompanying COPYING-CMAKE-SCRIPTS file.
 
-
-
-IF(SIP_VERSION)
+if(SIP_VERSION)
   # Already in cache, be silent
-  SET(SIP_FOUND TRUE)
-ELSE(SIP_VERSION)
+  set(SIP_FOUND TRUE)
+else(SIP_VERSION)
 
-  FIND_FILE(_find_sip_py FindSIP.py PATHS ${CMAKE_MODULE_PATH} NO_CMAKE_FIND_ROOT_PATH)
+  find_file(
+    _find_sip_py FindSIP.py
+    PATHS ${CMAKE_MODULE_PATH}
+    NO_CMAKE_FIND_ROOT_PATH)
 
-  EXECUTE_PROCESS(COMMAND ${Python_EXECUTABLE} ${_find_sip_py} OUTPUT_VARIABLE sip_config)
-  IF(sip_config)
-    STRING(REGEX REPLACE "^sip_version:([^\n]+).*$" "\\1" SIP_VERSION ${sip_config})
-    STRING(REGEX REPLACE ".*\nsip_version_num:([^\n]+).*$" "\\1" SIP_VERSION_NUM ${sip_config})
-    STRING(REGEX REPLACE ".*\nsip_version_str:([^\n]+).*$" "\\1" SIP_VERSION_STR ${sip_config})
-    STRING(REGEX REPLACE ".*\ndefault_sip_dir:([^\n]+).*$" "\\1" SIP_DEFAULT_SIP_DIR ${sip_config})
-    IF(${SIP_VERSION_STR} VERSION_LESS 5)
-      STRING(REGEX REPLACE ".*\nsip_bin:([^\n]+).*$" "\\1" SIP_BINARY_PATH ${sip_config})
-      STRING(REGEX REPLACE ".*\nsip_inc_dir:([^\n]+).*$" "\\1" SIP_INCLUDE_DIR ${sip_config})
-      STRING(REGEX REPLACE ".*\nsip_module_dir:([^\n]+).*$" "\\1" SIP_MODULE_DIR ${sip_config})
-    ELSE(${SIP_VERSION_STR} VERSION_LESS 5)
-      FIND_PROGRAM(SIP_BUILD_EXECUTABLE sip-build)
-    ENDIF(${SIP_VERSION_STR} VERSION_LESS 5)
-    SET(SIP_FOUND TRUE)
-  ENDIF(sip_config)
+  execute_process(COMMAND ${Python_EXECUTABLE} ${_find_sip_py}
+                  OUTPUT_VARIABLE sip_config)
+  if(sip_config)
+    string(REGEX REPLACE "^sip_version:([^\n]+).*$" "\\1" SIP_VERSION
+                         ${sip_config})
+    string(REGEX REPLACE ".*\nsip_version_num:([^\n]+).*$" "\\1"
+                         SIP_VERSION_NUM ${sip_config})
+    string(REGEX REPLACE ".*\nsip_version_str:([^\n]+).*$" "\\1"
+                         SIP_VERSION_STR ${sip_config})
+    string(REGEX REPLACE ".*\ndefault_sip_dir:([^\n]+).*$" "\\1"
+                         SIP_DEFAULT_SIP_DIR ${sip_config})
+    if(${SIP_VERSION_STR} VERSION_LESS 5)
+      string(REGEX REPLACE ".*\nsip_bin:([^\n]+).*$" "\\1" SIP_BINARY_PATH
+                           ${sip_config})
+      string(REGEX REPLACE ".*\nsip_inc_dir:([^\n]+).*$" "\\1" SIP_INCLUDE_DIR
+                           ${sip_config})
+      string(REGEX REPLACE ".*\nsip_module_dir:([^\n]+).*$" "\\1"
+                           SIP_MODULE_DIR ${sip_config})
+    else(${SIP_VERSION_STR} VERSION_LESS 5)
+      find_program(SIP_BUILD_EXECUTABLE sip-build)
+    endif(${SIP_VERSION_STR} VERSION_LESS 5)
+    set(SIP_FOUND TRUE)
+  endif(sip_config)
 
-  IF(SIP_FOUND)
-    IF(NOT SIP_FIND_QUIETLY)
-      MESSAGE(STATUS "Found SIP version: ${SIP_VERSION_STR}")
-    ENDIF(NOT SIP_FIND_QUIETLY)
-  ELSE(SIP_FOUND)
-    IF(SIP_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find SIP")
-    ENDIF(SIP_FIND_REQUIRED)
-  ENDIF(SIP_FOUND)
+  if(SIP_FOUND)
+    if(NOT SIP_FIND_QUIETLY)
+      message(STATUS "Found SIP version: ${SIP_VERSION_STR}")
+    endif(NOT SIP_FIND_QUIETLY)
+  else(SIP_FOUND)
+    if(SIP_FIND_REQUIRED)
+      message(FATAL_ERROR "Could not find SIP")
+    endif(SIP_FIND_REQUIRED)
+  endif(SIP_FOUND)
 
-ENDIF(SIP_VERSION)
+endif(SIP_VERSION)

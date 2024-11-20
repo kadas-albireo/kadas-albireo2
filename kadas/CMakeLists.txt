@@ -1,6 +1,6 @@
-ADD_SUBDIRECTORY(core)
-ADD_SUBDIRECTORY(analysis)
-ADD_SUBDIRECTORY(gui)
-ADD_SUBDIRECTORY(app)
+add_subdirectory(core)
+add_subdirectory(analysis)
+add_subdirectory(gui)
+add_subdirectory(app)
 
-INSTALL (FILES resources/timezone21.bin DESTINATION share/kadas/resources)
+install(FILES resources/timezone21.bin DESTINATION share/kadas/resources)

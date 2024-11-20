@@ -9,7 +9,10 @@ function(find_and_link_library TARGET LIBRARY)
     message(STATUS " -- Link ${${LIBRARY}-LIBRARY} interface to ${TARGET}")
     target_link_libraries(${TARGET} INTERFACE ${${LIBRARY}-LIBRARY})
   else()
-    message(FATAL_ERROR "Fail to find library ${LIBRARY}. Make sure it is present in CMAKE_PREFIX_PATH")
+    message(
+      FATAL_ERROR
+        "Fail to find library ${LIBRARY}. Make sure it is present in CMAKE_PREFIX_PATH"
+    )
   endif()
 endfunction()
 
@@ -20,7 +23,8 @@ endif()
 function(_qgis_core_add_dependency target package)
   find_package(${package} ${ARGN} ${_qgis_dep_find_args})
   if(${${package}_FOUND})
-    foreach(suffix IN ITEMS "" "-shared" "_shared" "-static" "_static" "-NOTFOUND")
+    foreach(suffix IN ITEMS "" "-shared" "_shared" "-static" "_static"
+                            "-NOTFOUND")
       set(dependency "${target}${suffix}")
       if(TARGET ${dependency})
         break()
@@ -42,11 +46,15 @@ function(_qgis_core_add_dependency target package)
       target_link_libraries(QGIS::Core INTERFACE ${dependency})
     else()
       message(WARNING "Did not find which libraries are exported by ${package}")
-        set(QGIS_FOUND false PARENT_SCOPE)
-      endif()
-    else()
-      set(QGIS_FOUND false PARENT_SCOPE)
+      set(QGIS_FOUND
+          false
+          PARENT_SCOPE)
     endif()
+  else()
+    set(QGIS_FOUND
+        false
+        PARENT_SCOPE)
+  endif()
 
 endfunction()
 
@@ -60,13 +68,9 @@ function(_find_and_link_library library target)
   endif()
 endfunction()
 
-# https://stackoverflow.com/a/32771883
-#if(CMAKE_... STREQUAL "iOS")
-#  set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-#  set(CMAKE_HAVE_THREADS_LIBRARY 1)
-#  set(CMAKE_USE_WIN32_THREADS_INIT 0)
-#  set(CMAKE_USE_PTHREADS_INIT 1)
-#endif()
+# https://stackoverflow.com/a/32771883 if(CMAKE_... STREQUAL "iOS")
+# set(CMAKE_THREAD_LIBS_INIT "-lpthread") set(CMAKE_HAVE_THREADS_LIBRARY 1)
+# set(CMAKE_USE_WIN32_THREADS_INIT 0) set(CMAKE_USE_PTHREADS_INIT 1) endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
   target_compile_definitions(QGIS::Core INTERFACE QT_NO_PRINTER=1)
@@ -82,7 +86,8 @@ _qgis_core_add_dependency(nlohmann_json::nlohmann_json nlohmann_json CONFIG)
 find_package(exiv2 CONFIG REQUIRED)
 target_link_libraries(QGIS::Core INTERFACE Exiv2::exiv2lib)
 
-if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as an exercise for later (should be part of the vcpkg qgis port)
+if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as
+          # an exercise for later (should be part of the vcpkg qgis port)
   _find_and_link_library(authmethod_basic_a QGIS::Core)
   _find_and_link_library(authmethod_esritoken_a QGIS::Core)
   _find_and_link_library(authmethod_identcert_a QGIS::Core)
@@ -105,17 +110,17 @@ if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as a
 
   _qgis_core_add_dependency(PostgreSQL::PostgreSQL PostgreSQL)
 
-  # Relink qgis_core in the end, to make all the qgis plugins happy that need symbols from it
+  # Relink qgis_core in the end, to make all the qgis plugins happy that need
+  # symbols from it
   _find_and_link_library(qgis_core QGIS::Core)
 
-  # Disabled because pkgconfig finds libc++ for the wrong architecture
-  #  and we already link to it through gdal
+  # Disabled because pkgconfig finds libc++ for the wrong architecture and we
+  # already link to it through gdal
   #
-  #  if(PKG_CONFIG_FOUND)
-  #    pkg_check_modules(spatialite REQUIRED IMPORTED_TARGET spatialite)
-  #    target_link_libraries(qgis_core INTERFACE PkgConfig::spatialite)
-  #  endif()
-  
+  # if(PKG_CONFIG_FOUND) pkg_check_modules(spatialite REQUIRED IMPORTED_TARGET
+  # spatialite) target_link_libraries(qgis_core INTERFACE PkgConfig::spatialite)
+  # endif()
+
   _find_and_link_library(qscintilla2_qt5 QGIS::Gui)
   find_package(Qt5 REQUIRED COMPONENTS UiTools)
   target_link_libraries(QGIS::Gui INTERFACE Qt::UiTools)
@@ -129,16 +134,16 @@ if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as a
   _find_and_link_library(provider_virtuallayer_gui_a QGIS::Gui)
 
 endif()
-# _qgis_core_add_dependency(Protobuf Protobuf)
-# Terrible hack ahead
-# 1. geos and proj add libc++.so to their pkgconfig linker instruction
-# 2. This is propagated through spatialite and GDAL
-# 3. pkgconfig finds the build system instead of target system lib
-# The variable pkgcfg_lib_PC_SPATIALITE_c++ is introduced by GDAL's FindSPATIALITE, patched in the gdal portfile
+# _qgis_core_add_dependency(Protobuf Protobuf) Terrible hack ahead 1. geos and
+# proj add libc++.so to their pkgconfig linker instruction 2. This is propagated
+# through spatialite and GDAL 3. pkgconfig finds the build system instead of
+# target system lib The variable pkgcfg_lib_PC_SPATIALITE_c++ is introduced by
+# GDAL's FindSPATIALITE, patched in the gdal portfile
 if(ANDROID)
   find_library(libdl dl)
   get_filename_component(arch_path ${libdl} DIRECTORY)
-  set(pkgcfg_lib_PC_SPATIALITE_c++ "${arch_path}/${ANDROID_PLATFORM_LEVEL}/libc++.so")
+  set(pkgcfg_lib_PC_SPATIALITE_c++
+      "${arch_path}/${ANDROID_PLATFORM_LEVEL}/libc++.so")
   if(NOT EXISTS ${pkgcfg_lib_PC_SPATIALITE_c++})
     set(pkgcfg_lib_PC_SPATIALITE_c++ "${arch_path}/libc++.so")
   endif()
@@ -178,48 +183,58 @@ else()
   _qgis_core_add_dependency(Qt5Keychain::Qt5Keychain Qt5Keychain)
 endif()
 
-find_package(Qt5 COMPONENTS Core Gui Network Xml Svg Concurrent Sql Positioning OpenGL Qml Multimedia QuickWidgets)
-target_link_libraries(QGIS::Core INTERFACE
-    Qt::Gui
-    Qt::Core
-    Qt::Network
-    Qt::Xml
-    Qt::Svg
-    Qt::Concurrent
-    Qt::Sql
-    Qt::Positioning
-    Qt::OpenGL
-    Qt::Qml
-    Qt::Multimedia
-    Qt::QuickWidgets
-  )
+find_package(
+  Qt5
+  COMPONENTS Core
+             Gui
+             Network
+             Xml
+             Svg
+             Concurrent
+             Sql
+             Positioning
+             OpenGL
+             Qml
+             Multimedia
+             QuickWidgets)
+target_link_libraries(
+  QGIS::Core
+  INTERFACE Qt::Gui
+            Qt::Core
+            Qt::Network
+            Qt::Xml
+            Qt::Svg
+            Qt::Concurrent
+            Qt::Sql
+            Qt::Positioning
+            Qt::OpenGL
+            Qt::Qml
+            Qt::Multimedia
+            Qt::QuickWidgets)
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
   find_package(Qt5 COMPONENTS SerialPort)
-  target_link_libraries(QGIS::Core INTERFACE
-    Qt5::SerialPort
-  )
+  target_link_libraries(QGIS::Core INTERFACE Qt5::SerialPort)
 endif()
 if(APPLE)
   if(NOT BUILD_WITH_QT6)
     find_package(Qt5 COMPONENTS MacExtras)
-    target_link_libraries(QGIS::Core INTERFACE
-      Qt5::MacExtras
-    )
+    target_link_libraries(QGIS::Core INTERFACE Qt5::MacExtras)
   endif()
   pkg_check_modules(libtasn1 REQUIRED IMPORTED_TARGET libtasn1)
   target_link_libraries(QGIS::Core INTERFACE PkgConfig::libtasn1)
 
   # QtKeychain
-  target_link_libraries(QGIS::Core INTERFACE "-framework Foundation" "-framework Security")
+  target_link_libraries(QGIS::Core INTERFACE "-framework Foundation"
+                                             "-framework Security")
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-   # poppler fixup for linux and macos
-   # _find_and_link_library(lcms2 QGIS::Core)
+  # poppler fixup for linux and macos _find_and_link_library(lcms2 QGIS::Core)
 
   # QtKeychain
-  find_package(Qt5 COMPONENTS DBus REQUIRED)
-  target_link_libraries(QGIS::Core INTERFACE
-    Qt5::DBus
-  )
+  find_package(
+    Qt5
+    COMPONENTS DBus
+    REQUIRED)
+  target_link_libraries(QGIS::Core INTERFACE Qt5::DBus)
 endif()
 target_link_libraries(QGIS::Analysis INTERFACE QGIS::Core)
