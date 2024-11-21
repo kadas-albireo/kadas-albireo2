@@ -34,12 +34,12 @@ int main( int argc, char *argv[] )
   try
   {
     std::ifstream file;
-    file.open("kadas.env");
+    file.open( "kadas.env" );
 
     std::string var;
-    while (std::getline(file, var))
+    while ( std::getline( file, var ) )
     {
-      if (_putenv(var.c_str()) < 0)
+      if ( _putenv( var.c_str() ) < 0 )
       {
         std::string message = "Could not set environment variable:" + var;
         std::cerr << message;
@@ -47,9 +47,9 @@ int main( int argc, char *argv[] )
       }
     }
   }
-  catch (std::ifstream::failure& e)
+  catch ( std::ifstream::failure &e )
   {
-    std::string message = std::string( "Could not read environment file ") + "`kadas.env`" + "[" + e.what() + "]";
+    std::string message = std::string( "Could not read environment file " ) + "`kadas.env`" + "[" + e.what() + "]";
     std::cerr << message;
     return EXIT_FAILURE;
   }
