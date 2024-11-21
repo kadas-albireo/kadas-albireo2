@@ -44,8 +44,8 @@ int main( int argc, char *argv[] )
       size_t pos = var.find('=');
       if ( pos != std::string::npos )
       {
-        name = env_def.substr(0, pos);
-        value = env_def.substr(pos + 1);
+        name = var.substr(0, pos);
+        value = var.substr(pos + 1);
         if ( !qputenv( name.c_str(), QByteArray::fromStdString( value ) ) )
         {
           std::string message = "Could not set environment variable:" + var;
