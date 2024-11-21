@@ -79,7 +79,7 @@ bool KadasPythonIntegration::checkSystemImports()
       }
     }
 #ifdef Q_OS_WIN
-    AddDllDirectory( static_cast<const wchar_t *>( QString::fromLocal8Bit( prefixPath + "/bin" ).utf16() ) );
+    AddDllDirectory( ( const wchar_t * ) QString::fromLocal8Bit( prefixPath + "/bin" ).utf16() );
 #endif
   }
 
