@@ -37,13 +37,21 @@ int main( int argc, char *argv[] )
     file.open( "kadas.env" );
 
     std::string var;
+    std::string name;
+    std::string value;
     while ( std::getline( file, var ) )
     {
-      if ( _putenv( var.c_str() ) < 0 )
+      size_t pos = var.find('=');
+      if ( pos != std::string::npos )
       {
-        std::string message = "Could not set environment variable:" + var;
-        std::cerr << message;
-        return EXIT_FAILURE;
+        name = env_def.substr(0, pos);
+        value = env_def.substr(pos + 1);
+        if ( !qputenv( name.c_str(), QByteArray::fromStdString( value ) ) )
+        {
+          std::string message = "Could not set environment variable:" + var;
+          std::cerr << message;
+          return EXIT_FAILURE;
+        }
       }
     }
   }
