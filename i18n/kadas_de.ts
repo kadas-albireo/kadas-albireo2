@@ -1604,30 +1604,40 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
         <translation>Formular</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="63"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="67"/>
         <source>Color:</source>
         <translation>Farbe:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="76"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="41"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="83"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="51"/>
         <source>Number:</source>
         <translation>Nummer:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="115"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="102"/>
         <source>Line width:</source>
         <translation>Liniendicke:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="125"/>
+        <source>Font:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="159"/>
+        <source> pt</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>KadasGpxRouteItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasgpxrouteitem.h" line="31"/>
+        <location filename="../kadas/gui/mapitems/kadasgpxrouteitem.h" line="33"/>
         <source>Route</source>
         <translation>Route</translation>
     </message>
@@ -1640,17 +1650,27 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
         <translation>Formular</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="79"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="41"/>
         <source>Color:</source>
         <translation>Farbe:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="92"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="108"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="105"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="115"/>
+        <source>Font:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="149"/>
+        <source> pt</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="73"/>
         <source>Size:</source>
         <translation>Grösse:</translation>
     </message>
@@ -1658,7 +1678,7 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
 <context>
     <name>KadasGpxWaypointItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasgpxwaypointitem.h" line="30"/>
+        <location filename="../kadas/gui/mapitems/kadasgpxwaypointitem.h" line="32"/>
         <source>Waypoint</source>
         <translation>Wegpunkt</translation>
     </message>
@@ -5881,7 +5901,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Text</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="179"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
         <source>Auto resize frame</source>
         <translation type="unfinished"/>
     </message>

@@ -63,7 +63,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="134"/>
         <source>Set View Theme</source>
-        <translation type="unfinished"/>
+        <translation>Définir thème affichage</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="147"/>
@@ -108,7 +108,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="213"/>
         <source>Show Ambient Occlusion</source>
-        <translation type="unfinished"/>
+        <translation>Afficher occlusion ambiante</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="223"/>
@@ -359,7 +359,7 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="29"/>
         <source>Ambient Occlusion</source>
-        <translation type="unfinished"/>
+        <translation>Occlusion ambiante</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="41"/>
@@ -374,12 +374,12 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="55"/>
         <source> map units</source>
-        <translation type="unfinished"/>
+        <translation>Unités cartographiques</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="96"/>
         <source>Occlusion Threshold</source>
-        <translation type="unfinished"/>
+        <translation>Seuil d&apos;occlusion</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="103"/>
@@ -663,12 +663,12 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="64"/>
         <source>Replace bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Remplacer un signet</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="69"/>
         <source>Delete bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer un signet</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="87"/>
@@ -683,7 +683,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
         <source>Replace Bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Remplacer un signet</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
@@ -1606,30 +1606,40 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="63"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="67"/>
         <source>Color:</source>
         <translation>Couleur:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="76"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="41"/>
         <source>Name:</source>
         <translation>Nom:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="83"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="51"/>
         <source>Number:</source>
         <translation>Numéro:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="115"/>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="102"/>
         <source>Line width:</source>
         <translation>Largeur des lignes:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="125"/>
+        <source>Font:</source>
+        <translation>Police:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxrouteeditor.ui" line="159"/>
+        <source> pt</source>
+        <translation>pt</translation>
     </message>
 </context>
 <context>
     <name>KadasGpxRouteItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasgpxrouteitem.h" line="31"/>
+        <location filename="../kadas/gui/mapitems/kadasgpxrouteitem.h" line="33"/>
         <source>Route</source>
         <translation>Route</translation>
     </message>
@@ -1642,17 +1652,27 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="79"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="41"/>
         <source>Color:</source>
         <translation>Couleur:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="92"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="108"/>
         <source>Name:</source>
         <translation>Nom:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="105"/>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="115"/>
+        <source>Font:</source>
+        <translation>Police:</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="149"/>
+        <source> pt</source>
+        <translation>pt</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/ui/kadasgpxwaypointeditor.ui" line="73"/>
         <source>Size:</source>
         <translation>Dimension:</translation>
     </message>
@@ -1660,7 +1680,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasGpxWaypointItem</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasgpxwaypointitem.h" line="30"/>
+        <location filename="../kadas/gui/mapitems/kadasgpxwaypointitem.h" line="32"/>
         <source>Waypoint</source>
         <translation>Waypoint</translation>
     </message>
@@ -3711,7 +3731,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="215"/>
         <source>Add Light</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter lumière</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="215"/>
@@ -3862,7 +3882,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="158"/>
         <source>Search for Places, Coordinates, Adresses, ...</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher places, coordonnées, adresses, ...</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="170"/>
@@ -5490,7 +5510,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="465"/>
         <source>Position locked</source>
-        <translation type="unfinished"/>
+        <translation>Position bloquée</translation>
     </message>
 </context>
 <context>
@@ -5884,7 +5904,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Texte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="179"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
         <source>Auto resize frame</source>
         <translation type="unfinished"/>
     </message>
@@ -6617,13 +6637,13 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="319"/>
         <source>Tile resolution</source>
-        <translation type="unfinished"/>
+        <translation>Résolution de la tuile</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="326"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1047"/>
         <source> map units</source>
-        <translation>Unités de carte</translation>
+        <translation>Unités cartographiques</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
@@ -6782,7 +6802,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1026"/>
         <source>Show light sources</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les sources de lumière</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1033"/>
