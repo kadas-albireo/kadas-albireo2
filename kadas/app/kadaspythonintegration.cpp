@@ -31,6 +31,10 @@
 #include "kadasapplication.h"
 #include "kadaspythonintegration.h"
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
+
 PyThreadState *_mainState = nullptr;
 
 
@@ -74,6 +78,9 @@ bool KadasPythonIntegration::checkSystemImports()
         runString( QStringLiteral( "sys.path.insert(0, '%1')" ).arg( prefixPath + '/' + path ) );
       }
     }
+#ifdef Q_OS_WIN
+    AddDllDirectory((const wchar_t*) QString::fromLocal8Bit( prefixPath + "/bin").utf16());
+#endif
   }
 
   // construct a list of plugin paths

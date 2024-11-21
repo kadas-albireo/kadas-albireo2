@@ -196,6 +196,10 @@ target_include_directories(kadas PUBLIC
     ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there
 )
 
+if(WITH_VCPKG)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY)
+endif()
+
 if(WITH_CRASHREPORT)
   target_link_libraries(kadas ${CRASHRPT_LIBRARY})
   target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
