@@ -1,80 +1,72 @@
-FIND_PACKAGE(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
 set(kadas_SRC
-  kadasapplayerhandling.cpp
-  kadasapplication.cpp
-  kadasbookmarksmenu.cpp
-  kadascanvascontextmenu.cpp
-  kadasgpsintegration.cpp
-  kadasgpxintegration.cpp
-  kadashandlebadlayers.cpp
-  kadashelpviewer.cpp
-  kadaslayerrefreshmanager.cpp
-  kadaslayoutappmenuprovider.cpp
-  kadaslayoutdesignerdialog.cpp
-  kadaslayoutdesignermanager.cpp
-  kadasmainwindow.cpp
-  kadasmapidentifydialog.cpp
-  kadasmapwidgetmanager.cpp
-  kadasmessagelogviewer.cpp
-  kadasnewspopup.cpp
-  kadasplugininterfaceimpl.cpp
-  kadaspluginlayerproperties.cpp
-  kadaspluginmanager.cpp
-  kadaspythonintegration.cpp
-  kadasredliningintegration.cpp
-  kadastemporalcontroller.cpp
-  main.cpp
+    kadasapplayerhandling.cpp
+    kadasapplication.cpp
+    kadasbookmarksmenu.cpp
+    kadascanvascontextmenu.cpp
+    kadasgpsintegration.cpp
+    kadasgpxintegration.cpp
+    kadashandlebadlayers.cpp
+    kadashelpviewer.cpp
+    kadaslayerrefreshmanager.cpp
+    kadaslayoutappmenuprovider.cpp
+    kadaslayoutdesignerdialog.cpp
+    kadaslayoutdesignermanager.cpp
+    kadasmainwindow.cpp
+    kadasmapidentifydialog.cpp
+    kadasmapwidgetmanager.cpp
+    kadasmessagelogviewer.cpp
+    kadasnewspopup.cpp
+    kadasplugininterfaceimpl.cpp
+    kadaspluginlayerproperties.cpp
+    kadaspluginmanager.cpp
+    kadaspythonintegration.cpp
+    kadasredliningintegration.cpp
+    kadastemporalcontroller.cpp
+    main.cpp
+    bullseye/kadasbullseyelayer.cpp
+    bullseye/kadasmaptoolbullseye.cpp
+    guidegrid/kadasguidegridlayer.cpp
+    guidegrid/kadasmaptoolguidegrid.cpp
+    iamauth/kadasiamauth.cpp
+    kml/kadaskmlexport.cpp
+    kml/kadaskmlexportdialog.cpp
+    kml/kadaskmlimport.cpp
+    kml/kadaskmlintegration.cpp
+    kml/kadaskmllabeling.cpp
+    layertree/kadaslayertreeviewmenuprovider.cpp
+    layertree/kadaslayertreeviewtemporalindicator.cpp
+    mapgrid/kadasmapgridlayer.cpp
+    mapgrid/kadasmapgridlayerrenderer.cpp
+    mapgrid/kadasmaptoolmapgrid.cpp
+    mapswipe/kadasmapswipecanvasitem.cpp
+    mapswipe/kadasmapswipetool.cpp
+    milx/kadasmilxintegration.cpp
+    milx/kadasmilxexportdialog.cpp
+    3d/kadas3dintegration.cpp
+    3d/kadas3dmapcanvaswidget.cpp
+    3d/kadas3dmapconfigwidget.cpp
+    3d/kadas3dnavigationwidget.cpp
+    3d/kadasambientocclusionsettingswidget.cpp
+    3d/kadaslightswidget.cpp
+    3d/kadasmesh3dsymbolwidget.cpp
+    3d/kadasphongmaterialwidget.cpp
+    3d/kadasshadowrenderingsettingswidget.cpp
+    3d/kadasskyboxrenderingsettingswidget.cpp
+    external/qgis/app/qgslayertreeviewindicatorprovider.cpp
+    external/qgis/app/qgsgotolocatorfilter.cpp)
 
-  bullseye/kadasbullseyelayer.cpp
-  bullseye/kadasmaptoolbullseye.cpp
-
-  guidegrid/kadasguidegridlayer.cpp
-  guidegrid/kadasmaptoolguidegrid.cpp
-
-  iamauth/kadasiamauth.cpp
-
-  kml/kadaskmlexport.cpp
-  kml/kadaskmlexportdialog.cpp
-  kml/kadaskmlimport.cpp
-  kml/kadaskmlintegration.cpp
-  kml/kadaskmllabeling.cpp
-
-  layertree/kadaslayertreeviewmenuprovider.cpp
-  layertree/kadaslayertreeviewtemporalindicator.cpp
-
-  mapgrid/kadasmapgridlayer.cpp
-  mapgrid/kadasmapgridlayerrenderer.cpp
-  mapgrid/kadasmaptoolmapgrid.cpp
-
-  mapswipe/kadasmapswipecanvasitem.cpp
-  mapswipe/kadasmapswipetool.cpp
-
-  milx/kadasmilxintegration.cpp
-  milx/kadasmilxexportdialog.cpp
-
-  3d/kadas3dintegration.cpp
-  3d/kadas3dmapcanvaswidget.cpp
-  3d/kadas3dmapconfigwidget.cpp
-  3d/kadas3dnavigationwidget.cpp
-  3d/kadasambientocclusionsettingswidget.cpp
-  3d/kadaslightswidget.cpp
-  3d/kadasmesh3dsymbolwidget.cpp
-  3d/kadasphongmaterialwidget.cpp
-  3d/kadasshadowrenderingsettingswidget.cpp
-  3d/kadasskyboxrenderingsettingswidget.cpp
-
-
-  external/qgis/app/qgslayertreeviewindicatorprovider.cpp
-  external/qgis/app/qgsgotolocatorfilter.cpp
-)
-
-set(WITH_CRASHREPORT OFF CACHE BOOL "Enable crash report")
+set(WITH_CRASHREPORT
+    OFF
+    CACHE BOOL "Enable crash report")
 
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
 endif()
 
-FILE(GLOB kadas_HDR
+file(
+  GLOB
+  kadas_HDR
   *.h
   milx/*.h
   kml/*.h
@@ -96,71 +88,79 @@ FILE(GLOB kadas_HDR
   3d/kadasskyboxrenderingsettingswidget.h
   external/qgis/app/*.h)
 
-LIST(SORT kadas_HDR)
+list(SORT kadas_HDR)
 
-FILE(GLOB kadas_UI
+file(
+  GLOB
+  kadas_UI
   ui/*.ui
   kml/*.ui
   bullseye/*.ui
   guidegrid/*.ui
   mapgrid/*.ui
   milx/*.ui)
-LIST(SORT kadas_UI)
+list(SORT kadas_UI)
 
-SET(KADAS_SPLASH "splash.png" CACHE STRING "Splash image")
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY)
-SET(KADAS_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
+set(KADAS_SPLASH
+    "splash.png"
+    CACHE STRING "Splash image")
+configure_file(${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in
+               ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY)
+set(KADAS_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
 
 # Translation
 find_package(Qt5 COMPONENTS LinguistTools)
 file(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/i18n/*.ts)
-set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_BINARY_DIR}/i18n)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION
+                                                   ${CMAKE_BINARY_DIR}/i18n)
 qt_add_translation(QM_FILES ${TS_FILES})
 
 set(KADAS_QM "${CMAKE_BINARY_DIR}/translations.qrc")
-file(WRITE ${KADAS_QM} "<!DOCTYPE RCC><RCC version=\"1.0\">\n  <qresource prefix=\"/i18n/\">\n")
+file(WRITE ${KADAS_QM}
+     "<!DOCTYPE RCC><RCC version=\"1.0\">\n  <qresource prefix=\"/i18n/\">\n")
 foreach(QM_FILE ${QM_FILES})
   get_filename_component(QM_FILE_NAME ${QM_FILE} NAME)
-  file(APPEND ${KADAS_QM} "\n        <file alias=\"${QM_FILE_NAME}\">${QM_FILE}</file>")
+  file(APPEND ${KADAS_QM}
+       "\n        <file alias=\"${QM_FILE_NAME}\">${QM_FILE}</file>")
 endforeach()
 file(APPEND ${KADAS_QM} "\n  </qresource>\n</RCC>\n")
 
 qt5_add_resources(KADAS_RCC ${KADAS_QM})
 
-
-QT5_ADD_RESOURCES(KADAS_RCC ${KADAS_RCC_SRC})
-QT5_WRAP_UI(kadas_UI_HDR ${kadas_UI})
+qt5_add_resources(KADAS_RCC ${KADAS_RCC_SRC})
+qt5_wrap_ui(kadas_UI_HDR ${kadas_UI})
 
 if(WIN32)
   enable_language(RC)
   list(APPEND kadas_SRC "${CMAKE_SOURCE_DIR}/kadas/resources/kadas-icon.rc")
 endif()
 if(MINGW)
-  SET(CMAKE_RC_COMPILER_INIT ${CMAKE_GENERATOR_RC})
-  SET(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -i <SOURCE> -o <OBJECT>")
-  SET(kadas_RC_LIBS -mwindows)
+  set(CMAKE_RC_COMPILER_INIT ${CMAKE_GENERATOR_RC})
+  set(CMAKE_RC_COMPILE_OBJECT
+      "<CMAKE_RC_COMPILER> -O coff -i <SOURCE> -o <OBJECT>")
+  set(kadas_RC_LIBS -mwindows)
 endif(MINGW)
 
-SET_PROPERTY(SOURCE ${kadas_UI_HDR} PROPERTY SKIP_AUTOMOC ON)
-SET_PROPERTY(SOURCE ${KADAS_RCC} PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ${kadas_UI_HDR} PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ${KADAS_RCC} PROPERTY SKIP_AUTOMOC ON)
 
-IF(WIN32)
-  FIND_PACKAGE(Qt5AxContainer REQUIRED)
-  SET(AXCONTAINER_LIBRARY Qt5::AxContainer)
-ENDIF(WIN32)
+if(WIN32)
+  find_package(Qt5AxContainer REQUIRED)
+  set(AXCONTAINER_LIBRARY Qt5::AxContainer)
+endif(WIN32)
 
+add_executable(
+  kadas
+  ${kadas_SRC}
+  ${kadas_HDR}
+  ${kadas_UI}
+  ${kadas_UI_HDR}
+  ${KADAS_RCC_SRC}
+  ${KADAS_RCC}
+  ${kadas_QM})
 
-ADD_EXECUTABLE(kadas
-    ${kadas_SRC}
-    ${kadas_HDR}
-    ${kadas_UI}
-    ${kadas_UI_HDR}
-    ${KADAS_RCC_SRC}
-    ${KADAS_RCC}
-    ${kadas_QM}
-)
-
-TARGET_LINK_LIBRARIES(kadas
+target_link_libraries(
+  kadas
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
@@ -174,26 +174,24 @@ TARGET_LINK_LIBRARIES(kadas
   QGIS::3D
   Python3::Python
   ${kadas_RC_LIBS}
-
   kadas_core
   kadas_analysis
-  kadas_gui
-)
+  kadas_gui)
 
-target_include_directories(kadas PUBLIC
-    ${CMAKE_SOURCE_DIR}/kadas/app
-    ${CMAKE_SOURCE_DIR}/kadas/app/3d
-    ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
-    ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
-    ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
-    ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
-    ${CMAKE_SOURCE_DIR}/kadas/app/kml
-    ${CMAKE_SOURCE_DIR}/kadas/app/layertree
-    ${CMAKE_SOURCE_DIR}/kadas/app/mapgrid
-    ${CMAKE_SOURCE_DIR}/kadas/app/mapswipe
-    ${CMAKE_SOURCE_DIR}/kadas/app/milx
-
-    ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there
+target_include_directories(
+  kadas
+  PUBLIC ${CMAKE_SOURCE_DIR}/kadas/app
+         ${CMAKE_SOURCE_DIR}/kadas/app/3d
+         ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
+         ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
+         ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
+         ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
+         ${CMAKE_SOURCE_DIR}/kadas/app/kml
+         ${CMAKE_SOURCE_DIR}/kadas/app/layertree
+         ${CMAKE_SOURCE_DIR}/kadas/app/mapgrid
+         ${CMAKE_SOURCE_DIR}/kadas/app/mapswipe
+         ${CMAKE_SOURCE_DIR}/kadas/app/milx
+         ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there
 )
 
 if(WITH_CRASHREPORT)
@@ -201,19 +199,20 @@ if(WITH_CRASHREPORT)
   target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
 endif()
 
-if (WITH_QTWEBKIT)
-  TARGET_LINK_LIBRARIES(kadas Qt5::WebKitWidgets)
+if(WITH_QTWEBKIT)
+  target_link_libraries(kadas Qt5::WebKitWidgets)
 endif()
 
-if (WITH_BINDINGS)
- add_definitions(-DWITH_BINDINGS)
+if(WITH_BINDINGS)
+  add_definitions(-DWITH_BINDINGS)
 endif()
 
-if (WITH_QTWEBKIT)
- add_definitions(-DWITH_QTWEBKIT)
+if(WITH_QTWEBKIT)
+  add_definitions(-DWITH_QTWEBKIT)
 endif()
 
-FILE(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt ${PROJECT_SOURCE_DIR})
+file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
+     ${PROJECT_SOURCE_DIR})
 
-INSTALL(TARGETS kadas DESTINATION bin)
-INSTALL(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
+install(TARGETS kadas DESTINATION bin)
+install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
