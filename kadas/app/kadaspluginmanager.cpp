@@ -221,7 +221,7 @@ void KadasPluginManager::updateAllPlugins()
 }
 
 KadasPluginManager::KadasPluginManager()
-  : KadasBottomBar( 0 )
+  : KadasBottomBar( nullptr )
 {
 }
 
