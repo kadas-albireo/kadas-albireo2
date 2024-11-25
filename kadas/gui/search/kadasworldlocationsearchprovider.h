@@ -42,9 +42,7 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     virtual void clearPreviousResults() override;
 
   private:
-    static const int sSearchTimeout;
     static const int sResultCountLimit;
-    static const QByteArray sGeoAdminUrl;
 
     QString mPinItemId;
     QString mGeometryItemId;
