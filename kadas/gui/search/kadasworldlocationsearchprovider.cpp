@@ -133,6 +133,10 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
       emit resultFetched( result );
     }
   }
+  else
+  {
+    QgsDebugMsgLevel( QString( "Could not fetch %1: %2" ).arg( url.toString(), rep.errorString() ), 1 );
+  }
 }
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
