@@ -51,10 +51,18 @@ set(KADAS_NAME
 set(KADAS_FULL_NAME
     "Kadas Albireo"
     CACHE STRING "Kadas full application name")
-set(KADAS_VERSION_MAJOR "2")
-set(KADAS_VERSION_MINOR "2")
-set(KADAS_VERSION_PATCH "2")
-set(KADAS_VERSION_PRE "")
+set(KADAS_VERSION_MAJOR
+    "2"
+    CACHE STRING "Kadas major version")
+set(KADAS_VERSION_MINOR
+    "3"
+    CACHE STRING "Kadas minor version")
+set(KADAS_VERSION_PATCH
+    "0"
+    CACHE STRING "Kadas patch version")
+set(KADAS_VERSION_PRE
+    "alpha4"
+    CACHE STRING "Kadas pre version")
 execute_process(
   COMMAND git rev-parse HEAD
   OUTPUT_VARIABLE KADAS_VERSION_DEV
