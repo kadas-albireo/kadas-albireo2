@@ -22,6 +22,7 @@
 
 KadasBottomBar::KadasBottomBar( QgsMapCanvas *canvas, const QString &color )
   : QgsFloatingWidget( canvas )
+  , mCanvas( canvas )
 {
   setAnchorWidget( canvas );
   setAnchorPoint( QgsFloatingWidget::BottomMiddle );
