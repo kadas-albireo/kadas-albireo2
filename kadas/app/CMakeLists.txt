@@ -197,7 +197,8 @@ target_include_directories(kadas PUBLIC
 )
 
 if(WITH_VCPKG)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY)
 endif()
 
 if(WITH_CRASHREPORT)
