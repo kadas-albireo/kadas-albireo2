@@ -40,7 +40,6 @@
 #include "kadas/gui/search/kadasworldlocationsearchprovider.h"
 
 
-const int KadasWorldLocationSearchProvider::sSearchTimeout = 10000;
 const int KadasWorldLocationSearchProvider::sResultCountLimit = 50;
 
 
