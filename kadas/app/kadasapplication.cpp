@@ -799,7 +799,8 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   // Add default print templates if none are loaded
   bool haveLayouts = false;
-  for ( const QString &file : QgsProject::instance()->attachedFiles() )
+  const QStringList attachedFileds = QgsProject::instance()->attachedFiles();
+  for ( const QString &file : attachedFileds )
   {
     if ( file.endsWith( ".qpt" ) )
     {
@@ -1084,7 +1085,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
       optionsWidget->item( panelIndices[i] )->setHidden( true );
     }
 
-    for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+    for ( QgsMapLayerConfigWidgetFactory *factory : std::as_const( mMapLayerPanelFactories ) )
     {
       dialog.addPropertiesPageFactory( factory );
     }
@@ -1098,7 +1099,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   else if ( qobject_cast<KadasPluginLayer *>( layer ) )
   {
     KadasPluginLayerProperties dialog( static_cast<KadasPluginLayer *>( layer ), mainWindow()->mapCanvas(), mainWindow() );
-    for ( QgsMapLayerConfigWidgetFactory *factory : mMapLayerPanelFactories )
+    for ( QgsMapLayerConfigWidgetFactory *factory : std::as_const( mMapLayerPanelFactories ) )
     {
       dialog.addPropertiesPageFactory( factory );
     }
@@ -1564,7 +1565,7 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
 
   // Perform string replacements
   QString newPath = path;
-  for ( const QPair<QString, QString> &entry : dataSourceMap.strings )
+  for ( const QPair<QString, QString> &entry : std::as_const( dataSourceMap.strings ) )
   {
     newPath.replace( entry.first, entry.second, Qt::CaseInsensitive );
   }
