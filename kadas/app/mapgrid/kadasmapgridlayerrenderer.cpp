@@ -458,7 +458,7 @@ double KadasMapGridLayerRenderer::exponentialScale( double value, double domainM
   }
   if ( exponent <= 0 )
   {
-    std::numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
   // outside of domain?
   if ( value >= domainMax )
