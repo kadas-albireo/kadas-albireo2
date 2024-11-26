@@ -69,6 +69,9 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
     serviceUrl = QgsSettings().value( "search/worldlocationsearchurl", "" ).toString();
   }
 
+  if ( serviceUrl.isEmpty() )
+    return;
+
   QUrl url( serviceUrl );
   QUrlQuery query( url );
   query.removeAllQueryItems( "type" );
@@ -85,7 +88,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
 
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  QgsNetworkReplyContent rep = QgsNetworkAccessManager::blockingGet( req );
+  QgsNetworkReplyContent rep = QgsNetworkAccessManager::blockingGet( req, QString(), false, feedback );
 
   if ( rep.error() == QNetworkReply::NoError )
   {
