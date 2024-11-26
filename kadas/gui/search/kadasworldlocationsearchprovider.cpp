@@ -87,7 +87,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   QgsNetworkReplyContent rep = QgsNetworkAccessManager::blockingGet( req );
 
-  if ( rep.error(), QNetworkReply::NoError )
+  if ( rep.error() == QNetworkReply::NoError )
   {
     QByteArray replyText = rep.content();
     QJsonParseError err;
