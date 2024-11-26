@@ -6550,7 +6550,7 @@ avec géoloc.</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="51"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="50"/>
         <source>World Places</source>
         <translation>Lieux mondiaux</translation>
     </message>
