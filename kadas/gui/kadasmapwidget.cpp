@@ -113,7 +113,8 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMapWidget::addMapCanvasItem );
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMapWidget::removeMapCanvasItem );
 
-  for ( QgsMapLayer *layer : mMasterCanvas->layers() )
+  const QList<QgsMapLayer *> layers = mMasterCanvas->layers();
+  for ( QgsMapLayer *layer : layers )
   {
     mInitialLayers.append( layer->id() );
   }
@@ -139,7 +140,8 @@ void KadasMapWidget::setInitialLayers( const QStringList &initialLayers )
 QStringList KadasMapWidget::getLayers() const
 {
   QStringList layers;
-  for ( QAction *layerAction : mLayerSelectionMenu->actions() )
+  const QList<QAction *> actions = mLayerSelectionMenu->actions();
+  for ( QAction *layerAction : actions )
   {
     if ( layerAction->isChecked() )
     {
@@ -206,7 +208,8 @@ void KadasMapWidget::updateLayerSelectionMenu()
 {
   QStringList prevDisabledLayers;
   QStringList prevLayers;
-  for ( QAction *action : mLayerSelectionMenu->actions() )
+  const QList<QAction *> actions = mLayerSelectionMenu->actions();
+  for ( QAction *action : actions )
   {
     prevLayers.append( action->data().toString() );
     if ( !action->isChecked() )
@@ -216,7 +219,8 @@ void KadasMapWidget::updateLayerSelectionMenu()
   }
   mLayerSelectionMenu->clear();
   mLayerSelectionMenu->addAction( tr( "Sync with main view" ), this, [this] {
-    for ( QgsMapLayer *layer : mMasterCanvas->layers() )
+    const QList<QgsMapLayer *> layers = mMasterCanvas->layers();
+    for ( QgsMapLayer *layer : layers )
     {
       mInitialLayers.append( layer->id() );
     }
@@ -255,7 +259,8 @@ void KadasMapWidget::updateLayerSelectionMenu()
 void KadasMapWidget::updateLayerSet()
 {
   QList<QgsMapLayer *> layerSet;
-  for ( QAction *layerAction : mLayerSelectionMenu->actions() )
+  const QList<QAction *> actions = mLayerSelectionMenu->actions();
+  for ( QAction *layerAction : actions )
   {
     if ( layerAction->isChecked() )
     {
@@ -264,7 +269,8 @@ void KadasMapWidget::updateLayerSet()
       layerSet.append( layer );
     }
   }
-  for ( QgsMapLayer *layer : mMapCanvas->layers() )
+  const QList<QgsMapLayer *> layers = mMapCanvas->layers();
+  for ( QgsMapLayer *layer : layers )
   {
     disconnect( layer, &QgsMapLayer::repaintRequested, mMapCanvas, &QgsMapCanvas::refresh );
   }
@@ -337,7 +343,8 @@ void KadasMapWidget::addMapCanvasItem( const KadasMapItem *item )
 
 void KadasMapWidget::removeMapCanvasItem( const KadasMapItem *item )
 {
-  for ( QGraphicsItem *canvasItem : mMapCanvas->items() )
+  const QList<QGraphicsItem *> items = mMapCanvas->items();
+  for ( QGraphicsItem *canvasItem : items )
   {
     if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->mapItem() == item )
     {
