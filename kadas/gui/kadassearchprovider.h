@@ -71,10 +71,6 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
     virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) = 0;
     virtual void cancelSearch() {}
 
-  signals:
-    void searchResultFound( KadasSearchProvider::SearchResult result );
-    void searchFinished();
-
   protected:
     QgsMapCanvas *mMapCanvas;
 };

@@ -46,7 +46,6 @@ class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
 
   private:
     QgsMapCanvas *mMapCanvas = nullptr;
-    static const int sSearchTimeout;
     static const int sResultCountLimit;
     static const QByteArray sGeoAdminUrl;
 

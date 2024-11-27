@@ -28,6 +28,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmultisurface.h>
 #include <qgis/qgsjsonutils.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -48,8 +49,6 @@ KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas
   , mMapCanvas( mapCanvas )
 {
   mCategoryMap.insert( "geonames", qMakePair( tr( "World Places" ), 30 ) );
-
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 }
 
 QgsLocatorFilter *KadasWorldLocationSearchProvider::clone() const
@@ -144,41 +143,54 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
 {
+  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+
   QVariantMap data = result.userData().value<QVariantMap>();
-  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
+  QgsPointXY itemPos = ct.transform( data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>() );
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
   QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
-
-  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
-  QgsPointXY itemPos = ct.transform( pos );
 
   bool geomShown = false;
   if ( !geometry.isEmpty() )
   {
-    QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"feature\", \"geometry\": %1}]}" ).arg( geometry );
+    QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"Feature\", \"geometry\": %1}]}" ).arg( geometry );
     QgsFeatureList features = QgsJsonUtils::stringToFeatureList( feature );
     if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
     {
       QgsGeometry geometry = features[0].geometry();
+      geometry.transform( ct );
       QgsAnnotationItem *item = nullptr;
       switch ( features[0].geometry().type() )
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
-          item = new QgsAnnotationMarkerItem( *pt );
+          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.constGet() );
+          item = new QgsAnnotationMarkerItem( *pt->clone() );
+
+          QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
+          symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+          dynamic_cast<QgsAnnotationMarkerItem *>( item )->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet() );
+          item = new QgsAnnotationLineItem( curve->clone() );
           break;
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
-          item = new QgsAnnotationPolygonItem( poly );
+          QgsCurvePolygon *poly = nullptr;
+          if ( geometry.isMultipart() )
+          {
+            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) );
+          }
+          else
+          {
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() );
+          }
+          item = new QgsAnnotationPolygonItem( poly->clone() );
           break;
         }
         case Qgis::GeometryType::Unknown:

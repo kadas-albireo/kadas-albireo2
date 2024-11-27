@@ -88,6 +88,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   setTitleBarWidget( titleWidget );
 
   mMapCanvas = new QgsMapCanvas( this );
+  mMapCanvas->setFlags( Qgis::MapCanvasFlag::ShowMainAnnotationLayer );
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->enableAntiAliasing( mMasterCanvas->antiAliasingEnabled() );
   mMapCanvas->enableMapTileRendering( mMasterCanvas->mapSettings().flags() & Qgis::MapSettingsFlag::RenderMapTile );

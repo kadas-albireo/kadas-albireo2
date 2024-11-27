@@ -137,6 +137,7 @@ void KadasMainWindow::init()
   KadasStatusWidget::setupUi( statusWidget );
   statusBar()->addPermanentWidget( statusWidget, 0 );
 
+  mMapCanvas->setFlags( Qgis::MapCanvasFlag::ShowMainAnnotationLayer );
   mMapCanvas->setCanvasColor( Qt::transparent );
   mMapCanvas->enableAntiAliasing( QgsSettings().value( "/kadas/mapAntialiasing", true ).toBool() );
   mMapCanvas->enableMapTileRendering( QgsSettings().value( "/kadas/mapTileRendering", true ).toBool() );
