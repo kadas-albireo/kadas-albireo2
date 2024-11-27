@@ -33,13 +33,13 @@
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmultisurface.h>
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
 
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 
 
-const int KadasLocationSearchFilter::sSearchTimeout = 10000;
 const int KadasLocationSearchFilter::sResultCountLimit = 50;
 
 
@@ -157,16 +157,11 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
 {
-  QVariantMap data = result.userData().value<QVariantMap>();
-  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
-  QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
+  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
 
-  QgsPointXY itemPos = QgsCoordinateTransform(
-                         QgsCoordinateReferenceSystem::fromOgcWmsCrs( QStringLiteral( "EPSG:4326" ) ),
-                         mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-  )
-                         .transform( pos );
+  QVariantMap data = result.userData().value<QVariantMap>();
+  QgsPointXY itemPos = ct.transform( data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>() );
+  QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
@@ -179,7 +174,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   // not sure if we will get this from somewhere, it is not documented in the swisstopo API
   if ( !geometry.isEmpty() )
   {
-    QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"feature\", \"geometry\": %1}]}" ).arg( geometry );
+    QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"Feature\", \"geometry\": %1}]}" ).arg( geometry );
     QgsFeatureList features = QgsJsonUtils::stringToFeatureList( feature );
     if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
     {
@@ -189,9 +184,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
-          item = new QgsAnnotationMarkerItem( *pt );
-          break;
+          // points are already rendered
         }
         case Qgis::GeometryType::Line:
         {
@@ -201,8 +194,17 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
-          item = new QgsAnnotationPolygonItem( poly );
+          QgsCurvePolygon *poly = nullptr;
+          if ( geometry.isMultipart() )
+          {
+            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) );
+          }
+          else
+          {
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() );
+          }
+          item = new QgsAnnotationPolygonItem( poly->clone() );
           break;
         }
         case Qgis::GeometryType::Unknown:
