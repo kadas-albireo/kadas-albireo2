@@ -1,0 +1,412 @@
+From b3c7f8ec46af787bfd3aa2dc2c9038e4ed707adf Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Thu, 28 Nov 2024 14:18:44 +0100
+Subject: [PATCH] Set additional HTTP headers for WCS provider
+
+Same way as done for WMS
+Fixes partially #17823 (WFS still missing)
+---
+ src/gui/qgsowssourceselect.cpp                |  4 +-
+ .../wcs/qgswcsdataitemguiprovider.cpp         |  4 +-
+ src/providers/wcs/qgswcsprovider.cpp          |  4 +-
+ src/providers/wcs/qgswcsprovider.h            | 49 ++--------------
+ src/providers/wfs/qgsauthorizationsettings.h  | 16 +++--
+ src/providers/wms/qgswmscapabilities.cpp      |  4 +-
+ src/providers/wms/qgswmscapabilities.h        | 58 ++-----------------
+ src/providers/wms/qgswmsprovider.cpp          |  4 +-
+ src/providers/wms/qgswmsprovider.h            |  6 +-
+ 9 files changed, 36 insertions(+), 113 deletions(-)
+
+diff --git a/src/gui/qgsowssourceselect.cpp b/src/gui/qgsowssourceselect.cpp
+index 2c7f008c409..0223486d28b 100644
+--- a/src/gui/qgsowssourceselect.cpp
++++ b/src/gui/qgsowssourceselect.cpp
+@@ -268,7 +268,7 @@ QgsNewHttpConnection::ConnectionType connectionTypeFromServiceString( const QStr
+ void QgsOWSSourceSelect::mNewButton_clicked()
+ {
+   const QgsNewHttpConnection::ConnectionType type = connectionTypeFromServiceString( mService );
+-  QgsNewHttpConnection *nc = new QgsNewHttpConnection( this, type, mService.toUpper() );
++  QgsNewHttpConnection *nc = new QgsNewHttpConnection( this, type, mService.toUpper(), QString(), QgsNewHttpConnection::FlagShowHttpSettings );
+ 
+   if ( nc->exec() )
+   {
+@@ -282,7 +282,7 @@ void QgsOWSSourceSelect::mNewButton_clicked()
+ void QgsOWSSourceSelect::mEditButton_clicked()
+ {
+   const QgsNewHttpConnection::ConnectionType type = connectionTypeFromServiceString( mService );
+-  QgsNewHttpConnection *nc = new QgsNewHttpConnection( this, type, mService.toUpper(), mConnectionsComboBox->currentText() );
++  QgsNewHttpConnection *nc = new QgsNewHttpConnection( this, type, mService.toUpper(), mConnectionsComboBox->currentText(), QgsNewHttpConnection::FlagShowHttpSettings );
+ 
+   if ( nc->exec() )
+   {
+diff --git a/src/providers/wcs/qgswcsdataitemguiprovider.cpp b/src/providers/wcs/qgswcsdataitemguiprovider.cpp
+index 3be66fc6877..01f51a77f81 100644
+--- a/src/providers/wcs/qgswcsdataitemguiprovider.cpp
++++ b/src/providers/wcs/qgswcsdataitemguiprovider.cpp
+@@ -76,7 +76,7 @@ void QgsWcsDataItemGuiProvider::populateContextMenu( QgsDataItem *item, QMenu *m
+ 
+ void QgsWcsDataItemGuiProvider::newConnection( QgsDataItem *item )
+ {
+-  QgsNewHttpConnection nc( nullptr, QgsNewHttpConnection::ConnectionWcs, QStringLiteral( "WCS" ) );
++  QgsNewHttpConnection nc( nullptr, QgsNewHttpConnection::ConnectionWcs, QStringLiteral( "WCS" ), QString(), QgsNewHttpConnection::FlagShowHttpSettings );
+ 
+   if ( nc.exec() )
+   {
+@@ -86,7 +86,7 @@ void QgsWcsDataItemGuiProvider::newConnection( QgsDataItem *item )
+ 
+ void QgsWcsDataItemGuiProvider::editConnection( QgsDataItem *item )
+ {
+-  QgsNewHttpConnection nc( nullptr, QgsNewHttpConnection::ConnectionWcs, QStringLiteral( "WCS" ), item->name() );
++  QgsNewHttpConnection nc( nullptr, QgsNewHttpConnection::ConnectionWcs, QStringLiteral( "WCS" ), item->name(), QgsNewHttpConnection::FlagShowHttpSettings );
+ 
+   if ( nc.exec() )
+   {
+diff --git a/src/providers/wcs/qgswcsprovider.cpp b/src/providers/wcs/qgswcsprovider.cpp
+index bc9f2e7f80d..5e32efffa3d 100644
+--- a/src/providers/wcs/qgswcsprovider.cpp
++++ b/src/providers/wcs/qgswcsprovider.cpp
+@@ -435,6 +435,8 @@ bool QgsWcsProvider::parseUri( const QString &uriString )
+   }
+   QgsDebugMsgLevel( "set authcfg to " + mAuth.mAuthCfg, 2 );
+ 
++  mAuth.mHttpHeaders = uri.httpHeaders();
++
+   mIdentifier = uri.param( QStringLiteral( "identifier" ) );
+ 
+   mTime = uri.param( QStringLiteral( "time" ) );
+@@ -1685,7 +1687,7 @@ QgsWcsProvider *QgsWcsProviderMetadata::createProvider( const QString &uri, cons
+ 
+ int QgsWcsDownloadHandler::sErrors = 0;
+ 
+-QgsWcsDownloadHandler::QgsWcsDownloadHandler( const QUrl &url, QgsWcsAuthorization &auth, QNetworkRequest::CacheLoadControl cacheLoadControl, QByteArray &cachedData, const QString &wcsVersion, QgsError &cachedError, QgsRasterBlockFeedback *feedback )
++QgsWcsDownloadHandler::QgsWcsDownloadHandler( const QUrl &url, QgsAuthorizationSettings &auth, QNetworkRequest::CacheLoadControl cacheLoadControl, QByteArray &cachedData, const QString &wcsVersion, QgsError &cachedError, QgsRasterBlockFeedback *feedback )
+   : mAuth( auth )
+   , mEventLoop( new QEventLoop )
+   , mCachedData( cachedData )
+diff --git a/src/providers/wcs/qgswcsprovider.h b/src/providers/wcs/qgswcsprovider.h
+index 836806fad83..634bda641fd 100644
+--- a/src/providers/wcs/qgswcsprovider.h
++++ b/src/providers/wcs/qgswcsprovider.h
+@@ -31,6 +31,7 @@
+ #include "qgscoordinatetransform.h"
+ #include "qgsogrutils.h"
+ #include "qgsapplication.h"
++#include "../wfs/qgsauthorizationsettings.h"
+ 
+ #include "qgsprovidermetadata.h"
+ 
+@@ -53,48 +54,6 @@ class QNetworkRequest;
+ #include <gdal.h>
+ #include "cpl_conv.h"
+ 
+-// TODO: merge with QgsWmsAuthorization?
+-struct QgsWcsAuthorization
+-{
+-  QgsWcsAuthorization( const QString &userName = QString(), const QString &password = QString(), const QString &authcfg = QString() )
+-    : mUserName( userName )
+-    , mPassword( password )
+-    , mAuthCfg( authcfg )
+-  {}
+-
+-  //! Sets authorization header
+-  bool setAuthorization( QNetworkRequest &request ) const
+-  {
+-    if ( !mAuthCfg.isEmpty() )
+-    {
+-      return QgsApplication::authManager()->updateNetworkRequest( request, mAuthCfg );
+-    }
+-    else if ( !mUserName.isNull() || !mPassword.isNull() )
+-    {
+-      request.setRawHeader( "Authorization", "Basic " + QStringLiteral( "%1:%2" ).arg( mUserName, mPassword ).toLatin1().toBase64() );
+-    }
+-    return true;
+-  }
+-
+-  //! Sets authorization reply
+-  bool setAuthorizationReply( QNetworkReply *reply ) const
+-  {
+-    if ( !mAuthCfg.isEmpty() )
+-    {
+-      return QgsApplication::authManager()->updateNetworkReply( reply, mAuthCfg );
+-    }
+-    return true;
+-  }
+-
+-  //! Username for basic http authentication
+-  QString mUserName;
+-
+-  //! Password for basic http authentication
+-  QString mPassword;
+-
+-  //! Authentication configuration ID
+-  QString mAuthCfg;
+-};
+ 
+ /**
+  *
+@@ -385,7 +344,7 @@ class QgsWcsProvider final: public QgsRasterDataProvider, QgsGdalProviderBase
+     //QMap<int, QStringList> mLayerParentNames;
+ 
+     //! http authorization details
+-    mutable QgsWcsAuthorization mAuth;
++    mutable QgsAuthorizationSettings mAuth;
+ 
+     //! whether to use hrefs from GetCapabilities (default) or
+     // the given base urls for GetMap and GetFeatureInfo
+@@ -415,7 +374,7 @@ class QgsWcsDownloadHandler : public QObject
+ {
+     Q_OBJECT
+   public:
+-    QgsWcsDownloadHandler( const QUrl &url, QgsWcsAuthorization &auth, QNetworkRequest::CacheLoadControl cacheLoadControl, QByteArray &cachedData, const QString &wcsVersion, QgsError &cachedError, QgsRasterBlockFeedback *feedback );
++    QgsWcsDownloadHandler( const QUrl &url, QgsAuthorizationSettings &auth, QNetworkRequest::CacheLoadControl cacheLoadControl, QByteArray &cachedData, const QString &wcsVersion, QgsError &cachedError, QgsRasterBlockFeedback *feedback );
+     ~QgsWcsDownloadHandler() override;
+ 
+     void blockingDownload();
+@@ -428,7 +387,7 @@ class QgsWcsDownloadHandler : public QObject
+   protected:
+     void finish() { QMetaObject::invokeMethod( mEventLoop, "quit", Qt::QueuedConnection ); }
+ 
+-    QgsWcsAuthorization &mAuth;
++    QgsAuthorizationSettings &mAuth;
+     QEventLoop *mEventLoop = nullptr;
+ 
+     QNetworkReply *mCacheReply = nullptr;
+diff --git a/src/providers/wfs/qgsauthorizationsettings.h b/src/providers/wfs/qgsauthorizationsettings.h
+index 45d63387de9..35d997a6e65 100644
+--- a/src/providers/wfs/qgsauthorizationsettings.h
++++ b/src/providers/wfs/qgsauthorizationsettings.h
+@@ -18,17 +18,19 @@
+ 
+ #include "qgsauthmanager.h"
+ #include "qgsapplication.h"
++#include "qgshttpheaders.h"
+ 
+ #include <QString>
+ #include <QNetworkRequest>
+ #include <QNetworkReply>
+ 
+-// TODO: merge with QgsWmsAuthorization?
++
+ struct QgsAuthorizationSettings
+ {
+-  QgsAuthorizationSettings( const QString &userName = QString(), const QString &password = QString(), const QString &authcfg = QString() )
++  QgsAuthorizationSettings( const QString &userName = QString(), const QString &password = QString(), const QgsHttpHeaders &httpHeaders = QgsHttpHeaders(), const QString &authcfg = QString() )
+     : mUserName( userName )
+     , mPassword( password )
++    , mHttpHeaders( httpHeaders )
+     , mAuthCfg( authcfg )
+   {}
+ 
+@@ -39,10 +41,13 @@ struct QgsAuthorizationSettings
+     {
+       return QgsApplication::authManager()->updateNetworkRequest( request, mAuthCfg );
+     }
+-    else if ( !mUserName.isNull() || !mPassword.isNull() ) // allow empty values
++    else if ( !mUserName.isEmpty() || !mPassword.isEmpty() )
+     {
+-      request.setRawHeader( "Authorization", "Basic " + QStringLiteral( "%1:%2" ).arg( mUserName, mPassword ).toLatin1().toBase64() );
++      request.setRawHeader( "Authorization", "Basic " + QStringLiteral( "%1:%2" ).arg( mUserName, mPassword ).toUtf8().toBase64() );
+     }
++
++    mHttpHeaders.updateNetworkRequest( request );
++
+     return true;
+   }
+ 
+@@ -62,6 +67,9 @@ struct QgsAuthorizationSettings
+   //! Password for basic http authentication
+   QString mPassword;
+ 
++  //! headers for http requests
++  QgsHttpHeaders mHttpHeaders;
++
+   //! Authentication configuration ID
+   QString mAuthCfg;
+ };
+diff --git a/src/providers/wms/qgswmscapabilities.cpp b/src/providers/wms/qgswmscapabilities.cpp
+index b08635904a9..c7275db6849 100644
+--- a/src/providers/wms/qgswmscapabilities.cpp
++++ b/src/providers/wms/qgswmscapabilities.cpp
+@@ -2511,7 +2511,7 @@ QgsWmsCapabilitiesDownload::QgsWmsCapabilitiesDownload( bool forceRefresh, QObje
+ {
+ }
+ 
+-QgsWmsCapabilitiesDownload::QgsWmsCapabilitiesDownload( const QString &baseUrl, const QgsWmsAuthorization &auth, bool forceRefresh, QObject *parent )
++QgsWmsCapabilitiesDownload::QgsWmsCapabilitiesDownload( const QString &baseUrl, const QgsAuthorizationSettings &auth, bool forceRefresh, QObject *parent )
+   : QObject( parent )
+   , mBaseUrl( baseUrl )
+   , mAuth( auth )
+@@ -2535,7 +2535,7 @@ void QgsWmsCapabilitiesDownload::setForceRefresh( bool forceRefresh )
+   mForceRefresh = forceRefresh;
+ }
+ 
+-bool QgsWmsCapabilitiesDownload::downloadCapabilities( const QString &baseUrl, const QgsWmsAuthorization &auth )
++bool QgsWmsCapabilitiesDownload::downloadCapabilities( const QString &baseUrl, const QgsAuthorizationSettings &auth )
+ {
+   mBaseUrl = baseUrl;
+   mAuth = auth;
+diff --git a/src/providers/wms/qgswmscapabilities.h b/src/providers/wms/qgswmscapabilities.h
+index 5fece8eafdf..64cf2dd7e8a 100644
+--- a/src/providers/wms/qgswmscapabilities.h
++++ b/src/providers/wms/qgswmscapabilities.h
+@@ -30,6 +30,7 @@
+ #include "qgstemporalutils.h"
+ #include "qgshttpheaders.h"
+ #include "qgscoordinatetransformcontext.h"
++#include "../wfs/qgsauthorizationsettings.h"
+ 
+ class QNetworkReply;
+ 
+@@ -690,53 +691,6 @@ struct QgsWmsParserSettings
+   bool invertAxisOrientation;
+ };
+ 
+-struct QgsWmsAuthorization
+-{
+-  QgsWmsAuthorization( const QString &userName = QString(), const QString &password = QString(), const QgsHttpHeaders &httpHeaders = QgsHttpHeaders(), const QString &authcfg = QString() )
+-    : mUserName( userName )
+-    , mPassword( password )
+-    , mHttpHeaders( httpHeaders )
+-    , mAuthCfg( authcfg )
+-  {}
+-
+-  bool setAuthorization( QNetworkRequest &request ) const
+-  {
+-    if ( !mAuthCfg.isEmpty() )
+-    {
+-      return QgsApplication::authManager()->updateNetworkRequest( request, mAuthCfg );
+-    }
+-    else if ( !mUserName.isEmpty() || !mPassword.isEmpty() )
+-    {
+-      request.setRawHeader( "Authorization", "Basic " + QStringLiteral( "%1:%2" ).arg( mUserName, mPassword ).toUtf8().toBase64() );
+-    }
+-
+-    mHttpHeaders.updateNetworkRequest( request );
+-
+-    return true;
+-  }
+-  //! Sets authorization reply
+-  bool setAuthorizationReply( QNetworkReply *reply ) const
+-  {
+-    if ( !mAuthCfg.isEmpty() )
+-    {
+-      return QgsApplication::authManager()->updateNetworkReply( reply, mAuthCfg );
+-    }
+-    return true;
+-  }
+-
+-  //! Username for basic http authentication
+-  QString mUserName;
+-
+-  //! Password for basic http authentication
+-  QString mPassword;
+-
+-  //! headers for http requests
+-  QgsHttpHeaders mHttpHeaders;
+-
+-  //! Authentication configuration ID
+-  QString mAuthCfg;
+-};
+-
+ 
+ //! URI that gets passed to provider
+ class QgsWmsSettings
+@@ -746,7 +700,7 @@ class QgsWmsSettings
+     bool parseUri( const QString &uriString );
+ 
+     QString baseUrl() const { return mBaseUrl; }
+-    QgsWmsAuthorization authorization() const { return mAuth; }
++    QgsAuthorizationSettings authorization() const { return mAuth; }
+ 
+     QgsWmsParserSettings parserSettings() const { return mParserSettings; }
+ 
+@@ -866,7 +820,7 @@ class QgsWmsSettings
+     //! URL part of URI (httpuri)
+     QString mBaseUrl;
+ 
+-    QgsWmsAuthorization mAuth;
++    QgsAuthorizationSettings mAuth;
+ 
+     bool mIgnoreGetMapUrl;
+     bool mIgnoreGetFeatureInfoUrl;
+@@ -1082,13 +1036,13 @@ class QgsWmsCapabilitiesDownload : public QObject
+   public:
+     explicit QgsWmsCapabilitiesDownload( bool forceRefresh, QObject *parent = nullptr );
+ 
+-    QgsWmsCapabilitiesDownload( const QString &baseUrl, const QgsWmsAuthorization &auth, bool forceRefresh, QObject *parent = nullptr );
++    QgsWmsCapabilitiesDownload( const QString &baseUrl, const QgsAuthorizationSettings &auth, bool forceRefresh, QObject *parent = nullptr );
+ 
+     ~QgsWmsCapabilitiesDownload() override;
+ 
+     bool downloadCapabilities();
+ 
+-    bool downloadCapabilities( const QString &baseUrl, const QgsWmsAuthorization &auth );
++    bool downloadCapabilities( const QString &baseUrl, const QgsAuthorizationSettings &auth );
+ 
+     /**
+      * Returns the download refresh state.
+@@ -1128,7 +1082,7 @@ class QgsWmsCapabilitiesDownload : public QObject
+     //! URL part of URI (httpuri)
+     QString mBaseUrl;
+ 
+-    QgsWmsAuthorization mAuth;
++    QgsAuthorizationSettings mAuth;
+ 
+     //! The reply to the capabilities request
+     QNetworkReply *mCapabilitiesReply = nullptr;
+diff --git a/src/providers/wms/qgswmsprovider.cpp b/src/providers/wms/qgswmsprovider.cpp
+index 6c9dcc9f964..226180bf80b 100644
+--- a/src/providers/wms/qgswmsprovider.cpp
++++ b/src/providers/wms/qgswmsprovider.cpp
+@@ -4519,7 +4519,7 @@ QgsProviderMetadata::ProviderCapabilities QgsWmsProviderMetadata::providerCapabi
+ 
+ // -----------------
+ 
+-QgsWmsImageDownloadHandler::QgsWmsImageDownloadHandler( const QString &providerUri, const QUrl &url, const QgsWmsAuthorization &auth, QImage *image, QgsRasterBlockFeedback *feedback )
++QgsWmsImageDownloadHandler::QgsWmsImageDownloadHandler( const QString &providerUri, const QUrl &url, const QgsAuthorizationSettings &auth, QImage *image, QgsRasterBlockFeedback *feedback )
+   : mProviderUri( providerUri )
+   , mCachedImage( image )
+   , mEventLoop( new QEventLoop )
+@@ -4686,7 +4686,7 @@ void QgsWmsImageDownloadHandler::canceled()
+ 
+ 
+ QgsWmsTiledImageDownloadHandler::QgsWmsTiledImageDownloadHandler( const QString &providerUri,
+-    const QgsWmsAuthorization &auth,
++    const QgsAuthorizationSettings &auth,
+     int tileReqNo,
+     const QgsWmsProvider::TileRequests &requests,
+     QImage *image,
+diff --git a/src/providers/wms/qgswmsprovider.h b/src/providers/wms/qgswmsprovider.h
+index 13d25ff3259..5d7ad25ea53 100644
+--- a/src/providers/wms/qgswmsprovider.h
++++ b/src/providers/wms/qgswmsprovider.h
+@@ -624,7 +624,7 @@ class QgsWmsImageDownloadHandler : public QObject
+ {
+     Q_OBJECT
+   public:
+-    QgsWmsImageDownloadHandler( const QString &providerUri, const QUrl &url, const QgsWmsAuthorization &auth, QImage *image, QgsRasterBlockFeedback *feedback );
++    QgsWmsImageDownloadHandler( const QString &providerUri, const QUrl &url, const QgsAuthorizationSettings &auth, QImage *image, QgsRasterBlockFeedback *feedback );
+     ~QgsWmsImageDownloadHandler() override;
+ 
+     void downloadBlocking();
+@@ -655,7 +655,7 @@ class QgsWmsTiledImageDownloadHandler : public QObject
+   public:
+ 
+     QgsWmsTiledImageDownloadHandler( const QString &providerUri,
+-                                     const QgsWmsAuthorization &auth,
++                                     const QgsAuthorizationSettings &auth,
+                                      int reqNo,
+                                      const QgsWmsProvider::TileRequests &requests,
+                                      QImage *image,
+@@ -692,7 +692,7 @@ class QgsWmsTiledImageDownloadHandler : public QObject
+ 
+     QString mProviderUri;
+     QString mBaseUrl;
+-    QgsWmsAuthorization mAuth;
++    QgsAuthorizationSettings mAuth;
+ 
+     QImage *mImage = nullptr;
+     QgsRectangle mViewExtent;
+-- 
+2.47.0
+
