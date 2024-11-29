@@ -143,10 +143,19 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
 {
-  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+  QgsCoordinateTransform mapCanvasTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
+  QgsCoordinateTransform annotationLayerTransform;
+  if ( QgsProject::instance()->mainAnnotationLayer()->crs().isValid() && QgsProject::instance()->mainAnnotationLayer()->crs() != mMapCanvas->mapSettings().destinationCrs() )
+  {
+    annotationLayerTransform = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+  }
+  else
+  {
+    annotationLayerTransform = mapCanvasTransform;
+  }
 
   QVariantMap data = result.userData().value<QVariantMap>();
-  QgsPointXY itemPos = ct.transform( data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>() );
+  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
   QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
 
@@ -158,7 +167,7 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
     if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
     {
       QgsGeometry geometry = features[0].geometry();
-      geometry.transform( ct );
+      geometry.transform( annotationLayerTransform );
       QgsAnnotationItem *item = nullptr;
       switch ( features[0].geometry().type() )
       {
@@ -207,6 +216,7 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
 
   if ( !geomShown )
   {
+    QgsPointXY itemPos = annotationLayerTransform.transform( pos );
     QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
     QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
     symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
@@ -216,12 +226,13 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
 
   if ( !bbox.isNull() )
   {
-    bbox = ct.transform( bbox );
+    bbox = mapCanvasTransform.transform( bbox );
     mMapCanvas->setExtent( bbox );
   }
   else
   {
-    mMapCanvas->setCenter( itemPos );
+    QgsPointXY mapPos = mapCanvasTransform.transform( pos );
+    mMapCanvas->setCenter( mapPos );
   }
 }
 

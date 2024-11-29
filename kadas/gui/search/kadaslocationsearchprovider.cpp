@@ -157,11 +157,23 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
 {
-  QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+  QgsCoordinateTransform mapCanvasTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
+  QgsCoordinateTransform annotationLayerTransform;
+  if ( QgsProject::instance()->mainAnnotationLayer()->crs().isValid() && QgsProject::instance()->mainAnnotationLayer()->crs() != mMapCanvas->mapSettings().destinationCrs() )
+  {
+    annotationLayerTransform = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+  }
+  else
+  {
+    annotationLayerTransform = mapCanvasTransform;
+  }
 
   QVariantMap data = result.userData().value<QVariantMap>();
-  QgsPointXY itemPos = ct.transform( data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>() );
+  QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
+
+  QgsPointXY mapPos = mapCanvasTransform.transform( pos );
+  QgsPointXY itemPos = annotationLayerTransform.transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
@@ -169,7 +181,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
-  mMapCanvas->setCenter( itemPos );
+  mMapCanvas->setCenter( mapPos );
 
   // not sure if we will get this from somewhere, it is not documented in the swisstopo API
   if ( !geometry.isEmpty() )
@@ -185,11 +197,12 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         case Qgis::GeometryType::Point:
         {
           // points are already rendered
+          break;
         }
         case Qgis::GeometryType::Line:
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve );
+          item = new QgsAnnotationLineItem( curve->clone() );
           break;
         }
         case Qgis::GeometryType::Polygon:
