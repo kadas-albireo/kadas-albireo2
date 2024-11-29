@@ -1,0 +1,63 @@
+From 0554296b16f4e1953fdfb4208148eea21efbd338 Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Thu, 28 Nov 2024 17:36:42 +0100
+Subject: [PATCH] WMS Ignore layer extent settings for default value
+
+---
+ src/gui/qgsnewhttpconnection.cpp | 4 ++++
+ src/gui/qgsnewhttpconnection.h   | 8 ++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/src/gui/qgsnewhttpconnection.cpp b/src/gui/qgsnewhttpconnection.cpp
+index 01552a3d97f..55ac3773bf9 100644
+--- a/src/gui/qgsnewhttpconnection.cpp
++++ b/src/gui/qgsnewhttpconnection.cpp
+@@ -32,6 +32,8 @@
+ #include <QRegularExpressionValidator>
+ #include <QUrlQuery>
+ 
++const QgsSettingsEntryBool *QgsNewHttpConnection::settingsIgnoreReportedLayerExtentsDefault = new QgsSettingsEntryBool( QStringLiteral( "ignore-reported-layer-extents-default" ), sTreeHttpConnectionDialog, false ) ;
++
+ QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes types, const QString &serviceName, const QString &connectionName, QgsNewHttpConnection::Flags flags, Qt::WindowFlags fl )
+   : QDialog( parent, fl )
+   , mTypes( types )
+@@ -158,6 +160,8 @@ QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes typ
+     }
+   }
+ 
++  cbxWmsIgnoreReportedLayerExtents->setChecked( settingsIgnoreReportedLayerExtentsDefault->value() );
++
+   if ( !( flags & FlagShowTestConnection ) )
+   {
+     mTestConnectionButton->hide();
+diff --git a/src/gui/qgsnewhttpconnection.h b/src/gui/qgsnewhttpconnection.h
+index d80a857bc11..4bba9e529e7 100644
+--- a/src/gui/qgsnewhttpconnection.h
++++ b/src/gui/qgsnewhttpconnection.h
+@@ -22,8 +22,10 @@
+ #include "ui_qgsnewhttpconnectionbase.h"
+ #include "qgsguiutils.h"
+ #include "qgis_gui.h"
++#include "qgssettingstree.h"
+ 
+ class QgsAuthSettingsWidget;
++class QgsSettingsEntryBool;
+ 
+ /**
+  * \ingroup gui
+@@ -36,6 +38,12 @@ class GUI_EXPORT QgsNewHttpConnection : public QDialog, private Ui::QgsNewHttpCo
+ 
+   public:
+ 
++#ifndef SIP_RUN
++  static inline QgsSettingsTreeNode *sTreeHttpConnectionDialog = QgsSettingsTree::sTreeConnections->createChildNode( QStringLiteral( "http-connection-dialog" ) );
++
++  static const QgsSettingsEntryBool *settingsIgnoreReportedLayerExtentsDefault;
++#endif
++
+     /**
+      * Available connection types for configuring in the dialog.
+      */
+-- 
+2.47.0
+
