@@ -29,7 +29,7 @@ vcpkg_from_github(
   nlohmann-json.patch
   qgis-debug.patch
   wcs-additional-HTTP-headers.patch # PR #59635
-  wms-ignore-reported-layer-extent.patch)
+  wms-ignore-reported-layer-extent.patch #PR #59653 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
