@@ -28,7 +28,8 @@ vcpkg_from_github(
   sipcxx17.patch
   nlohmann-json.patch
   qgis-debug.patch
-  wcs-additional-HTTP-headers.patch)
+  wcs-additional-HTTP-headers.patch # PR #59635
+)
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
