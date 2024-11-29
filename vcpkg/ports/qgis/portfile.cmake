@@ -28,6 +28,7 @@ vcpkg_from_github(
   sipcxx17.patch
   nlohmann-json.patch
   qgis-debug.patch
+  wcs-additional-HTTP-headers.patch # PR #59635
   wms-ignore-reported-layer-extent.patch)
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
