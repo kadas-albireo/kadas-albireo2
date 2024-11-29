@@ -146,6 +146,8 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     QString gdalHttpProxy = settingsGdalProxyHttp->value();
     QString gdalProxyUserPwd = settingsGdalProxyUserPassword->value();
     QString gdalProxyAuth = settingsGdalProxyAuth->value();
+    QString gdalHttpUserPwd = settingsGdalProxyUserPassword->value();
+    QString gdalHttpAuth = settingsGdalProxyAuth->value();
 
     if ( gdalHttpProxy.isEmpty() )
     {
@@ -174,6 +176,15 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
       {
         qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
       }
+    }
+
+    if ( !gdalHttpUserPwd.isEmpty() )
+    {
+      qputenv( "GDAL_HTTP_USERPWD", gdalHttpUserPwd.toLocal8Bit() );
+    }
+    if ( !gdalHttpAuth.isEmpty() )
+    {
+      qputenv( "GDAL_HTTP_AUTH", gdalHttpAuth.toLocal8Bit() );
     }
   }
 
