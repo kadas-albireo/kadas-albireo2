@@ -6869,7 +6869,7 @@ geolocazione</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../kadas/core/kadas.cpp" line="229"/>
+        <location filename="../kadas/core/kadas.cpp" line="240"/>
         <source>Failed to open raster file: %1</source>
         <translation>Impossibile aprire il file raster: %1</translation>
     </message>
