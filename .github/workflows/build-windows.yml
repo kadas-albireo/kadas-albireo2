@@ -48,7 +48,7 @@ jobs:
         run: |
           import os
           import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.previousTag }}" )
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.latestTag }}" )
           if match:
               with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
                 output_file.write(f'major={match.group(1)}\n')
