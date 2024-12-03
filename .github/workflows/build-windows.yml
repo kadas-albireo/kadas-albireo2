@@ -52,7 +52,10 @@ jobs:
               print(f'::set-output name=major::{match.group(1)}')
               print(f'::set-output name=minor::{match.group(2)}')
               print(f'::set-output name=patch::{match.group(3)}')
-              print(f'::set-output name=pre::{match.group(4)}')
+              pre = match.group(4)
+              if not pre:
+                pre = "${{ github.sha }}"
+              print(f'::set-output name=pre::{pre}')
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
