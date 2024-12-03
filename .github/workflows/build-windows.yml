@@ -46,16 +46,18 @@ jobs:
         id: extract_version
         shell: python
         run: |
+          import os
           import re
           match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.previousTag }}" )
           if match:
-              print(f'::set-output name=major::{match.group(1)}')
-              print(f'::set-output name=minor::{match.group(2)}')
-              print(f'::set-output name=patch::{match.group(3)}')
-              pre = match.group(4)
-              if not pre:
-                pre = "${{ github.sha }}"
-              print(f'::set-output name=pre::{pre}')
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
+                output_file.write(f'major={match.group(1)}\n')
+                output_file.write(f'minor={match.group(2)}\n')
+                output_file.write(f'patch={match.group(3)}\n')
+                pre = match.group(4)
+                if not pre:
+                  pre = "${{ github.sha }}"
+                output_file.write(f'pre={pre}\n')
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
