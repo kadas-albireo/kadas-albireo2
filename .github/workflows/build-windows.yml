@@ -40,14 +40,14 @@ jobs:
 
       - name: Get Tag name
         id: get_tag
-        uses: WOOSERK/get-prev-tag-action@v0.1.1
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: Extract version numbers from Tag
         id: extract_version
         shell: python
         run: |
           import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", ${{ steps.get_tag.outputs.prev-tag }} )
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.tag }}" )
           if match:
               print(f'::set-output name=major::{match.group(1)}')
               print(f'::set-output name=minor::{match.group(2)}')
