@@ -40,14 +40,14 @@ jobs:
 
       - name: Get Tag name
         id: get_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        uses: JinoArch/get-latest-tag@latest
 
       - name: Extract version numbers from Tag
         id: extract_version
         shell: python
         run: |
           import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ GITHUB_REF/refs\/tags\// }}" )
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.previousTag }}" )
           if match:
               print(f'::set-output name=major::{match.group(1)}')
               print(f'::set-output name=minor::{match.group(2)}')
