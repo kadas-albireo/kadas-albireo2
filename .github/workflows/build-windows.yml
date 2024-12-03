@@ -55,7 +55,7 @@ jobs:
                 output_file.write(f'minor={match.group(2)}\n')
                 output_file.write(f'patch={match.group(3)}\n')
                 pre = match.group(4)
-                if not pre:
+                if not "${{ github.ref }}".startswith("refs/tags/v"):
                   pre = "${{ github.sha }}"
                 output_file.write(f'pre={pre}\n')
 
