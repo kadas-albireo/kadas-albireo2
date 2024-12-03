@@ -38,6 +38,24 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
+      # - name: Get Tag name
+      #   id: get_tag
+      #   uses: younited/get-previous-tag-action@v1.0.0
+      #   with:
+      #     match: v*.*.*
+
+      - name: Extract version numbers from Tag
+        id: extract_version
+        shell: python
+        run: |
+          import re
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "v2.3.0-alpha5" )
+          if match:
+              print(f'::set-output name=major::{match.group(1)}')
+              print(f'::set-output name=minor::{match.group(2)}')
+              print(f'::set-output name=patch::{match.group(3)}')
+              print(f'::set-output name=pre::{match.group(4)}')
+
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
@@ -55,6 +73,10 @@ jobs:
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+                -D KADAS_VERSION_MAJOR=${{ steps.extract_version.outputs.major }} \
+                -D KADAS_VERSION_MINOR=${{ steps.extract_version.outputs.minor }} \
+                -D KADAS_VERSION_PATCH=${{ steps.extract_version.outputs.patch }} \
+                -D KADAS_VERSION_PRE=${{ steps.extract_version.outputs.pre }} \
                 ${CREATE_MSI_CMAKE_VAR}
 
       - name: 📑 Upload vcpkg build logs
