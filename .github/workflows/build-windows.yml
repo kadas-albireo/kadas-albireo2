@@ -47,7 +47,7 @@ jobs:
         shell: python
         run: |
           import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.tag }}" )
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ GITHUB_REF/refs\/tags\// }}" )
           if match:
               print(f'::set-output name=major::{match.group(1)}')
               print(f'::set-output name=minor::{match.group(2)}')
