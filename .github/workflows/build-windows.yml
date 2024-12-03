@@ -38,18 +38,16 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
-      # - name: Get Tag name
-      #   id: get_tag
-      #   uses: younited/get-previous-tag-action@v1.0.0
-      #   with:
-      #     match: v*.*.*
+      - name: Get Tag name
+        id: get_tag
+        uses: WOOSERK/get-prev-tag-action@v0.1.1
 
       - name: Extract version numbers from Tag
         id: extract_version
         shell: python
         run: |
           import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "v2.3.0-alpha5" )
+          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", ${{ steps.get_tag.outputs.prev-tag }} )
           if match:
               print(f'::set-output name=major::{match.group(1)}')
               print(f'::set-output name=minor::{match.group(2)}')
