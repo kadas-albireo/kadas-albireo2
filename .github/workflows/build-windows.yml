@@ -56,7 +56,9 @@ jobs:
                 output_file.write(f'patch={match.group(3)}\n')
                 pre = match.group(4)
                 if not "${{ github.ref }}".startswith("refs/tags/v"):
-                  pre.append("-${{ github.sha }}")
+                  if pre:
+                    pre += "-"
+                  pre += "${{ github.sha }}"
                 output_file.write(f'pre={pre}\n')
 
       - name: 🌱 Install dependencies and generate project files
