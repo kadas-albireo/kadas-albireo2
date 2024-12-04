@@ -43,10 +43,16 @@ jobs:
         run: |
           RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
 
-          MAJOR=$(echo $RELEASES | cut -d. -f1)
-          MINOR=$(echo $RELEASES | cut -d. -f2)
-          PATCH=$(echo $RELEASES | cut -d. -f3 | cut -d- -f1)
-          PRE=(echo $RELEASES | cut -d- -f2)
+
+          echo "ALL GOOD"
+
+          # RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
+          # RELEASE=$(${RELEASES} | jq -r '.[0].name')
+          RELEASE=${RELEASES}
+          MAJOR=$(echo $RELEASE | cut -d. -f1)
+          MINOR=$(echo $RELEASE | cut -d. -f2)
+          PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
+          PRE=(echo $RELEASE | cut -d- -f2)
           if [[ ${{ github.event.type }} == "PullRequestEvent" ]]; then
             PRE="${PRE}-PR${{ github.event.number }}"
           fi
