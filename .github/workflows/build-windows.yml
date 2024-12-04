@@ -41,14 +41,7 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
-
-
-          echo "ALL GOOD ${RELEASES}"
-
-          # RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
-          # RELEASE=$(${RELEASES} | jq -r '.[0].name')
-          RELEASE=${RELEASES}
+          RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
           MAJOR=$(echo $RELEASE | cut -d. -f1)
           MINOR=$(echo $RELEASE | cut -d. -f2)
           PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
