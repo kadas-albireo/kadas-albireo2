@@ -41,7 +41,7 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          RELEASE=$(gh release list --json name,isLatest --jq '.[] | select(.isLatest)|.name')
+          RELEASE=$(curl 'https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags' -s | jq -r '.[0].name')
           MAJOR=$(echo $RELEASE | cut -d. -f1)
           MINOR=$(echo $RELEASE | cut -d. -f2)
           PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
