@@ -46,8 +46,8 @@ jobs:
           MINOR=$(echo ${RELEASE} | cut -d. -f2)
           PATCH=$(echo ${RELEASE} | cut -d. -f3 | cut -d- -f1)
           PRE=$(echo ${RELEASE} | cut -s -d- -f2)
-          if [[ "${{ github.event.type }}" == "PullRequestEvent" ]]; then
-            PRE="${PRE}-PR${{ github.event.number }}"
+          if [[ -n "${{ github.event.pull_request.number }}" ]]; then
+            PRE="${PRE}-PR${{ github.event.pull_request.number }}"
           fi
           echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}-${PRE}"
 
