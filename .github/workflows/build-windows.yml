@@ -43,12 +43,13 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          RELEASE=$(curl 'https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags' -s | jq -r '.[0].name')
+          RELEASES=$(curl 'https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags' -s)
+          RELEASE=$(${RELEASES} | jq -r '.[0].name')
           MAJOR=$(echo $RELEASE | cut -d. -f1)
           MINOR=$(echo $RELEASE | cut -d. -f2)
           PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
           PRE=(echo $RELEASE | cut -d- -f2)
-          if [[ ${{ github.event.type }} == "pull_request" ]]; then
+          if [[ ${{ github.event.type }} == "PullRequestEvent" ]]; then
             PRE="${PRE}-PR${{ github.event.number }}"
           fi
 
@@ -66,10 +67,10 @@ jobs:
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-                -D KADAS_VERSION_MAJOR=${{ steps.extract_version.outputs.major }} \
-                -D KADAS_VERSION_MINOR=${{ steps.extract_version.outputs.minor }} \
-                -D KADAS_VERSION_PATCH=${{ steps.extract_version.outputs.patch }} \
-                -D KADAS_VERSION_PRE=${{ steps.extract_version.outputs.pre }} \
+                -D KADAS_VERSION_MAJOR=${MAJOR} \
+                -D KADAS_VERSION_MINOR=${MINOR} \
+                -D KADAS_VERSION_PATCH=${PATCH} \
+                -D KADAS_VERSION_PRE=${PRE} \
                 ${CREATE_MSI_CMAKE_VAR}
 
       - name: 📑 Upload vcpkg build logs
