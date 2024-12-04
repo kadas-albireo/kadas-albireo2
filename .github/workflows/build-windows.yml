@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
@@ -38,32 +40,17 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
-      - name: Get Tag name
-        id: get_tag
-        uses: JinoArch/get-latest-tag@latest
-
-      - name: Extract version numbers from Tag
-        id: extract_version
-        shell: python
-        run: |
-          import os
-          import re
-          match = re.match("v(\\d+).(\\d+).(\\d+)-*(.*)", "${{ steps.get_tag.outputs.latestTag }}" )
-          if match:
-              with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
-                output_file.write(f'major={match.group(1)}\n')
-                output_file.write(f'minor={match.group(2)}\n')
-                output_file.write(f'patch={match.group(3)}\n')
-                pre = match.group(4)
-                if not "${{ github.ref }}".startswith("refs/tags/v"):
-                  if pre:
-                    pre += "-"
-                  pre += "${{ github.sha }}"
-                output_file.write(f'pre={pre}\n')
-
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
+          TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          MAJOR=$(echo $TAG | cut -d. -f1)
+          MINOR=$(echo $TAG | cut -d. -f2)
+          PATCH=$(echo $TAG | cut -d. -f3 | cut -d- -f1)
+          PRE=(echo $TAG | cut -d- -f2)
+          if [[ ${{ github.event.type }} == "pull_request" ]]; then
+            PRE="${PRE}-PR${{ github.event.number }}"
+
           cmake -S . \
                 -G Ninja \
                 -B build \
