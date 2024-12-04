@@ -38,11 +38,13 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
+      - uses: mxschmitt/action-tmate@v3
+
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name' | xargs
-          
+          curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name'
+
 
           echo "ALL GOOD"
 
