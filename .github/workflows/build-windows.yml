@@ -41,7 +41,8 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name'
+          curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name' | xargs
+          
 
           echo "ALL GOOD"
 
