@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-tags: true
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
@@ -43,13 +41,14 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-          MAJOR=$(echo $TAG | cut -d. -f1)
-          MINOR=$(echo $TAG | cut -d. -f2)
-          PATCH=$(echo $TAG | cut -d. -f3 | cut -d- -f1)
-          PRE=(echo $TAG | cut -d- -f2)
+          RELEASE=$(gh release list --json name,isLatest --jq '.[] | select(.isLatest)|.name')
+          MAJOR=$(echo $RELEASE | cut -d. -f1)
+          MINOR=$(echo $RELEASE | cut -d. -f2)
+          PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
+          PRE=(echo $RELEASE | cut -d- -f2)
           if [[ ${{ github.event.type }} == "pull_request" ]]; then
             PRE="${PRE}-PR${{ github.event.number }}"
+          fi
 
           cmake -S . \
                 -G Ninja \
