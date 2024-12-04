@@ -44,7 +44,7 @@ jobs:
           RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
 
 
-          echo "ALL GOOD"
+          echo "ALL GOOD ${RELEASES}"
 
           # RELEASES=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
           # RELEASE=$(${RELEASES} | jq -r '.[0].name')
