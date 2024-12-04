@@ -49,6 +49,7 @@ jobs:
           if [[ "${{ github.event.type }}" == "PullRequestEvent" ]]; then
             PRE="${PRE}-PR${{ github.event.number }}"
           fi
+          echo "KADAS Version: ${MAJOR}.${MINOR}.${PATCH}-${PRE}"
 
           cmake -S . \
                 -G Ninja \
