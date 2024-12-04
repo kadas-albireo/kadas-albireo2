@@ -42,14 +42,14 @@ jobs:
         shell: bash
         run: |
           RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
-          MAJOR=$(echo $RELEASE | cut -d. -f1)
-          MINOR=$(echo $RELEASE | cut -d. -f2)
-          PATCH=$(echo $RELEASE | cut -d. -f3 | cut -d- -f1)
-          PRE=$(echo $RELEASE | cut -d- -f2)
+          MAJOR=$(echo ${RELEASE:1} | cut -d. -f1)
+          MINOR=$(echo ${RELEASE} | cut -d. -f2)
+          PATCH=$(echo ${RELEASE} | cut -d. -f3 | cut -d- -f1)
+          PRE=$(echo ${RELEASE} | cut -s -d- -f2)
           if [[ "${{ github.event.type }}" == "PullRequestEvent" ]]; then
             PRE="${PRE}-PR${{ github.event.number }}"
           fi
-          echo "KADAS Version: ${MAJOR}.${MINOR}.${PATCH}-${PRE}"
+          echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}-${PRE}"
 
           cmake -S . \
                 -G Ninja \
