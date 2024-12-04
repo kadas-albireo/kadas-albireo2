@@ -41,6 +41,7 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
+          curl -v "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags"
           RELEASES=$(curl -v "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
           RELEASE=$(${RELEASES} | jq -r '.[0].name')
           MAJOR=$(echo $RELEASE | cut -d. -f1)
