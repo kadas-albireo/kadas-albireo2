@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <csignal>
+#include <fstream>
 #include <QDir>
 #include <QSettings>
 #include <QStandardPaths>
@@ -30,6 +31,37 @@
 
 int main( int argc, char *argv[] )
 {
+  try
+  {
+    std::ifstream file;
+    file.open( "kadas.env" );
+
+    std::string var;
+    std::string name;
+    std::string value;
+    while ( std::getline( file, var ) )
+    {
+      size_t pos = var.find( '=' );
+      if ( pos != std::string::npos )
+      {
+        name = var.substr( 0, pos );
+        value = var.substr( pos + 1 );
+        if ( !qputenv( name.c_str(), QByteArray::fromStdString( value ) ) )
+        {
+          std::string message = "Could not set environment variable:" + var;
+          std::cerr << message;
+          return EXIT_FAILURE;
+        }
+      }
+    }
+  }
+  catch ( std::ifstream::failure &e )
+  {
+    std::string message = std::string( "Could not read environment file " ) + "`kadas.env`" + "[" + e.what() + "]";
+    std::cerr << message;
+    return EXIT_FAILURE;
+  }
+
 #ifdef Q_OS_WINDOWS
   // Clean environment
   QList<QByteArray> path = qgetenv( "PATH" ).split( ';' );
