@@ -75,11 +75,27 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
   widget->layout()->addWidget( replaceButton );
   widget->layout()->addWidget( deleteButton );
   QWidgetAction *widgetAction = new QWidgetAction( this );
+  widgetAction->setProperty( "name", bookmark->name );
   widgetAction->setDefaultWidget( widget );
   connect( replaceButton, &QToolButton::clicked, this, [=] { replaceBookmark( bookmark ); } );
   connect( deleteButton, &QToolButton::clicked, this, [=] { deleteBookmark( widgetAction, bookmark ); } );
   connect( widgetAction, &QWidgetAction::triggered, this, [=] { restoreBookmark( bookmark ); } );
-  addAction( widgetAction );
+
+  // insert alphabetically
+  const QList<QAction *> constMenuActions = actions();
+  QList<QAction *>::const_iterator it = constMenuActions.constBegin();
+  QAction *before = nullptr;
+  for ( ; it != constMenuActions.constEnd(); it++ )
+  {
+    if ( bookmark->name.compare( ( *it )->property( "name" ).toString(), Qt::CaseSensitivity::CaseInsensitive ) > 0 )
+    {
+      before = *std::next( it );
+    }
+  }
+  if ( before )
+    insertAction( before, widgetAction );
+  else
+    addAction( widgetAction );
 }
 
 void KadasBookmarksMenu::addBookmark()
@@ -153,11 +169,13 @@ void KadasBookmarksMenu::restoreBookmark( Bookmark *bookmark )
     // compatibility code
     mCanvas->freeze( true );
     // Disable all entries first, then re-enable the ones stored in the bookmark
-    for ( QgsLayerTreeLayer *layer : QgsProject::instance()->layerTreeRoot()->findLayers() )
+    const QList<QgsLayerTreeLayer *> layers = QgsProject::instance()->layerTreeRoot()->findLayers();
+    for ( QgsLayerTreeLayer *layer : layers )
     {
       layer->setItemVisibilityChecked( false );
     }
-    for ( QgsLayerTreeGroup *group : QgsProject::instance()->layerTreeRoot()->findGroups() )
+    const QList<QgsLayerTreeGroup *> groups = QgsProject::instance()->layerTreeRoot()->findGroups();
+    for ( QgsLayerTreeGroup *group : groups )
     {
       group->setItemVisibilityChecked( false );
     }
