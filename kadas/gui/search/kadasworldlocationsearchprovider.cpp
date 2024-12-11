@@ -33,6 +33,8 @@
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgscurve.h>
@@ -67,6 +69,8 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   {
     serviceUrl = QgsSettings().value( "search/worldlocationsearchurl", "" ).toString();
   }
+
+  // serviceUrl = "https://gist.githubusercontent.com/3nids/0fa5b42732df63f963111de7d0d9cd63/raw/4aa5024cf4ee9b664af8ec9135f7880a5c306f5b/search%2520kadas";
 
   if ( serviceUrl.isEmpty() )
     return;
@@ -193,13 +197,19 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
           if ( geometry.isMultipart() )
           {
             QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
           }
-          item = new QgsAnnotationPolygonItem( poly->clone() );
+          item = new QgsAnnotationPolygonItem( poly );
+          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
+            QColor( 0, 0, 200, 100 ),
+            Qt::BrushStyle::FDiagPattern,
+            QColor( 0, 0, 200, 200 )
+          );
+          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
           break;
         }
         case Qgis::GeometryType::Unknown:
@@ -214,15 +224,12 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
     }
   }
 
-  if ( !geomShown )
-  {
-    QgsPointXY itemPos = annotationLayerTransform.transform( pos );
-    QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
-    QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-    symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
-    item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
-    mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
-  }
+  QgsPointXY itemPos = annotationLayerTransform.transform( pos );
+  QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
+  QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
+  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+  item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+  mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
   if ( !bbox.isNull() )
   {
