@@ -31,6 +31,8 @@
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmultisurface.h>
@@ -81,6 +83,8 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   {
     serviceUrl = QgsSettings().value( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
   }
+
+  // serviceUrl = "https://gist.githubusercontent.com/3nids/50a5e773ff18fe78a49edb7d7eb13e1d/raw/99aaacc67f3fbae773fdb088213aeb7cc9bfbb16/kadas-search-2";
   QgsDebugMsgLevel( serviceUrl, 2 );
 
   QUrl url( serviceUrl );
@@ -211,13 +215,20 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           if ( geometry.isMultipart() )
           {
             QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
           }
-          item = new QgsAnnotationPolygonItem( poly->clone() );
+          poly->transform( annotationLayerTransform );
+          item = new QgsAnnotationPolygonItem( poly );
+          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
+            QColor( 0, 0, 200, 100 ),
+            Qt::BrushStyle::FDiagPattern,
+            QColor( 0, 0, 200, 200 )
+          );
+          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
           break;
         }
         case Qgis::GeometryType::Unknown:

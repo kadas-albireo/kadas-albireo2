@@ -101,7 +101,8 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
       // Detect geo.admin.ch layers
       else if ( nParts > 1 && urlParts[1].endsWith( "geo.admin.ch" ) )
       {
-        for ( const QString &id : dataSource.params( "layers" ) )
+        const QStringList params = dataSource.params( "layers" );
+        for ( const QString &id : params )
         {
           queryableLayers.append( qMakePair( id, rlayer->name() ) );
         }

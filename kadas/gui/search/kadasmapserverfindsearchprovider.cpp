@@ -29,10 +29,13 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsmultisurface.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
@@ -181,17 +184,21 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
 
-  QgsPointXY itemPos = QgsCoordinateTransform(
-                         QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
-                         mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-  )
-                         .transform( pos );
+  QgsCoordinateTransform mapCanvasTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
+  QgsCoordinateTransform annotationLayerTransform;
+  if ( QgsProject::instance()->mainAnnotationLayer()->crs().isValid() && QgsProject::instance()->mainAnnotationLayer()->crs() != mMapCanvas->mapSettings().destinationCrs() )
+  {
+    annotationLayerTransform = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance()->mainAnnotationLayer()->crs(), QgsProject::instance() );
+  }
+  else
+  {
+    annotationLayerTransform = mapCanvasTransform;
+  }
+
+  QgsPointXY itemPos = mapCanvasTransform.transform( pos );
 
   mMapCanvas->setCenter( itemPos );
 
-  // not sure if we will get this from somewhere, it is not documented in the swisstopo API
-  // also, there is no coordinate transform, so this is probably broken
   if ( !geometry.isEmpty() )
   {
     QString feature = QString( "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"feature\", \"geometry\": %1}]}" ).arg( geometry );
@@ -199,6 +206,7 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
     if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
     {
       QgsGeometry geometry = features[0].geometry();
+      geometry.transform( annotationLayerTransform );
       QgsAnnotationItem *item = nullptr;
       switch ( features[0].geometry().type() )
       {
@@ -211,13 +219,28 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
         case Qgis::GeometryType::Line:
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve );
+          item = new QgsAnnotationLineItem( curve->clone() );
           break;
         }
         case Qgis::GeometryType::Polygon:
         {
-          QgsCurvePolygon *poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.get() );
+          QgsCurvePolygon *poly = nullptr;
+          if ( geometry.isMultipart() )
+          {
+            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
+          }
+          else
+          {
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
+          }
           item = new QgsAnnotationPolygonItem( poly );
+          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
+            QColor( 0, 0, 200, 100 ),
+            Qt::BrushStyle::FDiagPattern,
+            QColor( 0, 0, 200, 200 )
+          );
+          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
           break;
         }
         case Qgis::GeometryType::Unknown:
