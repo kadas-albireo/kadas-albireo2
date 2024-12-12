@@ -73,22 +73,22 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="153"/>
         <source>2D Map View Follows 3D Camera</source>
-        <translation type="unfinished"/>
+        <translation>La carte en 2D suit la caméra 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="162"/>
         <source>3D Camera Follows 2D Map View</source>
-        <translation type="unfinished"/>
+        <translation>La caméra 3D suit la carte en 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="171"/>
         <source>Show Visible Camera Area in 2D Map View</source>
-        <translation type="unfinished"/>
+        <translation>Afficher la zone visible de la caméra sur la carte 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="179"/>
         <source>Set 3D Scene Extent on 2D Map View</source>
-        <translation type="unfinished"/>
+        <translation>Définir l&apos;étendue de la scène 3D sur la carte 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="191"/>
@@ -133,7 +133,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="320"/>
         <source>Choose a file name to save the 3D map canvas to an image</source>
-        <translation type="unfinished"/>
+        <translation>Choisir un nom de fichier pour sauvegarder le canevas de carte 3D dans une image</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="470"/>
@@ -158,7 +158,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="721"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
-        <translation type="unfinished"/>
+        <translation>Faire glisser un rectangle sur la carte 2D principale pour définir l&apos;étendue de la scène 3D. </translation>
     </message>
 </context>
 <context>
@@ -166,7 +166,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="55"/>
         <source>Terrain Based</source>
-        <translation type="unfinished"/>
+        <translation>En fonction du terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
@@ -285,7 +285,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="493"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
-        <translation type="unfinished"/>
+        <translation>Une couche d&apos;élévation doit être sélectionnée pour un terrain maillé</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
@@ -389,7 +389,7 @@
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="23"/>
         <source>The strength of the shading applied, bigger values means more pronounced and darker colors.</source>
-        <translation type="unfinished"/>
+        <translation>Selon l&apos;intensité de l&apos;ombrage appliqué, des valeurs plus élevées signifient des couleurs plus prononcées et plus sombres.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="24"/>
@@ -3828,7 +3828,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
         <source>Zip Codes</source>
-        <translation type="unfinished"/>
+        <translation>Codes Postaux</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
@@ -3843,7 +3843,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="41"/>
         <source>Location Search</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher une localisation</translation>
     </message>
 </context>
 <context>
@@ -4157,7 +4157,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.h" line="39"/>
         <source>Server Find</source>
-        <translation type="unfinished"/>
+        <translation>Trouver un serveur</translation>
     </message>
 </context>
 <context>
@@ -5487,7 +5487,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasPythonIntegration</name>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="51"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="55"/>
         <source>Failed to open Python console:</source>
         <translation>Impossible d&apos;ouvrir la console Python:</translation>
     </message>
@@ -5505,7 +5505,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="461"/>
         <source>Frame visible</source>
-        <translation type="unfinished"/>
+        <translation>Cadre visible</translation>
     </message>
     <message>
         <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="465"/>
@@ -6565,7 +6565,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="14"/>
         <source>Configure 3D Map Rendering</source>
-        <translation type="unfinished"/>
+        <translation>Configurer le rendu de carte 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="91"/>
@@ -6648,7 +6648,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
         <source>Skirt height</source>
-        <translation type="unfinished"/>
+        <translation>Hauteur des skirts</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="355"/>
@@ -6695,12 +6695,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="661"/>
         <source>Lighting strength</source>
-        <translation type="unfinished"/>
+        <translation>Intensité de l&apos;éclairage</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="668"/>
         <source>Lighting distance</source>
-        <translation type="unfinished"/>
+        <translation>Distance de l&apos;éclairage</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="751"/>
@@ -6735,7 +6735,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="817"/>
         <source>Show 3D Axis</source>
-        <translation type="unfinished"/>
+        <translation>Afficher l&apos;axe 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="826"/>
@@ -6827,7 +6827,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1090"/>
         <source>Show camera&apos;s view center</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le centre de vue de la caméra</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1097"/>
@@ -6997,77 +6997,77 @@ avec géoloc.</translation>
         <translation>Page</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="98"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="105"/>
         <source>Couldn&apos;t load SIP module.</source>
         <translation>Le module SIP n&apos;a pas pu être chargé.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="98"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="108"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="114"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="120"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="105"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="115"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="121"/>
         <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="169"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="134"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="176"/>
         <source>Python support will be disabled.</source>
         <translation>Le support Python va être désactivé.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="108"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="115"/>
         <source>Couldn&apos;t set SIP API versions.</source>
         <translation>Impossible de définir la version de l&apos;API SIP.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="114"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="121"/>
         <source>Couldn&apos;t load PyQt.</source>
         <translation>Impossible de charger PyQt.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="120"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
         <source>Couldn&apos;t load PyQGIS.</source>
         <translation>Impossible de charger PyQGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="134"/>
         <source>Couldn&apos;t load QGIS utils.</source>
         <translation>Impossible de charger les outils QGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="169"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="176"/>
         <source>Couldn&apos;t load qgis.user.</source>
         <translation>Impossible de charger qgis.user.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="265"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="272"/>
         <source>An error occurred during execution of following code:</source>
         <translation>Une erreur est survenue lors de l&apos;exécution du code suivant:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="276"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="283"/>
         <source>Python version:</source>
         <translation>Version de Python :</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="277"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="284"/>
         <source>KADAS version:</source>
         <translation>Version de KADAS:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="278"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="285"/>
         <source>Python path:</source>
         <translation>Chemin vers Python :</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="283"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="290"/>
         <source>Python error</source>
         <translation>Erreur Python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="586"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Erreur lors de la lecture des métadonnées de l&apos;extension %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="586"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
         <source>Plugins</source>
         <translation>Extensions</translation>
     </message>

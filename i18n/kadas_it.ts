@@ -5484,7 +5484,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasPythonIntegration</name>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="51"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="55"/>
         <source>Failed to open Python console:</source>
         <translation>Impossibile aprire la console Python:</translation>
     </message>
@@ -6993,77 +6993,77 @@ geolocazione</translation>
         <translation>Pagina</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="98"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="105"/>
         <source>Couldn&apos;t load SIP module.</source>
         <translation>Impossibile caricare il modulo SIP.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="98"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="108"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="114"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="120"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="105"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="115"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="121"/>
         <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="169"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="134"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="176"/>
         <source>Python support will be disabled.</source>
         <translation>Il supporto Python verrà disabilitato.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="108"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="115"/>
         <source>Couldn&apos;t set SIP API versions.</source>
         <translation>Impossibile impostare le versioni SIP API.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="114"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="121"/>
         <source>Couldn&apos;t load PyQt.</source>
         <translation>Impossibile caricare PyQt.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="120"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
         <source>Couldn&apos;t load PyQGIS.</source>
         <translation>Impossibile caricare PyQGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="127"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="134"/>
         <source>Couldn&apos;t load QGIS utils.</source>
         <translation>Impossibile caricare gli strumenti QGIS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="169"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="176"/>
         <source>Couldn&apos;t load qgis.user.</source>
         <translation>Impossibile caricare qgis.user.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="265"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="272"/>
         <source>An error occurred during execution of following code:</source>
         <translation>Si è verificato un errore durante l&apos;esecuzione delle istruzioni seguenti:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="276"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="283"/>
         <source>Python version:</source>
         <translation>Versione Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="277"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="284"/>
         <source>KADAS version:</source>
         <translation>Versione KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="278"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="285"/>
         <source>Python path:</source>
         <translation>Percorso Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="283"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="290"/>
         <source>Python error</source>
         <translation>Errore python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="586"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Errore durante la lettura dei metadati del plugin %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="586"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
         <source>Plugins</source>
         <translation>Plugin</translation>
     </message>
