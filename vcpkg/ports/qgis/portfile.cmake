@@ -1,8 +1,8 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF bf5907c68d0a4ed5f3c2e2ab6e3633742c6010f7)
+set(QGIS_REF 68dfbb1808e4a8d58e2ead6e83d95d7145638a8d)
 set(QGIS_SHA512
-    11636afbb26aa541f15ad8e4cda84ac6568c92d11f64a70da5a5cd5bef49e5d5f39ad20eb486593eaf6da05f73a5a55e6e18f9363d0fe31aca8a41fc8497eb11
+    59a0454e91a3b3296dffa7cd4e37ddfb860971ade8dff484e4abcb4b5ca3e1e8b208de0d797edad75ed8f1e0bceba53eec5dcf821fc5c42a1662a45c4fe3d522
 )
 
 vcpkg_from_github(
@@ -28,7 +28,7 @@ vcpkg_from_github(
   sipcxx17.patch
   nlohmann-json.patch
   qgis-debug.patch
-  wcs-additional-HTTP-headers.patch # PR #59635
+  # PR #59848
   wms-ignore-reported-layer-extent.patch)
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)

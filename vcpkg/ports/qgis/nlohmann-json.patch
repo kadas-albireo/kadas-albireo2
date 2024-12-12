@@ -1,8 +1,17 @@
+From df5ce046d5d895ae230867c11d29e05802c25e01 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 12 Dec 2024 09:45:11 +0100
+Subject: [PATCH 1/2] nlohmann-json.patch
+
+---
+ src/core/qgsjsonutils.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
 diff --git a/src/core/qgsjsonutils.cpp b/src/core/qgsjsonutils.cpp
-index 8bd89997d0c..f0f1978f72b 100644
+index d906148189e1..c49e57b4a4c2 100644
 --- a/src/core/qgsjsonutils.cpp
 +++ b/src/core/qgsjsonutils.cpp
-@@ -351,7 +351,11 @@ QVariantList QgsJsonUtils::parseArray( const QString &json, QMetaType::Type type
+@@ -352,7 +352,11 @@ QVariantList QgsJsonUtils::parseArray( const QString &json, QMetaType::Type type
      const auto jObj( json::parse( json.toStdString() ) );
      if ( ! jObj.is_array() )
      {
@@ -15,13 +24,23 @@ index 8bd89997d0c..f0f1978f72b 100644
      }
      for ( const auto &item : jObj )
      {
+
+From 066a74f20f12ae0cf7c6c0205008c00fa4ed91a0 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 12 Dec 2024 09:46:31 +0100
+Subject: [PATCH 2/2] Update qgsspatialiteprovider.cpp
+
+---
+ src/providers/spatialite/qgsspatialiteprovider.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
 diff --git a/src/providers/spatialite/qgsspatialiteprovider.cpp b/src/providers/spatialite/qgsspatialiteprovider.cpp
-index 2eaddd8a632..3b357382c50 100644
+index f38d3a7d2065..9d81420657e9 100644
 --- a/src/providers/spatialite/qgsspatialiteprovider.cpp
 +++ b/src/providers/spatialite/qgsspatialiteprovider.cpp
-@@ -4708,7 +4708,11 @@ bool QgsSpatiaLiteProvider::changeAttributeValues( const QgsChangedAttributesMap
+@@ -4624,7 +4624,11 @@ bool QgsSpatiaLiteProvider::changeAttributeValues( const QgsChangedAttributesMap
              const auto jObj = QgsJsonUtils::jsonFromVariant( val );
-             if ( ! jObj.is_array() )
+             if ( !jObj.is_array() )
              {
 -              throw json::parse_error::create( 0, 0, tr( "JSON value must be an array" ).toStdString() );
 +#if NLOHMANN_JSON_VERSION_MAJOR >= 3 && NLOHMANN_JSON_VERSION_MINOR >= 11
@@ -30,5 +49,5 @@ index 2eaddd8a632..3b357382c50 100644
 +              throw json::parse_error::create( 0, 0, "JSON value must be an array" );
 +#endif
              }
-             jRepr = QString::fromStdString( jObj.dump( ) );
-             sql += QStringLiteral( "%1=%2" ).arg( QgsSqliteUtils::quotedIdentifier( fld.name() ),  QgsSqliteUtils::quotedString( jRepr ) );
+             jRepr = QString::fromStdString( jObj.dump() );
+             sql += QStringLiteral( "%1=%2" ).arg( QgsSqliteUtils::quotedIdentifier( fld.name() ), QgsSqliteUtils::quotedString( jRepr ) );
