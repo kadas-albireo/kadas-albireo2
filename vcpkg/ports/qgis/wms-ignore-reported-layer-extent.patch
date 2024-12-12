@@ -1,15 +1,41 @@
-From 0554296b16f4e1953fdfb4208148eea21efbd338 Mon Sep 17 00:00:00 2001
+From f40faf1b09ed5381365a20bd768f7aff8bae5a38 Mon Sep 17 00:00:00 2001
 From: Damiano Lombardi <damiano@opengis.ch>
 Date: Thu, 28 Nov 2024 17:36:42 +0100
-Subject: [PATCH] WMS Ignore layer extent settings for default value
+Subject: [PATCH 1/2] WMS Ignore layer extent settings for default value
 
 ---
- src/gui/qgsnewhttpconnection.cpp | 4 ++++
- src/gui/qgsnewhttpconnection.h   | 8 ++++++++
- 2 files changed, 12 insertions(+)
+ .../PyQt6/gui/auto_generated/qgsnewhttpconnection.sip.in  | 1 +
+ python/gui/auto_generated/qgsnewhttpconnection.sip.in     | 1 +
+ src/gui/qgsnewhttpconnection.cpp                          | 4 ++++
+ src/gui/qgsnewhttpconnection.h                            | 8 ++++++++
+ 4 files changed, 14 insertions(+)
 
+diff --git a/python/PyQt6/gui/auto_generated/qgsnewhttpconnection.sip.in b/python/PyQt6/gui/auto_generated/qgsnewhttpconnection.sip.in
+index 70539ebd4f54..3b2820211c98 100644
+--- a/python/PyQt6/gui/auto_generated/qgsnewhttpconnection.sip.in
++++ b/python/PyQt6/gui/auto_generated/qgsnewhttpconnection.sip.in
+@@ -21,6 +21,7 @@ information for an HTTP Server for WMS, etc.
+ #include "qgsnewhttpconnection.h"
+ %End
+   public:
++
+     enum ConnectionType /BaseType=IntEnum/
+     {
+       ConnectionWfs,
+diff --git a/python/gui/auto_generated/qgsnewhttpconnection.sip.in b/python/gui/auto_generated/qgsnewhttpconnection.sip.in
+index 1d6df227db8c..7a1aa97cb883 100644
+--- a/python/gui/auto_generated/qgsnewhttpconnection.sip.in
++++ b/python/gui/auto_generated/qgsnewhttpconnection.sip.in
+@@ -21,6 +21,7 @@ information for an HTTP Server for WMS, etc.
+ #include "qgsnewhttpconnection.h"
+ %End
+   public:
++
+     enum ConnectionType
+     {
+       ConnectionWfs,
 diff --git a/src/gui/qgsnewhttpconnection.cpp b/src/gui/qgsnewhttpconnection.cpp
-index 01552a3d97f..55ac3773bf9 100644
+index c1b969bbb2e2..200ef72a6fd4 100644
 --- a/src/gui/qgsnewhttpconnection.cpp
 +++ b/src/gui/qgsnewhttpconnection.cpp
 @@ -32,6 +32,8 @@
@@ -21,7 +47,7 @@ index 01552a3d97f..55ac3773bf9 100644
  QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes types, const QString &serviceName, const QString &connectionName, QgsNewHttpConnection::Flags flags, Qt::WindowFlags fl )
    : QDialog( parent, fl )
    , mTypes( types )
-@@ -158,6 +160,8 @@ QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes typ
+@@ -154,6 +156,8 @@ QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes typ
      }
    }
  
@@ -31,7 +57,7 @@ index 01552a3d97f..55ac3773bf9 100644
    {
      mTestConnectionButton->hide();
 diff --git a/src/gui/qgsnewhttpconnection.h b/src/gui/qgsnewhttpconnection.h
-index d80a857bc11..4bba9e529e7 100644
+index 8be2cf1ba25c..7567c5f332a2 100644
 --- a/src/gui/qgsnewhttpconnection.h
 +++ b/src/gui/qgsnewhttpconnection.h
 @@ -22,8 +22,10 @@
@@ -45,19 +71,41 @@ index d80a857bc11..4bba9e529e7 100644
  
  /**
   * \ingroup gui
-@@ -36,6 +38,12 @@ class GUI_EXPORT QgsNewHttpConnection : public QDialog, private Ui::QgsNewHttpCo
+@@ -35,6 +37,12 @@ class GUI_EXPORT QgsNewHttpConnection : public QDialog, private Ui::QgsNewHttpCo
+     Q_OBJECT
  
    public:
- 
 +#ifndef SIP_RUN
-+  static inline QgsSettingsTreeNode *sTreeHttpConnectionDialog = QgsSettingsTree::sTreeConnections->createChildNode( QStringLiteral( "http-connection-dialog" ) );
++    static inline QgsSettingsTreeNode *sTreeHttpConnectionDialog = QgsSettingsTree::sTreeConnections->createChildNode( QStringLiteral( "http-connection-dialog" ) );
 +
-+  static const QgsSettingsEntryBool *settingsIgnoreReportedLayerExtentsDefault;
++    static const QgsSettingsEntryBool *settingsIgnoreReportedLayerExtentsDefault;
 +#endif
 +
      /**
       * Available connection types for configuring in the dialog.
       */
--- 
-2.47.0
 
+From 23b35a828d66d7ae36404a3e31e74031e2533223 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 9 Dec 2024 11:09:59 +0000
+Subject: [PATCH 2/2] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ src/gui/qgsnewhttpconnection.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gui/qgsnewhttpconnection.cpp b/src/gui/qgsnewhttpconnection.cpp
+index 200ef72a6fd4..a444bc43d930 100644
+--- a/src/gui/qgsnewhttpconnection.cpp
++++ b/src/gui/qgsnewhttpconnection.cpp
+@@ -32,7 +32,7 @@
+ #include <QRegularExpressionValidator>
+ #include <QUrlQuery>
+ 
+-const QgsSettingsEntryBool *QgsNewHttpConnection::settingsIgnoreReportedLayerExtentsDefault = new QgsSettingsEntryBool( QStringLiteral( "ignore-reported-layer-extents-default" ), sTreeHttpConnectionDialog, false ) ;
++const QgsSettingsEntryBool *QgsNewHttpConnection::settingsIgnoreReportedLayerExtentsDefault = new QgsSettingsEntryBool( QStringLiteral( "ignore-reported-layer-extents-default" ), sTreeHttpConnectionDialog, false );
+ 
+ QgsNewHttpConnection::QgsNewHttpConnection( QWidget *parent, ConnectionTypes types, const QString &serviceName, const QString &connectionName, QgsNewHttpConnection::Flags flags, Qt::WindowFlags fl )
+   : QDialog( parent, fl )
