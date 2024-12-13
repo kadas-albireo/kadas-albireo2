@@ -34,7 +34,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
     Renderer( KadasMilxLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id(), &rendererContext )
     {
-      bool omitSinglePoint = renderContext()->customRenderingFlags().contains( "globe" );
+      bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
       for ( const KadasMapItem *item : layer->items().values() )
       {
         const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( item );
