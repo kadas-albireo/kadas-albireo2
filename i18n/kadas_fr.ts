@@ -671,27 +671,27 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <translation>Supprimer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="87"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="103"/>
         <source>Create Bookmark</source>
         <translation>Créer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="87"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="103"/>
         <source>Enter bookmark name</source>
         <translation>Nom du signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Replace Bookmark</source>
         <translation>Remplacer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="194"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="212"/>
         <source>Some layers stored in the bookmark don&apos;t exist</source>
         <translation>Certaines couches stockées dans le signet n&apos;existent pas</translation>
     </message>
@@ -3806,37 +3806,37 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasLocationSearchFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="50"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
         <source>Municipalities</source>
         <translation>Municipalités</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="51"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
         <source>Cantons</source>
         <translation>Cantons</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
         <source>Districts</source>
         <translation>Districts</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
         <source>Places</source>
         <translation>Places</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
         <source>Zip Codes</source>
         <translation>Codes Postaux</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="57"/>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="58"/>
         <source>General place name directory</source>
         <translation type="unfinished"/>
     </message>
@@ -4150,7 +4150,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="165"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="168"/>
         <source>Layer %1</source>
         <translation>Couche %1</translation>
     </message>
@@ -5646,7 +5646,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="177"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="178"/>
         <source>Layer %1</source>
         <translation>Couche %1</translation>
     </message>
@@ -6550,7 +6550,7 @@ avec géoloc.</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="51"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="53"/>
         <source>World Places</source>
         <translation>Lieux mondiaux</translation>
     </message>

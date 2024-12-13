@@ -671,27 +671,27 @@ Annullare queste attività e riprovare.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="87"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="103"/>
         <source>Create Bookmark</source>
         <translation>Crea segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="87"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="103"/>
         <source>Enter bookmark name</source>
         <translation>Nome del segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Replace Bookmark</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="100"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="194"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="212"/>
         <source>Some layers stored in the bookmark don&apos;t exist</source>
         <translation>Alcuni layer memorizzati nel segnalibro non esistono</translation>
     </message>
@@ -3804,37 +3804,37 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasLocationSearchFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="50"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
         <source>Municipalities</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="51"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
         <source>Cantons</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="52"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
         <source>Districts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="53"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
         <source>Places</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="54"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
         <source>Zip Codes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="55"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="57"/>
         <source>Address</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="56"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="58"/>
         <source>General place name directory</source>
         <translation type="unfinished"/>
     </message>
@@ -4148,7 +4148,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="165"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="168"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -5643,7 +5643,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="177"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="178"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -6546,7 +6546,7 @@ geolocazione</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="51"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="53"/>
         <source>World Places</source>
         <translation>Luoghi mondiali</translation>
     </message>
