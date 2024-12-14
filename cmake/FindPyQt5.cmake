@@ -28,7 +28,8 @@ else(EXISTS PYQT5_VERSION_STR)
     file(GLOB _pyqt5_metadata "${Python_SITEARCH}/PyQt5-5*.dist-info/METADATA")
     file(READ ${_pyqt5_metadata} _pyqt5_metadata_contents)
     string(REGEX REPLACE ".*\nVersion: ([^\n]+).*$" "\\1" PYQT5_VERSION_STR
-                         ${_pyqt5_metadata_contents})
+                         ${_pyqt5_metadata_contents}
+    )
 
     if(PYQT5_VERSION_STR)
       set(PYQT5_MOD_DIR "${Python_SITEARCH}/PyQt5")
@@ -43,24 +44,32 @@ else(EXISTS PYQT5_VERSION_STR)
     find_file(
       _find_pyqt5_py FindPyQt5.py
       PATHS ${CMAKE_MODULE_PATH}
-      NO_CMAKE_FIND_ROOT_PATH)
+      NO_CMAKE_FIND_ROOT_PATH
+    )
 
-    execute_process(COMMAND ${Python_EXECUTABLE} ${_find_pyqt5_py}
-                    OUTPUT_VARIABLE pyqt_config)
+    execute_process(
+      COMMAND ${Python_EXECUTABLE} ${_find_pyqt5_py}
+      OUTPUT_VARIABLE pyqt_config
+    )
     if(pyqt_config)
       string(REGEX REPLACE "^pyqt_version_str:([^\n]+).*$" "\\1"
-                           PYQT5_VERSION_STR ${pyqt_config})
+                           PYQT5_VERSION_STR ${pyqt_config}
+      )
       string(REGEX REPLACE ".*\npyqt_mod_dir:([^\n]+).*$" "\\1" PYQT5_MOD_DIR
-                           ${pyqt_config})
+                           ${pyqt_config}
+      )
       string(REGEX REPLACE ".*\npyqt_sip_dir:([^\n]+).*$" "\\1" PYQT5_SIP_DIR
-                           ${pyqt_config})
+                           ${pyqt_config}
+      )
       if(EXISTS ${PYQT5_SIP_DIR}/Qt5)
         set(PYQT5_SIP_DIR ${PYQT5_SIP_DIR}/Qt5)
       endif(EXISTS ${PYQT5_SIP_DIR}/Qt5)
       string(REGEX REPLACE ".*\npyqt_sip_flags:([^\n]+).*$" "\\1"
-                           PYQT5_SIP_FLAGS ${pyqt_config})
+                           PYQT5_SIP_FLAGS ${pyqt_config}
+      )
       string(REGEX REPLACE ".*\npyqt_sip_module:([^\n]+).*$" "\\1"
-                           PYQT5_SIP_IMPORT ${pyqt_config})
+                           PYQT5_SIP_IMPORT ${pyqt_config}
+      )
       set(PYQT5_FOUND TRUE)
     endif(pyqt_config)
 

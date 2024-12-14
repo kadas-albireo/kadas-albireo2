@@ -8,7 +8,8 @@ vcpkg_from_github(
   SHA512
   9def961080df12725e2f8914d42527926cb9bf791515919b25b6d34ce20373993eed60fa526f3fa778b5cd61f21174914430c0f3aa9fe87513a242d7138ef0dc
   PATCHES
-  win.patch)
+  win.patch
+)
 
 vcpkg_cmake_configure(SOURCE_PATH "${SOURCE_PATH}" OPTIONS "-DWITH_GUI=OFF")
 
@@ -20,4 +21,5 @@ vcpkg_copy_pdbs()
 file(
   INSTALL "${SOURCE_PATH}/LICENSE.LGPL"
   DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}/"
-  RENAME copyright)
+  RENAME copyright
+)

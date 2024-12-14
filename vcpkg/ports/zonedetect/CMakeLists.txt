@@ -10,16 +10,19 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY PUBLIC_HEADER ${HDR_FILES})
 target_include_directories(
   ${PROJECT_NAME}
   PRIVATE ${CMAKE_CURRENT_LIST_DIR}
-  INTERFACE $<INSTALL_INTERFACE:include>)
+  INTERFACE $<INSTALL_INTERFACE:include>
+)
 install(
   TARGETS ${PROJECT_NAME}
   EXPORT unofficial-zonedetect-config
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include/zonedetect)
+  PUBLIC_HEADER DESTINATION include/zonedetect
+)
 install(
   EXPORT unofficial-zonedetect-config
   FILE unofficial-zonedetect-config.cmake
   NAMESPACE unofficial::zonedetect::
-  DESTINATION share/unofficial-zonedetect)
+  DESTINATION share/unofficial-zonedetect
+)

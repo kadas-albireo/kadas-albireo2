@@ -13,14 +13,16 @@ vcpkg_from_github(
   find-link-libraries.patch
   fix-gdal-target-interfaces.patch
   libkml.patch
-  target-is-valid.patch)
+  target-is-valid.patch
+)
 # `vcpkg clean` stumbles over one subdir
 file(REMOVE_RECURSE "${SOURCE_PATH}/autotest")
 
 # Avoid abseil, no matter if vcpkg or system
 vcpkg_replace_string(
   "${SOURCE_PATH}/ogr/ogrsf_frmts/flatgeobuf/flatbuffers/base.h"
-  [[__has_include("absl/strings/string_view.h")]] "(0)")
+  [[__has_include("absl/strings/string_view.h")]] "(0)"
+)
 
 # Cf. cmake/helpers/CheckDependentLibraries.cmake The default for all
 # `GDAL_USE_<PKG>` dependencies is `OFF`. Here, we explicitly control
@@ -105,7 +107,8 @@ vcpkg_check_features(
   BUILD_APPS
   INVERTED_FEATURES
   libspatialite
-  CMAKE_DISABLE_FIND_PACKAGE_SPATIALITE)
+  CMAKE_DISABLE_FIND_PACKAGE_SPATIALITE
+)
 if(GDAL_USE_ICONV AND VCPKG_TARGET_IS_WINDOWS)
   list(APPEND FEATURE_OPTIONS -D_ICONV_SECOND_ARGUMENT_IS_NOT_CONST=ON)
 endif()
@@ -115,19 +118,23 @@ endif()
 if(VCPKG_TARGET_IS_ANDROID
    AND ANRDOID_PLATFORM VERSION_LESS 24
    AND (VCPKG_TARGET_ARCHITECTURE STREQUAL "x86" OR VCPKG_TARGET_ARCHITECTURE
-                                                    STREQUAL "arm"))
+                                                    STREQUAL "arm")
+)
   list(APPEND FEATURE_OPTIONS -DBUILD_WITHOUT_64BIT_OFFSET=ON)
 endif()
 
 string(REPLACE "dynamic" "" qhull_target
-               "Qhull::qhull${VCPKG_LIBRARY_LINKAGE}_r")
+               "Qhull::qhull${VCPKG_LIBRARY_LINKAGE}_r"
+)
 
 if(VCPKG_TARGET_IS_WINDOWS)
   set(GDAL_PYTHON_INSTALL_PREFIX
-      "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../")
+      "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../"
+  )
 else()
   set(GDAL_PYTHON_INSTALL_PREFIX
-      "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../../")
+      "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/../../../"
+  )
 endif()
 vcpkg_cmake_configure(
   SOURCE_PATH
@@ -164,7 +171,8 @@ vcpkg_cmake_configure(
   -DBUILD_APPS=OFF
   "-DGDAL_DEBUG_POSTFIX="
   MAYBE_UNUSED_VARIABLES
-  QHULL_LIBRARY)
+  QHULL_LIBRARY
+)
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
 vcpkg_fixup_pkgconfig()
@@ -175,7 +183,8 @@ vcpkg_replace_string(
   "include(CMakeFindDependencyMacro)
 # gdal needs a pkg-config tool. A host dependency provides pkgconf.
 get_filename_component(vcpkg_host_prefix \"\${CMAKE_CURRENT_LIST_DIR}/../../../${HOST_TRIPLET}\" ABSOLUTE)
-list(APPEND CMAKE_PROGRAM_PATH \"\${vcpkg_host_prefix}/tools/pkgconf\")")
+list(APPEND CMAKE_PROGRAM_PATH \"\${vcpkg_host_prefix}/tools/pkgconf\")"
+)
 
 if(BUILD_APPS)
   vcpkg_copy_tools(
@@ -208,19 +217,23 @@ if(BUILD_APPS)
     ogrlineref
     ogrtindex
     sozip
-    AUTO_CLEAN)
+    AUTO_CLEAN
+  )
 endif()
 
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include"
-     "${CURRENT_PACKAGES_DIR}/debug/share")
+     "${CURRENT_PACKAGES_DIR}/debug/share"
+)
 
 file(REMOVE "${CURRENT_PACKAGES_DIR}/bin/gdal-config"
-     "${CURRENT_PACKAGES_DIR}/debug/bin/gdal-config")
+     "${CURRENT_PACKAGES_DIR}/debug/bin/gdal-config"
+)
 
 file(GLOB bin_files "${CURRENT_PACKAGES_DIR}/bin/*")
 if(NOT bin_files)
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/bin"
-       "${CURRENT_PACKAGES_DIR}/debug/bin")
+       "${CURRENT_PACKAGES_DIR}/debug/bin"
+  )
 endif()
 
 if("python" IN_LIST FEATURES)
@@ -228,7 +241,8 @@ if("python" IN_LIST FEATURES)
     file(
       GLOB_RECURSE macho_files
       LIST_DIRECTORIES FALSE
-      "${CURRENT_PACKAGES_DIR}/*")
+      "${CURRENT_PACKAGES_DIR}/*"
+    )
     list(FILTER macho_files INCLUDE REGEX "\.so$")
     foreach(macho_file IN LISTS macho_files)
       # Required for testing, as it needs to be able load shared libs from the
@@ -238,21 +252,27 @@ if("python" IN_LIST FEATURES)
         COMMAND install_name_tool -add_rpath "${CURRENT_PACKAGES_DIR}/lib"
                 "${macho_file}"
         OUTPUT_QUIET
-        ERROR_VARIABLE set_rpath_error)
+        ERROR_VARIABLE set_rpath_error
+      )
     endforeach()
   elseif(VCPKG_TARGET_IS_WINDOWS)
     file(
       COPY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/swig/python/osgeo"
-      DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}")
+      DESTINATION "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+    )
   endif()
   vcpkg_python_test_import(MODULE "osgeo.gdal")
 endif()
 
-vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/cpl_config.h"
-                     "#define GDAL_PREFIX \"${CURRENT_PACKAGES_DIR}\"" "")
+vcpkg_replace_string(
+  "${CURRENT_PACKAGES_DIR}/include/cpl_config.h"
+  "#define GDAL_PREFIX \"${CURRENT_PACKAGES_DIR}\"" ""
+)
 
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/vcpkg-cmake-wrapper.cmake"
-     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
+)
 file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage"
-     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
+)
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.TXT")

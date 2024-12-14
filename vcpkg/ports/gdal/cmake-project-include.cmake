@@ -3,10 +3,12 @@ if(GDAL_USE_KEA)
   add_library(KEA::KEA ALIAS Kealib::Kealib)
   set(GDAL_CHECK_PACKAGE_KEA_NAMES
       Kealib
-      CACHE INTERNAL "vcpkg")
+      CACHE INTERNAL "vcpkg"
+  )
   set(GDAL_CHECK_PACKAGE_KEA_TARGETS
       Kealib::Kealib
-      CACHE INTERNAL "vcpkg")
+      CACHE INTERNAL "vcpkg"
+  )
 endif()
 
 if(GDAL_USE_WEBP)
@@ -14,8 +16,10 @@ if(GDAL_USE_WEBP)
   add_library(WEBP::WebP ALIAS WebP::webp)
   set(GDAL_CHECK_PACKAGE_WebP_NAMES
       WebP
-      CACHE INTERNAL "vcpkg")
+      CACHE INTERNAL "vcpkg"
+  )
   set(GDAL_CHECK_PACKAGE_WebP_TARGETS
       WebP::webp
-      CACHE INTERNAL "vcpkg")
+      CACHE INTERNAL "vcpkg"
+  )
 endif()

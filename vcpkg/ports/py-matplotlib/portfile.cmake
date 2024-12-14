@@ -8,7 +8,8 @@ vcpkg_from_github(
   SHA512
   39b5dc1dd1423309375f9407010470f6cfd8f052d81c8393fe0beef90d911b00170c3953d910c7c70abd37395dd7623d1e4c49ebd231416aaf58057af4d3df0c
   HEAD_REF
-  main)
+  main
+)
 
 if(VCPKG_TARGET_IS_WINDOWS)
   set(ENV{PKG_CONFIG_PATH}
@@ -67,7 +68,8 @@ version_tuple: VERSION_TUPLE\n\
 __version__ = version = '${VERSION}'\n\
 __version_tuple__ = version_tuple = (${version_major}, ${version_minor}, ${version_patch})\n\
 \n\
-")
+"
+)
 
 set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
 
