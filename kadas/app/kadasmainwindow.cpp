@@ -339,6 +339,7 @@ void KadasMainWindow::init()
   connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
+  connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkWMSLayerIgnoreReportedExtents );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
@@ -1358,6 +1359,21 @@ void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
     return;
 
   layer->temporalProperties()->setIsActive( true );
+}
+
+void KadasMainWindow::checkWMSLayerIgnoreReportedExtents( QgsMapLayer *layer )
+{
+  QgsDataProvider *provider = layer->dataProvider();
+
+  if ( !provider )
+    return;
+
+  if ( layer->providerType().toLower() != "wms" )
+    return;
+
+  QgsDataSourceUri uri = provider->uri();
+  uri.setParam( QStringLiteral( "IgnoreReportedLayerExtents" ), QStringLiteral( "1" ) );
+  provider->setUri( uri );
 }
 
 void KadasMainWindow::layerTreeViewDoubleClicked( const QModelIndex & /*index*/ )
