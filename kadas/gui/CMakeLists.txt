@@ -7,7 +7,8 @@ file(
   mapitemeditors/*.cpp
   maptools/*.cpp
   milx/*.cpp
-  search/*.cpp)
+  search/*.cpp
+)
 list(SORT kadas_gui_SRC)
 
 file(
@@ -19,7 +20,8 @@ file(
   mapitemeditors/*.h
   maptools/*.h
   milx/*.h
-  search/*.h)
+  search/*.h
+)
 list(SORT kadas_gui_HDR)
 
 file(GLOB kadas_gui_UI ui/*.ui)
@@ -55,18 +57,21 @@ target_link_libraries(
   Exiv2::exiv2lib
   Qwt::Qwt
   kadas_core
-  kadas_analysis)
+  kadas_analysis
+)
 
 target_include_directories(kadas_gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-generate_export_header(kadas_gui BASE_NAME KADAS_GUI EXPORT_FILE_NAME
-                       kadas_gui.h)
+generate_export_header(
+  kadas_gui BASE_NAME KADAS_GUI EXPORT_FILE_NAME kadas_gui.h
+)
 set(kadas_gui_HDR ${kadas_gui_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_gui.h)
 
 install(
   TARGETS kadas_gui
   RUNTIME DESTINATION bin COMPONENT libraries
   ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
-  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries)
+  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
+)
 
 install(FILES ${kadas_gui_HDR} DESTINATION include/kadas/gui)

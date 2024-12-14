@@ -30,18 +30,21 @@ target_link_libraries(
   Qt5::Svg
   Qt5::Xml
   OpenSSL::SSL
-  OpenSSL::Crypto)
+  OpenSSL::Crypto
+)
 
 target_include_directories(kadas_core PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-generate_export_header(kadas_core BASE_NAME KADAS_CORE EXPORT_FILE_NAME
-                       kadas_core.h)
+generate_export_header(
+  kadas_core BASE_NAME KADAS_CORE EXPORT_FILE_NAME kadas_core.h
+)
 set(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_core.h)
 
 install(
   TARGETS kadas_core
   RUNTIME DESTINATION bin COMPONENT libraries
   ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
-  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries)
+  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
+)
 
 install(FILES ${kadas_core_HDR} DESTINATION include/kadas/core)
