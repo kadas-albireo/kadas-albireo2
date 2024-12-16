@@ -159,6 +159,19 @@ void KadasMapSwipeMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
     }
     mMapCanvasItem->setPixelPosition( e->x(), e->y() );
   }
+  else
+  {
+    bool vertical = mMapCanvasItem->vertical();
+    int length = mMapCanvasItem->pixelLength();
+    if ( vertical && std::abs( e->x() - length ) < 10 || !vertical && std::abs( e->y() - length ) < 10 )
+    {
+      canvas()->setCursor( vertical ? mCursorH : mCursorV );
+    }
+    else
+    {
+      canvas()->setCursor( QCursor( Qt::PointingHandCursor ) );
+    }
+  }
 }
 
 

@@ -37,7 +37,11 @@ class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
 
     void setPixelPosition( int x, int y );
 
+    int pixelLength() const;
+
     void setVertical( bool vertical );
+
+    bool vertical() const { return mIsVertical; }
 
   public slots:
     void refreshMap();
