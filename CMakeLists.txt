@@ -6,24 +6,28 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 set(WITH_QTWEBKIT
     ON
-    CACHE BOOL "Use Qt Webkit")
+    CACHE BOOL "Use Qt Webkit"
+)
 if(WITH_QTWEBKIT)
   list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
 endif()
 
 set(WITH_BINDINGS
     ON
-    CACHE BOOL "Build with python bindings")
+    CACHE BOOL "Build with python bindings"
+)
 if(WITH_BINDINGS)
   list(APPEND VCPKG_MANIFEST_FEATURES "bindings")
 endif()
 
 set(WITH_VCPKG
     TRUE
-    CACHE BOOL "Use the vcpkg submodule for dependency management.")
+    CACHE BOOL "Use the vcpkg submodule for dependency management."
+)
 set(KADAS_SDK_PATH
     ""
-    CACHE STRING "Build with VCPKG SDK")
+    CACHE STRING "Build with VCPKG SDK"
+)
 
 if(NOT KADAS_SDK_PATH STREQUAL "")
   message(STATUS "Building with KADAS SDK -- ${KADAS_SDK_PATH}")
@@ -47,26 +51,33 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(KADAS_NAME
     "Kadas"
-    CACHE STRING "Kadas application name")
+    CACHE STRING "Kadas application name"
+)
 set(KADAS_FULL_NAME
     "Kadas Albireo"
-    CACHE STRING "Kadas full application name")
+    CACHE STRING "Kadas full application name"
+)
 set(KADAS_VERSION_MAJOR
     "2"
-    CACHE STRING "Kadas major version")
+    CACHE STRING "Kadas major version"
+)
 set(KADAS_VERSION_MINOR
     "3"
-    CACHE STRING "Kadas minor version")
+    CACHE STRING "Kadas minor version"
+)
 set(KADAS_VERSION_PATCH
     "0"
-    CACHE STRING "Kadas patch version")
+    CACHE STRING "Kadas patch version"
+)
 set(KADAS_VERSION_PRE
     "alpha4"
-    CACHE STRING "Kadas pre version")
+    CACHE STRING "Kadas pre version"
+)
 execute_process(
   COMMAND git rev-parse HEAD
   OUTPUT_VARIABLE KADAS_VERSION_DEV
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
 find_package(PkgConfig REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -106,7 +117,8 @@ get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 
 set(CRASHRPT_LIBRARY
     "GdbCrashHandler"
-    CACHE FILEPATH "Path to CrashRpt library")
+    CACHE FILEPATH "Path to CrashRpt library"
+)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -140,7 +152,8 @@ install(
   DIRECTORY "share/"
   DESTINATION "share/kadas/"
   PATTERN "share/settings_patch.ini" EXCLUDE
-  PATTERN "share/project_templates" EXCLUDE)
+  PATTERN "share/project_templates" EXCLUDE
+)
 
 if(WITH_VCPKG)
   message("Install VCPKG deps")
@@ -151,11 +164,14 @@ include(Package)
 
 if(UNIX)
   install(FILES com.sourcepole.kadas.desktop
-          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/)
+          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/
+  )
   install(FILES com.sourcepole.kadas.appdata.xml
-          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo/)
+          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo/
+  )
   install(
     FILES kadas/resources/logo.png
     RENAME kadas.png
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/128x128/apps)
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/128x128/apps
+  )
 endif()

@@ -54,11 +54,13 @@ set(kadas_SRC
     3d/kadasshadowrenderingsettingswidget.cpp
     3d/kadasskyboxrenderingsettingswidget.cpp
     external/qgis/app/qgslayertreeviewindicatorprovider.cpp
-    external/qgis/app/qgsgotolocatorfilter.cpp)
+    external/qgis/app/qgsgotolocatorfilter.cpp
+)
 
 set(WITH_CRASHREPORT
     OFF
-    CACHE BOOL "Enable crash report")
+    CACHE BOOL "Enable crash report"
+)
 
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
@@ -86,7 +88,8 @@ file(
   3d/kadasphongmaterialwidget.h
   3d/kadasshadowrenderingsettingswidget.h
   3d/kadasskyboxrenderingsettingswidget.h
-  external/qgis/app/*.h)
+  external/qgis/app/*.h
+)
 
 list(SORT kadas_HDR)
 
@@ -98,30 +101,37 @@ file(
   bullseye/*.ui
   guidegrid/*.ui
   mapgrid/*.ui
-  milx/*.ui)
+  milx/*.ui
+)
 list(SORT kadas_UI)
 
 set(KADAS_SPLASH
     "splash.png"
-    CACHE STRING "Splash image")
-configure_file(${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in
-               ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY)
+    CACHE STRING "Splash image"
+)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc.in
+  ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc @ONLY
+)
 set(KADAS_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
 
 # Translation
 find_package(Qt5 COMPONENTS LinguistTools)
 file(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/i18n/*.ts)
-set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION
-                                                   ${CMAKE_BINARY_DIR}/i18n)
+set_source_files_properties(
+  ${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_BINARY_DIR}/i18n
+)
 qt_add_translation(QM_FILES ${TS_FILES})
 
 set(KADAS_QM "${CMAKE_BINARY_DIR}/translations.qrc")
 file(WRITE ${KADAS_QM}
-     "<!DOCTYPE RCC><RCC version=\"1.0\">\n  <qresource prefix=\"/i18n/\">\n")
+     "<!DOCTYPE RCC><RCC version=\"1.0\">\n  <qresource prefix=\"/i18n/\">\n"
+)
 foreach(QM_FILE ${QM_FILES})
   get_filename_component(QM_FILE_NAME ${QM_FILE} NAME)
   file(APPEND ${KADAS_QM}
-       "\n        <file alias=\"${QM_FILE_NAME}\">${QM_FILE}</file>")
+       "\n        <file alias=\"${QM_FILE_NAME}\">${QM_FILE}</file>"
+  )
 endforeach()
 file(APPEND ${KADAS_QM} "\n  </qresource>\n</RCC>\n")
 
@@ -137,7 +147,8 @@ endif()
 if(MINGW)
   set(CMAKE_RC_COMPILER_INIT ${CMAKE_GENERATOR_RC})
   set(CMAKE_RC_COMPILE_OBJECT
-      "<CMAKE_RC_COMPILER> -O coff -i <SOURCE> -o <OBJECT>")
+      "<CMAKE_RC_COMPILER> -O coff -i <SOURCE> -o <OBJECT>"
+  )
   set(kadas_RC_LIBS -mwindows)
 endif(MINGW)
 
@@ -157,7 +168,8 @@ add_executable(
   ${kadas_UI_HDR}
   ${KADAS_RCC_SRC}
   ${KADAS_RCC}
-  ${kadas_QM})
+  ${kadas_QM}
+)
 
 target_link_libraries(
   kadas
@@ -176,7 +188,8 @@ target_link_libraries(
   ${kadas_RC_LIBS}
   kadas_core
   kadas_analysis
-  kadas_gui)
+  kadas_gui
+)
 
 target_include_directories(
   kadas
@@ -195,8 +208,10 @@ target_include_directories(
 )
 
 if(WITH_VCPKG)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in
+    ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY
+  )
 endif()
 
 if(WITH_CRASHREPORT)
@@ -217,7 +232,8 @@ if(WITH_QTWEBKIT)
 endif()
 
 file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
-     ${PROJECT_SOURCE_DIR})
+     ${PROJECT_SOURCE_DIR}
+)
 
 install(TARGETS kadas DESTINATION bin)
 install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)

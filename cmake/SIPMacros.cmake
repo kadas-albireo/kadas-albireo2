@@ -39,7 +39,8 @@ set(SIP_EXTRA_OPTIONS)
 set(SIP_EXTRA_OBJECTS)
 
 macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
-      CPP_FILES)
+      CPP_FILES
+)
 
   string(REPLACE "." "/" _x ${MODULE_NAME})
   get_filename_component(_parent_module_path ${_x} PATH)
@@ -50,12 +51,14 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
   # If this is not need anymore (using input configuration file for SIP files)
   # SIP could be run in the source rather than in binary directory
   set(_configured_module_sip
-      ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/${_module_path}.sip)
+      ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/${_module_path}.sip
+  )
   foreach(_sip_file ${SIP_FILES})
     get_filename_component(_sip_file_path ${_sip_file} PATH)
     get_filename_component(_sip_file_name_we ${_sip_file} NAME_WE)
     file(RELATIVE_PATH _sip_file_relpath ${CMAKE_CURRENT_SOURCE_DIR}
-         "${_sip_file_path}/${_sip_file_name_we}")
+         "${_sip_file_path}/${_sip_file_name_we}"
+    )
     set(_out_sip_file "${CMAKE_CURRENT_BINARY_DIR}/${_sip_file_relpath}.sip")
     configure_file(${_sip_file} ${_out_sip_file})
   endforeach(_sip_file)
@@ -89,10 +92,9 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
 
   if(SIP_BUILD_EXECUTABLE)
 
-    file(
-      MAKE_DIRECTORY
-      ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build/${_child_module_name}
-    )# Output goes in this dir.
+    file(MAKE_DIRECTORY
+         ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build/${_child_module_name}
+    ) # Output goes in this dir.
 
     foreach(CONCAT_NUM RANGE 0 ${SIP_CONCAT_PARTS})
       if(${CONCAT_NUM} LESS ${SIP_CONCAT_PARTS})
@@ -110,7 +112,8 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
         --qmake=${QMAKE_EXECUTABLE}
         --include-dir=${CMAKE_CURRENT_BINARY_DIR}
         --include-dir=${QGIS_SIP_DIR}
-        --include-dir=${PYQT5_SIP_DIR})
+        --include-dir=${PYQT5_SIP_DIR}
+    )
 
     add_custom_command(
       OUTPUT ${_sip_output_files}
@@ -120,14 +123,16 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
       WORKING_DIRECTORY ${_module_path}
       MAIN_DEPENDENCY ${_configured_module_sip}
       DEPENDS ${SIP_EXTRA_FILES_DEPEND}
-      VERBATIM)
+      VERBATIM
+    )
 
   else(SIP_BUILD_EXECUTABLE)
     message(FATAL_ERROR "sip-build (SIP_BUILD_EXECUTABLE) not found")
   endif(SIP_BUILD_EXECUTABLE)
 
-  add_custom_target(generate_sip_${MODULE_NAME}_cpp_files
-                    DEPENDS ${_sip_output_files})
+  add_custom_target(
+    generate_sip_${MODULE_NAME}_cpp_files DEPENDS ${_sip_output_files}
+  )
 
   set(CPP_FILES ${sip_output_files})
 endmacro(GENERATE_SIP_PYTHON_MODULE_CODE)
@@ -146,7 +151,8 @@ macro(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
   add_library(${_logical_name} MODULE ${_sip_output_files} ${EXTRA_OBJECTS})
   set_property(TARGET ${_logical_name} PROPERTY AUTOMOC OFF)
   target_include_directories(
-    ${_logical_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build)
+    ${_logical_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${_module_path}/build
+  )
   if(NOT MSVC)
     target_compile_definitions(${_logical_name} PRIVATE protected=public)
   endif()
@@ -157,8 +163,9 @@ macro(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
     target_compile_features(${_logical_name} PRIVATE cxx_std_14)
   endif(${SIP_VERSION_STR} VERSION_LESS 5.0.0)
 
-  set_target_properties(${_logical_name} PROPERTIES CXX_VISIBILITY_PRESET
-                                                    default)
+  set_target_properties(
+    ${_logical_name} PROPERTIES CXX_VISIBILITY_PRESET default
+  )
   if(NOT APPLE)
     target_link_libraries(${_logical_name} ${Python_LIBRARIES})
   endif(NOT APPLE)
@@ -166,11 +173,13 @@ macro(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
 
   message(STATUS "${_logical_name} ${EXTRA_LINK_LIBRARIES}")
   if(APPLE)
-    set_target_properties(${_logical_name}
-                          PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    set_target_properties(
+      ${_logical_name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
+    )
   endif(APPLE)
-  set_target_properties(${_logical_name}
-                        PROPERTIES PREFIX "" OUTPUT_NAME ${_child_module_name})
+  set_target_properties(
+    ${_logical_name} PROPERTIES PREFIX "" OUTPUT_NAME ${_child_module_name}
+  )
 
   target_link_libraries(${_logical_name} Python::Python)
 
@@ -179,21 +188,25 @@ macro(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
   endif(WIN32)
 
   if(WIN32)
-    get_target_property(_runtime_output ${_logical_name}
-                        RUNTIME_OUTPUT_DIRECTORY)
+    get_target_property(
+      _runtime_output ${_logical_name} RUNTIME_OUTPUT_DIRECTORY
+    )
     add_custom_command(
       TARGET ${_logical_name}
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E echo "Copying extension ${_child_module_name}"
       COMMAND
         ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${_logical_name}>"
-        "${_runtime_output}/${_child_module_name}.pyd" DEPENDS ${_logical_name})
+        "${_runtime_output}/${_child_module_name}.pyd" DEPENDS ${_logical_name}
+    )
   endif(WIN32)
 
   install(TARGETS ${_logical_name}
-          DESTINATION "${SITEARCH_INSTALL_DIR}/${_parent_module_path}")
+          DESTINATION "${SITEARCH_INSTALL_DIR}/${_parent_module_path}"
+  )
 endmacro(
   BUILD_SIP_PYTHON_MODULE
   MODULE_NAME
   SIP_FILES
-  EXTRA_OBJECTS)
+  EXTRA_OBJECTS
+)

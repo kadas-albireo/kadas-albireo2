@@ -12,8 +12,9 @@
 #     destination directory during install. The file will be byte compiled
 #     and both the .py file and .pyc file will be installed.
 
-get_filename_component(PYTHON_MACROS_MODULE_PATH ${CMAKE_CURRENT_LIST_FILE}
-                       PATH)
+get_filename_component(
+  PYTHON_MACROS_MODULE_PATH ${CMAKE_CURRENT_LIST_FILE} PATH
+)
 
 macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
 
@@ -45,14 +46,16 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
       TARGET compile_python_files
       COMMAND ${CMAKE_COMMAND} -E echo ${message}
       COMMAND ${Python_EXECUTABLE} ${_python_compile_py} ${_bin_py} DEPENDS
-              ${_absfilename})
+              ${_absfilename}
+    )
   else(_abs_bin_py STREQUAL ${_absfilename})
     add_custom_command(
       TARGET compile_python_files
       COMMAND ${CMAKE_COMMAND} -E echo ${message}
       COMMAND ${CMAKE_COMMAND} -E copy ${_absfilename} ${_bin_py}
       COMMAND ${Python_EXECUTABLE} ${_python_compile_py} ${_bin_py} DEPENDS
-              ${_absfilename})
+              ${_absfilename}
+    )
   endif(_abs_bin_py STREQUAL ${_absfilename})
 
   install(FILES ${_bin_pyc} DESTINATION ${DESTINATION_DIR})

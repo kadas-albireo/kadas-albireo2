@@ -32,26 +32,35 @@ else(SIP_VERSION)
   find_file(
     _find_sip_py FindSIP.py
     PATHS ${CMAKE_MODULE_PATH}
-    NO_CMAKE_FIND_ROOT_PATH)
+    NO_CMAKE_FIND_ROOT_PATH
+  )
 
-  execute_process(COMMAND ${Python_EXECUTABLE} ${_find_sip_py}
-                  OUTPUT_VARIABLE sip_config)
+  execute_process(
+    COMMAND ${Python_EXECUTABLE} ${_find_sip_py} OUTPUT_VARIABLE sip_config
+  )
   if(sip_config)
     string(REGEX REPLACE "^sip_version:([^\n]+).*$" "\\1" SIP_VERSION
-                         ${sip_config})
+                         ${sip_config}
+    )
     string(REGEX REPLACE ".*\nsip_version_num:([^\n]+).*$" "\\1"
-                         SIP_VERSION_NUM ${sip_config})
+                         SIP_VERSION_NUM ${sip_config}
+    )
     string(REGEX REPLACE ".*\nsip_version_str:([^\n]+).*$" "\\1"
-                         SIP_VERSION_STR ${sip_config})
+                         SIP_VERSION_STR ${sip_config}
+    )
     string(REGEX REPLACE ".*\ndefault_sip_dir:([^\n]+).*$" "\\1"
-                         SIP_DEFAULT_SIP_DIR ${sip_config})
+                         SIP_DEFAULT_SIP_DIR ${sip_config}
+    )
     if(${SIP_VERSION_STR} VERSION_LESS 5)
       string(REGEX REPLACE ".*\nsip_bin:([^\n]+).*$" "\\1" SIP_BINARY_PATH
-                           ${sip_config})
+                           ${sip_config}
+      )
       string(REGEX REPLACE ".*\nsip_inc_dir:([^\n]+).*$" "\\1" SIP_INCLUDE_DIR
-                           ${sip_config})
+                           ${sip_config}
+      )
       string(REGEX REPLACE ".*\nsip_module_dir:([^\n]+).*$" "\\1"
-                           SIP_MODULE_DIR ${sip_config})
+                           SIP_MODULE_DIR ${sip_config}
+      )
     else(${SIP_VERSION_STR} VERSION_LESS 5)
       find_program(SIP_BUILD_EXECUTABLE sip-build)
     endif(${SIP_VERSION_STR} VERSION_LESS 5)

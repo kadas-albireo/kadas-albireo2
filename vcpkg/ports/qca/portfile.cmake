@@ -18,7 +18,8 @@ vcpkg_from_github(
   PATCHES
   0001-fix-path-for-vcpkg.patch
   0002-fix-build-error.patch
-  0003-Define-NOMINMAX-for-botan-plugin-with-MSVC.patch)
+  0003-Define-NOMINMAX-for-botan-plugin-with-MSVC.patch
+)
 
 vcpkg_find_acquire_program(PKGCONFIG)
 
@@ -39,7 +40,8 @@ file(
   DOWNLOAD
   https://raw.githubusercontent.com/mozilla/gecko-dev/master/security/nss/lib/ckfw/builtins/certdata.txt
   "${CURRENT_BUILDTREES_DIR}/cert/certdata.txt"
-  TLS_VERIFY ON)
+  TLS_VERIFY ON
+)
 vcpkg_execute_required_process(
   COMMAND
   "${PERL}"
@@ -49,7 +51,8 @@ vcpkg_execute_required_process(
   WORKING_DIRECTORY
   "${CURRENT_BUILDTREES_DIR}/cert"
   LOGNAME
-  ca-bundle)
+  ca-bundle
+)
 message(STATUS "Importing certstore done")
 
 set(PLUGINS gnupg logger softstore wincrypto ossl)
@@ -73,26 +76,31 @@ vcpkg_cmake_configure(
   OPTIONS_DEBUG
   -DQCA_PLUGINS_INSTALL_DIR=${QCA_FEATURE_INSTALL_DIR_DEBUG}
   OPTIONS_RELEASE
-  -DQCA_PLUGINS_INSTALL_DIR=${QCA_FEATURE_INSTALL_DIR_RELEASE})
+  -DQCA_PLUGINS_INSTALL_DIR=${QCA_FEATURE_INSTALL_DIR_RELEASE}
+)
 
 vcpkg_cmake_install()
 
 vcpkg_cmake_config_fixup(CONFIG_PATH share/qca/cmake)
 file(READ "${CURRENT_PACKAGES_DIR}/share/${PORT}/QcaConfig.cmake"
-     QCA_CONFIG_FILE)
+     QCA_CONFIG_FILE
+)
 string(
   REGEX
   REPLACE "PACKAGE_PREFIX_DIR \"(.*)\" ABSOLUTE"
           [[PACKAGE_PREFIX_DIR "${CMAKE_CURRENT_LIST_DIR}/../../" ABSOLUTE]]
-          QCA_CONFIG_FILE "${QCA_CONFIG_FILE}")
+          QCA_CONFIG_FILE "${QCA_CONFIG_FILE}"
+)
 file(WRITE "${CURRENT_PACKAGES_DIR}/share/${PORT}/QcaConfig.cmake"
-     "${QCA_CONFIG_FILE}")
+     "${QCA_CONFIG_FILE}"
+)
 
 # Remove unneeded dirs
 file(
   REMOVE_RECURSE "${CURRENT_BUILDTREES_DIR}/share/man"
   "${CURRENT_PACKAGES_DIR}/share/man" "${CURRENT_PACKAGES_DIR}/debug/include"
-  "${CURRENT_PACKAGES_DIR}/debug/share")
+  "${CURRENT_PACKAGES_DIR}/debug/share"
+)
 
 vcpkg_fixup_pkgconfig()
 

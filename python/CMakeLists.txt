@@ -13,7 +13,8 @@ set(DOCSTRINGSTEMPLATE "")
 set(SIP_FINAL "final")
 
 if((${PYQT5_VERSION_STR} VERSION_EQUAL 5.15) OR (${PYQT5_VERSION_STR}
-                                                 VERSION_GREATER 5.15))
+                                                 VERSION_GREATER 5.15)
+)
   set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} VECTOR_MAPPED_TYPE)
 endif()
 if(NOT ANDROID)
@@ -28,7 +29,8 @@ macro(PY_COMPILE TARGET_NAME RESOURCE_PATHS)
       POST_BUILD
       COMMAND ${Python_EXECUTABLE} -m compileall -q ${RESOURCE_PATHS}
       WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-      COMMENT "Byte-compiling staged resource...")
+      COMMENT "Byte-compiling staged resource..."
+    )
   endif()
 endmacro(PY_COMPILE)
 
@@ -46,15 +48,23 @@ set(SIP_EXTRA_OPTIONS
     -n
     ${PYQT5_SIP_IMPORT}
     -y
-    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadascore.pyi)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadascore/project.py.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadascore/project.py @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadascore/pyproject.toml @ONLY)
-generate_sip_python_module_code(kadas._kadascore kadascore/kadascore.sip
-                                "${sip_files_core}" cpp_files)
-build_sip_python_module(kadas._kadascore kadascore/kadascore.sip ${cpp_files}
-                        "" kadas_core QGIS::Core)
+    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadascore.pyi
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/project.py.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadascore/project.py @ONLY
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadascore/pyproject.toml @ONLY
+)
+generate_sip_python_module_code(
+  kadas._kadascore kadascore/kadascore.sip "${sip_files_core}" cpp_files
+)
+build_sip_python_module(
+  kadas._kadascore kadascore/kadascore.sip ${cpp_files} "" kadas_core
+  QGIS::Core
+)
 
 # analysis module
 file(GLOB_RECURSE sip_files_analysis kadasanalysis/*.sip kadasanalysis/*.sip.in)
@@ -68,14 +78,20 @@ set(SIP_EXTRA_OPTIONS
     -n
     ${PYQT5_SIP_IMPORT}
     -y
-    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasanalysis.pyi)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/project.py.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/project.py @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/pyproject.toml.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/pyproject.toml @ONLY)
+    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasanalysis.pyi
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/project.py.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/project.py @ONLY
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadasanalysis/pyproject.toml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadasanalysis/pyproject.toml @ONLY
+)
 generate_sip_python_module_code(
   kadas._kadasanalysis kadasanalysis/kadasanalysis.sip "${sip_files_analysis}"
-  cpp_files)
+  cpp_files
+)
 build_sip_python_module(
   kadas._kadasanalysis
   kadasanalysis/kadasanalysis.sip
@@ -83,7 +99,8 @@ build_sip_python_module(
   ""
   kadas_core
   kadas_analysis
-  QGIS::Analysis)
+  QGIS::Analysis
+)
 
 # gui module
 file(GLOB_RECURSE sip_files_gui kadasgui/*.sip kadasgui/*.sip.in)
@@ -97,13 +114,19 @@ set(SIP_EXTRA_OPTIONS
     -n
     ${PYQT5_SIP_IMPORT}
     -y
-    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasgui.pyi)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/project.py.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/project.py @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/pyproject.toml.in
-               ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/pyproject.toml @ONLY)
-generate_sip_python_module_code(kadas._kadasgui kadasgui/kadasgui.sip
-                                "${sip_files_gui}" cpp_files)
+    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasgui.pyi
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/project.py.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/project.py @ONLY
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/kadasgui/pyproject.toml.in
+  ${CMAKE_CURRENT_BINARY_DIR}/kadasgui/pyproject.toml @ONLY
+)
+generate_sip_python_module_code(
+  kadas._kadasgui kadasgui/kadasgui.sip "${sip_files_gui}" cpp_files
+)
 build_sip_python_module(
   kadas._kadasgui
   kadasgui/kadasgui.sip
@@ -111,7 +134,8 @@ build_sip_python_module(
   ""
   kadas_core
   kadas_gui
-  QGIS::Gui)
+  QGIS::Gui
+)
 
 set(PY_MODULES kadascore kadasanalysis kadasgui)
 foreach(module ${PY_MODULES})
@@ -122,30 +146,38 @@ foreach(module ${PY_MODULES})
   file(
     GLOB PY_FILES_AUTO_ADDITIONS
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${module}/auto_additions/*.py)
+    ${module}/auto_additions/*.py
+  )
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/${module}/__init__.py.in
-    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}/__init__.py COPYONLY)
+    ${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}/__init__.py COPYONLY
+  )
   foreach(pyfile ${PY_FILES_AUTO_ADDITIONS})
     file(READ ${pyfile} CONTENTS)
     file(APPEND ${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}/__init__.py
-         "${CONTENTS}")
+         "${CONTENTS}"
+    )
   endforeach(pyfile)
   install(FILES ${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}/__init__.py
-          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}")
+          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}"
+  )
 
   file(
     GLOB PY_FILES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${module}/*.py)
+    ${module}/*.py
+  )
   install(FILES ${PY_FILES}
-          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}")
+          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}"
+  )
   file(
     GLOB PY_FILES_ADDITIONS
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${module}/additions/*.py)
+    ${module}/additions/*.py
+  )
   install(FILES ${PY_FILES_ADDITIONS}
-          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}/additions")
+          DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}/${module}/additions"
+  )
   set(PY_FILES ${PY_FILES} ${PY_FILES_ADDITIONS})
   foreach(pyfile ${PY_FILES})
     get_filename_component(subdir ${pyfile} DIRECTORY)
@@ -157,7 +189,8 @@ foreach(module ${PY_MODULES})
       COMMAND ${CMAKE_COMMAND} -E copy ${pyfile}
               "${KADAS_PYTHON_OUTPUT_DIRECTORY}/${subdir}"
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      DEPENDS ${PY_FILES})
+      DEPENDS ${PY_FILES}
+    )
   endforeach(pyfile)
   py_compile(py${module} "${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}")
 endforeach(module)

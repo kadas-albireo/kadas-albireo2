@@ -12,15 +12,18 @@ endif()
 unset(vcpkg_gdal_maybe_version)
 _find_package(${ARGS} CONFIG)
 if(GDAL_FOUND)
-  get_filename_component(vcpkg_gdal_prefix "${CMAKE_CURRENT_LIST_DIR}/../.."
-                         ABSOLUTE)
+  get_filename_component(
+    vcpkg_gdal_prefix "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE
+  )
   set(GDAL_INCLUDE_DIR
       "${vcpkg_gdal_prefix}/include"
-      CACHE INTERNAL "")
+      CACHE INTERNAL ""
+  )
   set(GDAL_INCLUDE_DIRS "${GDAL_INCLUDE_DIR}")
   set(GDAL_LIBRARY
       GDAL::GDAL
-      CACHE INTERNAL "")
+      CACHE INTERNAL ""
+  )
   set(GDAL_LIBRARIES "${GDAL_LIBRARY}")
   unset(vcpkg_gdal_prefix)
 endif()

@@ -8,7 +8,8 @@ vcpkg_from_pythonhosted(
   SHA512
   d0a34f16dfa6bb9a6df39076cd43528cf854d343f6f801c448ea0ebab2a259aec3d03571e2a26709df6082ed2fcb6c43b86448be556fd559b6af41831b4f38e0
   PATCHES
-  fix-prefix.patch)
+  fix-prefix.patch
+)
 
 vcpkg_python_build_and_install_wheel(SOURCE_PATH "${SOURCE_PATH}")
 

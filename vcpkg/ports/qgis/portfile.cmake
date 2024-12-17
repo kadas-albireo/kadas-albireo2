@@ -29,7 +29,8 @@ vcpkg_from_github(
   nlohmann-json.patch
   qgis-debug.patch
   # PR #59848
-  wms-ignore-reported-layer-extent.patch)
+  wms-ignore-reported-layer-extent.patch
+)
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
@@ -51,7 +52,8 @@ if("bindings" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
 
   list(APPEND QGIS_OPTIONS
-       "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis")
+       "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis"
+  )
 else()
   vcpkg_find_acquire_program(PYTHON3)
   list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
@@ -151,24 +153,31 @@ macro(FIND_LIB_OPTIONS basename relname debname suffix libsuffix)
   file(
     TO_NATIVE_PATH
     "${CURRENT_INSTALLED_DIR}/lib/${VCPKG_TARGET_IMPORT_LIBRARY_PREFIX}${relname}${libsuffix}"
-    ${basename}_LIBRARY_RELEASE)
+    ${basename}_LIBRARY_RELEASE
+  )
   file(
     TO_NATIVE_PATH
     "${CURRENT_INSTALLED_DIR}/debug/lib/${VCPKG_TARGET_IMPORT_LIBRARY_PREFIX}${debname}${libsuffix}"
-    ${basename}_LIBRARY_DEBUG)
+    ${basename}_LIBRARY_DEBUG
+  )
   if(${basename}_LIBRARY_DEBUG
      AND ${basename}_LIBRARY_RELEASE
-     AND NOT ${basename}_LIBRARY_DEBUG STREQUAL ${basename}_LIBRARY_RELEASE)
+     AND NOT ${basename}_LIBRARY_DEBUG STREQUAL ${basename}_LIBRARY_RELEASE
+  )
     list(APPEND QGIS_OPTIONS_RELEASE
-         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_RELEASE})
+         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_RELEASE}
+    )
     list(APPEND QGIS_OPTIONS_DEBUG
-         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_DEBUG})
+         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_DEBUG}
+    )
   elseif(${basename}_LIBRARY_RELEASE)
     list(APPEND QGIS_OPTIONS
-         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_RELEASE})
+         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_RELEASE}
+    )
   elseif(${basename}_LIBRARY_DEBUG)
     list(APPEND QGIS_OPTIONS
-         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_DEBUG})
+         -D${basename}_${suffix}:FILEPATH=${${basename}_LIBRARY_DEBUG}
+    )
   endif()
 endmacro()
 
@@ -204,7 +213,8 @@ vcpkg_configure_cmake(
   OPTIONS_DEBUG
   ${QGIS_OPTIONS_DEBUG}
   OPTIONS_RELEASE
-  ${QGIS_OPTIONS_RELEASE})
+  ${QGIS_OPTIONS_RELEASE}
+)
 
 vcpkg_restore_env_variables(VARS PATH)
 
