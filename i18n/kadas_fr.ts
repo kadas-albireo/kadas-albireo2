@@ -3709,7 +3709,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="424"/>
         <source>Light Direction</source>
-        <translation type="unfinished"/>
+        <translation>Direction de la lumière</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="443"/>
@@ -3838,7 +3838,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="58"/>
         <source>General place name directory</source>
-        <translation type="unfinished"/>
+        <translation>Répertoire général de noms de lieux</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="41"/>
@@ -4679,22 +4679,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="40"/>
         <source>Both sides of the mesh are visible</source>
-        <translation type="unfinished"/>
+        <translation>Les deux côtés de la maille sont visibles</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="41"/>
         <source>Only the back of the mesh is visible</source>
-        <translation type="unfinished"/>
+        <translation>Seul l&apos;arrière de la maille est visible</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="42"/>
         <source>Only the front of the mesh is visible</source>
-        <translation type="unfinished"/>
+        <translation>Seul l&apos;avant de la maille est visible</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="113"/>
         <source>Color Ramp Shader</source>
-        <translation type="unfinished"/>
+        <translation>Nuanceur de palette de couleur</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="122"/>
@@ -5191,7 +5191,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
         <source>Specular color is disabled because material has no shininess</source>
-        <translation type="unfinished"/>
+        <translation>La couleur spéculaire est désactivée car le matériau n&apos;est pas brillant.</translation>
     </message>
 </context>
 <context>
@@ -5331,7 +5331,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="216"/>
         <source>Plugin update error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur de mise à jour du plugin</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="216"/>
@@ -5653,7 +5653,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadasremotedatasearchprovider.h" line="41"/>
         <source>Remote Data</source>
-        <translation type="unfinished"/>
+        <translation>Données distantes</translation>
     </message>
 </context>
 <context>
@@ -5906,7 +5906,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
         <source>Auto resize frame</source>
-        <translation type="unfinished"/>
+        <translation>Redimensionnement automatique du cadre</translation>
     </message>
 </context>
 <context>
@@ -6557,7 +6557,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="38"/>
         <source> World Location Search</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher une localisation mondiale</translation>
     </message>
 </context>
 <context>
@@ -6755,22 +6755,22 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="859"/>
         <source>Navigation Synchronization</source>
-        <translation type="unfinished"/>
+        <translation>Synchronisation de la navigation</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="865"/>
         <source>2D map view follows 3D camera</source>
-        <translation type="unfinished"/>
+        <translation>La carte en 2D suit la caméra 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="872"/>
         <source>3D camera follows 2D map view</source>
-        <translation type="unfinished"/>
+        <translation>La caméra 3D suit la carte en 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="879"/>
         <source>Show visible camera area in 2D map view</source>
-        <translation type="unfinished"/>
+        <translation>Afficher la zone visible de la caméra sur la carte 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="889"/>
@@ -6807,12 +6807,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1033"/>
         <source>Show bounding boxes</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les zones d&apos;emprise</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1040"/>
         <source>Show map tile info</source>
-        <translation type="unfinished"/>
+        <translation>Informations de la tuile de carte</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1066"/>
@@ -6842,7 +6842,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1114"/>
         <source>Show debug overlay</source>
-        <translation type="unfinished"/>
+        <translation>Afficher la fenêtre de débogage</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1121"/>
@@ -6862,7 +6862,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1142"/>
         <source>Show camera&apos;s rotation center</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le centre de la vue de la caméra</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1151"/>
