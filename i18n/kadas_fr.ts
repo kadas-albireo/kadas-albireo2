@@ -5176,17 +5176,17 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="44"/>
         <source>Sets the strength of the ambient color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Définir l&apos;intensité de la couleur ambiante</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="45"/>
         <source>Sets the strength of the diffuse color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Définir l&apos;intensité de la couleur diffuse</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="46"/>
         <source>Sets the strength of the specular color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Définir l&apos;intensité de la couleur spéculaire</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
