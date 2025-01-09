@@ -1361,6 +1361,8 @@ void KadasMainWindow::checkLayerTemporalCapabilities( QgsMapLayer *layer )
   layer->temporalProperties()->setIsActive( true );
 }
 
+// Needs to be done after adding a catalog layer to ensure that the
+// parameter IgnoreReportedLayerExtents is activated
 void KadasMainWindow::checkWMSLayerIgnoreReportedExtents( QgsMapLayer *layer )
 {
   QgsDataProvider *provider = layer->dataProvider();
