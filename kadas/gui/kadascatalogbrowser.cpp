@@ -68,6 +68,8 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
 
     QStandardItem *addItem( QStandardItem *parent, const QString &value, int sortIndex, bool isLeaf, QMimeData *mimeData )
     {
+      qDebug() << "KadasCatalogBrowser::addItem" << value;
+
       if ( !parent )
       {
         parent = invisibleRootItem();
