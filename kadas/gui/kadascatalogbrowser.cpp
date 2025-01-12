@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QMenu>
 #include <QSortFilterProxyModel>
 #include <QStandardItem>
 #include <QTreeView>
@@ -24,6 +26,7 @@
 
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadascatalogprovider.h"
+#include "kadas/gui/kadascatalogbrowserpropertiesdialog.h"
 
 
 class KadasCatalogBrowser::CatalogItem : public QStandardItem
@@ -206,8 +209,11 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
   mTreeView->setEditTriggers( QTreeView::NoEditTriggers );
   mTreeView->setDragEnabled( true );
   mTreeView->setIndentation( 10 );
+  mTreeView->setContextMenuPolicy( Qt::CustomContextMenu );
   layout()->addWidget( mTreeView );
   connect( mTreeView, &QTreeView::doubleClicked, this, &KadasCatalogBrowser::itemDoubleClicked );
+  connect( mTreeView, &QTreeView::customContextMenuRequested, this, &KadasCatalogBrowser::itemCustomContextMenuRequested );
+
   mCatalogModel = new CatalogModel( this );
   mTreeView->setHeaderHidden( true );
 
@@ -222,6 +228,16 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
   QStandardItem *offlineItem = new QStandardItem( tr( "Offline" ) );
   offlineItem->setEnabled( false );
   mOfflineModel->appendRow( offlineItem );
+
+  mAddLayerAction = new QAction( tr( "Add layer" ), this );
+  mOpenPropertiesAction = new QAction( tr( "Properties" ), this );
+
+  connect( mAddLayerAction, &QAction::triggered, this, &KadasCatalogBrowser::addLayerActionTriggered );
+  connect( mOpenPropertiesAction, &QAction::triggered, this, &KadasCatalogBrowser::openPropertiesActionTriggered );
+
+  mContextMenu = new QMenu( this );
+  mContextMenu->addAction( mAddLayerAction );
+  mContextMenu->addAction( mOpenPropertiesAction );
 }
 
 void KadasCatalogBrowser::reload()
@@ -283,7 +299,42 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
   }
 }
 
-QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf, QMimeData *mimeData )
+void KadasCatalogBrowser::itemCustomContextMenuRequested( const QPoint &point )
+{
+  QModelIndex index = mTreeView->indexAt( point );
+  if ( !index.isValid() )
+  {
+    return;
+  }
+
+  mContextMenu->popup( mTreeView->viewport()->mapToGlobal( point ) );
+}
+
+QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, const QString &text, int sortIndex, bool isLeaf, QMimeData *mimeData )
 {
   return mCatalogModel->addItem( parent, text, sortIndex, isLeaf, mimeData );
+}
+
+void KadasCatalogBrowser::addLayerActionTriggered()
+{
+  QModelIndex index = mTreeView->currentIndex();
+  itemDoubleClicked( index );
+}
+
+void KadasCatalogBrowser::openPropertiesActionTriggered()
+{
+  QModelIndex index = mTreeView->currentIndex();
+
+  QString text = mCatalogModel->data( index, Qt::DisplayRole ).toString();
+  QString uri = mCatalogModel->data( index, CatalogItem::s_uriRole ).toString();
+  QString metaDataUrl = mCatalogModel->data( index, CatalogItem::s_metadataUrlRole ).toString();
+  QString subLayers = mCatalogModel->data( index, CatalogItem::s_sublayersRole ).toString();
+  int sortIndex = mCatalogModel->data( index, CatalogItem::s_sortIndexRole ).toInt();
+  QMimeData *mimeData = mCatalogModel->mimeData( QModelIndexList() << mFilterProxyModel->mapToSource( index ) );
+
+  KadasCatalogBrowserPropertiesDialog dialog( text, uri, metaDataUrl, subLayers, sortIndex, mimeData, this );
+  dialog.exec();
+
+  if ( mimeData )
+    delete mimeData;
 }
