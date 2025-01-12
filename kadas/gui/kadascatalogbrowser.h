@@ -27,6 +27,8 @@
 class KadasCatalogProvider;
 class QgsFilterLineEdit;
 class QTreeView;
+class QMenu;
+class QAction;
 
 
 class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
@@ -35,7 +37,7 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
   public:
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
-    QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
+    QStandardItem *addItem( QStandardItem *parent, const QString &text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
 
   public slots:
     void reload();
@@ -56,11 +58,17 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     TreeFilterProxyModel *mFilterProxyModel;
     QList<KadasCatalogProvider *> mProviders;
     int mFinishedProviders;
+    QAction *mAddLayerAction;
+    QAction *mOpenPropertiesAction;
+    QMenu *mContextMenu;
 
   private slots:
     void filterChanged( const QString &text );
     void itemDoubleClicked( const QModelIndex &index );
+    void itemCustomContextMenuRequested( const QPoint &point );
     void providerFinished();
+    void addLayerActionTriggered();
+    void openPropertiesActionTriggered();
 };
 
 #endif // KADASCATALOGBROWSER_H
