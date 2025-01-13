@@ -71,8 +71,6 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
 
     QStandardItem *addItem( QStandardItem *parent, const QString &value, int sortIndex, bool isLeaf, QMimeData *mimeData )
     {
-      qDebug() << "KadasCatalogBrowser::addItem" << value;
-
       if ( !parent )
       {
         parent = invisibleRootItem();
@@ -307,6 +305,7 @@ void KadasCatalogBrowser::itemCustomContextMenuRequested( const QPoint &point )
     return;
   }
 
+  mContextMenu->setProperty( "index", index );
   mContextMenu->popup( mTreeView->viewport()->mapToGlobal( point ) );
 }
 
@@ -317,13 +316,13 @@ QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, const QStrin
 
 void KadasCatalogBrowser::addLayerActionTriggered()
 {
-  QModelIndex index = mTreeView->currentIndex();
+  QModelIndex index = mContextMenu->property( "index" ).toModelIndex();
   itemDoubleClicked( index );
 }
 
 void KadasCatalogBrowser::openPropertiesActionTriggered()
 {
-  QModelIndex index = mTreeView->currentIndex();
+  QModelIndex index = mContextMenu->property( "index" ).toModelIndex();
 
   QString text = mCatalogModel->data( index, Qt::DisplayRole ).toString();
   QString uri = mCatalogModel->data( index, CatalogItem::s_uriRole ).toString();
