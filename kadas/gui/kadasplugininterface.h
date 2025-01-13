@@ -24,6 +24,8 @@
 class QgsMapTool;
 class QgsPrintLayout;
 
+class KadasMapItem;
+
 class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
 {
     Q_OBJECT
@@ -96,6 +98,9 @@ class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
     virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) = 0;
     virtual QgsVectorTileLayer *addVectorTileLayerQuiet( const QString &url, const QString &baseName ) = 0;
     virtual QgsPointCloudLayer *addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey ) = 0;
+
+    virtual void mapCanvasItemManagerAddItem( KadasMapItem *item ) = 0;
+    virtual void mapCanvasItemManagerRemoveItem( KadasMapItem *item ) = 0;
 
   signals:
     void printLayoutAdded( QgsPrintLayout *layout );

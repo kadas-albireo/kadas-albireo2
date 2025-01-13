@@ -376,6 +376,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     bool deletePrintLayout( QgsPrintLayout *layout ) override;
     QList<QgsPrintLayout *> printLayouts() const override;
     void showLayoutDesigner( QgsPrintLayout *layout ) override;
+
+    virtual void mapCanvasItemManagerAddItem( KadasMapItem *item ) override;
+    virtual void mapCanvasItemManagerRemoveItem( KadasMapItem *item ) override;
 };
 
 
