@@ -323,13 +323,14 @@ void KadasCatalogBrowser::addLayerActionTriggered()
 void KadasCatalogBrowser::openPropertiesActionTriggered()
 {
   QModelIndex index = mContextMenu->property( "index" ).toModelIndex();
+  index = mFilterProxyModel->mapToSource( index );
 
   QString text = mCatalogModel->data( index, Qt::DisplayRole ).toString();
   QString uri = mCatalogModel->data( index, CatalogItem::s_uriRole ).toString();
   QString metaDataUrl = mCatalogModel->data( index, CatalogItem::s_metadataUrlRole ).toString();
   QString subLayers = mCatalogModel->data( index, CatalogItem::s_sublayersRole ).toString();
   int sortIndex = mCatalogModel->data( index, CatalogItem::s_sortIndexRole ).toInt();
-  QMimeData *mimeData = mCatalogModel->mimeData( QModelIndexList() << mFilterProxyModel->mapToSource( index ) );
+  QMimeData *mimeData = mCatalogModel->mimeData( QModelIndexList() << index );
 
   KadasCatalogBrowserPropertiesDialog dialog( text, uri, metaDataUrl, subLayers, sortIndex, mimeData, this );
   dialog.exec();
