@@ -27,7 +27,8 @@ vcpkg_from_github(
   bindings-install.patch
   sipcxx17.patch
   nlohmann-json.patch
-  qgis-debug.patch)
+  qgis-debug.patch
+)
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
