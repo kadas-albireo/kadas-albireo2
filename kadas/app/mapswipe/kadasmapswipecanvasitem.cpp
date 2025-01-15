@@ -55,10 +55,22 @@ void KadasMapSwipeCanvasItem::setLayers( const QSet<QgsMapLayer *> &layers )
 void KadasMapSwipeCanvasItem::setPixelPosition( int x, int y )
 {
   if ( mIsVertical )
+  {
     mPixelLength = x;
+  }
   else
+  {
     mPixelLength = boundingRect().height() - y;
+  }
   refreshMap();
+}
+
+int KadasMapSwipeCanvasItem::pixelLength() const
+{
+  if ( mIsVertical )
+    return mPixelLength;
+  else
+    return boundingRect().height() - mPixelLength;
 }
 
 void KadasMapSwipeCanvasItem::setVertical( bool vertical )
@@ -114,5 +126,8 @@ void KadasMapSwipeCanvasItem::paint( QPainter *painter )
     mRenderedMapImage.scaled( mRenderedMapImage.width() / mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height() / mRenderedMapImage.devicePixelRatioF() ),
     rect
   );
+
+  QPen pen( Qt::black, 3, Qt::SolidLine );
+  painter->setPen( pen );
   painter->drawLine( line );
 }
