@@ -9,7 +9,8 @@ vcpkg_from_git(
   qwt-6.2
   PATCHES
   config.patch
-  fix_dll_install.patch)
+  fix_dll_install.patch
+)
 
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "dynamic" IS_DYNAMIC)
 set(OPTIONS "")
@@ -24,16 +25,19 @@ vcpkg_qmake_configure(
   ${OPTIONS}
   "CONFIG-=debug_and_release"
   "CONFIG+=create_prl"
-  "CONFIG+=link_prl")
+  "CONFIG+=link_prl"
+)
 vcpkg_qmake_install()
 vcpkg_copy_pdbs()
 
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/bin"
-       "${CURRENT_PACKAGES_DIR}/debug/bin")
+       "${CURRENT_PACKAGES_DIR}/debug/bin"
+  )
 endif()
 
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/unofficial-qwt-config.cmake"
-     DESTINATION "${CURRENT_PACKAGES_DIR}/share/unofficial-qwt")
+     DESTINATION "${CURRENT_PACKAGES_DIR}/share/unofficial-qwt"
+)
 
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")

@@ -13,7 +13,8 @@ function(copy_resource source target)
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/${target}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${source}"
-            "${SHARE_DIR}/${target}")
+            "${SHARE_DIR}/${target}"
+  )
 endfunction()
 
 if(MSVC)
@@ -26,9 +27,11 @@ if(MSVC)
 
   # Additional Qt plugins (3D)
   install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/"
-          DESTINATION "bin/plugins/renderers/")
+          DESTINATION "bin/plugins/renderers/"
+  )
   install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderplugins/"
-          DESTINATION "bin/plugins/renderplugins/")
+          DESTINATION "bin/plugins/renderplugins/"
+  )
 
   # At least python3.dll, qgis_analysis.dll and gsl.dll are missing Copy
   # everything
@@ -49,13 +52,15 @@ add_custom_command(
   TARGET deploy
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory
-          "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins")
+          "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+)
 foreach(LIB ${PROVIDER_LIBS})
   add_custom_command(
     TARGET deploy
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}"
-            "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins")
+            "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+  )
   install(FILES "${LIB}" DESTINATION "${QGIS_PLUGIN_INSTALL_PREFIX}")
 endforeach()
 foreach(LIB ${AUTHMETHODS_LIBS})
@@ -63,7 +68,8 @@ foreach(LIB ${AUTHMETHODS_LIBS})
     TARGET deploy
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB}"
-            "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins")
+            "${CMAKE_BINARY_DIR}/output/bin/qgis/plugins"
+  )
   install(FILES "${LIB}" DESTINATION "${QGIS_PLUGIN_INSTALL_PREFIX}")
 endforeach()
 
@@ -72,12 +78,14 @@ endforeach()
 file(
   DOWNLOAD https://curl.se/ca/cacert.pem "${CMAKE_BINARY_DIR}/cacert.pem"
   TLS_VERIFY ON
-  STATUS DOWNLOAD_STATUS)
+  STATUS DOWNLOAD_STATUS
+)
 list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
 list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
 if(NOT ${STATUS_CODE} EQUAL 0)
   message(
-    FATAL_ERROR "Error occurred during cacert.pem download: ${ERROR_MESSAGE}")
+    FATAL_ERROR "Error occurred during cacert.pem download: ${ERROR_MESSAGE}"
+  )
 endif()
 
 set(QGIS_SHARE_DIR ${VCPKG_BASE_DIR}/share/qgis)
@@ -94,7 +102,8 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg"
           "${SHARE_DIR}/qgis/svg"
   COMMAND ${CMAKE_COMMAND} -E rm -R --
-          "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min")
+          "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
+)
 set(PROJ_DATA_PATH "${VCPKG_BASE_DIR}/share/proj")
 
 if(NOT EXISTS "${PROJ_DATA_PATH}/proj.db")
@@ -104,19 +113,25 @@ endif()
 copy_resource("${PROJ_DATA_PATH}" "proj")
 copy_resource("${VCPKG_BASE_DIR}/share/gdal" "gdal")
 install(DIRECTORY "${SHARE_DIR}/qgis/resources/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources"
+)
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg"
+)
 install(DIRECTORY "${PROJ_DATA_PATH}/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/proj")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/proj"
+)
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal"
+)
 install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/crypto/"
-        DESTINATION "bin/plugins/crypto") # QCA plugins
+        DESTINATION "bin/plugins/crypto"
+) # QCA plugins
 install(
   DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
   DESTINATION "bin"
   PATTERN "*.sip" EXCLUDE
-  PATTERN "__pycache__" EXCLUDE)
+  PATTERN "__pycache__" EXCLUDE
+)
 
 add_dependencies(kadas deploy)

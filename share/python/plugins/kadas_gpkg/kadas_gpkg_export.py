@@ -3,7 +3,7 @@
 from qgis.PyQt.QtCore import Qt, QTemporaryDir, QEventLoop
 from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QApplication
 
-from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer
+from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer, Qgis
 from qgis.gui import *
 
 import os

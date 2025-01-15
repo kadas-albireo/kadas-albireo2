@@ -136,4 +136,10 @@ jobs:
           path: |
             build/kadas-*-win64.msi
 
-    
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: |
+            build/kadas-*.zip
+            build/kadas-*.msi

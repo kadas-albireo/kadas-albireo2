@@ -9,10 +9,12 @@ vcpkg_from_github(
   SHA512
   b268fd77b14eba8b636e645e42897d5d02ffd11cab29371e13e4087b29665dd8b510026547a2b259a98c0c39ade69d6aa5fecce84f2d813a8cabd26a1a5ff87f
   HEAD_REF
-  master)
+  master
+)
 
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt"
-     DESTINATION "${SOURCE_PATH}")
+     DESTINATION "${SOURCE_PATH}"
+)
 
 vcpkg_cmake_configure(SOURCE_PATH "${SOURCE_PATH}")
 
@@ -23,4 +25,5 @@ file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 file(
   INSTALL ${SOURCE_PATH}/LICENSE
   DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT}
-  RENAME copyright)
+  RENAME copyright
+)

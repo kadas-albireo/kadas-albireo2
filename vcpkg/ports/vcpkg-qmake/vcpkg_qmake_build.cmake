@@ -16,14 +16,17 @@ function(z_run_jom_build invoke_command targets log_prefix log_suffix)
     WORKING_DIRECTORY
     "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${log_suffix}"
     LOGNAME
-    "package-${log_prefix}-${TARGET_TRIPLET}-${log_suffix}")
+    "package-${log_prefix}-${TARGET_TRIPLET}-${log_suffix}"
+  )
 endfunction()
 
 function(vcpkg_qmake_build)
   # parse parameters such that semicolons in options arguments to COMMAND don't
   # get erased
-  cmake_parse_arguments(PARSE_ARGV 0 arg "SKIP_MAKEFILES" "BUILD_LOGNAME"
-                        "TARGETS;RELEASE_TARGETS;DEBUG_TARGETS")
+  cmake_parse_arguments(
+    PARSE_ARGV 0 arg "SKIP_MAKEFILES" "BUILD_LOGNAME"
+    "TARGETS;RELEASE_TARGETS;DEBUG_TARGETS"
+  )
 
   # Make sure that the linker finds the libraries used
   vcpkg_backup_env_variables(VARS PATH LD_LIBRARY_PATH)
@@ -64,21 +67,27 @@ function(vcpkg_qmake_build)
   endif()
   foreach(build_type IN ITEMS ${items})
     set(current_installed_prefix
-        "${CURRENT_INSTALLED_DIR}${path_suffix_${build_type}}")
+        "${CURRENT_INSTALLED_DIR}${path_suffix_${build_type}}"
+    )
 
-    vcpkg_add_to_path(PREPEND "${current_installed_prefix}/lib"
-                      "${current_installed_prefix}/bin")
+    vcpkg_add_to_path(
+      PREPEND "${current_installed_prefix}/lib"
+      "${current_installed_prefix}/bin"
+    )
 
     vcpkg_list(SET targets ${targets_${build_type}} ${arg_TARGETS})
     if(NOT arg_SKIP_MAKEFILES)
-      z_run_jom_build("${invoke_command}" qmake_all makefiles
-                      "${short_name_${build_type}}")
+      z_run_jom_build(
+        "${invoke_command}" qmake_all makefiles "${short_name_${build_type}}"
+      )
       z_vcpkg_qmake_fix_makefiles(
         "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-${short_name_${build_type}}"
       )
     endif()
-    z_run_jom_build("${invoke_command}" "${targets}" "${arg_BUILD_LOGNAME}"
-                    "${short_name_${build_type}}")
+    z_run_jom_build(
+      "${invoke_command}" "${targets}" "${arg_BUILD_LOGNAME}"
+      "${short_name_${build_type}}"
+    )
 
     vcpkg_restore_env_variables(VARS PATH LD_LIBRARY_PATH)
   endforeach()

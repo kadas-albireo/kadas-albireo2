@@ -62,8 +62,8 @@ function(vcpkg_qmake_configure)
     unset(${qmake_var} CACHE)
     set(${var}
         "${${var}}"
-        PARENT_SCOPE) # Is this correct? Or is there a vcpkg_list command for
-                      # that?
+        PARENT_SCOPE
+    ) # Is this correct? Or is there a vcpkg_list command for that?
   endfunction()
   # Setup Build tools
   if(NOT VCPKG_QMAKE_COMMAND) # For users using outside Qt6
@@ -76,59 +76,79 @@ function(vcpkg_qmake_configure)
   execute_process(
     COMMAND ${VCPKG_QMAKE_COMMAND} -query QT_VERSION
     OUTPUT_VARIABLE QT_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
   if(VCPKG_TARGET_IS_OSX)
     if(DEFINED VCPKG_OSX_DEPLOYMENT_TARGET)
       vcpkg_list(
         APPEND arg_QMAKE_OPTIONS
-        "QMAKE_MACOSX_DEPLOYMENT_TARGET=${VCPKG_OSX_DEPLOYMENT_TARGET}")
+        "QMAKE_MACOSX_DEPLOYMENT_TARGET=${VCPKG_OSX_DEPLOYMENT_TARGET}"
+      )
     elseif(${QT_VERSION} VERSION_GREATER_EQUAL 6)
       # https://doc.qt.io/qt-6/macos.html
-      vcpkg_list(APPEND arg_QMAKE_OPTIONS
-                 "QMAKE_MACOSX_DEPLOYMENT_TARGET=10.15")
+      vcpkg_list(
+        APPEND arg_QMAKE_OPTIONS "QMAKE_MACOSX_DEPLOYMENT_TARGET=10.15"
+      )
     else() # Qt5
       # https://doc.qt.io/qt-5/macos.html
-      vcpkg_list(APPEND arg_QMAKE_OPTIONS
-                 "QMAKE_MACOSX_DEPLOYMENT_TARGET=10.13")
+      vcpkg_list(
+        APPEND arg_QMAKE_OPTIONS "QMAKE_MACOSX_DEPLOYMENT_TARGET=10.13"
+      )
     endif()
   endif()
 
   set(qmake_build_tools "")
-  qmake_append_program(qmake_build_tools "QMAKE_CC"
-                       "${VCPKG_DETECTED_CMAKE_C_COMPILER}")
-  qmake_append_program(qmake_build_tools "QMAKE_CXX"
-                       "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}")
-  qmake_append_program(qmake_build_tools "QMAKE_AR"
-                       "${VCPKG_DETECTED_CMAKE_AR}")
-  qmake_append_program(qmake_build_tools "QMAKE_RANLIB"
-                       "${VCPKG_DETECTED_CMAKE_RANLIB}")
-  qmake_append_program(qmake_build_tools "QMAKE_STRIP"
-                       "${VCPKG_DETECTED_CMAKE_STRIP}")
-  qmake_append_program(qmake_build_tools "QMAKE_NM"
-                       "${VCPKG_DETECTED_CMAKE_NM}")
-  qmake_append_program(qmake_build_tools "QMAKE_RC"
-                       "${VCPKG_DETECTED_CMAKE_RC_COMPILER}")
-  qmake_append_program(qmake_build_tools "QMAKE_MT"
-                       "${VCPKG_DETECTED_CMAKE_MT}")
+  qmake_append_program(
+    qmake_build_tools "QMAKE_CC" "${VCPKG_DETECTED_CMAKE_C_COMPILER}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_CXX" "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_AR" "${VCPKG_DETECTED_CMAKE_AR}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_RANLIB" "${VCPKG_DETECTED_CMAKE_RANLIB}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_STRIP" "${VCPKG_DETECTED_CMAKE_STRIP}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_NM" "${VCPKG_DETECTED_CMAKE_NM}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_RC" "${VCPKG_DETECTED_CMAKE_RC_COMPILER}"
+  )
+  qmake_append_program(
+    qmake_build_tools "QMAKE_MT" "${VCPKG_DETECTED_CMAKE_MT}"
+  )
 
   if(NOT VCPKG_TARGET_IS_WINDOWS OR VCPKG_DETECTED_CMAKE_AR MATCHES "ar$")
     vcpkg_list(APPEND qmake_build_tools "QMAKE_AR+=qc")
   endif()
 
   if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
-    qmake_append_program(qmake_build_tools "QMAKE_LIB"
-                         "${VCPKG_DETECTED_CMAKE_AR}")
-    qmake_append_program(qmake_build_tools "QMAKE_LINK"
-                         "${VCPKG_DETECTED_CMAKE_LINKER}")
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LIB" "${VCPKG_DETECTED_CMAKE_AR}"
+    )
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LINK" "${VCPKG_DETECTED_CMAKE_LINKER}"
+    )
   else()
-    qmake_append_program(qmake_build_tools "QMAKE_LINK"
-                         "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}")
-    qmake_append_program(qmake_build_tools "QMAKE_LINK_SHLIB"
-                         "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}")
-    qmake_append_program(qmake_build_tools "QMAKE_LINK_C"
-                         "${VCPKG_DETECTED_CMAKE_C_COMPILER}")
-    qmake_append_program(qmake_build_tools "QMAKE_LINK_C_SHLIB"
-                         "${VCPKG_DETECTED_CMAKE_C_COMPILER}")
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LINK" "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}"
+    )
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LINK_SHLIB"
+      "${VCPKG_DETECTED_CMAKE_CXX_COMPILER}"
+    )
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LINK_C" "${VCPKG_DETECTED_CMAKE_C_COMPILER}"
+    )
+    qmake_append_program(
+      qmake_build_tools "QMAKE_LINK_C_SHLIB"
+      "${VCPKG_DETECTED_CMAKE_C_COMPILER}"
+    )
   endif()
 
   if(DEFINED VCPKG_QT_TARGET_MKSPEC)
@@ -148,8 +168,9 @@ function(vcpkg_qmake_configure)
     macro(qmake_add_flags qmake_var operation flags)
       string(STRIP "${flags}" striped_flags)
       if(striped_flags)
-        vcpkg_list(APPEND qmake_comp_flags
-                   "${qmake_var}${operation}${striped_flags}")
+        vcpkg_list(
+          APPEND qmake_comp_flags "${qmake_var}${operation}${striped_flags}"
+        )
       endif()
     endmacro()
 
@@ -160,22 +181,36 @@ function(vcpkg_qmake_configure)
     )
     qmake_add_flags("QMAKE_RC" "+=" "${VCPKG_COMBINED_RC_FLAGS_${buildtype}}"
     )# not exported by vcpkg_cmake_get_vars yet
-    qmake_add_flags("QMAKE_CFLAGS_${buildtype}" "+="
-                    "${VCPKG_COMBINED_C_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_CXXFLAGS_${buildtype}" "+="
-                    "${VCPKG_COMBINED_CXX_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_LFLAGS" "+="
-                    "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_LFLAGS_SHLIB" "+="
-                    "${VCPKG_COMBINED_SHARED_LINKER_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_LFLAGS_PLUGIN" "+="
-                    "${VCPKG_COMBINED_MODULE_LINKER_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_LIBFLAGS" "+="
-                    "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}")
-    qmake_add_flags("QMAKE_LIBFLAGS_${buildtype}" "+="
-                    "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}")
-    vcpkg_list(APPEND qmake_build_tools
-               "QMAKE_AR+=${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}")
+    qmake_add_flags(
+      "QMAKE_CFLAGS_${buildtype}" "+=" "${VCPKG_COMBINED_C_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_CXXFLAGS_${buildtype}" "+="
+      "${VCPKG_COMBINED_CXX_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_LFLAGS" "+=" "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_LFLAGS_SHLIB" "+="
+      "${VCPKG_COMBINED_SHARED_LINKER_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_LFLAGS_PLUGIN" "+="
+      "${VCPKG_COMBINED_MODULE_LINKER_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_LIBFLAGS" "+="
+      "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}"
+    )
+    qmake_add_flags(
+      "QMAKE_LIBFLAGS_${buildtype}" "+="
+      "${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}"
+    )
+    vcpkg_list(
+      APPEND qmake_build_tools
+      "QMAKE_AR+=${VCPKG_COMBINED_STATIC_LINKER_FLAGS_${buildtype}}"
+    )
 
     # QMAKE_CXXFLAGS_SHLIB
 
@@ -183,10 +218,12 @@ function(vcpkg_qmake_configure)
     if(NOT VCPKG_QT_CONF_${buildtype})
       if(${QT_VERSION} VERSION_GREATER_EQUAL 6)
         set(VCPKG_QT_CONF_${buildtype}
-            "${CURRENT_INSTALLED_DIR}/tools/Qt6/qt_${lowerbuildtype}.conf")
+            "${CURRENT_INSTALLED_DIR}/tools/Qt6/qt_${lowerbuildtype}.conf"
+        )
       else()
         set(VCPKG_QT_CONF_${buildtype}
-            "${CURRENT_INSTALLED_DIR}/tools/qt5/qt_${lowerbuildtype}.conf")
+            "${CURRENT_INSTALLED_DIR}/tools/qt5/qt_${lowerbuildtype}.conf"
+        )
       endif()
     else()
       # Let a supplied qt.conf override everything. The file will still be
@@ -194,12 +231,16 @@ function(vcpkg_qmake_configure)
       set(qmake_build_tools "")
       set(qmake_comp_flags "")
     endif()
-    configure_file("${VCPKG_QT_CONF_${buildtype}}"
-                   "${CURRENT_BUILDTREES_DIR}/${config_triplet}/qt.conf")
+    configure_file(
+      "${VCPKG_QT_CONF_${buildtype}}"
+      "${CURRENT_BUILDTREES_DIR}/${config_triplet}/qt.conf"
+    )
 
     vcpkg_backup_env_variables(VARS PKG_CONFIG_PATH)
-    vcpkg_host_path_list(PREPEND PKG_CONFIG_PATH "${prefix}/lib/pkgconfig"
-                         "${CURRENT_INSTALLED_DIR}/share/pkgconfig")
+    vcpkg_host_path_list(
+      PREPEND PKG_CONFIG_PATH "${prefix}/lib/pkgconfig"
+      "${CURRENT_INSTALLED_DIR}/share/pkgconfig"
+    )
 
     message(STATUS "Configuring ${config_triplet}")
     file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${config_triplet}")
@@ -228,16 +269,19 @@ function(vcpkg_qmake_configure)
       LOGNAME
       config-${config_triplet}
       SAVE_LOG_FILES
-      config.log)
+      config.log
+    )
     z_vcpkg_qmake_fix_makefiles("${CURRENT_BUILDTREES_DIR}/${config_triplet}")
     message(STATUS "Configuring ${config_triplet} done")
 
     vcpkg_restore_env_variables(VARS PKG_CONFIG_PATH)
     if(EXISTS "${CURRENT_BUILDTREES_DIR}/${config_triplet}/config.log")
       file(REMOVE
-           "${CURRENT_BUILDTREES_DIR}/internal-config-${config_triplet}.log")
+           "${CURRENT_BUILDTREES_DIR}/internal-config-${config_triplet}.log"
+      )
       file(RENAME "${CURRENT_BUILDTREES_DIR}/${config_triplet}/config.log"
-           "${CURRENT_BUILDTREES_DIR}/internal-config-${config_triplet}.log")
+           "${CURRENT_BUILDTREES_DIR}/internal-config-${config_triplet}.log"
+      )
     endif()
   endforeach()
 endfunction()

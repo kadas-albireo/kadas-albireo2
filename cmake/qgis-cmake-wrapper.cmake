@@ -24,7 +24,8 @@ function(_qgis_core_add_dependency target package)
   find_package(${package} ${ARGN} ${_qgis_dep_find_args})
   if(${${package}_FOUND})
     foreach(suffix IN ITEMS "" "-shared" "_shared" "-static" "_static"
-                            "-NOTFOUND")
+                            "-NOTFOUND"
+    )
       set(dependency "${target}${suffix}")
       if(TARGET ${dependency})
         break()
@@ -48,12 +49,14 @@ function(_qgis_core_add_dependency target package)
       message(WARNING "Did not find which libraries are exported by ${package}")
       set(QGIS_FOUND
           false
-          PARENT_SCOPE)
+          PARENT_SCOPE
+      )
     endif()
   else()
     set(QGIS_FOUND
         false
-        PARENT_SCOPE)
+        PARENT_SCOPE
+    )
   endif()
 
 endfunction()
@@ -143,7 +146,8 @@ if(ANDROID)
   find_library(libdl dl)
   get_filename_component(arch_path ${libdl} DIRECTORY)
   set(pkgcfg_lib_PC_SPATIALITE_c++
-      "${arch_path}/${ANDROID_PLATFORM_LEVEL}/libc++.so")
+      "${arch_path}/${ANDROID_PLATFORM_LEVEL}/libc++.so"
+  )
   if(NOT EXISTS ${pkgcfg_lib_PC_SPATIALITE_c++})
     set(pkgcfg_lib_PC_SPATIALITE_c++ "${arch_path}/libc++.so")
   endif()
@@ -196,7 +200,8 @@ find_package(
              OpenGL
              Qml
              Multimedia
-             QuickWidgets)
+             QuickWidgets
+)
 target_link_libraries(
   QGIS::Core
   INTERFACE Qt::Gui
@@ -210,7 +215,8 @@ target_link_libraries(
             Qt::OpenGL
             Qt::Qml
             Qt::Multimedia
-            Qt::QuickWidgets)
+            Qt::QuickWidgets
+)
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
   find_package(Qt5 COMPONENTS SerialPort)
   target_link_libraries(QGIS::Core INTERFACE Qt5::SerialPort)
@@ -224,8 +230,9 @@ if(APPLE)
   target_link_libraries(QGIS::Core INTERFACE PkgConfig::libtasn1)
 
   # QtKeychain
-  target_link_libraries(QGIS::Core INTERFACE "-framework Foundation"
-                                             "-framework Security")
+  target_link_libraries(
+    QGIS::Core INTERFACE "-framework Foundation" "-framework Security"
+  )
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   # poppler fixup for linux and macos _find_and_link_library(lcms2 QGIS::Core)
@@ -234,7 +241,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   find_package(
     Qt5
     COMPONENTS DBus
-    REQUIRED)
+    REQUIRED
+  )
   target_link_libraries(QGIS::Core INTERFACE Qt5::DBus)
 endif()
 target_link_libraries(QGIS::Analysis INTERFACE QGIS::Core)

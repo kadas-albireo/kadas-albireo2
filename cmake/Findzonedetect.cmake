@@ -38,12 +38,15 @@ else()
   find_path(zonedetect_INCLUDE_DIR NAMES zonedetect.h)
   if(zonedetect_INCLUDE_DIR AND zonedetect_LIBRARY)
     add_library(zonedetect::ZoneDetect UNKNOWN IMPORTED)
-    target_link_libraries(zonedetect::ZoneDetect
-                          INTERFACE ${zonedetect_LIBRARY})
-    target_include_directories(zonedetect::ZoneDetect
-                               INTERFACE ${zonedetect_INCLUDE_DIR})
-    set_target_properties(zonedetect::ZoneDetect
-                          PROPERTIES IMPORTED_LOCATION ${zonedetect_LIBRARY})
+    target_link_libraries(
+      zonedetect::ZoneDetect INTERFACE ${zonedetect_LIBRARY}
+    )
+    target_include_directories(
+      zonedetect::ZoneDetect INTERFACE ${zonedetect_INCLUDE_DIR}
+    )
+    set_target_properties(
+      zonedetect::ZoneDetect PROPERTIES IMPORTED_LOCATION ${zonedetect_LIBRARY}
+    )
     set(zonedetect_FOUND TRUE)
   endif()
 endif()
