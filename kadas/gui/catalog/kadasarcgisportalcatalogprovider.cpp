@@ -415,8 +415,8 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     }
 
     QgsMimeDataUtils::Uri mimeDataUri;
-    mimeDataUri.layerType = "raster";
-    mimeDataUri.providerKey = "arcgismapserver";
+    mimeDataUri.layerType = "vector";
+    mimeDataUri.providerKey = "arcgisfeatureserver";
     mimeDataUri.name = entry->title;
     QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
     mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0'" ).arg( crs.authid() ).arg( format ).arg( url );
