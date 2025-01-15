@@ -16,35 +16,46 @@
 #ifndef KADAS3DMAPCANVASWIDGET_H
 #define KADAS3DMAPCANVASWIDGET_H
 
-#include "qmenu.h"
-#include "qgsdockwidget.h"
-#include "qgsdockablewidgethelper.h"
-
-#include "qobjectuniqueptr.h"
-#include "qtoolbutton.h"
-#include "qgsrectangle.h"
-
+#include <QMenu>
+#include <qobjectuniqueptr.h>
+#include <QToolButton>
 #include <QPointer>
+
+#include "qgsdockablewidgethelper.h"
+#include "qgsrectangle.h"
+#include "qgssettingsentryimpl.h"
+
+#include "kadas/core/kadassettingstree.h"
+
 
 #define SIP_NO_FILE
 
+
 class QLabel;
 class QProgressBar;
+class QTreeView;
 
 class Qgs3DMapCanvas;
 class Qgs3DMapSettings;
-class Kadas3DNavigationWidget;
+class QgsDockableWidgetHelper;
+class QgsMapCanvas;
 class QgsMapTool;
 class QgsMapToolExtent;
-class QgsMapCanvas;
-class QgsDockableWidgetHelper;
 class QgsMessageBar;
 class QgsRubberBand;
+
+class Kadas3DNavigationWidget;
+
 
 class Kadas3DMapCanvasWidget : public QWidget
 {
     Q_OBJECT
   public:
+    static inline QgsSettingsTreeNode *sTree3D = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "3d" ) );
+
+    static const inline QgsSettingsEntryBool *sSettingLayerTreeVisible = new QgsSettingsEntryBool( QStringLiteral( "layer-tree-visible" ), sTree3D, false );
+    static const inline QgsSettingsEntryBool *sSettingNavigationVisible = new QgsSettingsEntryBool( QStringLiteral( "navigation-visible" ), sTree3D, false );
+
     Kadas3DMapCanvasWidget( const QString &name, bool isDocked );
 
     //! takes ownership
@@ -79,18 +90,15 @@ class Kadas3DMapCanvasWidget : public QWidget
     // void measureLine();
     // void exportScene();
     void toggleNavigationWidget( bool visibility );
+    void toggleLayerTreeWidget( bool visibility );
     void toggleFpsCounter( bool visibility );
     // void setSceneExtentOn2DCanvas();
     void setSceneExtent( const QgsRectangle &extent );
 
-    void onMainCanvasLayersChanged();
     void onMainCanvasColorChanged();
     void onTotalPendingJobsCountChanged();
     void updateFpsCount( float fpsCount );
     void cameraNavigationSpeedChanged( double speed );
-    void mapThemeMenuAboutToShow();
-    //! Renames the active map theme called \a theme to \a newTheme
-    void currentMapThemeRenamed( const QString &theme, const QString &newTheme );
 
     void onMainMapCanvasExtentChanged();
     void onViewed2DExtentFrom3DChanged( QVector<QgsPointXY> extent );
@@ -113,7 +121,7 @@ class Kadas3DMapCanvasWidget : public QWidget
     // std::unique_ptr<QgsMapToolExtent> mMapToolExtent;
     QgsMapTool *mMapToolPrevious = nullptr;
     QMenu *mExportMenu = nullptr;
-    QMenu *mMapThemeMenu = nullptr;
+    // QMenu *mMapThemeMenu = nullptr;
     QMenu *mCameraMenu = nullptr;
     QMenu *mEffectsMenu = nullptr;
     QList<QAction *> mMapThemeMenuPresetActions;
@@ -130,6 +138,8 @@ class Kadas3DMapCanvasWidget : public QWidget
     QAction *mActionEffects = nullptr;
     QAction *mActionOptions = nullptr;
     QAction *mActionSetSceneExtent = nullptr;
+    QToolButton *mMapThemesButton = nullptr;
+    QTreeView *mLayerTreeView = nullptr;
     QgsDockableWidgetHelper *mDockableWidgetHelper;
     QObjectUniquePtr<QgsRubberBand> mViewFrustumHighlight;
     QObjectUniquePtr<QgsRubberBand> mViewExtentHighlight;
