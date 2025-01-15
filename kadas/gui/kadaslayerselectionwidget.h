@@ -98,6 +98,8 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
 
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = nullptr )
       : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent ) {}
+
+
     void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
