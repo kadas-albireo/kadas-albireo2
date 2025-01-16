@@ -44,6 +44,7 @@ set(kadas_SRC
     milx/kadasmilxintegration.cpp
     milx/kadasmilxexportdialog.cpp
     3d/kadas3dintegration.cpp
+    3d/kadas3dlayertreemodel.cpp
     3d/kadas3dmapcanvaswidget.cpp
     3d/kadas3dmapconfigwidget.cpp
     3d/kadas3dnavigationwidget.cpp

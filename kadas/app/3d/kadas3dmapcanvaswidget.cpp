@@ -15,20 +15,24 @@
 
 #include "kadas3dmapcanvaswidget.h"
 
+#include <QAction>
+#include <QActionGroup>
 #include <QBoxLayout>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QProgressBar>
-#include <QToolBar>
-#include <QUrl>
-#include <QAction>
-#include <QShortcut>
 #include <QPushButton>
+#include <QShortcut>
+#include <QToolBar>
+#include <QTreeView>
+#include <QUrl>
+#include <QWidget>
 
 #include "qgs3dmapcanvas.h"
 #include "qgs3dmapscene.h"
 #include "qgscameracontroller.h"
 #include "qgshelp.h"
+#include "qgslayertree.h"
 #include "qgsmapcanvas.h"
 #include "qgsmaptoolextent.h"
 #include "qgsmessagebar.h"
@@ -37,8 +41,10 @@
 #include "qgsgui.h"
 #include "qgsmapthemecollection.h"
 #include "qgsshortcutsmanager.h"
+#include "qgsrubberband.h"
 
-#include "qgs3danimationsettings.h"
+
+// #include "qgs3danimationsettings.h"
 // #include "qgs3danimationwidget.h"
 #include "qgs3dmapsettings.h"
 //#include "qgs3dmaptoolidentify.h"
@@ -49,14 +55,11 @@
 
 #include "kadas/app/3d/kadas3dmapconfigwidget.h"
 #include "kadas/app/3d/kadas3dnavigationwidget.h"
+#include "kadas/app/3d/kadas3dlayertreemodel.h"
 
 //#include "qgsmap3dexportwidget.h"
 //#include "qgs3dmapexportsettings.h"
 
-#include "qgsrubberband.h"
-
-#include <QWidget>
-#include <QActionGroup>
 
 Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDocked )
   : QWidget( nullptr )
@@ -78,9 +81,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   );
 
   toggleOnScreenNavigation->setCheckable( true );
-  toggleOnScreenNavigation->setChecked(
-    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), true, QgsSettings::Gui ).toBool()
-  );
+  toggleOnScreenNavigation->setChecked( sSettingNavigationVisible->value() );
   QObject::connect( toggleOnScreenNavigation, &QAction::toggled, this, &Kadas3DMapCanvasWidget::toggleNavigationWidget );
 
   toolBar->addSeparator();
@@ -126,18 +127,13 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   toolBar->addSeparator();
 
-  // Map Theme Menu
-  mMapThemeMenu = new QMenu( this );
-  connect( mMapThemeMenu, &QMenu::aboutToShow, this, &Kadas3DMapCanvasWidget::mapThemeMenuAboutToShow );
-  connect( QgsProject::instance()->mapThemeCollection(), &QgsMapThemeCollection::mapThemeRenamed, this, &Kadas3DMapCanvasWidget::currentMapThemeRenamed );
-
-  mActionMapThemes = new QAction( tr( "Set View Theme" ), this );
-  mActionMapThemes->setMenu( mMapThemeMenu );
-  mActionMapThemes->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ) );
-  toolBar->addAction( mActionMapThemes );
-  QToolButton *mapThemesButton = qobject_cast<QToolButton *>( toolBar->widgetForAction( mActionMapThemes ) );
-  mapThemesButton->setPopupMode( QToolButton::ToolButtonPopupMode::InstantPopup );
-
+  QAction *toggleLayerTree = toolBar->addAction(
+    QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ),
+    tr( "Toggle Layer Tree" )
+  );
+  toggleLayerTree->setCheckable( true );
+  toggleLayerTree->setChecked( sSettingLayerTreeVisible->value() );
+  connect( toggleLayerTree, &QAction::toggled, this, &Kadas3DMapCanvasWidget::toggleLayerTreeWidget );
 
   toolBar->addSeparator();
 
@@ -282,16 +278,25 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   layout->addWidget( mMessageBar );
 
   // mContainer takes ownership of Qgs3DMapCanvas
-  mContainer = QWidget::createWindowContainer( mCanvas );
+  mContainer = QWidget::createWindowContainer( mCanvas, this, Qt::Widget );
+  mContainer->lower();
   mContainer->setMinimumSize( QSize( 200, 200 ) );
   mContainer->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+
   mNavigationWidget = new Kadas3DNavigationWidget( mCanvas );
   mNavigationWidget->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Expanding );
 
+  mLayerTreeView = new QTreeView( this );
+  mLayerTreeView->setModel( new Kadas3DLayerTreeModel( mCanvas ) );
+  mLayerTreeView->setMinimumWidth( 200 );
+  mLayerTreeView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+
   QHBoxLayout *hLayout = new QHBoxLayout;
   hLayout->setContentsMargins( 0, 0, 0, 0 );
+  hLayout->addWidget( mLayerTreeView );
   hLayout->addWidget( mContainer );
   hLayout->addWidget( mNavigationWidget );
+  hLayout->setStretch( 1, 4 );
 
   toggleNavigationWidget(
     setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool()
@@ -383,8 +388,13 @@ void Kadas3DMapCanvasWidget::setCanvasName( const QString &name )
 void Kadas3DMapCanvasWidget::toggleNavigationWidget( bool visibility )
 {
   mNavigationWidget->setVisible( visibility );
-  QgsSettings setting;
-  setting.setValue( QStringLiteral( "/3D/navigationWidget/visibility" ), visibility, QgsSettings::Gui );
+  sSettingNavigationVisible->setValue( visibility );
+}
+
+void Kadas3DMapCanvasWidget::toggleLayerTreeWidget( bool visibility )
+{
+  mLayerTreeView->setVisible( visibility );
+  sSettingLayerTreeVisible->setValue( visibility );
 }
 
 void Kadas3DMapCanvasWidget::toggleFpsCounter( bool visibility )
@@ -416,7 +426,7 @@ void Kadas3DMapCanvasWidget::setMapSettings( Qgs3DMapSettings *map )
   // mAnimationWidget->setMap( map );
 
   // Disable button for switching the map theme if the terrain generator is a mesh, or if there is no terrain
-  mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled() || !mCanvas->mapSettings()->terrainGenerator() || mCanvas->mapSettings()->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
+  // mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled() || !mCanvas->mapSettings()->terrainGenerator() || mCanvas->mapSettings()->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
   mLabelFpsCounter->setVisible( map->isFpsCounterEnabled() );
 
   connect( map, &Qgs3DMapSettings::viewFrustumVisualizationEnabledChanged, this, &Kadas3DMapCanvasWidget::onViewFrustumVisualizationEnabledChanged );
@@ -435,7 +445,6 @@ void Kadas3DMapCanvasWidget::setMainCanvas( QgsMapCanvas *canvas )
   connect( mMapToolExtent.get(), &QgsMapToolExtent::extentChanged, this, &Kadas3DMapCanvasWidget::setSceneExtent );
 #endif
 
-  connect( mMainCanvas, &QgsMapCanvas::layersChanged, this, &Kadas3DMapCanvasWidget::onMainCanvasLayersChanged );
   connect( mMainCanvas, &QgsMapCanvas::canvasColorChanged, this, &Kadas3DMapCanvasWidget::onMainCanvasColorChanged );
   connect( mMainCanvas, &QgsMapCanvas::extentsChanged, this, &Kadas3DMapCanvasWidget::onMainMapCanvasExtentChanged );
 
@@ -557,11 +566,6 @@ void Kadas3DMapCanvasWidget::exportScene()
 }
 #endif
 
-void Kadas3DMapCanvasWidget::onMainCanvasLayersChanged()
-{
-  mCanvas->mapSettings()->setLayers( mMainCanvas->layers( true ) );
-}
-
 void Kadas3DMapCanvasWidget::onMainCanvasColorChanged()
 {
   mCanvas->mapSettings()->setBackgroundColor( mMainCanvas->canvasColor() );
@@ -586,49 +590,6 @@ void Kadas3DMapCanvasWidget::cameraNavigationSpeedChanged( double speed )
   mLabelNavigationSpeed->setText( QStringLiteral( "Speed: %1 ×" ).arg( QString::number( speed, 'f', 2 ) ) );
   mLabelNavigationSpeed->show();
   mLabelNavSpeedHideTimeout->start();
-}
-
-void Kadas3DMapCanvasWidget::mapThemeMenuAboutToShow()
-{
-  qDeleteAll( mMapThemeMenuPresetActions );
-  mMapThemeMenuPresetActions.clear();
-
-  const QString currentTheme = mCanvas->mapSettings()->terrainMapTheme();
-
-  QAction *actionFollowMain = new QAction( tr( "(none)" ), mMapThemeMenu );
-  actionFollowMain->setCheckable( true );
-  if ( currentTheme.isEmpty() || !QgsProject::instance()->mapThemeCollection()->hasMapTheme( currentTheme ) )
-  {
-    actionFollowMain->setChecked( true );
-  }
-  connect( actionFollowMain, &QAction::triggered, this, [=] {
-    mCanvas->mapSettings()->setTerrainMapTheme( QString() );
-  } );
-  mMapThemeMenuPresetActions.append( actionFollowMain );
-
-  const auto constMapThemes = QgsProject::instance()->mapThemeCollection()->mapThemes();
-  for ( const QString &grpName : constMapThemes )
-  {
-    QAction *a = new QAction( grpName, mMapThemeMenu );
-    a->setCheckable( true );
-    if ( grpName == currentTheme )
-    {
-      a->setChecked( true );
-    }
-    connect( a, &QAction::triggered, this, [a, this] {
-      mCanvas->mapSettings()->setTerrainMapTheme( a->text() );
-    } );
-    mMapThemeMenuPresetActions.append( a );
-  }
-  mMapThemeMenu->addActions( mMapThemeMenuPresetActions );
-}
-
-void Kadas3DMapCanvasWidget::currentMapThemeRenamed( const QString &theme, const QString &newTheme )
-{
-  if ( theme == mCanvas->mapSettings()->terrainMapTheme() )
-  {
-    mCanvas->mapSettings()->setTerrainMapTheme( newTheme );
-  }
 }
 
 void Kadas3DMapCanvasWidget::onMainMapCanvasExtentChanged()
