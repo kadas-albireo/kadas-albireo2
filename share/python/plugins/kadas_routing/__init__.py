@@ -19,7 +19,7 @@ os.environ["LANG"] = str(localeName())
 
 root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 translation_path = os.path.join(
-    root, "i18n", "kadasrouting_" + str(localeName()) + ".qm"
+    root, "i18n", "kadas_routing_" + str(localeName()) + ".qm"
 )
 
 if os.path.exists(translation_path):
