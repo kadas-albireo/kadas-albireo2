@@ -4178,12 +4178,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Swipe Tool</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Comparing Layers %1</source>
         <translation type="unfinished"/>
     </message>

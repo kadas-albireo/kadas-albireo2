@@ -119,7 +119,7 @@
     <message>
         <location filename="../ui/ui_cartouchedialog.py" line="135"/>
         <source>&quot;CODE NAME&quot;</source>
-        <translation>&amp;quot;NOM DE COUVERTURE&amp;quot;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../ui/ui_cartouchedialog.py" line="136"/>

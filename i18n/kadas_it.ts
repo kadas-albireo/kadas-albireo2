@@ -4176,12 +4176,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Swipe Tool</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Comparing Layers %1</source>
         <translation type="unfinished"/>
     </message>

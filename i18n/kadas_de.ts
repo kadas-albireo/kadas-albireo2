@@ -4176,12 +4176,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>&amp;Zum Vergleich mit dem Swipe Werkzeug hinzufügen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Swipe Tool</source>
         <translation>Wischwerkzeug</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="186"/>
+        <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Comparing Layers %1</source>
         <translation>Ebenen vergleichen %1</translation>
     </message>

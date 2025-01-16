@@ -130,12 +130,12 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="107"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
-        <translation>&amp;lt;small&amp;gt;&amp;lt;i&amp;gt;Les couches qui sont déjà dans le GeoPackage sont désactivées.&amp;lt;/i&amp;gt;&amp;lt;/small&amp;gt;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="133"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
-        <translation>&amp;lt;small&amp;gt;&amp;lt;i&amp;gt;Les couches supérieures à 50 Mo sont désactivées par défaut.&amp;lt;/i&amp;gt;&amp;lt;/small&amp;gt;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="143"/>
@@ -221,7 +221,7 @@
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="80"/>
         <source>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</source>
-        <translation>&amp;lt;i&amp;gt;Le GPKG sélectionné ne contient pas de projet QGIS, et sera importé comme une couche.&amp;lt;/i&amp;gt;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="81"/>
