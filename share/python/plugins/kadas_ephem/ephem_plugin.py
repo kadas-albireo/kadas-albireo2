@@ -52,7 +52,7 @@ class EphemPlugin:
         icon_dark_path = os.path.join(os.path.dirname(__file__), 'icons/icon_color.svg')
         self.actionCanvasRightClick = QAction(QIcon(icon_dark_path), self.action.text(),
                                       self.iface.mainWindow())
-        self.actionCanvasRightClick.triggered.connect(self.action.toggle)
+        self.actionCanvasRightClick.triggered.connect(self.canvasRightClickTriggered)
         self.iface.addActionMapCanvasRightClick(self.actionCanvasRightClick)
 
     def unload(self):
@@ -66,6 +66,18 @@ class EphemPlugin:
             self.ephem_tool = EphemTool(self.iface)
             self.ephem_tool.setAction(self.action)
             self.iface.mapCanvas().setMapTool(self.ephem_tool)
-        elif self.iface.mapCanvas().mapTool() and self.iface.mapCanvas().mapTool().action() == self.action:
-            self.iface.mapCanvas().unsetMapTool(self.iface.mapCanvas().mapTool())
+        else:
+            self.ephem_tool.clean()
             self.ephem_tool = None
+
+    def canvasRightClickTriggered(self):
+        if self.ephem_tool is None:
+            self.action.blockSignals(True)
+            self.action.setChecked(True)
+            self.toolToggled(True)
+            self.action.blockSignals(False)
+
+        self.ephem_tool.activate()
+        clickPosition = self.actionCanvasRightClick.property("MapPosition")
+        self.ephem_tool.positionPicked(clickPosition)
+
