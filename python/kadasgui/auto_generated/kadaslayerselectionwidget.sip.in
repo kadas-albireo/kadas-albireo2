@@ -84,6 +84,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = 0 );
+
+    void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
     QgsMapLayer *getSelectedLayer() const;
 
