@@ -13,150 +13,153 @@
     </message>
 </context>
 <context>
+    <name>Kadas3DLayerTreeModel</name>
+    <message>
+        <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="150"/>
+        <source>Layer</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>Kadas3DMapCanvasWidget</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="70"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="73"/>
         <source>Camera Control</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="73"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="76"/>
         <source>Zoom Full</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="77"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="80"/>
         <source>Toggle On-Screen Navigation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="90"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="91"/>
         <source>Identify</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="94"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="95"/>
         <source>Measurement Line</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="107"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="108"/>
         <source>Animations</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="114"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="115"/>
         <source>Export</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="120"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="121"/>
         <source>Save as Image…</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="124"/>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="539"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="125"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="548"/>
         <source>Export 3D Scene</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="134"/>
-        <source>Set View Theme</source>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="132"/>
+        <source>Toggle Layer Tree</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="147"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="143"/>
         <source>Camera</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="153"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="149"/>
         <source>2D Map View Follows 3D Camera</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="162"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="158"/>
         <source>3D Camera Follows 2D Map View</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="171"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="167"/>
         <source>Show Visible Camera Area in 2D Map View</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="179"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="175"/>
         <source>Set 3D Scene Extent on 2D Map View</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="191"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="187"/>
         <source>Effects</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="197"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="193"/>
         <source>Show Shadows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="206"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="202"/>
         <source>Show Eye Dome Lighting</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="213"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="209"/>
         <source>Show Ambient Occlusion</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="223"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="219"/>
         <source>Configure…</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="233"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="229"/>
         <source>Save as Image</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="233"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="229"/>
         <source>Successfully saved the 3D map to &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="314"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="319"/>
         <source>Dock 3D Map View</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="320"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="325"/>
         <source>Choose a file name to save the 3D map canvas to an image</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="470"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="479"/>
         <source>3D Configuration</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="576"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="580"/>
         <source>Loading %n tile(s)</source>
         <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="598"/>
-        <source>(none)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="705"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="666"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="721"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
         <translation type="unfinished"/>
     </message>
@@ -3938,82 +3941,82 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Livello di ingrandimento</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="705"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="706"/>
         <source>Choose file...</source>
         <translation>Scegli file...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="706"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="707"/>
         <source>Enter URL...</source>
         <translation>Inserire URL...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1130"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1131"/>
         <source>Language Changed</source>
         <translation>Lingua modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1130"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1131"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La nuova lingua verrà utilizzata al prossimo avvio dell&apos;applicazione.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1152"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1153"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1156"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1157"/>
         <source>Favorite</source>
         <translation>Preferito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1326"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1327"/>
         <source>Manually set projection</source>
         <translation>Seleziona la proiezione manualmente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1329"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1330"/>
         <source>Unknown layer projection</source>
         <translation>Proiezione del layer sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1330"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1331"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1393"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1411"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1428"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1446"/>
         <source>Downloading...</source>
         <translation>Scaricando...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1438"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1456"/>
         <source>Unable to download image</source>
         <translation>Impossibile scaricare l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1447"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1465"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible salvare l&apos;immagine scaricata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1481"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1499"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1566"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1584"/>
         <source>Font scaling setting changed</source>
         <translation>Configurazione scala carattere modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1566"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1584"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modifica della scala dei caratteri verrà applicata al successivo avvio del programma.</translation>
     </message>
