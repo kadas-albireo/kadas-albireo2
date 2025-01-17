@@ -26,6 +26,7 @@
 #include <qgis/qgsshortcutsmanager.h>
 
 #include "kadas/gui/kadasmapwidget.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -770,4 +771,14 @@ QList<QgsPrintLayout *> KadasPluginInterfaceImpl::printLayouts() const
 void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
 {
   kApp->showLayoutDesigner( layout );
+}
+
+void KadasPluginInterfaceImpl::mapCanvasItemManagerAddItem( KadasMapItem *item )
+{
+  KadasMapCanvasItemManager::addItem( item );
+}
+
+void KadasPluginInterfaceImpl::mapCanvasItemManagerRemoveItem( KadasMapItem *item )
+{
+  KadasMapCanvasItemManager::removeItem( item );
 }

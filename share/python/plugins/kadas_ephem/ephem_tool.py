@@ -31,7 +31,7 @@ class EphemTool(QgsMapTool):
         self.pin = KadasSymbolItem(self.iface.mapCanvas().mapSettings().destinationCrs())
         self.pin.setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
         self.pin.setVisible(False)
-        KadasMapCanvasItemManager.addItem(self.pin)
+        self.iface.mapCanvasItemManagerAddItem(self.pin)
 
         QgsMapTool.activate(self)
 
@@ -39,7 +39,7 @@ class EphemTool(QgsMapTool):
         if self.widget:
             self.widget.cleanup()
             self.widget = None
-        KadasMapCanvasItemManager.removeItem(self.pin)
+        self.iface.mapCanvasItemManagerRemoveItem(self.pin)
         self.pin = None
         QgsMapTool.deactivate(self)
 
@@ -116,11 +116,11 @@ class EphemToolWidget(KadasBottomBar):
         self.sunAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
         self.sunAzIcon.setup( ":/plugins/Ephem/icons/az_sun.svg", 0.5, 1.0 );
         self.sunAzIcon.setVisible(False)
-        KadasMapCanvasItemManager.addItem(self.sunAzIcon)
+        self.iface.mapCanvasItemManagerAddItem(self.sunAzIcon)
 
         self.moonAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
         self.moonAzIcon.setup( ":/plugins/Ephem/icons/az_moon.svg", 0.5, 1.0 );
-        KadasMapCanvasItemManager.addItem(self.moonAzIcon)
+        self.iface.mapCanvasItemManagerAddItem(self.moonAzIcon)
         self.moonAzIcon.setVisible(False)
 
     def getTimestamp(self):
@@ -137,9 +137,9 @@ class EphemToolWidget(KadasBottomBar):
         self.mrcPos = mrcPos
 
     def cleanup(self):
-        KadasMapCanvasItemManager.removeItem(self.sunAzIcon)
+        self.iface.mapCanvasItemManagerRemoveItem(self.sunAzIcon)
         self.sunAzIcon = None
-        KadasMapCanvasItemManager.removeItem(self.moonAzIcon)
+        self.iface.mapCanvasItemManagerRemoveItem(self.moonAzIcon)
         self.moonAzIcon = None
 
     def recompute(self):
