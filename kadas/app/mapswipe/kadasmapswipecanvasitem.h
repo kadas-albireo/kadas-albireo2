@@ -23,6 +23,7 @@
 #include <qgsmapcanvasitem.h>
 
 class QgsMapLayer;
+class QgsMapRendererParallelJob;
 
 class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
 {
@@ -54,6 +55,9 @@ class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
     QSet<QgsMapLayer *> mRemovedLayers;
     bool mIsVertical = true;
     QImage mRenderedMapImage;
+    QgsMapRendererParallelJob *mRenderJob = nullptr;
+    QMetaObject::Connection mRenderJobFinishedConnection;
+    QMetaObject::Connection mRenderJobUpdatedConnection;
 };
 
 #endif // KADASMAPSWIPECANVASITEM_H
