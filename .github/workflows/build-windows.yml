@@ -106,16 +106,9 @@ jobs:
         run: |
           cmake --build build --config Release
 
-      # A preliminary smoke test to determine basic functional python
-      # To be replaced with something proper when testing lands
-      - name: 🚭 PySmokeTest
-        shell: bash
-        env:
-          PYTHONPATH: build/output/python/
-        run: |
-          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadasgui import *'
-          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadascore import *'
-          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadasanalysis import *'
+  
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: 📦 Package
         run: |
@@ -135,6 +128,17 @@ jobs:
           name: kadas-albireo2-msi
           path: |
             build/kadas-*-win64.msi
+
+      # A preliminary smoke test to determine basic functional python
+      # To be replaced with something proper when testing lands
+      - name: 🚭 PySmokeTest
+        shell: bash
+        env:
+          PYTHONPATH: build/output/python/
+        run: |
+          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadasgui import *'
+          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadascore import *'
+          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -c 'from kadas.kadasanalysis import *'
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
