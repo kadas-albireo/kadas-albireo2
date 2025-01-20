@@ -36,7 +36,6 @@ KadasMapCanvasItemManager *KadasMapCanvasItemManager::instance()
 void KadasMapCanvasItemManager::addItem( KadasMapItem *item )
 {
   instance()->mMapItems.append( item );
-  qDebug() << "Instance:" << instance();
   connect( item, &KadasMapItem::aboutToBeDestroyed, instance(), &KadasMapCanvasItemManager::itemAboutToBeDestroyed );
   emit instance() -> itemAdded( item );
 }
