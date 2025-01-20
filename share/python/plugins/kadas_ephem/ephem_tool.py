@@ -25,7 +25,6 @@ class EphemTool(QgsMapTool):
         self.widget = None
 
     def clean(self):
-        self.deactivate()
         self.iface.mapCanvas().unsetMapTool(self)
 
     def activate(self):
