@@ -36,6 +36,8 @@
 #include <qgsdockablewidgethelper.h>
 #include <qgsmapviewsmanager.h>
 
+static const QString KADAS_3D_IDENTIFIER = QStringLiteral( "kadas-3d" );
+
 void write3DMapViewSettings( Kadas3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap )
 {
   QgsReadWriteContext readWriteContext;
@@ -92,7 +94,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
   connect( QgsProject::instance(), &QgsProject::readProject, [this] {
     if ( m3DMapCanvasWidget )
     {
-      QDomElement viewConfig = QgsProject::instance()->viewsManager()->get3DViewSettings( "kadas-3d" );
+      QDomElement viewConfig = QgsProject::instance()->viewsManager()->get3DViewSettings( KADAS_3D_IDENTIFIER );
       read3DMapViewSettings( m3DMapCanvasWidget, viewConfig );
     }
   } );
@@ -100,16 +102,16 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
   connect( mAction3D, &QAction::triggered, [this]() {
     if ( !m3DMapCanvasWidget )
     {
-      if ( !QgsProject::instance()->viewsManager()->get3DViewSettings( "kadas-3d" ).isNull() )
+      if ( !QgsProject::instance()->viewsManager()->get3DViewSettings( KADAS_3D_IDENTIFIER ).isNull() )
       {
-        m3DMapCanvasWidget = new Kadas3DMapCanvasWidget( "kadas-3d", true );
+        m3DMapCanvasWidget = new Kadas3DMapCanvasWidget( KADAS_3D_IDENTIFIER, true );
         m3DMapCanvasWidget->setMainCanvas( mMapCanvas );
-        QDomElement viewConfig = QgsProject::instance()->viewsManager()->get3DViewSettings( "kadas-3d" );
+        QDomElement viewConfig = QgsProject::instance()->viewsManager()->get3DViewSettings( KADAS_3D_IDENTIFIER );
         read3DMapViewSettings( m3DMapCanvasWidget, viewConfig );
       }
       else
       {
-        m3DMapCanvasWidget = createNewMapCanvas3D( "kadas-3d" );
+        m3DMapCanvasWidget = createNewMapCanvas3D( KADAS_3D_IDENTIFIER );
       }
 
       if ( m3DMapCanvasWidget )
@@ -125,7 +127,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
           elem3DMap = doc.createElement( QStringLiteral( "view" ) );
           write3DMapViewSettings( m3DMapCanvasWidget, doc, elem3DMap );
 
-          QgsProject::instance()->viewsManager()->register3DViewSettings( "kadas-3d", elem3DMap );
+          QgsProject::instance()->viewsManager()->register3DViewSettings( KADAS_3D_IDENTIFIER, elem3DMap );
 
           m3DMapCanvasWidget->deleteLater();
           m3DMapCanvasWidget = nullptr;
