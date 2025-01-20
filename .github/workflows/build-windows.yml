@@ -133,7 +133,7 @@ jobs:
           PYTHONPATH: build/output/python/
         run: |
           set -e
-          $(python <<EOF
+          $(./build/vcpkg_installed/x64-windows/tools/python3/python.exe <<EOF
           import os   
           os.add_dll_directory(os.getcwd() + '/build/output/bin')
           from kadas.kadasgui import *
