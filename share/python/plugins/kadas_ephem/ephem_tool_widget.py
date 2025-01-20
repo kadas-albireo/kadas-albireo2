@@ -227,8 +227,6 @@ class EphemToolWidget(KadasBottomBar):
 
             self.sunAzIcon.setVisible(False)
 
-            print(f"Moon visible: {moonrise is not None and moonset is not None and ts >= moonrise and ts <= moonset}")
-
             self.moonAzIcon.setVisible(moonrise is not None and moonset is not None and ts >= moonrise and ts <= moonset)
 
         self.busyOverlay.setVisible(False)
