@@ -90,12 +90,30 @@ void KadasMapSwipeCanvasItem::refreshMap()
   settings.setBackgroundColor( QColor( Qt::GlobalColor::white ) );
 
   setRect( mMapCanvas->extent() );
-  QgsMapRendererParallelJob job( settings );
-  job.start();
-  QObject::connect( &job, &QgsMapRendererParallelJob::finished, [this, &job]() {
-    mRenderedMapImage = job.renderedImage();
+  if ( mRenderJob )
+  {
+    mRenderJob->disconnect( mRenderJobFinishedConnection );
+    mRenderJob->disconnect( mRenderJobUpdatedConnection );
+    if ( !mRenderJob->isActive() )
+      mRenderJob->deleteLater();
+    else
+    {
+      QObject::connect( mRenderJob, &QgsMapRendererJob::finished, mRenderJob, &QObject::deleteLater );
+      mRenderJob->cancelWithoutBlocking();
+    }
+    mRenderJob = nullptr;
+  }
+  mRenderJob = new QgsMapRendererParallelJob( settings );
+  mRenderJob->setCache( mMapCanvas->cache() );
+  mRenderJob->start();
+  mRenderJobFinishedConnection = QObject::connect( mRenderJob, &QgsMapRendererJob::finished, [this] {
+    mRenderedMapImage = mRenderJob->renderedImage();
+    mRenderJob->deleteLater();
+    mRenderJob = nullptr;
   } );
-  job.waitForFinished();
+  mRenderJobUpdatedConnection = QObject::connect( mRenderJob, &QgsMapRendererJob::renderingLayersFinished, [this] {
+    mRenderedMapImage = mRenderJob->renderedImage();
+  } );
 }
 
 
