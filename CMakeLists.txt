@@ -51,7 +51,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(BUILD_SHARED_LIBS
     ON
-    CACHE BOOL "Build using shared libraries")
+    CACHE BOOL "Build using shared libraries"
+)
 set(KADAS_NAME
     "Kadas"
     CACHE STRING "Kadas application name"
