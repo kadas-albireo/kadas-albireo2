@@ -29,7 +29,7 @@ class QgsMapCanvas;
 class QgsMessageBar;
 
 
-class KADAS_GUI_EXPORT KadasBookmarksMenu : public QMenu
+class KadasBookmarksMenu : public QMenu
 {
     Q_OBJECT
   public:
