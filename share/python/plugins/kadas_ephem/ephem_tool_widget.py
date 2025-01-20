@@ -96,6 +96,8 @@ class EphemToolWidget(KadasBottomBar):
         if not self.wgsPos:
             return
 
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+
         if self.ui.checkBoxRelief.isChecked():
             self.busyOverlay.setVisible(True)
             self.ui.tabWidgetOutput.setEnabled(False)
@@ -231,6 +233,7 @@ class EphemToolWidget(KadasBottomBar):
 
         self.busyOverlay.setVisible(False)
         self.ui.tabWidgetOutput.setEnabled(True)
+        QApplication.restoreOverrideCursor()
 
     def timestampToHourString(self, timestamp):
         if self.ui.timezoneCombo.currentData() == EphemToolWidget.TIMEZONE_UTC:
