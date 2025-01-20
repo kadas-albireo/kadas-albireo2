@@ -34,6 +34,7 @@ class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
     Q_OBJECT
 
   public:
+    KadasMapCanvasItemManager() SIP_FORCE;
     static KadasMapCanvasItemManager *instance();
     static void addItem( KadasMapItem *item );
     static void removeItem( KadasMapItem *item );
@@ -46,8 +47,6 @@ class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
     void itemWillBeRemoved( const KadasMapItem *item );
 
   private:
-    KadasMapCanvasItemManager() SIP_FORCE;
-
     QList<KadasMapItem *> mMapItems;
 
   private slots:

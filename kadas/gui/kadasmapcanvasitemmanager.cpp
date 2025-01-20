@@ -20,6 +20,8 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
+Q_GLOBAL_STATIC( KadasMapCanvasItemManager, sKadasMapCanvasItemManager )
+
 KadasMapCanvasItemManager::KadasMapCanvasItemManager()
 {
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMapCanvasItemManager::readFromProject );
@@ -28,8 +30,7 @@ KadasMapCanvasItemManager::KadasMapCanvasItemManager()
 
 KadasMapCanvasItemManager *KadasMapCanvasItemManager::instance()
 {
-  static KadasMapCanvasItemManager manager;
-  return &manager;
+  return sKadasMapCanvasItemManager;
 }
 
 void KadasMapCanvasItemManager::addItem( KadasMapItem *item )
