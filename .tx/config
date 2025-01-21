@@ -32,7 +32,7 @@ source_lang = en
 type = QT
 
 [o:kadas:p:kadas-albireo:r:kadas-routing]
-file_filter = share/python/plugins/kadas_routing/i18n/kadas_ephem_<lang>.ts
-source_file = share/python/plugins/kadas_routing/i18n/kadas_ephem_en.ts
+file_filter = share/python/plugins/kadas_routing/i18n/kadas_routing_<lang>.ts
+source_file = share/python/plugins/kadas_routing/i18n/kadas_routing_en.ts
 source_lang = en
 type = QT
