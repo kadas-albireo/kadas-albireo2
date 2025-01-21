@@ -28,6 +28,7 @@
 #include <qgs3d.h>
 #include <qgs3dmapsettings.h>
 #include <qgs3dutils.h>
+#include <qgsdemterraingenerator.h>
 #include <qgsmapcanvas.h>
 #include <qgsproject.h>
 #include <qgsrectangle.h>
@@ -35,6 +36,10 @@
 #include <qgsdirectionallightsettings.h>
 #include <qgsdockablewidgethelper.h>
 #include <qgsmapviewsmanager.h>
+#include <qgsrasterlayer.h>
+
+#include "kadas/app/3d/kadas3dintegration.h"
+#include "kadas/app/3d/kadas3dmapcanvaswidget.h"
 
 static const QString KADAS_3D_IDENTIFIER = QStringLiteral( "kadas-3d" );
 
@@ -216,6 +221,21 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
   if ( canvasWidget->mapCanvas3D()->cameraController() )
     canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
+
+
+  QString heightLayerId = QgsProject::instance()->readEntry( "Heightmap", "layer" );
+  QgsRasterLayer *heightLayer = qobject_cast<QgsRasterLayer *>( QgsProject::instance()->mapLayer( heightLayerId ) );
+  if ( heightLayer )
+  {
+    map->setTerrainRenderingEnabled( true );
+    QgsDemTerrainGenerator *demTerrainGen = new QgsDemTerrainGenerator;
+    demTerrainGen->setCrs( map->crs(), QgsProject::instance()->transformContext() );
+    demTerrainGen->setLayer( heightLayer );
+    demTerrainGen->setResolution( 16 );
+    demTerrainGen->setSkirtHeight( 10 );
+    map->setTerrainGenerator( demTerrainGen );
+    map->setTerrainVerticalScale( 5 );
+  }
 
   return canvasWidget;
 }
