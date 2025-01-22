@@ -20,10 +20,8 @@
 #include <QScreen>
 #include <QDomDocument>
 
-#include "kadas/app/3d/kadas3dintegration.h"
 #include <qgis/qgs3dmapcanvas.h>
 #include <qgis/qgscameracontroller.h>
-#include "kadas/app/3d/kadas3dmapcanvaswidget.h"
 
 #include <qgs3d.h>
 #include <qgs3dmapsettings.h>
