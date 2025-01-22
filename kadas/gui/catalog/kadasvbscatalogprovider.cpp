@@ -272,7 +272,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
     {
       QgsMimeDataUtils::Uri mimeDataUri;
       mimeDataUri.layerType = "vector";
-      mimeDataUri.providerKey = "arcgisfeaturelayer";
+      mimeDataUri.providerKey = "arcgisfeatureserver";
       const ResultEntry &entry = ( *entries )[layerName];
       mimeDataUri.name = entry.title;
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
