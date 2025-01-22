@@ -1167,6 +1167,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   qDebug() << "addCatalogLayer" << "uri" << uri.data();
   qDebug() << "addCatalogLayer" << "metadataUrl" << metadataUrl;
   qDebug() << "addCatalogLayer" << "sublayers" << sublayers;
+  qDebug() << "addCatalogLayer" << "providerKey" << uri.providerKey;
 
   QString adjustedUri = uri.uri;
 
@@ -1201,7 +1202,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QVariantMap sublayer = sublayers[0].toMap();
 
     QgsMapLayer *layer = nullptr;
-    if ( uri.providerKey == "arcgismapserver" )
+    if ( uri.providerKey == "arcgisfeatureserver" )
     {
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
@@ -1275,7 +1276,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       if ( entry->leaf )
       {
         QgsMapLayer *layer = nullptr;
-        if ( uri.providerKey == "arcgismapserver" )
+        if ( uri.providerKey == "arcgisfeatureserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
           dataSource.removeParam( "layer" );
