@@ -84,30 +84,5 @@
         <source>-</source>
         <translation>-</translation>
     </message>
-    <message>
-        <location filename="../ephem_tool.py" line="93"/>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
-        <location filename="../ephem_tool.py" line="98"/>
-        <source>System time</source>
-        <translation>Heure du système</translation>
-    </message>
-    <message>
-        <location filename="../ephem_tool.py" line="99"/>
-        <source>UTC</source>
-        <translation>UTC</translation>
-    </message>
-    <message>
-        <location filename="../ephem_tool.py" line="100"/>
-        <source>Local time at position</source>
-        <translation>Heure locale à la position</translation>
-    </message>
-    <message>
-        <location filename="../ephem_tool.py" line="106"/>
-        <source>Calculating...</source>
-        <translation>Calcul...</translation>
-    </message>
 </context>
 </TS>
