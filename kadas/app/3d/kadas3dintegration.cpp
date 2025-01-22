@@ -230,7 +230,7 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
     demTerrainGen->setCrs( map->crs(), QgsProject::instance()->transformContext() );
     demTerrainGen->setLayer( heightLayer );
     demTerrainGen->setResolution( 16 );
-    demTerrainGen->setSkirtHeight( 10 );
+    demTerrainGen->setSkirtHeight( 1000 );
     map->setTerrainGenerator( demTerrainGen );
     map->setTerrainVerticalScale( 5 );
   }
