@@ -53,6 +53,7 @@ class Kadas3DMapCanvasWidget : public QWidget
   public:
     static inline QgsSettingsTreeNode *sTree3D = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "3d" ) );
 
+    static const inline QgsSettingsEntryBool *sSettingCanvasDocked = new QgsSettingsEntryBool( QStringLiteral( "canvas-docked" ), sTree3D, true );
     static const inline QgsSettingsEntryBool *sSettingLayerTreeVisible = new QgsSettingsEntryBool( QStringLiteral( "layer-tree-visible" ), sTree3D, false );
     static const inline QgsSettingsEntryBool *sSettingNavigationVisible = new QgsSettingsEntryBool( QStringLiteral( "navigation-visible" ), sTree3D, false );
 
