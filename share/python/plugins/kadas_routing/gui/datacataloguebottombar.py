@@ -180,7 +180,6 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
-        self.setStyleSheet("QFrame { background-color: orange; }")
         self.listWidget.setStyleSheet("QListWidget { background-color: white; }")
         self.radioButtonGroup = QButtonGroup(self)
         self.action = action

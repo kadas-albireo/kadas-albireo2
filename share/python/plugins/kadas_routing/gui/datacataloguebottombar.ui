@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>KadasPluginManagerBase</class>
- <widget class="QWidget" name="KadasPluginManagerBase">
+ <widget class="QWidget" name="DataCatalogBottomBar">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,6 +9,9 @@
     <width>571</width>
     <height>216</height>
    </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#DataCatalogBottomBar { background-color: orange; }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
