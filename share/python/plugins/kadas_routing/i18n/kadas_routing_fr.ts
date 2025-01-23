@@ -1,655 +1,660 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="fr" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
 <context>
     <name>@default</name>
     <message>
-        <location filename="utilities.py" line="60"/>
+        <location filename="../utilities.py" line="65"/>
         <source>Info</source>
-        <translation>Info</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="utilities.py" line="64"/>
+        <location filename="../utilities.py" line="69"/>
         <source>Warning</source>
-        <translation>Avertissement</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="isochroneslayer.py" line="99"/>
+        <location filename="../core/isochroneslayer.py" line="99"/>
         <source>layer {layername} already exists and overwrite is {overwrite}</source>
-        <translation>la couche {layername}  existe déjà et le paramètre d&apos;écrasement est {overwrite}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="103"/>
+        <location filename="../gui/navigationpanel.py" line="103"/>
         <source>Speed</source>
-        <translation>Vitesse</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="59"/>
+        <location filename="../gui/navigationpanel.py" line="59"/>
         <source>Time Left</source>
-        <translation>Temps restant</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="59"/>
+        <location filename="../gui/navigationpanel.py" line="59"/>
         <source>Dist Left</source>
-        <translation>Distance restante</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="103"/>
+        <location filename="../gui/navigationpanel.py" line="103"/>
         <source>ETA</source>
-        <translation>ETA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="59"/>
+        <location filename="../gui/navigationpanel.py" line="59"/>
         <source>My Position:</source>
-        <translation>Ma position</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="103"/>
+        <location filename="../gui/navigationpanel.py" line="103"/>
         <source>Ground Heading</source>
-        <translation>Cap</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="103"/>
+        <location filename="../gui/navigationpanel.py" line="103"/>
         <source>WP Angle</source>
-        <translation>Angle WP</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="147"/>
+        <location filename="../gui/navigationpanel.py" line="147"/>
         <source>Dist</source>
-        <translation>Dist</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="42"/>
+        <location filename="../plugin.py" line="45"/>
         <source>Valhalla is not installed or it cannot be found</source>
-        <translation>Valhalla n&apos;est pas installé ou introuvable</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="isochroneslayer.py" line="91"/>
+        <location filename="../core/isochroneslayer.py" line="91"/>
         <source>Center of {basename}</source>
-        <translation>Centre de {basename}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="59"/>
+        <location filename="../gui/navigationpanel.py" line="59"/>
         <source>Then</source>
-        <translation>Ensuite</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacatalogueclient.py" line="153"/>
+        <location filename="../core/datacatalogueclient.py" line="157"/>
         <source>Download is canceled!</source>
-        <translation>Le téléchargement est annulé!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacatalogueclient.py" line="166"/>
+        <location filename="../core/datacatalogueclient.py" line="170"/>
         <source>Downloading...</source>
-        <translation>Téléchargement en cours...</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>CPBottomBar</name>
     <message>
-        <location filename="cpbottombar.py" line="119"/>
+        <location filename="../gui/cpbottombar.py" line="126"/>
         <source>Custom polygon button is checked, but no polygon is drawn</source>
-        <translation>Le bouton de sélection du polygone est activé, mais il n&apos;y a pas de polygone dessiné</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.py" line="130"/>
+        <location filename="../gui/cpbottombar.py" line="137"/>
         <source>The polygon layer for Patrol must contain exactly only one polygon.</source>
-        <translation>La couche pour le polygone du mode patrouille ne peut contenir qu&apos;un seul polygone.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.py" line="140"/>
+        <location filename="../gui/cpbottombar.py" line="147"/>
         <source>Polygon layer button is checked for Patrol, but no layer polygon is selected</source>
-        <translation>Le bouton &quot;couche&quot; est activé pour le mode patrouille, mais aucune couche n&apos;est sélectionniée</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.py" line="172"/>
+        <location filename="../gui/cpbottombar.py" line="181"/>
         <source>Could not compute patrol: no polygon selected</source>
-        <translation>Impossible de calculer la patrouille: aucun polygone n&apos;est sélectionné</translation>
-    </message>
-    <message>
-        <location filename="cpbottombar.py" line="182"/>
-        <source>Could not compute route</source>
-        <translation>Impossible de calculer la route</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>Connector</name>
     <message>
-        <location filename="connectors.py" line="52"/>
+        <location filename="../valhalla/connectors.py" line="52"/>
         <source>The number of intervals and colors are different, using default color</source>
-        <translation>Le nombre d&apos;intervalles et de couleurs est différent,   la couleur par défaut est utilisée</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ConsoleConnector</name>
     <message>
-        <location filename="connectors.py" line="139"/>
+        <location filename="../valhalla/connectors.py" line="139"/>
         <source>No map package on this directory: {directory}</source>
-        <translation>Il n&apos;y a pas de paquet cartographique dans le dossier {directory}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="connectors.py" line="126"/>
+        <location filename="../valhalla/connectors.py" line="126"/>
         <source>No map package selected. Please open data catalogue, and select a map package.</source>
-        <translation>Aucun paquet cartographique est sélectionné. Prière de ouvrir le catalogue de données et de sélectionner un paquet.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DataCatalogueBottomBar</name>
     <message>
-        <location filename="datacataloguebottombar.py" line="178"/>
+        <location filename="../gui/datacataloguebottombar.py" line="189"/>
         <source>Close data catalogue dialog</source>
-        <translation>Fermer le catalogue de données</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="182"/>
+        <location filename="../gui/datacataloguebottombar.py" line="193"/>
         <source>Reload data catalogue with the selected repository</source>
-        <translation>Recharger le catalogue depuis le dépôt sélectionné</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DataItemWidget</name>
     <message>
-        <location filename="datacataloguebottombar.py" line="64"/>
+        <location filename="../gui/datacataloguebottombar.py" line="66"/>
         <source>Install</source>
-        <translation>Installer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="65"/>
+        <location filename="../gui/datacataloguebottombar.py" line="67"/>
         <source>Update</source>
-        <translation>Mettre à jour</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="67"/>
+        <location filename="../gui/datacataloguebottombar.py" line="69"/>
         <source>Remove</source>
-        <translation>Effacer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="97"/>
+        <location filename="../gui/datacataloguebottombar.py" line="99"/>
         <source>Map package has to be installed first</source>
-        <translation>Un paquet cartographique doit d&apos;abord être installé</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="124"/>
+        <location filename="../gui/datacataloguebottombar.py" line="131"/>
         <source>Cannot remove previous version of the {name} map package</source>
-        <translation>Impossible d&apos;effacer la version précédente du paquet cartographique {name}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="130"/>
+        <location filename="../gui/datacataloguebottombar.py" line="137"/>
         <source>Map package {name} has been successfully deleted </source>
-        <translation>Le paquet cartographique {name} a été désinstallé avec succès</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="139"/>
+        <location filename="../gui/datacataloguebottombar.py" line="147"/>
         <source>Cannot install map package {name}</source>
-        <translation>Impossible d&apos;installer le paquet cartographique {name}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="145"/>
+        <location filename="../gui/datacataloguebottombar.py" line="153"/>
         <source>Map package {name} has been successfully installed </source>
-        <translation>Le paquet cartographique {name} a été installé avec succès</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="161"/>
-        <source>Active map package is set to {tile}</source>
-        <translation>La carte courante est {tile}</translation>
-    </message>
-    <message>
-        <location filename="datacataloguebottombar.py" line="68"/>
+        <location filename="../gui/datacataloguebottombar.py" line="70"/>
         <source>N/A</source>
-        <translation>Pas disponsible</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.py" line="80"/>
+        <location filename="../gui/datacataloguebottombar.py" line="82"/>
         <source>This map package is local only, if you delete it you can not download it from the selected URL</source>
-        <translation>Ce paquet de données n&apos;est accessible que localement. Si vous l&apos;effacez vous ne pourrez plus le télécharger.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="disclaimerdialog.ui" line="14"/>
+        <location filename="../gui/disclaimerdialog.ui" line="14"/>
         <source>Disclaimer</source>
-        <translation>Décharge de responsabilité</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="disclaimerdialog.ui" line="174"/>
+        <location filename="../gui/disclaimerdialog.ui" line="174"/>
         <source>Do not show again</source>
-        <translation>Ne plus montrer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="disclaimerdialog.ui" line="194"/>
+        <location filename="../gui/disclaimerdialog.ui" line="194"/>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../gui/patrolwarning.ui" line="14"/>
+        <source>Warning</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../gui/patrolwarning.ui" line="38"/>
+        <source>OK</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>Form</name>
     <message>
-        <location filename="navigationpanel.ui" line="14"/>
+        <location filename="../gui/navigationpanel.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulaire</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.ui" line="85"/>
+        <location filename="../gui/navigationpanel.ui" line="85"/>
         <source>Waypoint</source>
-        <translation>Point de navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.ui" line="112"/>
+        <location filename="../gui/navigationpanel.ui" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Waypoints:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Points de navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.ui" line="48"/>
+        <location filename="../gui/navigationpanel.ui" line="48"/>
         <source>Show Warnings</source>
-        <translation>Montrer les avertissements</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.ui" line="68"/>
+        <location filename="../gui/navigationpanel.ui" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configure&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffa500;&quot;&gt;Configurer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>KadasPluginManagerBase</name>
     <message>
-        <location filename="cpbottombar.ui" line="20"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="14"/>
         <source>Frame</source>
-        <translation>Cadre</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutebottombar.ui" line="299"/>
+        <location filename="../gui/optimalroutebottombar.ui" line="71"/>
         <source>Fastest</source>
-        <translation>Plus rapide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutebottombar.ui" line="309"/>
+        <location filename="../gui/optimalroutebottombar.ui" line="81"/>
         <source>Shortest</source>
-        <translation>Plus court</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="208"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="26"/>
         <source>From</source>
-        <translation>De</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutebottombar.ui" line="216"/>
+        <location filename="../gui/optimalroutebottombar.ui" line="29"/>
         <source>Route type</source>
-        <translation>Type de route</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="194"/>
+        <location filename="../gui/cpbottombar.ui" line="163"/>
         <source>To</source>
-        <translation>Vers</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="215"/>
+        <location filename="../gui/cpbottombar.ui" line="187"/>
         <source>Vehicle type</source>
-        <translation>Type de véhicule</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutebottombar.ui" line="32"/>
+        <location filename="../gui/optimalroutebottombar.ui" line="120"/>
         <source>Waypoints</source>
-        <translation>Points de navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="360"/>
+        <location filename="../gui/cpbottombar.ui" line="326"/>
         <source>Clear</source>
-        <translation>Effacer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="66"/>
+        <location filename="../gui/cpbottombar.ui" line="238"/>
         <source>Reverse</source>
-        <translation>Inverser</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="280"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="140"/>
         <source>Calculate</source>
-        <translation>Calculer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="40"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="40"/>
         <source>Basename</source>
-        <translation>Nom de base</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="53"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="53"/>
         <source>isochrones</source>
-        <translation>isochrones</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="77"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="77"/>
         <source>Mode</source>
-        <translation>Mode</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="87"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="87"/>
         <source>Intervals</source>
-        <translation>Intervalles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="107"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="107"/>
         <source>With</source>
-        <translation>Avec</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.ui" line="117"/>
+        <location filename="../gui/reachabilitybottombar.ui" line="117"/>
         <source>Remove previous isoline</source>
-        <translation>Enlever l&apos;Isoligne précédente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="88"/>
+        <location filename="../gui/cpbottombar.ui" line="286"/>
         <source>Areas to avoid</source>
-        <translation>Zones à éviter</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="338"/>
+        <location filename="../gui/cpbottombar.ui" line="304"/>
         <source>Draw in Canvas</source>
-        <translation>Dessiner sur la carte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="312"/>
+        <location filename="../gui/cpbottombar.ui" line="347"/>
         <source>Polygon layer</source>
-        <translation>Couche polygone</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="319"/>
+        <location filename="../gui/cpbottombar.ui" line="333"/>
         <source>Custom polygon</source>
-        <translation>Polygone personnalisé</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="142"/>
+        <location filename="../gui/cpbottombar.ui" line="340"/>
         <source>No areas to avoid</source>
-        <translation>Il n&apos;y a pas de zones à éviter</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.ui" line="32"/>
+        <location filename="../gui/datacataloguebottombar.ui" line="23"/>
         <source>Routing Data Repository</source>
-        <translation>Dépot to données pour le routing</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="datacataloguebottombar.ui" line="44"/>
+        <location filename="../gui/datacataloguebottombar.ui" line="35"/>
         <source>Repository</source>
-        <translation>Dépôt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="395"/>
+        <location filename="../gui/cpbottombar.ui" line="382"/>
         <source>Save</source>
-        <translation>Sauver</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="251"/>
+        <location filename="../gui/cpbottombar.ui" line="51"/>
         <source>Start navigation</source>
-        <translation>Démarrer la navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="cpbottombar.ui" line="306"/>
+        <location filename="../gui/cpbottombar.ui" line="64"/>
         <source>Patrol area</source>
-        <translation>Aire à patrouiller</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LocationInputWidget</name>
     <message>
-        <location filename="locationinputwidget.py" line="61"/>
+        <location filename="../gui/locationinputwidget.py" line="61"/>
         <source>Get GPS location</source>
-        <translation>Trouve position GPS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="locationinputwidget.py" line="69"/>
+        <location filename="../gui/locationinputwidget.py" line="69"/>
         <source>Choose location on the map</source>
-        <translation>Choisir la position sur la carte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="locationinputwidget.py" line="113"/>
+        <location filename="../gui/locationinputwidget.py" line="112"/>
         <source>Cannot connect to GPS</source>
-        <translation>Impossible de se connecter au GPS</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>NavigationPanel</name>
     <message>
-        <location filename="navigationpanel.py" line="586"/>
+        <location filename="../gui/navigationpanel.py" line="586"/>
         <source>Cannot connect to GPS</source>
-        <translation>Impossible de se connecter au GPS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="415"/>
+        <location filename="../gui/navigationpanel.py" line="415"/>
         <source>Select a route or waypoint layer for navigation</source>
-        <translation>Sélectionner une route ou une couche de waypoints pour la navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="440"/>
+        <location filename="../gui/navigationpanel.py" line="440"/>
         <source>In {dist} meters you will arrive at your destination</source>
-        <translation>Vous arriverez à votre destination dans {dist} mètres.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="453"/>
+        <location filename="../gui/navigationpanel.py" line="453"/>
         <source>Navigation</source>
-        <translation>Navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="453"/>
+        <location filename="../gui/navigationpanel.py" line="453"/>
         <source>Select Vehicle to use with layer &apos;{name}&apos;</source>
-        <translation>Selectionner Vehicule à utiliser avec le layer &apos;{name}&apos;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="568"/>
+        <location filename="../gui/navigationpanel.py" line="568"/>
         <source>Connecting to GPS...</source>
-        <translation>Connection au GPS...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="294"/>
+        <location filename="../gui/navigationpanel.py" line="294"/>
         <source>Set threshold for warnings (meters)</source>
-        <translation>Configurer la limite pour les avertissement (metres)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="372"/>
+        <location filename="../gui/navigationpanel.py" line="372"/>
         <source>You are not on the route</source>
-        <translation>Vous n&apos;êtes pas sur la route</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="411"/>
+        <location filename="../gui/navigationpanel.py" line="411"/>
         <source>The &apos;Routes&apos; layer has no waypoints.</source>
-        <translation>La couche &quot;Routes&quot; n&apos;as pas de waypoints</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="576"/>
+        <location filename="../gui/navigationpanel.py" line="576"/>
         <source>You must save your project to use waypoint layers for navigation</source>
-        <translation>Vous devez sauver votre projet pour utiliser une couche &quot;waypoint&quot; pour la navigation</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="navigationpanel.py" line="583"/>
+        <location filename="../gui/navigationpanel.py" line="583"/>
         <source>There are no waypoints in the &apos;Routes&apos; layer</source>
-        <translation>La couche &quot;Routes&quot; n&apos;as pas de waypoints</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>OptimalRouteBottomBar</name>
     <message>
-        <location filename="optimalroutebottombar.py" line="31"/>
+        <location filename="../gui/optimalroutebottombar.py" line="31"/>
         <source>Add waypoint</source>
-        <translation>Ajouter points de navigation</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>OptimalRouteLayer</name>
     <message>
-        <location filename="optimalroutelayer.py" line="123"/>
+        <location filename="../core/optimalroutelayer.py" line="124"/>
         <source>Add to project as regular layer</source>
-        <translation>Ajouter au projet comme couche réguilère</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="157"/>
+        <location filename="../core/optimalroutelayer.py" line="158"/>
         <source>Could not compute route</source>
-        <translation>Impossible de calculer la route</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="221"/>
+        <location filename="../core/optimalroutelayer.py" line="227"/>
         <source>Distance: {distance} km&lt;br/&gt;Time: {formatted_hour}h{formatted_minute}</source>
-        <translation>Distance: {distance} km Temps: {formatted_hour}h{formatted_minute}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="240"/>
+        <location filename="../core/optimalroutelayer.py" line="246"/>
         <source>Origin Point</source>
-        <translation>Point d&apos;origine</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="243"/>
+        <location filename="../core/optimalroutelayer.py" line="249"/>
         <source>Destination Point</source>
-        <translation>Point de destination</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="248"/>
+        <location filename="../core/optimalroutelayer.py" line="254"/>
         <source>Waypoint {point_index}</source>
-        <translation>Point de navigation {point_index}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="optimalroutelayer.py" line="167"/>
+        <location filename="../core/optimalroutelayer.py" line="168"/>
         <source>Could not compute route from polyline</source>
-        <translation>Impossible de calculer la polyligne</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ReachabilityBottomBar</name>
     <message>
-        <location filename="reachabilitybottombar.py" line="64"/>
+        <location filename="../gui/reachabilitybottombar.py" line="64"/>
         <source>Isochrone</source>
-        <translation>Isochrone</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="65"/>
+        <location filename="../gui/reachabilitybottombar.py" line="65"/>
         <source>Isodistance</source>
-        <translation>Isodistance</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="45"/>
+        <location filename="../gui/reachabilitybottombar.py" line="45"/>
         <source>Close reachability dialog</source>
-        <translation>Fermer la boîte de dialogue d&apos;accessibilité</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="131"/>
+        <location filename="../gui/reachabilitybottombar.py" line="131"/>
         <source>Invalid location: {error_message}</source>
-        <translation>Posizione non valida: {error_message}</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="140"/>
+        <location filename="../gui/reachabilitybottombar.py" line="140"/>
         <source>Must have at least one and maximum 10 intervals.</source>
-        <translation>Doit avoir au moins 1 et au maximum 10 intervalles.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="170"/>
+        <location filename="../gui/reachabilitybottombar.py" line="170"/>
         <source>Please change the basename or activate the overwrite checkbox</source>
-        <translation>Veuillez changer le nom de base ou activer la case à cocher écraser</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="177"/>
+        <location filename="../gui/reachabilitybottombar.py" line="177"/>
         <source>Can not generate the error because &quot;{error_message}&quot;</source>
-        <translation>Impossible de générer l&apos;erreur car &quot;{error_message}&quot;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="222"/>
+        <location filename="../gui/reachabilitybottombar.py" line="222"/>
         <source>basename can not be empty</source>
-        <translation>le nom de base ne peut pas être vide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="230"/>
+        <location filename="../gui/reachabilitybottombar.py" line="230"/>
         <source>Please make sure the basename is correct.</source>
-        <translation>Veuillez vous assurer que le nom de base est correct.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="251"/>
+        <location filename="../gui/reachabilitybottombar.py" line="251"/>
         <source>Interval can not be empty</source>
-        <translation>L&apos;intervalle ne peut pas être vide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="253"/>
+        <location filename="../gui/reachabilitybottombar.py" line="253"/>
         <source>Interval can not be more than 10</source>
-        <translation>Il ne faut pas mettre plus de 10 intervalles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="261"/>
+        <location filename="../gui/reachabilitybottombar.py" line="261"/>
         <source>Please make sure the interval is correct.</source>
-        <translation>Veuillez vous assurer que l&apos;intervalle est correct.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="291"/>
+        <location filename="../gui/reachabilitybottombar.py" line="291"/>
         <source>Set interval as integer in minutes, separated by &quot;;&quot; symbol</source>
-        <translation>Définir l&apos;intervalle comme un nombre entier en minutes, séparé par le symbole &quot;;&quot; </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="reachabilitybottombar.py" line="295"/>
+        <location filename="../gui/reachabilitybottombar.py" line="295"/>
         <source>Set interval as float in Km, separated by &quot;;&quot; symbol</source>
-        <translation>Définir l&apos;intervalle en KM, séparé par le symbole &quot;;&quot; </translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>RoutingPlugin</name>
     <message>
-        <location filename="plugin.py" line="63"/>
+        <location filename="../plugin.py" line="66"/>
         <source>Routing</source>
-        <translation>Routing</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="73"/>
+        <location filename="../plugin.py" line="76"/>
         <source>Reachability</source>
-        <translation>Accessibilité</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="81"/>
+        <location filename="../plugin.py" line="84"/>
         <source>Navigate</source>
-        <translation>Naviguer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="87"/>
+        <location filename="../plugin.py" line="91"/>
         <source>Day / Night</source>
-        <translation>Jour / Nuit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="69"/>
+        <location filename="../plugin.py" line="72"/>
         <source>Patrol</source>
-        <translation>Patrouille</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="plugin.py" line="93"/>
+        <location filename="../plugin.py" line="97"/>
         <source>Routing Data</source>
-        <translation>Données de routing</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ValhallaRouteBottomBar</name>
     <message>
-        <location filename="valhallaroutebottombar.py" line="60"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="62"/>
         <source>Close routing dialog</source>
-        <translation>Fermer le dialogue de routing</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="207"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="241"/>
         <source>Please, select a valid destination layer</source>
-        <translation>Veuillez sélectionner une couche de destination valide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="215"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="255"/>
         <source>Invalid location:</source>
-        <translation>Endroit non valide:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="218"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="261"/>
         <source>Both origin and destination points are required</source>
-        <translation>Un point de départ et un point de destination sont requis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="236"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="280"/>
         <source>Custom polygon button is checked, but no polygon is drawn</source>
-        <translation>Le bouton pour le polygone est activé, mais il n&apos;y a pas de polygone dessiné</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="248"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="294"/>
         <source>Polygon layer button is checked, but no layer polygon is selected</source>
-        <translation>Le bouton pour une couche polygone est activé, mais il n&apos;y a pas de couche sélectionnée</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="valhallaroutebottombar.py" line="295"/>
+        <location filename="../gui/valhallaroutebottombar.py" line="355"/>
         <source>Could not compute route</source>
-        <translation>Impossible de calculer la route</translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../gui/valhallaroutebottombar.py" line="345"/>
+        <source>An Exception occured:</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
