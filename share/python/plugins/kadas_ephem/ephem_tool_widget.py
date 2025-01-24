@@ -113,14 +113,12 @@ class EphemToolWidget(KadasBottomBar):
         if self.ui.tabWidgetOutput.currentIndex() == 0:
             celestialBody = EphemComputeTask.CelestialBody.SUN
 
-        self.ephemRecomputeTask.compute(wgsPos=self.wgsPos, 
+        self.ephemRecomputeTask.compute(wgsPos=self.wgsPos,
+                                        mrcPos=self.mrcPos, 
                                         celestialBody=celestialBody,
                                         considerRelief=self.ui.checkBoxRelief.isChecked(), 
                                         dateTime=self.ui.dateTimeEdit.dateTime(),
                                         timezoneType=self.ui.timezoneCombo.currentData())
-
-
-
 
     def recomputeFinished(self):
         result = self.ephemRecomputeTask.getResult()

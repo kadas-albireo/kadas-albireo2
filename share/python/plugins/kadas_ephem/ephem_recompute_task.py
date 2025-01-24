@@ -42,6 +42,7 @@ class EphemComputeTask(QThread):
         QThread.__init__(self, parent)
 
         self.wgsPos = None
+        self.mrcPos = None
         self.celestialBody = self.CelestialBody.SUN
         self.considerRelief = False
         self.dateTime = QDateTime.currentDateTime()
@@ -49,8 +50,9 @@ class EphemComputeTask(QThread):
 
         self.result = EphemComputeResult()
 
-    def compute(self, wgsPos, celestialBody, considerRelief, dateTime, timezoneType):
+    def compute(self, wgsPos, mrcPos, celestialBody, considerRelief, dateTime, timezoneType):
         self.wgsPos = wgsPos
+        self.mrcPos = mrcPos
         self.celestialBody = celestialBody
         self.considerRelief = considerRelief
         self.dateTime = dateTime
@@ -69,9 +71,7 @@ class EphemComputeTask(QThread):
     def cancel(self):
         self.canceled = True
 
-
     def run(self):
-        
         try:
             ts = self.getTimestamp(self.dateTime)
     
