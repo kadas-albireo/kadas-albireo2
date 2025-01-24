@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QAction
 
 from kadas.kadasgui import KadasPinItem, KadasItemPos, KadasItemLayer, KadasGpxRouteItem
 
-from kadasrouting.utilities import (
+from kadas_routing.utilities import (
     iconPath,
     waitcursor,
     pushWarning,
@@ -18,7 +18,7 @@ from kadasrouting.utilities import (
     write_response
 )
 
-from kadasrouting.valhalla.client import ValhallaClient
+from kadas_routing.valhalla.client import ValhallaClient
 
 from qgis.core import (
     QgsProject,
@@ -31,7 +31,7 @@ from qgis.core import (
     QgsUnitTypes,
 )
 
-from kadasrouting.exceptions import ValhallaException
+from kadas_routing.exceptions import ValhallaException
 
 from kadas.kadascore import KadasPluginLayerType, KadasCoordinateFormat
 

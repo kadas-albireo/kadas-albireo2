@@ -1,7 +1,7 @@
 import os
 import csv
 
-from kadasrouting.utilities import localeName
+from kadas_routing.utilities import localeName
 
 _vehicles = []
 _vehicles_reduced = []

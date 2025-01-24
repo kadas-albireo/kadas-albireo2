@@ -5,7 +5,7 @@ import os
 from qgis.PyQt.QtCore import QTranslator, QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox
 
-from kadasrouting.utilities import localeName
+from kadas_routing.utilities import localeName
 
 # Setup internationalisation for the plugin.
 #

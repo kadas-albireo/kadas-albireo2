@@ -12,19 +12,19 @@ from qgis.core import QgsApplication
 
 from kadas.kadasgui import KadasPluginInterface
 
-from kadasrouting.utilities import icon, pushWarning, tr
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayerType
-from kadasrouting.gui.optimalroutebottombar import OptimalRouteBottomBar
-from kadasrouting.gui.cpbottombar import CPBottomBar
-from kadasrouting.gui.reachabilitybottombar import ReachabilityBottomBar
-from kadasrouting.gui.datacataloguebottombar import DataCatalogueBottomBar
-from kadasrouting.gui.navigationpanel import NavigationPanel
-from kadasrouting.gui.disclaimerdialog import DisclaimerDialog
-from kadasrouting.valhalla.client import ValhallaClient
+from kadas_routing.utilities import icon, pushWarning, tr
+from kadas_routing.core.optimalroutelayer import OptimalRouteLayerType
+from kadas_routing.gui.optimalroutebottombar import OptimalRouteBottomBar
+from kadas_routing.gui.cpbottombar import CPBottomBar
+from kadas_routing.gui.reachabilitybottombar import ReachabilityBottomBar
+from kadas_routing.gui.datacataloguebottombar import DataCatalogueBottomBar
+from kadas_routing.gui.navigationpanel import NavigationPanel
+from kadas_routing.gui.disclaimerdialog import DisclaimerDialog
+from kadas_routing.valhalla.client import ValhallaClient
 
-from kadasrouting.core.memorylayersaver import MemoryLayerSaver
+from kadas_routing.core.memorylayersaver import MemoryLayerSaver
 
-from kadasrouting.core.datacatalogueclient import DataCatalogueClient
+from kadas_routing.core.datacatalogueclient import DataCatalogueClient
 
 
 logfile = os.path.join(os.path.expanduser("~"), ".kadas", "kadas-routing.log")

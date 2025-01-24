@@ -4,9 +4,9 @@ import logging
 from PyQt5.QtCore import QTextCodec
 from PyQt5.QtGui import QColor
 
-from kadasrouting.utilities import waitcursor, tr
+from kadas_routing.utilities import waitcursor, tr
 
-from kadasrouting.valhalla.client import ValhallaClient
+from kadas_routing.valhalla.client import ValhallaClient
 
 from qgis.core import (
     QgsProject,

@@ -8,7 +8,7 @@ from qgis.core import (
     QgsGeometry,
 )
 from PyQt5.QtGui import QColor
-from kadasrouting.utilities import transformToWGS, pushWarning
+from kadas_routing.utilities import transformToWGS, pushWarning
 
 
 class CanvasLayerSaver:

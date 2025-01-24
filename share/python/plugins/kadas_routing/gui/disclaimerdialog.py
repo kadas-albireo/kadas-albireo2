@@ -4,7 +4,7 @@ from qgis.PyQt import uic
 
 from qgis.PyQt.QtCore import QSettings
 
-from kadasrouting.utilities import localeName
+from kadas_routing.utilities import localeName
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "disclaimerdialog.ui")

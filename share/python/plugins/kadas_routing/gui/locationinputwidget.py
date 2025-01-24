@@ -11,11 +11,11 @@ from qgis.core import (
     QgsPointXY,
 )
 
-from kadasrouting.utilities import icon, pushWarning
+from kadas_routing.utilities import icon, pushWarning
 
-from kadasrouting.gui.pointcapturemaptool import PointCaptureMapTool
+from kadas_routing.gui.pointcapturemaptool import PointCaptureMapTool
 
-from kadasrouting.gui.autocompletewidget import AutoCompleteWidget
+from kadas_routing.gui.autocompletewidget import AutoCompleteWidget
 
 from kadas.kadasgui import (
     KadasMapCanvasItemManager,
