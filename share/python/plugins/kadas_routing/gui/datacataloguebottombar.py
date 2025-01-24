@@ -17,8 +17,8 @@ from qgis.core import QgsSettings
 
 from kadas.kadasgui import KadasBottomBar
 
-from kadasrouting.utilities import pushWarning, pushMessage, icon
-from kadasrouting.core.datacatalogueclient import (
+from kadas_routing.utilities import pushWarning, pushMessage, icon
+from kadas_routing.core.datacatalogueclient import (
     DataCatalogueClient,
     DEFAULT_REPOSITORIES,
 )
@@ -180,7 +180,6 @@ class DataCatalogueBottomBar(KadasBottomBar, WIDGET):
     def __init__(self, canvas, action):
         KadasBottomBar.__init__(self, canvas, "orange")
         self.setupUi(self)
-        self.setStyleSheet("QFrame { background-color: orange; }")
         self.listWidget.setStyleSheet("QListWidget { background-color: white; }")
         self.radioButtonGroup = QButtonGroup(self)
         self.action = action

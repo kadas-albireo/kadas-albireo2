@@ -11,13 +11,13 @@ from kadas.kadasgui import (
     KadasMapCanvasItemManager,
     KadasLayerSelectionWidget,
 )
-from kadasrouting.gui.locationinputwidget import (
+from kadas_routing.gui.locationinputwidget import (
     LocationInputWidget,
     WrongLocationException,
 )
-from kadasrouting.core import vehicles
-from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
-from kadasrouting.utilities import iconPath, pushWarning, transformToWGS
+from kadas_routing.core import vehicles
+from kadas_routing.core.canvaslayersaver import CanvasLayerSaver
+from kadas_routing.utilities import iconPath, pushWarning, transformToWGS
 
 from qgis.utils import iface
 from qgis.core import (
@@ -29,8 +29,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsRubberBand, QgsMapToolPan
 
-from kadasrouting.core.optimalroutelayer import OptimalRouteLayer
-from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
+from kadas_routing.core.optimalroutelayer import OptimalRouteLayer
+from kadas_routing.gui.drawpolygonmaptool import DrawPolygonMapTool
 
 
 AVOID_AREA_COLOR = QColor(255, 0, 0)

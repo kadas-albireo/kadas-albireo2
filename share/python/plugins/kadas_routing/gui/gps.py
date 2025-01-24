@@ -2,7 +2,7 @@ import logging
 
 from qgis.core import QgsApplication
 
-from kadasrouting.utilities import waitcursor
+from kadas_routing.utilities import waitcursor
 
 LOG = logging.getLogger(__name__)
 
