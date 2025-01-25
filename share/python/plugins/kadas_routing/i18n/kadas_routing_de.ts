@@ -129,12 +129,12 @@
 <context>
     <name>DataCatalogueBottomBar</name>
     <message>
-        <location filename="../gui/datacataloguebottombar.py" line="189"/>
+        <location filename="../gui/datacataloguebottombar.py" line="188"/>
         <source>Close data catalogue dialog</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../gui/datacataloguebottombar.py" line="193"/>
+        <location filename="../gui/datacataloguebottombar.py" line="192"/>
         <source>Reload data catalogue with the selected repository</source>
         <translation type="unfinished"/>
     </message>
@@ -361,12 +361,12 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../gui/datacataloguebottombar.ui" line="23"/>
+        <location filename="../gui/datacataloguebottombar.ui" line="26"/>
         <source>Routing Data Repository</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../gui/datacataloguebottombar.ui" line="35"/>
+        <location filename="../gui/datacataloguebottombar.ui" line="38"/>
         <source>Repository</source>
         <translation type="unfinished"/>
     </message>
