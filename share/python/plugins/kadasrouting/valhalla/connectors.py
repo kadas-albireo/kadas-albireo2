@@ -8,8 +8,8 @@ from PyQt5.QtCore import QObject
 
 from qgis.core import QgsSettings
 
-from kadas_routing.utilities import localeName, appDataDir, pushWarning
-from kadas_routing.core.datacatalogueclient import DataCatalogueClient
+from kadasrouting.utilities import localeName, appDataDir, pushWarning
+from kadasrouting.core.datacatalogueclient import DataCatalogueClient
 
 LOG = logging.getLogger(__name__)
 

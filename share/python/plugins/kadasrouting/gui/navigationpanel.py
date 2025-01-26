@@ -41,11 +41,11 @@ from kadas.kadasgui import (
     KadasSymbolItem,
 )
 
-from kadas_routing.utilities import formatdist, pushMessage, iconPath
-from kadas_routing.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
-from kadas_routing.gui.gps import getGpsConnection
-from kadas_routing.core import vehicles
-from kadas_routing.utilities import tr
+from kadasrouting.utilities import formatdist, pushMessage, iconPath
+from kadasrouting.core.optimalroutelayer import OptimalRouteLayer, NotInRouteException
+from kadasrouting.gui.gps import getGpsConnection
+from kadasrouting.core import vehicles
+from kadasrouting.utilities import tr
 
 LOG = logging.getLogger(__name__)
 GPS_MIN_SPEED = (

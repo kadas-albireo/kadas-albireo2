@@ -13,7 +13,7 @@ from qgis.core import QgsNetworkAccessManager, QgsFileDownloader, Qgis
 from qgis.utils import iface
 
 from kadas.kadasgui import KadasPluginInterface
-from kadas_routing.utilities import appDataDir, waitcursor, pushWarning, tr
+from kadasrouting.utilities import appDataDir, waitcursor, pushWarning, tr
 
 LOG = logging.getLogger(__name__)
 

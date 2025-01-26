@@ -8,11 +8,11 @@ from PyQt5.QtGui import QColor
 from qgis.core import QgsWkbTypes, QgsProject, QgsVectorLayer
 from qgis.utils import iface
 from qgis.gui import QgsMapToolPan
-from kadas_routing.gui.valhallaroutebottombar import ValhallaRouteBottomBar
-from kadas_routing.gui.patrolwarning import PatrolWarning
-from kadas_routing.gui.drawpolygonmaptool import DrawPolygonMapTool
-from kadas_routing.utilities import pushWarning, transformToWGS
-from kadas_routing.core.canvaslayersaver import CanvasLayerSaver
+from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
+from kadasrouting.gui.patrolwarning import PatrolWarning
+from kadasrouting.gui.drawpolygonmaptool import DrawPolygonMapTool
+from kadasrouting.utilities import pushWarning, transformToWGS
+from kadasrouting.core.canvaslayersaver import CanvasLayerSaver
 
 
 # Royal Blue
