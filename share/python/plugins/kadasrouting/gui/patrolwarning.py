@@ -3,7 +3,7 @@ from copy import deepcopy
 
 from qgis.PyQt import uic
 
-from kadas_routing.utilities import localeName
+from kadasrouting.utilities import localeName
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "patrolwarning.ui")

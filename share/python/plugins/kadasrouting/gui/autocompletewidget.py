@@ -9,7 +9,7 @@ from PyQt5.QtGui import QPalette
 
 from qgis.core import QgsSettings
 
-from kadas_routing.utilities import strip_tags
+from kadasrouting.utilities import strip_tags
 
 LOG = logging.getLogger(__name__)
 

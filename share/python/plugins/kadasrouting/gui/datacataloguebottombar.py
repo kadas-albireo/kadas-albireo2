@@ -17,8 +17,8 @@ from qgis.core import QgsSettings
 
 from kadas.kadasgui import KadasBottomBar
 
-from kadas_routing.utilities import pushWarning, pushMessage, icon
-from kadas_routing.core.datacatalogueclient import (
+from kadasrouting.utilities import pushWarning, pushMessage, icon
+from kadasrouting.core.datacatalogueclient import (
     DataCatalogueClient,
     DEFAULT_REPOSITORIES,
 )

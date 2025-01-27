@@ -8,12 +8,12 @@ from PyQt5.QtWidgets import QDesktopWidget
 
 from kadas.kadasgui import KadasBottomBar
 
-from kadas_routing.gui.locationinputwidget import (
+from kadasrouting.gui.locationinputwidget import (
     LocationInputWidget,
     WrongLocationException,
 )
-from kadas_routing.core import vehicles
-from kadas_routing.utilities import iconPath, pushMessage, pushWarning
+from kadasrouting.core import vehicles
+from kadasrouting.utilities import iconPath, pushMessage, pushWarning
 
 from qgis.core import (
     QgsProject,
@@ -22,9 +22,9 @@ from qgis.core import (
     QgsRectangle,
 )
 
-from kadas_routing.core.isochroneslayer import generateIsochrones, OverwriteError
+from kadasrouting.core.isochroneslayer import generateIsochrones, OverwriteError
 
-from kadas_routing.exceptions import Valhalla400Exception
+from kadasrouting.exceptions import Valhalla400Exception
 
 LOG = logging.getLogger(__name__)
 

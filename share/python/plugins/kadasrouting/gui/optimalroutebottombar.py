@@ -9,12 +9,12 @@ from kadas.kadasgui import (
     KadasItemPos,
     KadasMapCanvasItemManager,
 )
-from kadas_routing.gui.locationinputwidget import LocationInputWidget
-from kadas_routing.utilities import iconPath
+from kadasrouting.gui.locationinputwidget import LocationInputWidget
+from kadasrouting.utilities import iconPath
 
 from qgis.core import QgsCoordinateReferenceSystem
 
-from kadas_routing.gui.valhallaroutebottombar import ValhallaRouteBottomBar
+from kadasrouting.gui.valhallaroutebottombar import ValhallaRouteBottomBar
 
 WIDGET, BASE = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "optimalroutebottombar.ui")
