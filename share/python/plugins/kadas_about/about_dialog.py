@@ -15,8 +15,6 @@ from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 from qgis.core import Qgis
 from kadas.kadascore import *
-import os
-from . import resources
 
 
 class AboutDialog(QDialog):
@@ -30,7 +28,7 @@ class AboutDialog(QDialog):
         self.setLayout(l)
 
         splashLabel = QLabel()
-        splashLabel.setPixmap(QPixmap(":/plugins/KadasHelp/splash.jpg"))
+        splashLabel.setPixmap(QPixmap(":/kadas/splash"))
         l.addWidget(splashLabel, l.rowCount(), 0, 1, 2)
 
         versionLabel = QLabel(self.tr("<b>Version</b>: %s (%s) - Based on QGIS %s") % (Kadas.KADAS_VERSION, Kadas.KADAS_BUILD_DATE, Qgis.version()))
