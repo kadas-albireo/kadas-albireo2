@@ -32,7 +32,7 @@ jobs:
       - name: 🧽 Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Setup Vcpkg
+      - name: 🍹 Setup Vcpkg
         uses: open-vcpkg/setup-vcpkg@v1
 
       - name: 📦 Prepare msi
