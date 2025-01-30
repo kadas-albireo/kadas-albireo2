@@ -54,6 +54,9 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: 🍹 Setup Vcpkg
+        uses: open-vcpkg/setup-vcpkg@v1
+
       - name: 🌱 Install dependencies and generate project files
         env:
           GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
