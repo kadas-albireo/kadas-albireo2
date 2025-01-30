@@ -1164,6 +1164,11 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
 
 void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers )
 {
+  qDebug() << "addCatalogLayer" << "uri" << uri.data();
+  qDebug() << "addCatalogLayer" << "metadataUrl" << metadataUrl;
+  qDebug() << "addCatalogLayer" << "sublayers" << sublayers;
+  qDebug() << "addCatalogLayer" << "providerKey" << uri.providerKey;
+
   QString adjustedUri = uri.uri;
 
   // Adjust layer CRS to project CRS
@@ -1195,18 +1200,23 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   {
     // If there is exactly one sublayer, add it directly
     QVariantMap sublayer = sublayers[0].toMap();
-    if ( uri.providerKey == "arcgismapserver" )
+
+    QgsMapLayer *layer = nullptr;
+    if ( uri.providerKey == "arcgisfeatureserver" )
     {
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
       dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
       adjustedUri = dataSource.uri();
+      qDebug() << "addVectorLayer 1";
+      layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "wms" )
     {
       adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
+      qDebug() << "addRasterLayer 1";
+      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     }
-    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     if ( layer )
     {
       layer->setMetadataUrl( metadataUrl );
@@ -1265,19 +1275,23 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       if ( entry->leaf )
       {
-        if ( uri.providerKey == "arcgismapserver" )
+        QgsMapLayer *layer = nullptr;
+        if ( uri.providerKey == "arcgisfeatureserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
           dataSource.removeParam( "layer" );
           dataSource.setParam( "layer", QString::number( entry->id ) );
           adjustedUri = dataSource.uri();
+          qDebug() << "addVectorLayer 2";
+          layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "wms" )
         {
           adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
+          qDebug() << "addRasterLayer 2";
+          layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
-        QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         if ( layer )
         {
           layer->setMetadataUrl( metadataUrl );
@@ -1293,6 +1307,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   else
   {
+    qDebug() << "else addRasterLayer";
     QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
     if ( layer )
     {

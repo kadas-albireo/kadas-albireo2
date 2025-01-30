@@ -1,0 +1,15 @@
+<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+
+ <metadata id="metadata5313">image/svg+xml</metadata>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="130" width="130" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="layer1">
+   <circle clip-rule="nonzero" fill="#00a8ff" fill-rule="evenodd" stroke="#000000" stroke-linecap="square" stroke-miterlimit="4" stroke-dashoffset="1" id="path6552" cx="8" cy="8.00002" r="6.5"/>
+  </g>
+  <path transform="rotate(-90 8.000000000000002,7.2537317276000985) " id="svg_1" d="m7.04082,10.77915c-0.22606,-0.19606 -0.19641,-0.31479 0.35323,-1.41386c0.27754,-0.55497 0.50461,-1.02517 0.50461,-1.04488c0,-0.01971 -0.76638,-0.03584 -1.70306,-0.03584l-1.70306,0l0,-1.0394l0,-1.0394l1.71656,0c1.32356,0 1.70178,-0.03131 1.65203,-0.13676c-0.03549,-0.07522 -0.2776,-0.57437 -0.53802,-1.10921c-0.49089,-1.0082 -0.49074,-1.27857 0.00076,-1.36238c0.2446,-0.04171 4.0527,3.16276 4.1836,3.52043c-1.26845,1.27711 -2.78467,2.61391 -4.18136,3.79259c-0.07364,0 -0.20202,-0.05908 -0.28528,-0.13129l0,0z" stroke-width="0.5" stroke="#000" fill="#fff"/>
+ </g>
+</svg>
