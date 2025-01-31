@@ -69,9 +69,9 @@ set(kadas_gui_HDR ${kadas_gui_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_gui.h)
 
 install(
   TARGETS kadas_gui
-  RUNTIME DESTINATION bin COMPONENT libraries
-  ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
-  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib${LIB_SUFFIX}
+  LIBRARY DESTINATION lib${LIB_SUFFIX}
 )
 
 install(FILES ${kadas_gui_HDR} DESTINATION include/kadas/gui)

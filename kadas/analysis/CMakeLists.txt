@@ -21,9 +21,9 @@ set(kadas_analysis_HDR ${kadas_analysis_HDR}
 
 install(
   TARGETS kadas_analysis
-  RUNTIME DESTINATION bin COMPONENT libraries
-  ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
-  LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT libraries
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib${LIB_SUFFIX}
+  LIBRARY DESTINATION lib${LIB_SUFFIX}
 )
 
 install(FILES ${kadas_analysis_HDR} DESTINATION include/kadas/analysis)

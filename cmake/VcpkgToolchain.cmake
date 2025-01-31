@@ -137,3 +137,10 @@ if(NOT "${NUGET_TOKEN}" STREQUAL "" AND (_HOST_IS_WINDOWS OR EXISTS
       "$ENV{VCPKG_BINARY_SOURCES};nugetconfig,${_CONFIG_PATH_NATIVE},readwrite"
   )
 endif()
+
+# Copies DLLs built by vcpkg when an install() command is run. Only works on
+# Windows.
+set(X_VCPKG_APPLOCAL_DEPS_INSTALL
+    ON
+    CACHE BOOL "Copy dependency DLLs on install"
+)
