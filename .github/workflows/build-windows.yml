@@ -123,7 +123,7 @@ jobs:
         with:
           name: kadas-albireo2-msi
           path: |
-            build/kadas-*-win64.msi
+            build/kadas-win64-*.msi
 
       # A preliminary smoke test to determine basic functional python
       # To be replaced with something proper when testing lands
