@@ -20,8 +20,6 @@ if(WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/LICENSE.txt")
 
     set(CPACK_WIX_UPGRADE_GUID 3d1b1ced-39c3-4086-8ab2-4814e0be74df)
-    set(CPACK_COMPONENTS_ALL "libraries") # Avoid duplicate libraries, disable
-                                          # "Unspecified" component
     set(CPACK_WIX_PRODUCT_ICON "${CMAKE_SOURCE_DIR}/kadas/resources/logo.ico")
     # set(CPACK_WIX_PRODUCT_LOGO "${CMAKE_SOURCE_DIR}/images/icons/kadas.png")
     # set(CPACK_WIX_TEMPLATE
