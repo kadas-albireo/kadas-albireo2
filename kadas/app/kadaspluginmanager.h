@@ -54,6 +54,7 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
     KadasPluginManager( QgsMapCanvas *canvas, QAction *action );
 
     void loadPlugins();
+    void installMandatoryPlugins();
     void updateAllPlugins();
 
   private slots:
@@ -66,12 +67,18 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
     const int INSTALLED_TREEWIDGET_COLUMN_NAME = 0;
     const int INSTALLED_TREEWIDGET_COLUMN_VERSION = 1;
 
+    const int AVAILABLE_TREEWIDGET_COLUMN_NAME = 0;
+    const int AVAILABLE_TREEWIDGET_COLUMN_BUTTON = 1;
+
+    const char *PROPERTY_PLUGIN_NAME = "PluginName";
+
     struct PluginInfo
     {
         QString name;
         QString description;
         QString version;
         QString downloadLink;
+        bool mandatory;
     };
 
     KadasPluginManager();
@@ -93,6 +100,8 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
     void setItemNotUpdateable( QTreeWidgetItem *item );
 
     static bool updateAvailable( const QString &installedVersion, const QString &repoVersion );
+
+    KadasPluginManagerInstallButton *getInstallButton( const QString &pluginName );
 
     //main window button to show/hide the plugin manager
     QAction *mAction;
