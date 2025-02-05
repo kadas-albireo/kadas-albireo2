@@ -78,7 +78,7 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
         QString description;
         QString version;
         QString downloadLink;
-        bool mandatory;
+        bool mandatory = false;
     };
 
     KadasPluginManager();

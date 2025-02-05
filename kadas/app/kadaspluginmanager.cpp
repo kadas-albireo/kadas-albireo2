@@ -279,6 +279,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
       QJsonObject result = resultRef.toObject();
       KadasPluginManager::PluginInfo p;
       p.name = result["title"].toString();
+      p.mandatory = false;
       for ( const QJsonValueRef &tagRef : result["tags"].toArray() )
       {
         QString tag = tagRef.toString();
@@ -286,10 +287,14 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
         {
           p.version = tag.mid( 8 );
         }
+
+        if ( tag == "mandatoryplugin" )
+        {
+          p.mandatory = true;
+        }
       }
       p.description = result["description"].toString();
       p.downloadLink = baseUrl + result["id"].toString() + "/data";
-      p.mandatory = result.contains( "mandatoryplugin" );
       pluginMap.insert( p.name, p );
     }
   }
