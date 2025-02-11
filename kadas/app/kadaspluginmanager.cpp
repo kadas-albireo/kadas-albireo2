@@ -182,6 +182,8 @@ void KadasPluginManager::installMandatoryPlugins()
   QMap<QString, PluginInfo>::const_iterator pluginIt = mAvailablePlugins.constBegin();
   for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
   {
+    qDebug() << "Available plugin" << pluginIt.value().name << "is mandatory:" << pluginIt.value().mandatory;
+
     if ( pluginIt.value().mandatory )
     {
       QString pluginName = pluginIt.key();
@@ -277,25 +279,29 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
     for ( const QJsonValueRef &resultRef : json.object()["results"].toArray() )
     {
       QJsonObject result = resultRef.toObject();
-      KadasPluginManager::PluginInfo p;
-      p.name = result["title"].toString();
-      p.mandatory = false;
+      KadasPluginManager::PluginInfo pluginInfo;
+      pluginInfo.name = result["title"].toString();
+      pluginInfo.mandatory = false;
       for ( const QJsonValueRef &tagRef : result["tags"].toArray() )
       {
         QString tag = tagRef.toString();
         if ( tag.startsWith( "version:" ) )
         {
-          p.version = tag.mid( 8 );
+          pluginInfo.version = tag.mid( 8 );
         }
 
         if ( tag == "mandatoryplugin" )
         {
-          p.mandatory = true;
+          pluginInfo.mandatory = true;
         }
       }
-      p.description = result["description"].toString();
-      p.downloadLink = baseUrl + result["id"].toString() + "/data";
-      pluginMap.insert( p.name, p );
+      pluginInfo.description = result["description"].toString();
+      pluginInfo.downloadLink = baseUrl + result["id"].toString() + "/data";
+
+      qDebug() << "Got plugin info name" << pluginInfo.name << "is mandatory:" << pluginInfo.mandatory;
+      qDebug() << "Json payload:" << result.toVariantMap();
+
+      pluginMap.insert( pluginInfo.name, pluginInfo );
     }
   }
   else if ( xml.setContent( response ) )
@@ -304,14 +310,14 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
     for ( int i = 0; i < pluginNodeList.size(); ++i )
     {
       QDomElement pluginElem = pluginNodeList.at( i ).toElement();
-      KadasPluginManager::PluginInfo p;
-      p.name = pluginElem.attribute( "name" );
-      p.version = pluginElem.attribute( "version" );
-      p.description = pluginElem.firstChildElement( "description" ).text();
-      p.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
+      KadasPluginManager::PluginInfo pluginInfo;
+      pluginInfo.name = pluginElem.attribute( "name" );
+      pluginInfo.version = pluginElem.attribute( "version" );
+      pluginInfo.description = pluginElem.firstChildElement( "description" ).text();
+      pluginInfo.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
       QDomElement mandatoryPluginElement = pluginElem.firstChildElement( "mandatoryplugin" );
-      p.mandatory = !mandatoryPluginElement.isNull();
-      pluginMap.insert( p.name, p );
+      pluginInfo.mandatory = !mandatoryPluginElement.isNull();
+      pluginMap.insert( pluginInfo.name, pluginInfo );
     }
   }
   return pluginMap;
