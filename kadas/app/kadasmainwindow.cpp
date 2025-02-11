@@ -1459,7 +1459,7 @@ void KadasMainWindow::addRemotePicture()
     }
 
     // Replace '?' with '_' as it results in a invalid path on windows
-    QString tempFilename = url.replace('?', '_');
+    QString tempFilename = url.replace( '?', '_' );
 
     QTemporaryFile tempfile( QDir::temp().absoluteFilePath( QFileInfo( tempFilename ).fileName() ) );
     tempfile.setAutoRemove( true );
