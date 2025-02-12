@@ -149,8 +149,8 @@ void KadasPluginManager::loadPlugins()
   for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
   {
     QTreeWidgetItem *availableItem = new QTreeWidgetItem();
-    availableItem->setText( 0, pluginIt.key() );
-    availableItem->setToolTip( 0, pluginIt.value().description );
+    availableItem->setText( AVAILABLE_TREEWIDGET_COLUMN_NAME, pluginIt.key() );
+    availableItem->setToolTip( AVAILABLE_TREEWIDGET_COLUMN_NAME, pluginIt.value().description );
     mAvailableTreeWidget->addTopLevelItem( availableItem );
     QString repoVersion = pluginIt.value().version;
     if ( installedPluginInfo.contains( pluginIt.key() ) )
@@ -177,6 +177,38 @@ void KadasPluginManager::loadPlugins()
   mAvailableTreeWidget->resizeColumnToContents( 0 );
 }
 
+void KadasPluginManager::installMandatoryPlugins()
+{
+  QMap<QString, PluginInfo>::const_iterator pluginIt = mAvailablePlugins.constBegin();
+  for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
+  {
+    qDebug() << "Available plugin" << pluginIt.value().name << "is mandatory:" << pluginIt.value().mandatory;
+
+    if ( pluginIt.value().mandatory )
+    {
+      QString pluginName = pluginIt.key();
+
+      QList<QTreeWidgetItem *> installedTreeWidgetItems = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
+      if ( installedTreeWidgetItems.size() > 0 )
+      {
+        // Plugin already installed
+        continue;
+      }
+
+      KadasPluginManagerInstallButton *button = getInstallButton( pluginName );
+      if ( button == nullptr )
+        continue;
+
+      bool success = installPlugin( pluginName, pluginIt.value().downloadLink, pluginIt.value().description, pluginIt.value().version, button );
+
+      if ( !success )
+      {
+        kApp->mainWindow()->messageBar()->pushMessage( tr( "Mandatory plugin installation error" ), tr( "Plugin '%1' couldn't be installed" ).arg( pluginName ), Qgis::Warning, kApp->mainWindow()->messageTimeout() );
+      }
+    }
+  }
+}
+
 void KadasPluginManager::updateAllPlugins()
 {
   QTreeWidgetItemIterator it( mInstalledTreeWidget );
@@ -196,15 +228,7 @@ void KadasPluginManager::updateAllPlugins()
     if ( availablePluginInfo.version > installedPluginVersion )
     {
       QString moduleName = ( *it )->data( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole ).toString();
-      KadasPluginManagerInstallButton *button = nullptr;
-      QList<QTreeWidgetItem *> availableTreeWidgetItems = mAvailableTreeWidget->findItems( installedPluginName, Qt::MatchExactly, 0 );
-      if ( availableTreeWidgetItems.size() > 0 )
-      {
-        QTreeWidgetItem *availableTreeWidgetItem = availableTreeWidgetItems.at( 0 );
-        QWidget *itemWidget = mAvailableTreeWidget->itemWidget( availableTreeWidgetItem, 1 );
-        button = qobject_cast<KadasPluginManagerInstallButton *>( itemWidget );
-      }
-
+      KadasPluginManagerInstallButton *button = getInstallButton( installedPluginName );
       if ( button == nullptr )
         continue;
 
@@ -255,19 +279,26 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
     for ( const QJsonValueRef &resultRef : json.object()["results"].toArray() )
     {
       QJsonObject result = resultRef.toObject();
-      KadasPluginManager::PluginInfo p;
-      p.name = result["title"].toString();
+      KadasPluginManager::PluginInfo pluginInfo;
+      pluginInfo.name = result["title"].toString();
+      pluginInfo.mandatory = false;
       for ( const QJsonValueRef &tagRef : result["tags"].toArray() )
       {
         QString tag = tagRef.toString();
         if ( tag.startsWith( "version:" ) )
         {
-          p.version = tag.mid( 8 );
+          pluginInfo.version = tag.mid( 8 );
+        }
+
+        if ( tag == "mandatoryplugin" )
+        {
+          pluginInfo.mandatory = true;
         }
       }
-      p.description = result["description"].toString();
-      p.downloadLink = baseUrl + result["id"].toString() + "/data";
-      pluginMap.insert( p.name, p );
+      pluginInfo.description = result["description"].toString();
+      pluginInfo.downloadLink = baseUrl + result["id"].toString() + "/data";
+
+      pluginMap.insert( pluginInfo.name, pluginInfo );
     }
   }
   else if ( xml.setContent( response ) )
@@ -276,12 +307,14 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
     for ( int i = 0; i < pluginNodeList.size(); ++i )
     {
       QDomElement pluginElem = pluginNodeList.at( i ).toElement();
-      KadasPluginManager::PluginInfo p;
-      p.name = pluginElem.attribute( "name" );
-      p.version = pluginElem.attribute( "version" );
-      p.description = pluginElem.firstChildElement( "description" ).text();
-      p.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
-      pluginMap.insert( p.name, p );
+      KadasPluginManager::PluginInfo pluginInfo;
+      pluginInfo.name = pluginElem.attribute( "name" );
+      pluginInfo.version = pluginElem.attribute( "version" );
+      pluginInfo.description = pluginElem.firstChildElement( "description" ).text();
+      pluginInfo.downloadLink = pluginElem.firstChildElement( "download_url" ).text();
+      QDomElement mandatoryPluginElement = pluginElem.firstChildElement( "mandatoryplugin" );
+      pluginInfo.mandatory = !mandatoryPluginElement.isNull();
+      pluginMap.insert( pluginInfo.name, pluginInfo );
     }
   }
   return pluginMap;
@@ -327,7 +360,7 @@ void KadasPluginManager::on_mCloseButton_clicked()
 
 void KadasPluginManager::updateButtonClicked()
 {
-  QString pluginName = sender()->property( "PluginName" ).toString();
+  QString pluginName = sender()->property( PROPERTY_PLUGIN_NAME ).toString();
   if ( pluginName.isEmpty() )
   {
     return;
@@ -339,7 +372,7 @@ void KadasPluginManager::updateButtonClicked()
   QString pluginVersion = mAvailablePlugins.value( pluginName ).version;
 
   //get module name
-  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
   if ( installed.size() < 1 )
   {
     return;
@@ -347,7 +380,7 @@ void KadasPluginManager::updateButtonClicked()
   QString moduleName = installed.at( 0 )->data( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole ).toString();
   updatePlugin( pluginName, moduleName, downloadPath, pluginTooltip, pluginVersion, b );
 
-  QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QList<QTreeWidgetItem *> available = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, AVAILABLE_TREEWIDGET_COLUMN_NAME );
   if ( available.size() > 0 )
   {
     setItemNotUpdateable( available.at( 0 ) );
@@ -357,13 +390,13 @@ void KadasPluginManager::updateButtonClicked()
 void KadasPluginManager::installButtonClicked()
 {
   KadasPluginManagerInstallButton *b = qobject_cast<KadasPluginManagerInstallButton *>( QObject::sender() );
-  QString pluginName = sender()->property( "PluginName" ).toString();
+  QString pluginName = sender()->property( PROPERTY_PLUGIN_NAME ).toString();
   if ( pluginName.isEmpty() )
   {
     return;
   }
 
-  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QList<QTreeWidgetItem *> installed = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
   KadasPluginManagerInstallButton::Status prevStatus = b->status();
   bool success = false;
 
@@ -516,14 +549,14 @@ bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   }
 
   //remove entry from mInstalledTreeWidget
-  QList<QTreeWidgetItem *> installedItem = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QList<QTreeWidgetItem *> installedItem = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
   if ( installedItem.size() > 0 )
   {
     delete mInstalledTreeWidget->takeTopLevelItem( mInstalledTreeWidget->indexOfTopLevelItem( installedItem.at( 0 ) ) );
   }
 
   //set icon to download in mAvailableTreeWidget
-  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, 0 );
+  QList<QTreeWidgetItem *> availableItem = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, AVAILABLE_TREEWIDGET_COLUMN_NAME );
   if ( mAvailablePlugins.contains( pluginName ) )
   {
     setItemInstallable( availableItem.at( 0 ), mAvailablePlugins[pluginName].version );
@@ -553,9 +586,9 @@ void KadasPluginManager::changeItemInstallationState( QTreeWidgetItem *item, Kad
   if ( item )
   {
     KadasPluginManagerInstallButton *b = new KadasPluginManagerInstallButton( buttonStatus );
-    b->setProperty( "PluginName", item->text( 0 ) );
+    b->setProperty( PROPERTY_PLUGIN_NAME, item->text( INSTALLED_TREEWIDGET_COLUMN_NAME ) );
     QObject::connect( b, &KadasPluginManagerInstallButton::clicked, this, &KadasPluginManager::installButtonClicked );
-    mAvailableTreeWidget->setItemWidget( item, 1, b );
+    mAvailableTreeWidget->setItemWidget( item, INSTALLED_TREEWIDGET_COLUMN_VERSION, b );
   }
 }
 
@@ -563,7 +596,7 @@ void KadasPluginManager::setItemActivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setCheckState( 0, Qt::Unchecked );
+    item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Unchecked );
   }
 }
 
@@ -571,7 +604,7 @@ void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem *item )
 {
   if ( item )
   {
-    item->setCheckState( 0, Qt::Checked );
+    item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Checked );
   }
 }
 
@@ -580,7 +613,7 @@ void KadasPluginManager::setItemUpdateable( QTreeWidgetItem *item )
   if ( item )
   {
     KadasPluginManagerInstallButton *b = new KadasPluginManagerInstallButton( KadasPluginManagerInstallButton::Update );
-    b->setProperty( "PluginName", item->text( 0 ) );
+    b->setProperty( PROPERTY_PLUGIN_NAME, item->text( AVAILABLE_TREEWIDGET_COLUMN_NAME ) );
     QObject::connect( b, &KadasPluginManagerInstallButton::clicked, this, &KadasPluginManager::updateButtonClicked );
     mAvailableTreeWidget->setItemWidget( item, 2, b );
   }
@@ -605,4 +638,18 @@ bool KadasPluginManager::updateAvailable( const QString &installedVersion, const
   }
 
   return ( repo > installed );
+}
+
+KadasPluginManagerInstallButton *KadasPluginManager::getInstallButton( const QString &pluginName )
+{
+  KadasPluginManagerInstallButton *button = nullptr;
+  QList<QTreeWidgetItem *> availableTreeWidgetItems = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, AVAILABLE_TREEWIDGET_COLUMN_NAME );
+  if ( availableTreeWidgetItems.size() > 0 )
+  {
+    QTreeWidgetItem *availableTreeWidgetItem = availableTreeWidgetItems.at( 0 );
+    QWidget *itemWidget = mAvailableTreeWidget->itemWidget( availableTreeWidgetItem, AVAILABLE_TREEWIDGET_COLUMN_BUTTON );
+    button = qobject_cast<KadasPluginManagerInstallButton *>( itemWidget );
+  }
+
+  return button;
 }

@@ -1449,6 +1449,7 @@ void KadasApplication::initAfterExec()
 {
   // Update plugins
   mainWindow()->pluginManager()->loadPlugins();
+  mainWindow()->pluginManager()->installMandatoryPlugins();
   mainWindow()->pluginManager()->updateAllPlugins();
 }
 
