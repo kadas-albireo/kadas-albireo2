@@ -188,8 +188,8 @@ void KadasPluginManager::installMandatoryPlugins()
     {
       QString pluginName = pluginIt.key();
 
-      QList<QTreeWidgetItem *> availableTreeWidgetItems = mAvailableTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
-      if ( availableTreeWidgetItems.size() > 0 )
+      QList<QTreeWidgetItem *> installedTreeWidgetItems = mInstalledTreeWidget->findItems( pluginName, Qt::MatchExactly, INSTALLED_TREEWIDGET_COLUMN_NAME );
+      if ( installedTreeWidgetItems.size() > 0 )
       {
         // Plugin already installed
         continue;
@@ -297,9 +297,6 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
       }
       pluginInfo.description = result["description"].toString();
       pluginInfo.downloadLink = baseUrl + result["id"].toString() + "/data";
-
-      qDebug() << "Got plugin info name" << pluginInfo.name << "is mandatory:" << pluginInfo.mandatory;
-      qDebug() << "Json payload:" << result.toVariantMap();
 
       pluginMap.insert( pluginInfo.name, pluginInfo );
     }
