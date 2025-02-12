@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/KadasHelp" >
-        <file>icon.png</file>
-        <file>splash.png</file>
-    </qresource>
-</RCC>
