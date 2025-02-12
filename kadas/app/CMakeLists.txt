@@ -17,6 +17,7 @@ set(kadas_SRC
     kadasmapwidgetmanager.cpp
     kadasmessagelogviewer.cpp
     kadasnewspopup.cpp
+    kadasfeedback.cpp
     kadasplugininterfaceimpl.cpp
     kadaspluginlayerproperties.cpp
     kadaspluginmanager.cpp

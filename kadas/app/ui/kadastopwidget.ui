@@ -285,10 +285,10 @@
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <property name="lineWidth">
         <number>0</number>
@@ -621,10 +621,10 @@
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -860,10 +860,10 @@
           <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1139,10 +1139,10 @@ Sight</string>
           <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1201,7 +1201,7 @@ Sight</string>
              </size>
             </property>
             <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
             </property>
            </widget>
           </item>
@@ -1388,10 +1388,10 @@ Sight</string>
              </size>
             </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1621,10 +1621,10 @@ Sight</string>
              </size>
             </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1692,33 +1692,33 @@ Sight</string>
              <bool>true</bool>
             </property>
            </widget>
-         </item>
-         <item>
+          </item>
+          <item>
            <widget class="KadasRibbonButton" name="mSaveMilxButton">
-             <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-               </sizepolicy>
-             </property>
-             <property name="minimumSize">
-               <size>
-                 <width>0</width>
-                 <height>80</height>
-               </size>
-             </property>
-             <property name="maximumSize">
-               <size>
-                 <width>80</width>
-                 <height>80</height>
-               </size>
-             </property>
-             <property name="text">
-               <string>Export MILXLY</string>
-             </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Export MILXLY</string>
+            </property>
            </widget>
           </item>
-          <item>mMilxKmlExportButton
+          <item>
            <widget class="KadasRibbonButton" name="mMilxKmlExportButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1811,10 +1811,10 @@ Sight</string>
                <bool>false</bool>
               </property>
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="tickPosition">
-               <enum>QSlider::TicksBelow</enum>
+               <enum>QSlider::TickPosition::TicksBelow</enum>
               </property>
              </widget>
             </item>
@@ -1836,10 +1836,10 @@ Sight</string>
                <bool>false</bool>
               </property>
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="tickPosition">
-               <enum>QSlider::TicksBelow</enum>
+               <enum>QSlider::TickPosition::TicksBelow</enum>
               </property>
              </widget>
             </item>
@@ -1885,10 +1885,10 @@ Sight</string>
           <item>
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2010,10 +2010,10 @@ Sight</string>
           <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2121,12 +2121,37 @@ Sight</string>
            </widget>
           </item>
           <item>
+           <widget class="KadasRibbonButton" name="mFeedbackButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Feedback</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2503,19 +2528,19 @@ Sight</string>
    <property name="toolTip">
     <string>Export MILXLY</string>
    </property>
- </action>
- <action name="mActionMilxKmlExport">
+  </action>
+  <action name="mActionMilxKmlExport">
    <property name="icon">
-     <iconset resource="../../resources/resources.qrc">
-       <normaloff>:/kadas/icons/kml_export</normaloff>:/kadas/icons/kml_export</iconset>
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/kml_export</normaloff>:/kadas/icons/kml_export</iconset>
    </property>
    <property name="text">
-     <string>Export KML</string>
+    <string>Export KML</string>
    </property>
    <property name="toolTip">
-     <string>Export KML</string>
+    <string>Export KML</string>
    </property>
- </action>
+  </action>
   <action name="mActionLoadMilx">
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
@@ -2655,6 +2680,18 @@ Sight</string>
    </property>
    <property name="toolTip">
     <string>Newsletter</string>
+   </property>
+  </action>
+  <action name="mActionFeedback">
+   <property name="icon">
+    <iconset resource="../../resources/resources.qrc">
+     <normaloff>:/kadas/icons/feedback</normaloff>:/kadas/icons/feedback</iconset>
+   </property>
+   <property name="text">
+    <string>Feedback</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a webpage to give feedback</string>
    </property>
   </action>
   <action name="mActionMinMax">

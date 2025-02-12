@@ -160,6 +160,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void updateBgLayerZoomResolutions() const;
     void showHelp() const;
     void showNewsletter();
+    void showFeedback();
     void toggleIgnoreDpiScale();
 
   private:
