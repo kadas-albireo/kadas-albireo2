@@ -7,24 +7,12 @@ set(NUGET_TOKEN
 string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_NAME}" "Windows" _HOST_IS_WINDOWS)
 set(VCPKG_MANIFEST_DIR "${CMAKE_SOURCE_DIR}/vcpkg")
 
-if(NOT VCPKG_TAG STREQUAL VCPKG_INSTALLED_VERSION)
-  message(STATUS "Updating vcpkg")
-  include(FetchContent)
-  FetchContent_Declare(
-    vcpkg
-    GIT_REPOSITORY https://github.com/microsoft/vcpkg.git
-    GIT_TAG ${VCPKG_TAG}
-  )
-  FetchContent_MakeAvailable(vcpkg)
-else()
-  message(STATUS "Using cached vcpkg")
-endif()
 set(VCPKG_ROOT
-    "${FETCHCONTENT_BASE_DIR}/vcpkg-src"
+    "$ENV{VCPKG_ROOT}"
     CACHE STRING ""
 )
 set(CMAKE_TOOLCHAIN_FILE
-    "${FETCHCONTENT_BASE_DIR}/vcpkg-src/scripts/buildsystems/vcpkg.cmake"
+    "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     CACHE FILEPATH ""
 )
 
