@@ -88,6 +88,7 @@
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
 #include "kadasnewspopup.h"
+#include "kadasfeedback.h"
 #include "kadastemporalcontroller.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
@@ -767,6 +768,16 @@ void KadasMainWindow::configureButtons()
   else
   {
     mNewsletterButton->hide();
+  }
+
+  if ( KadasFeedback::isConfigured() )
+  {
+    setActionToButton( mActionFeedback, mFeedbackButton );
+    connect( mActionFeedback, &QAction::triggered, this, &KadasMainWindow::showFeedback );
+  }
+  else
+  {
+    mFeedbackButton->hide();
   }
 }
 
@@ -1577,6 +1588,11 @@ void KadasMainWindow::showHelp() const
 void KadasMainWindow::showNewsletter()
 {
   KadasNewsPopup::showIfNewsAvailable( true );
+}
+
+void KadasMainWindow::showFeedback()
+{
+  KadasFeedback::show();
 }
 
 void KadasMainWindow::toggleIgnoreDpiScale()
