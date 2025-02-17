@@ -32,7 +32,7 @@ jobs:
           git config --global user.name "Geo Ninja"
           git config --global user.email "${{ secrets.GH_GEONINJA_EMAIL }}"
           git add i18n 
-          for PLUGIN in about gpkg print ephem
+          for PLUGIN in about gpkg print ephem routing
           do
             git add share/python/plugins/kadas_${PLUGIN}/i18n
           done
