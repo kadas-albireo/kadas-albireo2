@@ -25,6 +25,7 @@
 #include <gdal.h>
 
 #include <qgis/qgsgui.h>
+#include <qgis/qgsblockingnetworkrequest.h>
 #include <qgis/qgsfloatingwidget.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemodel.h>
@@ -1446,19 +1447,19 @@ void KadasMainWindow::addRemotePicture()
     statusLabel->setText( tr( "Downloading..." ) );
     dialog.setEnabled( false );
 
-    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( url ) ) );
-    QEventLoop evloop;
-    connect( reply, &QNetworkReply::finished, &evloop, &QEventLoop::quit );
-    evloop.exec();
+    QNetworkRequest request = QNetworkRequest( QUrl( url ) );
 
-    if ( reply->error() != QNetworkReply::NoError )
+    QgsBlockingNetworkRequest newReq;
+    const QgsBlockingNetworkRequest::ErrorCode errorCode = newReq.get( request, false );
+
+    if ( errorCode != QgsBlockingNetworkRequest::NoError )
     {
-      statusLabel->setText( tr( "Unable to download image" ) );
+      statusLabel->setText( tr( "Unable to download image (%1)." ).arg( newReq.errorMessage() ) );
       dialog.setEnabled( true );
       continue;
     }
 
-    QTemporaryFile tempfile( QDir::temp().absoluteFilePath( QFileInfo( url ).fileName() ) );
+    QTemporaryFile tempfile;
     tempfile.setAutoRemove( true );
     if ( !tempfile.open() )
     {
@@ -1467,7 +1468,7 @@ void KadasMainWindow::addRemotePicture()
       continue;
     }
 
-    tempfile.write( reply->readAll() );
+    tempfile.write( newReq.reply().content() );
     tempfile.flush();
 
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( tempfile.fileName() );
