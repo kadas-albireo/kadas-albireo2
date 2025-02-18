@@ -40,27 +40,6 @@ else()
   message(STATUS "Building with system libraries --")
 endif()
 
-project(kadas LANGUAGES CXX)
-
-set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
-
-include(GNUInstallDirs)
-include(GenerateExportHeader)
-
-set(CMAKE_CXX_STANDARD 17)
-
-set(BUILD_SHARED_LIBS
-    ON
-    CACHE BOOL "Build using shared libraries"
-)
-set(KADAS_NAME
-    "Kadas"
-    CACHE STRING "Kadas application name"
-)
-set(KADAS_FULL_NAME
-    "Kadas Albireo"
-    CACHE STRING "Kadas full application name"
-)
 set(KADAS_VERSION_MAJOR
     "2"
     CACHE STRING "Kadas major version"
@@ -73,10 +52,33 @@ set(KADAS_VERSION_PATCH
     "0"
     CACHE STRING "Kadas patch version"
 )
-set(KADAS_VERSION_PRE
-    "alpha4"
-    CACHE STRING "Kadas pre version"
+set(KADAS_NAME
+    "Kadas"
+    CACHE STRING "Kadas application name"
 )
+set(KADAS_FULL_NAME
+    "Kadas Albireo"
+    CACHE STRING "Kadas full application name"
+)
+
+project(
+  kadas
+  LANGUAGES CXX
+  VERSION "${KADAS_VERSION_MAJOR}.${KADAS_VERSION_MINOR}.${KADAS_VERSION_PATCH}"
+)
+
+set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(BUILD_SHARED_LIBS
+    ON
+    CACHE BOOL "Build using shared libraries"
+)
+
 execute_process(
   COMMAND git rev-parse HEAD
   OUTPUT_VARIABLE KADAS_VERSION_DEV
