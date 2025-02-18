@@ -106,17 +106,6 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   {
     // Scale such that largest dimension is max 64px
     QSize size = reader.size();
-    if ( size.width() > size.height() )
-    {
-      size.setHeight( ( 64. * size.height() ) / size.width() );
-      size.setWidth( 64 );
-    }
-    else
-    {
-      size.setWidth( ( 64. * size.width() ) / size.height() );
-      size.setHeight( 64 );
-    }
-
     state()->mSize = size;
   }
 
@@ -144,7 +133,7 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
 
 void KadasPictureItem::setFilePath( const QString &filePath )
 {
-  setup( filePath, constState()->mPos, true, state()->mOffsetX, state()->mOffsetY );
+  setup( filePath, constState()->mPos, true, state()->mOffsetX, state()->mOffsetY, state()->mSize.width(), state()->mSize.height() );
   update();
   emit propertyChanged();
 }
