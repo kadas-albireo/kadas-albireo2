@@ -124,6 +124,7 @@
           "platform": "windows"
         },
         "py-six",
+        "py-waitress",
         {
           "name": "qgis",
           "features": [
