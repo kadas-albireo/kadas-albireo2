@@ -162,8 +162,8 @@ if(WIN32)
   set(AXCONTAINER_LIBRARY Qt5::AxContainer)
 
   set(SHOW_CONSOLE
-    OFF
-    CACHE BOOL "Show console (Windows)"
+      OFF
+      CACHE BOOL "Show console (Windows)"
   )
   if(NOT SHOW_CONSOLE)
     set(WIN32_SHOW_CONSOLE "WIN32")
