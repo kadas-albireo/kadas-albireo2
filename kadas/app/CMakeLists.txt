@@ -160,10 +160,19 @@ set_property(SOURCE ${KADAS_RCC} PROPERTY SKIP_AUTOMOC ON)
 if(WIN32)
   find_package(Qt5AxContainer REQUIRED)
   set(AXCONTAINER_LIBRARY Qt5::AxContainer)
+
+  set(SHOW_CONSOLE
+      OFF
+      CACHE BOOL "Show console (Windows)"
+  )
+  if(NOT SHOW_CONSOLE)
+    set(WIN32_SHOW_CONSOLE "WIN32")
+  endif()
 endif(WIN32)
 
 add_executable(
   kadas
+  ${WIN32_SHOW_CONSOLE}
   ${kadas_SRC}
   ${kadas_HDR}
   ${kadas_UI}
