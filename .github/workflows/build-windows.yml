@@ -38,6 +38,12 @@ jobs:
         run: |
           echo "CREATE_MSI_CMAKE_VAR=-D CREATE_MSI=ON" >> $GITHUB_ENV
 
+      - name: 🔧 Debug options
+        if: github.event_name != 'workflow_dispatch' && github.event_name != 'release'
+        shell: bash
+        run: |
+          echo "DEBUG_OPTIONS=-D SHOW_CONSOLE=ON" >> $GITHUB_ENV
+
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
@@ -69,7 +75,8 @@ jobs:
                 -D KADAS_VERSION_MINOR=${MINOR} \
                 -D KADAS_VERSION_PATCH=${PATCH} \
                 -D KADAS_VERSION_PRE=${PRE} \
-                ${CREATE_MSI_CMAKE_VAR}
+                ${CREATE_MSI_CMAKE_VAR}\
+                ${DEBUG_OPTIONS}
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v4
