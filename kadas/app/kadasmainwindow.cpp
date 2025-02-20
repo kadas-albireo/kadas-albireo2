@@ -160,6 +160,7 @@ void KadasMainWindow::init()
   lw->setMapCanvas( mMapCanvas );
   lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
   lw->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomLeft );
+  lw->findChild<QgsFilterLineEdit *>()->setFixedHeight( 40 );
   mLocatorLayout->insertWidget( 0, lw );
 
   mLayersWidget->setVisible( false );
