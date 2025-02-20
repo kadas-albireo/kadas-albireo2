@@ -29,14 +29,13 @@
 class QMenu;
 
 
-class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer SIP_ABSTRACT
+class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
 {
     Q_OBJECT
 
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() )
-      : QgsPluginLayer( layerType, layerName )
-    {}
+      : QgsPluginLayer( layerType, layerName ) {}
 
 
     virtual QString layerTypeKey() const = 0;
