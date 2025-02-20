@@ -1,0 +1,27 @@
+From f00038e713c3d99d84866f2b7c79fac0d516cd97 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 20 Feb 2025 16:29:22 +0100
+Subject: [PATCH] improve locator titles and groups visibility
+
+---
+ src/core/locator/qgslocatormodel.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/locator/qgslocatormodel.cpp b/src/core/locator/qgslocatormodel.cpp
+index a77a8fea01b3..d110b76d2260 100644
+--- a/src/core/locator/qgslocatormodel.cpp
++++ b/src/core/locator/qgslocatormodel.cpp
+@@ -115,10 +115,11 @@ QVariant QgsLocatorModel::data( const QModelIndex &index, int role ) const
+     }
+ 
+     case Qt::FontRole:
+-      if ( index.column() == Name && !entry.groupTitle.isEmpty() )
++      if ( index.column() == Name )
+       {
+         QFont font;
+-        font.setItalic( true );
++        font.setItalic( entry.type == EntryType::Group );
++        font.setBold( entry.type != EntryType::Result );
+         return font;
+       }
+       else
