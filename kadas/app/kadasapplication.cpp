@@ -163,7 +163,18 @@ bool KadasApplication::isRunningFromBuildDir()
 
 KadasApplication::KadasApplication( int &argc, char **argv )
   : QgsApplication( argc, argv, true )
-{}
+{
+  const QStringList args = QCoreApplication::arguments();
+
+  if ( args.contains( QStringLiteral( "--clearsettings" ) ) )
+  {
+    QDir settingsDir( QgsApplication::qgisSettingsDirPath() );
+    if ( settingsDir.exists() )
+    {
+      settingsDir.removeRecursively();
+    }
+  }
+}
 
 KadasApplication::~KadasApplication()
 {
