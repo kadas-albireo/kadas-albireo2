@@ -35,7 +35,10 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer SIP_ABSTRACT
 
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() )
-      : QgsPluginLayer( layerType, layerName ) {}
+      : QgsPluginLayer( layerType, layerName )
+    {}
+
+
     virtual QString layerTypeKey() const = 0;
 
     void setTransformContext( const QgsCoordinateTransformContext &ctx ) override { mTransformContext = ctx; }
