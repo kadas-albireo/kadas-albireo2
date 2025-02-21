@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="ProgramMenuFolder">
+            <Component Id="ShortcutComponent" Guid="@CPACK_WIX_UPGRADE_GUID@">
+                <Shortcut
+                    Id="KadasFactoryReset"
+                    Name="KADAS Albireo (Factory Reset)"
+                    Description="Starts KADAS Albireo and clears the settings"
+                    Target="[INSTALLDIR]/bin/kadas.exe"
+                    Arguments="--clearsettings"
+                    WorkingDirectory="INSTALLDIR" />
+                <RemoveFolder Id="RemoveShortcut" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\KadasAlbireo" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+</Wix>
