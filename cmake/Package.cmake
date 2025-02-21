@@ -24,7 +24,10 @@ if(WIN32)
 
     set(CPACK_WIX_UPGRADE_GUID 3d1b1ced-39c3-4086-8ab2-4814e0be74df)
     set(CPACK_WIX_PRODUCT_ICON "${CMAKE_SOURCE_DIR}/kadas/resources/logo.ico")
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/shortcuts.wxs.in" "${CMAKE_BINARY_DIR}/shortcuts.wxs" @ONLY)
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/cmake/shortcuts.wxs.in"
+      "${CMAKE_BINARY_DIR}/shortcuts.wxs" @ONLY
+    )
     set(CPACK_WIX_EXTRA_SOURCES "${CMAKE_BINARY_DIR}/shortcuts.wxs")
     list(APPEND CPACK_GENERATOR "WIX")
   endif()
