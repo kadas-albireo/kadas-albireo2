@@ -21,7 +21,8 @@
 
 #include <QRegularExpression>
 
-#include "qgis/qgslocatorfilter.h"
+#include <qgis/qgslocatorfilter.h>
+#include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
 
