@@ -22,28 +22,49 @@
 #include <QUrlQuery>
 
 #include <qgis/qgsannotationlayer.h>
-#include <qgis/qgscoordinatetransform.h>
-#include <qgis/qgslogger.h>
-#include <qgis/qgsmapcanvas.h>
-#include <qgis/qgsblockingnetworkrequest.h>
-#include <qgis/qgssettings.h>
-#include <qgis/qgsjsonutils.h>
-#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpolygonitem.h>
-#include <qgis/qgsfillsymbol.h>
-#include <qgis/qgsfillsymbollayer.h>
-#include <qgis/qgsmarkersymbollayer.h>
-#include <qgis/qgsmarkersymbol.h>
-#include <qgis/qgsmultisurface.h>
+#include <qgis/qgsblockingnetworkrequest.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgsjsonutils.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgslogger.h>
+#include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsmultisurface.h>
+#include <qgis/qgssettings.h>
 
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 
 
 const int KadasLocationSearchFilter::sResultCountLimit = 50;
 
+
+QgsFillSymbol *KadasLocationSearchFilter::createPolygonSymbol()
+{
+  QgsFillSymbolLayer *outline = new QgsSimpleFillSymbolLayer(
+    QColor( 0, 0, 200, 200 ),
+    Qt::BrushStyle::NoBrush,
+    QColor( 0, 0, 200, 200 ),
+    DEFAULT_SIMPLEFILL_BORDERSTYLE,
+    .5 // border width
+  );
+
+  QgsLinePatternFillSymbolLayer *lineFill = new QgsLinePatternFillSymbolLayer();
+  QgsSimpleLineSymbolLayer *simpleLine = new QgsSimpleLineSymbolLayer( QColor( 0, 0, 200, 200 ), 0.5 );
+  lineFill->setSubSymbol( new QgsLineSymbol( { simpleLine } ) );
+  lineFill->setDistance( 1.5 );
+  lineFill->setLineAngle( 45 );
+
+  return new QgsFillSymbol( { outline, lineFill } );
+}
 
 KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()
@@ -223,12 +244,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           }
           poly->transform( annotationLayerTransform );
           item = new QgsAnnotationPolygonItem( poly );
-          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
-            QColor( 0, 0, 200, 100 ),
-            Qt::BrushStyle::FDiagPattern,
-            QColor( 0, 0, 200, 200 )
-          );
-          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
+          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
           break;
         }
         case Qgis::GeometryType::Unknown:

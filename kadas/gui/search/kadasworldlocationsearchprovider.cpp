@@ -22,26 +22,28 @@
 #include <QUrlQuery>
 
 #include <qgis/qgsannotationlayer.h>
-#include <qgis/qgscoordinatetransform.h>
-#include <qgis/qgslogger.h>
-#include <qgis/qgsnetworkaccessmanager.h>
-#include <qgis/qgssettings.h>
-#include <qgis/qgsfeedback.h>
-#include <qgis/qgsmapcanvas.h>
-#include <qgis/qgsmultisurface.h>
-#include <qgis/qgsjsonutils.h>
-#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpolygonitem.h>
-#include <qgis/qgsfillsymbol.h>
-#include <qgis/qgsfillsymbollayer.h>
-#include <qgis/qgsmarkersymbollayer.h>
-#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfeedback.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgsjsonutils.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgslogger.h>
+#include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsmultisurface.h>
+#include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgssettings.h>
 
 #include "kadas/gui/search/kadasworldlocationsearchprovider.h"
-
+#include "kadas/gui/search/kadaslocationsearchprovider.h"
 
 const int KadasWorldLocationSearchProvider::sResultCountLimit = 50;
 
@@ -204,12 +206,9 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
             poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
           }
           item = new QgsAnnotationPolygonItem( poly );
-          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
-            QColor( 0, 0, 200, 100 ),
-            Qt::BrushStyle::FDiagPattern,
-            QColor( 0, 0, 200, 200 )
-          );
-          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
+
+
+          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( KadasLocationSearchFilter::createPolygonSymbol() );
           break;
         }
         case Qgis::GeometryType::Unknown:
