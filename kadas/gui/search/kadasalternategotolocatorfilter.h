@@ -26,7 +26,7 @@
 class QgsMapCanvas;
 
 
-class KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
+class KADAS_GUI_EXPORT KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
 {
     Q_OBJECT
 
