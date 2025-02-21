@@ -1,5 +1,5 @@
 /***************************************************************************
-                        KadasAlternateGotoLocatorFilters.h
+                        kadasalternategotofilter.h
                         ----------------------------
    begin                : February 2025
    copyright            : (C) 2025 by Denis Rouzaud

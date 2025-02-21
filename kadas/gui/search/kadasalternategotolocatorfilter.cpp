@@ -1,5 +1,5 @@
 /***************************************************************************
-                        KadasAlternateGotoLocatorFilters.cpp
+                        kadasalternategotofilter.cpp
                         ----------------------------
    begin                : February 2025
    copyright            : (C) 2025 by Denis Rouzaud
@@ -32,7 +32,7 @@ KadasAlternateGotoLocatorFilter::KadasAlternateGotoLocatorFilter( QgsMapCanvas *
   : QgsLocatorFilter( parent )
   , mCanvas( mapCanvas )
 {
-  QString degChar = QString( "%1" ).arg( QChar( 0x00B0 ) );
+  QString degChar = QStringLiteral( "%1" ).arg( QChar( 0x00B0 ) );
   QString minChars = QString( "'%1%2%3" ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) );
   QString secChars = QString( "\"%1" ).arg( QChar( 0x2033 ) );
 
