@@ -102,8 +102,6 @@
 #include "mapgrid/kadasmaptoolmapgrid.h"
 #include "milx/kadasmilxintegration.h"
 
-#include <external/qgis/app/qgsgotolocatorfilter.h>
-
 
 KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
 {
@@ -391,7 +389,6 @@ void KadasMainWindow::init()
     }
   }
 
-  lw->locator()->registerFilter( new QgsGotoLocatorFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasAlternateGotoLocatorFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocalDataSearchFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocationSearchFilter( mMapCanvas ) );

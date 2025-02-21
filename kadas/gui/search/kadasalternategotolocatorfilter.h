@@ -1,10 +1,10 @@
 /***************************************************************************
-                         qgsgotolocatorfilters.h
-                         --------------------------
-    begin                : May 2017
-    copyright            : (C) 2017 by Nyall Dawson
-    email                : nyall dot dawson at gmail dot com
- ***************************************************************************/
+                        KadasAlternateGotoLocatorFilters.h
+                        ----------------------------
+   begin                : February 2025
+   copyright            : (C) 2025 by Denis Rouzaud
+   email                : denis@opengis.ch
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -14,6 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 
 #ifndef KADASALTERNATEGOTOLOCATORFILTER_H
 #define KADASALTERNATEGOTOLOCATORFILTER_H
@@ -40,6 +41,7 @@ class KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
 
     void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
     void triggerResult( const QgsLocatorResult &result ) override;
+    virtual void clearPreviousResults() override;
 
   private:
     double parseNumber( const QString &string ) const;
@@ -57,6 +59,8 @@ class KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
     QRegularExpression mPatUTMalt;
     QRegularExpression mPatUTM2;
     QRegularExpression mPatMGRS;
+
+    QString mPinItemId;
 };
 
 #endif // KADASALTERNATEGOTOLOCATORFILTER_H
