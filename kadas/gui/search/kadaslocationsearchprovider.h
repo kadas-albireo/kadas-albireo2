@@ -27,12 +27,15 @@
 #include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
+class QgsFillSymbol;
 
 
 class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
 {
     Q_OBJECT
   public:
+    static QgsFillSymbol *createPolygonSymbol();
+
     KadasLocationSearchFilter( QgsMapCanvas *mapCanvas );
     ~KadasLocationSearchFilter();
 
