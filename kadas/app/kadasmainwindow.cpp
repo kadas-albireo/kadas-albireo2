@@ -59,7 +59,6 @@
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
-#include "kadas/gui/mapitems/kadaspictureitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
@@ -71,6 +70,7 @@
 #include "kadas/gui/maptools/kadasmaptoolviewshed.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
 
+#include "kadas/gui/search/kadasalternategotolocatorfilter.h"
 #include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 #include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
@@ -101,8 +101,6 @@
 #include "kml/kadaskmlintegration.h"
 #include "mapgrid/kadasmaptoolmapgrid.h"
 #include "milx/kadasmilxintegration.h"
-
-#include <external/qgis/app/qgsgotolocatorfilter.h>
 
 
 KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
@@ -391,7 +389,7 @@ void KadasMainWindow::init()
     }
   }
 
-  lw->locator()->registerFilter( new QgsGotoLocatorFilter( mMapCanvas ) );
+  lw->locator()->registerFilter( new KadasAlternateGotoLocatorFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocalDataSearchFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocationSearchFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasMapServerFindSearchProvider( mMapCanvas ) );

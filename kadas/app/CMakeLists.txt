@@ -1,9 +1,12 @@
 find_package(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
+
 set(kadas_SRC
+    main.cpp
     kadasapplayerhandling.cpp
     kadasapplication.cpp
     kadasbookmarksmenu.cpp
     kadascanvascontextmenu.cpp
+    kadasfeedback.cpp
     kadasgpsintegration.cpp
     kadasgpxintegration.cpp
     kadashandlebadlayers.cpp
@@ -17,16 +20,26 @@ set(kadas_SRC
     kadasmapwidgetmanager.cpp
     kadasmessagelogviewer.cpp
     kadasnewspopup.cpp
-    kadasfeedback.cpp
     kadasplugininterfaceimpl.cpp
     kadaspluginlayerproperties.cpp
     kadaspluginmanager.cpp
     kadaspythonintegration.cpp
     kadasredliningintegration.cpp
     kadastemporalcontroller.cpp
-    main.cpp
+    3d/kadas3dintegration.cpp
+    3d/kadas3dlayertreemodel.cpp
+    3d/kadas3dmapcanvaswidget.cpp
+    3d/kadas3dmapconfigwidget.cpp
+    3d/kadas3dnavigationwidget.cpp
+    3d/kadasambientocclusionsettingswidget.cpp
+    3d/kadaslightswidget.cpp
+    3d/kadasmesh3dsymbolwidget.cpp
+    3d/kadasphongmaterialwidget.cpp
+    3d/kadasshadowrenderingsettingswidget.cpp
+    3d/kadasskyboxrenderingsettingswidget.cpp
     bullseye/kadasbullseyelayer.cpp
     bullseye/kadasmaptoolbullseye.cpp
+    external/qgis/app/qgslayertreeviewindicatorprovider.cpp
     guidegrid/kadasguidegridlayer.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
     iamauth/kadasiamauth.cpp
@@ -42,21 +55,66 @@ set(kadas_SRC
     mapgrid/kadasmaptoolmapgrid.cpp
     mapswipe/kadasmapswipecanvasitem.cpp
     mapswipe/kadasmapswipetool.cpp
-    milx/kadasmilxintegration.cpp
     milx/kadasmilxexportdialog.cpp
-    3d/kadas3dintegration.cpp
-    3d/kadas3dlayertreemodel.cpp
-    3d/kadas3dmapcanvaswidget.cpp
-    3d/kadas3dmapconfigwidget.cpp
-    3d/kadas3dnavigationwidget.cpp
-    3d/kadasambientocclusionsettingswidget.cpp
-    3d/kadaslightswidget.cpp
-    3d/kadasmesh3dsymbolwidget.cpp
-    3d/kadasphongmaterialwidget.cpp
-    3d/kadasshadowrenderingsettingswidget.cpp
-    3d/kadasskyboxrenderingsettingswidget.cpp
-    external/qgis/app/qgslayertreeviewindicatorprovider.cpp
-    external/qgis/app/qgsgotolocatorfilter.cpp
+    milx/kadasmilxintegration.cpp
+)
+
+set(kadas_HDR
+    kadasapplayerhandling.h
+    kadasapplication.h
+    kadasbookmarksmenu.h
+    kadascanvascontextmenu.h
+    kadasfeedback.h
+    kadasgpsintegration.h
+    kadasgpxintegration.h
+    kadashandlebadlayers.h
+    kadashelpviewer.h
+    kadaslayerrefreshmanager.h
+    kadaslayoutappmenuprovider.h
+    kadaslayoutdesignerdialog.h
+    kadaslayoutdesignermanager.h
+    kadasmainwindow.h
+    kadasmapidentifydialog.h
+    kadasmapwidgetmanager.h
+    kadasmessagelogviewer.h
+    kadasnewspopup.h
+    kadasplugininterfaceimpl.h
+    kadaspluginlayerproperties.h
+    kadaspluginmanager.h
+    kadaspythonintegration.h
+    kadasredliningintegration.h
+    kadastemporalcontroller.h
+    3d/kadas3dintegration.h
+    3d/kadas3dlayertreemodel.h
+    3d/kadas3dmapcanvaswidget.h
+    3d/kadas3dmapconfigwidget.h
+    3d/kadas3dnavigationwidget.h
+    3d/kadasambientocclusionsettingswidget.h
+    3d/kadaslightswidget.h
+    3d/kadasmesh3dsymbolwidget.h
+    3d/kadasphongmaterialwidget.h
+    3d/kadasshadowrenderingsettingswidget.h
+    3d/kadasskyboxrenderingsettingswidget.h
+    bullseye/kadasbullseyelayer.h
+    bullseye/kadasmaptoolbullseye.h
+    external/qgis/app/qgslayertreeviewindicatorprovider.h
+    guidegrid/kadasguidegridlayer.h
+    guidegrid/kadasmaptoolguidegrid.h
+    iamauth/kadasiamauth.h
+    kml/kadaskmlexport.h
+    kml/kadaskmlexportdialog.h
+    kml/kadaskmlimport.h
+    kml/kadaskmlintegration.h
+    kml/kadaskmllabeling.h
+    layertree/kadaslayertreeviewmenuprovider.h
+    layertree/kadaslayertreeviewtemporalindicator.h
+    mapgrid/kadasmapgridlayer.h
+    mapgrid/kadasmapgridlayerrenderer.h
+    mapgrid/kadasmaptoolmapgrid.h
+    mapswipe/kadasmapswipecanvasitem.h
+    mapswipe/kadasmapswipetool.h
+    milx/kadasmilxexportdialog.h
+    milx/kadasmilxintegration.h
 )
 
 set(WITH_CRASHREPORT
@@ -67,31 +125,6 @@ set(WITH_CRASHREPORT
 if(WITH_CRASHREPORT)
   set(kadas_SRC ${kadas_SRC} kadascrashrpt.cpp)
 endif()
-
-file(
-  GLOB
-  kadas_HDR
-  *.h
-  milx/*.h
-  kml/*.h
-  bullseye/*.h
-  guidegrid/*.h
-  iamauth/*.h
-  layertree/*.h
-  mapgrid/*.h
-  mapswipe/*.h
-  3d/kadas3dintegration.h
-  3d/kadas3dmapcanvaswidget.h
-  3d/kadas3dmapconfigwidget.h
-  3d/kadas3dnavigationwidget.h
-  3d/kadasambientocclusionsettingswidget.h
-  3d/kadaslightswidget.h
-  3d/kadasmesh3dsymbolwidget.h
-  3d/kadasphongmaterialwidget.h
-  3d/kadasshadowrenderingsettingswidget.h
-  3d/kadasskyboxrenderingsettingswidget.h
-  external/qgis/app/*.h
-)
 
 list(SORT kadas_HDR)
 

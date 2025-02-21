@@ -1,8 +1,25 @@
-file(GLOB kadas_core_SRC *.cpp)
-list(SORT kadas_core_SRC)
+set(kadas_core_SRC
+    kadas.cpp
+    kadasalgorithms.cpp
+    kadascoordinateformat.cpp
+    kadascoordinateutils.cpp
+    kadasfileserver.cpp
+    kadaslatlontoutm.cpp
+    kadassettingstree.cpp
+    kadasstatehistory.cpp
+)
 
-file(GLOB kadas_core_HDR *.h)
-list(SORT kadas_core_HDR)
+set(kadas_core_HDR
+    kadas.h
+    kadasalgorithms.h
+    kadascoordinateformat.h
+    kadascoordinateutils.h
+    kadasfileserver.h
+    kadaslatlontoutm.h
+    kadaspluginlayer.h
+    kadassettingstree.h
+    kadasstatehistory.h
+)
 
 configure_file(kadas_config.h.in kadas_config.h @ONLY)
 set(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_config.h)
