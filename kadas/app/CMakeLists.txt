@@ -6,7 +6,6 @@ set(kadas_SRC
     kadasapplication.cpp
     kadasbookmarksmenu.cpp
     kadascanvascontextmenu.cpp
-    kadascrashrpt.cpp
     kadasfeedback.cpp
     kadasgpsintegration.cpp
     kadasgpxintegration.cpp
@@ -66,7 +65,6 @@ set(kadas_HDR
     kadasapplication.h
     kadasbookmarksmenu.h
     kadascanvascontextmenu.h
-    kadascrashrpt.h
     kadasfeedback.h
     kadasgpsintegration.h
     kadasgpxintegration.h
