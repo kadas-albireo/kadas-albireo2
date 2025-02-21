@@ -117,9 +117,6 @@ jobs:
         run: |
           cmake --build build --target bundle --config Release
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: 📤 Upload portable
         uses: actions/upload-artifact@v4
         with:
