@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CPackWiXPatch>
+    <CPackWiXFragment Id="CM_SHORTCUT">
+        <Shortcut Id="CM_SP_bin.kadas_clearsettings"
+                  Name="KADAS Albireo (Factory settings)" 
+                  Target="[#CM_FP_bin.kadas.exe]" 
+                  Arguments="--clearsettings"
+                  WorkingDirectory="CM_DP_bin"/>
+    </CPackWiXFragment>
+</CPackWiXPatch>
