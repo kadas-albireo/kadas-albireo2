@@ -71,11 +71,18 @@ void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsL
 
     QgsFeatureRequest req;
     QgsFeature feature;
-    if ( !context.targetExtent.isNull() && layer->isSpatial() )
+    try
     {
-      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), layer->crs(), QgsProject::instance() );
-      QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
-      req.setFilterRect( box );
+      if ( !context.targetExtent.isNull() && layer->isSpatial() )
+      {
+        QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), layer->crs(), QgsProject::instance() );
+        QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
+        req.setFilterRect( box );
+      }
+    }
+    catch ( QgsCsException & )
+    {
+      qWarning() << "Transformation error caught in local search.";
     }
     req.setFilterExpression( exprText );
     QgsFeatureIterator it = layer->getFeatures( req );
