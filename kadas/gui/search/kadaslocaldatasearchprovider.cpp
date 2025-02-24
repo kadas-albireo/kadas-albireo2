@@ -27,6 +27,7 @@
 #include <qgis/qgsfeaturerequest.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgsexpressioncontextutils.h>
 
 #include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 
@@ -47,6 +48,9 @@ QgsLocatorFilter *KadasLocalDataSearchFilter::clone() const
 
 void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  if ( string.length() < 3 )
+    return;
+
   int resultCount = 0;
   QString escapedSearchText = string;
   escapedSearchText.replace( "'", "\\'" );
@@ -67,39 +71,29 @@ void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsL
 
     QgsFeatureRequest req;
     QgsFeature feature;
-    if ( !context.targetExtent.isNull() )
+    try
     {
-      QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), layer->crs(), QgsProject::instance() );
-      QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
-      req.setFilterRect( box );
-      req.setFilterExpression( exprText );
-      QgsFeatureIterator it = layer->getFeatures( req );
-      while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
+      if ( !context.targetExtent.isNull() && layer->isSpatial() )
       {
-        if ( feedback->isCanceled() )
-        {
-          break;
-        }
-        if ( context.targetExtent.intersects( feature.geometry().boundingBox() ) )
-        {
-          buildResult( feature, layer, escapedSearchText );
-          ++resultCount;
-        }
+        QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), layer->crs(), QgsProject::instance() );
+        QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
+        req.setFilterRect( box );
       }
     }
-    else
+    catch ( QgsCsException & )
     {
-      req.setFilterExpression( exprText );
-      QgsFeatureIterator it = layer->getFeatures( req );
-      while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
+      qWarning() << "Transformation error caught in local search.";
+    }
+    req.setFilterExpression( exprText );
+    QgsFeatureIterator it = layer->getFeatures( req );
+    while ( it.nextFeature( feature ) && resultCount < sResultCountLimit )
+    {
+      if ( feedback->isCanceled() )
       {
-        if ( feedback->isCanceled() )
-        {
-          break;
-        }
-        buildResult( feature, layer, escapedSearchText );
-        ++resultCount;
+        break;
       }
+      buildResult( feature, layer, escapedSearchText );
+      ++resultCount;
     }
     if ( resultCount >= sResultCountLimit )
     {
@@ -138,8 +132,14 @@ void KadasLocalDataSearchFilter::buildResult( const QgsFeature &feature, QgsVect
     }
   }
 
+  QgsExpressionContext context( ( QgsExpressionContextUtils::globalProjectLayerScopes( layer ) ) );
+  QgsExpression exp( layer->displayExpression() );
+  exp.prepare( &context );
+  context.setFeature( feature );
+  QString featureTitle = exp.evaluate( &context ).toString();
+
   QgsLocatorResult result;
-  result.displayString = tr( "%1 (feature %2)" ).arg( matchText ).arg( feature.id() );
+  result.displayString = tr( "%1 (%2)" ).arg( matchText ).arg( featureTitle );
   result.setUserData( QVariantMap(
     {
       { QStringLiteral( "feature_id" ), feature.id() },

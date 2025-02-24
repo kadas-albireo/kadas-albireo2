@@ -155,7 +155,6 @@ void KadasMainWindow::init()
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
 
   QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
-  lw->setMapCanvas( mMapCanvas );
   lw->setPlaceholderText( tr( "Search for Places, Coordinates, Adresses, ..." ) );
   lw->setResultContainerAnchors( QgsFloatingWidget::AnchorPoint::TopLeft, QgsFloatingWidget::AnchorPoint::BottomLeft );
   lw->findChild<QgsFilterLineEdit *>()->setFixedHeight( 40 );
@@ -389,6 +388,7 @@ void KadasMainWindow::init()
     }
   }
 
+  lw->setMapCanvas( mMapCanvas );
   lw->locator()->registerFilter( new KadasAlternateGotoLocatorFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocalDataSearchFilter( mMapCanvas ) );
   lw->locator()->registerFilter( new KadasLocationSearchFilter( mMapCanvas ) );
