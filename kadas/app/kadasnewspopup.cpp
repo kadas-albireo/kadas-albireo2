@@ -137,7 +137,7 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
   connect( reply, &QNetworkReply::finished, [reply, force, lastPortalNewsVer] {
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     reply->deleteLater();
-    QVariantList results = rootMap["results"].toList();
+    const QVariantList results = rootMap["results"].toList();
     if ( !results.isEmpty() )
     {
       QVariantMap chosenResult = results[0].toMap();
@@ -147,7 +147,8 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
       for ( const QVariant &result : results )
       {
         bool found = false;
-        for ( const QVariant &tag : result.toMap()["tags"].toList() )
+        const QVariantList tags = result.toMap()["tags"].toList();
+        for ( const QVariant &tag : tags )
         {
           if ( tag.toString() == langTag )
           {
@@ -163,7 +164,7 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
       }
 
       // Read version and URL for chosen result
-      QVariantList tags = chosenResult["tags"].toList();
+      const QVariantList tags = chosenResult["tags"].toList();
       QString url = chosenResult["url"].toString();
       QString version;
       for ( const QVariant &tag : tags )
