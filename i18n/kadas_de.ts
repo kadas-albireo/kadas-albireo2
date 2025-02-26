@@ -360,33 +360,33 @@
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="156"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="173"/>
         <source>Map CRS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="194"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="211"/>
         <source>Go to %1%2 %3%4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="227"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="244"/>
         <source>Go to %1°N %2°E</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="365"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
         <source>Go to %1°N %2°E %3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="365"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
         <source>at scale 1:%1 </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="517"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="552"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="534"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="569"/>
         <source>zone</source>
         <translation type="unfinished"/>
     </message>
@@ -5161,7 +5161,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="195"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="196"/>
         <source>KADAS Newsletter</source>
         <translation>KADAS Newsletter</translation>
     </message>
