@@ -252,7 +252,7 @@ KadasPluginManager::KadasPluginManager()
 QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugins()
 {
   QgsSettings s;
-  QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl", "http://pkg.sourcepole.ch/kadas/plugins/qgis-repo.xml" ).toString();
+  QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
   QEventLoop evLoop;
   connect( reply, &QNetworkReply::finished, &evLoop, &QEventLoop::quit );
@@ -274,15 +274,20 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   QJsonDocument json = QJsonDocument::fromJson( response, &err );
   if ( !json.isNull() )
   {
-    QString baseUrl = QString( repoUrl ).replace( QRegularExpression( "/rest/search/?\?.*$" ), "/rest/content/items/" );
+    const QJsonObject jsonObject = json.object();
 
-    for ( const QJsonValueRef &resultRef : json.object()["results"].toArray() )
+    const thread_local QRegularExpression urlRegex = QRegularExpression( "/rest/search/?\?.*$" );
+    QString baseUrl = QString( repoUrl ).replace( urlRegex, "/rest/content/items/" );
+
+    const QJsonArray results = jsonObject["results"].toArray();
+    for ( const QJsonValue &resultRef : results )
     {
       QJsonObject result = resultRef.toObject();
       KadasPluginManager::PluginInfo pluginInfo;
       pluginInfo.name = result["title"].toString();
       pluginInfo.mandatory = false;
-      for ( const QJsonValueRef &tagRef : result["tags"].toArray() )
+      const QJsonArray tags = result["tags"].toArray();
+      for ( const QJsonValue &tagRef : tags )
       {
         QString tag = tagRef.toString();
         if ( tag.startsWith( "version:" ) )
