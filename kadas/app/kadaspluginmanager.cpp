@@ -96,6 +96,7 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action )
   : KadasBottomBar( canvas ), mAction( action )
 {
   setupUi( this );
+  setFixedWidth( 700 );
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
   mInstalledTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
   mInstalledTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
@@ -144,6 +145,8 @@ void KadasPluginManager::loadPlugins()
     }
     mInstalledTreeWidget->addTopLevelItem( installedItem );
   }
+  mInstalledTreeWidget->resizeColumnToContents( 0 );
+
 
   QMap<QString, PluginInfo>::const_iterator pluginIt = mAvailablePlugins.constBegin();
   for ( ; pluginIt != mAvailablePlugins.constEnd(); ++pluginIt )
@@ -173,7 +176,6 @@ void KadasPluginManager::loadPlugins()
       setItemInstallable( availableItem, repoVersion );
     }
   }
-
   mAvailableTreeWidget->resizeColumnToContents( 0 );
 }
 
@@ -253,6 +255,10 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
 {
   QgsSettings s;
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
+
+  // FOR DEBUG
+  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/b87dc8a81970177940b8bb0622e472a87aced408/kadas-plugins.xml" );
+
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
   QEventLoop evLoop;
   connect( reply, &QNetworkReply::finished, &evLoop, &QEventLoop::quit );
