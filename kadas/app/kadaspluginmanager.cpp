@@ -127,15 +127,15 @@ void KadasPluginManager::loadPlugins()
   for ( const QString &installedUserPlugin : installedUserPlugins )
   {
     PluginInfo pi;
-    pi.name = p->getPluginMetadata( *installedIt, "name" );
-    pi.description = p->getPluginMetadata( *installedIt, "description" );
-    pi.version = p->getPluginMetadata( *installedIt, "version" );
+    pi.name = p->getPluginMetadata( installedUserPlugin, "name" );
+    pi.description = p->getPluginMetadata( installedUserPlugin, "description" );
+    pi.version = p->getPluginMetadata( installedUserPlugin, "version" );
     installedPluginInfo.insert( pi.name, pi );
     QTreeWidgetItem *installedItem = new QTreeWidgetItem();
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_NAME, pi.name );
     installedItem->setToolTip( INSTALLED_TREEWIDGET_COLUMN_NAME, pi.description );
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_VERSION, pi.version );
-    installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, *installedIt );
+    installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, installedUserPlugin );
     if ( p->isPluginEnabled( installedUserPlugin ) )
     {
       setItemDeactivatable( installedItem );
