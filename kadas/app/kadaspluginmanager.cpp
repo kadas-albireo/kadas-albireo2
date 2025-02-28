@@ -258,7 +258,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
 
   // FOR DEBUG
-  repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" );
+  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" );
 
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
   QEventLoop evLoop;
