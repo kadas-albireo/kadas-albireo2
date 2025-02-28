@@ -314,9 +314,9 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
             int kadasMajor = kadasVersionParts.at( 0 ).toInt();
             int kadasMinor = kadasVersionParts.at( 1 ).toInt();
             int kadasBugfix = kadasVersionParts.value( 2, "0" ).toInt();
-            QString kadasMinVerInt = QStringLiteral( "%1%2%3" ).arg( kadasMajor, 2, 10, QChar( '0' ) ).arg( kadasMinor, 2, 10, QChar( '0' ) ).arg( kadasBugfix, 2, 10, QChar( '0' ) );
+            int kadasMinVerInt = 10000 * kadasMajor + 100 * kadasMinor + kadasBugfix;
 
-            if ( QString::number( Kadas::KADAS_VERSION_INT ) < kadasMinVerInt )
+            if ( Kadas::KADAS_VERSION_INT < kadasMinVerInt )
               continue;
           }
         }
