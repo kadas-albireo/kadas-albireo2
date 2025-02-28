@@ -316,7 +316,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
             int kadasBugfix = kadasVersionParts.value( 2, "0" ).toInt();
             QString kadasMinVerInt = QStringLiteral( "%1%2%3" ).arg( kadasMajor, 2, 10, QChar( '0' ) ).arg( kadasMinor, 2, 10, QChar( '0' ) ).arg( kadasBugfix, 2, 10, QChar( '0' ) );
 
-            if ( Kadas::KADAS_VERSION_INT < kadasMinVerInt )
+            if ( QString::number( Kadas::KADAS_VERSION_INT ) < kadasMinVerInt )
               continue;
           }
         }
