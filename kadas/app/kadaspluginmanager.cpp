@@ -119,11 +119,10 @@ void KadasPluginManager::loadPlugins()
 
   //detect user plugins
   QDir userPluginDir( p->homePluginsPath() );
-  QStringList installedUserPlugins = userPluginDir.entryList( QDir::Dirs | QDir::NoDotAndDotDot );
+  const QStringList installedUserPlugins = userPluginDir.entryList( QDir::Dirs | QDir::NoDotAndDotDot );
   QMap<QString, PluginInfo> installedPluginInfo; // name/pluginInfo
 
-  QStringList::const_iterator installedIt = installedUserPlugins.constBegin();
-  for ( ; installedIt != installedUserPlugins.constEnd(); ++installedIt )
+  for ( const QString &installedUserPlugin : installedUserPlugins )
   {
     PluginInfo pi;
     pi.name = p->getPluginMetadata( *installedIt, "name" );
@@ -135,7 +134,7 @@ void KadasPluginManager::loadPlugins()
     installedItem->setToolTip( INSTALLED_TREEWIDGET_COLUMN_NAME, pi.description );
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_VERSION, pi.version );
     installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, *installedIt );
-    if ( p->isPluginEnabled( *installedIt ) )
+    if ( p->isPluginEnabled( installedUserPlugin ) )
     {
       setItemDeactivatable( installedItem );
     }
