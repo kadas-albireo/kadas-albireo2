@@ -258,7 +258,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
 
   // FOR DEBUG
-  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/b87dc8a81970177940b8bb0622e472a87aced408/kadas-plugins.xml" );
+  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" );
 
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
   QEventLoop evLoop;
@@ -289,6 +289,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
     const QJsonArray results = jsonObject["results"].toArray();
     for ( const QJsonValue &resultRef : results )
     {
+      bool skipPlugin = false;
       QJsonObject result = resultRef.toObject();
       KadasPluginManager::PluginInfo pluginInfo;
       pluginInfo.name = result["title"].toString();
@@ -314,13 +315,19 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
             int kadasMajor = kadasVersionParts.at( 0 ).toInt();
             int kadasMinor = kadasVersionParts.at( 1 ).toInt();
             int kadasBugfix = kadasVersionParts.value( 2, "0" ).toInt();
-            QString kadasMinVerInt = QStringLiteral( "%1%2%3" ).arg( kadasMajor, 2, 10, QChar( '0' ) ).arg( kadasMinor, 2, 10, QChar( '0' ) ).arg( kadasBugfix, 2, 10, QChar( '0' ) );
+            int kadasMinVerInt = 10000 * kadasMajor + 100 * kadasMinor + kadasBugfix;
 
             if ( Kadas::KADAS_VERSION_INT < kadasMinVerInt )
+            {
+              skipPlugin = true;
               continue;
+            }
           }
         }
       }
+      if ( skipPlugin )
+        continue;
+
       pluginInfo.description = result["description"].toString();
       pluginInfo.downloadLink = baseUrl + result["id"].toString() + "/data";
 
