@@ -175,7 +175,7 @@ void KadasNewsPopup::showIfNewsAvailable( bool force )
           break;
         }
       }
-      if ( !url.isEmpty() && ( force || ( !version.isEmpty() && version > lastPortalNewsVer ) ) )
+      if ( !url.isEmpty() && ( force || ( !version.isEmpty() && ( lastPortalNewsVer.isEmpty() || version > lastPortalNewsVer ) ) ) )
       {
         if ( sInstance == nullptr )
         {
