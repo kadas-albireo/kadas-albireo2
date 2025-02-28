@@ -305,7 +305,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
         {
           pluginInfo.mandatory = true;
         }
-        if ( tag == "kadas_min_version:" )
+        if ( tag.startsWith( "kadas_min_version:" ) )
         {
           const QString kadasMinVersion = tag.mid( 18 );
           if ( !kadasMinVersion.isEmpty() )
