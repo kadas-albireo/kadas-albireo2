@@ -33,6 +33,8 @@
 #include <qgis/qgsnetworkcontentfetcher.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadas.h"
+
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 #include "kadaspluginmanager.h"
@@ -119,23 +121,22 @@ void KadasPluginManager::loadPlugins()
 
   //detect user plugins
   QDir userPluginDir( p->homePluginsPath() );
-  QStringList installedUserPlugins = userPluginDir.entryList( QDir::Dirs | QDir::NoDotAndDotDot );
+  const QStringList installedUserPlugins = userPluginDir.entryList( QDir::Dirs | QDir::NoDotAndDotDot );
   QMap<QString, PluginInfo> installedPluginInfo; // name/pluginInfo
 
-  QStringList::const_iterator installedIt = installedUserPlugins.constBegin();
-  for ( ; installedIt != installedUserPlugins.constEnd(); ++installedIt )
+  for ( const QString &installedUserPlugin : installedUserPlugins )
   {
     PluginInfo pi;
-    pi.name = p->getPluginMetadata( *installedIt, "name" );
-    pi.description = p->getPluginMetadata( *installedIt, "description" );
-    pi.version = p->getPluginMetadata( *installedIt, "version" );
+    pi.name = p->getPluginMetadata( installedUserPlugin, "name" );
+    pi.description = p->getPluginMetadata( installedUserPlugin, "description" );
+    pi.version = p->getPluginMetadata( installedUserPlugin, "version" );
     installedPluginInfo.insert( pi.name, pi );
     QTreeWidgetItem *installedItem = new QTreeWidgetItem();
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_NAME, pi.name );
     installedItem->setToolTip( INSTALLED_TREEWIDGET_COLUMN_NAME, pi.description );
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_VERSION, pi.version );
-    installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, *installedIt );
-    if ( p->isPluginEnabled( *installedIt ) )
+    installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, installedUserPlugin );
+    if ( p->isPluginEnabled( installedUserPlugin ) )
     {
       setItemDeactivatable( installedItem );
     }
@@ -300,10 +301,24 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
         {
           pluginInfo.version = tag.mid( 8 );
         }
-
         if ( tag == "mandatoryplugin" )
         {
           pluginInfo.mandatory = true;
+        }
+        if ( tag.startsWith( "kadas_min_version:" ) )
+        {
+          const QString kadasMinVersion = tag.mid( 18 );
+          if ( !kadasMinVersion.isEmpty() )
+          {
+            QStringList kadasVersionParts = kadasMinVersion.split( '.' );
+            int kadasMajor = kadasVersionParts.at( 0 ).toInt();
+            int kadasMinor = kadasVersionParts.at( 1 ).toInt();
+            int kadasBugfix = kadasVersionParts.value( 2, "0" ).toInt();
+            QString kadasMinVerInt = QStringLiteral( "%1%2%3" ).arg( kadasMajor, 2, 10, QChar( '0' ) ).arg( kadasMinor, 2, 10, QChar( '0' ) ).arg( kadasBugfix, 2, 10, QChar( '0' ) );
+
+            if ( Kadas::KADAS_VERSION_INT < kadasMinVerInt )
+              continue;
+          }
         }
       }
       pluginInfo.description = result["description"].toString();
