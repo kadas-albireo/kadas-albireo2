@@ -40,7 +40,10 @@ else()
   message(STATUS "Building with system libraries --")
 endif()
 
-set(KADAS_VERSION "0.0.1" CACHE STRING "KADAS Version")
+set(KADAS_VERSION
+    "0.0.1"
+    CACHE STRING "KADAS Version"
+)
 
 string(REPLACE "." ";" VERSION_LIST ${KADAS_VERSION})
 list(GET VERSION_LIST 0 KADAS_VERSION_MAJOR)
