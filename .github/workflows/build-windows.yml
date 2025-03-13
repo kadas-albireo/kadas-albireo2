@@ -47,13 +47,15 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         shell: bash
         run: |
-          RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
-          MAJOR=$(echo ${RELEASE:1} | cut -d. -f1)
-          MINOR=$(echo ${RELEASE} | cut -d. -f2)
-          PATCH=$(echo ${RELEASE} | cut -d. -f3 | cut -d- -f1)
-          PRE=$(echo ${RELEASE} | cut -s -d- -f2)
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
-            PRE="${PRE}-PR${{ github.event.pull_request.number }}"
+            MAJOR="0"
+            MINOR="0"
+            PATCH="${{ github.event.pull_request.number }}"
+          else
+            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
+            MAJOR=$(echo ${RELEASE:1} | cut -d. -f1)
+            MINOR=$(echo ${RELEASE} | cut -d. -f2)
+            PATCH=$(echo ${RELEASE} | cut -d. -f3 | cut -d- -f1)
           fi
           echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}"
 
