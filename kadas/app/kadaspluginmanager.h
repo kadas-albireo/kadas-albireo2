@@ -18,6 +18,7 @@
 #include "kadas/gui/kadasbottombar.h"
 
 class QProgressBar;
+class QPushButton;
 class KadasRibbonButton;
 
 
@@ -60,7 +61,7 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
   private slots:
     void installButtonClicked();
     void updateButtonClicked();
-    void on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *item, int column );
+    void itemChanged( QTreeWidgetItem *item, int column );
     void on_mCloseButton_clicked();
 
   private:
@@ -94,8 +95,6 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
     void setItemInstallable( QTreeWidgetItem *item, const QString &version );
     void setItemRemoveable( QTreeWidgetItem *item );
     void changeItemInstallationState( QTreeWidgetItem *item, KadasPluginManagerInstallButton::Status buttonStatus );
-    void setItemActivatable( QTreeWidgetItem *item );
-    void setItemDeactivatable( QTreeWidgetItem *item );
     void setItemUpdateable( QTreeWidgetItem *item );
     void setItemNotUpdateable( QTreeWidgetItem *item );
 
