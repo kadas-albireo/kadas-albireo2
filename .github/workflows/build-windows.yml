@@ -55,7 +55,7 @@ jobs:
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
             PRE="${PRE}-PR${{ github.event.pull_request.number }}"
           fi
-          echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}-${PRE}"
+          echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}"
 
           cmake -S . \
                 -G Ninja \
@@ -71,10 +71,7 @@ jobs:
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-                -D KADAS_VERSION_MAJOR=${MAJOR} \
-                -D KADAS_VERSION_MINOR=${MINOR} \
-                -D KADAS_VERSION_PATCH=${PATCH} \
-                -D KADAS_VERSION_PRE=${PRE} \
+                -D KADAS_VERSION=${MAJOR}.${MINOR}.${PATCH} \
                 ${CREATE_MSI_CMAKE_VAR}\
                 ${DEBUG_OPTIONS}
 
