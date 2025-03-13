@@ -54,10 +54,6 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/project.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/kadascore/project.py @ONLY
 )
-message(
-  STATUS
-    "Configuring ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in with ${KADAS_VERSION}"
-)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in
