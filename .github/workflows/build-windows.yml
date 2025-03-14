@@ -59,7 +59,7 @@ jobs:
             IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           else
             # Regular Branch Build: Fetch latest release info and set patch to 99
-            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
+            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags"  --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"  | jq -r '.[0].name')
             
             if [[ -n "$RELEASE" ]]; then
               RELEASE="${RELEASE#v}"  # Strip 'v' prefix if exists

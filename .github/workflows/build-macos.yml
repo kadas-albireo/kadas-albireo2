@@ -57,12 +57,13 @@ jobs:
       - name: 🌱 Install dependencies and generate project files
         env:
           GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Install first only with binarycaching, then deduplicate binaries and replace copies with symlinks.
           # Nuget doesn't understand the symlink concept
 
-          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
-          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
+          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}")
+          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" | jq -r '.[0].name')
 
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
             # Pull Request Build: Use "0.0.PR-number"
@@ -76,7 +77,7 @@ jobs:
             IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           else
             # Regular Branch Build: Fetch latest release info and set patch to 99
-            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
+            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags"  --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"  | jq -r '.[0].name')
             
             if [[ -n "$RELEASE" ]]; then
               RELEASE="${RELEASE#v}"  # Strip 'v' prefix if exists
