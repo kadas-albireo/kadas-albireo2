@@ -100,11 +100,11 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action )
   setupUi( this );
   setFixedWidth( 700 );
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  mInstalledTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::ResizeToContents );
-  mInstalledTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
+  mInstalledTreeWidget->header()->setSectionResizeMode( INSTALLED_TREEWIDGET_COLUMN_NAME, QHeaderView::ResizeToContents );
+  mInstalledTreeWidget->header()->setSectionResizeMode( INSTALLED_TREEWIDGET_COLUMN_VERSION, QHeaderView::ResizeToContents );
 
-  mAvailableTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::ResizeToContents );
-  mAvailableTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
+  mAvailableTreeWidget->header()->setSectionResizeMode( AVAILABLE_TREEWIDGET_COLUMN_NAME, QHeaderView::ResizeToContents );
+  mAvailableTreeWidget->header()->setSectionResizeMode( AVAILABLE_TREEWIDGET_COLUMN_BUTTON, QHeaderView::ResizeToContents );
 
   connect( mInstalledTreeWidget, &QTreeWidget::itemChanged, this, &KadasPluginManager::itemChanged );
 }
