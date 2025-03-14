@@ -271,12 +271,24 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
     for ( const QString &layerName : entries->keys() )
     {
       QgsMimeDataUtils::Uri mimeDataUri;
-      mimeDataUri.layerType = "raster";
-      mimeDataUri.providerKey = "arcgismapserver";
+
+      if ( KadasCatalogBrowser::sSettingLoadArcgisLayerAsVector->value() )
+      {
+        mimeDataUri.layerType = "vector";
+        mimeDataUri.providerKey = "arcgisfeatureserver";
+        mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid() ).arg( url ).arg( layerName );
+      }
+      else
+      {
+        mimeDataUri.layerType = "raster";
+        mimeDataUri.providerKey = "arcgismapserver";
+        QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
+        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+      }
+
       const ResultEntry &entry = ( *entries )[layerName];
       mimeDataUri.name = entry.title;
-      QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+
       QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
       mimeData->setProperty( "metadataUrl", entry.metadataUrl );
       if ( !entry.flatten )
