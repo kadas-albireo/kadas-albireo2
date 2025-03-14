@@ -6,7 +6,7 @@ build-backend = "sipbuild.api"
 # Specify the PEP 566 metadata for the project.
 [tool.sip.metadata]
 name = "KADAS"
-version = "@KADAS_VERSION_MAJOR@.@KADAS_VERSION_MINOR@.@KADAS_VERSION_PATCH@"
+version = "@KADAS_VERSION@"
 summary = "Python bindings for KADAS"
 home-page = "https://github.com/kadas-albireo/kadas-albireo2"
 author = "Sandro Mani"

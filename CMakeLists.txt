@@ -40,18 +40,18 @@ else()
   message(STATUS "Building with system libraries --")
 endif()
 
-set(KADAS_VERSION_MAJOR
-    "2"
-    CACHE STRING "Kadas major version"
+set(KADAS_VERSION
+    "0.0.1"
+    CACHE STRING "KADAS Version"
 )
-set(KADAS_VERSION_MINOR
-    "3"
-    CACHE STRING "Kadas minor version"
-)
-set(KADAS_VERSION_PATCH
-    "0"
-    CACHE STRING "Kadas patch version"
-)
+
+string(REPLACE "." ";" VERSION_LIST ${KADAS_VERSION})
+list(GET VERSION_LIST 0 KADAS_VERSION_MAJOR)
+list(GET VERSION_LIST 1 KADAS_VERSION_MINOR)
+list(GET VERSION_LIST 2 KADAS_VERSION_PATCH)
+
+message(STATUS "Building KADAS version ${KADAS_VERSION}")
+
 set(KADAS_NAME
     "Kadas"
     CACHE STRING "Kadas application name"
@@ -64,7 +64,7 @@ set(KADAS_FULL_NAME
 project(
   kadas
   LANGUAGES CXX
-  VERSION "${KADAS_VERSION_MAJOR}.${KADAS_VERSION_MINOR}.${KADAS_VERSION_PATCH}"
+  VERSION "${KADAS_VERSION}"
 )
 
 set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")

@@ -54,6 +54,7 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/project.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/kadascore/project.py @ONLY
 )
+
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/kadascore/pyproject.toml.in
   ${CMAKE_CURRENT_BINARY_DIR}/kadascore/pyproject.toml @ONLY
