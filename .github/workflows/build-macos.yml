@@ -61,6 +61,9 @@ jobs:
           # Install first only with binarycaching, then deduplicate binaries and replace copies with symlinks.
           # Nuget doesn't understand the symlink concept
 
+          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags")
+          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
+
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
             # Pull Request Build: Use "0.0.PR-number"
             MAJOR="0"
