@@ -6609,7 +6609,7 @@ avec géoloc.</translation>
         <translation>Déconnexion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="578"/>
+        <location filename="../kadas/app/ui/kadaswindowbase.ui" line="584"/>
         <source>Loading...</source>
         <translation>Chargement...</translation>
     </message>
