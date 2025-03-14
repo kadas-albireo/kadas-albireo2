@@ -48,15 +48,30 @@ jobs:
         shell: bash
         run: |
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
+            # Pull Request Build: Use PR number as patch version
             MAJOR="0"
             MINOR="0"
             PATCH="${{ github.event.pull_request.number }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Release Workflow: Extract version from the tag name
+            TAG="${{ github.ref }}"  # e.g., refs/tags/v1.2.3
+            VERSION="${TAG#refs/tags/v}"  # Strip the prefix "refs/tags/v"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           else
+            # Regular Branch Build: Fetch latest release info and set patch to 99
             RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" | jq -r '.[0].name')
-            MAJOR=$(echo ${RELEASE:1} | cut -d. -f1)
-            MINOR=$(echo ${RELEASE} | cut -d. -f2)
-            PATCH=$(echo ${RELEASE} | cut -d. -f3 | cut -d- -f1)
+            
+            if [[ -n "$RELEASE" ]]; then
+              RELEASE="${RELEASE#v}"  # Strip 'v' prefix if exists
+              IFS='.' read -r MAJOR MINOR PATCH <<< "$RELEASE"
+            else
+              MAJOR="0"
+              MINOR="0"
+            fi
+            
+            PATCH="99"  # Default patch number for branch builds
           fi
+
           echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}"
 
           cmake -S . \
