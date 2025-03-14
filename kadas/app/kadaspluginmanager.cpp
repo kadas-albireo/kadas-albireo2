@@ -100,9 +100,13 @@ KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action )
   setupUi( this );
   setFixedWidth( 700 );
   mCloseButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  mInstalledTreeWidget->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
-  mInstalledTreeWidget->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
-  mInstalledTreeWidget->header()->setStretchLastSection( true );
+  mInstalledTreeWidget->header()->setSectionResizeMode( INSTALLED_TREEWIDGET_COLUMN_NAME, QHeaderView::ResizeToContents );
+  mInstalledTreeWidget->header()->setSectionResizeMode( INSTALLED_TREEWIDGET_COLUMN_VERSION, QHeaderView::ResizeToContents );
+
+  mAvailableTreeWidget->header()->setSectionResizeMode( AVAILABLE_TREEWIDGET_COLUMN_NAME, QHeaderView::ResizeToContents );
+  mAvailableTreeWidget->header()->setSectionResizeMode( AVAILABLE_TREEWIDGET_COLUMN_BUTTON, QHeaderView::ResizeToContents );
+
+  connect( mInstalledTreeWidget, &QTreeWidget::itemChanged, this, &KadasPluginManager::itemChanged );
 }
 
 void KadasPluginManager::loadPlugins()
@@ -137,13 +141,9 @@ void KadasPluginManager::loadPlugins()
     installedItem->setText( INSTALLED_TREEWIDGET_COLUMN_VERSION, pi.version );
     installedItem->setData( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole, installedUserPlugin );
     if ( p->isPluginEnabled( installedUserPlugin ) )
-    {
-      setItemDeactivatable( installedItem );
-    }
+      installedItem->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Checked );
     else
-    {
-      setItemActivatable( installedItem );
-    }
+      installedItem->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Unchecked );
     mInstalledTreeWidget->addTopLevelItem( installedItem );
   }
   mInstalledTreeWidget->resizeColumnToContents( 0 );
@@ -258,7 +258,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
 
   // FOR DEBUG
-  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" );
+  // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" ); // DEBUGONLY
 
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
   QEventLoop evLoop;
@@ -353,7 +353,7 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   return pluginMap;
 }
 
-void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *item, int column )
+void KadasPluginManager::itemChanged( QTreeWidgetItem *item, int column )
 {
   if ( column != 0 )
   {
@@ -369,16 +369,20 @@ void KadasPluginManager::on_mInstalledTreeWidget_itemClicked( QTreeWidgetItem *i
   QString pluginModule = item->data( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::UserRole ).toString();
   if ( p->isPluginLoaded( pluginModule ) )
   {
-    if ( p->disablePlugin( pluginModule ) )
+    if ( !p->disablePlugin( pluginModule ) )
     {
-      setItemActivatable( item );
+      mInstalledTreeWidget->blockSignals( true );
+      item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Checked );
+      mInstalledTreeWidget->blockSignals( false );
     }
   }
   else
   {
-    if ( p->loadPlugin( pluginModule ) )
+    if ( !p->loadPlugin( pluginModule ) )
     {
-      setItemDeactivatable( item );
+      mInstalledTreeWidget->blockSignals( true );
+      item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Unchecked );
+      mInstalledTreeWidget->blockSignals( false );
     }
   }
 }
@@ -543,11 +547,11 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   p->pluginList();
   if ( p->loadPlugin( moduleName ) )
   {
-    setItemDeactivatable( installedItem );
+    installedItem->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Checked );
   }
   else
   {
-    setItemActivatable( installedItem );
+    installedItem->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Unchecked );
   }
   mInstalledTreeWidget->addTopLevelItem( installedItem );
 
@@ -622,22 +626,6 @@ void KadasPluginManager::changeItemInstallationState( QTreeWidgetItem *item, Kad
     b->setProperty( PROPERTY_PLUGIN_NAME, item->text( INSTALLED_TREEWIDGET_COLUMN_NAME ) );
     QObject::connect( b, &KadasPluginManagerInstallButton::clicked, this, &KadasPluginManager::installButtonClicked );
     mAvailableTreeWidget->setItemWidget( item, INSTALLED_TREEWIDGET_COLUMN_VERSION, b );
-  }
-}
-
-void KadasPluginManager::setItemActivatable( QTreeWidgetItem *item )
-{
-  if ( item )
-  {
-    item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Unchecked );
-  }
-}
-
-void KadasPluginManager::setItemDeactivatable( QTreeWidgetItem *item )
-{
-  if ( item )
-  {
-    item->setCheckState( INSTALLED_TREEWIDGET_COLUMN_NAME, Qt::Checked );
   }
 }
 
