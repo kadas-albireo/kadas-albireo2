@@ -109,6 +109,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
       {
         m3DMapCanvasWidget = new Kadas3DMapCanvasWidget( KADAS_3D_IDENTIFIER, true );
         m3DMapCanvasWidget->setMainCanvas( mMapCanvas );
+
         QDomElement viewConfig = QgsProject::instance()->viewsManager()->get3DViewSettings( KADAS_3D_IDENTIFIER );
         read3DMapViewSettings( m3DMapCanvasWidget, viewConfig );
       }
@@ -119,7 +120,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
 
       if ( m3DMapCanvasWidget )
       {
-        connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]() {
+        connect( m3DMapCanvasWidget->mapCanvas3D()->mapSettings(), &Qgs3DMapSettings::settingsChanged, [this]() {
           QDomImplementation DomImplementation;
           QDomDocumentType documentType = DomImplementation.createDocumentType(
             QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" )
@@ -131,7 +132,9 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
           write3DMapViewSettings( m3DMapCanvasWidget, doc, elem3DMap );
 
           QgsProject::instance()->viewsManager()->register3DViewSettings( KADAS_3D_IDENTIFIER, elem3DMap );
+        } );
 
+        connect( m3DMapCanvasWidget->dockableWidgetHelper(), &QgsDockableWidgetHelper::closed, [this]() {
           m3DMapCanvasWidget->deleteLater();
           m3DMapCanvasWidget = nullptr;
           mAction3D->setChecked( false );
