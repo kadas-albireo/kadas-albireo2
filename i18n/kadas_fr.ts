@@ -4012,32 +4012,32 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Favori</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1338"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1357"/>
         <source>Manually set projection</source>
         <translation>Sélectionner manuellement la projection</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1341"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1360"/>
         <source>Unknown layer projection</source>
         <translation>Projection de la couche inconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1342"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1361"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1422"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1441"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1457"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1476"/>
         <source>Downloading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1467"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1486"/>
         <source>Unable to download image (%1).</source>
         <translation type="unfinished"/>
     </message>
@@ -4046,22 +4046,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="vanished">Impossible de télécharger l&apos;image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1476"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1495"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible d&apos;enregistrer l&apos;image téléchargée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1510"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1529"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1600"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1619"/>
         <source>Font scaling setting changed</source>
         <translation>Configuration modifiée de l&apos;échelle des caractères</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1600"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1619"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modification de l&apos;échelle des polices sera appliquée lors du prochain lancement du programme.</translation>
     </message>
@@ -5395,43 +5395,43 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="448"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="452"/>
         <source>Remove plugin</source>
         <translation>Désinstaller le plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="448"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="452"/>
         <source>Are you sure you want to remove the plugin &apos;%1&apos;?</source>
         <translation>Êtes-vous sûr de vouloir désinstaller le plugin &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="473"/>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="491"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="477"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="495"/>
         <source>Plugin install failed</source>
         <translation>Échec de l&apos;installation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="473"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="477"/>
         <source>Error creating plugin directory</source>
         <translation>Erreur de création du directoire des plugins</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="491"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="495"/>
         <source>Error downloading plugin: %1</source>
         <translation>Erreur de téléchargement du plugin : %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="580"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="584"/>
         <source>Plugin deinstallation failed</source>
         <translation>Échec de la désinstallation de plugin</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="580"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="584"/>
         <source>The deinstallation of the plugin &apos;%1&apos; failed</source>
         <translation>La désinstallation du plugin &apos;%1&apos; a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspluginmanager.cpp" line="660"/>
+        <location filename="../kadas/app/kadaspluginmanager.cpp" line="648"/>
         <source>up-to-date</source>
         <translation>À jour</translation>
     </message>
