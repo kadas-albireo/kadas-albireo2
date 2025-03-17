@@ -786,7 +786,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       }
 
       // Sub-grid
-      if ( mapScale > 5000000 )
+      if ( mapScale > 5000000 && cellSize == 0 )
         continue;
 
       QList<QPair<Level, int>> levels;
@@ -838,6 +838,11 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
         {
           levels << QPair( Level::Minor, 1 );
         }
+      }
+      else
+      {
+        if ( mapScale / cellSize <= 500 )
+          levels << QPair( Level::Minor, cellSize );
       }
 
       if ( gridMode == GridMode::GridMGRS )
