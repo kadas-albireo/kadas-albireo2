@@ -50,6 +50,7 @@ class KadasMapGridLayer : public KadasPluginLayer
         double intervalY = 10000;
         int cellSize = 0;
         int fontSize = 15;
+        double lineWidth = 1;
         QColor color = Qt::black;
         LabelingMode labelingMode = LabelingEnabled;
     };
@@ -70,6 +71,7 @@ class KadasMapGridLayer : public KadasPluginLayer
 
     const QColor &color() const { return mGridConfig.color; }
     int fontSize() const { return mGridConfig.fontSize; }
+    double lineWidth() const { return mGridConfig.lineWidth; }
     LabelingMode labelingMode() const { return mGridConfig.labelingMode; }
 
     GridConfig gridConfig() const { return mGridConfig; }
@@ -77,6 +79,7 @@ class KadasMapGridLayer : public KadasPluginLayer
   public slots:
     void setColor( const QColor &color ) { mGridConfig.color = color; }
     void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
+    void setLineWidth( double lineWidth ) { mGridConfig.lineWidth = lineWidth; }
     void setLabelingMode( LabelingMode labelingMode ) { mGridConfig.labelingMode = labelingMode; }
 
   protected:

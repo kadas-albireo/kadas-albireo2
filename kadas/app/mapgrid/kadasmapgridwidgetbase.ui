@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>546</width>
-    <height>99</height>
+    <width>645</width>
+    <height>153</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
@@ -23,6 +23,13 @@
    <property name="bottomMargin">
     <number>2</number>
    </property>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="layerSelectionWidgetHolder">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+    </layout>
+   </item>
    <item row="2" column="0" colspan="2">
     <widget class="QWidget" name="widgetLayerSetup" native="true">
      <property name="enabled">
@@ -41,53 +48,25 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="1" column="5">
-       <widget class="QWidget" name="widgetHeight" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QSpinBox" name="spinBoxFontSize">
-           <property name="suffix">
-            <string notr="true"> px</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="labelIntervalY">
-        <property name="text">
-         <string>Interval Y:</string>
+      <item row="1" column="1">
+       <widget class="QgsColorButton" name="toolButtonColor">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="labelIntervalX">
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelColor">
         <property name="text">
-         <string>Interval X:</string>
+         <string>Color:</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBoxGridType"/>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="labelGridType">
@@ -114,77 +93,131 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="comboBoxGridType"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labelColor">
-        <property name="text">
-         <string>Color:</string>
-        </property>
+      <item row="1" column="2" colspan="4">
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelLabeling">
+           <property name="text">
+            <string>Labeling:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBoxLabeling"/>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="labelFontSize">
+           <property name="text">
+            <string>Font size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Line width:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QSpinBox" name="spinBoxFontSize">
+           <property name="suffix">
+            <string notr="true"> px</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QDoubleSpinBox" name="mLineWidthSpinBox">
+           <property name="maximum">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QgsColorButton" name="toolButtonColor">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QDoubleSpinBox" name="spinBoxIntervalX">
-        <property name="toolTip">
-         <string>Columns</string>
-        </property>
-        <property name="maximum">
-         <double>100000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
-       <widget class="QDoubleSpinBox" name="spinBoxIntervalY">
-        <property name="toolTip">
-         <string>Rows</string>
-        </property>
-        <property name="maximum">
-         <double>100000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="labelLabeling">
-        <property name="text">
-         <string>Labeling:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QComboBox" name="comboBoxLabeling"/>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="labelFontSize">
-        <property name="text">
-         <string>Font size:</string>
-        </property>
+      <item row="0" column="2" colspan="4">
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="4">
+          <widget class="QLabel" name="mCellSizeLabel">
+           <property name="text">
+            <string>Cell Size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QDoubleSpinBox" name="spinBoxIntervalY">
+           <property name="toolTip">
+            <string>Rows</string>
+           </property>
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="spinBoxIntervalX">
+           <property name="toolTip">
+            <string>Columns</string>
+           </property>
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>1000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="labelIntervalY">
+           <property name="text">
+            <string>Interval Y:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelIntervalX">
+           <property name="text">
+            <string>Interval X:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QComboBox" name="mCellSizeCombo"/>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
     </widget>
    </item>
    <item row="0" column="1">
@@ -200,12 +233,12 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0">
-    <layout class="QHBoxLayout" name="layerSelectionWidgetHolder">
-     <property name="spacing">
-      <number>0</number>
+   <item row="1" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </layout>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -219,8 +252,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxGridType</tabstop>
-  <tabstop>spinBoxIntervalX</tabstop>
-  <tabstop>spinBoxIntervalY</tabstop>
   <tabstop>toolButtonColor</tabstop>
  </tabstops>
  <resources/>
