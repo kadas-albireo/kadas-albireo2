@@ -61,8 +61,6 @@ class KadasMapGridWidget : public KadasBottomBar
     Ui::KadasMapGridWidgetBase ui;
     KadasLayerSelectionWidget *mLayerSelectionWidget = nullptr;
     KadasMapGridLayer *mCurrentLayer = nullptr;
-    QLabel *mCellSizeLabel = nullptr;
-    QComboBox *mCellSizeCombo = nullptr;
 
 
   signals:

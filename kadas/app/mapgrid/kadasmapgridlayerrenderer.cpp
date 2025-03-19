@@ -112,6 +112,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid( const QString &crs, double segmentL
       poly.append( renderContext()->mapToPixel().transform( p ).toQPointF() );
       y += ySegmentLength;
     }
+    renderContext()->painter()->setPen( level2pen( KadasLatLonToUTM::Level::Minor, mRenderGridConfig.lineWidth ) );
     renderContext()->painter()->drawPolyline( poly );
 
     if ( drawLabels && mRenderGridConfig.labelingMode == KadasMapGridLayer::LabelingEnabled )
@@ -161,6 +162,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid( const QString &crs, double segmentL
       poly.append( renderContext()->mapToPixel().transform( p ).toQPointF() );
       x += xSegmentLength;
     }
+    renderContext()->painter()->setPen( level2pen( KadasLatLonToUTM::Level::Minor, mRenderGridConfig.lineWidth ) );
     renderContext()->painter()->drawPolyline( poly );
 
     if ( drawLabels && mRenderGridConfig.labelingMode == KadasMapGridLayer::LabelingEnabled )
@@ -329,7 +331,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     if ( gridLine.level == KadasLatLonToUTM::Level::OnlyLabels )
       continue;
 
-    renderContext()->painter()->setPen( level2pen( gridLine.level ) );
+    renderContext()->painter()->setPen( level2pen( gridLine.level, mRenderGridConfig.lineWidth ) );
 
     QPolygonF itemLine;
     for ( const QPointF &point : std::as_const( gridLine.line ) )
@@ -435,14 +437,14 @@ void KadasMapGridLayerRenderer::drawGridLabel( const QPointF &pos, const QString
   renderContext()->painter()->drawPath( path );
 }
 
-QPen KadasMapGridLayerRenderer::level2pen( KadasLatLonToUTM::Level level ) const
+QPen KadasMapGridLayerRenderer::level2pen( KadasLatLonToUTM::Level level, double lineWidth = 1 ) const
 {
   switch ( level )
   {
     case KadasLatLonToUTM::Level::Major:
-      return QPen( mRenderGridConfig.color, 2 );
+      return QPen( mRenderGridConfig.color, 2.1 * lineWidth );
     case KadasLatLonToUTM::Level::Minor:
-      return QPen( mRenderGridConfig.color, .8 );
+      return QPen( mRenderGridConfig.color, lineWidth );
     case KadasLatLonToUTM::Level::OnlyLabels:
       Q_ASSERT( false );
       break;
