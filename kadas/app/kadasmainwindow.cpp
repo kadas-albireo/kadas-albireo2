@@ -374,6 +374,7 @@ void KadasMainWindow::init()
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
+
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
 
@@ -1300,6 +1301,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           QgsDataSourceUri dataSource( adjustedUri );
           adjustedUri = dataSource.uri();
           layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
+        }
+        else if ( uri.providerKey == "arcgisvectortileservice" )
+        {
+          QgsDataSourceUri dataSource( adjustedUri );
+          layer = kApp->addVectorLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "wms" )
         {
