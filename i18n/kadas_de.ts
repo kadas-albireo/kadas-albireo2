@@ -4080,57 +4080,56 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Schliessen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="110"/>
         <source>Cell size:</source>
-        <translation>Zellengrösse:</translation>
+        <translation type="vanished">Zellengrösse:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="114"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="113"/>
         <source>Dynamic</source>
         <translation>Dynamisch</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="115"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="114"/>
         <source>1 m</source>
         <translation>1 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="116"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="115"/>
         <source>10 m</source>
         <translation>10 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="117"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="116"/>
         <source>100 m</source>
         <translation>100 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="118"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="117"/>
         <source>1 km</source>
         <translation>1 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="119"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="118"/>
         <source>10 km</source>
         <translation>10 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="120"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="119"/>
         <source>100 km</source>
         <translation>100 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="124"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="121"/>
         <source>Disabled</source>
         <translation>Deaktiviert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="125"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="122"/>
         <source>Enabled</source>
         <translation>Aktiviert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="139"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="142"/>
         <source>Map grid</source>
         <translation>Kartengitter</translation>
     </message>
@@ -4138,42 +4137,52 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapGridWidgetBase</name>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="81"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="203"/>
         <source>Interval Y:</source>
         <translation>Interval Y:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="88"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="210"/>
         <source>Interval X:</source>
         <translation>Interval X:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="95"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="74"/>
         <source>Type:</source>
         <translation>Type:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="123"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="64"/>
         <source>Color:</source>
         <translation>Farbe:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="140"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="119"/>
+        <source>Line width:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="170"/>
+        <source>Cell Size:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="190"/>
         <source>Columns</source>
         <translation>Spalten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="153"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="177"/>
         <source>Rows</source>
         <translation>Zeilen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="166"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="102"/>
         <source>Labeling:</source>
         <translation>Beschriftung:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="176"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="112"/>
         <source>Font size:</source>
         <translation>Schriftgrösse:</translation>
     </message>

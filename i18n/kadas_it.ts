@@ -4080,57 +4080,56 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="110"/>
         <source>Cell size:</source>
-        <translation>Dimensione delle celle:</translation>
+        <translation type="vanished">Dimensione delle celle:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="114"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="113"/>
         <source>Dynamic</source>
         <translation>Dinamico</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="115"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="114"/>
         <source>1 m</source>
         <translation>1 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="116"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="115"/>
         <source>10 m</source>
         <translation>10 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="117"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="116"/>
         <source>100 m</source>
         <translation>100 m</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="118"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="117"/>
         <source>1 km</source>
         <translation>1 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="119"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="118"/>
         <source>10 km</source>
         <translation>10 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="120"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="119"/>
         <source>100 km</source>
         <translation>100 km</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="124"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="121"/>
         <source>Disabled</source>
         <translation>Disabilitato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="125"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="122"/>
         <source>Enabled</source>
         <translation>Abilitato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="139"/>
+        <location filename="../kadas/app/mapgrid/kadasmaptoolmapgrid.cpp" line="142"/>
         <source>Map grid</source>
         <translation>Griglia</translation>
     </message>
@@ -4138,42 +4137,52 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapGridWidgetBase</name>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="81"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="203"/>
         <source>Interval Y:</source>
         <translation>Intervallo Y:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="88"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="210"/>
         <source>Interval X:</source>
         <translation>Intervallo X:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="95"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="74"/>
         <source>Type:</source>
         <translation>Tipo:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="123"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="64"/>
         <source>Color:</source>
         <translation>Colore:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="140"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="119"/>
+        <source>Line width:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="170"/>
+        <source>Cell Size:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="190"/>
         <source>Columns</source>
         <translation>Colonne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="153"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="177"/>
         <source>Rows</source>
         <translation>Righe</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="166"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="102"/>
         <source>Labeling:</source>
         <translation>Didascalia:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="176"/>
+        <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="112"/>
         <source>Font size:</source>
         <translation>Dimensione carattere:</translation>
     </message>
