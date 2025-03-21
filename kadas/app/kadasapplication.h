@@ -76,7 +76,7 @@ class KadasApplication : public QgsApplication
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType, bool quiet = false ) const;
     void addRasterLayers( const QStringList &layerUris, bool quiet = false ) const;
-    QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false );
+    QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );

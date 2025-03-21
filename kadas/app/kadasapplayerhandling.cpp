@@ -435,7 +435,7 @@ QgsPluginLayer *KadasAppLayerHandling::addPluginLayer( const QString &uri, const
   return layer;
 }
 
-QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &uri, const QString &baseName, bool showWarningOnInvalid )
+QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &uri, const QString &baseName, bool showWarningOnInvalid, bool forceUpdateUriSources )
 {
   KadasCanvasRefreshBlocker refreshBlocker;
   QgsSettings settings;
@@ -450,7 +450,7 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
   QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
 
   QString updatedUri = uri;
-  QgsVectorTileUtils::updateUriSources( updatedUri, true );
+  QgsVectorTileUtils::updateUriSources( updatedUri, forceUpdateUriSources );
 
   // create the layer
   const QgsVectorTileLayer::LayerOptions options( QgsProject::instance()->transformContext() );

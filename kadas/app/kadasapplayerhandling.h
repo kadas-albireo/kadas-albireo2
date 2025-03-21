@@ -124,7 +124,7 @@ class KadasAppLayerHandling
      * If \a showWarningOnInvalid layers is TRUE then a user facing warning will be raised
      * if the \a uri does not result in a valid vector tile layer.
      */
-    static QgsVectorTileLayer *addVectorTileLayer( const QString &uri, const QString &baseName, bool showWarningOnInvalid = true );
+    static QgsVectorTileLayer *addVectorTileLayer( const QString &uri, const QString &baseName, bool showWarningOnInvalid = true, bool forceUpdateUriSources = true );
 
     /**
      * Post processes an entire group of added \a layers.

@@ -122,7 +122,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
-    QStringList typeOrder = { "wmts", "map service", "wms" };
+    QStringList typeOrder = { "vector tile service", "wmts", "map service", "wms" };
     int pos = 0;
     for ( const QString &entry : mServicePreference.split( "," ) )
     {
@@ -135,11 +135,12 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       ++pos;
     }
     QMap<QString, std::function<void( const ResultEntry & )>> typeHandlers;
+    typeHandlers.insert( "vector tile service", [this]( const ResultEntry &entry ) { addVTSlayer( entry ); } );
     typeHandlers.insert( "map service", [this]( const ResultEntry &entry ) { readAMSCapabilities( entry ); } );
     typeHandlers.insert( "wmts", [this]( const ResultEntry &entry ) { readWMTSDetail( entry ); } );
     typeHandlers.insert( "wms", [this]( const ResultEntry &entry ) { readWMSDetail( entry ); } );
 
-    for ( const auto &layerTypeMap : mLayers )
+    for ( const auto &layerTypeMap : std::as_const( mLayers ) )
     {
       for ( const QString &type : typeOrder )
       {
@@ -442,4 +443,27 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 
   delete entry;
   endTask();
+}
+
+void KadasArcGisPortalCatalogProvider::addVTSlayer( const ResultEntry &entry )
+{
+  QString gdiBaseUrl = QgsSettings().value( "kadas/gdiBaseUrl" ).toString();
+  QString styleUrl = QString( "%1/sharing/rest/content/items/%2/resources/styles/root.json" ).arg( gdiBaseUrl, entry.id );
+  QString metadataUrl = QStringLiteral( "%1/home/item.html?id=%2" ).arg( gdiBaseUrl ).arg( entry.id );
+  QgsMimeDataUtils::Uri mimeDataUri;
+  mimeDataUri.layerType = "vector";
+  mimeDataUri.providerKey = "arcgisvectortileservice";
+  mimeDataUri.name = entry.title;
+  mimeDataUri.uri = QStringLiteral( "serviceType=arcgis&styleUrl=%1&type=xyz&url=%2" ).arg( styleUrl, entry.url );
+  QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
+  mimeData->setProperty( "metadataUrl", metadataUrl );
+
+  QStringList sortIndices = entry.sortIndices.split( "/" );
+  mBrowser->addItem(
+    getCategoryItem( entry.category.split( "/" ), sortIndices ),
+    entry.title,
+    sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(),
+    true,
+    mimeData
+  );
 }

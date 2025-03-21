@@ -44,6 +44,7 @@
 #include <qgis/qgssnappingutils.h>
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
+#include <qgis/qgsvectortilelayer.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -374,6 +375,7 @@ void KadasMainWindow::init()
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
+
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
 
@@ -1300,6 +1302,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           QgsDataSourceUri dataSource( adjustedUri );
           adjustedUri = dataSource.uri();
           layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
+        }
+        else if ( uri.providerKey == "arcgisvectortileservice" )
+        {
+          QgsDataSourceUri dataSource( adjustedUri );
+          layer = kApp->addVectorTileLayer( dataSource.uri(), entry->name, false, false );
         }
         else if ( uri.providerKey == "wms" )
         {
