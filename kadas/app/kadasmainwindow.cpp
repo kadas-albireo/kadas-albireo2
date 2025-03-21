@@ -1306,7 +1306,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
-          layer = kApp->addVectorTileLayer( dataSource.uri(), entry->name, false );
+          layer = kApp->addVectorTileLayer( dataSource.uri(), entry->name, false, false );
         }
         else if ( uri.providerKey == "wms" )
         {
