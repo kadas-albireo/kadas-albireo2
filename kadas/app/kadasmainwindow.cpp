@@ -44,6 +44,7 @@
 #include <qgis/qgssnappingutils.h>
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
+#include <qgis/qgsvectortilelayer.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -1305,7 +1306,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
-          layer = kApp->addVectorLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
+          layer = kApp->addVectorTileLayer( dataSource.uri(), entry->name, false );
         }
         else if ( uri.providerKey == "wms" )
         {
