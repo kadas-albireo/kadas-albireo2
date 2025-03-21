@@ -454,7 +454,7 @@ void KadasArcGisPortalCatalogProvider::addVTSlayer( const ResultEntry &entry )
   mimeDataUri.layerType = "vector";
   mimeDataUri.providerKey = "arcgisvectortileservice";
   mimeDataUri.name = entry.title;
-  mimeDataUri.uri = QStringLiteral( "serviceType=arcgis&styleUrl=%1&type=xyz&url=" ).arg( styleUrl, entry.url );
+  mimeDataUri.uri = QStringLiteral( "serviceType=arcgis&styleUrl=%1&type=xyz&url=%2" ).arg( styleUrl, entry.url );
   QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", metadataUrl );
 
