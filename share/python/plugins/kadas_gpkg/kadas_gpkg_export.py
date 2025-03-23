@@ -184,6 +184,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
     def rewriteProjectPaths(self, path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources):
         if not path:
             return path
+
         if path in added_layers_by_source:
             # Datasource newly added to GPKG: rewrite as GPKG path
             layer = QgsProject.instance().mapLayer(added_layers_by_source[path])
@@ -198,10 +199,20 @@ class KadasGpkgExport(KadasGpkgExportBase):
             # Other resource: Add it to resources,
             if not path in additional_resources:
                 additional_resources[path] = str(uuid.uuid1()) + os.path.splitext(path)[1]
+
             return "@qgis_resources@/%s" % additional_resources[path]
-        else:
-            # No action
-            return path
+        
+        for added_layer_source in added_layers_by_source.keys():
+            if path in added_layer_source:
+                # Datasource newly added to GPKG: rewrite as GPKG path
+                layer = QgsProject.instance().mapLayer(added_layers_by_source[added_layer_source])
+                if layer.type() == QgsMapLayer.VectorLayer:
+                    return "@gpkg_file@"
+                elif layer.type() == QgsMapLayer.RasterLayer:
+                    return "GPKG:@gpkg_file@:" + self.safe_name(layer.name())
+
+        # No action
+        return path
 
     def add_resource(self, cursor, path, resource_id):
         """ Add a resource file to qgis_resources """
