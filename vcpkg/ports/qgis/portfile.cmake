@@ -50,6 +50,7 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
 
   list(APPEND QGIS_OPTIONS
        "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis"
