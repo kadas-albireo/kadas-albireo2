@@ -1224,6 +1224,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       adjustedUri = dataSource.uri();
       layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     }
+    else if ( uri.providerKey == "arcgisvectortileservice" )
+    {
+      QgsDataSourceUri dataSource( adjustedUri );
+      layer = kApp->addVectorTileLayer( dataSource.uri(), uri.name, false, false );
+    }
     else if ( uri.providerKey == "wms" )
     {
       adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
@@ -1327,6 +1332,15 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
 
     qDeleteAll( entries );
+  }
+  else if ( uri.providerKey == "arcgisvectortileservice" )
+  {
+    QgsDataSourceUri dataSource( adjustedUri );
+    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( dataSource.uri(), uri.name, false, false );
+    if ( layer )
+    {
+      layer->setMetadataUrl( metadataUrl );
+    }
   }
   else
   {
