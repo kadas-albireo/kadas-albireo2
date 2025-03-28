@@ -68,6 +68,7 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 
     void readWMTSDetail( const ResultEntry &entry );
     void readWMSDetail( const ResultEntry &entry );
+    void addVTSlayer( const ResultEntry &entry );
     void readWMTSCapabilities();
     void readWMSCapabilities();
     void readAMSCapabilities( const ResultEntry &entry );

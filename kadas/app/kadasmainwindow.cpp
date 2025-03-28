@@ -44,6 +44,7 @@
 #include <qgis/qgssnappingutils.h>
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
+#include <qgis/qgsvectortilelayer.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -374,6 +375,7 @@ void KadasMainWindow::init()
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
+
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
 
@@ -1222,6 +1224,10 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       adjustedUri = dataSource.uri();
       layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     }
+    else if ( uri.providerKey == "arcgisvectortileservice" )
+    {
+      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+    }
     else if ( uri.providerKey == "wms" )
     {
       adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
@@ -1301,6 +1307,10 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           adjustedUri = dataSource.uri();
           layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
+        else if ( uri.providerKey == "arcgisvectortileservice" )
+        {
+          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false );
+        }
         else if ( uri.providerKey == "wms" )
         {
           adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
@@ -1320,6 +1330,14 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
 
     qDeleteAll( entries );
+  }
+  else if ( uri.providerKey == "arcgisvectortileservice" )
+  {
+    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+    if ( layer )
+    {
+      layer->setMetadataUrl( metadataUrl );
+    }
   }
   else
   {

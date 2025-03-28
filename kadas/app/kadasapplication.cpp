@@ -584,7 +584,7 @@ void KadasApplication::addRasterLayers( const QStringList &layerUris, bool quiet
   KadasAppLayerHandling::addGdalRasterLayers( layerUris, ok, !quiet );
 }
 
-QgsVectorTileLayer *KadasApplication::addVectorTileLayer( const QString &url, const QString &baseName, bool quiet )
+QgsVectorTileLayer *KadasApplication::addVectorTileLayer( const QString &url, const QString &baseName, bool quiet, bool forceUpdateUriSources )
 {
   return KadasAppLayerHandling::addVectorTileLayer( url, baseName, !quiet );
 }
