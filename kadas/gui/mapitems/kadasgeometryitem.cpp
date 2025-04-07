@@ -459,13 +459,7 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
   }
   if ( !measurements.isEmpty() )
   {
-    mMeasurementLabels.append( MeasurementLabel {
-      measurements.join( "\n" ),
-      mapPos,
-      width,
-      metrics.height() * measurements.size(),
-      center
-    } );
+    mMeasurementLabels.append( MeasurementLabel { measurements.join( "\n" ), mapPos, width, metrics.height() * measurements.size(), center } );
   }
 }
 

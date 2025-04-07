@@ -85,14 +85,8 @@ bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMa
   }
   else
   {
-    QgsLineString hLine( QVector<QgsPointXY> {
-      QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ),
-      QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() )
-    } );
-    QgsLineString vLine( QVector<QgsPointXY> {
-      QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ),
-      QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize )
-    } );
+    QgsLineString hLine( QVector<QgsPointXY> { QgsPointXY( itemMapPos.x() - mapCrossSize, itemMapPos.y() ), QgsPointXY( itemMapPos.x() + mapCrossSize, itemMapPos.y() ) } );
+    QgsLineString vLine( QVector<QgsPointXY> { QgsPointXY( itemMapPos.x(), itemMapPos.y() - mapCrossSize ), QgsPointXY( itemMapPos.x(), itemMapPos.y() + mapCrossSize ) } );
 
     result = geomEngine->intersects( &hLine ) || geomEngine->intersects( &vLine );
   }
