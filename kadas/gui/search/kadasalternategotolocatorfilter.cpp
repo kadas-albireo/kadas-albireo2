@@ -45,8 +45,8 @@ KadasAlternateGotoLocatorFilter::KadasAlternateGotoLocatorFilter( QgsMapCanvas *
   mPatDMS = QRegularExpression( QString( "^(\\d+)%1(\\d+)[%2](\\d+,?\\d*)[%3]\\s?([NnSsEeWw])\\s*[;:]?\\s*(\\d+)%1(\\d+)[%2](\\d+,?\\d*)[%3]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ).arg( secChars ) );
   mPatDMSalt = QRegularExpression( QString( "^(\\d+)%1(\\d+)[%2](\\d+\\.?\\d*)[%3]\\s?([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+)[%2](\\d+\\.?\\d*)[%3]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ).arg( secChars ) );
 
-  mPatUTM = QRegularExpression( "^([\\d']+,?\\d*)\\s+([\\d']+,?\\d*)\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
-  mPatUTMalt = QRegularExpression( "^([\\d']+\\.?\\d*)[,\\s]\\s*([\\d']+\\.?\\d*)\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
+  mPatUTM = QRegularExpression( "^([\\d']+),\\d*\\s+([\\d']+),\\d*\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
+  mPatUTMalt = QRegularExpression( "^([\\d']+)\\.?\\d*[,\\s]\\s*([\\d']+)\\.?\\d*\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
 
   mPatUTM2 = QRegularExpression( "^(\\d+)\\s*([A-Za-z])\\s+([\\d']+[.,]?\\d*)[,\\s]\\s*([\\d']+[.,]?\\d*)$" );
 
