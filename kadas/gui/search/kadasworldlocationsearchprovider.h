@@ -36,7 +36,7 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     virtual QgsLocatorFilter *clone() const override;
     QString name() const override { return QStringLiteral( "world-location-search" ); }
     QString displayName() const override { return tr( " World Location Search" ); }
-    virtual Priority priority() const override { return Priority::Medium; }
+    virtual Priority priority() const override { return Priority::Low; }
     virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
     virtual void triggerResult( const QgsLocatorResult &result ) override;
     virtual void clearPreviousResults() override;
