@@ -62,6 +62,9 @@ QgsLocatorFilter *KadasWorldLocationSearchProvider::clone() const
 
 void KadasWorldLocationSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  if ( string.length() < 3 )
+    return;
+
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
   {

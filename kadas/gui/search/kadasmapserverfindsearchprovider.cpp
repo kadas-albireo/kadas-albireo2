@@ -63,6 +63,9 @@ QgsLocatorFilter *KadasMapServerFindSearchProvider::clone() const
 
 void KadasMapServerFindSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  if ( string.length() < 3 )
+    return;
+
   // List queryable rasters
   typedef QPair<QString, QString> LayerUrlName; // <layerurl, layername>
   QList<LayerUrlName> queryableLayers;

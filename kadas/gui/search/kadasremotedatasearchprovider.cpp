@@ -57,6 +57,9 @@ QgsLocatorFilter *KadasRemoteDataSearchProvider::clone() const
 
 void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  if ( string.length() < 3 )
+    return;
+
   QString remoteDataSearchUrl = QgsSettings().value( "search/remotedatasearchurl", "" ).toString();
   if ( remoteDataSearchUrl.isEmpty() )
     return;
