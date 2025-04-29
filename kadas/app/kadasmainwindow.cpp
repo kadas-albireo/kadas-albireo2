@@ -1304,6 +1304,8 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         else if ( uri.providerKey == "arcgisfeatureserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
+          dataSource.removeParam( "layer" );
+          dataSource.setParam( "layer", QString::number( entry->id ) );
           adjustedUri = dataSource.uri();
           layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
