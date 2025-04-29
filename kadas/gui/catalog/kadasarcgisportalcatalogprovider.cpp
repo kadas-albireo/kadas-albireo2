@@ -23,6 +23,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrlQuery>
+#include <QDebug>
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -357,6 +358,11 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 
   if ( reply->error() == QNetworkReply::NoError )
   {
+    qDebug() << "REQUEST:" << reply->request().url();
+
+    // auto completeReply = reply->readAll();
+    // qDebug() << "REPLY:  " << completeReply;
+
     QVariantMap serviceInfoMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
     if ( !serviceInfoMap["error"].isNull() )
