@@ -37,6 +37,9 @@ QgsLocatorFilter *KadasPinSearchProvider::clone() const
 
 void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  if ( string.length() < 3 )
+    return;
+
   const QList<QgsMapLayer *> layers = mMapCanvas->layers();
   for ( QgsMapLayer *layer : layers )
   {
