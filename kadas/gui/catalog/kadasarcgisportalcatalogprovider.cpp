@@ -428,7 +428,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     {
       mimeDataUri.layerType = "vector";
       mimeDataUri.providerKey = "arcgisfeatureserver";
-      mimeDataUri.uri = QString( "crs='%1' url='%2/0'" ).arg( crs.authid() ).arg( url );
+      mimeDataUri.uri = QString( "crs='%1' url='%2'" ).arg( crs.authid() ).arg( url );
     }
     else
     {
