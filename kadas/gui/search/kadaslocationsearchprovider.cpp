@@ -77,8 +77,6 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
   mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
   mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
-
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
@@ -92,6 +90,10 @@ QgsLocatorFilter *KadasLocationSearchFilter::clone() const
 
 void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  static QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
+  static QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
+
+
   if ( string.length() < 3 )
     return;
 
@@ -155,9 +157,13 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
 
     QVariantMap resultData;
-    if ( mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
+    if ( itemAttrsMap.contains( "geom_st_box2d" ) )
     {
-      resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(), mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+      QRegularExpressionMatch match = patBoxRe.match( itemAttrsMap["geom_st_box2d"].toString() );
+      if ( match.hasMatch() )
+      {
+        resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
+      }
     }
     // When bbox is empty, fallback to pos + zoomScale is used
     resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
@@ -168,7 +174,6 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     }
     if ( itemAttrsMap.contains( "boundingBox" ) )
     {
-      static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
       QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
       if ( match.isValid() )
       {
