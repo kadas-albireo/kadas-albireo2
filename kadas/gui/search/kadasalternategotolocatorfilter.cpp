@@ -32,25 +32,6 @@ KadasAlternateGotoLocatorFilter::KadasAlternateGotoLocatorFilter( QgsMapCanvas *
   : QgsLocatorFilter( parent )
   , mCanvas( mapCanvas )
 {
-  QString degChar = QStringLiteral( "%1" ).arg( QChar( 0x00B0 ) );
-  QString minChars = QString( "'%1%2%3" ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) );
-  QString secChars = QString( "\"%1" ).arg( QChar( 0x2033 ) );
-
-  mPatLVDD = QRegularExpression( QString( "^(-?[\\d']+,?\\d*)(%1)?\\s*[;:\\s]\\s*(-?[\\d']+,?\\d*)(%1)?.*$" ).arg( degChar ) );
-  mPatLVDDalt = QRegularExpression( QString( "^(-?[\\d']+\\.?\\d*)(%1)?\\s*[,;:\\s]\\s*(-?[\\d']+\\.?\\d*)(%1)?.*$" ).arg( degChar ) );
-
-  mPatDM = QRegularExpression( QString( "^(\\d+)%1(\\d+,?\\d*)[%2]\\s?([NnSsEeWw])\\s*[;:]?\\s*(\\d+)%1(\\d+,?\\d*)[%2]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ) );
-  mPatDMalt = QRegularExpression( QString( "^(\\d+)%1(\\d+\\.?\\d*)[%2]\\s?([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+\\.?\\d*)[%2]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ) );
-
-  mPatDMS = QRegularExpression( QString( "^(\\d+)%1(\\d+)[%2](\\d+,?\\d*)[%3]\\s?([NnSsEeWw])\\s*[;:]?\\s*(\\d+)%1(\\d+)[%2](\\d+,?\\d*)[%3]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ).arg( secChars ) );
-  mPatDMSalt = QRegularExpression( QString( "^(\\d+)%1(\\d+)[%2](\\d+\\.?\\d*)[%3]\\s?([NnSsEeWw])\\s*[,;:]?\\s*(\\d+)%1(\\d+)[%2](\\d+\\.?\\d*)[%3]\\s?([NnSsEeWw])$" ).arg( degChar ).arg( minChars ).arg( secChars ) );
-
-  mPatUTM = QRegularExpression( "^([\\d']+),\\d*\\s+([\\d']+),\\d*\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
-  mPatUTMalt = QRegularExpression( "^([\\d']+)\\.?\\d*[,\\s]\\s*([\\d']+)\\.?\\d*\\s*\\(\\w+\\s+(\\d+)([A-Za-z])\\)$" );
-
-  mPatUTM2 = QRegularExpression( "^(\\d+)\\s*([A-Za-z])\\s+([\\d']+[.,]?\\d*)[,\\s]\\s*([\\d']+[.,]?\\d*)$" );
-
-  mPatMGRS = QRegularExpression( "^(\\d+)\\s*(\\w)\\s*(\\w\\w)\\s*[,:;\\s]?\\s*(\\d{5})\\s*[,:;\\s]?\\s*(\\d{5})$" );
 }
 
 KadasAlternateGotoLocatorFilter *KadasAlternateGotoLocatorFilter::clone() const
@@ -66,6 +47,26 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( string.length() < 3 )
     return;
 
+  //QString degChar = QStringLiteral( "%1" ).arg( QChar( 0x00B0 ) );
+  //QString minChars = QString( "'%1%2%3" ).arg( QChar( 0x2032 ) ).arg( QChar( 0x02BC ) ).arg( QChar( 0x2019 ) );
+  //QString secChars = QString( "\"%1" ).arg( QChar( 0x2033 ) );
+  //mPatLVDD = QRegularExpression( QString( R"(^(-?[\d']+,?\d*)(%1)?\s*[;:\s]\s*(-?[\d']+,?\d*)(%1)?.*$)" ).arg( degChar ) );
+  //mPatLVDDalt = QRegularExpression( QString( R"(^(-?[\d']+\.?\d*)(%1)?\s*[,;:\s]\s*(-?[\d']+\.?\d*)(%1)?.*$)" ).arg( degChar ) );
+  // thread_local QRegularExpression mPatDM( QString( R"(^(\d+)%1(\d+,?\d*)[%2]\s?([NnSsEeWw])\s*[;:]?\s*(\d+)%1(\d+,?\d*)[%2]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ) );
+  // thread_local QRegularExpression mPatDMalt( QString( R"(^(\d+)%1(\d+\.?\d*)[%2]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+\.?\d*)[%2]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ) );
+  // mPatDMS = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+,?\d*)[%3]\s?([NnSsEeWw])\s*[;:]?\s*(\d+)%1(\d+)[%2](\d+,?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
+  // mPatDMSalt = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
+
+  thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
+  thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
+
+  thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
+
+  thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
+
+  const QLocale locale;
+
+
   // Mostly copied from QgsGotoLocatorFilter::fetchResults
   // with additions for 2056 + 21781
 
@@ -74,11 +75,10 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   double firstNumber = 0.0;
   double secondNumber = 0.0;
   bool posIsWgs84 = false;
-  const QLocale locale;
 
   // Coordinates such as 106.8468,-6.3804
-  QRegularExpression separatorRx( QStringLiteral( "^([0-9\\-\\%1\\%2]*)[\\s%3]*([0-9\\-\\%1\\%2]*)$" ).arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString() ) );
-  QRegularExpressionMatch match = separatorRx.match( string.trimmed() );
+  thread_local QRegularExpression separatorRx1( QStringLiteral( R"(^([0-9\-\%1\%2]*)[\s%3]*([0-9\-\%1\%2]*)$)" ).arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString() ) );
+  QRegularExpressionMatch match = separatorRx1.match( string.trimmed() );
   if ( match.hasMatch() )
   {
     firstNumber = locale.toDouble( match.captured( 1 ), &firstOk );
@@ -88,8 +88,8 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() || !firstOk || !secondOk )
   {
     // Digit detection using user locale failed, use default C decimal separators
-    separatorRx = QRegularExpression( QStringLiteral( "^([0-9\\-\\.]*)[\\s\\,]*([0-9\\-\\.]*)$" ) );
-    match = separatorRx.match( string.trimmed() );
+    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)[\s\,]*([0-9\-\.]*)$)" ) );
+    match = separatorRx2.match( string.trimmed() );
     if ( match.hasMatch() )
     {
       firstNumber = match.captured( 1 ).toDouble( &firstOk );
@@ -100,9 +100,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes
-    separatorRx = QRegularExpression( QStringLiteral( "^\\s*([-]?\\d{1,3}(?:[\\.\\%1]\\d+)?\\s*[NSEWnsew])[\\s\\,]*([-]?\\d{1,3}(?:[\\.\\%1]\\d+)?\\s*[NSEWnsew])\\s*$" )
-                                        .arg( locale.decimalPoint() ) );
-    match = separatorRx.match( string.trimmed() );
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])\s*$)" )
+                                                    .arg( locale.decimalPoint() ) );
+    match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
     {
       posIsWgs84 = true;
@@ -118,16 +118,16 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of degree minute second
-    const QString dmsRx = QStringLiteral( "\\d{1,3}(?:[^0-9.]+[0-5]?\\d)?[^0-9.]+[0-5]?\\d(?:[\\.\\%1]\\d+)?" ).arg( locale.decimalPoint() );
-    separatorRx = QRegularExpression( QStringLiteral(
-                                        "^("
-                                        "(\\s*%1[^0-9.,]*[-+NSEWnsew]?)[,\\s]+(%1[^0-9.,]*[-+NSEWnsew]?)"
-                                        ")|("
-                                        "((?:([-+NSEWnsew])\\s*)%1[^0-9.,]*)[,\\s]+((?:([-+NSEWnsew])\\s*)%1[^0-9.,]*)"
-                                        ")$"
+    thread_local QString dmsRx = QStringLiteral( R"(\d{1,3}(?:[^0-9.]+[0-5]?\d)?[^0-9.]+[0-5]?\d(?:[\.\%1]\d+)?)" ).arg( locale.decimalPoint() );
+    thread_local QRegularExpression separatorRx4( QStringLiteral(
+                                                    "^("
+                                                    R"((\s*%1[^0-9.,]*[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*[-+NSEWnsew]?))"
+                                                    ")|("
+                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*))"
+                                                    ")$"
     )
-                                        .arg( dmsRx ) );
-    match = separatorRx.match( string.trimmed() );
+                                                    .arg( dmsRx ) );
+    match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
     {
       qDebug() << match.captured( 1 ) << match.captured( 2 ) << match.captured( 3 ) << match.captured( 4 ) << match.captured( 5 ) << match.captured( 6 ) << match.captured( 7 ) << match.captured( 8 );

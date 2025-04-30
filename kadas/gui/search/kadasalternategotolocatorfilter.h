@@ -50,17 +50,6 @@ class KADAS_GUI_EXPORT KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
 
     QgsMapCanvas *mCanvas = nullptr;
 
-    QRegularExpression mPatLVDD;
-    QRegularExpression mPatLVDDalt;
-    QRegularExpression mPatDM;
-    QRegularExpression mPatDMalt;
-    QRegularExpression mPatDMS;
-    QRegularExpression mPatDMSalt;
-    QRegularExpression mPatUTM;
-    QRegularExpression mPatUTMalt;
-    QRegularExpression mPatUTM2;
-    QRegularExpression mPatMGRS;
-
     QString mPinItemId;
 };
 
