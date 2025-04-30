@@ -48,7 +48,6 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     QString mGeometryItemId;
     QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int>> mCategoryMap;
-    QRegExp mPatBox;
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H

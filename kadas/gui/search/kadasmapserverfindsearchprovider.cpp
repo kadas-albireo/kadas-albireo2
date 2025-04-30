@@ -53,7 +53,6 @@ KadasMapServerFindSearchProvider::KadasMapServerFindSearchProvider( QgsMapCanvas
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
 {
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 }
 
 QgsLocatorFilter *KadasMapServerFindSearchProvider::clone() const

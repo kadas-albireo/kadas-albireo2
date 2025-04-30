@@ -49,7 +49,6 @@ class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider : public QgsLocatorFilte
     static const QByteArray sGeoAdminUrl;
 
     QString mGeometryItemId;
-    QRegExp mPatBox;
 };
 
 #endif // KADASMAPSERVERFINDSEARCHPROVIDER_H

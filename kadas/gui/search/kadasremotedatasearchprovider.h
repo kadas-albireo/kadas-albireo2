@@ -51,7 +51,6 @@ class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public QgsLocatorFilter
 
     QgsMapCanvas *mMapCanvas = nullptr;
     QString mPinItemId;
-    QRegExp mPatBox;
 };
 
 #endif // KADASREMOTEDATASEARCHPROVIDER_H
