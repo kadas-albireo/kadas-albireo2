@@ -90,12 +90,11 @@ QgsLocatorFilter *KadasLocationSearchFilter::clone() const
 
 void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
-  static QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
-  static QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
-
-
   if ( string.length() < 3 )
     return;
+
+  thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
+  thread_local QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
