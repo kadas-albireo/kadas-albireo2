@@ -57,12 +57,10 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // mPatDMS = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+,?\d*)[%3]\s?([NnSsEeWw])\s*[;:]?\s*(\d+)%1(\d+)[%2](\d+,?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
   // mPatDMSalt = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
 
-  thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
-  thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
-
-  thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
-
-  thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
+  const thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
+  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
+  const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
+  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
 
   const QLocale locale;
 

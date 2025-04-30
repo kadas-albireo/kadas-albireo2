@@ -93,8 +93,8 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   if ( string.length() < 3 )
     return;
 
-  thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
-  thread_local QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
+  const thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
+  const thread_local QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -158,7 +158,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     QVariantMap resultData;
     if ( itemAttrsMap.contains( "geom_st_box2d" ) )
     {
-      QRegularExpressionMatch match = patBoxRe.match( itemAttrsMap["geom_st_box2d"].toString() );
+      const QRegularExpressionMatch match = patBoxRe.match( itemAttrsMap["geom_st_box2d"].toString() );
       if ( match.hasMatch() )
       {
         resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
@@ -173,7 +173,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     }
     if ( itemAttrsMap.contains( "boundingBox" ) )
     {
-      QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
+      const QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
       if ( match.isValid() )
       {
         resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );

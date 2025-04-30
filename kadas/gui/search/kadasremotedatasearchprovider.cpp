@@ -58,7 +58,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
   if ( string.length() < 3 )
     return;
 
-  thread_local QRegularExpression patBox( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
+  const thread_local QRegularExpression patBox( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
 
   QString remoteDataSearchUrl = QgsSettings().value( "search/remotedatasearchurl", "" ).toString();
   if ( remoteDataSearchUrl.isEmpty() )
