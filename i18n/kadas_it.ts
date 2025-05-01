@@ -4203,7 +4203,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="168"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="171"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -5278,7 +5278,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Spilli</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaspinsearchprovider.cpp" line="61"/>
+        <location filename="../kadas/gui/search/kadaspinsearchprovider.cpp" line="64"/>
         <source>Pin %1</source>
         <translation>Spillo %1</translation>
     </message>
@@ -5708,7 +5708,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="178"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="181"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
