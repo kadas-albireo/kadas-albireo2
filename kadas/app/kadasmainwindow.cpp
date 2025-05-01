@@ -1296,8 +1296,9 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         if ( uri.providerKey == "arcgismapserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
-          dataSource.removeParam( "layer" );
-          dataSource.setParam( "layer", QString::number( entry->id ) );
+          QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( entry->id );
+          dataSource.removeParam( "url" );
+          dataSource.setParam( "url", urlParameter );
           adjustedUri = dataSource.uri();
           layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
