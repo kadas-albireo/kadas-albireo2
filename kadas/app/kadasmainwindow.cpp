@@ -1293,6 +1293,8 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       if ( entry->leaf )
       {
+        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
+
         QgsMapLayer *layer = nullptr;
         if ( uri.providerKey == "arcgismapserver" )
         {
@@ -1319,7 +1321,6 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
 
-        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
         if ( layer )
         {
           layer->setMetadataUrl( metadataUrl );
