@@ -358,11 +358,6 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 
   if ( reply->error() == QNetworkReply::NoError )
   {
-    qDebug() << "REQUEST:" << reply->request().url();
-
-    // auto completeReply = reply->readAll();
-    // qDebug() << "REPLY:  " << completeReply;
-
     QVariantMap serviceInfoMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
     if ( !serviceInfoMap["error"].isNull() )
@@ -421,6 +416,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
       sublayer["name"] = entry["name"];
       sublayers.append( sublayer );
 
+      // No mixing allowed: if one layer of the group is Raster -> use only raster
       if ( entry["type"] == "Raster Layer" )
       {
         typeVector = false;

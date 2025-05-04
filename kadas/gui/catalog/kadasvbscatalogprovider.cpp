@@ -268,6 +268,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       sublayer["name"] = entry["name"];
       sublayers.append( sublayer );
 
+      // No mixing allowed: if one layer of the group is Raster -> use only raster
       if ( entry["type"] == "Raster Layer" )
       {
         typeVector = false;

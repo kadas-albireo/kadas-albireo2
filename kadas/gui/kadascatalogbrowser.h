@@ -33,7 +33,6 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 {
     Q_OBJECT
   public:
-
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
     QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
