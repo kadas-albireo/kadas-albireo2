@@ -1223,7 +1223,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
       dataSource.removeParam( "url" );
       dataSource.setParam( "url", urlParameter );
-      layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addVectorLayer( dataSource.uri(), uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "arcgisvectortileservice" )
     {

@@ -1128,9 +1128,18 @@ int KadasApplication::dialogPanelIndex( const QString &name, QStackedWidget *sta
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 {
   QString layerUrl;
-  if ( layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )
+  if ( layer->providerType() == "arcgismapserver" )
   {
     layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
+  }
+  else if ( layer->providerType() == "arcgisfeatureserver" )
+  {
+    layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
+    int lastIndex = layerUrl.lastIndexOf( QRegExp( "\\/\\d+\\/{0,1}$" ) ); // Chop the layer index ../MapServer/4
+    if ( lastIndex >= 0 )
+    {
+      layerUrl = layerUrl.left( lastIndex );
+    }
   }
   else if ( layer->providerType() == "wms" )
   {
