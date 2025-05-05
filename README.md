@@ -103,5 +103,5 @@ More tools like hillshade and viewshed analysis are available as well.
 
 ## Feedback and support:
 
-This software is commercially supported by Sourcepole, Switzerland. 
-To get more information, please contact qgis at sourcepole.com.
+This software is commercially supported by OPENGIS.ch, Switzerland. 
+To get more information, please contact info@opengis.ch
