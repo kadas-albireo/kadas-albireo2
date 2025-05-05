@@ -20,6 +20,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrlQuery>
+#include <QElapsedTimer>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -62,6 +63,9 @@ QgsLocatorFilter *KadasWorldLocationSearchProvider::clone() const
 
 void KadasWorldLocationSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  QElapsedTimer timer;
+  timer.start();
+
   if ( string.length() < 3 )
     return;
 
@@ -111,6 +115,9 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
     const QJsonArray constResults = resultMap["results"].toArray();
     for ( const QJsonValue &item : constResults )
     {
+      if ( feedback->isCanceled() )
+        return;
+
       QJsonObject itemMap = item.toObject();
       QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
 
@@ -124,7 +131,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
       result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
       result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
       QString label = itemAttrsMap["label"].toString();
-      label.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
+      label.replace( QRegularExpression( "<[^>]+>" ), "" ); // Remove HTML tags
       result.displayString = label;
 
       if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
@@ -133,7 +140,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
       }
       if ( itemAttrsMap.contains( "boundingBox" ) )
       {
-        const thread_local QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
+        static const thread_local QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
         QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
         if ( match.isValid() )
         {
@@ -148,6 +155,7 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   {
     QgsDebugMsgLevel( QString( "Could not fetch %1: %2" ).arg( url.toString(), rep.errorString() ), 1 );
   }
+  qDebug() << " world fetchResults(" << string << ") took" << timer.elapsed() << "ms";
 }
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )

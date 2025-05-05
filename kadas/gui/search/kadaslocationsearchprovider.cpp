@@ -20,6 +20,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrlQuery>
+#include <QElapsedTimer>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -90,6 +91,9 @@ QgsLocatorFilter *KadasLocationSearchFilter::clone() const
 
 void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
+  QElapsedTimer timer;
+  timer.start();
+
   if ( string.length() < 3 )
     return;
 
@@ -182,6 +186,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     result.setUserData( resultData );
     emit resultFetched( result );
   }
+  qDebug() << "location fetchResults(" << string << ") took" << timer.elapsed() << "ms";
 }
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
