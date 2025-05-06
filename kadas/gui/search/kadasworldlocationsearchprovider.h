@@ -20,6 +20,8 @@
 #include <QMap>
 #include <QRegExp>
 #include <QTimer>
+#include <QNetworkReply>
+#include <QEventLoop>
 
 #include <qgis/qgslocatorfilter.h>
 
@@ -41,6 +43,9 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     virtual void triggerResult( const QgsLocatorResult &result ) override;
     virtual void clearPreviousResults() override;
 
+  private slots:
+    void handleNetworkReply();
+
   private:
     static const int sResultCountLimit;
 
@@ -48,6 +53,10 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     QString mGeometryItemId;
     QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int>> mCategoryMap;
+    QNetworkReply *mCurrentReply = nullptr;
+    QgsFeedback *mCurrentFeedback = nullptr;
+    QEventLoop *mCurrentEventLoop = nullptr;
+    QString mCurrentSearchString;
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H

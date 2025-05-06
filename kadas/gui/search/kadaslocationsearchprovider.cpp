@@ -21,6 +21,8 @@
 #include <QNetworkReply>
 #include <QUrlQuery>
 #include <QElapsedTimer>
+#include <QEventLoop>
+#include <QNetworkAccessManager>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -78,10 +80,21 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
   mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
   mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
+  mNetworkManager = new QNetworkAccessManager( this );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
 {
+  if ( mCurrentReply )
+  {
+    mCurrentReply->abort();
+    mCurrentReply->deleteLater();
+  }
+  if ( mEventLoop )
+  {
+    mEventLoop->quit();
+    delete mEventLoop;
+  }
 }
 
 QgsLocatorFilter *KadasLocationSearchFilter::clone() const
@@ -97,8 +110,16 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   if ( string.length() < 3 )
     return;
 
-  const thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*))", QRegularExpression::CaseInsensitiveOption );
-  const thread_local QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
+  if ( mCurrentReply )
+  {
+    mCurrentReply->abort();
+    mCurrentReply->deleteLater();
+    mCurrentReply = nullptr;
+  }
+
+  mPendingSearchString = string;
+  mPendingContext = context;
+  mPendingFeedback = feedback;
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -110,7 +131,6 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     serviceUrl = QgsSettings().value( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
   }
 
-  // serviceUrl = "https://gist.githubusercontent.com/3nids/50a5e773ff18fe78a49edb7d7eb13e1d/raw/99aaacc67f3fbae773fdb088213aeb7cc9bfbb16/kadas-search-2";
   QgsDebugMsgLevel( serviceUrl, 2 );
 
   QUrl url( serviceUrl );
@@ -130,22 +150,28 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
+  mCurrentReply = mNetworkManager->get( req );
+  mEventLoop = new QEventLoop;
+  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasLocationSearchFilter::handleSearchReply );
+  connect( feedback, &QgsFeedback::canceled, mCurrentReply, &QNetworkReply::abort );
+  mEventLoop->exec();
+  delete mEventLoop;
+  mEventLoop = nullptr;
+  qDebug() << "location fetchResults(" << string << ") took" << timer.elapsed() << "ms";
+}
 
-  QgsBlockingNetworkRequest bnr = QgsBlockingNetworkRequest();
-
-  connect( feedback, &QgsFeedback::canceled, &bnr, &QgsBlockingNetworkRequest::abort );
-  QgsBlockingNetworkRequest::ErrorCode errCode = bnr.get( req, false, feedback );
-  if ( errCode != QgsBlockingNetworkRequest::NoError )
+void KadasLocationSearchFilter::handleSearchReply()
+{
+  if ( !mCurrentReply )
     return;
 
-  QgsNetworkReplyContent reply = bnr.reply();
+  QByteArray replyContent = mCurrentReply->readAll();
   QJsonParseError err;
-  QJsonDocument doc = QJsonDocument::fromJson( reply.content(), &err );
+  QJsonDocument doc = QJsonDocument::fromJson( replyContent, &err );
   if ( doc.isNull() )
-    QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
+    QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
 
   QJsonObject resultMap = doc.object();
-  //bool fuzzy = resultMap["fuzzy"] == "true";
   const QJsonArray constResults = resultMap["results"].toArray();
   for ( const QJsonValue &item : constResults )
   {
@@ -160,6 +186,8 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
 
     QVariantMap resultData;
+    const thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*)", QRegularExpression::CaseInsensitiveOption );
+    const thread_local QRegularExpression patBoxRe( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
     if ( itemAttrsMap.contains( "geom_st_box2d" ) )
     {
       const QRegularExpressionMatch match = patBoxRe.match( itemAttrsMap["geom_st_box2d"].toString() );
@@ -186,7 +214,10 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     result.setUserData( resultData );
     emit resultFetched( result );
   }
-  qDebug() << "location fetchResults(" << string << ") took" << timer.elapsed() << "ms";
+  mCurrentReply->deleteLater();
+  mCurrentReply = nullptr;
+  if ( mEventLoop )
+    mEventLoop->quit();
 }
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )

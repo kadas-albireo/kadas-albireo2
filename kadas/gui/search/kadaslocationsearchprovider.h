@@ -21,6 +21,9 @@
 #include <QPointer>
 #include <QMap>
 #include <QRegExp>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QEventLoop>
 
 #include <qgis/qgslocatorfilter.h>
 
@@ -56,6 +59,16 @@ class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
 
     QString mPinItemId;
     QString mGeometryItemId;
+
+    QNetworkAccessManager *mNetworkManager = nullptr;
+    QEventLoop *mEventLoop = nullptr;
+    QNetworkReply *mCurrentReply = nullptr;
+    QString mPendingSearchString;
+    QgsLocatorContext mPendingContext;
+    QgsFeedback *mPendingFeedback = nullptr;
+
+  private slots:
+    void handleSearchReply();
 };
 
 #endif // KADASLOCATIONSEARCHPROVIDER_H
