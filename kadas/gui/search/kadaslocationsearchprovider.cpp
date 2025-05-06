@@ -157,7 +157,6 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   mEventLoop->exec();
   delete mEventLoop;
   mEventLoop = nullptr;
-  qDebug() << "location fetchResults(" << string << ") took" << timer.elapsed() << "ms";
 }
 
 void KadasLocationSearchFilter::handleSearchReply()

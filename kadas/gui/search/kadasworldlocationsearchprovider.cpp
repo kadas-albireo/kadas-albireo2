@@ -109,7 +109,6 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   connect( mCurrentReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::handleNetworkReply );
   eventLoop.exec();
   mCurrentEventLoop = nullptr;
-  qDebug() << " world fetchResults(" << string << ") took" << timer.elapsed() << "ms";
 }
 
 void KadasWorldLocationSearchProvider::handleNetworkReply()
