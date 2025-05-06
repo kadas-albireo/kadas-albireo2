@@ -26,9 +26,11 @@
 
 #include "kadas/gui/kadas_gui.h"
 
+class QNetworkReply;
+class QEventLoop;
+
 class QgsMapCanvas;
 class QgsFillSymbol;
-
 
 class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
 {
@@ -53,10 +55,16 @@ class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
     static const QByteArray sGeoAdminUrl;
 
     QMap<QString, QPair<QString, int>> mCategoryMap;
-    QRegExp mPatBox;
 
     QString mPinItemId;
     QString mGeometryItemId;
+
+    QEventLoop *mEventLoop = nullptr;
+    QNetworkReply *mCurrentReply = nullptr;
+    QgsFeedback *mFeedback = nullptr;
+
+  private slots:
+    void handleNetworkReply();
 };
 
 #endif // KADASLOCATIONSEARCHPROVIDER_H

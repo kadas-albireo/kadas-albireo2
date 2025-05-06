@@ -10,7 +10,7 @@
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   any later version.                                   *
  *                                                                         *
  ***************************************************************************/
 
@@ -53,7 +53,6 @@ KadasMapServerFindSearchProvider::KadasMapServerFindSearchProvider( QgsMapCanvas
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
 {
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
 }
 
 QgsLocatorFilter *KadasMapServerFindSearchProvider::clone() const
@@ -126,6 +125,11 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
                       .arg( box.yMaximum(), 0, 'f', 4 );
   }
 
+  // --- Begin event loop addition ---
+  QEventLoop eventLoop;
+  int pendingReplies = 0;
+  bool canceled = false;
+
   for ( const LayerUrlName &ql : queryableLayers )
   {
     QUrl url( ql.first + "/find" );
@@ -139,9 +143,14 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
     QNetworkRequest req( url );
     req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
+    ++pendingReplies;
     connect( feedback, &QgsFeedback::canceled, reply, &QNetworkReply::abort );
-    connect( reply, &QNetworkReply::finished, this, [this, reply]() {
-      if ( reply->error() == QNetworkReply::NoError )
+    connect( feedback, &QgsFeedback::canceled, &eventLoop, [&]() {
+      canceled = true;
+      eventLoop.quit();
+    } );
+    connect( reply, &QNetworkReply::finished, this, [this, reply, &pendingReplies, &eventLoop, &canceled]() {
+      if ( reply->error() == QNetworkReply::NoError && !canceled )
       {
         QByteArray replyText = reply->readAll();
         QJsonParseError err;
@@ -177,8 +186,16 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
         }
       }
       reply->deleteLater();
+      --pendingReplies;
+      if ( pendingReplies == 0 || canceled )
+        eventLoop.quit();
     } );
   }
+  if ( pendingReplies > 0 && !canceled )
+  {
+    eventLoop.exec();
+  }
+  // --- End event loop addition ---
 }
 
 void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &result )

@@ -46,9 +46,7 @@ const int KadasRemoteDataSearchProvider::sResultCountLimit = 100;
 KadasRemoteDataSearchProvider::KadasRemoteDataSearchProvider( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
-{
-  mPatBox = QRegExp( "^BOX\\s*\\(\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)\\s*\\)$" );
-}
+{}
 
 QgsLocatorFilter *KadasRemoteDataSearchProvider::clone() const
 {
@@ -59,6 +57,8 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
 {
   if ( string.length() < 3 )
     return;
+
+  const thread_local QRegularExpression patBox( R"(^BOX\s*\(\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*,\s*(\d+\.?\d*)\s*(\d+\.?\d*)\s*\)$)" );
 
   QString remoteDataSearchUrl = QgsSettings().value( "search/remotedatasearchurl", "" ).toString();
   if ( remoteDataSearchUrl.isEmpty() )
@@ -160,7 +160,9 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
           QVariantMap itemMap = item.toMap();
           QVariantMap itemAttrsMap = itemMap["attrs"].toMap();
 
-          if ( !mPatBox.exactMatch( itemAttrsMap["geom_st_box2d"].toString() ) )
+
+          const QRegularExpressionMatch match = patBox.match( itemAttrsMap["geom_st_box2d"].toString() );
+          if ( !match.hasMatch() )
           {
             QgsDebugMsgLevel( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString(), 2 );
             continue;
@@ -172,7 +174,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
           const QString crs = itemAttrsMap["sr"].toString();
           QgsPointXY pos( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
           resultData[QStringLiteral( "crs" )] = crs;
-          resultData[QStringLiteral( "bbox" )] = QgsRectangle( mPatBox.cap( 1 ).toDouble(), mPatBox.cap( 2 ).toDouble(), mPatBox.cap( 3 ).toDouble(), mPatBox.cap( 4 ).toDouble() );
+          resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
           if ( !bbox.isNull() && !bbox.contains( pos ) )
             continue;
 

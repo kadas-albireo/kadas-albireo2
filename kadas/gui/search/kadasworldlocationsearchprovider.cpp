@@ -20,6 +20,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrlQuery>
+#include <QElapsedTimer>
+#include <QEventLoop>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -52,6 +54,7 @@ KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
 {
+  setFetchResultsDelay( 300 );
   mCategoryMap.insert( "geonames", qMakePair( tr( "World Places" ), 30 ) );
 }
 
@@ -65,6 +68,8 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   if ( string.length() < 3 )
     return;
 
+  mFeedback = feedback;
+
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
   {
@@ -74,8 +79,6 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   {
     serviceUrl = QgsSettings().value( "search/worldlocationsearchurl", "" ).toString();
   }
-
-  // serviceUrl = "https://gist.githubusercontent.com/3nids/0fa5b42732df63f963111de7d0d9cd63/raw/4aa5024cf4ee9b664af8ec9135f7880a5c306f5b/search%2520kadas";
 
   if ( serviceUrl.isEmpty() )
     return;
@@ -96,58 +99,80 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
 
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  QgsNetworkReplyContent rep = QgsNetworkAccessManager::blockingGet( req, QString(), false, feedback );
 
-  if ( rep.error() == QNetworkReply::NoError )
+  //QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+  // we have performance issues with QgsNetworkAccessManager::instance()
+  QNetworkAccessManager *nam = new QNetworkAccessManager( this );
+  mCurrentReply = nam->get( req );
+
+  mEventLoop = new QEventLoop;
+  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::handleNetworkReply );
+  connect( feedback, &QgsFeedback::canceled, mEventLoop, [&]() {
+    mCurrentReply->abort();
+    mCurrentReply->deleteLater();
+    mCurrentReply = nullptr;
+    mEventLoop->quit();
+  } );
+  mEventLoop->exec();
+  delete mEventLoop;
+  mEventLoop = nullptr;
+}
+
+void KadasWorldLocationSearchProvider::handleNetworkReply()
+{
+  if ( !mCurrentReply )
+    return;
+
+  QByteArray replyText = mCurrentReply->readAll();
+  QJsonParseError err;
+  QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
+  if ( doc.isNull() )
   {
-    QByteArray replyText = rep.content();
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
-    if ( doc.isNull() )
-    {
-      QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
-    }
-    QJsonObject resultMap = doc.object();
-    const QJsonArray constResults = resultMap["results"].toArray();
-    for ( const QJsonValue &item : constResults )
-    {
-      QJsonObject itemMap = item.toObject();
-      QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
-
-
-      QString origin = itemAttrsMap["origin"].toString();
-
-      QgsLocatorResult result;
-      QVariantMap resultData;
-      resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
-
-      result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
-      result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
-      QString label = itemAttrsMap["label"].toString();
-      label.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
-      result.displayString = label;
-
-      if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
-      {
-        resultData[QStringLiteral( "geometry" )] = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
-      }
-      if ( itemAttrsMap.contains( "boundingBox" ) )
-      {
-        static QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
-        QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
-        if ( match.isValid() )
-        {
-          resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
-        }
-      }
-      result.setUserData( resultData );
-      emit resultFetched( result );
-    }
+    QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
   }
-  else
+  QJsonObject resultMap = doc.object();
+  const QJsonArray constResults = resultMap["results"].toArray();
+  for ( const QJsonValue &item : constResults )
   {
-    QgsDebugMsgLevel( QString( "Could not fetch %1: %2" ).arg( url.toString(), rep.errorString() ), 1 );
+    if ( mFeedback && mFeedback->isCanceled() )
+    {
+      mCurrentReply->deleteLater();
+      mCurrentReply = nullptr;
+      if ( mEventLoop )
+        mEventLoop->quit();
+      return;
+    }
+    QJsonObject itemMap = item.toObject();
+    QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
+    QString origin = itemAttrsMap["origin"].toString();
+    QgsLocatorResult result;
+    QVariantMap resultData;
+    resultData[QStringLiteral( "pos" )] = QgsPointXY( itemAttrsMap["lon"].toDouble(), itemAttrsMap["lat"].toDouble() );
+    result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
+    result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 1;
+    QString label = itemAttrsMap["label"].toString();
+    label.replace( QRegularExpression( "<[^>]+>" ), "" ); // Remove HTML tags
+    result.displayString = label;
+    if ( itemAttrsMap.contains( "geometryGeoJSON" ) )
+    {
+      resultData[QStringLiteral( "geometry" )] = QJsonDocument( itemAttrsMap["geometryGeoJSON"].toObject() ).toJson( QJsonDocument::Compact );
+    }
+    if ( itemAttrsMap.contains( "boundingBox" ) )
+    {
+      static const thread_local QRegularExpression bboxRe( "BOX\\s*\\(\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*,\\s*(-?\\d+\\.?\\d*)\\s+(-?\\d+\\.?\\d*)\\s*\\)", QRegularExpression::CaseInsensitiveOption );
+      QRegularExpressionMatch match = bboxRe.match( itemAttrsMap["boundingBox"].toString() );
+      if ( match.isValid() )
+      {
+        resultData[QStringLiteral( "bbox" )] = QgsRectangle( match.captured( 1 ).toDouble(), match.captured( 2 ).toDouble(), match.captured( 3 ).toDouble(), match.captured( 4 ).toDouble() );
+      }
+    }
+    result.setUserData( resultData );
+    emit resultFetched( result );
   }
+  mCurrentReply->deleteLater();
+  mCurrentReply = nullptr;
+  if ( mEventLoop )
+    mEventLoop->quit();
 }
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )
