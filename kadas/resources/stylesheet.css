@@ -49,6 +49,14 @@ QAbstractItemView::item::selected::disabled
   color: #999999;
 }
 
+QgsLocatorResultsView::item::disabled,
+QgsLocatorResultsView::item:selected::disabled
+{
+  background-color: transparent;
+  color: #3f3f3f;
+}
+QMenu::item,
+
 QMenu::item:selected, QAbstractItemView::item::selected {
     background-color: #3daee9;
     color: white;
@@ -107,36 +115,6 @@ QPushButton#mRibbonbarButton:pressed
 
 #mGeodataToolbar QToolButton:pressed {
     background: #16232f;
-}
-
-/** Search **/
-#mSearchWidget {
-  background-color: #5D7081;
-}
-
-#searchBox {
-    border: 1px solid #9db2c5;
-    background-color: #E8F4FF;
-    color: black;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-    padding: 5px;
-}
-
-#searchFilter {
-    border-right: 1px solid #9db2c5;
-    border-top: 1px solid #9db2c5;
-    border-bottom: 1px solid #9db2c5;
-    background-color: #5d7081;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    margin: 0;
-    padding: 5px;
-}
-
-#searchFilter:open
-{
-  background: #485764;
 }
 
 
