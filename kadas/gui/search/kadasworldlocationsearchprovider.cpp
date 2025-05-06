@@ -137,6 +137,7 @@ void KadasWorldLocationSearchProvider::handleNetworkReply()
     if ( mFeedback && mFeedback->isCanceled() )
     {
       mCurrentReply->deleteLater();
+      mCurrentReply = nullptr;
       if ( mEventLoop )
         mEventLoop->quit();
       return;

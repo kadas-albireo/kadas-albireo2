@@ -184,6 +184,8 @@ void KadasLocationSearchFilter::handleNetworkReply()
     {
       mCurrentReply->deleteLater();
       mCurrentReply = nullptr;
+      if ( mEventLoop )
+        mEventLoop->quit();
       return;
     }
 
