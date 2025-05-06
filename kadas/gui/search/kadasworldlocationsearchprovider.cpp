@@ -54,6 +54,7 @@ KadasWorldLocationSearchProvider::KadasWorldLocationSearchProvider( QgsMapCanvas
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
 {
+  setFetchResultsDelay( 300 );
   mCategoryMap.insert( "geonames", qMakePair( tr( "World Places" ), 30 ) );
 }
 
