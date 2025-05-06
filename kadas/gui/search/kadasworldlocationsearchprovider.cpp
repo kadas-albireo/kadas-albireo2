@@ -99,7 +99,9 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
-  QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+  //QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+  // we have performance issues with QgsNetworkAccessManager::instance()
+  QNetworkAccessManager *nam = new QNetworkAccessManager( this );
   mCurrentReply = nam->get( req );
 
   mEventLoop = new QEventLoop;
