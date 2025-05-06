@@ -64,11 +64,10 @@ QgsLocatorFilter *KadasWorldLocationSearchProvider::clone() const
 
 void KadasWorldLocationSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
-  QElapsedTimer timer;
-  timer.start();
-
   if ( string.length() < 3 )
     return;
+
+  mFeedback = feedback;
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -100,15 +99,15 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
-  QNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+  QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
   mCurrentReply = nam->get( req );
-  mCurrentFeedback = feedback;
-  mCurrentSearchString = string;
-  QEventLoop eventLoop;
-  mCurrentEventLoop = &eventLoop;
+
+  mEventLoop = new QEventLoop;
   connect( mCurrentReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::handleNetworkReply );
-  eventLoop.exec();
-  mCurrentEventLoop = nullptr;
+  connect( feedback, &QgsFeedback::canceled, mCurrentReply, &QNetworkReply::abort );
+  mEventLoop->exec();
+  delete mEventLoop;
+  mEventLoop = nullptr;
 }
 
 void KadasWorldLocationSearchProvider::handleNetworkReply()
@@ -127,11 +126,11 @@ void KadasWorldLocationSearchProvider::handleNetworkReply()
   const QJsonArray constResults = resultMap["results"].toArray();
   for ( const QJsonValue &item : constResults )
   {
-    if ( mCurrentFeedback && mCurrentFeedback->isCanceled() )
+    if ( mFeedback && mFeedback->isCanceled() )
     {
       mCurrentReply->deleteLater();
-      if ( mCurrentEventLoop )
-        mCurrentEventLoop->quit();
+      if ( mEventLoop )
+        mEventLoop->quit();
       return;
     }
     QJsonObject itemMap = item.toObject();
@@ -163,8 +162,8 @@ void KadasWorldLocationSearchProvider::handleNetworkReply()
   }
   mCurrentReply->deleteLater();
   mCurrentReply = nullptr;
-  if ( mCurrentEventLoop )
-    mCurrentEventLoop->quit();
+  if ( mEventLoop )
+    mEventLoop->quit();
 }
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )

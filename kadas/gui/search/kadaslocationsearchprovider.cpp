@@ -22,7 +22,6 @@
 #include <QUrlQuery>
 #include <QElapsedTimer>
 #include <QEventLoop>
-#include <QNetworkAccessManager>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
@@ -43,6 +42,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmultisurface.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsnetworkaccessmanager.h>
 
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 
@@ -80,7 +80,6 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
   mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
   mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
-  mNetworkManager = new QNetworkAccessManager( this );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
@@ -104,9 +103,6 @@ QgsLocatorFilter *KadasLocationSearchFilter::clone() const
 
 void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
 {
-  QElapsedTimer timer;
-  timer.start();
-
   if ( string.length() < 3 )
     return;
 
@@ -117,9 +113,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     mCurrentReply = nullptr;
   }
 
-  mPendingSearchString = string;
-  mPendingContext = context;
-  mPendingFeedback = feedback;
+  mFeedback = feedback;
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -150,16 +144,18 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
-  mCurrentReply = mNetworkManager->get( req );
+  QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
+  mCurrentReply = nam->get( req );
+
   mEventLoop = new QEventLoop;
-  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasLocationSearchFilter::handleSearchReply );
+  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasLocationSearchFilter::handleNetworkReply );
   connect( feedback, &QgsFeedback::canceled, mCurrentReply, &QNetworkReply::abort );
   mEventLoop->exec();
   delete mEventLoop;
   mEventLoop = nullptr;
 }
 
-void KadasLocationSearchFilter::handleSearchReply()
+void KadasLocationSearchFilter::handleNetworkReply()
 {
   if ( !mCurrentReply )
     return;
@@ -174,6 +170,13 @@ void KadasLocationSearchFilter::handleSearchReply()
   const QJsonArray constResults = resultMap["results"].toArray();
   for ( const QJsonValue &item : constResults )
   {
+    if ( mFeedback && mFeedback->isCanceled() )
+    {
+      mCurrentReply->deleteLater();
+      mCurrentReply = nullptr;
+      return;
+    }
+
     QJsonObject itemMap = item.toObject();
     QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
 

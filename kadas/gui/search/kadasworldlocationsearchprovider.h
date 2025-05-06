@@ -18,14 +18,14 @@
 #define KADASWORLDVBSLOCATIONSEARCHPROVIDER_H
 
 #include <QMap>
-#include <QRegExp>
-#include <QTimer>
-#include <QNetworkReply>
-#include <QEventLoop>
 
 #include <qgis/qgslocatorfilter.h>
 
 #include "kadas/gui/kadas_gui.h"
+
+
+class QNetworkReply;
+class QEventLoop;
 
 class QgsMapCanvas;
 
@@ -53,10 +53,10 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     QString mGeometryItemId;
     QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int>> mCategoryMap;
+
     QNetworkReply *mCurrentReply = nullptr;
-    QgsFeedback *mCurrentFeedback = nullptr;
-    QEventLoop *mCurrentEventLoop = nullptr;
-    QString mCurrentSearchString;
+    QgsFeedback *mFeedback = nullptr;
+    QEventLoop *mEventLoop = nullptr;
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H
