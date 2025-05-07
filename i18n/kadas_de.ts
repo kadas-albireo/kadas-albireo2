@@ -4,12 +4,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
         <source>New 3D Map View</source>
-        <translation type="unfinished"/>
+        <translation>Neue 3D Kartenansicht</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
-        <translation type="unfinished"/>
+        <translation>Projekt Ausdehnung ist ungültig. Bitte Ebene aktivieren oder hinzufügen.</translation>
     </message>
 </context>
 <context>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="150"/>
         <source>Layer</source>
-        <translation type="unfinished"/>
+        <translation>Ebene</translation>
     </message>
 </context>
 <context>
@@ -25,12 +25,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="73"/>
         <source>Camera Control</source>
-        <translation type="unfinished"/>
+        <translation>Kamerakontrolle</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="76"/>
         <source>Zoom Full</source>
-        <translation type="unfinished"/>
+        <translation>Zoom volle Ausdehnung</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="80"/>
@@ -40,12 +40,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="91"/>
         <source>Identify</source>
-        <translation type="unfinished"/>
+        <translation>Abfragen</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="95"/>
         <source>Measurement Line</source>
-        <translation type="unfinished"/>
+        <translation>Linie messen</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="108"/>
@@ -55,12 +55,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="115"/>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="121"/>
         <source>Save as Image…</source>
-        <translation type="unfinished"/>
+        <translation>Als Bild speichern</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="125"/>
@@ -360,33 +360,33 @@
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="173"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="171"/>
         <source>Map CRS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="211"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
         <source>Go to %1%2 %3%4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="244"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="242"/>
         <source>Go to %1°N %2°E</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>Go to %1°N %2°E %3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>at scale 1:%1 </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="534"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="569"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="567"/>
         <source>zone</source>
         <translation type="unfinished"/>
     </message>
@@ -3846,42 +3846,42 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasLocationSearchFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="73"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="78"/>
         <source>Municipalities</source>
         <translation>Gemeinden</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="74"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
         <source>Cantons</source>
         <translation>Kantone</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="75"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
         <source>Districts</source>
         <translation>Bezirke</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="76"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
         <source>Places</source>
         <translation>Orte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="77"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="82"/>
         <source>Zip Codes</source>
         <translation>Postleitzahlen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="78"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="83"/>
         <source>Address</source>
         <translation>Adressen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="84"/>
         <source>General place name directory</source>
         <translation>Allgemeines Verzeichnis der Ortschaften</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="44"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="46"/>
         <source>Location Search</source>
         <translation>Standortsuche</translation>
     </message>
@@ -4203,7 +4203,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="171"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="180"/>
         <source>Layer %1</source>
         <translation>Ebene %1</translation>
     </message>
@@ -5708,7 +5708,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="181"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="183"/>
         <source>Layer %1</source>
         <translation>Ebene %1</translation>
     </message>
@@ -6624,12 +6624,12 @@ bewegen</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="55"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="58"/>
         <source>World Places</source>
         <translation>Weltorte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="38"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="40"/>
         <source> World Location Search</source>
         <translation type="unfinished"/>
     </message>

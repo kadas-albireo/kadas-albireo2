@@ -360,33 +360,33 @@
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="173"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="171"/>
         <source>Map CRS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="211"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
         <source>Go to %1%2 %3%4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="244"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="242"/>
         <source>Go to %1°N %2°E</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>Go to %1°N %2°E %3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="382"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>at scale 1:%1 </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="534"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="569"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="567"/>
         <source>zone</source>
         <translation type="unfinished"/>
     </message>
@@ -3846,42 +3846,42 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasLocationSearchFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="73"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="78"/>
         <source>Municipalities</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="74"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
         <source>Cantons</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="75"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
         <source>Districts</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="76"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
         <source>Places</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="77"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="82"/>
         <source>Zip Codes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="78"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="83"/>
         <source>Address</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="84"/>
         <source>General place name directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="44"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="46"/>
         <source>Location Search</source>
         <translation type="unfinished"/>
     </message>
@@ -4203,7 +4203,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapServerFindSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="171"/>
+        <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.cpp" line="180"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -5708,7 +5708,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasRemoteDataSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="181"/>
+        <location filename="../kadas/gui/search/kadasremotedatasearchprovider.cpp" line="183"/>
         <source>Layer %1</source>
         <translation>Layer %1</translation>
     </message>
@@ -6622,12 +6622,12 @@ geolocazione</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="55"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="58"/>
         <source>World Places</source>
         <translation>Luoghi mondiali</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="38"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="40"/>
         <source> World Location Search</source>
         <translation type="unfinished"/>
     </message>
