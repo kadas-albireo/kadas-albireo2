@@ -258,6 +258,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
 
     // Parse sublayers
     QList<QVariantMap> sublayers;
+    bool typeVector = true;
     for ( QVariant variant : serviceInfoMap["layers"].toList() )
     {
       QVariantMap entry = variant.toMap();
@@ -266,13 +267,19 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       sublayer["parentLayerId"] = entry["parentLayerId"];
       sublayer["name"] = entry["name"];
       sublayers.append( sublayer );
+
+      // No mixing allowed: if one layer of the group is Raster -> use only raster
+      if ( entry["type"] == "Raster Layer" )
+      {
+        typeVector = false;
+      }
     }
 
     for ( const QString &layerName : entries->keys() )
     {
       QgsMimeDataUtils::Uri mimeDataUri;
 
-      if ( KadasCatalogBrowser::sSettingLoadArcgisLayerAsVector->value() )
+      if ( typeVector )
       {
         mimeDataUri.layerType = "vector";
         mimeDataUri.providerKey = "arcgisfeatureserver";

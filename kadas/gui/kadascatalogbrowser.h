@@ -21,10 +21,8 @@
 #include <QWidget>
 
 #include <qgis/qgsmimedatautils.h>
-#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/core/kadassettingstree.h"
 
 class KadasCatalogProvider;
 class QgsFilterLineEdit;
@@ -35,8 +33,6 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 {
     Q_OBJECT
   public:
-    static const inline QgsSettingsEntryBool *sSettingLoadArcgisLayerAsVector = new QgsSettingsEntryBool( QStringLiteral( "load-arcgis-layer-as-vector" ), KadasSettingsTree::sTreePortal, true );
-
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
     QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );

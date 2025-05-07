@@ -23,6 +23,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrlQuery>
+#include <QDebug>
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -405,6 +406,7 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
 
     // Parse sublayers
     QVariantList sublayers;
+    bool typeVector = true;
     for ( QVariant variant : serviceInfoMap["layers"].toList() )
     {
       QVariantMap entry = variant.toMap();
@@ -413,16 +415,22 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
       sublayer["parentLayerId"] = entry["parentLayerId"];
       sublayer["name"] = entry["name"];
       sublayers.append( sublayer );
+
+      // No mixing allowed: if one layer of the group is Raster -> use only raster
+      if ( entry["type"] == "Raster Layer" )
+      {
+        typeVector = false;
+      }
     }
 
     QgsMimeDataUtils::Uri mimeDataUri;
     mimeDataUri.name = entry->title;
 
-    if ( KadasCatalogBrowser::sSettingLoadArcgisLayerAsVector->value() )
+    if ( typeVector )
     {
       mimeDataUri.layerType = "vector";
       mimeDataUri.providerKey = "arcgisfeatureserver";
-      mimeDataUri.uri = QString( "crs='%1' url='%2/0'" ).arg( crs.authid() ).arg( url );
+      mimeDataUri.uri = QString( "crs='%1' url='%2'" ).arg( crs.authid() ).arg( url );
     }
     else
     {

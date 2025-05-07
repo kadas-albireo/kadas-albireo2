@@ -1215,14 +1215,15 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
       dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
-      adjustedUri = dataSource.uri();
-      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( dataSource.uri(), uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "arcgisfeatureserver" )
     {
       QgsDataSourceUri dataSource( adjustedUri );
-      adjustedUri = dataSource.uri();
-      layer = kApp->addVectorLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+      QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
+      dataSource.removeParam( "url" );
+      dataSource.setParam( "url", urlParameter );
+      layer = kApp->addVectorLayer( dataSource.uri(), uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "arcgisvectortileservice" )
     {
@@ -1292,20 +1293,23 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       if ( entry->leaf )
       {
+        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
+
         QgsMapLayer *layer = nullptr;
         if ( uri.providerKey == "arcgismapserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
           dataSource.removeParam( "layer" );
           dataSource.setParam( "layer", QString::number( entry->id ) );
-          adjustedUri = dataSource.uri();
-          layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
+          layer = kApp->addRasterLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "arcgisfeatureserver" )
         {
           QgsDataSourceUri dataSource( adjustedUri );
-          adjustedUri = dataSource.uri();
-          layer = kApp->addVectorLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
+          QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( entry->id );
+          dataSource.removeParam( "url" );
+          dataSource.setParam( "url", urlParameter );
+          layer = kApp->addVectorLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
@@ -1317,7 +1321,6 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
 
-        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
         if ( layer )
         {
           layer->setMetadataUrl( metadataUrl );
