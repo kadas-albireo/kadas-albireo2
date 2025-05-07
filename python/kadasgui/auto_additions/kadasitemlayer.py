@@ -46,6 +46,7 @@ except AttributeError:
     pass
 try:
     KadasItemLayerRegistry.getOrCreateItemLayer = staticmethod(KadasItemLayerRegistry.getOrCreateItemLayer)
+    KadasItemLayerRegistry.getItemLayers = staticmethod(KadasItemLayerRegistry.getItemLayers)
     KadasItemLayerRegistry.init = staticmethod(KadasItemLayerRegistry.init)
 except AttributeError:
     pass

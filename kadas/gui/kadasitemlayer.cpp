@@ -383,6 +383,23 @@ const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegist
   return names;
 }
 
+QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
+{
+  const auto mapLayers = QgsProject::instance()->mapLayers().values();
+
+  QList<KadasItemLayer *> itemLayers;
+  for ( QgsMapLayer *mapLayer : mapLayers )
+  {
+    KadasItemLayer *itemLayer = qobject_cast<KadasItemLayer *>( mapLayer );
+    if ( itemLayer )
+    {
+      itemLayers.append( itemLayer );
+    }
+  }
+
+  return itemLayers;
+}
+
 KadasItemLayerRegistry *KadasItemLayerRegistry::instance()
 {
   static KadasItemLayerRegistry registry;

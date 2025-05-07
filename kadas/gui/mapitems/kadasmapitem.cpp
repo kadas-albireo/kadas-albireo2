@@ -83,46 +83,19 @@ QJsonObject KadasMapItem::serialize() const
   QJsonObject props;
   for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
   {
-    QMetaProperty prop = metaObject()->property( i );
-    QVariant variant = prop.read( this );
-    QJsonValue value = variant.toJsonValue();
-    // TODO: use custom type
-    if ( prop.name() == QString( "filePath" ) )
-    {
-      value = QJsonValue( QgsProject::instance()->writePath( variant.toString() ) );
-    }
-    else if ( value.isUndefined() )
-    {
-      // Manually handle conversion, i.e. variant.toJsonValue does not convert enums to int...
-      if ( variant.canConvert( QVariant::Int ) )
-      {
-        value = QJsonValue( variant.toInt() );
-      }
-      else if ( variant.canConvert( QVariant::Double ) )
-      {
-        value = QJsonValue( variant.toDouble() );
-      }
-      else if ( prop.type() == QVariant::Pen )
-      {
-        QPen pen = variant.value<QPen>();
-        value = QString( "%1;%2;%3" ).arg( pen.color().name( QColor::HexArgb ) ).arg( pen.width() ).arg( pen.style() );
-      }
-      else if ( prop.type() == QVariant::Brush )
-      {
-        QBrush brush = variant.value<QBrush>();
-        value = QString( "%1;%2" ).arg( brush.color().name( QColor::HexArgb ) ).arg( brush.style() );
-      }
-      else if ( variant.canConvert( QVariant::String ) )
-      {
-        value = QJsonValue( variant.toString() );
-      }
-      else
-      {
-        QgsDebugMsgLevel( QString( "Skipping unserializable property: %1" ).arg( prop.name() ), 2 );
-      }
-    }
+    const QMetaProperty prop = metaObject()->property( i );
+    const QVariant variant = prop.read( this );
+    const QJsonValue value = serializeProperty( prop.name(), variant );
     props[prop.name()] = value;
   }
+
+  for ( const QString &dynamicPropertyName : dynamicPropertyNames() )
+  {
+    const QVariant variant = property( dynamicPropertyName.toLatin1().data() );
+    const QJsonValue value = serializeProperty( dynamicPropertyName, variant );
+    props[dynamicPropertyName] = value;
+  }
+
   QJsonObject json;
   json["state"] = constState()->serialize();
   json["props"] = props;
@@ -472,4 +445,47 @@ void KadasMapItem::setProps( const QMap<QString, QVariant> &props )
   blockSignals( false );
   emit changed();
   emit propertyChanged();
+}
+
+QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant &variant ) const
+{
+  QJsonValue value = variant.toJsonValue();
+
+  // TODO: use custom type
+  if ( name == QString( "filePath" ) )
+  {
+    value = QJsonValue( QgsProject::instance()->writePath( variant.toString() ) );
+  }
+  else if ( value.isUndefined() )
+  {
+    // Manually handle conversion, i.e. variant.toJsonValue does not convert enums to int...
+    if ( variant.canConvert( QVariant::Int ) )
+    {
+      value = QJsonValue( variant.toInt() );
+    }
+    else if ( variant.canConvert( QVariant::Double ) )
+    {
+      value = QJsonValue( variant.toDouble() );
+    }
+    else if ( variant.type() == QVariant::Pen )
+    {
+      QPen pen = variant.value<QPen>();
+      value = QString( "%1;%2;%3" ).arg( pen.color().name( QColor::HexArgb ) ).arg( pen.width() ).arg( pen.style() );
+    }
+    else if ( variant.type() == QVariant::Brush )
+    {
+      QBrush brush = variant.value<QBrush>();
+      value = QString( "%1;%2" ).arg( brush.color().name( QColor::HexArgb ) ).arg( brush.style() );
+    }
+    else if ( variant.canConvert( QVariant::String ) )
+    {
+      value = QJsonValue( variant.toString() );
+    }
+    else
+    {
+      QgsDebugMsgLevel( QString( "Skipping unserializable property: %1" ).arg( name ), 2 );
+    }
+  }
+
+  return value;
 }

@@ -219,6 +219,7 @@ class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
     };
     static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
     static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
+    static QList<KadasItemLayer *> getItemLayers();
     static void init();
 
   protected:

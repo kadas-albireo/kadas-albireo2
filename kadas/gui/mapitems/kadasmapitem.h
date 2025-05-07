@@ -538,6 +538,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QString mEditor;
     bool mDontCleanupAttachment = false;
 
+    QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
+
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };
 
