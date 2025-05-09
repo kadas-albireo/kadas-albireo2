@@ -3,10 +3,13 @@
 from qgis.PyQt.QtCore import Qt, QTemporaryDir, QEventLoop
 from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QApplication
 
-from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer, Qgis
+from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer, Qgis, QgsCoordinateTransform, QgsPluginLayer
 from qgis.gui import *
 
+from kadas.kadasgui import KadasMapRect, KadasItemLayer, KadasItemLayerRegistry
+
 import os
+import json
 import mimetypes
 import sqlite3
 import shutil
@@ -17,6 +20,8 @@ from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
 from .kadas_gpkg_export_base import KadasGpkgExportBase
 
 class KadasGpkgExport(KadasGpkgExportBase):
+
+    PROPERTY_ITEM_TO_BE_REMOVED = "flagToBeRemoved"
 
     def __init__(self, iface):
         KadasGpkgExportBase.__init__(self)
@@ -95,10 +100,22 @@ class KadasGpkgExport(KadasGpkgExportBase):
         prev_dirty = project.isDirty()
         tmpfile = tmpdir.filePath("gpkg_project.qgs")
         project.setFileName(tmpfile)
+
+        # Flag redlining items outside export extent
+        if self.kadasGpkgExportDialog.filterExtent() is not None:
+            self.__flagRedliningItemsOutsideExtent(self.kadasGpkgExportDialog.filterExtent(), self.kadasGpkgExportDialog.filterExtentCrs())
+
         additional_resources = {}
         preprocessorId = QgsPathResolver.setPathWriter(lambda path: self.rewriteProjectPaths(path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources))
         project.write()
         QgsPathResolver.removePathWriter(preprocessorId)
+
+        # Restore project state
+
+        # Remove Flag redlining items outside export extent
+        if self.kadasGpkgExportDialog.filterExtent() is not None:
+            self.__removeRedliningItemsFlag()
+
         project.setFileName(prev_filename if prev_filename else None)
         project.setDirty(prev_dirty)
 
@@ -119,6 +136,10 @@ class KadasGpkgExport(KadasGpkgExportBase):
                     projectlayerEl.find("provider").text = "ogr"
                 elif layer.type() == QgsMapLayer.RasterLayer:
                     projectlayerEl.find("provider").text = "gdal"
+
+        # Remove redlining items outside export extent from project file
+        if self.kadasGpkgExportDialog.filterExtent() is not None:
+            self.__removeFlaggedRedlining(doc)
 
         # Add additional resources
         conn = sqlite3.connect(gpkg_writefile)
@@ -224,3 +245,46 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 cursor.execute('INSERT INTO qgis_resources VALUES(?, ?, ?)', (resource_id, mime_type, sqlite3.Binary(blob)))
             else:
                 cursor.execute('UPDATE qgis_resources SET mime_type=?, content=? WHERE name=?', (mime_type, sqlite3.Binary(blob), resource_id))
+
+    def __flagRedliningItemsOutsideExtent(self, extent, crs):
+        """ Flag redlining items outside export extent """
+
+        rectExportExtent = KadasMapRect(extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum())
+        mapSettings = self.iface.mapCanvas().mapSettings()
+
+        for layer in KadasItemLayerRegistry.getItemLayers():
+            for item in layer.items().values():
+                if not item.intersects(rectExportExtent, mapSettings):
+                    # Flag redlining item
+                    item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, True)
+
+    def __removeRedliningItemsFlag(self):
+        """ Remove redlining items flag """
+        
+        for layer in KadasItemLayerRegistry.getItemLayers():
+            for item in layer.items().values():
+                if self.PROPERTY_ITEM_TO_BE_REMOVED in item.dynamicPropertyNames():
+                    # Un-Flag redlining item
+                    item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, None)
+
+    def __removeFlaggedRedlining(self, doc):
+        """ Remove redlining items outside export extent """
+        
+        for mapItemEl in doc.iterfind("projectlayers/maplayer/MapItem"):
+            
+            nameAttribute = mapItemEl.attrib.get("name", str())
+            if not nameAttribute.startswith("Kadas"):
+                return
+
+            cdata = json.loads(mapItemEl.text)
+
+            props = cdata.get("props", None)
+            if props is None:
+                continue
+
+            flagToBeRemoved = props.get(self.PROPERTY_ITEM_TO_BE_REMOVED, None)
+            if flagToBeRemoved is True:
+                # Remove redlining item
+                mapItemEl.getparent().remove(mapItemEl)
+                continue
+            
