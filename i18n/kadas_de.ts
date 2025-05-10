@@ -2112,7 +2112,7 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
 <context>
     <name>KadasItemLayerType</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="401"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="418"/>
         <source>Symbol scale:</source>
         <translation>Symbolmassstab:</translation>
     </message>

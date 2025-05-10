@@ -17,7 +17,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="150"/>
         <source>Layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="80"/>
         <source>Toggle On-Screen Navigation</source>
-        <translation type="unfinished"/>
+        <translation>Activer/désactiver la navigation à l&apos;écran</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="91"/>
@@ -71,7 +71,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="132"/>
         <source>Toggle Layer Tree</source>
-        <translation type="unfinished"/>
+        <translation>Activer/Masquer l&apos;arborescence des couches</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="143"/>
@@ -136,7 +136,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="319"/>
         <source>Dock 3D Map View</source>
-        <translation type="unfinished"/>
+        <translation>Ancrer la vue cartographique 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="325"/>
@@ -362,7 +362,7 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="171"/>
         <source>Map CRS</source>
-        <translation type="unfinished"/>
+        <translation>SCR de la carte</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
@@ -388,12 +388,12 @@
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="567"/>
         <source>zone</source>
-        <translation type="unfinished"/>
+        <translation>Zone</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
         <source>Go to Coordinate</source>
-        <translation type="unfinished"/>
+        <translation>Aller vers une coordonnée</translation>
     </message>
 </context>
 <context>
@@ -2114,7 +2114,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasItemLayerType</name>
     <message>
-        <location filename="../kadas/gui/kadasitemlayer.cpp" line="401"/>
+        <location filename="../kadas/gui/kadasitemlayer.cpp" line="418"/>
         <source>Symbol scale:</source>
         <translation>Échelle des symboles:</translation>
     </message>
@@ -4161,12 +4161,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="119"/>
         <source>Line width:</source>
-        <translation type="unfinished"/>
+        <translation>Largeur de ligne:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="170"/>
         <source>Cell Size:</source>
-        <translation type="unfinished"/>
+        <translation>Taille de cellules:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="190"/>
@@ -4235,7 +4235,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>Outil de balayage</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
@@ -5376,7 +5376,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="209"/>
         <source>Mandatory plugin installation error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;installation du plugin obligatoire</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="209"/>
@@ -6356,7 +6356,7 @@ avec géoloc.</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2144"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2691"/>
         <source>Feedback</source>
-        <translation type="unfinished"/>
+        <translation>Retour d&apos;expérience</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2181"/>
@@ -6437,7 +6437,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2694"/>
         <source>Open a webpage to give feedback</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir une page web pour donner votre avis</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2709"/>
@@ -6861,7 +6861,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="969"/>
         <source>Debug Depth Map</source>
-        <translation type="unfinished"/>
+        <translation>Déboguer la carte de profondeur</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="984"/>
@@ -6943,7 +6943,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1151"/>
         <source>Debug Shadow Map</source>
-        <translation type="unfinished"/>
+        <translation>Déboguer la carte d&apos;ombres</translation>
     </message>
 </context>
 <context>

@@ -20,52 +20,52 @@
 <context>
     <name>KadasGpkgExport</name>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="144"/>
+        <location filename="../kadas_gpkg_export.py" line="165"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="58"/>
+        <location filename="../kadas_gpkg_export.py" line="63"/>
         <source>Unable to create or open output file</source>
         <translation>Impossibile creare or aprire il file di output</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="61"/>
+        <location filename="../kadas_gpkg_export.py" line="66"/>
         <source>Writing %s...</source>
         <translation>Scrivendo %s...</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="61"/>
+        <location filename="../kadas_gpkg_export.py" line="66"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="152"/>
+        <location filename="../kadas_gpkg_export.py" line="173"/>
         <source>GPKG Export</source>
         <translation>Esportazione GPKG</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="90"/>
+        <location filename="../kadas_gpkg_export.py" line="95"/>
         <source>The operation was canceled.</source>
         <translation>L&apos;exportazione è stata annullata.</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="109"/>
+        <location filename="../kadas_gpkg_export.py" line="126"/>
         <source>Invalid project</source>
         <translation>Progetto non valido</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="144"/>
+        <location filename="../kadas_gpkg_export.py" line="165"/>
         <source>Unable to create output file</source>
         <translation>Impossibile creare il file di output</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="148"/>
+        <location filename="../kadas_gpkg_export.py" line="169"/>
         <source>GPKG export completed</source>
         <translation>Esportazione GPKG completata</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="152"/>
+        <location filename="../kadas_gpkg_export.py" line="173"/>
         <source>The following layers were not exported to the GeoPackage:
 - %s</source>
         <translation>I layer seguenti non sono stati scritti nel GeoPackage:
