@@ -1495,7 +1495,7 @@ void KadasMainWindow::addRemotePicture()
 
   while ( dialog.exec() == QDialog::Accepted )
   {
-    QString url = urlLineEdit->text();
+    QString url = urlLineEdit->text().simplified();
     if ( url.isEmpty() )
     {
       continue;
