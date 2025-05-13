@@ -5,4 +5,8 @@ SOURCES += PrintPlugin.py \
            ui/ui_printlayoutmanager.py \
            PrintTool.py
 
-TRANSLATIONS += i18n/kadas_print_en.ts
+
+
+TRANSLATIONS += i18n/kadas_print_de.ts \
+                i18n/kadas_print_it.ts \
+                i18n/kadas_print_fr.ts
