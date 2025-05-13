@@ -111,12 +111,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="202"/>
         <source>Show Eye Dome Lighting</source>
-        <translation type="unfinished"/>
+        <translation>Mostra illuminazione Eye Dome</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="209"/>
         <source>Show Ambient Occlusion</source>
-        <translation type="unfinished"/>
+        <translation>Mostra occlusione Ambientale</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="219"/>
@@ -169,7 +169,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="55"/>
         <source>Terrain Based</source>
-        <translation type="unfinished"/>
+        <translation>Basato sul Terreno</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
@@ -189,7 +189,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="99"/>
         <source>Flat Terrain</source>
-        <translation type="unfinished"/>
+        <translation>Terreno pianeggiante</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="100"/>
@@ -401,12 +401,12 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="29"/>
         <source>Ambient Occlusion</source>
-        <translation type="unfinished"/>
+        <translation>Occlusione Ambientale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="41"/>
         <source>Radius</source>
-        <translation type="unfinished"/>
+        <translation>Raggio</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="48"/>
@@ -421,7 +421,7 @@
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="96"/>
         <source>Occlusion Threshold</source>
-        <translation type="unfinished"/>
+        <translation>Soglia di occlusione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/ambientocclusionsettingswidget.ui" line="103"/>
@@ -3706,7 +3706,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="213"/>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="264"/>
         <source>Intensity</source>
-        <translation type="unfinished"/>
+        <translation>Intensità</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="220"/>
@@ -3761,7 +3761,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="50"/>
         <source>Point Light</source>
-        <translation type="unfinished"/>
+        <translation>Punti luce</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="54"/>
@@ -3776,7 +3776,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="215"/>
         <source>It is not possible to add more than 8 lights to the scene.</source>
-        <translation type="unfinished"/>
+        <translation>Non è possibile aggiungere più di 8 luci alla scena.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="228"/>
@@ -3786,7 +3786,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="228"/>
         <source>It is not possible to add more than 4 directional lights to the scene.</source>
-        <translation type="unfinished"/>
+        <translation>Non è possibile aggiungere più di 4 luci direzionali alla scena.</translation>
     </message>
 </context>
 <context>
@@ -4732,17 +4732,17 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="40"/>
         <source>Both sides of the mesh are visible</source>
-        <translation type="unfinished"/>
+        <translation>Entrambi i lati della mesh sono visibili</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="41"/>
         <source>Only the back of the mesh is visible</source>
-        <translation type="unfinished"/>
+        <translation>Solo il lato posteriore della mesh è visibile</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="42"/>
         <source>Only the front of the mesh is visible</source>
-        <translation type="unfinished"/>
+        <translation>Solo il lato anteriore della mesh è visibile</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="113"/>
@@ -6252,7 +6252,7 @@ geolocazione</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2538"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2541"/>
         <source>Export KML</source>
-        <translation type="unfinished"/>
+        <translation>Esporta KML</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="1767"/>
@@ -6352,7 +6352,7 @@ geolocazione</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2144"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2691"/>
         <source>Feedback</source>
-        <translation type="unfinished"/>
+        <translation>Feedback</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2181"/>
@@ -6642,74 +6642,74 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="91"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Generale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="94"/>
         <source>General settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni generali</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="103"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="307"/>
         <source>Terrain</source>
-        <translation type="unfinished"/>
+        <translation>Terreno</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="106"/>
         <source>Terrain settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni Terreno</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="115"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="522"/>
         <source>Lights</source>
-        <translation type="unfinished"/>
+        <translation>Luci</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="118"/>
         <source>Lights settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni luci</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="127"/>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effetti</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="130"/>
         <source>Effects settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni effeti</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="139"/>
         <source>Camera &amp; Skybox</source>
-        <translation type="unfinished"/>
+        <translation>Camera &amp; Skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="142"/>
         <source>Camera and skybox settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni camera &amp; skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="151"/>
         <source>Advanced</source>
-        <translation type="unfinished"/>
+        <translation>Avanzato</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="154"/>
         <source>Advanced settings</source>
-        <translation type="unfinished"/>
+        <translation>impostazioni avanzate</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="240"/>
         <source>Extent</source>
-        <translation type="unfinished"/>
+        <translation>Estensione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="319"/>
         <source>Tile resolution</source>
-        <translation type="unfinished"/>
+        <translation>Risoluzione tassello</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="326"/>
@@ -6720,7 +6720,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
         <source>Skirt height</source>
-        <translation type="unfinished"/>
+        <translation>Altezza bordo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="355"/>
@@ -6737,47 +6737,47 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="379"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="386"/>
         <source>Vertical scale</source>
-        <translation type="unfinished"/>
+        <translation>Scala verticale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="403"/>
         <source>Offset</source>
-        <translation type="unfinished"/>
+        <translation>Offset</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="431"/>
         <source>Terrain Shading</source>
-        <translation type="unfinished"/>
+        <translation>Ombreggiatura del terreno</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="606"/>
         <source>Show Shadows</source>
-        <translation type="unfinished"/>
+        <translation>Mostra ombre</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="636"/>
         <source>Show Eye Dome Lighting</source>
-        <translation type="unfinished"/>
+        <translation>Mostra illuminazione Eye Dome</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="661"/>
         <source>Lighting strength</source>
-        <translation type="unfinished"/>
+        <translation>Intensità dell’illuminazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="668"/>
         <source>Lighting distance</source>
-        <translation type="unfinished"/>
+        <translation>Distanza di illuminazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="751"/>
         <source>Camera</source>
-        <translation type="unfinished"/>
+        <translation>Camera</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="757"/>
@@ -6787,32 +6787,32 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="764"/>
         <source>°</source>
-        <translation type="unfinished"/>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="774"/>
         <source>Field of View</source>
-        <translation type="unfinished"/>
+        <translation>Campo Visivo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="784"/>
         <source>Navigation mode</source>
-        <translation type="unfinished"/>
+        <translation>Modalità navigazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="807"/>
         <source>Movement speed</source>
-        <translation type="unfinished"/>
+        <translation>Velocità movimento</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="817"/>
         <source>Show 3D Axis</source>
-        <translation type="unfinished"/>
+        <translation>Mostra Asse 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="826"/>
         <source>Axis type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo di asse</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="836"/>
@@ -6827,32 +6827,32 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="859"/>
         <source>Navigation Synchronization</source>
-        <translation type="unfinished"/>
+        <translation>Sincronizzazione della Navigazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="865"/>
         <source>2D map view follows 3D camera</source>
-        <translation type="unfinished"/>
+        <translation>La Vista Mappa 2D segue la Camera 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="872"/>
         <source>3D camera follows 2D map view</source>
-        <translation type="unfinished"/>
+        <translation>La Camera 3D segue la Vista Mappa 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="879"/>
         <source>Show visible camera area in 2D map view</source>
-        <translation type="unfinished"/>
+        <translation>Mostra Area Visibile della Camera nella Vista Mappa 2D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="889"/>
         <source>Show Skybox</source>
-        <translation type="unfinished"/>
+        <translation>Mostra Skybox</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="963"/>
         <source>Advanced Settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni Avanzate</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="969"/>
@@ -6863,78 +6863,78 @@ geolocazione</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="984"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1173"/>
         <source>Size</source>
-        <translation type="unfinished"/>
+        <translation>Dimensione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="991"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1166"/>
         <source>Corner</source>
-        <translation type="unfinished"/>
+        <translation>Angolo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1026"/>
         <source>Show light sources</source>
-        <translation type="unfinished"/>
+        <translation>Mostra sorgenti luminose</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1033"/>
         <source>Show bounding boxes</source>
-        <translation type="unfinished"/>
+        <translation>Mostra i perimetri di delimitazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1040"/>
         <source>Show map tile info</source>
-        <translation type="unfinished"/>
+        <translation>Mostra le info sui tasselli della mappa</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1066"/>
         <source>Max. screen error</source>
-        <translation type="unfinished"/>
+        <translation>Max. errore di schermo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1073"/>
         <source>Show labels</source>
-        <translation type="unfinished"/>
+        <translation>Mostra Etichette</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1090"/>
         <source>Show camera&apos;s view center</source>
-        <translation type="unfinished"/>
+        <translation>Mostra il centro di vista della camera</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1097"/>
         <source>Map tile resolution</source>
-        <translation type="unfinished"/>
+        <translation>Risoluzione delle tile della mappa</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1104"/>
         <source>Show frames per second (FPS)</source>
-        <translation type="unfinished"/>
+        <translation>Mostra fotogrammi al secundo (FPS)</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1114"/>
         <source>Show debug overlay</source>
-        <translation type="unfinished"/>
+        <translation>Mostra debud di sovrapposizione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1121"/>
         <source>Zoom levels</source>
-        <translation type="unfinished"/>
+        <translation>Livelli di zoom</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1128"/>
         <source>Max. ground error</source>
-        <translation type="unfinished"/>
+        <translation>Max. errore al suolo</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1135"/>
         <source>0</source>
-        <translation type="unfinished"/>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1142"/>
         <source>Show camera&apos;s rotation center</source>
-        <translation type="unfinished"/>
+        <translation>Mostra il centro di rotazione della fotocamera</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1151"/>

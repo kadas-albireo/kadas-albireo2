@@ -111,7 +111,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="202"/>
         <source>Show Eye Dome Lighting</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le Eye Dome Lighting</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="209"/>
@@ -6766,7 +6766,7 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="636"/>
         <source>Show Eye Dome Lighting</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le Eye Dome Lighting</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="661"/>
