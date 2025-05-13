@@ -30,7 +30,7 @@ index a77a8fea01b..688a5b16526 100644
        {
          QFont font;
 -        font.setItalic( true );
-+        font.setBold( entry.type == EntryType::Filter );
++        font.setBold( entry.type == EntryType::Filter || entry.type == EntryType::Group );
 +        font.setItalic( entry.type == EntryType::Group );
          return font;
        }
