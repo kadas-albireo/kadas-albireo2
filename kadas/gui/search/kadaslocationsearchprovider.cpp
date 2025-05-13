@@ -76,8 +76,8 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   setFetchResultsDelay( 300 );
 
   mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 20 ) );
-  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 21 ) );
-  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 22 ) );
+  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 21 ) );
+  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 22 ) );
   mCategoryMap.insert( "sn25", qMakePair( tr( "Places" ), 23 ) );
   mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
   mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
