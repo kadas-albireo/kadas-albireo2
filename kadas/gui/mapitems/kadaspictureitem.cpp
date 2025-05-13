@@ -104,9 +104,19 @@ void KadasPictureItem::setup( const QString &path, const KadasItemPos &fallbackP
   }
   else
   {
-    // Scale such that largest dimension is max 64px
+    // Scale such that largest dimension is max 100px
+    const int imgSize = 100;
     QSize size = reader.size();
-    state()->mSize = size;
+    if ( size.width() > size.height() )
+    {
+      state()->mSize.setHeight( ( imgSize * size.height() ) / size.width() );
+      state()->mSize.setWidth( imgSize );
+    }
+    else
+    {
+      state()->mSize.setWidth( ( imgSize * size.width() ) / size.height() );
+      state()->mSize.setHeight( imgSize );
+    }
   }
 
   state()->mPos = fallbackPos;
@@ -140,12 +150,11 @@ void KadasPictureItem::setFilePath( const QString &filePath )
 
 void KadasPictureItem::setState( const KadasMapItem::State *state )
 {
-  const KadasPictureItem::State *pictureState = dynamic_cast<const KadasPictureItem::State *>( state );
-  if ( pictureState && pictureState->mSize != constState()->mSize )
+  KadasRectangleItemBase::setState( state );
+  if ( mImage.size() != constState()->mSize )
   {
     mImage = readImage();
   }
-  KadasRectangleItemBase::setState( state );
 }
 
 QImage KadasPictureItem::readImage( double dpiScale ) const
