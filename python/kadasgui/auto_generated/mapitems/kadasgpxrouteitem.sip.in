@@ -29,12 +29,20 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasGpxRouteItem( QObject *parent = 0 );
 
     virtual QString itemName() const;
+    virtual QString exportName() const;
+
 
     const QString &name() const;
     void setName( const QString &name );
 
     const QString &number() const;
     void setNumber( const QString &number );
+
+    const QFont &labelFont() const;
+    void setLabelFont( const QFont &labelFont );
+
+    const QColor &labelColor() const;
+    void setLabelColor( const QColor &labelColor );
 
     virtual Margin margin() const;
 
