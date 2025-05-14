@@ -55,7 +55,6 @@ QgsLocatorResultsView::item:selected::disabled
   background-color: transparent;
   color: #3f3f3f;
 }
-QMenu::item,
 
 QMenu::item:selected, QAbstractItemView::item::selected {
     background-color: #3daee9;
