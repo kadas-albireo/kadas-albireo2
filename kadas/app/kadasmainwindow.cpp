@@ -1179,6 +1179,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 {
   QString adjustedUri = uri.uri;
 
+  const QString token = kApp->sEsriAuthCfgId;
+  if ( !token.isEmpty() )
+  {
+    adjustedUri.replace( QRegExp( "authcfg=[^&]+" ), QStringLiteral( "authcfg=%1" ).arg( token ) );
+  }
+
   // Adjust layer CRS to project CRS
   QgsCoordinateReferenceSystem testCrs;
   for ( QString c : uri.supportedCrs )
