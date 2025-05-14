@@ -612,7 +612,7 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
   else
   {
     KadasPictureItem *item = new KadasPictureItem( crs );
-    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
+    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ), false, 0, 0, 100, 100 );
     return qMakePair( item, KadasItemLayerRegistry::StandardLayer::PicturesLayer );
   }
 }
