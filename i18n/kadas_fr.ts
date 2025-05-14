@@ -151,12 +151,12 @@
     <message numerus="yes">
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="580"/>
         <source>Loading %n tile(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="666"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
-        <translation type="unfinished"/>
+        <translation>Une couche cartographique a utilisé toute la mémoire graphique autorisée (%1 Mo). Vous pouvez réduire le niveau de détail de la scène ou augmenter la limite dans les options.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
@@ -367,22 +367,22 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
         <source>Go to %1%2 %3%4</source>
-        <translation type="unfinished"/>
+        <translation>Aller à %1%2 %3%4</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="242"/>
         <source>Go to %1°N %2°E</source>
-        <translation type="unfinished"/>
+        <translation>Aller à %1°N %2°E</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>Go to %1°N %2°E %3</source>
-        <translation type="unfinished"/>
+        <translation>Aller à %1°N %2°E %3</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>at scale 1:%1 </source>
-        <translation type="unfinished"/>
+        <translation>À l&apos;échelle 1:%1</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
@@ -436,12 +436,12 @@
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="24"/>
         <source>The radius of the neighborhood: bigger values mean objects further away will add to the occlusion.</source>
-        <translation type="unfinished"/>
+        <translation>Rayon du voisinage : des valeurs plus élevées signifient que les objets plus éloignés contribueront à l’occlusion.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="25"/>
         <source>Only apply occlusion effect when at least the specified amount of neighboring points is occluded.</source>
-        <translation type="unfinished"/>
+        <translation>Appliquer l’effet d’occlusion uniquement lorsque le nombre spécifié de points voisins est occlus.</translation>
     </message>
 </context>
 <context>
@@ -730,7 +730,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
-        <translation type="unfinished"/>
+        <translation>Voulez-vous vraiment remplacer le signet existant &quot;%1 &quot; ?</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="212"/>
@@ -3837,7 +3837,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.cpp" line="142"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.h" line="41"/>
@@ -4039,7 +4039,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="1507"/>
         <source>Unable to download image (%1).</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de télécharger l&apos;image (%1).</translation>
     </message>
     <message>
         <source>Unable to download image</source>
@@ -4220,17 +4220,17 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="43"/>
         <source>&amp;Compare with Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Comparer avec outil de balayage</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="54"/>
         <source>&amp;Remove from comparison</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Retirer de la comparaison</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="61"/>
         <source>&amp;Add to Comparison with Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Ajouter à la comparaison avec l’outil de balayage</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
@@ -4240,7 +4240,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Comparing Layers %1</source>
-        <translation type="unfinished"/>
+        <translation>Comparaison des couches %1</translation>
     </message>
 </context>
 <context>
@@ -4719,7 +4719,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="36"/>
         <source>No Culling</source>
-        <translation type="unfinished"/>
+        <translation>Pas de Culling</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="37"/>
@@ -4754,7 +4754,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="122"/>
         <source>2D Contour Color Ramp Shader</source>
-        <translation type="unfinished"/>
+        <translation>Nuanceur de palette de couleur pour contour 2D</translation>
     </message>
 </context>
 <context>
@@ -5381,7 +5381,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="209"/>
         <source>Plugin &apos;%1&apos; couldn&apos;t be installed</source>
-        <translation type="unfinished"/>
+        <translation>L’extension &apos; %1 &apos; n’a pas pu être installée</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="241"/>
@@ -5391,7 +5391,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="241"/>
         <source>Plugin &apos;%1&apos; has been updated to version %2</source>
-        <translation type="unfinished"/>
+        <translation>L’extension &apos;%1 &apos; a été mise à jour vers la version %2</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="243"/>
@@ -5401,7 +5401,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="243"/>
         <source>Plugin &apos;%1&apos; update failed</source>
-        <translation type="unfinished"/>
+        <translation>La mise à jour de l’extension &apos;%1 &apos; a échoué</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="452"/>
@@ -7178,12 +7178,12 @@ avec géoloc.</translation>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="334"/>
         <source>Point light %1</source>
-        <translation type="unfinished"/>
+        <translation>Lumière ponctuelle %1</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="337"/>
         <source>Directional light %1</source>
-        <translation type="unfinished"/>
+        <translation>Lumière directionnelle %1</translation>
     </message>
 </context>
 </TS>

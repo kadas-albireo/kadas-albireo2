@@ -25,7 +25,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="73"/>
         <source>Camera Control</source>
-        <translation>Kamerakontrolle</translation>
+        <translation>Kamerabedienung</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="76"/>
@@ -35,7 +35,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="80"/>
         <source>Toggle On-Screen Navigation</source>
-        <translation type="unfinished"/>
+        <translation>Bildschirmnavigation umschalten</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="91"/>

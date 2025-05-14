@@ -9,7 +9,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;estensione del progetto non è valida. Aggiungere o attivare un layer per eseguire il rendering.</translation>
     </message>
 </context>
 <context>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="150"/>
         <source>Layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer</translation>
     </message>
 </context>
 <context>
@@ -141,7 +141,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="325"/>
         <source>Choose a file name to save the 3D map canvas to an image</source>
-        <translation type="unfinished"/>
+        <translation>Scegli un nome file per salvare il canvas della mappa 3D come immagine</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="479"/>
@@ -156,12 +156,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="666"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
-        <translation type="unfinished"/>
+        <translation>Un layer della mappa ha utilizzato tutta la memoria grafica consentita (%1 MB). Potresti ridurre il livello di dettaglio nella scena o aumentare il limite nelle opzioni.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
-        <translation type="unfinished"/>
+        <translation>Trascina un rettangolo nella vista principale della mappa 2D per definire l&apos;estensione della scena 3D</translation>
     </message>
 </context>
 <context>
@@ -174,7 +174,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
         <source>Walk Mode (First Person)</source>
-        <translation type="unfinished"/>
+        <translation>Modalità camminata (prima persona)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="76"/>
@@ -194,7 +194,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="100"/>
         <source>DEM (Raster Layer)</source>
-        <translation type="unfinished"/>
+        <translation>DEM (Layer raster)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Mesh</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
@@ -283,12 +283,12 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="485"/>
         <source>An elevation layer must be selected for a DEM terrain</source>
-        <translation type="unfinished"/>
+        <translation>È necessario selezionare un layer di elevazione per un terreno DEM</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="493"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
-        <translation type="unfinished"/>
+        <translation>È necessario selezionare un layer di elevazione per un terreno mesh</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
@@ -298,7 +298,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="512"/>
         <source>No lights exist in the scene</source>
-        <translation type="unfinished"/>
+        <translation>Nessuna luce presente nella scena</translation>
     </message>
 </context>
 <context>
@@ -362,27 +362,27 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="171"/>
         <source>Map CRS</source>
-        <translation type="unfinished"/>
+        <translation>SR della mappa</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
         <source>Go to %1%2 %3%4</source>
-        <translation type="unfinished"/>
+        <translation>Vai a %1%2 %3%4</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="242"/>
         <source>Go to %1°N %2°E</source>
-        <translation type="unfinished"/>
+        <translation>Vai a %1°N %2°E</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>Go to %1°N %2°E %3</source>
-        <translation type="unfinished"/>
+        <translation>Vai a %1°N %2°E %3</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
         <source>at scale 1:%1 </source>
-        <translation type="unfinished"/>
+        <translation>alla scala 1:%1</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
@@ -393,7 +393,7 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
         <source>Go to Coordinate</source>
-        <translation type="unfinished"/>
+        <translation>Vai alle coordinate</translation>
     </message>
 </context>
 <context>
@@ -431,17 +431,17 @@
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="23"/>
         <source>The strength of the shading applied, bigger values means more pronounced and darker colors.</source>
-        <translation type="unfinished"/>
+        <translation>L’intensità dell’ombreggiatura applicata: valori più alti significano colori più marcati e scuri.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="24"/>
         <source>The radius of the neighborhood: bigger values mean objects further away will add to the occlusion.</source>
-        <translation type="unfinished"/>
+        <translation>Raggio del vicinato: valori più alti implicano che anche oggetti più lontani contribuiranno all’occlusione.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="25"/>
         <source>Only apply occlusion effect when at least the specified amount of neighboring points is occluded.</source>
-        <translation type="unfinished"/>
+        <translation>Applica l’effetto di occlusione solo quando almeno il numero specificato di punti vicini è occluso.</translation>
     </message>
 </context>
 <context>
@@ -730,7 +730,7 @@ Annullare queste attività e riprovare.</translation>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="116"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
-        <translation type="unfinished"/>
+        <translation>Sei sicuro di voler sostituire il segnalibro esistente “%1”?</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="212"/>
@@ -1926,7 +1926,7 @@ Annullare queste attività e riprovare.</translation>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="163"/>
         <source>Difference of altitude start-end</source>
-        <translation type="unfinished"/>
+        <translation>Differenza di altitudine inizio-fine</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="164"/>
@@ -1956,7 +1956,7 @@ Annullare queste attività e riprovare.</translation>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="169"/>
         <source>Path distance</source>
-        <translation type="unfinished"/>
+        <translation>Distanza del percorso</translation>
     </message>
     <message>
         <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="208"/>
@@ -3835,7 +3835,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.cpp" line="142"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.h" line="41"/>
@@ -3863,7 +3863,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
         <source>Places</source>
-        <translation type="unfinished"/>
+        <translation>Luoghi</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="82"/>
@@ -3878,12 +3878,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="84"/>
         <source>General place name directory</source>
-        <translation type="unfinished"/>
+        <translation>Inventario generale luoghi</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="46"/>
         <source>Location Search</source>
-        <translation type="unfinished"/>
+        <translation>Ricerca località</translation>
     </message>
 </context>
 <context>
@@ -3922,7 +3922,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="159"/>
         <source>Search for Places, Coordinates, Adresses, ...</source>
-        <translation type="unfinished"/>
+        <translation>Trova luoghi, coordinate, indirizzi, ...</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="172"/>
@@ -4037,7 +4037,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="1507"/>
         <source>Unable to download image (%1).</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile scaricare l&apos;immagine (%1).</translation>
     </message>
     <message>
         <source>Unable to download image</source>
@@ -4210,7 +4210,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/search/kadasmapserverfindsearchprovider.h" line="39"/>
         <source>Server Find</source>
-        <translation type="unfinished"/>
+        <translation>Ricerca server</translation>
     </message>
 </context>
 <context>
@@ -4228,12 +4228,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="61"/>
         <source>&amp;Add to Comparison with Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Aggiungi al confronto con lo strumento Swipe</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
         <source>Swipe Tool</source>
-        <translation type="unfinished"/>
+        <translation>Strumento Swipe</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapswipe/kadasmapswipetool.cpp" line="199"/>
@@ -4712,12 +4712,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="33"/>
         <source>Single Color</source>
-        <translation type="unfinished"/>
+        <translation>Colore singolo</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="36"/>
         <source>No Culling</source>
-        <translation type="unfinished"/>
+        <translation>Nessun culling</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="37"/>
@@ -4871,7 +4871,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/milx/kadasmilxexportdialog.cpp" line="31"/>
         <source>Don&apos;t add</source>
-        <translation type="unfinished"/>
+        <translation>Non aggiungere</translation>
     </message>
 </context>
 <context>
@@ -4981,7 +4981,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="411"/>
         <source>Compressed KML Layer (*.kmz)</source>
-        <translation type="unfinished"/>
+        <translation>Layer KML compressi (*.kmz)</translation>
     </message>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="520"/>
@@ -5223,27 +5223,27 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="28"/>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Nessuno</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="44"/>
         <source>Sets the strength of the ambient color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Imposta l’intensità del contributo del colore ambientale</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="45"/>
         <source>Sets the strength of the diffuse color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Imposta l’intensità del contributo del colore diffuso</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="46"/>
         <source>Sets the strength of the specular color contribution</source>
-        <translation type="unfinished"/>
+        <translation>Imposta l’intensità del contributo del colore speculare</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
         <source>Specular color is disabled because material has no shininess</source>
-        <translation type="unfinished"/>
+        <translation>Il colore speculare è disattivato perché il materiale non ha brillantezza</translation>
     </message>
 </context>
 <context>
@@ -5373,32 +5373,32 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="209"/>
         <source>Mandatory plugin installation error</source>
-        <translation type="unfinished"/>
+        <translation>Errore nell’installazione del plugin obbligatorio</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="209"/>
         <source>Plugin &apos;%1&apos; couldn&apos;t be installed</source>
-        <translation type="unfinished"/>
+        <translation>Il plugin &apos;%1&apos; non può essere installato</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="241"/>
         <source>Plugin update</source>
-        <translation type="unfinished"/>
+        <translation>Aggiornamento plugin</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="241"/>
         <source>Plugin &apos;%1&apos; has been updated to version %2</source>
-        <translation type="unfinished"/>
+        <translation>Il plugin &apos;%1&apos; è stato aggiornato alla versione %2</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="243"/>
         <source>Plugin update error</source>
-        <translation type="unfinished"/>
+        <translation>Errore durante l’aggiornamento del plugin</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="243"/>
         <source>Plugin &apos;%1&apos; update failed</source>
-        <translation type="unfinished"/>
+        <translation>L’aggiornamento del plugin &apos;%1&apos; non è riuscito</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadaspluginmanager.cpp" line="452"/>
@@ -5567,12 +5567,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="461"/>
         <source>Frame visible</source>
-        <translation type="unfinished"/>
+        <translation>Cornice visibile</translation>
     </message>
     <message>
         <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="465"/>
         <source>Position locked</source>
-        <translation type="unfinished"/>
+        <translation>Posizione bloccata</translation>
     </message>
 </context>
 <context>
@@ -5715,7 +5715,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/search/kadasremotedatasearchprovider.h" line="41"/>
         <source>Remote Data</source>
-        <translation type="unfinished"/>
+        <translation>Dati remoti</translation>
     </message>
 </context>
 <context>
@@ -5836,7 +5836,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasshadowrenderingsettingswidget.cpp" line="55"/>
         <source>Directional light %1</source>
-        <translation type="unfinished"/>
+        <translation>Luce direzionale %1</translation>
     </message>
 </context>
 <context>
@@ -5844,12 +5844,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasskyboxrenderingsettingswidget.cpp" line="29"/>
         <source>Panoramic Texture</source>
-        <translation type="unfinished"/>
+        <translation>Texture panoramica</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasskyboxrenderingsettingswidget.cpp" line="30"/>
         <source>Distinct Faces</source>
-        <translation type="unfinished"/>
+        <translation>Facce distinte</translation>
     </message>
 </context>
 <context>
@@ -5968,7 +5968,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
         <source>Auto resize frame</source>
-        <translation type="unfinished"/>
+        <translation>Ridimensionamento automatico del frame</translation>
     </message>
 </context>
 <context>
@@ -6433,7 +6433,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2694"/>
         <source>Open a webpage to give feedback</source>
-        <translation type="unfinished"/>
+        <translation>Apri una pagina web per fornire un feedback</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2709"/>
@@ -6629,7 +6629,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="40"/>
         <source> World Location Search</source>
-        <translation type="unfinished"/>
+        <translation>Ricerca località mondiale</translation>
     </message>
 </context>
 <context>
@@ -6637,7 +6637,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="14"/>
         <source>Configure 3D Map Rendering</source>
-        <translation type="unfinished"/>
+        <translation>Configura il rendering della mappa 3D</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="91"/>
@@ -6715,7 +6715,7 @@ geolocazione</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="326"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1047"/>
         <source> map units</source>
-        <translation type="unfinished"/>
+        <translation>Unità della mappa</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
@@ -6727,12 +6727,12 @@ geolocazione</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1016"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1080"/>
         <source> px</source>
-        <translation type="unfinished"/>
+        <translation>px</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="365"/>
         <source>Elevation</source>
-        <translation type="unfinished"/>
+        <translation>Elevazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="379"/>
@@ -6782,7 +6782,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="757"/>
         <source>Projection type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo di proiezione</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="764"/>
@@ -6817,12 +6817,12 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="836"/>
         <source>Horizontal position</source>
-        <translation type="unfinished"/>
+        <translation>Posizione orizzontale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="846"/>
         <source>Vertical position</source>
-        <translation type="unfinished"/>
+        <translation>Posizione verticale</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="859"/>
@@ -6857,7 +6857,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="969"/>
         <source>Debug Depth Map</source>
-        <translation type="unfinished"/>
+        <translation>Debug mappa di profondità</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="984"/>
@@ -6939,7 +6939,7 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1151"/>
         <source>Debug Shadow Map</source>
-        <translation type="unfinished"/>
+        <translation>Debug mappa delle ombre</translation>
     </message>
 </context>
 <context>
@@ -7174,12 +7174,12 @@ geolocazione</translation>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="334"/>
         <source>Point light %1</source>
-        <translation type="unfinished"/>
+        <translation>Punti luce %1</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadaslightswidget.cpp" line="337"/>
         <source>Directional light %1</source>
-        <translation type="unfinished"/>
+        <translation>Luce direzionale %1</translation>
     </message>
 </context>
 </TS>
