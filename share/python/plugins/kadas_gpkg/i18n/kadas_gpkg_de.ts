@@ -130,12 +130,12 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="107"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;Ebenen, die bereits im GeoPackage enthalten sind, sind deaktiviert.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="133"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;Ebenen grösser als 50 MB sind standardmässig deaktiviert.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="143"/>
@@ -221,7 +221,7 @@
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="80"/>
         <source>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;i&gt;Die ausgewählte GPKG enthält kein QGIS Projekt, und wird daher als Ebene importiert.&lt;/i&gt;</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="81"/>

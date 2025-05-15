@@ -50,7 +50,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="108"/>
         <source>Animations</source>
-        <translation type="unfinished"/>
+        <translation>Animationen</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="115"/>
@@ -66,7 +66,7 @@
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="125"/>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="548"/>
         <source>Export 3D Scene</source>
-        <translation type="unfinished"/>
+        <translation>Exportiere 3D Szene</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="132"/>
@@ -146,7 +146,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="479"/>
         <source>3D Configuration</source>
-        <translation type="unfinished"/>
+        <translation>3D Konfigurieren</translation>
     </message>
     <message numerus="yes">
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="580"/>
