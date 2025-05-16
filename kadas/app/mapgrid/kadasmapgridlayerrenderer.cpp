@@ -350,7 +350,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   double gridLabelSize = mRenderGridConfig.fontSize;
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
-    
+
   renderContext()->painter()->setBrush( mRenderGridConfig.color );
 
   QFont font = renderContext()->painter()->font();
