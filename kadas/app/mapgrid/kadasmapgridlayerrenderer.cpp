@@ -351,8 +351,6 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   double gridLabelSize = mRenderGridConfig.fontSize;
   QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
 
-  double dpiScale = renderContext()->painter()->device()->logicalDpiX() / qApp->desktop()->logicalDpiX();
-
   renderContext()->painter()->setBrush( mRenderGridConfig.color );
 
   QFont font = renderContext()->painter()->font();
@@ -360,7 +358,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   if ( adaptToScreen )
   {
-    font.setPointSizeF( gridLabelSize * dpiScale );
+    font.setPointSizeF( gridLabelSize );
     for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
       const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].line;
@@ -407,7 +405,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   {
     double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
 
-    font.setPointSizeF( zoneFontSize * dpiScale );
+    font.setPointSizeF( zoneFontSize );
     QFontMetrics fm( font );
 
     const QPointF &pos = zoneLabel.pos;
