@@ -3852,13 +3852,13 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
-        <source>Cantons</source>
-        <translation>Cantoni</translation>
+        <source>Districts</source>
+        <translation>Distretti</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
-        <source>Districts</source>
-        <translation>Distretti</translation>
+        <source>Cantons</source>
+        <translation>Cantoni</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>

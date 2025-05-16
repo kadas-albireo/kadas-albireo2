@@ -3854,13 +3854,13 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
-        <source>Cantons</source>
-        <translation>Cantons</translation>
+        <source>Districts</source>
+        <translation>Districts</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
-        <source>Districts</source>
-        <translation>Districts</translation>
+        <source>Cantons</source>
+        <translation>Cantons</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
