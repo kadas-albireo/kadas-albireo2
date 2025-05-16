@@ -10,6 +10,7 @@
 
 
 
+
 class KadasGpxRouteEditor : KadasMapItemEditor
 {
 %Docstring(signature="appended")
@@ -27,6 +28,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
 %End
   public:
+    static const QgsSettingsEntryInteger *settingsGpxRouteSize;
+    static const QgsSettingsEntryColor *settingsGpxRouteColor;
+    static const QgsSettingsEntryString *settingsGpxRouteLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxRouteLabelColor;
+
     KadasGpxRouteEditor( KadasMapItem *item );
     ~KadasGpxRouteEditor();
 

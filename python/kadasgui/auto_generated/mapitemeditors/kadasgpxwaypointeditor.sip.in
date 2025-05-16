@@ -9,6 +9,8 @@
 
 
 
+
+
 class KadasGpxWaypointEditor : KadasMapItemEditor
 {
 %Docstring(signature="appended")
@@ -26,6 +28,11 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 %End
   public:
+    static const QgsSettingsEntryInteger *settingsGpxWaypointSize;
+    static const QgsSettingsEntryColor *settingsGpxWaypointColor;
+    static const QgsSettingsEntryString *settingsGpxWaypointLabelFont;
+    static const QgsSettingsEntryColor *settingsGpxWaypointLabelColor;
+
     KadasGpxWaypointEditor( KadasMapItem *item );
 
     virtual void syncItemToWidget();

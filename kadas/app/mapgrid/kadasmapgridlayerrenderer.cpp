@@ -357,10 +357,10 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   QFont font = renderContext()->painter()->font();
   font.setBold( true );
+  font.setPointSizeF( gridLabelSize * dpiScale );
 
   if ( adaptToScreen )
   {
-    font.setPointSizeF( gridLabelSize * dpiScale );
     for ( const KadasLatLonToUTM::GridLabel &gridLabel : std::as_const( grid.gridLabels ) )
     {
       const QPolygonF &gridLine = grid.lines[gridLabel.lineIdx].line;
