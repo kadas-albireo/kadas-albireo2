@@ -116,7 +116,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="209"/>
         <source>Show Ambient Occlusion</source>
-        <translation type="unfinished"/>
+        <translation>Umgebungsverdeckung</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="219"/>
@@ -156,7 +156,8 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="666"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
-        <translation type="unfinished"/>
+        <translation>Eine Kartenebene hat den gesamten erlaubten Grafikspeicher benutzt (%1 MB).
+Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limite in den Einstellungen erhöhen. </translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
@@ -169,17 +170,17 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="55"/>
         <source>Terrain Based</source>
-        <translation type="unfinished"/>
+        <translation>Geländebasiert</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
         <source>Walk Mode (First Person)</source>
-        <translation type="unfinished"/>
+        <translation>Gehmodus (erste Person)</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="76"/>
         <source>Perspective Projection</source>
-        <translation type="unfinished"/>
+        <translation>Perspektivische Projektion</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="77"/>
