@@ -24,7 +24,7 @@ vcpkg_from_github(
   crssync.patch
   # bigobj.patch
   mesh.patch
-  # bindings-install.patch
+  bindings-install.patch
   sipcxx17.patch
   # nlohmann-json.patch
   qgis-debug.patch
