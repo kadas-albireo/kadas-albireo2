@@ -22,6 +22,7 @@
 
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
+#include <qgis/qgslayertreeregistrybridge.h>
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
@@ -113,6 +114,8 @@ class KadasApplication : public QgsApplication
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
 
     int computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const;
+
+    QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() const;
 
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );

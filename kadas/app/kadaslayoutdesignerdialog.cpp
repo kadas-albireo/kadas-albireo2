@@ -1636,7 +1636,6 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   dialog.setRasterTilingDisabled( disableRasterTiles );
   dialog.setGeometriesSimplified( simplify );
   dialog.setExportGeospatialPdf( geospatialPdf );
-  dialog.setUseOgcBestPracticeFormat( useOgcBestPracticeFormat );
   dialog.setExportGeospatialPdf( exportGeospatialPdfFeatures );
   dialog.setExportThemes( exportThemes );
 
@@ -1650,7 +1649,6 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   simplify = dialog.geometriesSimplified();
   Qgis::TextRenderFormat textRenderFormat = dialog.textRenderFormat();
   geospatialPdf = dialog.exportGeospatialPdf();
-  useOgcBestPracticeFormat = dialog.useOgcBestPracticeFormat();
   exportGeospatialPdfFeatures = dialog.exportGeospatialPdf();
   exportThemes = dialog.exportThemes();
 

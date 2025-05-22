@@ -37,6 +37,7 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
 #include <qgis/qgslayertreemodel.h>
+#include <qgis/qgslayertreeutils.h>
 #include <qgis/qgslayoutundostack.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsmessageoutput.h>
@@ -1742,6 +1743,45 @@ int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group
     }
   }
   return pos;
+}
+
+QgsLayerTreeRegistryBridge::InsertionPoint KadasApplication::layerTreeInsertionPoint() const
+{
+  // defaults
+  QgsLayerTreeGroup *insertGroup = mMainWindow->layerTreeView()->layerTreeModel()->rootGroup();
+  QModelIndex current = mMainWindow->layerTreeView()->currentIndex();
+
+  int index = 0;
+
+  if ( current.isValid() )
+  {
+    index = current.row();
+
+    QgsLayerTreeNode *currentNode = mMainWindow->layerTreeView()->currentNode();
+    if ( currentNode )
+    {
+      // if the insertion point is actually a group, insert new layers into the group
+      if ( QgsLayerTree::isGroup( currentNode ) )
+      {
+        // if the group is embedded go to the first non-embedded group, at worst the top level item
+        QgsLayerTreeGroup *insertGroup = QgsLayerTreeUtils::firstGroupWithoutCustomProperty( QgsLayerTree::toGroup( currentNode ), QStringLiteral( "embedded" ) );
+
+        return QgsLayerTreeRegistryBridge::InsertionPoint( insertGroup, 0 );
+      }
+
+      // otherwise just set the insertion point in front of the current node
+      QgsLayerTreeNode *parentNode = currentNode->parent();
+      if ( QgsLayerTree::isGroup( parentNode ) )
+      {
+        // if the group is embedded go to the first non-embedded group, at worst the top level item
+        QgsLayerTreeGroup *parentGroup = QgsLayerTree::toGroup( parentNode );
+        insertGroup = QgsLayerTreeUtils::firstGroupWithoutCustomProperty( parentGroup, QStringLiteral( "embedded" ) );
+        if ( parentGroup != insertGroup )
+          index = 0;
+      }
+    }
+  }
+  return QgsLayerTreeRegistryBridge::InsertionPoint( insertGroup, index );
 }
 
 bool KadasApplication::askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer )

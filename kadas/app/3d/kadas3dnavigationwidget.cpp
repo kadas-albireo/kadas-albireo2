@@ -27,6 +27,7 @@ Q_NOWARN_DEPRECATED_POP
 
 #include "qgscameracontroller.h"
 #include "qgs3dmapcanvas.h"
+#include "qgs3dmapsettings.h"
 #include "kadas3dnavigationwidget.h"
 
 #include <Qt3DRender/QCamera>
@@ -36,6 +37,9 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
 {
   setupUi( this );
 
+  constexpr float MOVE_FACTOR = 0.000001f; // multiplied by distance to get angle
+  constexpr float ZOOM_FACTOR = 0.9f;
+
   m3DMapCanvas = canvas;
   // Zoom in button
   QObject::connect(
@@ -43,7 +47,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->zoom( 5 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeZoom( ZOOM_FACTOR );
+      else
+        controller->zoom( 5 );
     }
   );
 
@@ -53,7 +61,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->zoom( -5 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeZoom( 1 / ZOOM_FACTOR );
+      else
+        controller->zoom( -5 );
     }
   );
 
@@ -96,7 +108,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->moveView( 0, 1 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeMoveCenterPoint( MOVE_FACTOR * controller->cameraPose().distanceFromCenterPoint(), 0 );
+      else
+        controller->moveView( 0, 1 );
     }
   );
 
@@ -106,7 +122,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->moveView( 1, 0 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeMoveCenterPoint( 0, MOVE_FACTOR * controller->cameraPose().distanceFromCenterPoint() );
+      else
+        controller->moveView( 1, 0 );
     }
   );
 
@@ -116,7 +136,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->moveView( 0, -1 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeMoveCenterPoint( -MOVE_FACTOR * controller->cameraPose().distanceFromCenterPoint(), 0 );
+      else
+        controller->moveView( 0, -1 );
     }
   );
 
@@ -126,40 +150,11 @@ Kadas3DNavigationWidget::Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidge
     &QToolButton::clicked,
     m3DMapCanvas,
     [=] {
-      m3DMapCanvas->cameraController()->moveView( -1, 0 );
+      QgsCameraController *controller = m3DMapCanvas->cameraController();
+      if ( m3DMapCanvas->mapSettings()->sceneMode() == Qgis::SceneMode::Globe )
+        controller->globeMoveCenterPoint( 0, -MOVE_FACTOR * controller->cameraPose().distanceFromCenterPoint() );
+      else
+        m3DMapCanvas->cameraController()->moveView( -1, 0 );
     }
   );
-
-  mCameraInfoItemModel = new QStandardItemModel( this );
-
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Near plane" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Far plane" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Camera X pos" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Camera Y pos" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Camera Z pos" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Looking at X" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Looking at Y" ) ), new QStandardItem } );
-  mCameraInfoItemModel->appendRow( QList<QStandardItem *> { new QStandardItem( QStringLiteral( "Looking at Z" ) ), new QStandardItem } );
-
-  mCameraInfo->setModel( mCameraInfoItemModel );
-  mCameraInfo->verticalHeader()->hide();
-  mCameraInfo->horizontalHeader()->hide();
-  mCameraInfo->horizontalHeader()->setSectionResizeMode( QHeaderView::ResizeMode::Stretch );
-
-  QObject::connect( mCameraInfoCheckBox, &QCheckBox::clicked, m3DMapCanvas, [=]( bool enabled ) { mCameraInfo->setVisible( enabled ); } );
-}
-
-void Kadas3DNavigationWidget::updateFromCamera()
-{
-  // Make sure the angle is between 0 - 359
-  whileBlocking( mCompass )->setValue( fmod( m3DMapCanvas->cameraController()->yaw() + 360, 360 ) );
-
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 0, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->camera()->nearPlane() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 1, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->camera()->farPlane() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 2, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->camera()->position().x() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 3, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->camera()->position().y() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 4, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->camera()->position().z() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 5, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->lookingAtPoint().x() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 6, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->lookingAtPoint().y() ) );
-  mCameraInfoItemModel->setData( mCameraInfoItemModel->index( 7, 1 ), QStringLiteral( "%1" ).arg( m3DMapCanvas->cameraController()->lookingAtPoint().z() ) );
 }

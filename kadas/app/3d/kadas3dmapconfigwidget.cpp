@@ -287,7 +287,7 @@ void Kadas3DMapConfigWidget::apply()
     case QgsTerrainGenerator::Flat:
     {
       QgsFlatTerrainGenerator *flatTerrainGen = new QgsFlatTerrainGenerator;
-      flatTerrainGen->setCrs( mMap->crs() );
+      flatTerrainGen->setCrs( mMap->crs(), QgsCoordinateTransformContext() );
       mMap->setTerrainGenerator( flatTerrainGen );
     }
     break;
