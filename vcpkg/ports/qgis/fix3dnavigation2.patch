@@ -1,0 +1,67 @@
+diff --git a/src/3d/qgscameracontroller.cpp b/src/3d/qgscameracontroller.cpp
+index 86acb878c27..2545c2a49e4 100644
+--- a/src/3d/qgscameracontroller.cpp
++++ b/src/3d/qgscameracontroller.cpp
+@@ -566,7 +566,7 @@ void QgsCameraController::onPositionChangedTerrainNavigation( Qt3DInput::QMouseE
+   }
+   else if ( hasLeftButton && !hasShift && !hasCtrl )
+   {
+-    // translation works as if one grabbed a point on the 3D viewer and dragged it
++    // translation works as if one grabbed a point on the 3D viewer and dragged it
+     setMouseParameters( MouseOperation::Translation, mMousePos );
+ 
+     if ( !mDepthBufferIsReady )
+@@ -584,34 +584,31 @@ void QgsCameraController::onPositionChangedTerrainNavigation( Qt3DInput::QMouseE
+       }
+     }
+ 
+-    QVector3D cameraBeforeDragPos = mCameraBefore->position();
++    // Get the camera's forward direction (normalized)
++    QVector3D cameraForward = ( mCameraBefore->viewCenter() - mCameraBefore->position() ).normalized();
+ 
+-    QVector3D moveToPosition = Qgs3DUtils::screenPointToWorldPos( mMousePos, mDragDepth, mScene->engine()->size(), mCameraBefore.get() );
+-    QVector3D cameraBeforeToMoveToPos = ( moveToPosition - mCameraBefore->position() ).normalized();
+-    QVector3D cameraBeforeToDragPointPos = ( mDragPoint - mCameraBefore->position() ).normalized();
++    // Get screen-space movement vector
++    QVector2D screenDelta( mClickPoint.x() - mouse->x(), mouse->y() - mClickPoint.y() );
+ 
+-    // Make sure the rays are not horizontal (add small z shift if it is)
+-    if ( cameraBeforeToMoveToPos.z() == 0 )
+-    {
+-      cameraBeforeToMoveToPos.setZ( 0.01 );
+-      cameraBeforeToMoveToPos = cameraBeforeToMoveToPos.normalized();
+-    }
+-
+-    if ( cameraBeforeToDragPointPos.z() == 0 )
+-    {
+-      cameraBeforeToDragPointPos.setZ( 0.01 );
+-      cameraBeforeToDragPointPos = cameraBeforeToDragPointPos.normalized();
+-    }
++    // Get camera's right and up vectors in world space
++    QVector3D cameraRight = QVector3D::crossProduct( cameraForward, mCameraBefore->upVector() ).normalized();
++    QVector3D cameraUp = mCameraBefore->upVector().normalized();
+ 
+-    double d1 = ( mDragPoint.z() - cameraBeforeDragPos.z() ) / cameraBeforeToMoveToPos.z();
+-    double d2 = ( mDragPoint.z() - cameraBeforeDragPos.z() ) / cameraBeforeToDragPointPos.z();
++    // Convert screen movement to world movement
++    // Scale factor based on distance from camera to drag point
++    float distanceToPoint = ( mDragPoint - mCameraBefore->position() ).length();
++    float screenScale = distanceToPoint / 400.0f; // Correction factor for speed, chosen by manual testing
+ 
+-    QVector3D from = cameraBeforeDragPos + d1 * cameraBeforeToMoveToPos;
+-    QVector3D to = cameraBeforeDragPos + d2 * cameraBeforeToDragPointPos;
++    // Calculate world movement vector
++    QVector3D worldMovement = screenDelta.x() * cameraRight * screenScale + screenDelta.y() * cameraUp * screenScale;
+ 
+-    QVector3D shiftVector = to - from;
++    // For terrain navigation, we typically want to constrain movement to the horizontal plane
++    // or follow the terrain surface. Here we'll use horizontal plane constraint:
++    worldMovement.setZ( 0 );
+ 
+-    mCameraPose.setCenterPoint( mCameraBefore->viewCenter() + shiftVector );
++    // Apply the movement
++    QVector3D newViewCenter = mCameraBefore->viewCenter() + worldMovement;
++    mCameraPose.setCenterPoint( newViewCenter );
+     updateCameraFromPose();
+   }
+   else if ( hasLeftButton && hasShift && hasCtrl )
