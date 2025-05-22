@@ -309,7 +309,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   onTotalPendingJobsCountChanged();
 
-  mDockableWidgetHelper = new QgsDockableWidgetHelper( sSettingCanvasDocked->value(), mCanvasName, this, QgsDockableWidgetHelper::sOwnerWindow, Qt::DockWidgetArea::RightDockWidgetArea );
+  mDockableWidgetHelper = new QgsDockableWidgetHelper( mCanvasName, this, QgsDockableWidgetHelper::sOwnerWindow, QStringLiteral( "3dmapcanvaswidget" ) );
   if ( QDialog *dialog = mDockableWidgetHelper->dialog() )
   {
     QFontMetrics fm( font() );
@@ -414,13 +414,13 @@ void Kadas3DMapCanvasWidget::setMapSettings( Qgs3DMapSettings *map )
   mCanvas->setMapSettings( map );
 
   // Connect the camera to the navigation widget.
-  connect( mCanvas->cameraController(), &QgsCameraController::cameraChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
+  // connect( mCanvas->cameraController(), &QgsCameraController::cameraChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
   connect( mCanvas->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, this, &Kadas3DMapCanvasWidget::onTotalPendingJobsCountChanged );
   connect( mCanvas->scene(), &Qgs3DMapScene::gpuMemoryLimitReached, this, &Kadas3DMapCanvasWidget::onGpuMemoryLimitReached );
 
   // update the navigation widget when the near/far planes have been updated by the map scene
-  connect( mCanvas->cameraController()->camera(), &Qt3DRender::QCamera::nearPlaneChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
-  connect( mCanvas->cameraController()->camera(), &Qt3DRender::QCamera::farPlaneChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
+  // connect( mCanvas->cameraController()->camera(), &Qt3DRender::QCamera::nearPlaneChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
+  // connect( mCanvas->cameraController()->camera(), &Qt3DRender::QCamera::farPlaneChanged, mNavigationWidget, &Kadas3DNavigationWidget::updateFromCamera );
 
   // mAnimationWidget->setCameraController( mCanvas->cameraController() );
   // mAnimationWidget->setMap( map );

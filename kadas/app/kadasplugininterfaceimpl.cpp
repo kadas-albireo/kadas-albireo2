@@ -58,6 +58,12 @@ QgsLayerTreeView *KadasPluginInterfaceImpl::layerTreeView()
   return kApp->mainWindow()->layerTreeView();
 }
 
+QgsGpsToolsInterface *KadasPluginInterfaceImpl::gpsTools()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  return nullptr;
+}
+
 void KadasPluginInterfaceImpl::addCustomActionForLayerType( QAction *action, QString menu, Qgis::LayerType type, bool allLayers )
 {
   // TODO
@@ -103,7 +109,11 @@ QList<Qgs3DMapCanvas *> KadasPluginInterfaceImpl::mapCanvases3D()
   return QList<Qgs3DMapCanvas *>();
 }
 
-Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &name )
+#if _QGIS_VERSION_INT >= 34200
+Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &name, Qgis::SceneMode sceneMode )
+#else
+Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &name ) override
+#endif
 {
   QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
@@ -261,6 +271,18 @@ void KadasPluginInterfaceImpl::removeProjectExportAction( QAction *action )
 {
   Q_UNUSED( action )
   QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+}
+
+QMenu *KadasPluginInterfaceImpl::projectModelsMenu()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  return nullptr;
+}
+
+QMenu *KadasPluginInterfaceImpl::createProjectModelSubMenu( const QString &title )
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  return nullptr;
 }
 
 void KadasPluginInterfaceImpl::openDataSourceManagerPage( const QString &pageName )
@@ -457,13 +479,6 @@ void KadasPluginInterfaceImpl::unregisterCustomLayoutDropHandler( QgsLayoutCusto
 void KadasPluginInterfaceImpl::showOptionsDialog( QWidget *parent, const QString &currentPage )
 {
   // TODO ?
-}
-
-
-QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeInsertionPoint()
-{
-  // TODO ?
-  return QgsLayerTreeRegistryBridge::InsertionPoint( nullptr, 0 );
 }
 
 void KadasPluginInterfaceImpl::showLayerProperties( QgsMapLayer *l, const QString &page )
@@ -770,4 +785,15 @@ QList<QgsPrintLayout *> KadasPluginInterfaceImpl::printLayouts() const
 void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
 {
   kApp->showLayoutDesigner( layout );
+}
+
+QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeInsertionPoint()
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  return kApp->layerTreeInsertionPoint();
+}
+
+void KadasPluginInterfaceImpl::showApiDocumentation( Qgis::DocumentationApi api, Qgis::DocumentationBrowser browser, const QString &object, const QString &module )
+{
+  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
