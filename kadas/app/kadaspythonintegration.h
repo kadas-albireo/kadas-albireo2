@@ -126,6 +126,18 @@ class KadasPythonRunner : public QgsPythonRunner
       return false;
     }
 
+    bool runFileCommand( const QString &filename, const QString &messageOnError = QString() )
+    {
+      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+      return false;
+    }
+
+    bool setArgvCommand( const QStringList &arguments, const QString &messageOnError = QString() )
+    {
+      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+      return false;
+    }
+
   protected:
     KadasPythonIntegration *mPythonIntegration = nullptr;
 };
