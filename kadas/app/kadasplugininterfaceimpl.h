@@ -34,6 +34,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     // Supported QGIS interface
     virtual QgsPluginManagerInterface *pluginManagerInterface() override;
     virtual QgsLayerTreeView *layerTreeView() override;
+    virtual QgsGpsToolsInterface *gpsTools() override;
     virtual void addCustomActionForLayerType( QAction *action, QString menu, Qgis::LayerType type, bool allLayers ) override;
     virtual void addCustomActionForLayer( QAction *action, QgsMapLayer *layer ) override;
     virtual bool removeCustomActionForLayerType( QAction *action ) override;
@@ -42,7 +43,11 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void closeMapCanvas( const QString &name ) override;
 #if _QGIS_VERSION_INT >= 33500
     virtual QList<Qgs3DMapCanvas *> mapCanvases3D() override;
+#if _QGIS_VERSION_INT >= 34200
+    virtual Qgs3DMapCanvas *createNewMapCanvas3D( const QString &name, Qgis::SceneMode sceneMode = Qgis::SceneMode::Local ) override;
+#else
     virtual Qgs3DMapCanvas *createNewMapCanvas3D( const QString &name ) override;
+#endif
     virtual void closeMapCanvas3D( const QString &name ) override;
 #endif
     virtual QSize iconSize( bool dockedToolbar = false ) const override;
@@ -94,6 +99,9 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void removeProjectImportAction( QAction *action ) override;
     virtual void addProjectExportAction( QAction *action ) override;
     virtual void removeProjectExportAction( QAction *action ) override;
+    virtual QMenu *projectModelsMenu() override;
+    virtual QMenu *createProjectModelSubMenu( const QString &title ) override;
+
     virtual void openDataSourceManagerPage( const QString &pageName ) override;
     virtual QgsUserProfileManager *userProfileManager() override;
 #endif
@@ -339,6 +347,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void unregisterProjectPropertiesWidgetFactory( QgsOptionsWidgetFactory *factory ) override {};
     virtual void registerDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
     virtual void unregisterDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
+    virtual void showApiDocumentation( Qgis::DocumentationApi api = Qgis::DocumentationApi::PyQgis, Qgis::DocumentationBrowser browser = Qgis::DocumentationBrowser::DeveloperToolsPanel, const QString &object = QString(), const QString &module = QString() ) override;
     virtual void registerApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
     virtual void unregisterApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
     virtual void registerMapToolHandler( QgsAbstractMapToolHandler *handler ) override {};
