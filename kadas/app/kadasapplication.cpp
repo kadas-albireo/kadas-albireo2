@@ -158,7 +158,13 @@ KadasApplication *KadasApplication::instance()
 
 bool KadasApplication::isRunningFromBuildDir()
 {
-  return QFile::exists( QDir( applicationDirPath() ).absoluteFilePath( ".kadasbuilddir" ) );
+  // Go up one directory if inside a build subfolder (e.g., bin/RelWithDebInfo)
+  QDir appDir( QCoreApplication::applicationDirPath() );
+  if ( appDir.dirName().compare( "RelWithDebInfo", Qt::CaseInsensitive ) == 0 || appDir.dirName().compare( "Debug", Qt::CaseInsensitive ) == 0 || appDir.dirName().compare( "Release", Qt::CaseInsensitive ) == 0 )
+  {
+    appDir.cdUp();
+  }
+  return QFile::exists( appDir.absoluteFilePath( ".kadasbuilddir" ) );
 }
 
 KadasApplication::KadasApplication( int &argc, char **argv )
