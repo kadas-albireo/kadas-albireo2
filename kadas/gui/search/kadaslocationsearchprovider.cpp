@@ -79,9 +79,9 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 25 ) );
   mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 24 ) );
   mCategoryMap.insert( "sn25", qMakePair( tr( "Places" ), 23 ) );
-  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 22 ) );
-  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 21 ) );
-  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 20 ) );
+  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 23 ) );
+  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 22 ) );
+  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 21 ) );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
@@ -280,8 +280,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve->clone() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
+          item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
@@ -289,12 +289,12 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           QgsCurvePolygon *poly = nullptr;
           if ( geometry.isMultipart() )
           {
-            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
+            const QgsMultiSurface *ms = qgsgeometry_cast<const QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( 0 )->clone() );
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
           }
           poly->transform( annotationLayerTransform );
           item = new QgsAnnotationPolygonItem( poly );

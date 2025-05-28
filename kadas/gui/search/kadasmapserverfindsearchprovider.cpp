@@ -232,14 +232,14 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.get() );
-          item = new QgsAnnotationMarkerItem( *pt );
+          QgsPoint pt = *qgsgeometry_cast<const QgsPoint *>( geometry.constGet() );
+          item = new QgsAnnotationMarkerItem( pt );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve->clone() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
+          item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
@@ -247,12 +247,12 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
           QgsCurvePolygon *poly = nullptr;
           if ( geometry.isMultipart() )
           {
-            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
+            const QgsMultiSurface *ms = qgsgeometry_cast<const QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( 0 )->clone() );
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
           }
           item = new QgsAnnotationPolygonItem( poly );
           QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
