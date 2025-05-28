@@ -641,7 +641,7 @@ void KadasAlternateGotoLocatorFilter::triggerResult( const QgsLocatorResult &res
   }
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( point ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
