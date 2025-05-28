@@ -29,13 +29,6 @@ class Kadas3DNavigationWidget : public QWidget, private Ui::Q3DNavigationWidget
   public:
     Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidget *parent = nullptr );
 
-  public slots:
-
-    /**
-     * Update the state of navigation widget from camera's state
-     */
-    void updateFromCamera();
-
   private:
     Qgs3DMapCanvas *m3DMapCanvas = nullptr;
     QStandardItemModel *mCameraInfoItemModel = nullptr;
