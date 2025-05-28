@@ -75,13 +75,13 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
 {
   setFetchResultsDelay( 300 );
 
-  mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 26 ) );
-  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 25 ) );
-  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 24 ) );
+  mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 20 ) );
+  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 21 ) );
+  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 22 ) );
   mCategoryMap.insert( "sn25", qMakePair( tr( "Places" ), 23 ) );
-  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 22 ) );
-  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 21 ) );
-  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 20 ) );
+  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
+  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
+  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
@@ -256,7 +256,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
@@ -280,8 +280,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.get() );
-          item = new QgsAnnotationLineItem( curve->clone() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
+          item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
@@ -289,12 +289,12 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           QgsCurvePolygon *poly = nullptr;
           if ( geometry.isMultipart() )
           {
-            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
+            const QgsMultiSurface *ms = qgsgeometry_cast<const QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( 0 )->clone() );
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
           }
           poly->transform( annotationLayerTransform );
           item = new QgsAnnotationPolygonItem( poly );
