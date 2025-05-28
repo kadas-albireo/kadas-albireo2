@@ -211,7 +211,7 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
           item = new QgsAnnotationMarkerItem( pt );
 
           QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-          symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+          symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
           dynamic_cast<QgsAnnotationMarkerItem *>( item )->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
           break;
         }
@@ -254,7 +254,7 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
   QgsPointXY itemPos = annotationLayerTransform.transform( pos );
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 

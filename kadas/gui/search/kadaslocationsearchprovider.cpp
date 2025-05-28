@@ -75,13 +75,13 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
 {
   setFetchResultsDelay( 300 );
 
-  mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 20 ) );
-  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 21 ) );
-  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 22 ) );
+  mCategoryMap.insert( "gg25", qMakePair( tr( "Municipalities" ), 26 ) );
+  mCategoryMap.insert( "district", qMakePair( tr( "Districts" ), 25 ) );
+  mCategoryMap.insert( "kantone", qMakePair( tr( "Cantons" ), 24 ) );
   mCategoryMap.insert( "sn25", qMakePair( tr( "Places" ), 23 ) );
-  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 24 ) );
-  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 25 ) );
-  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 26 ) );
+  mCategoryMap.insert( "zipcode", qMakePair( tr( "Zip Codes" ), 23 ) );
+  mCategoryMap.insert( "address", qMakePair( tr( "Address" ), 22 ) );
+  mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 21 ) );
 }
 
 KadasLocationSearchFilter::~KadasLocationSearchFilter()
@@ -256,7 +256,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
