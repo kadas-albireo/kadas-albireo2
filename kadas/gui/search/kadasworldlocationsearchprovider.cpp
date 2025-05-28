@@ -207,18 +207,18 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
       {
         case Qgis::GeometryType::Point:
         {
-          QgsPoint *pt = qgsgeometry_cast<QgsPoint *>( geometry.constGet() );
-          item = new QgsAnnotationMarkerItem( *pt->clone() );
+          QgsPoint pt = *qgsgeometry_cast<const QgsPoint *>( geometry.constGet() );
+          item = new QgsAnnotationMarkerItem( pt );
 
           QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-          symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+          symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
           dynamic_cast<QgsAnnotationMarkerItem *>( item )->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
           break;
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet() );
-          item = new QgsAnnotationLineItem( curve->clone() );
+          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
+          item = new QgsAnnotationLineItem( curve );
           break;
         }
         case Qgis::GeometryType::Polygon:
@@ -226,12 +226,12 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
           QgsCurvePolygon *poly = nullptr;
           if ( geometry.isMultipart() )
           {
-            QgsMultiSurface *ms = qgsgeometry_cast<QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ( ms )->geometryN( 0 ) )->clone();
+            const QgsMultiSurface *ms = qgsgeometry_cast<const QgsMultiSurface *>( geometry.constGet() );
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( 0 )->clone() );
           }
           else
           {
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet() )->clone();
+            poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
           }
           item = new QgsAnnotationPolygonItem( poly );
 
@@ -254,7 +254,7 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
   QgsPointXY itemPos = annotationLayerTransform.transform( pos );
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( QgsMarkerSymbolLayer::VerticalAnchorPoint::Bottom );
+  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
