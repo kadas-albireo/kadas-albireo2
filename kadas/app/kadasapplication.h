@@ -57,8 +57,10 @@ class KadasApplication : public QgsApplication
     Q_OBJECT
 
   public:
+    static const QgsSettingsEntryBool *settingsTokenCreateCookies;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
+    static QString sEsriAuthCfgId;
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
@@ -160,8 +162,11 @@ class KadasApplication : public QgsApplication
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
 
+    void createCookies( const QString &token );
+    void createEsriAuth( const QString &token );
+
+
   private slots:
-    void extractPortalToken();
     void loadStartupProject();
     void autosave();
     void onActiveLayerChanged( QgsMapLayer *layer );
