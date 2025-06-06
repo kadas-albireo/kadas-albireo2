@@ -215,7 +215,7 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
         <source>Coordinate Reference System</source>
-        <translation type="unfinished"/>
+        <translation>Koordinatenreferenzsystem</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="206"/>
@@ -3836,7 +3836,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.cpp" line="142"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadaslocaldatasearchprovider.h" line="41"/>
@@ -4038,7 +4038,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/kadasmainwindow.cpp" line="1507"/>
         <source>Unable to download image (%1).</source>
-        <translation type="unfinished"/>
+        <translation>Bild (%1) konnte nicht heruntergeladen werden. </translation>
     </message>
     <message>
         <source>Unable to download image</source>
@@ -4160,12 +4160,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="119"/>
         <source>Line width:</source>
-        <translation type="unfinished"/>
+        <translation>Liniendicke:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="170"/>
         <source>Cell Size:</source>
-        <translation type="unfinished"/>
+        <translation>Zellengrösse:</translation>
     </message>
     <message>
         <location filename="../kadas/app/mapgrid/kadasmapgridwidgetbase.ui" line="190"/>
@@ -4723,12 +4723,12 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="37"/>
         <source>Front</source>
-        <translation type="unfinished"/>
+        <translation>Vorderseite</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="38"/>
         <source>Back</source>
-        <translation type="unfinished"/>
+        <translation>Rückseite</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="40"/>
@@ -4872,7 +4872,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/milx/kadasmilxexportdialog.cpp" line="31"/>
         <source>Don&apos;t add</source>
-        <translation type="unfinished"/>
+        <translation>Nicht hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -4982,7 +4982,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="411"/>
         <source>Compressed KML Layer (*.kmz)</source>
-        <translation type="unfinished"/>
+        <translation>Komprimierte KML Ebene (*.kmz)</translation>
     </message>
     <message>
         <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="520"/>
@@ -5224,7 +5224,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="28"/>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Keine</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="44"/>
@@ -6355,7 +6355,7 @@ bewegen</translation>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2144"/>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2691"/>
         <source>Feedback</source>
-        <translation type="unfinished"/>
+        <translation>Feedback</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadastopwidget.ui" line="2181"/>
@@ -6656,12 +6656,12 @@ bewegen</translation>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="103"/>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="307"/>
         <source>Terrain</source>
-        <translation type="unfinished"/>
+        <translation>Gelände</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="106"/>
         <source>Terrain settings</source>
-        <translation type="unfinished"/>
+        <translation>Geländeeinstellungen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="115"/>
@@ -6677,12 +6677,12 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="127"/>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effekte</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="130"/>
         <source>Effects settings</source>
-        <translation type="unfinished"/>
+        <translation>Effekte Einstellungen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="139"/>
@@ -6750,7 +6750,7 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="403"/>
         <source>Offset</source>
-        <translation type="unfinished"/>
+        <translation>Versatz</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="431"/>
@@ -6760,7 +6760,7 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="606"/>
         <source>Show Shadows</source>
-        <translation type="unfinished"/>
+        <translation>Schatten anzeigen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="636"/>
