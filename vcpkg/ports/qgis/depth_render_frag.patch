@@ -1,0 +1,13 @@
+diff --git a/src/3d/shaders/depth_render.frag b/src/3d/shaders/depth_render.frag
+index 6238575e7ef..f73db7f9ac6 100644
+--- a/src/3d/shaders/depth_render.frag
++++ b/src/3d/shaders/depth_render.frag
+@@ -9,7 +9,7 @@ out vec4 fragColor;
+ 
+ void main()
+ {
+-  float z = texture2D( depthTexture, texCoord ).r;
++  float z = texture( depthTexture, texCoord ).r;
+   fragColor.b = float( int(z * 255) ) / 255.0;
+   z = z * 255.0 - fragColor.b * 255.0;
+   fragColor.g = float( int(z * 255) ) / 255.0;

@@ -1,8 +1,8 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF 7489f84919d8d0deac3e13129b9b3c63a01a61b6) # pre 3.44
+set(QGIS_REF 6c9250f95ca788e9d1603ce13ae2fe99c2e81dc9) # pre 3.44
 set(QGIS_SHA512
-    c266a74a43094fc493dc33463d71968d34fe0792f7c414d6624a9dba5b420b08f2be63c4b14e444c41290474d9cf21e7923a83415f820f4e2e59a66fbda4e43e
+    6ac11a47bcc9e1c31ad923921e84fdde5c65f0a48204c56ee627b6c89c866de02901070162cf816d2c5fb9d7809d6f8f60321a56d46b29d8adbf506196bd60e2
 )
 
 vcpkg_from_github(
@@ -28,9 +28,7 @@ vcpkg_from_github(
   sipcxx17.patch
   # nlohmann-json.patch
   qgis-debug.patch
-  # locator-bold-pr60689.patch fix3dnavigation.patch
-  fix3dnavigation2.patch
-  missing_header_install.patch # https://github.com/qgis/QGIS/pull/61966
+  depth_render_frag.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
