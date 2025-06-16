@@ -29,7 +29,7 @@ vcpkg_from_github(
   nlohmann-json.patch
   qgis-debug.patch
   locator-bold-pr60689.patch
-  fix3dnavigation.patch
+  depth_render_frag.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
