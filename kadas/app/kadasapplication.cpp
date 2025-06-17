@@ -400,7 +400,12 @@ void KadasApplication::init()
           QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
           if ( settingsTokenCreateCookies->value() )
           {
-            createCookies( token );
+            // If we create the cookies directly,
+            // it does not work in the same event loop
+            // so we need to delay it a bit
+            QTimer::singleShot( 1, this, [=]() {
+              createCookies( token );
+            } );
           }
           createEsriAuth( token );
         }
