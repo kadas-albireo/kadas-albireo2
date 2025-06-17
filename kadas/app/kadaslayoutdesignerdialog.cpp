@@ -1582,11 +1582,11 @@ bool KadasLayoutDesignerDialog::getRasterExportSettings( QgsLayoutExporter::Imag
   }
   settings.generateWorldFile = imageDlg.generateWorldFile();
   settings.predefinedMapScales = predefinedScales();
-  settings.flags |= Qgis::LayoutRenderFlag::UseAdvancedEffects;
+  settings.flags |= Qgis::LayoutRenderFlags::UseAdvancedEffects;
   if ( imageDlg.antialiasing() )
-    settings.flags |= Qgis::LayoutRenderFlag::Antialiasing;
+    settings.flags |= Qgis::LayoutRenderFlags::Antialiasing;
   else
-    settings.flags &= ~Qgis::LayoutRenderFlag::Antialiasing;
+    settings.flags &= ~Qgis::LayoutRenderFlags::Antialiasing;
 
   return true;
 }
@@ -1680,9 +1680,9 @@ bool KadasLayoutDesignerDialog::getPdfExportSettings( QgsLayoutExporter::PdfExpo
   settings.predefinedMapScales = predefinedScales();
 
   if ( disableRasterTiles )
-    settings.flags = settings.flags | Qgis::LayoutRenderFlag::DisableTiledRasterLayerRenders;
+    settings.flags = settings.flags | Qgis::LayoutRenderFlags::DisableTiledRasterLayerRenders;
   else
-    settings.flags = settings.flags & ~Qgis::LayoutRenderFlag::DisableTiledRasterLayerRenders;
+    settings.flags = settings.flags & ~Qgis::LayoutRenderFlags::DisableTiledRasterLayerRenders;
 
   return true;
 }
