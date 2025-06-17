@@ -25,6 +25,8 @@
 #include <QUrlQuery>
 #include <QDebug>
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsauthmanager.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsmimedatautils.h>
