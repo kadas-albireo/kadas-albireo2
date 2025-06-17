@@ -26,7 +26,8 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 {
     Q_OBJECT
   public:
-    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
+    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QString &authId = QString() );
+
     void load() override;
 
   private slots:
@@ -79,6 +80,9 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     void readWMTSCapabilitiesDo();
     void readWMSCapabilitiesDo();
     void readAMSCapabilitiesDo();
+
+  private:
+    QString mAuthId;
 };
 
 #endif // KADASARCGISPORTALCATALOGPROVIDER_H
