@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 {
     Q_OBJECT
   public:
-    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QgsAuthEsriTokenMethod *authMethod = nullptr );
+    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthEsriTokenMethod *authMethod = nullptr );
 
     void load() override;
 

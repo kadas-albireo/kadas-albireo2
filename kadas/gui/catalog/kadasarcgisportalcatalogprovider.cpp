@@ -37,7 +37,7 @@
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
 
-KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QgsAuthEsriTokenMethod *authMethodr )
+KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthEsriTokenMethod *authMethod )
   : KadasCatalogProvider( browser )
   , mBaseUrl( baseUrl )
   , mServicePreference( params.value( "preferred", "wms" ) )
