@@ -1746,11 +1746,12 @@ void KadasApplication::createEsriAuth( const QString &token )
   QgsAuthMethodConfig config;
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
+  config.setConfig( QStringLiteral( "token" ), token );
 
   if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
   {
-    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( config.id() ), 1 );
     sEsriAuthCfgId = config.id();
+    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( sEsriAuthCfgId ), 1 );
   }
 }
 
