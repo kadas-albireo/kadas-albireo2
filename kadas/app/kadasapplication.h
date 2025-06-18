@@ -22,8 +22,10 @@
 
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
+#include <qgis/qgsauthesritokenmethod.h>
 
 #include "kadas/gui/kadasfeaturepicker.h"
+
 
 class QNetworkRequest;
 class QTemporaryDir;
@@ -73,6 +75,8 @@ class KadasApplication : public QgsApplication
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
     KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
+
+    QgsAuthEsriTokenMethod *esriTokenMethod() const { return &mEsriTokenMethod; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
@@ -151,6 +155,7 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
+    QgsAuthEsriTokenMethod mEsriTokenMethod;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;

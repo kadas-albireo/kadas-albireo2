@@ -389,6 +389,7 @@ void KadasApplication::init()
   QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
+    mEsriTokenManager = new QgsAuthManager( this );
     QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
@@ -1745,12 +1746,9 @@ void KadasApplication::createEsriAuth( const QString &token )
   QgsAuthMethodConfig config;
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
-
-  if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
-  {
-    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( config.id() ), 1 );
-    sEsriAuthCfgId = config.id();
-  }
+  config.setConfig( QStringLiteral( "token" ), token );
+  QgsDebugMsgLevel( QString( "Created EsriToken auth config" ), 1 );
+  mEsriTokenMethod.setConfig( config );
 }
 
 int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const
