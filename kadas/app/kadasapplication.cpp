@@ -187,6 +187,8 @@ void KadasApplication::init()
 
   const QStringList args = QCoreApplication::arguments();
 
+  bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
+
   if ( args.contains( QStringLiteral( "--clearsettings" ) ) )
   {
     QDir settingsDir( QgsApplication::qgisSettingsDirPath() );
@@ -295,7 +297,6 @@ void KadasApplication::init()
 
   Kadas::importSslCertificates();
 
-
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
@@ -334,6 +335,12 @@ void KadasApplication::init()
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
   mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
+  if ( showMessageLog )
+  {
+    mMessageLogViewer->show();
+  }
+
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::addMessage );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
@@ -430,6 +437,12 @@ void KadasApplication::init()
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
+
+  // Show Python console if requested
+  if ( mShowConsole )
+  {
+    showPythonConsole();
+  }
 
   // Continue loading application after exec()
   QTimer::singleShot( 1, this, &KadasApplication::initAfterExec );
