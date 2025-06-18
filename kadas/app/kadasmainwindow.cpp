@@ -371,7 +371,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->esriAuthManager(), kApp::esriAuthCfgId() );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
@@ -1178,6 +1178,12 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
 void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers )
 {
   QString adjustedUri = uri.uri;
+
+  const QString token = kApp->sEsriAuthCfgId;
+  if ( !token.isEmpty() )
+  {
+    adjustedUri.replace( QRegExp( "authcfg=[^&]+" ), QStringLiteral( "authcfg=%1" ).arg( token ) );
+  }
 
   // Adjust layer CRS to project CRS
   QgsCoordinateReferenceSystem testCrs;

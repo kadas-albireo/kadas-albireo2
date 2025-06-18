@@ -26,9 +26,11 @@
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
+
 class QNetworkRequest;
 class QTemporaryDir;
 
+class QgsAuthManager;
 class QStackedWidget;
 class QgsLayerTreeGroup;
 class QgsMapLayer;
@@ -58,8 +60,10 @@ class KadasApplication : public QgsApplication
     Q_OBJECT
 
   public:
+    static const QgsSettingsEntryBool *settingsTokenCreateCookies;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
+    static const QString sEsriAuthCfgId;
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
@@ -72,6 +76,8 @@ class KadasApplication : public QgsApplication
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
     KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
+
+    QgsAuthManager *esriAuthManager() const { return mEsriAuthManager; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
@@ -152,6 +158,7 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
+    QgsAuthManager *mEsriAuthManager = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;
@@ -163,8 +170,11 @@ class KadasApplication : public QgsApplication
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
 
+    void createCookies( const QString &token );
+    void createEsriAuth( const QString &token );
+
+
   private slots:
-    void extractPortalToken();
     void loadStartupProject();
     void autosave();
     void onActiveLayerChanged( QgsMapLayer *layer );
