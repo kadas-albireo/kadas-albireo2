@@ -22,7 +22,6 @@
 
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
-#include <qgis/qgsauthesritokenmethod.h>
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
@@ -63,7 +62,7 @@ class KadasApplication : public QgsApplication
     static const QgsSettingsEntryBool *settingsTokenCreateCookies;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
-    static QString sEsriAuthCfgId = "KADAS_ESRI_TOKEN_AUTH";
+    static const QString sEsriAuthCfgId;
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
