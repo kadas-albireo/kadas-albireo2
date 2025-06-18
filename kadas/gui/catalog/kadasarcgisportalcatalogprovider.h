@@ -22,13 +22,13 @@
 
 class QStandardItem;
 
-class QgsAuthEsriTokenMethod;
+class QgsAuthManager;
 
 class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogProvider
 {
     Q_OBJECT
   public:
-    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthMethod *authMethod = nullptr );
+    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthManager *authManager = nullptr, const QString &authConfigId = QString() );
 
     void load() override;
 
@@ -84,7 +84,8 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
     void readAMSCapabilitiesDo();
 
   private:
-    QgsAuthMethod *mAuthMethod = nullptr;
+    QgsAuthManager *mAuthManager = nullptr;
+    QString mAuthConfigId;
 };
 
 #endif // KADASARCGISPORTALCATALOGPROVIDER_H

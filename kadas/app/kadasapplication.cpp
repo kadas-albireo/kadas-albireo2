@@ -447,15 +447,6 @@ void KadasApplication::init()
   QTimer::singleShot( 1, this, &KadasApplication::initAfterExec );
 }
 
-QgsAuthMethod *KadasApplication::esriTokenMethod() const
-{
-  if ( !mEsriAuthManager )
-    return nullptr;
-
-  return mEsriAuthManager->configAuthMethod();
-}
-
-
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
 {
   for ( const QString &group : newSettings.childGroups() )

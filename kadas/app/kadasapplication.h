@@ -77,7 +77,7 @@ class KadasApplication : public QgsApplication
     KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
     KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
 
-    QgsAuthMethod *esriTokenMethod() const;
+    QgsAuthManager *esriAuthManager() const { return mEsriAuthManager; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;

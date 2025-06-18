@@ -37,12 +37,13 @@
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
 
-KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthMethod *authMethod )
+KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, QgsAuthManager *authManager, const QString &authConfigId )
   : KadasCatalogProvider( browser )
   , mBaseUrl( baseUrl )
   , mServicePreference( params.value( "preferred", "wms" ) )
   , mCatalogTag( params.value( "tag", "milcatalog" ) )
-  , mAuthMethod( authMethod )
+  , mAuthManager( authManager )
+  , mAuthConfigId( authConfigId )
 {
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QFile isoTopics( QDir( Kadas::pkgDataPath() ).absoluteFilePath( QString( "catalog/isoTopics_%1.csv" ).arg( lang ) ) );
@@ -73,8 +74,8 @@ void KadasArcGisPortalCatalogProvider::load()
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  if ( mAuthMethod )
-    mAuthMethod->updateNetworkRequest( req );
+  if ( mAuthManager && !mAuthConfigId.isEmpty() )
+    mAuthManager->configAuthMethod( mAuthConfigId )->updateNetworkRequest( req );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::replyFinished );
 }
@@ -209,8 +210,8 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
 
   QString WMTSCapUrl = QString( entry->url ).replace( QRegularExpression( "/WMTS/.*$" ), "/WMTS/WMTSCapabilities.xml" );
   QNetworkRequest req( ( QUrl( WMTSCapUrl ) ) );
-  if ( mAuthMethod )
-    mAuthMethod->updateNetworkRequest( req );
+  if ( mAuthManager && !mAuthConfigId.isEmpty() )
+    mAuthManager->configAuthMethod( mAuthConfigId )->updateNetworkRequest( req );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layeridentifier", layerIdentifier );
@@ -260,8 +261,8 @@ void KadasArcGisPortalCatalogProvider::readWMSDetail( const ResultEntry &entry )
 {
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
-  if ( mAuthMethod )
-    mAuthMethod->updateNetworkRequest( req );
+  if ( mAuthManager && !mAuthConfigId.isEmpty() )
+    mAuthManager->configAuthMethod( mAuthConfigId )->updateNetworkRequest( req );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilities );
@@ -280,8 +281,8 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
   }
 
   QNetworkRequest req( QUrl( entry->url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
-  if ( mAuthMethod )
-    mAuthMethod->updateNetworkRequest( req );
+  if ( mAuthManager && !mAuthConfigId.isEmpty() )
+    mAuthManager->configAuthMethod( mAuthConfigId )->updateNetworkRequest( req );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layername", layerName );
@@ -359,8 +360,8 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const ResultEntry &e
   QUrl url( entry.url + "?f=json" );
 
   QNetworkRequest req( url );
-  if ( mAuthMethod )
-    mAuthMethod->updateNetworkRequest( req );
+  if ( mAuthManager && !mAuthConfigId.isEmpty() )
+    mAuthManager->configAuthMethod( mAuthConfigId )->updateNetworkRequest( req );
   QNetworkReply *reply = nam->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo );

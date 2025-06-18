@@ -371,7 +371,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->esriAuthMethod() );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->esriAuthManager() );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
