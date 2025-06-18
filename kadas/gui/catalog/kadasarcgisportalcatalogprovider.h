@@ -22,6 +22,8 @@
 
 class QStandardItem;
 
+class QgsAuthEsriTokenMethod;
+
 class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogProvider
 {
     Q_OBJECT

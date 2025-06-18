@@ -26,15 +26,16 @@
 #include <QDebug>
 
 #include <qgis/qgsapplication.h>
-#include <qgis/qgsauthmanager.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgssettings.h>
 
+#include <kadas/core/external/qgis/qgsauthesritokenmethod.h>
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
+
 
 KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QgsAuthEsriTokenMethod *authMethodr )
   : KadasCatalogProvider( browser )

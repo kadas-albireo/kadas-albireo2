@@ -389,7 +389,6 @@ void KadasApplication::init()
   QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
-    mEsriTokenManager = new QgsAuthManager( this );
     QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );

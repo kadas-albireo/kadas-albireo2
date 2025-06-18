@@ -7,6 +7,7 @@ set(kadas_core_SRC
     kadaslatlontoutm.cpp
     kadassettingstree.cpp
     kadasstatehistory.cpp
+    external/qgis/app/qgsauthesritokenmethod.cpp
 )
 
 set(kadas_core_HDR
@@ -19,6 +20,7 @@ set(kadas_core_HDR
     kadaspluginlayer.h
     kadassettingstree.h
     kadasstatehistory.h
+    external/qgis/app/qgsauthesritokenmethod.h
 )
 
 configure_file(kadas_config.h.in kadas_config.h @ONLY)
