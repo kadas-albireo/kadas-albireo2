@@ -30,6 +30,7 @@
 class QNetworkRequest;
 class QTemporaryDir;
 
+class QgsAuthManager;
 class QStackedWidget;
 class QgsLayerTreeGroup;
 class QgsMapLayer;
@@ -62,7 +63,7 @@ class KadasApplication : public QgsApplication
     static const QgsSettingsEntryBool *settingsTokenCreateCookies;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
-    static QString sEsriAuthCfgId;
+    static QString sEsriAuthCfgId = "KADAS_ESRI_TOKEN_AUTH";
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
@@ -76,7 +77,7 @@ class KadasApplication : public QgsApplication
     KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
     KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
 
-    QgsAuthEsriTokenMethod *esriTokenMethod() const { return &mEsriTokenMethod; }
+    QgsAuthMethod *esriTokenMethod() const;
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
@@ -155,7 +156,7 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
-    QgsAuthEsriTokenMethod mEsriTokenMethod;
+    QgsAuthManager *mEsriAuthManager = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;

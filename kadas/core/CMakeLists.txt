@@ -7,7 +7,6 @@ set(kadas_core_SRC
     kadaslatlontoutm.cpp
     kadassettingstree.cpp
     kadasstatehistory.cpp
-    external/qgis/app/qgsauthesritokenmethod.cpp
 )
 
 set(kadas_core_HDR
@@ -20,7 +19,6 @@ set(kadas_core_HDR
     kadaspluginlayer.h
     kadassettingstree.h
     kadasstatehistory.h
-    external/qgis/app/qgsauthesritokenmethod.h
 )
 
 configure_file(kadas_config.h.in kadas_config.h @ONLY)
@@ -53,10 +51,7 @@ target_link_libraries(
 )
 
 target_include_directories(
-  kadas_core
-  PUBLIC ${CMAKE_SOURCE_DIR}/kadas/core
-         ${CMAKE_SOURCE_DIR}/kadas/core/external/qgis
-         ${CMAKE_CURRENT_BINARY_DIR}
+  kadas_core PUBLIC ${CMAKE_SOURCE_DIR}/kadas/core ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 generate_export_header(

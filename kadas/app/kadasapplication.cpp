@@ -389,6 +389,12 @@ void KadasApplication::init()
   QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
+    QgsDebugMsgLevel( QString( "Creating ESRI Auth Manager" ), 1 );
+    mEsriAuthManager = new QgsAuthManager();
+    mEsriAuthManager->->setMasterPasswordUsage( false );
+    QString esriAuthDbPath = QStringLiteral( "QSQLITE://" ) + QgsApplication::qgisSettingsDirPath() + QStringLiteral( "kadas-esri-auth.db" );
+    mEsriAuthManager->setup( pluginPath(), esriAuthDbPath );
+
     QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
@@ -440,6 +446,15 @@ void KadasApplication::init()
   // Continue loading application after exec()
   QTimer::singleShot( 1, this, &KadasApplication::initAfterExec );
 }
+
+QgsAuthMethod *KadasApplication::esriTokenMethod() const
+{
+  if ( !mEsriAuthManager )
+    return nullptr;
+
+  return mEsriAuthManager->configAuthMethod();
+}
+
 
 void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings )
 {
@@ -1743,11 +1758,15 @@ void KadasApplication::createEsriAuth( const QString &token )
 {
   // Create or update an EsriToken authentication configuration in QgsAuthManager
   QgsAuthMethodConfig config;
+  config.setId( sEsriAuthCfgId );
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
   config.setConfig( QStringLiteral( "token" ), token );
   QgsDebugMsgLevel( QString( "Created EsriToken auth config" ), 1 );
-  mEsriTokenMethod.setConfig( config );
+  if ( mEsriAuthManager->storeAuthenticationConfig( config, true /* overwrite */ ) )
+  {
+    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( config.id() ), 1 );
+  }
 }
 
 int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const
