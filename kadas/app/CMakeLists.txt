@@ -200,8 +200,6 @@ if(WIN32)
   )
   if(NOT SHOW_CONSOLE)
     set(WIN32_SHOW_CONSOLE "WIN32")
-  else()
-    add_definitions(-DWITH_CONSOLE)
   endif()
 endif(WIN32)
 
