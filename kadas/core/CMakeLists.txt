@@ -52,7 +52,12 @@ target_link_libraries(
   OpenSSL::Crypto
 )
 
-target_include_directories(kadas_core PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(
+  kadas_core
+  PUBLIC ${CMAKE_SOURCE_DIR}/kadas/core
+         ${CMAKE_SOURCE_DIR}/kadas/core/external/qgis
+         ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 generate_export_header(
   kadas_core BASE_NAME KADAS_CORE EXPORT_FILE_NAME kadas_core.h
