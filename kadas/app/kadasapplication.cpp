@@ -340,7 +340,7 @@ void KadasApplication::init()
     mMessageLogViewer->show();
   }
 
-  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::addMessage );
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::logMessage );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
@@ -437,12 +437,6 @@ void KadasApplication::init()
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
-
-  // Show Python console if requested
-  if ( mShowConsole )
-  {
-    showPythonConsole();
-  }
 
   // Continue loading application after exec()
   QTimer::singleShot( 1, this, &KadasApplication::initAfterExec );
