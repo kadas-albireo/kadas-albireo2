@@ -39,7 +39,10 @@
     "protobuf",
     {
       "name": "qca",
-      "default-features": false
+      "default-features": false,
+      "features": [
+        "ossl"
+      ]
     },
     "qt5-base",
     "qt5-location",
