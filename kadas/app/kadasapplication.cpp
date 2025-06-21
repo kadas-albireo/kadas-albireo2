@@ -1742,6 +1742,12 @@ void KadasApplication::createCookies( const QString &token )
 
 void KadasApplication::createEsriAuth( const QString &token )
 {
+  if ( !QgsApplication::authManager()->masterPasswordHashInDatabase() && QgsApplication::authManager()->passwordHelperEnabled() )
+  {
+    // if no master password set by user yet, just generate a new one and store it in the system keychain
+    QgsApplication::authManager()->createAndStoreRandomMasterPasswordInKeyChain();
+  }
+
   // Create or update an EsriToken authentication configuration in QgsAuthManager
   QgsAuthMethodConfig config;
   config.setName( QStringLiteral( "kadas_esri_token" ) );
