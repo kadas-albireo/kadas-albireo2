@@ -25,6 +25,12 @@
       "dependencies": [
         "botan"
       ]
+    },
+    "ossl": {
+      "description": "Build with openssl",
+      "dependencies": [
+        "openssl"
+      ]
     }
   }
 }
