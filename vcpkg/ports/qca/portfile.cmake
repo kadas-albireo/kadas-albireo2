@@ -59,6 +59,9 @@ set(PLUGINS gnupg logger softstore wincrypto ossl)
 if("botan" IN_LIST FEATURES)
   list(APPEND PLUGINS botan)
 endif()
+if("ossl" IN_LIST FEATURES)
+  list(APPEND PLUGINS ossl)
+endif()
 
 # Configure and build
 vcpkg_cmake_configure(
