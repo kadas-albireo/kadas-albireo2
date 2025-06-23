@@ -35,6 +35,7 @@
     "libxml2",
     "libzip",
     "nlohmann-json",
+    "openssl",
     "proj",
     "protobuf",
     {
