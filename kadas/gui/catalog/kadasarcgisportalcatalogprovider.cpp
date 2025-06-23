@@ -193,6 +193,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSDetail( const ResultEntry &entry 
 {
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
+  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilities );
