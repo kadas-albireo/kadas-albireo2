@@ -61,7 +61,7 @@ class KadasApplication : public QgsApplication
     static const QgsSettingsEntryBool *settingsTokenCreateCookies;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
-    static QString sEsriAuthCfgId;
+    static const QString sEsriAuthCfgId;
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();

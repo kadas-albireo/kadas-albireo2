@@ -106,7 +106,7 @@ const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls = n
 const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
 const QgsSettingsEntryBool *KadasApplication::settingsTokenCreateCookies = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
 
-QString KadasApplication::sEsriAuthCfgId;
+const QString KadasApplication::sEsriAuthCfgId = QStringLiteral( "kadas_esri_token" );
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -1750,14 +1750,18 @@ void KadasApplication::createEsriAuth( const QString &token )
 
   // Create or update an EsriToken authentication configuration in QgsAuthManager
   QgsAuthMethodConfig config;
+  confif.setId( sEsriAuthCfgId );
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
   config.setConfig( QStringLiteral( "token" ), token );
 
   if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
   {
-    sEsriAuthCfgId = config.id();
     QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( sEsriAuthCfgId ), 1 );
+  }
+  else
+  {
+    QgsDebugMsgLevel( QString( "Failed to create EsriToken auth config with id %1" ).arg( sEsriAuthCfgId ), 1 );
   }
 }
 
