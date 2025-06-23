@@ -1750,7 +1750,7 @@ void KadasApplication::createEsriAuth( const QString &token )
 
   // Create or update an EsriToken authentication configuration in QgsAuthManager
   QgsAuthMethodConfig config;
-  confif.setId( sEsriAuthCfgId );
+  config.setId( sEsriAuthCfgId );
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
   config.setConfig( QStringLiteral( "token" ), token );
