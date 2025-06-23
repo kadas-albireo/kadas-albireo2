@@ -309,7 +309,7 @@ void KadasApplication::init()
   QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
-    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
+    QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
     QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
