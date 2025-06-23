@@ -306,7 +306,7 @@ void KadasApplication::init()
   } );
 
   // Extract portal token before loading catalog
-  QString tokenUrl = settingsPortalTokenUrl->value();
+  const QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
   {
     QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
