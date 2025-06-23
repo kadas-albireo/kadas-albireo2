@@ -305,6 +305,53 @@ void KadasApplication::init()
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
+  // Extract portal token before loading catalog
+  QString tokenUrl = settingsPortalTokenUrl->value();
+  if ( !tokenUrl.isEmpty() )
+  {
+    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
+
+    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
+    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+    QString token;
+    if ( content.error() == QNetworkReply::NoError )
+    {
+      QJsonParseError err;
+      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
+      if ( !doc.isNull() )
+      {
+        QJsonObject obj = doc.object();
+        if ( obj.contains( QStringLiteral( "token" ) ) )
+        {
+          token = obj[QStringLiteral( "token" )].toString();
+          QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
+          if ( settingsTokenCreateCookies->value() )
+          {
+            // If we create the cookies directly,
+            // it does not work in the same event loop
+            // so we need to delay it a bit
+            QTimer::singleShot( 1, this, [=]() {
+              createCookies( token );
+            } );
+          }
+          createEsriAuth( token );
+        }
+      }
+      else
+      {
+        QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
+      }
+    }
+    else
+    {
+      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    }
+  }
+  else
+  {
+    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
+  }
+
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
   splash.show();
@@ -386,54 +433,7 @@ void KadasApplication::init()
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
 
-  // Extract portal token if necessary before loading startup project
-  QString tokenUrl = settingsPortalTokenUrl->value();
-  if ( !tokenUrl.isEmpty() )
-  {
-    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
-
-    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
-    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
-    QString token;
-    if ( content.error() == QNetworkReply::NoError )
-    {
-      QJsonParseError err;
-      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
-      if ( !doc.isNull() )
-      {
-        QJsonObject obj = doc.object();
-        if ( obj.contains( QStringLiteral( "token" ) ) )
-        {
-          token = obj[QStringLiteral( "token" )].toString();
-          QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
-          if ( settingsTokenCreateCookies->value() )
-          {
-            // If we create the cookies directly,
-            // it does not work in the same event loop
-            // so we need to delay it a bit
-            QTimer::singleShot( 1, this, [=]() {
-              createCookies( token );
-            } );
-          }
-          createEsriAuth( token );
-        }
-      }
-      else
-      {
-        QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
-      }
-    }
-    else
-    {
-      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
-    }
-    loadStartupProject();
-  }
-  else
-  {
-    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
-    loadStartupProject();
-  }
+  loadStartupProject();
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
