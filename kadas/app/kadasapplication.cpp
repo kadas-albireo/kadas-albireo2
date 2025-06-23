@@ -104,6 +104,9 @@
 
 const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
 const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+const QgsSettingsEntryBool *KadasApplication::settingsTokenCreateCookies = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+
+const QString KadasApplication::sEsriAuthCfgId = QStringLiteral( "kadas_esri_token" );
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -183,6 +186,8 @@ void KadasApplication::init()
   QgsApplication::init();
 
   const QStringList args = QCoreApplication::arguments();
+
+  const bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
 
   if ( args.contains( QStringLiteral( "--clearsettings" ) ) )
   {
@@ -292,7 +297,6 @@ void KadasApplication::init()
 
   Kadas::importSslCertificates();
 
-
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
@@ -300,6 +304,53 @@ void KadasApplication::init()
   QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) {
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
+
+  // Extract portal token before loading catalog
+  const QString tokenUrl = settingsPortalTokenUrl->value();
+  if ( !tokenUrl.isEmpty() )
+  {
+    QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
+
+    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
+    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+    QString token;
+    if ( content.error() == QNetworkReply::NoError )
+    {
+      QJsonParseError err;
+      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
+      if ( !doc.isNull() )
+      {
+        QJsonObject obj = doc.object();
+        if ( obj.contains( QStringLiteral( "token" ) ) )
+        {
+          token = obj[QStringLiteral( "token" )].toString();
+          QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
+          if ( settingsTokenCreateCookies->value() )
+          {
+            // If we create the cookies directly,
+            // it does not work in the same event loop
+            // so we need to delay it a bit
+            QTimer::singleShot( 1, this, [=]() {
+              createCookies( token );
+            } );
+          }
+          createEsriAuth( token );
+        }
+      }
+      else
+      {
+        QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
+      }
+    }
+    else
+    {
+      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    }
+  }
+  else
+  {
+    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
+  }
 
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
@@ -331,6 +382,12 @@ void KadasApplication::init()
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
   mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
+  if ( showMessageLog )
+  {
+    mMessageLogViewer->show();
+  }
+
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::logMessage );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
@@ -376,20 +433,7 @@ void KadasApplication::init()
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
 
-  // Extract portal token if necessary before loading startup project
-  QString tokenUrl = settingsPortalTokenUrl->value();
-  if ( !tokenUrl.isEmpty() )
-  {
-    QgsDebugMsgLevel( QString( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
-    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
-    QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-    connect( reply, &QNetworkReply::finished, this, &KadasApplication::extractPortalToken );
-  }
-  else
-  {
-    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
-    loadStartupProject();
-  }
+  loadStartupProject();
 
   // Show news popup
   KadasNewsPopup::showIfNewsAvailable();
@@ -412,42 +456,6 @@ void KadasApplication::mergeChildSettingsGroups( QgsSettings &settings, QgsSetti
     newSettings.endGroup();
     settings.endGroup();
   }
-}
-
-void KadasApplication::extractPortalToken()
-{
-  QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
-  if ( reply->error() == QNetworkReply::NoError )
-  {
-    QByteArray data = reply->readAll();
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson( data, &err );
-    if ( !doc.isNull() )
-    {
-      QJsonObject obj = doc.object();
-      if ( obj.contains( QStringLiteral( "token" ) ) )
-      {
-        QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
-        QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
-        const QStringList cookieUrls = settingsPortalCookieUrls->value();
-        for ( const QString &url : cookieUrls )
-        {
-          QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ), 1 );
-          QNetworkCookie cookie = QNetworkCookie( QByteArray( "agstoken" ), obj[QStringLiteral( "token" )].toString().toLocal8Bit() );
-          jar->setCookiesFromUrl( QList<QNetworkCookie>() << cookie, url.trimmed() );
-        }
-      }
-    }
-    else
-    {
-      QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
-    }
-  }
-  else
-  {
-    QgsDebugMsgLevel( QString( "error fetching token %1" ).arg( reply->error() ), 1 );
-  }
-  loadStartupProject();
 }
 
 void KadasApplication::loadStartupProject()
@@ -1717,6 +1725,43 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
         break;
       }
     }
+  }
+}
+
+void KadasApplication::createCookies( const QString &token )
+{
+  QNetworkCookieJar *jar = QgsNetworkAccessManager::instance()->cookieJar();
+  const QStringList cookieUrls = settingsPortalCookieUrls->value();
+  for ( const QString &url : cookieUrls )
+  {
+    QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ), 1 );
+    QNetworkCookie cookie = QNetworkCookie( QByteArray( "agstoken" ), token.toLocal8Bit() );
+    jar->setCookiesFromUrl( QList<QNetworkCookie>() << cookie, url.trimmed() );
+  }
+}
+
+void KadasApplication::createEsriAuth( const QString &token )
+{
+  if ( !QgsApplication::authManager()->masterPasswordHashInDatabase() && QgsApplication::authManager()->passwordHelperEnabled() )
+  {
+    // if no master password set by user yet, just generate a new one and store it in the system keychain
+    QgsApplication::authManager()->createAndStoreRandomMasterPasswordInKeyChain();
+  }
+
+  // Create or update an EsriToken authentication configuration in QgsAuthManager
+  QgsAuthMethodConfig config;
+  config.setId( sEsriAuthCfgId );
+  config.setName( QStringLiteral( "kadas_esri_token" ) );
+  config.setMethod( QStringLiteral( "EsriToken" ) );
+  config.setConfig( QStringLiteral( "token" ), token );
+
+  if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
+  {
+    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( sEsriAuthCfgId ), 1 );
+  }
+  else
+  {
+    QgsDebugMsgLevel( QString( "Failed to create EsriToken auth config with id %1" ).arg( sEsriAuthCfgId ), 1 );
   }
 }
 

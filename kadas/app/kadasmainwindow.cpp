@@ -371,7 +371,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->sEsriAuthCfgId );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
@@ -1179,6 +1179,21 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 {
   QString adjustedUri = uri.uri;
 
+  const QString token = kApp->sEsriAuthCfgId;
+  if ( !token.isEmpty() )
+  {
+    // Ensure "authcfg" is present and set to token
+    QRegExp authcfgRegex( "authcfg=[^&]+" );
+    if ( adjustedUri.contains( authcfgRegex ) )
+    {
+      adjustedUri.replace( authcfgRegex, QStringLiteral( "authcfg='%1'" ).arg( token ) );
+    }
+    else
+    {
+      adjustedUri.append( QStringLiteral( " authcfg='%1'" ).arg( token ) );
+    }
+  }
+
   // Adjust layer CRS to project CRS
   QgsCoordinateReferenceSystem testCrs;
   for ( QString c : uri.supportedCrs )
@@ -1215,7 +1230,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
       dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
-      layer = kApp->addRasterLayer( dataSource.uri(), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "arcgisfeatureserver" )
     {
@@ -1223,7 +1238,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
       dataSource.removeParam( "url" );
       dataSource.setParam( "url", urlParameter );
-      layer = kApp->addVectorLayer( dataSource.uri(), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
     }
     else if ( uri.providerKey == "arcgisvectortileservice" )
     {
@@ -1301,7 +1316,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           QgsDataSourceUri dataSource( adjustedUri );
           dataSource.removeParam( "layer" );
           dataSource.setParam( "layer", QString::number( entry->id ) );
-          layer = kApp->addRasterLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
+          layer = kApp->addRasterLayer( dataSource.uri( false ), entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "arcgisfeatureserver" )
         {
@@ -1309,7 +1324,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
           QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( entry->id );
           dataSource.removeParam( "url" );
           dataSource.setParam( "url", urlParameter );
-          layer = kApp->addVectorLayer( dataSource.uri(), entry->name, uri.providerKey, false, 0, false );
+          layer = kApp->addVectorLayer( dataSource.uri( false ), entry->name, uri.providerKey, false, 0, false );
         }
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
