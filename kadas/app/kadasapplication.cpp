@@ -187,7 +187,7 @@ void KadasApplication::init()
 
   const QStringList args = QCoreApplication::arguments();
 
-  bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
+  const bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
 
   if ( args.contains( QStringLiteral( "--clearsettings" ) ) )
   {
