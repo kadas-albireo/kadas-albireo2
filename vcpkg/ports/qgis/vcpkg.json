@@ -35,6 +35,7 @@
     "libxml2",
     "libzip",
     "nlohmann-json",
+    "openssl",
     "proj",
     "protobuf",
     {
@@ -106,10 +107,6 @@
       "dependencies": [
         "opencl"
       ]
-    },
-    {
-      "name": "openssl",
-      "platform": "!ios"
     },
     "process": {
       "description": "Determines whether the command line QGIS process tool should be built"
