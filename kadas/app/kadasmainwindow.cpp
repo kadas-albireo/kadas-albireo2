@@ -1182,7 +1182,23 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   const QString token = kApp->sEsriAuthCfgId;
   if ( !token.isEmpty() )
   {
-    adjustedUri.replace( QRegExp( "authcfg=[^&]+" ), QStringLiteral( "authcfg=%1" ).arg( token ) );
+    // Ensure "authcfg" is present and set to token
+    QRegExp authcfgRegex( "authcfg=[^&]+" );
+    if ( adjustedUri.contains( authcfgRegex ) )
+    {
+      adjustedUri.replace( authcfgRegex, QStringLiteral( "authcfg=%1" ).arg( token ) );
+    }
+    else
+    {
+      if ( adjustedUri.contains( '?' ) )
+      {
+        adjustedUri.append( QStringLiteral( "&authcfg=%1" ).arg( token ) );
+      }
+      else
+      {
+        adjustedUri.append( QStringLiteral( "?authcfg=%1" ).arg( token ) );
+      }
+    }
   }
 
   // Adjust layer CRS to project CRS
