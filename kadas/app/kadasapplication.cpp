@@ -1090,6 +1090,7 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   else if ( layer->type() == Qgis::LayerType::Vector )
   {
     QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
+    dialog.setWindowIcon( mMainWindow->windowIcon() );
     // Omit some panels
     QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
