@@ -57,7 +57,7 @@ class KADAS_GUI_EXPORT KadasLocationSearchFilter : public QgsLocatorFilter
     QMap<QString, QPair<QString, int>> mCategoryMap;
 
     QString mPinItemId;
-    QString mGeometryItemId;
+    QStringList mGeometryItemIds;
 
     QEventLoop *mEventLoop = nullptr;
     QNetworkReply *mCurrentReply = nullptr;

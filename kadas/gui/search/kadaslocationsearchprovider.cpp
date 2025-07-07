@@ -282,6 +282,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
           item = new QgsAnnotationLineItem( curve );
+          mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           break;
         }
         case Qgis::GeometryType::Polygon:
@@ -290,24 +291,28 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           if ( geometry.isMultipart() )
           {
             const QgsMultiSurface *ms = qgsgeometry_cast<const QgsMultiSurface *>( geometry.constGet() );
-            poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( 0 )->clone() );
+            for ( int p = 0; p < ms->numGeometries(); p++ )
+            {
+              poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( p )->clone() );
+              poly->transform( annotationLayerTransform );
+              item = new QgsAnnotationPolygonItem( poly );
+              dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
+              mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+            }
           }
           else
           {
             poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
+            poly->transform( annotationLayerTransform );
+            item = new QgsAnnotationPolygonItem( poly );
+            dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
+            mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           }
-          poly->transform( annotationLayerTransform );
-          item = new QgsAnnotationPolygonItem( poly );
-          dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
           break;
         }
         case Qgis::GeometryType::Unknown:
         case Qgis::GeometryType::Null:
           break;
-      }
-      if ( item )
-      {
-        mGeometryItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
       }
     }
   }
@@ -321,9 +326,9 @@ void KadasLocationSearchFilter::clearPreviousResults()
     QgsProject::instance()->mainAnnotationLayer()->removeItem( mPinItemId );
     mPinItemId = QString();
   }
-  if ( !mGeometryItemId.isEmpty() )
+  for ( const QString &itemId : std::as_const( mGeometryItemIds ) )
   {
-    QgsProject::instance()->mainAnnotationLayer()->removeItem( mGeometryItemId );
-    mGeometryItemId = QString();
+    QgsProject::instance()->mainAnnotationLayer()->removeItem( itemId );
   }
+  mGeometryItemIds.clear();
 }

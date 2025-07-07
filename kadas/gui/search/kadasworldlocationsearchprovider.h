@@ -50,7 +50,7 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     static const int sResultCountLimit;
 
     QString mPinItemId;
-    QString mGeometryItemId;
+    QStringList mGeometryItemIds;
     QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int>> mCategoryMap;
 
