@@ -201,24 +201,23 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
     {
       QgsGeometry geometry = features[0].geometry();
       geometry.transform( annotationLayerTransform );
-      QgsAnnotationItem *item = nullptr;
       switch ( features[0].geometry().type() )
       {
         case Qgis::GeometryType::Point:
         {
           QgsPoint pt = *qgsgeometry_cast<const QgsPoint *>( geometry.constGet() );
-          item = new QgsAnnotationMarkerItem( pt );
+          QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( pt );
 
           QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
           symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
-          dynamic_cast<QgsAnnotationMarkerItem *>( item )->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+          item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
           mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           break;
         }
         case Qgis::GeometryType::Line:
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
-          item = new QgsAnnotationLineItem( curve );
+          QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
           mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           break;
         }
@@ -231,16 +230,16 @@ void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &re
             for ( int p = 0; p < ms->numGeometries(); p++ )
             {
               poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( p )->clone() );
-              item = new QgsAnnotationPolygonItem( poly );
-              dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( KadasLocationSearchFilter::createPolygonSymbol() );
+              QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
+              item->setSymbol( KadasLocationSearchFilter::createPolygonSymbol() );
               mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
             }
           }
           else
           {
             poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
-            item = new QgsAnnotationPolygonItem( poly );
-            dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( KadasLocationSearchFilter::createPolygonSymbol() );
+            QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
+            item->setSymbol( KadasLocationSearchFilter::createPolygonSymbol() );
             mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           }
           break;

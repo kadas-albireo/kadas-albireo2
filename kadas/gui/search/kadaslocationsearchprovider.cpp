@@ -270,7 +270,6 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
     if ( !features.isEmpty() && !features[0].geometry().isEmpty() )
     {
       QgsGeometry geometry = features[0].geometry();
-      QgsAnnotationItem *item = nullptr;
       switch ( features[0].geometry().type() )
       {
         case Qgis::GeometryType::Point:
@@ -281,7 +280,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         case Qgis::GeometryType::Line:
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
-          item = new QgsAnnotationLineItem( curve );
+          QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
           mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           break;
         }
@@ -295,8 +294,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
             {
               poly = qgsgeometry_cast<QgsCurvePolygon *>( ms->geometryN( p )->clone() );
               poly->transform( annotationLayerTransform );
-              item = new QgsAnnotationPolygonItem( poly );
-              dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
+              QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
+              item->setSymbol( createPolygonSymbol() );
               mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
             }
           }
@@ -304,8 +303,8 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
           {
             poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
             poly->transform( annotationLayerTransform );
-            item = new QgsAnnotationPolygonItem( poly );
-            dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( createPolygonSymbol() );
+            QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
+            item->setSymbol( createPolygonSymbol() );
             mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           }
           break;
