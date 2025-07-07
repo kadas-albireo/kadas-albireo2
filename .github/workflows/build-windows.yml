@@ -83,7 +83,7 @@ jobs:
                 -D WITH_BINDINGS=ON \
                 -D INSTALL_DEMO_DATA=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src --debug" \
+                -D VCPKG_INSTALL_OPTIONS="--debug" \
                 -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.bat" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
