@@ -29,6 +29,7 @@ vcpkg_from_github(
   # nlohmann-json.patch
   qgis-debug.patch
   depth_render_frag.patch
+  62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
