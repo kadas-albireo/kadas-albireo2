@@ -30,6 +30,7 @@ vcpkg_from_github(
   qgis-debug.patch
   depth_render_frag.patch
   62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
+  sync_2d_3d.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1258
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
