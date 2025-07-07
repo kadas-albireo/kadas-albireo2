@@ -60,6 +60,11 @@ else()
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=OFF)
 endif()
 
+# Create .pdb files even for Release builds
+list(APPEND QGIS_OPTIONS
+     "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=ProgramDatabase"
+)
+
 list(APPEND QGIS_OPTIONS "-DENABLE_TESTS:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_GRASS7:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_SPATIALITE:BOOL=ON")
@@ -288,6 +293,7 @@ vcpkg_install_cmake()
 # endif()
 
 vcpkg_restore_env_variables(VARS PATH)
+vcpkg_copy_pdbs()
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 
