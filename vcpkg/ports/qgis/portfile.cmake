@@ -60,7 +60,9 @@ else()
 endif()
 
 # Create .pdb files even for Release builds
-list(APPEND QGIS_OPTIONS "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=ProgramDatabase")
+list(APPEND QGIS_OPTIONS
+     "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=ProgramDatabase"
+)
 
 list(APPEND QGIS_OPTIONS "-DENABLE_TESTS:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_GRASS7:BOOL=OFF")
