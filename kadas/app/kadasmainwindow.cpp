@@ -1186,11 +1186,11 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QRegExp authcfgRegex( "authcfg=[^&]+" );
     if ( adjustedUri.contains( authcfgRegex ) )
     {
-      adjustedUri.replace( authcfgRegex, QStringLiteral( "authcfg='%1'" ).arg( token ) );
+      adjustedUri.replace( authcfgRegex, QStringLiteral( "authcfg=%1" ).arg( token ) );
     }
     else
     {
-      adjustedUri.append( QStringLiteral( " authcfg='%1'" ).arg( token ) );
+      adjustedUri.append( QStringLiteral( "&authcfg=%1" ).arg( token ) );
     }
   }
 
