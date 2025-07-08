@@ -162,8 +162,8 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
     mCanvas->mapSettings()->setViewSyncMode( syncMode );
   } );
   mCameraMenu->addAction( mActionSync3DNavTo2D );
-  
-  QActionGroup* syncNavActionGroup = new QActionGroup( mCameraMenu );
+
+  QActionGroup *syncNavActionGroup = new QActionGroup( mCameraMenu );
   syncNavActionGroup->addAction( mActionSync2DNavTo3D );
   syncNavActionGroup->addAction( mActionSync3DNavTo2D );
 
