@@ -250,6 +250,10 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   QVariantMap data = result.userData().value<QVariantMap>();
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
+  QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
+  bool scaleOk = false;
+  int scale = data.value( QStringLiteral( "scale" ) ).toInt( &scaleOk );
+
 
   QgsPointXY mapPos = mapCanvasTransform.transform( pos );
   QgsPointXY itemPos = annotationLayerTransform.transform( pos );
@@ -260,7 +264,24 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 
-  mMapCanvas->setCenter( mapPos );
+  if ( !bbox.isEmpty() )
+  {
+    QgsRectangle zoomExtent = mapCanvasTransform.transform( bbox );
+    zoomExtent.scale( 3 );
+    mMapCanvas->setExtent( zoomExtent, true );
+  }
+  else
+  {
+    if ( scaleOk )
+    {
+      QgsRectangle zoomExtent = mMapCanvas->mapSettings().computeExtentForScale( mapPos, scale );
+      mMapCanvas->setExtent( zoomExtent, true );
+    }
+    else
+    {
+      mMapCanvas->setCenter( mapPos );
+    }
+  }
 
   // not sure if we will get this from somewhere, it is not documented in the swisstopo API
   if ( !geometry.isEmpty() )
