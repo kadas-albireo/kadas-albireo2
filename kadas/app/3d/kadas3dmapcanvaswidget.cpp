@@ -139,7 +139,6 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   // Camera Menu
   mCameraMenu = new QMenu( this );
-  
   mActionCamera = new QAction( QgsApplication::getThemeIcon( QStringLiteral( "mIconCamera.svg" ) ), tr( "Camera" ), this );
   mActionCamera->setMenu( mCameraMenu );
   toolBar->addAction( mActionCamera );
