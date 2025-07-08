@@ -162,7 +162,7 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
-        <translation type="unfinished"/>
+        <translation>Zeichne ein Rechteck auf der 2D Hauptkartenansicht um die 3D Szenenausdehnung zu definieren.</translation>
     </message>
 </context>
 <context>
@@ -205,12 +205,12 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Mesh</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Quantized Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Quantisiertes Mesh</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
@@ -220,7 +220,7 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="206"/>
         <source>Cube</source>
-        <translation type="unfinished"/>
+        <translation>Kubus</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="208"/>
@@ -289,7 +289,7 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="493"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
-        <translation type="unfinished"/>
+        <translation>Eine Höhenebene muss für ein Mesh-Gelände zuerst ausgewählt werden. </translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
@@ -432,12 +432,12 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="23"/>
         <source>The strength of the shading applied, bigger values means more pronounced and darker colors.</source>
-        <translation type="unfinished"/>
+        <translation>Die Stärke des angezeigten Schattens, höherer Wert bedeutet dunklerer Schatten.</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="24"/>
         <source>The radius of the neighborhood: bigger values mean objects further away will add to the occlusion.</source>
-        <translation type="unfinished"/>
+        <translation>Der Radius der Nachbarschaft: Höherer Wert bedeutet, Objekte, die weiter weg liegen, werden verdeckt. </translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasambientocclusionsettingswidget.cpp" line="25"/>
@@ -4713,7 +4713,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="33"/>
         <source>Single Color</source>
-        <translation type="unfinished"/>
+        <translation>Einzelfarbe</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="36"/>
@@ -6892,27 +6892,27 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1066"/>
         <source>Max. screen error</source>
-        <translation type="unfinished"/>
+        <translation>Max. Bildschirmfehler</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1073"/>
         <source>Show labels</source>
-        <translation type="unfinished"/>
+        <translation>Labels anzeigen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1090"/>
         <source>Show camera&apos;s view center</source>
-        <translation type="unfinished"/>
+        <translation>Sichtmittelpunkt der Kamera anzeigen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1097"/>
         <source>Map tile resolution</source>
-        <translation type="unfinished"/>
+        <translation>Kachelauflösung</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1104"/>
         <source>Show frames per second (FPS)</source>
-        <translation type="unfinished"/>
+        <translation>Bilder pro Sekunde anzeigen (FPS)</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1114"/>
@@ -6927,7 +6927,7 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1128"/>
         <source>Max. ground error</source>
-        <translation type="unfinished"/>
+        <translation>Max. Bodenfehler</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1135"/>
@@ -6937,7 +6937,7 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1142"/>
         <source>Show camera&apos;s rotation center</source>
-        <translation type="unfinished"/>
+        <translation>Zeige das Rotationszentrum der Kamera</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="1151"/>
