@@ -64,7 +64,7 @@
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="125"/>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="548"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="551"/>
         <source>Export 3D Scene</source>
         <translation>Exporter une scène 3D</translation>
     </message>
@@ -74,92 +74,92 @@
         <translation>Activer/Masquer l&apos;arborescence des couches</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="143"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="142"/>
         <source>Camera</source>
         <translation>Caméra</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="149"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="148"/>
         <source>2D Map View Follows 3D Camera</source>
         <translation>La carte en 2D suit la caméra 3D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="158"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="157"/>
         <source>3D Camera Follows 2D Map View</source>
         <translation>La caméra 3D suit la carte en 2D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="167"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="170"/>
         <source>Show Visible Camera Area in 2D Map View</source>
         <translation>Afficher la zone visible de la caméra sur la carte 2D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="175"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="178"/>
         <source>Set 3D Scene Extent on 2D Map View</source>
         <translation>Définir l&apos;étendue de la scène 3D sur la carte 2D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="187"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="190"/>
         <source>Effects</source>
         <translation>Effets</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="193"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="196"/>
         <source>Show Shadows</source>
         <translation>Montrer l&apos;ombre</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="202"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="205"/>
         <source>Show Eye Dome Lighting</source>
         <translation>Afficher le Eye Dome Lighting</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="209"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="212"/>
         <source>Show Ambient Occlusion</source>
         <translation>Afficher occlusion ambiante</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="219"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="222"/>
         <source>Configure…</source>
         <translation>Configurer...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="229"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="232"/>
         <source>Save as Image</source>
         <translation>Sauvegarder comme image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="229"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="232"/>
         <source>Successfully saved the 3D map to &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="319"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="322"/>
         <source>Dock 3D Map View</source>
         <translation>Ancrer la vue cartographique 3D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="325"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="328"/>
         <source>Choose a file name to save the 3D map canvas to an image</source>
         <translation>Choisir un nom de fichier pour sauvegarder le canevas de carte 3D dans une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="479"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="482"/>
         <source>3D Configuration</source>
         <translation>Configuration 3D</translation>
     </message>
     <message numerus="yes">
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="580"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="583"/>
         <source>Loading %n tile(s)</source>
         <translation><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform></translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="666"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="669"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
         <translation>Une couche cartographique a utilisé toute la mémoire graphique autorisée (%1 Mo). Vous pouvez réduire le niveau de détail de la scène ou augmenter la limite dans les options.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="682"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="685"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
         <translation>Faire glisser un rectangle sur la carte 2D principale pour définir l&apos;étendue de la scène 3D. </translation>
     </message>
