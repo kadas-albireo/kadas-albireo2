@@ -243,7 +243,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
       {
         QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
         QMimeData *mimeData = nullptr;
-        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), "", QString( "&referer=%1" ).arg( referer ), entry->title, layerIdentifier, mimeData );
+        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), "", QString( "&referer=%1" ).arg( referer ), entry->title, layerIdentifier, mAuthcfg, mimeData );
         QStringList sortIndices = entry->sortIndices.split( "/" );
         mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
       }
@@ -319,7 +319,7 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
     }
 
     QMimeData *mimeData = nullptr;
-    if ( !layerItem.isNull() && parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, "", mimeData ) )
+    if ( !layerItem.isNull() && parseWMSLayerCapabilities( layerItem, entry->title, imgFormats, parentCrs, url, "", mAuthcfg, mimeData ) )
     {
       // Parse sublayers
       QVariantList sublayers;
@@ -442,14 +442,14 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     {
       mimeDataUri.layerType = "vector";
       mimeDataUri.providerKey = "arcgisfeatureserver";
-      mimeDataUri.uri = QString( "crs='%1' url='%2'" ).arg( crs.authid() ).arg( url );
+      mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid() ).arg( url ).arg( mAuthcfg );
     }
     else
     {
       mimeDataUri.layerType = "raster";
       mimeDataUri.providerKey = "arcgismapserver";
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0'" ).arg( crs.authid() ).arg( format ).arg( url );
+      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid() ).arg( format ).arg( url ).arg( mAuthcfg );
     }
 
     QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
@@ -477,6 +477,7 @@ void KadasArcGisPortalCatalogProvider::addVTSlayer( const ResultEntry &entry )
   mimeDataUri.uri = QStringLiteral( "serviceType=arcgis&styleUrl=%1&type=xyz&url=%2" ).arg( styleUrl, entry.url );
   QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", metadataUrl );
+  mimeData->setProperty( "authcfg", mAuthcfg );
 
   QStringList sortIndices = entry.sortIndices.split( "/" );
   mBrowser->addItem(
