@@ -143,7 +143,7 @@ void KadasVBSCatalogProvider::readWMTSCapabilitiesDo()
           QString title;
           QMimeData *mimeData;
           const ResultEntry &entry = ( *entries )[layerid];
-          parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry.metadataUrl, QString( "&referer=%1" ).arg( referer ), title, layerid, mimeData );
+          parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, reply->request().url().toString(), entry.metadataUrl, QString( "&referer=%1" ).arg( referer ), title, layerid, QString(), mimeData );
           QStringList sortIndices = entry.sortIndices.split( "/" );
           mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
         }
@@ -327,7 +327,7 @@ void KadasVBSCatalogProvider::searchMatchingWMSLayer( const QDomNode &layerItem,
     QMimeData *mimeData;
     const ResultEntry &entry = entries[layerid];
     QString title = layerItem.firstChildElement( "Title" ).text();
-    if ( parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, entry.metadataUrl, mimeData ) )
+    if ( parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, entry.metadataUrl, QString(), mimeData ) )
     {
       QStringList sortIndices = entry.sortIndices.split( "/" );
       mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entries[layerid].title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );

@@ -53,7 +53,7 @@ QMap<QString, QString> KadasCatalogProvider::parseWMTSTileMatrixSets( const QDom
   return tileMatrixSetMap;
 }
 
-void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &authCfg, const QString &extraParams, QString &title, QString &layerid, QMimeData *&mimeData ) const
+void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, const QString &authCfg, QMimeData *&mimeData ) const
 {
   layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
   QString imgFormat = layerItem.firstChildElement( "Format" ).text();

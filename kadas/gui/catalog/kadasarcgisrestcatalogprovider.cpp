@@ -163,7 +163,7 @@ void KadasArcGisRestCatalogProvider::parseWMTSDo()
       {
         QString title, layerid;
         QMimeData *mimeData;
-        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, url, "", "", title, layerid, mimeData );
+        parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, url, "", "", title, layerid, QString(), mimeData );
         mBrowser->addItem( getCategoryItem( catTitles, QStringList() ), title, -1, true, mimeData );
       }
     }
@@ -201,7 +201,7 @@ void KadasArcGisRestCatalogProvider::parseWMSDo()
     {
       QMimeData *mimeData;
       QString title = layerItem.firstChildElement( "Title" ).text();
-      parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", mimeData );
+      parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData );
       mBrowser->addItem( getCategoryItem( catTitles, QStringList() ), title, -1, mimeData );
     }
   }
