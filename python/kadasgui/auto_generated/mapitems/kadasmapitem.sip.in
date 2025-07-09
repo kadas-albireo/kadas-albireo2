@@ -240,6 +240,7 @@ class KadasMapItem : QObject /Abstract/
     bool deserialize( const QJsonObject &json );
 
     virtual QString itemName() const = 0;
+    virtual QString exportName() const;
 
     const QgsCoordinateReferenceSystem &crs() const;
 %Docstring
@@ -460,6 +461,7 @@ Trigger a redraw */
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static double outputDpiScale( const QgsRenderContext &context );
+    static double getTextRenderScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;

@@ -29,9 +29,17 @@ the Free Software Foundation; either version 2 of the License, or     *
     KadasGpxWaypointItem();
 
     virtual QString itemName() const;
+    virtual QString exportName() const;
+
 
     const QString &name() const;
     void setName( const QString &name );
+
+    const QFont &labelFont() const;
+    void setLabelFont( const QFont &labelFont );
+
+    const QColor &labelColor() const;
+    void setLabelColor( const QColor &labelColor );
 
     virtual Margin margin() const;
 

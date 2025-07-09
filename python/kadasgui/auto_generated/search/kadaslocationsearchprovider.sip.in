@@ -31,6 +31,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 %End
   public:
+    static QgsFillSymbol *createPolygonSymbol();
+
     KadasLocationSearchFilter( QgsMapCanvas *mapCanvas );
     ~KadasLocationSearchFilter();
 

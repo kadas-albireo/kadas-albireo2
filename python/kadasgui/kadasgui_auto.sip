@@ -43,6 +43,7 @@
 %Include auto_generated/search/kadasmapserverfindsearchprovider.sip
 %Include auto_generated/search/kadasremotedatasearchprovider.sip
 %Include auto_generated/search/kadaspinsearchprovider.sip
+%Include auto_generated/search/kadasalternategotolocatorfilter.sip
 %Include auto_generated/search/kadasworldlocationsearchprovider.sip
 %Include auto_generated/search/kadaslocaldatasearchprovider.sip
 %Include auto_generated/kadasmapitemtooltip.sip

@@ -31,6 +31,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 %End
   public:
+    KadasMapCanvasItemManager();
     static KadasMapCanvasItemManager *instance();
     static void addItem( KadasMapItem *item );
     static void removeItem( KadasMapItem *item );
@@ -42,8 +43,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     void itemAdded( const KadasMapItem *item );
     void itemWillBeRemoved( const KadasMapItem *item );
 
-  private:
-    KadasMapCanvasItemManager();
 };
 
 /************************************************************************
