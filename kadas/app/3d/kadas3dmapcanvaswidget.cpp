@@ -162,7 +162,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
     mActionSync2DNavTo3D->setChecked( false );
     Qgis::ViewSyncModeFlags syncMode = mCanvas->mapSettings()->viewSyncMode();
     syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync3DTo2D, enabled );
-    syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync2DTo3D, false);
+    syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync2DTo3D, false );
     mCanvas->mapSettings()->setViewSyncMode( syncMode );
   } );
   mCameraMenu->addAction( mActionSync3DNavTo2D );
