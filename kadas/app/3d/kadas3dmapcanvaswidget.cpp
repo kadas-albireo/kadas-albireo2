@@ -148,8 +148,10 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   mActionSync2DNavTo3D = new QAction( tr( "2D Map View Follows 3D Camera" ), this );
   mActionSync2DNavTo3D->setCheckable( true );
   connect( mActionSync2DNavTo3D, &QAction::triggered, this, [=]( bool enabled ) {
+    mActionSync3DNavTo2D->setChecked( false );
     Qgis::ViewSyncModeFlags syncMode = mCanvas->mapSettings()->viewSyncMode();
     syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync2DTo3D, enabled );
+    syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync3DTo2D, false );
     mCanvas->mapSettings()->setViewSyncMode( syncMode );
   } );
   mCameraMenu->addAction( mActionSync2DNavTo3D );
@@ -157,15 +159,13 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   mActionSync3DNavTo2D = new QAction( tr( "3D Camera Follows 2D Map View" ), this );
   mActionSync3DNavTo2D->setCheckable( true );
   connect( mActionSync3DNavTo2D, &QAction::triggered, this, [=]( bool enabled ) {
+    mActionSync2DNavTo3D->setChecked( false );
     Qgis::ViewSyncModeFlags syncMode = mCanvas->mapSettings()->viewSyncMode();
     syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync3DTo2D, enabled );
+    syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync2DTo3D, false);
     mCanvas->mapSettings()->setViewSyncMode( syncMode );
   } );
   mCameraMenu->addAction( mActionSync3DNavTo2D );
-
-  QActionGroup *syncNavActionGroup = new QActionGroup( mCameraMenu );
-  syncNavActionGroup->addAction( mActionSync2DNavTo3D );
-  syncNavActionGroup->addAction( mActionSync3DNavTo2D );
 
   mShowFrustumPolyogon = new QAction( tr( "Show Visible Camera Area in 2D Map View" ), this );
   mShowFrustumPolyogon->setCheckable( true );
