@@ -229,9 +229,8 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   // When panning on the 3D map, the frustum disappears completley very often
   // This can be removed, whenever this is fixed upstream in QGIS (can be easily tested in QGIS itself)
   connect( mCanvas, &Qgs3DMapCanvas::mapSettingsChanged, this, [this]() {
-    mCanvas->scene()->setSceneOriginShiftEnabled(false);
-    }
-  );
+    mCanvas->scene()->setSceneOriginShiftEnabled( false );
+  } );
 
   mCanvas->setMinimumSize( QSize( 200, 200 ) );
 
