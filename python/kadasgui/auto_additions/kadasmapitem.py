@@ -66,6 +66,7 @@ try:
     KadasMapItem.defaultNodeRenderer = staticmethod(KadasMapItem.defaultNodeRenderer)
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
+    KadasMapItem.getTextRenderScale = staticmethod(KadasMapItem.getTextRenderScale)
 except AttributeError:
     pass
 try:

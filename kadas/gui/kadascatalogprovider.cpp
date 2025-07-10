@@ -53,7 +53,7 @@ QMap<QString, QString> KadasCatalogProvider::parseWMTSTileMatrixSets( const QDom
   return tileMatrixSetMap;
 }
 
-void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, QMimeData *&mimeData ) const
+void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, const QString &authCfg, QMimeData *&mimeData ) const
 {
   layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
   QString imgFormat = layerItem.firstChildElement( "Format" ).text();
@@ -77,6 +77,7 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
   mimeDataUri.supportedFormats.append( imgFormat );
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7&SmoothPixmapTransform=1"
+                      "&authCfg=%8"
                       "&layers=%1&crs=%2&format=%3&tileMatrixSet=%4"
                       "&styles=%5&url=%6%7"
   )
@@ -86,7 +87,8 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
                       .arg( tileMatrixSet )
                       .arg( styleId )
                       .arg( url )
-                      .arg( extraParams );
+                      .arg( extraParams )
+                      .arg( authCfg );
   mimeDataUri.uri += "&tileDimensions=" + dimensionParams; // Add this last because it contains % (from %3D) which confuses .arg
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", layerInfoUrl );
@@ -119,7 +121,7 @@ QString KadasCatalogProvider::parseWMSNestedLayer( const QDomNode &layerItem ) c
   return subLayerParams;
 }
 
-bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, QMimeData *&mimeData ) const
+bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const
 {
   QString layerid = layerItem.firstChildElement( "Name" ).text();
   QString subLayerParams = QString( "&layers=%1&styles=" ).arg( layerid );
@@ -165,13 +167,15 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
   mimeDataUri.supportedFormats = imgFormats;
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7"
+                      "&authCfg=%5"
                       "&IgnoreReportedLayerExtents=1&crs=%1&format=%2"
                       "%3&url=%4"
   )
                       .arg( supportedCrs[0] )
                       .arg( imgFormat )
                       .arg( subLayerParams )
-                      .arg( url );
+                      .arg( url )
+                      .arg( authCfg );
   mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
   mimeData->setProperty( "metadataUrl", layerInfoUrl );
   return true;
