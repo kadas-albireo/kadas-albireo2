@@ -84,7 +84,7 @@
         <translation> La vista mappa 2D segue la telecamera 3D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="157"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="159"/>
         <source>3D Camera Follows 2D Map View</source>
         <translation>La telecamera 3D segue la vista mappa 2D</translation>
     </message>

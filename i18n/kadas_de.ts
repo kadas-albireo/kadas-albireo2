@@ -84,7 +84,7 @@
         <translation>2D Kartenansicht folgt 3D Kamera</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="157"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="159"/>
         <source>3D Camera Follows 2D Map View</source>
         <translation>3D Kamera folgt 2D Kartenansicht</translation>
     </message>
