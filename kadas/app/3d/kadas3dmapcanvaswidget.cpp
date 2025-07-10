@@ -224,6 +224,15 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   toolBar->addAction( configureAction );
 
   mCanvas = new Qgs3DMapCanvas;
+
+  // Disable automatic origin shift, this is problematic in combination with frustum highlight (show 3D extent on 2D map)
+  // When panning on the 3D map, the frustum disappears completley very often
+  // This can be removed, whenever this is fixed upstream in QGIS (can be easily tested in QGIS itself)
+  connect( mCanvas, &Qgs3DMapCanvas::mapSettingsChanged, this, [this]() {
+    mCanvas->scene()->setSceneOriginShiftEnabled(false);
+    }
+  );
+
   mCanvas->setMinimumSize( QSize( 200, 200 ) );
 
 #if 0
