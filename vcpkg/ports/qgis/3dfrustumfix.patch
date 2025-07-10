@@ -1,0 +1,18 @@
+diff --git a/src/3d/qgs3dmapscene.cpp b/src/3d/qgs3dmapscene.cpp
+index 89899b0d6ec..a1d3f425a72 100644
+--- a/src/3d/qgs3dmapscene.cpp
++++ b/src/3d/qgs3dmapscene.cpp
+@@ -270,6 +270,13 @@ QVector<QgsPointXY> Qgs3DMapScene::viewFrustum2DExtent() const
+     const QPoint p( ( ( i >> 0 ) & 1 ) ? 0 : mEngine->size().width(), ( ( i >> 1 ) & 1 ) ? 0 : mEngine->size().height() );
+     QgsRay3D ray = Qgs3DUtils::rayFromScreenPoint( p, mEngine->size(), camera );
+     QVector3D dir = ray.direction();
++
++    // Push ray origin slightly below plane to prevent degenerate projection
++    if ( std::abs(ray.origin().z()) < 1e-5 )
++    {
++      ray.setOrigin( ray.origin() + QVector3D(0, 0, -0.01) );
++    }
++
+     if ( dir.z() == 0.0 )
+       dir.setZ( 0.000001 );
+     double t = -ray.origin().z() / dir.z();

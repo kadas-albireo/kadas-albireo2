@@ -31,6 +31,7 @@ vcpkg_from_github(
   depth_render_frag.patch
   62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
   sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
+  3dfrustumfix.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
