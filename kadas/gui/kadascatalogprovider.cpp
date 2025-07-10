@@ -167,7 +167,7 @@ bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem,
   mimeDataUri.supportedFormats = imgFormats;
   mimeDataUri.uri = QString(
                       "contextualWMSLegend=0&featureCount=10&dpiMode=7"
-                      "&authCfg=%8"
+                      "&authCfg=%5"
                       "&IgnoreReportedLayerExtents=1&crs=%1&format=%2"
                       "%3&url=%4"
   )
