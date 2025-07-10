@@ -252,7 +252,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   QString geometry = data.value( QStringLiteral( "geometry" ) ).toString();
   QgsRectangle bbox = data.value( QStringLiteral( "bbox" ) ).value<QgsRectangle>();
   bool scaleOk = false;
-  int scale = data.value( QStringLiteral( "scale" ) ).toInt( &scaleOk );
+  int scale = data.value( QStringLiteral( "zoomScale" ) ).toInt( &scaleOk );
 
 
   QgsPointXY mapPos = mapCanvasTransform.transform( pos );
