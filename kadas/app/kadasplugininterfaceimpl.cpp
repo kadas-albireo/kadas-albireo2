@@ -435,7 +435,7 @@ void KadasPluginInterfaceImpl::openURL( const QString &url, bool useQgisDocDirec
   }
 }
 
-void KadasPluginInterfaceImpl::openMessageLog()
+void KadasPluginInterfaceImpl::openMessageLog( const QString &tabName )
 {
   kApp->showMessageLog();
 }
