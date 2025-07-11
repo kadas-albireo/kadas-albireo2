@@ -144,7 +144,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void pasteFromClipboard( QgsMapLayer * ) override;
 
     virtual void openURL( const QString &url, bool useQgisDocDirectory = true ) SIP_DEPRECATED override;
-    virtual void openMessageLog() override;
+    virtual void openMessageLog( const QString &tabName = QString() ) override;
     virtual void showLayoutManager() override;
 
     bool saveProject() override;
