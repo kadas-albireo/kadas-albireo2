@@ -28,7 +28,6 @@ vcpkg_from_github(
   sipcxx17.patch
   # nlohmann-json.patch
   qgis-debug.patch
-  depth_render_frag.patch
   62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
   sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
 )
