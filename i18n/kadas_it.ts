@@ -4010,32 +4010,32 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Preferito</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1393"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1378"/>
         <source>Manually set projection</source>
         <translation>Seleziona la proiezione manualmente</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1396"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1381"/>
         <source>Unknown layer projection</source>
         <translation>Proiezione del layer sconosciuta</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1397"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1382"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La proiezione del layer %1 è sconoscita, è possibile che gli oggetti siano posizionati incorrettamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1477"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1462"/>
         <source>Select Image</source>
         <translation>Seleziona immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1512"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1497"/>
         <source>Downloading...</source>
         <translation>Scaricando...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1522"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1507"/>
         <source>Unable to download image (%1).</source>
         <translation>Impossibile scaricare l&apos;immagine (%1).</translation>
     </message>
@@ -4044,22 +4044,22 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation type="vanished">Impossibile scaricare l&apos;immagine</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1531"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1516"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible salvare l&apos;immagine scaricata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1565"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1550"/>
         <source>Authenticated as:</source>
         <translation>Autenticato come:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1655"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1640"/>
         <source>Font scaling setting changed</source>
         <translation>Configurazione scala carattere modificata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1655"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1640"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modifica della scala dei caratteri verrà applicata al successivo avvio del programma.</translation>
     </message>
