@@ -59,6 +59,7 @@ class KadasApplication : public QgsApplication
 
   public:
     static const QgsSettingsEntryBool *settingsTokenCreateCookies;
+    static const QgsSettingsEntryBool *settingsTokenUseEsriAuth;
     static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
     static const QgsSettingsEntryString *settingsPortalTokenUrl;
     static const QString sEsriAuthCfgId;
