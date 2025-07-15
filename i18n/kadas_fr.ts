@@ -131,7 +131,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="232"/>
         <source>Successfully saved the 3D map to &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"/>
+        <translation>Carte 3D sauvegardée avec succès vers &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="322"/>
@@ -209,7 +209,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Quantized Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Maillage</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
@@ -293,7 +293,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
         <source>An elevation layer must be selected for a quantized mesh terrain</source>
-        <translation type="unfinished"/>
+        <translation>Une couche d&apos;élévation doit être sélectionnée pour un mondèle numérique de terrain</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="512"/>
@@ -2385,7 +2385,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/app/layertree/kadaslayertreeviewtemporalindicator.cpp" line="82"/>
         <source>&lt;b&gt;Temporal layer&lt;/b&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Couche temporaire&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
