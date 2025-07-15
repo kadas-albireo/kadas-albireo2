@@ -258,12 +258,6 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   QgsPointXY mapPos = mapCanvasTransform.transform( pos );
   QgsPointXY itemPos = annotationLayerTransform.transform( pos );
 
-  QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
-  QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
-  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
-  item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
-  mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
-
   if ( !bbox.isEmpty() )
   {
     QgsRectangle zoomExtent = mapCanvasTransform.transform( bbox );
@@ -336,6 +330,12 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
       }
     }
   }
+
+  QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
+  QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
+  symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+  mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
 }
 
 
