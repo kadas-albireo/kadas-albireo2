@@ -105,6 +105,7 @@
 const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
 const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
 const QgsSettingsEntryBool *KadasApplication::settingsTokenCreateCookies = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+const QgsSettingsEntryBool *KadasApplication::settingsTokenUseEsriAuth = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
 
 const QString KadasApplication::sEsriAuthCfgId = QStringLiteral( "kadas_esri_token" );
 
@@ -334,7 +335,8 @@ void KadasApplication::init()
               createCookies( token );
             } );
           }
-          createEsriAuth( token );
+          if ( settingsTokenUseEsriAuth->value() )
+            createEsriAuth( token );
         }
       }
       else
