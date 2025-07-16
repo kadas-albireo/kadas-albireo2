@@ -2385,7 +2385,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     <message>
         <location filename="../kadas/app/layertree/kadaslayertreeviewtemporalindicator.cpp" line="82"/>
         <source>&lt;b&gt;Temporal layer&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Couche temporaire&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Couche temporelle&lt;/b&gt;</translation>
     </message>
 </context>
 <context>

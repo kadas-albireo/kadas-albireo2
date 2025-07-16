@@ -5851,7 +5851,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasskyboxrenderingsettingswidget.cpp" line="30"/>
         <source>Distinct Faces</source>
-        <translation type="unfinished"/>
+        <translation>Eindeutige Fläche - nicht redundante polygonale Oberfläche</translation>
     </message>
 </context>
 <context>
@@ -6724,7 +6724,7 @@ bewegen</translation>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="345"/>
         <source>Skirt height</source>
-        <translation type="unfinished"/>
+        <translation>Höhenausgleich bei Geländesprüngen</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/map3dconfigwidget.ui" line="355"/>
