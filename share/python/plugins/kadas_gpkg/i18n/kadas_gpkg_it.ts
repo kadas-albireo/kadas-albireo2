@@ -130,12 +130,12 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="107"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;I layers che già presenti nell&apos;output GeoPackage sono disabilitati.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="133"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;small&gt;&lt;i&gt;I layer di dimensioni sconosciute o superiori ai 50 MB sono deselezionati di default.&lt;/i&gt;&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="143"/>
@@ -155,22 +155,22 @@
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="192"/>
         <source>Y Max.:</source>
-        <translation type="unfinished"/>
+        <translation>Y Max.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="199"/>
         <source>X Min.:</source>
-        <translation type="unfinished"/>
+        <translation>X Min.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="212"/>
         <source>Y Min.:</source>
-        <translation type="unfinished"/>
+        <translation>Y Min.:</translation>
     </message>
     <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="219"/>
         <source>X Max.:</source>
-        <translation type="unfinished"/>
+        <translation>X Max.:</translation>
     </message>
 </context>
 <context>
@@ -221,7 +221,7 @@
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="80"/>
         <source>&lt;i&gt;The selected GPKG does not contain a QGIS project, and will be imported as a layer.&lt;/i&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;i&gt;Il geopackage selezionato non contiene un progetto QGIS e verrà importato come un layer.&lt;/i&gt;</translation>
     </message>
     <message>
         <location filename="../ui_kadas_gpkg_import_dialog.py" line="81"/>

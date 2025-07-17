@@ -9,12 +9,12 @@
     <message>
         <location filename="../about_dialog.py" line="36"/>
         <source>&lt;b&gt;Version&lt;/b&gt;: %s (%s) - Based on QGIS %s</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Versione&lt;/b&gt;: %s (%s) - Basato su QGIS %s</translation>
     </message>
     <message>
         <location filename="../about_dialog.py" line="40"/>
         <source>This software is released under the &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</source>
-        <translation type="unfinished"/>
+        <translation>Questo software è rilasciato sotto&lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</translation>
     </message>
 </context>
 </TS>
