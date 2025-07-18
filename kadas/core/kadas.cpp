@@ -168,6 +168,11 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
       {
         qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
       }
+      else
+      {
+        qunsetenv( "GDAL_HTTP_PROXY" );
+      }
+
       if ( !gdalProxyUserPwd.isEmpty() )
       {
         qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
