@@ -209,7 +209,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Quantized Mesh</source>
-        <translation type="unfinished"/>
+        <translation>Mesh quantizzata</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
@@ -293,7 +293,7 @@
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
         <source>An elevation layer must be selected for a quantized mesh terrain</source>
-        <translation type="unfinished"/>
+        <translation>Per un terreno a rete quantizzata è necessario selezionare un layer di elevazione</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="512"/>
@@ -4747,12 +4747,12 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="113"/>
         <source>Color Ramp Shader</source>
-        <translation type="unfinished"/>
+        <translation>Gradiente di colori</translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadasmesh3dsymbolwidget.cpp" line="122"/>
         <source>2D Contour Color Ramp Shader</source>
-        <translation type="unfinished"/>
+        <translation>Gradiente di colori per bordi 2D</translation>
     </message>
 </context>
 <context>
