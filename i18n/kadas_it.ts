@@ -151,7 +151,7 @@
     <message numerus="yes">
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="583"/>
         <source>Loading %n tile(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>Caricamento di %n tessere</numerusform><numerusform>Caricamento di %n tessere</numerusform><numerusform>Caricamento di %n tessere</numerusform></translation>
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="669"/>

@@ -3691,12 +3691,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="127"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="147"/>
@@ -3713,7 +3713,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="220"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="227"/>
@@ -3730,7 +3730,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="241"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attenuation (A&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;&amp;times;D+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;&amp;times;D&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Atténuation(A&lt;span style=&quot; vertical-align:sub;&quot;&gt;0&lt;/span&gt;+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;1&lt;/span&gt;&amp;fois;D+A&lt;span style=&quot; vertical-align:sub;&quot;&gt;2&lt;/span&gt;&amp;fois;D&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../kadas/app/ui/kadaslightswidget.ui" line="289"/>
