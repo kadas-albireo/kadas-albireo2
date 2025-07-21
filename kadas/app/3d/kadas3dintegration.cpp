@@ -39,7 +39,7 @@
 #include "kadas/app/3d/kadas3dintegration.h"
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
 
-static const QString KADAS_3D_IDENTIFIER = QStringLiteral( "kadas-3d" );
+static const QString KADAS_3D_IDENTIFIER = QStringLiteral( "Kadas 3D" );
 
 void write3DMapViewSettings( Kadas3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap )
 {
