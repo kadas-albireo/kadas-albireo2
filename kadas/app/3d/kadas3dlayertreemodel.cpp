@@ -163,12 +163,12 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
 {
   if ( idx.column() == 0 )
   {
-    if ( role == Qt::CheckStateRole )
+    if ( static_cast<Qt::ItemDataRole>( role ) == Qt::ItemDataRole::CheckStateRole )
     {
       QgsMapLayer *layer = mapLayer( idx );
       if ( layer )
       {
-        return mShownLayers.contains( layer ) ? Qt::Checked ::Qt::Unchecked;
+        return mShownLayers.contains( layer ) ? Qt::Checked : Qt::Unchecked;
       }
       else
       {
@@ -177,9 +177,10 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
         bool hasChecked = false;
         while ( true )
         {
-          const QVariant v = data( index( n, 0, idx ), role );
-          if ( !v.isValid() )
+          QModelIndex childIdx = index( n, 0, idx );
+          if ( !childIdx.isValid() )
             break;
+          const QVariant v = data( childIdx, role );
 
           switch ( v.value<Qt::CheckState>() )
           {
@@ -214,7 +215,7 @@ bool Kadas3DLayerTreeModel::setData( const QModelIndex &index, const QVariant &v
 {
   if ( index.column() == 0 )
   {
-    if ( role == Qt::CheckStateRole )
+    if ( static_cast<Qt::ItemDataRole>( role ) == Qt::ItemDataRole::CheckStateRole )
     {
       int i = 0;
       for ( i = 0;; i++ )
