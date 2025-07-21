@@ -25,8 +25,10 @@ Kadas3DLayerTreeModel::Kadas3DLayerTreeModel( Qgs3DMapCanvas *mapCanvas )
 
   setLayerTreeModel( new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this ) );
   connect( QgsProject::instance(), &QgsProject::readProject, this, [=] {
+    beginResetModel();
     mShownLayers.clear();
-    resetLayerTreeModel();
+    visibleLayers( QgsProject::instance()->layerTreeRoot(), mShownLayers );
+    endResetModel();
   } );
 }
 
