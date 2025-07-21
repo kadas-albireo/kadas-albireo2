@@ -24,6 +24,7 @@ Kadas3DLayerTreeModel::Kadas3DLayerTreeModel( Qgs3DMapCanvas *mapCanvas )
   visibleLayers( QgsProject::instance()->layerTreeRoot(), mShownLayers );
 
   setLayerTreeModel( new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this ) );
+
   connect( QgsProject::instance(), &QgsProject::readProject, this, [=] {
     beginResetModel();
     mShownLayers.clear();
@@ -167,55 +168,37 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
       QgsMapLayer *layer = mapLayer( idx );
       if ( layer )
       {
-        if ( mShownLayers.contains( layer ) )
-        {
-          return Qt::Checked;
-        }
-        else
-        {
-          return Qt::Unchecked;
-        }
+        return mShownLayers.contains( layer ) ? Qt::Checked ::Qt::Unchecked;
       }
       else
       {
         // i.e. this is a group, analyze its children
-        bool hasChecked = false, hasUnchecked = false;
-        int n;
-        for ( n = 0; !hasChecked || !hasUnchecked; n++ )
+        int n = 0;
+        bool hasChecked = false;
+        while ( true )
         {
           const QVariant v = data( index( n, 0, idx ), role );
           if ( !v.isValid() )
             break;
 
-          switch ( v.toInt() )
+          switch ( v.value<Qt::CheckState>() )
           {
             case Qt::PartiallyChecked:
-              // parent of partially checked child shared state
-              return Qt::PartiallyChecked;
-
             case Qt::Checked:
               hasChecked = true;
               break;
 
             case Qt::Unchecked:
-              hasUnchecked = true;
               break;
           }
+          n++;
         }
 
-        // unchecked leaf
+        // unchecked leaf (no child)
         if ( n == 0 )
           return Qt::Unchecked;
 
-        // both
-        if ( hasChecked && hasUnchecked )
-          return Qt::PartiallyChecked;
-
-        if ( hasChecked )
-          return Qt::Checked;
-
-        Q_ASSERT( hasUnchecked );
-        return Qt::Unchecked;
+        return hasChecked ? Qt::Checked : Qt::PartiallyChecked;
       }
     }
     else
