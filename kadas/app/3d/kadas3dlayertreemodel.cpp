@@ -173,9 +173,9 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
       else
       {
         // i.e. this is a group, analyze its children
-        int n = 0;
-        bool hasChecked = false;
-        while ( true )
+        bool hasChecked = false, hasUnchecked = false;
+        int n;
+        for ( n = 0; !hasChecked || !hasUnchecked; n++ )
         {
           QModelIndex childIdx = index( n, 0, idx );
           if ( !childIdx.isValid() )
@@ -185,21 +185,31 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
           switch ( v.value<Qt::CheckState>() )
           {
             case Qt::PartiallyChecked:
+              // parent of partially checked child shared state
+              return Qt::PartiallyChecked;
+
             case Qt::Checked:
               hasChecked = true;
               break;
 
             case Qt::Unchecked:
+              hasUnchecked = true;
               break;
           }
-          n++;
         }
-
-        // unchecked leaf (no child)
+        // unchecked leaf
         if ( n == 0 )
           return Qt::Unchecked;
 
-        return hasChecked ? Qt::Checked : Qt::PartiallyChecked;
+        // both
+        if ( hasChecked && hasUnchecked )
+          return Qt::PartiallyChecked;
+
+        if ( hasChecked )
+          return Qt::Checked;
+
+        Q_ASSERT( hasUnchecked );
+        return Qt::Unchecked;
       }
     }
     else
@@ -301,7 +311,7 @@ void Kadas3DLayerTreeModel::visibleLayers( QgsLayerTreeGroup *parent, QSet<QgsMa
     else if ( QgsLayerTree::isLayer( node ) )
     {
       QgsLayerTreeLayer *nodeLayer = QgsLayerTree::toLayer( node );
-      if ( node->itemVisibilityChecked() != Qt::Unchecked && nodeLayer->layer() )
+      if ( node->isVisible() != Qt::Unchecked && nodeLayer->layer() )
       {
         layers << nodeLayer->layer();
       }
