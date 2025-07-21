@@ -153,7 +153,10 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     {
       QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
       qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
+<<<<<<< HEAD
       qputenv( "GDAL_HTTPS_PROXY", gdalHttpProxy.toLocal8Bit() );
+=======
+>>>>>>> 8e3bb722 (Ingore system proxy)
     }
     else
     {
@@ -162,23 +165,15 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
       qunsetenv( "GDAL_HTTPS_PROXY" );
     }
 
-      if ( !gdalHttpProxy.isEmpty() )
-      {
-        qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
-      }
-      else
-      {
-        qunsetenv( "GDAL_HTTP_PROXY" );
-      }
-
-      if ( !gdalProxyUserPwd.isEmpty() )
-      {
-        qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
-      }
-      if ( !gdalProxyAuth.isEmpty() )
-      {
-        qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
-      }
+    if ( !gdalProxyUserPwd.isEmpty() )
+    {
+      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
+      qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
+    }
+    if ( !gdalProxyAuth.isEmpty() )
+    {
+      qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
     }
 
     if ( !gdalHttpUserPwd.isEmpty() )
