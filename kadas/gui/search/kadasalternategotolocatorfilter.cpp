@@ -77,10 +77,10 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   bool posIsWgs84 = false;
 
   // Coordinates such as 106.8468,-6.3804
-  // Accept decimal numbers, possibly with degree symbol (°) after each number
+  // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
     QStringLiteral(
-      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?$)"
+      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?(:?\s+[0-9]+)?$)"
     )
       .arg(
         locale.decimalPoint(),
@@ -138,7 +138,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
                                                     R"((\s*%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?))"
                                                     ")|("
                                                     R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?))"
-                                                    ")$"
+                                                    ")(:?\s+[0-9]+)?$"
     )
                                                     .arg( dmsRx, degreeSymbol ) );
     match = separatorRx4.match( string.trimmed() );
