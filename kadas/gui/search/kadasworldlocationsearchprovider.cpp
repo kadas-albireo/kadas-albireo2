@@ -108,10 +108,14 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   mEventLoop = new QEventLoop;
   connect( mCurrentReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::handleNetworkReply );
   connect( feedback, &QgsFeedback::canceled, mEventLoop, [&]() {
-    mCurrentReply->abort();
-    mCurrentReply->deleteLater();
-    mCurrentReply = nullptr;
-    mEventLoop->quit();
+    if ( mCurrentReply )
+    {
+      mCurrentReply->abort();
+      mCurrentReply->deleteLater();
+      mCurrentReply = nullptr;
+    }
+    if ( mEventLoop )
+      mEventLoop->quit();
   } );
   mEventLoop->exec();
   delete mEventLoop;
