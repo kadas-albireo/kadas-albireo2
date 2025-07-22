@@ -153,6 +153,7 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     {
       QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
       qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
+      qputenv( "GDAL_HTTPS_PROXY", gdalHttpProxy.toLocal8Bit() );
     }
     else
     {
