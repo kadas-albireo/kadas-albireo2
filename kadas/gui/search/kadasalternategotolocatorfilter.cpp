@@ -62,6 +62,8 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
   const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
 
+  const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
+
   const QLocale locale;
 
 
@@ -75,7 +77,18 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   bool posIsWgs84 = false;
 
   // Coordinates such as 106.8468,-6.3804
-  thread_local QRegularExpression separatorRx1( QStringLiteral( R"(^([0-9\-\%1\%2]*)[\s%3]*([0-9\-\%1\%2]*)$)" ).arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString() ) );
+  // Accept decimal numbers, possibly with degree symbol (°) after each number
+  thread_local QRegularExpression separatorRx1(
+    QStringLiteral(
+      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?$)"
+    )
+      .arg(
+        locale.decimalPoint(),
+        locale.groupSeparator(),
+        locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString(),
+        degreeSymbol
+      )
+  );
   QRegularExpressionMatch match = separatorRx1.match( string.trimmed() );
   if ( match.hasMatch() )
   {
@@ -86,7 +99,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() || !firstOk || !secondOk )
   {
     // Digit detection using user locale failed, use default C decimal separators
-    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)[\s\,]*([0-9\-\.]*)$)" ) );
+    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)(?:\s*%1)?[\s\,]*([0-9\-\.]*)(?:\s*%1)?$)" ).arg( degreeSymbol ) );
     match = separatorRx2.match( string.trimmed() );
     if ( match.hasMatch() )
     {
@@ -98,15 +111,18 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])\s*$)" )
-                                                    .arg( locale.decimalPoint() ) );
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])\s*$)" )
+                                                    .arg( locale.decimalPoint(), degreeSymbol ) );
     match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
     {
       posIsWgs84 = true;
       bool isEasting = false;
-      firstNumber = QgsCoordinateUtils::degreeToDecimal( match.captured( 1 ), &firstOk, &isEasting );
-      secondNumber = QgsCoordinateUtils::degreeToDecimal( match.captured( 2 ), &secondOk );
+      // Remove degree sign from the string before conversion
+      QString firstStr = match.captured( 1 ).remove( degreeSymbol ).trimmed();
+      firstNumber = QgsCoordinateUtils::degreeToDecimal( firstStr, &firstOk, &isEasting );
+      QString secondStr = match.captured( 2 ).remove( degreeSymbol ).trimmed();
+      secondNumber = QgsCoordinateUtils::degreeToDecimal( secondStr, &secondOk );
       // normalize to northing (i.e. Y) first
       if ( isEasting )
         std::swap( firstNumber, secondNumber );
@@ -119,28 +135,32 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     thread_local QString dmsRx = QStringLiteral( R"(\d{1,3}(?:[^0-9.]+[0-5]?\d)?[^0-9.]+[0-5]?\d(?:[\.\%1]\d+)?)" ).arg( locale.decimalPoint() );
     thread_local QRegularExpression separatorRx4( QStringLiteral(
                                                     "^("
-                                                    R"((\s*%1[^0-9.,]*[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*[-+NSEWnsew]?))"
+                                                    R"((\s*%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?))"
                                                     ")|("
-                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*))"
+                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?))"
                                                     ")$"
     )
-                                                    .arg( dmsRx ) );
+                                                    .arg( dmsRx, degreeSymbol ) );
     match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
     {
-      qDebug() << match.captured( 1 ) << match.captured( 2 ) << match.captured( 3 ) << match.captured( 4 ) << match.captured( 5 ) << match.captured( 6 ) << match.captured( 7 ) << match.captured( 8 );
+      //qDebug() << match.captured( 1 ) << match.captured( 2 ) << match.captured( 3 ) << match.captured( 4 ) << match.captured( 5 ) << match.captured( 6 ) << match.captured( 7 ) << match.captured( 8 );
 
       posIsWgs84 = true;
       bool isEasting = false;
       if ( !match.captured( 1 ).isEmpty() )
       {
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 2 ), &firstOk, &isEasting );
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 3 ), &secondOk );
+        QString firstStr = match.captured( 1 ).remove( degreeSymbol ).trimmed();
+        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
+        QString secondStr = match.captured( 2 ).remove( degreeSymbol ).trimmed();
+        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
       }
       else
       {
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 5 ), &firstOk, &isEasting );
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 7 ), &secondOk );
+        QString firstStr = match.captured( 5 ).remove( degreeSymbol ).trimmed();
+        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
+        QString secondStr = match.captured( 7 ).remove( degreeSymbol ).trimmed();
+        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
       }
       // normalize to northing (i.e. Y) first
       if ( isEasting )
