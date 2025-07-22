@@ -115,8 +115,11 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     {
       posIsWgs84 = true;
       bool isEasting = false;
-      firstNumber = QgsCoordinateUtils::degreeToDecimal( match.captured( 1 ), &firstOk, &isEasting );
-      secondNumber = QgsCoordinateUtils::degreeToDecimal( match.captured( 2 ), &secondOk );
+      // Remove degree sign from the string before conversion
+      QString firstStr = match.captured( 1 ).remove( QStringLiteral( "°" ) ).trimmed();
+      firstNumber = QgsCoordinateUtils::degreeToDecimal( firstStr, &firstOk, &isEasting );
+      QString secondStr = match.captured( 2 ).remove( QStringLiteral( "°" ) ).trimmed();
+      secondNumber = QgsCoordinateUtils::degreeToDecimal( secondStr, &secondOk );
       // normalize to northing (i.e. Y) first
       if ( isEasting )
         std::swap( firstNumber, secondNumber );
@@ -144,13 +147,17 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
       bool isEasting = false;
       if ( !match.captured( 1 ).isEmpty() )
       {
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 2 ), &firstOk, &isEasting );
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 3 ), &secondOk );
+        QString firstStr = match.captured( 1 ).remove( QStringLiteral( "°" ) ).trimmed();
+        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
+        QString secondStr = match.captured( 2 ).remove( QStringLiteral( "°" ) ).trimmed();
+        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
       }
       else
       {
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 5 ), &firstOk, &isEasting );
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( match.captured( 7 ), &secondOk );
+        QString firstStr = match.captured( 5 ).remove( QStringLiteral( "°" ) ).trimmed();
+        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
+        QString secondStr = match.captured( 7 ).remove( QStringLiteral( "°" ) ).trimmed();
+        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
       }
       // normalize to northing (i.e. Y) first
       if ( isEasting )
