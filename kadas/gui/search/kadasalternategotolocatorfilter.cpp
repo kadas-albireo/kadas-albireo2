@@ -110,8 +110,8 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
   if ( !match.hasMatch() )
   {
-    // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])\s*$)" )
+    // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes with optional degree symbol and optional altitude
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])(:?\s+[0-9]+)?\s*$)" )
                                                     .arg( locale.decimalPoint(), degreeSymbol ) );
     match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
