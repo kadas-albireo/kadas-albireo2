@@ -129,9 +129,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     thread_local QString dmsRx = QStringLiteral( R"(\d{1,3}(?:[^0-9.]+[0-5]?\d)?[^0-9.]+[0-5]?\d(?:[\.\%1]\d+)?)" ).arg( locale.decimalPoint() );
     thread_local QRegularExpression separatorRx4( QStringLiteral(
                                                     "^("
-                                                    R"((\s*%1[^0-9.,]*[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*[-+NSEWnsew]?))"
+                                                    R"((\s*%1[^0-9.,]*(?:\s*°)?[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*(?:\s*°)?[-+NSEWnsew]?))"
                                                     ")|("
-                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*))"
+                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*°)?)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*°)?))"
                                                     ")$"
     )
                                                     .arg( dmsRx ) );
