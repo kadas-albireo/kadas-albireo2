@@ -62,7 +62,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
   const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
 
-  const QString degreeSymbol = QString::fromLocal8Bit( "\xB0 C" );
+  const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
 
   const QLocale locale;
 
