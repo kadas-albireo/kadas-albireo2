@@ -384,7 +384,7 @@ void KadasColorAction::setColor( const QColor &color )
 
 void KadasColorAction::chooseColor()
 {
-  const QColor col = QColorDialog::getColor( m_color, nullptr );
+  const QColor col = QColorDialog::getColor( m_color, this->parent() );
   if ( col.isValid() && col != m_color )
   {
     setColor( col );
