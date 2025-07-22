@@ -149,33 +149,28 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     QString gdalHttpUserPwd = settingsGdalHttpUserPassword->value();
     QString gdalHttpAuth = settingsGdalHttpAuth->value();
 
-    if ( gdalHttpProxy.isEmpty() )
+    if ( !gdalHttpProxy.isEmpty() )
     {
-      QgsDebugMsgLevel( "Querying gdalProxyConfig for " + url.toString(), 2 );
-      QList<QNetworkProxy> proxies = QNetworkProxyFactory::systemProxyForQuery( QNetworkProxyQuery( url ) );
-      if ( !proxies.isEmpty() && !proxies[0].hostName().isEmpty() )
-      {
-        gdalHttpProxy = QString( "%1:%2" ).arg( proxies[0].hostName() ).arg( proxies[0].port() );
-        if ( gdalProxyUserPwd.isEmpty() )
-          gdalProxyUserPwd = QString( "%1:%2" ).arg( proxies[0].user() ).arg( proxies[0].password() );
-      }
-
       QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
-      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
-      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
+      qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
+      qputenv( "GDAL_HTTPS_PROXY", gdalHttpProxy.toLocal8Bit() );
+    }
+    else
+    {
+      QgsDebugMsgLevel( QString( "Unset GDAL_HTTP(S)_PROXY" ), 2 );
+      qunsetenv( "GDAL_HTTP_PROXY" );
+      qunsetenv( "GDAL_HTTPS_PROXY" );
+    }
 
-      if ( !gdalHttpProxy.isEmpty() )
-      {
-        qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
-      }
-      if ( !gdalProxyUserPwd.isEmpty() )
-      {
-        qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
-      }
-      if ( !gdalProxyAuth.isEmpty() )
-      {
-        qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
-      }
+    if ( !gdalProxyUserPwd.isEmpty() )
+    {
+      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
+      qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
+    }
+    if ( !gdalProxyAuth.isEmpty() )
+    {
+      qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
     }
 
     if ( !gdalHttpUserPwd.isEmpty() )
