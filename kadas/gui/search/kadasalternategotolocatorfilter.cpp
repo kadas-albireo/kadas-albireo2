@@ -75,7 +75,17 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   bool posIsWgs84 = false;
 
   // Coordinates such as 106.8468,-6.3804
-  thread_local QRegularExpression separatorRx1( QStringLiteral( R"(^([0-9\-\%1\%2]*)[\s%3]*([0-9\-\%1\%2]*)$)" ).arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString() ) );
+  // Accept decimal numbers, possibly with degree symbol (°) after each number
+  thread_local QRegularExpression separatorRx1(
+    QStringLiteral(
+      R"(^([0-9\-\%1\%2]*)(?:\s*°)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*°)?$)"
+    )
+      .arg(
+        locale.decimalPoint(),
+        locale.groupSeparator(),
+        locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString()
+      )
+  );
   QRegularExpressionMatch match = separatorRx1.match( string.trimmed() );
   if ( match.hasMatch() )
   {
@@ -86,7 +96,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() || !firstOk || !secondOk )
   {
     // Digit detection using user locale failed, use default C decimal separators
-    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)[\s\,]*([0-9\-\.]*)$)" ) );
+    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)(?:\s*°)?[\s\,]*([0-9\-\.]*)(?:\s*°)?$)" ) );
     match = separatorRx2.match( string.trimmed() );
     if ( match.hasMatch() )
     {
@@ -98,7 +108,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?\s*[NSEWnsew])\s*$)" )
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*°)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*°)?\s*[NSEWnsew])\s*$)" )
                                                     .arg( locale.decimalPoint() ) );
     match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
