@@ -360,33 +360,33 @@
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="171"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="191"/>
         <source>Map CRS</source>
         <translation>SR della mappa</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="209"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="229"/>
         <source>Go to %1%2 %3%4</source>
         <translation>Vai a %1%2 %3%4</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="242"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="262"/>
         <source>Go to %1°N %2°E</source>
         <translation>Vai a %1°N %2°E</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="400"/>
         <source>Go to %1°N %2°E %3</source>
         <translation>Vai a %1°N %2°E %3</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="380"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="400"/>
         <source>at scale 1:%1 </source>
         <translation>alla scala 1:%1</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="532"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="567"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="552"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="587"/>
         <source>zone</source>
         <translation>Zona</translation>
     </message>
@@ -6945,7 +6945,7 @@ geolocazione</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../kadas/core/kadas.cpp" line="240"/>
+        <location filename="../kadas/core/kadas.cpp" line="235"/>
         <source>Failed to open raster file: %1</source>
         <translation>Impossibile aprire il file raster: %1</translation>
     </message>
