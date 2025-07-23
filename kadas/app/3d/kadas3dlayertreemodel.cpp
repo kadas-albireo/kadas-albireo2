@@ -24,9 +24,12 @@ Kadas3DLayerTreeModel::Kadas3DLayerTreeModel( Qgs3DMapCanvas *mapCanvas )
   visibleLayers( QgsProject::instance()->layerTreeRoot(), mShownLayers );
 
   setLayerTreeModel( new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this ) );
+
   connect( QgsProject::instance(), &QgsProject::readProject, this, [=] {
+    beginResetModel();
     mShownLayers.clear();
-    resetLayerTreeModel();
+    visibleLayers( QgsProject::instance()->layerTreeRoot(), mShownLayers );
+    endResetModel();
   } );
 }
 
@@ -40,6 +43,10 @@ Qt::ItemFlags Kadas3DLayerTreeModel::flags( const QModelIndex &idx ) const
 {
   if ( idx.column() == 0 )
   {
+    if ( !mapLayer( idx ) )
+      return Qt::ItemIsEnabled;
+
+    // if this is a layer, allow check state
     return Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
   }
 
@@ -160,60 +167,12 @@ QVariant Kadas3DLayerTreeModel::data( const QModelIndex &idx, int role ) const
 {
   if ( idx.column() == 0 )
   {
-    if ( role == Qt::CheckStateRole )
+    if ( static_cast<Qt::ItemDataRole>( role ) == Qt::ItemDataRole::CheckStateRole )
     {
       QgsMapLayer *layer = mapLayer( idx );
       if ( layer )
       {
-        if ( mShownLayers.contains( layer ) )
-        {
-          return Qt::Checked;
-        }
-        else
-        {
-          return Qt::Unchecked;
-        }
-      }
-      else
-      {
-        // i.e. this is a group, analyze its children
-        bool hasChecked = false, hasUnchecked = false;
-        int n;
-        for ( n = 0; !hasChecked || !hasUnchecked; n++ )
-        {
-          const QVariant v = data( index( n, 0, idx ), role );
-          if ( !v.isValid() )
-            break;
-
-          switch ( v.toInt() )
-          {
-            case Qt::PartiallyChecked:
-              // parent of partially checked child shared state
-              return Qt::PartiallyChecked;
-
-            case Qt::Checked:
-              hasChecked = true;
-              break;
-
-            case Qt::Unchecked:
-              hasUnchecked = true;
-              break;
-          }
-        }
-
-        // unchecked leaf
-        if ( n == 0 )
-          return Qt::Unchecked;
-
-        // both
-        if ( hasChecked && hasUnchecked )
-          return Qt::PartiallyChecked;
-
-        if ( hasChecked )
-          return Qt::Checked;
-
-        Q_ASSERT( hasUnchecked );
-        return Qt::Unchecked;
+        return mShownLayers.contains( layer ) ? Qt::Checked : Qt::Unchecked;
       }
     }
     else
@@ -229,32 +188,19 @@ bool Kadas3DLayerTreeModel::setData( const QModelIndex &index, const QVariant &v
 {
   if ( index.column() == 0 )
   {
-    if ( role == Qt::CheckStateRole )
+    if ( static_cast<Qt::ItemDataRole>( role ) == Qt::ItemDataRole::CheckStateRole )
     {
-      int i = 0;
-      for ( i = 0;; i++ )
-      {
-        const QModelIndex child = Kadas3DLayerTreeModel::index( i, 0, index );
-        if ( !child.isValid() )
-          break;
+      QgsMapLayer *layer = mapLayer( index );
+      if ( !layer )
+        return false;
 
-        setData( child, value, role );
-      }
+      if ( value.value<Qt::CheckState>() == Qt::Checked )
+        mShownLayers.insert( layer );
+      else if ( value.value<Qt::CheckState>() == Qt::Unchecked )
+        mShownLayers.remove( layer );
+      else
+        Q_ASSERT( false ); // expected checked or unchecked
 
-      if ( i == 0 )
-      {
-        QgsMapLayer *layer = mapLayer( index );
-        if ( !layer )
-        {
-          return false;
-        }
-        if ( value.value<Qt::CheckState>() == Qt::Checked )
-          mShownLayers.insert( layer );
-        else if ( value.value<Qt::CheckState>() == Qt::Unchecked )
-          mShownLayers.remove( layer );
-        else
-          Q_ASSERT( false ); // expected checked or unchecked
-      }
       emit dataChanged( index, index );
 
       // create a new map theme and use it 3D
@@ -315,7 +261,7 @@ void Kadas3DLayerTreeModel::visibleLayers( QgsLayerTreeGroup *parent, QSet<QgsMa
     else if ( QgsLayerTree::isLayer( node ) )
     {
       QgsLayerTreeLayer *nodeLayer = QgsLayerTree::toLayer( node );
-      if ( node->itemVisibilityChecked() != Qt::Unchecked && nodeLayer->layer() )
+      if ( node->isVisible() != Qt::Unchecked && nodeLayer->layer() )
       {
         layers << nodeLayer->layer();
       }

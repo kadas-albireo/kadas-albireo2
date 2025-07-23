@@ -32,11 +32,6 @@ class Kadas3DLayerTreeModel : public QSortFilterProxyModel
 
     QgsLayerTreeModel *layerTreeModel() const;
     void setLayerTreeModel( QgsLayerTreeModel *layerTreeModel );
-    void resetLayerTreeModel()
-    {
-      beginResetModel();
-      endResetModel();
-    }
 
     QgsMapLayer *mapLayer( const QModelIndex &idx ) const;
 

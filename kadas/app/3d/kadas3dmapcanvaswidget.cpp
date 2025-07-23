@@ -293,6 +293,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   mLayerTreeView->setModel( new Kadas3DLayerTreeModel( mCanvas ) );
   mLayerTreeView->setMinimumWidth( 200 );
   mLayerTreeView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+  mLayerTreeView->setVisible( sSettingLayerTreeVisible->value() );
 
   QHBoxLayout *hLayout = new QHBoxLayout;
   hLayout->setContentsMargins( 0, 0, 0, 0 );
