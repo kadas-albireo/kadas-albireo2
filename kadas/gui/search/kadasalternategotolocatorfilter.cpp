@@ -131,39 +131,34 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
   if ( !match.hasMatch() )
   {
-    // Check if the string is a pair of degree minute second
-    thread_local QString dmsRx = QStringLiteral( R"(\d{1,3}(?:[^0-9.]+[0-5]?\d)?[^0-9.]+[0-5]?\d(?:[\.\%1]\d+)?)" ).arg( locale.decimalPoint() );
-    thread_local QRegularExpression separatorRx4( QStringLiteral(
-                                                    "^("
-                                                    R"((\s*%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?))"
-                                                    ")|("
-                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?))"
-                                                    ")(:?\s+[0-9]+)?$"
-    )
-                                                    .arg( dmsRx, degreeSymbol ) );
+    // Improved regex for DMS: matches e.g. 7°34'25.5"E,46°54'98.3"N or 7 34 25.5 E, 46 54 98.3 N
+    thread_local QRegularExpression separatorRx4(
+      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2})\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2})\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])\s*$)"
+    );
     match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
     {
-      //qDebug() << match.captured( 1 ) << match.captured( 2 ) << match.captured( 3 ) << match.captured( 4 ) << match.captured( 5 ) << match.captured( 6 ) << match.captured( 7 ) << match.captured( 8 );
-
       posIsWgs84 = true;
-      bool isEasting = false;
-      if ( !match.captured( 1 ).isEmpty() )
-      {
-        QString firstStr = match.captured( 1 ).remove( degreeSymbol ).trimmed();
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
-        QString secondStr = match.captured( 2 ).remove( degreeSymbol ).trimmed();
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
-      }
-      else
-      {
-        QString firstStr = match.captured( 5 ).remove( degreeSymbol ).trimmed();
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
-        QString secondStr = match.captured( 7 ).remove( degreeSymbol ).trimmed();
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
-      }
-      // normalize to northing (i.e. Y) first
-      if ( isEasting )
+      // First coordinate
+      double deg1 = match.captured( 1 ).toDouble( &firstOk );
+      double min1 = match.captured( 2 ).toDouble( &secondOk );
+      double sec1 = match.captured( 3 ).replace( ',', '.' ).toDouble();
+      QString dir1 = match.captured( 4 ).toUpper();
+      // Second coordinate
+      double deg2 = match.captured( 5 ).toDouble();
+      double min2 = match.captured( 6 ).toDouble();
+      double sec2 = match.captured( 7 ).replace( ',', '.' ).toDouble();
+      QString dir2 = match.captured( 8 ).toUpper();
+
+      firstNumber = deg1 + min1 / 60.0 + sec1 / 3600.0;
+      if ( dir1 == "S" || dir1 == "W" )
+        firstNumber *= -1;
+      secondNumber = deg2 + min2 / 60.0 + sec2 / 3600.0;
+      if ( dir2 == "S" || dir2 == "W" )
+        secondNumber *= -1;
+
+      // If E/W is first, swap to Y,X order
+      if ( dir1 == "E" || dir1 == "W" )
         std::swap( firstNumber, secondNumber );
     }
   }
