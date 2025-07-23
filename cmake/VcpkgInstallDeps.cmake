@@ -101,10 +101,17 @@ add_custom_command(
           "${SHARE_DIR}/cacert.pem"
   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/resources"
   COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/svg"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${SHARE_DIR}/qgis/i18n"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/resources"
           "${SHARE_DIR}/qgis/resources"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${QGIS_SHARE_DIR}/svg"
           "${SHARE_DIR}/qgis/svg"
+  COMMAND ${CMAKE_COMMAND} -E copy "${QGIS_SHARE_DIR}/i18n/qgis_de.qm"
+          "${SHARE_DIR}/qgis/i18n/qgis_de.qm"
+  COMMAND ${CMAKE_COMMAND} -E copy "${QGIS_SHARE_DIR}/i18n/qgis_it.qm"
+          "${SHARE_DIR}/qgis/i18n/qgis_it.qm"
+  COMMAND ${CMAKE_COMMAND} -E copy "${QGIS_SHARE_DIR}/i18n/qgis_fr.qm"
+          "${SHARE_DIR}/qgis/i18n/qgis_fr.qm"
   COMMAND ${CMAKE_COMMAND} -E rm -R --
           "${SHARE_DIR}/qgis/resources/cpt-city-qgis-min"
 )
