@@ -58,9 +58,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // mPatDMSalt = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
 
   const thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
-  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
+  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)(:?\s+[0-9]+)?$)" );
   const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
-  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})$)" );
+  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})(:?\s+[0-9]+)?$)" );
 
   const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
 
@@ -77,10 +77,10 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   bool posIsWgs84 = false;
 
   // Coordinates such as 106.8468,-6.3804
-  // Accept decimal numbers, possibly with degree symbol (°) after each number
+  // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
     QStringLiteral(
-      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?$)"
+      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?(:?\s+[0-9]+)?$)"
     )
       .arg(
         locale.decimalPoint(),
@@ -110,8 +110,8 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
   if ( !match.hasMatch() )
   {
-    // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])\s*$)" )
+    // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes with optional degree symbol and optional altitude
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])(:?\s+[0-9]+)?\s*$)" )
                                                     .arg( locale.decimalPoint(), degreeSymbol ) );
     match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
@@ -131,39 +131,34 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
   if ( !match.hasMatch() )
   {
-    // Check if the string is a pair of degree minute second
-    thread_local QString dmsRx = QStringLiteral( R"(\d{1,3}(?:[^0-9.]+[0-5]?\d)?[^0-9.]+[0-5]?\d(?:[\.\%1]\d+)?)" ).arg( locale.decimalPoint() );
-    thread_local QRegularExpression separatorRx4( QStringLiteral(
-                                                    "^("
-                                                    R"((\s*%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?)[,\s]+(%1[^0-9.,]*(?:\s*%2)?[-+NSEWnsew]?))"
-                                                    ")|("
-                                                    R"(((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?)[,\s]+((?:([-+NSEWnsew])\s*)%1[^0-9.,]*(?:\s*%2)?))"
-                                                    ")$"
-    )
-                                                    .arg( dmsRx, degreeSymbol ) );
+    // Improved regex for DMS: matches e.g. 7°34'25.5"E,46°54'98.3"N or 7 34 25.5 E, 46 54 98.3 N
+    thread_local QRegularExpression separatorRx4(
+      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])\s*(:?\d+)?$)"
+    );
     match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
     {
-      //qDebug() << match.captured( 1 ) << match.captured( 2 ) << match.captured( 3 ) << match.captured( 4 ) << match.captured( 5 ) << match.captured( 6 ) << match.captured( 7 ) << match.captured( 8 );
-
       posIsWgs84 = true;
-      bool isEasting = false;
-      if ( !match.captured( 1 ).isEmpty() )
-      {
-        QString firstStr = match.captured( 1 ).remove( degreeSymbol ).trimmed();
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
-        QString secondStr = match.captured( 2 ).remove( degreeSymbol ).trimmed();
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
-      }
-      else
-      {
-        QString firstStr = match.captured( 5 ).remove( degreeSymbol ).trimmed();
-        firstNumber = QgsCoordinateUtils::dmsToDecimal( firstStr, &firstOk, &isEasting );
-        QString secondStr = match.captured( 7 ).remove( degreeSymbol ).trimmed();
-        secondNumber = QgsCoordinateUtils::dmsToDecimal( secondStr, &secondOk );
-      }
-      // normalize to northing (i.e. Y) first
-      if ( isEasting )
+      // First coordinate
+      double deg1 = match.captured( 1 ).toDouble( &firstOk );
+      double min1 = match.captured( 2 ).toDouble( &secondOk );
+      double sec1 = match.captured( 3 ).replace( ',', '.' ).toDouble();
+      QString dir1 = match.captured( 4 ).toUpper();
+      // Second coordinate
+      double deg2 = match.captured( 5 ).toDouble();
+      double min2 = match.captured( 6 ).toDouble();
+      double sec2 = match.captured( 7 ).replace( ',', '.' ).toDouble();
+      QString dir2 = match.captured( 8 ).toUpper();
+
+      firstNumber = deg1 + min1 / 60.0 + sec1 / 3600.0;
+      if ( dir1 == "S" || dir1 == "W" )
+        firstNumber *= -1;
+      secondNumber = deg2 + min2 / 60.0 + sec2 / 3600.0;
+      if ( dir2 == "S" || dir2 == "W" )
+        secondNumber *= -1;
+
+      // If E/W is first, swap to Y,X order
+      if ( dir1 == "E" || dir1 == "W" )
         std::swap( firstNumber, secondNumber );
     }
   }
