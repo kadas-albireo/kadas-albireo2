@@ -15,7 +15,7 @@
 <context>
     <name>Kadas3DLayerTreeModel</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="150"/>
+        <location filename="../kadas/app/3d/kadas3dlayertreemodel.cpp" line="157"/>
         <source>Layer</source>
         <translation>Couche</translation>
     </message>
@@ -64,7 +64,7 @@
     </message>
     <message>
         <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="125"/>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="551"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="552"/>
         <source>Export 3D Scene</source>
         <translation>Exporter une scène 3D</translation>
     </message>
@@ -134,32 +134,32 @@
         <translation>Carte 3D sauvegardée avec succès vers &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="322"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="323"/>
         <source>Dock 3D Map View</source>
         <translation>Ancrer la vue cartographique 3D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="328"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="329"/>
         <source>Choose a file name to save the 3D map canvas to an image</source>
         <translation>Choisir un nom de fichier pour sauvegarder le canevas de carte 3D dans une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="482"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="483"/>
         <source>3D Configuration</source>
         <translation>Configuration 3D</translation>
     </message>
     <message numerus="yes">
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="583"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="584"/>
         <source>Loading %n tile(s)</source>
         <translation><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform><numerusform>Chargement de %n tuile(s)</numerusform></translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="669"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="670"/>
         <source>A map layer has used all graphics memory allowed (%1 MB). You may want to lower the amount of detail in the scene, or increase the limit in the options.</source>
         <translation>Une couche cartographique a utilisé toute la mémoire graphique autorisée (%1 Mo). Vous pouvez réduire le niveau de détail de la scène ou augmenter la limite dans les options.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="685"/>
+        <location filename="../kadas/app/3d/kadas3dmapcanvaswidget.cpp" line="686"/>
         <source>Drag a rectangle on the main 2D map view to define this 3D scene&apos;s extent</source>
         <translation>Faire glisser un rectangle sur la carte 2D principale pour définir l&apos;étendue de la scène 3D. </translation>
     </message>
@@ -360,33 +360,33 @@
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="191"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="186"/>
         <source>Map CRS</source>
         <translation>SCR de la carte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="229"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="224"/>
         <source>Go to %1%2 %3%4</source>
         <translation>Aller à %1%2 %3%4</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="262"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="257"/>
         <source>Go to %1°N %2°E</source>
         <translation>Aller à %1°N %2°E</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="400"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="395"/>
         <source>Go to %1°N %2°E %3</source>
         <translation>Aller à %1°N %2°E %3</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="400"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="395"/>
         <source>at scale 1:%1 </source>
         <translation>À l&apos;échelle 1:%1</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="552"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="587"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="547"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="582"/>
         <source>zone</source>
         <translation>Zone</translation>
     </message>
