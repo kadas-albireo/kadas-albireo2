@@ -99,7 +99,7 @@ jobs:
 
       - run: |
                tree build/vcpkg_installed
-               ls build/vcpkg_installed/share/qgis/i18n
+               ls build/vcpkg_installed/x64-windows/share/qgis/i18n
                exit 1
 
       - name: 📑 Upload vcpkg build logs
