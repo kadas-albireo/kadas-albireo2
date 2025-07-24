@@ -80,7 +80,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
     QStringLiteral(
-      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?(:?\d+(\.\d+)?)?$)"
+      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)[\s%4]*(:?\d+(\.\d+)?)?$)"
     )
       .arg(
         locale.decimalPoint(),
@@ -133,7 +133,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   {
     // Improved regex for DMS: matches e.g. 7°34'25.5"E,46°54'98.3"N or 7 34 25.5 E, 46 54 98.3 N
     thread_local QRegularExpression separatorRx4(
-      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])\s*(:?\d+(\.\d+)?)?$)"
+      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])\s*(:?\d+(\.\d+)?)?$)"
     );
     match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
