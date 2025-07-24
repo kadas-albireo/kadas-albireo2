@@ -58,9 +58,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // mPatDMSalt = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
 
   const thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
-  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)(:?\d+(\.\d+)?)?$)" );
+  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)(:?\s+\d+(\.\d+)?)?$)" );
   const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
-  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})(:?\d+(\.\d+)?)?$)" );
+  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})(:?\s+\d+(\.\d+)?)?$)" );
 
   const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
 
@@ -99,7 +99,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() || !firstOk || !secondOk )
   {
     // Digit detection using user locale failed, use default C decimal separators
-    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)(?:\s*%1)?[\s\,]*([0-9\-\.]*)(?:\s*%1)?$)" ).arg( degreeSymbol ) );
+    thread_local QRegularExpression separatorRx2( QStringLiteral( R"(^([0-9\-\.]*)(?:\s*%1)?[\s\,]*([0-9\-\.]*)(?:\s*%1)?(:?\s+\d+(\.\d+)?)?$)" ).arg( degreeSymbol ) );
     match = separatorRx2.match( string.trimmed() );
     if ( match.hasMatch() )
     {
