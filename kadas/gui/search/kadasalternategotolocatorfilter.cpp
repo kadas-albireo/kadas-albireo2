@@ -58,9 +58,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // mPatDMSalt = QRegularExpression( QString( R"(^(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])\s*[,;:]?\s*(\d+)%1(\d+)[%2](\d+\.?\d*)[%3]\s?([NnSsEeWw])$)" ).arg( degChar ).arg( minChars ).arg( secChars ) );
 
   const thread_local QRegularExpression mPatUTM( R"(^([\d']+),\d*\s+([\d']+),\d*\s*\(\w+\s+(\d+)([A-Za-z])\)$)" );
-  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)(:?\s+[0-9]+)?$)" );
+  const thread_local QRegularExpression mPatUTMalt( R"(^([\d']+)\.?\d*[,\s]\s*([\d']+)\.?\d*\s*\(\w+\s+(\d+)([A-Za-z])\)(:?\d+(\.\d+)?)?$)" );
   const thread_local QRegularExpression mPatUTM2( R"(^(\d+)\s*([A-Za-z])\s+([\d']+[.,]?\d*)[,\s]\s*([\d']+[.,]?\d*)$)" );
-  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})(:?\s+[0-9]+)?$)" );
+  const thread_local QRegularExpression mPatMGRS( R"(^(\d+)\s*(\w)\s*(\w\w)\s*[,:;\s]?\s*(\d{5})\s*[,:;\s]?\s*(\d{5})(:?\d+(\.\d+)?)?$)" );
 
   const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
 
@@ -80,7 +80,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
     QStringLiteral(
-      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?(:?\s+[0-9]+)?$)"
+      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)(?:\s*%4)?(:?\d+(\.\d+)?)?$)"
     )
       .arg(
         locale.decimalPoint(),
@@ -111,7 +111,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes with optional degree symbol and optional altitude
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])(:?\s+[0-9]+)?\s*$)" )
+    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?\s*[NSEWnsew])(:?\d+(\.\d+)?)?\s*$)" )
                                                     .arg( locale.decimalPoint(), degreeSymbol ) );
     match = separatorRx3.match( string.trimmed() );
     if ( match.hasMatch() )
@@ -133,7 +133,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   {
     // Improved regex for DMS: matches e.g. 7°34'25.5"E,46°54'98.3"N or 7 34 25.5 E, 46 54 98.3 N
     thread_local QRegularExpression separatorRx4(
-      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)?\s*["”″]?\s*([NSEWnsew])\s*(:?\d+)?$)"
+      R"(^\s*([0-9]{1,3})[°º\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])[\s,;]+([0-9]{1,3})[°\s]\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*['’′]?\s*([0-9]{1,2}(?:[\.,][0-9]+)?)\s*["”″]?\s*([NSEWnsew])\s*(:?\d+(\.\d+)?)?$)"
     );
     match = separatorRx4.match( string.trimmed() );
     if ( match.hasMatch() )
@@ -141,12 +141,12 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
       posIsWgs84 = true;
       // First coordinate
       double deg1 = match.captured( 1 ).toDouble( &firstOk );
-      double min1 = match.captured( 2 ).toDouble( &secondOk );
+      double min1 = match.captured( 2 ).toDouble( &firstOk );
       double sec1 = match.captured( 3 ).replace( ',', '.' ).toDouble();
       QString dir1 = match.captured( 4 ).toUpper();
       // Second coordinate
-      double deg2 = match.captured( 5 ).toDouble();
-      double min2 = match.captured( 6 ).toDouble();
+      double deg2 = match.captured( 5 ).toDouble( &secondOk );
+      double min2 = match.captured( 6 ).toDouble( &secondOk );
       double sec2 = match.captured( 7 ).replace( ',', '.' ).toDouble();
       QString dir2 = match.captured( 8 ).toUpper();
 
