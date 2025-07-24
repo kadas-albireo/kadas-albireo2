@@ -97,7 +97,10 @@ jobs:
                 ${CREATE_MSI_CMAKE_VAR}\
                 ${DEBUG_OPTIONS}
 
-      - run: tree build/vcpkg_installed
+      - run: |
+               tree build/vcpkg_installed
+               ls build/vcpkg_installed/share/qgis/i18n
+               exit 1
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v4
