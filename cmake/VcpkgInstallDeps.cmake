@@ -129,6 +129,9 @@ install(DIRECTORY "${SHARE_DIR}/qgis/resources/"
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg"
 )
+install(DIRECTORY "${QGIS_SHARE_DIR}/i18n/"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/i18n"
+)
 install(DIRECTORY "${PROJ_DATA_PATH}/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/proj"
 )
