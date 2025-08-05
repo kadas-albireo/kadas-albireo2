@@ -296,6 +296,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         {
           QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
           QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
+          item->setZIndex( 0 );
           mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           break;
         }
@@ -311,6 +312,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
               poly->transform( annotationLayerTransform );
               QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
               item->setSymbol( createPolygonSymbol() );
+              item->setZIndex( 0 );
               mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
             }
           }
@@ -320,6 +322,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
             poly->transform( annotationLayerTransform );
             QgsAnnotationPolygonItem *item = new QgsAnnotationPolygonItem( poly );
             item->setSymbol( createPolygonSymbol() );
+            item->setZIndex( 0 );
             mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
           }
           break;
@@ -336,6 +339,7 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
   symbolLayer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   item->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
   mPinItemId = QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+  item->setZIndex( 1 );
 }
 
 
