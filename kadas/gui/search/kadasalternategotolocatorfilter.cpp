@@ -64,8 +64,6 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
   const QString degreeSymbol = QString::fromUtf8( "\xC2\xB0" );
 
-  const thread_local QRegularExpression mCoordLetter( R"([NSEWnsew])" );
-
   const QLocale locale;
 
 
