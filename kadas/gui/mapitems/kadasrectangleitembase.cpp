@@ -66,11 +66,15 @@ QJsonObject KadasRectangleItemBase::State::serialize() const
   json["size"] = size;
   json["footprint"] = footprint;
   json["rectangle-center"] = rectCenterPoint;
+  json["frame"] = mFrame;
   return json;
 }
 
 bool KadasRectangleItemBase::State::deserialize( const QJsonObject &json )
 {
+  // frame is enable by default, but for openng of older projects with texts (that had no frame), we disable it
+  mFrame = json.contains( "frame" ) ? json["frame"].toBool() : false;
+
   drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   QJsonArray p = json["pos"].toArray();
   mPos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
@@ -106,7 +110,7 @@ KadasRectangleItemBase::~KadasRectangleItemBase()
 
 void KadasRectangleItemBase::setFrameVisible( bool frame )
 {
-  mFrame = frame;
+  state()->mFrame = frame;
   if ( !frame )
   {
     state()->mOffsetX = 0;
@@ -154,7 +158,7 @@ KadasItemRect KadasRectangleItemBase::boundingBox() const
 
 KadasMapItem::Margin KadasRectangleItemBase::margin() const
 {
-  double framePadding = mFrame ? sFramePadding : 0;
+  double framePadding = constState()->frame() ? sFramePadding : 0;
   return Margin {
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.width() - constState()->mOffsetX + framePadding ) * mSymbolScale ) ),
     static_cast<int>( std::ceil( std::max( 0., 0.5 * constState()->mSize.height() + constState()->mOffsetY + framePadding ) * mSymbolScale ) ),
@@ -265,7 +269,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
 
   // Draw frame
-  if ( mFrame )
+  if ( constState()->frame() )
   {
     context.painter()->setPen( QPen( Qt::black, 1 ) );
     context.painter()->setBrush( Qt::white );
@@ -413,7 +417,7 @@ KadasMapItem::EditContext KadasRectangleItemBase::getEditContext( const KadasMap
   }
   KadasMapPos testPos = toMapPos( constState()->mPos, mapSettings );
   bool frameClicked = hitTest( pos, mapSettings );
-  if ( !mPosLocked && ( ( !mFrame && frameClicked ) || pos.sqrDist( testPos ) < tol ) )
+  if ( !mPosLocked && ( ( !constState()->frame() && frameClicked ) || pos.sqrDist( testPos ) < tol ) )
   {
     return EditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
@@ -440,7 +444,7 @@ void KadasRectangleItemBase::edit( const EditContext &context, const KadasMapPos
     editPrivate( newPoint, mapSettings );
     update();
   }
-  else if ( mFrame )
+  else if ( constState()->frame() )
   {
     QgsCoordinateTransform crst( crs(), mapSettings.destinationCrs(), QgsProject::instance() );
     QgsPointXY screenPos = mapSettings.mapToPixel().transform( newPoint );
@@ -460,7 +464,7 @@ void KadasRectangleItemBase::populateContextMenu( QMenu *menu, const EditContext
 {
   QAction *frameAction = menu->addAction( tr( "Frame visible" ), [this]( bool active ) { setFrameVisible( active ); } );
   frameAction->setCheckable( true );
-  frameAction->setChecked( mFrame );
+  frameAction->setChecked( constState()->frame() );
 
   QAction *lockedAction = menu->addAction( tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
   lockedAction->setCheckable( true );
