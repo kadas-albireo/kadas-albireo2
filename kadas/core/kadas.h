@@ -54,6 +54,7 @@ class KADAS_CORE_EXPORT Kadas
     static const inline QgsSettingsEntryString *settingsGdalProxyUserPassword = new QgsSettingsEntryString( QStringLiteral( "proxy-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXYUSERPWD env variable." ) ) SIP_SKIP;
     static const inline QgsSettingsEntryString *settingsGdalHttpAuth = new QgsSettingsEntryString( QStringLiteral( "http-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_AUTH env variable." ) ) SIP_SKIP;
     static const inline QgsSettingsEntryString *settingsGdalHttpUserPassword = new QgsSettingsEntryString( QStringLiteral( "http-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_USERPWD env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryBool *settingsUnsetEnvVar = new QgsSettingsEntryBool( QStringLiteral( "unset-env-vars" ), sTreeGdalProxy, false, QStringLiteral( "this will be used to determine if env vars should be unset." ) ) SIP_SKIP;
 
     // Path where user-configuration is stored
     static QString configPath();

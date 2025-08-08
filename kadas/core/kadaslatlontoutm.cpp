@@ -883,7 +883,11 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     UTMCoo maxCoo = coo;
     maxCoo.northing = northing2;
     QgsPointXY maxPos = UTM2LL( maxCoo, ok );
+<<<<<<< HEAD
     subGrid.zoneLabels100kmSquareIdentifier.append( zoneLabelCallback( xMin, yMin, maxPos.x(), maxPos.y() ) );
+=======
+    subGrid.zoneLabels.append( zoneLabelCallback( xMin, yMax, maxPos.x(), maxPos.y() ) );
+>>>>>>> 250597fe (add option to unset env vars)
   }
   int count = 0;
   const int maxLines = 500;
@@ -905,7 +909,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
       xLine.append( truncateGridLineYMax( QPointF( r.x(), r.y() ), QPointF( q.x(), q.y() ), xMin, xMax, yMax, truncated ) );
     }
     // No grid labels below 1km grid
-    if ( lineLabelCallback && ( coo.easting % 1000 ) == 0 )
+    if ( lineLabelCallback && ( coo.easting % 1000 ) == 0 && restn == 0 )
     {
       subGrid.gridLabels << lineLabelCallback( xLine.last().x(), xLine.last().y(), cellSize, false, subGrid.lines.size() );
     }
@@ -972,7 +976,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     r = UTM2LL( ycoo, ok );
     yLine.append( truncateGridLineXMin( QPointF( r.x(), r.y() ), QPointF( q.x(), q.y() ), xMin ) );
     // No grid labels below 1km grid
-    if ( lineLabelCallback && ( coo.northing % 1000 ) == 0 )
+    if ( lineLabelCallback && ( coo.northing % 1000 ) == 0 && reste == 0 )
     {
       subGrid.gridLabels << lineLabelCallback( yLine.last().x(), yLine.last().y(), cellSize, true, subGrid.lines.size() );
     }
