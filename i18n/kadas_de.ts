@@ -361,33 +361,33 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
 <context>
     <name>KadasAlternateGotoLocatorFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="186"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="263"/>
         <source>Map CRS</source>
         <translation>Koordinatensystem der Karte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="224"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="301"/>
         <source>Go to %1%2 %3%4</source>
         <translation>Gehe zu %1%2 %3%4</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="257"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="334"/>
         <source>Go to %1°N %2°E</source>
         <translation>Gehe zu %1°N %2°E</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="395"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
         <source>Go to %1°N %2°E %3</source>
         <translation>Gehe zu %1°N %2°E %3</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="395"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
         <source>at scale 1:%1 </source>
         <translation>im Massstab 1:%1</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="547"/>
-        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="582"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="659"/>
         <source>zone</source>
         <translation>Zone</translation>
     </message>
