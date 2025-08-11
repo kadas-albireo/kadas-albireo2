@@ -112,6 +112,10 @@ if(WITH_BINDINGS)
   endif()
 endif()
 
+if(ENABLE_TESTS)
+  find_package(Qt5Test)
+endif()
+
 if(WITH_QTWEBKIT)
   find_package(Qt5WebKitWidgets REQUIRED)
   add_definitions(-DWITH_QTWEBKIT)
@@ -146,6 +150,10 @@ add_subdirectory(kadas)
 
 if(WITH_BINDINGS)
   add_subdirectory(python)
+endif()
+
+if(ENABLE_TESTS)
+  add_subdirectory(tests)
 endif()
 
 option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
