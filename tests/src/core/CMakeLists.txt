@@ -11,5 +11,5 @@ include_directories(SYSTEM ${QT_INCLUDE_DIR})
 set(TESTS testkadas.cpp)
 
 foreach(TESTSRC ${TESTS})
-  add_kadas_test(${TESTSRC} MODULE core LINKEDLIBRARIES qgis_core)
+  add_kadas_test(${TESTSRC} MODULE core LINKEDLIBRARIES kadas_core)
 endforeach(TESTSRC)
