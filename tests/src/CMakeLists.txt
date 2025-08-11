@@ -14,7 +14,6 @@ if(ENABLE_TESTS)
     string(REPLACE ".cpp" "" TESTNAME ${TESTNAME})
     set(TESTNAME "test_${ARG_QGIS_TEST_MODULE}_${TESTNAME}")
     add_executable(${TESTNAME} ${TESTSRC} ${util_SRCS})
-    # add_custom_target(${TESTNAME}moc ALL DEPENDS ${${TESTNAME}_MOC_SRCS})
     target_compile_features(${TESTNAME} PRIVATE cxx_std_17)
     set_target_properties(${TESTNAME} PROPERTIES AUTORCC TRUE)
     target_link_libraries(${TESTNAME} ${ARG_QGIS_TEST_LINKEDLIBRARIES})
@@ -39,18 +38,6 @@ if(ENABLE_TESTS)
 
   # ############################################################################
   # Compiler defines
-
-  # This define is used for tests that need to locate the test data under
-  # tests/testdata in the qgis source tree. the TEST_DATA_DIR variable is set in
-  # the top level CMakeLists.txt
-  add_definitions(-DTEST_DATA_DIR="${TEST_DATA_DIR}")
-
-  add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
-
-  # because of htonl
-  if(WIN32)
-    set(PLATFORM_LIBRARIES wsock32)
-  endif()
 
   add_subdirectory(core)
   # if (WITH_GUI) add_subdirectory(gui) endif()
