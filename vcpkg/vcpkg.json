@@ -73,7 +73,8 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect"
+    "zonedetect",
+    "qt5-location"
   ],
   "features": {
     "bindings": {
