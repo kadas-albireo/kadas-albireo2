@@ -49,7 +49,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     };
 
     struct ZoneLabel
-    {
+    {   
         QPointF pos;
         QString label;
         QPointF maxPos;
@@ -87,7 +87,8 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
 
     struct Grid
     {
-        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabelsGridZoneIdentifier;
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels100kmSquareIdentifier;
 
         QList<KadasLatLonToUTM::LineLevel> lines;
         QList<KadasLatLonToUTM::GridLabel> gridLabels;
@@ -97,7 +98,8 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
           int lineCount = lhs.lines.count();
           int labelCount = lhs.gridLabels.count();
 
-          lhs.zoneLabels << rhs.zoneLabels;
+          lhs.zoneLabelsGridZoneIdentifier << rhs.zoneLabelsGridZoneIdentifier;
+          lhs.zoneLabels100kmSquareIdentifier << rhs.zoneLabels100kmSquareIdentifier;
           lhs.lines << rhs.lines;
           lhs.gridLabels << rhs.gridLabels;
           for ( int i = labelCount; i < lhs.gridLabels.count(); i++ )
