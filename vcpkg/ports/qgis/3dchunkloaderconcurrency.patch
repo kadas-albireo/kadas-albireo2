@@ -1,0 +1,13 @@
+diff --git a/src/3d/terrain/qgsterraintileloader.cpp b/src/3d/terrain/qgsterraintileloader.cpp
+index 2a48b7c759b..f91658eeb50 100644
+--- a/src/3d/terrain/qgsterraintileloader.cpp
++++ b/src/3d/terrain/qgsterraintileloader.cpp
+@@ -48,7 +48,7 @@ QgsTerrainTileLoader::QgsTerrainTileLoader( QgsTerrainEntity *terrain, QgsChunkN
+ 
+ void QgsTerrainTileLoader::loadTexture()
+ {
+-  connect( mTerrain->textureGenerator(), &QgsTerrainTextureGenerator::tileReady, this, &QgsTerrainTileLoader::onImageReady );
++  connect( mTerrain->textureGenerator(), &QgsTerrainTextureGenerator::tileReady, this, &QgsTerrainTileLoader::onImageReady, Qt::QueuedConnection );
+   mTextureJobId = mTerrain->textureGenerator()->render( mExtentMapCrs, mNode->tileId(), mTileDebugText );
+ }
+ 
