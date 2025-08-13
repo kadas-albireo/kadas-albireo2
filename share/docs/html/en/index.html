@@ -130,6 +130,64 @@
 <p>The MSS / MilX component is the property of gs-soft AG.</p>
 <p>The terms of use for the data are listed in the application under Help → About.</p>
 <h2 id="changelog"><a name="sec3"></a>Changelog</h2>
+<h3 id="version-230-august-2025">Version 2.3.0 (August 2025)</h3>
+<p>With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, and bug fixes have been implemented.</p>
+<ul>
+<li>
+<p><em>New functionalities and geodata</em></p>
+<ul>
+<li>Geoservices and geodata with a time component can be played back as a chronological animation.</li>
+<li>Theme comparisons (SWIPE tool) where two map views can be interactively shown and hidden using a slider.</li>
+<li>Open attribute tables are saved in the project and displayed when the project is opened.</li>
+<li>Support for NetCDF raster data format (used primarily for meteorology).</li>
+<li>A new “Feedback” button. This button takes you directly to a form on the Geo Info Portal V, where you can provide feedback on software features and bugs.</li>
+<li>Creating elevation profiles provides additional statistics, such as highest/lowest point, length, and elevation difference to the profile line.</li>
+<li>Geoservices from the MGDI are loaded as vectors. This allows the symbology to be customized and the attribute tables of vector data to be opened.</li>
+<li>Vector tiles geodata services from the MGDI are listed in the geocatalog and can be loaded.</li>
+<li>Offline data now consists of the World Briefing Map.</li>
+<li>MSS export is now possible as KML (cannot be further edited after KML export).</li>
+</ul>
+</li>
+<li>
+<p><em>Improvements</em></p>
+<ul>
+<li>Plugin Manager: When KADAS is started, it checks whether more recent versions of the installed plugins are available in the repository. If so, the latest version of the plugin is automatically installed, and the user is informed with a message.</li>
+<li>When querying by clicking, the display of results has been improved, especially when multiple results are returned.</li>
+<li>The Bookmarks function now also saves layers in groups and subgroups.</li>
+<li>The Routing plugin is now a standard plugin and is automatically installed from the repository. Additional plugins can also be defined as mandatory.</li>
+<li>Restricted geoservices in the MGDI can be displayed in KADAS by authorized users.</li>
+<li>The coordinate search has been improved and standardized.</li>
+<li>Support for WCS geoservices now also enables analyses with high-resolution elevation models.</li>
+<li>The text function in redlining contains additional settings options.</li>
+<li>The display and labeling of the MGRS grid have been optimized.</li>
+<li>The print templates have been updated and now include the creation date and projection system by default.</li>
+<li>Analyses can be started directly by right-clicking with the mouse.</li>
+<li>The extent of the GPKG export of vector data can be defined.</li>
+</ul>
+</li>
+<li>
+<p><em>Bug fixes</em></p>
+<ul>
+<li>Crash when exporting GeoPDF has been fixed.</li>
+<li>When exporting GeoPDF, all layers are considered and displayed in the correct position.</li>
+<li>Crash when using the ephemeris tool has been fixed.</li>
+<li>Crash when exporting geopackages has been fixed.</li>
+<li>Missing translations in the languages (DE, FR, IT) have been fixed.</li>
+</ul>
+</li>
+<li>
+<p><em>Technical adjustments</em></p>
+<ul>
+<li>KADAS 2.3 is based on QGIS version 3.44.0-Solothurn.</li>
+<li>The two elevation models for Switzerland and worldwide (dtm_analysis.tif + general_dtm_globe.tif) are available in COG format (Cloud Optimized GeoTIFF). This allows for faster processing and visualization.</li>
+<li>The 3D viewer (Globe) had to be replaced because the technology used is end-of-life. The 3D viewer is now used by the QGIS application.</li>
+<li>The MSS/MilX library used by gs-soft is now MSS-2025.</li>
+<li>The Valhalla Routing Engine has been updated and now allows elevation to be included in route and distance calculations.</li>
+<li>All productive plugins have been adapted for version 2.3.</li>
+<li>Help has been externalized to the browser.</li>
+</ul>
+</li>
+</ul>
 <h3 id="version-220-june-2023">Version 2.2.0 (June 2023)</h3>
 <ul>
 <li><em>General</em>:<ul>
