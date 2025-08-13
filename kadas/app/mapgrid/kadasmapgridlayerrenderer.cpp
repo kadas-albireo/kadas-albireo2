@@ -356,6 +356,59 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   QFont font = renderContext()->painter()->font();
   font.setBold( true );
 
+
+  QList<QRect> drawnLabels;
+  
+  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
+  {
+    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+
+    font.setPointSizeF( zoneFontSize );
+    QFontMetrics fm( font );
+
+    const QPointF &pos = zoneLabel.pos;
+    const QPointF &maxPos = zoneLabel.maxPos;
+    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+    if ( adaptToScreen )
+    {
+      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
+    }
+    labelPos.rx() += 3;
+    labelPos.ry() -= 3;
+
+    int labelAdvance = fm.horizontalAdvance( zoneLabel.label );
+    if ( labelPos.x() + labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
+    {
+      QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
+
+      bool intersects = false;
+      for (const QRect& drawnLabelRect: drawnLabels)
+      {
+        if (labelRect.intersects(drawnLabelRect))
+        {
+          intersects = true;
+          break;
+        }
+      }
+
+      if ( intersects == false )
+      {
+        drawnLabels.append( labelRect );
+        drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
+        renderContext()->painter()->setPen( Qt::green );
+      }
+      else
+      {
+        renderContext()->painter()->setPen( Qt::red );
+      }
+
+      renderContext()->painter()->setBrush( Qt::NoBrush );
+      renderContext()->painter()->drawRect( labelRect);
+      renderContext()->painter()->setBrush( mRenderGridConfig.color );
+    }
+  }
+
   if ( adaptToScreen )
   {
     font.setPointSizeF( gridLabelSize );
@@ -396,33 +449,36 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
       }
       if ( i < n )
       {
-        drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+        QFontMetrics fm( font );
+        int labelAdvance = fm.horizontalAdvance( gridLabel.label );
+
+      QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
+
+      bool intersects = false;
+      for (const QRect& drawnLabelRect: drawnLabels)
+      {
+        if (labelRect.intersects(drawnLabelRect))
+        {
+          intersects = true;
+          break;
+        }
       }
-    }
-  }
 
-  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
-  {
-    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+      if ( intersects == false )
+      {
+        drawnLabels.append( labelRect );
+        drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+        renderContext()->painter()->setPen( Qt::green );
+      }
+      else
+      {
+        renderContext()->painter()->setPen( Qt::red );
+      }
 
-    font.setPointSizeF( zoneFontSize );
-    QFontMetrics fm( font );
-
-    const QPointF &pos = zoneLabel.pos;
-    const QPointF &maxPos = zoneLabel.maxPos;
-    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-    if ( adaptToScreen )
-    {
-      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-    }
-    labelPos.rx() += 3;
-    labelPos.ry() -= 3;
-
-    double labelAdvance = fm.horizontalAdvance( zoneLabel.label );
-    if ( labelPos.x() + labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-    {
-      drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
+      renderContext()->painter()->setBrush( Qt::NoBrush );
+      renderContext()->painter()->drawRect( labelRect);
+      renderContext()->painter()->setBrush( mRenderGridConfig.color );
+      }
     }
   }
 }
