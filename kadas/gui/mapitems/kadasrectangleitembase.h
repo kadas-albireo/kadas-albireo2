@@ -23,14 +23,13 @@
 class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( bool frame READ frameVisible WRITE setFrameVisible )
     Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
   public:
     KadasRectangleItemBase( const QgsCoordinateReferenceSystem &crs );
     virtual ~KadasRectangleItemBase();
 
-    bool frameVisible() const { return mFrame; }
+    bool frameVisible() const { return constState()->frame(); }
     void setFrameVisible( bool frame );
     bool positionLocked() const { return mPosLocked; }
     void setPositionLocked( bool locked );
@@ -73,6 +72,9 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
         double mOffsetX = 0.;
         double mOffsetY = 0.;
         QSize mSize;
+        bool mFrame = true;
+
+        bool frame() const { return mFrame; }
         virtual void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
         virtual State *clone() const override SIP_FACTORY { return new State( *this ); }
         virtual QJsonObject serialize() const override;
@@ -83,6 +85,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 
   protected:
     State *state() { return static_cast<State *>( mState ); }
+    const State *consState() { return static_cast<const State *>( mState ); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
     bool mPosLocked = false;
@@ -100,7 +103,6 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
       AttrY
     };
     QImage mImage;
-    bool mFrame = true;
 
     static constexpr int sFramePadding = 4;
     static constexpr int sArrowWidth = 6;
