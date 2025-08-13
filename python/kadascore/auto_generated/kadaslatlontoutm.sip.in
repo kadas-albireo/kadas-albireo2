@@ -80,7 +80,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     struct Grid
     {
-        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels;
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabelsGridZoneIdentifier;
+        QList<KadasLatLonToUTM::ZoneLabel> zoneLabels100kmSquareIdentifier;
 
         QList<KadasLatLonToUTM::LineLevel> lines;
         QList<KadasLatLonToUTM::GridLabel> gridLabels;
