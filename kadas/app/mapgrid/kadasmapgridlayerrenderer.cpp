@@ -362,7 +362,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   {
     QRect drawnRect = drawMgrsGridZoneLabel( zoneLabel, adaptToScreen, crst, screenExtent, mapScale, bufferColor, font, drawnLabelsRects );
 
-    if( drawnRect.isValid() )
+    if ( drawnRect.isValid() )
       drawnLabelsRects.append( drawnRect );
   }
 
@@ -370,7 +370,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   {
     QRect drawnRect = drawMgrsGridZoneLabel( zoneLabel, adaptToScreen, crst, screenExtent, mapScale, bufferColor, font, drawnLabelsRects );
 
-    if( drawnRect.isValid() )
+    if ( drawnRect.isValid() )
       drawnLabelsRects.append( drawnRect );
   }
 
@@ -420,9 +420,9 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
         QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
 
         bool intersects = false;
-        for (const QRect& drawnLabelRect: std::as_const( drawnLabelsRects ) )
+        for ( const QRect &drawnLabelRect : std::as_const( drawnLabelsRects ) )
         {
-          if (labelRect.intersects(drawnLabelRect))
+          if ( labelRect.intersects( drawnLabelRect ) )
           {
             intersects = true;
             break;
@@ -464,9 +464,9 @@ QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel( const KadasLatLonToUTM::
     QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
 
     bool intersects = false;
-    for (const QRect& drawnLabelRect: drawnLabelsRects)
+    for ( const QRect &drawnLabelRect : drawnLabelsRects )
     {
-      if (labelRect.intersects(drawnLabelRect))
+      if ( labelRect.intersects( drawnLabelRect ) )
       {
         // Intrersection mean label has not to be drawn as it collides with another one
         return QRect();

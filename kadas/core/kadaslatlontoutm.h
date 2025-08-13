@@ -49,7 +49,7 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     };
 
     struct ZoneLabel
-    {   
+    {
         QPointF pos;
         QString label;
         QPointF maxPos;
