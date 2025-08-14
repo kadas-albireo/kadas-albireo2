@@ -5568,12 +5568,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasRectangleItemBase</name>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="461"/>
+        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="465"/>
         <source>Frame visible</source>
         <translation>Cadre visible</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="465"/>
+        <location filename="../kadas/gui/mapitems/kadasrectangleitembase.cpp" line="469"/>
         <source>Position locked</source>
         <translation>Position bloquée</translation>
     </message>
