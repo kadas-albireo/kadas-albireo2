@@ -215,7 +215,7 @@ void KadasCanvasContextMenu::identify()
 void KadasCanvasContextMenu::copyCoordinates()
 {
   const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
-  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mMapPos, mapCrs );
+  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mMapPos, mapCrs, false );
   if ( posStr.isEmpty() )
   {
     posStr = QString( "%1 (%2)" ).arg( mMapPos.toString() ).arg( mapCrs.authid() );
