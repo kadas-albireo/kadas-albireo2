@@ -31,6 +31,7 @@ vcpkg_from_github(
   62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
   sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
   3dfrustumfix.patch
+  3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
