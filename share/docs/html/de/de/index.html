@@ -153,6 +153,64 @@
 <p>Die MSS/MilX Komponente ist Eigentum der Firma gs-soft AG.</p>
 <p>Die Nutzungsbedingungen für die Daten sind in der Anwendung unter Hilfe → Über aufgelistet.</p>
 <h2 id="versionsprotokoll"><a name="sec3"></a>Versionsprotokoll</h2>
+<h3 id="version-230-august-2025">Version 2.3 (August 2025)</h3>
+<p>Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserungen und Fehlerbehebungen umgesetzt worden. </p>
+<ul>
+<li>
+<p><em>Neue Funktionalitäten und Geodaten</em></p>
+<ul>
+<li>Geodienste und Geodaten mit einer Zeitkomponente können als chronologische Animation abgespielt werden.</li>
+<li>Themenvergleiche (SWIPE-Tool) bei dem zwei Kartenansichten interaktiv mithilfe eines Schiebereglers ein- und ausgeblendet werden können. </li>
+<li>Geöffnete Attributtabellen werden im Projekt gespeichert und beim Öffnen des Projektes angezeigt.</li>
+<li>Unterstützung von NetCDF Rasterdatenformat (wird vor allem für Meteorologie verwendet).</li>
+<li>Ein neuer «Feedback»-Knopf. Dieser Knopf führt direkt zu einem Formular auf dem Geo Info Portal V und ermöglicht Rückmeldungen auf Software-Funktionalitäten und Bugs.</li>
+<li>Das Erstellen von Höhenprofilen liefert zusätzliche Statistiken, wie z.B höchster/tiefster Punkt, Länge und Höhenunterschied zur Profillinie.</li>
+<li>Geodienste von der MGDI werden als Vektor geladen. Damit kann die Symbologie angepasst werden und die Attributtabellen von Vektordaten können geöffnet werden.</li>
+<li>Vector Tiles Geodienste der MGDI werden im Geokatalog gelistet und können geladen werden.</li>
+<li>Neu bestehen die Offline-Daten aus der World Briefing Map.</li>
+<li>Der MSS Export ist neu als KML möglich (nach dem KML-Export nicht weiter bearbeitbar).</li>
+</ul>
+</li>
+<li>
+<p><em>Verbesserungen</em></p>
+<ul>
+<li>Plugin Manager: Bei Start von KADAS wird geprüft, ob aktuellere Versionen der installierten Plugins im Repository vorhanden sind. Falls dem so ist, wird automatisch die neueste Version des Plugins installiert und der Benutzer mit einer Meldung informiert.</li>
+<li>Beim Abfragen via Klicken ist die Darstellung der Resultate, insbesondere wenn mehrere Resultate zurückgegeben werden, verbessert worden.</li>
+<li>Die Funktion Bookmarks speichert nun auch Layer in Gruppen und Untergruppen.</li>
+<li>Das Routing Plugin ist nun ein Standard-Plugin und wird automatisch vom Repository installiert. Es können auch weitere Plugins als obligatorisch definiert werden.</li>
+<li>Eingeschränkte Geodienste in der MGDI können von berechtigten Benutzern in KADAS angezeigt werden.</li>
+<li>Die Koordinatensuche wurde verbessert und standardisiert.</li>
+<li>Der Support von WCS Geodiensten ermöglicht nun auch Analysen mit hochaufgelösten Höhenmodellen.</li>
+<li>Die Textfunktion in Redlining enthält zusätzliche Einstellungsmöglichkeiten.</li>
+<li>Die Darstellung und Beschriftung des MGRS Gitters wurde optimiert.</li>
+<li>Die Druckvorlagen wurden aktualisiert und enthalten neu defaultmässig das Erstelldatum und das Projektionssystem.</li>
+<li>Analysen lassen sich direkt über einen Rechtsklick mit der Maus starten.</li>
+<li>Die Ausdehnung des GPKG-Exports von Vektordaten kann definiert werden. </li>
+</ul>
+</li>
+<li>
+<p><em>Fehlerbehebungen</em></p>
+<ul>
+<li>Crash beim Export von GeoPDF wurde behoben.</li>
+<li>Beim Export von GeoPDF werden alle Layer berücksichtigt und lagekorrekt dargestellt.</li>
+<li>Crash bei der Verwendung des Ephemeris-Werkzeuges wurde behoben.</li>
+<li>Crash beim Export von Geopackages wurde behoben.</li>
+<li>Fehlende Übersetzungen in den Sprachen (DE, FR, IT) behoben.</li>
+</ul>
+</li>
+<li>
+<p><em>Technische Anpassungen</em></p>
+<ul>
+<li>KADAS 2.3 basiert auf der QGIS-Version 3.44.0-Solothurn.</li>
+<li>Die beiden Höhenmodelle Schweiz und weltweit (dtm_analysis.tif + general_dtm_globe.tif) sind im COG-Format (Cloud Optimized GeoTIFF) vorhanden. Das erlaubt eine schnellere Prozessierung und Visualisierung.</li>
+<li>Der 3D Viewer (Globe) musste ausgetauscht werden, da die verwendete Technologie End-of-life ist. Neu wird der 3D Viewer von der QGIS-Applikation verwendet.</li>
+<li>Die verwendete MSS/MilX Bibliothek von gs-soft ist neu MSS-2025.</li>
+<li>Die Valhalla Routing Engine wurde aktualisiert und ermöglicht die Miteinbeziehung der Höhe in die Routen- und Distanzberechnung.  </li>
+<li>Alle produktiven Plugins wurden für die Version 2.3 angepasst.</li>
+<li>Hilfe wurde in den Browser externalisiert.</li>
+</ul>
+</li>
+</ul>
 <h3 id="version-220-juni-2023">Version 2.2.0 (Juni 2023)</h3>
 <ul>
 <li><em>Allgemein</em>:<ul>

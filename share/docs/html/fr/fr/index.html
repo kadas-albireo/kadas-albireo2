@@ -153,6 +153,64 @@
 <p>La composante MSS/MilX est la propriété de l’entreprise gs-soft AG.</p>
 <p>Les conditions d’utilisation des données sont énumérées dans l’application sous Aide → À propos.</p>
 <h2 id="protocole-de-version"><a name="sec3"></a>Protocole de version</h2>
+<h3 id="version-230-aout-2025">Version 2.3 (août 2025)</h3>
+<p>La version KADAS 2.3, sortie au troisième trimestre 2025, apporte de nombreuses nouveautés, améliorations et corrections. </p>
+<ul>
+<li>
+<p><em>Nouvelles fonctionnalités et géodonnées</em></p>
+<ul>
+<li>Les géoservices et les géodonnées comportant une composante temporelle peuvent être lus sous forme d'animation chronologique.</li>
+<li>La comparaison de thèmes (outil SWIPE) permettant d'afficher et de masquer de manière interactive deux vues cartographiques à l'aide d'un curseur.</li>
+<li>Les tableaux d'attributs ouverts sont enregistrés dans le projet et s'affichent à l'ouverture de celui-ci.</li>
+<li>La prise en charge du format de données raster NetCDF (utilisé principalement en météorologie).</li>
+<li>Un nouveau bouton « Feedback ». Ce bouton mène directement à un formulaire sur le Geo Info Portal V et permet de donner son avis sur les fonctionnalités du logiciel et de signaler des bugs.</li>
+<li>La création de profils d'altitude fournit des statistiques supplémentaires, telles que le point le plus haut/le plus bas, la longueur et la différence d'altitude par rapport à la ligne du profil.</li>
+<li>Les géoservices de la MGDI sont chargés sous forme de vecteurs. Cela permet d'adapter la symbologie et d'ouvrir les tables d'attributs des données vectorielles.</li>
+<li>Les géoservices Vector Tiles de la MGDI sont répertoriés dans le géocatalogue et peuvent être chargés.</li>
+<li>Les données hors ligne proviennent désormais de la World Briefing Map.</li>
+<li>L'exportation MSS est désormais possible au format KML (non modifiable après l'exportation KML).</li>
+</ul>
+</li>
+<li>
+<p><em>Améliorations</em></p>
+<ul>
+<li>Gestionnaire de plugins : au démarrage de KADAS, le système vérifie si des versions plus récentes des plugins installés sont disponibles dans le référentiel. Si tel est le cas, la dernière version du plugin est automatiquement installée et l'utilisateur en est informé par un message.</li>
+<li>Lors d'une requête par clic, l'affichage des résultats a été amélioré, en particulier lorsque plusieurs résultats sont renvoyés.</li>
+<li>La fonction Signets enregistre désormais également les couches dans des groupes et des sous-groupes.</li>
+<li>Le plugin Routing est désormais un plugin standard et est installé automatiquement à partir du référentiel. D'autres plugins peuvent également être définis comme obligatoires.</li>
+<li>Les géoservices restreints dans la MGDI peuvent être affichés dans KADAS par les utilisateurs autorisés.</li>
+<li>La recherche de coordonnées a été améliorée et standardisée.</li>
+<li>La prise en charge des géoservices WCS permet désormais également d'effectuer des analyses avec des modèles altimétriques à haute résolution.</li>
+<li>La fonction Texte dans Redlining contient des options de configuration supplémentaires.</li>
+<li>L'affichage et le libellé de la grille MGRS ont été optimisés.</li>
+<li>Les modèles d'impression ont été mis à jour et contiennent désormais par défaut la date de création et le système de projection.</li>
+<li>Les analyses peuvent être lancées directement par un clic droit de la souris.</li>
+<li>L'extension de l'exportation GPKG des données vectorielles peut être définie. </li>
+</ul>
+</li>
+<li>
+<p><em>Corrections</em></p>
+<ul>
+<li>Le crash lors de l'exportation de GeoPDF a été corrigé.</li>
+<li>Lors de l'exportation de GeoPDF, toutes les couches sont prises en compte et affichées correctement.</li>
+<li>Le crash lors de l'utilisation de l'outil Éphémérides a été corrigé.</li>
+<li>Le crash lors de l'exportation de GeoPackage a été corrigé.</li>
+<li>Corrigé : traductions manquantes dans les langues (DE, FR, IT)</li>
+</ul>
+</li>
+<li>
+<p><em>Adaptations techniques</em></p>
+<ul>
+<li>KADAS 2.3 est basé sur la version QGIS 3.44.0-Solothurn.</li>
+<li>Les deux modèles altimétriques Suisse et mondial (dtm_analysis.tif + general_dtm_globe.tif) sont disponibles au format COG (Cloud Optimized GeoTIFF). Cela permet un traitement et une visualisation plus rapides.</li>
+<li>Le visualiseur 3D (Globe) a dû être remplacé, car la technologie utilisée est en fin de vie. Le visualiseur 3D est désormais utilisé par l'application QGIS.</li>
+<li>La bibliothèque MSS/MilX utilisée par gs-soft est désormais MSS-2025.</li>
+<li>Le « Valhalla Routing Engine » a été mis à jour et permet désormais de prendre en compte l'altitude dans le calcul des itinéraires et des distances.</li>
+<li>Tous les plugins productifs ont été adaptés à la version 2.3.</li>
+<li>L'aide a été externalisée dans le navigateur.</li>
+</ul>
+</li>
+</ul>
 <h3 id="version-220-juin-2023">Version 2.2.0 (juin 2023)</h3>
 <ul>
 <li><em>Général</em>:<ul>
