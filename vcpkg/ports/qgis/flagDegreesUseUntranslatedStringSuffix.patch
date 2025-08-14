@@ -1,0 +1,88 @@
+diff --git a/src/core/qgscoordinateformatter.cpp b/src/core/qgscoordinateformatter.cpp
+index 27286661fda..4b6dfa4d8a6 100644
+--- a/src/core/qgscoordinateformatter.cpp
++++ b/src/core/qgscoordinateformatter.cpp
+@@ -140,7 +140,10 @@ QString QgsCoordinateFormatter::formatXAsDegreesMinutesSeconds( double val, int
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedX < 0 ? "W" : "E";
++    else
++      hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
+   }
+   else
+   {
+@@ -222,7 +225,10 @@ QString QgsCoordinateFormatter::formatYAsDegreesMinutesSeconds( double val, int
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedY < 0 ? "S" : "N";
++    else
++      hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
+   }
+   else
+   {
+@@ -291,7 +297,10 @@ QString QgsCoordinateFormatter::formatXAsDegreesMinutes( double val, int precisi
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedX < 0 ? "W" : "E";
++    else
++      hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
+   }
+   else
+   {
+@@ -354,7 +363,10 @@ QString QgsCoordinateFormatter::formatYAsDegreesMinutes( double val, int precisi
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedY < 0 ? "S" : "N";
++    else
++      hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
+   }
+   else
+   {
+@@ -404,7 +416,10 @@ QString QgsCoordinateFormatter::formatXAsDegrees( double val, int precision, For
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedX < 0 ? "W" : "E";
++    else
++      hemisphere = wrappedX < 0 ? QObject::tr( "W" ) : QObject::tr( "E" );
+   }
+   else
+   {
+@@ -453,7 +468,10 @@ QString QgsCoordinateFormatter::formatYAsDegrees( double val, int precision, For
+   QString sign;
+   if ( flags.testFlag( FlagDegreesUseStringSuffix ) )
+   {
+-    hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
++    if ( flags.testFlag( FlagDegreesUseUntranslatedStringSuffix ))
++      hemisphere = wrappedY < 0 ? "S" : "N";
++    else
++      hemisphere = wrappedY < 0 ? QObject::tr( "S" ) : QObject::tr( "N" );
+   }
+   else
+   {
+diff --git a/src/core/qgscoordinateformatter.h b/src/core/qgscoordinateformatter.h
+index cccf412075e..cbe58387c4e 100644
+--- a/src/core/qgscoordinateformatter.h
++++ b/src/core/qgscoordinateformatter.h
+@@ -58,6 +58,7 @@ class CORE_EXPORT QgsCoordinateFormatter
+     {
+       FlagDegreesUseStringSuffix = 1 << 1, //!< Include a direction suffix (eg 'N', 'E', 'S' or 'W'), otherwise a "-" prefix is used for west and south coordinates
+       FlagDegreesPadMinutesSeconds = 1 << 2, //!< Pad minute and second values with leading zeros, eg '05' instead of '5'
++      FlagDegreesUseUntranslatedStringSuffix = 1 << 3, //!< Don't translate direction suffix. Takes effect only togheter with FlagDegreesUseStringSuffix
+     };
+     Q_DECLARE_FLAGS( FormatFlags, FormatFlag )
+ 

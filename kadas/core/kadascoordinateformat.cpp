@@ -72,12 +72,12 @@ const QString &KadasCoordinateFormat::getCoordinateDisplayCrs() const
   return mEpsg;
 }
 
-QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const
+QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, bool translateDirectionSuffixes ) const
 {
-  return KadasCoordinateFormat::getDisplayString( p, sSrs, mFormat, mEpsg );
+  return KadasCoordinateFormat::getDisplayString( p, sSrs, mFormat, mEpsg, translateDirectionSuffixes );
 }
 
-QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg )
+QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg, bool translateDirectionSuffixes )
 {
   QgsCoordinateReferenceSystem destCrs( epsg );
   QgsPointXY pTrans;
@@ -98,15 +98,24 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
     }
     case Format::DegMinSec:
     {
-      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1 );
+      if ( translateDirectionSuffixes )
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1 );
+      else
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
     }
     case Format::DegMin:
     {
-      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3 );
+      if ( translateDirectionSuffixes )
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3 );
+      else
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
     }
     case Format::DecDeg:
     {
-      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5 );
+      if ( translateDirectionSuffixes )
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5 );
+      else
+        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
     }
     case Format::UTM:
     {

@@ -46,8 +46,8 @@ class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
     const QString &getCoordinateDisplayCrs() const;
     Qgis::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
 
-    QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs ) const;
-    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, KadasCoordinateFormat::Format format, const QString &epsg );
+    QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, bool translateDirectionSuffixes = true ) const;
+    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, KadasCoordinateFormat::Format format, const QString &epsg, bool translateDirectionSuffixes = true );
 
     double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
 
