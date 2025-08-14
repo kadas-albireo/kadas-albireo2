@@ -72,12 +72,12 @@ const QString &KadasCoordinateFormat::getCoordinateDisplayCrs() const
   return mEpsg;
 }
 
-QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, bool translateDirectionSuffixes = true ) const
+QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, bool translateDirectionSuffixes ) const
 {
   return KadasCoordinateFormat::getDisplayString( p, sSrs, mFormat, mEpsg, translateDirectionSuffixes );
 }
 
-QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg, bool translateDirectionSuffixes = true )
+QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, Format format, const QString &epsg, bool translateDirectionSuffixes )
 {
   QgsCoordinateReferenceSystem destCrs( epsg );
   QgsPointXY pTrans;
