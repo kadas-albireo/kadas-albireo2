@@ -311,7 +311,7 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
 
   QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( "EPSG:4326" ), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() );
   QgsRectangle area = crst.transformBoundingBox( renderContext()->mapExtent(), Qgis::TransformDirection::Reverse );
-  QRectF screenExtent = computeScreenExtent( renderContext()->mapExtent(), renderContext()->mapToPixel() );
+  QRect screenExtent = computeScreenExtent( renderContext()->mapExtent(), renderContext()->mapToPixel() );
   double mapScale = renderContext()->rendererScale();
   if ( !adaptToScreen )
   {
@@ -356,6 +356,24 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   QFont font = renderContext()->painter()->font();
   font.setBold( true );
 
+  QList<QRect> drawnLabelsRects;
+
+  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabelsGridZoneIdentifier ) )
+  {
+    QRect drawnRect = drawMgrsGridZoneLabel( zoneLabel, adaptToScreen, crst, screenExtent, mapScale, bufferColor, font, drawnLabelsRects );
+
+    if ( drawnRect.isValid() )
+      drawnLabelsRects.append( drawnRect );
+  }
+
+  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels100kmSquareIdentifier ) )
+  {
+    QRect drawnRect = drawMgrsGridZoneLabel( zoneLabel, adaptToScreen, crst, screenExtent, mapScale, bufferColor, font, drawnLabelsRects );
+
+    if ( drawnRect.isValid() )
+      drawnLabelsRects.append( drawnRect );
+  }
+
   if ( adaptToScreen )
   {
     font.setPointSizeF( gridLabelSize );
@@ -396,35 +414,70 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
       }
       if ( i < n )
       {
-        drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+        QFontMetrics fm( font );
+        int labelAdvance = fm.horizontalAdvance( gridLabel.label );
+
+        QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
+
+        bool intersects = false;
+        for ( const QRect &drawnLabelRect : std::as_const( drawnLabelsRects ) )
+        {
+          if ( labelRect.intersects( drawnLabelRect ) )
+          {
+            intersects = true;
+            break;
+          }
+        }
+
+        if ( intersects == false )
+        {
+          drawnLabelsRects.append( labelRect );
+          drawGridLabel( labelPos, gridLabel.label, font, bufferColor );
+        }
       }
     }
   }
+}
 
-  for ( const KadasLatLonToUTM::ZoneLabel &zoneLabel : std::as_const( grid.zoneLabels ) )
+QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel( const KadasLatLonToUTM::ZoneLabel &zoneLabel, bool adaptToScreen, const QgsCoordinateTransform &crst, const QRect &screenExtent, double mapScale, const QColor &bufferColor, const QFont &font, const QList<QRect> &drawnLabelsRects )
+{
+  double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
+
+  QFont zoneFont = font;
+  zoneFont.setPointSizeF( zoneFontSize );
+  QFontMetrics fm( zoneFont );
+
+  const QPointF &pos = zoneLabel.pos;
+  const QPointF &maxPos = zoneLabel.maxPos;
+  QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
+  QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
+  if ( adaptToScreen )
   {
-    double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
-
-    font.setPointSizeF( zoneFontSize );
-    QFontMetrics fm( font );
-
-    const QPointF &pos = zoneLabel.pos;
-    const QPointF &maxPos = zoneLabel.maxPos;
-    QPointF labelPos = renderContext()->mapToPixel().transform( crst.transform( pos.x(), pos.y() ) ).toQPointF();
-    QPointF maxLabelPos = renderContext()->mapToPixel().transform( crst.transform( maxPos.x(), maxPos.y() ) ).toQPointF();
-    if ( adaptToScreen )
-    {
-      adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
-    }
-    labelPos.rx() += 3;
-    labelPos.ry() -= 3;
-
-    double labelAdvance = fm.horizontalAdvance( zoneLabel.label );
-    if ( labelPos.x() + labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
-    {
-      drawGridLabel( labelPos, zoneLabel.label, font, bufferColor );
-    }
+    adjustZoneLabelPos( labelPos, maxLabelPos, screenExtent );
   }
+  labelPos.rx() += 3;
+  labelPos.ry() -= 3;
+
+  int labelAdvance = fm.horizontalAdvance( zoneLabel.label );
+  if ( labelPos.x() + labelAdvance < maxLabelPos.x() && labelPos.y() - fm.height() > maxLabelPos.y() )
+  {
+    QRect labelRect = QRect( labelPos.x(), labelPos.y() - fm.ascent(), labelAdvance, fm.height() );
+
+    bool intersects = false;
+    for ( const QRect &drawnLabelRect : drawnLabelsRects )
+    {
+      if ( labelRect.intersects( drawnLabelRect ) )
+      {
+        // Intrersection mean label has not to be drawn as it collides with another one
+        return QRect();
+      }
+    }
+
+    drawGridLabel( labelPos, zoneLabel.label, zoneFont, bufferColor );
+    return labelRect;
+  }
+
+  return QRect();
 }
 
 void KadasMapGridLayerRenderer::drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor )

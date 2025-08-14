@@ -782,7 +782,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
         label.fontSizeMinScale = 30000000;
         label.fontSizeMax = 20;
         label.fontSizeMaxScale = 15000000;
-        grid.zoneLabels.append( label );
+        grid.zoneLabelsGridZoneIdentifier.append( label );
       }
 
       // Sub-grid
@@ -883,7 +883,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
     UTMCoo maxCoo = coo;
     maxCoo.northing = northing2;
     QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-    subGrid.zoneLabels.append( zoneLabelCallback( xMin, yMin, maxPos.x(), maxPos.y() ) );
+    subGrid.zoneLabels100kmSquareIdentifier.append( zoneLabelCallback( xMin, yMin, maxPos.x(), maxPos.y() ) );
   }
   int count = 0;
   const int maxLines = 500;
@@ -914,7 +914,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
       UTMCoo maxCoo = xcoo;
       maxCoo.easting += cellSize;
       QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-      subGrid.zoneLabels << zoneLabelCallback( xLine.last().x(), std::max( yMin, xLine.last().y() ), maxPos.x(), maxPos.y() );
+      subGrid.zoneLabels100kmSquareIdentifier << zoneLabelCallback( xLine.last().x(), std::max( yMin, xLine.last().y() ), maxPos.x(), maxPos.y() );
     }
     truncated = false;
     // Draw remaining segments of grid line
@@ -981,7 +981,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
       UTMCoo maxCoo = ycoo;
       maxCoo.northing += cellSize;
       QgsPointXY maxPos = UTM2LL( maxCoo, ok );
-      subGrid.zoneLabels << zoneLabelCallback( yLine.last().x(), std::max( xMin, yLine.last().y() ), maxPos.x(), maxPos.y() );
+      subGrid.zoneLabels100kmSquareIdentifier << zoneLabelCallback( yLine.last().x(), std::max( xMin, yLine.last().y() ), maxPos.x(), maxPos.y() );
     }
     // Draw remaining segments of grid line
     while ( ( q = UTM2LL( ycoo, ok ) ).x() < xMax && ok )
@@ -995,7 +995,7 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level lev
         QgsPointXY maxPos = UTM2LL( maxCoo, ok );
         maxPos.setX( std::min( maxPos.x(), xMax ) );
         maxPos.setY( std::min( maxPos.y(), yMax ) );
-        subGrid.zoneLabels.append( zoneLabelCallback( q.x(), q.y(), maxPos.x(), maxPos.y() ) );
+        subGrid.zoneLabels100kmSquareIdentifier.append( zoneLabelCallback( q.x(), q.y(), maxPos.x(), maxPos.y() ) );
       }
       ycoo.easting += cellSize;
     }

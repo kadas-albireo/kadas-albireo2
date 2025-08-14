@@ -44,6 +44,7 @@ class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
     void adjustZoneLabelPos( QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent );
     QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
     void drawMgrsGrid();
+    QRect drawMgrsGridZoneLabel( const KadasLatLonToUTM::ZoneLabel &zoneLabel, bool adaptToScreen, const QgsCoordinateTransform &crst, const QRect &screenExtent, double mapScale, const QColor &bufferColor, const QFont &font, const QList<QRect> &drawnLabelsRects );
     void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
 
     //! creates a pen for the given level and lineWidth as a scale ratio
