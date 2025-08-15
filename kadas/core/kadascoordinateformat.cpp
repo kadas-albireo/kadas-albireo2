@@ -98,24 +98,27 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
     }
     case Format::DegMinSec:
     {
-      if ( translateDirectionSuffixes )
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1 );
-      else
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
+      QgsCoordinateFormatter::FormatFlags formatFlags = QgsCoordinateFormatter::FormatFlag::FlagDegreesUseStringSuffix;
+      if ( !translateDirectionSuffixes )
+        formatFlags |= QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
+
+      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1, formatFlags );
     }
     case Format::DegMin:
     {
-      if ( translateDirectionSuffixes )
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3 );
-      else
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
+      QgsCoordinateFormatter::FormatFlags formatFlags = QgsCoordinateFormatter::FormatFlag::FlagDegreesUseStringSuffix;
+      if ( !translateDirectionSuffixes )
+        formatFlags |= QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
+
+      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3, formatFlags );
     }
     case Format::DecDeg:
     {
-      if ( translateDirectionSuffixes )
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5 );
-      else
-        return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5, QgsCoordinateFormatter::FlagDegreesUseUntranslatedStringSuffix );
+      QgsCoordinateFormatter::FormatFlags formatFlags = QgsCoordinateFormatter::FormatFlag::FlagDegreesUseStringSuffix;
+      if ( !translateDirectionSuffixes )
+        formatFlags |= QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
+
+      return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDecimalDegrees, 5, formatFlags );
     }
     case Format::UTM:
     {
