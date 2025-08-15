@@ -167,10 +167,17 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
       QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
       qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
     }
-    if ( !gdalProxyAuth.isEmpty() )
+
+    if ( !gdalProxyAuth.isEmpty() && !settingsGdalUnsetEnvVar->value() )
     {
-      qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
       QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
+      qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
+    }
+
+    if ( settingsGdalUnsetEnvVar->value() )
+    {
+      QgsDebugMsgLevel( QString( "Unset GDAL_PROXY_AUTH" ), 2 );
+      qunsetenv( "GDAL_PROXY_AUTH" );
     }
 
     if ( !gdalHttpUserPwd.isEmpty() )
