@@ -88,7 +88,10 @@ int main( int argc, char *argv[] )
 
   QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
   QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
-  QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+
+  bool ignoreDpiScaling = QSettings().value( "/kadas/ignore_dpi_scale", false ).toBool();
+  if ( !ignoreDpiScaling )
+    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   // Initialize the default surface format for all
   // QWindow and QWindow derived components
