@@ -100,7 +100,7 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
     {
       QgsCoordinateFormatter::FormatFlags formatFlags = QgsCoordinateFormatter::FormatFlag::FlagDegreesUseStringSuffix;
       if ( !translateDirectionSuffixes )
-        formatFlags |= formatFlags | QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
+        formatFlags |= QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
 
       return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutesSeconds, 1, formatFlags );
     }
@@ -108,7 +108,7 @@ QString KadasCoordinateFormat::getDisplayString( const QgsPointXY &p, const QgsC
     {
       QgsCoordinateFormatter::FormatFlags formatFlags = QgsCoordinateFormatter::FormatFlag::FlagDegreesUseStringSuffix;
       if ( !translateDirectionSuffixes )
-        formatFlags |= formatFlags | QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
+        formatFlags |= QgsCoordinateFormatter::FormatFlag::FlagDegreesUseUntranslatedStringSuffix;
 
       return QgsCoordinateFormatter::format( pTrans, QgsCoordinateFormatter::FormatDegreesMinutes, 3, formatFlags );
     }
