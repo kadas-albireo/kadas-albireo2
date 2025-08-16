@@ -148,7 +148,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
     }
     else
     {
-      m3DMapCanvasWidget->close();
+      m3DMapCanvasWidget->parentWidget()->close();
     }
   } );
 }
