@@ -6949,7 +6949,7 @@ bewegen</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../kadas/core/kadas.cpp" line="235"/>
+        <location filename="../kadas/core/kadas.cpp" line="242"/>
         <source>Failed to open raster file: %1</source>
         <translation>Die Rasterdatei konnte nicht geöffnet werden: %1</translation>
     </message>
