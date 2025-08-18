@@ -34,6 +34,7 @@ vcpkg_from_github(
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
+  wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)

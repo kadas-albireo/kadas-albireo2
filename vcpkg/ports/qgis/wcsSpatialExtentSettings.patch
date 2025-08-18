@@ -1,0 +1,74 @@
+diff --git a/src/providers/wcs/qgswcssourceselect.cpp b/src/providers/wcs/qgswcssourceselect.cpp
+index ac39cc96e08..89b4bd3b8a5 100644
+--- a/src/providers/wcs/qgswcssourceselect.cpp
++++ b/src/providers/wcs/qgswcssourceselect.cpp
+@@ -31,6 +31,8 @@
+ 
+ #include <QWidget>
+ 
++const QgsSettingsEntryBool *QgsWCSSourceSelect::settingsSpatialExtentBoxChecked = new QgsSettingsEntryBool( QStringLiteral( "spatial-extent-box-checked" ), sTreeWCSConnectionDialog, true );
++
+ QgsWCSSourceSelect::QgsWCSSourceSelect( QWidget *parent, Qt::WindowFlags fl, QgsProviderRegistry::WidgetMode widgetMode )
+   : QgsOWSSourceSelect( QStringLiteral( "WCS" ), parent, fl, widgetMode )
+ {
+@@ -40,7 +42,10 @@ QgsWCSSourceSelect::QgsWCSSourceSelect( QWidget *parent, Qt::WindowFlags fl, Qgs
+ 
+   mLayersTreeWidget->setSelectionMode( QAbstractItemView::SingleSelection );
+ 
++  mSpatialExtentBox->setChecked( settingsSpatialExtentBoxChecked->value() );
++
+   connect( buttonBox, &QDialogButtonBox::helpRequested, this, &QgsWCSSourceSelect::showHelp );
++  connect( mSpatialExtentBox, &QgsExtentGroupBox::toggled, this, &QgsWCSSourceSelect::spatialExtentBoxToggled)
+ }
+ 
+ void QgsWCSSourceSelect::populateLayerList()
+@@ -307,3 +312,8 @@ void QgsWCSSourceSelect::showHelp()
+ {
+   QgsHelp::openHelp( QStringLiteral( "working_with_ogc/ogc_client_support.html" ) );
+ }
++
++void QgsWCSSourceSelect::spatialExtentBoxToggled( bool checked )
++{
++  settingsSpatialExtentBoxChecked->setValue( checked );
++}
+diff --git a/src/providers/wcs/qgswcssourceselect.h b/src/providers/wcs/qgswcssourceselect.h
+index a831b5a9362..76eec50aefb 100644
+--- a/src/providers/wcs/qgswcssourceselect.h
++++ b/src/providers/wcs/qgswcssourceselect.h
+@@ -28,6 +28,7 @@
+ #include "qgswcscapabilities.h"
+ #include "qgsproviderregistry.h"
+ #include "qgsdataprovider.h"
++#include "qgssettingstree.h"
+ 
+ #include <QStringList>
+ #include <QPushButton>
+@@ -38,6 +39,7 @@ class QButtonGroup;
+ class QgsTreeWidgetItem;
+ class QDomDocument;
+ class QDomElement;
++class QgsSettingsEntryBool;
+ 
+ /*!
+  * \brief  Dialog to create connections and add layers from WMS, WFS, WCS etc.
+@@ -57,6 +59,12 @@ class QgsWCSSourceSelect : public QgsOWSSourceSelect
+     QgsWCSSourceSelect( QWidget *parent = nullptr, Qt::WindowFlags fl = QgsGuiUtils::ModalDialogFlags, QgsProviderRegistry::WidgetMode widgetMode = QgsProviderRegistry::WidgetMode::Standalone );
+ 
+   private:
++    #ifndef SIP_RUN
++        static inline QgsSettingsTreeNode *sTreeWCSConnectionDialog = QgsSettingsTree::sTreeConnections->createChildNode( QStringLiteral( "wcs-connection-dialog" ) );
++
++        static const QgsSettingsEntryBool *settingsSpatialExtentBoxChecked;
++    #endif
++
+     QgsWcsCapabilities mCapabilities;
+ 
+     QString selectedIdentifier() const;
+@@ -77,5 +85,7 @@ class QgsWCSSourceSelect : public QgsOWSSourceSelect
+ 
+     //! Open help browser
+     void showHelp();
++
++    void spatialExtentBoxToggled( bool checked );
+ };
+ #endif // QGSWCSSOURCESELECT_H
