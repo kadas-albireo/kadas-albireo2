@@ -96,6 +96,8 @@ QImage KadasTextItem::symbolImage() const
   image.fill( Qt::transparent );
   QPainter painter( &image );
 
+  qDebug() << "Fill color transparency:" << mFillColor.alpha();
+  qDebug() << "Outline color transparency:" << mOutlineColor.alpha();
   painter.setBrush( QBrush( mFillColor ) );
   painter.setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
   painter.setFont( mFont );
