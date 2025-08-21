@@ -49,18 +49,21 @@ KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
 
   mUi.mToolButtonBorderColor->setAllowOpacity( true );
   mUi.mToolButtonBorderColor->setShowNoColor( true );
-  mUi.mToolButtonBorderColor->setProperty( "settings_key", "text_outline_color" );
   QColor initialOutlineColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_outline_color", "0,0,0,0" ).toString() );
   mUi.mToolButtonBorderColor->setColor( initialOutlineColor );
-  connect( mUi.mToolButtonBorderColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveColor );
+  connect( mUi.mToolButtonBorderColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveOutlineColor );
 
   mUi.mToolButtonFillColor->setAllowOpacity( true );
-  mUi.mToolButtonFillColor->setProperty( "settings_key", "text_color" );
   QColor initialFillColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_color", "255,0,0,255" ).toString() );
   mUi.mToolButtonFillColor->setColor( initialFillColor );
-  connect( mUi.mToolButtonFillColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveColor );
+  connect( mUi.mToolButtonFillColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveFillColor );
 
-  connect( this, &KadasRedliningTextEditor::styleChanged, this, &KadasRedliningTextEditor::syncWidgetToItem );
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
 }
 
 void KadasRedliningTextEditor::syncItemToWidget()
@@ -115,6 +118,20 @@ void KadasRedliningTextEditor::syncWidgetToItem()
   textItem->setFont( currentFont() );
 }
 
+void KadasRedliningTextEditor::setItem( KadasMapItem *item )
+{
+  disconnect( mItemConnection );
+
+  KadasMapItemEditor::setItem( item );
+
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
+}
+
 QFont KadasRedliningTextEditor::currentFont() const
 {
   QFont font = mUi.mFontComboBox->currentFont();
@@ -124,22 +141,50 @@ QFont KadasRedliningTextEditor::currentFont() const
   return font;
 }
 
-void KadasRedliningTextEditor::saveColor()
+void KadasRedliningTextEditor::saveFillColor()
 {
-  QgsColorButton *btn = qobject_cast<QgsColorButton *>( QObject::sender() );
-  QString key = QString( "/Redlining/" ) + btn->property( "settings_key" ).toString();
-  QgsSettings().setValue( key, QgsSymbolLayerUtils::encodeColor( btn->color() ) );
-  emit styleChanged();
+  QgsSettings().setValue( "text_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonFillColor->color() ) );
+
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  textItem->setFillColor( mUi.mToolButtonFillColor->color() );
+}
+
+void KadasRedliningTextEditor::saveOutlineColor()
+{
+  QgsSettings().setValue( "text_outline_color", QgsSymbolLayerUtils::encodeColor( mUi.mToolButtonBorderColor->color() ) );
+
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  textItem->setOutlineColor( mUi.mToolButtonBorderColor->color() );
 }
 
 void KadasRedliningTextEditor::saveFont()
 {
   QgsSettings().setValue( "/Redlining/font", currentFont().toString() );
-  emit styleChanged();
+
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  textItem->setFont( currentFont() );
 }
 
 void KadasRedliningTextEditor::saveText()
 {
   QgsSettings().setValue( "/Redlining/text", mUi.mLineEditText->text() );
-  emit styleChanged();
+
+  KadasTextItem *textItem = dynamic_cast<KadasTextItem *>( mItem );
+  if ( !textItem )
+  {
+    return;
+  }
+  textItem->setText( mUi.mLineEditText->text() );
 }

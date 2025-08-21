@@ -52,9 +52,6 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasRectangleItemBase
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif
 
-  signals:
-    void frameAutoResizeChanged( bool frameAutoResize );
-
   private:
     QString mText;
     QColor mOutlineColor;
