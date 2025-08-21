@@ -96,8 +96,6 @@ QImage KadasTextItem::symbolImage() const
   image.fill( Qt::transparent );
   QPainter painter( &image );
 
-  qDebug() << "Fill color transparency:" << mFillColor.alpha();
-  qDebug() << "Outline color transparency:" << mOutlineColor.alpha();
   painter.setBrush( QBrush( mFillColor ) );
   painter.setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
   painter.setFont( mFont );
@@ -118,8 +116,10 @@ void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &cen
   format.setFont( font );
   format.setSize( font.pointSize() * scale );
   format.setColor( mFillColor );
+  format.setOpacity( mFillColor.alpha() / 255.0 );
   QgsTextBufferSettings bs;
   bs.setColor( mOutlineColor );
+  bs.setOpacity( mOutlineColor.alpha() / 255.0 );
   bs.setSize( 1 );
   bs.setEnabled( true );
   format.setBuffer( bs );
