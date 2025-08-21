@@ -116,8 +116,10 @@ void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &cen
   format.setFont( font );
   format.setSize( font.pointSize() * scale );
   format.setColor( mFillColor );
+  format.setOpacity( mFillColor.alpha() / 255.0 );
   QgsTextBufferSettings bs;
   bs.setColor( mOutlineColor );
+  bs.setOpacity( mOutlineColor.alpha() / 255.0 );
   bs.setSize( 1 );
   bs.setEnabled( true );
   format.setBuffer( bs );
