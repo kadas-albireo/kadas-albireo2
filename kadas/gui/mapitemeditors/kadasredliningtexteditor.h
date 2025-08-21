@@ -32,16 +32,18 @@ class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
     void syncItemToWidget() override;
     void syncWidgetToItem() override;
 
+    void setItem( KadasMapItem *item ) override;
+
   private:
     Ui::KadasRedliningTextEditorBase mUi;
 
+    QMetaObject::Connection mItemConnection;
+
     QFont currentFont() const;
 
-  signals:
-    void styleChanged();
-
   private slots:
-    void saveColor();
+    void saveFillColor();
+    void saveOutlineColor();
     void saveFont();
     void saveText();
 };
