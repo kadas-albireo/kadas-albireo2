@@ -5966,7 +5966,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Testo</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="177"/>
         <source>Auto resize frame</source>
         <translation>Ridimensionamento automatico del frame</translation>
     </message>

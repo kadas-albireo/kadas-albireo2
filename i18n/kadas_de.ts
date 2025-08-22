@@ -5968,7 +5968,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Text</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="177"/>
         <source>Auto resize frame</source>
         <translation>Automatisch Kartenrahmen anpassen</translation>
     </message>

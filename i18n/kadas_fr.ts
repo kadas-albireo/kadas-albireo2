@@ -5969,7 +5969,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Texte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="175"/>
+        <location filename="../kadas/gui/mapitems/kadastextitem.cpp" line="177"/>
         <source>Auto resize frame</source>
         <translation>Redimensionnement automatique du cadre</translation>
     </message>
