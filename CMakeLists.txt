@@ -112,6 +112,11 @@ if(WITH_BINDINGS)
   endif()
 endif()
 
+set(ENABLE_TESTS
+    TRUE
+    CACHE BOOL "Build unit tests?"
+)
+
 if(WITH_QTWEBKIT)
   find_package(Qt5WebKitWidgets REQUIRED)
   add_definitions(-DWITH_QTWEBKIT)
@@ -146,6 +151,15 @@ add_subdirectory(kadas)
 
 if(WITH_BINDINGS)
   add_subdirectory(python)
+endif()
+
+if(ENABLE_TESTS)
+  # create a variable to specify where our test data is so that unit tests can
+  # use TEST_DATA_DIR to locate the test data. See CMakeLists in test dirs for
+  # more info
+  set(TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/testdata")
+
+  add_subdirectory(tests)
 endif()
 
 option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
