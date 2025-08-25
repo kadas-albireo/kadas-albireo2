@@ -8,7 +8,8 @@ add_library(kadas_test ${LIBRARY_TYPE} ${KADAS_TEST_HDRS})
 target_compile_features(kadas_test PRIVATE cxx_std_17)
 
 target_include_directories(
-  kadas_test PUBLIC ${CMAKE_SOURCE_DIR}/src/test ${CMAKE_BINARY_DIR}/src/test
+  kadas_test PUBLIC ${CMAKE_SOURCE_DIR}/kadas/test
+                    ${CMAKE_BINARY_DIR}/kadas/test
 )
 
-target_link_libraries(kadas_test kadas_core Qt::Test)
+target_link_libraries(kadas_test kadas_core Qt5::Test)

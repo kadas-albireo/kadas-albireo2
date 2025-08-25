@@ -39,7 +39,11 @@ if(ENABLE_TESTS)
   # ############################################################################
   # Compiler defines
 
+  # This define is used for tests that need to locate the test data under
+  # tests/testdata in the kadas source tree. the TEST_DATA_DIR variable is set
+  # in the top level CMakeLists.txt
+  add_definitions(-DTEST_DATA_DIR="${TEST_DATA_DIR}")
+
   add_subdirectory(core)
-  # if (WITH_GUI) add_subdirectory(gui) endif()
 
 endif()

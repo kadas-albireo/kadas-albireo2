@@ -112,8 +112,12 @@ if(WITH_BINDINGS)
   endif()
 endif()
 
+set(ENABLE_TESTS
+    TRUE
+    CACHE BOOL "Build unit tests?"
+)
 if(ENABLE_TESTS)
-  find_package(Qt5Test)
+  find_package(Qt5Test REQUIRED)
 endif()
 
 if(WITH_QTWEBKIT)
@@ -153,6 +157,11 @@ if(WITH_BINDINGS)
 endif()
 
 if(ENABLE_TESTS)
+  # create a variable to specify where our test data is so that unit tests can
+  # use TEST_DATA_DIR to locate the test data. See CMakeLists in test dirs for
+  # more info
+  set(TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/testdata")
+
   add_subdirectory(tests)
 endif()
 

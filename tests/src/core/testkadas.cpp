@@ -1,6 +1,5 @@
 
-#include "kadastest.h"
-#include <QObject>
+#include <QtTest/QTest>
 
 class TestKadas : public QObject
 {
@@ -35,3 +34,6 @@ class TestKadas : public QObject
       qDebug( "Called after myFirstTest and mySecondTest." );
     }
 };
+
+QTEST_MAIN( TestKadas )
+#include "testkadas.moc"
