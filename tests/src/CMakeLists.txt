@@ -17,7 +17,7 @@ if(ENABLE_TESTS)
     target_compile_features(${TESTNAME} PRIVATE cxx_std_17)
     set_target_properties(${TESTNAME} PROPERTIES AUTORCC TRUE)
     target_link_libraries(${TESTNAME} ${ARG_QGIS_TEST_LINKEDLIBRARIES})
-    target_link_libraries(${TESTNAME} kadas_test)
+    target_link_libraries(${TESTNAME} Qt5::Test)
     add_test(${TESTNAME} ${CMAKE_BINARY_DIR}/output/bin/${TESTNAME}
              -maxwarnings 10000
     )
@@ -34,15 +34,10 @@ if(ENABLE_TESTS)
     target_compile_definitions(
       ${TESTNAME} PRIVATE "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\""
     )
+    target_compile_definitions(
+      ${TESTNAME} PRIVATE "TEST_DATA_DIR=\"${TEST_DATA_DIR}\""
+    )
   endmacro()
-
-  # ############################################################################
-  # Compiler defines
-
-  # This define is used for tests that need to locate the test data under
-  # tests/testdata in the kadas source tree. the TEST_DATA_DIR variable is set
-  # in the top level CMakeLists.txt
-  add_definitions(-DTEST_DATA_DIR="${TEST_DATA_DIR}")
 
   add_subdirectory(core)
 
