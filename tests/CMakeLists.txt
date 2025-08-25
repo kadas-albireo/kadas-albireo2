@@ -1,3 +1,3 @@
-if(ENABLE_TESTS)
-  add_subdirectory(src)
-endif()
+find_package(Qt5Test REQUIRED)
+
+add_subdirectory(src)

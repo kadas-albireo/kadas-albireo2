@@ -116,9 +116,6 @@ set(ENABLE_TESTS
     TRUE
     CACHE BOOL "Build unit tests?"
 )
-if(ENABLE_TESTS)
-  find_package(Qt5Test REQUIRED)
-endif()
 
 if(WITH_QTWEBKIT)
   find_package(Qt5WebKitWidgets REQUIRED)
