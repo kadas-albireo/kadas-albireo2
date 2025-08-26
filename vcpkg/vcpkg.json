@@ -2,7 +2,7 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "230d85084ca006926d51c3d332c94298fb3bd56c",
+      "baseline": "9e7bfb1bcd1fa2e6e0755c4076441360b9c9ded7",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
@@ -21,7 +21,7 @@
       },
       {
         "kind": "git",
-        "baseline": "df20cabbf820245aff3286b521bb5f19bc6d1d86",
+        "baseline": "d460c1e800b74561c436d97dbf4414480312a047",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
@@ -73,7 +73,8 @@
     },
     "quazip-qt5",
     "svg2svgt-qt5",
-    "zonedetect"
+    "zonedetect",
+    "qt5-location"
   ],
   "features": {
     "bindings": {
