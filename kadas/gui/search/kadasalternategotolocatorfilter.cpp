@@ -469,7 +469,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
       QgsLocatorResult result;
       result.filter = this;
-      result.displayString = tr( "Go to %1°N %2°E %3" ).arg( locale.toString( point.y(), 'g', 10 ), locale.toString( point.x(), 'g', 10 ), scale > 0.0 ? tr( "at scale 1:%1 " ).arg( scale ) : QString() );
+      result.displayString = tr( "Go to %1°N %2°E %3" ).arg( locale.toString( point.y(), 'g', 10 ), locale.toString( point.x(), 'g', 10 ), scale > 0.0 ? tr( "at scale 1:%1" ).arg( scale ) : QString() );
       result.description = wgs84Crs.userFriendlyIdentifier();
       result.setUserData( data );
       result.score = 1.0;

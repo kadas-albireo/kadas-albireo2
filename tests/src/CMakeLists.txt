@@ -1,44 +1,39 @@
-if(ENABLE_TESTS)
+macro(add_kadas_test TESTSRC)
+  set(options OPTIONAL)
+  set(oneValueArgs MODULE LABELS)
+  set(multiValueArgs LINKEDLIBRARIES DEPENDENCIES)
+  cmake_parse_arguments(
+    ARG_QGIS_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
+  )
 
-  macro(add_kadas_test TESTSRC)
-    set(options OPTIONAL)
-    set(oneValueArgs MODULE LABELS)
-    set(multiValueArgs LINKEDLIBRARIES DEPENDENCIES)
-    cmake_parse_arguments(
-      ARG_QGIS_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
-    )
+  set(TESTNAME ${TESTSRC})
+  string(REPLACE "test" "" TESTNAME ${TESTNAME})
+  string(REPLACE "qgs" "" TESTNAME ${TESTNAME})
+  string(REPLACE ".cpp" "" TESTNAME ${TESTNAME})
+  set(TESTNAME "test_${ARG_QGIS_TEST_MODULE}_${TESTNAME}")
+  add_executable(${TESTNAME} ${TESTSRC} ${util_SRCS})
+  target_compile_features(${TESTNAME} PRIVATE cxx_std_17)
+  set_target_properties(${TESTNAME} PROPERTIES AUTORCC TRUE)
+  target_link_libraries(${TESTNAME} ${ARG_QGIS_TEST_LINKEDLIBRARIES})
+  target_link_libraries(${TESTNAME} Qt5::Test)
+  add_test(${TESTNAME} ${CMAKE_BINARY_DIR}/output/bin/${TESTNAME} -maxwarnings
+           10000
+  )
+  if(DEFINED ARG_QGIS_TEST_DEPENDENCIES)
+    add_dependencies(${TESTNAME} ${ARG_QGIS_TEST_DEPENDENCIES})
+  endif()
+  if(DEFINED ARG_QGIS_TEST_LABELS)
+    set_tests_properties(${TESTNAME} PROPERTIES LABELS ${ARG_QGIS_TEST_LABELS})
+  endif()
 
-    set(TESTNAME ${TESTSRC})
-    string(REPLACE "test" "" TESTNAME ${TESTNAME})
-    string(REPLACE "qgs" "" TESTNAME ${TESTNAME})
-    string(REPLACE ".cpp" "" TESTNAME ${TESTNAME})
-    set(TESTNAME "test_${ARG_QGIS_TEST_MODULE}_${TESTNAME}")
-    add_executable(${TESTNAME} ${TESTSRC} ${util_SRCS})
-    target_compile_features(${TESTNAME} PRIVATE cxx_std_17)
-    set_target_properties(${TESTNAME} PROPERTIES AUTORCC TRUE)
-    target_link_libraries(${TESTNAME} ${ARG_QGIS_TEST_LINKEDLIBRARIES})
-    target_link_libraries(${TESTNAME} Qt5::Test)
-    add_test(${TESTNAME} ${CMAKE_BINARY_DIR}/output/bin/${TESTNAME}
-             -maxwarnings 10000
-    )
-    if(DEFINED ARG_QGIS_TEST_DEPENDENCIES)
-      add_dependencies(${TESTNAME} ${ARG_QGIS_TEST_DEPENDENCIES})
-    endif()
-    if(DEFINED ARG_QGIS_TEST_LABELS)
-      set_tests_properties(
-        ${TESTNAME} PROPERTIES LABELS ${ARG_QGIS_TEST_LABELS}
-      )
-    endif()
+  set_tests_properties(${TESTNAME} PROPERTIES FIXTURES_REQUIRED SOURCETREE)
+  target_compile_definitions(
+    ${TESTNAME} PRIVATE "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\""
+  )
+  target_compile_definitions(
+    ${TESTNAME} PRIVATE "TEST_DATA_DIR=\"${TEST_DATA_DIR}\""
+  )
+endmacro()
 
-    set_tests_properties(${TESTNAME} PROPERTIES FIXTURES_REQUIRED SOURCETREE)
-    target_compile_definitions(
-      ${TESTNAME} PRIVATE "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\""
-    )
-    target_compile_definitions(
-      ${TESTNAME} PRIVATE "TEST_DATA_DIR=\"${TEST_DATA_DIR}\""
-    )
-  endmacro()
-
-  add_subdirectory(core)
-
-endif()
+add_subdirectory(core)
+add_subdirectory(gui)
