@@ -154,6 +154,9 @@ if(WITH_BINDINGS)
 endif()
 
 if(ENABLE_TESTS)
+
+  enable_testing()
+
   # create a variable to specify where our test data is so that unit tests can
   # use TEST_DATA_DIR to locate the test data. See CMakeLists in test dirs for
   # more info
