@@ -132,6 +132,10 @@ jobs:
         run: |
           cmake --build build --config Release
 
+      - name: 🧪 Run CTest
+        run: |
+          ctest --test-dir build --output-on-failure --config Release
+
       - name: 📦 Package
         run: |
           cmake --build build --target bundle --config Release
