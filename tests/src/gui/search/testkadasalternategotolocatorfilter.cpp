@@ -4,6 +4,7 @@
 
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgstest.h>
 
 #include <kadas/gui/search/kadasalternategotolocatorfilter.h>
 
@@ -52,7 +53,7 @@ void TestKadasAlternateGotoLocatorFilter::testGoto()
   for ( int i = 0; i < results.count(); i++ )
   {
     QCOMPARE( results.at( i ).displayString, expected.at( i ).displayString );
-    QCOMPARE( results.at( i ).userData().toMap()[QStringLiteral( "point" )].value<QgsPointXY>(), expected.at( i ).point );
+    QGSCOMPARENEARPOINT( results.at( i ).userData().toMap()[QStringLiteral( "point" )].value<QgsPointXY>(), expected.at( i ).point, 0.001 );
     if ( expected.at( i ).scale > 0 )
       QCOMPARE( results.at( 0 ).userData().toMap()[QStringLiteral( "scale" )].toDouble(), expected.at( i ).scale );
   }
@@ -65,17 +66,31 @@ void TestKadasAlternateGotoLocatorFilter::testGoto_data()
 
   QTest::newRow( "simple" ) << QStringLiteral( "4 5" ) << Results( { { QObject::tr( "Go to 4°N 5°E" ), QgsPointXY( 5, 4 ) } } );
 
-  QTest::newRow( "locale" ) << QStringLiteral( "1,234.56 789.012" ) << Results( { { QObject::tr( "Go to 1,234.56 789.012" ), QgsPointXY( 1234.56, 789.012 ) } } );
+  QTest::newRow( "locale" ) << QStringLiteral( "2679000, 1175500" ) << Results( { { QObject::tr( "Go to 2'679'000E 1'175'500N" ), QgsPointXY( 2679000, 1175500 ) } } );
 
-  QTest::newRow( "nort-west" ) << QStringLiteral( "12.345N, 67.890W" ) << Results( { { QObject::tr( "Go to 12.345°N -67.89°E" ), QgsPointXY( -67.890, 12.345 ) } } );
-  QTest::newRow( "east-south" ) << QStringLiteral( "12.345 e, 67.890 s" ) << Results( { { QObject::tr( "Go to -67.89°N 12.345°E" ), QgsPointXY( 12.345, -67.890 ) } } );
-  QTest::newRow( "degree-suffix" ) << QStringLiteral( "40deg 1' 0\" E 11deg  55' 0\" S" ) << Results( { { QObject::tr( "Go to -11.91666667°N 40.01666667°E" ), QgsPointXY( 40.0166666667, -11.9166666667 ) } } );
-  QTest::newRow( "north-east------------" ) << QStringLiteral( "14°49′48″N 01°48′45″E" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
-  QTest::newRow( "north-east-space------" ) << QStringLiteral( "14°49′48″ N 01°48′45″ E" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
-  QTest::newRow( "north-east-comma------" ) << QStringLiteral( "14°49′48″N, 01°48′45″E" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
-  QTest::newRow( "north-east-comma-space" ) << QStringLiteral( "14°49′48″ N, 01°48′45″ E" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
-  QTest::newRow( "north-east-front------" ) << QStringLiteral( "N 14°49′48″ E 01°48′45″" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
-  QTest::newRow( "north-east-front-comma" ) << QStringLiteral( "N 14°49′48″, E 01°48′45″" ) << Results( { { QObject::tr( "Go to 14.83°N 1.8125°E" ), QgsPointXY( 1.8125, 14.83 ) } } );
+  QTest::newRow( "DMS-east-north" ) << QString::fromUtf8( "9°4′12.5″E, 47°2′2.2″N" ) << Results( { { QObject::tr( "Go to 47.03394444%1N 9.070138889%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 9.0701388889, 47.03394444 ) } } );
+  QTest::newRow( "DMS-east-south" ) << QString::fromUtf8( "38°13′56.7″E,14°20′58.4″S" ) << Results( { { QObject::tr( "Go to -14.34955556%1N 38.23241667%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 38.23241667, -14.34955556 ) } } );
+  QTest::newRow( "DMS-west-north" ) << QString::fromUtf8( "87°37′37.0″W,59°18′38.8″N" ) << Results( { { QObject::tr( "Go to 59.31077778%1N -87.62694444%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -87.62694444, 59.31077778 ) } } );
+  QTest::newRow( "DMS-west-south" ) << QString::fromUtf8( "68°17′27.7″W,37°5′24.9″S" ) << Results( { { QObject::tr( "Go to -37.09025%1N -68.29102778%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -68.29102778, -37.09025 ) } } );
+
+  QTest::newRow( "DM-east-north" ) << QString::fromUtf8( "16°36.680′E,50°20.727′N" ) << Results( { { QObject::tr( "Go to 50.34545%1N 16.61133333%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 16.61133333, 50.34545 ) } } );
+  QTest::newRow( "DM-east-south" ) << QString::fromUtf8( "76°33.164′E,17°23.555′S" ) << Results( { { QObject::tr( "Go to -17.39258333%1N 76.55273333%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 76.55273333, -17.39258333 ) } } );
+  QTest::newRow( "DM-west-north" ) << QString::fromUtf8( "120°40.429′W,60°48.124′N" ) << Results( { { QObject::tr( "Go to 60.80206667%1N -120.6738167%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -120.6738167, 60.80206667 ) } } );
+  QTest::newRow( "DM-west-south" ) << QString::fromUtf8( "72°51.679′W,38°45.245′S" ) << Results( { { QObject::tr( "Go to -38.75408333%1N -72.86131667%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -72.86131667, -38.75408333 ) } } );
+
+  QTest::newRow( "DD-east-north" ) << QString::fromUtf8( "7.64649°E,59.75639°N" ) << Results( { { QObject::tr( "Go to 59.75639%1N 7.64649%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 7.64649, 59.75639 ) } } );
+  QTest::newRow( "DD-east-south" ) << QString::fromUtf8( "24.52149°E,31.87756°S" ) << Results( { { QObject::tr( "Go to -31.87756%1N 24.52149%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( 24.52149, -31.87756 ) } } );
+  QTest::newRow( "DD-west-north" ) << QString::fromUtf8( "100.98632°W,55.22902°N" ) << Results( { { QObject::tr( "Go to 55.22902%1N -100.98632%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -100.98632, 55.22902 ) } } );
+  QTest::newRow( "DD-west-south" ) << QString::fromUtf8( "65.83007°W,26.66710°S" ) << Results( { { QObject::tr( "Go to -26.6671%1N -65.83007%1E" ).arg( QString::fromUtf8( "°" ) ), QgsPointXY( -65.83007, -26.6671 ) } } );
+
+  QTest::newRow( "UTM-33V" ) << QStringLiteral( "460102, 6422026 (zone 33V)" ) << Results( { { QObject::tr( "Go to 460102, 6422026 (zone 33V)" ), QgsPointXY( 14.3261663140, 57.9381762924 ) } } );
+  QTest::newRow( "UTM-33K" ) << QStringLiteral( "754955, 7436525 (zone 33K)" ) << Results( { { QObject::tr( "Go to 754955, 7436525 (zone 33K)" ), QgsPointXY( 17.4902247957, -23.1605694189 ) } } );
+  QTest::newRow( "UTM-12R" ) << QStringLiteral( "375484, 2792615 (zone 12R)" ) << Results( { { QObject::tr( "Go to 375484, 2792615 (zone 12R)" ), QgsPointXY( -112.2363331505, 25.2446866382 ) } } );
+
+  QTest::newRow( "MGRS-Italia" ) << QStringLiteral( "32TPP 73642 62803" ) << Results( { { QObject::tr( "Go to 32TPP 73642 62803" ), QgsPointXY( 11.1620858580, 43.8978807883 ) } } );
+  QTest::newRow( "MGRS-France" ) << QStringLiteral( "31TEN 91239 96251" ) << Results( { { QObject::tr( "Go to 31TEN 91239 96251" ), QgsPointXY( 4.2187310610, 47.8131408597 ) } } );
+  QTest::newRow( "MGRS-Deutschland" ) << QStringLiteral( "32UNB 78237 14913" ) << Results( { { QObject::tr( "Go to 32UNB 78237 14913" ), QgsPointXY( 10.1074023522, 50.6807858612 ) } } );
+
   QTest::newRow( "osm.leaflet.OL" ) << QStringLiteral( "https://www.openstreetmap.org/#map=15/44.5546/6.4936" ) << Results( { { QObject::tr( "Go to 44.5546°N 6.4936°E at scale 1:22569" ), QgsPointXY( 6.4936, 44.5546 ), 22569.0 } } );
   QTest::newRow( "gmaps1" ) << QStringLiteral( "https://www.google.com/maps/@44.5546,6.4936,15.25z" ) << Results( { { QObject::tr( "Go to 44.5546°N 6.4936°E at scale 1:22569" ), QgsPointXY( 6.4936, 44.5546 ), 22569.0 } } );
   QTest::newRow( "gmaps2" ) << QStringLiteral( "https://www.google.com/maps/@7.8750,81.0149,574195m/data=!3m1!1e3" ) << Results( { { QObject::tr( "Go to 7.875°N 81.0149°E at scale 1:6.49572e+07" ), QgsPointXY( 81.0149, 7.8750 ) } } );

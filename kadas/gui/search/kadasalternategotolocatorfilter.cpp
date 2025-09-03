@@ -618,7 +618,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
     if ( ok )
     {
-      result.displayString = QString( "%1, %2 (%3 %4%5)" )
+      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" )
                                .arg( utm.easting )
                                .arg( utm.northing )
                                .arg( tr( "zone" ) )
@@ -653,7 +653,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
     if ( ok )
     {
-      result.displayString = QString( "%1, %2 (%3 %4%5)" )
+      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" )
                                .arg( utm.easting )
                                .arg( utm.northing )
                                .arg( tr( "zone" ) )
@@ -692,7 +692,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
       QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
       if ( ok )
       {
-        result.displayString = QString( "%1%2%3 %4 %5" )
+        result.displayString = tr( "Go to %1%2%3 %4 %5" )
                                  .arg( mgrs.zoneNumber )
                                  .arg( mgrs.zoneLetter )
                                  .arg( mgrs.letter100kID )
