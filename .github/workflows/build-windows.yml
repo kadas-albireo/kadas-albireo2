@@ -51,6 +51,8 @@ jobs:
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
+        env:
+          X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
         run: |
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
             # Pull Request Build: Use PR number as patch version
