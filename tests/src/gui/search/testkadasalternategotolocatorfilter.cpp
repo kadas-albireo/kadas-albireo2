@@ -47,6 +47,7 @@ void TestKadasAlternateGotoLocatorFilter::testGoto()
   QgsMapCanvas mapCanvas;
   mapCanvas.setDestinationCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
   mapCanvas.mapSettings().setOutputDpi( 96 );
+  mapCanvas.mapSettings().setOutputSize( QSize( 638, 478 ) );
   KadasAlternateGotoLocatorFilter filter( &mapCanvas );
 
   QList<QgsLocatorResult> results = gatherResults( &filter, string, QgsLocatorContext() );
