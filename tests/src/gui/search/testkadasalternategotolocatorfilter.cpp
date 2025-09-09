@@ -45,7 +45,7 @@ void TestKadasAlternateGotoLocatorFilter::testGoto()
   QFETCH( Results, expected );
 
   QgsMapCanvas mapCanvas;
-  mapCanvas.setDestinationCrs(QgsCoordinateReferenceSystem("EPSG:4326"));
+  mapCanvas.setDestinationCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
   KadasAlternateGotoLocatorFilter filter( &mapCanvas );
 
   QList<QgsLocatorResult> results = gatherResults( &filter, string, QgsLocatorContext() );
