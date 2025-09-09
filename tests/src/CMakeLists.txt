@@ -35,5 +35,4 @@ macro(add_kadas_test TESTSRC)
   )
 endmacro()
 
-add_subdirectory(core)
 add_subdirectory(gui)

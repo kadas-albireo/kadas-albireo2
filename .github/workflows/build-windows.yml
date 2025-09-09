@@ -135,6 +135,8 @@ jobs:
           cmake --build build --config Release
 
       - name: 🧪 Run CTest
+        env:
+          QT_LOGGING_TO_CONSOLE: "1"
         run: |
           ctest --test-dir build --output-on-failure --config Release
 
