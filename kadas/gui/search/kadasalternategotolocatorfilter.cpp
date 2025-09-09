@@ -458,12 +458,12 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
 
         QgsScaleCalculator calculator;
         calculator.setMapUnits( currentCrs.mapUnits() );
-        qDebug() << "currentCrs.mapUnits():" << currentCrs.mapUnits();
+        qInfo() << "currentCrs.mapUnits():" << currentCrs.mapUnits();
         calculator.setDpi( mCanvas->mapSettings().outputDpi() );
-        qDebug() << "mCanvas->mapSettings().outputDpi():" << mCanvas->mapSettings().outputDpi();
+        qInfo() << "mCanvas->mapSettings().outputDpi():" << mCanvas->mapSettings().outputDpi();
         scale = calculator.calculate( extent, outputSize.width() );
-        qDebug() << "extent:" << extent;
-        qDebug() << "outputSize.width():" << outputSize.width();
+        qInfo() << "extent:" << extent;
+        qInfo() << "outputSize.width():" << outputSize.width();
       }
 
       if ( scale > 0.0 )
