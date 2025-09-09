@@ -463,7 +463,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
         qInfo() << "mCanvas->mapSettings().outputDpi():" << mCanvas->mapSettings().outputDpi();
         scale = calculator.calculate( extent, outputSize.width() );
         qInfo() << "extent:" << extent;
-        qInfo() << "outputSize:" << outputSize();
+        qInfo() << "outputSize:" << outputSize;
       }
 
       if ( scale > 0.0 )
