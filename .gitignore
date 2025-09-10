@@ -7,5 +7,7 @@ kadas/resources/resources.qrc
 .idea
 *.orig
 .DS_Store
+.vs
 .vscode
 __pycache__
+out

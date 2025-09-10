@@ -140,3 +140,7 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build
+
+      - name: 🧪 Run CTest
+        run: |
+          ctest --test-dir build --output-on-failure

@@ -148,6 +148,11 @@ if(WITH_BINDINGS)
   add_subdirectory(python)
 endif()
 
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
+
 option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
 if(INSTALL_DEMO_DATA)
   install(FILES "share/settings_patch.ini" DESTINATION "share/kadas/")
