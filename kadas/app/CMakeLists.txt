@@ -1,7 +1,6 @@
 find_package(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
 
 set(kadas_SRC
-    main.cpp
     kadasapplayerhandling.cpp
     kadasapplication.cpp
     kadasbookmarksmenu.cpp
@@ -206,6 +205,7 @@ endif(WIN32)
 add_executable(
   kadas
   ${WIN32_SHOW_CONSOLE}
+  main.cpp
   ${kadas_SRC}
   ${kadas_HDR}
   ${kadas_UI}
@@ -217,7 +217,6 @@ add_executable(
 
 add_library(
   kadas_app
-  ${WIN32_SHOW_CONSOLE}
   ${kadas_SRC}
   ${kadas_HDR}
   ${kadas_UI}
@@ -321,6 +320,11 @@ file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
 
 install(TARGETS kadas DESTINATION bin)
 install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
+
+generate_export_header(
+  kadas_app BASE_NAME KADAS_APP EXPORT_FILE_NAME kadas_app.h
+)
+set(kadas_HDR ${kadas_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_app.h)
 
 install(
   TARGETS kadas_app

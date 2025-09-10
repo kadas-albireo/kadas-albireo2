@@ -3,7 +3,7 @@ add_subdirectory(analysis)
 add_subdirectory(gui)
 add_subdirectory(app)
 
-if(ENABLE_TESTS)
+if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
