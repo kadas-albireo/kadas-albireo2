@@ -381,14 +381,25 @@
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
-        <source>at scale 1:%1 </source>
-        <translation>alla scala 1:%1</translation>
+        <source>at scale 1:%1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="621"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="656"/>
+        <source>Go to %1, %2 (%3 %4%5)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="659"/>
         <source>zone</source>
         <translation>Zona</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="695"/>
+        <source>Go to %1%2%3 %4 %5</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
