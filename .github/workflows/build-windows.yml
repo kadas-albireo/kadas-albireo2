@@ -86,6 +86,7 @@ jobs:
                 -B build \
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
+                -D WITH_QTWEBKIT=OFF \
                 -D WITH_BINDINGS=ON \
                 -D INSTALL_DEMO_DATA=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
