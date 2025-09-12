@@ -209,6 +209,8 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
   map->setRendererUsage( Qgis::RendererUsage::View );
 
+  map->setMaxTerrainScreenError( 2.0 );
+
   connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] {
     map->setTransformContext( QgsProject::instance()->transformContext() );
   } );
@@ -232,8 +234,8 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
     QgsDemTerrainGenerator *demTerrainGen = new QgsDemTerrainGenerator;
     demTerrainGen->setCrs( map->crs(), QgsProject::instance()->transformContext() );
     demTerrainGen->setLayer( heightLayer );
-    demTerrainGen->setResolution( 16 );
-    demTerrainGen->setSkirtHeight( 1000 );
+    demTerrainGen->setResolution( 32 );
+    demTerrainGen->setSkirtHeight( 200 );
     map->setTerrainGenerator( demTerrainGen );
   }
 
