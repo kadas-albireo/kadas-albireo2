@@ -15,7 +15,6 @@
           "py-pyqt5-sip",
           "py-qscintilla-qt5",
           "qscintilla-qt5",
-          "qt5-webkit",
           "vcpkg-qmake-qt5"
         ]
       },
@@ -130,17 +129,6 @@
           "features": [
             "bindings",
             "desktop"
-          ]
-        }
-      ]
-    },
-    "webkit": {
-      "description": "Build with Qt Webkit",
-      "dependencies": [
-        {
-          "name": "qgis",
-          "features": [
-            "webkit"
           ]
         }
       ]
