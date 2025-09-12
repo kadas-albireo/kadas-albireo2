@@ -123,12 +123,6 @@
       "dependencies": [
         "fastcgi"
       ]
-    },
-    "webkit": {
-      "description": "webkit",
-      "dependencies": [
-        "qt5-webkit"
-      ]
     }
   }
 }

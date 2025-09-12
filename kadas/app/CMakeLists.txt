@@ -263,16 +263,8 @@ if(WITH_CRASHREPORT)
   target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
 endif()
 
-if(WITH_QTWEBKIT)
-  target_link_libraries(kadas Qt5::WebKitWidgets)
-endif()
-
 if(WITH_BINDINGS)
   add_definitions(-DWITH_BINDINGS)
-endif()
-
-if(WITH_QTWEBKIT)
-  add_definitions(-DWITH_QTWEBKIT)
 endif()
 
 file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt

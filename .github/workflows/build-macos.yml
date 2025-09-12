@@ -96,7 +96,6 @@ jobs:
                 -G Ninja \
                 -B build \
                 -D KADAS_VERSION=${MAJOR}.${MINOR}.${PATCH} \
-                -D WITH_QTWEBKIT=OFF \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \

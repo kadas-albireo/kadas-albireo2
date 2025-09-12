@@ -26,10 +26,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#ifdef WITH_QTWEBKIT
-#include <QWebView>
-#endif
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 
@@ -67,41 +63,8 @@ class KadasNewsWebView : public QAxWidget
     }
 };
 
-#elif defined( WITH_QTWEBKIT )
-class ExternalLinkDelegateWebView : public QWebView
-{
-  public:
-    ExternalLinkDelegateWebView( QWidget *parent = nullptr )
-      : QWebView( parent )
-    {
-      connect( this, &QWebView::urlChanged, this, &ExternalLinkDelegateWebView::openUrlInExternalBrowserAndDestory );
-    }
-
-  private:
-    void openUrlInExternalBrowserAndDestory( const QUrl &url )
-    {
-      QDesktopServices::openUrl( url );
-      deleteLater();
-    }
-};
-
-class KadasNewsWebView : public QWebView
-{
-  public:
-    KadasNewsWebView( QWidget *parent = nullptr )
-      : QWebView( parent )
-    {
-      settings()->setAttribute( QWebSettings::JavascriptCanOpenWindows, true );
-      settings()->setAttribute( QWebSettings::JavascriptCanAccessClipboard, true );
-    }
-
-  protected:
-    QWebView *createWindow( QWebPage::WebWindowType type ) override
-    {
-      return new ExternalLinkDelegateWebView( this );
-    }
-};
 #else
+
 class KadasNewsWebView : public QWidget
 {
   public:
