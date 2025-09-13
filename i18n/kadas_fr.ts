@@ -5184,7 +5184,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="196"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="159"/>
         <source>KADAS Newsletter</source>
         <translation>Newsletter KADAS</translation>
     </message>

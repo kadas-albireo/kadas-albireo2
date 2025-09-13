@@ -5181,7 +5181,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="196"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="159"/>
         <source>KADAS Newsletter</source>
         <translation>Newsletter KADAS</translation>
     </message>

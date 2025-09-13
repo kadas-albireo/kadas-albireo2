@@ -5183,7 +5183,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="196"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="159"/>
         <source>KADAS Newsletter</source>
         <translation>KADAS Newsletter</translation>
     </message>
