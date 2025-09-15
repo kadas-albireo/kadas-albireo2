@@ -115,7 +115,7 @@ KadasMeasureWidget::KadasMeasureWidget( KadasMapItem *item )
   connect( clearButton, &QToolButton::clicked, this, &KadasMeasureWidget::clearRequested );
   layout()->addWidget( clearButton );
 
-  connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
+  // TODO !!! connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
 
   setFixedWidth( 350 );
 }
@@ -138,7 +138,7 @@ void KadasMeasureWidget::syncWidgetToItem()
 void KadasMeasureWidget::setItem( KadasMapItem *item )
 {
   KadasMapItemEditor::setItem( item );
-  connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
+  // TODO !!! connect( mItem, &KadasMapItem::changed, this, &KadasMeasureWidget::updateTotal );
 }
 
 void KadasMeasureWidget::setDistanceUnit( int index )

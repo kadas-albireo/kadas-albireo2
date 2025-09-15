@@ -84,7 +84,7 @@ void KadasCircleItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 KadasItemPos KadasCircleItem::position() const
@@ -365,7 +365,7 @@ void KadasCircleItem::measureGeometry()
     QStringList measurements;
     measurements.append( formatArea( area, areaBaseUnit() ) );
     measurements.append( "" ); // Empty line to avoid center marker covering the measurement label text
-    measurements.append( tr( "Radius: %1" ).arg( formatLength( radius, distanceBaseUnit() ) ) );
+    measurements.append( QObject::tr( "Radius: %1" ).arg( formatLength( radius, distanceBaseUnit() ) ) );
     addMeasurements( QStringList() << measurements, KadasItemPos::fromPoint( state()->centers[i] ) );
     totalArea += area;
   }

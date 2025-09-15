@@ -347,7 +347,7 @@ void KadasMapToolCreateItem::createItem()
   }
   mItem->setSelected( mSelectItems );
   mCurrentItemData->props = mItem->getProps();
-  connect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
+  // TODO connect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
   KadasMapCanvasItemManager::addItem( mItem );
 }
 
@@ -420,7 +420,7 @@ void KadasMapToolCreateItem::commitItem()
     return;
   }
   mItem->setSelected( false );
-  disconnect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
+  // TODO !!! disconnect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
   if ( mEditor )
   {
     mEditor->setItem( nullptr );

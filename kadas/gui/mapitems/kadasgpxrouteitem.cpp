@@ -52,26 +52,26 @@ void KadasGpxRouteItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setNumber( const QString &number )
 {
   mNumber = number;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxRouteItem::margin() const
@@ -87,9 +87,9 @@ KadasMapItem::Margin KadasGpxRouteItem::margin() const
   return m;
 }
 
-void KadasGpxRouteItem::render( QgsRenderContext &context ) const
+void KadasGpxRouteItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
-  KadasLineItem::render( context );
+  KadasLineItem::render( context, feedback );
 
   // Draw name label at regular 5 * label width distance
   if ( !mName.isEmpty() && !constState()->points.isEmpty() && constState()->points.front().size() >= 2 )

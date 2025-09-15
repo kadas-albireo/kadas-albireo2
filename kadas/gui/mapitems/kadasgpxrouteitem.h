@@ -21,16 +21,16 @@
 
 class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
 {
-    Q_OBJECT
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString number READ number WRITE setNumber )
-    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
+    // Q_OBJECT
+    // Q_PROPERTY( QString name READ name WRITE setName )
+    // Q_PROPERTY( QString number READ number WRITE setNumber )
+    // Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
+    // Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxRouteItem( QObject *parent = nullptr );
 
-    QString itemName() const override { return tr( "Route" ); }
+    QString itemName() const override { return QObject::tr( "Route" ); }
     QString exportName() const override;
 
     const QString &name() const { return mName; }
@@ -46,7 +46,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     void setLabelColor( const QColor &labelColor );
 
     Margin margin() const override;
-    void render( QgsRenderContext &context ) const override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxRouteItem(); }

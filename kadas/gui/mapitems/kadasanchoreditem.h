@@ -22,9 +22,9 @@
 
 class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 {
-    Q_OBJECT
-    Q_PROPERTY( double anchorX READ anchorX WRITE setAnchorX )
-    Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
+    // Q_OBJECT
+    // Q_PROPERTY( double anchorX READ anchorX WRITE setAnchorX )
+    // Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
 
   public:
     KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs );
@@ -35,7 +35,7 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     double anchorY() const { return mAnchorY; }
     void setAnchorY( double anchorY );
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;

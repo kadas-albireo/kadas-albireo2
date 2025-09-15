@@ -23,12 +23,12 @@
 // MilX items always in EPSG:4326
 class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 {
-    Q_OBJECT
-    Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
-    Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
-    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
-    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
-    Q_PROPERTY( QString symbolType READ symbolType WRITE setSymbolType )
+    // Q_OBJECT
+    // Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
+    // Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
+    // Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
+    // Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
+    // Q_PROPERTY( QString symbolType READ symbolType WRITE setSymbolType )
 
   public:
     KadasMilxItem();
@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QImage symbolImage() const override;
     QPointF symbolAnchor() const override { return mSymbolAnchor; }
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
@@ -60,7 +60,7 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
 
-    void render( QgsRenderContext &context ) const override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif

@@ -22,17 +22,17 @@
 
 class KADAS_GUI_EXPORT KadasTextItem : public KadasRectangleItemBase
 {
-    Q_OBJECT
-    Q_PROPERTY( QString text READ text WRITE setText )
-    Q_PROPERTY( QColor outlineColor READ outlineColor WRITE setOutlineColor )
-    Q_PROPERTY( QColor fillColor READ fillColor WRITE setFillColor )
-    Q_PROPERTY( QFont font READ font WRITE setFont )
-    Q_PROPERTY( bool frameAutoResize READ frameAutoResize WRITE setFrameAutoResize )
+    // Q_OBJECT
+    // Q_PROPERTY( QString text READ text WRITE setText )
+    // Q_PROPERTY( QColor outlineColor READ outlineColor WRITE setOutlineColor )
+    // Q_PROPERTY( QColor fillColor READ fillColor WRITE setFillColor )
+    // Q_PROPERTY( QFont font READ font WRITE setFont )
+    // Q_PROPERTY( bool frameAutoResize READ frameAutoResize WRITE setFrameAutoResize )
 
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs );
 
-    QString itemName() const override { return tr( "Text" ); }
+    QString itemName() const override { return QObject::tr( "Text" ); }
 
     void setText( const QString &text );
     const QString &text() const { return mText; }

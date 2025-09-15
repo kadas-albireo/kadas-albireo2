@@ -21,15 +21,15 @@
 
 class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 {
-    Q_OBJECT
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
+    // Q_OBJECT
+    // Q_PROPERTY( QString name READ name WRITE setName )
+    // Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
+    // Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxWaypointItem();
 
-    QString itemName() const override { return tr( "Waypoint" ); }
+    QString itemName() const override { return QObject::tr( "Waypoint" ); }
     QString exportName() const override;
 
     const QString &name() const { return mName; }
@@ -42,7 +42,7 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
     void setLabelColor( const QColor &labelColor );
 
     Margin margin() const override;
-    void render( QgsRenderContext &context ) const override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif

@@ -43,8 +43,8 @@ class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
     static void clear();
 
   signals:
-    void itemAdded( const KadasMapItem *item );
-    void itemWillBeRemoved( const KadasMapItem *item );
+    void itemAdded( KadasMapItem *item );
+    void itemWillBeRemoved( KadasMapItem *item );
 
   private:
     QList<KadasMapItem *> mMapItems;

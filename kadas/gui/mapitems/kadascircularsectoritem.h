@@ -23,12 +23,12 @@ class QgsMultiSurface;
 
 class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 {
-    Q_OBJECT
+    // Q_OBJECT
 
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
 
-    QString itemName() const override { return tr( "Circular Sector" ); }
+    QString itemName() const override { return QObject::tr( "Circular Sector" ); }
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 

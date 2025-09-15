@@ -1354,7 +1354,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
 }
 
-void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )
+void KadasMainWindow::addMapCanvasItem( KadasMapItem *item )
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
   Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene

@@ -117,14 +117,14 @@ void KadasRectangleItemBase::setFrameVisible( bool frame )
     state()->mOffsetY = 0;
   }
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasRectangleItemBase::setPositionLocked( bool locked )
 {
   mPosLocked = locked;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasRectangleItemBase::setPosition( const KadasItemPos &pos )
@@ -142,7 +142,7 @@ void KadasRectangleItemBase::setState( const KadasMapItem::State *state )
   KadasMapItem::setState( state );
 }
 
-KadasItemRect KadasRectangleItemBase::boundingBox() const
+QgsRectangle KadasRectangleItemBase::boundingBox() const
 {
   double xmin = constState()->mPos.x(), xmax = constState()->mPos.x();
   double ymin = constState()->mPos.y(), ymax = constState()->mPos.y();
@@ -153,7 +153,7 @@ KadasItemRect KadasRectangleItemBase::boundingBox() const
     ymin = std::min( ymin, p.y() );
     ymax = std::max( ymax, p.y() );
   }
-  return KadasItemRect( xmin, ymin, xmax, ymax );
+  return QgsRectangle( xmin, ymin, xmax, ymax );
 }
 
 KadasMapItem::Margin KadasRectangleItemBase::margin() const
@@ -216,7 +216,7 @@ bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapS
   return intersects;
 }
 
-void KadasRectangleItemBase::render( QgsRenderContext &context ) const
+void KadasRectangleItemBase::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   QgsPoint pos( constState()->mPos );
   pos.transform( context.coordinateTransform() );
@@ -462,11 +462,11 @@ void KadasRectangleItemBase::edit( const EditContext &context, const AttribValue
 
 void KadasRectangleItemBase::populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
 {
-  QAction *frameAction = menu->addAction( tr( "Frame visible" ), [this]( bool active ) { setFrameVisible( active ); } );
+  QAction *frameAction = menu->addAction( QObject::tr( "Frame visible" ), [this]( bool active ) { setFrameVisible( active ); } );
   frameAction->setCheckable( true );
   frameAction->setChecked( constState()->frame() );
 
-  QAction *lockedAction = menu->addAction( tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
+  QAction *lockedAction = menu->addAction( QObject::tr( "Position locked" ), [this]( bool active ) { setPositionLocked( active ); } );
   lockedAction->setCheckable( true );
   lockedAction->setChecked( mPosLocked );
 

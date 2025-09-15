@@ -38,7 +38,7 @@ KadasSymbolAttributesEditor::KadasSymbolAttributesEditor( KadasMapItem *item )
 
   connect( mLineEditName, &QLineEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
   connect( mTextEditRemarks, &QTextEdit::textChanged, this, &KadasSymbolAttributesEditor::syncWidgetToItem );
-  connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+  // TODO !!! connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   setEnabled( false );
 }
 
@@ -51,12 +51,12 @@ void KadasSymbolAttributesEditor::setItem( KadasMapItem *item )
 {
   if ( mItem )
   {
-    disconnect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+    // TODO !!! disconnect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   }
   KadasMapItemEditor::setItem( item );
   if ( mItem )
   {
-    connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
+    // TODO !!! connect( mItem, &KadasMapItem::changed, this, &KadasSymbolAttributesEditor::adjustVisiblity );
   }
 }
 

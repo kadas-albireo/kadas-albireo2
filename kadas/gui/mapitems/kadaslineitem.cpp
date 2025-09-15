@@ -82,7 +82,7 @@ void KadasLineItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 KadasItemPos KadasLineItem::position() const
@@ -259,7 +259,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
 {
   if ( context.vidx.vertex == 0 )
   {
-    menu->addAction( tr( "Continue line" ), menu, [this, context] {
+    menu->addAction( QObject::tr( "Continue line" ), menu, [this, context] {
           std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
           recomputeDerived();
         } )
@@ -267,11 +267,11 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
   {
-    menu->addAction( tr( "Continue line" ) )->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
+    menu->addAction( QObject::tr( "Continue line" ) )->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
   }
   if ( context.vidx.vertex >= 0 )
   {
-    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), menu, [this, context] {
+    QAction *deleteNodeAction = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), QObject::tr( "Delete node" ), menu, [this, context] {
       state()->points[context.vidx.part].removeAt( context.vidx.vertex );
       recomputeDerived();
     } );
@@ -279,7 +279,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), QObject::tr( "Add node" ), menu, [=] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );
@@ -346,7 +346,7 @@ void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::A
   setMeasurementsEnabled( true );
   mMeasurementMode = measurementMode;
   mAngleUnit = angleUnit;
-  emit geometryChanged(); // Trigger re-measurement
+  // TODO !!! emit geometryChanged(); // Trigger re-measurement
 }
 
 void KadasLineItem::measureGeometry()
@@ -373,7 +373,7 @@ void KadasLineItem::measureGeometry()
           totLength += length;
           addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ), KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
-        QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
+        QString totLengthStr = QObject::tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
         addMeasurements( QStringList() << totLengthStr, KadasItemPos::fromPoint( part.last() ), false );
         totalLength += totLength;
         break;
@@ -405,7 +405,7 @@ void KadasLineItem::measureGeometry()
           QString segmentAngle = formatAngle( angle, mAngleUnit );
           addMeasurements( QStringList() << formatLength( length, distanceBaseUnit() ) << segmentAngle, KadasItemPos( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ) );
         }
-        QString totLengthStr = tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
+        QString totLengthStr = QObject::tr( "Tot.: %1" ).arg( formatLength( totLength, distanceBaseUnit() ) );
         addMeasurements( QStringList() << totLengthStr, KadasItemPos::fromPoint( part.last() ), false );
         totalLength += totLength;
         break;

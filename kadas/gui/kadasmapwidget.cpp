@@ -102,8 +102,9 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   mapTool->setParent( mMapCanvas );
   mMapCanvas->setMapTool( mapTool );
 
-  for ( const KadasMapItem *item : KadasMapCanvasItemManager::items() )
+  for ( KadasMapItem *item : KadasMapCanvasItemManager::items() )
   {
+    // TODO check ok not const
     addMapCanvasItem( item );
   }
 
@@ -336,7 +337,7 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
   return QObject::eventFilter( obj, ev );
 }
 
-void KadasMapWidget::addMapCanvasItem( const KadasMapItem *item )
+void KadasMapWidget::addMapCanvasItem( KadasMapItem *item )
 {
   KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
   Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene

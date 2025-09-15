@@ -21,12 +21,12 @@
 
 class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
 {
-    Q_OBJECT
+    // Q_OBJECT
 
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, KadasGeometryItem::IconType icon = KadasGeometryItem::IconType::ICON_CIRCLE );
 
-    QString itemName() const override { return tr( "Point" ); }
+    QString itemName() const override { return QObject::tr( "Point" ); }
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;

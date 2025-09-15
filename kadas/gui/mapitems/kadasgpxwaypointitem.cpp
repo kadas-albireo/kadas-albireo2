@@ -59,19 +59,19 @@ void KadasGpxWaypointItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGpxWaypointItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGpxWaypointItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxWaypointItem::margin() const
@@ -85,9 +85,9 @@ KadasMapItem::Margin KadasGpxWaypointItem::margin() const
   return m;
 }
 
-void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
+void KadasGpxWaypointItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
-  KadasPointItem::render( context );
+  KadasPointItem::render( context, feedback );
 
   // Draw name label
   if ( !mName.isEmpty() && !constState()->points.isEmpty() )

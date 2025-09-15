@@ -22,20 +22,20 @@
 
 class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
 {
-    Q_OBJECT
+    // Q_OBJECT
 
   public:
     KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs );
 
     void setSelectedItems( const QList<KadasMapItem *> &items );
 
-    QString itemName() const override { return tr( "Selection" ); }
+    QString itemName() const override { return QObject::tr( "Selection" ); }
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override { return QList<KadasMapItem::Node>(); }
     bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
-    void render( QgsRenderContext &context ) const override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override { return QString(); }
 #endif
@@ -77,7 +77,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
   private:
     QList<KadasMapItem *> mItems;
 
-    KadasMapRect itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const;
+    QgsRectangle itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const;
 };
 
 #endif // KADASPICTUREITEM_H

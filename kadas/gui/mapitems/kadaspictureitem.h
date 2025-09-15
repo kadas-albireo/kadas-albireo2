@@ -22,8 +22,8 @@
 
 class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 {
-    Q_OBJECT
-    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+    // Q_OBJECT
+    // Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
 
   public:
     KadasPictureItem( const QgsCoordinateReferenceSystem &crs );
@@ -33,7 +33,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
     const QString &filePath() const { return mFilePath; }
     void setFilePath( const QString &filePath );
 
-    QString itemName() const override { return tr( "Picture" ); }
+    QString itemName() const override { return QObject::tr( "Picture" ); }
 
     QImage symbolImage() const override { return mImage; }
 

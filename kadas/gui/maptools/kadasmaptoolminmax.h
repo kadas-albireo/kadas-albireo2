@@ -51,8 +51,8 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
   private:
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
-    QPointer<KadasSymbolItem> mPinMin;
-    QPointer<KadasSymbolItem> mPinMax;
+    KadasSymbolItem *mPinMin = nullptr;
+    KadasSymbolItem *mPinMax = nullptr;
     bool mPickFeature = false;
     QAction *mActionViewshed = nullptr;
     QAction *mActionProfile = nullptr;

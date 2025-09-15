@@ -43,17 +43,18 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
       std::stable_sort( mRenderItems.begin(), mRenderItems.end(), []( KadasMapItem *a, KadasMapItem *b ) { return a->zIndex() < b->zIndex(); } );
       mRenderOpacity = layer->opacity();
     }
+
     bool render() override
     {
       bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
-      for ( const KadasMapItem *item : std::as_const( mRenderItems ) )
+      for ( KadasMapItem *item : std::as_const( mRenderItems ) )
       {
         if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
         {
           renderContext()->painter()->save();
           renderContext()->painter()->setOpacity( mRenderOpacity );
           renderContext()->setCoordinateTransform( QgsCoordinateTransform( item->crs(), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() ) );
-          item->render( *renderContext() );
+          item->render( *renderContext(), feedback() );
           renderContext()->painter()->restore();
         }
       }

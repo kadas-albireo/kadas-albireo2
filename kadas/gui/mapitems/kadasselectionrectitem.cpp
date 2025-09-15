@@ -54,11 +54,11 @@ void KadasSelectionRectItem::setSelectedItems( const QList<KadasMapItem *> &item
   update();
 }
 
-KadasItemRect KadasSelectionRectItem::boundingBox() const
+QgsRectangle KadasSelectionRectItem::boundingBox() const
 {
   if ( mItems.isEmpty() )
   {
-    return KadasItemRect();
+    return QgsRectangle();
   }
   QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
   QgsRectangle rect = QgsCoordinateTransform( mItems.front()->crs(), crs(), tctx ).transformBoundingBox( mItems.front()->boundingBox() );
@@ -70,7 +70,7 @@ KadasItemRect KadasSelectionRectItem::boundingBox() const
     rect.setXMaximum( std::max( rect.xMaximum(), itemRect.xMaximum() ) );
     rect.setYMaximum( std::max( rect.yMaximum(), itemRect.yMaximum() ) );
   }
-  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
 KadasMapItem::Margin KadasSelectionRectItem::margin() const
@@ -91,7 +91,7 @@ KadasMapItem::Margin KadasSelectionRectItem::margin() const
   return m;
 }
 
-KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const
+QgsRectangle KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSystem &mapCrs, double mup ) const
 {
   if ( mItems.isEmpty() )
   {
@@ -123,7 +123,7 @@ bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapS
   {
     return false;
   }
-  KadasMapRect mapRect = itemsRect( settings.destinationCrs(), settings.mapUnitsPerPixel() );
+  QgsRectangle mapRect = itemsRect( settings.destinationCrs(), settings.mapUnitsPerPixel() );
 
   QgsPolygon itemRect;
   QgsLineString *points = new QgsLineString();
@@ -141,14 +141,14 @@ bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapS
   return intersects;
 }
 
-void KadasSelectionRectItem::render( QgsRenderContext &context ) const
+void KadasSelectionRectItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   if ( mItems.isEmpty() )
   {
     return;
   }
 
-  KadasMapRect mapRect = itemsRect( context.coordinateTransform().destinationCrs(), context.mapToPixel().mapUnitsPerPixel() );
+  QgsRectangle mapRect = itemsRect( context.coordinateTransform().destinationCrs(), context.mapToPixel().mapUnitsPerPixel() );
   QList<QgsPoint> points = QList<QgsPoint>()
                            << QgsPoint( mapRect.xMinimum(), mapRect.yMinimum() )
                            << QgsPoint( mapRect.xMaximum(), mapRect.yMinimum() )

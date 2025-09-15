@@ -23,8 +23,8 @@ class QgsMultiPolygon;
 
 class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
 {
-    Q_OBJECT
-    Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
+    // Q_OBJECT
+    // Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
     KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
@@ -32,7 +32,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );
 
-    QString itemName() const override { return tr( "Polygon" ); }
+    QString itemName() const override { return QObject::tr( "Polygon" ); }
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 

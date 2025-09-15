@@ -70,7 +70,7 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
 
   mDa.setSourceCrs( crs, QgsProject::instance()->transformContext() );
   mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
-  connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
+  // TODO !!! connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
 }
 
 KadasGeometryItem::~KadasGeometryItem()
@@ -78,7 +78,7 @@ KadasGeometryItem::~KadasGeometryItem()
   delete mGeometry;
 }
 
-void KadasGeometryItem::render( QgsRenderContext &context ) const
+void KadasGeometryItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   if ( !mGeometry )
   {
@@ -119,7 +119,7 @@ void KadasGeometryItem::render( QgsRenderContext &context ) const
   QgsPoint vertex;
   while ( paintGeom->nextVertex( vertexId, vertex ) )
   {
-    drawVertex( context, vertex.x(), vertex.y() );
+    drawVertex( context.painter(), dpiScale, vertex.x(), vertex.y() );
   }
 
   // Draw measurement labels
@@ -180,10 +180,8 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
   return outString;
 }
 
-void KadasGeometryItem::drawVertex( QgsRenderContext &context, double x, double y ) const
+void KadasGeometryItem::drawVertex( QPainter *p, double dpiScale, double x, double y ) const
 {
-  QPainter *p = context.painter();
-  double dpiScale = outputDpiScale( context );
   qreal iconSize = mIconSize * mSymbolScale * dpiScale;
   qreal s = ( iconSize - 1 ) / 2;
   p->save();
@@ -266,7 +264,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
 {
   delete mGeometry;
   mGeometry = geom;
-  emit geometryChanged();
+  // TODO !!! emit geometryChanged();
 }
 
 bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
@@ -341,48 +339,48 @@ void KadasGeometryItem::setOutline( const QPen &pen )
 {
   mPen = pen;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGeometryItem::setFill( const QBrush &brush )
 {
   mBrush = brush;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconSize( int iconSize )
 {
   mIconSize = iconSize;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconType( IconType iconType )
 {
   mIconType = iconType;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconOutline( const QPen &iconPen )
 {
   mIconPen = iconPen;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
 {
   mIconBrush = iconBrush;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
-KadasItemRect KadasGeometryItem::boundingBox() const
+QgsRectangle KadasGeometryItem::boundingBox() const
 {
   QgsRectangle bbox = mGeometry ? mGeometry->boundingBox() : QgsRectangle();
-  return KadasItemRect( bbox.xMinimum(), bbox.yMinimum(), bbox.xMaximum(), bbox.yMaximum() );
+  return bbox;
 }
 
 QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settings ) const
@@ -401,7 +399,7 @@ void KadasGeometryItem::setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit
 {
   mMeasureGeometry = enabled;
   mBaseUnit = baseUnit;
-  emit geometryChanged(); // Trigger re-measurement
+  // TODO !!! emit geometryChanged(); // Trigger re-measurement
 }
 
 Qgis::DistanceUnit KadasGeometryItem::distanceBaseUnit() const

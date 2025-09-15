@@ -83,7 +83,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  KadasMapRect filterRect;
+  QgsRectangle filterRect;
   filterRect.setXMinimum( mapPos.x() - radiusmu );
   filterRect.setXMaximum( mapPos.x() + radiusmu );
   filterRect.setYMinimum( mapPos.y() - radiusmu );

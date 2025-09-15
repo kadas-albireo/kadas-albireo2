@@ -21,13 +21,13 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
-KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas )
+KadasMapCanvasItem::KadasMapCanvasItem( KadasMapItem *item, QgsMapCanvas *canvas )
   : QgsMapCanvasItem( canvas ), mItem( item )
 {
   setZValue( mItem->zIndex() );
-  connect( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
-  connect( item, &QObject::destroyed, this, &QObject::deleteLater );
-  connect( canvas, &QgsMapCanvas::scaleChanged, this, &KadasMapCanvasItem::updateRect );
+  // TODO !!! connect( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
+  // TODO !!! connect( item, &QObject::destroyed, this, &QObject::deleteLater );
+  // TODO !!! connect( canvas, &QgsMapCanvas::scaleChanged, this, &KadasMapCanvasItem::updateRect );
   updateRect();
 }
 
@@ -65,7 +65,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
     rc.painter()->save();
     rc.painter()->translate( -pos() );
     rc.painter()->save();
-    mItem->render( rc );
+    mItem->render( rc, nullptr );
     rc.painter()->restore();
 
     if ( mItem->selected() )

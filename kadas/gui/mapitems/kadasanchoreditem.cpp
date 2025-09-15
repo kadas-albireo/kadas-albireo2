@@ -66,14 +66,14 @@ void KadasAnchoredItem::setAnchorX( double anchorX )
 {
   mAnchorX = anchorX;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasAnchoredItem::setAnchorY( double anchorY )
 {
   mAnchorY = anchorY;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasAnchoredItem::setPosition( const KadasItemPos &pos )
@@ -89,7 +89,7 @@ void KadasAnchoredItem::setAngle( double angle )
   update();
 }
 
-KadasItemRect KadasAnchoredItem::boundingBox() const
+QgsRectangle KadasAnchoredItem::boundingBox() const
 {
   return KadasItemRect( constState()->pos, constState()->pos );
 }

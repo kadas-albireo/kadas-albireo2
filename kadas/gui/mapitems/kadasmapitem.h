@@ -21,6 +21,7 @@
 #include <QWidget>
 
 #include <qgis/qgsabstractgeometry.h>
+#include <qgis/qgsannotationitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsrectangle.h>
@@ -274,30 +275,33 @@ class KADAS_GUI_EXPORT KadasItemRect
 // clang-format on
 #endif
 
-class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
+class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
 {
-    Q_OBJECT
-    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
-    Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
-    Q_PROPERTY( QString editor READ editor WRITE setEditor )
-    Q_PROPERTY( QString authId READ authId WRITE setAuthId )
-    Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
+    // Q_OBJECT
+    // Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+    // Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
+    // Q_PROPERTY( QString editor READ editor WRITE setEditor )
+    // Q_PROPERTY( QString authId READ authId WRITE setAuthId )
+    // Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
-    KadasMapItem *clone() const;
+    KadasMapItem *clone() const override;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
+
+    // TODO !!!!
+    bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override { return false; }
+    bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override { return false; }
+
+    QString type() const override { return itemName(); }
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
 
     /* The item crs */
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
-
-    /* Bounding box in geographic coordinates */
-    virtual KadasItemRect boundingBox() const = 0;
 
     /* Margin in screen units */
     struct Margin
@@ -329,9 +333,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     /* Return the item point to the specified one */
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
-
-    /* Render the item */
-    virtual void render( QgsRenderContext &context ) const = 0;
 
 #ifndef SIP_RUN
     /* Create KML representation */
@@ -502,10 +503,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QMap<QString, QVariant> getProps() const;
     void setProps( const QMap<QString, QVariant> &props );
 
-  signals:
-    void aboutToBeDestroyed();
-    void changed();
-    void propertyChanged();
+    // TODO !!!
+    // signals:
+    //   void aboutToBeDestroyed();
+    //   void changed();
+    //   void propertyChanged();
 
   protected:
     State *mState = nullptr;
@@ -528,7 +530,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
+    KadasMapRect toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;

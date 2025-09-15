@@ -22,17 +22,17 @@
 
 class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
-    Q_OBJECT
-    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
+    // Q_OBJECT
+    // Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+    // Q_PROPERTY( QString name READ name WRITE setName )
+    // Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
 
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasSymbolItem();
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
-    QString itemName() const override { return tr( "Symbol" ); }
+    QString itemName() const override { return QObject::tr( "Symbol" ); }
 
     void setFilePath( const QString &path );
     const QString &filePath() const { return mFilePath; }
@@ -44,7 +44,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QImage symbolImage() const override { return mImage; }
     QPointF symbolAnchor() const override { return QPointF( anchorX(), anchorY() ); }
 
-    void render( QgsRenderContext &context ) const override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif
@@ -67,7 +67,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
 class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
 {
-    Q_OBJECT
+    // Q_OBJECT
 
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );

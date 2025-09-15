@@ -23,12 +23,12 @@ class QgsMultiPolygon;
 
 class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 {
-    Q_OBJECT
+    // Q_OBJECT
 
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );
 
-    QString itemName() const override { return tr( "Rectangle" ); }
+    QString itemName() const override { return QObject::tr( "Rectangle" ); }
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;

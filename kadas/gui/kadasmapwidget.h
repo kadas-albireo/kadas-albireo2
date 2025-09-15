@@ -79,7 +79,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     void updateLayerSet();
     void updateMapProjection();
     void closeMapWidget();
-    void addMapCanvasItem( const KadasMapItem *item );
+    void addMapCanvasItem( KadasMapItem *item );
     void removeMapCanvasItem( const KadasMapItem *item );
 };
 

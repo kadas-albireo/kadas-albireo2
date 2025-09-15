@@ -151,42 +151,42 @@ void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
   mMinNPoints = symbolDesc.minNumPoints;
   mSymbolType = symbolDesc.symbolType;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasMilxItem::setMssString( const QString &mssString )
 {
   mMssString = mssString;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasMilxItem::setMilitaryName( const QString &militaryName )
 {
   mMilitaryName = militaryName;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasMilxItem::setMinNPoints( int minNPoints )
 {
   mMinNPoints = minNPoints;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
 {
   mHasVariablePoints = hasVariablePoints;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasMilxItem::setSymbolType( const QString &symbolType )
 {
   mSymbolType = symbolType;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 KadasItemPos KadasMilxItem::position() const
@@ -250,7 +250,7 @@ QgsAbstractGeometry *KadasMilxItem::toGeometry() const
   }
 }
 
-KadasItemRect KadasMilxItem::boundingBox() const
+QgsRectangle KadasMilxItem::boundingBox() const
 {
   QgsRectangle r;
 
@@ -265,7 +265,7 @@ KadasItemRect KadasMilxItem::boundingBox() const
       r.include( p );
     }
   }
-  return KadasItemRect( r.xMinimum(), r.yMinimum(), r.xMaximum(), r.yMaximum() );
+  return r;
 }
 
 KadasMapItem::Margin KadasMilxItem::margin() const
@@ -347,7 +347,7 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
   return qMakePair( minPos, std::sqrt( minDistSq ) );
 }
 
-void KadasMilxItem::render( QgsRenderContext &context ) const
+void KadasMilxItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   double dpiScale = outputDpiScale( context );
   KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true );
@@ -725,7 +725,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
 
-  menu->addAction( QIcon( ":/kadas/icons/editor" ), tr( "Symbol editor..." ), [=] {
+  menu->addAction( QIcon( ":/kadas/icons/editor" ), QObject::tr( "Symbol editor..." ), [=] {
     KadasMilxClient::NPointSymbolGraphic result;
     WId winId = 0;
     for ( QWidget *widget : QApplication::topLevelWidgets() )
@@ -745,7 +745,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   {
     if ( context.vidx.vertex >= 0 )
     {
-      QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), [=] {
+      QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), QObject::tr( "Delete node" ), [=] {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
@@ -755,7 +755,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
     }
     else
     {
-      menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), [=] {
+      menu->addAction( QIcon( ":/kadas/icons/add_node" ), QObject::tr( "Add node" ), [=] {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
@@ -764,7 +764,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    QAction *action = menu->addAction( tr( "Reset offset" ), [=] {
+    QAction *action = menu->addAction( QObject::tr( "Reset offset" ), [=] {
       state()->userOffset = QPoint();
       update();
     } );

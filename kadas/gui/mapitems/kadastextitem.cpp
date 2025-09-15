@@ -45,7 +45,7 @@ void KadasTextItem::setText( const QString &text )
     state()->mSize.setHeight( metrics.height() );
   }
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasTextItem::setAngle( double angle )
@@ -58,14 +58,14 @@ void KadasTextItem::setFillColor( const QColor &c )
 {
   mFillColor = c;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasTextItem::setOutlineColor( const QColor &c )
 {
   mOutlineColor = c;
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasTextItem::setFont( const QFont &font )
@@ -78,13 +78,13 @@ void KadasTextItem::setFont( const QFont &font )
     state()->mSize.setHeight( metrics.height() );
   }
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasTextItem::setFrameAutoResize( bool frameAutoResize )
 {
   mFrameAutoResize = frameAutoResize;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
   if ( mFrameAutoResize )
     setFont( mFont );
 }
@@ -174,7 +174,7 @@ void KadasTextItem::populateContextMenuPrivate( QMenu *menu, const EditContext &
 {
   if ( frameVisible() )
   {
-    QAction *lockedAction = menu->addAction( tr( "Auto resize frame" ), [this]( bool autoResize ) { setFrameAutoResize( autoResize ); } );
+    QAction *lockedAction = menu->addAction( QObject::tr( "Auto resize frame" ), [this]( bool autoResize ) { setFrameAutoResize( autoResize ); } );
     lockedAction->setCheckable( true );
     lockedAction->setChecked( mFrameAutoResize );
   }

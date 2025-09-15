@@ -47,7 +47,7 @@ KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
   setCursor( Qt::ArrowCursor );
   setUndoRedoVisible( false );
   setToolLabel( tr( "Compute hillshade" ) );
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
+  // TODO !!! connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
 }
 
 void KadasMapToolHillshade::drawFinished()

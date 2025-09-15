@@ -98,10 +98,10 @@ void KadasMapIdentifyDialog::clear()
 {
   delete mRubberband;
   mRubberband = nullptr;
-  delete mResultPin.data();
-  mResultPin.clear();
-  delete mClickPosPin.data();
-  mClickPosPin.clear();
+  delete mResultPin;
+  mResultPin = nullptr;
+  delete mClickPosPin;
+  mClickPosPin = nullptr;
   qDeleteAll( mGeometries );
   mGeometries.clear();
   if ( mRasterIdentifyReply )
@@ -119,8 +119,8 @@ void KadasMapIdentifyDialog::onItemClicked( QTreeWidgetItem *item, int /*col*/ )
 {
   delete mRubberband;
   mRubberband = nullptr;
-  delete mResultPin.data();
-  mResultPin.clear();
+  delete mResultPin;
+  mResultPin = nullptr;
 
   while ( item && item->data( 0, sGeometryRole ).isNull() )
     item = item->parent();

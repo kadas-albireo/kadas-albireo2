@@ -158,7 +158,7 @@ QFont KadasGpxRouteEditor::currentFont() const
 
 void KadasGpxRouteEditor::toggleItemMeasurements( bool enabled )
 {
-  KadasGpxRouteItem *routeItem = qobject_cast<KadasGpxRouteItem *>( mItem );
+  KadasGpxRouteItem *routeItem = dynamic_cast<KadasGpxRouteItem *>( mItem );
   if ( !routeItem )
   {
     return;

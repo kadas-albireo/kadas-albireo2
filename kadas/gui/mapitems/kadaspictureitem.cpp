@@ -145,7 +145,7 @@ void KadasPictureItem::setFilePath( const QString &filePath )
 {
   setup( filePath, constState()->mPos, true, state()->mOffsetX, state()->mOffsetY, state()->mSize.width(), state()->mSize.height() );
   update();
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasPictureItem::setState( const KadasMapItem::State *state )

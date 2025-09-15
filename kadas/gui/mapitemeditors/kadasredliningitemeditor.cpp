@@ -132,16 +132,16 @@ void KadasRedliningItemEditor::syncWidgetToItem()
   Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
   Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
 
-  geometryItem->blockSignals( true );
+  // TODO !!! geometryItem->blockSignals( true );
   geometryItem->setOutline( QPen( outlineColor, outlineWidth, lineStyle ) );
   geometryItem->setFill( QBrush( fillColor, brushStyle ) );
 
   geometryItem->setIconSize( 10 + 2 * outlineWidth );
   geometryItem->setIconOutline( QPen( outlineColor, outlineWidth / 4, lineStyle ) );
   geometryItem->setIconFill( QBrush( fillColor, brushStyle ) );
-  geometryItem->blockSignals( false );
-  emit geometryItem->changed();
-  emit geometryItem->propertyChanged();
+  // TODO !!! geometryItem->blockSignals( false );
+  // TODO !!! emit geometryItem->changed();
+  // TODO !!! emit geometryItem->propertyChanged();
 }
 
 KadasRedliningItemEditor::~KadasRedliningItemEditor()
@@ -151,7 +151,7 @@ KadasRedliningItemEditor::~KadasRedliningItemEditor()
 
 void KadasRedliningItemEditor::toggleItemMeasurements( bool enabled )
 {
-  KadasGeometryItem *geometryItem = qobject_cast<KadasGeometryItem *>( mItem );
+  KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );
   if ( !geometryItem )
   {
     return;

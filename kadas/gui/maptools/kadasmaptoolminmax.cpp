@@ -70,7 +70,7 @@ KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *action
   setCursor( Qt::ArrowCursor );
   setToolLabel( tr( "Compute min/max" ) );
   setUndoRedoVisible( false );
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolMinMax::drawFinished );
+  // TODO !!! connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolMinMax::drawFinished );
 
   QWidget *filterTypeWidget = new QWidget();
   filterTypeWidget->setLayout( new QHBoxLayout() );
@@ -101,12 +101,12 @@ KadasMapToolMinMax::~KadasMapToolMinMax()
   if ( mPinMin )
   {
     KadasMapCanvasItemManager::removeItem( mPinMin );
-    delete mPinMin.data();
+    delete mPinMin;
   }
   if ( mPinMax )
   {
     KadasMapCanvasItemManager::removeItem( mPinMax );
-    delete mPinMax.data();
+    delete mPinMax;
   }
 }
 

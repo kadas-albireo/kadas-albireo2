@@ -79,19 +79,19 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
 void KadasSymbolItem::setFilePath( const QString &path )
 {
   setup( path, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasSymbolItem::setName( const QString &name )
 {
   mName = name;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasSymbolItem::setRemarks( const QString &remarks )
 {
   mRemarks = remarks;
-  emit propertyChanged();
+  // TODO !!! emit propertyChanged();
 }
 
 void KadasSymbolItem::setState( const KadasMapItem::State *state )
@@ -107,7 +107,7 @@ void KadasSymbolItem::setState( const KadasMapItem::State *state )
   KadasMapItem::setState( state );
 }
 
-void KadasSymbolItem::render( QgsRenderContext &context ) const
+void KadasSymbolItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   if ( constState()->drawStatus == State::DrawStatus::Empty )
   {
@@ -251,7 +251,7 @@ KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs )
   : KadasSymbolItem( crs )
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
-  connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
+  // TODO !!! connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
 }
 
 void KadasPinItem::updateTooltip()
@@ -261,13 +261,13 @@ void KadasPinItem::updateTooltip()
   {
     posStr = QString( "%1 (%2)" ).arg( QgsPointXY( position() ).toString() ).arg( crs().authid() );
   }
-  QString toolTipText = tr( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
+  QString toolTipText = QObject::tr( "<b>Position:</b> %1<br /><b>Height:</b> %2 %3<br /><b>Name:</b> %4<br /><b>Remarks:</b><br />%5" )
                           .arg( posStr )
                           .arg( KadasCoordinateFormat::instance()->getHeightAtPos( position(), crs() ) )
                           .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? "ft" : "m" )
                           .arg( name() )
                           .arg( remarks() );
-  blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
+  // TODO !!! blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
   setTooltip( toolTipText );
-  blockSignals( false );
+  // TODO !!! blockSignals( false );
 }

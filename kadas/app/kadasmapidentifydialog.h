@@ -54,8 +54,8 @@ class KadasMapIdentifyDialog : public QDialog
     QgsMapCanvas *mCanvas = nullptr;
     QTreeWidget *mTreeWidget = nullptr;
     QgsGeometryRubberBand *mRubberband = nullptr;
-    QPointer<KadasPinItem> mClickPosPin;
-    QPointer<KadasPinItem> mResultPin;
+    KadasPinItem *mClickPosPin;
+    KadasPinItem *mResultPin;
     QList<QgsAbstractGeometry *> mGeometries;
     QTimer *mTimeoutTimer = nullptr;
     QNetworkReply *mRasterIdentifyReply = nullptr;
