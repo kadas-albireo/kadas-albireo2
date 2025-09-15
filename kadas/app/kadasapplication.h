@@ -24,6 +24,7 @@
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeregistrybridge.h>
 
+#include "kadas/app/kadas_app.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 
 class QNetworkRequest;
@@ -53,7 +54,7 @@ class KadasRedliningIntegration;
 
 #define kApp KadasApplication::instance()
 
-class KadasApplication : public QgsApplication
+class KADAS_APP_EXPORT KadasApplication : public QgsApplication
 {
     Q_OBJECT
 
