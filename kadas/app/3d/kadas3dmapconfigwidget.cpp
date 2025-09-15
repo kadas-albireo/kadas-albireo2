@@ -143,7 +143,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
     cboTerrainType->setCurrentIndex( cboTerrainType->findData( QgsTerrainGenerator::Flat ) );
     cboTerrainLayer->setLayer( nullptr );
     spinTerrainResolution->setValue( 32 );
-    spinTerrainSkirtHeight->setValue( 100 );
+    spinTerrainSkirtHeight->setValue( 200 );
   }
 
   spinCameraFieldOfView->setValue( mMap->fieldOfView() );
