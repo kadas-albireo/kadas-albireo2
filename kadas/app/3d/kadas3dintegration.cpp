@@ -35,6 +35,7 @@
 #include <qgsdockablewidgethelper.h>
 #include <qgsmapviewsmanager.h>
 #include <qgsrasterlayer.h>
+#include <qgsdemterrainsettings.h>
 
 #include "kadas/app/3d/kadas3dintegration.h"
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
@@ -230,13 +231,11 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   QgsRasterLayer *heightLayer = qobject_cast<QgsRasterLayer *>( QgsProject::instance()->mapLayer( heightLayerId ) );
   if ( heightLayer )
   {
-    map->setTerrainRenderingEnabled( true );
-    QgsDemTerrainGenerator *demTerrainGen = new QgsDemTerrainGenerator;
-    demTerrainGen->setCrs( map->crs(), QgsProject::instance()->transformContext() );
-    demTerrainGen->setLayer( heightLayer );
-    demTerrainGen->setResolution( 32 );
-    demTerrainGen->setSkirtHeight( 200 );
-    map->setTerrainGenerator( demTerrainGen );
+    auto demTerrainSettings = std::make_unique<QgsDemTerrainSettings>();
+    demTerrainSettings->setLayer( qobject_cast<QgsRasterLayer *>( heightLayer ) );
+    demTerrainSettings->setResolution( 32 );
+    demTerrainSettings->setSkirtHeight( 300 );
+    map->setTerrainSettings( demTerrainSettings.release() );
   }
 
   return canvasWidget;
