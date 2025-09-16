@@ -45,18 +45,13 @@ void TestKadasCatalogBrowser::testAddCatalogLayer()
   QgsLayerTree *layerTree = mainWindow->layerTreeView()->layerTreeModel()->rootGroup();
   layerTree->removeAllChildren();
 
-  QVERIFY(QMetaObject::invokeMethod(mainWindow,
-                                    "addCatalogLayer",
-                                    Qt::DirectConnection,
-                                    Q_ARG(QgsMimeDataUtils::Uri, QgsMimeDataUtils::Uri(uri)),
-                                    Q_ARG(QString, ""),
-                                    Q_ARG(QVariantList, QVariantList())));
+  QVERIFY( QMetaObject::invokeMethod( mainWindow, "addCatalogLayer", Qt::DirectConnection, Q_ARG( QgsMimeDataUtils::Uri, QgsMimeDataUtils::Uri( uri ) ), Q_ARG( QString, "" ), Q_ARG( QVariantList, QVariantList() ) ) );
 
   QCOMPARE( layerTree->findLayers().size(), 1 );
 
   QgsLayerTreeLayer *firstLayerNode = dynamic_cast<QgsLayerTreeLayer *>( layerTree->children().at( 0 ) );
   QVERIFY( firstLayerNode );
-  
+
   QgsMapLayer *layer = firstLayerNode->layer();
   QVERIFY( layer );
   QVERIFY( layer->isValid() );
