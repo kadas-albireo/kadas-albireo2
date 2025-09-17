@@ -28,7 +28,8 @@
 
 KadasMapItem *KadasMapToolHeightProfileItemInterface::createItem() const
 {
-  KadasLineItem *item = new KadasLineItem( mCanvas->mapSettings().destinationCrs() );
+  KadasLineItem *item = new KadasLineItem();
+  item->setCrs( mCanvas->mapSettings().destinationCrs() );
   item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
   return item;
 }
@@ -40,7 +41,8 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
 
-  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::IconType::ICON_CIRCLE );
+  mPosMarker = new KadasPointItem( KadasPointItem::IconType::ICON_CIRCLE );
+  mPosMarker->setCrs( canvas->mapSettings().destinationCrs() );
   mPosMarker->setIconFill( Qt::blue );
   mPosMarker->setIconOutline( QPen( Qt::blue ) );
   mPosMarker->setZIndex( 100 );

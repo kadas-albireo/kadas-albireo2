@@ -57,8 +57,8 @@ void KadasGeometryItem::registerMetaTypes()
   }
 }
 
-KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasMapItem( crs )
+KadasGeometryItem::KadasGeometryItem()
+  : KadasMapItem()
   , mPen( QPen( Qt::red, 4 ) )
   , mBrush( QColor( 255, 0, 0, 127 ) )
   , mIconSize( 10 )
@@ -68,14 +68,19 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
 {
   registerMetaTypes();
 
-  mDa.setSourceCrs( crs, QgsProject::instance()->transformContext() );
-  mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
   // TODO !!! connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
 }
 
 KadasGeometryItem::~KadasGeometryItem()
 {
   delete mGeometry;
+}
+
+void KadasGeometryItem::setCrs( const QgsCoordinateReferenceSystem &crs )
+{
+  KadasMapItem::setCrs( crs );
+  mDa.setSourceCrs( crs, QgsProject::instance()->transformContext() );
+  mDa.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
 }
 
 void KadasGeometryItem::render( QgsRenderContext &context, QgsFeedback *feedback )

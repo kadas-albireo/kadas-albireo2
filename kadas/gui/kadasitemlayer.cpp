@@ -20,6 +20,8 @@
 #include <QSlider>
 #include <QWidgetAction>
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsannotationitemguiregistry.h>
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
@@ -201,8 +203,19 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
   QDomNodeList itemEls = layerEl.elementsByTagName( "MapItem" );
   for ( int i = 0, n = itemEls.size(); i < n; ++i )
   {
-    KadasMapItem *item = KadasMapItem::fromXml( itemEls.at( i ).toElement() );
-    if ( item )
+    const QDomElement itemEl = itemEls.at( i ).toElement();
+    QString name = itemEl.attribute( "name" );
+
+    QgsAnnotationItem *annotItem = QgsApplication::annotationItemRegistry()->createItem( name );
+
+    KadasMapItem *item = dynamic_cast<KadasMapItem *>( annotItem );
+
+    if ( !item )
+    {
+      QgsDebugMsgLevel( QString( "Unknown item: %1" ).arg( name ), 2 );
+      continue;
+    }
+    if ( item->readXml( itemEl, context ) )
     {
       item->setOwnerLayer( this );
       mItems.insert( ++mIdCounter, item );
@@ -225,7 +238,9 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   layerEl.setAttribute( QStringLiteral( "minScale" ), minimumScale() );
   for ( auto it = mItemOrder.begin(), itEnd = mItemOrder.end(); it != itEnd; ++it )
   {
-    layerEl.appendChild( mItems[*it]->writeXml( document ) );
+    QDomElement itemEl;
+    mItems[*it]->writeXml( itemEl, document, context );
+    layerEl.appendChild( itemEl );
   }
   return true;
 }

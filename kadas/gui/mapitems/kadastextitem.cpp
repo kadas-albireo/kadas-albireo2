@@ -30,8 +30,8 @@
 #include "kadas/gui/mapitems/kadastextitem.h"
 
 
-KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasRectangleItemBase( crs )
+KadasTextItem::KadasTextItem()
+  : KadasRectangleItemBase()
 {
 }
 

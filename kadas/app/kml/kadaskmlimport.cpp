@@ -189,7 +189,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       if ( geoms.size() == 1 && !style.icon.isEmpty() && dynamic_cast<QgsPoint *>( geoms.front() ) )
       {
         QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );
-        KadasSymbolItem *item = new KadasSymbolItem( itemLayer->crs() );
+        KadasSymbolItem *item = new KadasSymbolItem();
+        item->setCrs( itemLayer->crs() );
         item->setFilePath( style.icon );
         item->setAnchorX( style.hotSpot.x() / item->constState()->size.width() );
         item->setAnchorY( style.hotSpot.y() / item->constState()->size.height() );
@@ -210,7 +211,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
           {
             QgsPointXY pos = *static_cast<QgsPoint *>( geom );
-            KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
+            KadasTextItem *item = new KadasTextItem();
+            item->setCrs( itemLayer->crs() );
             item->setEditor( "KadasRedliningTextEditor" );
             item->setText( name );
             item->setFillColor( style.labelColor );
@@ -222,7 +224,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsPoint *>( geom ) || dynamic_cast<QgsMultiPoint *>( geom ) )
           {
-            KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
+            KadasPointItem *item = new KadasPointItem();
+            item->setCrs( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
             item->setIconType( iconType );
@@ -233,7 +236,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
           {
-            KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
+            KadasLineItem *item = new KadasLineItem();
+            item->setCrs( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
             item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
@@ -241,7 +245,8 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           }
           else if ( dynamic_cast<QgsPolygon *>( geom ) || dynamic_cast<QgsMultiPolygon *>( geom ) )
           {
-            KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
+            KadasPolygonItem *item = new KadasPolygonItem();
+            item->setCrs( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
             item->addPartFromGeometry( *geom );
             item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );

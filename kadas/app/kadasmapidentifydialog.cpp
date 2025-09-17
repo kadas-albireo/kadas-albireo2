@@ -141,7 +141,8 @@ void KadasMapIdentifyDialog::onItemClicked( QTreeWidgetItem *item, int /*col*/ )
   if ( dynamic_cast<QgsPoint *>( geom ) )
   {
     QgsPoint *p = static_cast<QgsPoint *>( geom );
-    mResultPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+    mResultPin = new KadasPinItem();
+    mResultPin->setCrs( mCanvas->mapSettings().destinationCrs() );
     mResultPin->setPosition( KadasItemPos( p->x(), p->y() ) );
     mResultPin->setFilePath( ":/kadas/icons/pin_blue" );
   }
@@ -160,7 +161,8 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
 {
   clear();
 
-  mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+  mClickPosPin = new KadasPinItem();
+  mClickPosPin->setCrs( mCanvas->mapSettings().destinationCrs() );
   mClickPosPin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
   KadasMapCanvasItemManager::addItem( mClickPosPin );
 

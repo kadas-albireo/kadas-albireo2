@@ -24,7 +24,7 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
     // Q_OBJECT
 
   public:
-    KadasCoordinateCrossItem( const QgsCoordinateReferenceSystem &crs );
+    KadasCoordinateCrossItem();
 
     QString itemName() const override { return QObject::tr( "Coordinate cross" ); }
 
@@ -69,7 +69,7 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCoordinateCrossItem( crs() ); }
+    KadasMapItem *_clone() const override;
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:

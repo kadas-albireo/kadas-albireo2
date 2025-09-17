@@ -73,8 +73,8 @@ bool KadasCircleItem::State::deserialize( const QJsonObject &json )
   return centers.size() == ringpos.size();
 }
 
-KadasCircleItem::KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic )
-  : KadasGeometryItem( crs )
+KadasCircleItem::KadasCircleItem( bool geodesic )
+  : KadasGeometryItem()
 {
   mGeodesic = geodesic;
   clear();

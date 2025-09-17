@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     // Q_OBJECT
 
   public:
-    KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
+    KadasCircularSectorItem();
 
     QString itemName() const override { return QObject::tr( "Circular Sector" ); }
 
@@ -80,7 +80,7 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCircularSectorItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCircularSectorItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;

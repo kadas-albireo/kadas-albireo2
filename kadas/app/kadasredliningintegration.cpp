@@ -42,7 +42,8 @@
 KadasMapItem *KadasPointItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_CIRCLE );
+  KadasMapItem *item = new KadasPointItem( KadasPointItem::IconType::ICON_CIRCLE );
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 }
@@ -50,7 +51,8 @@ KadasMapItem *KadasPointItemInterface::createItem() const
 KadasMapItem *KadasSquareItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_BOX );
+  KadasMapItem *item = new KadasPointItem( KadasPointItem::IconType::ICON_FULL_BOX );
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -58,7 +60,8 @@ KadasMapItem *KadasSquareItemInterface::createItem() const
 KadasMapItem *KadasTriangleItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_TRIANGLE );
+  KadasMapItem *item = new KadasPointItem( KadasPointItem::IconType::ICON_FULL_TRIANGLE );
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -66,7 +69,8 @@ KadasMapItem *KadasTriangleItemInterface::createItem() const
 KadasMapItem *KadasLineItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasLineItem( crs );
+  KadasMapItem *item = new KadasLineItem();
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -74,7 +78,8 @@ KadasMapItem *KadasLineItemInterface::createItem() const
 KadasMapItem *KadasRectangleItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasRectangleItem( crs );
+  KadasMapItem *item = new KadasRectangleItem();
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -83,7 +88,8 @@ KadasMapItem *KadasRectangleItemInterface::createItem() const
 KadasMapItem *KadasPolygonItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPolygonItem( crs );
+  KadasMapItem *item = new KadasPolygonItem();
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -91,7 +97,8 @@ KadasMapItem *KadasPolygonItemInterface::createItem() const
 KadasMapItem *KadasCircleItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasCircleItem( crs );
+  KadasMapItem *item = new KadasCircleItem();
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -99,7 +106,8 @@ KadasMapItem *KadasCircleItemInterface::createItem() const
 KadasMapItem *KadasTextItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasTextItem *item = new KadasTextItem( crs );
+  KadasTextItem *item = new KadasTextItem();
+  item->setCrs( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_TEXT );
   return item;
 };
@@ -107,7 +115,8 @@ KadasMapItem *KadasTextItemInterface::createItem() const
 KadasMapItem *KadasCoordCrossItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasCoordinateCrossItem( crs );
+  KadasMapItem *item = new KadasCoordinateCrossItem();
+  item->setCrs( crs.mapUnits() == Qgis::DistanceUnit::Meters ? crs : QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   return item;
 };
 

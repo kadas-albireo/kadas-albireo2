@@ -42,8 +42,8 @@ bool KadasSelectionRectItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasSelectionRectItem::KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasMapItem( crs )
+KadasSelectionRectItem::KadasSelectionRectItem()
+  : KadasMapItem()
 {
   clear();
 }

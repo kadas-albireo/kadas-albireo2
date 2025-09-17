@@ -31,7 +31,8 @@
 
 KadasMapItem *KadasMapToolSlopeItemInterface::createItem() const
 {
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  KadasRectangleItem *item = new KadasRectangleItem();
+  item->setCrs( mCanvas->mapSettings().destinationCrs() );
   return item;
 }
 

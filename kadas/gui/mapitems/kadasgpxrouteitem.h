@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     // Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
-    KadasGpxRouteItem( QObject *parent = nullptr );
+    KadasGpxRouteItem();
 
     QString itemName() const override { return QObject::tr( "Route" ); }
     QString exportName() const override;

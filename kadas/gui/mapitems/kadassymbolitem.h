@@ -28,7 +28,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     // Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
 
   public:
-    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
+    KadasSymbolItem();
     ~KadasSymbolItem();
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
@@ -61,7 +61,7 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QImage mImage;
     bool mScalable = false;
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSymbolItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSymbolItem(); }
 };
 
 
@@ -70,7 +70,7 @@ class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
     // Q_OBJECT
 
   public:
-    KadasPinItem( const QgsCoordinateReferenceSystem &crs );
+    KadasPinItem();
 
   private slots:
     void updateTooltip();

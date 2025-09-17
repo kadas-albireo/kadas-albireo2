@@ -74,8 +74,10 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
       ICON_FULL_TRIANGLE
     };
 
-    KadasGeometryItem( const QgsCoordinateReferenceSystem &crs );
+    KadasGeometryItem();
     ~KadasGeometryItem();
+
+    void setCrs( const QgsCoordinateReferenceSystem &crs ) override;
 
     QgsRectangle boundingBox() const override;
     Margin margin() const override;

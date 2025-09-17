@@ -27,7 +27,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     // Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
-    KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
+    KadasPolygonItem( bool geodesic = false );
 
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );
@@ -74,7 +74,7 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPolygonItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPolygonItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;

@@ -19,6 +19,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsannotationitemguiregistry.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
@@ -51,8 +53,7 @@ Q_GLOBAL_STATIC( KadasMapItem::Registry, sRegistry )
 std::once_flag onceFlagMapItemRegistry;
 
 
-KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs )
-  : mCrs( crs )
+KadasMapItem::KadasMapItem()
 {
 }
 
@@ -69,6 +70,7 @@ KadasMapItem::~KadasMapItem()
 KadasMapItem *KadasMapItem::clone() const
 {
   KadasMapItem *item = _clone();
+  item->mCrs = mCrs;
   // TODO !!!
   // for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
   // {
@@ -147,6 +149,52 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
   }
   delete state;
   return success;
+}
+
+bool KadasMapItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  //QDomElement itemEl = document.createElement( "MapItem" );
+  // TODO !!! itemEl.setAttribute( "name", metaObject()->className() );
+  element.setAttribute( "crs", crs().authid() );
+  element.setAttribute( "editor", editor() );
+  if ( associatedLayer() )
+  {
+    element.setAttribute( "associatedLayer", associatedLayer()->id() );
+  }
+  QJsonDocument doc;
+  doc.setObject( serialize() );
+  element.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+
+  writeCommonProperties( element, document, context );
+
+  return true;
+}
+
+bool KadasMapItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
+{
+  QDomElement itemEl = element;
+  QString name = itemEl.attribute( "name" );
+  QString crs = itemEl.attribute( "crs" );
+  QString editor = itemEl.attribute( "editor" );
+  QString layerId = itemEl.attribute( "associatedLayer" );
+
+  readCommonProperties( element, context );
+
+  QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+
+  setCrs( QgsCoordinateReferenceSystem( crs ) );
+
+  setEditor( editor );
+  if ( !layerId.isEmpty() )
+  {
+    associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
+  }
+  if ( !deserialize( data.object() ) )
+  {
+    QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
+    return false;
+  }
+  return true;
 }
 
 QString KadasMapItem::exportName() const
@@ -321,21 +369,21 @@ double KadasMapItem::getTextRenderScale( const QgsRenderContext &context )
 KadasMapItem::Registry *KadasMapItem::registry()
 {
   std::call_once( onceFlagMapItemRegistry, []() {
-    sRegistry->insert( QStringLiteral( "KadasCircleItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCircleItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasCircularSectorItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCircularSectorItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasCoordinateCrossItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCoordinateCrossItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasGpxRouteItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasGpxRouteItem(); } );
-    sRegistry->insert( QStringLiteral( "KadasGpxWaypointItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasGpxWaypointItem(); } );
-    sRegistry->insert( QStringLiteral( "KadasLineItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasLineItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasPictureItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPictureItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasPointItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPointItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasPolygonItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPolygonItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasRectangleItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasRectangleItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasSelectionRectItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSelectionRectItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSymbolItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasPinItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPinItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasTextItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasTextItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasMilxItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasMilxItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasCircleItem" ), []() { return new KadasCircleItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasCircularSectorItem" ), []() { return new KadasCircularSectorItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasCoordinateCrossItem" ), []() { return new KadasCoordinateCrossItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasGpxRouteItem" ), []() { return new KadasGpxRouteItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasGpxWaypointItem" ), []() { return new KadasGpxWaypointItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasLineItem" ), []() { return new KadasLineItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasPictureItem" ), []() { return new KadasPictureItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasPointItem" ), []() { return new KadasPointItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasPolygonItem" ), []() { return new KadasPolygonItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasRectangleItem" ), []() { return new KadasRectangleItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasSelectionRectItem" ), []() { return new KadasSelectionRectItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), []() { return new KadasSymbolItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasPinItem" ), []() { return new KadasPinItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasTextItem" ), []() { return new KadasTextItem(); } );
+    sRegistry->insert( QStringLiteral( "KadasMilxItem" ), []() { return new KadasMilxItem(); } );
   } );
 
   return sRegistry;
@@ -370,55 +418,6 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
   return QString();
 }
 
-QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
-{
-  QDomElement itemEl = document.createElement( "MapItem" );
-  // TODO !!! itemEl.setAttribute( "name", metaObject()->className() );
-  itemEl.setAttribute( "crs", crs().authid() );
-  itemEl.setAttribute( "editor", editor() );
-  if ( associatedLayer() )
-  {
-    itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
-  }
-  QJsonDocument doc;
-  doc.setObject( serialize() );
-  itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
-  return itemEl;
-}
-
-KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
-{
-  QDomElement itemEl = element;
-  QString name = itemEl.attribute( "name" );
-  QString crs = itemEl.attribute( "crs" );
-  QString editor = itemEl.attribute( "editor" );
-  QString layerId = itemEl.attribute( "associatedLayer" );
-  QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
-  KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
-  if ( factory )
-  {
-    KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
-    item->setEditor( editor );
-    if ( !layerId.isEmpty() )
-    {
-      item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
-    }
-    if ( item->deserialize( data.object() ) )
-    {
-      return item;
-    }
-    else
-    {
-      delete item;
-      QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
-    }
-  }
-  else
-  {
-    QgsDebugMsgLevel( QString( "Unknown item: %1" ).arg( name ), 2 );
-  }
-  return nullptr;
-}
 
 QMap<QString, QVariant> KadasMapItem::getProps() const
 {

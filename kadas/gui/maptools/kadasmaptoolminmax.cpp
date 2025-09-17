@@ -44,16 +44,20 @@
 
 KadasMapItem *KadasMapToolMinMaxItemInterface::createItem() const
 {
+  KadasMapItem *item = nullptr;
+
   switch ( mFilterType )
   {
     case KadasMapToolMinMax::FilterType::FilterRect:
-      return new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+      item = new KadasRectangleItem();
     case KadasMapToolMinMax::FilterType::FilterPoly:
-      return new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() );
+      item = new KadasPolygonItem();
     case KadasMapToolMinMax::FilterType::FilterCircle:
-      return new KadasCircleItem( mCanvas->mapSettings().destinationCrs() );
+      item = new KadasCircleItem();
   }
-  return nullptr;
+  if ( item )
+    item->setCrs( mCanvas->mapSettings().destinationCrs() );
+  return item;
 }
 
 void KadasMapToolMinMaxItemInterface::setFilterType( KadasMapToolMinMax::FilterType filterType )
@@ -253,7 +257,8 @@ void KadasMapToolMinMax::drawFinished()
 
   if ( !mPinMin )
   {
-    mPinMin = new KadasSymbolItem( mCanvas->mapSettings().destinationCrs() );
+    mPinMin = new KadasSymbolItem();
+    mPinMin->setCrs( mCanvas->mapSettings().destinationCrs() );
     mPinMin->setup( ":/kadas/icons/tri_up", 0.5, 0 );
     KadasMapCanvasItemManager::addItem( mPinMin );
   }
@@ -261,7 +266,8 @@ void KadasMapToolMinMax::drawFinished()
 
   if ( !mPinMax )
   {
-    mPinMax = new KadasSymbolItem( mCanvas->mapSettings().destinationCrs() );
+    mPinMax = new KadasSymbolItem();
+    mPinMax->setCrs( mCanvas->mapSettings().destinationCrs() );
     mPinMax->setup( ":/kadas/icons/tri_down", 0.5, 1.0 );
     KadasMapCanvasItemManager::addItem( mPinMax );
   }
@@ -328,7 +334,8 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
     }
   } );
   menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Add pin" ), [this, mapPos] {
-    KadasPinItem *pin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
+    KadasPinItem *pin = new KadasPinItem();
+    pin->setCrs( mCanvas->mapSettings().destinationCrs() );
     pin->setEditor( "KadasSymbolAttributesEditor" );
     pin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
     KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->addItem( pin );

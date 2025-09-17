@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
     // Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
   public:
-    KadasRectangleItemBase( const QgsCoordinateReferenceSystem &crs );
+    KadasRectangleItemBase();
     virtual ~KadasRectangleItemBase();
 
     bool frameVisible() const { return constState()->frame(); }

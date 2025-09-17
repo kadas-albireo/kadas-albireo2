@@ -52,7 +52,8 @@ void KadasMapToolEditItemGroup::activate()
     KadasMapCanvasItemManager::addItem( item );
   }
 
-  mSelectionRect = new KadasSelectionRectItem( canvas()->mapSettings().destinationCrs() );
+  mSelectionRect = new KadasSelectionRectItem();
+  mSelectionRect->setCrs( canvas()->mapSettings().destinationCrs() );
   KadasMapCanvasItemManager::addItem( mSelectionRect );
 
   mBottomBar = new KadasBottomBar( canvas() );
@@ -235,7 +236,8 @@ void KadasMapToolEditItemGroup::createPinsFromPoints()
 {
   for ( const KadasMapItem *item : mItems )
   {
-    KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+    KadasPinItem *pin = new KadasPinItem();
+    pin->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
     pin->setEditor( "KadasSymbolAttributesEditor" );
     if ( dynamic_cast<const KadasGpxWaypointItem *>( item ) )
     {

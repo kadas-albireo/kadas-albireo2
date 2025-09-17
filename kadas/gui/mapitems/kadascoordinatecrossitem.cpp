@@ -44,8 +44,8 @@ bool KadasCoordinateCrossItem::State::deserialize( const QJsonObject &json )
   return true;
 }
 
-KadasCoordinateCrossItem::KadasCoordinateCrossItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasMapItem( crs.mapUnits() == Qgis::DistanceUnit::Meters ? crs : QgsCoordinateReferenceSystem( "EPSG:3857" ) )
+KadasCoordinateCrossItem::KadasCoordinateCrossItem()
+  : KadasMapItem()
 {
   clear();
 }
@@ -152,6 +152,11 @@ void KadasCoordinateCrossItem::setPosition( const KadasItemPos &pos )
 {
   state()->pos = roundToKilometre( pos );
   update();
+}
+
+KadasMapItem *KadasCoordinateCrossItem::_clone() const
+{
+  return new KadasCoordinateCrossItem();
 }
 
 bool KadasCoordinateCrossItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )

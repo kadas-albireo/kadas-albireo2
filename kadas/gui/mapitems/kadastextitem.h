@@ -30,7 +30,7 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasRectangleItemBase
     // Q_PROPERTY( bool frameAutoResize READ frameAutoResize WRITE setFrameAutoResize )
 
   public:
-    KadasTextItem( const QgsCoordinateReferenceSystem &crs );
+    KadasTextItem();
 
     QString itemName() const override { return QObject::tr( "Text" ); }
 
@@ -59,7 +59,7 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasRectangleItemBase
     QFont mFont;
     bool mFrameAutoResize = true;
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasTextItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasTextItem(); }
 
   protected:
     virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const override;

@@ -25,7 +25,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
     // Q_OBJECT
 
   public:
-    KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs );
+    KadasSelectionRectItem();
 
     void setSelectedItems( const QList<KadasMapItem *> &items );
 
@@ -71,7 +71,7 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
     void setPosition( const KadasItemPos &pos ) override {}
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSelectionRectItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSelectionRectItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:

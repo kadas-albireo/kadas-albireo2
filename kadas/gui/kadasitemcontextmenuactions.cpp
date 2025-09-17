@@ -134,7 +134,8 @@ void KadasItemContextMenuActions::createPinFromPoint()
     return;
   }
 
-  KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  KadasPinItem *pin = new KadasPinItem();
+  pin->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   pin->setEditor( "KadasSymbolAttributesEditor" );
   if ( dynamic_cast<KadasGpxWaypointItem *>( pointItem ) )
   {
@@ -161,7 +162,8 @@ void KadasItemContextMenuActions::createPolygonFromCircle()
   {
     return;
   }
-  KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
+  KadasPolygonItem *polygonitem = new KadasPolygonItem();
+  polygonitem->setCrs( circleItem->crs() );
   polygonitem->setEditor( "KadasRedliningItemEditor" );
   KadasItemPos pos = circleItem->constState()->centers.front();
   double r = std::sqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );

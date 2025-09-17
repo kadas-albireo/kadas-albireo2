@@ -152,7 +152,8 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
   // Update marker
   if ( !mMarker )
   {
-    mMarker = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
+    mMarker = new KadasSymbolItem();
+    mMarker->setCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
     mMarker->setup( ":/kadas/icons/gpsarrow", 0.5, 0.5, 92, 92 );
     KadasMapCanvasItemManager::addItem( mMarker );
   }

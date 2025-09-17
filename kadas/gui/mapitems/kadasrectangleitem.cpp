@@ -71,8 +71,8 @@ bool KadasRectangleItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasRectangleItem::KadasRectangleItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasGeometryItem( crs )
+KadasRectangleItem::KadasRectangleItem()
+  : KadasGeometryItem()
 {
   clear();
 }

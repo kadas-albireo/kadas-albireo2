@@ -615,14 +615,16 @@ QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::a
   QgsCoordinateTransform crst( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );
   if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
   {
-    KadasSymbolItem *item = new KadasSymbolItem( crs );
+    KadasSymbolItem *item = new KadasSymbolItem();
+    item->setCrs( crs );
     item->setup( attachedPath, 0.5, 0.5, 0, 64 );
     item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
     return qMakePair( item, KadasItemLayerRegistry::StandardLayer::SymbolsLayer );
   }
   else
   {
-    KadasPictureItem *item = new KadasPictureItem( crs );
+    KadasPictureItem *item = new KadasPictureItem();
+    item->setCrs( crs );
     item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ), false, 0, 0, 100, 100 );
     return qMakePair( item, KadasItemLayerRegistry::StandardLayer::PicturesLayer );
   }
@@ -1404,19 +1406,22 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     {
       if ( feature.geometry().type() == Qgis::GeometryType::Point )
       {
-        KadasPointItem *item = new KadasPointItem( featureStore.crs() );
+        KadasPointItem *item = new KadasPointItem();
+        item->setCrs( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
         items.append( item );
       }
       else if ( feature.geometry().type() == Qgis::GeometryType::Line )
       {
-        KadasLineItem *item = new KadasLineItem( featureStore.crs() );
+        KadasLineItem *item = new KadasLineItem();
+        item->setCrs( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
         items.append( item );
       }
       else if ( feature.geometry().type() == Qgis::GeometryType::Polygon )
       {
-        KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
+        KadasPolygonItem *item = new KadasPolygonItem();
+        item->setCrs( featureStore.crs() );
         item->addPartFromGeometry( *feature.geometry().constGet() );
         items.append( item );
       }
@@ -1445,7 +1450,8 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     {
       file.write( mimeData->data( "image/svg+xml" ) );
       file.close();
-      KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+      KadasSymbolItem *item = new KadasSymbolItem();
+      item->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, 0.5, 0.5 );
       item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
@@ -1460,7 +1466,8 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QImage image = qvariant_cast<QImage>( mimeData->imageData() );
       QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
       image.save( filename );
-      KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+      KadasPictureItem *item = new KadasPictureItem();
+      item->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
       QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
       item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
       return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PicturesLayer ) );

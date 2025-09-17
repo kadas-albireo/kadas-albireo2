@@ -166,7 +166,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         QColor fill = QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "fill" ) );
         fill.setAlpha( 255 ); // KADAS 1 ignored fill transparency;
 
-        KadasTextItem *textItem = new KadasTextItem( crs );
+        KadasTextItem *textItem = new KadasTextItem();
+        textItem->setCrs( crs );
         textItem->setText( redliningItemEl.attribute( "text" ) );
         textItem->setPosition( KadasItemPos::fromPoint( point ) );
         textItem->setAngle( flags["rotation"].toDouble() );
@@ -217,7 +218,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
               iconType = KadasPointItem::IconType::ICON_FULL_TRIANGLE;
             }
 
-            geomItem = new KadasPointItem( crs, iconType );
+            geomItem = new KadasPointItem( iconType );
+            geomItem->setCrs( crs );
             geomItem->setEditor( "KadasRedliningItemEditor" );
           }
         }
@@ -233,7 +235,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           }
           else
           {
-            geomItem = new KadasLineItem( crs );
+            geomItem = new KadasLineItem();
+            geomItem->setCrs( crs );
             geomItem->setEditor( "KadasRedliningItemEditor" );
           }
         }
@@ -242,7 +245,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           geom = new QgsPolygon();
           geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
 
-          geomItem = new KadasPolygonItem( crs );
+          geomItem = new KadasPolygonItem();
+          geomItem->setCrs( crs );
           geomItem->setEditor( "KadasRedliningItemEditor" );
         }
         else if ( flags["shape"] == "rectangle" )
@@ -250,7 +254,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           geom = new QgsPolygon();
           geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
 
-          geomItem = new KadasRectangleItem( crs );
+          geomItem = new KadasRectangleItem();
+          geomItem->setCrs( crs );
           geomItem->setEditor( "KadasRedliningItemEditor" );
         }
         else if ( flags["shape"] == "circle" )
@@ -270,7 +275,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
           geom = new QgsCurvePolygon();
           static_cast<QgsCurvePolygon *>( geom )->setExteriorRing( ring );
 
-          geomItem = new KadasCircleItem( crs );
+          geomItem = new KadasCircleItem();
+          geomItem->setCrs( crs );
           geomItem->setEditor( "KadasRedliningItemEditor" );
         }
 
@@ -350,7 +356,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       double adjHeight = height * qAbs( std::cos( angle / 180. * M_PI ) ) + width * qAbs( std::sin( angle / 180. * M_PI ) );
       double scale = std::min( width / adjWidth, height / adjHeight );
 
-      KadasSymbolItem symbolItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
+      KadasSymbolItem symbolItem;
+      symbolItem.setCrs( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) );
       symbolItem.setup( fileName, 0.5, 0.5, width * scale );
       symbolItem.setPosition( KadasItemPos::fromPoint( QgsPointXY( annotationItemEl.attribute( "geoPosX" ).toDouble(), annotationItemEl.attribute( "geoPosY" ).toDouble() ) ) );
       symbolItem.setAngle( -angle );
@@ -402,7 +409,10 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       int offsetX = -annotationItemEl.attribute( "offsetX" ).toInt() - 0.5 * width;
       int offsetY = -annotationItemEl.attribute( "offsetY" ).toInt() - 0.5 * height;
 
-      KadasPictureItem pictureItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
+      KadasPictureItem pictureItem;
+      pictureItem.setCrs( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) );
+
+
       pictureItem.setup( fileName, KadasItemPos::fromPoint( pos ), true, offsetX, offsetY, width );
 
       QDomElement mapItemEl = doc.createElement( "MapItem" );
@@ -438,7 +448,8 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         continue;
       }
 
-      KadasPinItem pinItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
+      KadasPinItem pinItem;
+      pinItem.setCrs( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) );
       QgsPointXY pos( annotationItemEl.attribute( "geoPosX" ).toDouble(), annotationItemEl.attribute( "geoPosY" ).toDouble() );
       pinItem.setPosition( KadasItemPos::fromPoint( pos ) );
       pinItem.setEditor( "KadasSymbolAttributesEditor" );

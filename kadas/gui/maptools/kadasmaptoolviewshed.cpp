@@ -184,7 +184,8 @@ void KadasViewshedDialog::adjustMinAngle()
 
 KadasMapItem *KadasMapToolViewshedItemInterface::createItem() const
 {
-  KadasCircularSectorItem *item = new KadasCircularSectorItem( mCanvas->mapSettings().destinationCrs() );
+  KadasCircularSectorItem *item = new KadasCircularSectorItem();
+  item->setCrs( mCanvas->mapSettings().destinationCrs() );
   return item;
 }
 
@@ -269,7 +270,8 @@ void KadasMapToolViewshed::drawFinished()
     layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
 
-    KadasSymbolItem *pin = new KadasSymbolItem( canvasCrs );
+    KadasSymbolItem *pin = new KadasSymbolItem();
+    pin->setCrs( canvasCrs );
     pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
     pin->associateToLayer( layer );
     pin->setPosition( KadasItemPos::fromPoint( center ) );

@@ -34,8 +34,8 @@
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 
 
-KadasSymbolItem::KadasSymbolItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasAnchoredItem( crs )
+KadasSymbolItem::KadasSymbolItem()
+  : KadasAnchoredItem()
 {
   clear();
 }
@@ -247,8 +247,8 @@ void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPo
 }
 
 
-KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasSymbolItem( crs )
+KadasPinItem::KadasPinItem()
+  : KadasSymbolItem()
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
   // TODO !!! connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );

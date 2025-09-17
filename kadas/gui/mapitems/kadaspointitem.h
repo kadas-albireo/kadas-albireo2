@@ -24,7 +24,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
     // Q_OBJECT
 
   public:
-    KadasPointItem( const QgsCoordinateReferenceSystem &crs, KadasGeometryItem::IconType icon = KadasGeometryItem::IconType::ICON_CIRCLE );
+    KadasPointItem( KadasGeometryItem::IconType icon = KadasGeometryItem::IconType::ICON_CIRCLE );
 
     QString itemName() const override { return QObject::tr( "Point" ); }
 
@@ -65,7 +65,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
 

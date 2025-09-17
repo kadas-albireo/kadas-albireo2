@@ -285,22 +285,21 @@ class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
     // Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
-    KadasMapItem( const QgsCoordinateReferenceSystem &crs );
+    KadasMapItem();
     ~KadasMapItem();
     KadasMapItem *clone() const override;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
-    // TODO !!!!
-    bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override { return false; }
-    bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override { return false; }
+    bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
+    bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
 
     QString type() const override { return itemName(); }
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
 
-    /* The item crs */
+    virtual void setCrs( const QgsCoordinateReferenceSystem &crs ) { mCrs = crs; }
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
 
     /* Margin in screen units */
@@ -486,13 +485,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
 
     // TODO: SIP
 #ifndef SIP_RUN
-    typedef std::function<KadasMapItem *( const QgsCoordinateReferenceSystem & )> RegistryItemFactory;
+    typedef std::function<KadasMapItem *()> RegistryItemFactory;
     typedef QMap<QString, RegistryItemFactory> Registry;
     static Registry *registry();
 #endif
-
-    QDomElement writeXml( QDomDocument &document ) const;
-    static KadasMapItem *fromXml( const QDomElement &element );
 
     void preventAttachmentCleanup()
     {

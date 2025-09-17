@@ -781,7 +781,8 @@ void KadasHeightProfileDialog::updateLineOfSight()
     curve->attach( mPlot );
     mLinesOfSight.append( curve );
 
-    KadasLineItem *line = new KadasLineItem( mTool->canvas()->mapSettings().destinationCrs() );
+    KadasLineItem *line = new KadasLineItem();
+    line->setCrs( mTool->canvas()->mapSettings().destinationCrs() );
     double lambda1 = losSamples.front().x() / mNSamples;
     double lambda2 = losSamples.back().x() / mNSamples;
     QgsPoint p1( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda1 );
@@ -835,7 +836,8 @@ void KadasHeightProfileDialog::addToCanvas()
   QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
 
-  KadasSymbolItem *item = new KadasSymbolItem( mTool->canvas()->mapSettings().destinationCrs() );
+  KadasSymbolItem *item = new KadasSymbolItem();
+  item->setCrs( mTool->canvas()->mapSettings().destinationCrs() );
   item->setFilePath( filename );
   item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->addItem( item );

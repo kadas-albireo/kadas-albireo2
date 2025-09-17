@@ -30,7 +30,8 @@
 
 KadasMapItem *KadasMapToolDeleteItemsInterface::createItem() const
 {
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  KadasRectangleItem *item = new KadasRectangleItem();
+  item->setCrs( mCanvas->mapSettings().destinationCrs() );
   item->setFill( Qt::NoBrush );
   item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
   return item;

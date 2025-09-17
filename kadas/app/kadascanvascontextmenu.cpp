@@ -71,7 +71,8 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
     KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( mPickResult.layer );
     mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
-    mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
+    mSelRect = new KadasSelectionRectItem();
+    mSelRect->setCrs( mCanvas->mapSettings().destinationCrs() );
     mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
     KadasMapCanvasItemManager::addItem( mSelRect );
   }

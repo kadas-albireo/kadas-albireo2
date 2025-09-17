@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     // Q_OBJECT
 
   public:
-    KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );
+    KadasRectangleItem();
 
     QString itemName() const override { return QObject::tr( "Rectangle" ); }
 
@@ -79,7 +79,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
       AttrY
     };
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasRectangleItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasRectangleItem(); }
     QgsMultiPolygon *geometry();
     State *state() { return static_cast<State *>( mState ); }
 };

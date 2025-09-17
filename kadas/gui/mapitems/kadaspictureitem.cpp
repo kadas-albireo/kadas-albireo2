@@ -74,8 +74,8 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasRectangleItemBase( crs )
+KadasPictureItem::KadasPictureItem()
+  : KadasRectangleItemBase()
 {
 }
 

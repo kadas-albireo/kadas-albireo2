@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
     // Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
 
   public:
-    KadasPictureItem( const QgsCoordinateReferenceSystem &crs );
+    KadasPictureItem();
     ~KadasPictureItem();
     void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50, int width = 0, int height = 0 );
 
@@ -54,7 +54,7 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
     void setState( const KadasMapItem::State *state ) override;
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPictureItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPictureItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const override;
     void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;

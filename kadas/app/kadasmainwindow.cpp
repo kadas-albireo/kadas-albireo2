@@ -106,7 +106,8 @@
 
 KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
 {
-  KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  KadasPinItem *item = new KadasPinItem();
+  item->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   item->setEditor( "KadasSymbolAttributesEditor" );
   return item;
 }

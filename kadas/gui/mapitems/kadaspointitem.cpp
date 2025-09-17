@@ -52,8 +52,8 @@ bool KadasPointItem::State::deserialize( const QJsonObject &json )
   return true;
 }
 
-KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, IconType icon )
-  : KadasGeometryItem( crs )
+KadasPointItem::KadasPointItem( IconType icon )
+  : KadasGeometryItem()
 {
   setIconType( icon );
   clear();

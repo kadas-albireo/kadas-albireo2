@@ -194,21 +194,21 @@ void KadasMeasureWidget::updateTotal()
 
 KadasMapItem *KadasMapToolMeasureItemInterface::createItem() const
 {
+  KadasMapItem *item = nullptr;
   switch ( mMeasureMode )
   {
     case KadasMapToolMeasure::MeasureMode::MeasureLine:
-      return setupItem( new KadasLineItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      item = new KadasLineItem( true );
     case KadasMapToolMeasure::MeasureMode::MeasurePolygon:
-      return setupItem( new KadasPolygonItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      item = new KadasPolygonItem( true );
     case KadasMapToolMeasure::MeasureMode::MeasureCircle:
-      return setupItem( new KadasCircleItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      item = new KadasCircleItem( true );
   }
-  return nullptr;
-}
-
-KadasGeometryItem *KadasMapToolMeasureItemInterface::setupItem( KadasGeometryItem *item ) const
-{
-  item->setEditor( "KadasMeasureWidget" );
+  if ( item )
+  {
+    item->setCrs( mCanvas->mapSettings().destinationCrs() );
+    item->setEditor( "KadasMeasureWidget" );
+  }
   return item;
 }
 

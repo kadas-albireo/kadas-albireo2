@@ -74,8 +74,8 @@ bool KadasPolygonItem::State::deserialize( const QJsonObject &json )
 }
 
 
-KadasPolygonItem::KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic )
-  : KadasGeometryItem( crs )
+KadasPolygonItem::KadasPolygonItem( bool geodesic )
+  : KadasGeometryItem()
 {
   mGeodesic = geodesic;
   clear();
