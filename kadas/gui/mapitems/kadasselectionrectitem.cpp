@@ -95,10 +95,10 @@ QgsRectangle KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
 {
   if ( mItems.isEmpty() )
   {
-    return KadasMapRect();
+    return QgsRectangle();
   }
   bool empty = true;
-  KadasMapRect rect;
+  QgsRectangle rect;
   QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
   for ( const KadasMapItem *item : mItems )
   {
@@ -106,7 +106,7 @@ QgsRectangle KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
     Margin m = item->margin();
     if ( empty )
     {
-      rect = KadasMapRect( itemRect.xMaximum(), itemRect.yMinimum(), itemRect.xMaximum(), itemRect.yMaximum() );
+      rect = QgsRectangle( itemRect.xMaximum(), itemRect.yMinimum(), itemRect.xMaximum(), itemRect.yMaximum() );
       empty = false;
     }
     rect.setXMinimum( std::min( rect.xMinimum(), itemRect.xMinimum() - m.left * mup ) );
@@ -117,7 +117,7 @@ QgsRectangle KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
   return rect;
 }
 
-bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasSelectionRectItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( mItems.isEmpty() )
   {

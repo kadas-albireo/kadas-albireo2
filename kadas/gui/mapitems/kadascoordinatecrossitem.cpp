@@ -65,7 +65,7 @@ QList<KadasMapItem::Node> KadasCoordinateCrossItem::nodes( const QgsMapSettings 
   return { { toMapPos( constState()->pos, settings ) } };
 }
 
-bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasCoordinateCrossItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   double mapCrossSize = sCrossSize * settings.mapUnitsPerPixel();
   KadasMapPos itemMapPos = toMapPos( constState()->pos, settings );

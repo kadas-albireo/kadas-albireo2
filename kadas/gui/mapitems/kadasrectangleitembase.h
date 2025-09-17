@@ -37,7 +37,7 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
     QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;

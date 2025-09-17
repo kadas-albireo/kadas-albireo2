@@ -58,7 +58,7 @@ void KadasMapToolDeleteItems::drawFinished()
   filterRect.normalize();
   if ( !filterRect.isEmpty() )
   {
-    KadasMapRect rect( filterRect.xMinimum(), filterRect.yMinimum(), filterRect.xMaximum(), filterRect.yMaximum() );
+    QgsRectangle rect( filterRect.xMinimum(), filterRect.yMinimum(), filterRect.xMaximum(), filterRect.yMaximum() );
     deleteItems( rect );
   }
   clear();
@@ -70,7 +70,7 @@ void KadasMapToolDeleteItems::activate()
   emit messageEmitted( tr( "Drag a rectangle around the items to delete" ) );
 }
 
-void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
+void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
 {
   QMap<KadasItemLayer *, QList<KadasItemLayer::ItemId>> delItems;
   QList<KadasMapItem *> mapItems;

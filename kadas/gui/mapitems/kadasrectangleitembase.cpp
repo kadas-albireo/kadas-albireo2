@@ -194,7 +194,7 @@ QList<KadasMapItem::Node> KadasRectangleItemBase::nodes( const QgsMapSettings &s
   return nodes;
 }
 
-bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasRectangleItemBase::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->mSize.isEmpty() )
   {

@@ -300,15 +300,15 @@ QList<KadasMapItem::Node> KadasMilxItem::nodes( const QgsMapSettings &settings )
   return nodes;
 }
 
-bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasMilxItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( contains )
   {
-    return QgsRectangle( rect ).contains( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+    return rect.contains( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
   }
   else
   {
-    return QgsRectangle( rect ).intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+    return rect.intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
   }
 }
 

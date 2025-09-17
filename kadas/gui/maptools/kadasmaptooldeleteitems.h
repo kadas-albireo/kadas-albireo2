@@ -39,7 +39,7 @@ class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
   public:
     KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );
     void activate() override;
-    void deleteItems( const KadasMapRect &filterRect );
+    void deleteItems( const QgsRectangle &filterRect );
 
   private slots:
     void drawFinished();

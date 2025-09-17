@@ -272,7 +272,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
   // TODO !!! emit geometryChanged();
 }
 
-bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasGeometryItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( !mGeometry )
   {

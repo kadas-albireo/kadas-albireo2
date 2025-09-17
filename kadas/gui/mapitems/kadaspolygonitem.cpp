@@ -220,7 +220,8 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const KadasMapPos &p
       }
     }
   }
-  if ( intersects( KadasMapRect( pos, pickTol( mapSettings ) ), mapSettings ) )
+  QgsRectangle rect = pointWithTolerance( pos, pickTol( mapSettings ) );
+  if ( intersects( rect, mapSettings ) )
   {
     KadasMapPos refPos = toMapPos( constState()->points.front().front(), mapSettings );
     return EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );

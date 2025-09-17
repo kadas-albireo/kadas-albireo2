@@ -292,16 +292,16 @@ KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSet
   return KadasItemPos( pos.x(), pos.y() );
 }
 
-KadasMapRect KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
+QgsRectangle KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
 {
   QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
-  return KadasMapRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
-KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
+QgsRectangle KadasMapItem::toItemRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
 {
   QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( itemRect );
-  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
 double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
@@ -315,17 +315,29 @@ bool KadasMapItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settin
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  KadasMapRect filterRect;
-  filterRect.setXMinimum( pos.x() - radiusmu );
-  filterRect.setXMaximum( pos.x() + radiusmu );
-  filterRect.setYMinimum( pos.y() - radiusmu );
-  filterRect.setYMaximum( pos.y() + radiusmu );
+  QgsRectangle filterRect(
+    pos.x() - radiusmu,
+    pos.y() - radiusmu,
+    pos.x() + radiusmu,
+    pos.y() + radiusmu
+  );
   return intersects( filterRect, settings );
 }
 
 double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
 {
   return 5 * settings.mapUnitsPerPixel();
+}
+
+QgsRectangle KadasMapItem::pointWithTolerance( const QgsPointXY &point, double tol )
+{
+  QgsRectangle rect = QgsRectangle(
+    point.x() - tol,
+    point.y() - tol,
+    point.x() + tol,
+    point.y() + tol
+  );
+  return rect;
 }
 
 void KadasMapItem::cleanupAttachment( const QString &filePath ) const

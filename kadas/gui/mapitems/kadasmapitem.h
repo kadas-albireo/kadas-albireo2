@@ -59,42 +59,6 @@ class KADAS_GUI_EXPORT KadasMapPos
     double mY = 0.;
 };
 
-class KADAS_GUI_EXPORT KadasMapRect
-{
-  public:
-    KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
-      : mXmin( xMin ), mYmin( yMin ), mXmax( xMax ), mYmax( yMax )
-    {}
-
-    KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
-    KadasMapRect( const KadasMapPos &center, double span )
-      : mXmin( center.x() - span ), mYmin( center.y() - span ), mXmax( center.x() + span ), mYmax( center.y() + span )
-    {}
-
-    double xMinimum() const { return mXmin; }
-    void setXMinimum( double xMin ) { mXmin = xMin; }
-    double yMinimum() const { return mYmin; }
-    void setYMinimum( double yMin ) { mYmin = yMin; }
-    double xMaximum() const { return mXmax; }
-    void setXMaximum( double xMax ) { mXmax = xMax; }
-    double yMaximum() const { return mYmax; }
-    void setYMaximum( double ymax ) { mYmax = ymax; }
-    operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasMapPos center() const { return KadasMapPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
-
-  private:
-    double mXmin = 0.;
-    double mYmin = 0.;
-    double mXmax = 0.;
-    double mYmax = 0.;
-};
-
 
 class KADAS_GUI_EXPORT KadasItemPos
 {
@@ -127,42 +91,6 @@ class KADAS_GUI_EXPORT KadasItemPos
     double mX = 0.;
     double mY = 0.;
     double mZ = 0.;
-};
-
-
-class KADAS_GUI_EXPORT KadasItemRect
-{
-  public:
-    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
-      : mXmin( xMin )
-      , mYmin( yMin )
-      , mXmax( xMax )
-      , mYmax( yMax )
-    {}
-
-    KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
-    double xMinimum() const { return mXmin; }
-    void setXMinimum( double xMin ) { mXmin = xMin; }
-    double yMinimum() const { return mYmin; }
-    void setYMinimum( double yMin ) { mYmin = yMin; }
-    double xMaximum() const { return mXmax; }
-    void setXMaximum( double xMax ) { mXmax = xMax; }
-    double yMaximum() const { return mYmax; }
-    void setYMaximum( double ymax ) { mYmax = ymax; }
-    operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasItemPos center() const { return KadasItemPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
-
-  private:
-    double mXmin = 0.;
-    double mYmin = 0.;
-    double mXmax = 0.;
-    double mYmax = 0.;
 };
 
 
@@ -327,7 +255,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
     /* Hit test, rect in item crs */
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     /* Return the item point to the specified one */
@@ -526,11 +454,13 @@ class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    KadasMapRect toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
-    KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
+    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
+    QgsRectangle toItemRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
     void cleanupAttachment( const QString &filePath ) const;
+
+    static QgsRectangle pointWithTolerance( const QgsPointXY &point, double tol );
 
   private:
     QString mEditor;

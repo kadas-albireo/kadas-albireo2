@@ -82,7 +82,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
     virtual void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
 #ifndef SIP_RUN
