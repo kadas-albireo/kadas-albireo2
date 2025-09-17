@@ -2,12 +2,12 @@
 <context>
     <name>Kadas3DIntegration</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
         <source>New 3D Map View</source>
         <translation>Nouvelle vue cartographique 3D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
         <translation>L&apos;étendue du projet n&apos;est pas valide. Veuillez ajouter ou activer une couche pour le rendu.</translation>
     </message>
@@ -167,136 +167,136 @@
 <context>
     <name>Kadas3DMapConfigWidget</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="55"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="57"/>
         <source>Terrain Based</source>
         <translation>En fonction du terrain</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="58"/>
         <source>Walk Mode (First Person)</source>
         <translation>Mode marche (première personne)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="76"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="78"/>
         <source>Perspective Projection</source>
         <translation>Projection en perspective</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="77"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="79"/>
         <source>Orthogonal Projection</source>
         <translation>Projection orthogonale</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="99"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
         <source>Flat Terrain</source>
         <translation>Terrain plat</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="100"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>DEM (Raster Layer)</source>
         <translation>MNE (Couche Raster)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Online</source>
         <translation>En ligne</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="104"/>
         <source>Mesh</source>
         <translation>Maillage</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="105"/>
         <source>Quantized Mesh</source>
         <translation>Maillage</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="217"/>
         <source>Coordinate Reference System</source>
         <translation>Système de coordonnées de références</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="206"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="218"/>
         <source>Cube</source>
         <translation>Cube</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="208"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="220"/>
         <source>Left</source>
         <translation>Gauche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="209"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="221"/>
         <source>Center</source>
         <translation>Centre</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="210"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="222"/>
         <source>Right</source>
         <translation>Droite</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="212"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="224"/>
         <source>Top</source>
         <translation>Haut</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="213"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="225"/>
         <source>Middle</source>
         <translation>Milieu</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="214"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="226"/>
         <source>Bottom</source>
         <translation>Bas</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="232"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="237"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="244"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="249"/>
         <source>Top Left</source>
         <translation>Coin supérieur gauche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="233"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="238"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="245"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="250"/>
         <source>Top Right</source>
         <translation>Coin supérieur droite</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="234"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="239"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="246"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="251"/>
         <source>Bottom Left</source>
         <translation>Coin inférieur gauche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="235"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="240"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="247"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="252"/>
         <source>Bottom Right</source>
         <translation>Coin inférieur droite</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="263"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="275"/>
         <source>Show in 2D map view</source>
         <translation>Vue Carte 2D</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="485"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="484"/>
         <source>An elevation layer must be selected for a DEM terrain</source>
         <translation>Une couche d&apos;élévation doit être sélectionnée pour un MNT</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="493"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="492"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
         <translation>Une couche d&apos;élévation doit être sélectionnée pour un terrain maillé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="500"/>
         <source>An elevation layer must be selected for a quantized mesh terrain</source>
         <translation>Une couche d&apos;élévation doit être sélectionnée pour un mondèle numérique de terrain</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="512"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="511"/>
         <source>No lights exist in the scene</source>
         <translation>Aucune lumière n&apos;existe dans la scène</translation>
     </message>
