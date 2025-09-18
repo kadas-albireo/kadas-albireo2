@@ -60,19 +60,19 @@ void KadasGpxWaypointItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGpxWaypointItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGpxWaypointItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxWaypointItem::margin() const

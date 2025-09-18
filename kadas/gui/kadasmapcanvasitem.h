@@ -28,7 +28,7 @@ class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapCanvasItem : public QgsMapCanvasItem
 {
-    // Q_OBJECT
+    Q_OBJECT
 
   public:
     KadasMapCanvasItem( KadasMapItem *item, QgsMapCanvas *canvas );

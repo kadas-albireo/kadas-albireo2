@@ -85,7 +85,7 @@ void KadasPolygonItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 QList<KadasMapItem::Node> KadasPolygonItem::nodes( const QgsMapSettings &settings ) const

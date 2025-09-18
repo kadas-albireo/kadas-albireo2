@@ -23,7 +23,7 @@ class QgsMultiSurface;
 
 class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
 {
-    // Q_OBJECT
+    Q_OBJECT
 
   public:
     KadasCircularSectorItem();

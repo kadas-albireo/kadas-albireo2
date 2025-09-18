@@ -79,19 +79,19 @@ void KadasSymbolItem::setup( const QString &path, double anchorX, double anchorY
 void KadasSymbolItem::setFilePath( const QString &path )
 {
   setup( path, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasSymbolItem::setName( const QString &name )
 {
   mName = name;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasSymbolItem::setRemarks( const QString &remarks )
 {
   mRemarks = remarks;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasSymbolItem::setState( const KadasMapItem::State *state )
@@ -251,7 +251,7 @@ KadasPinItem::KadasPinItem()
   : KadasSymbolItem()
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
-  // TODO !!! connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
+  connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
 }
 
 void KadasPinItem::updateTooltip()
@@ -267,7 +267,7 @@ void KadasPinItem::updateTooltip()
                           .arg( KadasCoordinateFormat::instance()->getHeightDisplayUnit() == Qgis::DistanceUnit::Feet ? "ft" : "m" )
                           .arg( name() )
                           .arg( remarks() );
-  // TODO !!! blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
+  blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
   setTooltip( toolTipText );
-  // TODO !!! blockSignals( false );
+  blockSignals( false );
 }

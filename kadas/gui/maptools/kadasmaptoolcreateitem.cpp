@@ -420,7 +420,7 @@ void KadasMapToolCreateItem::commitItem()
     return;
   }
   mItem->setSelected( false );
-  // TODO !!! disconnect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
+  disconnect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
   if ( mEditor )
   {
     mEditor->setItem( nullptr );

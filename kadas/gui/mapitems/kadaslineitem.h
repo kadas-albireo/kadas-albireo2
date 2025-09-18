@@ -23,8 +23,8 @@ class QgsMultiLineString;
 
 class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
 {
-    // Q_OBJECT
-    // Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
+    Q_OBJECT
+    Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
     KadasLineItem( bool geodesic = false );

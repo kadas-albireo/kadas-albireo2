@@ -45,7 +45,7 @@ void KadasTextItem::setText( const QString &text )
     state()->mSize.setHeight( metrics.height() );
   }
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasTextItem::setAngle( double angle )
@@ -58,14 +58,14 @@ void KadasTextItem::setFillColor( const QColor &c )
 {
   mFillColor = c;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasTextItem::setOutlineColor( const QColor &c )
 {
   mOutlineColor = c;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasTextItem::setFont( const QFont &font )
@@ -78,13 +78,13 @@ void KadasTextItem::setFont( const QFont &font )
     state()->mSize.setHeight( metrics.height() );
   }
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasTextItem::setFrameAutoResize( bool frameAutoResize )
 {
   mFrameAutoResize = frameAutoResize;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
   if ( mFrameAutoResize )
     setFont( mFont );
 }

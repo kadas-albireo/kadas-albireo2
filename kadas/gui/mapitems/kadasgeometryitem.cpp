@@ -68,7 +68,7 @@ KadasGeometryItem::KadasGeometryItem()
 {
   registerMetaTypes();
 
-  // TODO !!! connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
+  connect( this, &KadasGeometryItem::geometryChanged, this, &KadasGeometryItem::updateMeasurements );
 }
 
 KadasGeometryItem::~KadasGeometryItem()
@@ -269,7 +269,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
 {
   delete mGeometry;
   mGeometry = geom;
-  // TODO !!! emit geometryChanged();
+  emit geometryChanged();
 }
 
 bool KadasGeometryItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
@@ -344,42 +344,42 @@ void KadasGeometryItem::setOutline( const QPen &pen )
 {
   mPen = pen;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setFill( const QBrush &brush )
 {
   mBrush = brush;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconSize( int iconSize )
 {
   mIconSize = iconSize;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconType( IconType iconType )
 {
   mIconType = iconType;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconOutline( const QPen &iconPen )
 {
   mIconPen = iconPen;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
 {
   mIconBrush = iconBrush;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 QgsRectangle KadasGeometryItem::boundingBox() const
@@ -404,7 +404,7 @@ void KadasGeometryItem::setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit
 {
   mMeasureGeometry = enabled;
   mBaseUnit = baseUnit;
-  // TODO !!! emit geometryChanged(); // Trigger re-measurement
+  emit geometryChanged(); // Trigger re-measurement
 }
 
 Qgis::DistanceUnit KadasGeometryItem::distanceBaseUnit() const

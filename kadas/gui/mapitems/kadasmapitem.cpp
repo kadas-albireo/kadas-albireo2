@@ -54,15 +54,16 @@ std::once_flag onceFlagMapItemRegistry;
 
 
 KadasMapItem::KadasMapItem()
+  : QObject()
 {
 }
 
 KadasMapItem::~KadasMapItem()
 {
-  // TODO !!! emit aboutToBeDestroyed();
+  emit aboutToBeDestroyed();
   if ( mAssociatedLayer )
   {
-    // TODO !!! setParent( nullptr );
+    setParent( nullptr );
     QgsProject::instance()->removeMapLayer( mAssociatedLayer->id() );
   }
 }
@@ -71,12 +72,11 @@ KadasMapItem *KadasMapItem::clone() const
 {
   KadasMapItem *item = _clone();
   item->mCrs = mCrs;
-  // TODO !!!
-  // for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  // {
-  //   QMetaProperty prop = metaObject()->property( i );
-  //   prop.write( item, prop.read( this ) );
-  // }
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    prop.write( item, prop.read( this ) );
+  }
   item->setState( constState()->clone() );
   return item;
 }
@@ -154,7 +154,7 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
 bool KadasMapItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
   //QDomElement itemEl = document.createElement( "MapItem" );
-  // TODO !!! itemEl.setAttribute( "name", metaObject()->className() );
+  element.setAttribute( "name", metaObject()->className() );
   element.setAttribute( "crs", crs().authid() );
   element.setAttribute( "editor", editor() );
   if ( associatedLayer() )
@@ -205,7 +205,7 @@ QString KadasMapItem::exportName() const
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;
-  // TODO !!! setParent( layer );
+  setParent( layer );
 }
 
 void KadasMapItem::setOwnerLayer( KadasItemLayer *layer )
@@ -223,21 +223,21 @@ void KadasMapItem::setAuthId( const QString &authId )
 {
   mCrs = QgsCoordinateReferenceSystem( authId );
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setTooltip( const QString &tooltip )
 {
   mTooltip = tooltip;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setVisible( bool visible )
@@ -250,7 +250,7 @@ void KadasMapItem::setSymbolScale( double scale )
 {
   mSymbolScale = scale;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMapItem::setState( const State *state )
@@ -277,7 +277,7 @@ QPair<KadasMapPos, double> KadasMapItem::closestPoint( const KadasMapPos &pos, c
 
 void KadasMapItem::update()
 {
-  // TODO !!! emit changed();
+  emit changed();
 }
 
 KadasMapPos KadasMapItem::toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const
@@ -434,29 +434,29 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
 QMap<QString, QVariant> KadasMapItem::getProps() const
 {
   QMap<QString, QVariant> result;
-  // for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  // {
-  //   QMetaProperty prop = metaObject()->property( i );
-  //   result[prop.name()] = prop.read( this );
-  // }
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    result[prop.name()] = prop.read( this );
+  }
   return result;
 }
 
 void KadasMapItem::setProps( const QMap<QString, QVariant> &props )
 {
-  // blockSignals( true );
-  // for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  // {
-  //   QMetaProperty prop = metaObject()->property( i );
-  //   auto it = props.find( prop.name() );
-  //   if ( it != props.end() )
-  //   {
-  //     prop.write( this, it.value() );
-  //   }
-  // }
-  // blockSignals( false );
-  // TODO !!! emit changed();
-  // TODO !!! emit propertyChanged();
+  blockSignals( true );
+  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  {
+    QMetaProperty prop = metaObject()->property( i );
+    auto it = props.find( prop.name() );
+    if ( it != props.end() )
+    {
+      prop.write( this, it.value() );
+    }
+  }
+  blockSignals( false );
+  emit changed();
+  emit propertyChanged();
 }
 
 QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant &variant ) const

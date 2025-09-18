@@ -21,7 +21,7 @@
 
 class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
 {
-    // Q_OBJECT
+    Q_OBJECT
 
   public:
     KadasCoordinateCrossItem();

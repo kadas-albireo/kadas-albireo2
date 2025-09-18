@@ -117,14 +117,14 @@ void KadasRectangleItemBase::setFrameVisible( bool frame )
     state()->mOffsetY = 0;
   }
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasRectangleItemBase::setPositionLocked( bool locked )
 {
   mPosLocked = locked;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasRectangleItemBase::setPosition( const KadasItemPos &pos )

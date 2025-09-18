@@ -74,7 +74,7 @@ KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *action
   setCursor( Qt::ArrowCursor );
   setToolLabel( tr( "Compute min/max" ) );
   setUndoRedoVisible( false );
-  // TODO !!! connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolMinMax::drawFinished );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolMinMax::drawFinished );
 
   QWidget *filterTypeWidget = new QWidget();
   filterTypeWidget->setLayout( new QHBoxLayout() );

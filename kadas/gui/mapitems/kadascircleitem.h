@@ -24,8 +24,8 @@ class QgsMultiSurface;
 
 class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 {
-    // Q_OBJECT
-    // Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
+    Q_OBJECT
+    Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
     KadasCircleItem( bool geodesic = false );

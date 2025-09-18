@@ -63,7 +63,7 @@ KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
   {
     return;
   }
-  // TODO !!! mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
+  mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
 }
 
 void KadasRedliningTextEditor::syncItemToWidget()
@@ -129,7 +129,7 @@ void KadasRedliningTextEditor::setItem( KadasMapItem *item )
   {
     return;
   }
-  // TODO !!! mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
+  mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
 }
 
 QFont KadasRedliningTextEditor::currentFont() const

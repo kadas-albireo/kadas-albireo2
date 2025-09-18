@@ -21,10 +21,10 @@
 
 class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 {
-    // Q_OBJECT
-    // Q_PROPERTY( QString name READ name WRITE setName )
-    // Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    // Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
+    Q_OBJECT
+    Q_PROPERTY( QString name READ name WRITE setName )
+    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
+    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxWaypointItem();

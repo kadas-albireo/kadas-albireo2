@@ -73,53 +73,52 @@ void KadasMapCanvasItemManager::clear()
 
 void KadasMapCanvasItemManager::itemAboutToBeDestroyed()
 {
-  // TODO !!!
-  // KadasMapItem *item = qobject_cast<KadasMapItem *>( QObject::sender() );
-  // if ( item )
-  // {
-  //   removeItem( item );
-  // }
+  KadasMapItem *item = qobject_cast<KadasMapItem *>( QObject::sender() );
+  if ( item )
+  {
+    removeItem( item );
+  }
 }
 
 void KadasMapCanvasItemManager::readFromProject( const QDomDocument &doc )
 {
-  // TODO !!!
-  // QDomElement itemsEl = doc.firstChildElement( "qgis" ).firstChildElement( "MapCanvasItems" );
-  // if ( !itemsEl.isNull() )
-  // {
-  //   QDomNodeList items = itemsEl.elementsByTagName( "MapItem" );
-  //   for ( int i = 0, n = items.size(); i < n; ++i )
-  //   {
-  //     KadasMapItem *item = KadasMapItem::fromXml( items.at( i ).toElement() );
-  //     if ( item )
-  //     {
-  //       addItem( item );
-  //     }
-  //   }
-  // }
+  QDomElement itemsEl = doc.firstChildElement( "qgis" ).firstChildElement( "MapCanvasItems" );
+  if ( !itemsEl.isNull() )
+  {
+    QDomNodeList items = itemsEl.elementsByTagName( "MapItem" );
+    for ( int i = 0, n = items.size(); i < n; ++i )
+    {
+      KadasMapItem *item = KadasMapItem::fromXml( items.at( i ).toElement() );
+      if ( item )
+      {
+        addItem( item );
+      }
+    }
+  }
 }
 
 void KadasMapCanvasItemManager::writeToProject( QDomDocument &doc )
 {
-  // TODO !!!
-
-  // QDomElement root = doc.firstChildElement( "qgis" );
-  // // Write all items associated to a layer
-  // QList<const KadasMapItem *> items;
-  // for ( const KadasMapItem *item : mMapItems )
-  // {
-  //   if ( item->associatedLayer() )
-  //   {
-  //     items.append( item );
-  //   }
-  // }
-  // if ( !items.isEmpty() )
-  // {
-  //   QDomElement itemsEl = doc.createElement( "MapCanvasItems" );
-  //   for ( const KadasMapItem *item : items )
-  //   {
-  //     itemsEl.appendChild( item->writeXml( doc ) );
-  //   }
-  //   root.appendChild( itemsEl );
-  // }
+  QDomElement root = doc.firstChildElement( "qgis" );
+  // Write all items associated to a layer
+  QList<const KadasMapItem *> items;
+  for ( const KadasMapItem *item : mMapItems )
+  {
+    if ( item->associatedLayer() )
+    {
+      items.append( item );
+    }
+  }
+  if ( !items.isEmpty() )
+  {
+    QgsReadWriteContext context;
+    QDomElement itemsEl = doc.createElement( "MapCanvasItems" );
+    for ( const KadasMapItem *item : items )
+    {
+      QDomElement itemEl;
+      item->writeXml( itemEl, doc, context );
+      itemsEl.appendChild( itemEl );
+    }
+    root.appendChild( itemsEl );
+  }
 }

@@ -173,11 +173,11 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
         menu.addSeparator();
       }
       KadasItemContextMenuActions actions( mCanvas, &menu, mItem, mLayer );
-      // TODO !!! connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
+      connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
       QAction *clickedAction = menu.exec( e->globalPos() );
       if ( mItem )
       {
-        // TODO !!! disconnect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
+        disconnect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
       }
 
       if ( clickedAction )

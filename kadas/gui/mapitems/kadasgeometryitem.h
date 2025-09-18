@@ -29,13 +29,13 @@ struct QgsVertexId;
 
 class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
 {
-    // Q_OBJECT
-    // Q_PROPERTY( QPen outline READ outline WRITE setOutline )
-    // Q_PROPERTY( QBrush fill READ fill WRITE setFill )
-    // Q_PROPERTY( int iconSize READ iconSize WRITE setIconSize )
-    // Q_PROPERTY( IconType iconType READ iconType WRITE setIconType )
-    // Q_PROPERTY( QPen iconOutline READ iconOutline WRITE setIconOutline )
-    // Q_PROPERTY( QBrush iconFill READ iconFill WRITE setIconFill )
+    Q_OBJECT
+    Q_PROPERTY( QPen outline READ outline WRITE setOutline )
+    Q_PROPERTY( QBrush fill READ fill WRITE setFill )
+    Q_PROPERTY( int iconSize READ iconSize WRITE setIconSize )
+    Q_PROPERTY( IconType iconType READ iconType WRITE setIconType )
+    Q_PROPERTY( QPen iconOutline READ iconOutline WRITE setIconOutline )
+    Q_PROPERTY( QBrush iconFill READ iconFill WRITE setIconFill )
 
   public:
     enum class IconType SIP_MONKEYPATCH_SCOPEENUM
@@ -116,7 +116,7 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     const QgsAbstractGeometry *geometry() const { return mGeometry; }
 
   signals:
-    // TODO !!! void geometryChanged();
+    void geometryChanged();
 
   protected:
     QgsAbstractGeometry *mGeometry = nullptr;

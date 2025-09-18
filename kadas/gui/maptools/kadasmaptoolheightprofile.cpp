@@ -50,8 +50,8 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
 
 
   mDialog = new KadasHeightProfileDialog( this, 0, Qt::WindowStaysOnTopHint );
-  // TODO !!! connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHeightProfile::drawFinished );
-  // TODO !!! connect( this, &KadasMapToolCreateItem::cleared, this, &KadasMapToolHeightProfile::drawCleared );
+  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHeightProfile::drawFinished );
+  connect( this, &KadasMapToolCreateItem::cleared, this, &KadasMapToolHeightProfile::drawCleared );
 }
 
 void KadasMapToolHeightProfile::activate()

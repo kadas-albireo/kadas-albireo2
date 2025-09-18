@@ -21,11 +21,11 @@
 
 class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
 {
-    // Q_OBJECT
-    // Q_PROPERTY( QString name READ name WRITE setName )
-    // Q_PROPERTY( QString number READ number WRITE setNumber )
-    // Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    // Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
+    Q_OBJECT
+    Q_PROPERTY( QString name READ name WRITE setName )
+    Q_PROPERTY( QString number READ number WRITE setNumber )
+    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
+    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxRouteItem();

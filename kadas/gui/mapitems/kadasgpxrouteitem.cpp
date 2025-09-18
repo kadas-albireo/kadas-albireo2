@@ -53,26 +53,26 @@ void KadasGpxRouteItem::setName( const QString &name )
   QFontMetrics fm( mLabelFont );
   mLabelSize = fm.size( 0, name );
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setNumber( const QString &number )
 {
   mNumber = number;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setLabelFont( const QFont &labelFont )
 {
   mLabelFont = labelFont;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasGpxRouteItem::setLabelColor( const QColor &labelColor )
 {
   mLabelColor = labelColor;
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 KadasMapItem::Margin KadasGpxRouteItem::margin() const

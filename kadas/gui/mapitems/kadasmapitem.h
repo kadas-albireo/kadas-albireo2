@@ -203,14 +203,14 @@ class KADAS_GUI_EXPORT KadasItemPos
 // clang-format on
 #endif
 
-class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
+class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem SIP_ABSTRACT
 {
-    // Q_OBJECT
-    // Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
-    // Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
-    // Q_PROPERTY( QString editor READ editor WRITE setEditor )
-    // Q_PROPERTY( QString authId READ authId WRITE setAuthId )
-    // Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
+    Q_OBJECT
+    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+    Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
+    Q_PROPERTY( QString editor READ editor WRITE setEditor )
+    Q_PROPERTY( QString authId READ authId WRITE setAuthId )
+    Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
     KadasMapItem();
@@ -427,11 +427,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QgsAnnotationItem SIP_ABSTRACT
     QMap<QString, QVariant> getProps() const;
     void setProps( const QMap<QString, QVariant> &props );
 
-    // TODO !!!
-    // signals:
-    //   void aboutToBeDestroyed();
-    //   void changed();
-    //   void propertyChanged();
+  signals:
+    void aboutToBeDestroyed();
+    void changed();
+    void propertyChanged();
 
   protected:
     State *mState = nullptr;

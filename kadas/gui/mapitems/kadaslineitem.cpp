@@ -82,7 +82,7 @@ void KadasLineItem::setGeodesic( bool geodesic )
 {
   mGeodesic = geodesic;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 KadasItemPos KadasLineItem::position() const
@@ -347,7 +347,7 @@ void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::A
   setMeasurementsEnabled( true );
   mMeasurementMode = measurementMode;
   mAngleUnit = angleUnit;
-  // TODO !!! emit geometryChanged(); // Trigger re-measurement
+  emit geometryChanged(); // Trigger re-measurement
 }
 
 void KadasLineItem::measureGeometry()

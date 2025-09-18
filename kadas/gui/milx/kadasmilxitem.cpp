@@ -152,42 +152,42 @@ void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
   mMinNPoints = symbolDesc.minNumPoints;
   mSymbolType = symbolDesc.symbolType;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setMssString( const QString &mssString )
 {
   mMssString = mssString;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setMilitaryName( const QString &militaryName )
 {
   mMilitaryName = militaryName;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setMinNPoints( int minNPoints )
 {
   mMinNPoints = minNPoints;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setHasVariablePoints( bool hasVariablePoints )
 {
   mHasVariablePoints = hasVariablePoints;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 void KadasMilxItem::setSymbolType( const QString &symbolType )
 {
   mSymbolType = symbolType;
   update();
-  // TODO !!! emit propertyChanged();
+  emit propertyChanged();
 }
 
 KadasItemPos KadasMilxItem::position() const
