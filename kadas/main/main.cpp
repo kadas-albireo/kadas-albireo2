@@ -27,7 +27,7 @@
 #include <qgis/qgsuserprofilemanager.h>
 
 #include "kadas/core/kadas.h"
-#include "kadasapplication.h"
+#include "kadas/app/kadasapplication.h"
 
 int main( int argc, char *argv[] )
 {

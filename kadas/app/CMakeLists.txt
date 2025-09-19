@@ -202,19 +202,6 @@ if(WIN32)
   endif()
 endif(WIN32)
 
-add_executable(
-  kadas
-  ${WIN32_SHOW_CONSOLE}
-  main.cpp
-  ${kadas_SRC}
-  ${kadas_HDR}
-  ${kadas_UI}
-  ${kadas_UI_HDR}
-  ${KADAS_RCC_SRC}
-  ${KADAS_RCC}
-  ${kadas_QM}
-)
-
 add_library(
   kadas_app
   ${kadas_SRC}
@@ -227,26 +214,6 @@ add_library(
 )
 
 target_link_libraries(
-  kadas
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Xml
-  Qt5::Sql
-  Qt5::OpenGL
-  Qt5::PrintSupport
-  QuaZip::QuaZip
-  ${AXCONTAINER_LIBRARY}
-  QGIS::Core
-  QGIS::Gui
-  QGIS::3D
-  Python3::Python
-  ${kadas_RC_LIBS}
-  kadas_core
-  kadas_analysis
-  kadas_gui
-)
-
-target_link_libraries(
   kadas_app
   Qt5::Widgets
   Qt5::Network
@@ -264,22 +231,6 @@ target_link_libraries(
   kadas_core
   kadas_analysis
   kadas_gui
-)
-
-target_include_directories(
-  kadas
-  PUBLIC ${CMAKE_SOURCE_DIR}/kadas/app
-         ${CMAKE_SOURCE_DIR}/kadas/app/3d
-         ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
-         ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
-         ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
-         ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
-         ${CMAKE_SOURCE_DIR}/kadas/app/kml
-         ${CMAKE_SOURCE_DIR}/kadas/app/layertree
-         ${CMAKE_SOURCE_DIR}/kadas/app/mapgrid
-         ${CMAKE_SOURCE_DIR}/kadas/app/mapswipe
-         ${CMAKE_SOURCE_DIR}/kadas/app/milx
-         ${CMAKE_BINARY_DIR}/kadas/app # UI are compiled there
 )
 
 target_include_directories(
@@ -318,7 +269,6 @@ file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
      ${PROJECT_SOURCE_DIR}
 )
 
-install(TARGETS kadas DESTINATION bin)
 install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
 
 generate_export_header(
