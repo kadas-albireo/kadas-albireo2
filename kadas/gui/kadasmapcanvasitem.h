@@ -26,7 +26,7 @@ class QgsMapLayer;
 class KadasMapItem;
 
 
-class KADAS_GUI_EXPORT KadasMapCanvasItem : public QgsMapCanvasItem
+class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasItem
 {
     Q_OBJECT
 

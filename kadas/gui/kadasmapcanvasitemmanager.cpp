@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsannotationitemguiregistry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
 
@@ -88,11 +90,17 @@ void KadasMapCanvasItemManager::readFromProject( const QDomDocument &doc )
     QDomNodeList items = itemsEl.elementsByTagName( "MapItem" );
     for ( int i = 0, n = items.size(); i < n; ++i )
     {
-      KadasMapItem *item = KadasMapItem::fromXml( items.at( i ).toElement() );
-      if ( item )
+      const QDomElement itemEl = items.at( i ).toElement();
+      QString name = itemEl.attribute( "name" );
+      QgsAnnotationItem *annotItem = QgsApplication::annotationItemRegistry()->createItem( name );
+      KadasMapItem *item = dynamic_cast<KadasMapItem *>( annotItem );
+
+      if ( !item )
       {
-        addItem( item );
+        QgsDebugMsgLevel( QString( "Unknown item: %1" ).arg( name ), 2 );
+        continue;
       }
+      addItem( item );
     }
   }
 }
