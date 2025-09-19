@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <csignal>
 #include <fstream>
 #include <QDir>
 #include <QSettings>
