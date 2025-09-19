@@ -32,6 +32,8 @@ macro(add_kadas_test TESTSRC)
   target_compile_definitions(
     ${TESTNAME} PRIVATE "TEST_DATA_DIR=\"${TEST_DATA_DIR}\""
   )
+
+  install(TARGETS ${TESTNAME} DESTINATION bin)
 endmacro()
 
 add_subdirectory(gui)
