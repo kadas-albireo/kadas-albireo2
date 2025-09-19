@@ -1,4 +1,3 @@
-
 if(WIN32)
   set(SHOW_CONSOLE
       OFF
@@ -9,24 +8,10 @@ if(WIN32)
   endif()
 endif(WIN32)
 
-add_executable(
-  kadas
-  ${WIN32_SHOW_CONSOLE}
-  main.cpp
-)
+add_executable(kadas ${WIN32_SHOW_CONSOLE} main.cpp)
 
-target_link_libraries(
-  kadas
-  QGIS::Core
-  QGIS::Gui
-  kadas_app
-  kadas_core
-)
+target_link_libraries(kadas QGIS::Core QGIS::Gui kadas_app kadas_core)
 
-target_include_directories(
-  kadas
-  PUBLIC ${CMAKE_SOURCE_DIR}/kadas/main
-)
+target_include_directories(kadas PUBLIC ${CMAKE_SOURCE_DIR}/kadas/main)
 
 install(TARGETS kadas DESTINATION bin)
-
