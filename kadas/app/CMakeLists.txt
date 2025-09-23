@@ -39,7 +39,7 @@ set(kadas_SRC
     3d/kadasskyboxrenderingsettingswidget.cpp
     bullseye/kadasbullseyelayer.cpp
     bullseye/kadasmaptoolbullseye.cpp
-    devtools/kadasnetworkloggerdialog.cpp
+    devtools/kadasnetworkloggerdockwidget.cpp
     external/qgis/app/qgslayertreeviewindicatorprovider.cpp
     guidegrid/kadasguidegridlayer.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
@@ -98,7 +98,7 @@ set(kadas_HDR
     3d/kadasskyboxrenderingsettingswidget.h
     bullseye/kadasbullseyelayer.h
     bullseye/kadasmaptoolbullseye.h
-    devtools/kadasnetworkloggerdialog.h
+    devtools/kadasnetworkloggerdockwidget.h
     external/qgis/app/qgslayertreeviewindicatorprovider.h
     guidegrid/kadasguidegridlayer.h
     guidegrid/kadasmaptoolguidegrid.h
