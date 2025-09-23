@@ -53,20 +53,34 @@ Q_GLOBAL_STATIC( KadasMapItem::Registry, sRegistry )
 std::once_flag onceFlagMapItemRegistry;
 
 
-KadasMapItemAnnotationInterface::KadasMapItemAnnotationInterface()
+KadasMapItemBase::KadasMapItemBase()
 {
 }
 
-QString KadasMapItemAnnotationInterface::exportName() const
+QString KadasMapItemBase::exportName() const
 {
   return itemName();
+}
+
+void KadasMapItemBase::copyCommonPropertiesTo( KadasMapItemBase *other ) const
+{
+  other->mCrs = mCrs;
+  other->mSelected = mSelected;
+  other->mZIndex = mZIndex; // TODO !!! move it to KadasMapItem since implemented in Qgs??
+  other->mTooltip = mTooltip;
+  other->mVisible = mVisible;
+  other->mSymbolScale = mSymbolScale;
+  other->mAssociatedLayer = mAssociatedLayer;
+  other->mOwnerLayer = mOwnerLayer;
+  other->mIsPointSymbol = mIsPointSymbol;
+  other->mDontCleanupAttachment = mDontCleanupAttachment;
+  other->mEditor = mEditor;
 }
 
 
 KadasMapItem::KadasMapItem()
   : QObject()
-  , QgsAnnotationItem()
-  , KadasMapItemAnnotationInterface()
+  , KadasMapItemBase()
 {
 }
 
@@ -90,6 +104,7 @@ KadasMapItem *KadasMapItem::clone() const
     prop.write( item, prop.read( this ) );
   }
   item->setState( constState()->clone() );
+  copyCommonPropertiesTo( item );
   return item;
 }
 
@@ -177,8 +192,6 @@ bool KadasMapItem::writeXml( QDomElement &element, QDomDocument &document, const
   doc.setObject( serialize() );
   element.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
 
-  writeCommonProperties( element, document, context );
-
   return true;
 }
 
@@ -189,8 +202,6 @@ bool KadasMapItem::readXml( const QDomElement &element, const QgsReadWriteContex
   QString crs = itemEl.attribute( "crs" );
   QString editor = itemEl.attribute( "editor" );
   QString layerId = itemEl.attribute( "associatedLayer" );
-
-  readCommonProperties( element, context );
 
   QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
 
@@ -209,51 +220,51 @@ bool KadasMapItem::readXml( const QDomElement &element, const QgsReadWriteContex
   return true;
 }
 
-void KadasMapItem::associateToLayer( QgsMapLayer *layer )
+void KadasMapItemBase::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;
   setParent( layer );
 }
 
-void KadasMapItem::setOwnerLayer( KadasItemLayer *layer )
+void KadasMapItemBase::setOwnerLayer( KadasItemLayer *layer )
 {
   mOwnerLayer = layer;
 }
 
-void KadasMapItem::setSelected( bool selected )
+void KadasMapItemBase::setSelected( bool selected )
 {
   mSelected = selected;
   update();
 }
 
-void KadasMapItem::setAuthId( const QString &authId )
+void KadasMapItemBase::setAuthId( const QString &authId )
 {
   mCrs = QgsCoordinateReferenceSystem( authId );
   update();
   emit propertyChanged();
 }
 
-void KadasMapItem::setZIndex( int zIndex )
+void KadasMapItemBase::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
   update();
   emit propertyChanged();
 }
 
-void KadasMapItem::setTooltip( const QString &tooltip )
+void KadasMapItemBase::setTooltip( const QString &tooltip )
 {
   mTooltip = tooltip;
   update();
   emit propertyChanged();
 }
 
-void KadasMapItem::setVisible( bool visible )
+void KadasMapItemBase::setVisible( bool visible )
 {
   mVisible = visible;
   update();
 }
 
-void KadasMapItem::setSymbolScale( double scale )
+void KadasMapItemBase::setSymbolScale( double scale )
 {
   mSymbolScale = scale;
   update();
@@ -311,12 +322,12 @@ QgsRectangle KadasMapItem::toItemRect( const QgsRectangle &itemRect, const QgsMa
   return rect;
 }
 
-double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
+double KadasMapItemBase::pickTolSqr( const QgsMapSettings &settings ) const
 {
   return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();
 }
 
-bool KadasMapItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const
+bool KadasMapItemBase::hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const
 {
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( settings );
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
@@ -331,12 +342,12 @@ bool KadasMapItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settin
   return intersects( filterRect, settings );
 }
 
-double KadasMapItem::pickTol( const QgsMapSettings &settings ) const
+double KadasMapItemBase::pickTol( const QgsMapSettings &settings ) const
 {
   return 5 * settings.mapUnitsPerPixel();
 }
 
-QgsRectangle KadasMapItem::pointWithTolerance( const QgsPointXY &point, double tol )
+QgsRectangle KadasMapItemBase::pointWithTolerance( const QgsPointXY &point, double tol )
 {
   QgsRectangle rect = QgsRectangle(
     point.x() - tol,
@@ -507,4 +518,30 @@ QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant 
   }
 
   return value;
+}
+
+KadasQgsAnnotationWrapper::~KadasQgsAnnotationWrapper()
+{
+  delete mQgsItem;
+}
+
+bool KadasQgsAnnotationWrapper::readXml( const QDomElement &element, const QgsReadWriteContext &context )
+{
+  return mQgsItem->readXml( element, context );
+}
+
+bool KadasQgsAnnotationWrapper::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  return mQgsItem->writeXml( element, document, context );
+}
+
+KadasPointItem::~KadasPointItem()
+{
+  delete mQgsItem;
+}
+
+
+QgsRectangle KadasQgsAnnotationWrapper::boundingBox() const
+{
+  return mQgsItem->boundingBox();
 }

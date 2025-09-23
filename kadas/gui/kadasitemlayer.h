@@ -149,11 +149,11 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QString layerTypeKey() const override { return layerType(); }
     virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
-    ItemId addItem( KadasMapItemAnnotationInterface *item SIP_TRANSFER );
+    ItemId addItem( KadasMapItemBase *item SIP_TRANSFER );
     void lowerItem( const ItemId &itemId );
     void raiseItem( const ItemId &itemId );
-    KadasMapItemAnnotationInterface *takeItem( const ItemId &itemId ) SIP_TRANSFER;
-    const QMap<KadasItemLayer::ItemId, KadasMapItemAnnotationInterface *> &items() const { return mItems; }
+    KadasMapItemBase *takeItem( const ItemId &itemId ) SIP_TRANSFER;
+    const QMap<KadasItemLayer::ItemId, KadasMapItemBase *> &items() const { return mItems; }
 
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
@@ -186,7 +186,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
-    QMap<ItemId, KadasMapItemAnnotationInterface *> mItems;
+    QMap<ItemId, KadasMapItemBase *> mItems;
     QList<ItemId> mItemOrder;
     QMap<ItemId, QgsRectangle> mItemBounds;
     ItemId mIdCounter = 0;

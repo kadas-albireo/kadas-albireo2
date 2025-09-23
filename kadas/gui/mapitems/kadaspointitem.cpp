@@ -21,6 +21,7 @@
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsgeometryengine.h>
 
 #include "kadas/gui/mapitems/kadaspointitem.h"
 
@@ -55,18 +56,22 @@ bool KadasPointItem::State::deserialize( const QJsonObject &json )
 }
 
 KadasPointItem::KadasPointItem( Qgis::MarkerShape icon )
-  : QgsAnnotationMarkerItem( QgsPoint() )
-  , KadasMapItemAnnotationInterface()
+  : KadasQgsAnnotationWrapper()
 {
+  mQgsItem = new QgsAnnotationMarkerItem( QgsPoint() );
   setShape( icon );
   clear();
 }
 
-QgsAnnotationMarkerItem *KadasPointItem::clone() const
+
+KadasPointItem *KadasPointItem::clone() const
 {
-  QgsAnnotationMarkerItem *item = QgsAnnotationMarkerItem::clone();
+  KadasPointItem *item = new KadasPointItem();
+  item->mQgsItem = mQgsItem->clone();
+  copyCommonPropertiesTo( item );
   return item;
 }
+
 
 QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
@@ -88,7 +93,7 @@ void KadasPointItem::updateSymbol()
   symbolLayer->setStrokeColor( mStrokeColor );
   symbolLayer->setColor( mFillColor );
 
-  setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+  mQgsItem->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
 }
 
 
@@ -266,4 +271,25 @@ void KadasPointItem::recomputeDerived()
     multiGeom->addGeometry( new QgsPoint( point ) );
   }
   setInternalGeometry( multiGeom );
+}
+
+
+bool KadasPointItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
+{
+  if ( !mGeometry )
+  {
+    return false;
+  }
+  QgsRectangle r = QgsCoordinateTransform( settings.destinationCrs(), crs(), QgsProject::instance() ).transform( rect );
+
+  QgsPolygon filterRect;
+  QgsLineString *exterior = new QgsLineString();
+  exterior->setPoints( QgsPointSequence() << QgsPoint( r.xMinimum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMinimum() ) );
+  filterRect.setExteriorRing( exterior );
+
+  QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
+  bool intersects = false;
+  intersects = contains ? geomEngine->contains( mGeometry ) : geomEngine->intersects( mGeometry );
+  delete geomEngine;
+  return intersects;
 }

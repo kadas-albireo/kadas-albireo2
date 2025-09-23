@@ -65,7 +65,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
   if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     pickResult.layer = layer;
-    KadasMapItemAnnotationInterface *iface = layer->items()[pickResult.itemId];
+    KadasMapItemBase *iface = layer->items()[pickResult.itemId];
     const QgsAnnotationItem *item = iface->asAnnotationItem();
     pickResult.crs = iface->crs();
     if ( dynamic_cast<const KadasPointItem *>( item ) )

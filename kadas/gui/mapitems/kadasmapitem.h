@@ -203,18 +203,24 @@ class KADAS_GUI_EXPORT KadasItemPos
 // clang-format on
 #endif
 
-class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
+
+class KADAS_GUI_EXPORT KadasMapItemBase SIP_ABSTRACT
 {
     //    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
 
   public:
-    KadasMapItemAnnotationInterface();
-    virtual ~KadasMapItemAnnotationInterface() {}
+    KadasMapItemBase();
+    virtual ~KadasMapItemBase() {}
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
 
-    virtual KadasMapItemAnnotationInterface *clone() = 0;
+    virtual KadasMapItemBase *clone() const = 0;
+
+    void copyCommonPropertiesTo( KadasMapItemBase *other ) const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const = 0;
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) = 0;
 
     virtual void setCrs( const QgsCoordinateReferenceSystem &crs ) { mCrs = crs; }
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
@@ -292,6 +298,9 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
     void setVisible( bool visible );
     bool isVisible() const { return mVisible; }
 
+    void setZIndex( int index );
+    int zIndex() const { return mZIndex; }
+
     bool isPointSymbol() const { return mIsPointSymbol; }
 
     void preventAttachmentCleanup()
@@ -338,6 +347,8 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
 
+    virtual void render( QgsRenderContext &context, QgsFeedback *feedback ) = 0;
+
     // Editor
     void setEditor( const QString &editor ) { mEditor = editor; }
     const QString &editor() const { return mEditor; }
@@ -345,6 +356,9 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
     // Position interface
     virtual KadasItemPos position() const = 0;
     virtual void setPosition( const KadasItemPos &pos ) = 0;
+
+    virtual QgsRectangle boundingBox() const = 0;
+
 
     /* Margin in screen units */
     struct Margin
@@ -355,9 +369,50 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
         int bottom = 0;
     };
     virtual Margin margin() const { return Margin(); }
+
+    /* Hit test, rect in item crs */
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
+
+    /* Return the item point to the specified one */
+    virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
+
+
+  protected:
+    QgsCoordinateReferenceSystem mCrs;
+    bool mSelected = false;
+    int mZIndex = 0;
+    QString mTooltip;
+    bool mVisible = true;
+    double mSymbolScale = 1.0;
+    QgsMapLayer *mAssociatedLayer = nullptr;
+    KadasItemLayer *mOwnerLayer = nullptr;
+    bool mIsPointSymbol = false;
+
+  private:
+    bool mDontCleanupAttachment = false;
+    QString mEditor;
 };
 
-class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, public KadasMapItemAnnotationInterface SIP_ABSTRACT
+class KADAS_GUI_EXPORT KadasQgsAnnotationWrapper : public KadasMapItemBase SIP_ABSTRACT
+{
+  public:
+    ~KadasQgsAnnotationWrapper();
+
+    QgsAnnotationItem *item() const { return mQgsItem; }
+
+    bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
+    bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
+    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
+
+    virtual QgsRectangle boundingBox() const override;
+
+
+  protected:
+    QgsAnnotationItem *mQgsItem = nullptr;
+};
+
+class KADAS_GUI_EXPORT KadasMapItem : public QObject, public KadasMapItemBase SIP_ABSTRACT
 {
     Q_OBJECT
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
@@ -371,8 +426,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     KadasMapItem *clone() const override;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
-
-    QString type() const override { return itemName(); }
 
     bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
@@ -393,13 +446,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     };
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
-
-    /* Hit test, rect in item crs */
-    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
-    virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
-
-    /* Return the item point to the specified one */
-    virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
 
     virtual QImage symbolImage() const { return QImage(); }
@@ -470,20 +516,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
 
     static QgsRectangle pointWithTolerance( const QgsPointXY &point, double tol );
 
-  protected:
-    QgsCoordinateReferenceSystem mCrs;
-    bool mSelected = false;
-    int mZIndex = 0;
-    QString mTooltip;
-    bool mVisible = true;
-    double mSymbolScale = 1.0;
-    QgsMapLayer *mAssociatedLayer = nullptr;
-    KadasItemLayer *mOwnerLayer = nullptr;
-    bool mIsPointSymbol = false;
 
-  private:
-    bool mDontCleanupAttachment = false;
-    QString mEditor;
 
     QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
 

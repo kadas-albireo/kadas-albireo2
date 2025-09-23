@@ -52,7 +52,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
       bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
       for ( QgsAnnotationItem *item : std::as_const( mRenderItems ) )
       {
-        KadasMapItemAnnotationInterface *iface = dynamic_cast<KadasMapItemAnnotationInterface *>( item );
+        KadasMapItemBase *iface = dynamic_cast<KadasMapItemBase *>( item );
         if ( item && iface && iface->isVisible() && ( !omitSinglePoint || !iface->isPointSymbol() ) )
         {
           renderContext()->painter()->save();
@@ -90,7 +90,7 @@ KadasItemLayer::~KadasItemLayer()
   qDeleteAll( mItems );
 }
 
-KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItemAnnotationInterface *item )
+KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItemBase *item )
 {
   ItemId id = ITEM_ID_NULL;
   if ( !mFreeIds.isEmpty() )
@@ -128,9 +128,9 @@ void KadasItemLayer::raiseItem( const ItemId &itemId )
   emit repaintRequested();
 }
 
-KadasMapItemAnnotationInterface *KadasItemLayer::takeItem( const ItemId &itemId )
+KadasMapItemBase *KadasItemLayer::takeItem( const ItemId &itemId )
 {
-  KadasMapItemAnnotationInterface *item = mItems.take( itemId );
+  KadasMapItemBase *item = mItems.take( itemId );
   if ( item )
   {
     item->setOwnerLayer( nullptr );
@@ -251,7 +251,7 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, cons
 {
   for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
   {
-    KadasMapItem *item = mItems[*it];
+    KadasMapItemBase *item = mItems[*it];
     if ( pickObjective == PickObjective::PICK_OBJECTIVE_TOOLTIP && item->tooltip().isEmpty() )
     {
       continue;
@@ -297,7 +297,7 @@ QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, 
   QTextStream outStream( &outString );
   outStream << "<Folder>" << "\n";
   outStream << "<name>" << name() << "</name>" << "\n";
-  for ( const KadasMapItem *item : mItems )
+  for ( const KadasMapItemBase *item : mItems )
   {
     if ( !exportRect.isEmpty() )
     {
@@ -318,7 +318,7 @@ QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, 
 void KadasItemLayer::setSymbolScale( double scale )
 {
   mSymbolScale = scale;
-  for ( KadasMapItem *item : mItems )
+  for ( KadasMapItemBase *item : std::as_const( mItems ) )
   {
     item->setSymbolScale( scale );
   }

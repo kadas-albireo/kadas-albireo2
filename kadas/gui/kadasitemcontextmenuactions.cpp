@@ -72,7 +72,7 @@ void KadasItemContextMenuActions::deleteItem( bool preventAttachmentCleanup )
 {
   if ( mLayerItemId != KadasItemLayer::ITEM_ID_NULL )
   {
-    KadasMapItemAnnotationInterface *item = mLayer->takeItem( mLayerItemId );
+    KadasMapItemBase *item = mLayer->takeItem( mLayerItemId );
     if ( preventAttachmentCleanup )
     {
       item->preventAttachmentCleanup();

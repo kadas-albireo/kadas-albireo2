@@ -24,17 +24,17 @@
 #include "kadasmapitem.h"
 
 
-class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public KadasMapItemAnnotationInterface
+class KADAS_GUI_EXPORT KadasPointItem : public KadasQgsAnnotationWrapper
 {
     // Q_OBJECT
 
   public:
     KadasPointItem( Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
-
-    KadasPointItem( const QgsAnnotationMarkerItem &item );
+    virtual ~KadasPointItem();
 
     QString itemName() const override { return QObject::tr( "Point" ); }
 
+    KadasPointItem *clone() const override;
 
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const override;
 
@@ -68,20 +68,9 @@ class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public K
     const QgsMultiPoint *geometry() const;
 
   protected:
-    QgsCoordinateReferenceSystem mCrs;
-    bool mSelected = false;
-    int mZIndex = 0;
-    QString mTooltip;
-    bool mVisible = true;
-    double mSymbolScale = 1.0;
-    QgsMapLayer *mAssociatedLayer = nullptr;
-    KadasItemLayer *mOwnerLayer = nullptr;
-    bool mIsPointSymbol = false;
+    bool mIsPointSymbol = true;
 
   private:
-    bool mDontCleanupAttachment = false;
-    QString mEditor;
-
     void updateSymbol();
 
     Qgis::MarkerShape mShape = Qgis::MarkerShape::Circle;
@@ -98,6 +87,11 @@ class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public K
     };
 
     QgsMultiPoint mGeometry;
+
+
+    // KadasMapItemBase interface
+  public:
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const override;
 };
 
 #endif // KADASPOINTITEM_H
