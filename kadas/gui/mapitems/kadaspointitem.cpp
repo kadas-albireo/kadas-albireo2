@@ -53,7 +53,8 @@ bool KadasPointItem::State::deserialize( const QJsonObject &json )
 }
 
 KadasPointItem::KadasPointItem( IconType icon )
-  : KadasGeometryItem()
+  : QgsAnnotationMarkerItem()
+  , KadasMapItemAnnotationInterface()
 {
   setIconType( icon );
   clear();

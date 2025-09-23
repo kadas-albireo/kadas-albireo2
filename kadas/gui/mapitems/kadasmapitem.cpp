@@ -53,8 +53,20 @@ Q_GLOBAL_STATIC( KadasMapItem::Registry, sRegistry )
 std::once_flag onceFlagMapItemRegistry;
 
 
+KadasMapItemAnnotationInterface::KadasMapItemAnnotationInterface()
+{
+}
+
+QString KadasMapItemAnnotationInterface::exportName() const
+{
+  return itemName();
+}
+
+
 KadasMapItem::KadasMapItem()
   : QObject()
+  , QgsAnnotationItem()
+  , KadasMapItemAnnotationInterface()
 {
 }
 
@@ -195,11 +207,6 @@ bool KadasMapItem::readXml( const QDomElement &element, const QgsReadWriteContex
     return false;
   }
   return true;
-}
-
-QString KadasMapItem::exportName() const
-{
-  return itemName();
 }
 
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )

@@ -203,7 +203,148 @@ class KADAS_GUI_EXPORT KadasItemPos
 // clang-format on
 #endif
 
-class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem SIP_ABSTRACT
+class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
+{
+  public:
+    KadasMapItemAnnotationInterface();
+
+    virtual QString itemName() const = 0;
+    virtual QString exportName() const;
+
+    class KADAS_GUI_EXPORT NumericAttribute
+    {
+      public:
+        QString name;
+        // clang-format off
+        enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.Type, Type )
+          {
+            TypeCoordinate,
+            TypeDistance,
+            TypeAngle,
+            TypeOther
+          };
+        // clang-format on
+        Type type = Type::TypeCoordinate;
+        double min = std::numeric_limits<double>::lowest();
+        double max = std::numeric_limits<double>::max();
+        int decimals = -1;
+        int precision( const QgsMapSettings &mapSettings ) const;
+        QString suffix( const QgsMapSettings &mapSettings ) const;
+    };
+
+    typedef QMap<int, NumericAttribute> AttribDefs;
+    typedef QMap<int, double> AttribValues;
+
+#ifndef SIP_RUN
+    /* Create KML representation */
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const = 0;
+#endif
+
+
+    // Draw interface (coordinates in map crs, attribute distances in map units)
+    virtual void clear();
+    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) = 0;
+    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+    virtual bool continuePart( const QgsMapSettings &mapSettings ) = 0;
+    virtual void endPart() = 0;
+
+    virtual AttribDefs drawAttribs() const = 0;
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
+
+    // Edit interface (coordinates in map crs, attribute distances in map units)
+    struct EditContext
+    {
+        EditContext()
+          : mValid( false )
+        {}
+
+        EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
+          : mValid( true )
+          , vidx( _vidx )
+          , pos( _pos )
+          , attributes( _attributes )
+          , cursor( _cursor )
+        {}
+
+        bool mValid = false;
+        QgsVertexId vidx;
+        KadasMapPos pos;
+        AttribDefs attributes;
+        Qt::CursorShape cursor;
+        bool isValid() const { return mValid; }
+        bool operator==( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
+        bool operator!=( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
+    };
+    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
+    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
+    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
+
+    enum class ContextMenuActions SIP_MONKEYPATCH_SCOPEENUM
+    {
+      EditNoAction,
+      EditSwitchToDrawingTool
+    };
+    virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}
+    virtual void onDoubleClick( const QgsMapSettings &mapSettings ) {}
+
+    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
+    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
+
+    // Editor
+    void setEditor( const QString &editor ) { mEditor = editor; }
+    const QString &editor() const { return mEditor; }
+
+    // Position interface
+    virtual KadasItemPos position() const = 0;
+    virtual void setPosition( const KadasItemPos &pos ) = 0;
+
+    /* Margin in screen units */
+    struct Margin
+    {
+        int left = 0;
+        int top = 0;
+        int right = 0;
+        int bottom = 0;
+    };
+    virtual Margin margin() const { return Margin(); }
+
+    // State interface
+    class State : public KadasStateHistory::State
+    {
+      public:
+        // clang-format off
+        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
+          {
+            Empty,
+            Drawing,
+            Finished
+          };
+        //< clang-format on
+
+        DrawStatus drawStatus = DrawStatus::Empty;
+        virtual void assign( const State *other ) = 0;
+        virtual State *clone() const = 0 SIP_FACTORY;
+        virtual QJsonObject serialize() const = 0;
+        virtual bool deserialize( const QJsonObject &json ) = 0;
+    };
+    const State *constState() const { return mState; }
+    virtual void setState( const State *state );
+
+  protected:
+    virtual State *createEmptyState() const = 0 SIP_FACTORY;
+    virtual KadasMapItemAnnotationInterface *_clone() const = 0 SIP_FACTORY;
+
+    State *mState = nullptr;
+
+  private:
+
+    QString mEditor;
+};
+
+class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, public KadasMapItemAnnotationInterface SIP_ABSTRACT
 {
     Q_OBJECT
     Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
@@ -219,26 +360,13 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
+    QString type() const override { return itemName(); }
+
     bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
 
-    QString type() const override { return itemName(); }
-
-    virtual QString itemName() const = 0;
-    virtual QString exportName() const;
-
     virtual void setCrs( const QgsCoordinateReferenceSystem &crs ) { mCrs = crs; }
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
-
-    /* Margin in screen units */
-    struct Margin
-    {
-        int left = 0;
-        int top = 0;
-        int right = 0;
-        int bottom = 0;
-    };
-    virtual Margin margin() const { return Margin(); }
 
     /* Nodes for editing */
     struct Node
@@ -261,10 +389,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     /* Return the item point to the specified one */
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
-#ifndef SIP_RUN
-    /* Create KML representation */
-    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const = 0;
-#endif
+
 
     /* Associate to layer */
     void associateToLayer( QgsMapLayer *layer );
@@ -305,111 +430,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     /* Trigger a redraw */
     void update();
 
-    // State interface
-    class State : public KadasStateHistory::State
-    {
-      public:
-        // clang-format off
-        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
-        {
-          Empty,
-          Drawing,
-          Finished
-        };
-        //< clang-format on
-
-        DrawStatus drawStatus = DrawStatus::Empty;
-        virtual void assign( const State *other ) = 0;
-        virtual State *clone() const = 0 SIP_FACTORY;
-        virtual QJsonObject serialize() const = 0;
-        virtual bool deserialize( const QJsonObject &json ) = 0;
-    };
-    const State *constState() const { return mState; }
-    virtual void setState( const State *state );
-
-    class KADAS_GUI_EXPORT NumericAttribute
-    {
-      public:
-        QString name;
-        // clang-format off
-        enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.Type, Type )
-        {
-          TypeCoordinate,
-          TypeDistance,
-          TypeAngle,
-          TypeOther
-        };
-        // clang-format on
-        Type type = Type::TypeCoordinate;
-        double min = std::numeric_limits<double>::lowest();
-        double max = std::numeric_limits<double>::max();
-        int decimals = -1;
-        int precision( const QgsMapSettings &mapSettings ) const;
-        QString suffix( const QgsMapSettings &mapSettings ) const;
-    };
-    typedef QMap<int, KadasMapItem::NumericAttribute> AttribDefs;
-    typedef QMap<int, double> AttribValues;
 
 
-    // Draw interface (coordinates in map crs, attribute distances in map units)
-    virtual void clear();
-    virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) = 0;
-    virtual bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    virtual void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) = 0;
-    virtual void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-    virtual bool continuePart( const QgsMapSettings &mapSettings ) = 0;
-    virtual void endPart() = 0;
-
-    virtual AttribDefs drawAttribs() const = 0;
-    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
-    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
-
-    // Edit interface (coordinates in map crs, attribute distances in map units)
-    struct EditContext
-    {
-        EditContext()
-          : mValid( false )
-        {}
-
-        EditContext( const QgsVertexId &_vidx, const KadasMapPos &_pos = KadasMapPos(), const AttribDefs &_attributes = KadasMapItem::AttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
-          : mValid( true )
-          , vidx( _vidx )
-          , pos( _pos )
-          , attributes( _attributes )
-          , cursor( _cursor )
-        {}
-
-        bool mValid = false;
-        QgsVertexId vidx;
-        KadasMapPos pos;
-        AttribDefs attributes;
-        Qt::CursorShape cursor;
-        bool isValid() const { return mValid; }
-        bool operator==( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
-        bool operator!=( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
-    };
-    virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
-    virtual void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
-    virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) = 0;
-
-    enum class ContextMenuActions SIP_MONKEYPATCH_SCOPEENUM
-    {
-      EditNoAction,
-      EditSwitchToDrawingTool
-    };
-    virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}
-    virtual void onDoubleClick( const QgsMapSettings &mapSettings ) {}
-
-    virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
-    virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
-
-    // Editor
-    void setEditor( const QString &editor ) { mEditor = editor; }
-    const QString &editor() const { return mEditor; }
-
-    // Position interface
-    virtual KadasItemPos position() const = 0;
-    virtual void setPosition( const KadasItemPos &pos ) = 0;
 
     // TODO: SIP
 #ifndef SIP_RUN
@@ -433,7 +455,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     void propertyChanged();
 
   protected:
-    State *mState = nullptr;
     QgsCoordinateReferenceSystem mCrs;
     bool mSelected = false;
     int mZIndex = 0;
@@ -444,7 +465,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     KadasItemLayer *mOwnerLayer = nullptr;
     bool mIsPointSymbol = false;
 
-    virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
@@ -462,12 +482,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem S
     static QgsRectangle pointWithTolerance( const QgsPointXY &point, double tol );
 
   private:
-    QString mEditor;
     bool mDontCleanupAttachment = false;
 
     QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
 
-    virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };
 
 #endif // KADASMAPITEM_H

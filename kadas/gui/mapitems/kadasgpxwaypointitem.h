@@ -48,7 +48,7 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 #endif
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxWaypointItem(); }
+    KadasMapItemAnnotationInterface *_clone() const override SIP_FACTORY { return new KadasGpxWaypointItem(); }
 
     QString mName;
     QFont mLabelFont;

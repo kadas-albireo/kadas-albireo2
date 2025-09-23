@@ -17,9 +17,11 @@
 #ifndef KADASPOINTITEM_H
 #define KADASPOINTITEM_H
 
+#include "qgis/qgsannotationmarkeritem.h"
+
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 
-class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
+class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public KadasMapItemAnnotationInterface
 {
     // Q_OBJECT
 
@@ -49,8 +51,8 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
-    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
-    void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
+    //Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
+    //void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
 
     const QgsMultiPoint *geometry() const;
 
@@ -65,9 +67,9 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasGeometryItem
     const State *constState() const { return static_cast<State *>( mState ); }
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem(); }
+    // TODO !!! KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem(); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
-    void recomputeDerived() override;
+    // TODO !!! void recomputeDerived() override;
 
   private:
     enum AttribIds

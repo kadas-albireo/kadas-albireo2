@@ -137,7 +137,7 @@ void KadasGeometryItem::render( QgsRenderContext &context, QgsFeedback *feedback
   context.painter()->setFont( measurementFont() );
   QFontMetrics metrics = context.painter()->fontMetrics();
 
-  for ( const MeasurementLabel &label : mMeasurementLabels )
+  for ( const MeasurementLabel &label : std::as_const( mMeasurementLabels ) )
   {
     QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( label.pos ) ).toQPointF();
     int width = label.width + 6;
