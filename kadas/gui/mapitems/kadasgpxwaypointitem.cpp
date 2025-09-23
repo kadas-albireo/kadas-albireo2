@@ -27,7 +27,7 @@
 
 
 KadasGpxWaypointItem::KadasGpxWaypointItem()
-  : KadasPointItem( IconType::ICON_CIRCLE )
+  : KadasPointItem( Qgis::MarkerShape::Circle )
 {
   setCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
   setEditor( KadasMapItemEditor::GPX_WAYPOINT );

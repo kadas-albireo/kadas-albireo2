@@ -18,17 +18,28 @@
 #define KADASPOINTITEM_H
 
 #include "qgis/qgsannotationmarkeritem.h"
+#include "qgis/qgsmultipoint.h"
 
-#include "kadas/gui/mapitems/kadasgeometryitem.h"
+#include "kadas_gui.h"
+#include "kadasmapitem.h"
+
 
 class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public KadasMapItemAnnotationInterface
 {
     // Q_OBJECT
 
   public:
-    KadasPointItem( KadasGeometryItem::IconType icon = KadasGeometryItem::IconType::ICON_CIRCLE );
+    KadasPointItem( Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
+
+    KadasPointItem( const QgsAnnotationMarkerItem &item );
 
     QString itemName() const override { return QObject::tr( "Point" ); }
+
+
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const override;
+
+
+    void setShape( Qgis::MarkerShape shape );
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
@@ -56,30 +67,37 @@ class KADAS_GUI_EXPORT KadasPointItem : public QgsAnnotationMarkerItem, public K
 
     const QgsMultiPoint *geometry() const;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
-    {
-        QList<KadasItemPos> points;
-        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        State *clone() const override SIP_FACTORY { return new State( *this ); }
-        QJsonObject serialize() const override;
-        bool deserialize( const QJsonObject &json ) override;
-    };
-    const State *constState() const { return static_cast<State *>( mState ); }
-
   protected:
-    // TODO !!! KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem(); }
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
-    // TODO !!! void recomputeDerived() override;
+    QgsCoordinateReferenceSystem mCrs;
+    bool mSelected = false;
+    int mZIndex = 0;
+    QString mTooltip;
+    bool mVisible = true;
+    double mSymbolScale = 1.0;
+    QgsMapLayer *mAssociatedLayer = nullptr;
+    KadasItemLayer *mOwnerLayer = nullptr;
+    bool mIsPointSymbol = false;
 
   private:
+    bool mDontCleanupAttachment = false;
+    QString mEditor;
+
+    void updateSymbol();
+
+    Qgis::MarkerShape mShape = Qgis::MarkerShape::Circle;
+    int mIconSize = 10;
+    QColor mStrokeColor = Qt::red;
+    double mStrokeWidth = 2;
+    QColor mFillColor = Qt::white;
+
+
     enum AttribIds
     {
       AttrX,
       AttrY
     };
 
-    QgsMultiPoint *geometry();
-    State *state() { return static_cast<State *>( mState ); }
+    QgsMultiPoint mGeometry;
 };
 
 #endif // KADASPOINTITEM_H

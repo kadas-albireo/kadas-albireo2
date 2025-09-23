@@ -19,6 +19,8 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 
 #include "kadas/gui/mapitems/kadaspointitem.h"
 
@@ -52,13 +54,43 @@ bool KadasPointItem::State::deserialize( const QJsonObject &json )
   return true;
 }
 
-KadasPointItem::KadasPointItem( IconType icon )
-  : QgsAnnotationMarkerItem()
+KadasPointItem::KadasPointItem( Qgis::MarkerShape icon )
+  : QgsAnnotationMarkerItem( QgsPoint() )
   , KadasMapItemAnnotationInterface()
 {
-  setIconType( icon );
+  setShape( icon );
   clear();
 }
+
+QgsAnnotationMarkerItem *KadasPointItem::clone() const
+{
+  QgsAnnotationMarkerItem *item = QgsAnnotationMarkerItem::clone();
+  return item;
+}
+
+QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
+{
+  // TODO !
+}
+
+void KadasPointItem::setShape( Qgis::MarkerShape shape )
+{
+  mShape = shape;
+  updateSymbol();
+}
+
+void KadasPointItem::updateSymbol()
+{
+  QgsSimpleMarkerSymbolLayer *symbolLayer = new QgsSimpleMarkerSymbolLayer();
+  symbolLayer->setShape( mShape );
+  symbolLayer->setSize( mIconSize );
+  symbolLayer->setStrokeWidth( mStrokeWidth );
+  symbolLayer->setStrokeColor( mStrokeColor );
+  symbolLayer->setColor( mFillColor );
+
+  setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
+}
+
 
 KadasItemPos KadasPointItem::position() const
 {
@@ -221,10 +253,10 @@ const QgsMultiPoint *KadasPointItem::geometry() const
   return static_cast<QgsMultiPoint *>( mGeometry );
 }
 
-QgsMultiPoint *KadasPointItem::geometry()
-{
-  return static_cast<QgsMultiPoint *>( mGeometry );
-}
+// QgsMultiPoint *KadasPointItem::geometry()
+// {
+//   return static_cast<QgsMultiPoint *>( mGeometry );
+// }
 
 void KadasPointItem::recomputeDerived()
 {

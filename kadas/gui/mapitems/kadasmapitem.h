@@ -205,11 +205,21 @@ class KADAS_GUI_EXPORT KadasItemPos
 
 class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
 {
+    //    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+
   public:
     KadasMapItemAnnotationInterface();
+    virtual ~KadasMapItemAnnotationInterface() {}
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
+
+    virtual KadasMapItemAnnotationInterface *clone() = 0;
+
+    virtual void setCrs( const QgsCoordinateReferenceSystem &crs ) { mCrs = crs; }
+    const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
+
+    const QgsAnnotationItem *asAnnotationItem() const { return dynamic_cast<const QgsAnnotationItem *>( this ); }
 
     class KADAS_GUI_EXPORT NumericAttribute
     {
@@ -253,6 +263,41 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
     virtual AttribDefs drawAttribs() const = 0;
     virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
     virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const = 0;
+
+    /* Associate to layer */
+    void associateToLayer( QgsMapLayer *layer );
+    QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }
+
+    /* Owner layer */
+    void setOwnerLayer( KadasItemLayer *layer );
+    KadasItemLayer *ownerLayer() const { return mOwnerLayer; }
+
+    /* Selected state */
+    void setSelected( bool selected );
+    bool selected() const { return mSelected; }
+
+    /* symbol scale */
+    void setSymbolScale( double scale );
+    double symbolScale() const { return mSymbolScale; }
+
+    /* authid */
+    void setAuthId( const QString &authId );
+    QString authId() const { return mCrs.authid(); }
+
+    /* tooltip */
+    void setTooltip( const QString &tooltip );
+    const QString &tooltip() const { return mTooltip; }
+
+    /* visibility */
+    void setVisible( bool visible );
+    bool isVisible() const { return mVisible; }
+
+    bool isPointSymbol() const { return mIsPointSymbol; }
+
+    void preventAttachmentCleanup()
+    {
+      mDontCleanupAttachment = true;
+    }
 
     // Edit interface (coordinates in map crs, attribute distances in map units)
     struct EditContext
@@ -310,44 +355,11 @@ class KADAS_GUI_EXPORT KadasMapItemAnnotationInterface SIP_ABSTRACT
         int bottom = 0;
     };
     virtual Margin margin() const { return Margin(); }
-
-    // State interface
-    class State : public KadasStateHistory::State
-    {
-      public:
-        // clang-format off
-        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
-          {
-            Empty,
-            Drawing,
-            Finished
-          };
-        //< clang-format on
-
-        DrawStatus drawStatus = DrawStatus::Empty;
-        virtual void assign( const State *other ) = 0;
-        virtual State *clone() const = 0 SIP_FACTORY;
-        virtual QJsonObject serialize() const = 0;
-        virtual bool deserialize( const QJsonObject &json ) = 0;
-    };
-    const State *constState() const { return mState; }
-    virtual void setState( const State *state );
-
-  protected:
-    virtual State *createEmptyState() const = 0 SIP_FACTORY;
-    virtual KadasMapItemAnnotationInterface *_clone() const = 0 SIP_FACTORY;
-
-    State *mState = nullptr;
-
-  private:
-
-    QString mEditor;
 };
 
 class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, public KadasMapItemAnnotationInterface SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
     Q_PROPERTY( QString authId READ authId WRITE setAuthId )
@@ -365,8 +377,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
 
-    virtual void setCrs( const QgsCoordinateReferenceSystem &crs ) { mCrs = crs; }
-    const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
+
+    virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 
     /* Nodes for editing */
     struct Node
@@ -390,47 +402,11 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
 
-
-    /* Associate to layer */
-    void associateToLayer( QgsMapLayer *layer );
-    QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }
-
-    /* Owner layer */
-    void setOwnerLayer( KadasItemLayer *layer );
-    KadasItemLayer *ownerLayer() const { return mOwnerLayer; }
-
-    /* Selected state */
-    void setSelected( bool selected );
-    bool selected() const { return mSelected; }
-
-    /* z-index */
-    void setZIndex( int zIndex );
-    int zIndex() const { return mZIndex; }
-
-    /* symbol scale */
-    void setSymbolScale( double scale );
-    double symbolScale() const { return mSymbolScale; }
-
-    /* authid */
-    void setAuthId( const QString &authId );
-    QString authId() const { return mCrs.authid(); }
-
-    /* tooltip */
-    void setTooltip( const QString &tooltip );
-    const QString &tooltip() const { return mTooltip; }
-
-    /* visibility */
-    void setVisible( bool visible );
-    bool isVisible() const { return mVisible; }
-
-    bool isPointSymbol() const { return mIsPointSymbol; }
     virtual QImage symbolImage() const { return QImage(); }
     virtual QPointF symbolAnchor() const { return QPointF( 0.5, 0.5 ); }
 
     /* Trigger a redraw */
     void update();
-
-
 
 
     // TODO: SIP
@@ -440,14 +416,32 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     static Registry *registry();
 #endif
 
-    void preventAttachmentCleanup()
-    {
-      mDontCleanupAttachment = true;
-    }
-
     // Props
     QMap<QString, QVariant> getProps() const;
     void setProps( const QMap<QString, QVariant> &props );
+
+    // State interface
+    class State : public KadasStateHistory::State
+    {
+      public:
+        // clang-format off
+        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
+          {
+            Empty,
+            Drawing,
+            Finished
+          };
+        //< clang-format on
+
+        DrawStatus drawStatus = DrawStatus::Empty;
+        virtual void assign( const State *other ) = 0;
+        virtual State *clone() const = 0 SIP_FACTORY;
+        virtual QJsonObject serialize() const = 0;
+        virtual bool deserialize( const QJsonObject &json ) = 0;
+    };
+    const State *constState() const { return mState; }
+    virtual void setState( const State *state );
+
 
   signals:
     void aboutToBeDestroyed();
@@ -455,15 +449,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
     void propertyChanged();
 
   protected:
-    QgsCoordinateReferenceSystem mCrs;
-    bool mSelected = false;
-    int mZIndex = 0;
-    QString mTooltip;
-    bool mVisible = true;
-    double mSymbolScale = 1.0;
-    QgsMapLayer *mAssociatedLayer = nullptr;
-    KadasItemLayer *mOwnerLayer = nullptr;
-    bool mIsPointSymbol = false;
+    virtual State *createEmptyState() const = 0 SIP_FACTORY;
+
+    State *mState = nullptr;
+
 
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
@@ -481,8 +470,20 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject, public QgsAnnotationItem, 
 
     static QgsRectangle pointWithTolerance( const QgsPointXY &point, double tol );
 
+  protected:
+    QgsCoordinateReferenceSystem mCrs;
+    bool mSelected = false;
+    int mZIndex = 0;
+    QString mTooltip;
+    bool mVisible = true;
+    double mSymbolScale = 1.0;
+    QgsMapLayer *mAssociatedLayer = nullptr;
+    KadasItemLayer *mOwnerLayer = nullptr;
+    bool mIsPointSymbol = false;
+
   private:
     bool mDontCleanupAttachment = false;
+    QString mEditor;
 
     QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
 

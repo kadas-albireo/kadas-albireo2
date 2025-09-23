@@ -22,6 +22,7 @@
 
 #include "kadas/core/kadaspluginlayer.h"
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 class QMenu;
 class QuaZip;
@@ -148,11 +149,11 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QString layerTypeKey() const override { return layerType(); }
     virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
-    ItemId addItem( KadasMapItem *item SIP_TRANSFER );
+    ItemId addItem( KadasMapItemAnnotationInterface *item SIP_TRANSFER );
     void lowerItem( const ItemId &itemId );
     void raiseItem( const ItemId &itemId );
-    KadasMapItem *takeItem( const ItemId &itemId ) SIP_TRANSFER;
-    const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const { return mItems; }
+    KadasMapItemAnnotationInterface *takeItem( const ItemId &itemId ) SIP_TRANSFER;
+    const QMap<KadasItemLayer::ItemId, KadasMapItemAnnotationInterface *> &items() const { return mItems; }
 
     KadasItemLayer *clone() const override SIP_FACTORY;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
@@ -185,7 +186,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
-    QMap<ItemId, KadasMapItem *> mItems;
+    QMap<ItemId, KadasMapItemAnnotationInterface *> mItems;
     QList<ItemId> mItemOrder;
     QMap<ItemId, QgsRectangle> mItemBounds;
     ItemId mIdCounter = 0;

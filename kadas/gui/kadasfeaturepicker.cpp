@@ -22,9 +22,11 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
+#include <qgis/qgsmultipoint.h>
 
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasfeaturepicker.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 #include "kadas/gui/milx/kadasmilxitem.h"
 
@@ -63,15 +65,21 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
   if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
   {
     pickResult.layer = layer;
-    KadasMapItem *item = layer->items()[pickResult.itemId];
-    pickResult.crs = item->crs();
-    if ( dynamic_cast<KadasGeometryItem *>( item ) )
+    KadasMapItemAnnotationInterface *iface = layer->items()[pickResult.itemId];
+    const QgsAnnotationItem *item = iface->asAnnotationItem();
+    pickResult.crs = iface->crs();
+    if ( dynamic_cast<const KadasPointItem *>( item ) )
     {
-      pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
+      const QgsMultiPoint *geom = dynamic_cast<const KadasPointItem *>( item )->geometry();
+      pickResult.geom = geom->clone();
     }
-    else if ( dynamic_cast<KadasMilxItem *>( item ) )
+    else if ( dynamic_cast<const KadasGeometryItem *>( item ) )
     {
-      pickResult.geom = static_cast<KadasMilxItem *>( item )->toGeometry();
+      pickResult.geom = dynamic_cast<const KadasGeometryItem *>( item )->geometry()->clone();
+    }
+    else if ( dynamic_cast<const KadasMilxItem *>( item ) )
+    {
+      pickResult.geom = dynamic_cast<const KadasMilxItem *>( item )->toGeometry();
     }
   }
   return pickResult;

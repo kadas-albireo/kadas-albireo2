@@ -29,6 +29,7 @@
 #include <qgis/qgssettings.h>
 
 #include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 
@@ -40,7 +41,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     {
       for ( ItemId id : std::as_const( layer->mItemOrder ) )
       {
-        mRenderItems.append( layer->mItems[id]->clone() );
+        mRenderItems.append( layer->mItems[id]->asAnnotationItem()->clone() );
       }
       std::stable_sort( mRenderItems.begin(), mRenderItems.end(), []( KadasMapItem *a, KadasMapItem *b ) { return a->zIndex() < b->zIndex(); } );
       mRenderOpacity = layer->opacity();
@@ -49,13 +50,14 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     bool render() override
     {
       bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
-      for ( KadasMapItem *item : std::as_const( mRenderItems ) )
+      for ( QgsAnnotationItem *item : std::as_const( mRenderItems ) )
       {
-        if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
+        KadasMapItemAnnotationInterface *iface = dynamic_cast<KadasMapItemAnnotationInterface *>( item );
+        if ( item && iface && iface->isVisible() && ( !omitSinglePoint || !iface->isPointSymbol() ) )
         {
           renderContext()->painter()->save();
           renderContext()->painter()->setOpacity( mRenderOpacity );
-          renderContext()->setCoordinateTransform( QgsCoordinateTransform( item->crs(), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() ) );
+          renderContext()->setCoordinateTransform( QgsCoordinateTransform( iface->crs(), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() ) );
           item->render( *renderContext(), feedback() );
           renderContext()->painter()->restore();
         }
@@ -64,7 +66,7 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
 
   private:
-    QList<KadasMapItem *> mRenderItems;
+    QList<QgsAnnotationItem *> mRenderItems;
     double mRenderOpacity = 1.;
 };
 
@@ -88,7 +90,7 @@ KadasItemLayer::~KadasItemLayer()
   qDeleteAll( mItems );
 }
 
-KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
+KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItemAnnotationInterface *item )
 {
   ItemId id = ITEM_ID_NULL;
   if ( !mFreeIds.isEmpty() )
@@ -103,7 +105,7 @@ KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
   mItems.insert( id, item );
   mItemOrder.append( id );
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
-  mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
+  mItemBounds.insert( id, trans.transformBoundingBox( item->asAnnotationItem()->boundingBox() ) );
   item->setSymbolScale( mSymbolScale );
   emit itemAdded( id );
   emit repaintRequested();
@@ -126,9 +128,9 @@ void KadasItemLayer::raiseItem( const ItemId &itemId )
   emit repaintRequested();
 }
 
-KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
+KadasMapItemAnnotationInterface *KadasItemLayer::takeItem( const ItemId &itemId )
 {
-  KadasMapItem *item = mItems.take( itemId );
+  KadasMapItemAnnotationInterface *item = mItems.take( itemId );
   if ( item )
   {
     item->setOwnerLayer( nullptr );
