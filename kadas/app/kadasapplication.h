@@ -35,6 +35,7 @@ class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
 class QgsMessageOutput;
+class QgsNetworkLogger;
 class QgsPointCloudLayer;
 class QgsPrintLayout;
 class QgsRasterLayer;
@@ -47,6 +48,7 @@ class KadasLayerRefreshManager;
 class KadasMainWindow;
 class KadasMapToolPan;
 class KadasMessageLogViewer;
+class KadasNetworkLoggerDialog;
 class KadasPluginInterface;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
@@ -123,6 +125,7 @@ class KadasApplication : public QgsApplication
   public slots:
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
     void showPythonConsole();
+    void showNetworkLogger();
     void unsetMapTool();
 
     void initAfterExec();
@@ -155,6 +158,8 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
+    QgsNetworkLogger *mNetworkLogger = nullptr;
+    KadasNetworkLoggerDialog *mNetworkLoggerDialog = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;
