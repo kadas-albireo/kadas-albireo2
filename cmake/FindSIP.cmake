@@ -51,19 +51,13 @@ else(SIP_VERSION)
     string(REGEX REPLACE ".*\ndefault_sip_dir:([^\n]+).*$" "\\1"
                          SIP_DEFAULT_SIP_DIR ${sip_config}
     )
-    if(${SIP_VERSION_STR} VERSION_LESS 5)
-      string(REGEX REPLACE ".*\nsip_bin:([^\n]+).*$" "\\1" SIP_BINARY_PATH
-                           ${sip_config}
+    if(WITH_VCPKG AND WIN32)
+      set(SIP_BUILD_EXECUTABLE
+          "${VCPKG_BASE_DIR}/${VCPKG_HOST_TRIPLET}/tools/python3/Scripts/sip-build.bat"
       )
-      string(REGEX REPLACE ".*\nsip_inc_dir:([^\n]+).*$" "\\1" SIP_INCLUDE_DIR
-                           ${sip_config}
-      )
-      string(REGEX REPLACE ".*\nsip_module_dir:([^\n]+).*$" "\\1"
-                           SIP_MODULE_DIR ${sip_config}
-      )
-    else(${SIP_VERSION_STR} VERSION_LESS 5)
+    else()
       find_program(SIP_BUILD_EXECUTABLE sip-build)
-    endif(${SIP_VERSION_STR} VERSION_LESS 5)
+    endif()
     set(SIP_FOUND TRUE)
   endif(sip_config)
 
