@@ -403,6 +403,9 @@ void KadasMainWindow::init()
   QShortcut *pythonConsoleShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_P ), this );
   connect( pythonConsoleShortcut, &QShortcut::activated, kApp, &KadasApplication::showPythonConsole );
 
+  QShortcut *networkLoggerShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_L ), this );
+  connect( networkLoggerShortcut, &QShortcut::activated, kApp, &KadasApplication::showNetworkLogger );
+
   // Restore geometry
   restoreGeometry( QgsSettings().value( "/kadas/windowgeometry" ).toByteArray() );
 }

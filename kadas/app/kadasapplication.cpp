@@ -43,6 +43,7 @@
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgsmessageviewer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsnetworklogger.h>
 #include <qgis/qgspointcloudlayer.h>
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgslayeritem.h>
@@ -64,6 +65,7 @@
 #include <qgis/qgsziputils.h>
 #include <qgis/qgsdockablewidgethelper.h>
 
+#include "kadas/app/devtools/kadasnetworkloggerdialog.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -305,6 +307,9 @@ void KadasApplication::init()
   QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) {
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
+
+  // start the network logger early, we want all requests logged!
+  mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
 
   // Extract portal token before loading catalog
   const QString tokenUrl = settingsPortalTokenUrl->value();
@@ -1679,6 +1684,14 @@ void KadasApplication::loadPythonSupport()
 void KadasApplication::showPythonConsole()
 {
   mPythonIntegration->showConsole();
+}
+
+void KadasApplication::showNetworkLogger()
+{
+  if ( mNetworkLoggerDialog == nullptr )
+    mNetworkLoggerDialog = new KadasNetworkLoggerDialog( mNetworkLogger, mMainWindow );
+
+  mNetworkLoggerDialog->show();
 }
 
 QgsMessageOutput *KadasApplication::messageOutputViewer()
