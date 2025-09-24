@@ -1689,9 +1689,19 @@ void KadasApplication::showPythonConsole()
 void KadasApplication::showNetworkLogger()
 {
   if ( mNetworkLoggerDockWidget == nullptr )
+  {
     mNetworkLoggerDockWidget = new KadasNetworkLoggerDockWidget( mNetworkLogger, mMainWindow );
+    mMainWindow->addDockWidget( Qt::RightDockWidgetArea, mNetworkLoggerDockWidget );
+  }
 
-  mMainWindow->addDockWidget( Qt::RightDockWidgetArea, mNetworkLoggerDockWidget );
+  if( mNetworkLoggerDockWidget->isVisible() )
+  {
+    mNetworkLoggerDockWidget->close();
+  }
+  else
+  {
+    mNetworkLoggerDockWidget->show();
+  }
 }
 
 QgsMessageOutput *KadasApplication::messageOutputViewer()
