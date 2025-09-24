@@ -1694,7 +1694,7 @@ void KadasApplication::showNetworkLogger()
     mMainWindow->addDockWidget( Qt::RightDockWidgetArea, mNetworkLoggerDockWidget );
   }
 
-  if( mNetworkLoggerDockWidget->isVisible() )
+  if ( mNetworkLoggerDockWidget->isVisible() )
   {
     mNetworkLoggerDockWidget->close();
   }
