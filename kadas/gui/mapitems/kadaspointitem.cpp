@@ -242,6 +242,18 @@ void KadasPointItem::setFillColor( const QColor &newFillColor )
   mFillColor = newFillColor;
 }
 
+KadasMapItem *KadasPointItem::_clone() const SIP_FACTORY
+{
+  KadasPointItem *item = new KadasPointItem( crs() );
+  item->mQgsItem = mQgsItem->clone();
+  item->mShape = mShape;
+  item->mIconSize = mIconSize;
+  item->mStrokeColor = mStrokeColor;
+  item->mStrokeWidth = mStrokeWidth;
+  item->mFillColor = mFillColor;
+  return item;
+}
+
 
 QgsRectangle KadasPointItem::boundingBox() const
 {

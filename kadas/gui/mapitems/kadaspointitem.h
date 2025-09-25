@@ -90,7 +90,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 
   protected:
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPointItem( crs() ); }
+    KadasMapItem *_clone() const override;
     // void recomputeDerived() override;
 
   private:
@@ -98,9 +98,9 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 
     QgsAnnotationMarkerItem *mQgsItem = nullptr;
     Qgis::MarkerShape mShape = Qgis::MarkerShape::Circle;
-    int mIconSize = 3;
+    int mIconSize = 4;
     QColor mStrokeColor = Qt::red;
-    double mStrokeWidth = .5;
+    double mStrokeWidth = 1;
     QColor mFillColor = Qt::white;
 
     enum AttribIds

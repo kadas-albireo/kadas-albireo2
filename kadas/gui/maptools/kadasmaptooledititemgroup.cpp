@@ -152,7 +152,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
       // Special actions
       int nPoints = 0;
       int nPins = 0;
-      for ( const KadasMapItem *item : mItems )
+      for ( const KadasMapItem *item : std::as_const( mItems ) )
       {
         if ( dynamic_cast<const KadasPointItem *>( item ) )
         {
