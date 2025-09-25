@@ -98,9 +98,9 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 
     QgsAnnotationMarkerItem *mQgsItem = nullptr;
     Qgis::MarkerShape mShape = Qgis::MarkerShape::Circle;
-    int mIconSize = 10;
+    int mIconSize = 3;
     QColor mStrokeColor = Qt::red;
-    double mStrokeWidth = 2;
+    double mStrokeWidth = .5;
     QColor mFillColor = Qt::white;
 
     enum AttribIds

@@ -338,7 +338,7 @@ void KadasMapToolCreateItem::createItem()
   {
     mItem = mInterface->createItem();
   }
-  else
+  else if ( mItem )
   {
     KadasMapItem::State *state = mItem->constState()->clone();
     state->drawStatus = KadasMapItem::State::DrawStatus::Drawing;
