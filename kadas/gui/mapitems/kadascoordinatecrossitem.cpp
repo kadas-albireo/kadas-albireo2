@@ -50,9 +50,9 @@ KadasCoordinateCrossItem::KadasCoordinateCrossItem( const QgsCoordinateReference
   clear();
 }
 
-KadasItemRect KadasCoordinateCrossItem::boundingBox() const
+QgsRectangle KadasCoordinateCrossItem::boundingBox() const
 {
-  return KadasItemRect( constState()->pos.x(), constState()->pos.y(), constState()->pos.x(), constState()->pos.y() );
+  return QgsRectangle( constState()->pos.x(), constState()->pos.y(), constState()->pos.x(), constState()->pos.y() );
 }
 
 KadasMapItem::Margin KadasCoordinateCrossItem::margin() const
@@ -65,7 +65,7 @@ QList<KadasMapItem::Node> KadasCoordinateCrossItem::nodes( const QgsMapSettings 
   return { { toMapPos( constState()->pos, settings ) } };
 }
 
-bool KadasCoordinateCrossItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasCoordinateCrossItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   double mapCrossSize = sCrossSize * settings.mapUnitsPerPixel();
   KadasMapPos itemMapPos = toMapPos( constState()->pos, settings );

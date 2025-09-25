@@ -89,9 +89,9 @@ void KadasAnchoredItem::setAngle( double angle )
   update();
 }
 
-KadasItemRect KadasAnchoredItem::boundingBox() const
+QgsRectangle KadasAnchoredItem::boundingBox() const
 {
-  return KadasItemRect( constState()->pos, constState()->pos );
+  return QgsRectangle( constState()->pos, constState()->pos );
 }
 
 QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const
@@ -153,7 +153,7 @@ QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settin
   return nodes;
 }
 
-bool KadasAnchoredItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasAnchoredItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->size.isEmpty() )
   {

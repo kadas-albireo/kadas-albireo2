@@ -35,6 +35,7 @@ class QuaZip;
 class KadasItemLayer;
 class KadasMapItem;
 
+class QgsAnnotationItem;
 class QgsRenderContext;
 class QgsMapSettings;
 class QgsMapLayer;
@@ -290,6 +291,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
+    virtual QgsAnnotationItem *annotationItem() const { return nullptr; }
+
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
 
@@ -297,7 +300,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
 
     /* Bounding box in geographic coordinates */
-    virtual KadasItemRect boundingBox() const = 0;
+    virtual QgsRectangle boundingBox() const = 0;
 
     /* Margin in screen units */
     struct Margin
@@ -324,7 +327,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
     /* Hit test, rect in item crs */
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     /* Return the item point to the specified one */
@@ -479,9 +482,18 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setEditor( const QString &editor ) { mEditor = editor; }
     const QString &editor() const { return mEditor; }
 
-    // Position interface
-    virtual KadasItemPos position() const = 0;
-    virtual void setPosition( const KadasItemPos &pos ) = 0;
+    //! Position interface is implemented for non QgsAnnotationItem based items
+    //! Once every item has been migrated this should be dropped
+    virtual KadasItemPos position() const
+    {
+      Q_ASSERT( false );
+      return KadasItemPos();
+    }
+    virtual void setPosition( const KadasItemPos &pos ) { Q_ASSERT( false ); }
+
+    //! This shoulb be reimplemented for QgsAnnotation based items
+    //! Once every item has been migrated this should become pure virtual
+    virtual void translate( double dx, double dy ) { Q_ASSERT( false ); }
 
     // TODO: SIP
 #ifndef SIP_RUN
@@ -528,7 +540,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
+    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;

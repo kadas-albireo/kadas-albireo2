@@ -40,9 +40,9 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
 
-  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), KadasPointItem::IconType::ICON_CIRCLE );
-  mPosMarker->setIconFill( Qt::blue );
-  mPosMarker->setIconOutline( QPen( Qt::blue ) );
+  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), Qgis::MarkerShape::Circle );
+  mPosMarker->setColor( Qt::blue );
+  mPosMarker->setStrokeColor( Qt::blue );
   mPosMarker->setZIndex( 100 );
   KadasMapCanvasItemManager::instance()->addItem( mPosMarker );
 
@@ -91,7 +91,7 @@ void KadasMapToolHeightProfile::setMarkerPos( double distance )
       double k = distance / segDist;
       double x = points[i].x() + ( points[i + 1].x() - points[i].x() ) * k;
       double y = points[i].y() + ( points[i + 1].y() - points[i].y() ) * k;
-      mPosMarker->setPosition( KadasItemPos( x, y ) );
+      mPosMarker->setPoint( QgsPoint( x, y ) );
       return;
     }
     else
@@ -99,7 +99,7 @@ void KadasMapToolHeightProfile::setMarkerPos( double distance )
       distance -= segDist;
     }
   }
-  mPosMarker->setPosition( points.last() );
+  mPosMarker->setPoint( points.last() );
 }
 
 void KadasMapToolHeightProfile::pickLine()
@@ -144,7 +144,7 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
       }
       if ( std::sqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
       {
-        mPosMarker->setPosition( KadasItemPos::fromPoint( minPos ) );
+        mPosMarker->setPoint( minPos );
         mDialog->setMarkerPos( minIdx, minPos, mCanvas->mapSettings().destinationCrs() );
       }
     }
@@ -204,7 +204,7 @@ void KadasMapToolHeightProfile::drawFinished()
       mDialog->setPoints( points, lineItem->crs() );
       QgsPoint markerPos( points[0] );
       mPosMarker->clear();
-      mPosMarker->addPartFromGeometry( markerPos );
+      mPosMarker->setPoint( markerPos );
     }
   }
 }

@@ -250,7 +250,7 @@ QgsAbstractGeometry *KadasMilxItem::toGeometry() const
   }
 }
 
-KadasItemRect KadasMilxItem::boundingBox() const
+QgsRectangle KadasMilxItem::boundingBox() const
 {
   QgsRectangle r;
 
@@ -265,7 +265,7 @@ KadasItemRect KadasMilxItem::boundingBox() const
       r.include( p );
     }
   }
-  return KadasItemRect( r.xMinimum(), r.yMinimum(), r.xMaximum(), r.yMaximum() );
+  return r;
 }
 
 KadasMapItem::Margin KadasMilxItem::margin() const
@@ -299,15 +299,15 @@ QList<KadasMapItem::Node> KadasMilxItem::nodes( const QgsMapSettings &settings )
   return nodes;
 }
 
-bool KadasMilxItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasMilxItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( contains )
   {
-    return QgsRectangle( rect ).contains( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+    return QgsRectangle( rect ).contains( toMapRect( boundingBox(), settings ) );
   }
   else
   {
-    return QgsRectangle( rect ).intersects( QgsRectangle( toMapRect( boundingBox(), settings ) ) );
+    return QgsRectangle( rect ).intersects( toMapRect( boundingBox(), settings ) );
   }
 }
 

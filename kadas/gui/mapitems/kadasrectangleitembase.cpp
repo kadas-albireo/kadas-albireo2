@@ -142,7 +142,7 @@ void KadasRectangleItemBase::setState( const KadasMapItem::State *state )
   KadasMapItem::setState( state );
 }
 
-KadasItemRect KadasRectangleItemBase::boundingBox() const
+QgsRectangle KadasRectangleItemBase::boundingBox() const
 {
   double xmin = constState()->mPos.x(), xmax = constState()->mPos.x();
   double ymin = constState()->mPos.y(), ymax = constState()->mPos.y();
@@ -153,7 +153,7 @@ KadasItemRect KadasRectangleItemBase::boundingBox() const
     ymin = std::min( ymin, p.y() );
     ymax = std::max( ymax, p.y() );
   }
-  return KadasItemRect( xmin, ymin, xmax, ymax );
+  return QgsRectangle( xmin, ymin, xmax, ymax );
 }
 
 KadasMapItem::Margin KadasRectangleItemBase::margin() const
@@ -194,7 +194,7 @@ QList<KadasMapItem::Node> KadasRectangleItemBase::nodes( const QgsMapSettings &s
   return nodes;
 }
 
-bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasRectangleItemBase::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->mSize.isEmpty() )
   {

@@ -243,10 +243,10 @@ KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSet
   return KadasItemPos( pos.x(), pos.y() );
 }
 
-KadasMapRect KadasMapItem::toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const
+QgsRectangle KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
 {
   QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
-  return KadasMapRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
 KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
