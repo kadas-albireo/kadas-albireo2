@@ -1,7 +1,4 @@
-
-set(main_SRC
-  main.cpp
-)
+set(main_SRC main.cpp)
 
 if(WIN32)
   set(SHOW_CONSOLE
