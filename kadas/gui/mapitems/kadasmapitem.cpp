@@ -69,12 +69,21 @@ KadasMapItem::~KadasMapItem()
 KadasMapItem *KadasMapItem::clone() const
 {
   KadasMapItem *item = _clone();
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  item->mDrawStatus = mDrawStatus;
+  item->mEditor = mEditor;
+  if ( useProperties() )
   {
-    QMetaProperty prop = metaObject()->property( i );
-    prop.write( item, prop.read( this ) );
+    for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+    {
+      QMetaProperty prop = metaObject()->property( i );
+      prop.write( item, prop.read( this ) );
+    }
   }
-  item->setState( constState()->clone() );
+  if ( mState )
+    item->mState = mState->clone();
+
+  item->update();
+
   return item;
 }
 
@@ -170,12 +179,12 @@ void KadasMapItem::setSelected( bool selected )
   update();
 }
 
-void KadasMapItem::setAuthId( const QString &authId )
-{
-  mCrs = QgsCoordinateReferenceSystem( authId );
-  update();
-  emit propertyChanged();
-}
+// void KadasMapItem::setAuthId( const QString &authId )
+// {
+//   mCrs = QgsCoordinateReferenceSystem( authId );
+//   update();
+//   emit propertyChanged();
+// }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
@@ -237,16 +246,21 @@ KadasMapPos KadasMapItem::toMapPos( const KadasItemPos &itemPos, const QgsMapSet
   return KadasMapPos( pos.x(), pos.y() );
 }
 
+QgsPointXY KadasMapItem::toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const
+{
+  return QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemPos );
+}
+
 KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const
 {
   QgsPointXY pos = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( mapPos );
   return KadasItemPos( pos.x(), pos.y() );
 }
 
-KadasMapRect KadasMapItem::toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const
+QgsRectangle KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
 {
   QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
-  return KadasMapRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
 KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
@@ -375,13 +389,21 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
   itemEl.setAttribute( "name", metaObject()->className() );
   itemEl.setAttribute( "crs", crs().authid() );
   itemEl.setAttribute( "editor", editor() );
+  itemEl.setAttribute( "draw_status", qgsEnumValueToKey( mDrawStatus ) );
   if ( associatedLayer() )
   {
     itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
   }
   QJsonDocument doc;
-  doc.setObject( serialize() );
-  itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+  if ( useProperties() )
+  {
+    doc.setObject( serialize() );
+    itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+  }
+  else
+  {
+    writeXmlPrivate( itemEl );
+  }
   return itemEl;
 }
 
@@ -389,27 +411,38 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
 {
   QDomElement itemEl = element;
   QString name = itemEl.attribute( "name" );
-  QString crs = itemEl.attribute( "crs" );
+  QString crsCode = itemEl.attribute( "crs" );
   QString editor = itemEl.attribute( "editor" );
   QString layerId = itemEl.attribute( "associatedLayer" );
-  QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+  DrawStatus status = qgsEnumKeyToValue( itemEl.attribute( "draw_status", qgsEnumValueToKey( DrawStatus::Finished ) ), DrawStatus::Finished );
   KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
   if ( factory )
   {
-    KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
+    QgsCoordinateReferenceSystem crs( crsCode );
+    KadasMapItem *item = factory( crs );
     item->setEditor( editor );
+    item->setDrawStatus( status );
     if ( !layerId.isEmpty() )
     {
       item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
     }
-    if ( item->deserialize( data.object() ) )
+    if ( item->useProperties() )
     {
-      return item;
+      QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+      if ( item->deserialize( data.object() ) )
+      {
+        return item;
+      }
+      else
+      {
+        delete item;
+        QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
+      }
     }
     else
     {
-      delete item;
-      QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
+      item->readXmlPrivate( element );
+      return item;
     }
   }
   else

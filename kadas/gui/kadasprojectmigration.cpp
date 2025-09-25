@@ -188,114 +188,126 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       }
       else
       {
-        KadasGeometryItem *geomItem = nullptr;
-        QgsAbstractGeometry *geom = nullptr;
-
         if ( flags["shape"] == "point" )
         {
-          geom = new QgsPoint();
-          geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
+          KadasPointItem *pointItem = nullptr;
+          const QgsPointXY point = QgsGeometry::fromWkt( redliningItemEl.attribute( "geometry" ) ).asPoint();
 
           if ( isGps )
           {
-            geomItem = new KadasGpxWaypointItem();
-            static_cast<KadasGpxWaypointItem *>( geomItem )->setName( redliningItemEl.attribute( "text" ) );
+            pointItem = new KadasGpxWaypointItem();
+            static_cast<KadasGpxWaypointItem *>( pointItem )->setName( redliningItemEl.attribute( "text" ) );
           }
           else
           {
-            KadasPointItem::IconType iconType = KadasPointItem::IconType::ICON_CIRCLE;
+            Qgis::MarkerShape iconType = Qgis::MarkerShape::Circle;
             if ( flags["symbol"] == "circle" )
             {
-              iconType = KadasPointItem::IconType::ICON_CIRCLE;
+              iconType = Qgis::MarkerShape::Circle;
             }
             else if ( flags["symbol"] == "rectangle" )
             {
-              iconType = KadasPointItem::IconType::ICON_FULL_BOX;
+              iconType = Qgis::MarkerShape::Square;
             }
             else if ( flags["symbol"] == "triangle" )
             {
-              iconType = KadasPointItem::IconType::ICON_FULL_TRIANGLE;
+              iconType = Qgis::MarkerShape::Triangle;
             }
 
-            geomItem = new KadasPointItem( crs, iconType );
+            pointItem = new KadasPointItem( crs, iconType );
+            pointItem->setEditor( "KadasRedliningItemEditor" );
+          }
+
+          pointItem->setPoint( QgsPoint( point ) );
+
+          pointItem->setIconSize( 8 * redliningItemEl.attribute( "size" ).toInt() );
+          pointItem->setColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "fill" ) ) );
+          pointItem->setStrokeColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "outline" ) ) );
+          pointItem->setStrokeWidth( redliningItemEl.attribute( "size" ).toInt() );
+
+          item = pointItem;
+        }
+        else
+        {
+          QgsAbstractGeometry *geom = nullptr;
+
+          KadasGeometryItem *geomItem = nullptr;
+          if ( flags["shape"] == "line" )
+          {
+            geom = new QgsLineString();
+            geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
+            if ( isGps )
+            {
+              geomItem = new KadasGpxRouteItem();
+              static_cast<KadasGpxRouteItem *>( geomItem )->setName( redliningItemEl.attribute( "text" ) );
+              static_cast<KadasGpxRouteItem *>( geomItem )->setNumber( flags["routeNumber"] );
+            }
+            else
+            {
+              geomItem = new KadasLineItem( crs );
+              geomItem->setEditor( "KadasRedliningItemEditor" );
+            }
+          }
+          else if ( flags["shape"] == "polygon" )
+          {
+            geom = new QgsPolygon();
+            geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
+
+            geomItem = new KadasPolygonItem( crs );
             geomItem->setEditor( "KadasRedliningItemEditor" );
           }
-        }
-        else if ( flags["shape"] == "line" )
-        {
-          geom = new QgsLineString();
-          geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
-          if ( isGps )
+          else if ( flags["shape"] == "rectangle" )
           {
-            geomItem = new KadasGpxRouteItem();
-            static_cast<KadasGpxRouteItem *>( geomItem )->setName( redliningItemEl.attribute( "text" ) );
-            static_cast<KadasGpxRouteItem *>( geomItem )->setNumber( flags["routeNumber"] );
-          }
-          else
-          {
-            geomItem = new KadasLineItem( crs );
+            geom = new QgsPolygon();
+            geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
+
+            geomItem = new KadasRectangleItem( crs );
             geomItem->setEditor( "KadasRedliningItemEditor" );
           }
-        }
-        else if ( flags["shape"] == "polygon" )
-        {
-          geom = new QgsPolygon();
-          geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
-
-          geomItem = new KadasPolygonItem( crs );
-          geomItem->setEditor( "KadasRedliningItemEditor" );
-        }
-        else if ( flags["shape"] == "rectangle" )
-        {
-          geom = new QgsPolygon();
-          geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
-
-          geomItem = new KadasRectangleItem( crs );
-          geomItem->setEditor( "KadasRedliningItemEditor" );
-        }
-        else if ( flags["shape"] == "circle" )
-        {
-          // Circular strings were incorrectly serialized to wkt as ringpoint - center - ringpoint instead of 3x ringpoint
-          QgsCurvePolygon curve;
-          curve.fromWkt( redliningItemEl.attribute( "geometry" ) );
-          QgsPointSequence points;
-          curve.exteriorRing()->points( points );
-          if ( points.size() == 3 )
+          else if ( flags["shape"] == "circle" )
           {
-            points[1].setX( points[1].x() - points[0].distance( points[1] ) );
+            // Circular strings were incorrectly serialized to wkt as ringpoint - center - ringpoint instead of 3x ringpoint
+            QgsCurvePolygon curve;
+            curve.fromWkt( redliningItemEl.attribute( "geometry" ) );
+            QgsPointSequence points;
+            curve.exteriorRing()->points( points );
+            if ( points.size() == 3 )
+            {
+              points[1].setX( points[1].x() - points[0].distance( points[1] ) );
+            }
+
+            QgsCircularString *ring = new QgsCircularString();
+            ring->setPoints( points );
+            geom = new QgsCurvePolygon();
+            static_cast<QgsCurvePolygon *>( geom )->setExteriorRing( ring );
+
+            geomItem = new KadasCircleItem( crs );
+            geomItem->setEditor( "KadasRedliningItemEditor" );
           }
 
-          QgsCircularString *ring = new QgsCircularString();
-          ring->setPoints( points );
-          geom = new QgsCurvePolygon();
-          static_cast<QgsCurvePolygon *>( geom )->setExteriorRing( ring );
+          if ( geomItem && geom )
+          {
+            geomItem->addPartFromGeometry( *geom );
 
-          geomItem = new KadasCircleItem( crs );
-          geomItem->setEditor( "KadasRedliningItemEditor" );
+            QBrush brush;
+            brush.setColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "fill" ) ) );
+            brush.setStyle( QgsSymbolLayerUtils::decodeBrushStyle( redliningItemEl.attribute( "fill_style" ) ) );
+            geomItem->setFill( brush );
+
+            QPen pen;
+            pen.setColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "outline" ) ) );
+            pen.setStyle( QgsSymbolLayerUtils::decodePenStyle( redliningItemEl.attribute( "outline_style" ) ) );
+            pen.setWidth( redliningItemEl.attribute( "size" ).toInt() );
+            geomItem->setOutline( pen );
+
+            geomItem->setIconSize( 8 * pen.width() );
+            geomItem->setIconFill( brush );
+            geomItem->setIconOutline( QPen( pen.color(), pen.width(), pen.style() ) );
+
+            item = geomItem;
+          }
+          delete geom;
         }
-
-        if ( geomItem && geom )
-        {
-          geomItem->addPartFromGeometry( *geom );
-
-          QBrush brush;
-          brush.setColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "fill" ) ) );
-          brush.setStyle( QgsSymbolLayerUtils::decodeBrushStyle( redliningItemEl.attribute( "fill_style" ) ) );
-          geomItem->setFill( brush );
-
-          QPen pen;
-          pen.setColor( QgsSymbolLayerUtils::decodeColor( redliningItemEl.attribute( "outline" ) ) );
-          pen.setStyle( QgsSymbolLayerUtils::decodePenStyle( redliningItemEl.attribute( "outline_style" ) ) );
-          pen.setWidth( redliningItemEl.attribute( "size" ).toInt() );
-          geomItem->setOutline( pen );
-
-          geomItem->setIconSize( 8 * pen.width() );
-          geomItem->setIconFill( brush );
-          geomItem->setIconOutline( QPen( pen.color(), pen.width(), pen.style() ) );
-
-          item = geomItem;
-        }
-        delete geom;
       }
       if ( !item )
       {
@@ -304,7 +316,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
 
       QDomElement mapItemEl = doc.createElement( "MapItem" );
       mapItemEl.setAttribute( "name", item->metaObject()->className() );
-      mapItemEl.setAttribute( "crs", item->authId() );
+      mapItemEl.setAttribute( "crs", item->crs().authid() );
       QJsonDocument jsonDoc;
       jsonDoc.setObject( item->serialize() );
       mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );

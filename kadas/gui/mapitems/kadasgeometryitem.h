@@ -77,10 +77,10 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     KadasGeometryItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasGeometryItem();
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
